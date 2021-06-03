@@ -18,6 +18,7 @@
 plugins {
     id("com.android.application")
     kotlin("android")
+    kotlin("kapt")
 }
 
 android {
@@ -26,6 +27,7 @@ android {
 
     defaultConfig {
         applicationId = "com.nlab.practice"
+        multiDexEnabled = true
         minSdkVersion(AndroidConfig.MIN_SDK_VERSION)
         targetSdkVersion(AndroidConfig.TARGET_SDK_VERSION)
         versionCode = AndroidConfig.VERSION_CODE
@@ -52,6 +54,7 @@ android {
 
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_1_8.toString()
+        freeCompilerArgs = listOf("-Xopt-in=kotlin.RequiresOptIn")
     }
 
     buildFeatures {
@@ -67,17 +70,20 @@ dependencies {
     implementation(Dependencies.ANDROID_KTX)
     implementation(Dependencies.ANDROID_APPCOMPAT)
     implementation(Dependencies.ANDROID_MATERIAL)
-    implementation(Dependencies.ANDROID_CONSTRAINT_LAYOUT)
-    implementation(Dependencies.ANDROID_RECYCLER_VIEW)
-    implementation(Dependencies.ANDROID_LIFECYCLE_VIEWMODEL)
+    implementation(Dependencies.ANDROID_CONSTRAINTLAYOUT)
+    implementation(Dependencies.ANDROID_RECYCLERVIEW)
+    implementation(Dependencies.ANDROID_LIFECYCLE_VIEWMODEL_KTX)
+    implementation(Dependencies.ANDROID_LIFECYCLE_RUNTIME_KTX)
 
     testImplementation(Dependencies.TEST_JUNIT)
+    testImplementation(Dependencies.TEST_COROUTINES)
     testImplementation(Dependencies.TEST_MOCKITO)
+    testImplementation(Dependencies.TEST_MOCKITO_KOTLIN)
     androidTestImplementation(Dependencies.TEST_ANDROID_JUNIT_EXT)
     androidTestImplementation(Dependencies.TEST_ANDROID_JUNIT_ESPRESSO)
     androidTestImplementation(Dependencies.TEST_ANDROID_TEST_RUNNER)
     androidTestImplementation(Dependencies.TEST_ANDROID_TEST_RULES)
     androidTestImplementation(Dependencies.TEST_MOCKITO)
+    androidTestImplementation(Dependencies.TEST_MOCKITO_KOTLIN)
     androidTestImplementation(Dependencies.TEST_DEX_MAKER)
-    androidTestImplementation(Dependencies.TEST_ROBOLECTRIC)
 }
