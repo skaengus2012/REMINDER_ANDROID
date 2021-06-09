@@ -15,12 +15,13 @@
  *
  */
 
-package com.nlab.practice2021.domain.home
+package com.nlab.practice2021.domain.home.view
 
 import androidx.core.content.ContextCompat
 import com.nlab.practice2021.core.view.recyclerview.flow.FlowItemTypeViewHolderMaker
 import com.nlab.practice2021.core.view.recyclerview.ViewHolderMaker
 import com.nlab.practice2021.databinding.ViewHomeItemBinding
+import com.nlab.practice2021.domain.home.HomeItemViewModel
 
 /**
  * @author Doohyun

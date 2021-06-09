@@ -15,15 +15,11 @@
  *
  */
 
-package com.nlab.practice2021.domain.detail
-
-import com.nlab.practice2021.core.view.recyclerview.MappingViewHolderMakerPolicy
-import com.nlab.practice2021.core.view.recyclerview.ViewHolderMakerPolicy
-import com.nlab.practice2021.domain.home.view.HomeItemViewModelViewHolderMaker
+package com.nlab.practice2021.domain.home.model
 
 /**
  * @author Doohyun
  */
-class DomainViewHolderMakerMapper : ViewHolderMakerPolicy by MappingViewHolderMakerPolicy(
-    HomeItemViewModelViewHolderMaker()
-)
+interface NavigateMenuRepository {
+    suspend fun getNavigateMenus(): List<NavigateMenu>
+}

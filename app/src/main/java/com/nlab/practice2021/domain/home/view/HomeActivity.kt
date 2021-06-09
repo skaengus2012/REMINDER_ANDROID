@@ -15,7 +15,7 @@
  *
  */
 
-package com.nlab.practice2021.domain.home
+package com.nlab.practice2021.domain.home.view
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -31,10 +31,13 @@ import com.nlab.practice2021.core.view.recyclerview.CommonRecyclerViewAdapter
 import com.nlab.practice2021.core.view.recyclerview.flow.FlowItem
 import com.nlab.practice2021.core.view.recyclerview.flow.FlowSupportViewHolder
 import com.nlab.practice2021.core.view.recyclerview.flow.FlowSupportViewHolderLifecycle
+import com.nlab.practice2021.core.worker.DispatcherProviderImpl
 import com.nlab.practice2021.databinding.ActivityHomeBinding
 import com.nlab.practice2021.domain.detail.DomainDestinationToSystemEffect
 import com.nlab.practice2021.domain.detail.DomainViewHolderMakerMapper
 import com.nlab.practice2021.domain.detail.NavigateMenuRepositoryImpl
+import com.nlab.practice2021.domain.home.HomeItemViewModel
+import com.nlab.practice2021.domain.home.HomeViewModel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -66,6 +69,7 @@ class HomeActivity : AppCompatActivity() {
 
         ViewModelProvider(this, SimpleViewModelFactory {
             HomeViewModel(
+                DispatcherProviderImpl(),
                 NavigateMenuRepositoryImpl(),
                 HomeItemViewModel.Factory(AndroidSystemEffect(
                     systemEffectFlowProvider.effectFlow,
@@ -80,7 +84,7 @@ class HomeActivity : AppCompatActivity() {
     @Suppress("UNCHECKED_CAST")
     private fun render(
         binding: ActivityHomeBinding,
-        state: HomeState
+        state: HomeViewModel.State
     ) {
         if (state.isComplete) {
             val adapter = binding.contentView.adapter as CommonRecyclerViewAdapter<FlowSupportViewHolder, FlowItem>

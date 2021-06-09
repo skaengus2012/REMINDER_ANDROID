@@ -24,7 +24,7 @@ import com.nlab.practice2021.core.effect.system.SystemEffect
 import com.nlab.practice2021.core.view.recyclerview.flow.FlowItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
 /**
@@ -39,18 +39,14 @@ class HomeItemViewModel private constructor(
     @ColorRes backgroundResource: Int,
 ) : FlowItem {
 
-    override val stateFlow: Flow<State> = flow {
-        emit(
-            State(
-                titleResource,
-                descriptionResource,
-                backgroundResource,
-                onClickItem = {
-                    coroutineScope.launch { systemEffect.navigateTo(destination) }
-                }
-            )
+    override val stateFlow: Flow<State> = MutableStateFlow(
+        State(
+            titleResource,
+            descriptionResource,
+            backgroundResource,
+            onClickItem = { coroutineScope.launch { systemEffect.navigateTo(destination) } }
         )
-    }
+    )
 
     data class State(
         @StringRes val titleResource: Int,

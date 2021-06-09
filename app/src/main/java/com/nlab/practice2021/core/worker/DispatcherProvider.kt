@@ -15,11 +15,16 @@
  *
  */
 
-package com.nlab.practice2021.domain.home
+package com.nlab.practice2021.core.worker
+
+import kotlinx.coroutines.CoroutineDispatcher
 
 /**
  * @author Doohyun
  */
-interface NavigateMenuRepository {
-    suspend fun getNavigateMenus(): List<NavigateMenu>
+interface DispatcherProvider {
+    fun io(): CoroutineDispatcher
+    fun ui(): CoroutineDispatcher
+    fun unconfined(): CoroutineDispatcher
+    fun compute(): CoroutineDispatcher
 }

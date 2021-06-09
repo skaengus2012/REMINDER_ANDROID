@@ -15,15 +15,16 @@
  *
  */
 
-package com.nlab.practice2021.domain.detail
+package com.nlab.practice2021
 
-import com.nlab.practice2021.core.view.recyclerview.MappingViewHolderMakerPolicy
-import com.nlab.practice2021.core.view.recyclerview.ViewHolderMakerPolicy
-import com.nlab.practice2021.domain.home.view.HomeItemViewModelViewHolderMaker
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import org.junit.Rule
 
 /**
  * @author Doohyun
  */
-class DomainViewHolderMakerMapper : ViewHolderMakerPolicy by MappingViewHolderMakerPolicy(
-    HomeItemViewModelViewHolderMaker()
-)
+@OptIn(ExperimentalCoroutinesApi::class)
+abstract class BaseTest {
+    @get:Rule
+    val coroutineRule = MainCoroutineRule()
+}

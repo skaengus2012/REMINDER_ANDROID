@@ -38,11 +38,6 @@ android {
     }
 
     buildTypes {
-        getByName("debug") {
-            isDebuggable = true
-            isTestCoverageEnabled = true
-        }
-
         getByName("release") {
             isDebuggable = false
             isMinifyEnabled = false
@@ -89,7 +84,9 @@ tasks.register<JacocoReport>("coverageReport") {
         "**/R$*.class",
         "**/BuildConfig.*",
         "**/Manifest*.*",
-        "com/android/**/*.class"
+        "com/android/**/*.class",
+        "**/model/**",
+        "**/view/**"
     )
 
     classDirectories.setFrom(files(
@@ -123,7 +120,4 @@ dependencies {
     androidTestImplementation(Dependencies.TEST_ANDROID_JUNIT_ESPRESSO)
     androidTestImplementation(Dependencies.TEST_ANDROID_TEST_RUNNER)
     androidTestImplementation(Dependencies.TEST_ANDROID_TEST_RULES)
-    androidTestImplementation(Dependencies.TEST_MOCKITO)
-    androidTestImplementation(Dependencies.TEST_MOCKITO_KOTLIN)
-    androidTestImplementation(Dependencies.TEST_DEX_MAKER)
 }

@@ -15,18 +15,14 @@
  *
  */
 
-package com.nlab.practice2021.domain.home
+package com.nlab.practice2021.core.worker
 
-import androidx.annotation.ColorRes
-import androidx.annotation.StringRes
-import com.nlab.practice2021.core.effect.system.Destination
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 
-/**
- * @author Doohyun
- */
-data class NavigateMenu(
-    @StringRes val titleRes: Int = 0,
-    @StringRes val descriptionRes: Int,
-    @ColorRes val backgroundColorRes: Int,
-    val destination: Destination
-)
+class DispatcherProviderImpl : DispatcherProvider {
+    override fun io(): CoroutineDispatcher = Dispatchers.IO
+    override fun ui(): CoroutineDispatcher = Dispatchers.Main
+    override fun unconfined(): CoroutineDispatcher = Dispatchers.Unconfined
+    override fun compute(): CoroutineDispatcher = Dispatchers.Default
+}

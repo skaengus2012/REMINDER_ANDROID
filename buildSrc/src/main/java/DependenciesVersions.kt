@@ -33,11 +33,10 @@ object DependenciesVersions {
 
     const val TEST_JUNIT = "4.13.2"
     const val TEST_COROUTINES = "1.5.0"
-    const val TEST_MOCKITO = "3.10.0"
+    const val TEST_MOCKITO = "3.11.0"
     const val TEST_MOCKITO_KOTLIN = "3.2.0"
     const val TEST_ANDROID_JUNIT_EXT = "1.1.2"
     const val TEST_ANDROID_ESPRESSO = "3.3.0"
     const val TEST_ANDROID_RUNNER = "1.1.0"
     const val TEST_ANDROID_RULES = "1.1.0"
-    const val TEST_DEX_MAKER = "2.28.1"
 }

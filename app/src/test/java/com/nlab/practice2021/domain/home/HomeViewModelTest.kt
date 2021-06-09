@@ -17,17 +17,68 @@
 
 package com.nlab.practice2021.domain.home
 
-import org.junit.Assert
+import com.nlab.practice2021.BaseTest
+import com.nlab.practice2021.core.worker.DispatcherProvider
+import com.nlab.practice2021.domain.home.model.NavigateMenu
+import com.nlab.practice2021.domain.home.model.NavigateMenuRepository
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.test.runBlockingTest
+import org.junit.Assert.*
 import org.junit.Test
+import org.mockito.kotlin.*
 
 /**
  * @author Doohyun
  */
-class HomeViewModelTest {
+@OptIn(ExperimentalCoroutinesApi::class)
+class HomeViewModelTest : BaseTest() {
+
+    private val dispatcherProvider: DispatcherProvider = mock<DispatcherProvider>().apply {
+        whenever(io()).thenReturn(coroutineRule.testDispatcher)
+    }
 
     @Test
-    fun test() {
-        Assert.assertTrue(true)
+    fun `When the viewModel is created, Expect to load data`() = coroutineRule.runBlockingTest {
+        val navigateMenuRepository = spy(object : NavigateMenuRepository {
+            override suspend fun getNavigateMenus(): List<NavigateMenu> {
+                delay(1000)
+                return emptyList()
+            }
+        })
+        val viewModel = HomeViewModel(dispatcherProvider, navigateMenuRepository, HomeItemViewModel.Factory(mock()))
+
+        with(viewModel.stateFlow.first()) {
+            assertTrue(isLoading)
+            assertFalse(isComplete)
+        }
+        verify(navigateMenuRepository, times(1)).getNavigateMenus()
+        advanceTimeBy(1000)
+        with(viewModel.stateFlow.first()) {
+            assertFalse(isLoading)
+            assertTrue(isComplete)
+        }
+    }
+
+    @Test
+    fun `When data loading is success, Expect factory will make items`() = coroutineRule.runBlockingTest {
+        val dummyNavigateMenu = NavigateMenu(titleRes = 50, descriptionRes = 100, backgroundColorRes = 300, mock())
+        val navigateMenuRepository = mock<NavigateMenuRepository>().apply {
+            whenever(getNavigateMenus()).thenReturn(listOf(dummyNavigateMenu, dummyNavigateMenu))
+        }
+        val itemViewModelFactory = spy(HomeItemViewModel.Factory(mock()))
+        val viewModel = HomeViewModel(dispatcherProvider, navigateMenuRepository, itemViewModelFactory)
+
+        with(viewModel.stateFlow.first()) {
+            assertEquals(2, items.size)
+        }
+        verify(itemViewModelFactory, times(2)).create(
+            any(),
+            any(),
+            eq(dummyNavigateMenu.titleRes),
+            eq(dummyNavigateMenu.descriptionRes),
+            eq(dummyNavigateMenu.backgroundColorRes)
+        )
     }
 
 }
