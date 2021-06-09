@@ -27,7 +27,7 @@ android {
     buildToolsVersion(AndroidConfig.BUILD_TOOLS_VERSION)
 
     defaultConfig {
-        applicationId = "com.nlab.practice"
+        applicationId = "com.nlab.practice2021"
         multiDexEnabled = true
         minSdkVersion(AndroidConfig.MIN_SDK_VERSION)
         targetSdkVersion(AndroidConfig.TARGET_SDK_VERSION)

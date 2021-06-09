@@ -18,24 +18,23 @@
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.nlab.practice">
+    package="com.nlab.practice2021">
 
     <application
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.PRACTICE_2021"
         tools:ignore="AllowBackup">
 
-        <activity android:name=".domain.home.HomeActivity">
+        <activity android:name="com.nlab.practice2021.domain.home.HomeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <activity android:name=".domain.sample2.Sample2Activity">
+        <activity android:name="com.nlab.practice2021.domain.sample2.Sample2Activity">
 
         </activity>
 
