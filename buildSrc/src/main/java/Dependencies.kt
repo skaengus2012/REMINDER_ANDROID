@@ -33,6 +33,4 @@ object Dependencies {
     const val TEST_ANDROID_JUNIT_ESPRESSO = "androidx.test.espresso:espresso-core:${DependenciesVersions.TEST_ANDROID_ESPRESSO}"
     const val TEST_ANDROID_TEST_RUNNER = "androidx.test:runner:${DependenciesVersions.TEST_ANDROID_RUNNER}"
     const val TEST_ANDROID_TEST_RULES = "androidx.test:rules:${DependenciesVersions.TEST_ANDROID_RULES}"
-    const val TEST_DEX_MAKER = "com.linkedin.dexmaker:dexmaker-mockito:${DependenciesVersions.TEST_DEX_MAKER}"
-    const val TEST_ROBOLECTRIC = "org.robolectric:robolectric:${DependenciesVersions.TEST_ROBOLECTRIC}"
 }

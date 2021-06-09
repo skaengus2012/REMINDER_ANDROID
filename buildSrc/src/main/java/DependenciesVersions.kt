@@ -20,6 +20,7 @@
  */
 object DependenciesVersions {
     const val GRADLE = "4.2.1"
+    const val JACOCO = "0.8.7"
     const val KOTLIN = "1.5.10"
     const val KOTLIN_COROUTINE = "1.5.0"
 
@@ -36,6 +37,4 @@ object DependenciesVersions {
     const val TEST_ANDROID_ESPRESSO = "3.3.0"
     const val TEST_ANDROID_RUNNER = "1.1.0"
     const val TEST_ANDROID_RULES = "1.1.0"
-    const val TEST_DEX_MAKER = "2.28.1"
-    const val TEST_ROBOLECTRIC = "4.5.1"
 }

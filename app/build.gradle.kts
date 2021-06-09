@@ -18,6 +18,7 @@
 plugins {
     id("com.android.application")
     kotlin("android")
+    jacoco
 }
 
 android {
@@ -36,6 +37,7 @@ android {
 
     buildTypes {
         getByName("release") {
+            isDebuggable = false
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
@@ -59,6 +61,42 @@ android {
     }
 }
 
+jacoco {
+    toolVersion = DependenciesVersions.JACOCO
+}
+
+tasks.register<JacocoReport>("coverageReport") {
+    dependsOn("testDebugUnitTest")
+
+    group = "reporting"
+    description = "Generate Jacoco coverage reports"
+
+    reports {
+        xml.isEnabled = true // codecov depends on xml format report
+        html.isEnabled = true
+        html.destination = file("${buildDir}/reports")
+    }
+
+    val classFilters = setOf(
+        "**/R.class",
+        "**/R$*.class",
+        "**/BuildConfig.*",
+        "**/Manifest*.*",
+        "com/android/**/*.class",
+        "**/model/**",
+        "**/view/**"
+    )
+
+    classDirectories.setFrom(files(
+        fileTree("${buildDir}/intermediates/javac/debug/compileDebugJavaWithJavac/classes") {
+            setExcludes(classFilters)
+        },
+        fileTree("${buildDir}/tmp/kotlin-classes/debug") { setExcludes(classFilters) }
+    ))
+    sourceDirectories.setFrom(file("${projectDir}/src/main/java"))
+    executionData.setFrom(files("${buildDir}/jacoco/testDebugUnitTest.exec"))
+}
+
 dependencies {
     implementation(Dependencies.KOTLIN)
     implementation(Dependencies.KOTLIN_COROUTINE)
@@ -77,7 +115,4 @@ dependencies {
     androidTestImplementation(Dependencies.TEST_ANDROID_JUNIT_ESPRESSO)
     androidTestImplementation(Dependencies.TEST_ANDROID_TEST_RUNNER)
     androidTestImplementation(Dependencies.TEST_ANDROID_TEST_RULES)
-    androidTestImplementation(Dependencies.TEST_MOCKITO)
-    androidTestImplementation(Dependencies.TEST_DEX_MAKER)
-    androidTestImplementation(Dependencies.TEST_ROBOLECTRIC)
 }
