@@ -19,6 +19,7 @@ plugins {
     id("com.android.application")
     kotlin("android")
     kotlin("kapt")
+    jacoco
 }
 
 android {
@@ -37,7 +38,13 @@ android {
     }
 
     buildTypes {
+        getByName("debug") {
+            isDebuggable = true
+            isTestCoverageEnabled = true
+        }
+
         getByName("release") {
+            isDebuggable = false
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
@@ -48,18 +55,51 @@ android {
         targetCompatibility = JavaVersion.VERSION_1_8
     }
 
-    packagingOptions {
-        exclude("DebugProbesKt.bin")
-    }
-
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_1_8.toString()
         freeCompilerArgs = listOf("-Xopt-in=kotlin.RequiresOptIn")
     }
 
+    packagingOptions {
+        exclude("DebugProbesKt.bin")
+    }
+
     buildFeatures {
         viewBinding = true
     }
+}
+
+jacoco {
+    toolVersion = DependenciesVersions.JACOCO
+}
+
+tasks.register<JacocoReport>("coverageReport") {
+    dependsOn("testDebugUnitTest")
+
+    group = "reporting"
+    description = "Generate Jacoco coverage reports"
+
+    reports {
+        html.isEnabled = true
+        html.destination = file("${buildDir}/reports")
+    }
+
+    val classFilters = setOf(
+        "**/R.class",
+        "**/R$*.class",
+        "**/BuildConfig.*",
+        "**/Manifest*.*",
+        "com/android/**/*.class"
+    )
+
+    classDirectories.setFrom(files(
+        fileTree("${buildDir}/intermediates/javac/debug/compileDebugJavaWithJavac/classes") {
+            setExcludes(classFilters)
+        },
+        fileTree("${buildDir}/tmp/kotlin-classes/debug") { setExcludes(classFilters) }
+    ))
+    sourceDirectories.setFrom(file("${projectDir}/src/main/java"))
+    executionData.setFrom(files("${buildDir}/jacoco/testDebugUnitTest.exec"))
 }
 
 dependencies {

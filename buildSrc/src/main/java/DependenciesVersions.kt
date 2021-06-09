@@ -20,6 +20,7 @@
  */
 object DependenciesVersions {
     const val GRADLE = "4.2.1"
+    const val JACOCO = "0.8.7"
     const val KOTLIN = "1.5.10"
     const val KOTLIN_COROUTINE = "1.5.0"
 
