@@ -18,8 +18,8 @@
 package com.nlab.practice2021.domain.detail
 
 import com.nlab.practice2021.R
-import com.nlab.practice2021.domain.home.NavigateMenu
-import com.nlab.practice2021.domain.home.NavigateMenuRepository
+import com.nlab.practice2021.domain.home.model.NavigateMenu
+import com.nlab.practice2021.domain.home.model.NavigateMenuRepository
 import com.nlab.practice2021.domain.sample2.Sample2Destination
 import kotlinx.coroutines.delay
 
@@ -30,7 +30,14 @@ class NavigateMenuRepositoryImpl : NavigateMenuRepository {
 
     override suspend fun getNavigateMenus(): List<NavigateMenu> {
         delay(1000)
-        return listOf(NavigateMenu(R.string.home_title_1, R.string.home_description_1, R.color.purple_200, Sample2Destination()))
+        return listOf(
+            NavigateMenu(
+                R.string.home_title_1,
+                R.string.home_description_1,
+                R.color.purple_200,
+                Sample2Destination()
+            )
+        )
     }
 
 }

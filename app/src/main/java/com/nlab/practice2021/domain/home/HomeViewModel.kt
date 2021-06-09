@@ -19,6 +19,8 @@ package com.nlab.practice2021.domain.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.nlab.practice2021.core.worker.DispatcherProvider
+import com.nlab.practice2021.domain.home.model.NavigateMenuRepository
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
@@ -26,17 +28,18 @@ import kotlinx.coroutines.flow.*
  * @author Doohyun
  */
 class HomeViewModel(
-    private val navigateMenuRepository: NavigateMenuRepository,
-    private val homeItemViewModelFactory: HomeItemViewModel.Factory
+    dispatcherProvider: DispatcherProvider,
+    navigateMenuRepository: NavigateMenuRepository,
+    homeItemViewModelFactory: HomeItemViewModel.Factory
 ) : ViewModel() {
-    private val _stateFlow = MutableStateFlow(HomeState())
-    val stateFlow: Flow<HomeState> = _stateFlow
+    private val _stateFlow = MutableStateFlow(State())
+    val stateFlow: Flow<State> = _stateFlow
 
     init {
         viewModelScope.launch {
-            _stateFlow.emit(HomeState(isLoading = true))
-            _stateFlow.emit(withContext(Dispatchers.IO) {
-                HomeState(
+            _stateFlow.emit(State(isLoading = true))
+            _stateFlow.emit(withContext(dispatcherProvider.io()) {
+                State(
                     items = navigateMenuRepository.getNavigateMenus().map { menu ->
                         homeItemViewModelFactory.create(
                             viewModelScope,
@@ -51,5 +54,11 @@ class HomeViewModel(
             })
         }
     }
+
+    data class State(
+        val isLoading: Boolean = false,
+        val isComplete: Boolean = false,
+        val items: List<HomeItemViewModel> = emptyList()
+    )
 
 }

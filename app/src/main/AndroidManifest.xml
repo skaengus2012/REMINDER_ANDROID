@@ -27,7 +27,7 @@
         android:theme="@style/Theme.PRACTICE_2021"
         tools:ignore="AllowBackup">
 
-        <activity android:name="com.nlab.practice2021.domain.home.HomeActivity">
+        <activity android:name="com.nlab.practice2021.domain.home.view.HomeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
