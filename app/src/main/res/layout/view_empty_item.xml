@@ -1,4 +1,4 @@
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (C) 2018 The N's lab Open Source Project
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,8 +15,6 @@
   ~
   -->
 
-<resources>
-    <string name="app_name">AP-2021</string>
-    <string name="home_title_1">Sample2 로 이동</string>
-    <string name="home_description_1">Sample2 로 이동 자세한 설명</string>
-</resources>
+<View xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="0dp"
+    android:layout_height="0dp"/>

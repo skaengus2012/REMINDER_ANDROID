@@ -1,4 +1,4 @@
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (C) 2018 The N's lab Open Source Project
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,7 +16,6 @@
   -->
 
 <resources>
-    <string name="app_name">AP-2021</string>
-    <string name="home_title_1">Sample2 로 이동</string>
-    <string name="home_description_1">Sample2 로 이동 자세한 설명</string>
+    <color name="default_text_color">@color/white</color>
+    <color name="default_sub_text_color">@color/white_opa80</color>
 </resources>

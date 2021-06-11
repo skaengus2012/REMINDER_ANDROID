@@ -18,6 +18,7 @@
 plugins {
     id("com.android.application")
     kotlin("android")
+    kotlin("kapt")
     jacoco
 }
 
@@ -26,7 +27,8 @@ android {
     buildToolsVersion(AndroidConfig.BUILD_TOOLS_VERSION)
 
     defaultConfig {
-        applicationId = "com.nlab.practice"
+        applicationId = "com.nlab.practice2021"
+        multiDexEnabled = true
         minSdkVersion(AndroidConfig.MIN_SDK_VERSION)
         targetSdkVersion(AndroidConfig.TARGET_SDK_VERSION)
         versionCode = AndroidConfig.VERSION_CODE
@@ -54,11 +56,13 @@ android {
 
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_1_8.toString()
+        freeCompilerArgs = listOf("-Xopt-in=kotlin.RequiresOptIn")
     }
 
     buildFeatures {
         viewBinding = true
     }
+
 }
 
 jacoco {
@@ -74,7 +78,6 @@ tasks.register<JacocoReport>("coverageReport") {
     reports {
         html.isEnabled = true
         xml.isEnabled = true // codecov depends on xml format report
-        xml.destination = file("${buildDir}/reports/jacoco/report.xml")
     }
 
     val classFilters = setOf(
@@ -105,12 +108,15 @@ dependencies {
     implementation(Dependencies.ANDROID_KTX)
     implementation(Dependencies.ANDROID_APPCOMPAT)
     implementation(Dependencies.ANDROID_MATERIAL)
-    implementation(Dependencies.ANDROID_CONSTRAINT_LAYOUT)
-    implementation(Dependencies.ANDROID_RECYCLER_VIEW)
-    implementation(Dependencies.ANDROID_LIFECYCLE_VIEWMODEL)
+    implementation(Dependencies.ANDROID_CONSTRAINTLAYOUT)
+    implementation(Dependencies.ANDROID_RECYCLERVIEW)
+    implementation(Dependencies.ANDROID_LIFECYCLE_VIEWMODEL_KTX)
+    implementation(Dependencies.ANDROID_LIFECYCLE_RUNTIME_KTX)
 
     testImplementation(Dependencies.TEST_JUNIT)
+    testImplementation(Dependencies.TEST_COROUTINES)
     testImplementation(Dependencies.TEST_MOCKITO)
+    testImplementation(Dependencies.TEST_MOCKITO_KOTLIN)
     androidTestImplementation(Dependencies.TEST_ANDROID_JUNIT_EXT)
     androidTestImplementation(Dependencies.TEST_ANDROID_JUNIT_ESPRESSO)
     androidTestImplementation(Dependencies.TEST_ANDROID_TEST_RUNNER)
