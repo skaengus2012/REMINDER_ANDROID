@@ -62,6 +62,7 @@ android {
     buildFeatures {
         viewBinding = true
     }
+
 }
 
 jacoco {
@@ -77,7 +78,6 @@ tasks.register<JacocoReport>("coverageReport") {
     reports {
         html.isEnabled = true
         xml.isEnabled = true // codecov depends on xml format report
-        xml.destination = file("${buildDir}/reports/jacoco/report.xml")
     }
 
     val classFilters = setOf(

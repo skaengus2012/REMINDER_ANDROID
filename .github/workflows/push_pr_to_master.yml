@@ -18,7 +18,7 @@ jobs:
           
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
-        
+
       - name: Test with Gradle
         run: ./gradlew test
 
@@ -29,4 +29,7 @@ jobs:
         uses: codecov/codecov-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          file: ./build/reports/reports/jacoco/report.xml
+          flags: unittests
+          fail_ci_if_error: true
+          directory: /home/runner/work/PRACTICE_ANDROID_2021/PRACTICE_ANDROID_2021/
+          files: ./app/build/reports/jacoco/coverageReport/coverageReport.xml
