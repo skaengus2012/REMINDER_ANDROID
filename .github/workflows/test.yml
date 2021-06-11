@@ -21,3 +21,12 @@ jobs:
         
       - name: Test with Gradle
         run: ./gradlew test
+
+      - name: Create coverageReport
+        run: ./gradlew coverageReport
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          file: ./build/reports/jacoco/coverageReport/coverageReport.xml
