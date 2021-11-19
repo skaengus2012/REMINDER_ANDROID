@@ -23,14 +23,15 @@ plugins {
 }
 
 android {
-    compileSdkVersion(AndroidConfig.COMPILE_SDK_VERSION)
-    buildToolsVersion(AndroidConfig.BUILD_TOOLS_VERSION)
+    compileSdk = AndroidConfig.COMPILE_SDK_VERSION
+    buildToolsVersion = AndroidConfig.BUILD_TOOLS_VERSION
 
     defaultConfig {
         applicationId = "com.nlab.practice2021"
         multiDexEnabled = true
-        minSdkVersion(AndroidConfig.MIN_SDK_VERSION)
-        targetSdkVersion(AndroidConfig.TARGET_SDK_VERSION)
+        minSdk = AndroidConfig.MIN_SDK_VERSION
+        targetSdk = AndroidConfig.TARGET_SDK_VERSION
+
         versionCode = AndroidConfig.VERSION_CODE
         versionName = AndroidConfig.VERSION_NAME
 
@@ -51,7 +52,7 @@ android {
     }
 
     packagingOptions {
-        exclude("DebugProbesKt.bin")
+        resources.excludes.add("DebugProbesKt.bin")
     }
 
     kotlinOptions {
@@ -61,8 +62,12 @@ android {
 
     buildFeatures {
         viewBinding = true
+        compose = true
     }
 
+    composeOptions {
+        kotlinCompilerExtensionVersion = DependenciesVersions.ANDROID_COMPOSE
+    }
 }
 
 jacoco {
@@ -112,6 +117,13 @@ dependencies {
     implementation(Dependencies.ANDROID_RECYCLERVIEW)
     implementation(Dependencies.ANDROID_LIFECYCLE_VIEWMODEL_KTX)
     implementation(Dependencies.ANDROID_LIFECYCLE_RUNTIME_KTX)
+
+    implementation(Dependencies.ANDROID_COMPOSE_UI)
+    implementation(Dependencies.ANDROID_COMPOSE_UI_TOOLING)
+    implementation(Dependencies.ANDROID_COMPOSE_FOUNDATION)
+    implementation(Dependencies.ANDROID_COMPOSE_MATERIAL)
+
+    implementation(Dependencies.ANDROID_ACTIVITY_COMPOSE)
 
     testImplementation(Dependencies.TEST_JUNIT)
     testImplementation(Dependencies.TEST_COROUTINES)
