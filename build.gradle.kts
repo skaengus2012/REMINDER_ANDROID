@@ -22,7 +22,7 @@ buildscript {
     }
 
     dependencies {
-        classpath("com.android.tools.build:gradle:${DependenciesVersions.GRADLE}")
+        classpath("com.android.tools.build:gradle:${DependenciesVersions.AGP}")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${DependenciesVersions.KOTLIN}")
     }
 }
