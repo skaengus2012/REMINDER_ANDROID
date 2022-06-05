@@ -76,8 +76,8 @@ tasks.register<JacocoReport>("coverageReport") {
     description = "Generate Jacoco coverage reports"
 
     reports {
-        html.isEnabled = true
-        xml.isEnabled = true // codecov depends on xml format report
+        html.required.set(true)
+        xml.required.set(true) // codecov depends on xml format report
     }
 
     val classFilters = setOf(
