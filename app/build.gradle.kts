@@ -16,9 +16,10 @@
  */
 
 plugins {
-    id("com.android.application")
     kotlin("android")
     kotlin("kapt")
+    id("com.android.application")
+    id("androidx.navigation.safeargs.kotlin")
     jacoco
 }
 
@@ -112,6 +113,9 @@ dependencies {
     implementation(Dependencies.ANDROID_RECYCLERVIEW)
     implementation(Dependencies.ANDROID_LIFECYCLE_VIEWMODEL_KTX)
     implementation(Dependencies.ANDROID_LIFECYCLE_RUNTIME_KTX)
+    implementation(Dependencies.ANDROID_FRAGMENT)
+    implementation(Dependencies.ANDROID_NAVIGATION_FRAGMENT)
+    implementation(Dependencies.ANDROID_NAVIGATION_UI)
 
     testImplementation(Dependencies.TEST_JUNIT)
     testImplementation(Dependencies.TEST_COROUTINES)

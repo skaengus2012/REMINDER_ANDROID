@@ -30,6 +30,8 @@ object DependenciesVersions {
     const val ANDROID_CONSTRAINTLAYOUT = "2.1.3"
     const val ANDROID_RECYCLERVIEW = "1.2.1"
     const val ANDROID_LIFECYCLE = "2.4.1"
+    const val ANDROID_FRAGMENT = "1.4.1"
+    const val ANDROID_NAVIGATION = "2.4.2"
 
     const val TEST_JUNIT = "4.13.2"
     const val TEST_COROUTINES = "1.6.2"
