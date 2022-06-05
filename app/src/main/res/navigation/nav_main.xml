@@ -1,4 +1,4 @@
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (C) 2022 The N's lab Open Source Project
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,8 +14,16 @@
   ~ limitations under the License.
   -->
 
-<resources>
-    <string name="app_name">AP-2021</string>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:id="@+id/nav_main"
+	app:startDestination="@id/homeFragment">
 
-    <string name="label_home_fragment">홈</string>
-</resources>
+	<fragment
+		android:id="@+id/homeFragment"
+		android:name="com.nlab.practice2021.domain.home.view.HomeFragment"
+		android:label="@string/label_home_fragment"
+		tools:layout="@layout/fragment_home" />
+
+</navigation>
