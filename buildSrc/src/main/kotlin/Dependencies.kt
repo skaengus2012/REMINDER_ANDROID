@@ -21,7 +21,7 @@ object Dependencies {
     const val KOTLIN_COROUTINE_ANDROID = "org.jetbrains.kotlinx:kotlinx-coroutines-android:${DependenciesVersions.KOTLIN_COROUTINE}"
 
     const val ANDROID_APPCOMPAT = "androidx.appcompat:appcompat:${DependenciesVersions.ANDROID_APPCOMPAT}"
-    const val ANDROID_KTX = "androidx.core:core-ktx:${DependenciesVersions.ANDROID_KTX}"
+    const val ANDROID_KTX = "androidx.core:core-ktx:${DependenciesVersions.ANDROID_CORE}"
     const val ANDROID_MATERIAL = "com.google.android.material:material:${DependenciesVersions.ANDROID_MATERIAL}"
     const val ANDROID_CONSTRAINTLAYOUT = "androidx.constraintlayout:constraintlayout:${DependenciesVersions.ANDROID_CONSTRAINTLAYOUT}"
     const val ANDROID_RECYCLERVIEW = "androidx.recyclerview:recyclerview:${DependenciesVersions.ANDROID_RECYCLERVIEW}"
