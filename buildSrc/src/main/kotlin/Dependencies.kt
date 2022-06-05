@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 The N's lab Open Source Project
+ * Copyright (C) 2022 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,7 +12,6 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
 
 object Dependencies {
@@ -21,19 +20,15 @@ object Dependencies {
     const val KOTLIN_COROUTINE_ANDROID = "org.jetbrains.kotlinx:kotlinx-coroutines-android:${DependenciesVersions.KOTLIN_COROUTINE}"
 
     const val ANDROID_APPCOMPAT = "androidx.appcompat:appcompat:${DependenciesVersions.ANDROID_APPCOMPAT}"
-    const val ANDROID_KTX = "androidx.core:core-ktx:${DependenciesVersions.ANDROID_KTX}"
+    const val ANDROID_KTX = "androidx.core:core-ktx:${DependenciesVersions.ANDROID_CORE}"
     const val ANDROID_MATERIAL = "com.google.android.material:material:${DependenciesVersions.ANDROID_MATERIAL}"
     const val ANDROID_CONSTRAINTLAYOUT = "androidx.constraintlayout:constraintlayout:${DependenciesVersions.ANDROID_CONSTRAINTLAYOUT}"
     const val ANDROID_RECYCLERVIEW = "androidx.recyclerview:recyclerview:${DependenciesVersions.ANDROID_RECYCLERVIEW}"
     const val ANDROID_LIFECYCLE_VIEWMODEL_KTX = "androidx.lifecycle:lifecycle-viewmodel-ktx:${DependenciesVersions.ANDROID_LIFECYCLE}"
     const val ANDROID_LIFECYCLE_RUNTIME_KTX = "androidx.lifecycle:lifecycle-runtime-ktx:${DependenciesVersions.ANDROID_LIFECYCLE}"
-
-    const val ANDROID_COMPOSE_UI = "androidx.compose.ui:ui:${DependenciesVersions.ANDROID_COMPOSE}"
-    const val ANDROID_COMPOSE_UI_TOOLING = "androidx.compose.ui:ui-tooling:${DependenciesVersions.ANDROID_COMPOSE}"
-    const val ANDROID_COMPOSE_FOUNDATION = "androidx.compose.foundation:foundation:${DependenciesVersions.ANDROID_COMPOSE}"
-    const val ANDROID_COMPOSE_MATERIAL = "androidx.compose.material:material:${DependenciesVersions.ANDROID_COMPOSE}"
-
-    const val ANDROID_ACTIVITY_COMPOSE = "androidx.activity:activity-compose:${DependenciesVersions.ANDROID_ACTIVITY_COMPOSE}"
+    const val ANDROID_FRAGMENT = "androidx.fragment:fragment-ktx:${DependenciesVersions.ANDROID_FRAGMENT}"
+    const val ANDROID_NAVIGATION_FRAGMENT = "androidx.navigation:navigation-fragment-ktx:${DependenciesVersions.ANDROID_NAVIGATION}"
+    const val ANDROID_NAVIGATION_UI = "androidx.navigation:navigation-ui-ktx:${DependenciesVersions.ANDROID_NAVIGATION}"
 
     const val TEST_JUNIT = "junit:junit:${DependenciesVersions.TEST_JUNIT}"
     const val TEST_COROUTINES = "org.jetbrains.kotlinx:kotlinx-coroutines-test:${DependenciesVersions.TEST_COROUTINES}"

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 The N's lab Open Source Project
+ * Copyright (C) 2022 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,13 +12,13 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
 
 plugins {
-    id("com.android.application")
     kotlin("android")
     kotlin("kapt")
+    id("com.android.application")
+    id("androidx.navigation.safeargs.kotlin")
     jacoco
 }
 
@@ -62,11 +62,6 @@ android {
 
     buildFeatures {
         viewBinding = true
-        compose = true
-    }
-
-    composeOptions {
-        kotlinCompilerExtensionVersion = DependenciesVersions.ANDROID_COMPOSE
     }
 }
 
@@ -81,8 +76,8 @@ tasks.register<JacocoReport>("coverageReport") {
     description = "Generate Jacoco coverage reports"
 
     reports {
-        html.isEnabled = true
-        xml.isEnabled = true // codecov depends on xml format report
+        html.required.set(true)
+        xml.required.set(true) // codecov depends on xml format report
     }
 
     val classFilters = setOf(
@@ -117,13 +112,9 @@ dependencies {
     implementation(Dependencies.ANDROID_RECYCLERVIEW)
     implementation(Dependencies.ANDROID_LIFECYCLE_VIEWMODEL_KTX)
     implementation(Dependencies.ANDROID_LIFECYCLE_RUNTIME_KTX)
-
-    implementation(Dependencies.ANDROID_COMPOSE_UI)
-    implementation(Dependencies.ANDROID_COMPOSE_UI_TOOLING)
-    implementation(Dependencies.ANDROID_COMPOSE_FOUNDATION)
-    implementation(Dependencies.ANDROID_COMPOSE_MATERIAL)
-
-    implementation(Dependencies.ANDROID_ACTIVITY_COMPOSE)
+    implementation(Dependencies.ANDROID_FRAGMENT)
+    implementation(Dependencies.ANDROID_NAVIGATION_FRAGMENT)
+    implementation(Dependencies.ANDROID_NAVIGATION_UI)
 
     testImplementation(Dependencies.TEST_JUNIT)
     testImplementation(Dependencies.TEST_COROUTINES)
