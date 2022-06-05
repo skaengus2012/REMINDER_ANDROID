@@ -14,22 +14,15 @@
  * limitations under the License.
  */
 
-package com.nlab.practice2021.core.effect.system.impl
+package com.nlab.practice2021.domain.main.view
 
-import com.nlab.practice2021.core.effect.system.Destination
-import kotlin.reflect.KClass
+import androidx.appcompat.app.AppCompatActivity
+import android.os.Bundle
+import com.nlab.practice2021.R
 
-/**
- * @author Doohyun
- */
-class MappingDestinationToSystemEffect(
-    private val mapper: Map<KClass<out Destination>, DestinationToSystemEffect>
-) : DestinationToSystemEffect {
-
-    override fun invoke(
-        destination: Destination
-    ): AndroidSystemEffect.Command = with(requireNotNull(mapper[destination::class]) {
-        "Cannot found destination -> input[${destination.name}]"
-    }) { this(destination) }
-
+class MainActivity : AppCompatActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+    }
 }

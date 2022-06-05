@@ -16,6 +16,4 @@
 
 <resources>
     <string name="app_name">AP-2021</string>
-    <string name="home_title_1">Sample2 로 이동</string>
-    <string name="home_description_1">Sample2 로 이동 자세한 설명</string>
 </resources>
