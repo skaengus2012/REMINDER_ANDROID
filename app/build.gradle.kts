@@ -62,11 +62,6 @@ android {
 
     buildFeatures {
         viewBinding = true
-        compose = true
-    }
-
-    composeOptions {
-        kotlinCompilerExtensionVersion = DependenciesVersions.ANDROID_COMPOSE
     }
 }
 
@@ -117,13 +112,6 @@ dependencies {
     implementation(Dependencies.ANDROID_RECYCLERVIEW)
     implementation(Dependencies.ANDROID_LIFECYCLE_VIEWMODEL_KTX)
     implementation(Dependencies.ANDROID_LIFECYCLE_RUNTIME_KTX)
-
-    implementation(Dependencies.ANDROID_COMPOSE_UI)
-    implementation(Dependencies.ANDROID_COMPOSE_UI_TOOLING)
-    implementation(Dependencies.ANDROID_COMPOSE_FOUNDATION)
-    implementation(Dependencies.ANDROID_COMPOSE_MATERIAL)
-
-    implementation(Dependencies.ANDROID_ACTIVITY_COMPOSE)
 
     testImplementation(Dependencies.TEST_JUNIT)
     testImplementation(Dependencies.TEST_COROUTINES)

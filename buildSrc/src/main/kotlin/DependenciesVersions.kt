@@ -19,10 +19,10 @@
  * @author Doohyun
  */
 object DependenciesVersions {
-    const val AGP = "7.0.3"
+    const val AGP = "7.0.4"
     const val JACOCO = "0.8.7"
-    const val KOTLIN = "1.5.31"
-    const val KOTLIN_COROUTINE = "1.5.0"
+    const val KOTLIN = "1.6.21"
+    const val KOTLIN_COROUTINE = "1.6.2"
 
     const val ANDROID_APPCOMPAT = "1.3.1"
     const val ANDROID_KTX = "1.5.0"
@@ -30,8 +30,6 @@ object DependenciesVersions {
     const val ANDROID_CONSTRAINTLAYOUT = "2.0.4"
     const val ANDROID_RECYCLERVIEW = "1.2.0"
     const val ANDROID_LIFECYCLE = "2.3.1"
-    const val ANDROID_COMPOSE = "1.0.5"
-    const val ANDROID_ACTIVITY_COMPOSE = "1.3.1"
 
     const val TEST_JUNIT = "4.13.2"
     const val TEST_COROUTINES = "1.5.0"

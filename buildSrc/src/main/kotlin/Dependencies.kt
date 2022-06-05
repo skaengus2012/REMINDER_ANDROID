@@ -28,13 +28,6 @@ object Dependencies {
     const val ANDROID_LIFECYCLE_VIEWMODEL_KTX = "androidx.lifecycle:lifecycle-viewmodel-ktx:${DependenciesVersions.ANDROID_LIFECYCLE}"
     const val ANDROID_LIFECYCLE_RUNTIME_KTX = "androidx.lifecycle:lifecycle-runtime-ktx:${DependenciesVersions.ANDROID_LIFECYCLE}"
 
-    const val ANDROID_COMPOSE_UI = "androidx.compose.ui:ui:${DependenciesVersions.ANDROID_COMPOSE}"
-    const val ANDROID_COMPOSE_UI_TOOLING = "androidx.compose.ui:ui-tooling:${DependenciesVersions.ANDROID_COMPOSE}"
-    const val ANDROID_COMPOSE_FOUNDATION = "androidx.compose.foundation:foundation:${DependenciesVersions.ANDROID_COMPOSE}"
-    const val ANDROID_COMPOSE_MATERIAL = "androidx.compose.material:material:${DependenciesVersions.ANDROID_COMPOSE}"
-
-    const val ANDROID_ACTIVITY_COMPOSE = "androidx.activity:activity-compose:${DependenciesVersions.ANDROID_ACTIVITY_COMPOSE}"
-
     const val TEST_JUNIT = "junit:junit:${DependenciesVersions.TEST_JUNIT}"
     const val TEST_COROUTINES = "org.jetbrains.kotlinx:kotlinx-coroutines-test:${DependenciesVersions.TEST_COROUTINES}"
     const val TEST_MOCKITO = "org.mockito:mockito-inline:${DependenciesVersions.TEST_MOCKITO}"
