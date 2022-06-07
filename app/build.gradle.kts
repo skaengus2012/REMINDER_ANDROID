@@ -85,6 +85,7 @@ tasks.register<JacocoReport>("coverageReport") {
         "**/R$*.class",
         "**/BuildConfig.*",
         "**/Manifest*.*",
+        "**/android/**",
         "com/android/**/*.class",
         "**/model/**",
         "**/view/**"
