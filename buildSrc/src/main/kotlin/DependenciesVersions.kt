@@ -20,7 +20,7 @@
 object DependenciesVersions {
     const val AGP = "7.2.1"
     const val JACOCO = "0.8.8"
-    const val KOTLIN = "1.6.21"
+    const val KOTLIN = "1.7.0"
     const val KOTLIN_COROUTINE = "1.6.2"
 
     const val ANDROID_APPCOMPAT = "1.4.1"
