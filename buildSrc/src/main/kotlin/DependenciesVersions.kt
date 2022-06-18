@@ -32,6 +32,8 @@ object DependenciesVersions {
     const val ANDROID_FRAGMENT = "1.4.1"
     const val ANDROID_NAVIGATION = "2.4.2"
 
+    const val GOOGLE_HILT = "2.42"
+
     const val TEST_JUNIT = "4.13.2"
     const val TEST_COROUTINES = "1.6.2"
     const val TEST_MOCKITO = "4.6.1"

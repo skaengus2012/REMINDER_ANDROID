@@ -19,6 +19,7 @@ plugins {
     kotlin("kapt")
     id("com.android.application")
     id("androidx.navigation.safeargs.kotlin")
+    id("dagger.hilt.android.plugin")
     jacoco
 }
 
@@ -116,6 +117,9 @@ dependencies {
     implementation(Dependencies.ANDROID_FRAGMENT)
     implementation(Dependencies.ANDROID_NAVIGATION_FRAGMENT)
     implementation(Dependencies.ANDROID_NAVIGATION_UI)
+
+    implementation(Dependencies.GOOGLE_HILT_ANDROID)
+    kapt(Dependencies.GOOGLE_HILT_ANDROID_COMPILER)
 
     testImplementation(Dependencies.TEST_JUNIT)
     testImplementation(Dependencies.TEST_COROUTINES)
