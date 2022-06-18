@@ -14,24 +14,13 @@
  * limitations under the License.
  */
 
-package com.nlab.practice2021.domain.home.view
-
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import androidx.fragment.app.Fragment
-import com.nlab.practice2021.R
+package com.nlab.practice2021.domain.feature.home
 
 /**
  * @author Doohyun
  */
-class HomeFragment : Fragment() {
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View = inflater.inflate(R.layout.fragment_home, container, false)
-
-}
+@Suppress("TestFunctionName")
+fun HomeStateLoaded(
+    homeSummary: HomeSummary,
+    onTodayClicked: () -> Unit = {}
+): HomeState.Loaded = HomeState.Loaded(homeSummary, onTodayClicked)

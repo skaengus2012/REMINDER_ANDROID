@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-package com.nlab.practice2021.domain.main.view
+package com.nlab.practice2021.domain.common.effect.android.navigation
 
-import androidx.appcompat.app.AppCompatActivity
-import android.os.Bundle
-import com.nlab.practice2021.R
+import com.nlab.practice2021.core.effect.android.navigation.NavigationMessage
+import com.nlab.practice2021.core.effect.android.navigation.SendNavigationEffect
 
-class MainActivity : AppCompatActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-    }
-}
+/**
+ * @author Doohyun
+ */
+object ScheduledEndNavigationEffect : NavigationMessage
+
+suspend fun SendNavigationEffect.navigateScheduledEnd() = send(ScheduledEndNavigationEffect)

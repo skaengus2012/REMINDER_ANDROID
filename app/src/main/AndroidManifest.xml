@@ -27,7 +27,7 @@
         tools:ignore="AllowBackup">
 
         <activity
-            android:name="com.nlab.practice2021.domain.main.view.MainActivity"
+            android:name="com.nlab.practice2021.domain.feature.main.view.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

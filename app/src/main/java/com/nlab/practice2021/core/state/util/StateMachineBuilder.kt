@@ -29,13 +29,13 @@ class StateMachineBuilder<A : Action, S : State>(
 ) {
     private var onUpdate: (UpdateSource<A, S>) -> S = ImmutableListener()
     private val onErrors: MutableList<(Throwable) -> Unit> = arrayListOf(defaultUpdateErrorHandler)
-    private val sideEffects: MutableList<(ActionProcessor<A>, UpdateSource<A, S>) -> Unit> = arrayListOf()
+    private val sideEffects: MutableList<(UpdateSource<A, S>) -> Unit> = arrayListOf()
 
     internal fun buildExceptionHandler(): (Throwable) -> Unit = { error -> onErrors.forEach { it(error) } }
-    internal fun buildUpdateHandler(): (UpdateSource<A, S>) -> S = onUpdate
-    internal fun buildSideEffectHandler(
-        actionProcessor: ActionProcessor<A>
-    ): (UpdateSource<A, S>) -> Unit = { updateSource -> sideEffects.forEach { it(actionProcessor, updateSource) } }
+    internal fun buildUpdateHandler(): (UpdateSource<A, S>) -> S = { updateSource -> onUpdate(updateSource) }
+    internal fun buildSideEffectHandler(): (UpdateSource<A, S>) -> Unit = { updateSource ->
+        sideEffects.forEach { it(updateSource) }
+    }
 
     fun updateTo(block: (UpdateSource<A, S>) -> S) {
         onUpdate = block
@@ -45,16 +45,16 @@ class StateMachineBuilder<A : Action, S : State>(
         onErrors += block
     }
 
-    fun <T : A> withSideEffect(actionClazz: Class<T>, block: ActionProcessor<A>.(UpdateSource<T, S>) -> Unit) {
-        sideEffects.add { actionProcessor, updateSource ->
+    fun <T : A> withSideEffect(actionClazz: Class<T>, block: (UpdateSource<T, S>) -> Unit) {
+        sideEffects.add { updateSource ->
             val action = updateSource.action
             if (actionClazz.isInstance(action)) {
-                block(actionProcessor, UpdateSource(actionClazz.cast(action)!!, updateSource.oldState))
+                block(UpdateSource(actionClazz.cast(action)!!, updateSource.oldState))
             }
         }
     }
 
-    inline fun <reified T : A> withSideEffect(noinline block: ActionProcessor<A>.(UpdateSource<T, S>) -> Unit) {
+    inline fun <reified T : A> withSideEffect(noinline block: (UpdateSource<T, S>) -> Unit) {
         withSideEffect(T::class.java, block)
     }
 
