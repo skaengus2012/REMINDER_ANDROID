@@ -24,8 +24,7 @@ import com.nlab.practice2021.core.state.Action
 sealed class HomeAction private constructor() : Action {
     object Fetch : HomeAction()
     data class HomeSummaryRefreshed(val homeSummary: HomeSummary) : HomeAction()
-    object OnTodayEndClicked : HomeAction()
-    object OnScheduledEndClicked : HomeAction()
-    object OnAllEndClicked : HomeAction()
-    object OnFlaggedEndClicked : HomeAction()
+    object OnTodayCategoryClicked : HomeAction()
+    object OnTimetableCategoryClicked : HomeAction()
+    object OnAllCategoryClicked : HomeAction()
 }

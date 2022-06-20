@@ -87,9 +87,11 @@ tasks.register<JacocoReport>("coverageReport") {
         "**/BuildConfig.*",
         "**/Manifest*.*",
         "**/android/**",
+        "**/kotlin/**",
         "com/android/**/*.class",
         "**/model/**",
-        "**/view/**"
+        "**/view/**",
+        "**/di/**"
     )
 
     classDirectories.setFrom(files(
@@ -120,6 +122,7 @@ dependencies {
 
     implementation(Dependencies.GOOGLE_HILT_ANDROID)
     kapt(Dependencies.GOOGLE_HILT_ANDROID_COMPILER)
+    implementation(Dependencies.GOGGLE_FLEXBOX)
 
     testImplementation(Dependencies.TEST_JUNIT)
     testImplementation(Dependencies.TEST_COROUTINES)

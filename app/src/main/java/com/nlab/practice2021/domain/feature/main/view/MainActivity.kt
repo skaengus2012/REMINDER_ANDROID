@@ -19,7 +19,9 @@ package com.nlab.practice2021.domain.feature.main.view
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.nlab.practice2021.R
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

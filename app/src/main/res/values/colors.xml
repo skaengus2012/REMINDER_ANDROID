@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (C) 2022 The N's lab Open Source Project
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,18 +15,34 @@
   -->
 
 <resources>
-    <color name="purple_200">#FFBB86FC</color>
-    <color name="purple_500">#FF6200EE</color>
-    <color name="purple_700">#FF3700B3</color>
-    <color name="teal_200">#FF03DAC5</color>
-    <color name="teal_700">#FF018786</color>
+	<color name="black">#000000</color>
+	<color name="black_light">#1C1C1E</color>
 
-    <color name="black">#FF000000</color>
-    <color name="black_opa80">#cc000000</color>
+	<color name="gray_light">#F2F2F6</color>
+	<color name="gray_50">#FAFAFA</color>
+	<color name="gray_100">#F5F5F5</color>
+	<color name="gray_900">#212121</color>
 
-    <color name="white">#FFFFFFFF</color>
-    <color name="white_opa80">#CCFFFFFF</color>
+	<color name="white">#FFFFFF</color>
 
-    <color name="default_text_color">@color/black</color>
-    <color name="default_sub_text_color">@color/black_opa80</color>
+	<color name="point_color_1">#44BD98</color>
+	<color name="point_color_2">#BE94F3</color>
+	<color name="point_color_3">#E4A531</color>
+
+	<color name="category_point_today">@color/point_color_1</color>
+	<color name="category_point_category">@color/point_color_2</color>
+	<color name="category_point_all">@color/point_color_3</color>
+
+	<color name="purple_200">#FFBB86FC</color>
+	<color name="purple_500">#FF6200EE</color>
+	<color name="purple_700">#FF3700B3</color>
+	<color name="teal_200">#FF03DAC5</color>
+	<color name="teal_700">#FF018786</color>
+
+	<color name="black_opa80">#cc000000</color>
+
+	<color name="white_opa80">#CCFFFFFF</color>
+
+	<color name="default_text_color">@color/black</color>
+	<color name="default_sub_text_color">@color/black_opa80</color>
 </resources>

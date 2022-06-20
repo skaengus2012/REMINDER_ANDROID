@@ -22,12 +22,15 @@ import com.nlab.practice2021.core.effect.android.navigation.NavigationEffect
 import com.nlab.practice2021.core.effect.android.navigation.SendNavigationEffect
 import com.nlab.practice2021.core.effect.util.sideEffect
 import com.nlab.practice2021.core.state.util.fetchedFlow
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.StateFlow
+import javax.inject.Inject
 
 /**
  * @author Doohyun
  */
-class HomeViewModel(
+@HiltViewModel
+class HomeViewModel @Inject constructor(
     stateMachineFactory: HomeStateMachineFactory
 ) : ViewModel() {
     private val _navigationEffect: SendNavigationEffect by sideEffect()
@@ -35,7 +38,7 @@ class HomeViewModel(
         viewModelScope,
         _navigationEffect,
         onHomeSummaryLoaded = { homeSummary -> onAction(HomeAction.HomeSummaryRefreshed(homeSummary)) },
-        onTodayClicked = { onAction(HomeAction.OnTodayEndClicked) }
+        onTodayClicked = { onAction(HomeAction.OnTodayCategoryClicked) }
     )
 
     val navigationEffect: NavigationEffect = _navigationEffect

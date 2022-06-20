@@ -33,6 +33,7 @@ object DependenciesVersions {
     const val ANDROID_NAVIGATION = "2.4.2"
 
     const val GOOGLE_HILT = "2.42"
+    const val GOOGLE_FLEXBOX = "3.0.0"
 
     const val TEST_JUNIT = "4.13.2"
     const val TEST_COROUTINES = "1.6.2"

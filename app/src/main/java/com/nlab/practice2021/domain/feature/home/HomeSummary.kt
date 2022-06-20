@@ -17,6 +17,7 @@
 package com.nlab.practice2021.domain.feature.home
 
 import com.nlab.practice2021.core.util.annotation.test.Generated
+import com.nlab.practice2021.domain.common.tag.Tag
 
 /**
  * @author Doohyun
@@ -24,7 +25,7 @@ import com.nlab.practice2021.core.util.annotation.test.Generated
 @Generated
 data class HomeSummary(
     val todayNotificationCount: Long = 0,
-    val scheduledNotificationCount: Long = 0,
+    val timetableNotificationCount: Long = 0,
     val allNotificationCount: Long = 0,
-    val flaggedNotificationCount: Long = 0
+    val tags: List<Tag> = emptyList()
 )

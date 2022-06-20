@@ -20,8 +20,7 @@ import com.nlab.practice2021.core.effect.android.navigation.SendNavigationEffect
 import com.nlab.practice2021.core.state.StateMachine
 import com.nlab.practice2021.core.state.util.StateMachine
 import com.nlab.practice2021.domain.common.effect.android.navigation.navigateAllEnd
-import com.nlab.practice2021.domain.common.effect.android.navigation.navigateFlaggedEnd
-import com.nlab.practice2021.domain.common.effect.android.navigation.navigateScheduledEnd
+import com.nlab.practice2021.domain.common.effect.android.navigation.navigateTimetableEnd
 import com.nlab.practice2021.domain.common.effect.android.navigation.navigateTodayEnd
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -50,10 +49,9 @@ fun HomeStateMachine(
                 action.homeSummary,
                 onTodayClicked
             )
-            is HomeAction.OnTodayEndClicked,
-            is HomeAction.OnScheduledEndClicked,
-            is HomeAction.OnAllEndClicked,
-            is HomeAction.OnFlaggedEndClicked -> oldState
+            is HomeAction.OnTodayCategoryClicked,
+            is HomeAction.OnTimetableCategoryClicked,
+            is HomeAction.OnAllCategoryClicked -> oldState
         }
     }
 
@@ -61,19 +59,15 @@ fun HomeStateMachine(
         scope.launch { getHomeSummary().collect { onHomeSummaryLoaded(it) } }
     }
 
-    withSideEffect<HomeAction.OnTodayEndClicked> {
+    withSideEffect<HomeAction.OnTodayCategoryClicked> {
         scope.launch { navigationEffect.navigateTodayEnd() }
     }
 
-    withSideEffect<HomeAction.OnScheduledEndClicked> {
-        scope.launch { navigationEffect.navigateScheduledEnd() }
+    withSideEffect<HomeAction.OnTimetableCategoryClicked> {
+        scope.launch { navigationEffect.navigateTimetableEnd() }
     }
 
-    withSideEffect<HomeAction.OnAllEndClicked> {
+    withSideEffect<HomeAction.OnAllCategoryClicked> {
         scope.launch { navigationEffect.navigateAllEnd() }
-    }
-
-    withSideEffect<HomeAction.OnFlaggedEndClicked> {
-        scope.launch { navigationEffect.navigateFlaggedEnd() }
     }
 }

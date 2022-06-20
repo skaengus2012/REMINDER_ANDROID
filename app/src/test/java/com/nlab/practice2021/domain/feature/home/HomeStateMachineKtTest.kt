@@ -20,8 +20,7 @@ import com.nlab.practice2021.core.effect.android.navigation.NavigationMessage
 import com.nlab.practice2021.core.effect.android.navigation.SendNavigationEffect
 import com.nlab.practice2021.core.state.StateMachine
 import com.nlab.practice2021.domain.common.effect.android.navigation.AllEndNavigationEffect
-import com.nlab.practice2021.domain.common.effect.android.navigation.FlaggedEndNavigationEffect
-import com.nlab.practice2021.domain.common.effect.android.navigation.ScheduledEndNavigationEffect
+import com.nlab.practice2021.domain.common.effect.android.navigation.TimetableEndNavigationEffect
 import com.nlab.practice2021.domain.common.effect.android.navigation.TodayEndNavigationMessage
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.flow
@@ -38,10 +37,9 @@ import org.mockito.kotlin.*
 class HomeStateMachineKtTest {
     private val dummyActions: Set<HomeAction> = setOf(
         HomeAction.Fetch,
-        HomeAction.OnTodayEndClicked,
-        HomeAction.OnScheduledEndClicked,
-        HomeAction.OnFlaggedEndClicked,
-        HomeAction.OnAllEndClicked
+        HomeAction.OnTodayCategoryClicked,
+        HomeAction.OnTimetableCategoryClicked,
+        HomeAction.OnAllCategoryClicked
     )
 
     private val dummyStates: Set<HomeState> = setOf(
@@ -149,22 +147,17 @@ class HomeStateMachineKtTest {
 
     @Test
     fun `Navigate today end when today clicked`() = runTest {
-        testNavigationEnd(HomeAction.OnTodayEndClicked, TodayEndNavigationMessage)
+        testNavigationEnd(HomeAction.OnTodayCategoryClicked, TodayEndNavigationMessage)
     }
 
     @Test
-    fun `Navigate scheduled end when today clicked`() = runTest {
-        testNavigationEnd(HomeAction.OnScheduledEndClicked, ScheduledEndNavigationEffect)
+    fun `Navigate timetable end when today clicked`() = runTest {
+        testNavigationEnd(HomeAction.OnTimetableCategoryClicked, TimetableEndNavigationEffect)
     }
 
     @Test
     fun `Navigate all end when today clicked`() = runTest {
-        testNavigationEnd(HomeAction.OnAllEndClicked, AllEndNavigationEffect)
-    }
-
-    @Test
-    fun `Navigate flagged end when today clicked`() = runTest {
-        testNavigationEnd(HomeAction.OnFlaggedEndClicked, FlaggedEndNavigationEffect)
+        testNavigationEnd(HomeAction.OnAllCategoryClicked, AllEndNavigationEffect)
     }
 
     private suspend fun testNavigationEnd(

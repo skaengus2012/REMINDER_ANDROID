@@ -23,7 +23,7 @@
 		android:icon="@mipmap/ic_launcher"
 		android:label="@string/app_name"
 		android:supportsRtl="true"
-		android:theme="@style/Theme.PRACTICE_2021"
+		android:theme="@style/AppTheme"
 		tools:ignore="AllowBackup">
 
 		<activity

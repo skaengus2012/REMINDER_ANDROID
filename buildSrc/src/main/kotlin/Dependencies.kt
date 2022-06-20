@@ -32,6 +32,7 @@ object Dependencies {
 
     const val GOOGLE_HILT_ANDROID = "com.google.dagger:hilt-android:${DependenciesVersions.GOOGLE_HILT}"
     const val GOOGLE_HILT_ANDROID_COMPILER = "com.google.dagger:hilt-android-compiler:${DependenciesVersions.GOOGLE_HILT}"
+    const val GOGGLE_FLEXBOX = "com.google.android.flexbox:flexbox:${DependenciesVersions.GOOGLE_FLEXBOX}"
 
     const val TEST_JUNIT = "junit:junit:${DependenciesVersions.TEST_JUNIT}"
     const val TEST_COROUTINES = "org.jetbrains.kotlinx:kotlinx-coroutines-test:${DependenciesVersions.TEST_COROUTINES}"

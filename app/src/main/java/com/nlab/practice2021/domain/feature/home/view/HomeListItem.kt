@@ -16,10 +16,12 @@
 
 package com.nlab.practice2021.domain.feature.home.view
 
-import com.nlab.practice2021.domain.feature.home.HomeAction
-import com.nlab.practice2021.domain.feature.home.HomeViewModel
+import com.nlab.practice2021.domain.common.tag.view.TagItem
 
 /**
  * @author Doohyun
  */
-fun HomeViewModel.onClickToday() = onAction(HomeAction.OnTodayEndClicked)
+internal data class HomeListItem(
+    val categoryItems: List<CategoryItem>,
+    val tagItems: List<TagItem>
+)

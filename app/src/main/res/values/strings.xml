@@ -17,5 +17,12 @@
 <resources>
     <string name="app_name">AP-2021</string>
 
+    <string name="category_today" translatable="false">Today</string>
+    <string name="category_timetable" translatable="false">Timetable</string>
+    <string name="category_all" translatable="false">All</string>
+
+    <string name="tag_format" formatted="true"># %1$s</string>
+
     <string name="label_home_fragment">홈</string>
+
 </resources>
