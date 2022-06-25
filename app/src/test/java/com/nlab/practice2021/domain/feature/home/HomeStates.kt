@@ -16,6 +16,8 @@
 
 package com.nlab.practice2021.domain.feature.home
 
+import com.nlab.practice2021.domain.common.tag.Tag
+
 /**
  * @author Doohyun
  */
@@ -24,6 +26,12 @@ fun HomeStateLoaded(
     homeSummary: HomeSummary,
     onTodayCategoryClicked: () -> Unit = {},
     onTimetableCategoryClicked: () -> Unit = {},
-    onAllCategoryClicked: () -> Unit = {}
-): HomeState.Loaded =
-    HomeState.Loaded(homeSummary, onTodayCategoryClicked, onTimetableCategoryClicked, onAllCategoryClicked)
+    onAllCategoryClicked: () -> Unit = {},
+    onTagClicked: (Tag) -> Unit = {}
+): HomeState.Loaded = HomeState.Loaded(
+    homeSummary,
+    onTodayCategoryClicked,
+    onTimetableCategoryClicked,
+    onAllCategoryClicked,
+    onTagClicked
+)

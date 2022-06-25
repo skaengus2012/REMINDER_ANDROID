@@ -22,6 +22,7 @@ import com.nlab.practice2021.core.state.StateMachine
 import com.nlab.practice2021.domain.common.effect.android.navigation.AllEndNavigationMessage
 import com.nlab.practice2021.domain.common.effect.android.navigation.TimetableEndNavigationMessage
 import com.nlab.practice2021.domain.common.effect.android.navigation.TodayEndNavigationMessage
+import com.nlab.practice2021.domain.common.tag.Tag
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
@@ -56,14 +57,16 @@ class HomeStateMachineKtTest {
         onHomeSummaryLoaded: (HomeSummary) -> Unit = mock(),
         onTodayCategoryClicked: () -> Unit = mock(),
         onTimetableCategoryClicked: () -> Unit = mock(),
-        onAllCategoryClicked: () -> Unit = mock()
+        onAllCategoryClicked: () -> Unit = mock(),
+        onTagClicked: (Tag) -> Unit = mock()
     ): HomeStateMachine = HomeStateMachineFactory(getHomeSummary, initState).create(
         scope,
         navigationEffect,
         onHomeSummaryLoaded,
         onTodayCategoryClicked,
         onTimetableCategoryClicked,
-        onAllCategoryClicked
+        onAllCategoryClicked,
+        onTagClicked
     )
 
     @Test
@@ -77,7 +80,7 @@ class HomeStateMachineKtTest {
     fun `holds init state when machine created`() {
         assertThat(
             HomeStateMachineFactory(getHomeSummary = mock())
-                .create(CoroutineScope(Dispatchers.Default), mock(), mock(), mock(), mock(), mock())
+                .create(CoroutineScope(Dispatchers.Default), mock(), mock(), mock(), mock(), mock(), mock())
                 .state
                 .value,
             equalTo(HomeState.Init)

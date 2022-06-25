@@ -17,11 +17,14 @@
 package com.nlab.practice2021.domain.feature.home
 
 import com.nlab.practice2021.core.effect.android.navigation.SendNavigationEffect
+import com.nlab.practice2021.core.util.annotation.test.Generated
+import com.nlab.practice2021.domain.common.tag.Tag
 import kotlinx.coroutines.CoroutineScope
 
 /**
  * @author Doohyun
  */
+@Generated
 class HomeStateMachineFactory(
     private val getHomeSummary: GetHomeSummaryUseCase,
     private val initState: HomeState = HomeState.Init
@@ -32,7 +35,8 @@ class HomeStateMachineFactory(
         onHomeSummaryLoaded: (HomeSummary) -> Unit,
         onTodayCategoryClicked: () -> Unit,
         onTimeTableCategoryClicked: () -> Unit,
-        onAllCategoryClicked: () -> Unit
+        onAllCategoryClicked: () -> Unit,
+        onTagClicked: (Tag) -> Unit
     ): HomeStateMachine = HomeStateMachine(
         scope,
         initState,
@@ -41,6 +45,7 @@ class HomeStateMachineFactory(
         onHomeSummaryLoaded,
         onTodayCategoryClicked,
         onTimeTableCategoryClicked,
-        onAllCategoryClicked
+        onAllCategoryClicked,
+        onTagClicked
     )
 }

@@ -17,8 +17,11 @@
 package com.nlab.practice2021.domain.feature.home
 
 import com.nlab.practice2021.domain.common.effect.android.navigation.AllEndNavigationMessage
+import com.nlab.practice2021.domain.common.effect.android.navigation.TagEndNavigationMessage
 import com.nlab.practice2021.domain.common.effect.android.navigation.TimetableEndNavigationMessage
 import com.nlab.practice2021.domain.common.effect.android.navigation.TodayEndNavigationMessage
+import com.nlab.practice2021.domain.common.tag.Tag
+import com.nlab.practice2021.domain.common.tag.TagStyleResource
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.test.runTest
@@ -44,7 +47,7 @@ class HomeViewModelTest {
     ): Triple<HomeViewModel, HomeStateMachine, HomeStateMachineFactory> {
         val stateMachine: HomeStateMachine = mock { whenever(mock.state) doReturn state }
         val stateMachineFactory: HomeStateMachineFactory = mock {
-            whenever(mock.create(any(), any(), any(), any(), any(), any())) doReturn stateMachine
+            whenever(mock.create(any(), any(), any(), any(), any(), any(), any())) doReturn stateMachine
         }
         val viewModel = HomeViewModel(stateMachineFactory)
         return Triple(viewModel, stateMachine, stateMachineFactory)
@@ -80,6 +83,7 @@ class HomeViewModelTest {
             }
         )
 
+        val targetTag = Tag("Hello", TagStyleResource.TYPE4.code)
         val loaded: HomeState.Loaded =
             viewModel.state
                 .filterIsInstance<HomeState.Loaded>()
@@ -87,12 +91,20 @@ class HomeViewModelTest {
         loaded.onTodayCategoryClicked()
         loaded.onTimetableCategoryClicked()
         loaded.onAllCategoryClicked()
+        loaded.onTagClicked(targetTag)
         assertThat(
             viewModel.navigationEffect
                 .event
-                .take(3)
+                .take(4)
                 .toList(),
-            equalTo(listOf(TodayEndNavigationMessage, TimetableEndNavigationMessage, AllEndNavigationMessage))
+            equalTo(
+                listOf(
+                    TodayEndNavigationMessage,
+                    TimetableEndNavigationMessage,
+                    AllEndNavigationMessage,
+                    TagEndNavigationMessage(targetTag)
+                )
+            )
         )
     }
 }

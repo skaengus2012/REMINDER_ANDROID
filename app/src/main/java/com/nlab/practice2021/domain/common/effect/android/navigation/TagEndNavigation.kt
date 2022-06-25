@@ -14,24 +14,15 @@
  * limitations under the License.
  */
 
-package com.nlab.practice2021.domain.feature.home
+package com.nlab.practice2021.domain.common.effect.android.navigation
 
-import com.nlab.practice2021.core.state.State
-import com.nlab.practice2021.core.util.annotation.test.Generated
+import com.nlab.practice2021.core.effect.android.navigation.NavigationMessage
+import com.nlab.practice2021.core.effect.android.navigation.SendNavigationEffect
 import com.nlab.practice2021.domain.common.tag.Tag
 
 /**
  * @author Doohyun
  */
-sealed class HomeState private constructor() : State {
-    object Init : HomeState()
-    object Loading : HomeState()
-    @Generated
-    data class Loaded(
-        val homeSummary: HomeSummary,
-        val onTodayCategoryClicked: () -> Unit,
-        val onTimetableCategoryClicked: () -> Unit,
-        val onAllCategoryClicked: () -> Unit,
-        val onTagClicked: (Tag) -> Unit
-    ) : HomeState()
-}
+data class TagEndNavigationMessage(val tag: Tag) : NavigationMessage
+
+suspend fun SendNavigationEffect.navigateTagEnd(tag: Tag) = send(TagEndNavigationMessage(tag))

@@ -40,5 +40,11 @@ internal fun HomeState.Loaded.toListItem(): HomeListItem = HomeListItem(
             onItemClicked = onAllCategoryClicked
         )
     ),
-    tagItems = homeSummary.tags.map { tag -> TagItem(tag, onClicked = {}, onLongClicked = {}) }
+    tagItems = homeSummary.tags.map { tag ->
+        TagItem(
+            tag,
+            onClicked = { onTagClicked(tag) },
+            onLongClicked = {}
+        )
+    }
 )

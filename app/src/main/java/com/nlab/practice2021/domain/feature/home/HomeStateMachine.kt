@@ -20,8 +20,10 @@ import com.nlab.practice2021.core.effect.android.navigation.SendNavigationEffect
 import com.nlab.practice2021.core.state.StateMachine
 import com.nlab.practice2021.core.state.util.StateMachine
 import com.nlab.practice2021.domain.common.effect.android.navigation.navigateAllEnd
+import com.nlab.practice2021.domain.common.effect.android.navigation.navigateTagEnd
 import com.nlab.practice2021.domain.common.effect.android.navigation.navigateTimetableEnd
 import com.nlab.practice2021.domain.common.effect.android.navigation.navigateTodayEnd
+import com.nlab.practice2021.domain.common.tag.Tag
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -39,7 +41,8 @@ fun HomeStateMachine(
     onHomeSummaryLoaded: (HomeSummary) -> Unit,
     onTodayCategoryClicked: () -> Unit,
     onTimeTableCategoryClicked: () -> Unit,
-    onAllCategoryClicked: () -> Unit
+    onAllCategoryClicked: () -> Unit,
+    onTagClicked: (Tag) -> Unit
 ): HomeStateMachine = StateMachine(scope, initState) {
     updateTo { (action, oldState) ->
         when (action) {
@@ -51,11 +54,10 @@ fun HomeStateMachine(
                 action.homeSummary,
                 onTodayCategoryClicked,
                 onTimeTableCategoryClicked,
-                onAllCategoryClicked
+                onAllCategoryClicked,
+                onTagClicked
             )
-            is HomeAction.OnTodayCategoryClicked,
-            is HomeAction.OnTimetableCategoryClicked,
-            is HomeAction.OnAllCategoryClicked -> oldState
+            else -> oldState
         }
     }
 
@@ -73,5 +75,9 @@ fun HomeStateMachine(
 
     withSideEffect<HomeAction.OnAllCategoryClicked> {
         scope.launch { navigationEffect.navigateAllEnd() }
+    }
+
+    withSideEffect<HomeAction.OnTagClicked> { (action) ->
+        scope.launch { navigationEffect.navigateTagEnd(action.tag) }
     }
 }
