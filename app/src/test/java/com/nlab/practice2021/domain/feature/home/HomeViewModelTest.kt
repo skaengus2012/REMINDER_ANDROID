@@ -16,6 +16,8 @@
 
 package com.nlab.practice2021.domain.feature.home
 
+import com.nlab.practice2021.domain.common.effect.android.navigation.AllEndNavigationMessage
+import com.nlab.practice2021.domain.common.effect.android.navigation.TimetableEndNavigationMessage
 import com.nlab.practice2021.domain.common.effect.android.navigation.TodayEndNavigationMessage
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -42,7 +44,7 @@ class HomeViewModelTest {
     ): Triple<HomeViewModel, HomeStateMachine, HomeStateMachineFactory> {
         val stateMachine: HomeStateMachine = mock { whenever(mock.state) doReturn state }
         val stateMachineFactory: HomeStateMachineFactory = mock {
-            whenever(mock.create(any(), any(), any(), any())) doReturn stateMachine
+            whenever(mock.create(any(), any(), any(), any(), any(), any())) doReturn stateMachine
         }
         val viewModel = HomeViewModel(stateMachineFactory)
         return Triple(viewModel, stateMachine, stateMachineFactory)
@@ -71,23 +73,26 @@ class HomeViewModelTest {
     }
 
     @Test
-    fun `notify navigation message when onclick today invoked`() = runTest {
+    fun `notify navigation message when navigation event invoked`() = runTest {
         val viewModel: HomeViewModel = createViewModel(
             getHomeSummary = mock {
                 whenever(mock()) doReturn flowOf(HomeSummary())
             }
         )
 
-        viewModel.state
-            .filterIsInstance<HomeState.Loaded>()
-            .first()
-            .onTodayClicked()
+        val loaded: HomeState.Loaded =
+            viewModel.state
+                .filterIsInstance<HomeState.Loaded>()
+                .first()
+        loaded.onTodayCategoryClicked()
+        loaded.onTimetableCategoryClicked()
+        loaded.onAllCategoryClicked()
         assertThat(
             viewModel.navigationEffect
                 .event
-                .take(1)
-                .first(),
-            equalTo(TodayEndNavigationMessage)
+                .take(3)
+                .toList(),
+            equalTo(listOf(TodayEndNavigationMessage, TimetableEndNavigationMessage, AllEndNavigationMessage))
         )
     }
 }

@@ -22,6 +22,6 @@ import com.nlab.practice2021.core.effect.android.navigation.SendNavigationEffect
 /**
  * @author Doohyun
  */
-object TimetableEndNavigationEffect : NavigationMessage
+object TimetableEndNavigationMessage : NavigationMessage
 
-suspend fun SendNavigationEffect.navigateTimetableEnd() = send(TimetableEndNavigationEffect)
+suspend fun SendNavigationEffect.navigateTimetableEnd() = send(TimetableEndNavigationMessage)

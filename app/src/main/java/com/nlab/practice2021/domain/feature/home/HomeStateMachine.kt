@@ -37,7 +37,9 @@ fun HomeStateMachine(
     navigationEffect: SendNavigationEffect,
     getHomeSummary: GetHomeSummaryUseCase,
     onHomeSummaryLoaded: (HomeSummary) -> Unit,
-    onTodayClicked: () -> Unit
+    onTodayCategoryClicked: () -> Unit,
+    onTimeTableCategoryClicked: () -> Unit,
+    onAllCategoryClicked: () -> Unit
 ): HomeStateMachine = StateMachine(scope, initState) {
     updateTo { (action, oldState) ->
         when (action) {
@@ -47,7 +49,9 @@ fun HomeStateMachine(
             }
             is HomeAction.HomeSummaryRefreshed -> HomeState.Loaded(
                 action.homeSummary,
-                onTodayClicked
+                onTodayCategoryClicked,
+                onTimeTableCategoryClicked,
+                onAllCategoryClicked
             )
             is HomeAction.OnTodayCategoryClicked,
             is HomeAction.OnTimetableCategoryClicked,

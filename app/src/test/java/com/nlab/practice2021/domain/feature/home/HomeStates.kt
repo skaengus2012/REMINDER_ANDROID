@@ -22,5 +22,8 @@ package com.nlab.practice2021.domain.feature.home
 @Suppress("TestFunctionName")
 fun HomeStateLoaded(
     homeSummary: HomeSummary,
-    onTodayClicked: () -> Unit = {}
-): HomeState.Loaded = HomeState.Loaded(homeSummary, onTodayClicked)
+    onTodayCategoryClicked: () -> Unit = {},
+    onTimetableCategoryClicked: () -> Unit = {},
+    onAllCategoryClicked: () -> Unit = {}
+): HomeState.Loaded =
+    HomeState.Loaded(homeSummary, onTodayCategoryClicked, onTimetableCategoryClicked, onAllCategoryClicked)

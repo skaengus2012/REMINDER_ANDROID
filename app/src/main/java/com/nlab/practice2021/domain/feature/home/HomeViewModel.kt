@@ -38,7 +38,9 @@ class HomeViewModel @Inject constructor(
         viewModelScope,
         _navigationEffect,
         onHomeSummaryLoaded = { homeSummary -> onAction(HomeAction.HomeSummaryRefreshed(homeSummary)) },
-        onTodayClicked = { onAction(HomeAction.OnTodayCategoryClicked) }
+        onTodayCategoryClicked = { onAction(HomeAction.OnTodayCategoryClicked) },
+        onTimeTableCategoryClicked = { onAction(HomeAction.OnTimetableCategoryClicked) },
+        onAllCategoryClicked = { onAction(HomeAction.OnAllCategoryClicked) }
     )
 
     val navigationEffect: NavigationEffect = _navigationEffect

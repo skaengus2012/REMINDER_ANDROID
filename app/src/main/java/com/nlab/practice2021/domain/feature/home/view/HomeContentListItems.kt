@@ -27,17 +27,17 @@ internal fun HomeState.Loaded.toListItem(): HomeListItem = HomeListItem(
         CategoryItem(
             categoryResource = CategoryResource.TODAY,
             count = homeSummary.todayNotificationCount,
-            onItemClicked = onTodayClicked
+            onItemClicked = onTodayCategoryClicked
         ),
         CategoryItem(
             categoryResource = CategoryResource.TIME_TABLE,
             count = homeSummary.timetableNotificationCount,
-            onItemClicked = onTodayClicked
+            onItemClicked = onTimetableCategoryClicked
         ),
         CategoryItem(
             categoryResource = CategoryResource.ALL,
             count = homeSummary.allNotificationCount,
-            onItemClicked = onTodayClicked
+            onItemClicked = onAllCategoryClicked
         )
     ),
     tagItems = homeSummary.tags.map { tag -> TagItem(tag, onClicked = {}, onLongClicked = {}) }

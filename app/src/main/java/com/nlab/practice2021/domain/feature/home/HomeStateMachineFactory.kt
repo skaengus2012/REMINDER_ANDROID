@@ -30,13 +30,17 @@ class HomeStateMachineFactory(
         scope: CoroutineScope,
         navigationEffect: SendNavigationEffect,
         onHomeSummaryLoaded: (HomeSummary) -> Unit,
-        onTodayClicked: () -> Unit
+        onTodayCategoryClicked: () -> Unit,
+        onTimeTableCategoryClicked: () -> Unit,
+        onAllCategoryClicked: () -> Unit
     ): HomeStateMachine = HomeStateMachine(
         scope,
         initState,
         navigationEffect,
         getHomeSummary,
         onHomeSummaryLoaded,
-        onTodayClicked
+        onTodayCategoryClicked,
+        onTimeTableCategoryClicked,
+        onAllCategoryClicked
     )
 }

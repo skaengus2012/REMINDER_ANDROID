@@ -19,8 +19,8 @@ package com.nlab.practice2021.domain.feature.home
 import com.nlab.practice2021.core.effect.android.navigation.NavigationMessage
 import com.nlab.practice2021.core.effect.android.navigation.SendNavigationEffect
 import com.nlab.practice2021.core.state.StateMachine
-import com.nlab.practice2021.domain.common.effect.android.navigation.AllEndNavigationEffect
-import com.nlab.practice2021.domain.common.effect.android.navigation.TimetableEndNavigationEffect
+import com.nlab.practice2021.domain.common.effect.android.navigation.AllEndNavigationMessage
+import com.nlab.practice2021.domain.common.effect.android.navigation.TimetableEndNavigationMessage
 import com.nlab.practice2021.domain.common.effect.android.navigation.TodayEndNavigationMessage
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.flow
@@ -54,12 +54,16 @@ class HomeStateMachineKtTest {
         navigationEffect: SendNavigationEffect = mock(),
         getHomeSummary: GetHomeSummaryUseCase = mock { whenever(mock()) doReturn flow { emit(HomeSummary()) } },
         onHomeSummaryLoaded: (HomeSummary) -> Unit = mock(),
-        onTodayClicked: () -> Unit = mock()
+        onTodayCategoryClicked: () -> Unit = mock(),
+        onTimetableCategoryClicked: () -> Unit = mock(),
+        onAllCategoryClicked: () -> Unit = mock()
     ): HomeStateMachine = HomeStateMachineFactory(getHomeSummary, initState).create(
         scope,
         navigationEffect,
         onHomeSummaryLoaded,
-        onTodayClicked
+        onTodayCategoryClicked,
+        onTimetableCategoryClicked,
+        onAllCategoryClicked
     )
 
     @Test
@@ -73,7 +77,7 @@ class HomeStateMachineKtTest {
     fun `holds init state when machine created`() {
         assertThat(
             HomeStateMachineFactory(getHomeSummary = mock())
-                .create(CoroutineScope(Dispatchers.Default), mock(), mock(), mock())
+                .create(CoroutineScope(Dispatchers.Default), mock(), mock(), mock(), mock(), mock())
                 .state
                 .value,
             equalTo(HomeState.Init)
@@ -152,12 +156,12 @@ class HomeStateMachineKtTest {
 
     @Test
     fun `Navigate timetable end when today clicked`() = runTest {
-        testNavigationEnd(HomeAction.OnTimetableCategoryClicked, TimetableEndNavigationEffect)
+        testNavigationEnd(HomeAction.OnTimetableCategoryClicked, TimetableEndNavigationMessage)
     }
 
     @Test
     fun `Navigate all end when today clicked`() = runTest {
-        testNavigationEnd(HomeAction.OnAllCategoryClicked, AllEndNavigationEffect)
+        testNavigationEnd(HomeAction.OnAllCategoryClicked, AllEndNavigationMessage)
     }
 
     private suspend fun testNavigationEnd(

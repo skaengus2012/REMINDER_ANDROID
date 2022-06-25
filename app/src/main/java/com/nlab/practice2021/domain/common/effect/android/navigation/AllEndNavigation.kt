@@ -22,6 +22,6 @@ import com.nlab.practice2021.core.effect.android.navigation.SendNavigationEffect
 /**
  * @author Doohyun
  */
-object AllEndNavigationEffect : NavigationMessage
+object AllEndNavigationMessage : NavigationMessage
 
-suspend fun SendNavigationEffect.navigateAllEnd() = send(AllEndNavigationEffect)
+suspend fun SendNavigationEffect.navigateAllEnd() = send(AllEndNavigationMessage)

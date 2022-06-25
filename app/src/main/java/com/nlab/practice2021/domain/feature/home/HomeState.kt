@@ -28,6 +28,8 @@ sealed class HomeState private constructor() : State {
     @Generated
     data class Loaded(
         val homeSummary: HomeSummary,
-        val onTodayClicked: () -> Unit
+        val onTodayCategoryClicked: () -> Unit,
+        val onTimetableCategoryClicked: () -> Unit,
+        val onAllCategoryClicked: () -> Unit
     ) : HomeState()
 }
