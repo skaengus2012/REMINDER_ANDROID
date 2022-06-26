@@ -21,11 +21,17 @@ import com.nlab.practice2021.domain.common.tag.Tag
 /**
  * @author Doohyun
  */
-@Suppress("TestFunctionName")
-fun TestHomeStateLoadedFactory(
-    onTodayCategoryClicked: () -> Unit = {},
-    onTimetableCategoryClicked: () -> Unit = {},
-    onAllCategoryClicked: () -> Unit = {},
-    onTagClicked: (Tag) -> Unit = {}
-): HomeStateLoadedFactory =
-    HomeStateLoadedFactory(onTodayCategoryClicked, onTimetableCategoryClicked, onAllCategoryClicked, onTagClicked)
+class HomeStateLoadedFactory(
+    private val onTodayCategoryClicked: () -> Unit,
+    private val onTimetableCategoryClicked: () -> Unit,
+    private val onAllCategoryClicked: () -> Unit,
+    private val onTagClicked: (Tag) -> Unit
+) {
+    fun create(homeSummary: HomeSummary): HomeState.Loaded = HomeState.Loaded(
+        homeSummary,
+        onTodayCategoryClicked,
+        onTimetableCategoryClicked,
+        onAllCategoryClicked,
+        onTagClicked
+    )
+}

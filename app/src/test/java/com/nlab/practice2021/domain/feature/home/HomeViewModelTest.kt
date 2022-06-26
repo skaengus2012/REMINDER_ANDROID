@@ -47,8 +47,16 @@ class HomeViewModelTest {
     ): Triple<HomeViewModel, HomeStateMachine, HomeStateMachineFactory> {
         val stateMachine: HomeStateMachine = mock { whenever(mock.state) doReturn state }
         val stateMachineFactory: HomeStateMachineFactory = mock {
-            whenever(mock.create(any(), any(), any(), any(), any(), any(), any())) doReturn stateMachine
+            whenever(
+                mock.create(
+                    scope = any(),
+                    navigationEffect = any(),
+                    homeStateLoadedFactory = any(),
+                    onHomeSummaryLoaded = any()
+                )
+            ) doReturn stateMachine
         }
+
         val viewModel = HomeViewModel(stateMachineFactory)
         return Triple(viewModel, stateMachine, stateMachineFactory)
     }

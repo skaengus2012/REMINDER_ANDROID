@@ -23,7 +23,6 @@ import com.nlab.practice2021.domain.common.effect.android.navigation.navigateAll
 import com.nlab.practice2021.domain.common.effect.android.navigation.navigateTagEnd
 import com.nlab.practice2021.domain.common.effect.android.navigation.navigateTimetableEnd
 import com.nlab.practice2021.domain.common.effect.android.navigation.navigateTodayEnd
-import com.nlab.practice2021.domain.common.tag.Tag
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -38,11 +37,8 @@ fun HomeStateMachine(
     initState: HomeState,
     navigationEffect: SendNavigationEffect,
     getHomeSummary: GetHomeSummaryUseCase,
-    onHomeSummaryLoaded: (HomeSummary) -> Unit,
-    onTodayCategoryClicked: () -> Unit,
-    onTimeTableCategoryClicked: () -> Unit,
-    onAllCategoryClicked: () -> Unit,
-    onTagClicked: (Tag) -> Unit
+    homeStateLoadedFactory: HomeStateLoadedFactory,
+    onHomeSummaryLoaded: (HomeSummary) -> Unit
 ): HomeStateMachine = StateMachine(scope, initState) {
     updateTo { (action, oldState) ->
         when (action) {
@@ -50,13 +46,9 @@ fun HomeStateMachine(
                 if (oldState is HomeState.Init) HomeState.Loading
                 else oldState
             }
-            is HomeAction.HomeSummaryRefreshed -> HomeState.Loaded(
-                action.homeSummary,
-                onTodayCategoryClicked,
-                onTimeTableCategoryClicked,
-                onAllCategoryClicked,
-                onTagClicked
-            )
+            is HomeAction.HomeSummaryRefreshed -> {
+                homeStateLoadedFactory.create(action.homeSummary)
+            }
             else -> oldState
         }
     }

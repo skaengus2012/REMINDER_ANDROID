@@ -22,7 +22,6 @@ import com.nlab.practice2021.core.state.StateMachine
 import com.nlab.practice2021.domain.common.effect.android.navigation.AllEndNavigationMessage
 import com.nlab.practice2021.domain.common.effect.android.navigation.TimetableEndNavigationMessage
 import com.nlab.practice2021.domain.common.effect.android.navigation.TodayEndNavigationMessage
-import com.nlab.practice2021.domain.common.tag.Tag
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
@@ -46,7 +45,7 @@ class HomeStateMachineKtTest {
     private val dummyStates: Set<HomeState> = setOf(
         HomeState.Init,
         HomeState.Loading,
-        HomeStateLoaded(HomeSummary())
+        TestHomeStateLoadedFactory().create(HomeSummary())
     )
 
     private fun createHomeStateMachine(
@@ -54,24 +53,14 @@ class HomeStateMachineKtTest {
         initState: HomeState = HomeState.Init,
         navigationEffect: SendNavigationEffect = mock(),
         getHomeSummary: GetHomeSummaryUseCase = mock { whenever(mock()) doReturn flow { emit(HomeSummary()) } },
+        homeStateLoadedFactory: HomeStateLoadedFactory = TestHomeStateLoadedFactory(),
         onHomeSummaryLoaded: (HomeSummary) -> Unit = mock(),
-        onTodayCategoryClicked: () -> Unit = mock(),
-        onTimetableCategoryClicked: () -> Unit = mock(),
-        onAllCategoryClicked: () -> Unit = mock(),
-        onTagClicked: (Tag) -> Unit = mock()
-    ): HomeStateMachine = HomeStateMachineFactory(getHomeSummary, initState).create(
-        scope,
-        navigationEffect,
-        onHomeSummaryLoaded,
-        onTodayCategoryClicked,
-        onTimetableCategoryClicked,
-        onAllCategoryClicked,
-        onTagClicked
-    )
+    ): HomeStateMachine = HomeStateMachineFactory(getHomeSummary, initState)
+        .create(scope, navigationEffect, homeStateLoadedFactory, onHomeSummaryLoaded)
 
     @Test
     fun `holds injected state when machine created`() = runTest {
-        val initState = HomeStateLoaded(HomeSummary(todayNotificationCount = 1))
+        val initState = TestHomeStateLoadedFactory().create(HomeSummary(todayNotificationCount = 1))
         val stateMachine = createHomeStateMachine(initState = initState)
         assertThat(stateMachine.state.value, sameInstance(initState))
     }
@@ -80,7 +69,12 @@ class HomeStateMachineKtTest {
     fun `holds init state when machine created`() {
         assertThat(
             HomeStateMachineFactory(getHomeSummary = mock())
-                .create(CoroutineScope(Dispatchers.Default), mock(), mock(), mock(), mock(), mock(), mock())
+                .create(
+                    scope = CoroutineScope(Dispatchers.Default),
+                    navigationEffect = mock(),
+                    homeStateLoadedFactory = TestHomeStateLoadedFactory(),
+                    onHomeSummaryLoaded = mock()
+                )
                 .state
                 .value,
             equalTo(HomeState.Init)
@@ -174,7 +168,7 @@ class HomeStateMachineKtTest {
         val navigationEffect: SendNavigationEffect = mock()
         val stateMachine: HomeStateMachine = createHomeStateMachine(
             scope = CoroutineScope(Dispatchers.Unconfined),
-            initState = HomeStateLoaded(HomeSummary(todayNotificationCount = 10)),
+            initState = TestHomeStateLoadedFactory().create(HomeSummary(todayNotificationCount = 10)),
             navigationEffect = navigationEffect
         )
         stateMachine
