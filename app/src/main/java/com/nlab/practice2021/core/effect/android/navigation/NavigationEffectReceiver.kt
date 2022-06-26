@@ -14,22 +14,11 @@
  * limitations under the License.
  */
 
-package com.nlab.practice2021.domain.common.effect.android.navigation
-
-import android.util.Log
-import androidx.navigation.NavController
-import com.nlab.practice2021.core.effect.android.navigation.NavigationMessage
-import com.nlab.practice2021.core.effect.android.navigation.SendNavigationEffect
+package com.nlab.practice2021.core.effect.android.navigation
 
 /**
  * @author Doohyun
  */
-object TodayEndNavigationMessage : NavigationMessage
-
-suspend fun SendNavigationEffect.navigateTodayEnd() = send(TodayEndNavigationMessage)
-
-class TodayEndNavigationEffectRunner {
-    operator fun invoke(navController: NavController) {
-        Log.w("TODO", "navigate Today")
-    }
+interface NavigationEffectReceiver {
+    fun observeEvent(navigationEffect: NavigationEffect)
 }

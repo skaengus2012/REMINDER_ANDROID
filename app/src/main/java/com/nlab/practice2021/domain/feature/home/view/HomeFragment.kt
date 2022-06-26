@@ -26,6 +26,7 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ConcatAdapter
 import com.nlab.practice2021.R
+import com.nlab.practice2021.core.effect.android.navigation.NavigationEffectReceiver
 import com.nlab.practice2021.databinding.FragmentHomeBinding
 import com.nlab.practice2021.domain.common.android.view.recyclerview.simple.SimpleLayoutAdapter
 import com.nlab.practice2021.domain.feature.home.HomeState
@@ -33,6 +34,7 @@ import com.nlab.practice2021.domain.feature.home.HomeViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
+import javax.inject.Inject
 
 /**
  * @author Doohyun
@@ -43,6 +45,9 @@ class HomeFragment : Fragment() {
 
     private var _binding: FragmentHomeBinding? = null
     private val binding: FragmentHomeBinding get() = checkNotNull(_binding)
+
+    @Inject
+    lateinit var navigateEffectReceiver: NavigationEffectReceiver
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         FragmentHomeBinding.inflate(inflater, container, false)
@@ -63,6 +68,8 @@ class HomeFragment : Fragment() {
                 tagAdapter
             )
         }
+
+        navigateEffectReceiver.observeEvent(viewModel.navigationEffect)
 
         viewModel.state
             .filterIsInstance<HomeState.Init>()

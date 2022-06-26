@@ -16,6 +16,8 @@
 
 package com.nlab.practice2021.domain.common.effect.android.navigation
 
+import android.util.Log
+import androidx.navigation.NavController
 import com.nlab.practice2021.core.effect.android.navigation.NavigationMessage
 import com.nlab.practice2021.core.effect.android.navigation.SendNavigationEffect
 import com.nlab.practice2021.domain.common.tag.Tag
@@ -26,3 +28,9 @@ import com.nlab.practice2021.domain.common.tag.Tag
 data class TagEndNavigationMessage(val tag: Tag) : NavigationMessage
 
 suspend fun SendNavigationEffect.navigateTagEnd(tag: Tag) = send(TagEndNavigationMessage(tag))
+
+class TagEndNavigationEffectRunner {
+    operator fun invoke(navController: NavController, tag: Tag) {
+        Log.w("TODO", "navigate TagEnd ${tag.text}")
+    }
+}

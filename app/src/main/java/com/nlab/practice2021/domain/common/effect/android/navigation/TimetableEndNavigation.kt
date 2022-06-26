@@ -16,6 +16,8 @@
 
 package com.nlab.practice2021.domain.common.effect.android.navigation
 
+import android.util.Log
+import androidx.navigation.NavController
 import com.nlab.practice2021.core.effect.android.navigation.NavigationMessage
 import com.nlab.practice2021.core.effect.android.navigation.SendNavigationEffect
 
@@ -25,3 +27,9 @@ import com.nlab.practice2021.core.effect.android.navigation.SendNavigationEffect
 object TimetableEndNavigationMessage : NavigationMessage
 
 suspend fun SendNavigationEffect.navigateTimetableEnd() = send(TimetableEndNavigationMessage)
+
+class TimetableEndNavigationEffectRunner {
+    operator fun invoke(navController: NavController) {
+        Log.w("TODO", "navigate Timetable")
+    }
+}
