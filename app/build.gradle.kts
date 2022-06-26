@@ -19,6 +19,7 @@ plugins {
     kotlin("kapt")
     id("com.android.application")
     id("androidx.navigation.safeargs.kotlin")
+    id("dagger.hilt.android.plugin")
     jacoco
 }
 
@@ -85,9 +86,12 @@ tasks.register<JacocoReport>("coverageReport") {
         "**/R$*.class",
         "**/BuildConfig.*",
         "**/Manifest*.*",
+        "**/android/**",
+        "**/kotlin/**",
         "com/android/**/*.class",
         "**/model/**",
-        "**/view/**"
+        "**/view/**",
+        "**/di/**"
     )
 
     classDirectories.setFrom(files(
@@ -115,6 +119,10 @@ dependencies {
     implementation(Dependencies.ANDROID_FRAGMENT)
     implementation(Dependencies.ANDROID_NAVIGATION_FRAGMENT)
     implementation(Dependencies.ANDROID_NAVIGATION_UI)
+
+    implementation(Dependencies.GOOGLE_HILT_ANDROID)
+    kapt(Dependencies.GOOGLE_HILT_ANDROID_COMPILER)
+    implementation(Dependencies.GOGGLE_FLEXBOX)
 
     testImplementation(Dependencies.TEST_JUNIT)
     testImplementation(Dependencies.TEST_COROUTINES)
