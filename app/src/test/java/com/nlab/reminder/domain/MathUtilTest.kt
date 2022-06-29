@@ -10,6 +10,6 @@ import org.junit.Test
 class MathUtilTest {
     @Test
     fun test() {
-        Assert.assertEquals(3,  MathUtil().sum(1, 2))
+        Assert.assertEquals(-1,  MathUtil().sum(1, 2))
     }
 }
