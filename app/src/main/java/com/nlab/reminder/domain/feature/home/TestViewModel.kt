@@ -7,6 +7,6 @@ import androidx.lifecycle.ViewModel
  */
 class TestViewModel : ViewModel() {
     fun hello() {
-        println("Hello ci")
+   //     println("Hello ci")
     }
 }
