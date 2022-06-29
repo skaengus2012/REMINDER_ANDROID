@@ -14,5 +14,14 @@
  * limitations under the License.
  */
 
-include(":app")
-rootProject.name="REMINDER_ANDROID"
+package com.nlab.reminder.core.effect.android.navigation.fragment
+
+import androidx.navigation.NavController
+import com.nlab.reminder.core.effect.android.navigation.NavigationMessage
+
+/**
+ * @author Doohyun
+ */
+interface FragmentNavigateUseCase {
+    operator fun invoke(navController: NavController, navigateMessage: NavigationMessage)
+}

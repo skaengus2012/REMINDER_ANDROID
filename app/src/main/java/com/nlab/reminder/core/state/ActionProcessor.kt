@@ -14,5 +14,13 @@
  * limitations under the License.
  */
 
-include(":app")
-rootProject.name="REMINDER_ANDROID"
+package com.nlab.reminder.core.state
+
+import kotlinx.coroutines.Job
+
+/**
+ * @author Doohyun
+ */
+interface ActionProcessor<A : Action> {
+    fun send(action: A): Job
+}

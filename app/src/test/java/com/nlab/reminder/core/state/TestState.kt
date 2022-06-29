@@ -14,5 +14,13 @@
  * limitations under the License.
  */
 
-include(":app")
-rootProject.name="REMINDER_ANDROID"
+package com.nlab.reminder.core.state
+
+/**
+ * @author Doohyun
+ */
+internal sealed class TestState private constructor() : State {
+    class StateInit : TestState()
+    class State1 : TestState()
+    class State2 : TestState()
+}

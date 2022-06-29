@@ -14,5 +14,20 @@
  * limitations under the License.
  */
 
-include(":app")
-rootProject.name="REMINDER_ANDROID"
+package com.nlab.reminder.domain.feature.home.view
+
+import com.nlab.reminder.core.android.recyclerview.HashIdentifier
+import com.nlab.reminder.domain.common.android.view.recyclerview.ItemModel
+import java.util.*
+
+/**
+ * @author Doohyun
+ */
+@ItemModel
+internal class CategoryItem(
+    val categoryResource: CategoryResource,
+    val count: Long,
+    val onItemClicked: () -> Unit
+) : HashIdentifier {
+    override val hashId: Int = Objects.hash(categoryResource, count)
+}

@@ -31,5 +31,5 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           flags: unittests
           fail_ci_if_error: true
-          directory: /home/runner/work/PRACTICE_ANDROID_2021/PRACTICE_ANDROID_2021/
+          directory: /home/runner/work/REMINDER_ANDROID/REMINDER_ANDROID/
           files: ./app/build/reports/jacoco/coverageReport/coverageReport.xml

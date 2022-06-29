@@ -14,5 +14,20 @@
  * limitations under the License.
  */
 
-include(":app")
-rootProject.name="REMINDER_ANDROID"
+package com.nlab.reminder.core.state.impl
+
+import com.nlab.reminder.core.state.Action
+import com.nlab.reminder.core.state.ActionProcessor
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+
+/**
+ * @author Doohyun
+ */
+internal class DefaultActionProcessor<A : Action>(
+    private val scope: CoroutineScope,
+    private val onActionReceived: suspend (A) -> Unit,
+) : ActionProcessor<A> {
+    override fun send(action: A): Job = scope.launch { onActionReceived(action) }
+}

@@ -14,5 +14,9 @@
  * limitations under the License.
  */
 
-include(":app")
-rootProject.name="REMINDER_ANDROID"
+package com.nlab.reminder.core.effect
+
+/**
+ * @author Doohyun
+ */
+data class TestSideEffectMessage(val number: Int) : SideEffect.Message

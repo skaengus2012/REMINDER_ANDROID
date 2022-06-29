@@ -14,5 +14,19 @@
  * limitations under the License.
  */
 
-include(":app")
-rootProject.name="REMINDER_ANDROID"
+package com.nlab.reminder.core.android.recyclerview
+
+import androidx.recyclerview.widget.DiffUtil
+
+/**
+ * @author Doohyun
+ */
+class HashIdentifierItemDiffCallback<T : HashIdentifier> : DiffUtil.ItemCallback<T>() {
+    override fun areItemsTheSame(oldItem: T, newItem: T): Boolean {
+        return oldItem == newItem
+    }
+
+    override fun areContentsTheSame(oldItem: T, newItem: T): Boolean {
+        return oldItem.hashId == newItem.hashId
+    }
+}

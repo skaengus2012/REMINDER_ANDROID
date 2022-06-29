@@ -14,5 +14,14 @@
  * limitations under the License.
  */
 
-include(":app")
-rootProject.name="REMINDER_ANDROID"
+package com.nlab.reminder.domain.feature.home.view
+
+import com.nlab.reminder.domain.common.tag.view.TagItem
+
+/**
+ * @author Doohyun
+ */
+internal data class HomeListItem(
+    val categoryItems: List<CategoryItem>,
+    val tagItems: List<TagItem>
+)

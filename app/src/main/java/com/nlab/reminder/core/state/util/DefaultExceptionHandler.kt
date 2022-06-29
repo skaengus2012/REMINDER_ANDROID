@@ -14,5 +14,16 @@
  * limitations under the License.
  */
 
-include(":app")
-rootProject.name="REMINDER_ANDROID"
+package com.nlab.reminder.core.state.util
+
+import com.nlab.reminder.core.util.annotation.test.Generated
+
+/**
+ * @author Doohyun
+ */
+@Generated
+internal class DefaultExceptionHandler : (Throwable) -> Unit {
+    override fun invoke(throwable: Throwable) {
+        throwable.printStackTrace()
+    }
+}

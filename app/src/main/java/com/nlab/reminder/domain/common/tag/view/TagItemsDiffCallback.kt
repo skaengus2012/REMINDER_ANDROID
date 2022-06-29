@@ -14,5 +14,17 @@
  * limitations under the License.
  */
 
-include(":app")
-rootProject.name="REMINDER_ANDROID"
+package com.nlab.reminder.domain.common.tag.view
+
+import androidx.recyclerview.widget.DiffUtil
+
+class TagItemsDiffCallback : DiffUtil.ItemCallback<List<TagItem>>() {
+    override fun areItemsTheSame(oldItem: List<TagItem>, newItem: List<TagItem>): Boolean {
+        return oldItem === newItem
+    }
+
+    override fun areContentsTheSame(oldItem: List<TagItem>, newItem: List<TagItem>): Boolean {
+        return if (oldItem.size != newItem.size) false
+        else oldItem.map { it.tagText } == newItem.map { it.tagText }
+    }
+}

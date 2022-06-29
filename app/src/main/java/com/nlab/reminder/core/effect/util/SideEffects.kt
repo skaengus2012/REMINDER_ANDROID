@@ -14,5 +14,17 @@
  * limitations under the License.
  */
 
-include(":app")
-rootProject.name="REMINDER_ANDROID"
+package com.nlab.reminder.core.effect.util
+
+import com.nlab.reminder.core.effect.SideEffect
+import com.nlab.reminder.core.effect.impl.DefaultSideEffect
+import com.nlab.reminder.core.effect.impl.SideEffectDelegate
+import kotlinx.coroutines.channels.Channel
+
+/**
+ * @author Doohyun
+ */
+@Suppress("FunctionName")
+fun <T : SideEffect.Message> sideEffect(
+    eventChannel: Channel<T> = Channel(Channel.BUFFERED)
+) = SideEffectDelegate(DefaultSideEffect(eventChannel))

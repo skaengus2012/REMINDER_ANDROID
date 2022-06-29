@@ -14,5 +14,18 @@
  * limitations under the License.
  */
 
-include(":app")
-rootProject.name="REMINDER_ANDROID"
+package com.nlab.reminder.domain.feature.home
+
+import com.nlab.reminder.domain.common.tag.Tag
+
+/**
+ * @author Doohyun
+ */
+@Suppress("TestFunctionName")
+fun TestHomeStateLoadedFactory(
+    onTodayCategoryClicked: () -> Unit = {},
+    onTimetableCategoryClicked: () -> Unit = {},
+    onAllCategoryClicked: () -> Unit = {},
+    onTagClicked: (Tag) -> Unit = {}
+): HomeStateLoadedFactory =
+    HomeStateLoadedFactory(onTodayCategoryClicked, onTimetableCategoryClicked, onAllCategoryClicked, onTagClicked)

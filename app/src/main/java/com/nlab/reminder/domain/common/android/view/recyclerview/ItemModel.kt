@@ -14,5 +14,10 @@
  * limitations under the License.
  */
 
-include(":app")
-rootProject.name="REMINDER_ANDROID"
+package com.nlab.reminder.domain.common.android.view.recyclerview
+
+/**
+ * @author Doohyun
+ */
+@Retention(AnnotationRetention.SOURCE)
+annotation class ItemModel

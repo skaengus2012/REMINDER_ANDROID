@@ -14,5 +14,13 @@
  * limitations under the License.
  */
 
-include(":app")
-rootProject.name="REMINDER_ANDROID"
+package com.nlab.reminder.test
+
+import org.hamcrest.CoreMatchers
+import org.hamcrest.Matcher
+import kotlin.reflect.KClass
+
+/**
+ * @author Doohyun
+ */
+fun <T> instanceOf(clazz: KClass<*>): Matcher<T> = CoreMatchers.instanceOf(clazz.java)

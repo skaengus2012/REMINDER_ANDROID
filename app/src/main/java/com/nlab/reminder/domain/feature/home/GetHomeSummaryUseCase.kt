@@ -14,5 +14,13 @@
  * limitations under the License.
  */
 
-include(":app")
-rootProject.name="REMINDER_ANDROID"
+package com.nlab.reminder.domain.feature.home
+
+import kotlinx.coroutines.flow.Flow
+
+/**
+ * @author Doohyun
+ */
+interface GetHomeSummaryUseCase {
+    operator fun invoke(): Flow<HomeSummary>
+}

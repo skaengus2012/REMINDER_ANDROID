@@ -14,5 +14,22 @@
  * limitations under the License.
  */
 
-include(":app")
-rootProject.name="REMINDER_ANDROID"
+package com.nlab.reminder.domain.common.effect.android.navigation
+
+import android.util.Log
+import androidx.navigation.NavController
+import com.nlab.reminder.core.effect.android.navigation.NavigationMessage
+import com.nlab.reminder.core.effect.android.navigation.SendNavigationEffect
+
+/**
+ * @author Doohyun
+ */
+object AllEndNavigationMessage : NavigationMessage
+
+suspend fun SendNavigationEffect.navigateAllEnd() = send(AllEndNavigationMessage)
+
+class AllEndNavigationEffectRunner {
+    operator fun invoke(navController: NavController) {
+        Log.w("TODO", "navigate all")
+    }
+}

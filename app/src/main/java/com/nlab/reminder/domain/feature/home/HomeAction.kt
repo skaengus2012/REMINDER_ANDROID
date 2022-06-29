@@ -14,5 +14,19 @@
  * limitations under the License.
  */
 
-include(":app")
-rootProject.name="REMINDER_ANDROID"
+package com.nlab.reminder.domain.feature.home
+
+import com.nlab.reminder.core.state.Action
+import com.nlab.reminder.domain.common.tag.Tag
+
+/**
+ * @author Doohyun
+ */
+sealed class HomeAction private constructor() : Action {
+    object Fetch : HomeAction()
+    data class HomeSummaryRefreshed(val homeSummary: HomeSummary) : HomeAction()
+    object OnTodayCategoryClicked : HomeAction()
+    object OnTimetableCategoryClicked : HomeAction()
+    object OnAllCategoryClicked : HomeAction()
+    data class OnTagClicked(val tag: Tag) : HomeAction()
+}

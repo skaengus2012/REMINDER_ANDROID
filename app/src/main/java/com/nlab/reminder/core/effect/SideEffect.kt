@@ -14,5 +14,14 @@
  * limitations under the License.
  */
 
-include(":app")
-rootProject.name="REMINDER_ANDROID"
+package com.nlab.reminder.core.effect
+
+import kotlinx.coroutines.flow.Flow
+
+/**
+ * @author Doohyun
+ */
+interface SideEffect<T : SideEffect.Message> {
+    val event: Flow<T>
+    interface Message
+}

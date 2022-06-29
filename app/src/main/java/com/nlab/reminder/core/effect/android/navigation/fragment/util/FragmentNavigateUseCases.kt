@@ -14,5 +14,19 @@
  * limitations under the License.
  */
 
-include(":app")
-rootProject.name="REMINDER_ANDROID"
+package com.nlab.reminder.core.effect.android.navigation.fragment.util
+
+import androidx.navigation.NavController
+import com.nlab.reminder.core.effect.android.navigation.NavigationMessage
+import com.nlab.reminder.core.effect.android.navigation.fragment.FragmentNavigateUseCase
+
+/**
+ * @author Doohyun
+ */
+inline fun FragmentNavigateUseCase(
+    crossinline block: (NavController, NavigationMessage) -> Unit
+): FragmentNavigateUseCase = object : FragmentNavigateUseCase {
+    override fun invoke(navController: NavController, navigateMessage: NavigationMessage) {
+        block(navController, navigateMessage)
+    }
+}

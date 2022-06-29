@@ -14,5 +14,11 @@
  * limitations under the License.
  */
 
-include(":app")
-rootProject.name="REMINDER_ANDROID"
+package com.nlab.reminder.core.effect.android.navigation
+
+/**
+ * @author Doohyun
+ */
+interface NavigationEffectReceiver {
+    fun observeEvent(navigationEffect: NavigationEffect)
+}

@@ -14,5 +14,15 @@
  * limitations under the License.
  */
 
-include(":app")
-rootProject.name="REMINDER_ANDROID"
+package com.nlab.reminder
+
+import android.app.Application
+import com.nlab.reminder.core.util.annotation.test.Generated
+import dagger.hilt.android.HiltAndroidApp
+
+/**
+ * @author Doohyun
+ */
+@Generated
+@HiltAndroidApp
+class ReminderApplication : Application()

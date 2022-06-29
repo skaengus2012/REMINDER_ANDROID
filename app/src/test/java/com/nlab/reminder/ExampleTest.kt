@@ -14,5 +14,18 @@
  * limitations under the License.
  */
 
-include(":app")
-rootProject.name="REMINDER_ANDROID"
+package com.nlab.reminder
+
+import org.hamcrest.CoreMatchers.equalTo
+import org.hamcrest.MatcherAssert.assertThat
+import org.junit.Test
+
+/**
+ * @author Doohyun
+ */
+class ExampleTest {
+    @Test
+    fun sum() {
+        assertThat(1 + 1, equalTo(2))
+    }
+}

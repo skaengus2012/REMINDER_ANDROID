@@ -14,5 +14,11 @@
  * limitations under the License.
  */
 
-include(":app")
-rootProject.name="REMINDER_ANDROID"
+package com.nlab.reminder.core.android.recyclerview
+
+/**
+ * @author Doohyun
+ */
+interface HashIdentifier {
+    val hashId: Int
+}

@@ -14,5 +14,19 @@
  * limitations under the License.
  */
 
-include(":app")
-rootProject.name="REMINDER_ANDROID"
+package com.nlab.reminder.core.state.util
+
+import com.nlab.reminder.core.state.State
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.stateIn
+
+/**
+ * @author Doohyun
+ */
+fun <S : State> StateFlow<S>.fetchedFlow(
+    scope: CoroutineScope,
+    onFetch: suspend () -> Unit
+): StateFlow<S> = onStart { onFetch() }.stateIn(scope, SharingStarted.Lazily, value)

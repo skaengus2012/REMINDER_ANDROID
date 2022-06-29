@@ -14,5 +14,24 @@
  * limitations under the License.
  */
 
-include(":app")
-rootProject.name="REMINDER_ANDROID"
+package com.nlab.reminder.core.state.util
+
+import com.nlab.reminder.core.state.State
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
+
+/**
+ * @author Doohyun
+ */
+internal class StateReducer<S : State> {
+    operator fun invoke(
+        state: MutableStateFlow<S>,
+        curState: S,
+        newState: S
+    ) {
+        state.update { old ->
+            if (old == curState) newState
+            else old
+        }
+    }
+}

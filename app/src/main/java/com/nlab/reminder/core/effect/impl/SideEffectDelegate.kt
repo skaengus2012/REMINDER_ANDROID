@@ -14,5 +14,19 @@
  * limitations under the License.
  */
 
-include(":app")
-rootProject.name="REMINDER_ANDROID"
+package com.nlab.reminder.core.effect.impl
+
+import com.nlab.reminder.core.effect.SendSideEffect
+import com.nlab.reminder.core.effect.SideEffect
+import kotlin.reflect.KProperty
+
+/**
+ * @author Doohyun
+ */
+class SideEffectDelegate<T : SideEffect.Message>(
+    private val sideEffect: SendSideEffect<T>
+) {
+    operator fun getValue(t: Any?, property: KProperty<*>): SendSideEffect<T> {
+        return sideEffect
+    }
+}

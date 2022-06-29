@@ -14,5 +14,17 @@
  * limitations under the License.
  */
 
-include(":app")
-rootProject.name="REMINDER_ANDROID"
+package com.nlab.reminder.domain.common.tag
+
+import com.nlab.reminder.core.util.annotation.test.Generated
+
+/**
+ * @author Doohyun
+ */
+@Generated
+data class Tag(
+    val text: String,
+    private val code: Int
+) {
+    val tagStyleResource: TagStyleResource get() = TagStyleResource.findByCode(code)
+}

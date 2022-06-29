@@ -14,5 +14,14 @@
  * limitations under the License.
  */
 
-include(":app")
-rootProject.name="REMINDER_ANDROID"
+package com.nlab.reminder.core.effect.android.navigation
+
+import com.nlab.reminder.core.effect.SendSideEffect
+import com.nlab.reminder.core.effect.SideEffect
+
+/**
+ * @author Doohyun
+ */
+interface NavigationMessage : SideEffect.Message
+typealias SendNavigationEffect = SendSideEffect<NavigationMessage>
+typealias NavigationEffect = SideEffect<NavigationMessage>

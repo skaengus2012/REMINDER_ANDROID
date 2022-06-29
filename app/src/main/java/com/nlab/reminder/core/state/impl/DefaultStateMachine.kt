@@ -14,5 +14,19 @@
  * limitations under the License.
  */
 
-include(":app")
-rootProject.name="REMINDER_ANDROID"
+package com.nlab.reminder.core.state.impl
+
+import com.nlab.reminder.core.state.Action
+import com.nlab.reminder.core.state.ActionProcessor
+import com.nlab.reminder.core.state.State
+import com.nlab.reminder.core.state.StateMachine
+import kotlinx.coroutines.flow.*
+
+/**
+ * @author Doohyun
+ */
+internal class DefaultStateMachine<A : Action, S : State>(
+    actionProcessor: ActionProcessor<A>,
+    override val state: StateFlow<S>,
+) : StateMachine<A, S>,
+    ActionProcessor<A> by actionProcessor

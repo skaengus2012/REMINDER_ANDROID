@@ -14,5 +14,9 @@
  * limitations under the License.
  */
 
-include(":app")
-rootProject.name="REMINDER_ANDROID"
+package com.nlab.reminder.core.state.util
+
+/**
+ * @author Doohyun
+ */
+data class UpdateSource<A, S>(val action: A, val oldState: S)
