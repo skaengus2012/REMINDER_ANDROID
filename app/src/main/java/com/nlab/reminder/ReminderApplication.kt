@@ -25,4 +25,4 @@ import dagger.hilt.android.HiltAndroidApp
  */
 @Generated
 @HiltAndroidApp
-class PracticeApplication : Application()
+class ReminderApplication : Application()
