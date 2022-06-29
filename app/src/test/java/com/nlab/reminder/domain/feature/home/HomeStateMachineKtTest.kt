@@ -122,31 +122,6 @@ class HomeStateMachineKtTest {
     }
 
     @Test
-    fun `Notify Loaded when fetch is called`() = runTest {
-        val getHomeSummaryUseCase: GetHomeSummaryUseCase = mock {
-            whenever(mock()) doReturn flow {
-                repeat(10) { number ->
-                    emit(HomeSummary(todayNotificationCount = number.toLong()))
-                }
-            }
-        }
-        val collectedStates: MutableList<HomeSummary> = mutableListOf()
-        val onHomeSummaryLoaded: (HomeSummary) -> Unit = { collectedStates += it }
-        val stateMachine: HomeStateMachine = createHomeStateMachine(
-            scope = CoroutineScope(Dispatchers.Unconfined),
-            getHomeSummary = getHomeSummaryUseCase,
-            onHomeSummaryLoaded = onHomeSummaryLoaded
-        )
-        stateMachine
-            .send(HomeAction.Fetch)
-            .join()
-        assertThat(
-            collectedStates,
-            equalTo((0..9).map { HomeSummary(todayNotificationCount = it.toLong()) })
-        )
-    }
-
-    @Test
     fun `Navigate today end when today clicked`() = runTest {
         testNavigationEnd(HomeAction.OnTodayCategoryClicked, TodayEndNavigationMessage)
     }
