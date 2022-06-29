@@ -82,46 +82,6 @@ class HomeStateMachineKtTest {
     }
 
     @Test
-    fun `keep state init even when action occurs until fetched`() = runTest {
-        val stateMachine: HomeStateMachine = createHomeStateMachine()
-        val initState: HomeState = HomeState.Init
-        dummyActions
-            .asSequence()
-            .filter { it !is HomeAction.Fetch }
-            .forEach { action ->
-                stateMachine.send(action).join()
-                assertThat(stateMachine.state.value, sameInstance(initState))
-            }
-
-        stateMachine.send(HomeAction.Fetch).join()
-        assertThat(stateMachine.state.value, not(sameInstance(initState)))
-    }
-
-    @Test
-    fun `fetch is executed when state is init`() = runTest {
-        fun createHomeStateMachineWithEmptySummary(
-            initState: HomeState
-        ): HomeStateMachine = createHomeStateMachine(
-            getHomeSummary = mock { onBlocking { invoke() } doReturn flow {} },
-            initState = initState
-        )
-
-        dummyStates
-            .asSequence()
-            .filter { it !is HomeState.Init }
-            .map { state -> createHomeStateMachineWithEmptySummary(state) }
-            .forEach { machine ->
-                val curState: HomeState = machine.state.value
-                machine.send(HomeAction.Fetch).join()
-                assertThat(machine.state.value, sameInstance(curState))
-            }
-
-        val stateMachine: StateMachine<HomeAction, HomeState> = createHomeStateMachineWithEmptySummary(HomeState.Init)
-        stateMachine.send(HomeAction.Fetch).join()
-        assertThat(stateMachine.state.value, equalTo(HomeState.Loading))
-    }
-
-    @Test
     fun `Navigate today end when today clicked`() = runTest {
         testNavigationEnd(HomeAction.OnTodayCategoryClicked, TodayEndNavigationMessage)
     }
