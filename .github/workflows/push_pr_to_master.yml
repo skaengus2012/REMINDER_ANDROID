@@ -1,4 +1,4 @@
-name: Test CI with Gradle
+name: Test CI
 
 on:
   push:
@@ -15,7 +15,7 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 11
-          
+
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
@@ -33,3 +33,56 @@ jobs:
           fail_ci_if_error: true
           directory: /home/runner/work/REMINDER_ANDROID/REMINDER_ANDROID/
           files: ./app/build/reports/jacoco/coverageReport/coverageReport.xml
+
+      - name: action-slack
+        uses: 8398a7/action-slack@v3.12.0
+        with:
+          status: custom
+          fields: job,commit,author,pullRequest,took
+          mention: here,
+          if_mention: failure,cancelled,
+          custom_payload: |
+            {
+              text: 'Github Actions 알림',
+              attachments: [{
+                  color: '${{ job.status }}' === 'success' ? 'good' : '${{ job.status }}' === 'failure' ? 'danger' : 'warning',
+                  title: 'Pull Request CI 가 완료됐어!',
+                  text: '아래에 상세한 내용이 있으니, 살펴보면 좋을 것 같아 😆',
+                  fields: [
+                      {
+                          title: 'title',
+                          value: `\`${process.env.AS_PULL_REQUEST}\``,
+                          short: true
+                      },
+                      {
+                          title: 'ci result',
+                          value: '${{ job.status }}' === 'success' ? '\`성공\`' : '${{ job.status }}' === 'failure' ? '\`실패\`' : '\`중단\`',
+                          short: true
+                      },
+                      {
+                          title: 'author',
+                          value: `\`${process.env.AS_AUTHOR}\``,
+                          short: true
+                      },
+                      {
+                          title: 'job',
+                          value: `\`${process.env.AS_JOB}\``,
+                          short: true
+                      },
+                      {
+                          title: 'commit',
+                          value: `\`${process.env.AS_COMMIT}\``,
+                          short: true
+                      },
+                      {
+                          title: 'took',
+                          value: `\`${process.env.AS_TOOK}\``,
+                          short: true
+                      }
+                  ],
+              }]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_CI_URL }}
+        if: always()
+
