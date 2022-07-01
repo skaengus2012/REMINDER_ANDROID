@@ -29,8 +29,7 @@ import com.nlab.reminder.R
 import com.nlab.reminder.core.effect.android.navigation.NavigationEffectReceiver
 import com.nlab.reminder.databinding.FragmentHomeBinding
 import com.nlab.reminder.domain.common.android.view.recyclerview.simple.SimpleLayoutAdapter
-import com.nlab.reminder.domain.feature.home.HomeState
-import com.nlab.reminder.domain.feature.home.HomeViewModel
+import com.nlab.reminder.domain.feature.home.*
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -89,7 +88,14 @@ class HomeFragment : Fragment() {
             .filterIsInstance<HomeState.Loaded>()
             .flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .distinctUntilChanged()
-            .map { state -> state.toListItem() }
+            .map { state ->
+                state.toListItem(
+                    onTodayCategoryClicked = viewModel::onTodayCategoryClicked,
+                    onTimetableCategoryClicked = viewModel::onTimetableCategoryClicked,
+                    onAllCategoryClicked = viewModel::onAllCategoryClicked,
+                    onTagClicked = viewModel::onTagClicked
+                )
+            }
             .flowOn(Dispatchers.Default)
             .onEach { homeListItem -> renderWhenLoaded(homeListItem) }
             .launchIn(viewLifecycleOwner.lifecycleScope)

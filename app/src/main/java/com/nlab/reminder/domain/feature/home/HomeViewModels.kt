@@ -18,20 +18,18 @@ package com.nlab.reminder.domain.feature.home
 
 import com.nlab.reminder.domain.common.tag.Tag
 
-/**
- * @author Doohyun
- */
-class HomeStateLoadedFactory(
-    private val onTodayCategoryClicked: () -> Unit,
-    private val onTimetableCategoryClicked: () -> Unit,
-    private val onAllCategoryClicked: () -> Unit,
-    private val onTagClicked: (Tag) -> Unit
-) {
-    fun create(homeSummary: HomeSummary): HomeState.Loaded = HomeState.Loaded(
-        homeSummary,
-        onTodayCategoryClicked,
-        onTimetableCategoryClicked,
-        onAllCategoryClicked,
-        onTagClicked
-    )
+fun HomeViewModel.onTodayCategoryClicked() {
+    onAction(HomeAction.OnTodayCategoryClicked)
+}
+
+fun HomeViewModel.onTimetableCategoryClicked() {
+    onAction(HomeAction.OnTimetableCategoryClicked)
+}
+
+fun HomeViewModel.onAllCategoryClicked() {
+    onAction(HomeAction.OnAllCategoryClicked)
+}
+
+fun HomeViewModel.onTagClicked(tag: Tag) {
+    onAction(HomeAction.OnTagClicked(tag))
 }

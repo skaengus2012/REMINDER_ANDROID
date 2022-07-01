@@ -16,13 +16,19 @@
 
 package com.nlab.reminder.domain.feature.home.view
 
+import com.nlab.reminder.domain.common.tag.Tag
 import com.nlab.reminder.domain.common.tag.view.TagItem
 import com.nlab.reminder.domain.feature.home.HomeState
 
 /**
  * @author Doohyun
  */
-internal fun HomeState.Loaded.toListItem(): HomeListItem = HomeListItem(
+internal fun HomeState.Loaded.toListItem(
+    onTodayCategoryClicked: () -> Unit,
+    onTimetableCategoryClicked: () -> Unit,
+    onAllCategoryClicked: () -> Unit,
+    onTagClicked: (Tag) -> Unit
+): HomeListItem = HomeListItem(
     categoryItems = listOf(
         CategoryItem(
             categoryResource = CategoryResource.TODAY,

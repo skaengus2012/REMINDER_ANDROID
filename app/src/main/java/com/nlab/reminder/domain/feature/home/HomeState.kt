@@ -18,7 +18,6 @@ package com.nlab.reminder.domain.feature.home
 
 import com.nlab.reminder.core.state.State
 import com.nlab.reminder.core.util.annotation.test.Generated
-import com.nlab.reminder.domain.common.tag.Tag
 
 /**
  * @author Doohyun
@@ -27,11 +26,5 @@ sealed class HomeState private constructor() : State {
     object Init : HomeState()
     object Loading : HomeState()
     @Generated
-    data class Loaded(
-        val homeSummary: HomeSummary,
-        val onTodayCategoryClicked: () -> Unit,
-        val onTimetableCategoryClicked: () -> Unit,
-        val onAllCategoryClicked: () -> Unit,
-        val onTagClicked: (Tag) -> Unit
-    ) : HomeState()
+    data class Loaded(val homeSummary: HomeSummary) : HomeState()
 }

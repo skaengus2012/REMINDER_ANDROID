@@ -37,7 +37,6 @@ fun HomeStateMachine(
     initState: HomeState,
     navigationEffect: SendNavigationEffect,
     getHomeSummary: GetHomeSummaryUseCase,
-    homeStateLoadedFactory: HomeStateLoadedFactory,
     onHomeSummaryLoaded: (HomeSummary) -> Unit
 ): HomeStateMachine = StateMachine(scope, initState) {
     updateTo { (action, oldState) ->
@@ -46,9 +45,7 @@ fun HomeStateMachine(
                 if (oldState is HomeState.Init) HomeState.Loading
                 else oldState
             }
-            is HomeAction.HomeSummaryRefreshed -> {
-                homeStateLoadedFactory.create(action.homeSummary)
-            }
+            is HomeAction.HomeSummaryRefreshed -> HomeState.Loaded(action.homeSummary)
             else -> oldState
         }
     }

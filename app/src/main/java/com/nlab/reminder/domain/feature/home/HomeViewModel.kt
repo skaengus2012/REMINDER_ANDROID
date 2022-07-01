@@ -37,12 +37,6 @@ class HomeViewModel @Inject constructor(
     private val stateMachine: HomeStateMachine = stateMachineFactory.create(
         viewModelScope,
         _navigationEffect,
-        HomeStateLoadedFactory(
-            onTodayCategoryClicked = { onAction(HomeAction.OnTodayCategoryClicked) },
-            onTimetableCategoryClicked = { onAction(HomeAction.OnTimetableCategoryClicked) },
-            onAllCategoryClicked = { onAction(HomeAction.OnAllCategoryClicked) },
-            onTagClicked = { tag -> onAction(HomeAction.OnTagClicked(tag)) }
-        ),
         onHomeSummaryLoaded = { homeSummary -> onAction(HomeAction.HomeSummaryRefreshed(homeSummary)) }
     )
 
