@@ -44,17 +44,38 @@ class StateMachineBuilder<A : Action, S : State>(
         onErrors += block
     }
 
-    fun <T : A> withSideEffect(actionClazz: Class<T>, block: (UpdateSource<T, S>) -> Unit) {
-        sideEffects.add { updateSource ->
-            val action = updateSource.action
+    fun sideEffect(block: (UpdateSource<A, S>) -> Unit) {
+        sideEffects += block
+    }
+
+    inline fun <reified T : A> sideEffectBy(noinline block: (UpdateSource<T, S>) -> Unit) {
+        sideEffectBy(T::class.java, block)
+    }
+
+    // Jacoco could not measure coverage for functions that were directly processed as inline.
+    // So I created a wrapping function
+    fun <T : A> sideEffectBy(actionClazz: Class<T>, block: (UpdateSource<T, S>) -> Unit) {
+        sideEffect { (action, oldState) ->
             if (actionClazz.isInstance(action)) {
-                block(UpdateSource(actionClazz.cast(action)!!, updateSource.oldState))
+                block(UpdateSource(actionClazz.cast(action)!!, oldState))
             }
         }
     }
 
-    inline fun <reified T : A> withSideEffect(noinline block: (UpdateSource<T, S>) -> Unit) {
-        withSideEffect(T::class.java, block)
+    inline fun <reified T : A, reified U : S> sideEffectWhen(noinline block: (UpdateSource<T, U>) -> Unit) {
+        sideEffectWhen(T::class.java, U::class.java, block)
+    }
+
+    fun <T : A, U : S> sideEffectWhen(
+        actionClazz: Class<T>,
+        stateClazz: Class<U>,
+        block: (UpdateSource<T, U>) -> Unit
+    ) {
+        sideEffect { (action, oldState) ->
+            if (actionClazz.isInstance(action) && stateClazz.isInstance(oldState)) {
+                block(UpdateSource(actionClazz.cast(action)!!, stateClazz.cast(oldState)!!))
+            }
+        }
     }
 
     private class ImmutableListener<A : Action, S : State> : (UpdateSource<A, S>) -> S {

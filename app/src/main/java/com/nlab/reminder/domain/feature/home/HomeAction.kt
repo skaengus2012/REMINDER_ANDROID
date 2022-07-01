@@ -24,9 +24,9 @@ import com.nlab.reminder.domain.common.tag.Tag
  */
 sealed class HomeAction private constructor() : Action {
     object Fetch : HomeAction()
-    data class HomeSummaryRefreshed(val homeSummary: HomeSummary) : HomeAction()
+    data class HomeSummaryLoaded(val homeSummary: HomeSummary) : HomeAction()
     object OnTodayCategoryClicked : HomeAction()
     object OnTimetableCategoryClicked : HomeAction()
     object OnAllCategoryClicked : HomeAction()
-    data class OnTagClicked(val tag: Tag) : HomeAction()
+    data class OnTagClicked(val clickedIndex: Int) : HomeAction()
 }

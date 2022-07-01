@@ -37,7 +37,7 @@ class HomeViewModel @Inject constructor(
     private val stateMachine: HomeStateMachine = stateMachineFactory.create(
         viewModelScope,
         _navigationEffect,
-        onHomeSummaryLoaded = { homeSummary -> onAction(HomeAction.HomeSummaryRefreshed(homeSummary)) }
+        onHomeSummaryLoaded = { homeSummary -> onAction(HomeAction.HomeSummaryLoaded(homeSummary)) }
     )
 
     val navigationEffect: NavigationEffect = _navigationEffect

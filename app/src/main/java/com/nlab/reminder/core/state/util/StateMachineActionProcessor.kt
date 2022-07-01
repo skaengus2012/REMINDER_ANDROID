@@ -35,7 +35,7 @@ internal class StateMachineActionProcessor<A : Action, S : State>(
     private val errorHandler = stateMachineBuilder.buildExceptionHandler()
     private val newStateWith = stateMachineBuilder.buildUpdateHandler()
     private val invokeSideEffect = stateMachineBuilder.buildSideEffectHandler()
-    private val internalActionProcessor = DefaultActionProcessor<A>(
+    private val internalActionProcessor = DefaultActionProcessor(
         scope = scope + CoroutineExceptionHandler { _, e -> errorHandler(e) },
         onActionReceived = createOnActionReceiver(state)
     )

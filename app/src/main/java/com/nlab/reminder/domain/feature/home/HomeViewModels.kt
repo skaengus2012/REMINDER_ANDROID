@@ -16,8 +16,6 @@
 
 package com.nlab.reminder.domain.feature.home
 
-import com.nlab.reminder.domain.common.tag.Tag
-
 fun HomeViewModel.onTodayCategoryClicked() {
     onAction(HomeAction.OnTodayCategoryClicked)
 }
@@ -30,6 +28,6 @@ fun HomeViewModel.onAllCategoryClicked() {
     onAction(HomeAction.OnAllCategoryClicked)
 }
 
-fun HomeViewModel.onTagClicked(tag: Tag) {
-    onAction(HomeAction.OnTagClicked(tag))
+fun HomeViewModel.onTagClicked(clickedIndex: Int) {
+    onAction(HomeAction.OnTagClicked(clickedIndex))
 }

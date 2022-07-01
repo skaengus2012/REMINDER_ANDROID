@@ -23,6 +23,7 @@ import com.nlab.reminder.domain.common.effect.android.navigation.navigateAllEnd
 import com.nlab.reminder.domain.common.effect.android.navigation.navigateTagEnd
 import com.nlab.reminder.domain.common.effect.android.navigation.navigateTimetableEnd
 import com.nlab.reminder.domain.common.effect.android.navigation.navigateTodayEnd
+import com.nlab.reminder.domain.common.tag.Tag
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -45,28 +46,34 @@ fun HomeStateMachine(
                 if (oldState is HomeState.Init) HomeState.Loading
                 else oldState
             }
-            is HomeAction.HomeSummaryRefreshed -> HomeState.Loaded(action.homeSummary)
+            is HomeAction.HomeSummaryLoaded -> HomeState.Loaded(action.homeSummary)
             else -> oldState
         }
     }
 
-    withSideEffect<HomeAction.Fetch> {
+    sideEffectWhen<HomeAction.Fetch, HomeState.Init> {
         scope.launch { getHomeSummary().collect { onHomeSummaryLoaded(it) } }
     }
 
-    withSideEffect<HomeAction.OnTodayCategoryClicked> {
+    sideEffectWhen<HomeAction.OnTodayCategoryClicked, HomeState.Loaded> {
         scope.launch { navigationEffect.navigateTodayEnd() }
     }
 
-    withSideEffect<HomeAction.OnTimetableCategoryClicked> {
+    sideEffectWhen<HomeAction.OnTimetableCategoryClicked, HomeState.Loaded> {
         scope.launch { navigationEffect.navigateTimetableEnd() }
     }
 
-    withSideEffect<HomeAction.OnAllCategoryClicked> {
+    sideEffectWhen<HomeAction.OnAllCategoryClicked, HomeState.Loaded> {
         scope.launch { navigationEffect.navigateAllEnd() }
     }
 
-    withSideEffect<HomeAction.OnTagClicked> { (action) ->
-        scope.launch { navigationEffect.navigateTagEnd(action.tag) }
+    sideEffectWhen<HomeAction.OnTagClicked, HomeState.Loaded> { (action, oldState) ->
+        scope.launch {
+            val index: Int = action.clickedIndex
+            val tags: List<Tag> = oldState.homeSummary.tags
+            if (index < tags.size) {
+                navigationEffect.navigateTagEnd(tags[index])
+            }
+        }
     }
 }

@@ -51,7 +51,6 @@ class HomeViewModelTest {
                 mock.create(
                     scope = any(),
                     navigationEffect = any(),
-                    homeStateLoadedFactory = any(),
                     onHomeSummaryLoaded = any()
                 )
             ) doReturn stateMachine
@@ -84,22 +83,39 @@ class HomeViewModelTest {
     }
 
     @Test
-    fun `notify navigation message when navigation event invoked`() = runTest {
+    fun `Notify state when state subscribed`() = runTest {
+        val actualHomeStates = mutableListOf<HomeState>()
+        val expectedSummary = HomeSummary(todayNotificationCount = 1)
+
         val viewModel: HomeViewModel = createViewModel(
             getHomeSummary = mock {
-                whenever(mock()) doReturn flowOf(HomeSummary())
+                whenever(mock()) doReturn flowOf(expectedSummary)
             }
         )
+        CoroutineScope(Dispatchers.Unconfined).launch { viewModel.state.collect(actualHomeStates::add) }
+        assertThat(
+            actualHomeStates,
+            equalTo(buildList {
+                add(HomeState.Init)
+                add(HomeState.Loading)
+                add(HomeState.Loaded(expectedSummary))
+            })
+        )
+    }
 
-        val targetTag = Tag("Hello", TagStyleResource.TYPE4.code)
-        val loaded: HomeState.Loaded =
-            viewModel.state
-                .filterIsInstance<HomeState.Loaded>()
-                .first()
-        loaded.onTodayCategoryClicked()
-        loaded.onTimetableCategoryClicked()
-        loaded.onAllCategoryClicked()
-        loaded.onTagClicked(targetTag)
+    @Test
+    fun `notify navigation message when navigation event invoked`() = runTest {
+        val clickedTag = Tag(text = "ClickedTag", TagStyleResource.TYPE4)
+        val viewModel: HomeViewModel = createViewModel(
+            initState = HomeState.Loaded(
+                HomeSummary(tags = listOf(Tag(text = "", TagStyleResource.TYPE1), clickedTag))
+            )
+        )
+
+        viewModel.onTodayCategoryClicked()
+        viewModel.onTimetableCategoryClicked()
+        viewModel.onAllCategoryClicked()
+        viewModel.onTagClicked(clickedIndex = 1)
         assertThat(
             viewModel.navigationEffect
                 .event
@@ -110,7 +126,7 @@ class HomeViewModelTest {
                     TodayEndNavigationMessage,
                     TimetableEndNavigationMessage,
                     AllEndNavigationMessage,
-                    TagEndNavigationMessage(targetTag)
+                    TagEndNavigationMessage(clickedTag)
                 )
             )
         )

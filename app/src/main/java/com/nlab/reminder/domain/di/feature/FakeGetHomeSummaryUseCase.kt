@@ -17,6 +17,7 @@
 package com.nlab.reminder.domain.di.feature
 
 import com.nlab.reminder.domain.common.tag.Tag
+import com.nlab.reminder.domain.common.tag.TagStyleResource
 import com.nlab.reminder.domain.feature.home.GetHomeSummaryUseCase
 import com.nlab.reminder.domain.feature.home.HomeSummary
 import kotlinx.coroutines.delay
@@ -37,31 +38,31 @@ class FakeGetHomeSummaryUseCase : GetHomeSummaryUseCase {
             tags = listOf(
                 Tag(
                     "Hello",
-                    6
+                    TagStyleResource.TYPE6
                 ),
                 Tag(
                     "돈내는거",
-                    1
+                    TagStyleResource.TYPE1
                 ),
                 Tag(
                     "약속",
-                    2
+                    TagStyleResource.TYPE2
                 ),
                 Tag(
                     "건강",
-                    3
+                    TagStyleResource.TYPE3
                 ),
                 Tag(
                     "공과금 내는 날~!!",
-                    4
+                    TagStyleResource.TYPE4
                 ),
                 Tag(
                     "장보러 가는 날",
-                    5
+                    TagStyleResource.TYPE5
                 ),
                 Tag(
                     "Phone",
-                    6
+                    TagStyleResource.TYPE6
                 )
             )
         ))
@@ -75,27 +76,27 @@ class FakeGetHomeSummaryUseCase : GetHomeSummaryUseCase {
             tags = listOf(
                 Tag(
                     "Hello",
-                    6
+                    TagStyleResource.TYPE6
                 ),
                 Tag(
                     "돈내는거",
-                    1
+                    TagStyleResource.TYPE1
                 ),
                 Tag(
                     "건강",
-                    3
+                    TagStyleResource.TYPE3
                 ),
                 Tag(
                     "공과금 내는 날~!!",
-                    4
+                    TagStyleResource.TYPE4
                 ),
                 Tag(
                     "장보러 가는 날",
-                    5
+                    TagStyleResource.TYPE5
                 ),
                 Tag(
                     "Phone",
-                    6
+                    TagStyleResource.TYPE6
                 )
             )
         ))
@@ -109,36 +110,48 @@ class FakeGetHomeSummaryUseCase : GetHomeSummaryUseCase {
             tags = listOf(
                 Tag(
                     "Hello",
-                    6
+                    TagStyleResource.TYPE6
                 ),
                 Tag(
                     "돈내는거",
-                    1
+                    TagStyleResource.TYPE1
                 ),
                 Tag(
                     "건강",
-                    3
+                    TagStyleResource.TYPE3
                 ),
                 Tag(
                     "공과금 내는 날~!!",
-                    4
+                    TagStyleResource.TYPE4
                 ),
                 Tag(
                     "장보러 가는 날",
-                    5
+                    TagStyleResource.TYPE5
                 ),
                 Tag(
                     "Phone",
-                    6
+                    TagStyleResource.TYPE6
                 ),
                 Tag(
                     "Phone",
-                    4
+                    TagStyleResource.TYPE3
                 ),
                 Tag(
                     "Phone",
-                    2
-                )
+                    TagStyleResource.TYPE2
+                ),
+                Tag(
+                    "돈내는거",
+                    TagStyleResource.TYPE6
+                ),
+                Tag(
+                    "건강",
+                    TagStyleResource.TYPE3
+                ),
+                Tag(
+                    "공과금 내는 날~!!",
+                    TagStyleResource.TYPE2
+                ),
             )
         ))
     }
