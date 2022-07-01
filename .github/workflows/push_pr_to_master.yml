@@ -33,3 +33,14 @@ jobs:
           fail_ci_if_error: true
           directory: /home/runner/work/REMINDER_ANDROID/REMINDER_ANDROID/
           files: ./app/build/reports/jacoco/coverageReport/coverageReport.xml
+
+      - name: action-slack
+        uses: 8398a7/action-slack@v3.12.0
+        with:
+          status: ${{job.status}}
+          author_name: CI-BOT
+          fields: repo,message,commit,author,action,eventName,ref,workflow,job,took
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_CI_URL }}
+        if: always()
+
