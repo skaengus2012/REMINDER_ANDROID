@@ -48,11 +48,12 @@ class TagViewHolder(
         val itemSize = tagItems.size
         val viewCacheSize = tagBindingCache.size
         if (itemSize > viewCacheSize) {
+            val layoutInflater = LayoutInflater.from(tagHolderLayout.context)
             val curLastViewIndex = tagBindingCache.lastIndex
             repeat(times = itemSize - viewCacheSize) { time ->
                 val executeIndex = curLastViewIndex + time + 1
                 tagBindingCache += ViewTagBinding
-                    .inflate(LayoutInflater.from(tagHolderLayout.context), tagHolderLayout, false)
+                    .inflate(layoutInflater, tagHolderLayout, false)
                     .apply {
                         tagButton.throttleClicks()
                             .flowWithLifecycle(lifecycleOwner.lifecycle)

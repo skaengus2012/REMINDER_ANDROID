@@ -18,10 +18,12 @@ package com.nlab.reminder.core.effect.util
 
 import com.nlab.reminder.core.effect.SendSideEffect
 import com.nlab.reminder.core.effect.TestSideEffectMessage
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.fold
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.*
 import org.junit.Test
@@ -33,6 +35,7 @@ import org.junit.Test
 class SideEffectsKtTest {
     @Test
     fun `notify message when sideEffect invoked`() = runTest {
+        Dispatchers.setMain(Dispatchers.Unconfined)
         val testSideEffect: SendSideEffect<TestSideEffectMessage> by sideEffect()
         (1..64)
             .map { TestSideEffectMessage(it) }

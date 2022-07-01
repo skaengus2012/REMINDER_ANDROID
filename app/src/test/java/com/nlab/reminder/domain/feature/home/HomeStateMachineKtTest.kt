@@ -20,8 +20,11 @@ import com.nlab.reminder.core.effect.android.navigation.NavigationMessage
 import com.nlab.reminder.core.effect.android.navigation.SendNavigationEffect
 import com.nlab.reminder.core.state.StateMachine
 import com.nlab.reminder.domain.common.effect.android.navigation.AllEndNavigationMessage
+import com.nlab.reminder.domain.common.effect.android.navigation.TagEndNavigationMessage
 import com.nlab.reminder.domain.common.effect.android.navigation.TimetableEndNavigationMessage
 import com.nlab.reminder.domain.common.effect.android.navigation.TodayEndNavigationMessage
+import com.nlab.reminder.domain.common.tag.Tag
+import com.nlab.reminder.domain.common.tag.TagStyleResource
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
@@ -45,7 +48,7 @@ class HomeStateMachineKtTest {
     private val dummyStates: Set<HomeState> = setOf(
         HomeState.Init,
         HomeState.Loading,
-        TestHomeStateLoadedFactory().create(HomeSummary())
+        HomeState.Loaded(HomeSummary())
     )
 
     private fun createHomeStateMachine(
@@ -53,14 +56,13 @@ class HomeStateMachineKtTest {
         initState: HomeState = HomeState.Init,
         navigationEffect: SendNavigationEffect = mock(),
         getHomeSummary: GetHomeSummaryUseCase = mock { whenever(mock()) doReturn flow { emit(HomeSummary()) } },
-        homeStateLoadedFactory: HomeStateLoadedFactory = TestHomeStateLoadedFactory(),
         onHomeSummaryLoaded: (HomeSummary) -> Unit = mock(),
-    ): HomeStateMachine = HomeStateMachineFactory(getHomeSummary, initState)
-        .create(scope, navigationEffect, homeStateLoadedFactory, onHomeSummaryLoaded)
+    ): HomeStateMachine =
+        HomeStateMachineFactory(getHomeSummary, initState).create(scope, navigationEffect, onHomeSummaryLoaded)
 
     @Test
     fun `holds injected state when machine created`() = runTest {
-        val initState = TestHomeStateLoadedFactory().create(HomeSummary(todayNotificationCount = 1))
+        val initState = HomeState.Loaded(HomeSummary(todayNotificationCount = 1))
         val stateMachine = createHomeStateMachine(initState = initState)
         assertThat(stateMachine.state.value, sameInstance(initState))
     }
@@ -72,7 +74,6 @@ class HomeStateMachineKtTest {
                 .create(
                     scope = CoroutineScope(Dispatchers.Default),
                     navigationEffect = mock(),
-                    homeStateLoadedFactory = TestHomeStateLoadedFactory(),
                     onHomeSummaryLoaded = mock()
                 )
                 .state
@@ -122,6 +123,19 @@ class HomeStateMachineKtTest {
     }
 
     @Test
+    fun `Notify Loaded when loaded action received`() = runTest {
+        val homeSummary = HomeSummary(allNotificationCount = 10)
+        val stateMachine: HomeStateMachine = createHomeStateMachine()
+        stateMachine
+            .send(HomeAction.HomeSummaryLoaded(homeSummary))
+            .join()
+        assertThat(
+            stateMachine.state.value,
+            equalTo(HomeState.Loaded(homeSummary))
+        )
+    }
+
+    @Test
     fun `Notify Loaded when fetch is called`() = runTest {
         val getHomeSummaryUseCase: GetHomeSummaryUseCase = mock {
             whenever(mock()) doReturn flow {
@@ -147,28 +161,63 @@ class HomeStateMachineKtTest {
     }
 
     @Test
-    fun `Navigate today end when today clicked`() = runTest {
-        testNavigationEnd(HomeAction.OnTodayCategoryClicked, TodayEndNavigationMessage)
+    fun `Navigate today end when today category clicked`() = runTest {
+        testNavigationEnd(
+            navigateAction = HomeAction.OnTodayCategoryClicked,
+            expectedNavigationMessage = TodayEndNavigationMessage
+        )
     }
 
     @Test
-    fun `Navigate timetable end when today clicked`() = runTest {
-        testNavigationEnd(HomeAction.OnTimetableCategoryClicked, TimetableEndNavigationMessage)
+    fun `Navigate timetable end when timetable category clicked`() = runTest {
+        testNavigationEnd(
+            navigateAction = HomeAction.OnTimetableCategoryClicked,
+            expectedNavigationMessage = TimetableEndNavigationMessage
+        )
     }
 
     @Test
-    fun `Navigate all end when today clicked`() = runTest {
-        testNavigationEnd(HomeAction.OnAllCategoryClicked, AllEndNavigationMessage)
+    fun `Navigate all end when all category clicked`() = runTest {
+        testNavigationEnd(
+            navigateAction = HomeAction.OnAllCategoryClicked,
+            expectedNavigationMessage = AllEndNavigationMessage
+        )
+    }
+
+    @Test
+    fun `Navigate tag end when tag element clicked`() = runTest {
+        val tag = Tag(text = "Test", TagStyleResource.TYPE3)
+        testNavigationEnd(
+            initState = HomeState.Loaded(HomeSummary(tags = listOf(tag))),
+            navigateAction = HomeAction.OnTagClicked(clickedIndex = 0),
+            expectedNavigationMessage = TagEndNavigationMessage(tag)
+        )
+    }
+
+    @Test
+    fun `failed Navigate by tag when wrong index tag item clicked`() = runTest {
+        val navigationEffect: SendNavigationEffect = mock()
+        val stateMachine: HomeStateMachine = createHomeStateMachine(
+            scope = CoroutineScope(Dispatchers.Unconfined),
+            initState = HomeState.Loaded(HomeSummary()),
+            navigationEffect = navigationEffect
+        )
+
+        stateMachine
+            .send(HomeAction.OnTagClicked(clickedIndex = 0))
+            .join()
+        verify(navigationEffect, never()).send(any())
     }
 
     private suspend fun testNavigationEnd(
+        initState: HomeState = HomeState.Loaded(HomeSummary(todayNotificationCount = 10)),
         navigateAction: HomeAction,
-        expectedNavigationMessage: NavigationMessage
+        expectedNavigationMessage: NavigationMessage,
     ) {
         val navigationEffect: SendNavigationEffect = mock()
         val stateMachine: HomeStateMachine = createHomeStateMachine(
             scope = CoroutineScope(Dispatchers.Unconfined),
-            initState = TestHomeStateLoadedFactory().create(HomeSummary(todayNotificationCount = 10)),
+            initState = initState,
             navigationEffect = navigationEffect
         )
         stateMachine

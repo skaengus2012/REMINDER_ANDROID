@@ -22,7 +22,12 @@ import com.nlab.reminder.domain.feature.home.HomeState
 /**
  * @author Doohyun
  */
-internal fun HomeState.Loaded.toListItem(): HomeListItem = HomeListItem(
+internal fun HomeState.Loaded.toListItem(
+    onTodayCategoryClicked: () -> Unit,
+    onTimetableCategoryClicked: () -> Unit,
+    onAllCategoryClicked: () -> Unit,
+    onTagClicked: (Int) -> Unit
+): HomeListItem = HomeListItem(
     categoryItems = listOf(
         CategoryItem(
             categoryResource = CategoryResource.TODAY,
@@ -40,10 +45,10 @@ internal fun HomeState.Loaded.toListItem(): HomeListItem = HomeListItem(
             onItemClicked = onAllCategoryClicked
         )
     ),
-    tagItems = homeSummary.tags.map { tag ->
+    tagItems = homeSummary.tags.mapIndexed { index, tag ->
         TagItem(
             tag,
-            onClicked = { onTagClicked(tag) },
+            onClicked = { onTagClicked(index) },
             onLongClicked = {}
         )
     }

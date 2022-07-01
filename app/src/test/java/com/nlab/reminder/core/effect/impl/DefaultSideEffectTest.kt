@@ -23,10 +23,8 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.fold
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
-import org.junit.Before
 import org.junit.Test
 
 /**
@@ -34,17 +32,12 @@ import org.junit.Test
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class DefaultSideEffectTest {
-    @Before
-    fun init() {
-        Dispatchers.setMain(Dispatchers.Unconfined)
-    }
-
     @Test
     fun `notify 64 times event after sending message 64 times`() {
         joinSendJobsAndReceiveTest(
             // DefaultSideEffect use Buffered channel.
             // default buffer size is 64
-            DefaultSideEffect(Channel(Channel.BUFFERED)),
+            DefaultSideEffect(Channel(Channel.BUFFERED), Dispatchers.Unconfined),
             testCount = 64
         )
     }
@@ -52,7 +45,7 @@ class DefaultSideEffectTest {
     @Test
     fun `notify 100 times event after sending message 100 times with unlimited channel`() {
         joinSendJobsAndReceiveTest(
-            DefaultSideEffect(Channel(Channel.UNLIMITED)),
+            DefaultSideEffect(Channel(Channel.UNLIMITED), Dispatchers.Unconfined),
             testCount = 100
         )
     }

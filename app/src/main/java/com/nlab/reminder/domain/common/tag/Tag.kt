@@ -24,7 +24,5 @@ import com.nlab.reminder.core.util.annotation.test.Generated
 @Generated
 data class Tag(
     val text: String,
-    private val code: Int
-) {
-    val tagStyleResource: TagStyleResource get() = TagStyleResource.findByCode(code)
-}
+    val tagStyleResource: TagStyleResource
+)

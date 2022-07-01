@@ -60,8 +60,8 @@ class StateMachineTest {
         val testAction1: (UpdateSource<TestAction.Action1, TestState>) -> Unit = mock()
         val testAction2: (UpdateSource<TestAction.Action2, TestState>) -> Unit = mock()
         val stateMachine = StateMachine<TestAction, TestState>(scope, TestState.StateInit()) {
-            withSideEffect(TestAction.Action1::class.java) { testAction1(it) }
-            withSideEffect{ testAction2(it) }
+            sideEffectBy { testAction1(it) }
+            sideEffectBy { testAction2(it) }
         }
 
         repeat(2) {
