@@ -19,6 +19,8 @@ package com.nlab.reminder.core.effect.util
 import com.nlab.reminder.core.effect.SideEffect
 import com.nlab.reminder.core.effect.impl.DefaultSideEffect
 import com.nlab.reminder.core.effect.impl.SideEffectDelegate
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 
 /**
@@ -26,5 +28,6 @@ import kotlinx.coroutines.channels.Channel
  */
 @Suppress("FunctionName")
 fun <T : SideEffect.Message> sideEffect(
-    eventChannel: Channel<T> = Channel(Channel.BUFFERED)
-) = SideEffectDelegate(DefaultSideEffect(eventChannel))
+    eventChannel: Channel<T> = Channel(Channel.BUFFERED),
+    dispatcher: CoroutineDispatcher = Dispatchers.Main
+) = SideEffectDelegate(DefaultSideEffect(eventChannel, dispatcher))
