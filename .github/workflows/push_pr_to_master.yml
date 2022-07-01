@@ -1,4 +1,4 @@
-name: Test CI with Gradle
+name: Test CI
 
 on:
   push:
