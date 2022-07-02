@@ -33,3 +33,7 @@ fun HomeViewModel.onAllCategoryClicked() {
 fun HomeViewModel.onTagClicked(tag: Tag) {
     onAction(HomeAction.OnTagClicked(tag))
 }
+
+fun HomeViewModel.onTagLongClicked(tag: Tag) {
+    onAction(HomeAction.OnTagLongClicked(tag))
+}

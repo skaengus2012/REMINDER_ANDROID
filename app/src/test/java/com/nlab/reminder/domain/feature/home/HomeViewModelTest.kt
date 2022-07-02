@@ -114,17 +114,19 @@ class HomeViewModelTest {
         viewModel.onTimetableCategoryClicked()
         viewModel.onAllCategoryClicked()
         viewModel.onTagClicked(clickedTag)
+        viewModel.onTagLongClicked(clickedTag)
         assertThat(
             viewModel.navigationEffect
                 .event
-                .take(4)
+                .take(5)
                 .toList(),
             equalTo(
                 listOf(
                     TodayEndNavigationMessage,
                     TimetableEndNavigationMessage,
                     AllEndNavigationMessage,
-                    TagEndNavigationMessage(clickedTag)
+                    TagEndNavigationMessage(clickedTag),
+                    HomeTagConfigNavigation(clickedTag)
                 )
             )
         )

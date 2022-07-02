@@ -69,4 +69,8 @@ fun HomeStateMachine(
     sideEffectWhen<HomeAction.OnTagClicked, HomeState.Loaded> { (action) ->
         scope.launch { navigationEffect.navigateTagEnd(action.tag) }
     }
+
+    sideEffectWhen<HomeAction.OnTagLongClicked, HomeState.Loaded> { (action) ->
+        scope.launch { navigationEffect.navigateHomeTagConfig(action.tag) }
+    }
 }

@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.di.common.navigation
+package com.nlab.reminder.domain.common.effect.android.navigation.di
 
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
 import com.nlab.reminder.core.effect.android.navigation.NavigationEffectReceiver
 import com.nlab.reminder.core.effect.android.navigation.fragment.FragmentNavigateUseCase
-import com.nlab.reminder.core.effect.android.navigation.util.NavigationEffectReceiver
+import com.nlab.reminder.core.effect.android.navigation.fragment.util.FragmentNavigateEffectReceiver
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -39,10 +38,5 @@ class NavigateFragmentModule {
     fun provideNavigationEffectReceiver(
         fragment: Fragment,
         fragmentNavigateUseCase: FragmentNavigateUseCase
-    ): NavigationEffectReceiver {
-        return NavigationEffectReceiver(
-            lifecycleOwner = { fragment.viewLifecycleOwner },
-            onNavigationMessageReceived = { message -> fragmentNavigateUseCase(fragment.findNavController(), message) }
-        )
-    }
+    ): NavigationEffectReceiver = FragmentNavigateEffectReceiver(fragment, fragmentNavigateUseCase)
 }

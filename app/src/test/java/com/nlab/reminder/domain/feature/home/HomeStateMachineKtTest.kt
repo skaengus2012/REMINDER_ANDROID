@@ -187,21 +187,25 @@ class HomeStateMachineKtTest {
     @Test
     fun `Navigate tag end when tag element clicked`() = runTest {
         val tag = Tag(text = "Test", TagStyleResource.TYPE3)
-        testNavigationEnd(
-            initState = HomeState.Loaded(HomeSummary(tags = listOf(tag))),
-            navigateAction = HomeAction.OnTagClicked(tag),
-            expectedNavigationMessage = TagEndNavigationMessage(tag)
-        )
+        listOf(HomeSummary(tags = listOf(tag)), HomeSummary(tags = emptyList())).forEach { homeSummary ->
+            testNavigationEnd(
+                initState = HomeState.Loaded(homeSummary),
+                navigateAction = HomeAction.OnTagClicked(tag),
+                expectedNavigationMessage = TagEndNavigationMessage(tag)
+            )
+        }
     }
 
     @Test
-    fun `notify navigation when tag element clicked without no items`() = runTest {
+    fun `Navigate tag config end when tag element long clicked without no items`() = runTest {
         val tag = Tag(text = "Test", TagStyleResource.TYPE3)
-        testNavigationEnd(
-            initState = HomeState.Loaded(HomeSummary(tags = emptyList())),
-            navigateAction = HomeAction.OnTagClicked(tag),
-            expectedNavigationMessage = TagEndNavigationMessage(tag)
-        )
+        listOf(HomeSummary(tags = listOf(tag)), HomeSummary(tags = emptyList())).forEach { homeSummary ->
+            testNavigationEnd(
+                initState = HomeState.Loaded(homeSummary),
+                navigateAction = HomeAction.OnTagLongClicked(tag),
+                expectedNavigationMessage = HomeTagConfigNavigation(tag)
+            )
+        }
     }
 
     private suspend fun testNavigationEnd(

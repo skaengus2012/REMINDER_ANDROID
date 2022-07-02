@@ -45,6 +45,7 @@ class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
     private val binding: FragmentHomeBinding get() = checkNotNull(_binding)
 
+    @HomeScope
     @Inject
     lateinit var navigateEffectReceiver: NavigationEffectReceiver
 
@@ -93,7 +94,8 @@ class HomeFragment : Fragment() {
                     onTodayCategoryClicked = viewModel::onTodayCategoryClicked,
                     onTimetableCategoryClicked = viewModel::onTimetableCategoryClicked,
                     onAllCategoryClicked = viewModel::onAllCategoryClicked,
-                    onTagClicked = viewModel::onTagClicked
+                    onTagClicked = viewModel::onTagClicked,
+                    onTagLongClicked = viewModel::onTagLongClicked
                 )
             }
             .flowOn(Dispatchers.Default)

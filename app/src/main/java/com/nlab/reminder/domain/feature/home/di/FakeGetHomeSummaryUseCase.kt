@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.di.feature
+package com.nlab.reminder.domain.feature.home.di
 
 import com.nlab.reminder.domain.common.tag.Tag
 import com.nlab.reminder.domain.common.tag.TagStyleResource

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.di.common.navigation
+package com.nlab.reminder.domain.common.effect.android.navigation.di
 
 import com.nlab.reminder.core.effect.android.navigation.fragment.FragmentNavigateUseCase
 import com.nlab.reminder.core.effect.android.navigation.fragment.util.FragmentNavigateUseCase
