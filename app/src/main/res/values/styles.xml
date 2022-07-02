@@ -30,6 +30,8 @@
 		<item name="android:windowBackground">?attr/colorPrimary</item>
 		<item name="android:statusBarColor">?attr/colorPrimary</item>
 
+		<item name="defaultTextColor">@color/black</item>
+
 		<!-- home -->
 		<item name="cardBackground">@color/white</item>
 	</style>

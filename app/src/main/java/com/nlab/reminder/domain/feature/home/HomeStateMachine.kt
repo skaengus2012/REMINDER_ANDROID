@@ -16,13 +16,13 @@
 
 package com.nlab.reminder.domain.feature.home
 
-import com.nlab.reminder.core.effect.android.navigation.SendNavigationEffect
+import com.nlab.reminder.core.effect.message.navigation.SendNavigationEffect
 import com.nlab.reminder.core.state.StateMachine
 import com.nlab.reminder.core.state.util.StateMachine
-import com.nlab.reminder.domain.common.effect.android.navigation.navigateAllEnd
-import com.nlab.reminder.domain.common.effect.android.navigation.navigateTagEnd
-import com.nlab.reminder.domain.common.effect.android.navigation.navigateTimetableEnd
-import com.nlab.reminder.domain.common.effect.android.navigation.navigateTodayEnd
+import com.nlab.reminder.domain.common.effect.message.navigation.util.navigateAllEnd
+import com.nlab.reminder.domain.common.effect.message.navigation.util.navigateTagEnd
+import com.nlab.reminder.domain.common.effect.message.navigation.util.navigateTimetableEnd
+import com.nlab.reminder.domain.common.effect.message.navigation.util.navigateTodayEnd
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -37,6 +37,7 @@ fun HomeStateMachine(
     initState: HomeState,
     navigationEffect: SendNavigationEffect,
     getHomeSummary: GetHomeSummaryUseCase,
+    getTagUsageCount: GetTagUsageCountUseCase,
     onHomeSummaryLoaded: (HomeSummary) -> Unit
 ): HomeStateMachine = StateMachine(scope, initState) {
     updateTo { (action, oldState) ->
@@ -71,6 +72,14 @@ fun HomeStateMachine(
     }
 
     sideEffectWhen<HomeAction.OnTagLongClicked, HomeState.Loaded> { (action) ->
-        scope.launch { navigationEffect.navigateHomeTagConfig(action.tag) }
+        scope.launch { navigationEffect.send(HomeTagConfigNavigationMessage(action.tag)) }
+    }
+
+    sideEffectWhen<HomeAction.OnTagRenameRequestClicked, HomeState.Loaded> { (action) ->
+        scope.launch { navigationEffect.send(HomeTagRenameNavigationMessage(action.tag, getTagUsageCount.invoke(action.tag))) }
+    }
+
+    sideEffectWhen<HomeAction.OnTagDeleteRequestClicked, HomeState.Loaded> { (action) ->
+        scope.launch { navigationEffect.send(HomeTagDeleteConfirmNavigationMessage(action.tag)) }
     }
 }

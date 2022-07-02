@@ -26,7 +26,7 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ConcatAdapter
 import com.nlab.reminder.R
-import com.nlab.reminder.core.effect.android.navigation.NavigationEffectReceiver
+import com.nlab.reminder.core.entrypoint.fragment.FragmentEntryPointInit
 import com.nlab.reminder.databinding.FragmentHomeBinding
 import com.nlab.reminder.domain.common.android.view.recyclerview.simple.SimpleLayoutAdapter
 import com.nlab.reminder.domain.feature.home.*
@@ -47,7 +47,7 @@ class HomeFragment : Fragment() {
 
     @HomeScope
     @Inject
-    lateinit var navigateEffectReceiver: NavigationEffectReceiver
+    lateinit var entryPointInit: FragmentEntryPointInit
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         FragmentHomeBinding.inflate(inflater, container, false)
@@ -56,6 +56,10 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        entryPointInit.initialize(
+            navigationEffect = viewModel.navigationEffect
+        )
+
         val categoryAdapter = CategoryAdapter(viewLifecycleOwner)
         val tagAdapter = TagAdapter(viewLifecycleOwner)
         val renderWhenLoaded = renderWhenLoadedFunc(categoryAdapter, tagAdapter)
@@ -68,8 +72,6 @@ class HomeFragment : Fragment() {
                 tagAdapter
             )
         }
-
-        navigateEffectReceiver.observeEvent(viewModel.navigationEffect)
 
         viewModel.state
             .filterIsInstance<HomeState.Init>()

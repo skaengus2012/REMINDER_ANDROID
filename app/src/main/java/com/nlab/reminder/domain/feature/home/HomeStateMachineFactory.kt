@@ -16,7 +16,7 @@
 
 package com.nlab.reminder.domain.feature.home
 
-import com.nlab.reminder.core.effect.android.navigation.SendNavigationEffect
+import com.nlab.reminder.core.effect.message.navigation.SendNavigationEffect
 import com.nlab.reminder.core.util.annotation.test.Generated
 import kotlinx.coroutines.CoroutineScope
 
@@ -26,11 +26,19 @@ import kotlinx.coroutines.CoroutineScope
 @Generated
 class HomeStateMachineFactory(
     private val getHomeSummary: GetHomeSummaryUseCase,
+    private val getTagUsageCount: GetTagUsageCountUseCase,
     private val initState: HomeState = HomeState.Init
 ) {
     fun create(
         scope: CoroutineScope,
         navigationEffect: SendNavigationEffect,
         onHomeSummaryLoaded: (HomeSummary) -> Unit,
-    ): HomeStateMachine = HomeStateMachine(scope, initState, navigationEffect, getHomeSummary, onHomeSummaryLoaded)
+    ): HomeStateMachine = HomeStateMachine(
+        scope,
+        initState,
+        navigationEffect,
+        getHomeSummary,
+        getTagUsageCount,
+        onHomeSummaryLoaded
+    )
 }

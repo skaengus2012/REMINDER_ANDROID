@@ -22,5 +22,5 @@ import kotlinx.coroutines.flow.Flow
  * @author Doohyun
  */
 interface GetHomeSummaryUseCase {
-    operator fun invoke(): Flow<HomeSummary>
+    suspend operator fun invoke(): Flow<HomeSummary>
 }

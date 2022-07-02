@@ -14,18 +14,15 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.common.tag
+package com.nlab.reminder.domain.feature.home.di
 
-import android.os.Parcelable
-import com.nlab.reminder.core.util.annotation.test.Generated
-import kotlinx.parcelize.Parcelize
+import com.nlab.reminder.domain.common.tag.Tag
+import com.nlab.reminder.domain.feature.home.GetTagUsageCountUseCase
 
 /**
  * @author Doohyun
  */
-@Parcelize
-@Generated
-data class Tag(
-    val text: String,
-    val tagStyleResource: TagStyleResource
-) : Parcelable
+@Deprecated(message = "Fake UseCase was used")
+class FakeGetTagUsageCountUseCase : GetTagUsageCountUseCase {
+    override suspend fun invoke(tag: Tag): Int = 10
+}

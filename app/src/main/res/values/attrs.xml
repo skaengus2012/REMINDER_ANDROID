@@ -15,5 +15,7 @@
   -->
 
 <resources>
+	<attr name="defaultTextColor" format="color" />
+
 	<attr name="cardBackground" format="color" />
 </resources>

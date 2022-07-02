@@ -37,3 +37,11 @@ fun HomeViewModel.onTagClicked(tag: Tag) {
 fun HomeViewModel.onTagLongClicked(tag: Tag) {
     onAction(HomeAction.OnTagLongClicked(tag))
 }
+
+fun HomeViewModel.onTagRenameRequestClicked(tag: Tag) {
+    onAction(HomeAction.OnTagRenameRequestClicked(tag))
+}
+
+fun HomeViewModel.onTagDeleteRequestClicked(tag: Tag) {
+    onAction(HomeAction.OnTagDeleteRequestClicked(tag))
+}

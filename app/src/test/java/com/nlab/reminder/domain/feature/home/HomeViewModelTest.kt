@@ -16,10 +16,10 @@
 
 package com.nlab.reminder.domain.feature.home
 
-import com.nlab.reminder.domain.common.effect.android.navigation.AllEndNavigationMessage
-import com.nlab.reminder.domain.common.effect.android.navigation.TagEndNavigationMessage
-import com.nlab.reminder.domain.common.effect.android.navigation.TimetableEndNavigationMessage
-import com.nlab.reminder.domain.common.effect.android.navigation.TodayEndNavigationMessage
+import com.nlab.reminder.domain.common.effect.message.navigation.AllEndNavigationMessage
+import com.nlab.reminder.domain.common.effect.message.navigation.TagEndNavigationMessage
+import com.nlab.reminder.domain.common.effect.message.navigation.TimetableEndNavigationMessage
+import com.nlab.reminder.domain.common.effect.message.navigation.TodayEndNavigationMessage
 import com.nlab.reminder.domain.common.tag.Tag
 import com.nlab.reminder.domain.common.tag.TagStyleResource
 import kotlinx.coroutines.*
@@ -62,8 +62,9 @@ class HomeViewModelTest {
 
     private fun createViewModel(
         getHomeSummary: GetHomeSummaryUseCase = mock(),
+        getTagUsageCount: GetTagUsageCountUseCase = mock(),
         initState: HomeState = HomeState.Init
-    ): HomeViewModel = HomeViewModel(HomeStateMachineFactory(getHomeSummary, initState))
+    ): HomeViewModel = HomeViewModel(HomeStateMachineFactory(getHomeSummary, getTagUsageCount, initState))
 
     @Test
     fun `notify action to stateMachine when viewModel action invoked`() {
@@ -106,8 +107,10 @@ class HomeViewModelTest {
     @Test
     fun `notify navigation message when navigation event invoked`() = runTest {
         val clickedTag = Tag(text = "ClickedTag", TagStyleResource.TYPE4)
+        val usageCount = 10
         val viewModel: HomeViewModel = createViewModel(
-            initState = HomeState.Loaded(HomeSummary())
+            initState = HomeState.Loaded(HomeSummary()),
+            getTagUsageCount = mock { whenever(mock(clickedTag)) doReturn usageCount  }
         )
 
         viewModel.onTodayCategoryClicked()
@@ -115,10 +118,12 @@ class HomeViewModelTest {
         viewModel.onAllCategoryClicked()
         viewModel.onTagClicked(clickedTag)
         viewModel.onTagLongClicked(clickedTag)
+        viewModel.onTagRenameRequestClicked(clickedTag)
+        viewModel.onTagDeleteRequestClicked(clickedTag)
         assertThat(
             viewModel.navigationEffect
                 .event
-                .take(5)
+                .take(7)
                 .toList(),
             equalTo(
                 listOf(
@@ -126,7 +131,9 @@ class HomeViewModelTest {
                     TimetableEndNavigationMessage,
                     AllEndNavigationMessage,
                     TagEndNavigationMessage(clickedTag),
-                    HomeTagConfigNavigation(clickedTag)
+                    HomeTagConfigNavigationMessage(clickedTag),
+                    HomeTagRenameNavigationMessage(clickedTag, usageCount),
+                    HomeTagDeleteConfirmNavigationMessage(clickedTag)
                 )
             )
         )

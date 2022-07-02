@@ -14,18 +14,17 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.common.tag
+package com.nlab.reminder.domain.common.effect.message.navigation.android.runner
 
-import android.os.Parcelable
-import com.nlab.reminder.core.util.annotation.test.Generated
-import kotlinx.parcelize.Parcelize
+import android.util.Log
+import androidx.navigation.NavController
+import com.nlab.reminder.domain.common.tag.Tag
 
 /**
  * @author Doohyun
  */
-@Parcelize
-@Generated
-data class Tag(
-    val text: String,
-    val tagStyleResource: TagStyleResource
-) : Parcelable
+class TagEndNavigationEffectRunner {
+    operator fun invoke(navController: NavController, tag: Tag) {
+        Log.w("TODO", "navigate TagEnd ${tag.text}")
+    }
+}

@@ -23,6 +23,7 @@
 
     <string name="tag_format" formatted="true"># %1$s</string>
 
-    <string name="label_home_fragment">홈</string>
-
+    <!-- home -->
+    <string name="home_config_label_rename_tag">Rename Tag</string>
+    <string name="home_config_label_delete_tag">Delete Tag</string>
 </resources>

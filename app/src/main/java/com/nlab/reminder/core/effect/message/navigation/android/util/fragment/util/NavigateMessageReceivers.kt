@@ -14,18 +14,19 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.common.tag
+package com.nlab.reminder.core.effect.message.navigation.android.util.fragment.util
 
-import android.os.Parcelable
-import com.nlab.reminder.core.util.annotation.test.Generated
-import kotlinx.parcelize.Parcelize
+import androidx.navigation.NavController
+import com.nlab.reminder.core.effect.message.navigation.NavigationMessage
+import com.nlab.reminder.core.effect.message.navigation.android.util.fragment.NavigationMessageReceiver
 
 /**
  * @author Doohyun
  */
-@Parcelize
-@Generated
-data class Tag(
-    val text: String,
-    val tagStyleResource: TagStyleResource
-) : Parcelable
+inline fun NavigationMessageReceiver(
+    crossinline block: (NavController, NavigationMessage) -> Unit
+): NavigationMessageReceiver = object : NavigationMessageReceiver {
+    override fun invoke(navController: NavController, navigateMessage: NavigationMessage) {
+        block(navController, navigateMessage)
+    }
+}

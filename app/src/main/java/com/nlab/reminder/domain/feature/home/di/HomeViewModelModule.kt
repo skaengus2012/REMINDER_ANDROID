@@ -17,6 +17,7 @@
 package com.nlab.reminder.domain.feature.home.di
 
 import com.nlab.reminder.domain.feature.home.GetHomeSummaryUseCase
+import com.nlab.reminder.domain.feature.home.GetTagUsageCountUseCase
 import com.nlab.reminder.domain.feature.home.HomeStateMachineFactory
 import dagger.Module
 import dagger.Provides
@@ -33,7 +34,11 @@ class HomeViewModelModule {
     fun provideGetHomeSummaryUseCase(): GetHomeSummaryUseCase = FakeGetHomeSummaryUseCase()
 
     @Provides
+    fun provideGetTagUsageCountUseCase(): GetTagUsageCountUseCase = FakeGetTagUsageCountUseCase()
+
+    @Provides
     fun provideHomeStateMachineFactory(
-        getHomeSummary: GetHomeSummaryUseCase
-    ): HomeStateMachineFactory = HomeStateMachineFactory(getHomeSummary)
+        getHomeSummary: GetHomeSummaryUseCase,
+        getTagUsageCount: GetTagUsageCountUseCase
+    ): HomeStateMachineFactory = HomeStateMachineFactory(getHomeSummary, getTagUsageCount)
 }

@@ -16,13 +16,13 @@
 
 package com.nlab.reminder.domain.feature.home
 
-import com.nlab.reminder.core.effect.android.navigation.NavigationMessage
-import com.nlab.reminder.core.effect.android.navigation.SendNavigationEffect
+import com.nlab.reminder.core.effect.message.navigation.NavigationMessage
+import com.nlab.reminder.core.effect.message.navigation.SendNavigationEffect
 import com.nlab.reminder.core.state.StateMachine
-import com.nlab.reminder.domain.common.effect.android.navigation.AllEndNavigationMessage
-import com.nlab.reminder.domain.common.effect.android.navigation.TagEndNavigationMessage
-import com.nlab.reminder.domain.common.effect.android.navigation.TimetableEndNavigationMessage
-import com.nlab.reminder.domain.common.effect.android.navigation.TodayEndNavigationMessage
+import com.nlab.reminder.domain.common.effect.message.navigation.AllEndNavigationMessage
+import com.nlab.reminder.domain.common.effect.message.navigation.TagEndNavigationMessage
+import com.nlab.reminder.domain.common.effect.message.navigation.TimetableEndNavigationMessage
+import com.nlab.reminder.domain.common.effect.message.navigation.TodayEndNavigationMessage
 import com.nlab.reminder.domain.common.tag.Tag
 import com.nlab.reminder.domain.common.tag.TagStyleResource
 import kotlinx.coroutines.*
@@ -51,14 +51,22 @@ class HomeStateMachineKtTest {
         HomeState.Loaded(HomeSummary())
     )
 
+    private fun createHomeStateMachineFactory(
+        getHomeSummary: GetHomeSummaryUseCase = mock(),
+        getTagUsageCount: GetTagUsageCountUseCase = mock(),
+        initState: HomeState = HomeState.Init
+    ): HomeStateMachineFactory = HomeStateMachineFactory(getHomeSummary, getTagUsageCount, initState)
+
     private fun createHomeStateMachine(
         scope: CoroutineScope = CoroutineScope(Dispatchers.Default),
         initState: HomeState = HomeState.Init,
         navigationEffect: SendNavigationEffect = mock(),
-        getHomeSummary: GetHomeSummaryUseCase = mock { whenever(mock()) doReturn flow { emit(HomeSummary()) } },
+        getHomeSummary: GetHomeSummaryUseCase = mock { onBlocking { mock() } doReturn flow { emit(HomeSummary()) } },
+        getTagUsageCount: GetTagUsageCountUseCase = mock(),
         onHomeSummaryLoaded: (HomeSummary) -> Unit = mock(),
     ): HomeStateMachine =
-        HomeStateMachineFactory(getHomeSummary, initState).create(scope, navigationEffect, onHomeSummaryLoaded)
+        createHomeStateMachineFactory(getHomeSummary, getTagUsageCount, initState)
+            .create(scope, navigationEffect, onHomeSummaryLoaded)
 
     @Test
     fun `holds injected state when machine created`() = runTest {
@@ -70,7 +78,7 @@ class HomeStateMachineKtTest {
     @Test
     fun `holds init state when machine created`() {
         assertThat(
-            HomeStateMachineFactory(getHomeSummary = mock())
+            createHomeStateMachineFactory()
                 .create(
                     scope = CoroutineScope(Dispatchers.Default),
                     navigationEffect = mock(),
@@ -203,13 +211,43 @@ class HomeStateMachineKtTest {
             testNavigationEnd(
                 initState = HomeState.Loaded(homeSummary),
                 navigateAction = HomeAction.OnTagLongClicked(tag),
-                expectedNavigationMessage = HomeTagConfigNavigation(tag)
+                expectedNavigationMessage = HomeTagConfigNavigationMessage(tag)
+            )
+        }
+    }
+
+    @Test
+    fun `Navigate tag rename config when tag rename request invoked`() = runTest {
+        val tag = Tag(text = "Test", TagStyleResource.TYPE3)
+        val fakeUsageCount = 10
+        val getTagUsageCount: GetTagUsageCountUseCase = mock { whenever(mock(tag)) doReturn fakeUsageCount }
+
+        listOf(HomeSummary(tags = listOf(tag)), HomeSummary(tags = emptyList())).forEach { homeSummary ->
+            testNavigationEnd(
+                initState = HomeState.Loaded(homeSummary),
+                getTagUsageCount = getTagUsageCount,
+                navigateAction = HomeAction.OnTagRenameRequestClicked(tag),
+                expectedNavigationMessage = HomeTagRenameNavigationMessage(tag, fakeUsageCount)
+            )
+        }
+        verify(getTagUsageCount, times(2))(tag)
+    }
+
+    @Test
+    fun `Navigate tag delete confirm when tag delete request invoked`() = runTest {
+        val tag = Tag(text = "Test", TagStyleResource.TYPE3)
+        listOf(HomeSummary(tags = listOf(tag)), HomeSummary(tags = emptyList())).forEach { homeSummary ->
+            testNavigationEnd(
+                initState = HomeState.Loaded(homeSummary),
+                navigateAction = HomeAction.OnTagDeleteRequestClicked(tag),
+                expectedNavigationMessage = HomeTagDeleteConfirmNavigationMessage(tag)
             )
         }
     }
 
     private suspend fun testNavigationEnd(
         initState: HomeState = HomeState.Loaded(HomeSummary(todayNotificationCount = 10)),
+        getTagUsageCount: GetTagUsageCountUseCase = mock(),
         navigateAction: HomeAction,
         expectedNavigationMessage: NavigationMessage,
     ) {
@@ -217,6 +255,7 @@ class HomeStateMachineKtTest {
         val stateMachine: HomeStateMachine = createHomeStateMachine(
             scope = CoroutineScope(Dispatchers.Unconfined),
             initState = initState,
+            getTagUsageCount = getTagUsageCount,
             navigationEffect = navigationEffect
         )
         stateMachine

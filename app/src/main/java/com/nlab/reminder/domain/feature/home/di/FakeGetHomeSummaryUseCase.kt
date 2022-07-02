@@ -30,7 +30,7 @@ import kotlinx.coroutines.flow.flow
  */
 @Deprecated(message = "Fake UseCase was used")
 class FakeGetHomeSummaryUseCase : GetHomeSummaryUseCase {
-    override fun invoke(): Flow<HomeSummary> = flow {
+    override suspend fun invoke(): Flow<HomeSummary> = flow {
         emit(HomeSummary(
             todayNotificationCount = 10,
             timetableNotificationCount = 8,

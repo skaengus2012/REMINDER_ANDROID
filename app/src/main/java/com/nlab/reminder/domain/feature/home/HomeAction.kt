@@ -30,4 +30,6 @@ sealed class HomeAction private constructor() : Action {
     object OnAllCategoryClicked : HomeAction()
     data class OnTagClicked(val tag: Tag) : HomeAction()
     data class OnTagLongClicked(val tag: Tag) : HomeAction()
+    data class OnTagRenameRequestClicked(val tag: Tag) : HomeAction()
+    data class OnTagDeleteRequestClicked(val tag: Tag) : HomeAction()
 }
