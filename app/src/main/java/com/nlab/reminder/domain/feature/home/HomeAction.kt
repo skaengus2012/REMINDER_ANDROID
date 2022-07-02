@@ -28,5 +28,5 @@ sealed class HomeAction private constructor() : Action {
     object OnTodayCategoryClicked : HomeAction()
     object OnTimetableCategoryClicked : HomeAction()
     object OnAllCategoryClicked : HomeAction()
-    data class OnTagClicked(val clickedIndex: Int) : HomeAction()
+    data class OnTagClicked(val tag: Tag) : HomeAction()
 }

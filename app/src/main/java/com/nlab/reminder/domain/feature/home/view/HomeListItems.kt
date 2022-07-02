@@ -16,6 +16,7 @@
 
 package com.nlab.reminder.domain.feature.home.view
 
+import com.nlab.reminder.domain.common.tag.Tag
 import com.nlab.reminder.domain.common.tag.view.TagItem
 import com.nlab.reminder.domain.feature.home.HomeState
 
@@ -26,7 +27,7 @@ internal fun HomeState.Loaded.toListItem(
     onTodayCategoryClicked: () -> Unit,
     onTimetableCategoryClicked: () -> Unit,
     onAllCategoryClicked: () -> Unit,
-    onTagClicked: (Int) -> Unit
+    onTagClicked: (Tag) -> Unit
 ): HomeListItem = HomeListItem(
     categoryItems = listOf(
         CategoryItem(
@@ -45,10 +46,10 @@ internal fun HomeState.Loaded.toListItem(
             onItemClicked = onAllCategoryClicked
         )
     ),
-    tagItems = homeSummary.tags.mapIndexed { index, tag ->
+    tagItems = homeSummary.tags.map { tag ->
         TagItem(
             tag,
-            onClicked = { onTagClicked(index) },
+            onClicked = { onTagClicked(tag) },
             onLongClicked = {}
         )
     }

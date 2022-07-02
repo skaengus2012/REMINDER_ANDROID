@@ -189,24 +189,19 @@ class HomeStateMachineKtTest {
         val tag = Tag(text = "Test", TagStyleResource.TYPE3)
         testNavigationEnd(
             initState = HomeState.Loaded(HomeSummary(tags = listOf(tag))),
-            navigateAction = HomeAction.OnTagClicked(clickedIndex = 0),
+            navigateAction = HomeAction.OnTagClicked(tag),
             expectedNavigationMessage = TagEndNavigationMessage(tag)
         )
     }
 
     @Test
-    fun `failed Navigate by tag when wrong index tag item clicked`() = runTest {
-        val navigationEffect: SendNavigationEffect = mock()
-        val stateMachine: HomeStateMachine = createHomeStateMachine(
-            scope = CoroutineScope(Dispatchers.Unconfined),
-            initState = HomeState.Loaded(HomeSummary()),
-            navigationEffect = navigationEffect
+    fun `notify navigation when tag element clicked without no items`() = runTest {
+        val tag = Tag(text = "Test", TagStyleResource.TYPE3)
+        testNavigationEnd(
+            initState = HomeState.Loaded(HomeSummary(tags = emptyList())),
+            navigateAction = HomeAction.OnTagClicked(tag),
+            expectedNavigationMessage = TagEndNavigationMessage(tag)
         )
-
-        stateMachine
-            .send(HomeAction.OnTagClicked(clickedIndex = 0))
-            .join()
-        verify(navigationEffect, never()).send(any())
     }
 
     private suspend fun testNavigationEnd(

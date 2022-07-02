@@ -107,15 +107,13 @@ class HomeViewModelTest {
     fun `notify navigation message when navigation event invoked`() = runTest {
         val clickedTag = Tag(text = "ClickedTag", TagStyleResource.TYPE4)
         val viewModel: HomeViewModel = createViewModel(
-            initState = HomeState.Loaded(
-                HomeSummary(tags = listOf(Tag(text = "", TagStyleResource.TYPE1), clickedTag))
-            )
+            initState = HomeState.Loaded(HomeSummary())
         )
 
         viewModel.onTodayCategoryClicked()
         viewModel.onTimetableCategoryClicked()
         viewModel.onAllCategoryClicked()
-        viewModel.onTagClicked(clickedIndex = 1)
+        viewModel.onTagClicked(clickedTag)
         assertThat(
             viewModel.navigationEffect
                 .event

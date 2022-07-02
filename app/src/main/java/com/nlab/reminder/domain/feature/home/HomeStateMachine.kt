@@ -23,7 +23,6 @@ import com.nlab.reminder.domain.common.effect.android.navigation.navigateAllEnd
 import com.nlab.reminder.domain.common.effect.android.navigation.navigateTagEnd
 import com.nlab.reminder.domain.common.effect.android.navigation.navigateTimetableEnd
 import com.nlab.reminder.domain.common.effect.android.navigation.navigateTodayEnd
-import com.nlab.reminder.domain.common.tag.Tag
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -67,13 +66,7 @@ fun HomeStateMachine(
         scope.launch { navigationEffect.navigateAllEnd() }
     }
 
-    sideEffectWhen<HomeAction.OnTagClicked, HomeState.Loaded> { (action, oldState) ->
-        scope.launch {
-            val index: Int = action.clickedIndex
-            val tags: List<Tag> = oldState.homeSummary.tags
-            if (index < tags.size) {
-                navigationEffect.navigateTagEnd(tags[index])
-            }
-        }
+    sideEffectWhen<HomeAction.OnTagClicked, HomeState.Loaded> { (action) ->
+        scope.launch { navigationEffect.navigateTagEnd(action.tag) }
     }
 }
