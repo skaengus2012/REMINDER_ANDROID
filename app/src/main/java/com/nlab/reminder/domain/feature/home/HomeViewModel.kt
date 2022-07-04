@@ -44,13 +44,9 @@ class HomeViewModel @Inject constructor(
     val state: StateFlow<HomeState> =
         stateMachine
             .state
-            .fetchedFlow(viewModelScope, this::onFetch)
+            .fetchedFlow(viewModelScope, onFetch = { onAction(HomeAction.Fetch) })
 
     fun onAction(action: HomeAction) {
         stateMachine.send(action)
-    }
-
-    private fun onFetch() {
-        onAction(HomeAction.Fetch)
     }
 }

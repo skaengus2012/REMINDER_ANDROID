@@ -62,11 +62,26 @@ class StateMachineBuilder<A : Action, S : State>(
         }
     }
 
-    inline fun <reified T : A, reified U : S> sideEffectWhen(noinline block: (UpdateSource<T, U>) -> Unit) {
-        sideEffectWhen(T::class.java, U::class.java, block)
+    inline fun <reified U : S> sideEffectWhen(noinline block: (UpdateSource<A, U>) -> Unit) {
+        sideEffectWhen(U::class.java, block)
     }
 
-    fun <T : A, U : S> sideEffectWhen(
+    fun <U : S> sideEffectWhen(
+        stateClazz: Class<U>,
+        block: (UpdateSource<A, U>) -> Unit
+    ) {
+        sideEffect { (action, oldState) ->
+            if (stateClazz.isInstance(oldState)) {
+                block(UpdateSource(action, stateClazz.cast(oldState)!!))
+            }
+        }
+    }
+
+    inline fun <reified T : A, reified U : S> sideEffectOn(noinline block: (UpdateSource<T, U>) -> Unit) {
+        sideEffectOn(T::class.java, U::class.java, block)
+    }
+
+    fun <T : A, U : S> sideEffectOn(
         actionClazz: Class<T>,
         stateClazz: Class<U>,
         block: (UpdateSource<T, U>) -> Unit

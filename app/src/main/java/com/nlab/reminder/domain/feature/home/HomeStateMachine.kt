@@ -51,35 +51,35 @@ fun HomeStateMachine(
         }
     }
 
-    sideEffectWhen<HomeAction.Fetch, HomeState.Init> {
+    sideEffectOn<HomeAction.Fetch, HomeState.Init> {
         scope.launch { getHomeSummary().collect { onHomeSummaryLoaded(it) } }
     }
 
-    sideEffectWhen<HomeAction.OnTodayCategoryClicked, HomeState.Loaded> {
+    sideEffectOn<HomeAction.OnTodayCategoryClicked, HomeState.Loaded> {
         scope.launch { navigationEffect.navigateTodayEnd() }
     }
 
-    sideEffectWhen<HomeAction.OnTimetableCategoryClicked, HomeState.Loaded> {
+    sideEffectOn<HomeAction.OnTimetableCategoryClicked, HomeState.Loaded> {
         scope.launch { navigationEffect.navigateTimetableEnd() }
     }
 
-    sideEffectWhen<HomeAction.OnAllCategoryClicked, HomeState.Loaded> {
+    sideEffectOn<HomeAction.OnAllCategoryClicked, HomeState.Loaded> {
         scope.launch { navigationEffect.navigateAllEnd() }
     }
 
-    sideEffectWhen<HomeAction.OnTagClicked, HomeState.Loaded> { (action) ->
+    sideEffectOn<HomeAction.OnTagClicked, HomeState.Loaded> { (action) ->
         scope.launch { navigationEffect.navigateTagEnd(action.tag) }
     }
 
-    sideEffectWhen<HomeAction.OnTagLongClicked, HomeState.Loaded> { (action) ->
+    sideEffectOn<HomeAction.OnTagLongClicked, HomeState.Loaded> { (action) ->
         scope.launch { navigationEffect.send(HomeTagConfigNavigationMessage(action.tag)) }
     }
 
-    sideEffectWhen<HomeAction.OnTagRenameRequestClicked, HomeState.Loaded> { (action) ->
-        scope.launch { navigationEffect.send(HomeTagRenameNavigationMessage(action.tag, getTagUsageCount.invoke(action.tag))) }
+    sideEffectOn<HomeAction.OnTagRenameRequestClicked, HomeState.Loaded> { (action) ->
+        scope.launch { navigationEffect.send(HomeTagRenameNavigationMessage(action.tag, getTagUsageCount(action.tag))) }
     }
 
-    sideEffectWhen<HomeAction.OnTagDeleteRequestClicked, HomeState.Loaded> { (action) ->
+    sideEffectOn<HomeAction.OnTagDeleteRequestClicked, HomeState.Loaded> { (action) ->
         scope.launch { navigationEffect.send(HomeTagDeleteConfirmNavigationMessage(action.tag)) }
     }
 }
