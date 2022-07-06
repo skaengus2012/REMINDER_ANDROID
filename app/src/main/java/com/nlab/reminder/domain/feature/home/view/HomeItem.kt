@@ -16,12 +16,24 @@
 
 package com.nlab.reminder.domain.feature.home.view
 
+import com.nlab.reminder.core.android.recyclerview.HashIdentifier
+import com.nlab.reminder.domain.common.android.view.recyclerview.ItemModel
 import com.nlab.reminder.domain.common.tag.view.TagItem
+import java.util.*
 
-/**
- * @author Doohyun
- */
-internal data class HomeListItem(
-    val categoryItems: List<CategoryItem>,
-    val tagItems: List<TagItem>
-)
+@ItemModel
+internal sealed class HomeItem private constructor() : HashIdentifier {
+    data class CategoryItem(
+        val categoryResource: CategoryResource,
+        val count: Long,
+        val onItemClicked: () -> Unit
+    ) : HomeItem() {
+        override val hashId: Int = Objects.hash(categoryResource, count)
+    }
+
+    data class TagHolderItem(
+        val tagItems: List<TagItem>
+    ) : HomeItem() {
+        override val hashId: Int = Objects.hash(tagItems.map { it.tagText })
+    }
+}

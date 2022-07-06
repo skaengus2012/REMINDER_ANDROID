@@ -24,11 +24,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.ConcatAdapter
-import com.nlab.reminder.R
 import com.nlab.reminder.core.entrypoint.fragment.FragmentEntryPointInit
 import com.nlab.reminder.databinding.FragmentHomeBinding
-import com.nlab.reminder.domain.common.android.view.recyclerview.simple.SimpleLayoutAdapter
 import com.nlab.reminder.domain.feature.home.*
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -60,17 +57,12 @@ class HomeFragment : Fragment() {
             navigationEffect = viewModel.navigationEffect
         )
 
-        val categoryAdapter = CategoryAdapter(viewLifecycleOwner)
-        val tagAdapter = TagAdapter(viewLifecycleOwner)
-        val renderWhenLoaded = renderWhenLoadedFunc(categoryAdapter, tagAdapter)
+        val homeItemAdapter = HomeItemAdapter(viewLifecycleOwner)
+        val renderWhenLoaded = renderWhenLoadedFunc(homeItemAdapter)
 
         with(binding.categoryRecyclerview) {
             itemAnimator = null
-            adapter = ConcatAdapter(
-                categoryAdapter,
-                SimpleLayoutAdapter(layoutResource = R.layout.view_item_home_space_between_category_and_tags),
-                tagAdapter
-            )
+            adapter = homeItemAdapter
         }
 
         viewModel.state
@@ -92,7 +84,7 @@ class HomeFragment : Fragment() {
             .flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .distinctUntilChanged()
             .map { state ->
-                state.toListItem(
+                state.toHomeItems(
                     onTodayCategoryClicked = viewModel::onTodayCategoryClicked,
                     onTimetableCategoryClicked = viewModel::onTimetableCategoryClicked,
                     onAllCategoryClicked = viewModel::onAllCategoryClicked,
@@ -113,14 +105,9 @@ class HomeFragment : Fragment() {
         binding.categoryRecyclerview.visibility = View.GONE
     }
 
-    private fun renderWhenLoadedFunc(
-        categoryAdapter: CategoryAdapter,
-        tagAdapter: TagAdapter
-    ): (HomeListItem) -> Unit = { (categoryItems, tagItems) ->
+    private fun renderWhenLoadedFunc(homeItemAdapter: HomeItemAdapter) = { homeItems: List<HomeItem> ->
         binding.categoryRecyclerview.visibility = View.VISIBLE
-
-        categoryAdapter.submitList(categoryItems)
-        tagAdapter.submitList(listOf(tagItems))
+        homeItemAdapter.submitList(homeItems)
     }
 
     override fun onDestroyView() {

@@ -23,35 +23,35 @@ import com.nlab.reminder.domain.feature.home.HomeState
 /**
  * @author Doohyun
  */
-internal inline fun HomeState.Loaded.toListItem(
+internal inline fun HomeState.Loaded.toHomeItems(
     noinline onTodayCategoryClicked: () -> Unit,
     noinline onTimetableCategoryClicked: () -> Unit,
     noinline onAllCategoryClicked: () -> Unit,
     crossinline onTagClicked: (Tag) -> Unit,
     crossinline onTagLongClicked: (Tag) -> Unit
-): HomeListItem = HomeListItem(
-    categoryItems = listOf(
-        CategoryItem(
-            categoryResource = CategoryResource.TODAY,
-            count = homeSummary.todayNotificationCount,
-            onItemClicked = onTodayCategoryClicked
-        ),
-        CategoryItem(
-            categoryResource = CategoryResource.TIME_TABLE,
-            count = homeSummary.timetableNotificationCount,
-            onItemClicked = onTimetableCategoryClicked
-        ),
-        CategoryItem(
-            categoryResource = CategoryResource.ALL,
-            count = homeSummary.allNotificationCount,
-            onItemClicked = onAllCategoryClicked
-        )
-    ),
-    tagItems = homeSummary.tags.map { tag ->
-        TagItem(
-            tag,
-            onClicked = { onTagClicked(tag) },
-            onLongClicked = { onTagLongClicked(tag) }
-        )
-    }
-)
+): List<HomeItem> = buildList {
+    this += HomeItem.CategoryItem(
+        categoryResource = CategoryResource.TODAY,
+        count = homeSummary.todayNotificationCount,
+        onItemClicked = onTodayCategoryClicked
+    )
+    this += HomeItem.CategoryItem(
+        categoryResource = CategoryResource.TIME_TABLE,
+        count = homeSummary.timetableNotificationCount,
+        onItemClicked = onTimetableCategoryClicked
+    )
+    this += HomeItem.CategoryItem(
+        categoryResource = CategoryResource.ALL,
+        count = homeSummary.allNotificationCount,
+        onItemClicked = onAllCategoryClicked
+    )
+    this += HomeItem.TagHolderItem(
+        homeSummary.tags.map { tag ->
+            TagItem(
+                tag,
+                onClicked = { onTagClicked(tag) },
+                onLongClicked = { onTagLongClicked(tag) }
+            )
+        }
+    )
+}
