@@ -22,7 +22,7 @@
 	android:layout_height="match_parent">
 
 	<androidx.constraintlayout.widget.ConstraintLayout
-		android:layout_width="300dp"
+		android:layout_width="@dimen/dialog_default_width"
 		android:layout_height="wrap_content"
 		android:layout_gravity="center">
 
@@ -40,7 +40,7 @@
 			android:id="@+id/rename_button"
 			android:layout_width="match_parent"
 			android:layout_height="50dp"
-			android:text="@string/home_config_label_rename_tag"
+			android:text="@string/home_tag_config_label_rename"
 			android:textAllCaps="false"
 			android:textColor="?defaultTextColor"
 			app:layout_constraintBottom_toTopOf="@id/delete_button"
@@ -50,7 +50,7 @@
 			android:id="@+id/delete_button"
 			android:layout_width="match_parent"
 			android:layout_height="50dp"
-			android:text="@string/home_config_label_delete_tag"
+			android:text="@string/home_tag_config_label_delete"
 			android:textAllCaps="false"
 			android:textColor="?defaultTextColor"
 			app:layout_constraintBottom_toBottomOf="parent"

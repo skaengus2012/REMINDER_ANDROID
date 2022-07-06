@@ -23,7 +23,12 @@
 
     <string name="tag_format" formatted="true"># %1$s</string>
 
+    <!-- common -->
+    <string name="cancel">Cancel</string>
+    <string name="ok">OK</string>
+
     <!-- home -->
-    <string name="home_config_label_rename_tag">Rename Tag</string>
-    <string name="home_config_label_delete_tag">Delete Tag</string>
+    <string name="home_tag_config_label_rename">Rename Tag</string>
+    <string name="home_tag_config_label_delete">Delete Tag</string>
+    <string name="home_tag_rename_edittext_hint">input tag</string>
 </resources>

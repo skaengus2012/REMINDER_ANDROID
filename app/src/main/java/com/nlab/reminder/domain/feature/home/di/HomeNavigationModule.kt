@@ -48,6 +48,12 @@ class HomeNavigationModule {
                     .actionHomeFragmentToHomeConfigDialogFragment(REQUEST_KEY_HOME_TO_HOME_TAG_CONFIG, message.tag)
                     .run(navController::navigate)
 
+            is HomeTagRenameNavigationMessage -> {
+                HomeFragmentDirections
+                    .actionHomeFragmentToHomeTagRenameDialogFragment(REQUEST_KEY_HOME_TO_HOME_TAG_RENAME, message.tag)
+                    .run(navController::navigate)
+            }
+
             else -> navigateWithGlobalAction(navController, message)
         }
     }
@@ -60,13 +66,14 @@ class HomeNavigationModule {
         fragment.setFragmentResultListener(
             requestKey = REQUEST_KEY_HOME_TO_HOME_TAG_CONFIG,
             listener = HomeTagConfigDialogFragment.resultListenerOf(
-                onRenameClicked = { viewModel.onTagRenameRequestClicked(it) },
-                onDeleteClicked = { viewModel.onTagDeleteRequestClicked(it) }
+                onRenameClicked = { tag -> viewModel.onTagRenameRequestClicked(tag) },
+                onDeleteClicked = { tag -> viewModel.onTagDeleteRequestClicked(tag) }
             )
         )
     }
 
     companion object {
         private const val REQUEST_KEY_HOME_TO_HOME_TAG_CONFIG = "requestKeyHomeToHomeTagConfig"
+        private const val REQUEST_KEY_HOME_TO_HOME_TAG_RENAME = "requestKeyHomeToHomeTagRename"
     }
 }

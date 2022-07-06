@@ -46,10 +46,11 @@ class HomeFragment : Fragment() {
     @Inject
     lateinit var entryPointInit: EntryPointInit
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
-        FragmentHomeBinding.inflate(inflater, container, false)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        return FragmentHomeBinding.inflate(inflater, container, false)
             .also { _binding = it }
             .root
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

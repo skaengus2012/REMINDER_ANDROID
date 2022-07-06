@@ -26,6 +26,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.nlab.reminder.R
 import com.nlab.reminder.core.android.view.throttleClicks
@@ -80,14 +81,13 @@ class HomeTagConfigDialogFragment : DialogFragment() {
         private const val RESULT_TYPE_DELETE_REQUEST = "deleteRequest"
 
         private fun DialogFragment.sendResultAndDismiss(requestKey: String, tag: Tag, @ResultType resultType: String) {
+            findNavController().popBackStack()
             setFragmentResult(
-                requestKey,
-                result = bundleOf(
+                requestKey, result = bundleOf(
                     RESULT_TAG to tag,
                     RESULT_TYPE to resultType
                 )
             )
-            dismiss()
         }
 
         fun resultListenerOf(
