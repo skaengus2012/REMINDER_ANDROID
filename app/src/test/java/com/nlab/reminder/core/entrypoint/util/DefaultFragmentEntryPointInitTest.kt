@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.entrypoint.fragment.util
+package com.nlab.reminder.core.entrypoint.util
 
 import com.nlab.reminder.core.effect.message.navigation.NavigationEffectReceiver
 import org.hamcrest.CoreMatchers.*
@@ -33,9 +33,9 @@ class DefaultFragmentEntryPointInitTest {
     fun testInitialize() {
         val navigationEffectReceiver: NavigationEffectReceiver = mock()
         val block: () -> Unit = mock()
-        val defaultFragmentEntryPointInit = DefaultFragmentEntryPointInit(
+        val defaultFragmentEntryPointInit = DefaultEntryPointInit(
             navigationEffectReceiver,
-            block
+            EntryBlock { block() }
         )
 
         defaultFragmentEntryPointInit.initialize(
@@ -51,10 +51,10 @@ class DefaultFragmentEntryPointInitTest {
     @Test
     fun testGet() {
         val navigationEffectReceiver: NavigationEffectReceiver = mock()
-        val block: () -> Unit = mock()
-        val defaultFragmentEntryPointInit = DefaultFragmentEntryPointInit(
+        val entryBlock = EntryBlock { }
+        val defaultFragmentEntryPointInit = DefaultEntryPointInit(
             navigationEffectReceiver,
-            block
+            entryBlock
         )
         assertThat(
             defaultFragmentEntryPointInit.navigationEffectReceiver,
@@ -62,7 +62,7 @@ class DefaultFragmentEntryPointInitTest {
         )
         assertThat(
             defaultFragmentEntryPointInit.block,
-            equalTo(block)
+            equalTo(entryBlock)
         )
     }
 }

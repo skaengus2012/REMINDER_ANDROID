@@ -20,9 +20,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.StringDef
 import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -56,43 +56,49 @@ class HomeTagConfigDialogFragment : DialogFragment() {
 
         binding.renameButton.throttleClicks()
             .flowWithLifecycle(viewLifecycleOwner.lifecycle)
-            .onEach { sendRenameRequestEvent(args.tag) }
-            .onEach { dismiss() }
+            .onEach { sendResultAndDismiss(args.requestKey, args.tag, RESULT_TYPE_RENAME_REQUEST) }
             .launchIn(viewLifecycleOwner.lifecycleScope)
 
         binding.deleteButton.throttleClicks()
             .flowWithLifecycle(viewLifecycleOwner.lifecycle)
-            .onEach { sendDeleteRequestEvent(args.tag) }
-            .onEach { dismiss() }
+            .onEach { sendResultAndDismiss(args.requestKey, args.tag, RESULT_TYPE_DELETE_REQUEST) }
             .launchIn(viewLifecycleOwner.lifecycleScope)
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
+    @StringDef(value = [RESULT_TYPE_RENAME_REQUEST, RESULT_TYPE_DELETE_REQUEST])
+    private annotation class ResultType
+
     companion object {
-        const val RESULT_KEY = "homeConfigDialogFragmentResult"
-        private const val RESULT_TAG = "resultTag"
+        private const val RESULT_TAG = "homeConfigDialogResultTag"
         private const val RESULT_TYPE = "homeConfigDialogResultType"
-        const val RESULT_TYPE_RENAME_REQUEST = "renameRequest"
-        const val RESULT_TYPE_DELETE_REQUEST = "deleteRequest"
+        private const val RESULT_TYPE_RENAME_REQUEST = "renameRequest"
+        private const val RESULT_TYPE_DELETE_REQUEST = "deleteRequest"
 
-        private fun Fragment.sendRenameRequestEvent(tag: Tag) {
-            setFragmentResult(RESULT_KEY, bundleOf(
-                RESULT_TAG to tag,
-                RESULT_TYPE to RESULT_TYPE_RENAME_REQUEST
-            ))
-        }
-
-        private fun Fragment.sendDeleteRequestEvent(tag: Tag) {
-            setFragmentResult(RESULT_KEY, bundleOf(
-                RESULT_TAG to tag,
-                RESULT_TYPE to RESULT_TYPE_DELETE_REQUEST
-            ))
-        }
-
-        fun resultListenerOf(listener: (resultType: String, tag: Tag) -> Unit) = { _: String, bundle: Bundle ->
-            listener(
-                requireNotNull(bundle.getString(RESULT_TYPE)),
-                requireNotNull(bundle.getParcelable(RESULT_TAG))
+        private fun DialogFragment.sendResultAndDismiss(requestKey: String, tag: Tag, @ResultType resultType: String) {
+            setFragmentResult(
+                requestKey,
+                result = bundleOf(
+                    RESULT_TAG to tag,
+                    RESULT_TYPE to resultType
+                )
             )
+            dismiss()
+        }
+
+        fun resultListenerOf(
+            onRenameClicked: (Tag) -> Unit,
+            onDeleteClicked: (Tag) -> Unit
+        ) = { _: String, bundle: Bundle ->
+            val resultTag: Tag = requireNotNull(bundle.getParcelable(RESULT_TAG))
+            when (requireNotNull(bundle.getString(RESULT_TYPE))) {
+                RESULT_TYPE_RENAME_REQUEST -> onRenameClicked(resultTag)
+                RESULT_TYPE_DELETE_REQUEST -> onDeleteClicked(resultTag)
+            }
         }
     }
 }

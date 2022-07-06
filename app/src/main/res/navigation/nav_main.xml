@@ -15,30 +15,34 @@
   -->
 
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:app="http://schemas.android.com/apk/res-auto"
-	xmlns:tools="http://schemas.android.com/tools"
-	android:id="@+id/home_graph"
-	app:startDestination="@id/homeFragment">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/home_graph"
+    app:startDestination="@id/homeFragment">
 
-	<fragment
-		android:id="@+id/homeFragment"
-		android:name="com.nlab.reminder.domain.feature.home.view.HomeFragment"
-		android:label="Home"
-		tools:layout="@layout/fragment_home">
-		<action
-			android:id="@+id/action_homeFragment_to_homeConfigDialogFragment"
-			app:destination="@id/homeConfigDialogFragment" />
-	</fragment>
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.nlab.reminder.domain.feature.home.view.HomeFragment"
+        android:label="Home"
+        tools:layout="@layout/fragment_home">
+        <action
+            android:id="@+id/action_homeFragment_to_homeConfigDialogFragment"
+            app:destination="@id/homeConfigDialogFragment" />
+    </fragment>
 
-	<dialog
-		android:id="@+id/homeConfigDialogFragment"
-		android:name="com.nlab.reminder.domain.feature.home.view.HomeTagConfigDialogFragment"
-		android:label="HomeConfigDialog"
-		tools:layout="@layout/fragment_home_tag_config_dialog">
-		<argument
-			android:name="tag"
-			app:argType="com.nlab.reminder.domain.common.tag.Tag"
-			app:nullable="false" />
-	</dialog>
+    <dialog
+        android:id="@+id/homeConfigDialogFragment"
+        android:name="com.nlab.reminder.domain.feature.home.view.HomeTagConfigDialogFragment"
+        android:label="HomeConfigDialog"
+        tools:layout="@layout/fragment_home_tag_config_dialog">
+        <argument
+            android:name="requestKey"
+            app:argType="string"
+            app:nullable="false" />
+        <argument
+            android:name="tag"
+            app:argType="com.nlab.reminder.domain.common.tag.Tag"
+            app:nullable="false" />
+    </dialog>
 
 </navigation>

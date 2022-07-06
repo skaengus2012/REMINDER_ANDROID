@@ -24,7 +24,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import com.nlab.reminder.core.entrypoint.fragment.FragmentEntryPointInit
+import com.nlab.reminder.core.entrypoint.EntryPointInit
 import com.nlab.reminder.databinding.FragmentHomeBinding
 import com.nlab.reminder.domain.feature.home.*
 import dagger.hilt.android.AndroidEntryPoint
@@ -44,7 +44,7 @@ class HomeFragment : Fragment() {
 
     @HomeScope
     @Inject
-    lateinit var entryPointInit: FragmentEntryPointInit
+    lateinit var entryPointInit: EntryPointInit
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         FragmentHomeBinding.inflate(inflater, container, false)

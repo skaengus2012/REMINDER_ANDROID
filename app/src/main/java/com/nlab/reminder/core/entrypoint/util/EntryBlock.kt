@@ -14,23 +14,9 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.entrypoint.fragment.util
-
-import com.nlab.reminder.core.effect.message.navigation.NavigationEffect
-import com.nlab.reminder.core.effect.message.navigation.NavigationEffectReceiver
-import com.nlab.reminder.core.entrypoint.fragment.FragmentEntryPointInit
+package com.nlab.reminder.core.entrypoint.util
 
 /**
  * @author Doohyun
  */
-data class DefaultFragmentEntryPointInit(
-    val navigationEffectReceiver: NavigationEffectReceiver,
-    val block: () -> Unit
-) : FragmentEntryPointInit {
-    override fun initialize(
-        navigationEffect: NavigationEffect?
-    ) {
-        navigationEffect?.let(navigationEffectReceiver::register)
-        block()
-    }
-}
+class EntryBlock(block: () -> Unit) : () -> Unit by block

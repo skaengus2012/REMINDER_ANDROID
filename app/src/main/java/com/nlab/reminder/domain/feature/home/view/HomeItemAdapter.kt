@@ -24,7 +24,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.nlab.reminder.core.android.recyclerview.HashIdentifierItemDiffCallback
 import com.nlab.reminder.domain.common.tag.view.TagViewHolder
 
-internal class HomeItemAdapter(
+class HomeItemAdapter(
     private val lifecycleOwner: LifecycleOwner
 ) : ListAdapter<HomeItem, RecyclerView.ViewHolder>(HashIdentifierItemDiffCallback()) {
     override fun onCreateViewHolder(

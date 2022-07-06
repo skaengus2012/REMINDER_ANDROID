@@ -23,7 +23,7 @@ import com.nlab.reminder.domain.feature.home.HomeState
 /**
  * @author Doohyun
  */
-internal inline fun HomeState.Loaded.toHomeItems(
+inline fun HomeState.Loaded.toHomeItems(
     noinline onTodayCategoryClicked: () -> Unit,
     noinline onTimetableCategoryClicked: () -> Unit,
     noinline onAllCategoryClicked: () -> Unit,

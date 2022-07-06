@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.effect.message.navigation.android.util.fragment.util
+package com.nlab.reminder.core.effect.message.navigation.android.fragment.util
 
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.nlab.reminder.core.effect.message.navigation.NavigationEffectReceiver
 import com.nlab.reminder.core.effect.message.navigation.android.util.*
-import com.nlab.reminder.core.effect.message.navigation.android.util.fragment.NavigationMessageReceiver
+import com.nlab.reminder.core.effect.message.navigation.android.NavigationMediator
 
 /**
  * @author Doohyun
  */
 class FragmentNavigateEffectReceiver(
     fragment: Fragment,
-    navigationMessageReceiver: NavigationMessageReceiver
+    controller: NavigationMediator
 ) : NavigationEffectReceiver by NavigationEffectReceiver(
     lifecycleOwner = { fragment.viewLifecycleOwner },
-    onNavigationMessageReceived = { message -> navigationMessageReceiver(fragment.findNavController(), message) }
+    onNavigationMessageReceived = { controller(fragment.findNavController(), it) }
 )

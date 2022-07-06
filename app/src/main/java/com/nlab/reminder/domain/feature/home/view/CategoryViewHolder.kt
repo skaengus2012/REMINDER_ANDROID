@@ -31,7 +31,7 @@ import kotlinx.coroutines.flow.onEach
 /**
  * @author Doohyun
  */
-internal class CategoryViewHolder private constructor(
+class CategoryViewHolder private constructor(
     lifecycleOwner: LifecycleOwner,
     private val binding: ViewItemHomeCategoryBinding
 ) : RecyclerView.ViewHolder(binding.root) {

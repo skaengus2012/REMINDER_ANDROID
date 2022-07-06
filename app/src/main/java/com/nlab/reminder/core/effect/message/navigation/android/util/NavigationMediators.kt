@@ -14,9 +14,19 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.entrypoint.fragment.util
+package com.nlab.reminder.core.effect.message.navigation.android.util
+
+import androidx.navigation.NavController
+import com.nlab.reminder.core.effect.message.navigation.NavigationMessage
+import com.nlab.reminder.core.effect.message.navigation.android.NavigationMediator
 
 /**
  * @author Doohyun
  */
-class EntryBlock(block: () -> Unit) : () -> Unit by block
+inline fun NavigationMediator(
+    crossinline block: (NavController, NavigationMessage) -> Unit
+): NavigationMediator = object : NavigationMediator {
+    override fun invoke(navController: NavController, navigationMessage: NavigationMessage) {
+        block(navController, navigationMessage)
+    }
+}

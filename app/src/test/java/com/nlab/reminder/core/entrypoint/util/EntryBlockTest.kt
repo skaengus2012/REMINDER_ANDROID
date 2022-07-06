@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.entrypoint.fragment.util
+package com.nlab.reminder.core.entrypoint.util
 
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -32,5 +32,27 @@ class EntryBlockTest {
         entryBlock.invoke()
 
         verify(block, times(1))()
+    }
+
+    @Test
+    fun testConcat() {
+        val block1: () -> Unit = mock()
+        val block2: () -> Unit = mock()
+
+        listOf(EntryBlock { block1() }, EntryBlock { block2() })
+            .concat()
+            .invoke()
+        verify(block1, times(1))()
+        verify(block2, times(1))()
+    }
+
+    @Test
+    fun testPlus() {
+        val block1: () -> Unit = mock()
+        val block2: () -> Unit = mock()
+        val entryBlock = EntryBlock { block1() } + EntryBlock { block2() }
+        entryBlock.invoke()
+        verify(block1, times(1))()
+        verify(block2, times(1))()
     }
 }

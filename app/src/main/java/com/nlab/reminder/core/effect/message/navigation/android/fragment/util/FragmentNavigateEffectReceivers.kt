@@ -14,18 +14,16 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.feature.home.view
+package com.nlab.reminder.core.effect.message.navigation.android.fragment.util
 
-import androidx.navigation.NavController
-import com.nlab.reminder.domain.common.tag.Tag
+import androidx.fragment.app.Fragment
+import com.nlab.reminder.core.effect.message.navigation.NavigationEffectReceiver
+import com.nlab.reminder.core.effect.message.navigation.android.NavigationMediator
 
 /**
  * @author Doohyun
  */
-class HomeTagConfigNavigationEffectRunner {
-    operator fun invoke(navController: NavController, tag: Tag) {
-        navController.navigate(
-            HomeFragmentDirections.actionHomeFragmentToHomeConfigDialogFragment(tag)
-        )
-    }
-}
+fun NavigationMediator.toReceiver(fragment: Fragment): NavigationEffectReceiver = FragmentNavigateEffectReceiver(
+    fragment,
+    controller = this
+)

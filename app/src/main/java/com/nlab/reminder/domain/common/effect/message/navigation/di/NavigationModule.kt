@@ -16,8 +16,8 @@
 
 package com.nlab.reminder.domain.common.effect.message.navigation.di
 
-import com.nlab.reminder.core.effect.message.navigation.android.util.fragment.NavigationMessageReceiver
-import com.nlab.reminder.core.effect.message.navigation.android.util.fragment.util.NavigationMessageReceiver
+import com.nlab.reminder.core.effect.message.navigation.android.NavigationMediator
+import com.nlab.reminder.core.effect.message.navigation.android.util.NavigationMediator
 import com.nlab.reminder.domain.common.effect.message.navigation.*
 import com.nlab.reminder.domain.common.effect.message.navigation.android.runner.*
 import dagger.Module
@@ -39,7 +39,7 @@ class NavigationModule {
         navigateTimeTable: TimetableEndNavigationEffectRunner,
         navigateAllEnd: AllEndNavigationEffectRunner,
         navigateTagEnd: TagEndNavigationEffectRunner
-    ): NavigationMessageReceiver = NavigationMessageReceiver { navController, message ->
+    ): NavigationMediator = NavigationMediator { navController, message ->
         when (message) {
             is TodayEndNavigationMessage -> navigateTodayEnd(navController)
             is TimetableEndNavigationMessage -> navigateTimeTable(navController)

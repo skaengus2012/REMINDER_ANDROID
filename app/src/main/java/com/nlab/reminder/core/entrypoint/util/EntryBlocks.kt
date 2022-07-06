@@ -14,15 +14,8 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.entrypoint.fragment
+package com.nlab.reminder.core.entrypoint.util
 
-import com.nlab.reminder.core.effect.message.navigation.NavigationEffect
+fun Collection<EntryBlock>.concat(): EntryBlock = EntryBlock { forEach { it() } }
 
-/**
- * @author Doohyun
- */
-interface FragmentEntryPointInit {
-    fun initialize(
-        navigationEffect: NavigationEffect? = null
-    )
-}
+operator fun EntryBlock.plus(entryBlock: EntryBlock): EntryBlock = listOf(this, entryBlock).concat()

@@ -19,14 +19,12 @@ package com.nlab.reminder.domain.feature.home.di
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
-import com.nlab.reminder.core.effect.message.navigation.NavigationEffectReceiver
-import com.nlab.reminder.core.effect.message.navigation.android.util.fragment.NavigationMessageReceiver
-import com.nlab.reminder.core.effect.message.navigation.android.util.fragment.util.FragmentNavigateEffectReceiver
-import com.nlab.reminder.core.effect.message.navigation.android.util.fragment.util.NavigationMessageReceiver
-import com.nlab.reminder.core.entrypoint.fragment.util.EntryBlock
+import com.nlab.reminder.core.effect.message.navigation.android.NavigationMediator
+import com.nlab.reminder.core.effect.message.navigation.android.util.NavigationMediator
+import com.nlab.reminder.core.entrypoint.util.EntryBlock
 import com.nlab.reminder.domain.feature.home.*
+import com.nlab.reminder.domain.feature.home.view.HomeFragmentDirections
 import com.nlab.reminder.domain.feature.home.view.HomeTagConfigDialogFragment
-import com.nlab.reminder.domain.feature.home.view.HomeTagConfigNavigationEffectRunner
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -41,42 +39,34 @@ import dagger.multibindings.IntoSet
 class HomeNavigationModule {
     @HomeScope
     @Provides
-    fun provideHomeNavigationEffectRunner() = HomeTagConfigNavigationEffectRunner()
-
-    @HomeScope
-    @Provides
     fun provideFragmentNavigateUseCase(
-        navigateWithGlobalAction: NavigationMessageReceiver,
-        @HomeScope navigateTagConfig: HomeTagConfigNavigationEffectRunner
-    ): NavigationMessageReceiver = NavigationMessageReceiver { navController, message ->
+        navigateWithGlobalAction: NavigationMediator
+    ): NavigationMediator = NavigationMediator { navController, message ->
         when (message) {
-            is HomeTagConfigNavigationMessage -> navigateTagConfig(navController, message.tag)
+            is HomeTagConfigNavigationMessage ->
+                HomeFragmentDirections
+                    .actionHomeFragmentToHomeConfigDialogFragment(REQUEST_KEY_HOME_TO_HOME_TAG_CONFIG, message.tag)
+                    .run(navController::navigate)
+
             else -> navigateWithGlobalAction(navController, message)
         }
     }
 
     @HomeScope
-    @Provides
-    fun provideNavigationEffectReceiver(
-        fragment: Fragment,
-        @HomeScope fragmentNavigationUseCase: NavigationMessageReceiver
-    ): NavigationEffectReceiver = FragmentNavigateEffectReceiver(fragment, fragmentNavigationUseCase)
-
-    @HomeScope
     @IntoSet
     @Provides
-    fun provideHomeFragmentResultReceiver(
-        fragment: Fragment
-    ) = EntryBlock {
+    fun provideHomeFragmentResultReceiver(fragment: Fragment) = EntryBlock {
         val viewModel: HomeViewModel by fragment.viewModels()
         fragment.setFragmentResultListener(
-            requestKey = HomeTagConfigDialogFragment.RESULT_KEY,
-            listener = HomeTagConfigDialogFragment.resultListenerOf { resultKey, tag ->
-                when (resultKey) {
-                    HomeTagConfigDialogFragment.RESULT_TYPE_RENAME_REQUEST -> viewModel.onTagRenameRequestClicked(tag)
-                    HomeTagConfigDialogFragment.RESULT_TYPE_DELETE_REQUEST -> viewModel.onTagDeleteRequestClicked(tag)
-                }
-            }
+            requestKey = REQUEST_KEY_HOME_TO_HOME_TAG_CONFIG,
+            listener = HomeTagConfigDialogFragment.resultListenerOf(
+                onRenameClicked = { viewModel.onTagRenameRequestClicked(it) },
+                onDeleteClicked = { viewModel.onTagDeleteRequestClicked(it) }
+            )
         )
+    }
+
+    companion object {
+        private const val REQUEST_KEY_HOME_TO_HOME_TAG_CONFIG = "requestKeyHomeToHomeTagConfig"
     }
 }

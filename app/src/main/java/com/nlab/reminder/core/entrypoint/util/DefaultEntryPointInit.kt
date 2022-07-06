@@ -14,14 +14,23 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.effect.message.navigation.android.util.fragment
+package com.nlab.reminder.core.entrypoint.util
 
-import androidx.navigation.NavController
-import com.nlab.reminder.core.effect.message.navigation.NavigationMessage
+import com.nlab.reminder.core.effect.message.navigation.NavigationEffect
+import com.nlab.reminder.core.effect.message.navigation.NavigationEffectReceiver
+import com.nlab.reminder.core.entrypoint.EntryPointInit
 
 /**
  * @author Doohyun
  */
-interface NavigationMessageReceiver {
-    operator fun invoke(navController: NavController, navigateMessage: NavigationMessage)
+data class DefaultEntryPointInit(
+    val navigationEffectReceiver: NavigationEffectReceiver,
+    val block: EntryBlock
+) : EntryPointInit {
+    override fun initialize(
+        navigationEffect: NavigationEffect?
+    ) {
+        navigationEffect?.let(navigationEffectReceiver::register)
+        block()
+    }
 }

@@ -16,8 +16,11 @@
 
 package com.nlab.reminder.domain.common.effect.message.navigation.di
 
-import com.nlab.reminder.core.effect.message.navigation.NavigationEffectReceiver
-import com.nlab.reminder.core.entrypoint.fragment.util.DefaultFragmentEntryPointInit
+import androidx.fragment.app.Fragment
+import com.nlab.reminder.core.effect.message.navigation.android.NavigationMediator
+import com.nlab.reminder.core.effect.message.navigation.android.fragment.util.toReceiver
+import com.nlab.reminder.core.entrypoint.util.DefaultEntryPointInit
+import com.nlab.reminder.core.entrypoint.util.EntryBlock
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -32,10 +35,11 @@ import dagger.hilt.android.scopes.FragmentScoped
 class EntryPointInitFragmentModule {
     @FragmentScoped
     @Provides
-    fun provideFragmentEntryPointInit(
-        @FragmentScoped defaultNavigationEffectReceiver: NavigationEffectReceiver
-    ): DefaultFragmentEntryPointInit = DefaultFragmentEntryPointInit(
-        navigationEffectReceiver = defaultNavigationEffectReceiver,
-        block = {}
+    fun provideEntryPointInit(
+        fragment: Fragment,
+        @FragmentScoped navigationMediator: NavigationMediator
+    ): DefaultEntryPointInit = DefaultEntryPointInit(
+        navigationEffectReceiver = navigationMediator.toReceiver(fragment),
+        block = EntryBlock {}
     )
 }

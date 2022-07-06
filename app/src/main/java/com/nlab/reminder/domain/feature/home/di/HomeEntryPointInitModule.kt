@@ -16,10 +16,14 @@
 
 package com.nlab.reminder.domain.feature.home.di
 
-import com.nlab.reminder.core.effect.message.navigation.NavigationEffectReceiver
-import com.nlab.reminder.core.entrypoint.fragment.FragmentEntryPointInit
-import com.nlab.reminder.core.entrypoint.fragment.util.DefaultFragmentEntryPointInit
-import com.nlab.reminder.core.entrypoint.fragment.util.EntryBlock
+import androidx.fragment.app.Fragment
+import com.nlab.reminder.core.effect.message.navigation.android.NavigationMediator
+import com.nlab.reminder.core.effect.message.navigation.android.fragment.util.toReceiver
+import com.nlab.reminder.core.entrypoint.EntryPointInit
+import com.nlab.reminder.core.entrypoint.util.DefaultEntryPointInit
+import com.nlab.reminder.core.entrypoint.util.EntryBlock
+import com.nlab.reminder.core.entrypoint.util.concat
+import com.nlab.reminder.core.entrypoint.util.plus
 import com.nlab.reminder.domain.feature.home.*
 import dagger.Module
 import dagger.Provides
@@ -37,14 +41,12 @@ class HomeEntryPointInitModule {
     @FragmentScoped
     @Provides
     fun provideEntryPointInit(
-        defaultFragmentEntryPointInit: DefaultFragmentEntryPointInit,
-        @HomeScope homeNavigateEffectReceiver: NavigationEffectReceiver,
+        fragment: Fragment,
+        defaultEntryPointInit: DefaultEntryPointInit,
+        @HomeScope navigationMediator: NavigationMediator,
         @HomeScope blocks: Set<@JvmSuppressWildcards EntryBlock>
-    ): FragmentEntryPointInit = defaultFragmentEntryPointInit.copy(
-        navigationEffectReceiver = homeNavigateEffectReceiver,
-        block = {
-            defaultFragmentEntryPointInit.block()
-            blocks.forEach { it() }
-        }
+    ): EntryPointInit = defaultEntryPointInit.copy(
+        navigationEffectReceiver = navigationMediator.toReceiver(fragment),
+        block = defaultEntryPointInit.block + blocks.concat()
     )
 }

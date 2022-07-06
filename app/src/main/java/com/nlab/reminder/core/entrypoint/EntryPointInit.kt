@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.util.annotation.test
+package com.nlab.reminder.core.entrypoint
+
+import com.nlab.reminder.core.effect.message.navigation.NavigationEffect
 
 /**
- * Classes and methods annotated with annotation whose retention policy is runtime or class and
- * whose simple name is Generated are filtered out during generation of report
- *
  * @author Doohyun
- * @see <a href="https://github.com/jacoco/jacoco/releases/tag/v0.8.2">jacoco update</a>
- * @see <a href="https://github.com/jacoco/jacoco/pull/731">jacoco issue</a>
  */
-@Retention(AnnotationRetention.BINARY)
-annotation class Generated
+interface EntryPointInit {
+    fun initialize(
+        navigationEffect: NavigationEffect? = null
+    )
+}

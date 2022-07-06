@@ -14,19 +14,14 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.effect.message.navigation.android.util.fragment.util
+package com.nlab.reminder.core.effect.message.navigation.android
 
 import androidx.navigation.NavController
 import com.nlab.reminder.core.effect.message.navigation.NavigationMessage
-import com.nlab.reminder.core.effect.message.navigation.android.util.fragment.NavigationMessageReceiver
 
 /**
  * @author Doohyun
  */
-inline fun NavigationMessageReceiver(
-    crossinline block: (NavController, NavigationMessage) -> Unit
-): NavigationMessageReceiver = object : NavigationMessageReceiver {
-    override fun invoke(navController: NavController, navigateMessage: NavigationMessage) {
-        block(navController, navigateMessage)
-    }
+interface NavigationMediator {
+    operator fun invoke(navController: NavController, navigationMessage: NavigationMessage)
 }

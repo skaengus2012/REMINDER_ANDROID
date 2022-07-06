@@ -22,7 +22,7 @@ import com.nlab.reminder.domain.common.tag.view.TagItem
 import java.util.*
 
 @ItemModel
-internal sealed class HomeItem private constructor() : HashIdentifier {
+sealed class HomeItem private constructor() : HashIdentifier {
     data class CategoryItem(
         val categoryResource: CategoryResource,
         val count: Long,
