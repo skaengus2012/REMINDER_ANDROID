@@ -24,7 +24,8 @@ import com.nlab.reminder.core.effect.message.navigation.android.util.NavigationM
 import com.nlab.reminder.core.entrypoint.util.EntryBlock
 import com.nlab.reminder.domain.feature.home.*
 import com.nlab.reminder.domain.feature.home.view.HomeFragmentDirections
-import com.nlab.reminder.domain.feature.home.view.HomeTagConfigDialogFragment
+import com.nlab.reminder.domain.feature.home.tag.config.view.HomeTagConfigDialogFragment
+import com.nlab.reminder.domain.feature.home.tag.rename.view.HomeTagRenameDialogFragment
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -68,6 +69,19 @@ class HomeNavigationModule {
             listener = HomeTagConfigDialogFragment.resultListenerOf(
                 onRenameClicked = { tag -> viewModel.onTagRenameRequestClicked(tag) },
                 onDeleteClicked = { tag -> viewModel.onTagDeleteRequestClicked(tag) }
+            )
+        )
+        fragment.setFragmentResultListener(
+            requestKey = REQUEST_KEY_HOME_TO_HOME_TAG_RENAME,
+            listener = HomeTagRenameDialogFragment.resultListenerOf(
+                onConfirmClicked = { tag, rename ->
+                    // todo implements
+                    println("TODO onConfirm rename ${tag.text} $rename")
+                },
+                onCancelClicked = { tag ->
+                    // todo implements
+                    println("TODO onCancel rename ${tag.text}")
+                }
             )
         )
     }

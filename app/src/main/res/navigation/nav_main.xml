@@ -35,7 +35,7 @@
 
 	<dialog
 		android:id="@+id/homeTagConfigDialogFragment"
-		android:name="com.nlab.reminder.domain.feature.home.view.HomeTagConfigDialogFragment"
+		android:name="com.nlab.reminder.domain.feature.home.tag.config.view.HomeTagConfigDialogFragment"
 		android:label="HomeTagConfigDialog"
 		tools:layout="@layout/fragment_home_tag_config_dialog">
 		<argument
@@ -50,7 +50,7 @@
 
 	<dialog
 		android:id="@+id/homeTagRenameDialogFragment"
-		android:name="com.nlab.reminder.domain.feature.home.view.HomeTagRenameDialogFragment"
+		android:name="com.nlab.reminder.domain.feature.home.tag.rename.view.HomeTagRenameDialogFragment"
 		android:label="HomeTagRenameDialog"
 		tools:layout="@layout/fragment_home_tag_rename_dialog">
 		<argument

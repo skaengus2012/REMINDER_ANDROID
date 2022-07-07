@@ -14,23 +14,21 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.feature.home.view
+package com.nlab.reminder.domain.feature.home.tag.config.view
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.StringDef
 import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.nlab.reminder.R
 import com.nlab.reminder.core.android.view.throttleClicks
 import com.nlab.reminder.databinding.FragmentHomeTagConfigDialogBinding
+import com.nlab.reminder.domain.common.android.view.fragment.sendResultAndDismiss
 import com.nlab.reminder.domain.common.tag.Tag
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -57,12 +55,28 @@ class HomeTagConfigDialogFragment : DialogFragment() {
 
         binding.renameButton.throttleClicks()
             .flowWithLifecycle(viewLifecycleOwner.lifecycle)
-            .onEach { sendResultAndDismiss(args.requestKey, args.tag, RESULT_TYPE_RENAME_REQUEST) }
+            .onEach {
+                sendResultAndDismiss(
+                    args.requestKey,
+                    result = bundleOf(
+                        RESULT_TAG to args.tag,
+                        RESULT_TYPE to RESULT_TYPE_RENAME_REQUEST
+                    )
+                )
+            }
             .launchIn(viewLifecycleOwner.lifecycleScope)
 
         binding.deleteButton.throttleClicks()
             .flowWithLifecycle(viewLifecycleOwner.lifecycle)
-            .onEach { sendResultAndDismiss(args.requestKey, args.tag, RESULT_TYPE_DELETE_REQUEST) }
+            .onEach {
+                sendResultAndDismiss(
+                    args.requestKey,
+                    result = bundleOf(
+                        RESULT_TAG to args.tag,
+                        RESULT_TYPE to RESULT_TYPE_DELETE_REQUEST
+                    )
+                )
+            }
             .launchIn(viewLifecycleOwner.lifecycleScope)
     }
 
@@ -71,24 +85,11 @@ class HomeTagConfigDialogFragment : DialogFragment() {
         _binding = null
     }
 
-    @StringDef(value = [RESULT_TYPE_RENAME_REQUEST, RESULT_TYPE_DELETE_REQUEST])
-    private annotation class ResultType
-
     companion object {
         private const val RESULT_TAG = "homeConfigDialogResultTag"
         private const val RESULT_TYPE = "homeConfigDialogResultType"
         private const val RESULT_TYPE_RENAME_REQUEST = "renameRequest"
         private const val RESULT_TYPE_DELETE_REQUEST = "deleteRequest"
-
-        private fun DialogFragment.sendResultAndDismiss(requestKey: String, tag: Tag, @ResultType resultType: String) {
-            findNavController().popBackStack()
-            setFragmentResult(
-                requestKey, result = bundleOf(
-                    RESULT_TAG to tag,
-                    RESULT_TYPE to resultType
-                )
-            )
-        }
 
         fun resultListenerOf(
             onRenameClicked: (Tag) -> Unit,
