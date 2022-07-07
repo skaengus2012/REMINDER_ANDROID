@@ -31,7 +31,6 @@ typealias HomeStateMachine = StateMachine<HomeAction, HomeState>
 /**
  * @author Doohyun
  */
-@Suppress("FunctionName")
 fun HomeStateMachine(
     scope: CoroutineScope,
     initState: HomeState,

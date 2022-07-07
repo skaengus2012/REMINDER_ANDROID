@@ -51,34 +51,28 @@ class HomeStateMachineKtTest {
         HomeState.Loaded(HomeSummary())
     )
 
-    private fun createHomeStateMachineFactory(
-        getHomeSummary: GetHomeSummaryUseCase = mock(),
-        getTagUsageCount: GetTagUsageCountUseCase = mock(),
-        initState: HomeState = HomeState.Init
-    ): HomeStateMachineFactory = HomeStateMachineFactory(getHomeSummary, getTagUsageCount, initState)
-
-    private fun createHomeStateMachine(
+    private fun createStateMachine(
         scope: CoroutineScope = CoroutineScope(Dispatchers.Default),
         initState: HomeState = HomeState.Init,
         navigationEffect: SendNavigationEffect = mock(),
         getHomeSummary: GetHomeSummaryUseCase = mock { onBlocking { mock() } doReturn flow { emit(HomeSummary()) } },
         getTagUsageCount: GetTagUsageCountUseCase = mock(),
         onHomeSummaryLoaded: (HomeSummary) -> Unit = mock(),
-    ): HomeStateMachine =
-        createHomeStateMachineFactory(getHomeSummary, getTagUsageCount, initState)
-            .create(scope, navigationEffect, onHomeSummaryLoaded)
+    ): HomeStateMachine = HomeStateMachine(
+        scope, initState, navigationEffect, getHomeSummary, getTagUsageCount, onHomeSummaryLoaded
+    )
 
     @Test
     fun `holds injected state when machine created`() = runTest {
         val initState = HomeState.Loaded(HomeSummary(todayNotificationCount = 1))
-        val stateMachine = createHomeStateMachine(initState = initState)
+        val stateMachine = createStateMachine(initState = initState)
         assertThat(stateMachine.state.value, sameInstance(initState))
     }
 
     @Test
-    fun `holds init state when machine created`() {
+    fun `holds init state when machine created by factory`() {
         assertThat(
-            createHomeStateMachineFactory()
+            HomeStateMachineFactory(getHomeSummary = mock(), getTagUsageCount = mock())
                 .create(
                     scope = CoroutineScope(Dispatchers.Default),
                     navigationEffect = mock(),
@@ -92,7 +86,7 @@ class HomeStateMachineKtTest {
 
     @Test
     fun `keep state init even when action occurs until fetched`() = runTest {
-        val stateMachine: HomeStateMachine = createHomeStateMachine()
+        val stateMachine: HomeStateMachine = createStateMachine()
         val initState: HomeState = HomeState.Init
         dummyActions
             .asSequence()
@@ -110,7 +104,7 @@ class HomeStateMachineKtTest {
     fun `fetch is executed when state is init`() = runTest {
         fun createHomeStateMachineWithEmptySummary(
             initState: HomeState
-        ): HomeStateMachine = createHomeStateMachine(
+        ): HomeStateMachine = createStateMachine(
             getHomeSummary = mock { onBlocking { invoke() } doReturn flow {} },
             initState = initState
         )
@@ -133,7 +127,7 @@ class HomeStateMachineKtTest {
     @Test
     fun `Notify Loaded when loaded action received`() = runTest {
         val homeSummary = HomeSummary(allNotificationCount = 10)
-        val stateMachine: HomeStateMachine = createHomeStateMachine()
+        val stateMachine: HomeStateMachine = createStateMachine()
         stateMachine
             .send(HomeAction.HomeSummaryLoaded(homeSummary))
             .join()
@@ -154,7 +148,7 @@ class HomeStateMachineKtTest {
         }
         val collectedStates: MutableList<HomeSummary> = mutableListOf()
         val onHomeSummaryLoaded: (HomeSummary) -> Unit = { collectedStates += it }
-        val stateMachine: HomeStateMachine = createHomeStateMachine(
+        val stateMachine: HomeStateMachine = createStateMachine(
             scope = CoroutineScope(Dispatchers.Unconfined),
             getHomeSummary = getHomeSummaryUseCase,
             onHomeSummaryLoaded = onHomeSummaryLoaded
@@ -252,7 +246,7 @@ class HomeStateMachineKtTest {
         expectedNavigationMessage: NavigationMessage,
     ) {
         val navigationEffect: SendNavigationEffect = mock()
-        val stateMachine: HomeStateMachine = createHomeStateMachine(
+        val stateMachine: HomeStateMachine = createStateMachine(
             scope = CoroutineScope(Dispatchers.Unconfined),
             initState = initState,
             getTagUsageCount = getTagUsageCount,

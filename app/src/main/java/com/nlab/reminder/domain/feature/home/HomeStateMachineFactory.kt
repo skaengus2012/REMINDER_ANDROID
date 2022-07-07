@@ -17,13 +17,11 @@
 package com.nlab.reminder.domain.feature.home
 
 import com.nlab.reminder.core.effect.message.navigation.SendNavigationEffect
-import com.nlab.reminder.core.util.annotation.test.Generated
 import kotlinx.coroutines.CoroutineScope
 
 /**
  * @author Doohyun
  */
-@Generated
 class HomeStateMachineFactory(
     private val getHomeSummary: GetHomeSummaryUseCase,
     private val getTagUsageCount: GetTagUsageCountUseCase,

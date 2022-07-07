@@ -37,11 +37,6 @@ import org.hamcrest.MatcherAssert.assertThat
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class HomeViewModelTest {
-    @Before
-    fun init() {
-        Dispatchers.setMain(Dispatchers.Unconfined)
-    }
-
     private fun createMockingViewModelComponent(
         state: MutableStateFlow<HomeState>
     ): Triple<HomeViewModel, HomeStateMachine, HomeStateMachineFactory> {
@@ -66,10 +61,14 @@ class HomeViewModelTest {
         initState: HomeState = HomeState.Init
     ): HomeViewModel = HomeViewModel(HomeStateMachineFactory(getHomeSummary, getTagUsageCount, initState))
 
+    @Before
+    fun init() {
+        Dispatchers.setMain(Dispatchers.Unconfined)
+    }
+
     @Test
     fun `notify action to stateMachine when viewModel action invoked`() {
-        val stateFlow: MutableStateFlow<HomeState> = MutableStateFlow(HomeState.Init)
-        val (viewModel, stateMachine) = createMockingViewModelComponent(stateFlow)
+        val (viewModel, stateMachine) = createMockingViewModelComponent(MutableStateFlow(HomeState.Init))
         val action = HomeAction.Fetch
         viewModel.onAction(action)
         verify(stateMachine, times(1)).send(action)
@@ -77,8 +76,7 @@ class HomeViewModelTest {
 
     @Test
     fun `invoke fetch when subscribing home state`() = runTest {
-        val stateFlow: MutableStateFlow<HomeState> = MutableStateFlow(HomeState.Init)
-        val (viewModel, stateMachine) = createMockingViewModelComponent(stateFlow)
+        val (viewModel, stateMachine) = createMockingViewModelComponent(MutableStateFlow(HomeState.Init))
         CoroutineScope(Dispatchers.Unconfined).launch { viewModel.state.collect() }
         verify(stateMachine, times(1)).send(HomeAction.Fetch)
     }

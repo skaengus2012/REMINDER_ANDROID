@@ -54,17 +54,16 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val homeItemAdapter = HomeItemAdapter(viewLifecycleOwner)
+        val renderWhenLoaded = renderWhenLoadedFunc(homeItemAdapter)
+
         entryPointInit.initialize(
             navigationEffect = viewModel.navigationEffect
         )
 
-        val homeItemAdapter = HomeItemAdapter(viewLifecycleOwner)
-        val renderWhenLoaded = renderWhenLoadedFunc(homeItemAdapter)
-
-        with(binding.categoryRecyclerview) {
-            itemAnimator = null
-            adapter = homeItemAdapter
-        }
+        binding.categoryRecyclerview
+            .apply { itemAnimator = null }
+            .apply { adapter = homeItemAdapter }
 
         viewModel.state
             .filterIsInstance<HomeState.Init>()
