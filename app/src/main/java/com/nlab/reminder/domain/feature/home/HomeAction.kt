@@ -31,5 +31,6 @@ sealed class HomeAction private constructor() : Action {
     data class OnTagClicked(val tag: Tag) : HomeAction()
     data class OnTagLongClicked(val tag: Tag) : HomeAction()
     data class OnTagRenameRequestClicked(val tag: Tag) : HomeAction()
+    data class OnTagRenameConfirmClicked(val originalTag: Tag, val renameText: String) : HomeAction()
     data class OnTagDeleteRequestClicked(val tag: Tag) : HomeAction()
 }

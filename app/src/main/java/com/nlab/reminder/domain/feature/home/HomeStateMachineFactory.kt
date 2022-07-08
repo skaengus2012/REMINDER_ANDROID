@@ -25,6 +25,7 @@ import kotlinx.coroutines.CoroutineScope
 class HomeStateMachineFactory(
     private val getHomeSummary: GetHomeSummaryUseCase,
     private val getTagUsageCount: GetTagUsageCountUseCase,
+    private val modifyTagName: ModifyTagNameUseCase,
     private val initState: HomeState = HomeState.Init
 ) {
     fun create(
@@ -37,6 +38,7 @@ class HomeStateMachineFactory(
         navigationEffect,
         getHomeSummary,
         getTagUsageCount,
+        modifyTagName,
         onHomeSummaryLoaded
     )
 }

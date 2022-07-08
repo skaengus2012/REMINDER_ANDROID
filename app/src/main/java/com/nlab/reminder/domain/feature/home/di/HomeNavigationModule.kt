@@ -74,14 +74,7 @@ class HomeNavigationModule {
         fragment.setFragmentResultListener(
             requestKey = REQUEST_KEY_HOME_TO_HOME_TAG_RENAME,
             listener = HomeTagRenameDialogFragment.resultListenerOf(
-                onConfirmClicked = { tag, rename ->
-                    // todo implements
-                    println("TODO onConfirm rename ${tag.text} $rename")
-                },
-                onCancelClicked = { tag ->
-                    // todo implements
-                    println("TODO onCancel rename ${tag.text}")
-                }
+                onConfirmClicked = { tag, rename -> viewModel.onTagRenameConfirmClicked(tag, rename) }
             )
         )
     }

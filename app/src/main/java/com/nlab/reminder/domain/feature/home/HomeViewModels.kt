@@ -42,6 +42,10 @@ fun HomeViewModel.onTagRenameRequestClicked(tag: Tag) {
     onAction(HomeAction.OnTagRenameRequestClicked(tag))
 }
 
+fun HomeViewModel.onTagRenameConfirmClicked(originalTag: Tag, renameText: String) {
+    onAction(HomeAction.OnTagRenameConfirmClicked(originalTag, renameText))
+}
+
 fun HomeViewModel.onTagDeleteRequestClicked(tag: Tag) {
     onAction(HomeAction.OnTagDeleteRequestClicked(tag))
 }

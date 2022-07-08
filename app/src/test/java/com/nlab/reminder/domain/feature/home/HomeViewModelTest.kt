@@ -37,8 +37,10 @@ import org.hamcrest.MatcherAssert.assertThat
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class HomeViewModelTest {
+    private val dummyTag = Tag(text = "DUMMY", TagStyleResource.TYPE4)
+
     private fun createMockingViewModelComponent(
-        state: MutableStateFlow<HomeState>
+        state: MutableStateFlow<HomeState> = MutableStateFlow(HomeState.Init)
     ): Triple<HomeViewModel, HomeStateMachine, HomeStateMachineFactory> {
         val stateMachine: HomeStateMachine = mock { whenever(mock.state) doReturn state }
         val stateMachineFactory: HomeStateMachineFactory = mock {
@@ -58,8 +60,11 @@ class HomeViewModelTest {
     private fun createViewModel(
         getHomeSummary: GetHomeSummaryUseCase = mock(),
         getTagUsageCount: GetTagUsageCountUseCase = mock(),
+        modifyTagName: ModifyTagNameUseCase = mock(),
         initState: HomeState = HomeState.Init
-    ): HomeViewModel = HomeViewModel(HomeStateMachineFactory(getHomeSummary, getTagUsageCount, initState))
+    ): HomeViewModel = HomeViewModel(
+        HomeStateMachineFactory(getHomeSummary, getTagUsageCount, modifyTagName, initState)
+    )
 
     @Before
     fun init() {
@@ -68,7 +73,7 @@ class HomeViewModelTest {
 
     @Test
     fun `notify action to stateMachine when viewModel action invoked`() {
-        val (viewModel, stateMachine) = createMockingViewModelComponent(MutableStateFlow(HomeState.Init))
+        val (viewModel, stateMachine) = createMockingViewModelComponent()
         val action = HomeAction.Fetch
         viewModel.onAction(action)
         verify(stateMachine, times(1)).send(action)
@@ -76,7 +81,7 @@ class HomeViewModelTest {
 
     @Test
     fun `invoke fetch when subscribing home state`() = runTest {
-        val (viewModel, stateMachine) = createMockingViewModelComponent(MutableStateFlow(HomeState.Init))
+        val (viewModel, stateMachine) = createMockingViewModelComponent()
         CoroutineScope(Dispatchers.Unconfined).launch { viewModel.state.collect() }
         verify(stateMachine, times(1)).send(HomeAction.Fetch)
     }
@@ -104,20 +109,19 @@ class HomeViewModelTest {
 
     @Test
     fun `notify navigation message when navigation event invoked`() = runTest {
-        val clickedTag = Tag(text = "ClickedTag", TagStyleResource.TYPE4)
         val usageCount = 10
         val viewModel: HomeViewModel = createViewModel(
             initState = HomeState.Loaded(HomeSummary()),
-            getTagUsageCount = mock { whenever(mock(clickedTag)) doReturn usageCount  }
+            getTagUsageCount = mock { whenever(mock(dummyTag)) doReturn usageCount  }
         )
 
         viewModel.onTodayCategoryClicked()
         viewModel.onTimetableCategoryClicked()
         viewModel.onAllCategoryClicked()
-        viewModel.onTagClicked(clickedTag)
-        viewModel.onTagLongClicked(clickedTag)
-        viewModel.onTagRenameRequestClicked(clickedTag)
-        viewModel.onTagDeleteRequestClicked(clickedTag)
+        viewModel.onTagClicked(dummyTag)
+        viewModel.onTagLongClicked(dummyTag)
+        viewModel.onTagRenameRequestClicked(dummyTag)
+        viewModel.onTagDeleteRequestClicked(dummyTag)
         assertThat(
             viewModel.navigationEffect
                 .event
@@ -128,12 +132,22 @@ class HomeViewModelTest {
                     TodayEndNavigationMessage,
                     TimetableEndNavigationMessage,
                     AllEndNavigationMessage,
-                    TagEndNavigationMessage(clickedTag),
-                    HomeTagConfigNavigationMessage(clickedTag),
-                    HomeTagRenameNavigationMessage(clickedTag, usageCount),
-                    HomeTagDeleteConfirmNavigationMessage(clickedTag)
+                    TagEndNavigationMessage(dummyTag),
+                    HomeTagConfigNavigationMessage(dummyTag),
+                    HomeTagRenameNavigationMessage(dummyTag, usageCount),
+                    HomeTagDeleteConfirmNavigationMessage(dummyTag)
                 )
             )
         )
+    }
+
+    @Test
+    fun testExtraExtensions() {
+        val renameText = "fix"
+        val (viewModel, stateMachine) = createMockingViewModelComponent()
+
+        viewModel.onTagRenameConfirmClicked(dummyTag, renameText)
+
+        verify(stateMachine, times(1)).send(HomeAction.OnTagRenameConfirmClicked(dummyTag, renameText))
     }
 }

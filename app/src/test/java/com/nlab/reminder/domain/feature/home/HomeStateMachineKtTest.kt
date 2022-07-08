@@ -38,11 +38,16 @@ import org.mockito.kotlin.*
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class HomeStateMachineKtTest {
+    private val dummyTag = Tag(text = "DUMMY", tagStyleResource = TagStyleResource.TYPE1)
     private val dummyActions: Set<HomeAction> = setOf(
         HomeAction.Fetch,
         HomeAction.OnTodayCategoryClicked,
         HomeAction.OnTimetableCategoryClicked,
-        HomeAction.OnAllCategoryClicked
+        HomeAction.OnAllCategoryClicked,
+        HomeAction.OnTagClicked(dummyTag),
+        HomeAction.OnTagLongClicked(dummyTag),
+        HomeAction.OnTagRenameConfirmClicked(dummyTag, renameText = ""),
+        HomeAction.OnTagDeleteRequestClicked(dummyTag)
     )
 
     private val dummyStates: Set<HomeState> = setOf(
@@ -57,9 +62,10 @@ class HomeStateMachineKtTest {
         navigationEffect: SendNavigationEffect = mock(),
         getHomeSummary: GetHomeSummaryUseCase = mock { onBlocking { mock() } doReturn flow { emit(HomeSummary()) } },
         getTagUsageCount: GetTagUsageCountUseCase = mock(),
+        modifyTagName: ModifyTagNameUseCase = mock(),
         onHomeSummaryLoaded: (HomeSummary) -> Unit = mock(),
     ): HomeStateMachine = HomeStateMachine(
-        scope, initState, navigationEffect, getHomeSummary, getTagUsageCount, onHomeSummaryLoaded
+        scope, initState, navigationEffect, getHomeSummary, getTagUsageCount, modifyTagName, onHomeSummaryLoaded
     )
 
     @Test
@@ -72,7 +78,7 @@ class HomeStateMachineKtTest {
     @Test
     fun `holds init state when machine created by factory`() {
         assertThat(
-            HomeStateMachineFactory(getHomeSummary = mock(), getTagUsageCount = mock())
+            HomeStateMachineFactory(getHomeSummary = mock(), getTagUsageCount = mock(), modifyTagName = mock())
                 .create(
                     scope = CoroutineScope(Dispatchers.Default),
                     navigationEffect = mock(),
@@ -188,53 +194,49 @@ class HomeStateMachineKtTest {
 
     @Test
     fun `Navigate tag end when tag element clicked`() = runTest {
-        val tag = Tag(text = "Test", TagStyleResource.TYPE3)
-        listOf(HomeSummary(tags = listOf(tag)), HomeSummary(tags = emptyList())).forEach { homeSummary ->
+        listOf(HomeSummary(tags = listOf(dummyTag)), HomeSummary(tags = emptyList())).forEach { homeSummary ->
             testNavigationEnd(
                 initState = HomeState.Loaded(homeSummary),
-                navigateAction = HomeAction.OnTagClicked(tag),
-                expectedNavigationMessage = TagEndNavigationMessage(tag)
+                navigateAction = HomeAction.OnTagClicked(dummyTag),
+                expectedNavigationMessage = TagEndNavigationMessage(dummyTag)
             )
         }
     }
 
     @Test
     fun `Navigate tag config end when tag element long clicked without no items`() = runTest {
-        val tag = Tag(text = "Test", TagStyleResource.TYPE3)
-        listOf(HomeSummary(tags = listOf(tag)), HomeSummary(tags = emptyList())).forEach { homeSummary ->
+        listOf(HomeSummary(tags = listOf(dummyTag)), HomeSummary(tags = emptyList())).forEach { homeSummary ->
             testNavigationEnd(
                 initState = HomeState.Loaded(homeSummary),
-                navigateAction = HomeAction.OnTagLongClicked(tag),
-                expectedNavigationMessage = HomeTagConfigNavigationMessage(tag)
+                navigateAction = HomeAction.OnTagLongClicked(dummyTag),
+                expectedNavigationMessage = HomeTagConfigNavigationMessage(dummyTag)
             )
         }
     }
 
     @Test
     fun `Navigate tag rename config when tag rename request invoked`() = runTest {
-        val tag = Tag(text = "Test", TagStyleResource.TYPE3)
         val fakeUsageCount = 10
-        val getTagUsageCount: GetTagUsageCountUseCase = mock { whenever(mock(tag)) doReturn fakeUsageCount }
+        val getTagUsageCount: GetTagUsageCountUseCase = mock { whenever(mock(dummyTag)) doReturn fakeUsageCount }
 
-        listOf(HomeSummary(tags = listOf(tag)), HomeSummary(tags = emptyList())).forEach { homeSummary ->
+        listOf(HomeSummary(tags = listOf(dummyTag)), HomeSummary(tags = emptyList())).forEach { homeSummary ->
             testNavigationEnd(
                 initState = HomeState.Loaded(homeSummary),
                 getTagUsageCount = getTagUsageCount,
-                navigateAction = HomeAction.OnTagRenameRequestClicked(tag),
-                expectedNavigationMessage = HomeTagRenameNavigationMessage(tag, fakeUsageCount)
+                navigateAction = HomeAction.OnTagRenameRequestClicked(dummyTag),
+                expectedNavigationMessage = HomeTagRenameNavigationMessage(dummyTag, fakeUsageCount)
             )
         }
-        verify(getTagUsageCount, times(2))(tag)
+        verify(getTagUsageCount, times(2))(dummyTag)
     }
 
     @Test
     fun `Navigate tag delete confirm when tag delete request invoked`() = runTest {
-        val tag = Tag(text = "Test", TagStyleResource.TYPE3)
-        listOf(HomeSummary(tags = listOf(tag)), HomeSummary(tags = emptyList())).forEach { homeSummary ->
+        listOf(HomeSummary(tags = listOf(dummyTag)), HomeSummary(tags = emptyList())).forEach { homeSummary ->
             testNavigationEnd(
                 initState = HomeState.Loaded(homeSummary),
-                navigateAction = HomeAction.OnTagDeleteRequestClicked(tag),
-                expectedNavigationMessage = HomeTagDeleteConfirmNavigationMessage(tag)
+                navigateAction = HomeAction.OnTagDeleteRequestClicked(dummyTag),
+                expectedNavigationMessage = HomeTagDeleteConfirmNavigationMessage(dummyTag)
             )
         }
     }
@@ -256,5 +258,20 @@ class HomeStateMachineKtTest {
             .send(navigateAction)
             .join()
         verify(navigationEffect, times(1)).send(expectedNavigationMessage)
+    }
+
+    @Test
+    fun `Modify tags when tag rename confirmed`() = runTest {
+        val renameText = "fix"
+        val modifyTagNameUseCase: ModifyTagNameUseCase = mock()
+        val stateMachine: HomeStateMachine = createStateMachine(
+            scope = CoroutineScope(Dispatchers.Unconfined),
+            initState = HomeState.Loaded(HomeSummary()),
+            modifyTagName = modifyTagNameUseCase
+        )
+        stateMachine
+            .send(HomeAction.OnTagRenameConfirmClicked(dummyTag, renameText))
+            .join()
+        verify(modifyTagNameUseCase, times(1))(dummyTag, renameText)
     }
 }
