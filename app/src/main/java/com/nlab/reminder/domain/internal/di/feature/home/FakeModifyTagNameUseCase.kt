@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.feature.home.di
+package com.nlab.reminder.domain.internal.di.feature.home
 
 import com.nlab.reminder.domain.common.tag.Tag
 import com.nlab.reminder.domain.feature.home.ModifyTagNameUseCase

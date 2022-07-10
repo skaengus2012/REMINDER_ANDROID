@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.feature.home.di
+package com.nlab.reminder.domain.internal.di.feature.home
 
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResultListener
