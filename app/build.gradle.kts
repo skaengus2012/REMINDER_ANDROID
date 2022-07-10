@@ -41,9 +41,15 @@ android {
     }
 
     buildTypes {
+        getByName("debug") {
+            isDebuggable = true
+            isMinifyEnabled = false
+        }
+
         getByName("release") {
             isDebuggable = false
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            signingConfig = signingConfigs.getByName("debug") // TODO make release key..
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
