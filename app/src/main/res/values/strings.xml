@@ -31,4 +31,8 @@
     <string name="home_tag_config_label_rename">Rename Tag</string>
     <string name="home_tag_config_label_delete">Delete Tag</string>
     <string name="home_tag_rename_edittext_hint">input tag</string>
+    <plurals name="home_tag_rename_text_label">
+        <item quantity="one">#%1$s will be updated in %2$d reminder.</item>
+        <item quantity="other">#%1$s will be updated in %2$d reminders.</item>
+    </plurals>
 </resources>

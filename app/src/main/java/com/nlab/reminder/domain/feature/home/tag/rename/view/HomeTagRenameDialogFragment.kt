@@ -28,6 +28,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
+import com.nlab.reminder.R
 import com.nlab.reminder.core.android.view.clicks
 import com.nlab.reminder.core.android.view.textChanged
 import com.nlab.reminder.databinding.FragmentHomeTagRenameDialogBinding
@@ -67,6 +68,14 @@ class HomeTagRenameDialogFragment : DialogFragment() {
             .distinctUntilChanged()
             .onEach { viewModel.onRenameTextInput(it) }
             .launchIn(viewLifecycleOwner.lifecycleScope)
+
+        binding.usageCountTextview.apply {
+            text = args.tag.let { tag ->
+                resources.getQuantityString(
+                    R.plurals.home_tag_rename_text_label, tag.usageCount, tag.text, tag.usageCount
+                )
+            }
+        }
 
         binding.clearButton.clicks()
             .flowWithLifecycle(viewLifecycleOwner.lifecycle)
