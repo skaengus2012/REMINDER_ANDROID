@@ -23,9 +23,10 @@ import kotlinx.parcelize.Parcelize
 /**
  * @author Doohyun
  */
-@Parcelize
 @Generated
+@Parcelize
 data class Tag(
     val text: String,
-    val tagStyleResource: TagStyleResource
+    val tagStyleResource: TagStyleResource,
+    val usageCount: Int
 ) : Parcelable

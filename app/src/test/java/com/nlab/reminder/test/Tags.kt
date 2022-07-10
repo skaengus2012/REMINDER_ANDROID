@@ -14,15 +14,12 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.feature.home.di
+package com.nlab.reminder.test
 
 import com.nlab.reminder.domain.common.tag.Tag
-import com.nlab.reminder.domain.feature.home.GetTagUsageCountUseCase
+import com.nlab.reminder.domain.common.tag.TagStyleResource
 
 /**
  * @author Doohyun
  */
-@Deprecated(message = "Fake UseCase was used")
-class FakeGetTagUsageCountUseCase : GetTagUsageCountUseCase {
-    override suspend fun invoke(tag: Tag): Int = 10
-}
+val dummyTag: Tag = Tag(text = "DUMMY", tagStyleResource = TagStyleResource.TYPE1, usageCount = 10)

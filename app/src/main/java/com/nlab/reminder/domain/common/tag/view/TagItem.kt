@@ -30,15 +30,14 @@ data class TagItem(
     val onClicked: () -> Unit,
     val onLongClicked: () -> Unit
 ) {
-    private val tagStyleResource = tag.tagStyleResource
-
-    val tagText: String get() = tag.text
+    val tagText: String
+        get() = tag.text
 
     @get:ColorRes
     val textColorResource: Int
-        get() = tagStyleResource.textColorResource
+        get() = tag.tagStyleResource.textColorResource
 
     @get:DrawableRes
     val backgroundDrawableResource: Int
-        get() = tagStyleResource.backgroundDrawableResource
+        get() = tag.tagStyleResource.backgroundDrawableResource
 }

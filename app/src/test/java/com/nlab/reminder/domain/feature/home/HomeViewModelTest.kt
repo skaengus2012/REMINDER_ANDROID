@@ -20,8 +20,7 @@ import com.nlab.reminder.domain.common.effect.message.navigation.AllEndNavigatio
 import com.nlab.reminder.domain.common.effect.message.navigation.TagEndNavigationMessage
 import com.nlab.reminder.domain.common.effect.message.navigation.TimetableEndNavigationMessage
 import com.nlab.reminder.domain.common.effect.message.navigation.TodayEndNavigationMessage
-import com.nlab.reminder.domain.common.tag.Tag
-import com.nlab.reminder.domain.common.tag.TagStyleResource
+import com.nlab.reminder.test.dummyTag
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.test.runTest
@@ -37,8 +36,6 @@ import org.hamcrest.MatcherAssert.assertThat
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class HomeViewModelTest {
-    private val dummyTag = Tag(text = "DUMMY", TagStyleResource.TYPE4)
-
     private fun createMockingViewModelComponent(
         state: MutableStateFlow<HomeState> = MutableStateFlow(HomeState.Init)
     ): Triple<HomeViewModel, HomeStateMachine, HomeStateMachineFactory> {
@@ -59,11 +56,10 @@ class HomeViewModelTest {
 
     private fun createViewModel(
         getHomeSummary: GetHomeSummaryUseCase = mock(),
-        getTagUsageCount: GetTagUsageCountUseCase = mock(),
         modifyTagName: ModifyTagNameUseCase = mock(),
         initState: HomeState = HomeState.Init
     ): HomeViewModel = HomeViewModel(
-        HomeStateMachineFactory(getHomeSummary, getTagUsageCount, modifyTagName, initState)
+        HomeStateMachineFactory(getHomeSummary, modifyTagName, initState)
     )
 
     @Before
@@ -109,11 +105,7 @@ class HomeViewModelTest {
 
     @Test
     fun `notify navigation message when navigation event invoked`() = runTest {
-        val usageCount = 10
-        val viewModel: HomeViewModel = createViewModel(
-            initState = HomeState.Loaded(HomeSummary()),
-            getTagUsageCount = mock { whenever(mock(dummyTag)) doReturn usageCount  }
-        )
+        val viewModel: HomeViewModel = createViewModel(initState = HomeState.Loaded(HomeSummary()))
 
         viewModel.onTodayCategoryClicked()
         viewModel.onTimetableCategoryClicked()
@@ -134,7 +126,7 @@ class HomeViewModelTest {
                     AllEndNavigationMessage,
                     TagEndNavigationMessage(dummyTag),
                     HomeTagConfigNavigationMessage(dummyTag),
-                    HomeTagRenameNavigationMessage(dummyTag, usageCount),
+                    HomeTagRenameNavigationMessage(dummyTag),
                     HomeTagDeleteConfirmNavigationMessage(dummyTag)
                 )
             )

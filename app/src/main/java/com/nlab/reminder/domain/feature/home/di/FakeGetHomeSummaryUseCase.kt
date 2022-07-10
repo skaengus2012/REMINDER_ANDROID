@@ -38,31 +38,38 @@ class FakeGetHomeSummaryUseCase : GetHomeSummaryUseCase {
             tags = listOf(
                 Tag(
                     "Hello",
-                    TagStyleResource.TYPE6
+                    TagStyleResource.TYPE6,
+                    usageCount = 10
                 ),
                 Tag(
                     "돈내는거",
-                    TagStyleResource.TYPE1
+                    TagStyleResource.TYPE1,
+                    usageCount = 5
                 ),
                 Tag(
                     "약속",
-                    TagStyleResource.TYPE2
+                    TagStyleResource.TYPE2,
+                    usageCount = 8
                 ),
                 Tag(
                     "건강",
-                    TagStyleResource.TYPE3
+                    TagStyleResource.TYPE3,
+                    usageCount = 9
                 ),
                 Tag(
                     "공과금 내는 날~!!",
-                    TagStyleResource.TYPE4
+                    TagStyleResource.TYPE4,
+                    usageCount = 1
                 ),
                 Tag(
                     "장보러 가는 날",
-                    TagStyleResource.TYPE5
+                    TagStyleResource.TYPE5,
+                    usageCount = 1
                 ),
                 Tag(
                     "Phone",
-                    TagStyleResource.TYPE6
+                    TagStyleResource.TYPE6,
+                    usageCount = 9
                 )
             )
         ))
@@ -76,27 +83,33 @@ class FakeGetHomeSummaryUseCase : GetHomeSummaryUseCase {
             tags = listOf(
                 Tag(
                     "Hello",
-                    TagStyleResource.TYPE6
+                    TagStyleResource.TYPE6,
+                    usageCount = 10
                 ),
                 Tag(
                     "돈내는거",
-                    TagStyleResource.TYPE1
+                    TagStyleResource.TYPE1,
+                    usageCount = 5
                 ),
                 Tag(
                     "건강",
-                    TagStyleResource.TYPE3
+                    TagStyleResource.TYPE3,
+                    usageCount = 9
                 ),
                 Tag(
                     "공과금 내는 날~!!",
-                    TagStyleResource.TYPE4
+                    TagStyleResource.TYPE4,
+                    usageCount = 19
                 ),
                 Tag(
                     "장보러 가는 날",
-                    TagStyleResource.TYPE5
+                    TagStyleResource.TYPE5,
+                    usageCount = 2
                 ),
                 Tag(
                     "Phone",
-                    TagStyleResource.TYPE6
+                    TagStyleResource.TYPE6,
+                    usageCount = 9
                 )
             )
         ))
@@ -110,47 +123,58 @@ class FakeGetHomeSummaryUseCase : GetHomeSummaryUseCase {
             tags = listOf(
                 Tag(
                     "Hello",
-                    TagStyleResource.TYPE6
+                    TagStyleResource.TYPE6,
+                    usageCount = 9
                 ),
                 Tag(
                     "돈내는거",
-                    TagStyleResource.TYPE1
+                    TagStyleResource.TYPE1,
+                    usageCount = 9
                 ),
                 Tag(
                     "건강",
-                    TagStyleResource.TYPE3
+                    TagStyleResource.TYPE3,
+                    usageCount = 9
                 ),
                 Tag(
                     "공과금 내는 날~!!",
-                    TagStyleResource.TYPE4
+                    TagStyleResource.TYPE4,
+                    usageCount = 9
                 ),
                 Tag(
                     "장보러 가는 날",
-                    TagStyleResource.TYPE5
+                    TagStyleResource.TYPE5,
+                    usageCount = 9
                 ),
                 Tag(
                     "Phone",
-                    TagStyleResource.TYPE6
+                    TagStyleResource.TYPE6,
+                    usageCount = 10
                 ),
                 Tag(
                     "Phone",
-                    TagStyleResource.TYPE3
+                    TagStyleResource.TYPE3,
+                    usageCount = 20
                 ),
                 Tag(
                     "Phone",
-                    TagStyleResource.TYPE2
+                    TagStyleResource.TYPE2,
+                    usageCount = 25
                 ),
                 Tag(
                     "돈내는거",
-                    TagStyleResource.TYPE6
+                    TagStyleResource.TYPE6,
+                    usageCount = 20
                 ),
                 Tag(
                     "건강",
-                    TagStyleResource.TYPE3
+                    TagStyleResource.TYPE3,
+                    usageCount = 19
                 ),
                 Tag(
                     "공과금 내는 날~!!",
-                    TagStyleResource.TYPE2
+                    TagStyleResource.TYPE2,
+                    usageCount = 16
                 ),
             )
         ))
