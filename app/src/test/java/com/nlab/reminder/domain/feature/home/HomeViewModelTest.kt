@@ -16,12 +16,11 @@
 
 package com.nlab.reminder.domain.feature.home
 
-import com.nlab.reminder.domain.common.effect.android.navigation.AllEndNavigationMessage
-import com.nlab.reminder.domain.common.effect.android.navigation.TagEndNavigationMessage
-import com.nlab.reminder.domain.common.effect.android.navigation.TimetableEndNavigationMessage
-import com.nlab.reminder.domain.common.effect.android.navigation.TodayEndNavigationMessage
-import com.nlab.reminder.domain.common.tag.Tag
-import com.nlab.reminder.domain.common.tag.TagStyleResource
+import com.nlab.reminder.domain.common.effect.message.navigation.AllEndNavigationMessage
+import com.nlab.reminder.domain.common.effect.message.navigation.TagEndNavigationMessage
+import com.nlab.reminder.domain.common.effect.message.navigation.TimetableEndNavigationMessage
+import com.nlab.reminder.domain.common.effect.message.navigation.TodayEndNavigationMessage
+import com.nlab.reminder.test.dummyTag
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.test.runTest
@@ -37,13 +36,8 @@ import org.hamcrest.MatcherAssert.assertThat
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class HomeViewModelTest {
-    @Before
-    fun init() {
-        Dispatchers.setMain(Dispatchers.Unconfined)
-    }
-
     private fun createMockingViewModelComponent(
-        state: MutableStateFlow<HomeState>
+        state: MutableStateFlow<HomeState> = MutableStateFlow(HomeState.Init)
     ): Triple<HomeViewModel, HomeStateMachine, HomeStateMachineFactory> {
         val stateMachine: HomeStateMachine = mock { whenever(mock.state) doReturn state }
         val stateMachineFactory: HomeStateMachineFactory = mock {
@@ -62,13 +56,19 @@ class HomeViewModelTest {
 
     private fun createViewModel(
         getHomeSummary: GetHomeSummaryUseCase = mock(),
+        modifyTagName: ModifyTagNameUseCase = mock(),
+        deleteTag: DeleteTagUseCase = mock(),
         initState: HomeState = HomeState.Init
-    ): HomeViewModel = HomeViewModel(HomeStateMachineFactory(getHomeSummary, initState))
+    ): HomeViewModel = HomeViewModel(HomeStateMachineFactory(getHomeSummary, modifyTagName, deleteTag, initState))
+
+    @Before
+    fun init() {
+        Dispatchers.setMain(Dispatchers.Unconfined)
+    }
 
     @Test
     fun `notify action to stateMachine when viewModel action invoked`() {
-        val stateFlow: MutableStateFlow<HomeState> = MutableStateFlow(HomeState.Init)
-        val (viewModel, stateMachine) = createMockingViewModelComponent(stateFlow)
+        val (viewModel, stateMachine) = createMockingViewModelComponent()
         val action = HomeAction.Fetch
         viewModel.onAction(action)
         verify(stateMachine, times(1)).send(action)
@@ -76,8 +76,7 @@ class HomeViewModelTest {
 
     @Test
     fun `invoke fetch when subscribing home state`() = runTest {
-        val stateFlow: MutableStateFlow<HomeState> = MutableStateFlow(HomeState.Init)
-        val (viewModel, stateMachine) = createMockingViewModelComponent(stateFlow)
+        val (viewModel, stateMachine) = createMockingViewModelComponent()
         CoroutineScope(Dispatchers.Unconfined).launch { viewModel.state.collect() }
         verify(stateMachine, times(1)).send(HomeAction.Fetch)
     }
@@ -105,30 +104,45 @@ class HomeViewModelTest {
 
     @Test
     fun `notify navigation message when navigation event invoked`() = runTest {
-        val clickedTag = Tag(text = "ClickedTag", TagStyleResource.TYPE4)
-        val viewModel: HomeViewModel = createViewModel(
-            initState = HomeState.Loaded(
-                HomeSummary(tags = listOf(Tag(text = "", TagStyleResource.TYPE1), clickedTag))
-            )
-        )
+        val viewModel: HomeViewModel = createViewModel(initState = HomeState.Loaded(HomeSummary()))
 
         viewModel.onTodayCategoryClicked()
         viewModel.onTimetableCategoryClicked()
         viewModel.onAllCategoryClicked()
-        viewModel.onTagClicked(clickedIndex = 1)
+        viewModel.onTagClicked(dummyTag)
+        viewModel.onTagLongClicked(dummyTag)
+        viewModel.onTagRenameRequestClicked(dummyTag)
+        viewModel.onTagDeleteRequestClicked(dummyTag)
         assertThat(
             viewModel.navigationEffect
                 .event
-                .take(4)
+                .take(7)
                 .toList(),
             equalTo(
                 listOf(
                     TodayEndNavigationMessage,
                     TimetableEndNavigationMessage,
                     AllEndNavigationMessage,
-                    TagEndNavigationMessage(clickedTag)
+                    TagEndNavigationMessage(dummyTag),
+                    HomeTagConfigNavigationMessage(dummyTag),
+                    HomeTagRenameNavigationMessage(dummyTag),
+                    HomeTagDeleteNavigationMessage(dummyTag)
                 )
             )
         )
+    }
+
+    @Test
+    fun testExtraExtensions() {
+        val renameText = "fix"
+        val (viewModel, stateMachine) = createMockingViewModelComponent()
+
+        viewModel.onTagRenameConfirmClicked(dummyTag, renameText)
+        viewModel.onTagDeleteConfirmClicked(dummyTag)
+
+        verify(stateMachine, times(1))
+            .send(HomeAction.OnTagRenameConfirmClicked(dummyTag, renameText))
+        verify(stateMachine, times(1))
+            .send(HomeAction.OnTagDeleteConfirmClicked(dummyTag))
     }
 }

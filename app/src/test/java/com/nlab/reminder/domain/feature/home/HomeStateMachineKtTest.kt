@@ -16,15 +16,14 @@
 
 package com.nlab.reminder.domain.feature.home
 
-import com.nlab.reminder.core.effect.android.navigation.NavigationMessage
-import com.nlab.reminder.core.effect.android.navigation.SendNavigationEffect
+import com.nlab.reminder.core.effect.message.navigation.NavigationMessage
+import com.nlab.reminder.core.effect.message.navigation.SendNavigationEffect
 import com.nlab.reminder.core.state.StateMachine
-import com.nlab.reminder.domain.common.effect.android.navigation.AllEndNavigationMessage
-import com.nlab.reminder.domain.common.effect.android.navigation.TagEndNavigationMessage
-import com.nlab.reminder.domain.common.effect.android.navigation.TimetableEndNavigationMessage
-import com.nlab.reminder.domain.common.effect.android.navigation.TodayEndNavigationMessage
-import com.nlab.reminder.domain.common.tag.Tag
-import com.nlab.reminder.domain.common.tag.TagStyleResource
+import com.nlab.reminder.domain.common.effect.message.navigation.AllEndNavigationMessage
+import com.nlab.reminder.domain.common.effect.message.navigation.TagEndNavigationMessage
+import com.nlab.reminder.domain.common.effect.message.navigation.TimetableEndNavigationMessage
+import com.nlab.reminder.domain.common.effect.message.navigation.TodayEndNavigationMessage
+import com.nlab.reminder.test.dummyTag
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
@@ -42,7 +41,12 @@ class HomeStateMachineKtTest {
         HomeAction.Fetch,
         HomeAction.OnTodayCategoryClicked,
         HomeAction.OnTimetableCategoryClicked,
-        HomeAction.OnAllCategoryClicked
+        HomeAction.OnAllCategoryClicked,
+        HomeAction.OnTagClicked(dummyTag),
+        HomeAction.OnTagLongClicked(dummyTag),
+        HomeAction.OnTagRenameConfirmClicked(dummyTag, renameText = ""),
+        HomeAction.OnTagDeleteRequestClicked(dummyTag),
+        HomeAction.OnTagDeleteConfirmClicked(dummyTag)
     )
 
     private val dummyStates: Set<HomeState> = setOf(
@@ -51,26 +55,29 @@ class HomeStateMachineKtTest {
         HomeState.Loaded(HomeSummary())
     )
 
-    private fun createHomeStateMachine(
+    private fun createStateMachine(
         scope: CoroutineScope = CoroutineScope(Dispatchers.Default),
         initState: HomeState = HomeState.Init,
         navigationEffect: SendNavigationEffect = mock(),
-        getHomeSummary: GetHomeSummaryUseCase = mock { whenever(mock()) doReturn flow { emit(HomeSummary()) } },
+        getHomeSummary: GetHomeSummaryUseCase = mock { onBlocking { mock() } doReturn flow { emit(HomeSummary()) } },
+        modifyTagName: ModifyTagNameUseCase = mock(),
+        deleteTag: DeleteTagUseCase = mock(),
         onHomeSummaryLoaded: (HomeSummary) -> Unit = mock(),
-    ): HomeStateMachine =
-        HomeStateMachineFactory(getHomeSummary, initState).create(scope, navigationEffect, onHomeSummaryLoaded)
+    ): HomeStateMachine = HomeStateMachine(
+        scope, initState, navigationEffect, getHomeSummary, modifyTagName, deleteTag, onHomeSummaryLoaded
+    )
 
     @Test
     fun `holds injected state when machine created`() = runTest {
         val initState = HomeState.Loaded(HomeSummary(todayNotificationCount = 1))
-        val stateMachine = createHomeStateMachine(initState = initState)
+        val stateMachine = createStateMachine(initState = initState)
         assertThat(stateMachine.state.value, sameInstance(initState))
     }
 
     @Test
-    fun `holds init state when machine created`() {
+    fun `holds init state when machine created by factory`() {
         assertThat(
-            HomeStateMachineFactory(getHomeSummary = mock())
+            HomeStateMachineFactory(getHomeSummary = mock(), modifyTagName = mock(), deleteTag = mock())
                 .create(
                     scope = CoroutineScope(Dispatchers.Default),
                     navigationEffect = mock(),
@@ -84,7 +91,7 @@ class HomeStateMachineKtTest {
 
     @Test
     fun `keep state init even when action occurs until fetched`() = runTest {
-        val stateMachine: HomeStateMachine = createHomeStateMachine()
+        val stateMachine: HomeStateMachine = createStateMachine()
         val initState: HomeState = HomeState.Init
         dummyActions
             .asSequence()
@@ -102,7 +109,7 @@ class HomeStateMachineKtTest {
     fun `fetch is executed when state is init`() = runTest {
         fun createHomeStateMachineWithEmptySummary(
             initState: HomeState
-        ): HomeStateMachine = createHomeStateMachine(
+        ): HomeStateMachine = createStateMachine(
             getHomeSummary = mock { onBlocking { invoke() } doReturn flow {} },
             initState = initState
         )
@@ -125,7 +132,7 @@ class HomeStateMachineKtTest {
     @Test
     fun `Notify Loaded when loaded action received`() = runTest {
         val homeSummary = HomeSummary(allNotificationCount = 10)
-        val stateMachine: HomeStateMachine = createHomeStateMachine()
+        val stateMachine: HomeStateMachine = createStateMachine()
         stateMachine
             .send(HomeAction.HomeSummaryLoaded(homeSummary))
             .join()
@@ -146,7 +153,7 @@ class HomeStateMachineKtTest {
         }
         val collectedStates: MutableList<HomeSummary> = mutableListOf()
         val onHomeSummaryLoaded: (HomeSummary) -> Unit = { collectedStates += it }
-        val stateMachine: HomeStateMachine = createHomeStateMachine(
+        val stateMachine: HomeStateMachine = createStateMachine(
             scope = CoroutineScope(Dispatchers.Unconfined),
             getHomeSummary = getHomeSummaryUseCase,
             onHomeSummaryLoaded = onHomeSummaryLoaded
@@ -186,27 +193,46 @@ class HomeStateMachineKtTest {
 
     @Test
     fun `Navigate tag end when tag element clicked`() = runTest {
-        val tag = Tag(text = "Test", TagStyleResource.TYPE3)
-        testNavigationEnd(
-            initState = HomeState.Loaded(HomeSummary(tags = listOf(tag))),
-            navigateAction = HomeAction.OnTagClicked(clickedIndex = 0),
-            expectedNavigationMessage = TagEndNavigationMessage(tag)
-        )
+        listOf(HomeSummary(tags = listOf(dummyTag)), HomeSummary(tags = emptyList())).forEach { homeSummary ->
+            testNavigationEnd(
+                initState = HomeState.Loaded(homeSummary),
+                navigateAction = HomeAction.OnTagClicked(dummyTag),
+                expectedNavigationMessage = TagEndNavigationMessage(dummyTag)
+            )
+        }
     }
 
     @Test
-    fun `failed Navigate by tag when wrong index tag item clicked`() = runTest {
-        val navigationEffect: SendNavigationEffect = mock()
-        val stateMachine: HomeStateMachine = createHomeStateMachine(
-            scope = CoroutineScope(Dispatchers.Unconfined),
-            initState = HomeState.Loaded(HomeSummary()),
-            navigationEffect = navigationEffect
-        )
+    fun `Navigate tag config end when tag element long clicked without no items`() = runTest {
+        listOf(HomeSummary(tags = listOf(dummyTag)), HomeSummary(tags = emptyList())).forEach { homeSummary ->
+            testNavigationEnd(
+                initState = HomeState.Loaded(homeSummary),
+                navigateAction = HomeAction.OnTagLongClicked(dummyTag),
+                expectedNavigationMessage = HomeTagConfigNavigationMessage(dummyTag)
+            )
+        }
+    }
 
-        stateMachine
-            .send(HomeAction.OnTagClicked(clickedIndex = 0))
-            .join()
-        verify(navigationEffect, never()).send(any())
+    @Test
+    fun `Navigate tag rename config when tag rename request invoked`() = runTest {
+        listOf(HomeSummary(tags = listOf(dummyTag)), HomeSummary(tags = emptyList())).forEach { homeSummary ->
+            testNavigationEnd(
+                initState = HomeState.Loaded(homeSummary),
+                navigateAction = HomeAction.OnTagRenameRequestClicked(dummyTag),
+                expectedNavigationMessage = HomeTagRenameNavigationMessage(dummyTag)
+            )
+        }
+    }
+
+    @Test
+    fun `Navigate tag delete confirm when tag delete request invoked`() = runTest {
+        listOf(HomeSummary(tags = listOf(dummyTag)), HomeSummary(tags = emptyList())).forEach { homeSummary ->
+            testNavigationEnd(
+                initState = HomeState.Loaded(homeSummary),
+                navigateAction = HomeAction.OnTagDeleteRequestClicked(dummyTag),
+                expectedNavigationMessage = HomeTagDeleteNavigationMessage(dummyTag)
+            )
+        }
     }
 
     private suspend fun testNavigationEnd(
@@ -215,7 +241,7 @@ class HomeStateMachineKtTest {
         expectedNavigationMessage: NavigationMessage,
     ) {
         val navigationEffect: SendNavigationEffect = mock()
-        val stateMachine: HomeStateMachine = createHomeStateMachine(
+        val stateMachine: HomeStateMachine = createStateMachine(
             scope = CoroutineScope(Dispatchers.Unconfined),
             initState = initState,
             navigationEffect = navigationEffect
@@ -224,5 +250,34 @@ class HomeStateMachineKtTest {
             .send(navigateAction)
             .join()
         verify(navigationEffect, times(1)).send(expectedNavigationMessage)
+    }
+
+    @Test
+    fun `Modify tags when tag rename confirmed`() = runTest {
+        val renameText = "fix"
+        val modifyTagNameUseCase: ModifyTagNameUseCase = mock()
+        val stateMachine: HomeStateMachine = createStateMachine(
+            scope = CoroutineScope(Dispatchers.Unconfined),
+            initState = HomeState.Loaded(HomeSummary()),
+            modifyTagName = modifyTagNameUseCase
+        )
+        stateMachine
+            .send(HomeAction.OnTagRenameConfirmClicked(dummyTag, renameText))
+            .join()
+        verify(modifyTagNameUseCase, times(1))(dummyTag, renameText)
+    }
+
+    @Test
+    fun `Delete tag when delete confirm invoked`() = runTest {
+        val deleteTagUseCase: DeleteTagUseCase = mock()
+        val stateMachine: HomeStateMachine = createStateMachine(
+            scope = CoroutineScope(Dispatchers.Unconfined),
+            initState = HomeState.Loaded(HomeSummary()),
+            deleteTag = deleteTagUseCase
+        )
+        stateMachine
+            .send(HomeAction.OnTagDeleteConfirmClicked(dummyTag))
+            .join()
+        verify(deleteTagUseCase, times(1))(dummyTag)
     }
 }

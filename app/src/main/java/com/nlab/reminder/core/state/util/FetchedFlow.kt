@@ -18,15 +18,15 @@ package com.nlab.reminder.core.state.util
 
 import com.nlab.reminder.core.state.State
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.*
 
 /**
  * @author Doohyun
  */
 fun <S : State> StateFlow<S>.fetchedFlow(
     scope: CoroutineScope,
-    onFetch: suspend () -> Unit
-): StateFlow<S> = onStart { onFetch() }.stateIn(scope, SharingStarted.Lazily, value)
+    onFetch: () -> Unit
+): StateFlow<S> = onStart(onFetchToOnStartConverter(onFetch)).stateIn(scope, SharingStarted.Lazily, value)
+
+// Jacoco could not measure coverage in onStart suspend function..
+private fun <T> onFetchToOnStartConverter(onFetch: () -> Unit): FlowCollector<T>.() -> Unit = { onFetch() }

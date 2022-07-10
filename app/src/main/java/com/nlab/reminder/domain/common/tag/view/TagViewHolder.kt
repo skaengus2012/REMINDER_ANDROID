@@ -33,9 +33,9 @@ import kotlinx.coroutines.flow.onEach
 /**
  * @author Doohyun
  */
-class TagViewHolder(
-    private val lifecycleOwner: LifecycleOwner,
+class TagViewHolder private constructor(
     binding: ViewItemTagHolderBinding,
+    private val lifecycleOwner: LifecycleOwner,
 ) : RecyclerView.ViewHolder(binding.root) {
     private val tagHolderLayout: ViewGroup = binding.tagHolderLayout
     private val tagBindingCache: MutableList<ViewTagBinding> = arrayListOf()
@@ -91,5 +91,15 @@ class TagViewHolder(
 
     private fun onTagLongClicked(index: Int) {
         tagItems.getOrNull(index)?.onLongClicked?.invoke()
+    }
+
+    companion object {
+        fun create(
+            parent: ViewGroup,
+            lifecycleOwner: LifecycleOwner
+        ): TagViewHolder = TagViewHolder(
+            ViewItemTagHolderBinding.inflate(LayoutInflater.from(parent.context), parent, false),
+            lifecycleOwner
+        )
     }
 }

@@ -16,6 +16,8 @@
 
 package com.nlab.reminder.domain.feature.home
 
+import com.nlab.reminder.domain.common.tag.Tag
+
 fun HomeViewModel.onTodayCategoryClicked() {
     onAction(HomeAction.OnTodayCategoryClicked)
 }
@@ -28,6 +30,26 @@ fun HomeViewModel.onAllCategoryClicked() {
     onAction(HomeAction.OnAllCategoryClicked)
 }
 
-fun HomeViewModel.onTagClicked(clickedIndex: Int) {
-    onAction(HomeAction.OnTagClicked(clickedIndex))
+fun HomeViewModel.onTagClicked(tag: Tag) {
+    onAction(HomeAction.OnTagClicked(tag))
+}
+
+fun HomeViewModel.onTagLongClicked(tag: Tag) {
+    onAction(HomeAction.OnTagLongClicked(tag))
+}
+
+fun HomeViewModel.onTagRenameRequestClicked(tag: Tag) {
+    onAction(HomeAction.OnTagRenameRequestClicked(tag))
+}
+
+fun HomeViewModel.onTagRenameConfirmClicked(originalTag: Tag, renameText: String) {
+    onAction(HomeAction.OnTagRenameConfirmClicked(originalTag, renameText))
+}
+
+fun HomeViewModel.onTagDeleteRequestClicked(tag: Tag) {
+    onAction(HomeAction.OnTagDeleteRequestClicked(tag))
+}
+
+fun HomeViewModel.onTagDeleteConfirmClicked(tag: Tag) {
+    onAction(HomeAction.OnTagDeleteConfirmClicked(tag))
 }

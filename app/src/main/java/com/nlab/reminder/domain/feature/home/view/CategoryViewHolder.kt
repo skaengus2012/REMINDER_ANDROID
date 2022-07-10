@@ -17,6 +17,8 @@
 package com.nlab.reminder.domain.feature.home.view
 
 import android.content.Context
+import android.view.LayoutInflater
+import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -29,7 +31,7 @@ import kotlinx.coroutines.flow.onEach
 /**
  * @author Doohyun
  */
-internal class CategoryViewHolder(
+class CategoryViewHolder private constructor(
     lifecycleOwner: LifecycleOwner,
     private val binding: ViewItemHomeCategoryBinding
 ) : RecyclerView.ViewHolder(binding.root) {
@@ -43,7 +45,7 @@ internal class CategoryViewHolder(
             .launchIn(lifecycleOwner.lifecycleScope)
     }
 
-    fun onBind(categoryItem: CategoryItem) {
+    fun onBind(categoryItem: HomeItem.CategoryItem) {
         val context: Context = binding.root.context
         val categoryResource = categoryItem.categoryResource
         val contentColor = context.getColorStateList(categoryResource.contentColorResource)
@@ -59,5 +61,15 @@ internal class CategoryViewHolder(
             iconImageview.imageTintList = contentColor
             background.setBackgroundResource(categoryResource.backgroundColorResource)
         }
+    }
+
+    companion object {
+        fun create(
+            parent: ViewGroup,
+            lifecycleOwner: LifecycleOwner
+        ): CategoryViewHolder = CategoryViewHolder(
+            lifecycleOwner,
+            ViewItemHomeCategoryBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        )
     }
 }

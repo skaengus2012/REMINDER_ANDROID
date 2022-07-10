@@ -18,8 +18,8 @@ package com.nlab.reminder.domain.feature.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nlab.reminder.core.effect.android.navigation.NavigationEffect
-import com.nlab.reminder.core.effect.android.navigation.SendNavigationEffect
+import com.nlab.reminder.core.effect.message.navigation.NavigationEffect
+import com.nlab.reminder.core.effect.message.navigation.SendNavigationEffect
 import com.nlab.reminder.core.effect.util.sideEffect
 import com.nlab.reminder.core.state.util.fetchedFlow
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -44,13 +44,9 @@ class HomeViewModel @Inject constructor(
     val state: StateFlow<HomeState> =
         stateMachine
             .state
-            .fetchedFlow(viewModelScope, this::onFetch)
+            .fetchedFlow(viewModelScope, onFetch = { onAction(HomeAction.Fetch) })
 
     fun onAction(action: HomeAction) {
         stateMachine.send(action)
-    }
-
-    private fun onFetch() {
-        onAction(HomeAction.Fetch)
     }
 }

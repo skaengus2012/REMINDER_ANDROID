@@ -24,11 +24,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.ConcatAdapter
-import com.nlab.reminder.R
-import com.nlab.reminder.core.effect.android.navigation.NavigationEffectReceiver
+import com.nlab.reminder.core.entrypoint.EntryPointInit
 import com.nlab.reminder.databinding.FragmentHomeBinding
-import com.nlab.reminder.domain.common.android.view.recyclerview.simple.SimpleLayoutAdapter
 import com.nlab.reminder.domain.feature.home.*
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -45,30 +42,28 @@ class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
     private val binding: FragmentHomeBinding get() = checkNotNull(_binding)
 
+    @HomeScope
     @Inject
-    lateinit var navigateEffectReceiver: NavigationEffectReceiver
+    lateinit var entryPointInit: EntryPointInit
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
-        FragmentHomeBinding.inflate(inflater, container, false)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        return FragmentHomeBinding.inflate(inflater, container, false)
             .also { _binding = it }
             .root
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val categoryAdapter = CategoryAdapter(viewLifecycleOwner)
-        val tagAdapter = TagAdapter(viewLifecycleOwner)
-        val renderWhenLoaded = renderWhenLoadedFunc(categoryAdapter, tagAdapter)
+        val homeItemAdapter = HomeItemAdapter(viewLifecycleOwner)
+        val renderWhenLoaded = renderWhenLoadedFunc(homeItemAdapter)
 
-        with(binding.categoryRecyclerview) {
-            itemAnimator = null
-            adapter = ConcatAdapter(
-                categoryAdapter,
-                SimpleLayoutAdapter(layoutResource = R.layout.view_item_home_space_between_category_and_tags),
-                tagAdapter
-            )
-        }
+        entryPointInit.initialize(
+            navigationEffect = viewModel.navigationEffect
+        )
 
-        navigateEffectReceiver.observeEvent(viewModel.navigationEffect)
+        binding.categoryRecyclerview
+            .apply { itemAnimator = null }
+            .apply { adapter = homeItemAdapter }
 
         viewModel.state
             .filterIsInstance<HomeState.Init>()
@@ -89,11 +84,12 @@ class HomeFragment : Fragment() {
             .flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .distinctUntilChanged()
             .map { state ->
-                state.toListItem(
+                state.toHomeItems(
                     onTodayCategoryClicked = viewModel::onTodayCategoryClicked,
                     onTimetableCategoryClicked = viewModel::onTimetableCategoryClicked,
                     onAllCategoryClicked = viewModel::onAllCategoryClicked,
-                    onTagClicked = viewModel::onTagClicked
+                    onTagClicked = viewModel::onTagClicked,
+                    onTagLongClicked = viewModel::onTagLongClicked
                 )
             }
             .flowOn(Dispatchers.Default)
@@ -109,14 +105,9 @@ class HomeFragment : Fragment() {
         binding.categoryRecyclerview.visibility = View.GONE
     }
 
-    private fun renderWhenLoadedFunc(
-        categoryAdapter: CategoryAdapter,
-        tagAdapter: TagAdapter
-    ): (HomeListItem) -> Unit = { (categoryItems, tagItems) ->
+    private fun renderWhenLoadedFunc(homeItemAdapter: HomeItemAdapter) = { homeItems: List<HomeItem> ->
         binding.categoryRecyclerview.visibility = View.VISIBLE
-
-        categoryAdapter.submitList(categoryItems)
-        tagAdapter.submitList(listOf(tagItems))
+        homeItemAdapter.submitList(homeItems)
     }
 
     override fun onDestroyView() {

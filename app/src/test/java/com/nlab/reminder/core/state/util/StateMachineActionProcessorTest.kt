@@ -129,32 +129,68 @@ internal class StateMachineActionProcessorTest {
     }
 
     @Test
-    fun `ignore sideEffect action when config type was different`() = runTest {
+    fun `ignore sideEffect action when config type was different with sideEffectBy`() = runTest {
         val onReceiveAction: (TestAction) -> Unit = mock()
         val actionProcessor = createTestStateMachineActionProcessor(
             stateMachineBuilder = StateMachineBuilder<TestAction, TestState>().apply {
                 sideEffectBy<TestAction.Action1> { (action) -> onReceiveAction(action) }
             }
         )
-        actionProcessor
-            .send(TestAction.Action2())
-            .join()
-        verify(onReceiveAction, never()).invoke(any())
+        listOf(TestAction.Action1(), TestAction.Action2()).forEach { action ->
+            actionProcessor
+                .send(action)
+                .join()
+        }
+        verify(onReceiveAction, times(1)).invoke(any())
     }
 
     @Test
-    fun `ignore sideEffect action and state when config type was different`() = runTest {
+    fun `ignore sideEffect action when config type was different with sideEffectWhen`() = runTest {
         val onReceiveAction: (TestAction, TestState) -> Unit = mock()
+        val stateFlow: MutableStateFlow<TestState> = MutableStateFlow(TestState.State2())
         val actionProcessor = createTestStateMachineActionProcessor(
-            state = MutableStateFlow(TestState.State2()),
+            state = stateFlow,
             stateMachineBuilder = StateMachineBuilder<TestAction, TestState>().apply {
-                sideEffectWhen<TestAction.Action1, TestState.StateInit> { onReceiveAction(it.action, it.oldState) }
+                sideEffectWhen<TestState.StateInit> { onReceiveAction(it.action, it.oldState) }
             }
         )
         actionProcessor
             .send(TestAction.Action1())
             .join()
-        verify(onReceiveAction, never()).invoke(any(), any())
+
+        stateFlow.value = TestState.StateInit()
+        listOf(TestAction.Action1(), TestAction.Action2()).forEach { action ->
+            actionProcessor
+                .send(action)
+                .join()
+        }
+
+        verify(onReceiveAction, times(2)).invoke(any(), any())
+    }
+
+    @Test
+    fun `ignore sideEffect action when config type was different with sideEffectOn`() = runTest {
+        val onReceiveAction: (TestAction, TestState) -> Unit = mock()
+        val stateFlow: MutableStateFlow<TestState> = MutableStateFlow(TestState.State2())
+        val actionProcessor = createTestStateMachineActionProcessor(
+            state = stateFlow,
+            stateMachineBuilder = StateMachineBuilder<TestAction, TestState>().apply {
+                sideEffectOn<TestAction.Action1, TestState.StateInit> { onReceiveAction(it.action, it.oldState) }
+            }
+        )
+        listOf(TestAction.Action1(), TestAction.Action2()).forEach { action ->
+            actionProcessor
+                .send(action)
+                .join()
+        }
+
+        stateFlow.value = TestState.StateInit()
+        listOf(TestAction.Action1(), TestAction.Action2()).forEach { action ->
+            actionProcessor
+                .send(action)
+                .join()
+        }
+        verify(onReceiveAction, times(1)).invoke(any(), any())
     }
 
     @Test

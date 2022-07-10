@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (C) 2022 The N's lab Open Source Project
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~        http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<FrameLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent">
+
+	<androidx.constraintlayout.widget.ConstraintLayout
+		android:layout_width="@dimen/dialog_default_width"
+		android:layout_height="wrap_content"
+		android:layout_gravity="center">
+
+		<TextView
+			android:id="@+id/current_tag_textview"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="@string/home_tag_config_label_rename"
+			android:textColor="?defaultTextColor"
+			android:textSize="16sp"
+			android:textStyle="bold"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toTopOf="parent"
+			tools:textColor="@color/black" />
+
+		<TextView
+			android:id="@+id/usage_count_textview"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:gravity="center"
+			android:paddingStart="20dp"
+			android:paddingEnd="20dp"
+			android:paddingBottom="20dp"
+			android:textColor="?defaultTextColor"
+			android:textSize="14sp"
+			app:layout_constraintBottom_toTopOf="@id/clear_button"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toBottomOf="@id/current_tag_textview"
+			tools:text="#Hello will be updated in 1 reminder." />
+
+		<EditText
+			android:id="@+id/rename_edittext"
+			android:layout_width="0dp"
+			android:layout_height="0dp"
+			android:hint="@string/home_tag_rename_edittext_hint"
+			android:importantForAutofill="no"
+			android:inputType="text"
+			android:textColor="?defaultTextColor"
+			android:textSize="12sp"
+			app:layout_constraintBottom_toBottomOf="@id/clear_button"
+			app:layout_constraintEnd_toStartOf="@id/clear_button"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toTopOf="@id/clear_button"
+			tools:textColor="@color/black" />
+
+		<androidx.appcompat.widget.AppCompatImageButton
+			android:id="@+id/clear_button"
+			android:layout_width="40dp"
+			android:layout_height="40dp"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintTop_toBottomOf="@id/usage_count_textview" />
+
+		<androidx.appcompat.widget.AppCompatButton
+			android:id="@+id/cancel_button"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:text="@string/home_tag_rename_cancel"
+			android:textAllCaps="false"
+			app:layout_constraintBottom_toBottomOf="parent"
+			app:layout_constraintEnd_toStartOf="@id/ok_button"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toBottomOf="@id/clear_button" />
+
+		<androidx.appcompat.widget.AppCompatButton
+			android:id="@+id/ok_button"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:text="@string/home_tag_rename_confirm"
+			android:textAllCaps="false"
+			app:layout_constraintBottom_toBottomOf="@id/cancel_button"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintStart_toEndOf="@id/cancel_button"
+			app:layout_constraintTop_toTopOf="@id/cancel_button" />
+
+	</androidx.constraintlayout.widget.ConstraintLayout>
+
+</FrameLayout>

@@ -23,7 +23,7 @@ import com.nlab.reminder.R
 /**
  * @author Doohyun
  */
-internal enum class CategoryResource(
+enum class CategoryResource(
     @StringRes val titleResource: Int,
     @ColorRes val contentColorResource: Int,
     @ColorRes val backgroundColorResource: Int

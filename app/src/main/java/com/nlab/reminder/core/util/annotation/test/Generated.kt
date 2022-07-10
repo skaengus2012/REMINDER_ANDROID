@@ -24,5 +24,5 @@ package com.nlab.reminder.core.util.annotation.test
  * @see <a href="https://github.com/jacoco/jacoco/releases/tag/v0.8.2">jacoco update</a>
  * @see <a href="https://github.com/jacoco/jacoco/pull/731">jacoco issue</a>
  */
-@Retention(AnnotationRetention.RUNTIME)
+@Retention(AnnotationRetention.BINARY)
 annotation class Generated
