@@ -16,6 +16,7 @@
 
 package com.nlab.reminder.domain.internal.di.feature.home
 
+import com.nlab.reminder.domain.feature.home.DeleteTagUseCase
 import com.nlab.reminder.domain.feature.home.GetHomeSummaryUseCase
 import com.nlab.reminder.domain.feature.home.HomeStateMachineFactory
 import com.nlab.reminder.domain.feature.home.ModifyTagNameUseCase
@@ -37,8 +38,12 @@ class HomeViewModelModule {
     fun provideModifyTagNameUseCase(): ModifyTagNameUseCase = FakeModifyTagNameUseCase()
 
     @Provides
+    fun provideDeleteTagUseCase(): DeleteTagUseCase = FakeDeleteTagUseCase()
+
+    @Provides
     fun provideHomeStateMachineFactory(
         getHomeSummary: GetHomeSummaryUseCase,
-        modifyTagNameUseCase: ModifyTagNameUseCase
-    ): HomeStateMachineFactory = HomeStateMachineFactory(getHomeSummary, modifyTagNameUseCase)
+        modifyTagNameUseCase: ModifyTagNameUseCase,
+        deleteTagUseCase: DeleteTagUseCase
+    ): HomeStateMachineFactory = HomeStateMachineFactory(getHomeSummary, modifyTagNameUseCase, deleteTagUseCase)
 }

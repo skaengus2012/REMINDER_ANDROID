@@ -37,6 +37,7 @@ fun HomeStateMachine(
     navigationEffect: SendNavigationEffect,
     getHomeSummary: GetHomeSummaryUseCase,
     modifyTagName: ModifyTagNameUseCase,
+    deleteTag: DeleteTagUseCase,
     onHomeSummaryLoaded: (HomeSummary) -> Unit
 ): HomeStateMachine = StateMachine(scope, initState) {
     updateTo { (action, oldState) ->
@@ -84,5 +85,9 @@ fun HomeStateMachine(
 
     sideEffectOn<HomeAction.OnTagRenameConfirmClicked, HomeState.Loaded> { (action) ->
         scope.launch { modifyTagName(originalTag = action.originalTag, newText = action.renameText) }
+    }
+
+    sideEffectOn<HomeAction.OnTagDeleteConfirmClicked, HomeState.Loaded> { (action) ->
+        scope.launch { deleteTag(action.tag) }
     }
 }

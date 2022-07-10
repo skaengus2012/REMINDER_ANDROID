@@ -57,10 +57,9 @@ class HomeViewModelTest {
     private fun createViewModel(
         getHomeSummary: GetHomeSummaryUseCase = mock(),
         modifyTagName: ModifyTagNameUseCase = mock(),
+        deleteTag: DeleteTagUseCase = mock(),
         initState: HomeState = HomeState.Init
-    ): HomeViewModel = HomeViewModel(
-        HomeStateMachineFactory(getHomeSummary, modifyTagName, initState)
-    )
+    ): HomeViewModel = HomeViewModel(HomeStateMachineFactory(getHomeSummary, modifyTagName, deleteTag, initState))
 
     @Before
     fun init() {
@@ -139,7 +138,11 @@ class HomeViewModelTest {
         val (viewModel, stateMachine) = createMockingViewModelComponent()
 
         viewModel.onTagRenameConfirmClicked(dummyTag, renameText)
+        viewModel.onTagDeleteConfirmClicked(dummyTag)
 
-        verify(stateMachine, times(1)).send(HomeAction.OnTagRenameConfirmClicked(dummyTag, renameText))
+        verify(stateMachine, times(1))
+            .send(HomeAction.OnTagRenameConfirmClicked(dummyTag, renameText))
+        verify(stateMachine, times(1))
+            .send(HomeAction.OnTagDeleteConfirmClicked(dummyTag))
     }
 }

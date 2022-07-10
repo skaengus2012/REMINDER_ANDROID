@@ -87,9 +87,7 @@ class HomeNavigationModule {
         fragment.setFragmentResultListener(
             requestKey = REQUEST_KEY_HOME_TO_HOME_TAG_DELETE,
             listener = HomeTagDeleteDialogFragment.resultListenerOf(
-                onDeleteClicked =  { tag ->
-
-                }
+                onDeleteClicked =  { tag -> viewModel.onTagDeleteConfirmClicked(tag) }
             )
         )
     }

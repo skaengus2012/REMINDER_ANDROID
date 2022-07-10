@@ -33,4 +33,5 @@ sealed class HomeAction private constructor() : Action {
     data class OnTagRenameRequestClicked(val tag: Tag) : HomeAction()
     data class OnTagRenameConfirmClicked(val originalTag: Tag, val renameText: String) : HomeAction()
     data class OnTagDeleteRequestClicked(val tag: Tag) : HomeAction()
+    data class OnTagDeleteConfirmClicked(val tag: Tag) : HomeAction()
 }

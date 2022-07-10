@@ -49,3 +49,7 @@ fun HomeViewModel.onTagRenameConfirmClicked(originalTag: Tag, renameText: String
 fun HomeViewModel.onTagDeleteRequestClicked(tag: Tag) {
     onAction(HomeAction.OnTagDeleteRequestClicked(tag))
 }
+
+fun HomeViewModel.onTagDeleteConfirmClicked(tag: Tag) {
+    onAction(HomeAction.OnTagDeleteConfirmClicked(tag))
+}

@@ -45,7 +45,8 @@ class HomeStateMachineKtTest {
         HomeAction.OnTagClicked(dummyTag),
         HomeAction.OnTagLongClicked(dummyTag),
         HomeAction.OnTagRenameConfirmClicked(dummyTag, renameText = ""),
-        HomeAction.OnTagDeleteRequestClicked(dummyTag)
+        HomeAction.OnTagDeleteRequestClicked(dummyTag),
+        HomeAction.OnTagDeleteConfirmClicked(dummyTag)
     )
 
     private val dummyStates: Set<HomeState> = setOf(
@@ -60,9 +61,10 @@ class HomeStateMachineKtTest {
         navigationEffect: SendNavigationEffect = mock(),
         getHomeSummary: GetHomeSummaryUseCase = mock { onBlocking { mock() } doReturn flow { emit(HomeSummary()) } },
         modifyTagName: ModifyTagNameUseCase = mock(),
+        deleteTag: DeleteTagUseCase = mock(),
         onHomeSummaryLoaded: (HomeSummary) -> Unit = mock(),
     ): HomeStateMachine = HomeStateMachine(
-        scope, initState, navigationEffect, getHomeSummary, modifyTagName, onHomeSummaryLoaded
+        scope, initState, navigationEffect, getHomeSummary, modifyTagName, deleteTag, onHomeSummaryLoaded
     )
 
     @Test
@@ -75,7 +77,7 @@ class HomeStateMachineKtTest {
     @Test
     fun `holds init state when machine created by factory`() {
         assertThat(
-            HomeStateMachineFactory(getHomeSummary = mock(), modifyTagName = mock())
+            HomeStateMachineFactory(getHomeSummary = mock(), modifyTagName = mock(), deleteTag = mock())
                 .create(
                     scope = CoroutineScope(Dispatchers.Default),
                     navigationEffect = mock(),
@@ -263,5 +265,19 @@ class HomeStateMachineKtTest {
             .send(HomeAction.OnTagRenameConfirmClicked(dummyTag, renameText))
             .join()
         verify(modifyTagNameUseCase, times(1))(dummyTag, renameText)
+    }
+
+    @Test
+    fun `Delete tag when delete confirm invoked`() = runTest {
+        val deleteTagUseCase: DeleteTagUseCase = mock()
+        val stateMachine: HomeStateMachine = createStateMachine(
+            scope = CoroutineScope(Dispatchers.Unconfined),
+            initState = HomeState.Loaded(HomeSummary()),
+            deleteTag = deleteTagUseCase
+        )
+        stateMachine
+            .send(HomeAction.OnTagDeleteConfirmClicked(dummyTag))
+            .join()
+        verify(deleteTagUseCase, times(1))(dummyTag)
     }
 }
