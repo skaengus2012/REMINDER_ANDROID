@@ -228,7 +228,7 @@ class HomeStateMachineKtTest {
             testNavigationEnd(
                 initState = HomeState.Loaded(homeSummary),
                 navigateAction = HomeAction.OnTagDeleteRequestClicked(dummyTag),
-                expectedNavigationMessage = HomeTagDeleteConfirmNavigationMessage(dummyTag)
+                expectedNavigationMessage = HomeTagDeleteNavigationMessage(dummyTag)
             )
         }
     }

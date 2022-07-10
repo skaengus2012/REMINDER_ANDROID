@@ -18,12 +18,14 @@ package com.nlab.reminder.domain.common.tag
 
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
+import androidx.annotation.Keep
 import com.nlab.reminder.R
 import com.nlab.reminder.core.util.annotation.test.Generated
 
 /**
  * @author Doohyun
  */
+@Keep
 @Generated
 enum class TagStyleResource(
     val code: Int,

@@ -25,6 +25,7 @@ import com.nlab.reminder.core.entrypoint.util.EntryBlock
 import com.nlab.reminder.domain.feature.home.*
 import com.nlab.reminder.domain.feature.home.view.HomeFragmentDirections
 import com.nlab.reminder.domain.feature.home.tag.config.view.HomeTagConfigDialogFragment
+import com.nlab.reminder.domain.feature.home.tag.delete.view.HomeTagDeleteDialogFragment
 import com.nlab.reminder.domain.feature.home.tag.rename.view.HomeTagRenameDialogFragment
 import dagger.Module
 import dagger.Provides
@@ -55,6 +56,12 @@ class HomeNavigationModule {
                     .run(navController::navigate)
             }
 
+            is HomeTagDeleteNavigationMessage -> {
+                HomeFragmentDirections
+                    .actionHomeFragmentToHomeTagDeleteDialogFragment(REQUEST_KEY_HOME_TO_HOME_TAG_DELETE, message.tag)
+                    .run(navController::navigate)
+            }
+
             else -> navigateWithGlobalAction(navController, message)
         }
     }
@@ -77,10 +84,19 @@ class HomeNavigationModule {
                 onConfirmClicked = { tag, rename -> viewModel.onTagRenameConfirmClicked(tag, rename) }
             )
         )
+        fragment.setFragmentResultListener(
+            requestKey = REQUEST_KEY_HOME_TO_HOME_TAG_DELETE,
+            listener = HomeTagDeleteDialogFragment.resultListenerOf(
+                onDeleteClicked =  { tag ->
+
+                }
+            )
+        )
     }
 
     companion object {
         private const val REQUEST_KEY_HOME_TO_HOME_TAG_CONFIG = "requestKeyHomeToHomeTagConfig"
         private const val REQUEST_KEY_HOME_TO_HOME_TAG_RENAME = "requestKeyHomeToHomeTagRename"
+        private const val REQUEST_KEY_HOME_TO_HOME_TAG_DELETE = "requestKeyHomeToHomeTagDelete"
     }
 }

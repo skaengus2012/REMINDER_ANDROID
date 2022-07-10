@@ -63,12 +63,6 @@ class HomeTagRenameDialogFragment : DialogFragment() {
         super.onViewCreated(view, savedInstanceState)
         isCancelable = false
 
-        binding.renameEdittext.textChanged()
-            .map { it.text?.toString() ?: "" }
-            .distinctUntilChanged()
-            .onEach { viewModel.onRenameTextInput(it) }
-            .launchIn(viewLifecycleOwner.lifecycleScope)
-
         binding.usageCountTextview.apply {
             text = args.tag.let { tag ->
                 resources.getQuantityString(
@@ -77,8 +71,13 @@ class HomeTagRenameDialogFragment : DialogFragment() {
             }
         }
 
+        binding.renameEdittext.textChanged()
+            .map { it.text?.toString() ?: "" }
+            .distinctUntilChanged()
+            .onEach { viewModel.onRenameTextInput(it) }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
+
         binding.clearButton.clicks()
-            .flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { viewModel.onRenameTextClearClicked() }
             .launchIn(viewLifecycleOwner.lifecycleScope)
 

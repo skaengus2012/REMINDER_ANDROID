@@ -79,7 +79,7 @@ fun HomeStateMachine(
     }
 
     sideEffectOn<HomeAction.OnTagDeleteRequestClicked, HomeState.Loaded> { (action) ->
-        scope.launch { navigationEffect.send(HomeTagDeleteConfirmNavigationMessage(action.tag)) }
+        scope.launch { navigationEffect.send(HomeTagDeleteNavigationMessage(action.tag)) }
     }
 
     sideEffectOn<HomeAction.OnTagRenameConfirmClicked, HomeState.Loaded> { (action) ->

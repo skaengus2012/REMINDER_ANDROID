@@ -17,12 +17,14 @@
 package com.nlab.reminder.domain.common.tag
 
 import android.os.Parcelable
+import androidx.annotation.Keep
 import com.nlab.reminder.core.util.annotation.test.Generated
 import kotlinx.parcelize.Parcelize
 
 /**
  * @author Doohyun
  */
+@Keep
 @Generated
 @Parcelize
 data class Tag(

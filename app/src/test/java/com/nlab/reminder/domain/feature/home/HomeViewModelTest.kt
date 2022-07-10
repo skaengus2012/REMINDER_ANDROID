@@ -127,7 +127,7 @@ class HomeViewModelTest {
                     TagEndNavigationMessage(dummyTag),
                     HomeTagConfigNavigationMessage(dummyTag),
                     HomeTagRenameNavigationMessage(dummyTag),
-                    HomeTagDeleteConfirmNavigationMessage(dummyTag)
+                    HomeTagDeleteNavigationMessage(dummyTag)
                 )
             )
         )

@@ -31,6 +31,9 @@
 		<action
 			android:id="@+id/action_homeFragment_to_homeTagRenameDialogFragment"
 			app:destination="@id/homeTagRenameDialogFragment" />
+		<action
+			android:id="@+id/action_homeFragment_to_homeTagDeleteDialogFragment"
+			app:destination="@id/homeTagDeleteDialogFragment" />
 	</fragment>
 
 	<dialog
@@ -53,6 +56,21 @@
 		android:name="com.nlab.reminder.domain.feature.home.tag.rename.view.HomeTagRenameDialogFragment"
 		android:label="HomeTagRenameDialog"
 		tools:layout="@layout/fragment_home_tag_rename_dialog">
+		<argument
+			android:name="requestKey"
+			app:argType="string"
+			app:nullable="false" />
+		<argument
+			android:name="tag"
+			app:argType="com.nlab.reminder.domain.common.tag.Tag"
+			app:nullable="false" />
+	</dialog>
+
+	<dialog
+		android:id="@+id/homeTagDeleteDialogFragment"
+		android:name="com.nlab.reminder.domain.feature.home.tag.delete.view.HomeTagDeleteDialogFragment"
+		android:label="HomeTagDeleteDialog"
+		tools:layout="@layout/fragment_home_tag_delete_dialog">
 		<argument
 			android:name="requestKey"
 			app:argType="string"
