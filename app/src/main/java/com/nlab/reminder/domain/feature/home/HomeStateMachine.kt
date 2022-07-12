@@ -52,7 +52,7 @@ fun HomeStateMachine(
     }
 
     sideEffectOn<HomeAction.Fetch, HomeState.Init> {
-        scope.launch { getHomeSummary().collect { onHomeSummaryLoaded(it) } }
+        scope.launch { getHomeSummary().collect(onHomeSummaryLoaded) }
     }
 
     sideEffectOn<HomeAction.OnTodayCategoryClicked, HomeState.Loaded> {

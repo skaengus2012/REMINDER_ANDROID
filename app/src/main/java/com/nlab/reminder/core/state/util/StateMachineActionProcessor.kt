@@ -31,21 +31,16 @@ internal class StateMachineActionProcessor<A : Action, S : State>(
     state: MutableStateFlow<S>,
     stateMachineBuilder: StateMachineBuilder<A, S>,
 ) : ActionProcessor<A> {
-    private val reduceState = StateReducer<S>()
+    private val stateReduceInvoker = StateReduceInvoker(state, stateMachineBuilder.buildUpdateHandler())
     private val errorHandler = stateMachineBuilder.buildExceptionHandler()
-    private val newStateWith = stateMachineBuilder.buildUpdateHandler()
     private val invokeSideEffect = stateMachineBuilder.buildSideEffectHandler()
     private val internalActionProcessor = DefaultActionProcessor(
         scope = scope + CoroutineExceptionHandler { _, e -> errorHandler(e) },
-        onActionReceived = createOnActionReceiver(state)
+        onActionReceived = this::onActionReceived
     )
 
-    private fun createOnActionReceiver(state: MutableStateFlow<S>): (A) -> Unit = { action ->
-        UpdateSource(action, state.value)
-            .also { updateSource ->
-                reduceState(state, curState = updateSource.oldState, newState = newStateWith(updateSource))
-            }
-            .also(invokeSideEffect)
+    private fun onActionReceived(action: A) {
+        invokeSideEffect(stateReduceInvoker.getSourceAndUpdate(action))
     }
 
     override fun send(action: A): Job = internalActionProcessor.send(action)

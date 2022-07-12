@@ -16,6 +16,7 @@
 
 package com.nlab.reminder.core.state.util
 
+import com.nlab.reminder.core.state.TestAction
 import com.nlab.reminder.core.state.TestState
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.hamcrest.CoreMatchers.equalTo
@@ -25,34 +26,49 @@ import org.hamcrest.MatcherAssert.assertThat
 /**
  * @author Doohyun
  */
-internal class StateReducerKtTest {
+internal class StateReduceInvokerTest {
     @Test
-    fun `ignore update when started value was changed`() {
+    fun `emit update when started value was not changed`() {
+        val action = TestAction.Action1()
         val initState = TestState.State2()
-        val updateState = TestState.StateInit()
+        val targetState = TestState.State1()
         val state: MutableStateFlow<TestState> = MutableStateFlow(initState)
-        val reduceState = StateReducer<TestState>()
-
-        state.value = updateState
-        reduceState(
+        val invoker = StateReduceInvoker<TestAction, TestState>(
             state,
-            curState = initState,
-            newState = TestState.State1()
+            reducer = { targetState }
         )
-        assertThat(state.value, equalTo(updateState))
+        assertThat(
+            invoker.getSourceAndUpdate(action),
+            equalTo(UpdateSource(action, initState))
+        )
+        assertThat(
+            state.value,
+            equalTo(targetState)
+        )
     }
 
     @Test
-    fun `emit update when started value was not changed`() {
+    fun `update with current state when started value was changed`() {
+        val action = TestAction.Action1()
         val initState = TestState.State2()
-        val changeState = TestState.State1()
+        val updateState = TestState.StateInit()
         val state: MutableStateFlow<TestState> = MutableStateFlow(initState)
-        val reduceState = StateReducer<TestState>()
-        reduceState(
+        val invoker = StateReduceInvoker<TestAction, TestState>(
             state,
-            curState = initState,
-            newState = changeState
+            reducer = { updateSource ->
+                if (updateSource.oldState == initState) TestState.State1()
+                else updateSource.oldState
+            }
         )
-        assertThat(state.value, equalTo(changeState))
+        state.value = updateState
+
+        assertThat(
+            invoker.getSourceAndUpdate(action),
+            equalTo(UpdateSource(action, updateState))
+        )
+        assertThat(
+            state.value,
+            equalTo(updateState)
+        )
     }
 }
