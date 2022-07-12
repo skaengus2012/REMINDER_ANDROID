@@ -22,8 +22,8 @@ jobs:
       - name: Test with Gradle
         run: ./gradlew test
 
-      - name: Create coverageReport
-        run: ./gradlew coverageReport
+      - name: Create coverageReport on release build
+        run: ./gradlew coverageReportRelease
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1
@@ -32,7 +32,7 @@ jobs:
           flags: unittests
           fail_ci_if_error: true
           directory: /home/runner/work/REMINDER_ANDROID/REMINDER_ANDROID/
-          files: ./app/build/reports/jacoco/coverageReport/coverageReport.xml
+          files: ./app/build/reports/jacoco/coverageReportRelease/coverageReportRelease.xml
 
       - name: action-slack
         uses: 8398a7/action-slack@v3.12.0
