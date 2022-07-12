@@ -1,3 +1,5 @@
+import org.gradle.configurationcache.extensions.capitalized
+
 /*
  * Copyright (C) 2022 The N's lab Open Source Project
  *
@@ -22,6 +24,10 @@ plugins {
     id("dagger.hilt.android.plugin")
     id("kotlin-parcelize")
     jacoco
+}
+
+jacoco {
+    toolVersion = DependenciesVersions.JACOCO
 }
 
 android {
@@ -50,7 +56,62 @@ android {
             isDebuggable = false
             isMinifyEnabled = true
             signingConfig = signingConfigs.getByName("debug") // TODO make release key..
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+        }
+    }
+
+    buildTypes.forEach { buildType ->
+        if (buildType.isMinifyEnabled) {
+            buildType.proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"))
+            buildType.proguardFile("proguard-rules.pro")
+        }
+
+        // TODO with Flavor.
+        val buildName = buildType.name
+        val buildNameCapitalized = buildName.capitalized()
+        val taskName = "coverageReport${buildNameCapitalized}"
+        val dependOnName = "test${buildNameCapitalized}UnitTest"
+        tasks.register<JacocoReport>(taskName) {
+            dependsOn(dependOnName)
+
+            group = "reporting"
+            description = "Generate Jacoco coverage reports"
+
+            reports {
+                html.required.set(true)
+                // codecov depends on xml format report
+                if (buildType.name == "release") {
+                    xml.required.set(true)
+                }
+            }
+
+            val classFilters = setOf(
+                "**/R.class",
+                "**/R$*.class",
+                "**/BuildConfig.*",
+                "**/Manifest*.*",
+                "**/android/**",
+                "**/kotlin/**",
+                "com/android/**/*.class",
+                "**/model/**",
+                "**/view/**",
+                "**/di/**"
+            )
+
+            classDirectories.setFrom(files(
+                fileTree("${buildDir}/intermediates/javac/${buildName}/compile${buildNameCapitalized}JavaWithJavac/classes") {
+                    setExcludes(classFilters)
+                },
+                fileTree("${buildDir}/tmp/kotlin-classes/${buildName}") { setExcludes(classFilters) }
+            ))
+            sourceDirectories.setFrom(file("${projectDir}/src/main/java"))
+            executionData.setFrom(files("${buildDir}/jacoco/${dependOnName}.exec"))
+        }
+    }
+
+    sourceSets {
+        getByName("release") {
+            java.srcDirs("src/release/java")
+            res.srcDirs("src/release/res")
         }
     }
 
@@ -65,50 +126,12 @@ android {
 
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_1_8.toString()
-        freeCompilerArgs = listOf("-Xopt-in=kotlin.RequiresOptIn")
+        freeCompilerArgs = listOf("-opt-in=kotlin.RequiresOptIn")
     }
 
     buildFeatures {
         viewBinding = true
     }
-}
-
-jacoco {
-    toolVersion = DependenciesVersions.JACOCO
-}
-
-tasks.register<JacocoReport>("coverageReport") {
-    dependsOn("testDebugUnitTest")
-
-    group = "reporting"
-    description = "Generate Jacoco coverage reports"
-
-    reports {
-        html.required.set(true)
-        xml.required.set(true) // codecov depends on xml format report
-    }
-
-    val classFilters = setOf(
-        "**/R.class",
-        "**/R$*.class",
-        "**/BuildConfig.*",
-        "**/Manifest*.*",
-        "**/android/**",
-        "**/kotlin/**",
-        "com/android/**/*.class",
-        "**/model/**",
-        "**/view/**",
-        "**/di/**"
-    )
-
-    classDirectories.setFrom(files(
-        fileTree("${buildDir}/intermediates/javac/debug/compileDebugJavaWithJavac/classes") {
-            setExcludes(classFilters)
-        },
-        fileTree("${buildDir}/tmp/kotlin-classes/debug") { setExcludes(classFilters) }
-    ))
-    sourceDirectories.setFrom(file("${projectDir}/src/main/java"))
-    executionData.setFrom(files("${buildDir}/jacoco/testDebugUnitTest.exec"))
 }
 
 dependencies {
