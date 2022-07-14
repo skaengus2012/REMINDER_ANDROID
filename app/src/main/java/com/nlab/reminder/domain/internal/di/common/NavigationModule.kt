@@ -16,10 +16,12 @@
 
 package com.nlab.reminder.domain.internal.di.common
 
+import com.nlab.reminder.R
 import com.nlab.reminder.core.effect.message.navigation.android.NavigationMediator
 import com.nlab.reminder.core.effect.message.navigation.android.util.NavigationMediator
 import com.nlab.reminder.domain.common.effect.message.navigation.*
 import com.nlab.reminder.domain.common.effect.message.navigation.android.runner.*
+import com.nlab.reminder.domain.feature.end.all.view.AllEndFragmentDirections
 import dagger.Module
 import dagger.Provides
 import dagger.Reusable
@@ -37,13 +39,12 @@ class NavigationModule {
     fun provideFragmentNavigateUseCase(
         navigateTodayEnd: TodayEndNavigationEffectRunner,
         navigateTimeTable: TimetableEndNavigationEffectRunner,
-        navigateAllEnd: AllEndNavigationEffectRunner,
         navigateTagEnd: TagEndNavigationEffectRunner
     ): NavigationMediator = NavigationMediator { navController, message ->
         when (message) {
             is TodayEndNavigationMessage -> navigateTodayEnd(navController)
             is TimetableEndNavigationMessage -> navigateTimeTable(navController)
-            is AllEndNavigationMessage -> navigateAllEnd(navController)
+            is AllEndNavigationMessage -> navController.navigate(R.id.action_global_allEndFragment)
             is TagEndNavigationMessage -> navigateTagEnd(navController, message.tag)
             else -> Unit
         }
@@ -54,9 +55,6 @@ class NavigationModule {
 
     @Provides
     fun provideTimetableEndNavigate() = TimetableEndNavigationEffectRunner()
-
-    @Provides
-    fun provideAllEndNavigate() = AllEndNavigationEffectRunner()
 
     @Provides
     fun provideTagEndNavigate() = TagEndNavigationEffectRunner()
