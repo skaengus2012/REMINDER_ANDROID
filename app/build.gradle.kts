@@ -44,12 +44,19 @@ android {
         versionName = AndroidConfig.VERSION_NAME
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        kapt {
+            arguments {
+                arg("room.schemaLocation", "$buildDir/schemas")
+            }
+        }
     }
 
     buildTypes {
         getByName("debug") {
             isDebuggable = true
             isMinifyEnabled = false
+            applicationIdSuffix = ".debug"
         }
 
         getByName("release") {
@@ -94,7 +101,7 @@ android {
                 "com/android/**/*.class",
                 "**/model/**",
                 "**/view/**",
-                "**/di/**"
+                "**/internal/**"
             )
 
             classDirectories.setFrom(files(
@@ -150,13 +157,17 @@ dependencies {
     implementation(Dependencies.ANDROID_NAVIGATION_FRAGMENT)
     implementation(Dependencies.ANDROID_NAVIGATION_UI)
     implementation(Dependencies.ANDROID_PAGING)
-    implementation(Dependencies.ANDROID_ROOM)
+    implementation(Dependencies.ANDROID_ROOM_RUNTIME)
+    implementation(Dependencies.ANDROID_ROOM_KTX)
     kapt(Dependencies.ANDROID_ROOM_COMPILER)
     implementation(Dependencies.ANDROID_STARTUP_RUNTIME)
 
     implementation(Dependencies.GOOGLE_HILT_ANDROID)
     kapt(Dependencies.GOOGLE_HILT_ANDROID_COMPILER)
     implementation(Dependencies.GOGGLE_FLEXBOX)
+
+    debugImplementation(Dependencies.FACEBOOK_FLIPPER)
+    debugImplementation(Dependencies.FACEBOOK_SOLOADER)
 
     testImplementation(Dependencies.TEST_JUNIT)
     testImplementation(Dependencies.TEST_COROUTINES)
