@@ -20,6 +20,14 @@
 	android:id="@+id/home_graph"
 	app:startDestination="@id/homeFragment">
 
+	<action
+		android:id="@+id/action_global_allEndFragment"
+		app:destination="@id/allEndFragment"
+		app:enterAnim="@anim/end_enter"
+		app:exitAnim="@anim/end_exit"
+		app:popEnterAnim="@anim/end_enter_pop"
+		app:popExitAnim="@anim/end_exit_pop"/>
+
 	<fragment
 		android:id="@+id/homeFragment"
 		android:name="com.nlab.reminder.domain.feature.home.view.HomeFragment"
@@ -80,5 +88,11 @@
 			app:argType="com.nlab.reminder.domain.common.tag.Tag"
 			app:nullable="false" />
 	</dialog>
+
+	<fragment
+		android:id="@+id/allEndFragment"
+		android:name="com.nlab.reminder.domain.feature.end.all.view.AllEndFragment"
+		android:label="AllEndFragment"
+		tools:layout="@layout/fragment_all_end" />
 
 </navigation>
