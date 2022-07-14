@@ -29,6 +29,7 @@ object Dependencies {
     const val ANDROID_FRAGMENT = "androidx.fragment:fragment-ktx:${DependenciesVersions.ANDROID_FRAGMENT}"
     const val ANDROID_NAVIGATION_FRAGMENT = "androidx.navigation:navigation-fragment-ktx:${DependenciesVersions.ANDROID_NAVIGATION}"
     const val ANDROID_NAVIGATION_UI = "androidx.navigation:navigation-ui-ktx:${DependenciesVersions.ANDROID_NAVIGATION}"
+    const val ANDROID_PAGING = "androidx.paging:paging-runtime:${DependenciesVersions.ANDROID_PAGING}"
 
     const val GOOGLE_HILT_ANDROID = "com.google.dagger:hilt-android:${DependenciesVersions.GOOGLE_HILT}"
     const val GOOGLE_HILT_ANDROID_COMPILER = "com.google.dagger:hilt-android-compiler:${DependenciesVersions.GOOGLE_HILT}"
