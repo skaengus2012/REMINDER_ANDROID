@@ -150,6 +150,8 @@ dependencies {
     implementation(Dependencies.ANDROID_NAVIGATION_FRAGMENT)
     implementation(Dependencies.ANDROID_NAVIGATION_UI)
     implementation(Dependencies.ANDROID_PAGING)
+    implementation(Dependencies.ANDROID_ROOM)
+    kapt(Dependencies.ANDROID_ROOM_COMPILER)
 
     implementation(Dependencies.GOOGLE_HILT_ANDROID)
     kapt(Dependencies.GOOGLE_HILT_ANDROID_COMPILER)
