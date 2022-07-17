@@ -14,34 +14,17 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.internal.local.database
+package com.nlab.reminder.domain.feature.home.di
 
-import android.content.Context
-import androidx.room.*
+import com.nlab.reminder.domain.common.tag.Tag
+import com.nlab.reminder.domain.feature.home.DeleteTagUseCase
 
 /**
  * @author Doohyun
  */
-@Database(
-    entities = [
-        ScheduleEntity::class,
-        TagEntity::class
-    ],
-    version = 1
-)
-@TypeConverters(
-    value = [
-        StringValuesConverter::class
-    ]
-)
-abstract class ReminderDatabase : RoomDatabase() {
-    abstract fun scheduleDao(): ScheduleDao
-    abstract fun tagDao(): TagDao
-
-    companion object {
-        private const val DB_NAME = "reminder_common.db"
-
-        fun getDatabase(context: Context): ReminderDatabase =
-            Room.databaseBuilder(context, ReminderDatabase::class.java, DB_NAME).build()
+@Deprecated(message = "Fake UseCase was used")
+class FakeDeleteTagUseCase : DeleteTagUseCase {
+    override suspend fun invoke(tag: Tag) {
+        println("todo implement DeleteTagUseCase $tag")
     }
 }

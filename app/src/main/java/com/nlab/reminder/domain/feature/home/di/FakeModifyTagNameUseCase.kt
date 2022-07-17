@@ -14,14 +14,17 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.internal.local.database
+package com.nlab.reminder.domain.feature.home.di
 
-import androidx.room.TypeConverter
+import com.nlab.reminder.domain.common.tag.Tag
+import com.nlab.reminder.domain.feature.home.ModifyTagNameUseCase
 
 /**
  * @author Doohyun
  */
-class StringValuesConverter {
-    @TypeConverter fun listToString(values: List<String>): String = values.joinToString(separator = ",")
-    @TypeConverter fun stringToList(list: String): List<String> = list.split(",")
+@Deprecated(message = "Fake UseCase was used")
+class FakeModifyTagNameUseCase : ModifyTagNameUseCase {
+    override suspend fun invoke(originalTag: Tag, newText: String) {
+        println("todo implement ModifyTagNameUseCase $originalTag $newText")
+    }
 }

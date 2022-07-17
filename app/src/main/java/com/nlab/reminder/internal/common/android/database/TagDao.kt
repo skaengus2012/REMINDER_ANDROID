@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.internal.local.database
+package com.nlab.reminder.internal.common.android.database
 
 import androidx.room.Dao
 import androidx.room.Insert
-import androidx.room.OnConflictStrategy.REPLACE
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
 
@@ -26,10 +25,10 @@ import kotlinx.coroutines.flow.Flow
  * @author Doohyun
  */
 @Dao
-interface ScheduleDao {
-    @Insert(onConflict = REPLACE)
-    fun insert(schedule: ScheduleEntity): Long
+interface TagDao {
+    @Insert
+    fun insert(schedule: TagEntity): Long
 
-    @Query("SELECT * FROM schedule WHERE is_complete = 0")
-    fun findNotComplete(): Flow<List<ScheduleEntity>>
+    @Query("SELECT * FROM tag")
+    fun getTags(): Flow<List<TagEntity>>
 }
