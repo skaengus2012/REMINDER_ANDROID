@@ -24,4 +24,4 @@ import com.nlab.reminder.domain.common.tag.Tag
  * @author Doohyun
  */
 @Generated
-data class HomeTagDeleteNavigationMessage(val tag: Tag) : NavigationMessage
+data class HomeTagDeleteNavigationMessage(val tag: Tag, val usageCount: Long) : NavigationMessage

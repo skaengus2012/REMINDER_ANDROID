@@ -20,7 +20,7 @@ import com.nlab.reminder.domain.common.tag.Tag
 import com.nlab.reminder.domain.common.tag.TagStyleResource
 import com.nlab.reminder.domain.feature.home.GetHomeSummaryUseCase
 import com.nlab.reminder.domain.feature.home.HomeSummary
-import kotlinx.coroutines.delay
+import com.nlab.reminder.domain.feature.home.TagWithResource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
@@ -31,152 +31,29 @@ import kotlinx.coroutines.flow.flow
 @Deprecated(message = "Fake UseCase was used")
 class FakeGetHomeSummaryUseCase : GetHomeSummaryUseCase {
     override suspend fun invoke(): Flow<HomeSummary> = flow {
-        emit(HomeSummary(
-            todayNotificationCount = 10,
-            timetableNotificationCount = 8,
-            allNotificationCount = 20,
-            tags = listOf(
-                Tag(
-                    "Hello",
-                    TagStyleResource.TYPE6,
-                    usageCount = 10
-                ),
-                Tag(
-                    "돈내는거",
-                    TagStyleResource.TYPE1,
-                    usageCount = 5
-                ),
-                Tag(
-                    "약속",
-                    TagStyleResource.TYPE2,
-                    usageCount = 8
-                ),
-                Tag(
-                    "건강",
-                    TagStyleResource.TYPE3,
-                    usageCount = 9
-                ),
-                Tag(
-                    "공과금 내는 날~!!",
-                    TagStyleResource.TYPE4,
-                    usageCount = 1
-                ),
-                Tag(
-                    "장보러 가는 날",
-                    TagStyleResource.TYPE5,
-                    usageCount = 1
-                ),
-                Tag(
-                    "Phone",
-                    TagStyleResource.TYPE6,
-                    usageCount = 9
+        TagWithResource(
+            Tag(
+                1,
+                "Hello",
+            ),
+            TagStyleResource.TYPE6,
+        )
+
+        emit(
+            HomeSummary(
+                todayNotificationCount = 10,
+                timetableNotificationCount = 8,
+                allNotificationCount = 20,
+                tags = listOf(
+                    TagWithResource(
+                        Tag(
+                            1,
+                            "Hello",
+                        ),
+                        TagStyleResource.TYPE6,
+                    )
                 )
             )
-        ))
-
-        delay(1500)
-
-        emit(HomeSummary(
-            todayNotificationCount = 16,
-            timetableNotificationCount = 8,
-            allNotificationCount = 20,
-            tags = listOf(
-                Tag(
-                    "Hello",
-                    TagStyleResource.TYPE6,
-                    usageCount = 10
-                ),
-                Tag(
-                    "돈내는거",
-                    TagStyleResource.TYPE1,
-                    usageCount = 5
-                ),
-                Tag(
-                    "건강",
-                    TagStyleResource.TYPE3,
-                    usageCount = 9
-                ),
-                Tag(
-                    "공과금 내는 날~!!",
-                    TagStyleResource.TYPE4,
-                    usageCount = 19
-                ),
-                Tag(
-                    "장보러 가는 날",
-                    TagStyleResource.TYPE5,
-                    usageCount = 2
-                ),
-                Tag(
-                    "Phone",
-                    TagStyleResource.TYPE6,
-                    usageCount = 9
-                )
-            )
-        ))
-
-        delay(2000)
-
-        emit(HomeSummary(
-            todayNotificationCount = 16,
-            timetableNotificationCount = 8,
-            allNotificationCount = 20,
-            tags = listOf(
-                Tag(
-                    "Hello",
-                    TagStyleResource.TYPE6,
-                    usageCount = 9
-                ),
-                Tag(
-                    "돈내는거",
-                    TagStyleResource.TYPE1,
-                    usageCount = 9
-                ),
-                Tag(
-                    "건강",
-                    TagStyleResource.TYPE3,
-                    usageCount = 9
-                ),
-                Tag(
-                    "공과금 내는 날~!!",
-                    TagStyleResource.TYPE4,
-                    usageCount = 9
-                ),
-                Tag(
-                    "장보러 가는 날",
-                    TagStyleResource.TYPE5,
-                    usageCount = 9
-                ),
-                Tag(
-                    "Phone",
-                    TagStyleResource.TYPE6,
-                    usageCount = 10
-                ),
-                Tag(
-                    "Phone",
-                    TagStyleResource.TYPE3,
-                    usageCount = 20
-                ),
-                Tag(
-                    "Phone",
-                    TagStyleResource.TYPE2,
-                    usageCount = 25
-                ),
-                Tag(
-                    "돈내는거",
-                    TagStyleResource.TYPE6,
-                    usageCount = 20
-                ),
-                Tag(
-                    "건강",
-                    TagStyleResource.TYPE3,
-                    usageCount = 19
-                ),
-                Tag(
-                    "공과금 내는 날~!!",
-                    TagStyleResource.TYPE2,
-                    usageCount = 16
-                ),
-            )
-        ))
+        )
     }
 }

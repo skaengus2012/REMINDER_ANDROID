@@ -50,7 +50,7 @@ class HomeTagConfigDialogFragment : DialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         with(binding.tagTextview) {
-            text = context.getString(R.string.tag_format, args.tag.text)
+            text = context.getString(R.string.tag_format, args.tag.name)
         }
 
         binding.renameButton.throttleClicks()
@@ -95,10 +95,10 @@ class HomeTagConfigDialogFragment : DialogFragment() {
             onRenameClicked: (Tag) -> Unit,
             onDeleteClicked: (Tag) -> Unit
         ) = { _: String, bundle: Bundle ->
-            val resultTag: Tag = requireNotNull(bundle.getParcelable(RESULT_TAG))
+            val resultTag2: Tag = requireNotNull(bundle.getParcelable(RESULT_TAG))
             when (requireNotNull(bundle.getString(RESULT_TYPE))) {
-                RESULT_TYPE_RENAME_REQUEST -> onRenameClicked(resultTag)
-                RESULT_TYPE_DELETE_REQUEST -> onDeleteClicked(resultTag)
+                RESULT_TYPE_RENAME_REQUEST -> onRenameClicked(resultTag2)
+                RESULT_TYPE_DELETE_REQUEST -> onDeleteClicked(resultTag2)
             }
         }
     }

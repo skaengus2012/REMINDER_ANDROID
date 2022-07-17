@@ -24,8 +24,8 @@ import androidx.room.PrimaryKey
 /**
  * @author Doohyun
  */
-@Entity(tableName = "tag", indices = [Index(value = ["tag_name"], unique = true)])
+@Entity(tableName = "tag", indices = [Index(value = ["name"], unique = true)])
 data class TagEntity(
     @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "tag_id") val tagId: Long = 0,
-    @ColumnInfo(name = "tag_name") val tagName: String
+    @ColumnInfo(name = "name") val name: String
 )

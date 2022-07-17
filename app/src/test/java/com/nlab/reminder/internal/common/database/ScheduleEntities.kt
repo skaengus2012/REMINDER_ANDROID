@@ -14,14 +14,19 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.feature.home
+package com.nlab.reminder.internal.common.database
 
-import com.nlab.reminder.core.effect.message.navigation.NavigationMessage
-import com.nlab.reminder.core.util.annotation.test.Generated
-import com.nlab.reminder.domain.common.tag.Tag
+import com.nlab.reminder.domain.common.schedule.Schedule
+import com.nlab.reminder.internal.common.android.database.ScheduleEntity
 
 /**
  * @author Doohyun
  */
-@Generated
-data class HomeTagRenameNavigationMessage(val tag: Tag, val usageCount: Long) : NavigationMessage
+fun from(schedule: Schedule): ScheduleEntity = ScheduleEntity(
+    schedule.scheduleId,
+    schedule.title,
+    schedule.note,
+    schedule.url,
+    schedule.visiblePriority,
+    schedule.isComplete
+)

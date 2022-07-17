@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.feature.home
-
-import com.nlab.reminder.core.effect.message.navigation.NavigationMessage
-import com.nlab.reminder.core.util.annotation.test.Generated
-import com.nlab.reminder.domain.common.tag.Tag
+package com.nlab.reminder.core.util.annotation.test
 
 /**
+ * jacoco made npe on coverageReport if not inlined
+ *
  * @author Doohyun
  */
-@Generated
-data class HomeTagRenameNavigationMessage(val tag: Tag, val usageCount: Long) : NavigationMessage
+@Retention(AnnotationRetention.SOURCE)
+annotation class InlineRequired

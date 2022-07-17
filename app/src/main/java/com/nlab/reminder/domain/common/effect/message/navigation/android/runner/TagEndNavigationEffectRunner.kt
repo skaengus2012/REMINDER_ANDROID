@@ -25,6 +25,6 @@ import com.nlab.reminder.domain.common.tag.Tag
  */
 class TagEndNavigationEffectRunner {
     operator fun invoke(navController: NavController, tag: Tag) {
-        Log.w("TODO", "navigate TagEnd ${tag.text}")
+        Log.w("TODO", "navigate TagEnd ${tag.name}")
     }
 }

@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.feature.home
+package com.nlab.reminder.domain.feature.home.tag.rename
 
-import com.nlab.reminder.core.effect.message.navigation.NavigationMessage
-import com.nlab.reminder.core.util.annotation.test.Generated
-import com.nlab.reminder.domain.common.tag.Tag
+import com.nlab.reminder.test.genBothify
 
 /**
  * @author Doohyun
  */
-@Generated
-data class HomeTagRenameNavigationMessage(val tag: Tag, val usageCount: Long) : NavigationMessage
+fun genHomeTagRenameState(
+    currentText: String = genBothify(),
+    isKeyboardShowWhenViewCreated: Boolean = true
+): HomeTagRenameState = HomeTagRenameState(currentText, isKeyboardShowWhenViewCreated)

@@ -17,7 +17,6 @@
 package com.nlab.reminder.domain.feature.home
 
 import com.nlab.reminder.core.util.annotation.test.Generated
-import com.nlab.reminder.domain.common.tag.Tag
 
 /**
  * @author Doohyun
@@ -27,5 +26,5 @@ data class HomeSummary(
     val todayNotificationCount: Long = 0,
     val timetableNotificationCount: Long = 0,
     val allNotificationCount: Long = 0,
-    val tags: List<Tag> = emptyList()
+    val tags: List<TagWithResource> = emptyList()
 )

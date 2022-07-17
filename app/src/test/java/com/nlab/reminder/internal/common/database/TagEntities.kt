@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.feature.home
+package com.nlab.reminder.internal.common.database
 
-import com.nlab.reminder.core.effect.message.navigation.NavigationMessage
-import com.nlab.reminder.core.util.annotation.test.Generated
 import com.nlab.reminder.domain.common.tag.Tag
+import com.nlab.reminder.internal.common.android.database.TagEntity
 
 /**
  * @author Doohyun
  */
-@Generated
-data class HomeTagRenameNavigationMessage(val tag: Tag, val usageCount: Long) : NavigationMessage
+fun from(tag: Tag): TagEntity = TagEntity(tag.tagId, tag.name)

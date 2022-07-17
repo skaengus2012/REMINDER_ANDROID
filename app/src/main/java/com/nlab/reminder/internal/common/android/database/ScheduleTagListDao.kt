@@ -14,14 +14,21 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.feature.home
+package com.nlab.reminder.internal.common.android.database
 
-import com.nlab.reminder.core.effect.message.navigation.NavigationMessage
-import com.nlab.reminder.core.util.annotation.test.Generated
-import com.nlab.reminder.domain.common.tag.Tag
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.Query
 
-/**
- * @author Doohyun
- */
-@Generated
-data class HomeTagRenameNavigationMessage(val tag: Tag, val usageCount: Long) : NavigationMessage
+@Dao
+interface ScheduleTagListDao {
+    @Insert
+    fun insert(scheduleTagList: ScheduleTagListEntity)
+
+    @Delete
+    fun delete(scheduleTagList: ScheduleTagListEntity)
+
+    @Query("SELECT COUNT(schedule_id) FROM schedule_tag_list WHERE tag_id = :tagId")
+    fun findTagUsageCount(tagId: Long): Long
+}

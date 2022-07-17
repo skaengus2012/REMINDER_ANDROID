@@ -20,6 +20,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy.REPLACE
 import androidx.room.Query
+import androidx.room.Transaction
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -30,6 +31,7 @@ interface ScheduleDao {
     @Insert(onConflict = REPLACE)
     fun insert(schedule: ScheduleEntity): Long
 
+    @Transaction
     @Query("SELECT * FROM schedule WHERE is_complete = :isComplete")
-    fun find(isComplete: Boolean): Flow<List<ScheduleEntity>>
+    fun find(isComplete: Boolean): Flow<List<ScheduleEntityWithTagEntities>>
 }

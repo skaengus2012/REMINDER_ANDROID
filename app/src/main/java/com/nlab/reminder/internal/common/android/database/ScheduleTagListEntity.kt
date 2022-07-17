@@ -18,17 +18,31 @@ package com.nlab.reminder.internal.common.android.database
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
-import androidx.room.PrimaryKey
+import androidx.room.ForeignKey
+import androidx.room.ForeignKey.CASCADE
 
 /**
  * @author Doohyun
  */
-@Entity(tableName = "schedule")
-data class ScheduleEntity(
-    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "schedule_id") val scheduleId: Long = 0,
-    @ColumnInfo(name = "title") val title: String,
-    @ColumnInfo(name = "description") val description: String? = null,
-    @ColumnInfo(name = "url") val url: String? = null,
-    @ColumnInfo(name = "visible_priority") val visiblePriority: Int = 0,
-    @ColumnInfo(name = "is_complete") val isComplete: Boolean = false
+@Entity(
+    tableName = "schedule_tag_list",
+    primaryKeys = ["schedule_id", "tag_id"],
+    foreignKeys = [
+        ForeignKey(
+            entity = ScheduleEntity::class,
+            parentColumns = ["schedule_id"],
+            childColumns = ["schedule_id"],
+            onDelete = CASCADE
+        ),
+        ForeignKey(
+            entity = TagEntity::class,
+            parentColumns = ["tag_id"],
+            childColumns = ["tag_id"],
+            onDelete = CASCADE
+        )
+    ]
+)
+data class ScheduleTagListEntity(
+    @ColumnInfo(name = "schedule_id") val scheduleId: Long,
+    @ColumnInfo(name = "tag_id", index = true) val tagId: Long
 )

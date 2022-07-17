@@ -16,12 +16,16 @@
 
 package com.nlab.reminder.domain.feature.home
 
-import com.nlab.reminder.core.effect.message.navigation.NavigationMessage
 import com.nlab.reminder.core.util.annotation.test.Generated
 import com.nlab.reminder.domain.common.tag.Tag
+import com.nlab.reminder.domain.common.tag.TagStyleResource
 
 /**
  * @author Doohyun
  */
 @Generated
-data class HomeTagRenameNavigationMessage(val tag: Tag, val usageCount: Long) : NavigationMessage
+@Deprecated("Maybe deprecated.. tag style will be changed")
+data class TagWithResource(
+    val tag: Tag,
+    val tagStyleResource: TagStyleResource
+)

@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.feature.home
+package com.nlab.reminder.domain.common.tag
 
-import com.nlab.reminder.core.effect.message.navigation.NavigationMessage
-import com.nlab.reminder.core.util.annotation.test.Generated
-import com.nlab.reminder.domain.common.tag.Tag
+import com.nlab.reminder.domain.feature.home.TagWithResource
+import com.nlab.reminder.test.genBothify
+import com.nlab.reminder.test.genLong
 
 /**
  * @author Doohyun
  */
-@Generated
-data class HomeTagRenameNavigationMessage(val tag: Tag, val usageCount: Long) : NavigationMessage
+
+fun genTag(tagId: Long = genLong(), name: String = genBothify()) = Tag(tagId, name)
+fun genTagWithResource(tag: Tag = genTag(), tagStyleResource: TagStyleResource = TagStyleResource.TYPE1) = TagWithResource(tag, tagStyleResource)

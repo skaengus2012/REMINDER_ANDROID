@@ -64,6 +64,10 @@
 			android:name="tag"
 			app:argType="com.nlab.reminder.domain.common.tag.Tag"
 			app:nullable="false" />
+		<argument
+			android:name="tagUsageCount"
+			app:argType="long"
+			app:nullable="false"/>
 	</dialog>
 
 	<dialog
@@ -79,6 +83,10 @@
 			android:name="tag"
 			app:argType="com.nlab.reminder.domain.common.tag.Tag"
 			app:nullable="false" />
+		<argument
+			android:name="tagUsageCount"
+			app:argType="long"
+			app:nullable="false"/>
 	</dialog>
 
 </navigation>

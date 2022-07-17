@@ -46,9 +46,10 @@ inline fun HomeState.Loaded.toHomeItems(
         onItemClicked = onAllCategoryClicked
     )
     this += HomeItem.TagHolderItem(
-        homeSummary.tags.map { tag ->
+        homeSummary.tags.map { (tag, tagStyleResource) ->
             TagItem(
                 tag,
+                tagStyleResource,
                 onClicked = { onTagClicked(tag) },
                 onLongClicked = { onTagLongClicked(tag) }
             )

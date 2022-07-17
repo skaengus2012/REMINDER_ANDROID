@@ -16,19 +16,11 @@
 
 package com.nlab.reminder.domain.common.schedule
 
-import com.nlab.reminder.core.util.annotation.test.Generated
-import com.nlab.reminder.domain.common.tag.Tag
+import kotlinx.coroutines.flow.Flow
 
 /**
  * @author Doohyun
  */
-@Generated
-data class ScheduleItem(
-    val scheduleId: Long,
-    val title: String = "",
-    val notes: String = "",
-    val url: String = "",
-    val tags: List<Tag> = emptyList(),
-    val visiblePriority: Int = 0,
-    val isComplete: Boolean = true
-)
+interface ScheduleRepository {
+    fun get(requestConfig: ScheduleItemRequestConfig): Flow<List<Schedule>>
+}

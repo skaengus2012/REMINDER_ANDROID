@@ -14,14 +14,24 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.feature.home
+package com.nlab.reminder.domain.common.schedule
 
-import com.nlab.reminder.core.effect.message.navigation.NavigationMessage
-import com.nlab.reminder.core.util.annotation.test.Generated
 import com.nlab.reminder.domain.common.tag.Tag
+import com.nlab.reminder.domain.common.tag.genTag
+import com.nlab.reminder.test.genBoolean
+import com.nlab.reminder.test.genBothify
+import com.nlab.reminder.test.genInt
+import com.nlab.reminder.test.genLong
 
 /**
  * @author Doohyun
  */
-@Generated
-data class HomeTagRenameNavigationMessage(val tag: Tag, val usageCount: Long) : NavigationMessage
+fun genSchedule(
+    scheduleId: Long = genLong(),
+    title: String = genBothify(),
+    note: String = genBothify(),
+    url: String = genBothify(),
+    tags: List<Tag> = List(genInt("#")) { genTag(tagId = it.toLong()) },
+    visiblePriority: Int = genInt(),
+    isComplete: Boolean = genBoolean()
+): Schedule = Schedule(scheduleId, title, note, url, tags, visiblePriority, isComplete)

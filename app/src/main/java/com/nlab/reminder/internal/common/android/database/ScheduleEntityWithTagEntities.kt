@@ -14,14 +14,21 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.feature.home
+package com.nlab.reminder.internal.common.android.database
 
-import com.nlab.reminder.core.effect.message.navigation.NavigationMessage
-import com.nlab.reminder.core.util.annotation.test.Generated
-import com.nlab.reminder.domain.common.tag.Tag
+import androidx.room.Embedded
+import androidx.room.Junction
+import androidx.room.Relation
 
 /**
  * @author Doohyun
  */
-@Generated
-data class HomeTagRenameNavigationMessage(val tag: Tag, val usageCount: Long) : NavigationMessage
+data class ScheduleEntityWithTagEntities(
+    @Embedded val scheduleEntity: ScheduleEntity,
+    @Relation(
+        parentColumn = "schedule_id",
+        entityColumn = "tag_id",
+        associateBy = Junction(ScheduleTagListEntity::class)
+    )
+    val tagEntities: List<TagEntity>
+)
