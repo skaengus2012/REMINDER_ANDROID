@@ -67,7 +67,7 @@ class TagViewHolder(
         with(tagHolderLayout) {
             tagItems.forEachIndexed { index, tagItem ->
                 with(tagBindingCache[index].tagButton) {
-                    text = context.getString(R.string.tag_format, tagItem.tagText)
+                    text = context.getString(R.string.tag_format, tagItem.name)
                     background = context.getDrawable(tagItem.backgroundDrawableResource)
                     setTextColor(context.getColorStateList(tagItem.textColorResource))
                 }

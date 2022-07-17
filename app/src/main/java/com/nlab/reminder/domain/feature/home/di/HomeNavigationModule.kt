@@ -52,13 +52,21 @@ class HomeNavigationModule {
 
             is HomeTagRenameNavigationMessage -> {
                 HomeFragmentDirections
-                    .actionHomeFragmentToHomeTagRenameDialogFragment(REQUEST_KEY_HOME_TO_HOME_TAG_RENAME, message.tag)
+                    .actionHomeFragmentToHomeTagRenameDialogFragment(
+                        REQUEST_KEY_HOME_TO_HOME_TAG_RENAME,
+                        message.tag,
+                        message.usageCount
+                    )
                     .run(navController::navigate)
             }
 
             is HomeTagDeleteNavigationMessage -> {
                 HomeFragmentDirections
-                    .actionHomeFragmentToHomeTagDeleteDialogFragment(REQUEST_KEY_HOME_TO_HOME_TAG_DELETE, message.tag)
+                    .actionHomeFragmentToHomeTagDeleteDialogFragment(
+                        REQUEST_KEY_HOME_TO_HOME_TAG_DELETE,
+                        message.tag,
+                        message.usageCount
+                    )
                     .run(navController::navigate)
             }
 

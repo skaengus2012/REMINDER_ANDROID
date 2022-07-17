@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.feature.home
+package com.nlab.reminder.domain.common.schedule
 
-import com.nlab.reminder.core.effect.message.navigation.NavigationMessage
 import com.nlab.reminder.core.util.annotation.test.Generated
 import com.nlab.reminder.domain.common.tag.Tag
 
@@ -24,4 +23,12 @@ import com.nlab.reminder.domain.common.tag.Tag
  * @author Doohyun
  */
 @Generated
-data class HomeTagRenameNavigationMessage(val tag: Tag, val usageCount: Long) : NavigationMessage
+data class Schedule(
+    val scheduleId: Long,
+    val title: String,
+    val note: String,
+    val url: String,
+    val tags: List<Tag>,
+    val visiblePriority: Int,
+    val isComplete: Boolean
+)

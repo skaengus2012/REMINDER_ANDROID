@@ -20,6 +20,7 @@ import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import com.nlab.reminder.domain.common.android.view.recyclerview.ItemModel
 import com.nlab.reminder.domain.common.tag.Tag
+import com.nlab.reminder.domain.common.tag.TagStyleResource
 
 /**
  * @author Doohyun
@@ -27,17 +28,21 @@ import com.nlab.reminder.domain.common.tag.Tag
 @ItemModel
 data class TagItem(
     val tag: Tag,
+    val tagStyleResource: TagStyleResource,
     val onClicked: () -> Unit,
     val onLongClicked: () -> Unit
 ) {
-    val tagText: String
-        get() = tag.text
+    val tagId: Long
+        get() = tag.tagId
+
+    val name: String
+        get() = tag.name
 
     @get:ColorRes
     val textColorResource: Int
-        get() = tag.tagStyleResource.textColorResource
+        get() = tagStyleResource.textColorResource
 
     @get:DrawableRes
     val backgroundDrawableResource: Int
-        get() = tag.tagStyleResource.backgroundDrawableResource
+        get() = tagStyleResource.backgroundDrawableResource
 }

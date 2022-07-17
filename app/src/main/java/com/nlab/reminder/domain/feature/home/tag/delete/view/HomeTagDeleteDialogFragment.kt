@@ -50,11 +50,12 @@ class HomeTagDeleteDialogFragment : BottomSheetDialogFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.descriptionTextview.apply {
-            text = args.tag.let { tag ->
-                resources.getQuantityString(
-                    R.plurals.home_tag_delete_text_label, tag.usageCount, tag.text, tag.usageCount
-                )
-            }
+            text = resources.getQuantityString(
+                R.plurals.home_tag_delete_text_label,
+                args.tagUsageCount.toInt(),
+                args.tag.name,
+                args.tagUsageCount
+            )
         }
 
         binding.cancelButton.clicks()
@@ -97,10 +98,10 @@ class HomeTagDeleteDialogFragment : BottomSheetDialogFragment() {
             onDeleteClicked: (Tag) -> Unit,
             onCancelClicked: (Tag) -> Unit = {}
         ) = { _: String, bundle: Bundle ->
-            val resultTag: Tag = requireNotNull(bundle.getParcelable(RESULT_TAG))
+            val resultTag2: Tag = requireNotNull(bundle.getParcelable(RESULT_TAG))
             when (requireNotNull(bundle.getString(RESULT_TYPE))) {
-                RESULT_TYPE_DISMISS_REQUEST -> onCancelClicked(resultTag)
-                RESULT_TYPE_CONFIRM_REQUEST -> onDeleteClicked(resultTag)
+                RESULT_TYPE_DISMISS_REQUEST -> onCancelClicked(resultTag2)
+                RESULT_TYPE_CONFIRM_REQUEST -> onDeleteClicked(resultTag2)
             }
         }
     }

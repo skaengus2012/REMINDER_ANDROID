@@ -46,6 +46,7 @@ object Dependencies {
     const val TEST_COROUTINES = "org.jetbrains.kotlinx:kotlinx-coroutines-test:${DependenciesVersions.TEST_COROUTINES}"
     const val TEST_MOCKITO = "org.mockito:mockito-inline:${DependenciesVersions.TEST_MOCKITO}"
     const val TEST_MOCKITO_KOTLIN = "org.mockito.kotlin:mockito-kotlin:${DependenciesVersions.TEST_MOCKITO_KOTLIN}"
+    const val TEST_JAVAFAKER = "com.github.javafaker:javafaker:${DependenciesVersions.TEST_JAVAFAKER}"
     const val TEST_ANDROID_JUNIT_EXT = "androidx.test.ext:junit:${DependenciesVersions.TEST_ANDROID_JUNIT_EXT}"
     const val TEST_ANDROID_JUNIT_ESPRESSO = "androidx.test.espresso:espresso-core:${DependenciesVersions.TEST_ANDROID_ESPRESSO}"
     const val TEST_ANDROID_TEST_RUNNER = "androidx.test:runner:${DependenciesVersions.TEST_ANDROID_RUNNER}"

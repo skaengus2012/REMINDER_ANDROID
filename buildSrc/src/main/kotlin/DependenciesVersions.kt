@@ -45,6 +45,7 @@ object DependenciesVersions {
     const val TEST_COROUTINES = "1.6.2"
     const val TEST_MOCKITO = "4.6.1"
     const val TEST_MOCKITO_KOTLIN = "4.0.0"
+    const val TEST_JAVAFAKER = "1.0.2"
     const val TEST_ANDROID_JUNIT_EXT = "1.1.3"
     const val TEST_ANDROID_ESPRESSO = "3.3.0"
     const val TEST_ANDROID_RUNNER = "1.1.0"

@@ -20,6 +20,7 @@ import android.app.Application
 import com.nlab.reminder.domain.common.util.DatabaseQualifier
 import com.nlab.reminder.internal.common.android.database.ReminderDatabase
 import com.nlab.reminder.internal.common.android.database.ScheduleDao
+import com.nlab.reminder.internal.common.android.database.ScheduleTagListDao
 import com.nlab.reminder.internal.common.android.database.TagDao
 import dagger.Module
 import dagger.Provides
@@ -53,4 +54,10 @@ class ReminderDatabaseModule {
     @Singleton
     @Provides
     fun provideTagDao(reminderDatabase: ReminderDatabase): TagDao = reminderDatabase.tagDao()
+
+    @Singleton
+    @Provides
+    fun provideScheduleTagListDao(
+        reminderDatabase: ReminderDatabase
+    ): ScheduleTagListDao = reminderDatabase.scheduleTagListDao()
 }

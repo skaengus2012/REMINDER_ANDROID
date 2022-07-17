@@ -18,6 +18,7 @@ package com.nlab.reminder.core.effect.util
 
 import com.nlab.reminder.core.effect.SendSideEffect
 import com.nlab.reminder.core.effect.TestSideEffectMessage
+import com.nlab.reminder.test.genInt
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.fold
@@ -37,14 +38,15 @@ class SideEffectsKtTest {
     fun `notify message when sideEffect invoked`() = runTest {
         Dispatchers.setMain(Dispatchers.Unconfined)
         val testSideEffect: SendSideEffect<TestSideEffectMessage> by sideEffect()
-        (1..64)
+        val tryCount = genInt("##")
+        (1..tryCount)
             .map { TestSideEffectMessage(it) }
             .forEach { message -> testSideEffect.send(message) }
         assertThat(
             testSideEffect.event
-                .take(64)
+                .take(tryCount)
                 .fold(0) { acc, value -> acc + value.number },
-            equalTo((1..64).reduce { acc, i -> acc + i })
+            equalTo((1..tryCount).reduce { acc, i -> acc + i })
         )
     }
 }

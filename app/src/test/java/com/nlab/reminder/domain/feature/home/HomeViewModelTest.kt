@@ -20,7 +20,10 @@ import com.nlab.reminder.domain.common.effect.message.navigation.AllEndNavigatio
 import com.nlab.reminder.domain.common.effect.message.navigation.TagEndNavigationMessage
 import com.nlab.reminder.domain.common.effect.message.navigation.TimetableEndNavigationMessage
 import com.nlab.reminder.domain.common.effect.message.navigation.TodayEndNavigationMessage
-import com.nlab.reminder.test.dummyTag
+import com.nlab.reminder.domain.common.tag.Tag
+import com.nlab.reminder.domain.common.tag.genTag
+import com.nlab.reminder.test.genBothify
+import com.nlab.reminder.test.genLong
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.test.runTest
@@ -55,10 +58,13 @@ class HomeViewModelTest {
 
     private fun createViewModel(
         getHomeSummary: GetHomeSummaryUseCase = mock(),
+        getTagUsageCount: GetTagUsageCountUseCase = mock(),
         modifyTagName: ModifyTagNameUseCase = mock(),
         deleteTag: DeleteTagUseCase = mock(),
         initState: HomeState = HomeState.Init
-    ): HomeViewModel = HomeViewModel(HomeStateMachineFactory(getHomeSummary, modifyTagName, deleteTag, initState))
+    ): HomeViewModel = HomeViewModel(
+        HomeStateMachineFactory(getHomeSummary, getTagUsageCount, modifyTagName, deleteTag, initState)
+    )
 
     @Before
     fun init() {
@@ -103,15 +109,22 @@ class HomeViewModelTest {
 
     @Test
     fun `notify navigation message when navigation event invoked`() = runTest {
-        val viewModel: HomeViewModel = createViewModel(initState = HomeState.Loaded(HomeSummary()))
+        val testUsageCount: Long = genLong()
+        val testTag: Tag = genTag()
+        val viewModel: HomeViewModel = createViewModel(
+            initState = HomeState.Loaded(HomeSummary()),
+            getTagUsageCount = mock {
+                whenever(mock(testTag)) doReturn testUsageCount
+            }
+        )
 
         viewModel.onTodayCategoryClicked()
         viewModel.onTimetableCategoryClicked()
         viewModel.onAllCategoryClicked()
-        viewModel.onTagClicked(dummyTag)
-        viewModel.onTagLongClicked(dummyTag)
-        viewModel.onTagRenameRequestClicked(dummyTag)
-        viewModel.onTagDeleteRequestClicked(dummyTag)
+        viewModel.onTagClicked(testTag)
+        viewModel.onTagLongClicked(testTag)
+        viewModel.onTagRenameRequestClicked(testTag)
+        viewModel.onTagDeleteRequestClicked(testTag)
         assertThat(
             viewModel.navigationEffect
                 .event
@@ -122,10 +135,10 @@ class HomeViewModelTest {
                     TodayEndNavigationMessage,
                     TimetableEndNavigationMessage,
                     AllEndNavigationMessage,
-                    TagEndNavigationMessage(dummyTag),
-                    HomeTagConfigNavigationMessage(dummyTag),
-                    HomeTagRenameNavigationMessage(dummyTag),
-                    HomeTagDeleteNavigationMessage(dummyTag)
+                    TagEndNavigationMessage(testTag),
+                    HomeTagConfigNavigationMessage(testTag),
+                    HomeTagRenameNavigationMessage(testTag, testUsageCount),
+                    HomeTagDeleteNavigationMessage(testTag, testUsageCount)
                 )
             )
         )
@@ -133,15 +146,16 @@ class HomeViewModelTest {
 
     @Test
     fun testExtraExtensions() {
-        val renameText = "fix"
+        val renameText = genBothify()
+        val testTag: Tag = genTag()
         val (viewModel, stateMachine) = createMockingViewModelComponent()
 
-        viewModel.onTagRenameConfirmClicked(dummyTag, renameText)
-        viewModel.onTagDeleteConfirmClicked(dummyTag)
+        viewModel.onTagRenameConfirmClicked(testTag, renameText)
+        viewModel.onTagDeleteConfirmClicked(testTag)
 
         verify(stateMachine, times(1))
-            .send(HomeAction.OnTagRenameConfirmClicked(dummyTag, renameText))
+            .send(HomeAction.OnTagRenameConfirmClicked(testTag, renameText))
         verify(stateMachine, times(1))
-            .send(HomeAction.OnTagDeleteConfirmClicked(dummyTag))
+            .send(HomeAction.OnTagDeleteConfirmClicked(testTag))
     }
 }

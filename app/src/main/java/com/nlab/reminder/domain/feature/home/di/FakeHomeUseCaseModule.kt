@@ -16,9 +16,7 @@
 
 package com.nlab.reminder.domain.feature.home.di
 
-import androidx.lifecycle.SavedStateHandle
-import com.nlab.reminder.domain.common.android.lifecycle.tag
-import com.nlab.reminder.domain.feature.home.tag.rename.HomeTagRenameStateMachineFactory
+import com.nlab.reminder.domain.feature.home.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -29,9 +27,16 @@ import dagger.hilt.android.components.ViewModelComponent
  */
 @Module
 @InstallIn(ViewModelComponent::class)
-class HomeTagRenameViewModelModule {
+class FakeHomeUseCaseModule {
     @Provides
-    fun provideHomeTagRenameStateMachineFactory(
-        savedStateHandle: SavedStateHandle
-    ): HomeTagRenameStateMachineFactory = HomeTagRenameStateMachineFactory(initText = savedStateHandle.tag.name)
+    fun provideGetHomeSummaryUseCase(): GetHomeSummaryUseCase = FakeGetHomeSummaryUseCase()
+
+    @Provides
+    fun provideGetTagUsageCountUseCase(): GetTagUsageCountUseCase = FakeGetTagUsageCountUseCase()
+
+    @Provides
+    fun provideModifyTagNameUseCase(): ModifyTagNameUseCase = FakeModifyTagNameUseCase()
+
+    @Provides
+    fun provideDeleteTagUseCase(): DeleteTagUseCase = FakeDeleteTagUseCase()
 }

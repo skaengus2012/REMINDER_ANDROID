@@ -24,11 +24,7 @@ import kotlinx.parcelize.Parcelize
 /**
  * @author Doohyun
  */
-@Keep
-@Generated
+@Keep   // for navigation graph.
 @Parcelize
-data class Tag(
-    val text: String,
-    val tagStyleResource: TagStyleResource,
-    val usageCount: Int
-) : Parcelable
+@Generated
+data class Tag(val tagId: Long, val name: String) : Parcelable

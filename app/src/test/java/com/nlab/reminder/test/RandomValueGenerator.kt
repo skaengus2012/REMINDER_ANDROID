@@ -14,14 +14,19 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.feature.home
+package com.nlab.reminder.test
 
-import com.nlab.reminder.core.effect.message.navigation.NavigationMessage
-import com.nlab.reminder.core.util.annotation.test.Generated
-import com.nlab.reminder.domain.common.tag.Tag
+import com.github.javafaker.Faker
 
 /**
  * @author Doohyun
  */
-@Generated
-data class HomeTagRenameNavigationMessage(val tag: Tag, val usageCount: Long) : NavigationMessage
+
+private val f = Faker()
+
+fun genNumerify(numericString: String = "###"): String = f.numerify(numericString)
+fun genLetterify(letterString: String = "???", isUpper: Boolean = false): String = f.letterify(letterString, isUpper)
+fun genBothify(string: String = "???###", isUpper: Boolean = false): String = f.bothify(string, isUpper)
+fun genLong(numericString: String = "#######"): Long = genNumerify(numericString).toLong()
+fun genInt(numericString: String = "####"): Int = genNumerify(numericString).toInt()
+fun genBoolean(): Boolean = genInt("#") % 2 == 0

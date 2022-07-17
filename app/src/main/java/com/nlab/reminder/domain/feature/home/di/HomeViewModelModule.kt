@@ -16,10 +16,7 @@
 
 package com.nlab.reminder.domain.feature.home.di
 
-import com.nlab.reminder.domain.feature.home.DeleteTagUseCase
-import com.nlab.reminder.domain.feature.home.GetHomeSummaryUseCase
-import com.nlab.reminder.domain.feature.home.HomeStateMachineFactory
-import com.nlab.reminder.domain.feature.home.ModifyTagNameUseCase
+import com.nlab.reminder.domain.feature.home.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -32,18 +29,10 @@ import dagger.hilt.android.components.ViewModelComponent
 @InstallIn(ViewModelComponent::class)
 class HomeViewModelModule {
     @Provides
-    fun provideGetHomeSummaryUseCase(): GetHomeSummaryUseCase = FakeGetHomeSummaryUseCase()
-
-    @Provides
-    fun provideModifyTagNameUseCase(): ModifyTagNameUseCase = FakeModifyTagNameUseCase()
-
-    @Provides
-    fun provideDeleteTagUseCase(): DeleteTagUseCase = FakeDeleteTagUseCase()
-
-    @Provides
     fun provideHomeStateMachineFactory(
         getHomeSummary: GetHomeSummaryUseCase,
-        modifyTagNameUseCase: ModifyTagNameUseCase,
-        deleteTagUseCase: DeleteTagUseCase
-    ): HomeStateMachineFactory = HomeStateMachineFactory(getHomeSummary, modifyTagNameUseCase, deleteTagUseCase)
+        getTagUsageCount: GetTagUsageCountUseCase,
+        modifyTagName: ModifyTagNameUseCase,
+        deleteTag: DeleteTagUseCase,
+    ): HomeStateMachineFactory = HomeStateMachineFactory(getHomeSummary, getTagUsageCount, modifyTagName, deleteTag)
 }

@@ -14,14 +14,17 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.feature.home
+package com.nlab.reminder.core.kotlin.flow
 
-import com.nlab.reminder.core.effect.message.navigation.NavigationMessage
-import com.nlab.reminder.core.util.annotation.test.Generated
-import com.nlab.reminder.domain.common.tag.Tag
+import com.nlab.reminder.core.util.annotation.test.InlineRequired
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+
 
 /**
  * @author Doohyun
  */
-@Generated
-data class HomeTagRenameNavigationMessage(val tag: Tag, val usageCount: Long) : NavigationMessage
+
+@InlineRequired
+@Suppress("NOTHING_TO_INLINE")
+inline fun <T1, T2> Flow<T1>.combine(flow: Flow<T2>): Flow<Pair<T1, T2>> = combine(flow) { a, b -> a to b }

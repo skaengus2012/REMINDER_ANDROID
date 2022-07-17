@@ -25,7 +25,8 @@ import androidx.room.*
 @Database(
     entities = [
         ScheduleEntity::class,
-        TagEntity::class
+        TagEntity::class,
+        ScheduleTagListEntity::class
     ],
     version = 1
 )
@@ -37,6 +38,7 @@ import androidx.room.*
 abstract class ReminderDatabase : RoomDatabase() {
     abstract fun scheduleDao(): ScheduleDao
     abstract fun tagDao(): TagDao
+    abstract fun scheduleTagListDao(): ScheduleTagListDao
 
     companion object {
         private const val DB_NAME = "reminder_common.db"
