@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.internal.di.common
+package com.nlab.reminder.internal.common.di
 
 import androidx.fragment.app.Fragment
 import com.nlab.reminder.core.effect.message.navigation.android.NavigationMediator

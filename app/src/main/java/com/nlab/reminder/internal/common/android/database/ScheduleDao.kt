@@ -14,20 +14,22 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.common.schedule
+package com.nlab.reminder.internal.common.android.database
 
-import com.nlab.reminder.core.util.annotation.test.Generated
-import com.nlab.reminder.domain.common.tag.Tag
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy.REPLACE
+import androidx.room.Query
+import kotlinx.coroutines.flow.Flow
 
 /**
  * @author Doohyun
  */
-@Generated
-data class ScheduleListItem(
-    val scheduleId: Long,
-    val title: String,
-    val notes: String,
-    val url: String,
-    val tags: List<Tag>,
-    val scheduledTime: Long
-)
+@Dao
+interface ScheduleDao {
+    @Insert(onConflict = REPLACE)
+    fun insert(schedule: ScheduleEntity): Long
+
+    @Query("SELECT * FROM schedule WHERE is_complete = :isComplete")
+    fun find(isComplete: Boolean): Flow<List<ScheduleEntity>>
+}

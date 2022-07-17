@@ -14,17 +14,21 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.internal.di.feature.home
+package com.nlab.reminder.domain.common.schedule
 
+import com.nlab.reminder.core.util.annotation.test.Generated
 import com.nlab.reminder.domain.common.tag.Tag
-import com.nlab.reminder.domain.feature.home.DeleteTagUseCase
 
 /**
  * @author Doohyun
  */
-@Deprecated(message = "Fake UseCase was used")
-class FakeDeleteTagUseCase : DeleteTagUseCase {
-    override suspend fun invoke(tag: Tag) {
-        println("todo implement DeleteTagUseCase $tag")
-    }
-}
+@Generated
+data class ScheduleItem(
+    val scheduleId: Long,
+    val title: String = "",
+    val notes: String = "",
+    val url: String = "",
+    val tags: List<Tag> = emptyList(),
+    val visiblePriority: Int = 0,
+    val isComplete: Boolean = true
+)

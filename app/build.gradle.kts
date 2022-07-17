@@ -98,10 +98,11 @@ android {
                 "**/Manifest*.*",
                 "**/android/**",
                 "**/kotlin/**",
-                "com/android/**/*.class",
                 "**/model/**",
                 "**/view/**",
-                "**/internal/**"
+                "**/di/**",
+                "**/*Args*.*",          /* filtering Navigation Component generated classes */
+                "**/*Directions*.*"     /* filtering Navigation Component generated classes */
             )
 
             classDirectories.setFrom(files(

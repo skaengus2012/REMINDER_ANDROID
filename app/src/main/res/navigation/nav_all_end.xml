@@ -14,26 +14,16 @@
   ~ limitations under the License.
   -->
 
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
 	xmlns:tools="http://schemas.android.com/tools"
-	package="com.nlab.reminder">
+	android:id="@+id/nav_all_end"
+	app:startDestination="@id/allEndFragment">
 
-	<application tools:ignore="MissingApplicationIcon">
+	<fragment
+		android:id="@+id/allEndFragment"
+		android:name="com.nlab.reminder.domain.feature.end.all.view.AllEndFragment"
+		android:label="AllEndFragment"
+		tools:layout="@layout/fragment_all_end" />
 
-		<activity
-			android:name="com.facebook.flipper.android.diagnostics.FlipperDiagnosticActivity"
-			android:exported="true" />
-
-		<provider
-			android:name="androidx.startup.InitializationProvider"
-			android:authorities="${applicationId}.androidx-startup"
-			android:exported="false"
-			tools:node="merge">
-			<meta-data
-				android:name="com.nlab.reminder.internal.android.init.FlipperInitializer"
-				android:value="androidx.startup" />
-		</provider>
-
-	</application>
-
-</manifest>
+</navigation>

@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.internal.di.common
+package com.nlab.reminder.internal.common.di
 
 import com.nlab.reminder.R
 import com.nlab.reminder.core.effect.message.navigation.android.NavigationMediator
 import com.nlab.reminder.core.effect.message.navigation.android.util.NavigationMediator
 import com.nlab.reminder.domain.common.effect.message.navigation.*
 import com.nlab.reminder.domain.common.effect.message.navigation.android.runner.*
-import com.nlab.reminder.domain.feature.end.all.view.AllEndFragmentDirections
 import dagger.Module
 import dagger.Provides
 import dagger.Reusable

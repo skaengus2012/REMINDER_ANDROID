@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.internal.di.common
+package com.nlab.reminder.internal.common.di
 
 import android.app.Application
 import com.nlab.reminder.domain.common.util.DatabaseQualifier
-import com.nlab.reminder.domain.internal.local.database.ReminderDatabase
-import com.nlab.reminder.domain.internal.local.database.ScheduleDao
-import com.nlab.reminder.domain.internal.local.database.TagDao
+import com.nlab.reminder.internal.common.android.database.ReminderDatabase
+import com.nlab.reminder.internal.common.android.database.ScheduleDao
+import com.nlab.reminder.internal.common.android.database.TagDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

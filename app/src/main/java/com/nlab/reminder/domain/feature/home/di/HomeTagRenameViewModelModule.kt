@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.internal.di.feature.home
+package com.nlab.reminder.domain.feature.home.di
 
 import androidx.lifecycle.SavedStateHandle
 import com.nlab.reminder.domain.common.android.lifecycle.tag

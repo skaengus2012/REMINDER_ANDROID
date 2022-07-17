@@ -14,22 +14,18 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.internal.local.database
+package com.nlab.reminder.internal.common.android.database
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
 /**
  * @author Doohyun
  */
-@Entity(tableName = "schedule")
-data class ScheduleEntity(
-    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "schedule_id") val id: Long = 0,
-    @ColumnInfo(name = "title") val title: String,
-    @ColumnInfo(name = "description") val description: String? = null,
-    @ColumnInfo(name = "url") val url: String? = null,
-    @ColumnInfo(name = "tag_ids", defaultValue = "") val tagIds: List<String> = emptyList(),
-    @ColumnInfo(name = "visible_priority") val visiblePriority: Int = 0,
-    @ColumnInfo(name = "is_complete") val isComplete: Boolean = false
+@Entity(tableName = "tag", indices = [Index(value = ["tag_name"], unique = true)])
+data class TagEntity(
+    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "tag_id") val tagId: Long = 0,
+    @ColumnInfo(name = "tag_name") val tagName: String
 )

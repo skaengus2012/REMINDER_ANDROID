@@ -16,11 +16,12 @@
 
 package com.nlab.reminder.domain.common.schedule
 
-import androidx.paging.PagingData
+import com.nlab.reminder.core.util.annotation.test.Generated
 
 /**
  * @author Doohyun
  */
-interface ScheduleListItemPagingSource {
-    operator fun invoke(): PagingData<ScheduleListItem>
-}
+@Generated
+data class ScheduleItemRequestConfig(
+    val isComplete: Boolean = true
+)
