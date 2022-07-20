@@ -35,3 +35,9 @@ fun genSchedule(
     visiblePriority: Int = genInt(),
     isComplete: Boolean = genBoolean()
 ): Schedule = Schedule(scheduleId, title, note, url, tags, visiblePriority, isComplete)
+
+fun genSchedules(
+    isComplete: Boolean = genBoolean()
+): List<Schedule> = List(genInt("#")) { index ->
+    genSchedule(scheduleId = index.toLong(), isComplete = isComplete)
+}

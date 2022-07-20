@@ -160,6 +160,7 @@ dependencies {
     implementation(Dependencies.ANDROID_PAGING)
     implementation(Dependencies.ANDROID_ROOM_RUNTIME)
     implementation(Dependencies.ANDROID_ROOM_KTX)
+    implementation(Dependencies.ANDROID_ROOM_PAGING)
     kapt(Dependencies.ANDROID_ROOM_COMPILER)
     implementation(Dependencies.ANDROID_STARTUP_RUNTIME)
 
