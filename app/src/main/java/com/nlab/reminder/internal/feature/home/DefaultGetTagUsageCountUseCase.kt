@@ -14,25 +14,17 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.internal.common.android.database
+package com.nlab.reminder.internal.feature.home
 
-import androidx.room.Dao
-import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.Query
-import kotlinx.coroutines.flow.Flow
+import com.nlab.reminder.domain.common.tag.Tag
+import com.nlab.reminder.domain.common.tag.TagRepository
+import com.nlab.reminder.domain.feature.home.GetTagUsageCountUseCase
 
 /**
  * @author Doohyun
  */
-@Dao
-interface TagDao {
-    @Insert
-    suspend fun insert(tag: TagEntity): Long
-
-    @Delete
-    suspend fun delete(tag: TagEntity)
-
-    @Query("SELECT * FROM tag")
-    fun find(): Flow<List<TagEntity>>
+class DefaultGetTagUsageCountUseCase(
+    private val tagRepository: TagRepository,
+) : GetTagUsageCountUseCase {
+    override suspend fun invoke(tag: Tag): Long = tagRepository.getUsageCount(tag)
 }

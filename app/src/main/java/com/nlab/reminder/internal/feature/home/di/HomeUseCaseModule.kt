@@ -14,15 +14,24 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.feature.home.di
+package com.nlab.reminder.internal.feature.home.di
 
-import com.nlab.reminder.domain.common.tag.Tag
+import com.nlab.reminder.domain.common.tag.TagRepository
 import com.nlab.reminder.domain.feature.home.GetTagUsageCountUseCase
+import com.nlab.reminder.internal.feature.home.DefaultGetTagUsageCountUseCase
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ViewModelComponent
 
-@Deprecated(message = "Fake UseCase was used")
-class FakeGetTagUsageCountUseCase : GetTagUsageCountUseCase {
-    override suspend fun invoke(tag: Tag): Long {
-        println("todo implement GetTagUsageCountUseCase $tag")
-        return (1..500).random().toLong()
-    }
+/**
+ * @author Doohyun
+ */
+@Module
+@InstallIn(ViewModelComponent::class)
+class HomeUseCaseModule {
+    @Provides
+    fun provideGetTagUsageCountUseCase(
+        tagRepository: TagRepository
+    ): GetTagUsageCountUseCase = DefaultGetTagUsageCountUseCase(tagRepository)
 }

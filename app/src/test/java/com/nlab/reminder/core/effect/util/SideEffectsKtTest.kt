@@ -38,7 +38,7 @@ class SideEffectsKtTest {
     fun `notify message when sideEffect invoked`() = runTest {
         Dispatchers.setMain(Dispatchers.Unconfined)
         val testSideEffect: SendSideEffect<TestSideEffectMessage> by sideEffect()
-        val tryCount = genInt("##")
+        val tryCount = genInt("#")
         (1..tryCount)
             .map { TestSideEffectMessage(it) }
             .forEach { message -> testSideEffect.send(message) }
