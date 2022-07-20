@@ -16,15 +16,16 @@
 
 package com.nlab.reminder.domain.feature.home
 
-import com.nlab.reminder.core.util.annotation.test.Generated
+import com.nlab.reminder.domain.common.tag.genTagWithResource
+import com.nlab.reminder.test.genInt
+import com.nlab.reminder.test.genLong
 
 /**
  * @author Doohyun
  */
-@Generated
-data class HomeSummary(
-    val todayNotificationCount: Long,
-    val timetableNotificationCount: Long,
-    val allNotificationCount: Long,
-    val tags: List<TagWithResource>
-)
+fun genHomeSummary(
+    todayNotificationCount: Long = genLong(),
+    timetableNotificationCount: Long = genLong(),
+    allNotificationCount: Long = genLong(),
+    tags: List<TagWithResource> = List(genInt("#")) { genTagWithResource() }
+): HomeSummary = HomeSummary(todayNotificationCount, timetableNotificationCount, allNotificationCount, tags)

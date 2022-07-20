@@ -57,14 +57,14 @@ class HomeStateMachineKtTest {
     private val dummyStates: Set<HomeState> = setOf(
         HomeState.Init,
         HomeState.Loading,
-        HomeState.Loaded(HomeSummary())
+        HomeState.Loaded(genHomeSummary())
     )
 
     private fun createStateMachine(
         scope: CoroutineScope = CoroutineScope(Dispatchers.Default),
         initState: HomeState = HomeState.Init,
         navigationEffect: SendNavigationEffect = mock(),
-        getHomeSummary: GetHomeSummaryUseCase = mock { onBlocking { mock() } doReturn flow { emit(HomeSummary()) } },
+        getHomeSummary: GetHomeSummaryUseCase = mock { onBlocking { mock() } doReturn flow { emit(genHomeSummary()) } },
         getTagUsageCount: GetTagUsageCountUseCase = mock(),
         modifyTagName: ModifyTagNameUseCase = mock(),
         deleteTag: DeleteTagUseCase = mock()
@@ -80,30 +80,9 @@ class HomeStateMachineKtTest {
 
     @Test
     fun `holds injected state when machine created`() = runTest {
-        val initState = HomeState.Loaded(HomeSummary(todayNotificationCount = 1))
+        val initState = HomeState.Loaded(genHomeSummary())
         val stateMachine = createStateMachine(initState = initState)
         assertThat(stateMachine.state.value, sameInstance(initState))
-    }
-
-    @Test
-    fun `holds init state when machine created by factory`() {
-        val stateMachineFactory = HomeStateMachineFactory(
-            getHomeSummary = mock(),
-            getTagUsageCount = mock(),
-            modifyTagName = mock(),
-            deleteTag = mock()
-        )
-
-        assertThat(
-            stateMachineFactory
-                .create(
-                    scope = CoroutineScope(Dispatchers.Default),
-                    navigationEffect = mock()
-                )
-                .state
-                .value,
-            equalTo(HomeState.Init)
-        )
     }
 
     @Test
@@ -148,7 +127,7 @@ class HomeStateMachineKtTest {
 
     @Test
     fun `Notify Loaded when loaded action received`() = runTest {
-        val homeSummary = HomeSummary(allNotificationCount = 10)
+        val homeSummary = genHomeSummary()
         val stateMachine: HomeStateMachine = createStateMachine()
         stateMachine
             .send(HomeAction.HomeSummaryLoaded(homeSummary))
@@ -161,9 +140,9 @@ class HomeStateMachineKtTest {
 
     @Test
     fun `Notify Loaded when fetch is called`() = runTest {
-        val exptectHomeSummary = HomeSummary(todayNotificationCount = 1)
+        val homeSummary = genHomeSummary()
         val getHomeSummaryUseCase: GetHomeSummaryUseCase = mock {
-            whenever(mock()) doReturn flow { emit(exptectHomeSummary) }
+            whenever(mock()) doReturn flow { emit(homeSummary) }
         }
         val stateMachine: HomeStateMachine = createStateMachine(
             scope = CoroutineScope(Dispatchers.Unconfined),
@@ -173,7 +152,7 @@ class HomeStateMachineKtTest {
             .send(HomeAction.Fetch)
             .join()
         assertThat(
-            HomeState.Loaded(exptectHomeSummary),
+            HomeState.Loaded(homeSummary),
             equalTo(stateMachine.state.value)
         )
     }
@@ -206,8 +185,8 @@ class HomeStateMachineKtTest {
     fun `Navigate tag end when tag element clicked`() = runTest {
         val testTag: Tag = genTag()
         val testSummaries = listOf(
-            HomeSummary(tags = listOf(genTagWithResource(testTag))),
-            HomeSummary(tags = emptyList())
+            genHomeSummary(tags = listOf(genTagWithResource(testTag))),
+            genHomeSummary(tags = emptyList())
         )
         testSummaries.forEach { homeSummary ->
             testNavigationEnd(
@@ -222,8 +201,8 @@ class HomeStateMachineKtTest {
     fun `Navigate tag config end when tag element long clicked`() = runTest {
         val testTag: Tag = genTag()
         val testSummaries = listOf(
-            HomeSummary(tags = listOf(genTagWithResource(testTag))),
-            HomeSummary(tags = emptyList())
+            genHomeSummary(tags = listOf(genTagWithResource(testTag))),
+            genHomeSummary(tags = emptyList())
         )
         testSummaries.forEach { homeSummary ->
             testNavigationEnd(
@@ -239,8 +218,8 @@ class HomeStateMachineKtTest {
         val testTag: Tag = genTag()
         val testUsageCount = genLong()
         val testSummaries = listOf(
-            HomeSummary(tags = listOf(genTagWithResource(testTag))),
-            HomeSummary(tags = emptyList())
+            genHomeSummary(tags = listOf(genTagWithResource(testTag))),
+            genHomeSummary(tags = emptyList())
         )
         testSummaries.forEach { homeSummary ->
             testNavigationEnd(
@@ -257,8 +236,8 @@ class HomeStateMachineKtTest {
         val testTag: Tag = genTag()
         val testUsageCount = genLong()
         val testSummaries = listOf(
-            HomeSummary(tags = listOf(genTagWithResource(testTag))),
-            HomeSummary(tags = emptyList())
+            genHomeSummary(tags = listOf(genTagWithResource(testTag))),
+            genHomeSummary(tags = emptyList())
         )
         testSummaries.forEach { homeSummary ->
             testNavigationEnd(
@@ -272,7 +251,7 @@ class HomeStateMachineKtTest {
 
     private suspend fun testNavigationEnd(
         getTagUsageCount: GetTagUsageCountUseCase = mock(),
-        initState: HomeState = HomeState.Loaded(HomeSummary(todayNotificationCount = 10)),
+        initState: HomeState = HomeState.Loaded(genHomeSummary()),
         navigateAction: HomeAction,
         expectedNavigationMessage: NavigationMessage,
     ) {
@@ -296,7 +275,7 @@ class HomeStateMachineKtTest {
         val modifyTagNameUseCase: ModifyTagNameUseCase = mock()
         val stateMachine: HomeStateMachine = createStateMachine(
             scope = CoroutineScope(Dispatchers.Unconfined),
-            initState = HomeState.Loaded(HomeSummary()),
+            initState = HomeState.Loaded(genHomeSummary()),
             modifyTagName = modifyTagNameUseCase
         )
         stateMachine
@@ -311,7 +290,7 @@ class HomeStateMachineKtTest {
         val testTag: Tag = genTag()
         val stateMachine: HomeStateMachine = createStateMachine(
             scope = CoroutineScope(Dispatchers.Unconfined),
-            initState = HomeState.Loaded(HomeSummary()),
+            initState = HomeState.Loaded(genHomeSummary()),
             deleteTag = deleteTagUseCase
         )
         stateMachine
