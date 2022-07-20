@@ -21,7 +21,7 @@ import com.nlab.reminder.domain.common.tag.TagRepository
 import com.nlab.reminder.domain.common.tag.genTag
 import com.nlab.reminder.internal.common.android.database.ScheduleTagListDao
 import com.nlab.reminder.internal.common.android.database.TagDao
-import com.nlab.reminder.internal.common.database.from
+import com.nlab.reminder.internal.common.android.database.TagEntity
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -57,9 +57,9 @@ class LocalTagRepositoryTest {
         val secondTags: List<Tag> = listOf(genTag(), genTag(), genTag()).sortedBy { it.name }.reversed()
         val tagDao: TagDao = mock {
             whenever(mock.find()) doReturn flow {
-                emit(firstTags.map { from(it) })
+                emit(firstTags.map { TagEntity.from(it) })
                 delay(500)
-                emit(secondTags.map { from(it) })
+                emit(secondTags.map { TagEntity.from(it) })
             }
         }
         val actualTags = mutableListOf<List<Tag>>()
@@ -82,5 +82,14 @@ class LocalTagRepositoryTest {
 
         tagRepository.getUsageCount(testTag)
         verify(scheduleTagListDao, times(1)).findTagUsageCount(tagId = testTag.tagId)
+    }
+
+    @Test
+    fun `tagDao delete tag when repository deleting requested`() = runTest {
+        val testTag: Tag = genTag()
+        val tagDao: TagDao = mock()
+        val tagRepository: TagRepository = createTagRepository(tagDao = tagDao)
+        tagRepository.delete(testTag)
+        verify(tagDao, times(1)).delete(TagEntity.from(testTag))
     }
 }

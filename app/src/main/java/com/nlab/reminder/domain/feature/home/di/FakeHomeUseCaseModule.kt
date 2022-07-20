@@ -36,7 +36,4 @@ class FakeHomeUseCaseModule {
 
     @Provides
     fun provideModifyTagNameUseCase(): ModifyTagNameUseCase = FakeModifyTagNameUseCase()
-
-    @Provides
-    fun provideDeleteTagUseCase(): DeleteTagUseCase = FakeDeleteTagUseCase()
 }

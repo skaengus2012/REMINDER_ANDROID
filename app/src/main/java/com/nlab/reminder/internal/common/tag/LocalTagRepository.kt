@@ -21,6 +21,7 @@ import com.nlab.reminder.domain.common.tag.Tag
 import com.nlab.reminder.domain.common.tag.TagRepository
 import com.nlab.reminder.internal.common.android.database.ScheduleTagListDao
 import com.nlab.reminder.internal.common.android.database.TagDao
+import com.nlab.reminder.internal.common.android.database.TagEntity
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
@@ -41,4 +42,7 @@ class LocalTagRepository(
 
     override suspend fun getUsageCount(tag: Tag): Long =
         withContext(dispatcher) { scheduleTagListDao.findTagUsageCount(tagId = tag.tagId) }
+
+    override suspend fun delete(tag: Tag) =
+        withContext(dispatcher) { tagDao.delete(TagEntity.from(tag)) }
 }

@@ -68,7 +68,7 @@ class LocalScheduleRepositoryTest {
         )
         val secondState = ScheduleEntityWithTagEntities(
             scheduleEntity = from(secondSchedule),
-            tagEntities = secondSchedule.tags.map { from(it) }.reversed()
+            tagEntities = secondSchedule.tags.map { TagEntity.from(it) }.reversed()
         )
 
         val scheduleDao: ScheduleDao = mock {
