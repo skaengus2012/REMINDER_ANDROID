@@ -17,7 +17,9 @@
 package com.nlab.reminder.internal.feature.home.di
 
 import com.nlab.reminder.domain.common.tag.TagRepository
+import com.nlab.reminder.domain.feature.home.DeleteTagUseCase
 import com.nlab.reminder.domain.feature.home.GetTagUsageCountUseCase
+import com.nlab.reminder.internal.feature.home.DefaultDeleteTagUseCase
 import com.nlab.reminder.internal.feature.home.DefaultGetTagUsageCountUseCase
 import dagger.Module
 import dagger.Provides
@@ -34,4 +36,9 @@ class HomeUseCaseModule {
     fun provideGetTagUsageCountUseCase(
         tagRepository: TagRepository
     ): GetTagUsageCountUseCase = DefaultGetTagUsageCountUseCase(tagRepository)
+
+    @Provides
+    fun provideDeleteTagUseCase(
+        tagRepository: TagRepository
+    ): DeleteTagUseCase = DefaultDeleteTagUseCase(tagRepository)
 }

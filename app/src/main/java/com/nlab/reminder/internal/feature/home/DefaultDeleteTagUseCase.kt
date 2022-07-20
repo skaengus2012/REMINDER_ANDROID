@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.feature.home.di
+package com.nlab.reminder.internal.feature.home
 
 import com.nlab.reminder.domain.common.tag.Tag
+import com.nlab.reminder.domain.common.tag.TagRepository
 import com.nlab.reminder.domain.feature.home.DeleteTagUseCase
 
 /**
  * @author Doohyun
  */
-@Deprecated(message = "Fake UseCase was used")
-class FakeDeleteTagUseCase : DeleteTagUseCase {
-    override suspend fun invoke(tag: Tag) {
-        println("todo implement DeleteTagUseCase $tag")
-    }
+class DefaultDeleteTagUseCase(
+    private val tagRepository: TagRepository
+) : DeleteTagUseCase {
+    override suspend fun invoke(tag: Tag) = tagRepository.delete(tag)
 }
