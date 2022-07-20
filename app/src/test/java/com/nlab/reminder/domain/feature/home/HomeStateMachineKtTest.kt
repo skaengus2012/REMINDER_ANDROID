@@ -18,7 +18,6 @@ package com.nlab.reminder.domain.feature.home
 
 import com.nlab.reminder.core.effect.message.navigation.NavigationMessage
 import com.nlab.reminder.core.effect.message.navigation.SendNavigationEffect
-import com.nlab.reminder.core.state.StateMachine
 import com.nlab.reminder.domain.common.effect.message.navigation.AllEndNavigationMessage
 import com.nlab.reminder.domain.common.effect.message.navigation.TagEndNavigationMessage
 import com.nlab.reminder.domain.common.effect.message.navigation.TimetableEndNavigationMessage
@@ -87,8 +86,8 @@ class HomeStateMachineKtTest {
 
     @Test
     fun `keep state init even when action occurs until fetched`() = runTest {
-        val stateMachine: HomeStateMachine = createStateMachine()
         val initState: HomeState = HomeState.Init
+        val stateMachine: HomeStateMachine = createStateMachine(initState = initState)
         dummyActions
             .asSequence()
             .filter { it !is HomeAction.Fetch }
@@ -113,14 +112,13 @@ class HomeStateMachineKtTest {
         dummyStates
             .asSequence()
             .filter { it !is HomeState.Init }
-            .map { state -> createHomeStateMachineWithEmptySummary(state) }
-            .forEach { machine ->
-                val curState: HomeState = machine.state.value
+            .map { state -> state to createHomeStateMachineWithEmptySummary(state) }
+            .forEach { (initState, machine) ->
                 machine.send(HomeAction.Fetch).join()
-                assertThat(machine.state.value, sameInstance(curState))
+                assertThat(machine.state.value, sameInstance(initState))
             }
 
-        val stateMachine: StateMachine<HomeAction, HomeState> = createHomeStateMachineWithEmptySummary(HomeState.Init)
+        val stateMachine: HomeStateMachine = createHomeStateMachineWithEmptySummary(HomeState.Init)
         stateMachine.send(HomeAction.Fetch).join()
         assertThat(stateMachine.state.value, equalTo(HomeState.Loading))
     }

@@ -16,6 +16,7 @@
 
 package com.nlab.reminder.internal.common.android.database
 
+import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy.REPLACE
@@ -34,4 +35,8 @@ interface ScheduleDao {
     @Transaction
     @Query("SELECT * FROM schedule WHERE is_complete = :isComplete")
     fun find(isComplete: Boolean): Flow<List<ScheduleEntityWithTagEntities>>
+
+    @Transaction
+    @Query("SELECT * FROM schedule WHERE is_complete = :isComplete")
+    fun findAsPagingSource(isComplete: Boolean): PagingSource<Int, ScheduleEntityWithTagEntities>
 }
