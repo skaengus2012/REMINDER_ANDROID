@@ -19,6 +19,7 @@ package com.nlab.reminder.internal.common.tag
 import com.nlab.reminder.domain.common.tag.Tag
 import com.nlab.reminder.domain.common.tag.TagRepository
 import com.nlab.reminder.domain.common.tag.genTag
+import com.nlab.reminder.internal.common.android.database.ScheduleTagListDao
 import com.nlab.reminder.internal.common.android.database.TagDao
 import com.nlab.reminder.internal.common.database.from
 import kotlinx.coroutines.*
@@ -36,10 +37,16 @@ import org.mockito.kotlin.*
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class LocalTagRepositoryTest {
+    private fun createTagRepository(
+        tagDao: TagDao = mock(),
+        scheduleTagListDao: ScheduleTagListDao = mock(),
+        dispatcher: CoroutineDispatcher = Dispatchers.Unconfined
+    ): TagRepository = LocalTagRepository(tagDao, scheduleTagListDao, dispatcher)
+
     @Test
     fun `tagDao found when get`() {
         val tagDao: TagDao = mock()
-        val tagRepository: TagRepository = LocalTagRepository(tagDao, Dispatchers.Unconfined)
+        val tagRepository: TagRepository = createTagRepository(tagDao = tagDao)
         tagRepository.get()
         verify(tagDao, times(1)).find()
     }
@@ -56,11 +63,24 @@ class LocalTagRepositoryTest {
             }
         }
         val actualTags = mutableListOf<List<Tag>>()
-        val tagRepository: TagRepository = LocalTagRepository(tagDao, StandardTestDispatcher(testScheduler))
+        val tagRepository: TagRepository = createTagRepository(
+            tagDao = tagDao,
+            dispatcher = StandardTestDispatcher(testScheduler)
+        )
         CoroutineScope(Dispatchers.Unconfined).launch {
             tagRepository.get().collect { actualTags += it }
         }
         advanceTimeBy(1_000)
         assertThat(actualTags, equalTo(listOf(firstTags, secondTags)))
+    }
+
+    @Test
+    fun `scheduleListDao found tag usage count when repository request findUsageCount`() = runTest {
+        val testTag: Tag = genTag()
+        val scheduleTagListDao: ScheduleTagListDao = mock()
+        val tagRepository: TagRepository = createTagRepository(scheduleTagListDao = scheduleTagListDao)
+
+        tagRepository.getUsageCount(testTag)
+        verify(scheduleTagListDao, times(1)).findTagUsageCount(tagId = testTag.tagId)
     }
 }

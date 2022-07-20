@@ -19,22 +19,26 @@ package com.nlab.reminder.internal.common.tag
 import com.nlab.reminder.core.kotlin.flow.map
 import com.nlab.reminder.domain.common.tag.Tag
 import com.nlab.reminder.domain.common.tag.TagRepository
-import com.nlab.reminder.domain.common.util.DatabaseQualifier
+import com.nlab.reminder.internal.common.android.database.ScheduleTagListDao
 import com.nlab.reminder.internal.common.android.database.TagDao
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
-import javax.inject.Inject
+import kotlinx.coroutines.withContext
 
 /**
  * @author Doohyun
  */
-class LocalTagRepository @Inject constructor(
+class LocalTagRepository(
     private val tagDao: TagDao,
-    @DatabaseQualifier private val dispatcher: CoroutineDispatcher
+    private val scheduleTagListDao: ScheduleTagListDao,
+    private val dispatcher: CoroutineDispatcher
 ) : TagRepository {
     override fun get(): Flow<List<Tag>> =
         tagDao.find()
             .map { tagEntities -> tagEntities.map { Tag(it.tagId, it.name) } }
             .flowOn(dispatcher)
+
+    override suspend fun getUsageCount(tag: Tag): Long =
+        withContext(dispatcher) { scheduleTagListDao.findTagUsageCount(tagId = tag.tagId) }
 }

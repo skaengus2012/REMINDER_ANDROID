@@ -16,44 +16,43 @@
 
 package com.nlab.reminder.domain.feature.home.di
 
-import com.nlab.reminder.domain.common.tag.Tag
+import com.nlab.reminder.core.kotlin.flow.map
+import com.nlab.reminder.core.util.annotation.test.Generated
+import com.nlab.reminder.domain.common.tag.TagRepository
 import com.nlab.reminder.domain.common.tag.TagStyleResource
 import com.nlab.reminder.domain.feature.home.GetHomeSummaryUseCase
 import com.nlab.reminder.domain.feature.home.HomeSummary
 import com.nlab.reminder.domain.feature.home.TagWithResource
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 
 /**
- * TODO Implement with Room
  * @author Doohyun
  */
 @Deprecated(message = "Fake UseCase was used")
-class FakeGetHomeSummaryUseCase : GetHomeSummaryUseCase {
-    override suspend fun invoke(): Flow<HomeSummary> = flow {
-        TagWithResource(
-            Tag(
-                1,
-                "Hello",
-            ),
-            TagStyleResource.TYPE6,
-        )
-
-        emit(
-            HomeSummary(
-                todayNotificationCount = 10,
-                timetableNotificationCount = 8,
-                allNotificationCount = 20,
-                tags = listOf(
-                    TagWithResource(
-                        Tag(
-                            1,
-                            "Hello",
-                        ),
-                        TagStyleResource.TYPE6,
-                    )
+class FakeGetHomeSummaryUseCase(
+    private val tagRepository: TagRepository,
+    private val dispatcher: CoroutineDispatcher = Dispatchers.Default
+) : GetHomeSummaryUseCase {
+    @Generated
+    override suspend fun invoke(): Flow<HomeSummary> {
+        // TODO with scheduleEntityModel
+        return tagRepository.get()
+            .map { tags ->
+                HomeSummary(
+                    todayNotificationCount = (0..50).random().toLong(),
+                    timetableNotificationCount = (0..50).random().toLong(),
+                    allNotificationCount = (0..50).random().toLong(),
+                    tags = tags.map { tag ->
+                        TagWithResource(
+                            tag,
+                            TagStyleResource.findByCode((1..6).random())
+                        )
+                    }
                 )
-            )
-        )
+            }
+            .flowOn(dispatcher)
     }
 }

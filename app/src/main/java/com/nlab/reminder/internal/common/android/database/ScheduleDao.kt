@@ -29,7 +29,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface ScheduleDao {
     @Insert(onConflict = REPLACE)
-    fun insert(schedule: ScheduleEntity): Long
+    suspend fun insert(schedule: ScheduleEntity): Long
 
     @Transaction
     @Query("SELECT * FROM schedule WHERE is_complete = :isComplete")

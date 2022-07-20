@@ -24,11 +24,11 @@ import androidx.room.Query
 @Dao
 interface ScheduleTagListDao {
     @Insert
-    fun insert(scheduleTagList: ScheduleTagListEntity)
+    suspend fun insert(scheduleTagList: ScheduleTagListEntity)
 
     @Delete
-    fun delete(scheduleTagList: ScheduleTagListEntity)
+    suspend fun delete(scheduleTagList: ScheduleTagListEntity)
 
     @Query("SELECT COUNT(schedule_id) FROM schedule_tag_list WHERE tag_id = :tagId")
-    fun findTagUsageCount(tagId: Long): Long
+    suspend fun findTagUsageCount(tagId: Long): Long
 }

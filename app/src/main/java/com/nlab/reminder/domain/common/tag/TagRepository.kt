@@ -23,4 +23,5 @@ import kotlinx.coroutines.flow.Flow
  */
 interface TagRepository {
     fun get(): Flow<List<Tag>>
+    suspend fun getUsageCount(tag: Tag): Long
 }

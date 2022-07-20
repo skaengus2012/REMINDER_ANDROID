@@ -16,6 +16,7 @@
 
 package com.nlab.reminder.domain.feature.home.di
 
+import com.nlab.reminder.domain.common.tag.TagRepository
 import com.nlab.reminder.domain.feature.home.*
 import dagger.Module
 import dagger.Provides
@@ -29,10 +30,9 @@ import dagger.hilt.android.components.ViewModelComponent
 @InstallIn(ViewModelComponent::class)
 class FakeHomeUseCaseModule {
     @Provides
-    fun provideGetHomeSummaryUseCase(): GetHomeSummaryUseCase = FakeGetHomeSummaryUseCase()
-
-    @Provides
-    fun provideGetTagUsageCountUseCase(): GetTagUsageCountUseCase = FakeGetTagUsageCountUseCase()
+    fun provideGetHomeSummaryUseCase(
+        tagRepository: TagRepository
+    ): GetHomeSummaryUseCase = FakeGetHomeSummaryUseCase(tagRepository)
 
     @Provides
     fun provideModifyTagNameUseCase(): ModifyTagNameUseCase = FakeModifyTagNameUseCase()

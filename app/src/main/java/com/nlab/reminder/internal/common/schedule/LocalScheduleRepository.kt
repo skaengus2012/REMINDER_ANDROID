@@ -21,18 +21,16 @@ import com.nlab.reminder.domain.common.schedule.Schedule
 import com.nlab.reminder.domain.common.schedule.ScheduleItemRequestConfig
 import com.nlab.reminder.domain.common.schedule.ScheduleRepository
 import com.nlab.reminder.domain.common.tag.Tag
-import com.nlab.reminder.domain.common.util.DatabaseQualifier
 import com.nlab.reminder.internal.common.android.database.ScheduleDao
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.*
-import javax.inject.Inject
 
 /**
  * @author Doohyun
  */
-class LocalScheduleRepository @Inject constructor(
+class LocalScheduleRepository(
     private val scheduleDao: ScheduleDao,
-    @DatabaseQualifier private val dispatcher: CoroutineDispatcher
+    private val dispatcher: CoroutineDispatcher
 ) : ScheduleRepository {
     override fun get(requestConfig: ScheduleItemRequestConfig): Flow<List<Schedule>> =
         scheduleDao.find(isComplete = requestConfig.isComplete)
