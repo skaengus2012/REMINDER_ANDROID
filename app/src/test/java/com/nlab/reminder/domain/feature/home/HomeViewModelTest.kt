@@ -89,7 +89,7 @@ class HomeViewModelTest {
     @Test
     fun `Notify state when state subscribed`() = runTest {
         val actualHomeStates = mutableListOf<HomeState>()
-        val expectedSummary = HomeSummary(todayNotificationCount = 1)
+        val expectedSummary: HomeSummary = genHomeSummary()
 
         val viewModel: HomeViewModel = createViewModel(
             getHomeSummary = mock {
@@ -112,7 +112,7 @@ class HomeViewModelTest {
         val testUsageCount: Long = genLong()
         val testTag: Tag = genTag()
         val viewModel: HomeViewModel = createViewModel(
-            initState = HomeState.Loaded(HomeSummary()),
+            initState = HomeState.Loaded(genHomeSummary()),
             getTagUsageCount = mock {
                 whenever(mock(testTag)) doReturn testUsageCount
             }
