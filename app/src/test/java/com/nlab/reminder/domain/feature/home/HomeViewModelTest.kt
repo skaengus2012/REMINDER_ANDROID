@@ -44,8 +44,7 @@ class HomeViewModelTest {
             whenever(
                 mock.create(
                     scope = any(),
-                    navigationEffect = any(),
-                    onHomeSummaryLoaded = any()
+                    navigationEffect = any()
                 )
             ) doReturn stateMachine
         }

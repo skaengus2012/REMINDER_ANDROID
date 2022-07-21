@@ -30,15 +30,13 @@ class HomeStateMachineFactory(
 ) {
     fun create(
         scope: CoroutineScope,
-        navigationEffect: SendNavigationEffect,
-        onHomeSummaryLoaded: (HomeSummary) -> Unit,
+        navigationEffect: SendNavigationEffect
     ): HomeStateMachine = HomeStateMachine(
         scope,
         initState,
         navigationEffect,
         getHomeSummary,
         modifyTagName,
-        deleteTag,
-        onHomeSummaryLoaded
+        deleteTag
     )
 }
