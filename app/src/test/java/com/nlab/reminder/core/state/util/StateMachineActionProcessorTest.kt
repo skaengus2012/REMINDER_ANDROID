@@ -16,7 +16,6 @@
 
 package com.nlab.reminder.core.state.util
 
-import com.nlab.reminder.core.state.StateMachineConfig
 import com.nlab.reminder.core.state.TestAction
 import com.nlab.reminder.core.state.TestState
 import com.nlab.reminder.test.instanceOf
@@ -240,6 +239,31 @@ internal class StateMachineActionProcessorTest {
 
         actionProcessor
             .send(TestAction.Action2())
+            .join()
+        assertThat(
+            state.value,
+            instanceOf(TestState.State2::class)
+        )
+    }
+
+    @Test
+    fun `notify State1, State2 when state is init and action1 called action2 and invoked action1`() = runTest {
+        val state: MutableStateFlow<TestState> = MutableStateFlow(TestState.State1())
+        val actionProcessor = createTestStateMachineActionProcessor(
+            state = state,
+            stateMachineBuilder = StateMachineBuilder<TestAction, TestState>().apply {
+                updateTo { (action) ->
+                    when (action) {
+                        is TestAction.Action1 -> TestState.State1()
+                        is TestAction.Action2 -> TestState.State2()
+                    }
+                }
+
+                sideEffectBy<TestAction.Action1> { send(TestAction.Action2()) }
+            }
+        )
+        actionProcessor
+            .send(TestAction.Action1())
             .join()
         assertThat(
             state.value,

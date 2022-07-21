@@ -17,8 +17,8 @@
 package com.nlab.reminder.core.state.util
 
 import com.nlab.reminder.core.state.Action
+import com.nlab.reminder.core.state.ActionProcessor
 import com.nlab.reminder.core.state.State
-import com.nlab.reminder.core.state.StateMachineConfig
 
 /**
  * @author Doohyun
@@ -28,11 +28,11 @@ class StateMachineBuilder<A : Action, S : State>(
 ) {
     private var onUpdate: (UpdateSource<A, S>) -> S = ImmutableListener()
     private val onErrors: MutableList<(Throwable) -> Unit> = arrayListOf(defaultUpdateErrorHandler)
-    private val sideEffects: MutableList<(UpdateSource<A, S>) -> Unit> = arrayListOf()
+    private val sideEffects: MutableList<(ActionProcessor<A>).(UpdateSource<A, S>) -> Unit> = arrayListOf()
 
     internal fun buildExceptionHandler(): (Throwable) -> Unit = { error -> onErrors.forEach { it(error) } }
     internal fun buildUpdateHandler(): (UpdateSource<A, S>) -> S = { updateSource -> onUpdate(updateSource) }
-    internal fun buildSideEffectHandler(): (UpdateSource<A, S>) -> Unit = { updateSource ->
+    internal fun buildSideEffectHandler(): (ActionProcessor<A>).(UpdateSource<A, S>) -> Unit = { updateSource ->
         sideEffects.forEach { it(updateSource) }
     }
 
@@ -44,17 +44,20 @@ class StateMachineBuilder<A : Action, S : State>(
         onErrors += block
     }
 
-    fun sideEffect(block: (UpdateSource<A, S>) -> Unit) {
+    fun sideEffect(block: (ActionProcessor<A>).(UpdateSource<A, S>) -> Unit) {
         sideEffects += block
     }
 
-    inline fun <reified T : A> sideEffectBy(noinline block: (UpdateSource<T, S>) -> Unit) {
+    inline fun <reified T : A> sideEffectBy(noinline block: (ActionProcessor<A>).(UpdateSource<T, S>) -> Unit) {
         sideEffectBy(T::class.java, block)
     }
 
     // Jacoco could not measure coverage for functions that were directly processed as inline.
     // So I created a wrapping function
-    fun <T : A> sideEffectBy(actionClazz: Class<T>, block: (UpdateSource<T, S>) -> Unit) {
+    fun <T : A> sideEffectBy(
+        actionClazz: Class<T>,
+        block: (ActionProcessor<A>).(UpdateSource<T, S>) -> Unit
+    ) {
         sideEffect { (action, oldState) ->
             if (actionClazz.isInstance(action)) {
                 block(UpdateSource(actionClazz.cast(action)!!, oldState))
@@ -62,13 +65,15 @@ class StateMachineBuilder<A : Action, S : State>(
         }
     }
 
-    inline fun <reified U : S> sideEffectWhen(noinline block: (UpdateSource<A, U>) -> Unit) {
+    inline fun <reified U : S> sideEffectWhen(noinline block: (ActionProcessor<A>).(UpdateSource<A, U>) -> Unit) {
         sideEffectWhen(U::class.java, block)
     }
 
+    // Jacoco could not measure coverage for functions that were directly processed as inline.
+    // So I created a wrapping function
     fun <U : S> sideEffectWhen(
         stateClazz: Class<U>,
-        block: (UpdateSource<A, U>) -> Unit
+        block: (ActionProcessor<A>).(UpdateSource<A, U>) -> Unit
     ) {
         sideEffect { (action, oldState) ->
             if (stateClazz.isInstance(oldState)) {
@@ -77,14 +82,18 @@ class StateMachineBuilder<A : Action, S : State>(
         }
     }
 
-    inline fun <reified T : A, reified U : S> sideEffectOn(noinline block: (UpdateSource<T, U>) -> Unit) {
+    inline fun <reified T : A, reified U : S> sideEffectOn(
+        noinline block: (ActionProcessor<A>).(UpdateSource<T, U>) -> Unit
+    ) {
         sideEffectOn(T::class.java, U::class.java, block)
     }
 
+    // Jacoco could not measure coverage for functions that were directly processed as inline.
+    // So I created a wrapping function
     fun <T : A, U : S> sideEffectOn(
         actionClazz: Class<T>,
         stateClazz: Class<U>,
-        block: (UpdateSource<T, U>) -> Unit
+        block: (ActionProcessor<A>).(UpdateSource<T, U>) -> Unit
     ) {
         sideEffect { (action, oldState) ->
             if (actionClazz.isInstance(action) && stateClazz.isInstance(oldState)) {
