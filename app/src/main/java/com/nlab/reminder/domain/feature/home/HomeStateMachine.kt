@@ -46,7 +46,10 @@ fun HomeStateMachine(
                 if (oldState is HomeState.Init) HomeState.Loading
                 else oldState
             }
-            is HomeAction.HomeSummaryLoaded -> HomeState.Loaded(action.homeSummary)
+            is HomeAction.HomeSummaryLoaded -> {
+                if (oldState !is HomeState.Init) HomeState.Loaded(action.homeSummary)
+                else oldState
+            }
             else -> oldState
         }
     }

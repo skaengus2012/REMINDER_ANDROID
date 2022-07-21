@@ -50,7 +50,8 @@ class HomeStateMachineKtTest {
         HomeAction.OnTagLongClicked(genTag()),
         HomeAction.OnTagRenameConfirmClicked(genTag(), renameText = genLetterify()),
         HomeAction.OnTagDeleteRequestClicked(genTag()),
-        HomeAction.OnTagDeleteConfirmClicked(genTag())
+        HomeAction.OnTagDeleteConfirmClicked(genTag()),
+        HomeAction.HomeSummaryLoaded(genHomeSummary())
     )
 
     private val dummyStates: Set<HomeState> = setOf(
@@ -102,38 +103,33 @@ class HomeStateMachineKtTest {
 
     @Test
     fun `fetch is executed when state is init`() = runTest {
-        fun createHomeStateMachineWithEmptySummary(
-            initState: HomeState
-        ): HomeStateMachine = createStateMachine(
-            getHomeSummary = mock { onBlocking { invoke() } doReturn flow {} },
-            initState = initState
-        )
-
         dummyStates
-            .asSequence()
-            .filter { it !is HomeState.Init }
-            .map { state -> state to createHomeStateMachineWithEmptySummary(state) }
-            .forEach { (initState, machine) ->
-                machine.send(HomeAction.Fetch).join()
-                assertThat(machine.state.value, sameInstance(initState))
+            .map { state -> state to createStateMachine(initState = state) }
+            .forEach { (initState, stateMachine) ->
+                stateMachine
+                    .send(HomeAction.Fetch)
+                    .join()
+                assertThat(
+                    stateMachine.state.value,
+                    equalTo(if (initState is HomeState.Init) HomeState.Loading else initState)
+                )
             }
-
-        val stateMachine: HomeStateMachine = createHomeStateMachineWithEmptySummary(HomeState.Init)
-        stateMachine.send(HomeAction.Fetch).join()
-        assertThat(stateMachine.state.value, equalTo(HomeState.Loading))
     }
 
     @Test
-    fun `Notify Loaded when loaded action received`() = runTest {
+    fun `Notify Loaded when loaded action received after loading`() = runTest {
         val homeSummary = genHomeSummary()
-        val stateMachine: HomeStateMachine = createStateMachine()
-        stateMachine
-            .send(HomeAction.HomeSummaryLoaded(homeSummary))
-            .join()
-        assertThat(
-            stateMachine.state.value,
-            equalTo(HomeState.Loaded(homeSummary))
-        )
+        dummyStates
+            .map { state -> state to createStateMachine(initState = state) }
+            .forEach { (initState, stateMachine) ->
+                stateMachine
+                    .send(HomeAction.HomeSummaryLoaded(homeSummary))
+                    .join()
+                assertThat(
+                    stateMachine.state.value,
+                    equalTo(if (initState is HomeState.Init) initState else HomeState.Loaded(homeSummary))
+                )
+            }
     }
 
     @Test
@@ -150,8 +146,8 @@ class HomeStateMachineKtTest {
             .send(HomeAction.Fetch)
             .join()
         assertThat(
-            HomeState.Loaded(homeSummary),
-            equalTo(stateMachine.state.value)
+            stateMachine.state.value,
+            equalTo(HomeState.Loaded(homeSummary))
         )
     }
 
