@@ -37,8 +37,7 @@ fun HomeStateMachine(
     navigationEffect: SendNavigationEffect,
     getHomeSummary: GetHomeSummaryUseCase,
     modifyTagName: ModifyTagNameUseCase,
-    deleteTag: DeleteTagUseCase,
-    onHomeSummaryLoaded: (HomeSummary) -> Unit
+    deleteTag: DeleteTagUseCase
 ): HomeStateMachine = StateMachine(scope, initState) {
     updateTo { (action, oldState) ->
         when (action) {
@@ -52,7 +51,7 @@ fun HomeStateMachine(
     }
 
     sideEffectOn<HomeAction.Fetch, HomeState.Init> {
-        scope.launch { getHomeSummary().collect(onHomeSummaryLoaded) }
+        scope.launch { getHomeSummary().collect { send(HomeAction.HomeSummaryLoaded(it)) } }
     }
 
     sideEffectOn<HomeAction.OnTodayCategoryClicked, HomeState.Loaded> {

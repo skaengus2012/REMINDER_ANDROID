@@ -61,10 +61,9 @@ class HomeStateMachineKtTest {
         navigationEffect: SendNavigationEffect = mock(),
         getHomeSummary: GetHomeSummaryUseCase = mock { onBlocking { mock() } doReturn flow { emit(HomeSummary()) } },
         modifyTagName: ModifyTagNameUseCase = mock(),
-        deleteTag: DeleteTagUseCase = mock(),
-        onHomeSummaryLoaded: (HomeSummary) -> Unit = mock(),
+        deleteTag: DeleteTagUseCase = mock()
     ): HomeStateMachine = HomeStateMachine(
-        scope, initState, navigationEffect, getHomeSummary, modifyTagName, deleteTag, onHomeSummaryLoaded
+        scope, initState, navigationEffect, getHomeSummary, modifyTagName, deleteTag
     )
 
     @Test
@@ -80,8 +79,7 @@ class HomeStateMachineKtTest {
             HomeStateMachineFactory(getHomeSummary = mock(), modifyTagName = mock(), deleteTag = mock())
                 .create(
                     scope = CoroutineScope(Dispatchers.Default),
-                    navigationEffect = mock(),
-                    onHomeSummaryLoaded = mock()
+                    navigationEffect = mock()
                 )
                 .state
                 .value,
@@ -144,26 +142,20 @@ class HomeStateMachineKtTest {
 
     @Test
     fun `Notify Loaded when fetch is called`() = runTest {
+        val exptectHomeSummary = HomeSummary(todayNotificationCount = 1)
         val getHomeSummaryUseCase: GetHomeSummaryUseCase = mock {
-            whenever(mock()) doReturn flow {
-                repeat(10) { number ->
-                    emit(HomeSummary(todayNotificationCount = number.toLong()))
-                }
-            }
+            whenever(mock()) doReturn flow { emit(exptectHomeSummary) }
         }
-        val collectedStates: MutableList<HomeSummary> = mutableListOf()
-        val onHomeSummaryLoaded: (HomeSummary) -> Unit = { collectedStates += it }
         val stateMachine: HomeStateMachine = createStateMachine(
             scope = CoroutineScope(Dispatchers.Unconfined),
-            getHomeSummary = getHomeSummaryUseCase,
-            onHomeSummaryLoaded = onHomeSummaryLoaded
+            getHomeSummary = getHomeSummaryUseCase
         )
         stateMachine
             .send(HomeAction.Fetch)
             .join()
         assertThat(
-            collectedStates,
-            equalTo((0..9).map { HomeSummary(todayNotificationCount = it.toLong()) })
+            HomeState.Loaded(exptectHomeSummary),
+            equalTo(stateMachine.state.value)
         )
     }
 

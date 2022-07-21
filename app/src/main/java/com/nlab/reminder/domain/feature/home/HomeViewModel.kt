@@ -34,11 +34,7 @@ class HomeViewModel @Inject constructor(
     stateMachineFactory: HomeStateMachineFactory
 ) : ViewModel() {
     private val _navigationEffect: SendNavigationEffect by sideEffect()
-    private val stateMachine: HomeStateMachine = stateMachineFactory.create(
-        viewModelScope,
-        _navigationEffect,
-        onHomeSummaryLoaded = { homeSummary -> onAction(HomeAction.HomeSummaryLoaded(homeSummary)) }
-    )
+    private val stateMachine: HomeStateMachine = stateMachineFactory.create(viewModelScope, _navigationEffect)
 
     val navigationEffect: NavigationEffect = _navigationEffect
     val state: StateFlow<HomeState> =
