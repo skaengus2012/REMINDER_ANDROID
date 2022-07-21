@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.state
+package com.nlab.reminder.core.state.util
 
-import com.nlab.reminder.core.state.util.StateMachine
+import com.nlab.reminder.core.state.TestAction
+import com.nlab.reminder.core.state.TestState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import org.junit.Test

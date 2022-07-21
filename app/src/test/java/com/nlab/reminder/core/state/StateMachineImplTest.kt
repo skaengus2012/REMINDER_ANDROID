@@ -14,20 +14,24 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.state.impl
+package com.nlab.reminder.core.state
 
-import com.nlab.reminder.core.state.Action
-import com.nlab.reminder.core.state.ActionProcessor
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
+import org.junit.Test
+import org.mockito.kotlin.*
 
 /**
  * @author Doohyun
  */
-internal class DefaultActionProcessor<A : Action>(
-    private val scope: CoroutineScope,
-    private val onActionReceived: suspend (A) -> Unit,
-) : ActionProcessor<A> {
-    override fun send(action: A): Job = scope.launch { onActionReceived(action) }
+@OptIn(ExperimentalCoroutinesApi::class)
+internal class StateMachineImplTest {
+    @Test
+    fun `actionProcessor sent event when state machine sent`() = runTest {
+        val actionProcessor: ActionProcessor<TestAction> = mock()
+        val stateMachine = StateMachineImpl<TestAction, TestState>(actionProcessor, mock())
+        val action = TestAction.Action1()
+        stateMachine.send(action)
+        verify(actionProcessor, times(1)).send(action)
+    }
 }

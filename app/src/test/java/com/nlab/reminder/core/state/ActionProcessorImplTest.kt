@@ -14,11 +14,8 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.state.impl
+package com.nlab.reminder.core.state
 
-import com.nlab.reminder.core.state.ActionProcessor
-import com.nlab.reminder.core.state.TestAction
-import com.nlab.reminder.core.state.TestState
 import kotlinx.coroutines.*
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
@@ -32,11 +29,11 @@ import org.mockito.kotlin.verify
  * @author Doohyun
  */
 @OptIn(ExperimentalCoroutinesApi::class)
-internal class DefaultActionProcessorTest {
+internal class ActionProcessorImplTest {
     @Test
     fun `Receive action when action is sent to actionProcessor`() = runTest {
         val actionReceiver: (TestAction) -> Unit = mock()
-        val actionProcessor = DefaultActionProcessor(
+        val actionProcessor = ActionProcessorImpl(
             CoroutineScope(Dispatchers.Default),
             actionReceiver
         )
@@ -51,7 +48,7 @@ internal class DefaultActionProcessorTest {
     @Test
     fun `execution completes asynchronously when event is sent 1000 times`() = runTest {
         val onReceiveState: (TestState) -> Unit = mock()
-        val stateReducer: ActionProcessor<TestAction> = DefaultActionProcessor(
+        val stateReducer: ActionProcessor<TestAction> = ActionProcessorImpl(
             scope = this,
             onActionReceived = { delay(timeMillis = 5000); TestState.State1().also { onReceiveState(it); } },
         )

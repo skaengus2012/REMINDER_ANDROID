@@ -16,11 +16,16 @@
 
 package com.nlab.reminder.core.state
 
-import com.nlab.reminder.core.state.util.DefaultExceptionHandler
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 
 /**
  * @author Doohyun
  */
-object StateMachineConfig {
-    var defaultExceptionHandler: (Throwable) -> Unit = DefaultExceptionHandler()
+internal class ActionProcessorImpl<A : Action>(
+    private val scope: CoroutineScope,
+    private val onActionReceived: suspend (A) -> Unit,
+) : ActionProcessor<A> {
+    override fun send(action: A): Job = scope.launch { onActionReceived(action) }
 }

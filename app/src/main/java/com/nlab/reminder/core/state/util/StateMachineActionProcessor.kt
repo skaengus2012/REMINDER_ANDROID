@@ -19,7 +19,7 @@ package com.nlab.reminder.core.state.util
 import com.nlab.reminder.core.state.Action
 import com.nlab.reminder.core.state.ActionProcessor
 import com.nlab.reminder.core.state.State
-import com.nlab.reminder.core.state.impl.DefaultActionProcessor
+import com.nlab.reminder.core.state.ActionProcessorImpl
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 
@@ -34,7 +34,7 @@ internal class StateMachineActionProcessor<A : Action, S : State>(
     private val stateReduceInvoker = StateReduceInvoker(state, stateMachineBuilder.buildUpdateHandler())
     private val errorHandler = stateMachineBuilder.buildExceptionHandler()
     private val invokeSideEffect = stateMachineBuilder.buildSideEffectHandler()
-    private val internalActionProcessor = DefaultActionProcessor(
+    private val internalActionProcessor = ActionProcessorImpl(
         scope = scope + CoroutineExceptionHandler { _, e -> errorHandler(e) },
         onActionReceived = this::onActionReceived
     )
