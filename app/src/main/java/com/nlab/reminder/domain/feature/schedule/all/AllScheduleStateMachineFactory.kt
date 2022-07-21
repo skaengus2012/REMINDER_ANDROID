@@ -14,24 +14,22 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.feature.end.all
+package com.nlab.reminder.domain.feature.schedule.all
 
-import androidx.paging.PagingData
-import com.nlab.reminder.domain.common.schedule.Schedule
-import com.nlab.reminder.domain.common.schedule.genSchedules
-import com.nlab.reminder.test.genBoolean
+import kotlinx.coroutines.CoroutineScope
 
 /**
  * @author Doohyun
  */
-object AllEndStateGenerator {
-    fun genLoaded(
-        doingSchedules: List<Schedule> = genSchedules(isComplete = false),
-        doneSchedules: PagingData<Schedule> = PagingData.from(genSchedules(isComplete = true)),
-        isDoneScheduleShown: Boolean = genBoolean()
-    ): AllEndState.Loaded = AllEndState.Loaded(
-        doingSchedules,
-        doneSchedules,
-        isDoneScheduleShown
+class AllScheduleStateMachineFactory(
+    private val getAllScheduleReport: GetAllScheduleReportUseCase,
+    private val initState: AllScheduleState = AllScheduleState.Init
+) {
+    fun create(
+        scope: CoroutineScope
+    ): AllScheduleStateMachine = AllScheduleStateMachine(
+        scope,
+        initState,
+        getAllScheduleReport
     )
 }

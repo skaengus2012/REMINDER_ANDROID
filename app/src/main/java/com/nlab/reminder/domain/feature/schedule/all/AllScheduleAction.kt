@@ -14,18 +14,14 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.feature.end.all
+package com.nlab.reminder.domain.feature.schedule.all
 
-import androidx.paging.PagingData
 import com.nlab.reminder.core.state.Action
-import com.nlab.reminder.domain.common.schedule.Schedule
 
 /**
  * @author Doohyun
  */
-sealed class AllEndAction private constructor() : Action {
-    object Fetch : AllEndAction()
-    data class DoingScheduleLoaded(val doingSchedules: List<Schedule>) : AllEndAction()
-    data class DoneScheduleLoaded(val doneSchedule: PagingData<Schedule>) : AllEndAction()
-    data class DoneScheduleShownChanged(val isShow: Boolean) : AllEndAction()
+sealed class AllScheduleAction private constructor() : Action {
+    object Fetch : AllScheduleAction()
+    data class AllScheduleReportLoaded(val allSchedulesReport: AllScheduleReport) : AllScheduleAction()
 }

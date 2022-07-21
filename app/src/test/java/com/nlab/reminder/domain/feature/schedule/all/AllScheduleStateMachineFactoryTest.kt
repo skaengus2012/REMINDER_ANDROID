@@ -14,21 +14,24 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.feature.end.all
+package com.nlab.reminder.domain.feature.schedule.all
 
+import com.nlab.reminder.domain.feature.schedule.all.AllScheduleState
+import com.nlab.reminder.domain.feature.schedule.all.AllScheduleStateMachineFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.*
 import org.junit.Test
+import org.mockito.kotlin.mock
 
 /**
  * @author Doohyun
  */
-class AllEndStateMachineFactoryTest {
+class AllScheduleStateMachineFactoryTest {
     @Test
     fun `hold init state when machine created by factory`() {
-        val stateMachineFactory = AllEndStateMachineFactory()
+        val stateMachineFactory = AllScheduleStateMachineFactory(getAllScheduleReport = mock())
         assertThat(
             stateMachineFactory
                 .create(
@@ -36,7 +39,7 @@ class AllEndStateMachineFactoryTest {
                 )
                 .state
                 .value,
-            equalTo(AllEndState.Init)
+            equalTo(AllScheduleState.Init)
         )
     }
 }

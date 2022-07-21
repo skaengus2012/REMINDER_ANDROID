@@ -14,15 +14,13 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.feature.end.all
+package com.nlab.reminder.domain.feature.schedule.all
 
-import androidx.paging.PagingData
-import com.nlab.reminder.domain.common.schedule.Schedule
 import kotlinx.coroutines.flow.Flow
 
 /**
  * @author Doohyun
  */
-interface GetDoneScheduleUseCase {
-    suspend fun invoke(): Flow<PagingData<Schedule>>
+interface GetAllScheduleReportUseCase {
+    operator fun invoke(): Flow<AllScheduleReport>
 }

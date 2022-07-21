@@ -43,7 +43,7 @@ class NavigationModule {
         when (message) {
             is TodayEndNavigationMessage -> navigateTodayEnd(navController)
             is TimetableEndNavigationMessage -> navigateTimeTable(navController)
-            is AllEndNavigationMessage -> navController.navigate(R.id.action_global_allEndFragment)
+            is AllEndNavigationMessage -> navController.navigate(R.id.action_global_allScheduleFragment)
             is TagEndNavigationMessage -> navigateTagEnd(navController, message.tag)
             else -> Unit
         }

@@ -14,14 +14,18 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.feature.end.all
+package com.nlab.reminder.domain.feature.schedule.all
 
-import com.nlab.reminder.domain.common.schedule.Schedule
-import kotlinx.coroutines.flow.Flow
+import com.nlab.reminder.core.state.State
+import com.nlab.reminder.core.util.annotation.test.Generated
 
 /**
  * @author Doohyun
  */
-interface GetDoingScheduleUseCase {
-    suspend fun invoke(): Flow<List<Schedule>>
+sealed class AllScheduleState private constructor() : State {
+    object Init : AllScheduleState()
+    object Loading : AllScheduleState()
+
+    @Generated
+    data class Loaded(val allSchedulesReport: AllScheduleReport) : AllScheduleState()
 }
