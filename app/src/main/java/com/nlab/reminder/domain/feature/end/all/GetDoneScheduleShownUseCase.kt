@@ -16,13 +16,11 @@
 
 package com.nlab.reminder.domain.feature.end.all
 
-import androidx.paging.PagingData
-import com.nlab.reminder.domain.common.schedule.Schedule
 import kotlinx.coroutines.flow.Flow
 
 /**
  * @author Doohyun
  */
-interface GetDoneScheduleUseCase {
-    suspend operator fun invoke(): Flow<PagingData<Schedule>>
+interface GetDoneScheduleShownUseCase {
+    operator fun invoke(): Flow<Boolean>
 }

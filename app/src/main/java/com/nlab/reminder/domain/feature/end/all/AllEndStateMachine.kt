@@ -19,6 +19,7 @@ package com.nlab.reminder.domain.feature.end.all
 import androidx.paging.PagingData
 import com.nlab.reminder.core.state.StateMachine
 import com.nlab.reminder.core.state.util.StateMachine
+import com.nlab.reminder.domain.common.schedule.Schedule
 import kotlinx.coroutines.CoroutineScope
 
 typealias AllEndStateMachine = StateMachine<AllEndAction, AllEndState>
@@ -28,7 +29,13 @@ typealias AllEndStateMachine = StateMachine<AllEndAction, AllEndState>
  */
 fun AllEndStateMachine(
     scope: CoroutineScope,
-    initState: AllEndState
+    initState: AllEndState,
+    getDoingSchedule: GetDoingScheduleUseCase,
+    getDoneSchedule: GetDoneScheduleUseCase,
+    getDoneScheduleShown: GetDoneScheduleShownUseCase,
+    onDoingScheduleLoaded: (dotingSchedules: List<Schedule>) -> Unit,
+    onDoneScheduleLoaded: (doneSchedules: PagingData<Schedule>) -> Unit,
+    onDoneScheduleShownChanged: (Boolean) -> Unit
 ): AllEndStateMachine = StateMachine(scope, initState) {
     updateTo { (action, oldState) ->
         when (action) {

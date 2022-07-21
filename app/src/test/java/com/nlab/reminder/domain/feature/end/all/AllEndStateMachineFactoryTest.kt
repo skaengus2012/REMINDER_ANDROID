@@ -21,6 +21,7 @@ import kotlinx.coroutines.Dispatchers
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.*
 import org.junit.Test
+import org.mockito.kotlin.mock
 
 /**
  * @author Doohyun
@@ -28,7 +29,11 @@ import org.junit.Test
 class AllEndStateMachineFactoryTest {
     @Test
     fun `hold init state when machine created by factory`() {
-        val stateMachineFactory = AllEndStateMachineFactory()
+        val stateMachineFactory = AllEndStateMachineFactory(
+            getDoingSchedule = mock(),
+            getDoneSchedule = mock(),
+            getDoneScheduleShown = mock()
+        )
         assertThat(
             stateMachineFactory
                 .create(

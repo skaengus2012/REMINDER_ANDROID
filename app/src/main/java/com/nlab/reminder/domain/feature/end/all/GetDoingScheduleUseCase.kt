@@ -23,5 +23,5 @@ import kotlinx.coroutines.flow.Flow
  * @author Doohyun
  */
 interface GetDoingScheduleUseCase {
-    suspend fun invoke(): Flow<List<Schedule>>
+    suspend operator fun invoke(): Flow<List<Schedule>>
 }

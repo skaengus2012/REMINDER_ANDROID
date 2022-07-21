@@ -16,18 +16,32 @@
 
 package com.nlab.reminder.domain.feature.end.all
 
+import androidx.paging.PagingData
+import com.nlab.reminder.domain.common.schedule.Schedule
 import kotlinx.coroutines.CoroutineScope
 
 /**
  * @author Doohyun
  */
 class AllEndStateMachineFactory(
+    private val getDoingSchedule: GetDoingScheduleUseCase,
+    private val getDoneSchedule: GetDoneScheduleUseCase,
+    private val getDoneScheduleShown: GetDoneScheduleShownUseCase,
     private val initState: AllEndState = AllEndState.Init
 ) {
     fun create(
-        scope: CoroutineScope
+        scope: CoroutineScope,
+        onDoingScheduleLoaded: (dotingSchedules: List<Schedule>) -> Unit,
+        onDoneScheduleLoaded: (doneSchedules: PagingData<Schedule>) -> Unit,
+        onDoneScheduleShownChanged: (Boolean) -> Unit
     ): AllEndStateMachine = AllEndStateMachine(
         scope,
-        initState
+        initState,
+        getDoingSchedule,
+        getDoneSchedule,
+        getDoneScheduleShown,
+        onDoingScheduleLoaded,
+        onDoneScheduleLoaded,
+        onDoneScheduleShownChanged
     )
 }

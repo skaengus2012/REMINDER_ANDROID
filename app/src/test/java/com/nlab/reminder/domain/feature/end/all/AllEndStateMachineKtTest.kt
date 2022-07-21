@@ -15,6 +15,7 @@
  */
 
 package com.nlab.reminder.domain.feature.end.all
+
 import androidx.paging.PagingData
 import com.nlab.reminder.domain.common.schedule.Schedule
 import com.nlab.reminder.domain.common.schedule.genSchedules
@@ -22,10 +23,14 @@ import com.nlab.reminder.test.genBoolean
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.*
 import org.junit.Test
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 /**
  * @author Doohyun
@@ -47,8 +52,16 @@ class AllEndStateMachineKtTest {
 
     private fun createStateMachine(
         scope: CoroutineScope = CoroutineScope(Dispatchers.Default),
-        initState: AllEndState = AllEndState.Init
-    ): AllEndStateMachine = AllEndStateMachineFactory(initState).create(scope)
+        initState: AllEndState = AllEndState.Init,
+        getDoingSchedule: GetDoingScheduleUseCase = mock(),
+        getDoneSchedule: GetDoneScheduleUseCase = mock(),
+        getDoneScheduleShown: GetDoneScheduleShownUseCase = mock(),
+        onDoingScheduleLoaded: (dotingSchedules: List<Schedule>) -> Unit = mock(),
+        onDoneScheduleLoaded: (doneSchedules: PagingData<Schedule>) -> Unit = mock(),
+        onDoneScheduleShownChanged: (Boolean) -> Unit = mock()
+    ): AllEndStateMachine =
+        AllEndStateMachineFactory(getDoingSchedule, getDoneSchedule, getDoneScheduleShown, initState)
+            .create(scope, onDoingScheduleLoaded, onDoneScheduleLoaded, onDoneScheduleShownChanged)
 
     @Test
     fun `holds injected state when machine created`() = runTest {
@@ -161,5 +174,27 @@ class AllEndStateMachineKtTest {
                     )
                 )
             }
+    }
+
+    @Test
+    fun `Notify Loaded when fetch is called`() = runTest {
+        val doingSchedule: List<Schedule> = genSchedules(isComplete = false)
+        val doneSchedule: PagingData<Schedule> = PagingData.from(genSchedules(isComplete = true))
+        val isDoneScheduleShown: Boolean = genBoolean()
+        val getDoingSchedule: GetDoingScheduleUseCase = mock {
+            whenever(mock()) doReturn  flow { emit(doingSchedule) }
+        }
+        val getDoneScheduleUseCase: GetDoneScheduleUseCase = mock {
+            whenever(mock()) doReturn  flow { emit(doneSchedule) }
+        }
+        val getDoneScheduleShownUseCase: GetDoneScheduleShownUseCase = mock {
+            whenever(mock()) doReturn  flow { emit(isDoneScheduleShown) }
+        }
+        /**
+        val stateMachine: AllEndStateMachine = createStateMachine(
+            scope = CoroutineScope(Dispatchers.Unconfined),
+            getHomeSummary = getHomeSummaryUseCase,
+            onHomeSummaryLoaded = onHomeSummaryLoaded
+        )*/
     }
 }
