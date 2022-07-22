@@ -14,32 +14,37 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.feature.end.all
+package com.nlab.reminder.domain.feature.schedule.all
 
 import com.nlab.reminder.core.state.StateMachine
 import com.nlab.reminder.core.state.util.StateMachine
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
-typealias AllEndStateMachine = StateMachine<AllEndAction, AllEndState>
+typealias AllScheduleStateMachine = StateMachine<AllScheduleAction, AllScheduleState>
 
 /**
  * @author Doohyun
  */
-fun AllEndStateMachine(
+fun AllScheduleStateMachine(
     scope: CoroutineScope,
-    initState: AllEndState,
+    initState: AllScheduleState,
     getAllScheduleReport: GetAllScheduleReportUseCase
-): AllEndStateMachine = StateMachine(scope, initState) {
+): AllScheduleStateMachine = StateMachine(scope, initState) {
     updateTo { (action, oldState) ->
         when (action) {
-            is AllEndAction.Fetch -> {
-                if (oldState is AllEndState.Init) AllEndState.Loading
+            is AllScheduleAction.Fetch -> {
+                if (oldState is AllScheduleState.Init) AllScheduleState.Loading
                 else oldState
             }
-            is AllEndAction.AllScheduleReportLoaded -> {
-                if (oldState is AllEndState.Init) oldState
-                else AllEndState.Loaded(action.allSchedulesReport)
+            is AllScheduleAction.AllScheduleReportLoaded -> {
+                if (oldState is AllScheduleState.Init) oldState
+                else AllScheduleState.Loaded(action.allSchedulesReport)
             }
         }
+    }
+
+    sideEffectOn<AllScheduleAction.Fetch, AllScheduleState.Init> {
+        scope.launch { getAllScheduleReport().collect { send(AllScheduleAction.AllScheduleReportLoaded(it)) } }
     }
 }

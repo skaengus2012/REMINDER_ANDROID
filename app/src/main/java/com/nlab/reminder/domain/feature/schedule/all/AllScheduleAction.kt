@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.feature.end.all
+package com.nlab.reminder.domain.feature.schedule.all
 
-import kotlinx.coroutines.flow.Flow
+import com.nlab.reminder.core.state.Action
 
 /**
  * @author Doohyun
  */
-interface GetAllScheduleReportUseCase {
-    operator fun invoke(): Flow<AllScheduleReport>
+sealed class AllScheduleAction private constructor() : Action {
+    object Fetch : AllScheduleAction()
+    data class AllScheduleReportLoaded(val allSchedulesReport: AllScheduleReport) : AllScheduleAction()
 }

@@ -14,18 +14,13 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.feature.end.all
+package com.nlab.reminder.domain.feature.schedule.all
 
-import androidx.paging.PagingData
-import com.nlab.reminder.domain.common.schedule.Schedule
-import com.nlab.reminder.domain.common.schedule.genSchedules
-import com.nlab.reminder.test.genBoolean
+import kotlinx.coroutines.flow.Flow
 
 /**
  * @author Doohyun
  */
-fun genAllScheduleReport(
-    doingSchedules: List<Schedule> = genSchedules(isComplete = false),
-    doneSchedules: PagingData<Schedule> = PagingData.from(genSchedules(isComplete = true)),
-    isDoneScheduleShown: Boolean = genBoolean()
-): AllScheduleReport = AllScheduleReport(doingSchedules, doneSchedules, isDoneScheduleShown)
+interface GetAllScheduleReportUseCase {
+    operator fun invoke(): Flow<AllScheduleReport>
+}

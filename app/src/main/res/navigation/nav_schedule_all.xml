@@ -17,13 +17,13 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:app="http://schemas.android.com/apk/res-auto"
 	xmlns:tools="http://schemas.android.com/tools"
-	android:id="@+id/nav_all_end"
-	app:startDestination="@id/allEndFragment">
+	android:id="@+id/nav_schedule_all"
+	app:startDestination="@id/allScheduleFragment">
 
 	<fragment
-		android:id="@+id/allEndFragment"
-		android:name="com.nlab.reminder.domain.feature.end.all.view.AllEndFragment"
-		android:label="AllEndFragment"
-		tools:layout="@layout/fragment_all_end" />
+		android:id="@+id/allScheduleFragment"
+		android:name="com.nlab.reminder.domain.feature.schedule.all.view.AllScheduleFragment"
+		android:label="AllScheduleFragment"
+		tools:layout="@layout/fragment_all_schedule" />
 
 </navigation>

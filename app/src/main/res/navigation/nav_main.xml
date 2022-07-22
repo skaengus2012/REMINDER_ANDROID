@@ -20,14 +20,14 @@
 	app:startDestination="@id/nav_home">
 
 	<action
-		android:id="@+id/action_global_allEndFragment"
-		app:destination="@id/nav_all_end"
+		android:id="@+id/action_global_allScheduleFragment"
+		app:destination="@id/nav_schedule_all"
 		app:enterAnim="@anim/end_enter"
 		app:exitAnim="@anim/end_exit"
 		app:popEnterAnim="@anim/end_enter_pop"
 		app:popExitAnim="@anim/end_exit_pop" />
 
-	<include app:graph="@navigation/nav_all_end" />
+	<include app:graph="@navigation/nav_schedule_all" />
 	<include app:graph="@navigation/nav_home" />
 
 </navigation>

@@ -14,18 +14,19 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.feature.end.all
+package com.nlab.reminder.domain.feature.schedule.all
 
 import androidx.paging.PagingData
-import com.nlab.reminder.core.util.annotation.test.Generated
 import com.nlab.reminder.domain.common.schedule.Schedule
+import com.nlab.reminder.domain.common.schedule.genSchedules
+import com.nlab.reminder.domain.feature.schedule.all.AllScheduleReport
+import com.nlab.reminder.test.genBoolean
 
 /**
  * @author Doohyun
  */
-@Generated
-data class AllScheduleReport(
-    val doingSchedules: List<Schedule>,
-    val doneSchedules: PagingData<Schedule>,
-    val isDoneScheduleShown: Boolean
-)
+fun genAllScheduleReport(
+    doingSchedules: List<Schedule> = genSchedules(isComplete = false),
+    doneSchedules: PagingData<Schedule> = PagingData.from(genSchedules(isComplete = true)),
+    isDoneScheduleShown: Boolean = genBoolean()
+): AllScheduleReport = AllScheduleReport(doingSchedules, doneSchedules, isDoneScheduleShown)

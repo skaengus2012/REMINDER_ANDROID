@@ -14,24 +14,24 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.feature.end.all.view
+package com.nlab.reminder.domain.feature.schedule.all.view
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.nlab.reminder.databinding.FragmentAllEndBinding
+import com.nlab.reminder.databinding.FragmentAllScheduleBinding
 
 /**
  * @author Doohyun
  */
-class AllEndFragment : Fragment() {
-    private var _binding: FragmentAllEndBinding? = null
-    val binding: FragmentAllEndBinding get() = checkNotNull(_binding)
+class AllScheduleFragment : Fragment() {
+    private var _binding: FragmentAllScheduleBinding? = null
+    val binding: FragmentAllScheduleBinding get() = checkNotNull(_binding)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
-        FragmentAllEndBinding.inflate(inflater, container, false)
+        FragmentAllScheduleBinding.inflate(inflater, container, false)
             .also { _binding = it }
             .root
 

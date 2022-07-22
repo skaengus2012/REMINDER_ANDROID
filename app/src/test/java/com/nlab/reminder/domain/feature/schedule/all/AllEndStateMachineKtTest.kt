@@ -14,60 +14,63 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.feature.end.all
+package com.nlab.reminder.domain.feature.schedule.all
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.*
 import org.junit.Test
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 /**
  * @author Doohyun
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class AllEndStateMachineKtTest {
-    private val dummyActions: Set<AllEndAction> = setOf(
-        AllEndAction.Fetch,
-        AllEndAction.AllScheduleReportLoaded(genAllScheduleReport())
+    private val dummyActions: Set<AllScheduleAction> = setOf(
+        AllScheduleAction.Fetch,
+        AllScheduleAction.AllScheduleReportLoaded(genAllScheduleReport())
     )
 
-    private val dummyStates: Set<AllEndState> = setOf(
-        AllEndState.Init,
-        AllEndState.Loading,
-        AllEndState.Loaded(genAllScheduleReport())
+    private val dummyStates: Set<AllScheduleState> = setOf(
+        AllScheduleState.Init,
+        AllScheduleState.Loading,
+        AllScheduleState.Loaded(genAllScheduleReport())
     )
 
     private fun createStateMachine(
         scope: CoroutineScope = CoroutineScope(Dispatchers.Default),
-        initState: AllEndState = AllEndState.Init,
+        initState: AllScheduleState = AllScheduleState.Init,
         getAllScheduleReport: GetAllScheduleReportUseCase = mock()
-    ): AllEndStateMachine =
-        AllEndStateMachineFactory(getAllScheduleReport, initState).create(scope)
+    ): AllScheduleStateMachine =
+        AllScheduleStateMachineFactory(getAllScheduleReport, initState).create(scope)
 
     @Test
     fun `holds injected state when machine created`() = runTest {
-        val initState: AllEndState = AllEndState.Loaded(genAllScheduleReport())
-        val stateMachine: AllEndStateMachine = createStateMachine(initState = initState)
+        val initState: AllScheduleState = AllScheduleState.Loaded(genAllScheduleReport())
+        val stateMachine: AllScheduleStateMachine = createStateMachine(initState = initState)
         assertThat(stateMachine.state.value, sameInstance(initState))
     }
 
     @Test
     fun `keep state init even when action occurs until fetched`() = runTest {
-        val initState: AllEndState = AllEndState.Init
-        val stateMachine: AllEndStateMachine = createStateMachine(initState = initState)
+        val initState: AllScheduleState = AllScheduleState.Init
+        val stateMachine: AllScheduleStateMachine = createStateMachine(initState = initState)
         dummyActions
             .asSequence()
-            .filter { it !is AllEndAction.Fetch }
+            .filter { it !is AllScheduleAction.Fetch }
             .forEach { action ->
                 stateMachine.send(action).join()
                 assertThat(stateMachine.state.value, sameInstance(initState))
             }
 
-        stateMachine.send(AllEndAction.Fetch).join()
+        stateMachine.send(AllScheduleAction.Fetch).join()
         assertThat(stateMachine.state.value, not(sameInstance(initState)))
     }
 
@@ -75,21 +78,21 @@ class AllEndStateMachineKtTest {
     fun `fetch is executed when state is init`() = runTest {
         dummyStates
             .asSequence()
-            .filter { it !is AllEndState.Init }
+            .filter { it !is AllScheduleState.Init }
             .map { state -> state to createStateMachine(initState = state) }
             .forEach { (initState, stateMachine) ->
-                stateMachine.send(AllEndAction.Fetch).join()
+                stateMachine.send(AllScheduleAction.Fetch).join()
                 assertThat(stateMachine.state.value, sameInstance(initState))
             }
-        val stateMachine: AllEndStateMachine = createStateMachine(initState = AllEndState.Init)
-        stateMachine.send(AllEndAction.Fetch).join()
-        assertThat(stateMachine.state.value, equalTo(AllEndState.Loading))
+        val stateMachine: AllScheduleStateMachine = createStateMachine(initState = AllScheduleState.Init)
+        stateMachine.send(AllScheduleAction.Fetch).join()
+        assertThat(stateMachine.state.value, equalTo(AllScheduleState.Loading))
     }
 
     @Test
     fun `Notify AllScheduleReport when AllScheduleReportLoaded action received after loading`() = runTest {
         val report: AllScheduleReport = genAllScheduleReport()
-        val action: AllEndAction = AllEndAction.AllScheduleReportLoaded(report)
+        val action: AllScheduleAction = AllScheduleAction.AllScheduleReportLoaded(report)
         dummyStates
             .asSequence()
             .map { state -> state to createStateMachine(initState = state) }
@@ -100,10 +103,29 @@ class AllEndStateMachineKtTest {
                 assertThat(
                     stateMachine.state.value,
                     equalTo(
-                        if (initState is AllEndState.Init) initState
-                        else AllEndState.Loaded(report)
+                        if (initState is AllScheduleState.Init) initState
+                        else AllScheduleState.Loaded(report)
                     )
                 )
             }
+    }
+
+    @Test
+    fun `Notify loaded when fetch is called`() = runTest {
+        val testReport: AllScheduleReport = genAllScheduleReport()
+        val getAllScheduleReportUseCase: GetAllScheduleReportUseCase = mock {
+            whenever(mock()) doReturn flow { emit(testReport) }
+        }
+        val stateMachine: AllScheduleStateMachine = createStateMachine(
+            scope = CoroutineScope(Dispatchers.Unconfined),
+            getAllScheduleReport = getAllScheduleReportUseCase
+        )
+        stateMachine
+            .send(AllScheduleAction.Fetch)
+            .join()
+        assertThat(
+            stateMachine.state.value,
+            equalTo(AllScheduleState.Loaded(testReport))
+        )
     }
 }

@@ -14,18 +14,22 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.feature.end.all
+package com.nlab.reminder.domain.feature.schedule.all
 
-import com.nlab.reminder.core.state.State
-import com.nlab.reminder.core.util.annotation.test.Generated
+import kotlinx.coroutines.CoroutineScope
 
 /**
  * @author Doohyun
  */
-sealed class AllEndState private constructor() : State {
-    object Init : AllEndState()
-    object Loading : AllEndState()
-
-    @Generated
-    data class Loaded(val allSchedulesReport: AllScheduleReport) : AllEndState()
+class AllScheduleStateMachineFactory(
+    private val getAllScheduleReport: GetAllScheduleReportUseCase,
+    private val initState: AllScheduleState = AllScheduleState.Init
+) {
+    fun create(
+        scope: CoroutineScope
+    ): AllScheduleStateMachine = AllScheduleStateMachine(
+        scope,
+        initState,
+        getAllScheduleReport
+    )
 }
