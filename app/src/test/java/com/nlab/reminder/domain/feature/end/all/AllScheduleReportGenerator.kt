@@ -24,14 +24,8 @@ import com.nlab.reminder.test.genBoolean
 /**
  * @author Doohyun
  */
-object AllEndStateGenerator {
-    fun genLoaded(
-        doingSchedules: List<Schedule> = genSchedules(isComplete = false),
-        doneSchedules: PagingData<Schedule> = PagingData.from(genSchedules(isComplete = true)),
-        isDoneScheduleShown: Boolean = genBoolean()
-    ): AllEndState.Loaded = AllEndState.Loaded(
-        doingSchedules,
-        doneSchedules,
-        isDoneScheduleShown
-    )
-}
+fun genAllScheduleReport(
+    doingSchedules: List<Schedule> = genSchedules(isComplete = false),
+    doneSchedules: PagingData<Schedule> = PagingData.from(genSchedules(isComplete = true)),
+    isDoneScheduleShown: Boolean = genBoolean()
+): AllScheduleReport = AllScheduleReport(doingSchedules, doneSchedules, isDoneScheduleShown)

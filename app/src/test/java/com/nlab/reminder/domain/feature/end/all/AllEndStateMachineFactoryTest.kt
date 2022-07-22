@@ -29,11 +29,7 @@ import org.mockito.kotlin.mock
 class AllEndStateMachineFactoryTest {
     @Test
     fun `hold init state when machine created by factory`() {
-        val stateMachineFactory = AllEndStateMachineFactory(
-            getDoingSchedule = mock(),
-            getDoneSchedule = mock(),
-            getDoneScheduleShown = mock()
-        )
+        val stateMachineFactory = AllEndStateMachineFactory(getAllScheduleReport = mock())
         assertThat(
             stateMachineFactory
                 .create(

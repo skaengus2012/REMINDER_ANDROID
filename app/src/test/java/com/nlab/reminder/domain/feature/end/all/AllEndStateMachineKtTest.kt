@@ -16,21 +16,14 @@
 
 package com.nlab.reminder.domain.feature.end.all
 
-import androidx.paging.PagingData
-import com.nlab.reminder.domain.common.schedule.Schedule
-import com.nlab.reminder.domain.common.schedule.genSchedules
-import com.nlab.reminder.test.genBoolean
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.*
 import org.junit.Test
-import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
 
 /**
  * @author Doohyun
@@ -39,33 +32,25 @@ import org.mockito.kotlin.whenever
 class AllEndStateMachineKtTest {
     private val dummyActions: Set<AllEndAction> = setOf(
         AllEndAction.Fetch,
-        AllEndAction.DoingScheduleLoaded(doingSchedules = genSchedules(isComplete = false)),
-        AllEndAction.DoneScheduleLoaded(doneSchedule = PagingData.from(genSchedules(isComplete = true))),
-        AllEndAction.DoneScheduleShownChanged(isShow = genBoolean())
+        AllEndAction.AllScheduleReportLoaded(genAllScheduleReport())
     )
 
     private val dummyStates: Set<AllEndState> = setOf(
         AllEndState.Init,
         AllEndState.Loading,
-        AllEndStateGenerator.genLoaded()
+        AllEndState.Loaded(genAllScheduleReport())
     )
 
     private fun createStateMachine(
         scope: CoroutineScope = CoroutineScope(Dispatchers.Default),
         initState: AllEndState = AllEndState.Init,
-        getDoingSchedule: GetDoingScheduleUseCase = mock(),
-        getDoneSchedule: GetDoneScheduleUseCase = mock(),
-        getDoneScheduleShown: GetDoneScheduleShownUseCase = mock(),
-        onDoingScheduleLoaded: (dotingSchedules: List<Schedule>) -> Unit = mock(),
-        onDoneScheduleLoaded: (doneSchedules: PagingData<Schedule>) -> Unit = mock(),
-        onDoneScheduleShownChanged: (Boolean) -> Unit = mock()
+        getAllScheduleReport: GetAllScheduleReportUseCase = mock()
     ): AllEndStateMachine =
-        AllEndStateMachineFactory(getDoingSchedule, getDoneSchedule, getDoneScheduleShown, initState)
-            .create(scope, onDoingScheduleLoaded, onDoneScheduleLoaded, onDoneScheduleShownChanged)
+        AllEndStateMachineFactory(getAllScheduleReport, initState).create(scope)
 
     @Test
     fun `holds injected state when machine created`() = runTest {
-        val initState: AllEndState = AllEndStateGenerator.genLoaded()
+        val initState: AllEndState = AllEndState.Loaded(genAllScheduleReport())
         val stateMachine: AllEndStateMachine = createStateMachine(initState = initState)
         assertThat(stateMachine.state.value, sameInstance(initState))
     }
@@ -102,99 +87,23 @@ class AllEndStateMachineKtTest {
     }
 
     @Test
-    fun `Notify doing schedules Loaded when doing schedule loaded action received after loading`() = runTest {
-        val target: List<Schedule> = genSchedules(isComplete = false)
+    fun `Notify AllScheduleReport when AllScheduleReportLoaded action received after loading`() = runTest {
+        val report: AllScheduleReport = genAllScheduleReport()
+        val action: AllEndAction = AllEndAction.AllScheduleReportLoaded(report)
         dummyStates
             .asSequence()
-            .filter { it !is AllEndState.Init }
             .map { state -> state to createStateMachine(initState = state) }
             .forEach { (initState, stateMachine) ->
                 stateMachine
-                    .send(AllEndAction.DoingScheduleLoaded(target))
+                    .send(action)
                     .join()
                 assertThat(
                     stateMachine.state.value,
                     equalTo(
-                        if (initState is AllEndState.Loaded) initState.copy(doingSchedules = target)
-                        else AllEndState.Loaded(
-                            doingSchedules = target,
-                            doneSchedules = PagingData.empty(),
-                            isDoneScheduleShown = false
-                        )
+                        if (initState is AllEndState.Init) initState
+                        else AllEndState.Loaded(report)
                     )
                 )
             }
-    }
-
-    @Test
-    fun `Notify done schedules Loaded when done schedule loaded action received after loading`() = runTest {
-        val target: PagingData<Schedule> = PagingData.from(genSchedules(isComplete = true))
-        dummyStates
-            .asSequence()
-            .filter { it !is AllEndState.Init }
-            .map { state -> state to createStateMachine(initState = state) }
-            .forEach { (initState, stateMachine) ->
-                stateMachine
-                    .send(AllEndAction.DoneScheduleLoaded(target))
-                    .join()
-                assertThat(
-                    stateMachine.state.value,
-                    equalTo(
-                        if (initState is AllEndState.Loaded) initState.copy(doneSchedules = target)
-                        else AllEndState.Loaded(
-                            doingSchedules = emptyList(),
-                            doneSchedules = target,
-                            isDoneScheduleShown = false
-                        )
-                    )
-                )
-            }
-    }
-
-    @Test
-    fun `Notify done schedules shown changed when done schedule change action received after loading`() = runTest {
-        val isDoneScheduleShown: Boolean = genBoolean()
-        dummyStates
-            .asSequence()
-            .filter { it !is AllEndState.Init }
-            .map { state -> state to createStateMachine(initState = state) }
-            .forEach { (initState, stateMachine) ->
-                stateMachine
-                    .send(AllEndAction.DoneScheduleShownChanged(isDoneScheduleShown))
-                    .join()
-                assertThat(
-                    stateMachine.state.value,
-                    equalTo(
-                        if (initState is AllEndState.Loaded) initState.copy(isDoneScheduleShown = isDoneScheduleShown)
-                        else AllEndState.Loaded(
-                            doingSchedules = emptyList(),
-                            doneSchedules = PagingData.empty(),
-                            isDoneScheduleShown = isDoneScheduleShown
-                        )
-                    )
-                )
-            }
-    }
-
-    @Test
-    fun `Notify Loaded when fetch is called`() = runTest {
-        val doingSchedule: List<Schedule> = genSchedules(isComplete = false)
-        val doneSchedule: PagingData<Schedule> = PagingData.from(genSchedules(isComplete = true))
-        val isDoneScheduleShown: Boolean = genBoolean()
-        val getDoingSchedule: GetDoingScheduleUseCase = mock {
-            whenever(mock()) doReturn  flow { emit(doingSchedule) }
-        }
-        val getDoneScheduleUseCase: GetDoneScheduleUseCase = mock {
-            whenever(mock()) doReturn  flow { emit(doneSchedule) }
-        }
-        val getDoneScheduleShownUseCase: GetDoneScheduleShownUseCase = mock {
-            whenever(mock()) doReturn  flow { emit(isDoneScheduleShown) }
-        }
-        /**
-        val stateMachine: AllEndStateMachine = createStateMachine(
-            scope = CoroutineScope(Dispatchers.Unconfined),
-            getHomeSummary = getHomeSummaryUseCase,
-            onHomeSummaryLoaded = onHomeSummaryLoaded
-        )*/
     }
 }

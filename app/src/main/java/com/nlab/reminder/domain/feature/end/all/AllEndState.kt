@@ -16,10 +16,8 @@
 
 package com.nlab.reminder.domain.feature.end.all
 
-import androidx.paging.PagingData
 import com.nlab.reminder.core.state.State
 import com.nlab.reminder.core.util.annotation.test.Generated
-import com.nlab.reminder.domain.common.schedule.Schedule
 
 /**
  * @author Doohyun
@@ -29,9 +27,5 @@ sealed class AllEndState private constructor() : State {
     object Loading : AllEndState()
 
     @Generated
-    data class Loaded(
-        val doingSchedules: List<Schedule>,
-        val doneSchedules: PagingData<Schedule>,
-        val isDoneScheduleShown: Boolean
-    ) : AllEndState()
+    data class Loaded(val allSchedulesReport: AllScheduleReport) : AllEndState()
 }

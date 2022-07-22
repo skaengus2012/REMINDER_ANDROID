@@ -16,10 +16,8 @@
 
 package com.nlab.reminder.domain.feature.end.all
 
-import androidx.paging.PagingData
 import com.nlab.reminder.core.state.StateMachine
 import com.nlab.reminder.core.state.util.StateMachine
-import com.nlab.reminder.domain.common.schedule.Schedule
 import kotlinx.coroutines.CoroutineScope
 
 typealias AllEndStateMachine = StateMachine<AllEndAction, AllEndState>
@@ -30,12 +28,7 @@ typealias AllEndStateMachine = StateMachine<AllEndAction, AllEndState>
 fun AllEndStateMachine(
     scope: CoroutineScope,
     initState: AllEndState,
-    getDoingSchedule: GetDoingScheduleUseCase,
-    getDoneSchedule: GetDoneScheduleUseCase,
-    getDoneScheduleShown: GetDoneScheduleShownUseCase,
-    onDoingScheduleLoaded: (dotingSchedules: List<Schedule>) -> Unit,
-    onDoneScheduleLoaded: (doneSchedules: PagingData<Schedule>) -> Unit,
-    onDoneScheduleShownChanged: (Boolean) -> Unit
+    getAllScheduleReport: GetAllScheduleReportUseCase
 ): AllEndStateMachine = StateMachine(scope, initState) {
     updateTo { (action, oldState) ->
         when (action) {
@@ -43,25 +36,10 @@ fun AllEndStateMachine(
                 if (oldState is AllEndState.Init) AllEndState.Loading
                 else oldState
             }
-            is AllEndAction.DoingScheduleLoaded -> oldState.updateWhenLoaded { curLoaded ->
-                curLoaded.copy(doingSchedules = action.doingSchedules)
-            }
-            is AllEndAction.DoneScheduleLoaded -> oldState.updateWhenLoaded { curLoaded ->
-                curLoaded.copy(doneSchedules = action.doneSchedule)
-            }
-            is AllEndAction.DoneScheduleShownChanged -> oldState.updateWhenLoaded { curLoaded ->
-                curLoaded.copy(isDoneScheduleShown = action.isShow)
+            is AllEndAction.AllScheduleReportLoaded -> {
+                if (oldState is AllEndState.Init) oldState
+                else AllEndState.Loaded(action.allSchedulesReport)
             }
         }
     }
 }
-
-private fun AllEndState.updateWhenLoaded(transform: (AllEndState.Loaded) -> AllEndState): AllEndState =
-    if (this is AllEndState.Init) this
-    else transform(
-        if (this is AllEndState.Loaded) this else AllEndState.Loaded(
-            doingSchedules = emptyList(),
-            doneSchedules = PagingData.empty(),
-            isDoneScheduleShown = false
-        )
-    )

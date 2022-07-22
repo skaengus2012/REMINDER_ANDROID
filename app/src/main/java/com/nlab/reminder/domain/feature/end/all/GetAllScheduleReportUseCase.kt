@@ -21,6 +21,6 @@ import kotlinx.coroutines.flow.Flow
 /**
  * @author Doohyun
  */
-interface GetDoneScheduleShownUseCase {
-    operator fun invoke(): Flow<Boolean>
+interface GetAllScheduleReportUseCase {
+    operator fun invoke(): Flow<AllScheduleReport>
 }
