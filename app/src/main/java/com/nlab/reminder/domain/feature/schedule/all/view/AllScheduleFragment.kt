@@ -21,12 +21,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import com.nlab.reminder.databinding.FragmentAllScheduleBinding
+import com.nlab.reminder.domain.feature.schedule.all.AllScheduleViewModel
 
 /**
  * @author Doohyun
  */
 class AllScheduleFragment : Fragment() {
+    private val viewModel: AllScheduleViewModel by viewModels()
+
     private var _binding: FragmentAllScheduleBinding? = null
     val binding: FragmentAllScheduleBinding get() = checkNotNull(_binding)
 
