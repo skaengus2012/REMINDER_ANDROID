@@ -16,77 +16,137 @@
 
 package com.nlab.reminder.internal.common.schedule
 
-import com.nlab.reminder.domain.common.schedule.Schedule
-import com.nlab.reminder.domain.common.schedule.ScheduleItemRequestConfig
-import com.nlab.reminder.domain.common.schedule.ScheduleRepository
-import com.nlab.reminder.domain.common.schedule.genSchedule
-import com.nlab.reminder.domain.common.tag.Tag
+import androidx.paging.*
+import com.nlab.reminder.domain.common.schedule.*
+import com.nlab.reminder.domain.common.tag.genTags
 import com.nlab.reminder.internal.common.android.database.*
-import com.nlab.reminder.internal.common.database.from
-import com.nlab.reminder.test.genBothify
+import com.nlab.reminder.internal.common.database.genScheduleEntityWithTagEntitiesList
+import com.nlab.reminder.internal.common.database.toScheduleEntityWithTagEntities
+import com.nlab.reminder.test.*
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.advanceTimeBy
-import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.test.*
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.*
+import org.junit.After
+import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.*
-
 
 /**
  * @author Doohyun
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class LocalScheduleRepositoryTest {
+    @Before
+    fun setUp() = runTest {
+        Dispatchers.setMain(genFlowExecutionDispatcher(testScheduler))
+    }
+
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
+    }
+
     @Test
     fun `scheduleDao found when get`() {
         val expectedIsComplete = true
         val scheduleDao: ScheduleDao = mock()
-        val scheduleRepository: ScheduleRepository = LocalScheduleRepository(scheduleDao, Dispatchers.Unconfined)
-        val requestConfig = ScheduleItemRequestConfig(
-            isComplete = expectedIsComplete
-        )
+        val scheduleRepository: ScheduleRepository = LocalScheduleRepository(scheduleDao)
+        val requestConfig = ScheduleItemRequest.FindByComplete(expectedIsComplete)
         scheduleRepository.get(requestConfig)
         verify(scheduleDao, times(1)).find(isComplete = expectedIsComplete)
     }
 
     @Test
-    fun `combined 2 time item when event notified as loading first schedule, loading tags update schedule`() = runTest {
-        val firstSchedule = genSchedule(note = "", url = "", tags = emptyList())
-        val secondSchedule = genSchedule(
-            tags = listOf(
-                Tag(tagId = 1, name = genBothify()),
-                Tag(tagId = 2, name = genBothify()),
-                Tag(tagId = 3, name = genBothify())
-            ).sortedBy { it.name }
-        )
-        val firstState = ScheduleEntityWithTagEntities(
-            scheduleEntity = from(firstSchedule).copy(description = null, url = null),
-            tagEntities = emptyList()
-        )
-        val secondState = ScheduleEntityWithTagEntities(
-            scheduleEntity = from(secondSchedule),
-            tagEntities = secondSchedule.tags.map { TagEntity.from(it) }.reversed()
-        )
-
-        val scheduleDao: ScheduleDao = mock {
-            whenever(mock.find(isComplete = true)) doReturn flow {
-                emit(listOf(firstState))
-                delay(1_000)
-                emit(listOf(secondState))
+    fun `observe 2 times schedules when ScheduleDao sent 2 times notifications`() = runTest {
+        val expectedIsComplete: Boolean = genBoolean()
+        observeSchedulesWhenScheduleDaoNotified2Times(
+            ScheduleItemRequest.FindByComplete(expectedIsComplete),
+            setupMock = { scheduleDao, mockFlow ->
+                whenever(scheduleDao.find(expectedIsComplete)) doReturn mockFlow
             }
-        }
+        )
+    }
 
-        val actualSchedules = mutableListOf<Schedule>()
-        val scheduleRepository: ScheduleRepository =
-            LocalScheduleRepository(scheduleDao, StandardTestDispatcher(testScheduler))
-        CoroutineScope(Dispatchers.Unconfined).launch {
-            scheduleRepository.get(ScheduleItemRequestConfig()).collect { actualSchedules += it.first() }
+    private fun observeSchedulesWhenScheduleDaoNotified2Times(
+        scheduleItemRequest: ScheduleItemRequest,
+        setupMock: (ScheduleDao, Flow<List<ScheduleEntityWithTagEntities>>) -> Unit
+    ) = runTest {
+        val executeDispatcher = genFlowExecutionDispatcher(testScheduler)
+        val firstSchedule = genSchedule(tags = emptyList())
+        val secondSchedule = genSchedule(tags = genTags().sortedBy { it.name })
+        val scheduleDao: ScheduleDao = mock {
+            setupMock(mock, flow {
+                firstSchedule.toScheduleEntityWithTagEntities()
+                    .let(::listOf)
+                    .also { emit(it) }
+
+                delay(1_000)
+                secondSchedule.toScheduleEntityWithTagEntities()
+                    .let { entity -> entity.copy(tagEntities = entity.tagEntities.sortedBy { it.name }.reversed()) }
+                    .let(::listOf)
+                    .also { emit(it) }
+            }.flowOn(executeDispatcher))
         }
+        val actualSchedules = mutableListOf<Schedule>()
+
+        LocalScheduleRepository(scheduleDao)
+            .get(scheduleItemRequest)
+            .onEach { actualSchedules += it.first() }
+            .launchIn(genFlowObserveDispatcher())
 
         advanceTimeBy(2_000)
         assertThat(actualSchedules, equalTo(listOf(firstSchedule, secondSchedule)))
+    }
+
+    @Test
+    fun `pagedData converted to schedule from pagingDataFlow`() = runTest {
+        val expectedIsComplete: Boolean = genBoolean()
+        observeSchedulePagingDataWhenPagingDataFlowSubscribed(
+            ScheduleItemPagingRequest.FindByComplete(expectedIsComplete),
+            setupMock = { scheduleDao, fakePagingSource ->
+                whenever(scheduleDao.findAsPagingSource(expectedIsComplete)) doReturn fakePagingSource
+            }
+        )
+    }
+
+    private fun observeSchedulePagingDataWhenPagingDataFlowSubscribed(
+        scheduleItemPagingRequest: ScheduleItemPagingRequest,
+        setupMock: (ScheduleDao, PagingSource<Int, ScheduleEntityWithTagEntities>) -> Unit
+    ) = runTest {
+        val input = genScheduleEntityWithTagEntitiesList()
+        val scheduleDao: ScheduleDao = mock {
+            setupMock(
+                mock,
+                FakePagingSource(
+                    PagingSource.LoadResult.Page(
+                        data = input,
+                        prevKey = null,
+                        nextKey = null
+                    )
+                )
+            )
+        }
+        val differ = AsyncPagingDataDiffer(
+            diffCallback = IdentityItemCallback<Schedule>(),
+            updateCallback = NoopListCallback(),
+            workerDispatcher = Dispatchers.Main
+        )
+
+        LocalScheduleRepository(scheduleDao)
+            .getAsPagingData(scheduleItemPagingRequest, PagingConfig(pageSize = genInt()))
+            .onEach { data -> differ.submitData(data) }
+            .launchIn(genFlowObserveDispatcher())
+
+        advanceUntilIdle()
+        assertThat(differ.snapshot().items, equalTo(input.toSchedules()))
+    }
+
+    private class FakePagingSource(
+        private val result: LoadResult<Int, ScheduleEntityWithTagEntities>
+    ) : PagingSource<Int, ScheduleEntityWithTagEntities>() {
+        override fun getRefreshKey(state: PagingState<Int, ScheduleEntityWithTagEntities>): Int? = null
+        override suspend fun load(params: LoadParams<Int>): LoadResult<Int, ScheduleEntityWithTagEntities> = result
     }
 }

@@ -27,8 +27,8 @@ import com.nlab.reminder.domain.common.tag.TagStyleResource
  */
 @ItemModel
 data class TagItem(
-    val tag: Tag,
-    val tagStyleResource: TagStyleResource,
+    private val tag: Tag,
+    private val tagStyleResource: TagStyleResource,
     val onClicked: () -> Unit,
     val onLongClicked: () -> Unit
 ) {

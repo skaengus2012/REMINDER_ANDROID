@@ -37,13 +37,13 @@ internal class StateMachineActionProcessorTest {
     private lateinit var recoveryExceptionHandler: (Throwable) -> Unit
 
     @Before
-    fun init() {
+    fun setup() {
         recoveryExceptionHandler = StateMachineConfig.defaultExceptionHandler
         StateMachineConfig.defaultExceptionHandler = {}
     }
 
     @After
-    fun finish() {
+    fun tearDown() {
         StateMachineConfig.defaultExceptionHandler = recoveryExceptionHandler
     }
 
@@ -250,6 +250,7 @@ internal class StateMachineActionProcessorTest {
     fun `notify State1, State2 when state is init and action1 called action2 and invoked action1`() = runTest {
         val state: MutableStateFlow<TestState> = MutableStateFlow(TestState.State1())
         val actionProcessor = createTestStateMachineActionProcessor(
+            scope = CoroutineScope(Dispatchers.Unconfined),
             state = state,
             stateMachineBuilder = StateMachineBuilder<TestAction, TestState>().apply {
                 updateTo { (action) ->

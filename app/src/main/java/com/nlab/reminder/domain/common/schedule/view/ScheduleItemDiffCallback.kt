@@ -14,21 +14,19 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.common.schedule
+package com.nlab.reminder.domain.common.schedule.view
 
-import com.nlab.reminder.core.util.annotation.test.Generated
-import com.nlab.reminder.domain.common.tag.Tag
+import androidx.recyclerview.widget.DiffUtil
 
 /**
  * @author Doohyun
  */
-@Generated
-data class Schedule(
-    val scheduleId: Long,
-    val title: String,
-    val note: String?,
-    val url: String?,
-    val tags: List<Tag>,
-    val visiblePriority: Int,
-    val isComplete: Boolean
-)
+class ScheduleItemDiffCallback : DiffUtil.ItemCallback<ScheduleItem>() {
+    override fun areItemsTheSame(oldItem: ScheduleItem, newItem: ScheduleItem): Boolean {
+        return oldItem == newItem
+    }
+
+    override fun areContentsTheSame(oldItem: ScheduleItem, newItem: ScheduleItem): Boolean {
+        return oldItem.scheduleId == newItem.scheduleId
+    }
+}

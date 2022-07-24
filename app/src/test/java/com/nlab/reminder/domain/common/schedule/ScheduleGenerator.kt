@@ -17,7 +17,7 @@
 package com.nlab.reminder.domain.common.schedule
 
 import com.nlab.reminder.domain.common.tag.Tag
-import com.nlab.reminder.domain.common.tag.genTag
+import com.nlab.reminder.domain.common.tag.genTags
 import com.nlab.reminder.test.genBoolean
 import com.nlab.reminder.test.genBothify
 import com.nlab.reminder.test.genInt
@@ -31,7 +31,7 @@ fun genSchedule(
     title: String = genBothify(),
     note: String = genBothify(),
     url: String = genBothify(),
-    tags: List<Tag> = List(genInt("#")) { genTag(tagId = it.toLong()) },
+    tags: List<Tag> = genTags(),
     visiblePriority: Int = genInt(),
     isComplete: Boolean = genBoolean()
 ): Schedule = Schedule(scheduleId, title, note, url, tags, visiblePriority, isComplete)

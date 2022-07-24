@@ -17,18 +17,11 @@
 package com.nlab.reminder.domain.common.schedule
 
 import com.nlab.reminder.core.util.annotation.test.Generated
-import com.nlab.reminder.domain.common.tag.Tag
 
 /**
  * @author Doohyun
  */
-@Generated
-data class Schedule(
-    val scheduleId: Long,
-    val title: String,
-    val note: String?,
-    val url: String?,
-    val tags: List<Tag>,
-    val visiblePriority: Int,
-    val isComplete: Boolean
-)
+sealed class ScheduleItemPagingRequest private constructor() {
+    @Generated
+    data class FindByComplete(val isComplete: Boolean) : ScheduleItemPagingRequest()
+}

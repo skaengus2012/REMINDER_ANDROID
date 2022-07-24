@@ -18,7 +18,6 @@ package com.nlab.reminder.internal.common.di
 
 import com.nlab.reminder.domain.common.schedule.ScheduleRepository
 import com.nlab.reminder.domain.common.tag.TagRepository
-import com.nlab.reminder.domain.common.util.DatabaseQualifier
 import com.nlab.reminder.internal.common.android.database.ScheduleDao
 import com.nlab.reminder.internal.common.android.database.ScheduleTagListDao
 import com.nlab.reminder.internal.common.android.database.TagDao
@@ -29,7 +28,6 @@ import dagger.Provides
 import dagger.Reusable
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.CoroutineDispatcher
 
 /**
  * @author Doohyun
@@ -40,15 +38,13 @@ class RepositoryModule {
     @Reusable
     @Provides
     fun provideScheduleRepository(
-        scheduleDao: ScheduleDao,
-        @DatabaseQualifier dispatcher: CoroutineDispatcher
-    ): ScheduleRepository = LocalScheduleRepository(scheduleDao, dispatcher)
+        scheduleDao: ScheduleDao
+    ): ScheduleRepository = LocalScheduleRepository(scheduleDao)
 
     @Reusable
     @Provides
     fun provideTagRepository(
         tagDao: TagDao,
-        scheduleTagListDao: ScheduleTagListDao,
-        @DatabaseQualifier dispatcher: CoroutineDispatcher
-    ): TagRepository = LocalTagRepository(tagDao, scheduleTagListDao, dispatcher)
+        scheduleTagListDao: ScheduleTagListDao
+    ): TagRepository = LocalTagRepository(tagDao, scheduleTagListDao)
 }

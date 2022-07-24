@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.common.util
+package com.nlab.reminder.domain.common.schedule
 
-import javax.inject.Qualifier
+import com.nlab.reminder.core.util.annotation.test.Generated
 
 /**
  * @author Doohyun
  */
-@Qualifier
-@Retention(AnnotationRetention.BINARY)
-annotation class DatabaseQualifier
+sealed class ScheduleItemRequest private constructor() {
+    @Generated
+    data class FindByComplete(val isComplete: Boolean) : ScheduleItemRequest()
+}

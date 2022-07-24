@@ -18,6 +18,7 @@ package com.nlab.reminder.domain.common.tag
 
 import com.nlab.reminder.domain.feature.home.TagWithResource
 import com.nlab.reminder.test.genBothify
+import com.nlab.reminder.test.genInt
 import com.nlab.reminder.test.genLong
 
 /**
@@ -25,4 +26,11 @@ import com.nlab.reminder.test.genLong
  */
 
 fun genTag(tagId: Long = genLong(), name: String = genBothify()) = Tag(tagId, name)
-fun genTagWithResource(tag: Tag = genTag(), tagStyleResource: TagStyleResource = TagStyleResource.TYPE1) = TagWithResource(tag, tagStyleResource)
+fun genTags(numericString: String = "##"): List<Tag> =
+    List(genInt(numericString)) { index -> genTag(index.toLong()) }
+        .distinctBy { it.name }
+
+fun genTagWithResource(
+    tag: Tag = genTag(),
+    tagStyleResource: TagStyleResource = TagStyleResource.TYPE1
+) = TagWithResource(tag, tagStyleResource)

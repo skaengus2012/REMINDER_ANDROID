@@ -26,6 +26,7 @@ import com.nlab.reminder.test.genBothify
 import com.nlab.reminder.test.genLong
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.Before
@@ -33,6 +34,7 @@ import org.junit.Test
 import org.mockito.kotlin.*
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
+import org.junit.After
 
 /**
  * @author Doohyun
@@ -67,8 +69,13 @@ class HomeViewModelTest {
     )
 
     @Before
-    fun init() {
+    fun setup() {
         Dispatchers.setMain(Dispatchers.Unconfined)
+    }
+
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
     }
 
     @Test

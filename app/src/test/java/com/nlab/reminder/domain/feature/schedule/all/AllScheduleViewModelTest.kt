@@ -23,10 +23,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.hamcrest.CoreMatchers
 import org.hamcrest.MatcherAssert
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.*
@@ -60,8 +62,13 @@ class AllScheduleViewModelTest {
     )
 
     @Before
-    fun init() {
+    fun setUp() {
         Dispatchers.setMain(Dispatchers.Unconfined)
+    }
+
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
     }
 
     @Test
@@ -86,7 +93,7 @@ class AllScheduleViewModelTest {
 
         val viewModel: AllScheduleViewModel = createViewModel(
             getAllScheduleReport = mock {
-                whenever(mock()) doReturn flowOf(expectedReport)
+                whenever(mock(any())) doReturn flowOf(expectedReport)
             }
         )
         CoroutineScope(Dispatchers.Unconfined).launch { viewModel.state.collect(actualStates::add) }

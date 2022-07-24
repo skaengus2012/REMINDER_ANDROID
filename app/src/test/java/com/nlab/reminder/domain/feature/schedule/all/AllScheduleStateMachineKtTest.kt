@@ -24,15 +24,13 @@ import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.*
 import org.junit.Test
-import org.mockito.kotlin.doReturn
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
+import org.mockito.kotlin.*
 
 /**
  * @author Doohyun
  */
 @OptIn(ExperimentalCoroutinesApi::class)
-class AllEndStateMachineKtTest {
+class AllScheduleStateMachineKtTest {
     private val dummyActions: Set<AllScheduleAction> = setOf(
         AllScheduleAction.Fetch,
         AllScheduleAction.AllScheduleReportLoaded(genAllScheduleReport())
@@ -114,7 +112,7 @@ class AllEndStateMachineKtTest {
     fun `Notify loaded when fetch is called`() = runTest {
         val testReport: AllScheduleReport = genAllScheduleReport()
         val getAllScheduleReportUseCase: GetAllScheduleReportUseCase = mock {
-            whenever(mock()) doReturn flow { emit(testReport) }
+            whenever(mock(any())) doReturn flow { emit(testReport) }
         }
         val stateMachine: AllScheduleStateMachine = createStateMachine(
             scope = CoroutineScope(Dispatchers.Unconfined),

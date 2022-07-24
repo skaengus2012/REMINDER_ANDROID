@@ -14,21 +14,37 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.common.schedule
+package com.nlab.reminder.domain.common.schedule.view
 
-import com.nlab.reminder.core.util.annotation.test.Generated
+import com.nlab.reminder.domain.common.android.view.recyclerview.ItemModel
+import com.nlab.reminder.domain.common.schedule.Schedule
 import com.nlab.reminder.domain.common.tag.Tag
 
 /**
  * @author Doohyun
  */
-@Generated
-data class Schedule(
-    val scheduleId: Long,
-    val title: String,
-    val note: String?,
-    val url: String?,
-    val tags: List<Tag>,
-    val visiblePriority: Int,
+@ItemModel
+data class ScheduleItem(
+    private val schedule: Schedule
+) {
+    val scheduleId: Long
+        get() = schedule.scheduleId
+
+    val title: String
+        get() = schedule.title
+
+    val note: String?
+        get() = schedule.note
+
+    val url: String?
+        get() = schedule.url
+
+    val tags: List<Tag>
+        get() = schedule.tags
+
+    val visiblePriority: Int
+        get() = schedule.visiblePriority
+
     val isComplete: Boolean
-)
+        get() = schedule.isComplete
+}

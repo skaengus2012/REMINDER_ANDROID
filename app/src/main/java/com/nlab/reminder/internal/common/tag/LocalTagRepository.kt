@@ -19,30 +19,21 @@ package com.nlab.reminder.internal.common.tag
 import com.nlab.reminder.core.kotlin.flow.map
 import com.nlab.reminder.domain.common.tag.Tag
 import com.nlab.reminder.domain.common.tag.TagRepository
-import com.nlab.reminder.internal.common.android.database.ScheduleTagListDao
-import com.nlab.reminder.internal.common.android.database.TagDao
-import com.nlab.reminder.internal.common.android.database.TagEntity
-import kotlinx.coroutines.CoroutineDispatcher
+import com.nlab.reminder.internal.common.android.database.*
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.withContext
 
 /**
  * @author Doohyun
  */
 class LocalTagRepository(
     private val tagDao: TagDao,
-    private val scheduleTagListDao: ScheduleTagListDao,
-    private val dispatcher: CoroutineDispatcher
+    private val scheduleTagListDao: ScheduleTagListDao
 ) : TagRepository {
     override fun get(): Flow<List<Tag>> =
-        tagDao.find()
-            .map { tagEntities -> tagEntities.map { Tag(it.tagId, it.name) } }
-            .flowOn(dispatcher)
-
+        tagDao.find().map { it.toTags() }
     override suspend fun getUsageCount(tag: Tag): Long =
-        withContext(dispatcher) { scheduleTagListDao.findTagUsageCount(tagId = tag.tagId) }
+        scheduleTagListDao.findTagUsageCount(tagId = tag.tagId)
 
     override suspend fun delete(tag: Tag) =
-        withContext(dispatcher) { tagDao.delete(TagEntity.from(tag)) }
+        tagDao.delete(tag.toEntity())
 }

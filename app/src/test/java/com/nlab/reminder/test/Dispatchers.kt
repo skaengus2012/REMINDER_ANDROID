@@ -14,21 +14,18 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.common.schedule
+package com.nlab.reminder.test
 
-import com.nlab.reminder.core.util.annotation.test.Generated
-import com.nlab.reminder.domain.common.tag.Tag
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestCoroutineScheduler
 
 /**
  * @author Doohyun
  */
-@Generated
-data class Schedule(
-    val scheduleId: Long,
-    val title: String,
-    val note: String?,
-    val url: String?,
-    val tags: List<Tag>,
-    val visiblePriority: Int,
-    val isComplete: Boolean
-)
+fun genFlowObserveDispatcher() = CoroutineScope(Dispatchers.Unconfined)
+
+@ExperimentalCoroutinesApi
+fun genFlowExecutionDispatcher(testScheduler: TestCoroutineScheduler) = StandardTestDispatcher(testScheduler)

@@ -45,6 +45,6 @@ fun AllScheduleStateMachine(
     }
 
     sideEffectOn<AllScheduleAction.Fetch, AllScheduleState.Init> {
-        scope.launch { getAllScheduleReport().collect { send(AllScheduleAction.AllScheduleReportLoaded(it)) } }
+        scope.launch { getAllScheduleReport(scope).collect { send(AllScheduleAction.AllScheduleReportLoaded(it)) } }
     }
 }

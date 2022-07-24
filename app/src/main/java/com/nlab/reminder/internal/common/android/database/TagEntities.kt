@@ -14,21 +14,14 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.common.schedule
+package com.nlab.reminder.internal.common.android.database
 
-import com.nlab.reminder.core.util.annotation.test.Generated
 import com.nlab.reminder.domain.common.tag.Tag
 
 /**
  * @author Doohyun
  */
-@Generated
-data class Schedule(
-    val scheduleId: Long,
-    val title: String,
-    val note: String?,
-    val url: String?,
-    val tags: List<Tag>,
-    val visiblePriority: Int,
-    val isComplete: Boolean
-)
+fun TagEntity.toTag(): Tag = Tag(tagId, name)
+fun List<TagEntity>.toTags(): List<Tag> = map { it.toTag() }
+
+fun Tag.toEntity(): TagEntity = TagEntity(tagId, name)

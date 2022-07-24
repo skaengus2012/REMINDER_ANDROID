@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (C) 2022 The N's lab Open Source Project
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~        http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<androidx.constraintlayout.widget.ConstraintLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content">
+
+	<ImageButton
+		android:id="@+id/checkbox_button"
+		android:layout_width="@dimen/schedule_check_size"
+		android:layout_height="@dimen/schedule_check_size"
+		android:layout_marginStart="@dimen/default_side_padding"
+		android:layout_marginTop="10dp"
+		android:background="@android:color/transparent"
+		android:contentDescription="@string/schedule_checkbox_contentDescription"
+		android:scaleType="fitXY"
+		android:src="@drawable/checkbox_schedule"
+		app:layout_constraintStart_toStartOf="parent"
+		app:layout_constraintTop_toTopOf="parent"
+		tools:src="@drawable/checkbox_schedule_checked" />
+
+	<TextView
+		android:id="@+id/title_textview"
+		android:layout_width="0dp"
+		android:layout_height="wrap_content"
+		android:layout_marginStart="15dp"
+		android:layout_marginEnd="@dimen/default_side_padding"
+		android:gravity="center_vertical"
+		android:textColor="@color/default_text_color"
+		android:textSize="16sp"
+		app:layout_constraintBottom_toTopOf="@id/note_textview"
+		app:layout_constraintEnd_toEndOf="parent"
+		app:layout_constraintHeight_min="@dimen/schedule_check_size"
+		app:layout_constraintStart_toEndOf="@id/checkbox_button"
+		app:layout_constraintTop_toTopOf="@id/checkbox_button"
+		tools:text="@tools:sample/lorem" />
+
+	<TextView
+		android:id="@+id/note_textview"
+		android:layout_width="0dp"
+		android:layout_height="wrap_content"
+		android:layout_marginTop="2dp"
+		android:gravity="center_vertical"
+		android:textColor="@color/default_sub_text_color"
+		android:textSize="14sp"
+		app:layout_constraintEnd_toEndOf="@id/title_textview"
+		app:layout_constraintStart_toStartOf="@id/title_textview"
+		app:layout_constraintTop_toBottomOf="@id/title_textview"
+		tools:text="@tools:sample/lorem" />
+
+	<View
+		android:id="@+id/line_view"
+		android:layout_width="0dp"
+		android:layout_height="0.5dp"
+		android:layout_marginTop="13dp"
+		android:background="@color/schedule_line_color"
+		app:layout_constraintBottom_toBottomOf="parent"
+		app:layout_constraintEnd_toEndOf="parent"
+		app:layout_constraintStart_toStartOf="@id/title_textview"
+		app:layout_constraintTop_toBottomOf="@id/note_textview" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

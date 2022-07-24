@@ -17,7 +17,6 @@
 package com.nlab.reminder.internal.common.di
 
 import android.app.Application
-import com.nlab.reminder.domain.common.util.DatabaseQualifier
 import com.nlab.reminder.internal.common.android.database.ReminderDatabase
 import com.nlab.reminder.internal.common.android.database.ScheduleDao
 import com.nlab.reminder.internal.common.android.database.ScheduleTagListDao
@@ -26,9 +25,6 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.newSingleThreadContext
 import javax.inject.Singleton
 
 /**
@@ -37,12 +33,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 class ReminderDatabaseModule {
-    @OptIn(DelicateCoroutinesApi::class)
-    @DatabaseQualifier
-    @Singleton
-    @Provides
-    fun provideDispatcher(): CoroutineDispatcher = newSingleThreadContext("database-thread")
-
     @Singleton
     @Provides
     fun provideReminderDatabase(application: Application): ReminderDatabase = ReminderDatabase.getDatabase(application)

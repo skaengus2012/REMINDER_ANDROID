@@ -14,14 +14,16 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.common.schedule
+package com.nlab.reminder.test
 
-import com.nlab.reminder.core.util.annotation.test.Generated
+import androidx.recyclerview.widget.ListUpdateCallback
 
 /**
  * @author Doohyun
  */
-@Generated
-data class ScheduleItemRequestConfig(
-    val isComplete: Boolean = true
-)
+class NoopListCallback : ListUpdateCallback {
+    override fun onChanged(position: Int, count: Int, payload: Any?) {}
+    override fun onMoved(fromPosition: Int, toPosition: Int) {}
+    override fun onInserted(position: Int, count: Int) {}
+    override fun onRemoved(position: Int, count: Int) {}
+}

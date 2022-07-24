@@ -43,4 +43,7 @@
         <item quantity="one">#%1$s will be updated in %2$d reminder.</item>
         <item quantity="other">#%1$s will be updated in %2$d reminders.</item>
     </plurals>
+
+    <!-- schedule -->
+    <string name="schedule_checkbox_contentDescription">toggle schedule</string>
 </resources>

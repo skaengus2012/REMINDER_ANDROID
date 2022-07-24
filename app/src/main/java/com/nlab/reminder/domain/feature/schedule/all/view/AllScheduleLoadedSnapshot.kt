@@ -14,21 +14,17 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.common.schedule
+package com.nlab.reminder.domain.feature.schedule.all.view
 
-import com.nlab.reminder.core.util.annotation.test.Generated
-import com.nlab.reminder.domain.common.tag.Tag
+import androidx.paging.PagingData
+import com.nlab.reminder.domain.common.schedule.view.ScheduleItem
 
 /**
  * @author Doohyun
  */
-@Generated
-data class Schedule(
-    val scheduleId: Long,
-    val title: String,
-    val note: String?,
-    val url: String?,
-    val tags: List<Tag>,
-    val visiblePriority: Int,
-    val isComplete: Boolean
+data class AllScheduleLoadedSnapshot(
+    val doingScheduleItems: List<ScheduleItem>,
+    val doneScheduleItems: PagingData<ScheduleItem>,
+    val isDoneScheduleShown: Boolean,
+    val isFirstBinding: Boolean
 )

@@ -22,17 +22,28 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.paging.map
+import androidx.recyclerview.widget.ConcatAdapter
+import com.nlab.reminder.core.kotlin.flow.withOld
 import com.nlab.reminder.databinding.FragmentAllScheduleBinding
+import com.nlab.reminder.domain.common.schedule.view.ScheduleItem
+import com.nlab.reminder.domain.feature.schedule.all.AllScheduleState
 import com.nlab.reminder.domain.feature.schedule.all.AllScheduleViewModel
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.*
 
 /**
  * @author Doohyun
  */
+@AndroidEntryPoint
 class AllScheduleFragment : Fragment() {
     private val viewModel: AllScheduleViewModel by viewModels()
 
     private var _binding: FragmentAllScheduleBinding? = null
-    val binding: FragmentAllScheduleBinding get() = checkNotNull(_binding)
+    private val binding: FragmentAllScheduleBinding get() = checkNotNull(_binding)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         FragmentAllScheduleBinding.inflate(inflater, container, false)
@@ -41,7 +52,49 @@ class AllScheduleFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val doingScheduleAdapter = DoingScheduleItemAdapter(viewLifecycleOwner)
+        val doneScheduleAdapter = DoneSchedulePagingDataAdapter(viewLifecycleOwner)
+        val scheduleAdapter = ConcatAdapter(doingScheduleAdapter, doneScheduleAdapter)
+        val renderWhenLoaded = renderWhenLoadedFunc(scheduleAdapter, doingScheduleAdapter, doneScheduleAdapter)
 
+        binding.contentRecyclerview.adapter = scheduleAdapter
+
+        viewModel.state
+            .filterIsInstance<AllScheduleState.Loaded>()
+            .map { it.allSchedulesReport }
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle)
+            .distinctUntilChanged()
+            .withOld()
+            .map { (old, new) ->
+                AllScheduleLoadedSnapshot(
+                    doingScheduleItems = new.doingSchedules.map { ScheduleItem(it) },
+                    doneScheduleItems = new.doneSchedules.map { ScheduleItem(it) },
+                    isDoneScheduleShown = new.isDoneScheduleShown,
+                    isFirstBinding = (old == null)
+                )
+            }
+            .flowOn(Dispatchers.Default)
+            .onEach { snapshot -> renderWhenLoaded(snapshot)() }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
+    }
+
+    private fun renderWhenInit() {
+
+    }
+
+    private fun renderWhenLoading() {
+
+    }
+
+    private fun renderWhenLoadedFunc(
+        scheduleAdapter: ConcatAdapter,
+        doingScheduleAdapter: DoingScheduleItemAdapter,
+        doneScheduleAdapter: DoneSchedulePagingDataAdapter
+    ): (AllScheduleLoadedSnapshot) -> suspend () -> Unit = { snapshot ->
+        suspend {
+            doingScheduleAdapter.submitList(snapshot.doingScheduleItems)
+            doneScheduleAdapter.submitData(snapshot.doneScheduleItems)
+        }
     }
 
     override fun onDestroyView() {

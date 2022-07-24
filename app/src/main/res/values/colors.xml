@@ -21,6 +21,9 @@
 	<color name="gray_light">#F2F2F6</color>
 	<color name="gray_50">#FAFAFA</color>
 	<color name="gray_100">#F5F5F5</color>
+	<color name="gray_400">#BDBDBD</color>
+	<color name="gray_500">#9E9E9E</color>
+	<color name="gray_800">#424242</color>
 	<color name="gray_900">#212121</color>
 
 	<color name="white">#FFFFFF</color>
@@ -44,5 +47,9 @@
 	<color name="white_opa80">#CCFFFFFF</color>
 
 	<color name="default_text_color">@color/black</color>
-	<color name="default_sub_text_color">@color/black_opa80</color>
+	<color name="default_sub_text_color">@color/gray_500</color>
+
+	<color name="schedule_checkbox_checked_color">@color/point_color_1</color>
+	<color name="schedule_checkbox_unchecked_color">@color/gray_500</color>
+	<color name="schedule_line_color">@color/gray_400</color>
 </resources>

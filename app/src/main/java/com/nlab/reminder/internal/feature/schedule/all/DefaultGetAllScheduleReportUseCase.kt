@@ -16,17 +16,51 @@
 
 package com.nlab.reminder.internal.feature.schedule.all
 
-import com.nlab.reminder.core.util.annotation.test.Generated
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
+import com.nlab.reminder.domain.common.schedule.Schedule
+import com.nlab.reminder.domain.common.schedule.ScheduleItemPagingRequest
+import com.nlab.reminder.domain.common.schedule.ScheduleItemRequest
+import com.nlab.reminder.domain.common.schedule.ScheduleRepository
 import com.nlab.reminder.domain.feature.schedule.all.AllScheduleReport
 import com.nlab.reminder.domain.feature.schedule.all.GetAllScheduleReportUseCase
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOn
 
 /**
  * @author Doohyun
  */
-@Generated
-class DefaultGetAllScheduleReportUseCase : GetAllScheduleReportUseCase {
-    override fun invoke(): Flow<AllScheduleReport> {
-        TODO("Not yet implemented")
+class DefaultGetAllScheduleReportUseCase(
+    private val scheduleRepository: ScheduleRepository,
+    private val pagingConfig: PagingConfig,
+    private val dispatcher: CoroutineDispatcher
+) : GetAllScheduleReportUseCase {
+    override fun invoke(coroutineScope: CoroutineScope): Flow<AllScheduleReport> =
+        createAllScheduleReportFlow(coroutineScope)
+            .flowOn(dispatcher)
+
+    private fun createAllScheduleReportFlow(coroutineScope: CoroutineScope): Flow<AllScheduleReport> =
+        combine(
+            scheduleRepository
+                .get(ScheduleItemRequest.FindByComplete(isComplete = false)),
+            scheduleRepository
+                .getAsPagingData(ScheduleItemPagingRequest.FindByComplete(isComplete = true), pagingConfig)
+                .cachedIn(coroutineScope),
+            transform = ::transformToScheduleReport
+        )
+
+    companion object {
+        private fun transformToScheduleReport(
+            doingSchedules: List<Schedule>,
+            doneSchedules: PagingData<Schedule>
+        ): AllScheduleReport = AllScheduleReport(
+            doingSchedules,
+            doneSchedules,
+            isDoneScheduleShown = false
+        )
     }
 }

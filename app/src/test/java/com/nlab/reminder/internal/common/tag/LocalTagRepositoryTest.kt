@@ -19,11 +19,18 @@ package com.nlab.reminder.internal.common.tag
 import com.nlab.reminder.domain.common.tag.Tag
 import com.nlab.reminder.domain.common.tag.TagRepository
 import com.nlab.reminder.domain.common.tag.genTag
+import com.nlab.reminder.domain.common.tag.genTags
 import com.nlab.reminder.internal.common.android.database.ScheduleTagListDao
 import com.nlab.reminder.internal.common.android.database.TagDao
-import com.nlab.reminder.internal.common.android.database.TagEntity
+import com.nlab.reminder.internal.common.android.database.toEntity
+import com.nlab.reminder.internal.common.database.toEntities
+import com.nlab.reminder.test.genFlowExecutionDispatcher
+import com.nlab.reminder.test.genFlowObserveDispatcher
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
@@ -39,9 +46,8 @@ import org.mockito.kotlin.*
 class LocalTagRepositoryTest {
     private fun createTagRepository(
         tagDao: TagDao = mock(),
-        scheduleTagListDao: ScheduleTagListDao = mock(),
-        dispatcher: CoroutineDispatcher = Dispatchers.Unconfined
-    ): TagRepository = LocalTagRepository(tagDao, scheduleTagListDao, dispatcher)
+        scheduleTagListDao: ScheduleTagListDao = mock()
+    ): TagRepository = LocalTagRepository(tagDao, scheduleTagListDao)
 
     @Test
     fun `tagDao found when get`() {
@@ -53,43 +59,46 @@ class LocalTagRepositoryTest {
 
     @Test
     fun `notify tag list when dao updated`() = runTest {
-        val firstTags: List<Tag> = listOf(genTag())
-        val secondTags: List<Tag> = listOf(genTag(), genTag(), genTag()).sortedBy { it.name }.reversed()
-        val tagDao: TagDao = mock {
-            whenever(mock.find()) doReturn flow {
-                emit(firstTags.map { TagEntity.from(it) })
-                delay(500)
-                emit(secondTags.map { TagEntity.from(it) })
-            }
-        }
+        val executeDispatcher = genFlowExecutionDispatcher(testScheduler)
         val actualTags = mutableListOf<List<Tag>>()
-        val tagRepository: TagRepository = createTagRepository(
-            tagDao = tagDao,
-            dispatcher = StandardTestDispatcher(testScheduler)
-        )
-        CoroutineScope(Dispatchers.Unconfined).launch {
-            tagRepository.get().collect { actualTags += it }
+        val firstTags: List<Tag> = listOf(genTag())
+        val secondTags: List<Tag> = genTags().sortedBy { it.name }.reversed()
+        val tagDao: TagDao = mock {
+            val mockFlow = flow {
+                emit(firstTags.toEntities())
+
+                delay(500)
+                emit(secondTags.toEntities())
+            }
+            whenever(mock.find()) doReturn mockFlow.flowOn(executeDispatcher)
         }
+
+        createTagRepository(tagDao = tagDao)
+            .get()
+            .onEach(actualTags::add)
+            .launchIn(genFlowObserveDispatcher())
+
         advanceTimeBy(1_000)
         assertThat(actualTags, equalTo(listOf(firstTags, secondTags)))
     }
 
     @Test
     fun `scheduleListDao found tag usage count when repository request findUsageCount`() = runTest {
-        val testTag: Tag = genTag()
+        val input: Tag = genTag()
         val scheduleTagListDao: ScheduleTagListDao = mock()
         val tagRepository: TagRepository = createTagRepository(scheduleTagListDao = scheduleTagListDao)
 
-        tagRepository.getUsageCount(testTag)
-        verify(scheduleTagListDao, times(1)).findTagUsageCount(tagId = testTag.tagId)
+        tagRepository.getUsageCount(input)
+        verify(scheduleTagListDao, times(1)).findTagUsageCount(tagId = input.tagId)
     }
 
     @Test
     fun `tagDao delete tag when repository deleting requested`() = runTest {
-        val testTag: Tag = genTag()
+        val input: Tag = genTag()
         val tagDao: TagDao = mock()
         val tagRepository: TagRepository = createTagRepository(tagDao = tagDao)
-        tagRepository.delete(testTag)
-        verify(tagDao, times(1)).delete(TagEntity.from(testTag))
+
+        tagRepository.delete(input)
+        verify(tagDao, times(1)).delete(input.toEntity())
     }
 }

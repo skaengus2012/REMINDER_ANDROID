@@ -16,12 +16,15 @@
 
 package com.nlab.reminder.internal.feature.schedule.all.di
 
+import androidx.paging.PagingConfig
+import com.nlab.reminder.domain.common.schedule.ScheduleRepository
 import com.nlab.reminder.domain.feature.schedule.all.GetAllScheduleReportUseCase
 import com.nlab.reminder.internal.feature.schedule.all.DefaultGetAllScheduleReportUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
+import kotlinx.coroutines.Dispatchers
 
 /**
  * @author Doohyun
@@ -30,5 +33,11 @@ import dagger.hilt.android.components.ViewModelComponent
 @InstallIn(ViewModelComponent::class)
 class AllScheduleUseCaseModule {
     @Provides
-    fun provideGetAllScheduleReportUseCase(): GetAllScheduleReportUseCase = DefaultGetAllScheduleReportUseCase()
+    fun provideGetAllScheduleReportUseCase(
+        scheduleRepository: ScheduleRepository
+    ): GetAllScheduleReportUseCase = DefaultGetAllScheduleReportUseCase(
+        scheduleRepository,
+        pagingConfig = PagingConfig(pageSize = 10),
+        dispatcher = Dispatchers.Default
+    )
 }

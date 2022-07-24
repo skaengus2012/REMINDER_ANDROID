@@ -16,17 +16,11 @@
 
 package com.nlab.reminder.internal.common.database
 
-import com.nlab.reminder.domain.common.schedule.Schedule
-import com.nlab.reminder.internal.common.android.database.ScheduleEntity
+import com.nlab.reminder.domain.common.tag.Tag
+import com.nlab.reminder.internal.common.android.database.TagEntity
+import com.nlab.reminder.internal.common.android.database.toEntity
 
 /**
  * @author Doohyun
  */
-fun from(schedule: Schedule): ScheduleEntity = ScheduleEntity(
-    schedule.scheduleId,
-    schedule.title,
-    schedule.note,
-    schedule.url,
-    schedule.visiblePriority,
-    schedule.isComplete
-)
+fun List<Tag>.toEntities(): List<TagEntity> = map { it.toEntity() }
