@@ -16,6 +16,9 @@
 
 package com.nlab.reminder.domain.feature.schedule.all
 
+import com.nlab.reminder.domain.common.schedule.Schedule
+import com.nlab.reminder.domain.common.schedule.genSchedule
+import com.nlab.reminder.test.genBoolean
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -45,9 +48,11 @@ class AllScheduleStateMachineKtTest {
     private fun createStateMachine(
         scope: CoroutineScope = CoroutineScope(Dispatchers.Default),
         initState: AllScheduleState = AllScheduleState.Init,
-        getAllScheduleReport: GetAllScheduleReportUseCase = mock()
+        getAllScheduleReport: GetAllScheduleReportUseCase = mock(),
+        updateScheduleComplete: UpdateScheduleCompleteUseCase = mock()
     ): AllScheduleStateMachine =
-        AllScheduleStateMachineFactory(getAllScheduleReport, initState).create(scope)
+        AllScheduleStateMachineFactory(getAllScheduleReport, updateScheduleComplete, initState)
+            .create(scope)
 
     @Test
     fun `holds injected state when machine created`() = runTest {
@@ -125,5 +130,20 @@ class AllScheduleStateMachineKtTest {
             stateMachine.state.value,
             equalTo(AllScheduleState.Loaded(testReport))
         )
+    }
+
+    @Test
+    fun `update schedule complete when stateMachine received update schedule complete`() = runTest {
+        val schedule: Schedule = genSchedule()
+        val isComplete: Boolean = genBoolean()
+        val updateScheduleCompleteUseCase: UpdateScheduleCompleteUseCase = mock()
+        val stateMachine: AllScheduleStateMachine = createStateMachine(
+            initState = AllScheduleState.Loaded(genAllScheduleReport()),
+            updateScheduleComplete = updateScheduleCompleteUseCase
+        )
+        stateMachine
+            .send(AllScheduleAction.OnScheduleCompleteUpdateClicked(schedule, isComplete))
+            .join()
+        verify(updateScheduleCompleteUseCase, times(1))(schedule, isComplete)
     }
 }

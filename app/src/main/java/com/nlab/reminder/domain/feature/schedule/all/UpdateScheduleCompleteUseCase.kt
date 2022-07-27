@@ -16,22 +16,11 @@
 
 package com.nlab.reminder.domain.feature.schedule.all
 
-import kotlinx.coroutines.CoroutineScope
+import com.nlab.reminder.domain.common.schedule.Schedule
 
 /**
  * @author Doohyun
  */
-class AllScheduleStateMachineFactory(
-    private val getAllScheduleReport: GetAllScheduleReportUseCase,
-    private val updateScheduleComplete: UpdateScheduleCompleteUseCase,
-    private val initState: AllScheduleState = AllScheduleState.Init
-) {
-    fun create(
-        scope: CoroutineScope
-    ): AllScheduleStateMachine = AllScheduleStateMachine(
-        scope,
-        initState,
-        getAllScheduleReport,
-        updateScheduleComplete
-    )
+interface UpdateScheduleCompleteUseCase {
+    suspend operator fun invoke(schedule: Schedule, isComplete: Boolean)
 }

@@ -19,7 +19,9 @@ package com.nlab.reminder.internal.feature.schedule.all.di
 import androidx.paging.PagingConfig
 import com.nlab.reminder.domain.common.schedule.ScheduleRepository
 import com.nlab.reminder.domain.feature.schedule.all.GetAllScheduleReportUseCase
+import com.nlab.reminder.domain.feature.schedule.all.UpdateScheduleCompleteUseCase
 import com.nlab.reminder.internal.feature.schedule.all.DefaultGetAllScheduleReportUseCase
+import com.nlab.reminder.internal.feature.schedule.all.DefaultUpdateScheduleCompleteUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -40,4 +42,9 @@ class AllScheduleUseCaseModule {
         pagingConfig = PagingConfig(pageSize = 10),
         dispatcher = Dispatchers.Default
     )
+
+    @Provides
+    fun provideUpdateScheduleCompleteUseCase(
+
+    ): UpdateScheduleCompleteUseCase = DefaultUpdateScheduleCompleteUseCase()
 }

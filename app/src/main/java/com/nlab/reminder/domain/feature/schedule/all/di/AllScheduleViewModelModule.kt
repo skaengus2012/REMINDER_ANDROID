@@ -18,6 +18,7 @@ package com.nlab.reminder.domain.feature.schedule.all.di
 
 import com.nlab.reminder.domain.feature.schedule.all.AllScheduleStateMachineFactory
 import com.nlab.reminder.domain.feature.schedule.all.GetAllScheduleReportUseCase
+import com.nlab.reminder.domain.feature.schedule.all.UpdateScheduleCompleteUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -31,8 +32,10 @@ import dagger.hilt.android.components.ViewModelComponent
 class AllScheduleViewModelModule {
     @Provides
     fun provideStateMachineProvider(
-        getAllScheduleReportUseCase: GetAllScheduleReportUseCase
+        getAllScheduleReportUseCase: GetAllScheduleReportUseCase,
+        updateScheduleCompleteUseCase: UpdateScheduleCompleteUseCase
     ): AllScheduleStateMachineFactory = AllScheduleStateMachineFactory(
-        getAllScheduleReportUseCase
+        getAllScheduleReportUseCase,
+        updateScheduleCompleteUseCase
     )
 }

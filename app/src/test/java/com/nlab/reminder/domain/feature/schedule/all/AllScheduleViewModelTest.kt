@@ -26,8 +26,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import org.hamcrest.CoreMatchers
-import org.hamcrest.MatcherAssert
+import org.hamcrest.CoreMatchers.*
+import org.hamcrest.MatcherAssert.*
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -56,9 +56,10 @@ class AllScheduleViewModelTest {
 
     private fun createViewModel(
         getAllScheduleReport: GetAllScheduleReportUseCase = mock(),
+        updateScheduleComplete: UpdateScheduleCompleteUseCase = mock(),
         initState: AllScheduleState = AllScheduleState.Init
     ): AllScheduleViewModel = AllScheduleViewModel(
-        AllScheduleStateMachineFactory(getAllScheduleReport, initState)
+        AllScheduleStateMachineFactory(getAllScheduleReport, updateScheduleComplete, initState)
     )
 
     @Before
@@ -97,9 +98,9 @@ class AllScheduleViewModelTest {
             }
         )
         CoroutineScope(Dispatchers.Unconfined).launch { viewModel.state.collect(actualStates::add) }
-        MatcherAssert.assertThat(
+        assertThat(
             actualStates,
-            CoreMatchers.equalTo(buildList {
+            equalTo(buildList {
                 add(AllScheduleState.Init)
                 add(AllScheduleState.Loading)
                 add(AllScheduleState.Loaded(expectedReport))

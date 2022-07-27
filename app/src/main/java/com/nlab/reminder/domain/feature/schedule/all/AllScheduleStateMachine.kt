@@ -29,7 +29,8 @@ typealias AllScheduleStateMachine = StateMachine<AllScheduleAction, AllScheduleS
 fun AllScheduleStateMachine(
     scope: CoroutineScope,
     initState: AllScheduleState,
-    getAllScheduleReport: GetAllScheduleReportUseCase
+    getAllScheduleReport: GetAllScheduleReportUseCase,
+    updateScheduleComplete: UpdateScheduleCompleteUseCase
 ): AllScheduleStateMachine = StateMachine(scope, initState) {
     updateTo { (action, oldState) ->
         when (action) {
@@ -41,10 +42,15 @@ fun AllScheduleStateMachine(
                 if (oldState is AllScheduleState.Init) oldState
                 else AllScheduleState.Loaded(action.allSchedulesReport)
             }
+            else -> oldState
         }
     }
 
     sideEffectOn<AllScheduleAction.Fetch, AllScheduleState.Init> {
         scope.launch { getAllScheduleReport(scope).collect { send(AllScheduleAction.AllScheduleReportLoaded(it)) } }
+    }
+
+    sideEffectOn<AllScheduleAction.OnScheduleCompleteUpdateClicked, AllScheduleState.Loaded> { (action) ->
+        scope.launch { updateScheduleComplete(action.schedule, action.isComplete) }
     }
 }

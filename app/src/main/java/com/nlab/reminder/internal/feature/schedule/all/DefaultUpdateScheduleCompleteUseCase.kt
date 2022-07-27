@@ -14,24 +14,16 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.feature.schedule.all
+package com.nlab.reminder.internal.feature.schedule.all
 
-import kotlinx.coroutines.CoroutineScope
+import com.nlab.reminder.domain.common.schedule.Schedule
+import com.nlab.reminder.domain.feature.schedule.all.UpdateScheduleCompleteUseCase
 
 /**
  * @author Doohyun
  */
-class AllScheduleStateMachineFactory(
-    private val getAllScheduleReport: GetAllScheduleReportUseCase,
-    private val updateScheduleComplete: UpdateScheduleCompleteUseCase,
-    private val initState: AllScheduleState = AllScheduleState.Init
-) {
-    fun create(
-        scope: CoroutineScope
-    ): AllScheduleStateMachine = AllScheduleStateMachine(
-        scope,
-        initState,
-        getAllScheduleReport,
-        updateScheduleComplete
-    )
+class DefaultUpdateScheduleCompleteUseCase : UpdateScheduleCompleteUseCase {
+    override suspend fun invoke(schedule: Schedule, isComplete: Boolean) {
+
+    }
 }
