@@ -61,4 +61,8 @@ class LocalScheduleRepository(
         })
         return pager.flow.map { pagedData -> pagedData.map(ScheduleEntityWithTagEntities::toSchedule) }
     }
+
+    override suspend fun updateCompleteState(schedule: Schedule, isComplete: Boolean) {
+        scheduleDao.updateCompleteState(schedule.scheduleId, isComplete)
+    }
 }

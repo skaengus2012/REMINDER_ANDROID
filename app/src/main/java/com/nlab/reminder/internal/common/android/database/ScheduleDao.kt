@@ -39,4 +39,7 @@ interface ScheduleDao {
     @Transaction
     @Query("SELECT * FROM schedule WHERE is_complete = :isComplete")
     fun findAsPagingSource(isComplete: Boolean): PagingSource<Int, ScheduleEntityWithTagEntities>
+
+    @Query("UPDATE schedule SET is_complete = :isComplete WHERE schedule_id = :scheduleId")
+    suspend fun updateCompleteState(scheduleId: Long, isComplete: Boolean)
 }

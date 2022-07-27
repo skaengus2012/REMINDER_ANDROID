@@ -143,6 +143,16 @@ class LocalScheduleRepositoryTest {
         assertThat(differ.snapshot().items, equalTo(input.toSchedules()))
     }
 
+    @Test
+    fun `scheduleDao update complete state when repository invoked update complete state`() = runTest {
+        val schedule: Schedule = genSchedule()
+        val isComplete: Boolean = genBoolean()
+        val scheduleDao: ScheduleDao = mock()
+
+        LocalScheduleRepository(scheduleDao).updateCompleteState(schedule, isComplete)
+        verify(scheduleDao, times(1)).updateCompleteState(schedule.scheduleId, isComplete)
+    }
+
     private class FakePagingSource(
         private val result: LoadResult<Int, ScheduleEntityWithTagEntities>
     ) : PagingSource<Int, ScheduleEntityWithTagEntities>() {
