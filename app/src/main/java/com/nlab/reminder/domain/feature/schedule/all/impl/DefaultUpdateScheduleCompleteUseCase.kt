@@ -17,13 +17,16 @@
 package com.nlab.reminder.domain.feature.schedule.all.impl
 
 import com.nlab.reminder.domain.common.schedule.Schedule
+import com.nlab.reminder.domain.common.schedule.ScheduleRepository
 import com.nlab.reminder.domain.feature.schedule.all.UpdateScheduleCompleteUseCase
 
 /**
  * @author Doohyun
  */
-class DefaultUpdateScheduleCompleteUseCase : UpdateScheduleCompleteUseCase {
+class DefaultUpdateScheduleCompleteUseCase(
+    private val scheduleRepository: ScheduleRepository
+) : UpdateScheduleCompleteUseCase {
     override suspend fun invoke(schedule: Schedule, isComplete: Boolean) {
-
+        scheduleRepository.updateCompleteState(schedule, isComplete)
     }
 }

@@ -42,6 +42,6 @@ class AllScheduleViewModelModule {
             pagingConfig = PagingConfig(pageSize = 10),
             dispatcher = Dispatchers.Default
         ),
-        DefaultUpdateScheduleCompleteUseCase()
+        updateScheduleComplete = DefaultUpdateScheduleCompleteUseCase(scheduleRepository)
     )
 }
