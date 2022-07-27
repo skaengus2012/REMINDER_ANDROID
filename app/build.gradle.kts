@@ -178,6 +178,8 @@ dependencies {
     testImplementation(Dependencies.TEST_MOCKITO)
     testImplementation(Dependencies.TEST_MOCKITO_KOTLIN)
     testImplementation(Dependencies.TEST_JAVAFAKER)
+    androidTestImplementation(Dependencies.TEST_COROUTINES)
+    androidTestImplementation(Dependencies.TEST_JAVAFAKER)
     androidTestImplementation(Dependencies.TEST_ANDROID_JUNIT_EXT)
     androidTestImplementation(Dependencies.TEST_ANDROID_JUNIT_ESPRESSO)
     androidTestImplementation(Dependencies.TEST_ANDROID_TEST_RUNNER)

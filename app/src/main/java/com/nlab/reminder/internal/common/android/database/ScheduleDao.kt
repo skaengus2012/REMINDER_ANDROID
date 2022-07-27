@@ -17,11 +17,8 @@
 package com.nlab.reminder.internal.common.android.database
 
 import androidx.paging.PagingSource
-import androidx.room.Dao
-import androidx.room.Insert
+import androidx.room.*
 import androidx.room.OnConflictStrategy.REPLACE
-import androidx.room.Query
-import androidx.room.Transaction
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -33,13 +30,20 @@ interface ScheduleDao {
     suspend fun insert(schedule: ScheduleEntity): Long
 
     @Transaction
-    @Query("SELECT * FROM schedule WHERE is_complete = :isComplete")
+    @Query("SELECT * FROM schedule WHERE is_complete = :isComplete ORDER BY $RULE_ORDER_BY")
     fun find(isComplete: Boolean): Flow<List<ScheduleEntityWithTagEntities>>
 
     @Transaction
-    @Query("SELECT * FROM schedule WHERE is_complete = :isComplete")
+    @Query("SELECT * FROM schedule WHERE is_complete = :isComplete ORDER BY $RULE_ORDER_BY")
     fun findAsPagingSource(isComplete: Boolean): PagingSource<Int, ScheduleEntityWithTagEntities>
 
     @Query("UPDATE schedule SET is_complete = :isComplete WHERE schedule_id = :scheduleId")
     suspend fun updateCompleteState(scheduleId: Long, isComplete: Boolean)
+
+    @Delete
+    suspend fun delete(schedule: ScheduleEntity)
+
+    companion object {
+        private const val RULE_ORDER_BY = "visible_priority"
+    }
 }
