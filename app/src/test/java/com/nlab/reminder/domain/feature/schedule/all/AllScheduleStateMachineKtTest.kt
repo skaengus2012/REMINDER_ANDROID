@@ -36,7 +36,8 @@ import org.mockito.kotlin.*
 class AllScheduleStateMachineKtTest {
     private val dummyActions: Set<AllScheduleAction> = setOf(
         AllScheduleAction.Fetch,
-        AllScheduleAction.AllScheduleReportLoaded(genAllScheduleReport())
+        AllScheduleAction.AllScheduleReportLoaded(genAllScheduleReport()),
+        AllScheduleAction.OnScheduleCompleteUpdateClicked(genSchedule(), genBoolean())
     )
 
     private val dummyStates: Set<AllScheduleState> = setOf(
