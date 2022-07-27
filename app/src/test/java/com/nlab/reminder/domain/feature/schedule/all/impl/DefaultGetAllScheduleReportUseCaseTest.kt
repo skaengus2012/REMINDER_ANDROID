@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.internal.feature.schedule.all
+package com.nlab.reminder.domain.feature.schedule.all.impl
 
 import androidx.paging.AsyncPagingDataDiffer
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.nlab.reminder.domain.common.schedule.*
 import com.nlab.reminder.domain.feature.schedule.all.GetAllScheduleReportUseCase
+import com.nlab.reminder.domain.feature.schedule.all.impl.DefaultGetAllScheduleReportUseCase
 import com.nlab.reminder.test.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi

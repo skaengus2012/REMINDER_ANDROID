@@ -16,13 +16,16 @@
 
 package com.nlab.reminder.domain.feature.schedule.all.di
 
+import androidx.paging.PagingConfig
+import com.nlab.reminder.domain.common.schedule.ScheduleRepository
 import com.nlab.reminder.domain.feature.schedule.all.AllScheduleStateMachineFactory
-import com.nlab.reminder.domain.feature.schedule.all.GetAllScheduleReportUseCase
-import com.nlab.reminder.domain.feature.schedule.all.UpdateScheduleCompleteUseCase
+import com.nlab.reminder.domain.feature.schedule.all.impl.DefaultGetAllScheduleReportUseCase
+import com.nlab.reminder.domain.feature.schedule.all.impl.DefaultUpdateScheduleCompleteUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
+import kotlinx.coroutines.Dispatchers
 
 /**
  * @author Doohyun
@@ -32,10 +35,13 @@ import dagger.hilt.android.components.ViewModelComponent
 class AllScheduleViewModelModule {
     @Provides
     fun provideStateMachineProvider(
-        getAllScheduleReportUseCase: GetAllScheduleReportUseCase,
-        updateScheduleCompleteUseCase: UpdateScheduleCompleteUseCase
+        scheduleRepository: ScheduleRepository
     ): AllScheduleStateMachineFactory = AllScheduleStateMachineFactory(
-        getAllScheduleReportUseCase,
-        updateScheduleCompleteUseCase
+        getAllScheduleReport = DefaultGetAllScheduleReportUseCase(
+            scheduleRepository,
+            pagingConfig = PagingConfig(pageSize = 10),
+            dispatcher = Dispatchers.Default
+        ),
+        DefaultUpdateScheduleCompleteUseCase()
     )
 }

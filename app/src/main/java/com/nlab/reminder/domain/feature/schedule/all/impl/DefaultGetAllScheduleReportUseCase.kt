@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.internal.feature.schedule.all
+package com.nlab.reminder.domain.feature.schedule.all.impl
 
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
@@ -50,7 +50,7 @@ class DefaultGetAllScheduleReportUseCase(
             scheduleRepository
                 .getAsPagingData(ScheduleItemPagingRequest.FindByComplete(isComplete = true), pagingConfig)
                 .cachedIn(coroutineScope),
-            transform = ::transformToScheduleReport
+            transform = Companion::transformToScheduleReport
         )
 
     companion object {

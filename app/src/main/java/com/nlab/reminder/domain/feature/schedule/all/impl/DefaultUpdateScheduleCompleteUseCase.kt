@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.internal.feature.schedule.all
+package com.nlab.reminder.domain.feature.schedule.all.impl
 
 import com.nlab.reminder.domain.common.schedule.Schedule
 import com.nlab.reminder.domain.feature.schedule.all.UpdateScheduleCompleteUseCase
