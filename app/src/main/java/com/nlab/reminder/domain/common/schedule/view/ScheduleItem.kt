@@ -25,7 +25,8 @@ import com.nlab.reminder.domain.common.tag.Tag
  */
 @ItemModel
 data class ScheduleItem(
-    private val schedule: Schedule
+    private val schedule: Schedule,
+    val onCompleteToggleClicked: () -> Unit
 ) {
     val scheduleId: Long
         get() = schedule.scheduleId

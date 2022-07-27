@@ -46,26 +46,17 @@ class AllScheduleStateMachineKtTest {
         AllScheduleState.Loaded(genAllScheduleReport())
     )
 
-    private fun createStateMachine(
-        scope: CoroutineScope = CoroutineScope(Dispatchers.Default),
-        initState: AllScheduleState = AllScheduleState.Init,
-        getAllScheduleReport: GetAllScheduleReportUseCase = mock(),
-        updateScheduleComplete: UpdateScheduleCompleteUseCase = mock()
-    ): AllScheduleStateMachine =
-        AllScheduleStateMachineFactory(getAllScheduleReport, updateScheduleComplete, initState)
-            .create(scope)
-
     @Test
     fun `holds injected state when machine created`() = runTest {
         val initState: AllScheduleState = AllScheduleState.Loaded(genAllScheduleReport())
-        val stateMachine: AllScheduleStateMachine = createStateMachine(initState = initState)
+        val stateMachine: AllScheduleStateMachine = genStateMachine(initState = initState)
         assertThat(stateMachine.state.value, sameInstance(initState))
     }
 
     @Test
     fun `keep state init even when action occurs until fetched`() = runTest {
         val initState: AllScheduleState = AllScheduleState.Init
-        val stateMachine: AllScheduleStateMachine = createStateMachine(initState = initState)
+        val stateMachine: AllScheduleStateMachine = genStateMachine(initState = initState)
         dummyActions
             .asSequence()
             .filter { it !is AllScheduleAction.Fetch }
@@ -83,12 +74,12 @@ class AllScheduleStateMachineKtTest {
         dummyStates
             .asSequence()
             .filter { it !is AllScheduleState.Init }
-            .map { state -> state to createStateMachine(initState = state) }
+            .map { state -> state to genStateMachine(initState = state) }
             .forEach { (initState, stateMachine) ->
                 stateMachine.send(AllScheduleAction.Fetch).join()
                 assertThat(stateMachine.state.value, sameInstance(initState))
             }
-        val stateMachine: AllScheduleStateMachine = createStateMachine(initState = AllScheduleState.Init)
+        val stateMachine: AllScheduleStateMachine = genStateMachine(initState = AllScheduleState.Init)
         stateMachine.send(AllScheduleAction.Fetch).join()
         assertThat(stateMachine.state.value, equalTo(AllScheduleState.Loading))
     }
@@ -99,7 +90,7 @@ class AllScheduleStateMachineKtTest {
         val action: AllScheduleAction = AllScheduleAction.AllScheduleReportLoaded(report)
         dummyStates
             .asSequence()
-            .map { state -> state to createStateMachine(initState = state) }
+            .map { state -> state to genStateMachine(initState = state) }
             .forEach { (initState, stateMachine) ->
                 stateMachine
                     .send(action)
@@ -120,7 +111,7 @@ class AllScheduleStateMachineKtTest {
         val getAllScheduleReportUseCase: GetAllScheduleReportUseCase = mock {
             whenever(mock(any())) doReturn flow { emit(testReport) }
         }
-        val stateMachine: AllScheduleStateMachine = createStateMachine(
+        val stateMachine: AllScheduleStateMachine = genStateMachine(
             scope = CoroutineScope(Dispatchers.Unconfined),
             getAllScheduleReport = getAllScheduleReportUseCase
         )
@@ -138,7 +129,7 @@ class AllScheduleStateMachineKtTest {
         val schedule: Schedule = genSchedule()
         val isComplete: Boolean = genBoolean()
         val updateScheduleCompleteUseCase: UpdateScheduleCompleteUseCase = mock()
-        val stateMachine: AllScheduleStateMachine = createStateMachine(
+        val stateMachine: AllScheduleStateMachine = genStateMachine(
             initState = AllScheduleState.Loaded(genAllScheduleReport()),
             updateScheduleComplete = updateScheduleCompleteUseCase
         )

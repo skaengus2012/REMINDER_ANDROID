@@ -24,13 +24,12 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.paging.map
 import androidx.recyclerview.widget.ConcatAdapter
 import com.nlab.reminder.core.kotlin.flow.withOld
 import com.nlab.reminder.databinding.FragmentAllScheduleBinding
-import com.nlab.reminder.domain.common.schedule.view.ScheduleItem
 import com.nlab.reminder.domain.feature.schedule.all.AllScheduleState
 import com.nlab.reminder.domain.feature.schedule.all.AllScheduleViewModel
+import com.nlab.reminder.domain.feature.schedule.all.onScheduleCompleteUpdateClicked
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -67,10 +66,11 @@ class AllScheduleFragment : Fragment() {
             .withOld()
             .map { (old, new) ->
                 AllScheduleLoadedSnapshot(
-                    doingScheduleItems = new.doingSchedules.map { ScheduleItem(it) },
-                    doneScheduleItems = new.doneSchedules.map { ScheduleItem(it) },
-                    isDoneScheduleShown = new.isDoneScheduleShown,
-                    isFirstBinding = (old == null)
+                    oldScheduleReport = old,
+                    newScheduleReport = new,
+                    onCompleteToggleClicked = { schedule ->
+                        viewModel.onScheduleCompleteUpdateClicked(schedule, isComplete = schedule.isComplete.not())
+                    }
                 )
             }
             .flowOn(Dispatchers.Default)

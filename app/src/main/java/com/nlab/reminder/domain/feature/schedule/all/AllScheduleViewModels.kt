@@ -16,27 +16,11 @@
 
 package com.nlab.reminder.domain.feature.schedule.all
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import org.hamcrest.CoreMatchers.*
-import org.hamcrest.MatcherAssert.*
-import org.junit.Test
+import com.nlab.reminder.domain.common.schedule.Schedule
 
 /**
  * @author Doohyun
  */
-class AllScheduleStateMachineFactoryTest {
-    @Test
-    fun `hold init state when machine created by factory`() {
-        val stateMachineFactory: AllScheduleStateMachineFactory = genAllScheduleStateMachineFactory()
-        assertThat(
-            stateMachineFactory
-                .create(
-                    scope = CoroutineScope(Dispatchers.Default)
-                )
-                .state
-                .value,
-            equalTo(AllScheduleState.Init)
-        )
-    }
+fun AllScheduleViewModel.onScheduleCompleteUpdateClicked(schedule: Schedule, isComplete: Boolean) {
+    onAction(AllScheduleAction.OnScheduleCompleteUpdateClicked(schedule, isComplete))
 }

@@ -19,7 +19,6 @@ package com.nlab.reminder.domain.feature.schedule.all
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
@@ -38,30 +37,6 @@ import org.mockito.kotlin.*
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class AllScheduleViewModelTest {
-    private fun createMockingViewModelComponent(
-        state: MutableStateFlow<AllScheduleState> = MutableStateFlow(AllScheduleState.Init)
-    ): Triple<AllScheduleViewModel, AllScheduleStateMachine, AllScheduleStateMachineFactory> {
-        val stateMachine: AllScheduleStateMachine = mock { whenever(mock.state) doReturn state }
-        val stateMachineFactory: AllScheduleStateMachineFactory = mock {
-            whenever(
-                mock.create(
-                    scope = any()
-                )
-            ) doReturn stateMachine
-        }
-
-        val viewModel = AllScheduleViewModel(stateMachineFactory)
-        return Triple(viewModel, stateMachine, stateMachineFactory)
-    }
-
-    private fun createViewModel(
-        getAllScheduleReport: GetAllScheduleReportUseCase = mock(),
-        updateScheduleComplete: UpdateScheduleCompleteUseCase = mock(),
-        initState: AllScheduleState = AllScheduleState.Init
-    ): AllScheduleViewModel = AllScheduleViewModel(
-        AllScheduleStateMachineFactory(getAllScheduleReport, updateScheduleComplete, initState)
-    )
-
     @Before
     fun setUp() {
         Dispatchers.setMain(Dispatchers.Unconfined)
@@ -74,7 +49,7 @@ class AllScheduleViewModelTest {
 
     @Test
     fun `notify action to stateMachine when viewModel action invoked`() {
-        val (viewModel, stateMachine) = createMockingViewModelComponent()
+        val (viewModel, stateMachine) = genAllScheduleMockingViewModelComponent()
         val action = AllScheduleAction.Fetch
         viewModel.onAction(action)
         verify(stateMachine, times(1)).send(action)
@@ -82,7 +57,7 @@ class AllScheduleViewModelTest {
 
     @Test
     fun `invoke fetch when subscribing home state`() = runTest {
-        val (viewModel, stateMachine) = createMockingViewModelComponent()
+        val (viewModel, stateMachine) = genAllScheduleMockingViewModelComponent()
         CoroutineScope(Dispatchers.Unconfined).launch { viewModel.state.collect() }
         verify(stateMachine, times(1)).send(AllScheduleAction.Fetch)
     }
@@ -92,7 +67,7 @@ class AllScheduleViewModelTest {
         val actualStates = mutableListOf<AllScheduleState>()
         val expectedReport: AllScheduleReport = genAllScheduleReport()
 
-        val viewModel: AllScheduleViewModel = createViewModel(
+        val viewModel: AllScheduleViewModel = genAllScheduleViewModel(
             getAllScheduleReport = mock {
                 whenever(mock(any())) doReturn flowOf(expectedReport)
             }
