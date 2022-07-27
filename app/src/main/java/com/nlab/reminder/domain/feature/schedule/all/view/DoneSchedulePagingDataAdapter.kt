@@ -19,6 +19,7 @@ package com.nlab.reminder.domain.feature.schedule.all.view
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
 import androidx.paging.PagingDataAdapter
+import com.nlab.reminder.domain.common.schedule.Schedule
 import com.nlab.reminder.domain.common.schedule.view.ScheduleItem
 import com.nlab.reminder.domain.common.schedule.view.ScheduleItemDiffCallback
 import com.nlab.reminder.domain.common.schedule.view.ScheduleItemViewHolder
@@ -27,13 +28,14 @@ import com.nlab.reminder.domain.common.schedule.view.ScheduleItemViewHolder
  * @author Doohyun
  */
 class DoneSchedulePagingDataAdapter(
-    private val lifecycleOwner: LifecycleOwner
+    private val lifecycleOwner: LifecycleOwner,
+    private val emptyItem: ScheduleItem = ScheduleItem(schedule = Schedule.createEmpty().copy(isComplete = true))
 ) : PagingDataAdapter<ScheduleItem, ScheduleItemViewHolder>(ScheduleItemDiffCallback()) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ScheduleItemViewHolder {
         return ScheduleItemViewHolder.create(parent, lifecycleOwner)
     }
 
     override fun onBindViewHolder(holder: ScheduleItemViewHolder, position: Int) {
-        holder.onBind(checkNotNull(getItem(position)) { "Adapter not support placeHolder" })
+        holder.onBind(scheduleItem = getItem(position) ?: emptyItem)
     }
 }

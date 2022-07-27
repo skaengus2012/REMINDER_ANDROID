@@ -23,7 +23,7 @@ import androidx.recyclerview.widget.DiffUtil
  */
 class ScheduleItemDiffCallback : DiffUtil.ItemCallback<ScheduleItem>() {
     override fun areItemsTheSame(oldItem: ScheduleItem, newItem: ScheduleItem): Boolean {
-        return oldItem == newItem
+        return oldItem.schedule == newItem.schedule
     }
 
     override fun areContentsTheSame(oldItem: ScheduleItem, newItem: ScheduleItem): Boolean {

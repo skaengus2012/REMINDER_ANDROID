@@ -31,4 +31,16 @@ data class Schedule(
     val tags: List<Tag>,
     val visiblePriority: Int,
     val isComplete: Boolean
-)
+) {
+    companion object {
+        fun createEmpty(): Schedule = Schedule(
+            scheduleId = -1,
+            title = "",
+            note = null,
+            url = null,
+            tags = emptyList(),
+            visiblePriority = 0,
+            isComplete = false
+        )
+    }
+}

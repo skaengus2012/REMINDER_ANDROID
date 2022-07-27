@@ -50,7 +50,7 @@ class DefaultGetAllScheduleReportUseCase(
             scheduleRepository
                 .getAsPagingData(ScheduleItemPagingRequest.FindByComplete(isComplete = true), pagingConfig)
                 .cachedIn(coroutineScope),
-            transform = Companion::transformToScheduleReport
+            transform = ::transformToScheduleReport
         )
 
     companion object {
@@ -60,7 +60,7 @@ class DefaultGetAllScheduleReportUseCase(
         ): AllScheduleReport = AllScheduleReport(
             doingSchedules,
             doneSchedules,
-            isDoneScheduleShown = false
+            isDoneScheduleShown = true
         )
     }
 }

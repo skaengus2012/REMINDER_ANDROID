@@ -21,7 +21,6 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.nlab.reminder.domain.common.schedule.*
 import com.nlab.reminder.domain.feature.schedule.all.GetAllScheduleReportUseCase
-import com.nlab.reminder.domain.feature.schedule.all.impl.DefaultGetAllScheduleReportUseCase
 import com.nlab.reminder.test.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi

@@ -14,17 +14,21 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.kotlin.flow
+package com.nlab.reminder.core.android.recyclerview
 
-import com.nlab.reminder.core.util.annotation.test.InlineRequired
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.combine
-
+import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.suspendCancellableCoroutine
 
 /**
  * @author Doohyun
  */
-
-@InlineRequired
-@Suppress("NOTHING_TO_INLINE")
-inline fun <T1, T2> Flow<T1>.combine(flow: Flow<T2>): Flow<Pair<T1, T2>> = combine(flow) { a, b -> a to b }
+@OptIn(ExperimentalCoroutinesApi::class)
+suspend fun <T : Any, VH : RecyclerView.ViewHolder> ListAdapter<T, VH>.suspendSubmitList(newItems: List<T>) {
+    suspendCancellableCoroutine { continuation ->
+        submitList(newItems) {
+            continuation.resume(Unit, null)
+        }
+    }
+}

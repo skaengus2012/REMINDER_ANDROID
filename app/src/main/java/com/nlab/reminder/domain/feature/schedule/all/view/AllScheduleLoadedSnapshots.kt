@@ -16,7 +16,6 @@
 
 package com.nlab.reminder.domain.feature.schedule.all.view
 
-import androidx.paging.map
 import com.nlab.reminder.domain.common.schedule.Schedule
 import com.nlab.reminder.domain.common.schedule.view.ScheduleItem
 import com.nlab.reminder.domain.feature.schedule.all.AllScheduleReport
@@ -24,25 +23,10 @@ import com.nlab.reminder.domain.feature.schedule.all.AllScheduleReport
 /**
  * @author Doohyun
  */
-inline fun AllScheduleLoadedSnapshot(
-    oldScheduleReport: AllScheduleReport?,
-    newScheduleReport: AllScheduleReport,
-    crossinline onCompleteToggleClicked: (Schedule) -> Unit
+fun AllScheduleLoadedSnapshot(
+    allScheduleReport: AllScheduleReport,
+    scheduleItemFactory: (Schedule) -> ScheduleItem
 ): AllScheduleLoadedSnapshot = AllScheduleLoadedSnapshot(
-    doingScheduleItems = newScheduleReport.doingSchedules.map { schedule ->
-        ScheduleItem(schedule, onCompleteToggleClicked)
-    },
-    doneScheduleItems = newScheduleReport.doneSchedules.map { schedule ->
-        ScheduleItem(schedule, onCompleteToggleClicked)
-    },
-    isDoneScheduleShown = newScheduleReport.isDoneScheduleShown,
-    isFirstBinding = (oldScheduleReport == null)
-)
-
-inline fun ScheduleItem(
-    schedule: Schedule,
-    crossinline onCompleteToggleClicked: (Schedule) -> Unit
-): ScheduleItem = ScheduleItem(
-    schedule,
-    onCompleteToggleClicked = { onCompleteToggleClicked(schedule) }
+    doingScheduleItems = allScheduleReport.doingSchedules.map(scheduleItemFactory),
+    isDoneScheduleShown = allScheduleReport.isDoneScheduleShown
 )

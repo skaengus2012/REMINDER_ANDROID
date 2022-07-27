@@ -22,6 +22,7 @@ import com.nlab.reminder.core.state.StateMachine
 import com.nlab.reminder.core.state.StateMachineImpl
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 /**
  * @author Doohyun
@@ -35,6 +36,6 @@ fun <A : Action, S : State> StateMachine(
     val state = MutableStateFlow(initState)
     return StateMachineImpl(
         StateMachineActionProcessor(scope, state, StateMachineBuilder<A, S>().apply(builderBlock)),
-        state
+        state.asStateFlow()
     )
 }

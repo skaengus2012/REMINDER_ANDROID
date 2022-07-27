@@ -25,8 +25,8 @@ import com.nlab.reminder.domain.common.tag.Tag
  */
 @ItemModel
 data class ScheduleItem(
-    private val schedule: Schedule,
-    val onCompleteToggleClicked: () -> Unit
+    val schedule: Schedule,
+    val onCompleteToggleClicked: () -> Unit = {}
 ) {
     val scheduleId: Long
         get() = schedule.scheduleId
@@ -42,9 +42,6 @@ data class ScheduleItem(
 
     val tags: List<Tag>
         get() = schedule.tags
-
-    val visiblePriority: Int
-        get() = schedule.visiblePriority
 
     val isComplete: Boolean
         get() = schedule.isComplete

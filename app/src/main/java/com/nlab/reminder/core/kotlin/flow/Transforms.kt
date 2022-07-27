@@ -18,9 +18,7 @@ package com.nlab.reminder.core.kotlin.flow
 
 import com.nlab.reminder.core.util.annotation.test.InlineRequired
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.scan
 
 /**
  * @author Doohyun
@@ -32,8 +30,3 @@ import kotlinx.coroutines.flow.scan
 @InlineRequired
 @Suppress("NOTHING_TO_INLINE")
 inline fun <T, R> Flow<T>.map(noinline transform: (value: T) -> R): Flow<R> = map { transform(it) }
-
-fun <T : Any> Flow<T>.withOld(): Flow<Pair<T?, T>> =
-    scan(Pair(null, null)) { acc: Pair<T?, T?>, value -> acc.second to value }
-        .filter { (_, new) -> new != null }
-        .map { (old, new) -> old to requireNotNull(new) }
