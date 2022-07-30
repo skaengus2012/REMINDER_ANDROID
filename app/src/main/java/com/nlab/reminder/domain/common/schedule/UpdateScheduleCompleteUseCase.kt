@@ -20,5 +20,5 @@ package com.nlab.reminder.domain.common.schedule
  * @author Doohyun
  */
 interface UpdateScheduleCompleteUseCase {
-    suspend operator fun invoke(schedule: Schedule, isComplete: Boolean)
+    suspend operator fun invoke(scheduleId: ScheduleId, isComplete: Boolean)
 }

@@ -149,8 +149,8 @@ class LocalScheduleRepositoryTest {
         val isComplete: Boolean = genBoolean()
         val scheduleDao: ScheduleDao = mock()
 
-        LocalScheduleRepository(scheduleDao).updateCompleteState(schedule, isComplete)
-        verify(scheduleDao, times(1)).updateCompleteState(schedule.scheduleId, isComplete)
+        LocalScheduleRepository(scheduleDao).updateCompleteState(schedule.id(), isComplete)
+        verify(scheduleDao, times(1)).updateCompleteState(schedule.id().value, isComplete)
     }
 
     private class FakePagingSource(

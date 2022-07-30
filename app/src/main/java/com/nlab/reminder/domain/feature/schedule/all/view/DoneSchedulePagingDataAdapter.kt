@@ -19,7 +19,7 @@ package com.nlab.reminder.domain.feature.schedule.all.view
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
 import androidx.paging.PagingDataAdapter
-import com.nlab.reminder.domain.common.schedule.Schedule
+import com.nlab.reminder.domain.common.schedule.util.EmptySchedule
 import com.nlab.reminder.domain.common.schedule.view.ScheduleItem
 import com.nlab.reminder.domain.common.schedule.view.ScheduleItemDiffCallback
 import com.nlab.reminder.domain.common.schedule.view.ScheduleItemViewHolder
@@ -29,7 +29,7 @@ import com.nlab.reminder.domain.common.schedule.view.ScheduleItemViewHolder
  */
 class DoneSchedulePagingDataAdapter(
     private val lifecycleOwner: LifecycleOwner,
-    private val emptyItem: ScheduleItem = ScheduleItem(schedule = Schedule.createEmpty().copy(isComplete = true))
+    private val emptyItem: ScheduleItem = ScheduleItem(schedule = EmptySchedule().copy(isComplete = true))
 ) : PagingDataAdapter<ScheduleItem, ScheduleItemViewHolder>(ScheduleItemDiffCallback()) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ScheduleItemViewHolder {
         return ScheduleItemViewHolder.create(parent, lifecycleOwner)

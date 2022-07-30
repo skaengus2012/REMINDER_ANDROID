@@ -21,10 +21,7 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
 import com.nlab.reminder.core.kotlin.flow.map
-import com.nlab.reminder.domain.common.schedule.Schedule
-import com.nlab.reminder.domain.common.schedule.ScheduleItemPagingRequest
-import com.nlab.reminder.domain.common.schedule.ScheduleItemRequest
-import com.nlab.reminder.domain.common.schedule.ScheduleRepository
+import com.nlab.reminder.domain.common.schedule.*
 import com.nlab.reminder.internal.common.android.database.ScheduleDao
 import com.nlab.reminder.internal.common.android.database.ScheduleEntityWithTagEntities
 import com.nlab.reminder.internal.common.android.database.toSchedule
@@ -62,7 +59,7 @@ class LocalScheduleRepository(
         return pager.flow.map { pagedData -> pagedData.map(ScheduleEntityWithTagEntities::toSchedule) }
     }
 
-    override suspend fun updateCompleteState(schedule: Schedule, isComplete: Boolean) {
-        scheduleDao.updateCompleteState(schedule.scheduleId, isComplete)
+    override suspend fun updateCompleteState(scheduleId: ScheduleId, isComplete: Boolean) {
+        scheduleDao.updateCompleteState(scheduleId.value, isComplete)
     }
 }

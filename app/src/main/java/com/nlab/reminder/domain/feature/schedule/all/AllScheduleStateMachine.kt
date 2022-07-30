@@ -16,7 +16,6 @@
 
 package com.nlab.reminder.domain.feature.schedule.all
 
-import androidx.paging.map
 import com.nlab.reminder.core.state.StateMachine
 import com.nlab.reminder.core.state.util.StateMachine
 import com.nlab.reminder.domain.common.schedule.UpdateScheduleCompleteUseCase
@@ -49,8 +48,8 @@ fun AllScheduleStateMachine(
                 if (oldState !is AllScheduleState.Loaded) oldState
                 else AllScheduleState.Loaded(allSchedulesReport = with(oldState.allSchedulesReport) {
                     copy(
-                        doingSchedules = doingSchedules.mapWithComplete(action.schedule, action.isComplete),
-                        doneSchedules = doneSchedules.mapWithComplete(action.schedule, action.isComplete)
+                        doingSchedules = doingSchedules.mapWithComplete(action.scheduleId, action.isComplete),
+                        doneSchedules = doneSchedules.mapWithComplete(action.scheduleId, action.isComplete)
                     )
                 })
             }
@@ -62,6 +61,6 @@ fun AllScheduleStateMachine(
     }
 
     sideEffectOn<AllScheduleAction.OnScheduleCompleteUpdateClicked, AllScheduleState.Loaded> { (action) ->
-        scope.launch { updateScheduleComplete(action.schedule, action.isComplete) }
+        scope.launch { updateScheduleComplete(action.scheduleId, action.isComplete) }
     }
 }

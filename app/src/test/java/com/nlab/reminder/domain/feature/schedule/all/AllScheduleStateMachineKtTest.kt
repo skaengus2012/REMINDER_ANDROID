@@ -47,7 +47,7 @@ class AllScheduleStateMachineKtTest {
     private val dummyActions: Set<AllScheduleAction> = setOf(
         AllScheduleAction.Fetch,
         AllScheduleAction.AllScheduleReportLoaded(genAllScheduleReport()),
-        AllScheduleAction.OnScheduleCompleteUpdateClicked(genSchedule(), genBoolean())
+        AllScheduleAction.OnScheduleCompleteUpdateClicked(genSchedule().id(), genBoolean())
     )
 
     private val dummyStates: Set<AllScheduleState> = setOf(
@@ -154,9 +154,9 @@ class AllScheduleStateMachineKtTest {
             updateScheduleComplete = updateScheduleCompleteUseCase
         )
         stateMachine
-            .send(AllScheduleAction.OnScheduleCompleteUpdateClicked(schedule, isComplete))
+            .send(AllScheduleAction.OnScheduleCompleteUpdateClicked(schedule.id(), isComplete))
             .join()
-        verify(updateScheduleCompleteUseCase, times(1))(schedule, isComplete)
+        verify(updateScheduleCompleteUseCase, times(1))(schedule.id(), isComplete)
     }
 
     @Test
@@ -174,7 +174,7 @@ class AllScheduleStateMachineKtTest {
         stateMachine
             .send(
                 AllScheduleAction.OnScheduleCompleteUpdateClicked(
-                    doingSchedule,
+                    doingSchedule.id(),
                     isComplete = doingScheduleComplete.not()
                 )
             )
@@ -182,7 +182,7 @@ class AllScheduleStateMachineKtTest {
         stateMachine
             .send(
                 AllScheduleAction.OnScheduleCompleteUpdateClicked(
-                    doneSchedule,
+                    doneSchedule.id(),
                     isComplete = doneScheduleComplete.not())
             )
             .join()

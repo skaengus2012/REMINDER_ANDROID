@@ -18,6 +18,7 @@ package com.nlab.reminder.domain.common.schedule.view
 
 import com.nlab.reminder.domain.common.android.view.recyclerview.ItemModel
 import com.nlab.reminder.domain.common.schedule.Schedule
+import com.nlab.reminder.domain.common.schedule.ScheduleId
 import com.nlab.reminder.domain.common.tag.Tag
 
 /**
@@ -28,8 +29,8 @@ data class ScheduleItem(
     val schedule: Schedule,
     val onCompleteToggleClicked: () -> Unit = {}
 ) {
-    val scheduleId: Long
-        get() = schedule.scheduleId
+    val scheduleId: ScheduleId
+        get() = schedule.id()
 
     val title: String
         get() = schedule.title

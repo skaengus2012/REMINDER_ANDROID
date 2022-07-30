@@ -95,7 +95,7 @@ class AllScheduleFragment : Fragment() {
     private fun createScheduleItem(schedule: Schedule): ScheduleItem = ScheduleItem(
         schedule,
         onCompleteToggleClicked = {
-            viewModel.onScheduleCompleteUpdateClicked(schedule, isComplete = schedule.isComplete.not())
+            viewModel.onScheduleCompleteUpdateClicked(schedule.id(), isComplete = schedule.isComplete.not())
         }
     )
 

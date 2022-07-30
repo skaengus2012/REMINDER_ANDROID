@@ -16,15 +16,15 @@
 
 package com.nlab.reminder.domain.common.schedule
 
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
-import kotlinx.coroutines.flow.Flow
+import com.nlab.reminder.core.util.annotation.test.Generated
 
 /**
  * @author Doohyun
  */
-interface ScheduleRepository {
-    fun get(request: ScheduleItemRequest): Flow<List<Schedule>>
-    fun getAsPagingData(request: ScheduleItemPagingRequest, pagingConfig: PagingConfig): Flow<PagingData<Schedule>>
-    suspend fun updateCompleteState(scheduleId: ScheduleId, isComplete: Boolean)
+@Generated
+@JvmInline
+value class ScheduleId(val value: Long) {
+    init {
+        require(value >= 0) { "Id should be bigger than 0, input was [$value]" }
+    }
 }

@@ -39,7 +39,7 @@ class DefaultUpdateScheduleCompleteUseCaseTest {
         val scheduleRepository: ScheduleRepository = mock()
         val updateScheduleCompleteUseCase = DefaultUpdateScheduleCompleteUseCase(scheduleRepository)
 
-        updateScheduleCompleteUseCase(schedule, isComplete)
-        verify(scheduleRepository, times(1)).updateCompleteState(schedule, isComplete)
+        updateScheduleCompleteUseCase(schedule.id(), isComplete)
+        verify(scheduleRepository, times(1)).updateCompleteState(schedule.id(), isComplete)
     }
 }

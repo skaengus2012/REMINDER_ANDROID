@@ -16,11 +16,11 @@
 
 package com.nlab.reminder.domain.feature.schedule.all
 
-import com.nlab.reminder.domain.common.schedule.Schedule
+import com.nlab.reminder.domain.common.schedule.ScheduleId
 
 /**
  * @author Doohyun
  */
-fun AllScheduleViewModel.onScheduleCompleteUpdateClicked(schedule: Schedule, isComplete: Boolean) {
-    onAction(AllScheduleAction.OnScheduleCompleteUpdateClicked(schedule, isComplete))
+fun AllScheduleViewModel.onScheduleCompleteUpdateClicked(scheduleId: ScheduleId, isComplete: Boolean) {
+    onAction(AllScheduleAction.OnScheduleCompleteUpdateClicked(scheduleId, isComplete))
 }

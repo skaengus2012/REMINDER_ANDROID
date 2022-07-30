@@ -24,7 +24,7 @@ import com.nlab.reminder.domain.common.tag.Tag
  */
 @Generated
 data class Schedule(
-    val scheduleId: Long,
+    private val scheduleId: Long,
     val title: String,
     val note: String?,
     val url: String?,
@@ -32,15 +32,5 @@ data class Schedule(
     val visiblePriority: Int,
     val isComplete: Boolean
 ) {
-    companion object {
-        fun createEmpty(): Schedule = Schedule(
-            scheduleId = -1,
-            title = "",
-            note = null,
-            url = null,
-            tags = emptyList(),
-            visiblePriority = 0,
-            isComplete = false
-        )
-    }
+    fun id(): ScheduleId = ScheduleId(scheduleId)
 }

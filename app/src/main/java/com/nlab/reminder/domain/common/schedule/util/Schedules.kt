@@ -18,22 +18,36 @@ package com.nlab.reminder.domain.common.schedule.util
 
 import androidx.paging.PagingData
 import androidx.paging.map
+import com.nlab.reminder.core.util.annotation.test.Generated
 import com.nlab.reminder.domain.common.schedule.Schedule
+import com.nlab.reminder.domain.common.schedule.ScheduleId
 
 /**
  * @author Doohyun
  */
-private fun mapCompleteIfNeed(what: Schedule, isComplete: Boolean): (Schedule) -> Schedule = { schedule ->
-    if (schedule == what) schedule.copy(isComplete = isComplete)
+@Generated
+@Suppress("FunctionName")
+fun EmptySchedule(): Schedule = Schedule(
+    scheduleId = 0,
+    title = "",
+    note = null,
+    url = null,
+    tags = emptyList(),
+    visiblePriority = 0,
+    isComplete = false
+)
+
+private fun mapCompleteIfNeed(id: ScheduleId, isComplete: Boolean): (Schedule) -> Schedule = { schedule ->
+    if (schedule.id() == id) schedule.copy(isComplete = isComplete)
     else schedule
 }
 
 fun List<Schedule>.mapWithComplete(
-    what: Schedule,
+    id: ScheduleId,
     isComplete: Boolean
-): List<Schedule> = map(mapCompleteIfNeed(what, isComplete))
+): List<Schedule> = map(mapCompleteIfNeed(id, isComplete))
 
 fun PagingData<Schedule>.mapWithComplete(
-    what: Schedule,
+    id: ScheduleId,
     isComplete: Boolean
-): PagingData<Schedule> = map(mapCompleteIfNeed(what, isComplete))
+): PagingData<Schedule> = map(mapCompleteIfNeed(id, isComplete))
