@@ -16,16 +16,26 @@
 
 package com.nlab.reminder.domain.feature.schedule.all
 
+import androidx.paging.AsyncPagingDataDiffer
+import androidx.paging.PagingData
 import com.nlab.reminder.domain.common.schedule.Schedule
+import com.nlab.reminder.domain.common.schedule.UpdateScheduleCompleteUseCase
 import com.nlab.reminder.domain.common.schedule.genSchedule
+import com.nlab.reminder.test.IdentityItemCallback
+import com.nlab.reminder.test.NoopListCallback
 import com.nlab.reminder.test.genBoolean
+import com.nlab.reminder.test.genFlowExecutionDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.*
+import org.junit.After
+import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.*
 
@@ -45,6 +55,16 @@ class AllScheduleStateMachineKtTest {
         AllScheduleState.Loading,
         AllScheduleState.Loaded(genAllScheduleReport())
     )
+
+    @Before
+    fun setUp() = runTest {
+        Dispatchers.setMain(genFlowExecutionDispatcher(testScheduler))
+    }
+
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
+    }
 
     @Test
     fun `holds injected state when machine created`() = runTest {
@@ -137,5 +157,58 @@ class AllScheduleStateMachineKtTest {
             .send(AllScheduleAction.OnScheduleCompleteUpdateClicked(schedule, isComplete))
             .join()
         verify(updateScheduleCompleteUseCase, times(1))(schedule, isComplete)
+    }
+
+    @Test
+    fun `react complete changed when stateMachine received update schedule complete`() = runTest {
+        val doingScheduleComplete: Boolean = genBoolean()
+        val doneScheduleComplete: Boolean = genBoolean()
+        val doingSchedule: Schedule = genSchedule(isComplete = doingScheduleComplete)
+        val doneSchedule: Schedule = genSchedule(isComplete = doneScheduleComplete)
+        val stateMachine: AllScheduleStateMachine = genStateMachine(
+            initState = AllScheduleState.Loaded(genAllScheduleReport(
+                doingSchedules = listOf(doingSchedule),
+                doneSchedules = PagingData.from(listOf(doneSchedule))
+            ))
+        )
+        stateMachine
+            .send(
+                AllScheduleAction.OnScheduleCompleteUpdateClicked(
+                    doingSchedule,
+                    isComplete = doingScheduleComplete.not()
+                )
+            )
+            .join()
+        stateMachine
+            .send(
+                AllScheduleAction.OnScheduleCompleteUpdateClicked(
+                    doneSchedule,
+                    isComplete = doneScheduleComplete.not())
+            )
+            .join()
+
+        val result: AllScheduleReport =
+            stateMachine.state
+                .filterIsInstance<AllScheduleState.Loaded>()
+                .map { it.allSchedulesReport }
+                .first()
+        val differ = AsyncPagingDataDiffer(
+            diffCallback = IdentityItemCallback<Schedule>(),
+            updateCallback = NoopListCallback(),
+            workerDispatcher = Dispatchers.Main
+        )
+
+        assertThat(
+            result.doingSchedules,
+            equalTo(
+                listOf(doingSchedule.copy(isComplete = doingScheduleComplete.not()))
+            )
+        )
+        assertThat(
+            differ.apply { submitData(result.doneSchedules) }.snapshot().items,
+            equalTo(
+                listOf(doneSchedule.copy(isComplete = doneScheduleComplete.not()))
+            )
+        )
     }
 }

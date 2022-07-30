@@ -20,7 +20,7 @@ import androidx.paging.PagingConfig
 import com.nlab.reminder.domain.common.schedule.ScheduleRepository
 import com.nlab.reminder.domain.feature.schedule.all.AllScheduleStateMachineFactory
 import com.nlab.reminder.domain.feature.schedule.all.impl.DefaultGetAllScheduleReportUseCase
-import com.nlab.reminder.domain.feature.schedule.all.impl.DefaultUpdateScheduleCompleteUseCase
+import com.nlab.reminder.domain.common.schedule.impl.DefaultUpdateScheduleCompleteUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

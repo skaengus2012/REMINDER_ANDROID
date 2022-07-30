@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.feature.schedule.all
-
-import com.nlab.reminder.domain.common.schedule.Schedule
+package com.nlab.reminder.domain.common.schedule
 
 /**
  * @author Doohyun

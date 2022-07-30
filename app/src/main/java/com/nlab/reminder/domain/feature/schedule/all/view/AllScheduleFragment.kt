@@ -76,12 +76,7 @@ class AllScheduleFragment : Fragment() {
             .flowWithLifecycle(viewLifecycle)
             .map { it.allSchedulesReport }
             .distinctUntilChanged()
-            .map { report ->
-                AllScheduleLoadedSnapshot(
-                    report,
-                    scheduleItemFactory = ::createScheduleItem
-                )
-            }
+            .map { report -> AllScheduleLoadedSnapshot(report, scheduleItemFactory = ::createScheduleItem) }
             .flowOn(Dispatchers.Default)
             .onEach { snapshot -> renderWhenLoaded(snapshot) }
             .launchIn(viewLifecycleScope)

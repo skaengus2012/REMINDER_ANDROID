@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.feature.schedule.all.impl
+package com.nlab.reminder.domain.common.schedule.impl
 
 import com.nlab.reminder.domain.common.schedule.Schedule
 import com.nlab.reminder.domain.common.schedule.ScheduleRepository
-import com.nlab.reminder.domain.feature.schedule.all.UpdateScheduleCompleteUseCase
+import com.nlab.reminder.domain.common.schedule.UpdateScheduleCompleteUseCase
 
 /**
  * @author Doohyun

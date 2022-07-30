@@ -16,6 +16,7 @@
 
 package com.nlab.reminder.domain.feature.schedule.all
 
+import com.nlab.reminder.domain.common.schedule.UpdateScheduleCompleteUseCase
 import kotlinx.coroutines.CoroutineScope
 
 /**
