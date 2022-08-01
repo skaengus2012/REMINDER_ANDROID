@@ -16,17 +16,30 @@
 
 package com.nlab.reminder.domain.common.schedule.impl
 
-import com.nlab.reminder.domain.common.schedule.ScheduleId
-import com.nlab.reminder.domain.common.schedule.ScheduleRepository
-import com.nlab.reminder.domain.common.schedule.UpdateScheduleCompleteUseCase
+import com.nlab.reminder.core.kotlin.coroutine.Delay
+import com.nlab.reminder.core.kotlin.coroutine.flow.firstElement
+import com.nlab.reminder.domain.common.schedule.*
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.withContext
 
 /**
  * @author Doohyun
  */
 class DefaultUpdateScheduleCompleteUseCase(
-    private val scheduleRepository: ScheduleRepository
+    private val scheduleRepository: ScheduleRepository,
+    private val pendingDelayed: Delay
 ) : UpdateScheduleCompleteUseCase {
     override suspend fun invoke(scheduleId: ScheduleId, isComplete: Boolean) {
-        scheduleRepository.updateCompleteState(scheduleId, isComplete)
+        withContext(NonCancellable) {
+            scheduleRepository.updatePendingComplete(scheduleId, isComplete)
+            pendingDelayed()
+
+            scheduleRepository
+                .get(ScheduleItemRequest.FindByScheduleId(scheduleId))
+                .firstElement()
+                ?.let { schedule ->
+                    println("sadsdasad ${schedule.id()} ${schedule.isComplete}")
+                    scheduleRepository.updateComplete(schedule.id(), schedule.isComplete) }
+        }
     }
 }

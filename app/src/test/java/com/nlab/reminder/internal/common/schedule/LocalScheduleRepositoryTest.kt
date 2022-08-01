@@ -55,16 +55,23 @@ class LocalScheduleRepositoryTest {
         val scheduleRepository: ScheduleRepository = LocalScheduleRepository(scheduleDao)
         val requestConfig = ScheduleItemRequest.FindByComplete(expectedIsComplete)
         scheduleRepository.get(requestConfig)
-        verify(scheduleDao, times(1)).find(isComplete = expectedIsComplete)
+        verify(scheduleDao, times(1)).findByComplete(isComplete = expectedIsComplete)
     }
 
     @Test
     fun `observe 2 times schedules when ScheduleDao sent 2 times notifications`() = runTest {
+        val expectedScheduleId: Long = genLong("####")
         val expectedIsComplete: Boolean = genBoolean()
+        observeSchedulesWhenScheduleDaoNotified2Times(
+            ScheduleItemRequest.FindByScheduleId(ScheduleId(expectedScheduleId)),
+            setupMock = { scheduleDao, mockFlow ->
+                whenever(scheduleDao.findById(expectedScheduleId)) doReturn mockFlow
+            }
+        )
         observeSchedulesWhenScheduleDaoNotified2Times(
             ScheduleItemRequest.FindByComplete(expectedIsComplete),
             setupMock = { scheduleDao, mockFlow ->
-                whenever(scheduleDao.find(expectedIsComplete)) doReturn mockFlow
+                whenever(scheduleDao.findByComplete(expectedIsComplete)) doReturn mockFlow
             }
         )
     }
@@ -106,7 +113,7 @@ class LocalScheduleRepositoryTest {
         observeSchedulePagingDataWhenPagingDataFlowSubscribed(
             ScheduleItemPagingRequest.FindByComplete(expectedIsComplete),
             setupMock = { scheduleDao, fakePagingSource ->
-                whenever(scheduleDao.findAsPagingSource(expectedIsComplete)) doReturn fakePagingSource
+                whenever(scheduleDao.findByCompleteAsPagingSource(expectedIsComplete)) doReturn fakePagingSource
             }
         )
     }
@@ -149,8 +156,18 @@ class LocalScheduleRepositoryTest {
         val isComplete: Boolean = genBoolean()
         val scheduleDao: ScheduleDao = mock()
 
-        LocalScheduleRepository(scheduleDao).updateCompleteState(schedule.id(), isComplete)
-        verify(scheduleDao, times(1)).updateCompleteState(schedule.id().value, isComplete)
+        LocalScheduleRepository(scheduleDao).updateComplete(schedule.id(), isComplete)
+        verify(scheduleDao, times(1)).updateComplete(schedule.id().value, isComplete)
+    }
+
+    @Test
+    fun `scheduleDao pending update complete state when repository invoked update pending complete state`() = runTest {
+        val schedule: Schedule = genSchedule()
+        val isComplete: Boolean = genBoolean()
+        val scheduleDao: ScheduleDao = mock()
+
+        LocalScheduleRepository(scheduleDao).updatePendingComplete(schedule.id(), isComplete)
+        verify(scheduleDao, times(1)).updatePendingComplete(schedule.id().value, isComplete)
     }
 
     private class FakePagingSource(

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.internal.android.init
+package com.nlab.reminder.internal.common.android.init
 
 import android.content.Context
 import androidx.startup.Initializer

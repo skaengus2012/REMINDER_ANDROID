@@ -17,7 +17,6 @@
 package com.nlab.reminder.domain.feature.schedule.all.view
 
 import android.view.ViewGroup
-import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.ListAdapter
 import com.nlab.reminder.domain.common.schedule.view.ScheduleItem
 import com.nlab.reminder.domain.common.schedule.view.ScheduleItemDiffCallback
@@ -26,11 +25,9 @@ import com.nlab.reminder.domain.common.schedule.view.ScheduleItemViewHolder
 /**
  * @author Doohyun
  */
-class DoingScheduleItemAdapter(
-    private val lifecycleOwner: LifecycleOwner
-) : ListAdapter<ScheduleItem, ScheduleItemViewHolder>(ScheduleItemDiffCallback()) {
+class DoingScheduleItemAdapter : ListAdapter<ScheduleItem, ScheduleItemViewHolder>(ScheduleItemDiffCallback()) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ScheduleItemViewHolder {
-        return ScheduleItemViewHolder.create(parent, lifecycleOwner)
+        return ScheduleItemViewHolder.of(parent)
     }
 
     override fun onBindViewHolder(holder: ScheduleItemViewHolder, position: Int) {

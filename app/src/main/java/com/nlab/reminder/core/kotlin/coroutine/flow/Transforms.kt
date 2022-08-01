@@ -14,22 +14,19 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.common.schedule.util
+package com.nlab.reminder.core.kotlin.coroutine.flow
 
-import com.nlab.reminder.core.util.annotation.test.Generated
-import com.nlab.reminder.domain.common.schedule.Schedule
+import com.nlab.reminder.core.util.annotation.test.InlineRequired
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 /**
  * @author Doohyun
  */
-@Generated
-@Suppress("FunctionName")
-fun EmptySchedule(): Schedule = Schedule(
-    scheduleId = 0,
-    title = "",
-    note = null,
-    url = null,
-    tags = emptyList(),
-    visiblePriority = 0,
-    isComplete = false
-)
+
+/**
+ * jacoco cannot recognize this function..
+ */
+@InlineRequired
+@Suppress("NOTHING_TO_INLINE")
+inline fun <T, R> Flow<T>.map(noinline transform: (value: T) -> R): Flow<R> = map { transform(it) }

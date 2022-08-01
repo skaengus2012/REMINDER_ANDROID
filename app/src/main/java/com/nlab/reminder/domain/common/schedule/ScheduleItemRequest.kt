@@ -23,5 +23,7 @@ import com.nlab.reminder.core.util.annotation.test.Generated
  */
 sealed class ScheduleItemRequest private constructor() {
     @Generated
+    data class FindByScheduleId(val scheduleId: ScheduleId) : ScheduleItemRequest()
+    @Generated
     data class FindByComplete(val isComplete: Boolean) : ScheduleItemRequest()
 }

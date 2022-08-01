@@ -29,7 +29,7 @@ fun ScheduleEntity.toSchedule(tags: List<Tag> = emptyList()): Schedule = Schedul
     url = url,
     tags = tags,
     visiblePriority = visiblePriority,
-    isComplete = isComplete
+    isComplete = isPendingComplete
 )
 
 fun Schedule.toEntity(): ScheduleEntity = ScheduleEntity(
@@ -38,5 +38,6 @@ fun Schedule.toEntity(): ScheduleEntity = ScheduleEntity(
     description = note,
     url = url,
     visiblePriority = visiblePriority,
-    isComplete = isComplete
+    isComplete = isComplete,
+    isPendingComplete = isComplete
 )

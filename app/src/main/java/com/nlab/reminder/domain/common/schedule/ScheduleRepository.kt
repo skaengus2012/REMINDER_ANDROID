@@ -26,5 +26,6 @@ import kotlinx.coroutines.flow.Flow
 interface ScheduleRepository {
     fun get(request: ScheduleItemRequest): Flow<List<Schedule>>
     fun getAsPagingData(request: ScheduleItemPagingRequest, pagingConfig: PagingConfig): Flow<PagingData<Schedule>>
-    suspend fun updateCompleteState(scheduleId: ScheduleId, isComplete: Boolean)
+    suspend fun updatePendingComplete(scheduleId: ScheduleId, isComplete: Boolean)
+    suspend fun updateComplete(scheduleId: ScheduleId, isComplete: Boolean)
 }

@@ -30,5 +30,6 @@ data class ScheduleEntity(
     @ColumnInfo(name = "description") val description: String? = null,
     @ColumnInfo(name = "url") val url: String? = null,
     @ColumnInfo(name = "visible_priority") val visiblePriority: Int = 0,
-    @ColumnInfo(name = "is_complete") val isComplete: Boolean = false
+    @ColumnInfo(name = "is_complete") val isComplete: Boolean = false,
+    @ColumnInfo(name = "is_pending_complete") val isPendingComplete: Boolean = false
 )

@@ -29,4 +29,8 @@ class ScheduleItemDiffCallback : DiffUtil.ItemCallback<ScheduleItem>() {
     override fun areContentsTheSame(oldItem: ScheduleItem, newItem: ScheduleItem): Boolean {
         return oldItem.schedule == newItem.schedule
     }
+
+    override fun getChangePayload(oldItem: ScheduleItem, newItem: ScheduleItem): Any {
+        return newItem
+    }
 }

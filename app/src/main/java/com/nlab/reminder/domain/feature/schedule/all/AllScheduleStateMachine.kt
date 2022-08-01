@@ -19,7 +19,6 @@ package com.nlab.reminder.domain.feature.schedule.all
 import com.nlab.reminder.core.state.StateMachine
 import com.nlab.reminder.core.state.util.StateMachine
 import com.nlab.reminder.domain.common.schedule.UpdateScheduleCompleteUseCase
-import com.nlab.reminder.domain.common.schedule.util.mapWithComplete
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -44,15 +43,7 @@ fun AllScheduleStateMachine(
                 if (oldState is AllScheduleState.Init) oldState
                 else AllScheduleState.Loaded(action.allSchedulesReport)
             }
-            is AllScheduleAction.OnScheduleCompleteUpdateClicked -> {
-                if (oldState !is AllScheduleState.Loaded) oldState
-                else AllScheduleState.Loaded(allSchedulesReport = with(oldState.allSchedulesReport) {
-                    copy(
-                        doingSchedules = doingSchedules.mapWithComplete(action.scheduleId, action.isComplete),
-                        doneSchedules = doneSchedules.mapWithComplete(action.scheduleId, action.isComplete)
-                    )
-                })
-            }
+            else -> oldState
         }
     }
 

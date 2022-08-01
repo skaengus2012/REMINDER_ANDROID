@@ -16,7 +16,7 @@
 
 package com.nlab.reminder.internal.common.tag
 
-import com.nlab.reminder.core.kotlin.flow.map
+import com.nlab.reminder.core.kotlin.coroutine.flow.map
 import com.nlab.reminder.domain.common.tag.Tag
 import com.nlab.reminder.domain.common.tag.TagRepository
 import com.nlab.reminder.internal.common.android.database.*

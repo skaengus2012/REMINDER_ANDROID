@@ -14,22 +14,13 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.common.schedule.util
+package com.nlab.reminder.internal.common
 
-import com.nlab.reminder.core.util.annotation.test.Generated
-import com.nlab.reminder.domain.common.schedule.Schedule
+import javax.inject.Qualifier
 
 /**
  * @author Doohyun
  */
-@Generated
-@Suppress("FunctionName")
-fun EmptySchedule(): Schedule = Schedule(
-    scheduleId = 0,
-    title = "",
-    note = null,
-    url = null,
-    tags = emptyList(),
-    visiblePriority = 0,
-    isComplete = false
-)
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class InternalCommonScope

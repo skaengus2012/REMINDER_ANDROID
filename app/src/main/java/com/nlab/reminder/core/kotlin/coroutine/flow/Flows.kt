@@ -14,22 +14,15 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.common.schedule.util
+package com.nlab.reminder.core.kotlin.coroutine.flow
 
-import com.nlab.reminder.core.util.annotation.test.Generated
-import com.nlab.reminder.domain.common.schedule.Schedule
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.firstOrNull
 
 /**
  * @author Doohyun
  */
-@Generated
-@Suppress("FunctionName")
-fun EmptySchedule(): Schedule = Schedule(
-    scheduleId = 0,
-    title = "",
-    note = null,
-    url = null,
-    tags = emptyList(),
-    visiblePriority = 0,
-    isComplete = false
-)
+suspend fun <T : Any> Flow<List<T>>.firstElement(): T? {
+    val curItems: List<T> = firstOrNull() ?: emptyList()
+    return curItems.firstOrNull()
+}

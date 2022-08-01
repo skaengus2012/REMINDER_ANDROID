@@ -20,7 +20,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
-import com.nlab.reminder.core.kotlin.flow.map
+import com.nlab.reminder.core.kotlin.coroutine.flow.map
 import com.nlab.reminder.domain.common.schedule.*
 import com.nlab.reminder.internal.common.android.database.ScheduleDao
 import com.nlab.reminder.internal.common.android.database.ScheduleEntityWithTagEntities
@@ -37,8 +37,11 @@ class LocalScheduleRepository(
     override fun get(request: ScheduleItemRequest): Flow<List<Schedule>> {
         val resultFlow: Flow<List<ScheduleEntityWithTagEntities>> =
             when (request) {
+                is ScheduleItemRequest.FindByScheduleId -> {
+                    scheduleDao.findById(scheduleId = request.scheduleId.value)
+                }
                 is ScheduleItemRequest.FindByComplete -> {
-                    scheduleDao.find(isComplete = request.isComplete)
+                    scheduleDao.findByComplete(isComplete = request.isComplete)
                 }
             }
 
@@ -52,14 +55,18 @@ class LocalScheduleRepository(
         val pager = Pager(pagingConfig, pagingSourceFactory = {
             when (request) {
                 is ScheduleItemPagingRequest.FindByComplete -> {
-                    scheduleDao.findAsPagingSource(isComplete = request.isComplete)
+                    scheduleDao.findByCompleteAsPagingSource(isComplete = request.isComplete)
                 }
             }
         })
         return pager.flow.map { pagedData -> pagedData.map(ScheduleEntityWithTagEntities::toSchedule) }
     }
 
-    override suspend fun updateCompleteState(scheduleId: ScheduleId, isComplete: Boolean) {
-        scheduleDao.updateCompleteState(scheduleId.value, isComplete)
+    override suspend fun updatePendingComplete(scheduleId: ScheduleId, isComplete: Boolean) {
+        scheduleDao.updatePendingComplete(scheduleId.value, isComplete)
+    }
+
+    override suspend fun updateComplete(scheduleId: ScheduleId, isComplete: Boolean) {
+        scheduleDao.updateComplete(scheduleId.value, isComplete)
     }
 }

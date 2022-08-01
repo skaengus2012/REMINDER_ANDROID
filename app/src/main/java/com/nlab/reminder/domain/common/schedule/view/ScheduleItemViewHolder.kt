@@ -18,29 +18,29 @@ package com.nlab.reminder.domain.common.schedule.view
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
+import com.nlab.reminder.core.android.view.initWithLifecycleOwner
 import com.nlab.reminder.core.android.view.throttleClicks
 import com.nlab.reminder.databinding.ViewItemScheduleBinding
-import com.nlab.reminder.domain.common.schedule.Schedule
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 /**
  * @author Doohyun
  */
-class ScheduleItemViewHolder private constructor(
-    lifecycleOwner: LifecycleOwner,
+class ScheduleItemViewHolder(
     private val binding: ViewItemScheduleBinding
 ) : RecyclerView.ViewHolder(binding.root) {
     private var onCompleteToggleClicked: () -> Unit = {}
 
     init {
-        binding.checkboxButton
-            .throttleClicks()
-            .onEach { onCompleteToggleClicked() }
-            .launchIn(lifecycleOwner.lifecycleScope)
+        binding.initWithLifecycleOwner { lifecycleOwner ->
+            checkboxButton
+                .throttleClicks()
+                .onEach { onCompleteToggleClicked() }
+                .launchIn(lifecycleOwner.lifecycleScope)
+        }
     }
 
     fun onBind(scheduleItem: ScheduleItem) {
@@ -52,11 +52,7 @@ class ScheduleItemViewHolder private constructor(
     }
 
     companion object {
-        fun create(
-            parent: ViewGroup,
-            lifecycleOwner: LifecycleOwner
-        ): ScheduleItemViewHolder = ScheduleItemViewHolder(
-            lifecycleOwner,
+        fun of(parent: ViewGroup): ScheduleItemViewHolder = ScheduleItemViewHolder(
             ViewItemScheduleBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         )
     }

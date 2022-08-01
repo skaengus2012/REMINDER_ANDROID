@@ -14,22 +14,25 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.common.schedule.util
+package com.nlab.reminder.internal.common.di
 
-import com.nlab.reminder.core.util.annotation.test.Generated
-import com.nlab.reminder.domain.common.schedule.Schedule
+import com.nlab.reminder.internal.common.InternalCommonScope
+import dagger.Module
+import dagger.Provides
+import dagger.Reusable
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 
 /**
  * @author Doohyun
  */
-@Generated
-@Suppress("FunctionName")
-fun EmptySchedule(): Schedule = Schedule(
-    scheduleId = 0,
-    title = "",
-    note = null,
-    url = null,
-    tags = emptyList(),
-    visiblePriority = 0,
-    isComplete = false
-)
+@Module
+@InstallIn(SingletonComponent::class)
+class InternalCoroutineModule {
+    @Reusable
+    @InternalCommonScope
+    @Provides
+    fun provideCoroutineScope(): CoroutineScope = CoroutineScope(Dispatchers.Default)
+}

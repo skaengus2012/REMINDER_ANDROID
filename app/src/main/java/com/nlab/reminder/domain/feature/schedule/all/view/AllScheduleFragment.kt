@@ -60,8 +60,8 @@ class AllScheduleFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val doingScheduleAdapter = DoingScheduleItemAdapter(viewLifecycleOwner)
-        val doneScheduleAdapter = DoneSchedulePagingDataAdapter(viewLifecycleOwner)
+        val doingScheduleAdapter = DoingScheduleItemAdapter()
+        val doneScheduleAdapter = DoneSchedulePagingDataAdapter()
         val scheduleAdapter = ConcatAdapter(
             ConcatAdapter.Config.Builder().setIsolateViewTypes(false).build(),
             doingScheduleAdapter,
@@ -86,7 +86,6 @@ class AllScheduleFragment : Fragment() {
             .flowWithLifecycle(viewLifecycle)
             .map { it.allSchedulesReport.doneSchedules }
             .distinctUntilChanged()
-            .conflate()
             .onEach { pagingData -> doneScheduleAdapter.submitData(pagingData.map(::createScheduleItem)) }
             .flowOn(Dispatchers.Default)
             .launchIn(viewLifecycleScope)

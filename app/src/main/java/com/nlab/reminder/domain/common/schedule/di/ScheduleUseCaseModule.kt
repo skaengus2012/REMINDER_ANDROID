@@ -14,35 +14,28 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.feature.schedule.all.di
+package com.nlab.reminder.domain.common.schedule.di
 
-import androidx.paging.PagingConfig
+import com.nlab.reminder.core.kotlin.coroutine.util.Delay
 import com.nlab.reminder.domain.common.schedule.ScheduleRepository
 import com.nlab.reminder.domain.common.schedule.UpdateScheduleCompleteUseCase
-import com.nlab.reminder.domain.feature.schedule.all.AllScheduleStateMachineFactory
-import com.nlab.reminder.domain.feature.schedule.all.impl.DefaultGetAllScheduleReportUseCase
+import com.nlab.reminder.domain.common.schedule.impl.DefaultUpdateScheduleCompleteUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
-import kotlinx.coroutines.Dispatchers
 
 /**
  * @author Doohyun
  */
 @Module
 @InstallIn(ViewModelComponent::class)
-class AllScheduleViewModelModule {
+class ScheduleUseCaseModule {
     @Provides
-    fun provideStateMachineProvider(
-        scheduleRepository: ScheduleRepository,
-        updateScheduleCompleteUseCase: UpdateScheduleCompleteUseCase
-    ): AllScheduleStateMachineFactory = AllScheduleStateMachineFactory(
-        getAllScheduleReport = DefaultGetAllScheduleReportUseCase(
-            scheduleRepository,
-            pagingConfig = PagingConfig(pageSize = 10),
-            dispatcher = Dispatchers.Default
-        ),
-        updateScheduleComplete = updateScheduleCompleteUseCase
+    fun provideUpdateScheduleCompleteUseCase(
+        scheduleRepository: ScheduleRepository
+    ): UpdateScheduleCompleteUseCase = DefaultUpdateScheduleCompleteUseCase(
+        scheduleRepository,
+        Delay(timeMillis = 1_500)
     )
 }

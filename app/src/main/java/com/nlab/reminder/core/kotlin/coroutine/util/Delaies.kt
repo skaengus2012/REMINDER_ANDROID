@@ -14,22 +14,16 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.common.schedule.util
+package com.nlab.reminder.core.kotlin.coroutine.util
 
-import com.nlab.reminder.core.util.annotation.test.Generated
-import com.nlab.reminder.domain.common.schedule.Schedule
+import com.nlab.reminder.core.kotlin.coroutine.Delay
+import kotlinx.coroutines.delay
 
 /**
  * @author Doohyun
  */
-@Generated
-@Suppress("FunctionName")
-fun EmptySchedule(): Schedule = Schedule(
-    scheduleId = 0,
-    title = "",
-    note = null,
-    url = null,
-    tags = emptyList(),
-    visiblePriority = 0,
-    isComplete = false
-)
+fun Delay(timeMillis: Long): Delay = object : Delay {
+    override suspend fun invoke() {
+        delay(timeMillis)
+    }
+}

@@ -14,22 +14,11 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.common.schedule.util
-
-import com.nlab.reminder.core.util.annotation.test.Generated
-import com.nlab.reminder.domain.common.schedule.Schedule
+package com.nlab.reminder.core.kotlin.coroutine
 
 /**
  * @author Doohyun
  */
-@Generated
-@Suppress("FunctionName")
-fun EmptySchedule(): Schedule = Schedule(
-    scheduleId = 0,
-    title = "",
-    note = null,
-    url = null,
-    tags = emptyList(),
-    visiblePriority = 0,
-    isComplete = false
-)
+interface Delay {
+    suspend operator fun invoke()
+}

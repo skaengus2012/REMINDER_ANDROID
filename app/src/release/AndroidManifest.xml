@@ -18,22 +18,16 @@
 	xmlns:tools="http://schemas.android.com/tools"
 	package="com.nlab.reminder">
 
-	<application
-		android:name=".ReminderApplication"
-		android:icon="@mipmap/ic_launcher"
-		android:label="@string/app_name"
-		android:supportsRtl="true"
-		android:theme="@style/AppTheme"
-		tools:ignore="AllowBackup">
-
-		<activity
-			android:name=".domain.feature.main.view.MainActivity"
-			android:exported="true">
-			<intent-filter>
-				<action android:name="android.intent.action.MAIN" />
-				<category android:name="android.intent.category.LAUNCHER" />
-			</intent-filter>
-		</activity>
+	<application tools:ignore="MissingApplicationIcon">
+		<provider
+			android:name="androidx.startup.InitializationProvider"
+			android:authorities="${applicationId}.androidx-startup"
+			android:exported="false"
+			tools:node="merge">
+			<meta-data
+				android:name="com.nlab.reminder.internal.common.android.init.DatabaseInitializer"
+				android:value="androidx.startup" />
+		</provider>
 	</application>
 
 </manifest>

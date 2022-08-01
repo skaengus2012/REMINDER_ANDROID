@@ -36,8 +36,8 @@ class CategoryViewHolder(
     private var onItemClicked: () -> Unit = {}
 
     init {
-        itemView.initWithLifecycleOwner { lifecycleOwner ->
-            binding.categoryLayout
+        binding.initWithLifecycleOwner { lifecycleOwner ->
+            categoryLayout
                 .throttleClicks()
                 .onEach { onItemClicked() }
                 .launchIn(lifecycleOwner.lifecycleScope)
