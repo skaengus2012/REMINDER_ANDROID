@@ -18,11 +18,10 @@ package com.nlab.reminder.domain.common.tag.view
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.nlab.reminder.R
+import com.nlab.reminder.core.android.view.initWithLifecycleOwner
 import com.nlab.reminder.core.android.view.throttleClicks
 import com.nlab.reminder.core.android.view.throttleLongClicks
 import com.nlab.reminder.databinding.ViewItemTagHolderBinding
@@ -33,9 +32,8 @@ import kotlinx.coroutines.flow.onEach
 /**
  * @author Doohyun
  */
-class TagViewHolder private constructor(
-    binding: ViewItemTagHolderBinding,
-    private val lifecycleOwner: LifecycleOwner,
+class TagViewHolder(
+    binding: ViewItemTagHolderBinding
 ) : RecyclerView.ViewHolder(binding.root) {
     private val tagHolderLayout: ViewGroup = binding.tagHolderLayout
     private val tagBindingCache: MutableList<ViewTagBinding> = arrayListOf()
@@ -52,17 +50,14 @@ class TagViewHolder private constructor(
             val curLastViewIndex = tagBindingCache.lastIndex
             repeat(times = itemSize - viewCacheSize) { time ->
                 val executeIndex = curLastViewIndex + time + 1
-                tagBindingCache += ViewTagBinding
-                    .inflate(layoutInflater, tagHolderLayout, false)
-                    .apply {
+                tagBindingCache += ViewTagBinding.inflate(layoutInflater, tagHolderLayout, false)
+                    .initWithLifecycleOwner { lifecycleOwner ->
                         tagButton.throttleClicks()
-                            .flowWithLifecycle(lifecycleOwner.lifecycle)
                             .onEach { onTagClicked(executeIndex) }
                             .launchIn(lifecycleOwner.lifecycleScope)
                     }
-                    .apply {
+                    .initWithLifecycleOwner { lifecycleOwner ->
                         tagButton.throttleLongClicks()
-                            .flowWithLifecycle(lifecycleOwner.lifecycle)
                             .onEach { onTagLongClicked(executeIndex) }
                             .launchIn(lifecycleOwner.lifecycleScope)
                     }
@@ -94,12 +89,8 @@ class TagViewHolder private constructor(
     }
 
     companion object {
-        fun create(
-            parent: ViewGroup,
-            lifecycleOwner: LifecycleOwner
-        ): TagViewHolder = TagViewHolder(
-            ViewItemTagHolderBinding.inflate(LayoutInflater.from(parent.context), parent, false),
-            lifecycleOwner
+        fun of(parent: ViewGroup): TagViewHolder = TagViewHolder(
+            ViewItemTagHolderBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         )
     }
 }
