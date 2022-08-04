@@ -23,6 +23,9 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 
+/**
+ * @author Doohyun
+ */
 data class TextChange(val text: CharSequence?, val start: Int, val before: Int, val count: Int)
 
 fun EditText.textChanged(): Flow<TextChange> = callbackFlow {

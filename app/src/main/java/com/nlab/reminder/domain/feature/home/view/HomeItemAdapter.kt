@@ -18,21 +18,21 @@ package com.nlab.reminder.domain.feature.home.view
 
 import android.view.ViewGroup
 import androidx.annotation.IntDef
-import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.nlab.reminder.core.android.recyclerview.HashIdentifierItemDiffCallback
 import com.nlab.reminder.domain.common.tag.view.TagViewHolder
 
-class HomeItemAdapter(
-    private val lifecycleOwner: LifecycleOwner
-) : ListAdapter<HomeItem, RecyclerView.ViewHolder>(HashIdentifierItemDiffCallback()) {
+/**
+ * @author Doohyun
+ */
+class HomeItemAdapter : ListAdapter<HomeItem, RecyclerView.ViewHolder>(HashIdentifierItemDiffCallback()) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         @ItemViewType viewType: Int
     ): RecyclerView.ViewHolder = when (viewType) {
-        CATEGORY_VIEW_TYPE -> CategoryViewHolder.create(parent, lifecycleOwner)
-        TAG_VIEW_TYPE -> TagViewHolder.create(parent, lifecycleOwner)
+        CATEGORY_VIEW_TYPE -> CategoryViewHolder.of(parent)
+        TAG_VIEW_TYPE -> TagViewHolder.of(parent)
         else -> throw IllegalArgumentException()
     }
 

@@ -19,10 +19,9 @@ package com.nlab.reminder.domain.feature.home.view
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
+import com.nlab.reminder.core.android.view.initWithLifecycleOwner
 import com.nlab.reminder.core.android.view.throttleClicks
 import com.nlab.reminder.databinding.ViewItemHomeCategoryBinding
 import kotlinx.coroutines.flow.launchIn
@@ -31,18 +30,18 @@ import kotlinx.coroutines.flow.onEach
 /**
  * @author Doohyun
  */
-class CategoryViewHolder private constructor(
-    lifecycleOwner: LifecycleOwner,
+class CategoryViewHolder(
     private val binding: ViewItemHomeCategoryBinding
 ) : RecyclerView.ViewHolder(binding.root) {
     private var onItemClicked: () -> Unit = {}
 
     init {
-        binding.categoryLayout
-            .throttleClicks()
-            .flowWithLifecycle(lifecycleOwner.lifecycle)
-            .onEach { onItemClicked() }
-            .launchIn(lifecycleOwner.lifecycleScope)
+        itemView.initWithLifecycleOwner { lifecycleOwner ->
+            binding.categoryLayout
+                .throttleClicks()
+                .onEach { onItemClicked() }
+                .launchIn(lifecycleOwner.lifecycleScope)
+        }
     }
 
     fun onBind(categoryItem: HomeItem.CategoryItem) {
@@ -64,11 +63,7 @@ class CategoryViewHolder private constructor(
     }
 
     companion object {
-        fun create(
-            parent: ViewGroup,
-            lifecycleOwner: LifecycleOwner
-        ): CategoryViewHolder = CategoryViewHolder(
-            lifecycleOwner,
+        fun of(parent: ViewGroup): CategoryViewHolder = CategoryViewHolder(
             ViewItemHomeCategoryBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         )
     }

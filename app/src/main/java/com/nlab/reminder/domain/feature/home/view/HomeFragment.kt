@@ -54,7 +54,7 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val homeItemAdapter = HomeItemAdapter(viewLifecycleOwner)
+        val homeItemAdapter = HomeItemAdapter()
         val renderWhenLoaded = renderWhenLoadedFunc(homeItemAdapter)
 
         entryPointInit.initialize(
