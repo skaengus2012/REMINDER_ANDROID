@@ -27,6 +27,6 @@ fun AllScheduleLoadedSnapshot(
     allScheduleReport: AllScheduleReport,
     scheduleItemFactory: (Schedule) -> ScheduleItem
 ): AllScheduleLoadedSnapshot = AllScheduleLoadedSnapshot(
-    doingScheduleItems = allScheduleReport.doingSchedules.map(scheduleItemFactory),
+    doingScheduleItems = allScheduleReport.schedules.map(scheduleItemFactory),
     isDoneScheduleShown = allScheduleReport.isDoneScheduleShown
 )

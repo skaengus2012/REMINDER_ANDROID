@@ -16,17 +16,14 @@
 
 package com.nlab.reminder.domain.feature.schedule.all
 
-import androidx.paging.PagingData
 import com.nlab.reminder.domain.common.schedule.Schedule
 import com.nlab.reminder.domain.common.schedule.genSchedules
-import com.nlab.reminder.domain.feature.schedule.all.AllScheduleReport
 import com.nlab.reminder.test.genBoolean
 
 /**
  * @author Doohyun
  */
 fun genAllScheduleReport(
-    doingSchedules: List<Schedule> = genSchedules(isComplete = false),
-    doneSchedules: PagingData<Schedule> = PagingData.from(genSchedules(isComplete = true)),
+    schedules: List<Schedule> = genSchedules(isComplete = false),
     isDoneScheduleShown: Boolean = genBoolean()
-): AllScheduleReport = AllScheduleReport(doingSchedules, doneSchedules, isDoneScheduleShown)
+): AllScheduleReport = AllScheduleReport(schedules, isDoneScheduleShown)

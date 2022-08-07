@@ -125,7 +125,7 @@ class AllScheduleStateMachineKtTest {
     fun `Notify loaded when fetch is called`() = runTest {
         val testReport: AllScheduleReport = genAllScheduleReport()
         val getAllScheduleReportUseCase: GetAllScheduleReportUseCase = mock {
-            whenever(mock(any())) doReturn flow { emit(testReport) }
+            whenever(mock()) doReturn flow { emit(testReport) }
         }
         val stateMachine: AllScheduleStateMachine = genStateMachine(
             scope = CoroutineScope(Dispatchers.Unconfined),

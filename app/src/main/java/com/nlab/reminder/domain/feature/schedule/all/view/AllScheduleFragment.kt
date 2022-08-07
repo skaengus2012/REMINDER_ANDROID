@@ -23,7 +23,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.flowWithLifecycle
-import androidx.paging.map
 import androidx.recyclerview.widget.ConcatAdapter
 import com.nlab.reminder.core.android.fragment.viewLifecycle
 import com.nlab.reminder.core.android.fragment.viewLifecycleScope
@@ -81,6 +80,7 @@ class AllScheduleFragment : Fragment() {
             .onEach { snapshot -> renderWhenLoaded(snapshot) }
             .launchIn(viewLifecycleScope)
 
+        /**
         viewModel.state
             .filterIsInstance<AllScheduleState.Loaded>()
             .flowWithLifecycle(viewLifecycle)
@@ -88,7 +88,7 @@ class AllScheduleFragment : Fragment() {
             .distinctUntilChanged()
             .onEach { pagingData -> doneScheduleAdapter.submitData(pagingData.map(::createScheduleItem)) }
             .flowOn(Dispatchers.Default)
-            .launchIn(viewLifecycleScope)
+            .launchIn(viewLifecycleScope)*/
     }
 
     private fun createScheduleItem(schedule: Schedule): ScheduleItem = ScheduleItem(

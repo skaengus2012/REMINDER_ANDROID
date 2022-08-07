@@ -16,15 +16,10 @@
 
 package com.nlab.reminder.internal.common.schedule
 
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
-import androidx.paging.map
 import com.nlab.reminder.core.kotlin.coroutine.flow.map
 import com.nlab.reminder.domain.common.schedule.*
 import com.nlab.reminder.internal.common.android.database.ScheduleDao
 import com.nlab.reminder.internal.common.android.database.ScheduleEntityWithTagEntities
-import com.nlab.reminder.internal.common.android.database.toSchedule
 import com.nlab.reminder.internal.common.android.database.toSchedules
 import kotlinx.coroutines.flow.*
 
@@ -35,35 +30,12 @@ class LocalScheduleRepository(
     private val scheduleDao: ScheduleDao,
 ) : ScheduleRepository {
     override fun get(request: ScheduleItemRequest): Flow<List<Schedule>> {
-        val resultFlow: Flow<List<ScheduleEntityWithTagEntities>> =
-            when (request) {
-                is ScheduleItemRequest.FindByScheduleId -> {
-                    scheduleDao.findById(scheduleId = request.scheduleId.value)
-                }
-                is ScheduleItemRequest.FindByComplete -> {
-                    scheduleDao.findByComplete(isComplete = request.isComplete)
-                }
-            }
+        val resultFlow: Flow<List<ScheduleEntityWithTagEntities>> = when (request) {
+            is ScheduleItemRequest.Find -> scheduleDao.find()
+            is ScheduleItemRequest.FindByComplete -> scheduleDao.findByComplete(request.isComplete)
+        }
 
-        return resultFlow.map { it.toSchedules() }
-    }
-
-    override fun getAsPagingData(
-        request: ScheduleItemPagingRequest,
-        pagingConfig: PagingConfig
-    ): Flow<PagingData<Schedule>> {
-        val pager = Pager(pagingConfig, pagingSourceFactory = {
-            when (request) {
-                is ScheduleItemPagingRequest.FindByComplete -> {
-                    scheduleDao.findByCompleteAsPagingSource(isComplete = request.isComplete)
-                }
-            }
-        })
-        return pager.flow.map { pagedData -> pagedData.map(ScheduleEntityWithTagEntities::toSchedule) }
-    }
-
-    override suspend fun updatePendingComplete(scheduleId: ScheduleId, isComplete: Boolean) {
-        scheduleDao.updatePendingComplete(scheduleId.value, isComplete)
+        return resultFlow.map(List<ScheduleEntityWithTagEntities>::toSchedules)
     }
 
     override suspend fun updateComplete(scheduleId: ScheduleId, isComplete: Boolean) {

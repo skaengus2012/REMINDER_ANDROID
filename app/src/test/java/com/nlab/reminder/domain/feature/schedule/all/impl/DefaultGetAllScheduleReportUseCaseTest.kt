@@ -43,6 +43,7 @@ import org.mockito.kotlin.*
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class DefaultGetAllScheduleReportUseCaseTest {
+    /**
     @Before
     fun setUp() = runTest {
         Dispatchers.setMain(genFlowExecutionDispatcher(testScheduler))
@@ -93,5 +94,5 @@ class DefaultGetAllScheduleReportUseCaseTest {
         advanceUntilIdle()
         assertThat(actualDoingSchedules, equalTo(doingSchedules))
         assertThat(actualDoneSchedulesDiffer.snapshot().items, equalTo(doneSchedules))
-    }
+    }*/
 }

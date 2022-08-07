@@ -16,7 +16,6 @@
 
 package com.nlab.reminder.domain.feature.schedule.all.di
 
-import androidx.paging.PagingConfig
 import com.nlab.reminder.domain.common.schedule.ScheduleRepository
 import com.nlab.reminder.domain.common.schedule.UpdateScheduleCompleteUseCase
 import com.nlab.reminder.domain.feature.schedule.all.AllScheduleStateMachineFactory
@@ -40,7 +39,6 @@ class AllScheduleViewModelModule {
     ): AllScheduleStateMachineFactory = AllScheduleStateMachineFactory(
         getAllScheduleReport = DefaultGetAllScheduleReportUseCase(
             scheduleRepository,
-            pagingConfig = PagingConfig(pageSize = 10),
             dispatcher = Dispatchers.Default
         ),
         updateScheduleComplete = updateScheduleCompleteUseCase
