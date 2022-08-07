@@ -23,13 +23,13 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.flowWithLifecycle
-import androidx.recyclerview.widget.ConcatAdapter
 import com.nlab.reminder.core.android.fragment.viewLifecycle
 import com.nlab.reminder.core.android.fragment.viewLifecycleScope
 import com.nlab.reminder.core.android.recyclerview.suspendSubmitList
 import com.nlab.reminder.databinding.FragmentAllScheduleBinding
-import com.nlab.reminder.domain.common.schedule.Schedule
+import com.nlab.reminder.domain.common.schedule.view.DefaultScheduleItemAdapter
 import com.nlab.reminder.domain.common.schedule.view.ScheduleItem
+import com.nlab.reminder.domain.common.schedule.view.ScheduleItemAnimator
 import com.nlab.reminder.domain.feature.schedule.all.AllScheduleState
 import com.nlab.reminder.domain.feature.schedule.all.AllScheduleViewModel
 import com.nlab.reminder.domain.feature.schedule.all.onScheduleCompleteUpdateClicked
@@ -59,15 +59,11 @@ class AllScheduleFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val doingScheduleAdapter = DoingScheduleItemAdapter()
-        val doneScheduleAdapter = DoneSchedulePagingDataAdapter()
-        val scheduleAdapter = ConcatAdapter(
-            ConcatAdapter.Config.Builder().setIsolateViewTypes(false).build(),
-            doingScheduleAdapter,
-        )
-        val renderWhenLoaded = renderWhenLoadedFunc(scheduleAdapter, doingScheduleAdapter, doneScheduleAdapter)
+        val scheduleAdapter = DefaultScheduleItemAdapter()
+        val renderWhenLoaded = renderWhenLoadedFunc(scheduleAdapter)
 
         binding.contentRecyclerview
+            .apply { itemAnimator = ScheduleItemAnimator() }
             .apply { adapter = scheduleAdapter }
 
         viewModel.state
@@ -75,39 +71,28 @@ class AllScheduleFragment : Fragment() {
             .flowWithLifecycle(viewLifecycle)
             .map { it.allSchedulesReport }
             .distinctUntilChanged()
-            .map { report -> AllScheduleLoadedSnapshot(report, scheduleItemFactory = ::createScheduleItem) }
+            .map { report ->
+                AllScheduleLoadedSnapshot(report, scheduleItemFactory = { uiState ->
+                    ScheduleItem(
+                        uiState,
+                        onCompleteToggleClicked = {
+                            viewModel.onScheduleCompleteUpdateClicked(
+                                uiState.schedule.id(), isComplete = uiState.isCompleteMarked.not()
+                            )
+                        }
+                    )
+                })
+            }
             .flowOn(Dispatchers.Default)
-            .onEach { snapshot -> renderWhenLoaded(snapshot) }
+            .onEach(renderWhenLoaded)
             .launchIn(viewLifecycleScope)
-
-        /**
-        viewModel.state
-            .filterIsInstance<AllScheduleState.Loaded>()
-            .flowWithLifecycle(viewLifecycle)
-            .map { it.allSchedulesReport.doneSchedules }
-            .distinctUntilChanged()
-            .onEach { pagingData -> doneScheduleAdapter.submitData(pagingData.map(::createScheduleItem)) }
-            .flowOn(Dispatchers.Default)
-            .launchIn(viewLifecycleScope)*/
     }
 
-    private fun createScheduleItem(schedule: Schedule): ScheduleItem = ScheduleItem(
-        schedule,
-        onCompleteToggleClicked = {
-            viewModel.onScheduleCompleteUpdateClicked(schedule.id(), isComplete = schedule.isComplete.not())
-        }
-    )
-
     private fun renderWhenLoadedFunc(
-        scheduleAdapter: ConcatAdapter,
-        doingScheduleAdapter: DoingScheduleItemAdapter,
-        doneScheduleAdapter: DoneSchedulePagingDataAdapter
+        doingScheduleAdapter: DefaultScheduleItemAdapter
     ): suspend (AllScheduleLoadedSnapshot) -> Unit = { snapshot ->
         doingScheduleAdapter.suspendSubmitList(snapshot.doingScheduleItems)
         startPostponedEnterTransition()
-
-        if (snapshot.isDoneScheduleShown) scheduleAdapter.addAdapter(doneScheduleAdapter)
-        else scheduleAdapter.removeAdapter(doneScheduleAdapter)
     }
 
     override fun onDestroyView() {

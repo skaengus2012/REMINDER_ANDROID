@@ -17,13 +17,12 @@
 package com.nlab.reminder.domain.feature.schedule.all.impl
 
 import com.nlab.reminder.core.kotlin.coroutine.flow.map
-import com.nlab.reminder.domain.common.schedule.Schedule
-import com.nlab.reminder.domain.common.schedule.ScheduleItemRequest
-import com.nlab.reminder.domain.common.schedule.ScheduleRepository
+import com.nlab.reminder.domain.common.schedule.*
 import com.nlab.reminder.domain.feature.schedule.all.AllScheduleReport
 import com.nlab.reminder.domain.feature.schedule.all.GetAllScheduleReportUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
 
 /**
@@ -31,17 +30,27 @@ import kotlinx.coroutines.flow.flowOn
  */
 class DefaultGetAllScheduleReportUseCase(
     private val scheduleRepository: ScheduleRepository,
+    private val completeMarkRepository: CompleteMarkRepository,
     private val dispatcher: CoroutineDispatcher
 ) : GetAllScheduleReportUseCase {
     override fun invoke(): Flow<AllScheduleReport> =
         createAllScheduleReportFlow(isDoneScheduleShown = true).flowOn(dispatcher)
 
     private fun createAllScheduleReportFlow(isDoneScheduleShown: Boolean): Flow<AllScheduleReport> {
-        val resultFlow: Flow<List<Schedule>> = scheduleRepository.get(
-            if (isDoneScheduleShown) ScheduleItemRequest.Find
-            else ScheduleItemRequest.FindByComplete(isComplete = false)
-        )
-
-        return resultFlow.map { schedules ->  AllScheduleReport(schedules, isDoneScheduleShown) }
+        return combine(
+            scheduleRepository.get(
+                if (isDoneScheduleShown) ScheduleItemRequest.Find
+                else ScheduleItemRequest.FindByComplete(isComplete = false)
+            ),
+            completeMarkRepository.get(),
+            transform = { schedules, completeMarkSnapshot ->
+                schedules.map { schedule ->
+                    ScheduleUiState(
+                        schedule,
+                        isCompleteMarked = completeMarkSnapshot[schedule.id()]?.isComplete ?: schedule.isComplete
+                    )
+                }
+            }
+        ).map { scheduleItems -> AllScheduleReport(scheduleItems, isDoneScheduleShown) }
     }
 }

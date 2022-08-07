@@ -14,19 +14,14 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.common.schedule.view
+package com.nlab.reminder.core.util.transaction
 
-import androidx.recyclerview.widget.DiffUtil
+import com.nlab.reminder.core.util.annotation.test.Generated
 
 /**
+ * caution : cannot test when value class with coroutine
+ * @see <a href="https://github.com/mockito/mockito-kotlin/issues/456">issue</a>
  * @author Doohyun
  */
-class ScheduleItemDiffCallback : DiffUtil.ItemCallback<ScheduleItem>() {
-    override fun areItemsTheSame(oldItem: ScheduleItem, newItem: ScheduleItem): Boolean {
-        return oldItem.scheduleId == newItem.scheduleId
-    }
-
-    override fun areContentsTheSame(oldItem: ScheduleItem, newItem: ScheduleItem): Boolean {
-        return oldItem.uiState == newItem.uiState
-    }
-}
+@Generated
+data class TransactionId(val value: String)

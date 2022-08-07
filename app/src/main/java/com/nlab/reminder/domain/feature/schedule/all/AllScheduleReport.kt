@@ -17,13 +17,13 @@
 package com.nlab.reminder.domain.feature.schedule.all
 
 import com.nlab.reminder.core.util.annotation.test.Generated
-import com.nlab.reminder.domain.common.schedule.Schedule
+import com.nlab.reminder.domain.common.schedule.ScheduleUiState
 
 /**
  * @author Doohyun
  */
 @Generated
 data class AllScheduleReport(
-    val schedules: List<Schedule>,
+    val schedules: List<ScheduleUiState>,
     val isDoneScheduleShown: Boolean
 )

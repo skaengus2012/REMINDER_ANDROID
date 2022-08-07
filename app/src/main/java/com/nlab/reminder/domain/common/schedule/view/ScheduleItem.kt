@@ -17,8 +17,8 @@
 package com.nlab.reminder.domain.common.schedule.view
 
 import com.nlab.reminder.domain.common.android.view.recyclerview.ItemModel
-import com.nlab.reminder.domain.common.schedule.Schedule
 import com.nlab.reminder.domain.common.schedule.ScheduleId
+import com.nlab.reminder.domain.common.schedule.ScheduleUiState
 import com.nlab.reminder.domain.common.tag.Tag
 
 /**
@@ -26,24 +26,24 @@ import com.nlab.reminder.domain.common.tag.Tag
  */
 @ItemModel
 data class ScheduleItem(
-    val schedule: Schedule,
+    val uiState: ScheduleUiState,
     val onCompleteToggleClicked: () -> Unit = {}
 ) {
     val scheduleId: ScheduleId
-        get() = schedule.id()
+        get() = uiState.schedule.id()
 
     val title: String
-        get() = schedule.title
+        get() = uiState.schedule.title
 
     val note: String?
-        get() = schedule.note
+        get() = uiState.schedule.note
 
     val url: String?
-        get() = schedule.url
+        get() = uiState.schedule.url
 
     val tags: List<Tag>
-        get() = schedule.tags
+        get() = uiState.schedule.tags
 
     val isComplete: Boolean
-        get() = schedule.isComplete
+        get() = uiState.isCompleteMarked
 }

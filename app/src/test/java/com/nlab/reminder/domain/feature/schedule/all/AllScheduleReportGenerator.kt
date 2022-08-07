@@ -16,14 +16,14 @@
 
 package com.nlab.reminder.domain.feature.schedule.all
 
-import com.nlab.reminder.domain.common.schedule.Schedule
-import com.nlab.reminder.domain.common.schedule.genSchedules
+import com.nlab.reminder.domain.common.schedule.ScheduleUiState
+import com.nlab.reminder.domain.common.schedule.genScheduleUiStates
 import com.nlab.reminder.test.genBoolean
 
 /**
  * @author Doohyun
  */
 fun genAllScheduleReport(
-    schedules: List<Schedule> = genSchedules(isComplete = false),
+    schedules: List<ScheduleUiState> = genScheduleUiStates(),
     isDoneScheduleShown: Boolean = genBoolean()
 ): AllScheduleReport = AllScheduleReport(schedules, isDoneScheduleShown)

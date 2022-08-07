@@ -41,3 +41,10 @@ fun genSchedules(
 ): List<Schedule> = List(genInt("#")) { index ->
     genSchedule(scheduleId = index.toLong(), isComplete = isComplete)
 }
+
+fun genScheduleUiStates(
+    schedules: List<Schedule> = genSchedules(),
+    isCompleteMarked: Boolean? = null
+): List<ScheduleUiState> = schedules.map { schedule ->
+    ScheduleUiState(schedule, isCompleteMarked = isCompleteMarked ?: schedule.isComplete)
+}
