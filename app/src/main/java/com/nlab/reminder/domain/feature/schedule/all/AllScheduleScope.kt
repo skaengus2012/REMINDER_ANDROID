@@ -14,15 +14,13 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.kotlin.coroutine.flow
+package com.nlab.reminder.domain.feature.schedule.all
 
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.firstOrNull
+import javax.inject.Qualifier
 
 /**
  * @author Doohyun
  */
-suspend fun <T : Any> Flow<List<T>>.firstElement(): T? {
-    val curItems: List<T> = firstOrNull() ?: emptyList()
-    return curItems.firstOrNull()
-}
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class AllScheduleScope

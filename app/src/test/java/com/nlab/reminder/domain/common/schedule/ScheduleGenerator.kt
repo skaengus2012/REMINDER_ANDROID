@@ -42,6 +42,11 @@ fun genSchedules(
     genSchedule(scheduleId = index.toLong(), isComplete = isComplete)
 }
 
+fun genScheduleUiState(
+    schedule: Schedule = genSchedule(),
+    isCompleteMarked: Boolean? = null
+): ScheduleUiState = ScheduleUiState(schedule, isCompleteMarked = isCompleteMarked ?: schedule.isComplete)
+
 fun genScheduleUiStates(
     schedules: List<Schedule> = genSchedules(),
     isCompleteMarked: Boolean? = null

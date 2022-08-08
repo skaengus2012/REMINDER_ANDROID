@@ -21,9 +21,8 @@ import com.nlab.reminder.domain.common.schedule.*
 import com.nlab.reminder.domain.feature.schedule.all.AllScheduleReport
 import com.nlab.reminder.domain.feature.schedule.all.GetAllScheduleReportUseCase
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.*
 
 /**
  * @author Doohyun
@@ -31,10 +30,14 @@ import kotlinx.coroutines.flow.flowOn
 class DefaultGetAllScheduleReportUseCase(
     private val scheduleRepository: ScheduleRepository,
     private val completeMarkRepository: CompleteMarkRepository,
+    private val doneScheduleShownRepository: DoneScheduleShownRepository,
     private val dispatcher: CoroutineDispatcher
 ) : GetAllScheduleReportUseCase {
+    @FlowPreview
     override fun invoke(): Flow<AllScheduleReport> =
-        createAllScheduleReportFlow(isDoneScheduleShown = true).flowOn(dispatcher)
+        doneScheduleShownRepository.get()
+            .flatMapConcat(this::createAllScheduleReportFlow)
+            .flowOn(dispatcher)
 
     private fun createAllScheduleReportFlow(isDoneScheduleShown: Boolean): Flow<AllScheduleReport> {
         return combine(
@@ -43,14 +46,7 @@ class DefaultGetAllScheduleReportUseCase(
                 else ScheduleItemRequest.FindByComplete(isComplete = false)
             ),
             completeMarkRepository.get(),
-            transform = { schedules, completeMarkSnapshot ->
-                schedules.map { schedule ->
-                    ScheduleUiState(
-                        schedule,
-                        isCompleteMarked = completeMarkSnapshot[schedule.id()]?.isComplete ?: schedule.isComplete
-                    )
-                }
-            }
+            transform = ::transformScheduleToUiState
         ).map { scheduleItems -> AllScheduleReport(scheduleItems, isDoneScheduleShown) }
     }
 }

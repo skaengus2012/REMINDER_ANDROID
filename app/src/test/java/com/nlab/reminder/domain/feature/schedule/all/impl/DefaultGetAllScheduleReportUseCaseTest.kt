@@ -16,25 +16,18 @@
 
 package com.nlab.reminder.domain.feature.schedule.all.impl
 
-import androidx.paging.AsyncPagingDataDiffer
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
+import com.nlab.reminder.core.util.transaction.TransactionId
 import com.nlab.reminder.domain.common.schedule.*
+import com.nlab.reminder.domain.feature.schedule.all.AllScheduleReport
 import com.nlab.reminder.domain.feature.schedule.all.GetAllScheduleReportUseCase
+import com.nlab.reminder.domain.feature.schedule.all.genAllScheduleReport
 import com.nlab.reminder.test.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.test.advanceUntilIdle
-import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.*
-import org.junit.After
-import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.*
 
@@ -43,56 +36,96 @@ import org.mockito.kotlin.*
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class DefaultGetAllScheduleReportUseCaseTest {
-    /**
-    @Before
-    fun setUp() = runTest {
-        Dispatchers.setMain(genFlowExecutionDispatcher(testScheduler))
-    }
-
-    @After
-    fun tearDown() {
-        Dispatchers.resetMain()
+    @Test
+    fun `find all schedules when doneScheduleShown was true`() {
+        testSchedulesRequest(
+            expectSchedules = genSchedules(),
+            scheduleItemRequest = ScheduleItemRequest.Find,
+            isDoneScheduleShown = true
+        )
     }
 
     @Test
-    fun `flow data bring to scheduleRepository`() = runTest {
-        val executeDispatcher = genFlowExecutionDispatcher(testScheduler)
-        val pagingConfig = PagingConfig(pageSize = genInt())
-        val doingSchedules = genSchedules(isComplete = false)
-        val doneSchedules = genSchedules(isComplete = true)
-        val scheduleRepository: ScheduleRepository = mock {
-            whenever(
-                mock.get(ScheduleItemRequest.FindByComplete(isComplete = false))
-            ) doReturn flow { emit(doingSchedules) }
+    fun `find doing schedules when doneScheduleShown was false`() {
+        testSchedulesRequest(
+            expectSchedules = genSchedules(isComplete = false),
+            scheduleItemRequest = ScheduleItemRequest.FindByComplete(isComplete = false),
+            isDoneScheduleShown = false
+        )
+    }
 
-            whenever(
-                mock.getAsPagingData(
-                    ScheduleItemPagingRequest.FindByComplete(isComplete = true),
-                    pagingConfig
-                )
-            ) doReturn flow { emit(PagingData.from(doneSchedules)) }
+    private fun testSchedulesRequest(
+        expectSchedules: List<Schedule>,
+        scheduleItemRequest: ScheduleItemRequest,
+        isDoneScheduleShown: Boolean
+    ) {
+        val scheduleRepository: ScheduleRepository = mock {
+            whenever(mock.get(scheduleItemRequest)) doReturn flowOf(expectSchedules)
         }
         val getAllScheduleReport: GetAllScheduleReportUseCase = DefaultGetAllScheduleReportUseCase(
             scheduleRepository,
-            pagingConfig,
-            executeDispatcher
+            completeMarkRepository = mock { whenever(mock.get()) doReturn flowOf(emptyMap()) },
+            doneScheduleShownRepository = mock { whenever(mock.get()) doReturn flowOf(isDoneScheduleShown) },
+            dispatcher = Dispatchers.Unconfined
         )
-        var actualDoingSchedules: List<Schedule> = emptyList()
-        val actualDoneSchedulesDiffer = AsyncPagingDataDiffer(
-            diffCallback = IdentityItemCallback<Schedule>(),
-            updateCallback = NoopListCallback(),
-            workerDispatcher = Dispatchers.Main
+        val actualReports = mutableListOf<AllScheduleReport>()
+        getAllScheduleReport()
+            .onEach(actualReports::add)
+            .launchIn(genFlowObserveDispatcher())
+        assertThat(
+            actualReports,
+            equalTo(
+                listOf(
+                    genAllScheduleReport(
+                        genScheduleUiStates(expectSchedules),
+                        isDoneScheduleShown
+                    )
+                )
+            )
         )
+    }
 
-        getAllScheduleReport(coroutineScope = this)
-            .onEach { report ->
-                actualDoingSchedules = report.doingSchedules
-                actualDoneSchedulesDiffer.submitData(report.doneSchedules)
-            }
+    @Test
+    fun `marked complete on uiState when completeMarkRepository sent snapshot`() = runTest {
+        val executeDispatcher = genFlowExecutionDispatcher(testScheduler)
+        val expectedSchedule: Schedule = genSchedule()
+        val scheduleRepository: ScheduleRepository = mock {
+            whenever(mock.get(any())) doReturn flowOf(listOf(expectedSchedule))
+        }
+        val completeMarkRepository: CompleteMarkRepository = mock {
+            whenever(mock.get()) doReturn flow {
+                emit(emptyMap())
+                delay(500)
+                emit(
+                    mapOf(
+                        expectedSchedule.id() to CompleteMark(
+                            TransactionId(genBothify()),
+                            expectedSchedule.isComplete.not()
+                        )
+                    )
+                )
+            }.flowOn(executeDispatcher)
+        }
+        val getAllScheduleReport: GetAllScheduleReportUseCase = DefaultGetAllScheduleReportUseCase(
+            scheduleRepository,
+            completeMarkRepository,
+            doneScheduleShownRepository = mock { whenever(mock.get()) doReturn flowOf(genBoolean()) },
+            dispatcher = Dispatchers.Unconfined
+        )
+        val actualReports = mutableListOf<AllScheduleReport>()
+        getAllScheduleReport()
+            .onEach(actualReports::add)
             .launchIn(genFlowObserveDispatcher())
 
-        advanceUntilIdle()
-        assertThat(actualDoingSchedules, equalTo(doingSchedules))
-        assertThat(actualDoneSchedulesDiffer.snapshot().items, equalTo(doneSchedules))
-    }*/
+        advanceTimeBy(1_000)
+        assertThat(
+            actualReports.map { it.schedules.first() },
+            equalTo(
+                listOf(
+                    genScheduleUiState(expectedSchedule),
+                    genScheduleUiState(expectedSchedule, isCompleteMarked = expectedSchedule.isComplete.not())
+                )
+            )
+        )
+    }
 }
