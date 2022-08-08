@@ -16,12 +16,11 @@
 
 package com.nlab.reminder.domain.feature.schedule.all
 
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 
 /**
  * @author Doohyun
  */
 interface GetAllScheduleReportUseCase {
-    operator fun invoke(coroutineScope: CoroutineScope): Flow<AllScheduleReport>
+    operator fun invoke(): Flow<AllScheduleReport>
 }

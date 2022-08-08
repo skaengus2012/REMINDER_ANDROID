@@ -14,40 +14,40 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.feature.schedule.all.di
+package com.nlab.reminder.internal.common.di
 
+import com.nlab.reminder.core.kotlin.coroutine.util.Delay
+import com.nlab.reminder.core.util.transaction.TransactionIdGenerator
 import com.nlab.reminder.domain.common.schedule.CompleteMarkRepository
-import com.nlab.reminder.domain.common.schedule.DoneScheduleShownRepository
 import com.nlab.reminder.domain.common.schedule.ScheduleRepository
 import com.nlab.reminder.domain.common.schedule.UpdateScheduleCompleteUseCase
-import com.nlab.reminder.domain.feature.schedule.all.AllScheduleScope
-import com.nlab.reminder.domain.feature.schedule.all.AllScheduleStateMachineFactory
-import com.nlab.reminder.domain.feature.schedule.all.impl.DefaultGetAllScheduleReportUseCase
+import com.nlab.reminder.domain.common.schedule.impl.DefaultUpdateScheduleCompleteUseCase
+import com.nlab.reminder.domain.common.schedule.impl.ScopedCompleteMarkRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
-import kotlinx.coroutines.Dispatchers
+import dagger.hilt.android.scopes.ViewModelScoped
 
 /**
  * @author Doohyun
  */
 @Module
 @InstallIn(ViewModelComponent::class)
-class AllScheduleViewModelModule {
+class ScheduleModule {
+    @ViewModelScoped
     @Provides
-    fun provideStateMachineProvider(
+    fun provideCompleteMarkRepository(
+        transactionIdGenerator: TransactionIdGenerator
+    ): CompleteMarkRepository = ScopedCompleteMarkRepository(transactionIdGenerator)
+
+    @Provides
+    fun provideUpdateScheduleCompleteUseCase(
         scheduleRepository: ScheduleRepository,
         completeMarkRepository: CompleteMarkRepository,
-        updateScheduleCompleteUseCase: UpdateScheduleCompleteUseCase,
-        @AllScheduleScope doneScheduleShownRepository: DoneScheduleShownRepository
-    ): AllScheduleStateMachineFactory = AllScheduleStateMachineFactory(
-        getAllScheduleReport = DefaultGetAllScheduleReportUseCase(
-            scheduleRepository,
-            completeMarkRepository,
-            doneScheduleShownRepository,
-            dispatcher = Dispatchers.Default
-        ),
-        updateScheduleComplete = updateScheduleCompleteUseCase
+    ): UpdateScheduleCompleteUseCase = DefaultUpdateScheduleCompleteUseCase(
+        scheduleRepository,
+        completeMarkRepository,
+        pendingDelay = Delay(500)
     )
 }

@@ -14,19 +14,16 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.common.schedule.view
+package com.nlab.reminder.domain.common.schedule
 
-import androidx.recyclerview.widget.DiffUtil
+import com.nlab.reminder.core.util.transaction.TransactionId
+import kotlinx.coroutines.flow.Flow
 
 /**
  * @author Doohyun
  */
-class ScheduleItemDiffCallback : DiffUtil.ItemCallback<ScheduleItem>() {
-    override fun areItemsTheSame(oldItem: ScheduleItem, newItem: ScheduleItem): Boolean {
-        return oldItem.scheduleId == newItem.scheduleId
-    }
-
-    override fun areContentsTheSame(oldItem: ScheduleItem, newItem: ScheduleItem): Boolean {
-        return oldItem.uiState == newItem.uiState
-    }
+interface CompleteMarkRepository {
+    fun get(): Flow<Map<ScheduleId, CompleteMark>>
+    suspend fun insert(scheduleId: ScheduleId, isComplete: Boolean): TransactionId
+    suspend fun delete(scheduleId: ScheduleId, transactionId: TransactionId)
 }

@@ -14,19 +14,9 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.common.schedule.view
-
-import androidx.recyclerview.widget.DiffUtil
+package com.nlab.reminder.core.util.domain
 
 /**
  * @author Doohyun
  */
-class ScheduleItemDiffCallback : DiffUtil.ItemCallback<ScheduleItem>() {
-    override fun areItemsTheSame(oldItem: ScheduleItem, newItem: ScheduleItem): Boolean {
-        return oldItem.scheduleId == newItem.scheduleId
-    }
-
-    override fun areContentsTheSame(oldItem: ScheduleItem, newItem: ScheduleItem): Boolean {
-        return oldItem.uiState == newItem.uiState
-    }
-}
+interface UiState

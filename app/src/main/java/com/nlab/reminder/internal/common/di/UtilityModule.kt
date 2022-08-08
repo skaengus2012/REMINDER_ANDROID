@@ -14,27 +14,27 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.feature.home.di
+package com.nlab.reminder.internal.common.di
 
-import com.nlab.reminder.domain.common.tag.TagRepository
-import com.nlab.reminder.domain.feature.home.*
+import com.nlab.reminder.core.util.transaction.TransactionIdGenerator
+import com.nlab.reminder.core.util.transaction.impl.DefaultTransactionIdGenerator
 import dagger.Module
 import dagger.Provides
+import dagger.Reusable
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ViewModelComponent
+import dagger.hilt.components.SingletonComponent
+import java.util.*
 
 /**
  * @author Doohyun
  */
 @Module
-@InstallIn(ViewModelComponent::class)
-@Deprecated(message = "Fake UseCase was used")
-class FakeHomeUseCaseModule {
+@InstallIn(SingletonComponent::class)
+class UtilityModule {
+    @Reusable
     @Provides
-    fun provideGetHomeSummaryUseCase(
-        tagRepository: TagRepository
-    ): GetHomeSummaryUseCase = FakeGetHomeSummaryUseCase(tagRepository)
-
-    @Provides
-    fun provideModifyTagNameUseCase(): ModifyTagNameUseCase = FakeModifyTagNameUseCase()
+    fun provideCoroutineScope(): TransactionIdGenerator = DefaultTransactionIdGenerator(
+        randomPrefix = { UUID.randomUUID().toString() },
+        timestamp = { Calendar.getInstance().timeInMillis }
+    )
 }

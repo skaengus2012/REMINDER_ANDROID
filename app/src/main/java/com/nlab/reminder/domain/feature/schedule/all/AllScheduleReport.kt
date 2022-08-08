@@ -16,16 +16,14 @@
 
 package com.nlab.reminder.domain.feature.schedule.all
 
-import androidx.paging.PagingData
 import com.nlab.reminder.core.util.annotation.test.Generated
-import com.nlab.reminder.domain.common.schedule.Schedule
+import com.nlab.reminder.domain.common.schedule.ScheduleUiState
 
 /**
  * @author Doohyun
  */
 @Generated
 data class AllScheduleReport(
-    val doingSchedules: List<Schedule>,
-    val doneSchedules: PagingData<Schedule>,
+    val schedules: List<ScheduleUiState>,
     val isDoneScheduleShown: Boolean
 )

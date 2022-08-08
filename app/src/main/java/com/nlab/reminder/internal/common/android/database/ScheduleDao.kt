@@ -16,9 +16,7 @@
 
 package com.nlab.reminder.internal.common.android.database
 
-import androidx.paging.PagingSource
 import androidx.room.*
-import androidx.room.OnConflictStrategy.REPLACE
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -26,34 +24,20 @@ import kotlinx.coroutines.flow.Flow
  */
 @Dao
 interface ScheduleDao {
-    @Insert(onConflict = REPLACE)
+    @Insert
     suspend fun insert(schedule: ScheduleEntity): Long
 
     @Transaction
-    @Query("SELECT * FROM schedule WHERE schedule_id = :scheduleId LIMIT 1")
-    fun findById(scheduleId: Long): Flow<List<ScheduleEntityWithTagEntities>>
+    @Query("SELECT * FROM schedule ORDER BY is_complete, visible_priority")
+    fun find(): Flow<List<ScheduleEntityWithTagEntities>>
 
     @Transaction
-    @Query("SELECT * FROM schedule WHERE is_complete = :isComplete ORDER BY $RULE_ORDER_BY")
+    @Query("SELECT * FROM schedule WHERE is_complete = :isComplete ORDER BY is_complete, visible_priority")
     fun findByComplete(isComplete: Boolean): Flow<List<ScheduleEntityWithTagEntities>>
-
-    @Transaction
-    @Query("SELECT * FROM schedule WHERE is_complete = :isComplete ORDER BY $RULE_ORDER_BY")
-    fun findByCompleteAsPagingSource(isComplete: Boolean): PagingSource<Int, ScheduleEntityWithTagEntities>
-
-    @Query("UPDATE schedule SET is_complete = is_pending_complete WHERE is_complete <> is_pending_complete")
-    suspend fun syncComplete()
 
     @Query("UPDATE schedule SET is_complete = :isComplete WHERE schedule_id = :scheduleId")
     suspend fun updateComplete(scheduleId: Long, isComplete: Boolean)
 
-    @Query("UPDATE schedule SET is_pending_complete = :isPendingComplete WHERE schedule_id = :scheduleId")
-    suspend fun updatePendingComplete(scheduleId: Long, isPendingComplete: Boolean)
-
     @Delete
     suspend fun delete(schedule: ScheduleEntity)
-
-    companion object {
-        private const val RULE_ORDER_BY = "visible_priority"
-    }
 }

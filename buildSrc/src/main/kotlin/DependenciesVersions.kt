@@ -31,7 +31,6 @@ object DependenciesVersions {
     const val ANDROID_LIFECYCLE = "2.4.1"
     const val ANDROID_FRAGMENT = "1.4.1"
     const val ANDROID_NAVIGATION = "2.4.2"
-    const val ANDROID_PAGING = "3.1.1"
     const val ANDROID_ROOM = "2.4.2"
     const val ANDROID_STARTUP = "1.1.1"
 

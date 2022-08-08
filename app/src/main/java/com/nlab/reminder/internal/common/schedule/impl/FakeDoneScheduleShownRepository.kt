@@ -14,19 +14,18 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.common.schedule.view
+package com.nlab.reminder.internal.common.schedule.impl
 
-import androidx.recyclerview.widget.DiffUtil
+import com.nlab.reminder.core.util.annotation.test.Generated
+import com.nlab.reminder.domain.common.schedule.DoneScheduleShownRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 
 /**
  * @author Doohyun
  */
-class ScheduleItemDiffCallback : DiffUtil.ItemCallback<ScheduleItem>() {
-    override fun areItemsTheSame(oldItem: ScheduleItem, newItem: ScheduleItem): Boolean {
-        return oldItem.scheduleId == newItem.scheduleId
-    }
-
-    override fun areContentsTheSame(oldItem: ScheduleItem, newItem: ScheduleItem): Boolean {
-        return oldItem.uiState == newItem.uiState
-    }
+@Generated
+@Deprecated(message = "Fake Repository was used")
+class FakeDoneScheduleShownRepository : DoneScheduleShownRepository {
+    override fun get(): Flow<Boolean> = flowOf(true)
 }

@@ -16,51 +16,37 @@
 
 package com.nlab.reminder.domain.feature.schedule.all.impl
 
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
-import androidx.paging.cachedIn
-import com.nlab.reminder.domain.common.schedule.Schedule
-import com.nlab.reminder.domain.common.schedule.ScheduleItemPagingRequest
-import com.nlab.reminder.domain.common.schedule.ScheduleItemRequest
-import com.nlab.reminder.domain.common.schedule.ScheduleRepository
+import com.nlab.reminder.core.kotlin.coroutine.flow.map
+import com.nlab.reminder.domain.common.schedule.*
 import com.nlab.reminder.domain.feature.schedule.all.AllScheduleReport
 import com.nlab.reminder.domain.feature.schedule.all.GetAllScheduleReportUseCase
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.*
 
 /**
  * @author Doohyun
  */
 class DefaultGetAllScheduleReportUseCase(
     private val scheduleRepository: ScheduleRepository,
-    private val pagingConfig: PagingConfig,
+    private val completeMarkRepository: CompleteMarkRepository,
+    private val doneScheduleShownRepository: DoneScheduleShownRepository,
     private val dispatcher: CoroutineDispatcher
 ) : GetAllScheduleReportUseCase {
-    override fun invoke(coroutineScope: CoroutineScope): Flow<AllScheduleReport> =
-        createAllScheduleReportFlow(coroutineScope)
+    @FlowPreview
+    override fun invoke(): Flow<AllScheduleReport> =
+        doneScheduleShownRepository.get()
+            .flatMapConcat(this::createAllScheduleReportFlow)
             .flowOn(dispatcher)
 
-    private fun createAllScheduleReportFlow(coroutineScope: CoroutineScope): Flow<AllScheduleReport> =
-        combine(
-            scheduleRepository
-                .get(ScheduleItemRequest.FindByComplete(isComplete = false)),
-            scheduleRepository
-                .getAsPagingData(ScheduleItemPagingRequest.FindByComplete(isComplete = true), pagingConfig)
-                .cachedIn(coroutineScope),
-            transform = ::transformToScheduleReport
-        )
-
-    companion object {
-        private fun transformToScheduleReport(
-            doingSchedules: List<Schedule>,
-            doneSchedules: PagingData<Schedule>
-        ): AllScheduleReport = AllScheduleReport(
-            doingSchedules,
-            doneSchedules,
-            isDoneScheduleShown = true
-        )
+    private fun createAllScheduleReportFlow(isDoneScheduleShown: Boolean): Flow<AllScheduleReport> {
+        return combine(
+            scheduleRepository.get(
+                if (isDoneScheduleShown) ScheduleItemRequest.Find
+                else ScheduleItemRequest.FindByComplete(isComplete = false)
+            ),
+            completeMarkRepository.get(),
+            transform = ::transformScheduleToUiState
+        ).map { scheduleItems -> AllScheduleReport(scheduleItems, isDoneScheduleShown) }
     }
 }

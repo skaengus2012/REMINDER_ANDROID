@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.kotlin.coroutine.flow
+package com.nlab.reminder.core.util.transaction
 
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.firstOrNull
+import com.nlab.reminder.core.util.annotation.test.Generated
 
 /**
+ * caution : cannot test when value class with coroutine
+ * @see <a href="https://github.com/mockito/mockito-kotlin/issues/456">issue</a>
  * @author Doohyun
  */
-suspend fun <T : Any> Flow<List<T>>.firstElement(): T? {
-    val curItems: List<T> = firstOrNull() ?: emptyList()
-    return curItems.firstOrNull()
-}
+@Generated
+data class TransactionId(val value: String)

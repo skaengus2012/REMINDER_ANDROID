@@ -14,19 +14,17 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.common.schedule.view
-
-import androidx.recyclerview.widget.DiffUtil
+package com.nlab.reminder.domain.common.schedule
 
 /**
  * @author Doohyun
  */
-class ScheduleItemDiffCallback : DiffUtil.ItemCallback<ScheduleItem>() {
-    override fun areItemsTheSame(oldItem: ScheduleItem, newItem: ScheduleItem): Boolean {
-        return oldItem.scheduleId == newItem.scheduleId
-    }
-
-    override fun areContentsTheSame(oldItem: ScheduleItem, newItem: ScheduleItem): Boolean {
-        return oldItem.uiState == newItem.uiState
-    }
+fun transformScheduleToUiState(
+    schedules: List<Schedule>,
+    completeMarkSnapshot: Map<ScheduleId, CompleteMark>
+): List<ScheduleUiState> = schedules.map { schedule ->
+    ScheduleUiState(
+        schedule,
+        isCompleteMarked = completeMarkSnapshot[schedule.id()]?.isComplete ?: schedule.isComplete
+    )
 }

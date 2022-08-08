@@ -14,18 +14,15 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.feature.schedule.all.view
+package com.nlab.reminder.domain.common.schedule.view
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
-import com.nlab.reminder.domain.common.schedule.view.ScheduleItem
-import com.nlab.reminder.domain.common.schedule.view.ScheduleItemDiffCallback
-import com.nlab.reminder.domain.common.schedule.view.ScheduleItemViewHolder
 
 /**
  * @author Doohyun
  */
-class DoingScheduleItemAdapter : ListAdapter<ScheduleItem, ScheduleItemViewHolder>(ScheduleItemDiffCallback()) {
+class DefaultScheduleItemAdapter : ListAdapter<ScheduleItem, ScheduleItemViewHolder>(ScheduleItemDiffCallback()) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ScheduleItemViewHolder {
         return ScheduleItemViewHolder.of(parent)
     }

@@ -48,10 +48,17 @@ fun AllScheduleStateMachine(
     }
 
     sideEffectOn<AllScheduleAction.Fetch, AllScheduleState.Init> {
-        scope.launch { getAllScheduleReport(scope).collect { send(AllScheduleAction.AllScheduleReportLoaded(it)) } }
+        scope.launch { getAllScheduleReport().collect { send(AllScheduleAction.AllScheduleReportLoaded(it)) } }
     }
 
     sideEffectOn<AllScheduleAction.OnScheduleCompleteUpdateClicked, AllScheduleState.Loaded> { (action) ->
-        scope.launch { updateScheduleComplete(action.scheduleId, action.isComplete) }
+        scope.launch {
+
+
+            // 1. schedule 을 local 에서 업데이트. 이 때 txId 발급 필요.
+            // 2. 딜레이
+            // 3. txId 비교하여 schedule 처리할것..
+            updateScheduleComplete(action.scheduleId, action.isComplete)
+        }
     }
 }

@@ -52,8 +52,7 @@ class InsertDummyInfoToDatabaseMacro {
                 description = "Good to know about [${faker.programmingLanguage().name()}] with ${faker.name().fullName()}",
                 url = "https://github.com/skaengus2012/REMINDER_ANDROID",
                 visiblePriority = faker.number().numberBetween(0, 300),
-                isComplete = false,
-                isPendingComplete = false
+                isComplete = false
             )
         }
 
@@ -62,8 +61,7 @@ class InsertDummyInfoToDatabaseMacro {
                 title = "Travel ✈️",
                 description = "Go to [${faker.nation().capitalCity()}] with ${faker.name().fullName()}",
                 visiblePriority = faker.number().numberBetween(0, 300),
-                isComplete = false,
-                isPendingComplete = false
+                isComplete = false
             )
         }
 
@@ -73,8 +71,7 @@ class InsertDummyInfoToDatabaseMacro {
                 title = "Book club",
                 description = "About [${book.title()} of ${book.author()}]",
                 visiblePriority = faker.number().numberBetween(0, 300),
-                isComplete = false,
-                isPendingComplete = false
+                isComplete = false
             )
         }
     }
@@ -102,7 +99,7 @@ class InsertDummyInfoToDatabaseMacro {
     fun input() = runTest {
         resetTagEntities()
         resetScheduleEntities()
-        reseScheduleTagList()
+        resetScheduleTagList()
     }
 
     private suspend fun resetTagEntities() {
@@ -117,7 +114,7 @@ class InsertDummyInfoToDatabaseMacro {
         inputScheduleEntities.shuffled().forEach { scheduleDao.insert(it)  }
     }
 
-    private suspend fun reseScheduleTagList() {
+    private suspend fun resetScheduleTagList() {
         val tagEntities = tagDao.find().first()
         scheduleDao.findByComplete(isComplete = false)
             .first()

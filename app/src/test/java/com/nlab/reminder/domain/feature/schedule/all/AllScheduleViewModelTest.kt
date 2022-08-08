@@ -69,7 +69,7 @@ class AllScheduleViewModelTest {
 
         val viewModel: AllScheduleViewModel = genAllScheduleViewModel(
             getAllScheduleReport = mock {
-                whenever(mock(any())) doReturn flowOf(expectedReport)
+                whenever(mock()) doReturn flowOf(expectedReport)
             }
         )
         CoroutineScope(Dispatchers.Unconfined).launch { viewModel.state.collect(actualStates::add) }

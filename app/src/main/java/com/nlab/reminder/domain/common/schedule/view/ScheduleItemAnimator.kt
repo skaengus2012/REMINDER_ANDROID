@@ -16,17 +16,11 @@
 
 package com.nlab.reminder.domain.common.schedule.view
 
-import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.DefaultItemAnimator
+import androidx.recyclerview.widget.RecyclerView
 
 /**
  * @author Doohyun
  */
-class ScheduleItemDiffCallback : DiffUtil.ItemCallback<ScheduleItem>() {
-    override fun areItemsTheSame(oldItem: ScheduleItem, newItem: ScheduleItem): Boolean {
-        return oldItem.scheduleId == newItem.scheduleId
-    }
-
-    override fun areContentsTheSame(oldItem: ScheduleItem, newItem: ScheduleItem): Boolean {
-        return oldItem.uiState == newItem.uiState
-    }
-}
+@Suppress("FunctionName")
+fun ScheduleItemAnimator(): RecyclerView.ItemAnimator = DefaultItemAnimator().apply { changeDuration = 0 }
