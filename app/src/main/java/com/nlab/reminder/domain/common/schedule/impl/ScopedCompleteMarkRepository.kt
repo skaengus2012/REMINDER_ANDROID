@@ -17,7 +17,6 @@
 package com.nlab.reminder.domain.common.schedule.impl
 
 import com.nlab.reminder.core.util.transaction.TransactionId
-import com.nlab.reminder.core.util.transaction.TransactionIdGenerator
 import com.nlab.reminder.domain.common.schedule.CompleteMark
 import com.nlab.reminder.domain.common.schedule.CompleteMarkRepository
 import com.nlab.reminder.domain.common.schedule.ScheduleId
@@ -31,16 +30,13 @@ import kotlinx.coroutines.flow.update
  *
  * @author Doohyun
  */
-class ScopedCompleteMarkRepository(
-    private val transactionIdGenerator: TransactionIdGenerator
-) : CompleteMarkRepository {
+class ScopedCompleteMarkRepository : CompleteMarkRepository {
     private val completeMarks: MutableStateFlow<Map<ScheduleId, CompleteMark>> = MutableStateFlow(emptyMap())
 
     override fun get(): Flow<Map<ScheduleId, CompleteMark>> = completeMarks.asStateFlow()
 
-    override suspend fun insert(scheduleId: ScheduleId, isComplete: Boolean): TransactionId {
-        return transactionIdGenerator.generate()
-            .also { completeMarks.update { old -> old + (scheduleId to CompleteMark(txId = it, isComplete)) } }
+    override suspend fun insert(scheduleId: ScheduleId, completeMark: CompleteMark) {
+        completeMarks.update { snapshot -> snapshot + (scheduleId to completeMark) }
     }
 
     override suspend fun delete(scheduleId: ScheduleId, transactionId: TransactionId) {

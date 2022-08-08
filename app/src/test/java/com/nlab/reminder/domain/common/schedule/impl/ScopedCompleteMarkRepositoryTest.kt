@@ -17,8 +17,6 @@
 package com.nlab.reminder.domain.common.schedule.impl
 
 import com.nlab.reminder.core.util.transaction.TransactionId
-import com.nlab.reminder.core.util.transaction.TransactionIdGenerator
-import com.nlab.reminder.core.util.transaction.genTransactionIdGenerator
 import com.nlab.reminder.domain.common.schedule.*
 import com.nlab.reminder.test.genBoolean
 import com.nlab.reminder.test.genBothify
@@ -43,14 +41,9 @@ class ScopedCompleteMarkRepositoryTest {
         val init = ScheduleId(genLong())
         val txId: String = genBothify()
         val isComplete: Boolean = genBoolean()
-        val completeMarkRepository: CompleteMarkRepository =
-            ScopedCompleteMarkRepository(genTransactionIdGenerator(txId))
+        val completeMarkRepository: CompleteMarkRepository = ScopedCompleteMarkRepository()
 
-        val generatedTxId = completeMarkRepository.insert(init, isComplete)
-        assertThat(
-            generatedTxId,
-            equalTo(TransactionId(txId))
-        )
+        completeMarkRepository.insert(init, CompleteMark(TransactionId(txId), isComplete))
         assertThat(
             completeMarkRepository.find(init),
             equalTo(CompleteMark(TransactionId(txId), isComplete))
@@ -61,10 +54,9 @@ class ScopedCompleteMarkRepositoryTest {
     fun testDelete() = runTest {
         val init = ScheduleId(genLong())
         val txId: String = genBothify()
-        val completeMarkRepository: CompleteMarkRepository =
-            ScopedCompleteMarkRepository(genTransactionIdGenerator(txId))
+        val completeMarkRepository: CompleteMarkRepository = ScopedCompleteMarkRepository()
 
-        completeMarkRepository.insert(init, genBoolean())
+        completeMarkRepository.insert(init, CompleteMark(TransactionId(txId), genBoolean()))
         completeMarkRepository.delete(init, TransactionId(txId))
         assertThat(completeMarkRepository.find(init), equalTo(null))
     }
@@ -74,10 +66,9 @@ class ScopedCompleteMarkRepositoryTest {
         val init = ScheduleId(genLong())
         val txId: String = genBothify()
         val isCompleteMarked: Boolean = genBoolean()
-        val completeMarkRepository: CompleteMarkRepository =
-            ScopedCompleteMarkRepository(genTransactionIdGenerator(txId))
+        val completeMarkRepository: CompleteMarkRepository = ScopedCompleteMarkRepository()
 
-        completeMarkRepository.insert(init, isCompleteMarked)
+        completeMarkRepository.insert(init, CompleteMark(TransactionId(txId), isCompleteMarked))
         completeMarkRepository.delete(init, TransactionId(""))
         assertThat(completeMarkRepository.find(init), equalTo(CompleteMark(TransactionId(txId), isCompleteMarked)))
     }
@@ -87,10 +78,9 @@ class ScopedCompleteMarkRepositoryTest {
         val init = ScheduleId(1L)
         val txId: String = genBothify()
         val isCompleteMarked: Boolean = genBoolean()
-        val completeMarkRepository: CompleteMarkRepository =
-            ScopedCompleteMarkRepository(genTransactionIdGenerator(txId))
+        val completeMarkRepository: CompleteMarkRepository = ScopedCompleteMarkRepository()
 
-        completeMarkRepository.insert(init, isCompleteMarked)
+        completeMarkRepository.insert(init, CompleteMark(TransactionId(txId), isCompleteMarked))
         completeMarkRepository.delete(ScheduleId(0L), TransactionId(""))
         assertThat(completeMarkRepository.find(init), equalTo(CompleteMark(TransactionId(txId), isCompleteMarked)))
     }
@@ -98,11 +88,10 @@ class ScopedCompleteMarkRepositoryTest {
     @Test
     fun testUpdate() = runTest {
         val init = ScheduleId(genLong())
-        val transactionIdGenerator: TransactionIdGenerator = genTransactionIdGenerator()
-        val completeMarkRepository: CompleteMarkRepository = ScopedCompleteMarkRepository(transactionIdGenerator)
+        val completeMarkRepository: CompleteMarkRepository = ScopedCompleteMarkRepository()
 
-        completeMarkRepository.insert(init, isComplete = true)
-        completeMarkRepository.insert(init, isComplete = false)
+        completeMarkRepository.insert(init, CompleteMark(TransactionId(genBothify()), isComplete = true))
+        completeMarkRepository.insert(init, CompleteMark(TransactionId(genBothify()), isComplete = false))
         assertThat(completeMarkRepository.find(init)?.isComplete, equalTo(false))
     }
 

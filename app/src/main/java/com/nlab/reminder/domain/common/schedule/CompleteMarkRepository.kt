@@ -24,6 +24,6 @@ import kotlinx.coroutines.flow.Flow
  */
 interface CompleteMarkRepository {
     fun get(): Flow<Map<ScheduleId, CompleteMark>>
-    suspend fun insert(scheduleId: ScheduleId, isComplete: Boolean): TransactionId
+    suspend fun insert(scheduleId: ScheduleId, completeMark: CompleteMark)
     suspend fun delete(scheduleId: ScheduleId, transactionId: TransactionId)
 }

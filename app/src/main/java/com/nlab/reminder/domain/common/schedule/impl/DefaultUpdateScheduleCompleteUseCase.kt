@@ -18,23 +18,30 @@ package com.nlab.reminder.domain.common.schedule.impl
 
 import com.nlab.reminder.core.kotlin.coroutine.Delay
 import com.nlab.reminder.core.util.transaction.TransactionId
+import com.nlab.reminder.core.util.transaction.TransactionIdGenerator
 import com.nlab.reminder.domain.common.schedule.*
 
 /**
  * @author Doohyun
  */
 class DefaultUpdateScheduleCompleteUseCase(
+    private val transactionIdGenerator: TransactionIdGenerator,
     private val scheduleRepository: ScheduleRepository,
     private val completeMarkRepository: CompleteMarkRepository,
     private val pendingDelay: Delay
 ) : UpdateScheduleCompleteUseCase {
     override suspend fun invoke(scheduleId: ScheduleId, isComplete: Boolean) {
-        val txId: TransactionId = completeMarkRepository.insert(scheduleId, isComplete)
-        pendingDelay()
+        val txId: TransactionId = transactionIdGenerator.generate()
+        try {
+            completeMarkRepository.insert(scheduleId, CompleteMark(txId, isComplete))
+            pendingDelay()
 
-        val curCompleteMark: CompleteMark =
-            completeMarkRepository.find(scheduleId)?.takeIf { it.txId == txId } ?: return
-        scheduleRepository.updateComplete(scheduleId, curCompleteMark.isComplete)
-        completeMarkRepository.delete(scheduleId, txId)
+            scheduleRepository.updateComplete(
+                scheduleId,
+                isComplete = completeMarkRepository.find(scheduleId)?.takeIf { it.txId == txId }?.isComplete ?: return
+            )
+        } catch (e: Exception) {
+            completeMarkRepository.delete(scheduleId, txId)
+        }
     }
 }

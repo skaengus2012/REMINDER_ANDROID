@@ -19,9 +19,8 @@ package com.nlab.reminder.core.util.transaction
 import com.nlab.reminder.core.util.annotation.test.Generated
 
 /**
- * caution : cannot test when value class with coroutine
- * @see <a href="https://github.com/mockito/mockito-kotlin/issues/456">issue</a>
  * @author Doohyun
  */
 @Generated
-data class TransactionId(val value: String)
+@JvmInline
+value class TransactionId(val value: String)

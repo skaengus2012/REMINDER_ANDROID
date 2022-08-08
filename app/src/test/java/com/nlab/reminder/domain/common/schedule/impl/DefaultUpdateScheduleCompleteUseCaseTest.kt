@@ -18,6 +18,8 @@ package com.nlab.reminder.domain.common.schedule.impl
 
 import com.nlab.reminder.core.kotlin.coroutine.Delay
 import com.nlab.reminder.core.util.transaction.TransactionId
+import com.nlab.reminder.core.util.transaction.TransactionIdGenerator
+import com.nlab.reminder.core.util.transaction.genTransactionIdGenerator
 import com.nlab.reminder.domain.common.schedule.*
 import com.nlab.reminder.test.genBoolean
 import com.nlab.reminder.test.genBothify
@@ -28,6 +30,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.*
+import java.lang.RuntimeException
 
 /**
  * @author Doohyun
@@ -35,45 +38,56 @@ import org.mockito.kotlin.*
 @OptIn(ExperimentalCoroutinesApi::class)
 class DefaultUpdateScheduleCompleteUseCaseTest {
     private lateinit var schedule: Schedule
-    private lateinit var txId: TransactionId
+    private lateinit var transactionIdGenerator: TransactionIdGenerator
     private lateinit var completeMarkRepository: CompleteMarkRepository
     private lateinit var scheduleRepository: ScheduleRepository
     private lateinit var delay: Delay
+    private var transactionId: TransactionId = TransactionId("")
     private var isCompleteMarked: Boolean = false
 
     @Before
     fun setup() = runTest {
         schedule = genSchedule()
         isCompleteMarked = genBoolean()
-        txId = TransactionId(genBothify())
+        transactionId = TransactionId(genBothify())
+        transactionIdGenerator = genTransactionIdGenerator(transactionId.value)
         completeMarkRepository = mock {
-            whenever(mock.insert(schedule.id(), isCompleteMarked)) doReturn txId
-            whenever(mock.get()) doReturn flow { emit(mapOf(schedule.id() to CompleteMark(txId, isCompleteMarked))) }
+            whenever(mock.get()) doReturn flow {
+                emit(mapOf(schedule.id() to CompleteMark(transactionIdGenerator.generate(), isCompleteMarked)))
+            }
         }
         scheduleRepository = mock()
         delay = mock()
     }
 
     @Test
-    fun `clear complete mark when update succeed`() = runTest {
-        val updateScheduleCompleteUseCase: UpdateScheduleCompleteUseCase =
-            DefaultUpdateScheduleCompleteUseCase(scheduleRepository, completeMarkRepository, delay)
+    fun `update complete when useCase invoked and txId not changed`() = runTest {
+        val updateScheduleCompleteUseCase: UpdateScheduleCompleteUseCase = DefaultUpdateScheduleCompleteUseCase(
+            transactionIdGenerator,
+            scheduleRepository,
+            completeMarkRepository,
+            delay
+        )
         updateScheduleCompleteUseCase(schedule.id(), isCompleteMarked)
 
-        verify(completeMarkRepository).insert(schedule.id(), isCompleteMarked)
-        verify(completeMarkRepository).delete(schedule.id(), txId)
-        verify(scheduleRepository).updateComplete(schedule.id(), isCompleteMarked)
+        verify(completeMarkRepository, once()).insert(schedule.id(), CompleteMark(transactionId, isCompleteMarked))
+        verify(scheduleRepository, once()).updateComplete(schedule.id(), isCompleteMarked)
     }
 
     @Test
     fun `complete will update after marking complete with delay when useCase invoked`() = runTest {
-        val updateScheduleCompleteUseCase: UpdateScheduleCompleteUseCase =
-            DefaultUpdateScheduleCompleteUseCase(scheduleRepository, completeMarkRepository, delay)
+        val updateScheduleCompleteUseCase: UpdateScheduleCompleteUseCase = DefaultUpdateScheduleCompleteUseCase(
+            transactionIdGenerator,
+            scheduleRepository,
+            completeMarkRepository,
+            delay
+        )
         val beforeDelayedOrder = inOrder(completeMarkRepository, delay)
         val afterDelayedOrder = inOrder(delay, scheduleRepository)
         updateScheduleCompleteUseCase(schedule.id(), isCompleteMarked)
 
-        beforeDelayedOrder.verify(completeMarkRepository, once()).insert(schedule.id(), isCompleteMarked)
+        beforeDelayedOrder.verify(completeMarkRepository, once())
+            .insert(schedule.id(), CompleteMark(transactionId, isCompleteMarked))
         beforeDelayedOrder.verify(delay, once())()
         afterDelayedOrder.verify(delay, once())()
         afterDelayedOrder.verify(scheduleRepository, once()).updateComplete(schedule.id(), isCompleteMarked)
@@ -90,17 +104,52 @@ class DefaultUpdateScheduleCompleteUseCaseTest {
         wrongSnapshot
             .map { snapshot ->
                 DefaultUpdateScheduleCompleteUseCase(
+                    transactionIdGenerator,
                     scheduleRepository,
-                    mock {
-                        whenever(mock.insert(schedule.id(), isCompleteMarked)) doReturn txId
-                        whenever(mock.get()) doReturn flow { emit(snapshot) }
-                    },
+                    mock { whenever(mock.get()) doReturn flow { emit(snapshot) } },
                     delay
                 )
             }
             .forEach { useCase -> useCase.invoke(schedule.id(), isCompleteMarked) }
 
         verify(scheduleRepository, never()).updateComplete(schedule.id(), isCompleteMarked)
-        verify(completeMarkRepository, never()).delete(schedule.id(), txId)
+    }
+
+    @Test
+    fun `rollback complete mark when update failed`() = runTest {
+        val scheduleRepositoryErrorUseCase: UpdateScheduleCompleteUseCase = DefaultUpdateScheduleCompleteUseCase(
+            transactionIdGenerator,
+            mock { whenever(mock.updateComplete(schedule.id(), isCompleteMarked)) doThrow RuntimeException() },
+            completeMarkRepository,
+            delay
+        )
+        val insertErrorCompleteMarkRepository: CompleteMarkRepository = mock {
+            whenever(
+                mock.insert(schedule.id(), CompleteMark(transactionId, isCompleteMarked))
+            ) doThrow RuntimeException()
+        }
+        val insertErrorUseCase: UpdateScheduleCompleteUseCase = DefaultUpdateScheduleCompleteUseCase(
+            transactionIdGenerator,
+            scheduleRepository,
+            insertErrorCompleteMarkRepository,
+            delay
+        )
+        val findErrorCompleteMarkRepository: CompleteMarkRepository = mock {
+            whenever(mock.get()) doThrow RuntimeException()
+        }
+        val findErrorUseCase: UpdateScheduleCompleteUseCase = DefaultUpdateScheduleCompleteUseCase(
+            transactionIdGenerator,
+            scheduleRepository,
+            findErrorCompleteMarkRepository,
+            delay
+        )
+
+
+        scheduleRepositoryErrorUseCase(schedule.id(), isCompleteMarked)
+        insertErrorUseCase(schedule.id(), isCompleteMarked)
+        findErrorUseCase(schedule.id(), isCompleteMarked)
+        verify(completeMarkRepository, once()).delete(schedule.id(), transactionId)
+        verify(insertErrorCompleteMarkRepository, once()).delete(schedule.id(), transactionId)
+        verify(findErrorCompleteMarkRepository, once()).delete(schedule.id(), transactionId)
     }
 }

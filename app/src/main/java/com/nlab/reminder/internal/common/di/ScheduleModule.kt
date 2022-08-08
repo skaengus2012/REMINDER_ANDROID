@@ -37,15 +37,15 @@ import dagger.hilt.android.scopes.ViewModelScoped
 class ScheduleModule {
     @ViewModelScoped
     @Provides
-    fun provideCompleteMarkRepository(
-        transactionIdGenerator: TransactionIdGenerator
-    ): CompleteMarkRepository = ScopedCompleteMarkRepository(transactionIdGenerator)
+    fun provideCompleteMarkRepository(): CompleteMarkRepository = ScopedCompleteMarkRepository()
 
     @Provides
     fun provideUpdateScheduleCompleteUseCase(
+        transactionIdGenerator: TransactionIdGenerator,
         scheduleRepository: ScheduleRepository,
         completeMarkRepository: CompleteMarkRepository,
     ): UpdateScheduleCompleteUseCase = DefaultUpdateScheduleCompleteUseCase(
+        transactionIdGenerator,
         scheduleRepository,
         completeMarkRepository,
         pendingDelay = Delay(500)
