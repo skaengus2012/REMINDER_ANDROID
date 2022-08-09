@@ -16,6 +16,8 @@
 
 package com.nlab.reminder.internal.common.schedule.impl
 
+import com.nlab.reminder.core.kotlin.util.isFailure
+import com.nlab.reminder.core.kotlin.util.isSuccess
 import com.nlab.reminder.domain.common.schedule.*
 import com.nlab.reminder.domain.common.tag.genTags
 import com.nlab.reminder.internal.common.android.database.*
@@ -80,12 +82,28 @@ class LocalScheduleRepositoryTest {
     }
 
     @Test
-    fun `scheduleDao update complete state when repository invoked update complete state`() = runTest {
+    fun `scheduleDao invoke updateComplete when repository invoked update complete state`() = runTest {
         val schedule: Schedule = genSchedule()
         val isComplete: Boolean = genBoolean()
         val scheduleDao: ScheduleDao = mock()
 
-        LocalScheduleRepository(scheduleDao).updateComplete(schedule.id(), isComplete)
-        verify(scheduleDao, times(1)).updateComplete(schedule.id().value, isComplete)
+        assertThat(
+            LocalScheduleRepository(scheduleDao).updateComplete(schedule.id(), isComplete)
+                .isSuccess,
+            equalTo(true)
+        )
+        verify(scheduleDao, once()).updateComplete(schedule.id().value, isComplete)
+    }
+
+    @Test
+    fun `repository received failed result when scheduleDao failed to updateComplete`() = runTest {
+        val scheduleDao: ScheduleDao = mock {
+            whenever(mock.updateComplete(any(), any())) doThrow RuntimeException()
+        }
+        assertThat(
+            LocalScheduleRepository(scheduleDao).updateComplete(genSchedule().id(), genBoolean())
+                .isFailure,
+            equalTo(true)
+        )
     }
 }

@@ -16,6 +16,7 @@
 
 package com.nlab.reminder.domain.common.schedule
 
+import com.nlab.reminder.core.kotlin.util.Result
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -23,5 +24,5 @@ import kotlinx.coroutines.flow.Flow
  */
 interface ScheduleRepository {
     fun get(request: ScheduleItemRequest): Flow<List<Schedule>>
-    suspend fun updateComplete(scheduleId: ScheduleId, isComplete: Boolean)
+    suspend fun updateComplete(scheduleId: ScheduleId, isComplete: Boolean): Result<Unit>
 }

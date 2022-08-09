@@ -17,7 +17,6 @@
 package com.nlab.reminder.domain.common.schedule
 
 import com.nlab.reminder.core.util.annotation.test.Generated
-import com.nlab.reminder.core.util.domain.UiState
 
 /**
  * @author Doohyun
@@ -26,4 +25,4 @@ import com.nlab.reminder.core.util.domain.UiState
 data class ScheduleUiState(
     val schedule: Schedule,
     val isCompleteMarked: Boolean
-) : UiState
+)

@@ -20,18 +20,12 @@ import com.nlab.reminder.domain.common.schedule.Schedule
 import com.nlab.reminder.domain.common.schedule.UpdateScheduleCompleteUseCase
 import com.nlab.reminder.domain.common.schedule.genSchedule
 import com.nlab.reminder.test.genBoolean
-import com.nlab.reminder.test.genFlowExecutionDispatcher
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import com.nlab.reminder.test.once
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.*
-import org.junit.After
-import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.*
 
@@ -51,16 +45,6 @@ class AllScheduleStateMachineKtTest {
         AllScheduleState.Loading,
         AllScheduleState.Loaded(genAllScheduleReport())
     )
-
-    @Before
-    fun setUp() = runTest {
-        Dispatchers.setMain(genFlowExecutionDispatcher(testScheduler))
-    }
-
-    @After
-    fun tearDown() {
-        Dispatchers.resetMain()
-    }
 
     @Test
     fun `holds injected state when machine created`() = runTest {
@@ -128,7 +112,6 @@ class AllScheduleStateMachineKtTest {
             whenever(mock()) doReturn flow { emit(testReport) }
         }
         val stateMachine: AllScheduleStateMachine = genStateMachine(
-            scope = CoroutineScope(Dispatchers.Unconfined),
             getAllScheduleReport = getAllScheduleReportUseCase
         )
         stateMachine
@@ -152,6 +135,6 @@ class AllScheduleStateMachineKtTest {
         stateMachine
             .send(AllScheduleAction.OnScheduleCompleteUpdateClicked(schedule.id(), isComplete))
             .join()
-        verify(updateScheduleCompleteUseCase, times(1))(schedule.id(), isComplete)
+        verify(updateScheduleCompleteUseCase, once())(schedule.id(), isComplete)
     }
 }
