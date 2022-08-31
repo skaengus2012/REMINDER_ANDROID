@@ -22,15 +22,17 @@ import com.nlab.reminder.domain.feature.schedule.all.AllScheduleReport
 import com.nlab.reminder.domain.feature.schedule.all.GetAllScheduleReportUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.flowOn
 
 /**
  * @author Doohyun
  */
 class DefaultGetAllScheduleReportUseCase(
-    private val scheduleRepository: ScheduleRepository,
-    private val completeMarkRepository: CompleteMarkRepository,
     private val doneScheduleShownRepository: DoneScheduleShownRepository,
+    private val scheduleRepository: ScheduleRepository,
+    private val scheduleUiStateFlowFactory: ScheduleUiStateFlowFactory,
     private val dispatcher: CoroutineDispatcher
 ) : GetAllScheduleReportUseCase {
     @FlowPreview
@@ -39,14 +41,15 @@ class DefaultGetAllScheduleReportUseCase(
             .flatMapConcat(this::createAllScheduleReportFlow)
             .flowOn(dispatcher)
 
+    private fun getScheduleFlow(isDoneScheduleShown: Boolean): Flow<List<Schedule>> =
+        scheduleRepository.get(
+            if (isDoneScheduleShown) ScheduleItemRequest.Find
+            else ScheduleItemRequest.FindByComplete(isComplete = false)
+        )
+
     private fun createAllScheduleReportFlow(isDoneScheduleShown: Boolean): Flow<AllScheduleReport> {
-        return combine(
-            scheduleRepository.get(
-                if (isDoneScheduleShown) ScheduleItemRequest.Find
-                else ScheduleItemRequest.FindByComplete(isComplete = false)
-            ),
-            completeMarkRepository.get(),
-            transform = ::transformScheduleToUiState
-        ).map { scheduleItems -> AllScheduleReport(scheduleItems, isDoneScheduleShown) }
+        return getScheduleFlow(isDoneScheduleShown)
+            .let(scheduleUiStateFlowFactory::combineWith)
+            .map { scheduleItems -> AllScheduleReport(scheduleItems, isDoneScheduleShown) }
     }
 }

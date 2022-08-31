@@ -23,21 +23,26 @@ import kotlinx.coroutines.flow.Flow
  * @author Doohyun
  */
 @Dao
-interface ScheduleDao {
+abstract class ScheduleDao {
     @Insert
-    suspend fun insert(schedule: ScheduleEntity): Long
+    abstract suspend fun insert(schedule: ScheduleEntity): Long
 
     @Transaction
     @Query("SELECT * FROM schedule ORDER BY is_complete, visible_priority")
-    fun find(): Flow<List<ScheduleEntityWithTagEntities>>
+    abstract fun find(): Flow<List<ScheduleEntityWithTagEntities>>
 
     @Transaction
     @Query("SELECT * FROM schedule WHERE is_complete = :isComplete ORDER BY is_complete, visible_priority")
-    fun findByComplete(isComplete: Boolean): Flow<List<ScheduleEntityWithTagEntities>>
+    abstract fun findByComplete(isComplete: Boolean): Flow<List<ScheduleEntityWithTagEntities>>
 
     @Query("UPDATE schedule SET is_complete = :isComplete WHERE schedule_id = :scheduleId")
-    suspend fun updateComplete(scheduleId: Long, isComplete: Boolean)
+    abstract suspend fun updateComplete(scheduleId: Long, isComplete: Boolean)
+
+    @Transaction
+    open suspend fun updateComplete(requests: Map<Long, Boolean>) {
+        requests.forEach { (scheduleId, isComplete) -> updateComplete(scheduleId, isComplete) }
+    }
 
     @Delete
-    suspend fun delete(schedule: ScheduleEntity)
+    abstract suspend fun delete(schedule: ScheduleEntity)
 }

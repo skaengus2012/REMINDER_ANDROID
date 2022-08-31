@@ -20,14 +20,17 @@ import com.nlab.reminder.core.kotlin.coroutine.util.Delay
 import com.nlab.reminder.core.util.transaction.TransactionIdGenerator
 import com.nlab.reminder.domain.common.schedule.CompleteMarkRepository
 import com.nlab.reminder.domain.common.schedule.ScheduleRepository
-import com.nlab.reminder.domain.common.schedule.UpdateScheduleCompleteUseCase
-import com.nlab.reminder.domain.common.schedule.impl.DefaultUpdateScheduleCompleteUseCase
+import com.nlab.reminder.domain.common.schedule.ScheduleUiStateFlowFactory
+import com.nlab.reminder.domain.common.schedule.UpdateCompleteUseCase
+import com.nlab.reminder.domain.common.schedule.impl.DefaultScheduleUiStateFlowFactory
+import com.nlab.reminder.domain.common.schedule.impl.DefaultUpdateCompleteUseCase
 import com.nlab.reminder.domain.common.schedule.impl.ScopedCompleteMarkRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.android.scopes.ViewModelScoped
+import kotlinx.coroutines.Dispatchers
 
 /**
  * @author Doohyun
@@ -40,14 +43,20 @@ class ScheduleModule {
     fun provideCompleteMarkRepository(): CompleteMarkRepository = ScopedCompleteMarkRepository()
 
     @Provides
+    fun provideScheduleUiStateFlowFactory(
+        completeMarkRepository: CompleteMarkRepository
+    ): ScheduleUiStateFlowFactory = DefaultScheduleUiStateFlowFactory(completeMarkRepository)
+
+    @Provides
     fun provideUpdateScheduleCompleteUseCase(
         transactionIdGenerator: TransactionIdGenerator,
         scheduleRepository: ScheduleRepository,
-        completeMarkRepository: CompleteMarkRepository,
-    ): UpdateScheduleCompleteUseCase = DefaultUpdateScheduleCompleteUseCase(
+        completeMarkRepository: CompleteMarkRepository
+    ): UpdateCompleteUseCase = DefaultUpdateCompleteUseCase(
         transactionIdGenerator,
         scheduleRepository,
         completeMarkRepository,
-        pendingDelay = Delay(500)
+        delayUntilTransactionPeriod = Delay(timeMillis = 1_000),
+        dispatcher = Dispatchers.Default
     )
 }

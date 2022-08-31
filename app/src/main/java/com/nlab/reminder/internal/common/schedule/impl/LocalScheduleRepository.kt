@@ -18,7 +18,7 @@ package com.nlab.reminder.internal.common.schedule.impl
 
 import com.nlab.reminder.core.kotlin.coroutine.flow.map
 import com.nlab.reminder.core.kotlin.util.Result
-import com.nlab.reminder.core.kotlin.util.suspendCatching
+import com.nlab.reminder.core.kotlin.util.catching
 import com.nlab.reminder.domain.common.schedule.*
 import com.nlab.reminder.internal.common.android.database.ScheduleDao
 import com.nlab.reminder.internal.common.android.database.ScheduleEntityWithTagEntities
@@ -40,6 +40,9 @@ class LocalScheduleRepository(
         return resultFlow.map(List<ScheduleEntityWithTagEntities>::toSchedules)
     }
 
-    override suspend fun updateComplete(scheduleId: ScheduleId, isComplete: Boolean): Result<Unit> =
-        suspendCatching { scheduleDao.updateComplete(scheduleId.value, isComplete) }
+    override suspend fun updateComplete(requests: Set<ScheduleCompleteRequest>): Result<Unit> = catching {
+        scheduleDao.updateComplete(
+            requests.fold(emptyMap()) { acc, (scheduleId, isComplete) -> acc + (scheduleId.value to isComplete) }
+        )
+    }
 }

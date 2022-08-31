@@ -38,7 +38,7 @@ fun genSchedule(
 
 fun genSchedules(
     isComplete: Boolean = genBoolean()
-): List<Schedule> = List(genInt("#")) { index ->
+): List<Schedule> = List(genInt("##")) { index ->
     genSchedule(scheduleId = index.toLong(), isComplete = isComplete)
 }
 

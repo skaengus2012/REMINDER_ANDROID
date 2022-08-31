@@ -16,7 +16,7 @@
 
 package com.nlab.reminder.domain.feature.schedule.all
 
-import com.nlab.reminder.domain.common.schedule.UpdateScheduleCompleteUseCase
+import com.nlab.reminder.domain.common.schedule.UpdateCompleteUseCase
 import kotlinx.coroutines.CoroutineScope
 
 /**
@@ -24,7 +24,7 @@ import kotlinx.coroutines.CoroutineScope
  */
 class AllScheduleStateMachineFactory(
     private val getAllScheduleReport: GetAllScheduleReportUseCase,
-    private val updateScheduleComplete: UpdateScheduleCompleteUseCase,
+    private val updateScheduleComplete: UpdateCompleteUseCase,
     private val initState: AllScheduleState = AllScheduleState.Init
 ) {
     fun create(

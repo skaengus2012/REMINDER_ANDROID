@@ -17,6 +17,10 @@
 package com.nlab.reminder.core.kotlin.util
 
 /**
+ * Replication of Kotlin Result
+ *
+ * Because Kotlin's Result is a value class, jacoco doesn't work properly.
+ * So, I remastered it in the form of a data class.
  * @author Doohyun
  */
 sealed class Result<T> {

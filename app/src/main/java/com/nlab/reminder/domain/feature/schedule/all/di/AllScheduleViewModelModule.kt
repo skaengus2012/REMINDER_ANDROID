@@ -16,10 +16,10 @@
 
 package com.nlab.reminder.domain.feature.schedule.all.di
 
-import com.nlab.reminder.domain.common.schedule.CompleteMarkRepository
 import com.nlab.reminder.domain.common.schedule.DoneScheduleShownRepository
 import com.nlab.reminder.domain.common.schedule.ScheduleRepository
-import com.nlab.reminder.domain.common.schedule.UpdateScheduleCompleteUseCase
+import com.nlab.reminder.domain.common.schedule.ScheduleUiStateFlowFactory
+import com.nlab.reminder.domain.common.schedule.UpdateCompleteUseCase
 import com.nlab.reminder.domain.feature.schedule.all.AllScheduleScope
 import com.nlab.reminder.domain.feature.schedule.all.AllScheduleStateMachineFactory
 import com.nlab.reminder.domain.feature.schedule.all.impl.DefaultGetAllScheduleReportUseCase
@@ -38,16 +38,16 @@ class AllScheduleViewModelModule {
     @Provides
     fun provideStateMachineProvider(
         scheduleRepository: ScheduleRepository,
-        completeMarkRepository: CompleteMarkRepository,
-        updateScheduleCompleteUseCase: UpdateScheduleCompleteUseCase,
+        scheduleUiStateFlowFactory: ScheduleUiStateFlowFactory,
+        updateCompleteUseCase: UpdateCompleteUseCase,
         @AllScheduleScope doneScheduleShownRepository: DoneScheduleShownRepository
     ): AllScheduleStateMachineFactory = AllScheduleStateMachineFactory(
         getAllScheduleReport = DefaultGetAllScheduleReportUseCase(
-            scheduleRepository,
-            completeMarkRepository,
             doneScheduleShownRepository,
+            scheduleRepository,
+            scheduleUiStateFlowFactory,
             dispatcher = Dispatchers.Default
         ),
-        updateScheduleComplete = updateScheduleCompleteUseCase
+        updateScheduleComplete = updateCompleteUseCase
     )
 }

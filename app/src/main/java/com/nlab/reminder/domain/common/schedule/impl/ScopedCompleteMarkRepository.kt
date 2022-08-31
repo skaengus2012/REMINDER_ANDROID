@@ -16,7 +16,6 @@
 
 package com.nlab.reminder.domain.common.schedule.impl
 
-import com.nlab.reminder.core.util.transaction.TransactionId
 import com.nlab.reminder.domain.common.schedule.CompleteMark
 import com.nlab.reminder.domain.common.schedule.CompleteMarkRepository
 import com.nlab.reminder.domain.common.schedule.ScheduleId
@@ -26,23 +25,25 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
 /**
- * Thread-safe CompleteMark Manager
+ * Thread-safe CompleteRequest Manager
  *
  * @author Doohyun
  */
 class ScopedCompleteMarkRepository : CompleteMarkRepository {
-    private val completeMarks: MutableStateFlow<Map<ScheduleId, CompleteMark>> = MutableStateFlow(emptyMap())
+    private val chunkRequests: MutableStateFlow<Map<ScheduleId, CompleteMark>> = MutableStateFlow(emptyMap())
 
-    override fun get(): Flow<Map<ScheduleId, CompleteMark>> = completeMarks.asStateFlow()
+    override fun get(): Flow<Map<ScheduleId, CompleteMark>> = chunkRequests.asStateFlow()
 
-    override suspend fun insert(scheduleId: ScheduleId, completeMark: CompleteMark) {
-        completeMarks.update { snapshot -> snapshot + (scheduleId to completeMark) }
+    override suspend fun insert(completeMarks: Map<ScheduleId, CompleteMark>) {
+        chunkRequests.update { old -> old + completeMarks }
     }
 
-    override suspend fun delete(scheduleId: ScheduleId, transactionId: TransactionId) {
-        completeMarks.update { snapshot ->
-            if (snapshot[scheduleId]?.txId == transactionId) snapshot - scheduleId
-            else snapshot
+    override suspend fun updateToApplied(completeMarks: Map<ScheduleId, CompleteMark>) {
+        chunkRequests.update { old ->
+            old.mapValues { (key, value) ->
+                if (completeMarks[key] == value) value.copy(isApplied = true)
+                else value
+            }
         }
     }
 }

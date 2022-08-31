@@ -14,22 +14,13 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.common.schedule.util
+package com.nlab.reminder.domain.common.schedule
 
-import com.nlab.reminder.core.util.annotation.test.Generated
-import com.nlab.reminder.domain.common.schedule.Schedule
+import kotlinx.coroutines.flow.Flow
 
 /**
  * @author Doohyun
  */
-@Generated
-@Suppress("FunctionName")
-fun EmptySchedule(): Schedule = Schedule(
-    scheduleId = 0,
-    title = "",
-    note = null,
-    url = null,
-    tags = emptyList(),
-    visiblePriority = 0,
-    isComplete = false
-)
+interface ScheduleUiStateFlowFactory {
+    fun combineWith(scheduleFlow: Flow<List<Schedule>>): Flow<List<ScheduleUiState>>
+}

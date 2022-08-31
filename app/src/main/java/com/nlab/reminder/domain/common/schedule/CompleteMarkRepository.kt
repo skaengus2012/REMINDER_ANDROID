@@ -16,7 +16,6 @@
 
 package com.nlab.reminder.domain.common.schedule
 
-import com.nlab.reminder.core.util.transaction.TransactionId
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -24,6 +23,6 @@ import kotlinx.coroutines.flow.Flow
  */
 interface CompleteMarkRepository {
     fun get(): Flow<Map<ScheduleId, CompleteMark>>
-    suspend fun insert(scheduleId: ScheduleId, completeMark: CompleteMark)
-    suspend fun delete(scheduleId: ScheduleId, transactionId: TransactionId)
+    suspend fun insert(completeMarks: Map<ScheduleId, CompleteMark>)
+    suspend fun updateToApplied(completeMarks: Map<ScheduleId, CompleteMark>)
 }

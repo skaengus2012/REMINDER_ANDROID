@@ -16,7 +16,7 @@
 
 package com.nlab.reminder.domain.feature.schedule.all
 
-import com.nlab.reminder.domain.common.schedule.UpdateScheduleCompleteUseCase
+import com.nlab.reminder.domain.common.schedule.UpdateCompleteUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -31,7 +31,7 @@ import org.mockito.kotlin.whenever
  */
 fun genAllScheduleStateMachineFactory(
     getAllScheduleReport: GetAllScheduleReportUseCase = mock(),
-    updateScheduleComplete: UpdateScheduleCompleteUseCase = mock(),
+    updateScheduleComplete: UpdateCompleteUseCase = mock(),
     initState: AllScheduleState? = null
 ): AllScheduleStateMachineFactory =
     if (initState == null) AllScheduleStateMachineFactory(getAllScheduleReport, updateScheduleComplete)
@@ -41,14 +41,14 @@ fun genStateMachine(
     scope: CoroutineScope = CoroutineScope(Dispatchers.Unconfined),
     initState: AllScheduleState? = null,
     getAllScheduleReport: GetAllScheduleReportUseCase = mock { whenever(mock()) doReturn emptyFlow() },
-    updateScheduleComplete: UpdateScheduleCompleteUseCase = mock()
+    updateScheduleComplete: UpdateCompleteUseCase = mock()
 ): AllScheduleStateMachine =
     genAllScheduleStateMachineFactory(getAllScheduleReport, updateScheduleComplete, initState)
         .create(scope)
 
 fun genAllScheduleViewModel(
     getAllScheduleReport: GetAllScheduleReportUseCase = mock(),
-    updateScheduleComplete: UpdateScheduleCompleteUseCase = mock(),
+    updateScheduleComplete: UpdateCompleteUseCase = mock(),
     initState: AllScheduleState? = null
 ): AllScheduleViewModel = AllScheduleViewModel(
     genAllScheduleStateMachineFactory(getAllScheduleReport, updateScheduleComplete, initState)

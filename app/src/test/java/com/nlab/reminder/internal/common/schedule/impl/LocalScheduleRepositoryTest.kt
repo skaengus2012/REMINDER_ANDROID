@@ -82,28 +82,30 @@ class LocalScheduleRepositoryTest {
     }
 
     @Test
-    fun `scheduleDao invoke updateComplete when repository invoked update complete state`() = runTest {
-        val schedule: Schedule = genSchedule()
-        val isComplete: Boolean = genBoolean()
-        val scheduleDao: ScheduleDao = mock()
+    fun `update result for updateComplete was success`() = runTest {
+        val schedules: List<Schedule> = genSchedules()
+        val completes: List<Boolean> = List(schedules.size) { genBoolean() }
+        val repositoryParam: Set<ScheduleCompleteRequest> =
+            schedules
+                .mapIndexed { index, schedule -> ScheduleCompleteRequest(schedule.id(), completes[index]) }
+                .toSet()
+        val daoParam = buildMap {
+            schedules.forEachIndexed { index, schedule -> this[schedule.id().value] = completes[index] }
+        }
 
-        assertThat(
-            LocalScheduleRepository(scheduleDao).updateComplete(schedule.id(), isComplete)
-                .isSuccess,
-            equalTo(true)
-        )
-        verify(scheduleDao, once()).updateComplete(schedule.id().value, isComplete)
+        val scheduleDao: ScheduleDao = mock()
+        val updateResult = LocalScheduleRepository(scheduleDao).updateComplete(repositoryParam)
+
+        verify(scheduleDao, once()).updateComplete(daoParam)
+        assertThat(updateResult.isSuccess, equalTo(true))
     }
 
     @Test
-    fun `repository received failed result when scheduleDao failed to updateComplete`() = runTest {
+    fun `update result for updateComplete was failed`() = runTest {
         val scheduleDao: ScheduleDao = mock {
-            whenever(mock.updateComplete(any(), any())) doThrow RuntimeException()
+            whenever(mock.updateComplete(any())) doThrow RuntimeException()
         }
-        assertThat(
-            LocalScheduleRepository(scheduleDao).updateComplete(genSchedule().id(), genBoolean())
-                .isFailure,
-            equalTo(true)
-        )
+        val updateResult = LocalScheduleRepository(scheduleDao).updateComplete(emptySet())
+        assertThat(updateResult.isFailure, equalTo(true))
     }
 }

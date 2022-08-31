@@ -24,5 +24,5 @@ import kotlinx.coroutines.flow.Flow
  */
 interface ScheduleRepository {
     fun get(request: ScheduleItemRequest): Flow<List<Schedule>>
-    suspend fun updateComplete(scheduleId: ScheduleId, isComplete: Boolean): Result<Unit>
+    suspend fun updateComplete(requests: Set<ScheduleCompleteRequest>): Result<Unit>
 }

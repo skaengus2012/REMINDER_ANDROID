@@ -17,7 +17,7 @@
 package com.nlab.reminder.domain.feature.schedule.all
 
 import com.nlab.reminder.domain.common.schedule.Schedule
-import com.nlab.reminder.domain.common.schedule.UpdateScheduleCompleteUseCase
+import com.nlab.reminder.domain.common.schedule.UpdateCompleteUseCase
 import com.nlab.reminder.domain.common.schedule.genSchedule
 import com.nlab.reminder.test.genBoolean
 import com.nlab.reminder.test.once
@@ -127,14 +127,14 @@ class AllScheduleStateMachineKtTest {
     fun `update schedule complete when stateMachine received update schedule complete`() = runTest {
         val schedule: Schedule = genSchedule()
         val isComplete: Boolean = genBoolean()
-        val updateScheduleCompleteUseCase: UpdateScheduleCompleteUseCase = mock()
+        val updateCompleteUseCase: UpdateCompleteUseCase = mock()
         val stateMachine: AllScheduleStateMachine = genStateMachine(
             initState = AllScheduleState.Loaded(genAllScheduleReport()),
-            updateScheduleComplete = updateScheduleCompleteUseCase
+            updateScheduleComplete = updateCompleteUseCase
         )
         stateMachine
             .send(AllScheduleAction.OnScheduleCompleteUpdateClicked(schedule.id(), isComplete))
             .join()
-        verify(updateScheduleCompleteUseCase, once())(schedule.id(), isComplete)
+        verify(updateCompleteUseCase, once())(schedule.id(), isComplete)
     }
 }

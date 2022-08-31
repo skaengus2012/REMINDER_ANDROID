@@ -18,7 +18,7 @@ package com.nlab.reminder.domain.feature.schedule.all
 
 import com.nlab.reminder.core.state.StateMachine
 import com.nlab.reminder.core.state.util.StateMachine
-import com.nlab.reminder.domain.common.schedule.UpdateScheduleCompleteUseCase
+import com.nlab.reminder.domain.common.schedule.UpdateCompleteUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -31,7 +31,7 @@ fun AllScheduleStateMachine(
     scope: CoroutineScope,
     initState: AllScheduleState,
     getAllScheduleReport: GetAllScheduleReportUseCase,
-    updateScheduleComplete: UpdateScheduleCompleteUseCase
+    updateScheduleComplete: UpdateCompleteUseCase
 ): AllScheduleStateMachine = StateMachine(scope, initState) {
     updateTo { (action, oldState) ->
         when (action) {

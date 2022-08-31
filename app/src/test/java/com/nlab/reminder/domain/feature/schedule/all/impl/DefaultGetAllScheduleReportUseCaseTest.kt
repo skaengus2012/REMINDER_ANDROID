@@ -16,7 +16,6 @@
 
 package com.nlab.reminder.domain.feature.schedule.all.impl
 
-import com.nlab.reminder.core.util.transaction.TransactionId
 import com.nlab.reminder.domain.common.schedule.*
 import com.nlab.reminder.domain.feature.schedule.all.AllScheduleReport
 import com.nlab.reminder.domain.feature.schedule.all.GetAllScheduleReportUseCase
@@ -24,8 +23,6 @@ import com.nlab.reminder.domain.feature.schedule.all.genAllScheduleReport
 import com.nlab.reminder.test.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.test.advanceTimeBy
-import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.*
 import org.junit.Test
@@ -34,7 +31,6 @@ import org.mockito.kotlin.*
 /**
  * @author Doohyun
  */
-@OptIn(ExperimentalCoroutinesApi::class)
 class DefaultGetAllScheduleReportUseCaseTest {
     @Test
     fun `find all schedules when doneScheduleShown was true`() {
@@ -59,13 +55,19 @@ class DefaultGetAllScheduleReportUseCaseTest {
         scheduleItemRequest: ScheduleItemRequest,
         isDoneScheduleShown: Boolean
     ) {
+        val fakeCompleteMark: Boolean = genBoolean()
+        val fakeScheduleUiStateFlowFactory: ScheduleUiStateFlowFactory = object : ScheduleUiStateFlowFactory {
+            override fun combineWith(scheduleFlow: Flow<List<Schedule>>): Flow<List<ScheduleUiState>> {
+                return scheduleFlow.map { schedules -> genScheduleUiStates(schedules, fakeCompleteMark) }
+            }
+        }
         val scheduleRepository: ScheduleRepository = mock {
             whenever(mock.get(scheduleItemRequest)) doReturn flowOf(expectSchedules)
         }
         val getAllScheduleReport: GetAllScheduleReportUseCase = DefaultGetAllScheduleReportUseCase(
-            scheduleRepository,
-            completeMarkRepository = mock { whenever(mock.get()) doReturn flowOf(emptyMap()) },
             doneScheduleShownRepository = mock { whenever(mock.get()) doReturn flowOf(isDoneScheduleShown) },
+            scheduleRepository = scheduleRepository,
+            scheduleUiStateFlowFactory = fakeScheduleUiStateFlowFactory,
             dispatcher = Dispatchers.Unconfined
         )
         val actualReports = mutableListOf<AllScheduleReport>()
@@ -77,53 +79,9 @@ class DefaultGetAllScheduleReportUseCaseTest {
             equalTo(
                 listOf(
                     genAllScheduleReport(
-                        genScheduleUiStates(expectSchedules),
+                        genScheduleUiStates(expectSchedules, fakeCompleteMark),
                         isDoneScheduleShown
                     )
-                )
-            )
-        )
-    }
-
-    @Test
-    fun `marked complete on uiState when completeMarkRepository sent snapshot`() = runTest {
-        val executeDispatcher = genFlowExecutionDispatcher(testScheduler)
-        val expectedSchedule: Schedule = genSchedule()
-        val scheduleRepository: ScheduleRepository = mock {
-            whenever(mock.get(any())) doReturn flowOf(listOf(expectedSchedule))
-        }
-        val completeMarkRepository: CompleteMarkRepository = mock {
-            whenever(mock.get()) doReturn flow {
-                emit(emptyMap())
-                delay(500)
-                emit(
-                    mapOf(
-                        expectedSchedule.id() to CompleteMark(
-                            TransactionId(genBothify()),
-                            expectedSchedule.isComplete.not()
-                        )
-                    )
-                )
-            }.flowOn(executeDispatcher)
-        }
-        val getAllScheduleReport: GetAllScheduleReportUseCase = DefaultGetAllScheduleReportUseCase(
-            scheduleRepository,
-            completeMarkRepository,
-            doneScheduleShownRepository = mock { whenever(mock.get()) doReturn flowOf(genBoolean()) },
-            dispatcher = Dispatchers.Unconfined
-        )
-        val actualReports = mutableListOf<AllScheduleReport>()
-        getAllScheduleReport()
-            .onEach(actualReports::add)
-            .launchIn(genFlowObserveDispatcher())
-
-        advanceTimeBy(1_000)
-        assertThat(
-            actualReports.map { it.schedules.first() },
-            equalTo(
-                listOf(
-                    genScheduleUiState(expectedSchedule),
-                    genScheduleUiState(expectedSchedule, isCompleteMarked = expectedSchedule.isComplete.not())
                 )
             )
         )

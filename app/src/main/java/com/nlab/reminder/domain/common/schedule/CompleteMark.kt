@@ -19,11 +19,9 @@ package com.nlab.reminder.domain.common.schedule
 import com.nlab.reminder.core.util.annotation.test.Generated
 import com.nlab.reminder.core.util.transaction.TransactionId
 
-/**
- * @author Doohyun
- */
 @Generated
 data class CompleteMark(
-    val txId: TransactionId,
-    val isComplete: Boolean
+    val isComplete: Boolean,
+    val isApplied: Boolean,
+    val transactionId: TransactionId
 )

@@ -20,16 +20,9 @@ package com.nlab.reminder.core.kotlin.util
  * Created because Jacoco doesn't recognize Kotlin's Result with runCatching.
  * @author Doohyun
  */
-inline fun <T> catching(crossinline action: () -> T): Result<T> =
+inline fun <T> catching(block: () -> T): Result<T> =
     try {
-        Result.Success(action())
-    } catch (e: Exception) {
-        Result.Failure(e)
-    }
-
-suspend fun <T> suspendCatching(action: suspend () -> T): Result<T> =
-    try {
-        Result.Success(action())
+        Result.Success(block())
     } catch (e: Exception) {
         Result.Failure(e)
     }

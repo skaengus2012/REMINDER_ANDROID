@@ -16,15 +16,10 @@
 
 package com.nlab.reminder.domain.common.schedule
 
+import com.nlab.reminder.core.util.annotation.test.Generated
+
 /**
  * @author Doohyun
  */
-fun transformScheduleToUiState(
-    schedules: List<Schedule>,
-    completeMarkSnapshot: Map<ScheduleId, CompleteMark>
-): List<ScheduleUiState> = schedules.map { schedule ->
-    ScheduleUiState(
-        schedule,
-        isCompleteMarked = completeMarkSnapshot[schedule.id()]?.isComplete ?: schedule.isComplete
-    )
-}
+@Generated
+data class ScheduleCompleteRequest(val scheduleId: ScheduleId, val isComplete: Boolean)
