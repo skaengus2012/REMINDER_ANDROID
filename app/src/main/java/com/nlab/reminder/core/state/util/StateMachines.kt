@@ -16,7 +16,7 @@
 
 package com.nlab.reminder.core.state.util
 
-import com.nlab.reminder.core.state.Action
+import com.nlab.reminder.core.state.Event
 import com.nlab.reminder.core.state.State
 import com.nlab.reminder.core.state.StateMachine
 import com.nlab.reminder.core.state.StateMachineImpl
@@ -28,14 +28,14 @@ import kotlinx.coroutines.flow.asStateFlow
  * @author Doohyun
  */
 @Suppress("FunctionName")
-fun <A : Action, S : State> StateMachine(
+fun <E : Event, S : State> StateMachine(
     scope: CoroutineScope,
     initState: S,
-    builderBlock: (StateMachineBuilder<A, S>).() -> Unit
-): StateMachine<A, S> {
+    builderBlock: (StateMachineBuilder<E, S>).() -> Unit
+): StateMachine<E, S> {
     val state = MutableStateFlow(initState)
     return StateMachineImpl(
-        StateMachineActionProcessor(scope, state, StateMachineBuilder<A, S>().apply(builderBlock)),
+        StateMachineEventProcessor(scope, state, StateMachineBuilder<E, S>().apply(builderBlock)),
         state.asStateFlow()
     )
 }

@@ -48,18 +48,18 @@ class AllScheduleViewModelTest {
     }
 
     @Test
-    fun `notify action to stateMachine when viewModel action invoked`() {
+    fun `notify event to stateMachine when viewModel event invoked`() {
         val (viewModel, stateMachine) = genAllScheduleMockingViewModelComponent()
-        val action = AllScheduleAction.Fetch
-        viewModel.onAction(action)
-        verify(stateMachine, times(1)).send(action)
+        val event = AllScheduleEvent.Fetch
+        viewModel.invoke(event)
+        verify(stateMachine, times(1)).send(event)
     }
 
     @Test
     fun `invoke fetch when subscribing home state`() = runTest {
         val (viewModel, stateMachine) = genAllScheduleMockingViewModelComponent()
         CoroutineScope(Dispatchers.Unconfined).launch { viewModel.state.collect() }
-        verify(stateMachine, times(1)).send(AllScheduleAction.Fetch)
+        verify(stateMachine, times(1)).send(AllScheduleEvent.Fetch)
     }
 
     @Test

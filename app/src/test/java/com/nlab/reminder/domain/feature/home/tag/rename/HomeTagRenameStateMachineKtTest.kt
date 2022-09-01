@@ -34,10 +34,10 @@ import org.mockito.kotlin.verify
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class HomeTagRenameStateMachineKtTest {
-    private fun genDummyActions(): Set<HomeTagRenameAction> = setOf(
-        HomeTagRenameAction.OnConfirmClicked,
-        HomeTagRenameAction.OnCancelClicked,
-        HomeTagRenameAction.OnRenameTextInput(text = genBothify())
+    private fun genDummyEvents(): Set<HomeTagRenameEvent> = setOf(
+        HomeTagRenameEvent.OnConfirmClicked,
+        HomeTagRenameEvent.OnCancelClicked,
+        HomeTagRenameEvent.OnRenameTextInput(text = genBothify())
     )
 
     private fun createStateMachine(
@@ -67,12 +67,12 @@ class HomeTagRenameStateMachineKtTest {
     fun `state equals when simple event inputted`() = runTest {
         val initState = genHomeTagRenameState()
         val stateMachine: HomeTagRenameStateMachine = createStateMachine(initState = initState)
-        genDummyActions()
-            .filterNot { it is HomeTagRenameAction.OnRenameTextInput }
-            .filterNot { it is HomeTagRenameAction.OnKeyboardShownWhenViewCreated }
-            .forEach { action ->
+        genDummyEvents()
+            .filterNot { it is HomeTagRenameEvent.OnRenameTextInput }
+            .filterNot { it is HomeTagRenameEvent.OnKeyboardShownWhenViewCreated }
+            .forEach { event ->
                 stateMachine
-                    .send(action)
+                    .send(event)
                     .join()
             }
 
@@ -87,7 +87,7 @@ class HomeTagRenameStateMachineKtTest {
             initState = initState
         )
         stateMachine
-            .send(HomeTagRenameAction.OnRenameTextInput(changeText))
+            .send(HomeTagRenameEvent.OnRenameTextInput(changeText))
             .join()
         assertThat(
             stateMachine.state.value,
@@ -102,7 +102,7 @@ class HomeTagRenameStateMachineKtTest {
             initState = initState
         )
         stateMachine
-            .send(HomeTagRenameAction.OnRenameTextClearClicked)
+            .send(HomeTagRenameEvent.OnRenameTextClearClicked)
             .join()
         assertThat(
             stateMachine.state.value,
@@ -117,7 +117,7 @@ class HomeTagRenameStateMachineKtTest {
             initState = initState
         )
         stateMachine
-            .send(HomeTagRenameAction.OnKeyboardShownWhenViewCreated)
+            .send(HomeTagRenameEvent.OnKeyboardShownWhenViewCreated)
             .join()
         assertThat(
             stateMachine.state.value,
@@ -134,7 +134,7 @@ class HomeTagRenameStateMachineKtTest {
             homeTagRenameSideEffect = sideEffect
         )
         stateMachine
-            .send(HomeTagRenameAction.OnConfirmClicked)
+            .send(HomeTagRenameEvent.OnConfirmClicked)
             .join()
         verify(sideEffect, times(1))
             .send(HomeTagRenameSideEffectMessage.Complete(changeText))
@@ -145,7 +145,7 @@ class HomeTagRenameStateMachineKtTest {
         val sideEffect: SendHomeTagRenameSideEffect = mock()
         val stateMachine: HomeTagRenameStateMachine = createStateMachine(homeTagRenameSideEffect = sideEffect)
         stateMachine
-            .send(HomeTagRenameAction.OnCancelClicked)
+            .send(HomeTagRenameEvent.OnCancelClicked)
             .join()
         verify(sideEffect, times(1)).send(HomeTagRenameSideEffectMessage.Dismiss)
     }

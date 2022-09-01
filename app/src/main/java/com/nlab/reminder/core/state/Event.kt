@@ -19,4 +19,4 @@ package com.nlab.reminder.core.state
 /**
  * @author Doohyun
  */
-interface Action
+interface Event

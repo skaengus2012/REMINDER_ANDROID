@@ -14,16 +14,18 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.feature.home.tag.rename
+package com.nlab.reminder.core.state
 
-import com.nlab.reminder.core.state.Action
-import com.nlab.reminder.core.util.annotation.test.Generated
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 
-sealed class HomeTagRenameAction private constructor() : Action {
-    @Generated
-    data class OnRenameTextInput(val text: String) : HomeTagRenameAction()
-    object OnRenameTextClearClicked : HomeTagRenameAction()
-    object OnKeyboardShownWhenViewCreated : HomeTagRenameAction()
-    object OnCancelClicked : HomeTagRenameAction()
-    object OnConfirmClicked : HomeTagRenameAction()
+/**
+ * @author Doohyun
+ */
+internal class EventProcessorImpl<E : Event>(
+    private val scope: CoroutineScope,
+    private val onEventReceived: suspend (E) -> Unit,
+) : EventProcessor<E> {
+    override fun send(event: E): Job = scope.launch { onEventReceived(event) }
 }

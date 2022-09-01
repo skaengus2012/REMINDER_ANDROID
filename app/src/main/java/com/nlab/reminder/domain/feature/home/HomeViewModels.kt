@@ -19,37 +19,37 @@ package com.nlab.reminder.domain.feature.home
 import com.nlab.reminder.domain.common.tag.Tag
 
 fun HomeViewModel.onTodayCategoryClicked() {
-    onAction(HomeAction.OnTodayCategoryClicked)
+    invoke(HomeEvent.OnTodayCategoryClicked)
 }
 
 fun HomeViewModel.onTimetableCategoryClicked() {
-    onAction(HomeAction.OnTimetableCategoryClicked)
+    invoke(HomeEvent.OnTimetableCategoryClicked)
 }
 
 fun HomeViewModel.onAllCategoryClicked() {
-    onAction(HomeAction.OnAllCategoryClicked)
+    invoke(HomeEvent.OnAllCategoryClicked)
 }
 
 fun HomeViewModel.onTagClicked(tag: Tag) {
-    onAction(HomeAction.OnTagClicked(tag))
+    invoke(HomeEvent.OnTagClicked(tag))
 }
 
 fun HomeViewModel.onTagLongClicked(tag: Tag) {
-    onAction(HomeAction.OnTagLongClicked(tag))
+    invoke(HomeEvent.OnTagLongClicked(tag))
 }
 
 fun HomeViewModel.onTagRenameRequestClicked(tag: Tag) {
-    onAction(HomeAction.OnTagRenameRequestClicked(tag))
+    invoke(HomeEvent.OnTagRenameRequestClicked(tag))
 }
 
 fun HomeViewModel.onTagRenameConfirmClicked(originalTag: Tag, renameText: String) {
-    onAction(HomeAction.OnTagRenameConfirmClicked(originalTag, renameText))
+    invoke(HomeEvent.OnTagRenameConfirmClicked(originalTag, renameText))
 }
 
 fun HomeViewModel.onTagDeleteRequestClicked(tag: Tag) {
-    onAction(HomeAction.OnTagDeleteRequestClicked(tag))
+    invoke(HomeEvent.OnTagDeleteRequestClicked(tag))
 }
 
 fun HomeViewModel.onTagDeleteConfirmClicked(tag: Tag) {
-    onAction(HomeAction.OnTagDeleteConfirmClicked(tag))
+    invoke(HomeEvent.OnTagDeleteConfirmClicked(tag))
 }

@@ -14,12 +14,19 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.state
+package com.nlab.reminder.domain.feature.schedule.all
+
+import com.nlab.reminder.core.state.Event
+import com.nlab.reminder.domain.common.schedule.ScheduleId
 
 /**
  * @author Doohyun
  */
-internal sealed class TestAction private constructor() : Action {
-    class Action1 : TestAction()
-    class Action2 : TestAction()
+sealed class AllScheduleEvent private constructor() : Event {
+    object Fetch : AllScheduleEvent()
+    data class AllScheduleReportLoaded(val allSchedulesReport: AllScheduleReport) : AllScheduleEvent()
+    data class OnScheduleCompleteUpdateClicked(
+        val scheduleId: ScheduleId,
+        val isComplete: Boolean
+    ) : AllScheduleEvent()
 }

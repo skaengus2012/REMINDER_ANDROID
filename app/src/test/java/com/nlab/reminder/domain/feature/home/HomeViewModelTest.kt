@@ -79,18 +79,18 @@ class HomeViewModelTest {
     }
 
     @Test
-    fun `notify action to stateMachine when viewModel action invoked`() {
+    fun `notify event to stateMachine when viewModel event invoked`() {
         val (viewModel, stateMachine) = createMockingViewModelComponent()
-        val action = HomeAction.Fetch
-        viewModel.onAction(action)
-        verify(stateMachine, times(1)).send(action)
+        val event = HomeEvent.Fetch
+        viewModel.invoke(event)
+        verify(stateMachine, times(1)).send(event)
     }
 
     @Test
     fun `invoke fetch when subscribing home state`() = runTest {
         val (viewModel, stateMachine) = createMockingViewModelComponent()
         CoroutineScope(Dispatchers.Unconfined).launch { viewModel.state.collect() }
-        verify(stateMachine, times(1)).send(HomeAction.Fetch)
+        verify(stateMachine, times(1)).send(HomeEvent.Fetch)
     }
 
     @Test
@@ -161,8 +161,8 @@ class HomeViewModelTest {
         viewModel.onTagDeleteConfirmClicked(testTag)
 
         verify(stateMachine, times(1))
-            .send(HomeAction.OnTagRenameConfirmClicked(testTag, renameText))
+            .send(HomeEvent.OnTagRenameConfirmClicked(testTag, renameText))
         verify(stateMachine, times(1))
-            .send(HomeAction.OnTagDeleteConfirmClicked(testTag))
+            .send(HomeEvent.OnTagDeleteConfirmClicked(testTag))
     }
 }

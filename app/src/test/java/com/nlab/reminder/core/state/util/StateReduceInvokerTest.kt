@@ -16,7 +16,7 @@
 
 package com.nlab.reminder.core.state.util
 
-import com.nlab.reminder.core.state.TestAction
+import com.nlab.reminder.core.state.TestEvent
 import com.nlab.reminder.core.state.TestState
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.hamcrest.CoreMatchers.equalTo
@@ -29,17 +29,17 @@ import org.hamcrest.MatcherAssert.assertThat
 internal class StateReduceInvokerTest {
     @Test
     fun `emit update when started value was not changed`() {
-        val action = TestAction.Action1()
+        val event = TestEvent.Event1()
         val initState = TestState.State2()
         val targetState = TestState.State1()
         val state: MutableStateFlow<TestState> = MutableStateFlow(initState)
-        val invoker = StateReduceInvoker<TestAction, TestState>(
+        val invoker = StateReduceInvoker<TestEvent, TestState>(
             state,
             reducer = { targetState }
         )
         assertThat(
-            invoker.getSourceAndUpdate(action),
-            equalTo(UpdateSource(action, initState))
+            invoker.getSourceAndUpdate(event),
+            equalTo(UpdateSource(event, initState))
         )
         assertThat(
             state.value,
@@ -49,11 +49,11 @@ internal class StateReduceInvokerTest {
 
     @Test
     fun `update with current state when started value was changed`() {
-        val action = TestAction.Action1()
+        val event = TestEvent.Event1()
         val initState = TestState.State2()
         val updateState = TestState.StateInit()
         val state: MutableStateFlow<TestState> = MutableStateFlow(initState)
-        val invoker = StateReduceInvoker<TestAction, TestState>(
+        val invoker = StateReduceInvoker<TestEvent, TestState>(
             state,
             reducer = { updateSource ->
                 if (updateSource.oldState == initState) TestState.State1()
@@ -63,8 +63,8 @@ internal class StateReduceInvokerTest {
         state.value = updateState
 
         assertThat(
-            invoker.getSourceAndUpdate(action),
-            equalTo(UpdateSource(action, updateState))
+            invoker.getSourceAndUpdate(event),
+            equalTo(UpdateSource(event, updateState))
         )
         assertThat(
             state.value,

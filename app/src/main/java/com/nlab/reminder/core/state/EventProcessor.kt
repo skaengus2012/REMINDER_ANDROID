@@ -16,16 +16,11 @@
 
 package com.nlab.reminder.core.state
 
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 
 /**
  * @author Doohyun
  */
-internal class ActionProcessorImpl<A : Action>(
-    private val scope: CoroutineScope,
-    private val onActionReceived: suspend (A) -> Unit,
-) : ActionProcessor<A> {
-    override fun send(action: A): Job = scope.launch { onActionReceived(action) }
+interface EventProcessor<E : Event> {
+    fun send(event: E): Job
 }

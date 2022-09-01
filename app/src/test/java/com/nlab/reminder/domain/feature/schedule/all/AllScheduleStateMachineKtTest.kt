@@ -34,10 +34,10 @@ import org.mockito.kotlin.*
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class AllScheduleStateMachineKtTest {
-    private val dummyActions: Set<AllScheduleAction> = setOf(
-        AllScheduleAction.Fetch,
-        AllScheduleAction.AllScheduleReportLoaded(genAllScheduleReport()),
-        AllScheduleAction.OnScheduleCompleteUpdateClicked(genSchedule().id(), genBoolean())
+    private val dummyEvents: Set<AllScheduleEvent> = setOf(
+        AllScheduleEvent.Fetch,
+        AllScheduleEvent.AllScheduleReportLoaded(genAllScheduleReport()),
+        AllScheduleEvent.OnScheduleCompleteUpdateClicked(genSchedule().id(), genBoolean())
     )
 
     private val dummyStates: Set<AllScheduleState> = setOf(
@@ -54,18 +54,18 @@ class AllScheduleStateMachineKtTest {
     }
 
     @Test
-    fun `keep state init even when action occurs until fetched`() = runTest {
+    fun `keep state init even when event occurs until fetched`() = runTest {
         val initState: AllScheduleState = AllScheduleState.Init
         val stateMachine: AllScheduleStateMachine = genStateMachine(initState = initState)
-        dummyActions
+        dummyEvents
             .asSequence()
-            .filter { it !is AllScheduleAction.Fetch }
-            .forEach { action ->
-                stateMachine.send(action).join()
+            .filter { it !is AllScheduleEvent.Fetch }
+            .forEach { event ->
+                stateMachine.send(event).join()
                 assertThat(stateMachine.state.value, sameInstance(initState))
             }
 
-        stateMachine.send(AllScheduleAction.Fetch).join()
+        stateMachine.send(AllScheduleEvent.Fetch).join()
         assertThat(stateMachine.state.value, not(sameInstance(initState)))
     }
 
@@ -76,24 +76,24 @@ class AllScheduleStateMachineKtTest {
             .filter { it !is AllScheduleState.Init }
             .map { state -> state to genStateMachine(initState = state) }
             .forEach { (initState, stateMachine) ->
-                stateMachine.send(AllScheduleAction.Fetch).join()
+                stateMachine.send(AllScheduleEvent.Fetch).join()
                 assertThat(stateMachine.state.value, sameInstance(initState))
             }
         val stateMachine: AllScheduleStateMachine = genStateMachine(initState = AllScheduleState.Init)
-        stateMachine.send(AllScheduleAction.Fetch).join()
+        stateMachine.send(AllScheduleEvent.Fetch).join()
         assertThat(stateMachine.state.value, equalTo(AllScheduleState.Loading))
     }
 
     @Test
-    fun `Notify AllScheduleReport when AllScheduleReportLoaded action received after loading`() = runTest {
+    fun `Notify AllScheduleReport when AllScheduleReportLoaded event received after loading`() = runTest {
         val report: AllScheduleReport = genAllScheduleReport()
-        val action: AllScheduleAction = AllScheduleAction.AllScheduleReportLoaded(report)
+        val event: AllScheduleEvent = AllScheduleEvent.AllScheduleReportLoaded(report)
         dummyStates
             .asSequence()
             .map { state -> state to genStateMachine(initState = state) }
             .forEach { (initState, stateMachine) ->
                 stateMachine
-                    .send(action)
+                    .send(event)
                     .join()
                 assertThat(
                     stateMachine.state.value,
@@ -115,7 +115,7 @@ class AllScheduleStateMachineKtTest {
             getAllScheduleReport = getAllScheduleReportUseCase
         )
         stateMachine
-            .send(AllScheduleAction.Fetch)
+            .send(AllScheduleEvent.Fetch)
             .join()
         assertThat(
             stateMachine.state.value,
@@ -133,7 +133,7 @@ class AllScheduleStateMachineKtTest {
             updateScheduleComplete = updateCompleteUseCase
         )
         stateMachine
-            .send(AllScheduleAction.OnScheduleCompleteUpdateClicked(schedule.id(), isComplete))
+            .send(AllScheduleEvent.OnScheduleCompleteUpdateClicked(schedule.id(), isComplete))
             .join()
         verify(updateCompleteUseCase, once())(schedule.id(), isComplete)
     }

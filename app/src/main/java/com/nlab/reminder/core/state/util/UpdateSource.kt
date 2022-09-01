@@ -16,7 +16,10 @@
 
 package com.nlab.reminder.core.state.util
 
+import com.nlab.reminder.core.state.Event
+import com.nlab.reminder.core.state.State
+
 /**
  * @author Doohyun
  */
-data class UpdateSource<A, S>(val action: A, val oldState: S)
+data class UpdateSource<E : Event, S : State>(val event: E, val oldState: S)

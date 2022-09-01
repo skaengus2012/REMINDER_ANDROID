@@ -21,30 +21,30 @@ import com.nlab.reminder.core.state.util.StateMachine
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-typealias HomeTagRenameStateMachine = StateMachine<HomeTagRenameAction, HomeTagRenameState>
+typealias HomeTagRenameStateMachine = StateMachine<HomeTagRenameEvent, HomeTagRenameState>
 
 fun HomeTagRenameStateMachine(
     scope: CoroutineScope,
     initState: HomeTagRenameState,
     homeTagRenameSideEffect: SendHomeTagRenameSideEffect
 ): HomeTagRenameStateMachine = StateMachine(scope, initState) {
-    updateTo { (action, oldState) ->
-        when (action) {
-            is HomeTagRenameAction.OnRenameTextInput -> oldState.copy(currentText = action.text)
-            is HomeTagRenameAction.OnRenameTextClearClicked -> oldState.copy(currentText = "")
-            is HomeTagRenameAction.OnKeyboardShownWhenViewCreated -> {
-                oldState.copy(isKeyboardShowWhenViewCreated = false)
+    updateTo { (event, state) ->
+        when (event) {
+            is HomeTagRenameEvent.OnRenameTextInput -> state.copy(currentText = event.text)
+            is HomeTagRenameEvent.OnRenameTextClearClicked -> state.copy(currentText = "")
+            is HomeTagRenameEvent.OnKeyboardShownWhenViewCreated -> {
+                state.copy(isKeyboardShowWhenViewCreated = false)
             }
 
-            else -> oldState
+            else -> state
         }
     }
 
-    sideEffectBy<HomeTagRenameAction.OnConfirmClicked> { (_, state) ->
+    sideEffectBy<HomeTagRenameEvent.OnConfirmClicked> { (_, state) ->
         scope.launch { homeTagRenameSideEffect.complete(state.currentText) }
     }
 
-    sideEffectBy<HomeTagRenameAction.OnCancelClicked> {
+    sideEffectBy<HomeTagRenameEvent.OnCancelClicked> {
         scope.launch { homeTagRenameSideEffect.dismiss() }
     }
 }
