@@ -17,6 +17,11 @@
 plugins {
     `kotlin-dsl`
 }
+
+kotlinDslPluginOptions {
+    jvmTarget.set(provider { java.targetCompatibility.toString() })
+}
+
 repositories {
     mavenCentral()
 }
