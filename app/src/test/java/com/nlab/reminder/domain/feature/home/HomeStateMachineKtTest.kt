@@ -29,6 +29,7 @@ import com.nlab.reminder.test.genBothify
 import com.nlab.reminder.test.genLetterify
 import com.nlab.reminder.test.genLong
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.*
@@ -104,7 +105,12 @@ class HomeStateMachineKtTest {
     @Test
     fun `fetch is executed when state is init`() = runTest {
         dummyStates
-            .map { state -> state to createStateMachine(initState = state) }
+            .map { state ->
+                state to createStateMachine(
+                    initState = state,
+                    getHomeSummary = mock { whenever(mock()) doReturn emptyFlow() }
+                )
+            }
             .forEach { (initState, stateMachine) ->
                 stateMachine
                     .send(HomeAction.Fetch)
