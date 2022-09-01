@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (C) 2022 The N's lab Open Source Project
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~        http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:id="@+id/nav_home"
+	app:startDestination="@id/homeFragment">
+
+	<fragment
+		android:id="@+id/homeFragment"
+		android:name="com.nlab.reminder.domain.feature.home.view.HomeFragment"
+		android:label="Home"
+		tools:layout="@layout/fragment_home">
+		<action
+			android:id="@+id/action_homeFragment_to_homeConfigDialogFragment"
+			app:destination="@id/homeTagConfigDialogFragment" />
+		<action
+			android:id="@+id/action_homeFragment_to_homeTagRenameDialogFragment"
+			app:destination="@id/homeTagRenameDialogFragment" />
+		<action
+			android:id="@+id/action_homeFragment_to_homeTagDeleteDialogFragment"
+			app:destination="@id/homeTagDeleteDialogFragment" />
+	</fragment>
+
+	<dialog
+		android:id="@+id/homeTagConfigDialogFragment"
+		android:name="com.nlab.reminder.domain.feature.home.tag.config.view.HomeTagConfigDialogFragment"
+		android:label="HomeTagConfigDialog"
+		tools:layout="@layout/fragment_home_tag_config_dialog">
+		<argument
+			android:name="requestKey"
+			app:argType="string"
+			app:nullable="false" />
+		<argument
+			android:name="tag"
+			app:argType="com.nlab.reminder.domain.common.tag.Tag"
+			app:nullable="false" />
+	</dialog>
+
+	<dialog
+		android:id="@+id/homeTagRenameDialogFragment"
+		android:name="com.nlab.reminder.domain.feature.home.tag.rename.view.HomeTagRenameDialogFragment"
+		android:label="HomeTagRenameDialog"
+		tools:layout="@layout/fragment_home_tag_rename_dialog">
+		<argument
+			android:name="requestKey"
+			app:argType="string"
+			app:nullable="false" />
+		<argument
+			android:name="tag"
+			app:argType="com.nlab.reminder.domain.common.tag.Tag"
+			app:nullable="false" />
+		<argument
+			android:name="tagUsageCount"
+			app:argType="long"
+			app:nullable="false"/>
+	</dialog>
+
+	<dialog
+		android:id="@+id/homeTagDeleteDialogFragment"
+		android:name="com.nlab.reminder.domain.feature.home.tag.delete.view.HomeTagDeleteDialogFragment"
+		android:label="HomeTagDeleteDialog"
+		tools:layout="@layout/fragment_home_tag_delete_dialog">
+		<argument
+			android:name="requestKey"
+			app:argType="string"
+			app:nullable="false" />
+		<argument
+			android:name="tag"
+			app:argType="com.nlab.reminder.domain.common.tag.Tag"
+			app:nullable="false" />
+		<argument
+			android:name="tagUsageCount"
+			app:argType="long"
+			app:nullable="false"/>
+	</dialog>
+
+</navigation>

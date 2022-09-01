@@ -29,15 +29,23 @@ object Dependencies {
     const val ANDROID_FRAGMENT = "androidx.fragment:fragment-ktx:${DependenciesVersions.ANDROID_FRAGMENT}"
     const val ANDROID_NAVIGATION_FRAGMENT = "androidx.navigation:navigation-fragment-ktx:${DependenciesVersions.ANDROID_NAVIGATION}"
     const val ANDROID_NAVIGATION_UI = "androidx.navigation:navigation-ui-ktx:${DependenciesVersions.ANDROID_NAVIGATION}"
+    const val ANDROID_ROOM_RUNTIME = "androidx.room:room-runtime:${DependenciesVersions.ANDROID_ROOM}"
+    const val ANDROID_ROOM_KTX = "androidx.room:room-ktx:${DependenciesVersions.ANDROID_ROOM}"
+    const val ANDROID_ROOM_COMPILER = "androidx.room:room-compiler:${DependenciesVersions.ANDROID_ROOM}"
+    const val ANDROID_STARTUP_RUNTIME = "androidx.startup:startup-runtime:${DependenciesVersions.ANDROID_STARTUP}"
 
     const val GOOGLE_HILT_ANDROID = "com.google.dagger:hilt-android:${DependenciesVersions.GOOGLE_HILT}"
     const val GOOGLE_HILT_ANDROID_COMPILER = "com.google.dagger:hilt-android-compiler:${DependenciesVersions.GOOGLE_HILT}"
     const val GOGGLE_FLEXBOX = "com.google.android.flexbox:flexbox:${DependenciesVersions.GOOGLE_FLEXBOX}"
 
+    const val FACEBOOK_FLIPPER = "com.facebook.flipper:flipper:${DependenciesVersions.FACEBOOK_FLIPPER}"
+    const val FACEBOOK_SOLOADER = "com.facebook.soloader:soloader:${DependenciesVersions.FACEBOOK_SOLOADER}"
+
     const val TEST_JUNIT = "junit:junit:${DependenciesVersions.TEST_JUNIT}"
     const val TEST_COROUTINES = "org.jetbrains.kotlinx:kotlinx-coroutines-test:${DependenciesVersions.TEST_COROUTINES}"
     const val TEST_MOCKITO = "org.mockito:mockito-inline:${DependenciesVersions.TEST_MOCKITO}"
     const val TEST_MOCKITO_KOTLIN = "org.mockito.kotlin:mockito-kotlin:${DependenciesVersions.TEST_MOCKITO_KOTLIN}"
+    const val TEST_JAVAFAKER = "com.github.javafaker:javafaker:${DependenciesVersions.TEST_JAVAFAKER}"
     const val TEST_ANDROID_JUNIT_EXT = "androidx.test.ext:junit:${DependenciesVersions.TEST_ANDROID_JUNIT_EXT}"
     const val TEST_ANDROID_JUNIT_ESPRESSO = "androidx.test.espresso:espresso-core:${DependenciesVersions.TEST_ANDROID_ESPRESSO}"
     const val TEST_ANDROID_TEST_RUNNER = "androidx.test:runner:${DependenciesVersions.TEST_ANDROID_RUNNER}"

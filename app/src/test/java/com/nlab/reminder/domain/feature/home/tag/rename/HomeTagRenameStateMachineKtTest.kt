@@ -16,6 +16,8 @@
 
 package com.nlab.reminder.domain.feature.home.tag.rename
 
+import com.nlab.reminder.test.genBothify
+import com.nlab.reminder.test.genLetterify
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -32,26 +34,21 @@ import org.mockito.kotlin.verify
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class HomeTagRenameStateMachineKtTest {
-    private val testState: HomeTagRenameState = HomeTagRenameState(
-        currentText = "test",
-        isKeyboardShowWhenViewCreated = true
-    )
-
-    private val dummyActions: Set<HomeTagRenameAction> = setOf(
+    private fun genDummyActions(): Set<HomeTagRenameAction> = setOf(
         HomeTagRenameAction.OnConfirmClicked,
         HomeTagRenameAction.OnCancelClicked,
-        HomeTagRenameAction.OnRenameTextInput(text = "")
+        HomeTagRenameAction.OnRenameTextInput(text = genBothify())
     )
 
     private fun createStateMachine(
         scope: CoroutineScope = CoroutineScope(Dispatchers.Unconfined),
-        initState: HomeTagRenameState = testState,
+        initState: HomeTagRenameState = genHomeTagRenameState(),
         homeTagRenameSideEffect: SendHomeTagRenameSideEffect = mock()
     ): HomeTagRenameStateMachine = HomeTagRenameStateMachine(scope, initState, homeTagRenameSideEffect)
 
     @Test
     fun `holds init state when machine created by factory`() {
-        val initText = "init"
+        val initText: String = genBothify()
         val stateMachine: HomeTagRenameStateMachine =
             HomeTagRenameStateMachineFactory(initText)
                 .create(scope = CoroutineScope(Dispatchers.Unconfined), homeTagRenameSideEffect = mock())
@@ -68,8 +65,9 @@ class HomeTagRenameStateMachineKtTest {
 
     @Test
     fun `state equals when simple event inputted`() = runTest {
-        val stateMachine: HomeTagRenameStateMachine = createStateMachine(initState = testState)
-        dummyActions
+        val initState = genHomeTagRenameState()
+        val stateMachine: HomeTagRenameStateMachine = createStateMachine(initState = initState)
+        genDummyActions()
             .filterNot { it is HomeTagRenameAction.OnRenameTextInput }
             .filterNot { it is HomeTagRenameAction.OnKeyboardShownWhenViewCreated }
             .forEach { action ->
@@ -78,13 +76,13 @@ class HomeTagRenameStateMachineKtTest {
                     .join()
             }
 
-        assertThat(stateMachine.state.value, equalTo(testState))
+        assertThat(stateMachine.state.value, equalTo(initState))
     }
 
     @Test
     fun `changed text state when renameTextInput sent`() = runTest {
-        val changeText = "Hello world"
-        val initState: HomeTagRenameState = testState.copy(currentText = "Hello")
+        val changeText = genBothify(string = "????####")
+        val initState: HomeTagRenameState = genHomeTagRenameState(currentText = genLetterify("???"))
         val stateMachine: HomeTagRenameStateMachine = createStateMachine(
             initState = initState
         )
@@ -93,13 +91,13 @@ class HomeTagRenameStateMachineKtTest {
             .join()
         assertThat(
             stateMachine.state.value,
-            equalTo(testState.copy(currentText = changeText))
+            equalTo(initState.copy(currentText = changeText))
         )
     }
 
     @Test
     fun `cleared text state when clearEvent sent`() = runTest {
-        val initState: HomeTagRenameState = testState.copy(currentText = "Hello")
+        val initState: HomeTagRenameState = genHomeTagRenameState(currentText = genLetterify("?"))
         val stateMachine: HomeTagRenameStateMachine = createStateMachine(
             initState = initState
         )
@@ -108,13 +106,13 @@ class HomeTagRenameStateMachineKtTest {
             .join()
         assertThat(
             stateMachine.state.value,
-            equalTo(testState.copy(currentText = ""))
+            equalTo(initState.copy(currentText = ""))
         )
     }
 
     @Test
     fun `changed disable keyboard shown onViewCreated when keyboardShown sent`() = runTest {
-        val initState: HomeTagRenameState = testState.copy(isKeyboardShowWhenViewCreated = true)
+        val initState: HomeTagRenameState = genHomeTagRenameState(isKeyboardShowWhenViewCreated = true)
         val stateMachine: HomeTagRenameStateMachine = createStateMachine(
             initState = initState
         )
@@ -123,16 +121,16 @@ class HomeTagRenameStateMachineKtTest {
             .join()
         assertThat(
             stateMachine.state.value,
-            equalTo(testState.copy(isKeyboardShowWhenViewCreated = false))
+            equalTo(initState.copy(isKeyboardShowWhenViewCreated = false))
         )
     }
 
     @Test
     fun `notify complete event when confirm clicked`() = runTest {
-        val changeText = "Hello world"
+        val changeText = genBothify()
         val sideEffect: SendHomeTagRenameSideEffect = mock()
         val stateMachine: HomeTagRenameStateMachine = createStateMachine(
-            initState = testState.copy(currentText = changeText),
+            initState = genHomeTagRenameState(currentText = changeText),
             homeTagRenameSideEffect = sideEffect
         )
         stateMachine

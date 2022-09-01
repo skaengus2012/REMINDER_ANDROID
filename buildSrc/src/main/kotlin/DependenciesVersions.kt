@@ -31,14 +31,20 @@ object DependenciesVersions {
     const val ANDROID_LIFECYCLE = "2.4.1"
     const val ANDROID_FRAGMENT = "1.4.1"
     const val ANDROID_NAVIGATION = "2.4.2"
+    const val ANDROID_ROOM = "2.4.2"
+    const val ANDROID_STARTUP = "1.1.1"
 
     const val GOOGLE_HILT = "2.42"
     const val GOOGLE_FLEXBOX = "3.0.0"
+
+    const val FACEBOOK_FLIPPER = "0.154.0"
+    const val FACEBOOK_SOLOADER = "0.10.1"
 
     const val TEST_JUNIT = "4.13.2"
     const val TEST_COROUTINES = "1.6.2"
     const val TEST_MOCKITO = "4.6.1"
     const val TEST_MOCKITO_KOTLIN = "4.0.0"
+    const val TEST_JAVAFAKER = "1.0.2"
     const val TEST_ANDROID_JUNIT_EXT = "1.1.3"
     const val TEST_ANDROID_ESPRESSO = "3.3.0"
     const val TEST_ANDROID_RUNNER = "1.1.0"

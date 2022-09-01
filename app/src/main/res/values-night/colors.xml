@@ -16,5 +16,6 @@
 
 <resources>
     <color name="default_text_color">@color/white</color>
-    <color name="default_sub_text_color">@color/white_opa80</color>
+
+    <color name="schedule_line_color">@color/gray_800</color>
 </resources>

@@ -1,7 +1,7 @@
 import org.gradle.configurationcache.extensions.capitalized
 
 /*
- * Copyright (C) 2022 The N's lab Open Source Project
+ * Copyright (C) 2022 The N"s lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,12 +44,21 @@ android {
         versionName = AndroidConfig.VERSION_NAME
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        kapt {
+            arguments {
+                arg("dagger.fastInit", "enabled")
+                arg("dagger.formatGeneratedSource", "disabled")
+                arg("room.schemaLocation", "$buildDir/schemas")
+            }
+        }
     }
 
     buildTypes {
         getByName("debug") {
             isDebuggable = true
             isMinifyEnabled = false
+            applicationIdSuffix = ".debug"
         }
 
         getByName("release") {
@@ -91,10 +100,11 @@ android {
                 "**/Manifest*.*",
                 "**/android/**",
                 "**/kotlin/**",
-                "com/android/**/*.class",
                 "**/model/**",
                 "**/view/**",
-                "**/di/**"
+                "**/di/**",
+                "**/*Args*.*",          /* filtering Navigation Component generated classes */
+                "**/*Directions*.*"     /* filtering Navigation Component generated classes */
             )
 
             classDirectories.setFrom(files(
@@ -149,15 +159,25 @@ dependencies {
     implementation(Dependencies.ANDROID_FRAGMENT)
     implementation(Dependencies.ANDROID_NAVIGATION_FRAGMENT)
     implementation(Dependencies.ANDROID_NAVIGATION_UI)
+    implementation(Dependencies.ANDROID_ROOM_RUNTIME)
+    implementation(Dependencies.ANDROID_ROOM_KTX)
+    kapt(Dependencies.ANDROID_ROOM_COMPILER)
+    implementation(Dependencies.ANDROID_STARTUP_RUNTIME)
 
     implementation(Dependencies.GOOGLE_HILT_ANDROID)
     kapt(Dependencies.GOOGLE_HILT_ANDROID_COMPILER)
     implementation(Dependencies.GOGGLE_FLEXBOX)
 
+    debugImplementation(Dependencies.FACEBOOK_FLIPPER)
+    debugImplementation(Dependencies.FACEBOOK_SOLOADER)
+
     testImplementation(Dependencies.TEST_JUNIT)
     testImplementation(Dependencies.TEST_COROUTINES)
     testImplementation(Dependencies.TEST_MOCKITO)
     testImplementation(Dependencies.TEST_MOCKITO_KOTLIN)
+    testImplementation(Dependencies.TEST_JAVAFAKER)
+    androidTestImplementation(Dependencies.TEST_COROUTINES)
+    androidTestImplementation(Dependencies.TEST_JAVAFAKER)
     androidTestImplementation(Dependencies.TEST_ANDROID_JUNIT_EXT)
     androidTestImplementation(Dependencies.TEST_ANDROID_JUNIT_ESPRESSO)
     androidTestImplementation(Dependencies.TEST_ANDROID_TEST_RUNNER)

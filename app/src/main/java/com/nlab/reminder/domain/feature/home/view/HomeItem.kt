@@ -34,6 +34,6 @@ sealed class HomeItem private constructor() : HashIdentifier {
     data class TagHolderItem(
         val tagItems: List<TagItem>
     ) : HomeItem() {
-        override val hashId: Int = Objects.hash(tagItems.map { it.tagText })
+        override val hashId: Int = Objects.hash(tagItems.map { it.tagId })
     }
 }

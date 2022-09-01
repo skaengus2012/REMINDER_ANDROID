@@ -34,7 +34,6 @@ import com.nlab.reminder.core.android.view.textChanged
 import com.nlab.reminder.databinding.FragmentHomeTagRenameDialogBinding
 import com.nlab.reminder.domain.common.android.view.fragment.sendResultAndDismiss
 import com.nlab.reminder.domain.common.tag.Tag
-import com.nlab.reminder.domain.feature.home.tag.config.view.HomeTagConfigDialogFragmentArgs
 import com.nlab.reminder.domain.feature.home.tag.rename.*
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
@@ -48,7 +47,7 @@ import kotlinx.coroutines.flow.onEach
  */
 @AndroidEntryPoint
 class HomeTagRenameDialogFragment : DialogFragment() {
-    private val args: HomeTagConfigDialogFragmentArgs by navArgs()
+    private val args: HomeTagRenameDialogFragmentArgs by navArgs()
     private val viewModel: HomeTagRenameViewModel by viewModels()
 
     private var _binding: FragmentHomeTagRenameDialogBinding? = null
@@ -64,11 +63,12 @@ class HomeTagRenameDialogFragment : DialogFragment() {
         isCancelable = false
 
         binding.usageCountTextview.apply {
-            text = args.tag.let { tag ->
-                resources.getQuantityString(
-                    R.plurals.home_tag_rename_text_label, tag.usageCount, tag.text, tag.usageCount
-                )
-            }
+            text = resources.getQuantityString(
+                R.plurals.home_tag_rename_text_label,
+                args.tagUsageCount.toInt(),
+                args.tag.name,
+                args.tagUsageCount
+            )
         }
 
         binding.renameEdittext.textChanged()

@@ -17,6 +17,7 @@
 package com.nlab.reminder.domain.feature.home.tag.rename
 
 import com.nlab.reminder.test.createMockingViewModelComponent
+import com.nlab.reminder.test.genBothify
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -24,10 +25,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.*
@@ -42,19 +45,19 @@ class HomeTagRenameViewModelTest {
     }
 
     @Before
-    fun init() {
+    fun setup() {
         Dispatchers.setMain(Dispatchers.Unconfined)
+    }
+
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
     }
 
     @Test
     fun `notify action to stateMachine when viewModel action invoked`() {
         val (viewModel, stateMachine) = createMockingViewModelComponent(
-            MutableStateFlow(
-                HomeTagRenameState(
-                    currentText = "",
-                    isKeyboardShowWhenViewCreated = true
-                )
-            ),
+            MutableStateFlow(genHomeTagRenameState()),
             createViewModel = { HomeTagRenameViewModel(it) },
             wheneverMocking = { factory: HomeTagRenameStateMachineFactory ->
                 factory.create(scope = any(), homeTagRenameSideEffect = any())
@@ -68,11 +71,8 @@ class HomeTagRenameViewModelTest {
     @Test
     fun `notify changed state when state event sent`() = runTest {
         val actualHomeRenameState = mutableListOf<HomeTagRenameState>()
-        val initText = "Hello"
-        val expectedInitState = HomeTagRenameState(
-            currentText = initText,
-            isKeyboardShowWhenViewCreated = true
-        )
+        val initText = genBothify()
+        val expectedInitState = genHomeTagRenameState(initText, isKeyboardShowWhenViewCreated = true)
         val viewModel: HomeTagRenameViewModel = createViewModel(initText)
         CoroutineScope(Dispatchers.Unconfined).launch { viewModel.state.collect(actualHomeRenameState::add) }
         viewModel.onKeyboardShownWhenViewCreated()
@@ -87,7 +87,7 @@ class HomeTagRenameViewModelTest {
 
     @Test
     fun `notify sideEffect message when sideEffect event sent`() = runTest {
-        val inputText = "test"
+        val inputText = genBothify()
         val viewModel: HomeTagRenameViewModel = createViewModel()
         viewModel.onRenameTextInput(inputText)
         viewModel.onConfirmClicked()
