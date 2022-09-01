@@ -18,38 +18,15 @@ package com.nlab.reminder.domain.feature.home
 
 import com.nlab.reminder.domain.common.tag.Tag
 
-fun HomeViewModel.onTodayCategoryClicked() {
-    onAction(HomeAction.OnTodayCategoryClicked)
-}
-
-fun HomeViewModel.onTimetableCategoryClicked() {
-    onAction(HomeAction.OnTimetableCategoryClicked)
-}
-
-fun HomeViewModel.onAllCategoryClicked() {
-    onAction(HomeAction.OnAllCategoryClicked)
-}
-
-fun HomeViewModel.onTagClicked(tag: Tag) {
-    onAction(HomeAction.OnTagClicked(tag))
-}
-
-fun HomeViewModel.onTagLongClicked(tag: Tag) {
-    onAction(HomeAction.OnTagLongClicked(tag))
-}
-
-fun HomeViewModel.onTagRenameRequestClicked(tag: Tag) {
-    onAction(HomeAction.OnTagRenameRequestClicked(tag))
-}
-
-fun HomeViewModel.onTagRenameConfirmClicked(originalTag: Tag, renameText: String) {
-    onAction(HomeAction.OnTagRenameConfirmClicked(originalTag, renameText))
-}
-
-fun HomeViewModel.onTagDeleteRequestClicked(tag: Tag) {
-    onAction(HomeAction.OnTagDeleteRequestClicked(tag))
-}
-
-fun HomeViewModel.onTagDeleteConfirmClicked(tag: Tag) {
-    onAction(HomeAction.OnTagDeleteConfirmClicked(tag))
-}
+/**
+ * @author Doohyun
+ */
+fun HomeViewModel.onTodayCategoryClicked() = invoke(HomeEvent.OnTodayCategoryClicked)
+fun HomeViewModel.onTimetableCategoryClicked() = invoke(HomeEvent.OnTimetableCategoryClicked)
+fun HomeViewModel.onAllCategoryClicked() = invoke(HomeEvent.OnAllCategoryClicked)
+fun HomeViewModel.onTagClicked(tag: Tag) = invoke(HomeEvent.OnTagClicked(tag))
+fun HomeViewModel.onTagLongClicked(tag: Tag) = invoke(HomeEvent.OnTagLongClicked(tag))
+fun HomeViewModel.onTagRenameRequestClicked(tag: Tag) = invoke(HomeEvent.OnTagRenameRequestClicked(tag))
+fun HomeViewModel.onTagRenameConfirmClicked(originalTag: Tag, renameText: String) = invoke(HomeEvent.OnTagRenameConfirmClicked(originalTag, renameText))
+fun HomeViewModel.onTagDeleteRequestClicked(tag: Tag) = invoke(HomeEvent.OnTagDeleteRequestClicked(tag))
+fun HomeViewModel.onTagDeleteConfirmClicked(tag: Tag) = invoke(HomeEvent.OnTagDeleteConfirmClicked(tag))

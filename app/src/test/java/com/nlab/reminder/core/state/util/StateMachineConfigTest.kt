@@ -16,7 +16,7 @@
 
 package com.nlab.reminder.core.state.util
 
-import com.nlab.reminder.core.state.TestAction
+import com.nlab.reminder.core.state.TestEvent
 import com.nlab.reminder.core.state.TestState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -33,13 +33,13 @@ class StateMachineConfigTest {
     @Test
     fun `notify error to default error handler when stateMachine not set`() {
         StateMachineConfig.defaultExceptionHandler = mock()
-        val stateMachine = StateMachine<TestAction, TestState>(
+        val stateMachine = StateMachine<TestEvent, TestState>(
             CoroutineScope(Dispatchers.Unconfined),
             TestState.StateInit()
         ) {
             updateTo { throw Throwable() }
         }
-        stateMachine.send(TestAction.Action1())
+        stateMachine.send(TestEvent.Event1())
         verify(StateMachineConfig.defaultExceptionHandler, times(1))(any())
     }
 }

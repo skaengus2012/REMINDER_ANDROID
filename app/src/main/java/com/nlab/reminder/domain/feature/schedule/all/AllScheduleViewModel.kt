@@ -35,9 +35,9 @@ class AllScheduleViewModel @Inject constructor(
     val state: StateFlow<AllScheduleState> =
         stateMachine
             .state
-            .fetchedFlow(viewModelScope, onFetch = { onAction(AllScheduleAction.Fetch) })
+            .fetchedFlow(viewModelScope, onFetch = { invoke(AllScheduleEvent.Fetch) })
 
-    fun onAction(action: AllScheduleAction) {
+    fun invoke(action: AllScheduleEvent) {
         stateMachine.send(action)
     }
 }

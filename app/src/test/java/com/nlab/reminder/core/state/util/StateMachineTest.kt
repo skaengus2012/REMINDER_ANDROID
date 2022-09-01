@@ -16,7 +16,7 @@
 
 package com.nlab.reminder.core.state.util
 
-import com.nlab.reminder.core.state.TestAction
+import com.nlab.reminder.core.state.TestEvent
 import com.nlab.reminder.core.state.TestState
 import com.nlab.reminder.test.instanceOf
 import kotlinx.coroutines.*
@@ -34,20 +34,20 @@ class StateMachineTest {
 
     @Test
     fun `notify state1 when when state is StateInit and Action1 receives`() = runTest {
-        val stateMachine = StateMachine<TestAction, TestState>(scope, TestState.StateInit()) {
+        val stateMachine = StateMachine<TestEvent, TestState>(scope, TestState.StateInit()) {
             updateTo { (action, old) ->
                 when (action) {
-                    is TestAction.Action1 -> {
+                    is TestEvent.Event1 -> {
                         if (old is TestState.StateInit) TestState.State1()
                         else TestState.State2()
                     }
-                    is TestAction.Action2 -> TestState.State2()
+                    is TestEvent.Event2 -> TestState.State2()
                 }
             }
         }
 
         stateMachine
-            .send(TestAction.Action1())
+            .send(TestEvent.Event1())
             .join()
         assertThat(
             stateMachine.state.value,
@@ -57,25 +57,25 @@ class StateMachineTest {
 
     @Test
     fun `invoked testAction1, testAction2 when stateMachine send TestAction1, TestAction2`() = runTest {
-        val testAction1: (UpdateSource<TestAction.Action1, TestState>) -> Unit = mock()
-        val testAction2: (UpdateSource<TestAction.Action2, TestState>) -> Unit = mock()
-        val stateMachine = StateMachine<TestAction, TestState>(scope, TestState.StateInit()) {
-            sideEffectBy { testAction1(it) }
-            sideEffectBy { testAction2(it) }
+        val testEvent1: (UpdateSource<TestEvent.Event1, TestState>) -> Unit = mock()
+        val testEvent2: (UpdateSource<TestEvent.Event2, TestState>) -> Unit = mock()
+        val stateMachine = StateMachine<TestEvent, TestState>(scope, TestState.StateInit()) {
+            sideEffectBy { testEvent1(it) }
+            sideEffectBy { testEvent2(it) }
         }
 
         repeat(2) {
             stateMachine
-                .send(TestAction.Action1())
+                .send(TestEvent.Event1())
                 .join()
         }
 
         repeat(3) {
             stateMachine
-                .send(TestAction.Action2())
+                .send(TestEvent.Event2())
                 .join()
         }
-        verify(testAction1, times(2))(any())
-        verify(testAction2, times(3))(any())
+        verify(testEvent1, times(2))(any())
+        verify(testEvent2, times(3))(any())
     }
 }

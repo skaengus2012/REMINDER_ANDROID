@@ -26,7 +26,7 @@ import com.nlab.reminder.domain.common.effect.message.navigation.util.navigateTo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-typealias HomeStateMachine = StateMachine<HomeAction, HomeState>
+typealias HomeStateMachine = StateMachine<HomeEvent, HomeState>
 
 /**
  * @author Doohyun
@@ -40,57 +40,57 @@ fun HomeStateMachine(
     modifyTagName: ModifyTagNameUseCase,
     deleteTag: DeleteTagUseCase
 ): HomeStateMachine = StateMachine(scope, initState) {
-    updateTo { (action, oldState) ->
-        when (action) {
-            is HomeAction.Fetch -> {
-                if (oldState is HomeState.Init) HomeState.Loading
-                else oldState
+    updateTo { (event, state) ->
+        when (event) {
+            is HomeEvent.Fetch -> {
+                if (state is HomeState.Init) HomeState.Loading
+                else state
             }
-            is HomeAction.HomeSummaryLoaded -> {
-                if (oldState is HomeState.Init) oldState
-                else HomeState.Loaded(action.homeSummary)
+            is HomeEvent.OnHomeSummaryLoaded -> {
+                if (state is HomeState.Init) state
+                else HomeState.Loaded(event.homeSummary)
             }
-            else -> oldState
+            else -> state
         }
     }
 
-    sideEffectOn<HomeAction.Fetch, HomeState.Init> {
-        scope.launch { getHomeSummary().collect { send(HomeAction.HomeSummaryLoaded(it)) } }
+    sideEffectOn<HomeEvent.Fetch, HomeState.Init> {
+        scope.launch { getHomeSummary().collect { send(HomeEvent.OnHomeSummaryLoaded(it)) } }
     }
 
-    sideEffectOn<HomeAction.OnTodayCategoryClicked, HomeState.Loaded> {
+    sideEffectOn<HomeEvent.OnTodayCategoryClicked, HomeState.Loaded> {
         scope.launch { navigationEffect.navigateTodayEnd() }
     }
 
-    sideEffectOn<HomeAction.OnTimetableCategoryClicked, HomeState.Loaded> {
+    sideEffectOn<HomeEvent.OnTimetableCategoryClicked, HomeState.Loaded> {
         scope.launch { navigationEffect.navigateTimetableEnd() }
     }
 
-    sideEffectOn<HomeAction.OnAllCategoryClicked, HomeState.Loaded> {
+    sideEffectOn<HomeEvent.OnAllCategoryClicked, HomeState.Loaded> {
         scope.launch { navigationEffect.navigateAllEnd() }
     }
 
-    sideEffectOn<HomeAction.OnTagClicked, HomeState.Loaded> { (action) ->
-        scope.launch { navigationEffect.navigateTagEnd(action.tag) }
+    sideEffectOn<HomeEvent.OnTagClicked, HomeState.Loaded> { (event) ->
+        scope.launch { navigationEffect.navigateTagEnd(event.tag) }
     }
 
-    sideEffectOn<HomeAction.OnTagLongClicked, HomeState.Loaded> { (action) ->
-        scope.launch { navigationEffect.send(HomeTagConfigNavigationMessage(action.tag)) }
+    sideEffectOn<HomeEvent.OnTagLongClicked, HomeState.Loaded> { (event) ->
+        scope.launch { navigationEffect.send(HomeTagConfigNavigationMessage(event.tag)) }
     }
 
-    sideEffectOn<HomeAction.OnTagRenameRequestClicked, HomeState.Loaded> { (action) ->
-        scope.launch { navigationEffect.send(HomeTagRenameNavigationMessage(action.tag, getTagUsageCount(action.tag))) }
+    sideEffectOn<HomeEvent.OnTagRenameRequestClicked, HomeState.Loaded> { (event) ->
+        scope.launch { navigationEffect.send(HomeTagRenameNavigationMessage(event.tag, getTagUsageCount(event.tag))) }
     }
 
-    sideEffectOn<HomeAction.OnTagDeleteRequestClicked, HomeState.Loaded> { (action) ->
-        scope.launch { navigationEffect.send(HomeTagDeleteNavigationMessage(action.tag, getTagUsageCount(action.tag))) }
+    sideEffectOn<HomeEvent.OnTagDeleteRequestClicked, HomeState.Loaded> { (event) ->
+        scope.launch { navigationEffect.send(HomeTagDeleteNavigationMessage(event.tag, getTagUsageCount(event.tag))) }
     }
 
-    sideEffectOn<HomeAction.OnTagRenameConfirmClicked, HomeState.Loaded> { (action) ->
-        scope.launch { modifyTagName(originalTag = action.originalTag, newText = action.renameText) }
+    sideEffectOn<HomeEvent.OnTagRenameConfirmClicked, HomeState.Loaded> { (event) ->
+        scope.launch { modifyTagName(originalTag = event.originalTag, newText = event.renameText) }
     }
 
-    sideEffectOn<HomeAction.OnTagDeleteConfirmClicked, HomeState.Loaded> { (action) ->
-        scope.launch { deleteTag(action.tag) }
+    sideEffectOn<HomeEvent.OnTagDeleteConfirmClicked, HomeState.Loaded> { (event) ->
+        scope.launch { deleteTag(event.tag) }
     }
 }

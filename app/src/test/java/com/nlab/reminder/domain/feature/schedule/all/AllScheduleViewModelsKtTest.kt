@@ -48,13 +48,13 @@ class AllScheduleViewModelsKtTest {
     fun testExtensions() {
         val schedule: Schedule = genSchedule()
         val isComplete: Boolean = genBoolean()
-        val actions = listOf(
-            AllScheduleAction.OnScheduleCompleteUpdateClicked(schedule.id(), isComplete)
+        val events = listOf(
+            AllScheduleEvent.OnScheduleCompleteUpdateClicked(schedule.id(), isComplete)
         )
         val (viewModel, stateMachine) = genAllScheduleMockingViewModelComponent()
 
         viewModel.onScheduleCompleteUpdateClicked(schedule.id(), isComplete)
 
-        actions.forEach { action -> verify(stateMachine, times(1)).send(action) }
+        events.forEach { action -> verify(stateMachine, times(1)).send(action) }
     }
 }

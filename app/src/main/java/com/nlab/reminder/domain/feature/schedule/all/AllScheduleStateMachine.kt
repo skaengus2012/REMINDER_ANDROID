@@ -22,7 +22,7 @@ import com.nlab.reminder.domain.common.schedule.UpdateCompleteUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-typealias AllScheduleStateMachine = StateMachine<AllScheduleAction, AllScheduleState>
+typealias AllScheduleStateMachine = StateMachine<AllScheduleEvent, AllScheduleState>
 
 /**
  * @author Doohyun
@@ -33,25 +33,25 @@ fun AllScheduleStateMachine(
     getAllScheduleReport: GetAllScheduleReportUseCase,
     updateScheduleComplete: UpdateCompleteUseCase
 ): AllScheduleStateMachine = StateMachine(scope, initState) {
-    updateTo { (action, oldState) ->
-        when (action) {
-            is AllScheduleAction.Fetch -> {
-                if (oldState is AllScheduleState.Init) AllScheduleState.Loading
-                else oldState
+    updateTo { (event, state) ->
+        when (event) {
+            is AllScheduleEvent.Fetch -> {
+                if (state is AllScheduleState.Init) AllScheduleState.Loading
+                else state
             }
-            is AllScheduleAction.AllScheduleReportLoaded -> {
-                if (oldState is AllScheduleState.Init) oldState
-                else AllScheduleState.Loaded(action.allSchedulesReport)
+            is AllScheduleEvent.AllScheduleReportLoaded -> {
+                if (state is AllScheduleState.Init) state
+                else AllScheduleState.Loaded(event.allSchedulesReport)
             }
-            else -> oldState
+            else -> state
         }
     }
 
-    sideEffectOn<AllScheduleAction.Fetch, AllScheduleState.Init> {
-        scope.launch { getAllScheduleReport().collect { send(AllScheduleAction.AllScheduleReportLoaded(it)) } }
+    sideEffectOn<AllScheduleEvent.Fetch, AllScheduleState.Init> {
+        scope.launch { getAllScheduleReport().collect { send(AllScheduleEvent.AllScheduleReportLoaded(it)) } }
     }
 
-    sideEffectOn<AllScheduleAction.OnScheduleCompleteUpdateClicked, AllScheduleState.Loaded> { (action) ->
-        scope.launch { updateScheduleComplete(action.scheduleId, action.isComplete) }
+    sideEffectOn<AllScheduleEvent.OnScheduleCompleteUpdateClicked, AllScheduleState.Loaded> { (event) ->
+        scope.launch { updateScheduleComplete(event.scheduleId, event.isComplete) }
     }
 }

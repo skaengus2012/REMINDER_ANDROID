@@ -37,7 +37,7 @@ class HomeTagRenameViewModel @Inject constructor(
     val homeTagRenameSideEffect: HomeTagRenameSideEffect = _homeTagRenameSideEffect
     val state: StateFlow<HomeTagRenameState> = stateMachine.state
 
-    fun onAction(action: HomeTagRenameAction) {
-        stateMachine.send(action)
+    fun invoke(event: HomeTagRenameEvent) {
+        stateMachine.send(event)
     }
 }

@@ -21,6 +21,6 @@ import kotlinx.coroutines.flow.StateFlow
 /**
  * @author Doohyun
  */
-sealed interface StateMachine<A : Action, S : State> : ActionProcessor<A> {
+sealed interface StateMachine<E : Event, S : State> : EventProcessor<E> {
     val state: StateFlow<S>
 }

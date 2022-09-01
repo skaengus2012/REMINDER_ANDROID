@@ -23,6 +23,7 @@ import com.nlab.reminder.core.effect.message.navigation.SendNavigationEffect
 import com.nlab.reminder.core.effect.util.sideEffect
 import com.nlab.reminder.core.state.util.fetchedFlow
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
@@ -40,9 +41,7 @@ class HomeViewModel @Inject constructor(
     val state: StateFlow<HomeState> =
         stateMachine
             .state
-            .fetchedFlow(viewModelScope, onFetch = { onAction(HomeAction.Fetch) })
+            .fetchedFlow(viewModelScope, onFetch = { invoke(HomeEvent.Fetch) })
 
-    fun onAction(action: HomeAction) {
-        stateMachine.send(action)
-    }
+    fun invoke(event: HomeEvent): Job = stateMachine.send(event)
 }

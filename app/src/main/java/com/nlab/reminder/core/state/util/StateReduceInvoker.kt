@@ -16,7 +16,7 @@
 
 package com.nlab.reminder.core.state.util
 
-import com.nlab.reminder.core.state.Action
+import com.nlab.reminder.core.state.Event
 import com.nlab.reminder.core.state.State
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.getAndUpdate
@@ -24,10 +24,10 @@ import kotlinx.coroutines.flow.getAndUpdate
 /**
  * @author Doohyun
  */
-internal class StateReduceInvoker<A : Action, S : State>(
+internal class StateReduceInvoker<E : Event, S : State>(
     private val state: MutableStateFlow<S>,
-    private val reducer: (UpdateSource<A, S>) -> S
+    private val reducer: (UpdateSource<E, S>) -> S
 ) {
-    fun getSourceAndUpdate(action: A): UpdateSource<A, S> =
-        UpdateSource(action, oldState = state.getAndUpdate { old -> reducer(UpdateSource(action, old)) })
+    fun getSourceAndUpdate(event: E): UpdateSource<E, S> =
+        UpdateSource(event, oldState = state.getAndUpdate { old -> reducer(UpdateSource(event, old)) })
 }

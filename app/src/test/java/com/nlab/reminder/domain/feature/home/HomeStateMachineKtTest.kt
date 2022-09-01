@@ -42,17 +42,17 @@ import org.mockito.kotlin.*
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class HomeStateMachineKtTest {
-    private val dummyActions: Set<HomeAction> = setOf(
-        HomeAction.Fetch,
-        HomeAction.OnTodayCategoryClicked,
-        HomeAction.OnTimetableCategoryClicked,
-        HomeAction.OnAllCategoryClicked,
-        HomeAction.OnTagClicked(genTag()),
-        HomeAction.OnTagLongClicked(genTag()),
-        HomeAction.OnTagRenameConfirmClicked(genTag(), renameText = genLetterify()),
-        HomeAction.OnTagDeleteRequestClicked(genTag()),
-        HomeAction.OnTagDeleteConfirmClicked(genTag()),
-        HomeAction.HomeSummaryLoaded(genHomeSummary())
+    private val dummyEvents: Set<HomeEvent> = setOf(
+        HomeEvent.Fetch,
+        HomeEvent.OnTodayCategoryClicked,
+        HomeEvent.OnTimetableCategoryClicked,
+        HomeEvent.OnAllCategoryClicked,
+        HomeEvent.OnTagClicked(genTag()),
+        HomeEvent.OnTagLongClicked(genTag()),
+        HomeEvent.OnTagRenameConfirmClicked(genTag(), renameText = genLetterify()),
+        HomeEvent.OnTagDeleteRequestClicked(genTag()),
+        HomeEvent.OnTagDeleteConfirmClicked(genTag()),
+        HomeEvent.OnHomeSummaryLoaded(genHomeSummary())
     )
 
     private val dummyStates: Set<HomeState> = setOf(
@@ -87,18 +87,18 @@ class HomeStateMachineKtTest {
     }
 
     @Test
-    fun `keep state init even when action occurs until fetched`() = runTest {
+    fun `keep state init even when event occurs until fetched`() = runTest {
         val initState: HomeState = HomeState.Init
         val stateMachine: HomeStateMachine = createStateMachine(initState = initState)
-        dummyActions
+        dummyEvents
             .asSequence()
-            .filter { it !is HomeAction.Fetch }
-            .forEach { action ->
-                stateMachine.send(action).join()
+            .filter { it !is HomeEvent.Fetch }
+            .forEach { event ->
+                stateMachine.send(event).join()
                 assertThat(stateMachine.state.value, sameInstance(initState))
             }
 
-        stateMachine.send(HomeAction.Fetch).join()
+        stateMachine.send(HomeEvent.Fetch).join()
         assertThat(stateMachine.state.value, not(sameInstance(initState)))
     }
 
@@ -113,7 +113,7 @@ class HomeStateMachineKtTest {
             }
             .forEach { (initState, stateMachine) ->
                 stateMachine
-                    .send(HomeAction.Fetch)
+                    .send(HomeEvent.Fetch)
                     .join()
                 assertThat(
                     stateMachine.state.value,
@@ -123,13 +123,13 @@ class HomeStateMachineKtTest {
     }
 
     @Test
-    fun `Notify Loaded when loaded action received after loading`() = runTest {
+    fun `Notify Loaded when loaded event received after loading`() = runTest {
         val homeSummary = genHomeSummary()
         dummyStates
             .map { state -> state to createStateMachine(initState = state) }
             .forEach { (initState, stateMachine) ->
                 stateMachine
-                    .send(HomeAction.HomeSummaryLoaded(homeSummary))
+                    .send(HomeEvent.OnHomeSummaryLoaded(homeSummary))
                     .join()
                 assertThat(
                     stateMachine.state.value,
@@ -149,7 +149,7 @@ class HomeStateMachineKtTest {
             getHomeSummary = getHomeSummaryUseCase
         )
         stateMachine
-            .send(HomeAction.Fetch)
+            .send(HomeEvent.Fetch)
             .join()
         assertThat(
             stateMachine.state.value,
@@ -160,7 +160,7 @@ class HomeStateMachineKtTest {
     @Test
     fun `Navigate today end when today category clicked`() = runTest {
         testNavigationEnd(
-            navigateAction = HomeAction.OnTodayCategoryClicked,
+            navigateEvent = HomeEvent.OnTodayCategoryClicked,
             expectedNavigationMessage = TodayEndNavigationMessage
         )
     }
@@ -168,7 +168,7 @@ class HomeStateMachineKtTest {
     @Test
     fun `Navigate timetable end when timetable category clicked`() = runTest {
         testNavigationEnd(
-            navigateAction = HomeAction.OnTimetableCategoryClicked,
+            navigateEvent = HomeEvent.OnTimetableCategoryClicked,
             expectedNavigationMessage = TimetableEndNavigationMessage
         )
     }
@@ -176,7 +176,7 @@ class HomeStateMachineKtTest {
     @Test
     fun `Navigate all end when all category clicked`() = runTest {
         testNavigationEnd(
-            navigateAction = HomeAction.OnAllCategoryClicked,
+            navigateEvent = HomeEvent.OnAllCategoryClicked,
             expectedNavigationMessage = AllEndNavigationMessage
         )
     }
@@ -191,7 +191,7 @@ class HomeStateMachineKtTest {
         testSummaries.forEach { homeSummary ->
             testNavigationEnd(
                 initState = HomeState.Loaded(homeSummary),
-                navigateAction = HomeAction.OnTagClicked(testTag),
+                navigateEvent = HomeEvent.OnTagClicked(testTag),
                 expectedNavigationMessage = TagEndNavigationMessage(testTag)
             )
         }
@@ -207,7 +207,7 @@ class HomeStateMachineKtTest {
         testSummaries.forEach { homeSummary ->
             testNavigationEnd(
                 initState = HomeState.Loaded(homeSummary),
-                navigateAction = HomeAction.OnTagLongClicked(testTag),
+                navigateEvent = HomeEvent.OnTagLongClicked(testTag),
                 expectedNavigationMessage = HomeTagConfigNavigationMessage(testTag)
             )
         }
@@ -225,7 +225,7 @@ class HomeStateMachineKtTest {
             testNavigationEnd(
                 getTagUsageCount = mock { whenever(mock(testTag)) doReturn testUsageCount },
                 initState = HomeState.Loaded(homeSummary),
-                navigateAction = HomeAction.OnTagRenameRequestClicked(testTag),
+                navigateEvent = HomeEvent.OnTagRenameRequestClicked(testTag),
                 expectedNavigationMessage = HomeTagRenameNavigationMessage(testTag, testUsageCount)
             )
         }
@@ -243,7 +243,7 @@ class HomeStateMachineKtTest {
             testNavigationEnd(
                 getTagUsageCount = mock { whenever(mock(testTag)) doReturn testUsageCount },
                 initState = HomeState.Loaded(homeSummary),
-                navigateAction = HomeAction.OnTagDeleteRequestClicked(testTag),
+                navigateEvent = HomeEvent.OnTagDeleteRequestClicked(testTag),
                 expectedNavigationMessage = HomeTagDeleteNavigationMessage(testTag, testUsageCount)
             )
         }
@@ -252,7 +252,7 @@ class HomeStateMachineKtTest {
     private suspend fun testNavigationEnd(
         getTagUsageCount: GetTagUsageCountUseCase = mock(),
         initState: HomeState = HomeState.Loaded(genHomeSummary()),
-        navigateAction: HomeAction,
+        navigateEvent: HomeEvent,
         expectedNavigationMessage: NavigationMessage,
     ) {
         val navigationEffect: SendNavigationEffect = mock()
@@ -263,7 +263,7 @@ class HomeStateMachineKtTest {
             getTagUsageCount = getTagUsageCount
         )
         stateMachine
-            .send(navigateAction)
+            .send(navigateEvent)
             .join()
         verify(navigationEffect, times(1)).send(expectedNavigationMessage)
     }
@@ -279,7 +279,7 @@ class HomeStateMachineKtTest {
             modifyTagName = modifyTagNameUseCase
         )
         stateMachine
-            .send(HomeAction.OnTagRenameConfirmClicked(testTag, renameText))
+            .send(HomeEvent.OnTagRenameConfirmClicked(testTag, renameText))
             .join()
         verify(modifyTagNameUseCase, times(1))(testTag, renameText)
     }
@@ -294,7 +294,7 @@ class HomeStateMachineKtTest {
             deleteTag = deleteTagUseCase
         )
         stateMachine
-            .send(HomeAction.OnTagDeleteConfirmClicked(testTag))
+            .send(HomeEvent.OnTagDeleteConfirmClicked(testTag))
             .join()
         verify(deleteTagUseCase, times(1))(testTag)
     }

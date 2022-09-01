@@ -21,8 +21,8 @@ import kotlinx.coroutines.flow.*
 /**
  * @author Doohyun
  */
-internal class StateMachineImpl<A : Action, S : State>(
-    actionProcessor: ActionProcessor<A>,
+internal class StateMachineImpl<E : Event, S : State>(
+    eventProcessor: EventProcessor<E>,
     override val state: StateFlow<S>,
-) : StateMachine<A, S>,
-    ActionProcessor<A> by actionProcessor
+) : StateMachine<E, S>,
+    EventProcessor<E> by eventProcessor

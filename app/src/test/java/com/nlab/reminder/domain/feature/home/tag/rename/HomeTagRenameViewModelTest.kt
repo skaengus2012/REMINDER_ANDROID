@@ -55,7 +55,7 @@ class HomeTagRenameViewModelTest {
     }
 
     @Test
-    fun `notify action to stateMachine when viewModel action invoked`() {
+    fun `notify event to stateMachine when viewModel event invoked`() {
         val (viewModel, stateMachine) = createMockingViewModelComponent(
             MutableStateFlow(genHomeTagRenameState()),
             createViewModel = { HomeTagRenameViewModel(it) },
@@ -63,9 +63,9 @@ class HomeTagRenameViewModelTest {
                 factory.create(scope = any(), homeTagRenameSideEffect = any())
             }
         )
-        val action = HomeTagRenameAction.OnKeyboardShownWhenViewCreated
-        viewModel.onAction(action)
-        verify(stateMachine, times(1)).send(action)
+        val event = HomeTagRenameEvent.OnKeyboardShownWhenViewCreated
+        viewModel.invoke(event)
+        verify(stateMachine, times(1)).send(event)
     }
 
     @Test

@@ -17,21 +17,21 @@
 package com.nlab.reminder.domain.feature.home.tag.rename
 
 fun HomeTagRenameViewModel.onRenameTextInput(text: String) {
-    onAction(HomeTagRenameAction.OnRenameTextInput(text))
+    invoke(HomeTagRenameEvent.OnRenameTextInput(text))
 }
 
 fun HomeTagRenameViewModel.onRenameTextClearClicked() {
-    onAction(HomeTagRenameAction.OnRenameTextClearClicked)
+    invoke(HomeTagRenameEvent.OnRenameTextClearClicked)
 }
 
 fun HomeTagRenameViewModel.onKeyboardShownWhenViewCreated() {
-    onAction(HomeTagRenameAction.OnKeyboardShownWhenViewCreated)
+    invoke(HomeTagRenameEvent.OnKeyboardShownWhenViewCreated)
 }
 
 fun HomeTagRenameViewModel.onCancelClicked() {
-    onAction(HomeTagRenameAction.OnCancelClicked)
+    invoke(HomeTagRenameEvent.OnCancelClicked)
 }
 
 fun HomeTagRenameViewModel.onConfirmClicked() {
-    onAction(HomeTagRenameAction.OnConfirmClicked)
+    invoke(HomeTagRenameEvent.OnConfirmClicked)
 }
