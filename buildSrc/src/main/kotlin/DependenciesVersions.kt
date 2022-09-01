@@ -1,3 +1,5 @@
+import org.gradle.api.JavaVersion
+
 /*
  * Copyright (C) 2022 The N's lab Open Source Project
  *
@@ -18,6 +20,7 @@
  * @author Doohyun
  */
 object DependenciesVersions {
+    val JAVA_VERSION = JavaVersion.VERSION_11
     const val AGP = "7.2.1"
     const val JACOCO = "0.8.8"
     const val KOTLIN = "1.7.0"

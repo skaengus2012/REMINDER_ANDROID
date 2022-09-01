@@ -126,8 +126,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = DependenciesVersions.JAVA_VERSION
+        targetCompatibility = DependenciesVersions.JAVA_VERSION
     }
 
     packagingOptions {
@@ -135,7 +135,7 @@ android {
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8.toString()
+        jvmTarget = DependenciesVersions.JAVA_VERSION.toString()
         freeCompilerArgs = listOf("-opt-in=kotlin.RequiresOptIn")
     }
 
