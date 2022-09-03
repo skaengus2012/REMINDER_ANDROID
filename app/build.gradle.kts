@@ -100,8 +100,8 @@ android {
                 "**/Manifest*.*",
                 "**/android/**",
                 "**/kotlin/**",
-                "**/model/**",
                 "**/view/**",
+                "**/test/**",
                 "**/di/**",
                 "**/*Args*.*",          /* filtering Navigation Component generated classes */
                 "**/*Directions*.*"     /* filtering Navigation Component generated classes */

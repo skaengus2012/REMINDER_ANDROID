@@ -16,14 +16,12 @@
 
 package com.nlab.reminder.core.util.test.coroutine
 
-import com.nlab.reminder.core.util.test.annotation.Generated
 import kotlinx.coroutines.coroutineScope
 
 /**
  * @author thalys
  */
-@Generated
-suspend fun onRoutine(action: () -> Unit) {
+suspend inline fun onRoutine(crossinline action: () -> Unit) {
     coroutineScope {
         action()
     }
