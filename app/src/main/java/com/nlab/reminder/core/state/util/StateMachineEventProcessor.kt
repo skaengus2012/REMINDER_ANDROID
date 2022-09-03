@@ -34,14 +34,10 @@ internal class StateMachineEventProcessor<E : Event, S : State>(
     private val stateReduceInvoker = StateReduceInvoker(state, stateMachineBuilder.buildUpdateHandler())
     private val errorHandler = stateMachineBuilder.buildExceptionHandler()
     private val invokeSideEffect = stateMachineBuilder.buildSideEffectHandler()
-    private val internalActionProcessor = EventProcessorImpl(
+    private val internalActionProcessor = EventProcessorImpl<E>(
         scope = scope + CoroutineExceptionHandler { _, e -> errorHandler(e) },
-        onEventReceived = this::onEventReceived
+        onEventReceived = { event -> invokeSideEffect(stateReduceInvoker.getSourceAndUpdate(event)) }
     )
-
-    private fun onEventReceived(event: E) {
-        invokeSideEffect(stateReduceInvoker.getSourceAndUpdate(event))
-    }
 
     override fun send(event: E): Job = internalActionProcessor.send(event)
 }

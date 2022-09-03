@@ -16,7 +16,7 @@
 
 package com.nlab.reminder.core.state.util
 
-import com.nlab.reminder.core.util.annotation.test.Generated
+import com.nlab.reminder.core.util.test.annotation.Generated
 
 /**
  * @author Doohyun

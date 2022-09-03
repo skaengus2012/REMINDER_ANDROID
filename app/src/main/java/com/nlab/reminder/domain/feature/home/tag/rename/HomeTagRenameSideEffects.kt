@@ -18,7 +18,7 @@ package com.nlab.reminder.domain.feature.home.tag.rename
 
 import com.nlab.reminder.core.effect.SendSideEffect
 import com.nlab.reminder.core.effect.SideEffect
-import com.nlab.reminder.core.util.annotation.test.Generated
+import com.nlab.reminder.core.util.test.annotation.Generated
 
 /**
  * @author Doohyun

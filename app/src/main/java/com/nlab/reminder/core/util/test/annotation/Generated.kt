@@ -14,18 +14,15 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.internal.common.schedule.impl
-
-import com.nlab.reminder.core.util.test.annotation.Generated
-import com.nlab.reminder.domain.common.schedule.DoneScheduleShownRepository
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
+package com.nlab.reminder.core.util.test.annotation
 
 /**
+ * Classes and methods annotated with annotation whose retention policy is runtime or class and
+ * whose simple name is Generated are filtered out during generation of report
+ *
  * @author Doohyun
+ * @see <a href="https://github.com/jacoco/jacoco/releases/tag/v0.8.2">jacoco update</a>
+ * @see <a href="https://github.com/jacoco/jacoco/pull/731">jacoco issue</a>
  */
-@Generated
-@Deprecated(message = "Fake Repository was used")
-class FakeDoneScheduleShownRepository : DoneScheduleShownRepository {
-    override fun get(): Flow<Boolean> = flowOf(true)
-}
+@Retention(AnnotationRetention.BINARY)
+annotation class Generated

@@ -16,7 +16,7 @@
 
 package com.nlab.reminder.core.kotlin.coroutine.flow
 
-import com.nlab.reminder.core.util.annotation.test.InlineRequired
+import com.nlab.reminder.core.util.test.annotation.InlineRequired
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
