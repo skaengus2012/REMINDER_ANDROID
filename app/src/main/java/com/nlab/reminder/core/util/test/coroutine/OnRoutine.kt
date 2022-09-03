@@ -14,12 +14,17 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.util.annotation.test
+package com.nlab.reminder.core.util.test.coroutine
+
+import com.nlab.reminder.core.util.test.annotation.Generated
+import kotlinx.coroutines.coroutineScope
 
 /**
- * jacoco made npe on coverageReport if not inlined
- *
- * @author Doohyun
+ * @author thalys
  */
-@Retention(AnnotationRetention.SOURCE)
-annotation class InlineRequired
+@Generated
+suspend fun onRoutine(action: () -> Unit) {
+    coroutineScope {
+        action()
+    }
+}

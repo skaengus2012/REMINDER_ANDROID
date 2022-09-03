@@ -17,7 +17,7 @@
 package com.nlab.reminder.domain.feature.home.di
 
 import com.nlab.reminder.core.kotlin.coroutine.flow.map
-import com.nlab.reminder.core.util.annotation.test.Generated
+import com.nlab.reminder.core.util.test.annotation.Generated
 import com.nlab.reminder.domain.common.tag.TagRepository
 import com.nlab.reminder.domain.common.tag.TagStyleResource
 import com.nlab.reminder.domain.feature.home.GetHomeSummaryUseCase

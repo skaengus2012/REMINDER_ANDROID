@@ -20,7 +20,7 @@ import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.Keep
 import com.nlab.reminder.R
-import com.nlab.reminder.core.util.annotation.test.Generated
+import com.nlab.reminder.core.util.test.annotation.Generated
 
 /**
  * @author Doohyun

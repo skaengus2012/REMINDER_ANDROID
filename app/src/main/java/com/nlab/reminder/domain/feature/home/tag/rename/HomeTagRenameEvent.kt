@@ -17,7 +17,7 @@
 package com.nlab.reminder.domain.feature.home.tag.rename
 
 import com.nlab.reminder.core.state.Event
-import com.nlab.reminder.core.util.annotation.test.Generated
+import com.nlab.reminder.core.util.test.annotation.Generated
 
 sealed class HomeTagRenameEvent private constructor() : Event {
     @Generated

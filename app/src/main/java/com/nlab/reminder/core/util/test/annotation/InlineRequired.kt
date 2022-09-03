@@ -14,15 +14,12 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.util.annotation.test
+package com.nlab.reminder.core.util.test.annotation
 
 /**
- * Classes and methods annotated with annotation whose retention policy is runtime or class and
- * whose simple name is Generated are filtered out during generation of report
+ * jacoco made npe on coverageReport if not inlined
  *
  * @author Doohyun
- * @see <a href="https://github.com/jacoco/jacoco/releases/tag/v0.8.2">jacoco update</a>
- * @see <a href="https://github.com/jacoco/jacoco/pull/731">jacoco issue</a>
  */
-@Retention(AnnotationRetention.BINARY)
-annotation class Generated
+@Retention(AnnotationRetention.SOURCE)
+annotation class InlineRequired
