@@ -28,11 +28,11 @@ class StateMachineBuilder<E : Event, S : State>(
 ) {
     private var onUpdate: (UpdateSource<E, S>) -> S = ImmutableListener()
     private val onErrors: MutableList<(Throwable) -> Unit> = arrayListOf(defaultUpdateErrorHandler)
-    private val sideEffects: MutableList<(EventProcessor<E>).(UpdateSource<E, S>) -> Unit> = arrayListOf()
+    private val sideEffects: MutableList<suspend (EventProcessor<E>).(UpdateSource<E, S>) -> Unit> = arrayListOf()
 
     internal fun buildExceptionHandler(): (Throwable) -> Unit = { error -> onErrors.forEach { it(error) } }
     internal fun buildUpdateHandler(): (UpdateSource<E, S>) -> S = { updateSource -> onUpdate(updateSource) }
-    internal fun buildSideEffectHandler(): (EventProcessor<E>).(UpdateSource<E, S>) -> Unit = { updateSource ->
+    internal fun buildSideEffectHandler(): suspend (EventProcessor<E>).(UpdateSource<E, S>) -> Unit = { updateSource ->
         sideEffects.forEach { it(updateSource) }
     }
 
@@ -44,11 +44,11 @@ class StateMachineBuilder<E : Event, S : State>(
         onErrors += block
     }
 
-    fun sideEffect(block: (EventProcessor<E>).(UpdateSource<E, S>) -> Unit) {
+    fun sideEffect(block: suspend (EventProcessor<E>).(UpdateSource<E, S>) -> Unit) {
         sideEffects += block
     }
 
-    inline fun <reified T : E> sideEffectBy(noinline block: (EventProcessor<E>).(UpdateSource<T, S>) -> Unit) {
+    inline fun <reified T : E> sideEffectBy(noinline block: suspend (EventProcessor<E>).(UpdateSource<T, S>) -> Unit) {
         sideEffectBy(T::class.java, block)
     }
 
@@ -56,7 +56,7 @@ class StateMachineBuilder<E : Event, S : State>(
     // So I created a wrapping function
     fun <T : E> sideEffectBy(
         eventClazz: Class<T>,
-        block: (EventProcessor<E>).(UpdateSource<T, S>) -> Unit
+        block: suspend (EventProcessor<E>).(UpdateSource<T, S>) -> Unit
     ) {
         sideEffect { (event, oldState) ->
             if (eventClazz.isInstance(event)) {
@@ -65,7 +65,7 @@ class StateMachineBuilder<E : Event, S : State>(
         }
     }
 
-    inline fun <reified U : S> sideEffectWhen(noinline block: (EventProcessor<E>).(UpdateSource<E, U>) -> Unit) {
+    inline fun <reified U : S> sideEffectWhen(noinline block: suspend (EventProcessor<E>).(UpdateSource<E, U>) -> Unit) {
         sideEffectWhen(U::class.java, block)
     }
 
@@ -73,7 +73,7 @@ class StateMachineBuilder<E : Event, S : State>(
     // So I created a wrapping function
     fun <U : S> sideEffectWhen(
         stateClazz: Class<U>,
-        block: (EventProcessor<E>).(UpdateSource<E, U>) -> Unit
+        block: suspend (EventProcessor<E>).(UpdateSource<E, U>) -> Unit
     ) {
         sideEffect { (event, oldState) ->
             if (stateClazz.isInstance(oldState)) {
@@ -83,7 +83,7 @@ class StateMachineBuilder<E : Event, S : State>(
     }
 
     inline fun <reified T : E, reified U : S> sideEffectOn(
-        noinline block: (EventProcessor<E>).(UpdateSource<T, U>) -> Unit
+        noinline block: suspend (EventProcessor<E>).(UpdateSource<T, U>) -> Unit
     ) {
         sideEffectOn(T::class.java, U::class.java, block)
     }
@@ -93,7 +93,7 @@ class StateMachineBuilder<E : Event, S : State>(
     fun <T : E, U : S> sideEffectOn(
         eventClazz: Class<T>,
         stateClazz: Class<U>,
-        block: (EventProcessor<E>).(UpdateSource<T, U>) -> Unit
+        block: suspend (EventProcessor<E>).(UpdateSource<T, U>) -> Unit
     ) {
         sideEffect { (action, oldState) ->
             if (eventClazz.isInstance(action) && stateClazz.isInstance(oldState)) {
