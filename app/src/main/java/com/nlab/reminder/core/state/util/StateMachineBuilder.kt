@@ -22,7 +22,7 @@ import com.nlab.reminder.core.state.*
  * @author Doohyun
  */
 class StateMachineBuilder<E : Event, S : State>(
-    defaultUpdateErrorHandler: (Throwable) -> Unit = StateMachineConfig.defaultExceptionHandler
+    defaultUpdateErrorHandler: (Throwable) -> Unit = StateMachinePlugin.defaultErrorHandler
 ) {
     private var onUpdate: (UpdateSource<E, S>) -> S = ImmutableListener()
     private val onErrors: MutableList<(Throwable) -> Unit> = arrayListOf(defaultUpdateErrorHandler)

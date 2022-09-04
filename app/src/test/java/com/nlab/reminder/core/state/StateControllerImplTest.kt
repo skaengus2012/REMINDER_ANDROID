@@ -25,11 +25,11 @@ import org.mockito.kotlin.*
  * @author Doohyun
  */
 @OptIn(ExperimentalCoroutinesApi::class)
-internal class StateMachineImplTest {
+internal class StateControllerImplTest {
     @Test
     fun `eventProcessor sent event when state machine sent`() = runTest {
         val eventProcessor: EventProcessor<TestEvent> = mock()
-        val stateMachine = StateMachineImpl<TestEvent, TestState>(eventProcessor, mock())
+        val stateMachine = StateControllerImpl<TestEvent, TestState>(eventProcessor, mock())
         val event = TestEvent.Event1()
         stateMachine.send(event)
         verify(eventProcessor, times(1)).send(event)

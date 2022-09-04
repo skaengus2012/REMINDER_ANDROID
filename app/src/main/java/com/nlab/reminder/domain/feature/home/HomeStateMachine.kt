@@ -17,7 +17,7 @@
 package com.nlab.reminder.domain.feature.home
 
 import com.nlab.reminder.core.effect.message.navigation.SendNavigationEffect
-import com.nlab.reminder.core.state.StateMachine
+import com.nlab.reminder.core.state.StateController
 import com.nlab.reminder.core.state.util.StateMachine
 import com.nlab.reminder.domain.common.effect.message.navigation.util.navigateAllEnd
 import com.nlab.reminder.domain.common.effect.message.navigation.util.navigateTagEnd
@@ -26,7 +26,7 @@ import com.nlab.reminder.domain.common.effect.message.navigation.util.navigateTo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-typealias HomeStateMachine = StateMachine<HomeEvent, HomeState>
+typealias HomeStateMachine = StateController<HomeEvent, HomeState>
 
 /**
  * @author Doohyun

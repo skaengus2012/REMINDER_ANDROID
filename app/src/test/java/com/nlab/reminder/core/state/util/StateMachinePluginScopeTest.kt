@@ -16,6 +16,7 @@
 
 package com.nlab.reminder.core.state.util
 
+import com.nlab.reminder.core.state.StateMachinePlugin
 import com.nlab.reminder.core.state.TestEvent
 import com.nlab.reminder.core.state.TestState
 import kotlinx.coroutines.CoroutineScope
@@ -29,10 +30,10 @@ import org.mockito.kotlin.verify
 /**
  * @author Doohyun
  */
-class StateMachineConfigScopeTest {
+class StateMachinePluginScopeTest {
     @Test
     fun `notify error to default error handler when stateMachine not set`() {
-        StateMachineConfig.defaultExceptionHandler = mock()
+        StateMachinePlugin.defaultErrorHandler = mock()
         val stateMachine = StateMachine<TestEvent, TestState>(
             CoroutineScope(Dispatchers.Unconfined),
             TestState.StateInit()
@@ -40,6 +41,6 @@ class StateMachineConfigScopeTest {
             updateTo { throw Throwable() }
         }
         stateMachine.send(TestEvent.Event1())
-        verify(StateMachineConfig.defaultExceptionHandler, times(1))(any())
+        verify(StateMachinePlugin.defaultErrorHandler, times(1))(any())
     }
 }
