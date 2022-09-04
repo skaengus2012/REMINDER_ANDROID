@@ -14,12 +14,10 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.state.util
-
-import com.nlab.reminder.core.state.Event
-import com.nlab.reminder.core.state.State
+package com.nlab.reminder.core.state
 
 /**
- * @author Doohyun
+ * @author thalys
  */
-data class UpdateSource<E : Event, S : State>(val event: E, val oldState: S)
+@StateMachineBuildMarker
+object StateMachineBuildScope

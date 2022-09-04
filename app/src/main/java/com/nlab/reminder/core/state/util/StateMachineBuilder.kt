@@ -16,9 +16,7 @@
 
 package com.nlab.reminder.core.state.util
 
-import com.nlab.reminder.core.state.Event
-import com.nlab.reminder.core.state.EventProcessor
-import com.nlab.reminder.core.state.State
+import com.nlab.reminder.core.state.*
 
 /**
  * @author Doohyun
@@ -103,6 +101,6 @@ class StateMachineBuilder<E : Event, S : State>(
     }
 
     private class ImmutableListener<E : Event, S : State> : (UpdateSource<E, S>) -> S {
-        override fun invoke(updateSource: UpdateSource<E, S>): S = updateSource.oldState
+        override fun invoke(updateSource: UpdateSource<E, S>): S = updateSource.before
     }
 }

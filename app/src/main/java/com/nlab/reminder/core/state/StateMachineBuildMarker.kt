@@ -14,13 +14,10 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.state.util
-
-import com.nlab.reminder.core.state.util.DefaultExceptionHandler
+package com.nlab.reminder.core.state
 
 /**
- * @author Doohyun
+ * @author thalys
  */
-object StateMachineConfig {
-    var defaultExceptionHandler: (Throwable) -> Unit = DefaultExceptionHandler()
-}
+@DslMarker
+annotation class StateMachineBuildMarker

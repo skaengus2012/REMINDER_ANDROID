@@ -14,10 +14,8 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.state.util
+package com.nlab.reminder.core.state
 
-import com.nlab.reminder.core.state.TestEvent
-import com.nlab.reminder.core.state.TestState
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.hamcrest.CoreMatchers.equalTo
 import org.junit.Test
@@ -26,14 +24,14 @@ import org.hamcrest.MatcherAssert.assertThat
 /**
  * @author Doohyun
  */
-internal class StateReduceInvokerTest {
+internal class StateReduceTest {
     @Test
     fun `emit update when started value was not changed`() {
         val event = TestEvent.Event1()
         val initState = TestState.State2()
         val targetState = TestState.State1()
         val state: MutableStateFlow<TestState> = MutableStateFlow(initState)
-        val invoker = StateReduceInvoker<TestEvent, TestState>(
+        val invoker = StateReduce<TestEvent, TestState>(
             state,
             reducer = { targetState }
         )
@@ -53,11 +51,11 @@ internal class StateReduceInvokerTest {
         val initState = TestState.State2()
         val updateState = TestState.StateInit()
         val state: MutableStateFlow<TestState> = MutableStateFlow(initState)
-        val invoker = StateReduceInvoker<TestEvent, TestState>(
+        val invoker = StateReduce<TestEvent, TestState>(
             state,
             reducer = { updateSource ->
-                if (updateSource.oldState == initState) TestState.State1()
-                else updateSource.oldState
+                if (updateSource.before == initState) TestState.State1()
+                else updateSource.before
             }
         )
         state.value = updateState
