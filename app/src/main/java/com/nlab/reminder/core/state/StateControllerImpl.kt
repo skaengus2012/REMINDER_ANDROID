@@ -16,11 +16,12 @@
 
 package com.nlab.reminder.core.state
 
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.*
 
 /**
  * @author Doohyun
  */
-sealed interface StateMachine<E : Event, S : State> : EventProcessor<E> {
-    val state: StateFlow<S>
-}
+internal class StateControllerImpl<E : Event, S : State>(
+    eventProcessor: EventProcessor<E>,
+    override val state: StateFlow<S>,
+) : StateController<E, S>, EventProcessor<E> by eventProcessor

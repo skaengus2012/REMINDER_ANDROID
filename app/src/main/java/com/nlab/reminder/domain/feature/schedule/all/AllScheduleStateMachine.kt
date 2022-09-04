@@ -16,13 +16,13 @@
 
 package com.nlab.reminder.domain.feature.schedule.all
 
-import com.nlab.reminder.core.state.StateMachine
+import com.nlab.reminder.core.state.StateController
 import com.nlab.reminder.core.state.util.StateMachine
 import com.nlab.reminder.domain.common.schedule.UpdateCompleteUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-typealias AllScheduleStateMachine = StateMachine<AllScheduleEvent, AllScheduleState>
+typealias AllScheduleStateMachine = StateController<AllScheduleEvent, AllScheduleState>
 
 /**
  * @author Doohyun

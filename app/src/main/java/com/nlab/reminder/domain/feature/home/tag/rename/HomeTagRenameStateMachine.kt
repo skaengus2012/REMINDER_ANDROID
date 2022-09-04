@@ -16,12 +16,12 @@
 
 package com.nlab.reminder.domain.feature.home.tag.rename
 
-import com.nlab.reminder.core.state.StateMachine
+import com.nlab.reminder.core.state.StateController
 import com.nlab.reminder.core.state.util.StateMachine
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-typealias HomeTagRenameStateMachine = StateMachine<HomeTagRenameEvent, HomeTagRenameState>
+typealias HomeTagRenameStateMachine = StateController<HomeTagRenameEvent, HomeTagRenameState>
 
 fun HomeTagRenameStateMachine(
     scope: CoroutineScope,
