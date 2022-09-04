@@ -14,13 +14,9 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.state.util
-
-import com.nlab.reminder.core.state.util.DefaultExceptionHandler
+package com.nlab.reminder.core.state
 
 /**
  * @author Doohyun
  */
-object StateMachineConfig {
-    var defaultExceptionHandler: (Throwable) -> Unit = DefaultExceptionHandler()
-}
+data class UpdateSource<E : Event, S : State>(val event: E, val before: S)

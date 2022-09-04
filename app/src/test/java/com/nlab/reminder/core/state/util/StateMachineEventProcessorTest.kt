@@ -114,8 +114,8 @@ internal class StateMachineEventProcessorTest {
         val onReceiveState: (TestState) -> Unit = mock()
         val eventProcessor = createTestStateMachineEventProcessor(
             stateMachineBuilder = StateMachineBuilder<TestEvent, TestState>().apply {
-                sideEffect { onReceiveEvent(it.event, it.oldState) }
-                updateTo { onReceiveState(it.oldState); it.oldState }
+                sideEffect { onReceiveEvent(it.event, it.before) }
+                updateTo { onReceiveState(it.before); it.before }
             }
         )
         eventProcessor
@@ -150,7 +150,7 @@ internal class StateMachineEventProcessorTest {
         val eventProcessor = createTestStateMachineEventProcessor(
             state = stateFlow,
             stateMachineBuilder = StateMachineBuilder<TestEvent, TestState>().apply {
-                sideEffectWhen<TestState.StateInit> { onReceiveEvent(it.event, it.oldState) }
+                sideEffectWhen<TestState.StateInit> { onReceiveEvent(it.event, it.before) }
             }
         )
         eventProcessor
@@ -174,7 +174,7 @@ internal class StateMachineEventProcessorTest {
         val eventProcessor = createTestStateMachineEventProcessor(
             state = stateFlow,
             stateMachineBuilder = StateMachineBuilder<TestEvent, TestState>().apply {
-                sideEffectOn<TestEvent.Event1, TestState.StateInit> { onReceiveEvent(it.event, it.oldState) }
+                sideEffectOn<TestEvent.Event1, TestState.StateInit> { onReceiveEvent(it.event, it.before) }
             }
         )
         listOf(TestEvent.Event1(), TestEvent.Event2()).forEach { event ->

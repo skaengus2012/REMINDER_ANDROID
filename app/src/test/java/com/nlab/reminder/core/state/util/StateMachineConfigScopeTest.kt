@@ -29,7 +29,7 @@ import org.mockito.kotlin.verify
 /**
  * @author Doohyun
  */
-class StateMachineConfigTest {
+class StateMachineConfigScopeTest {
     @Test
     fun `notify error to default error handler when stateMachine not set`() {
         StateMachineConfig.defaultExceptionHandler = mock()

@@ -14,28 +14,28 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.state.util
+package com.nlab.reminder.core.state
 
-import com.nlab.reminder.core.state.*
-import com.nlab.reminder.core.state.EventProcessorImpl
-import com.nlab.reminder.core.state.StateReduce
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.plus
 
 /**
- * @author Doohyun
+ * @author thalys
  */
-internal class StateMachineEventProcessor<E : Event, S : State>(
+class StateMachineEventProcessor<E : Event, S : State>(
     scope: CoroutineScope,
     state: MutableStateFlow<S>,
     stateMachineBuilder: StateMachineBuilder<E, S>,
 ) : EventProcessor<E> {
-    private val stateReduceInvoker = StateReduce(state, stateMachineBuilder.buildUpdateHandler())
+    private val stateReduce = StateReduce(state, stateMachineBuilder.buildUpdateHandler())
     private val errorHandler = stateMachineBuilder.buildExceptionHandler()
-    private val invokeSideEffect = stateMachineBuilder.buildSideEffectHandler()
+    private val eventHandler = stateMachineBuilder.buildEventHandler()
     private val internalActionProcessor = EventProcessorImpl<E>(
         scope = scope + CoroutineExceptionHandler { _, e -> errorHandler(e) },
-        onEventReceived = { event -> invokeSideEffect(stateReduceInvoker.getSourceAndUpdate(event)) }
+        onEventReceived = { event -> eventHandler(stateReduce.getSourceAndUpdate(event)) }
     )
 
     override fun send(event: E): Job = internalActionProcessor.send(event)

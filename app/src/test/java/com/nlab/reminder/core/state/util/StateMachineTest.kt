@@ -18,6 +18,7 @@ package com.nlab.reminder.core.state.util
 
 import com.nlab.reminder.core.state.TestEvent
 import com.nlab.reminder.core.state.TestState
+import com.nlab.reminder.core.state.UpdateSource
 import com.nlab.reminder.test.instanceOf
 import kotlinx.coroutines.*
 import kotlinx.coroutines.test.*
