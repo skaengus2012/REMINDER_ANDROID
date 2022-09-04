@@ -16,7 +16,6 @@
 
 package com.nlab.reminder.core.state.util
 
-import com.nlab.reminder.core.state.StateMachinePlugin
 import com.nlab.reminder.core.state.TestEvent
 import com.nlab.reminder.core.state.TestState
 import com.nlab.reminder.test.instanceOf
