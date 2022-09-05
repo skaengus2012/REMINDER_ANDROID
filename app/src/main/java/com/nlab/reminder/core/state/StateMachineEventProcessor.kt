@@ -30,7 +30,13 @@ internal fun <E : Event, S : State> StateMachineEventProcessor(
     scope: CoroutineScope,
     state: MutableStateFlow<S>,
     stateMachineBuilder: StateMachineBuilder<E, S>
-): EventProcessor<E> = object : EventProcessor<E> {
+): EventProcessor<E> = InternalEventProcessor(scope, state, stateMachineBuilder)
+
+private class InternalEventProcessor<E : Event, S : State>(
+    scope: CoroutineScope,
+    state: MutableStateFlow<S>,
+    stateMachineBuilder: StateMachineBuilder<E, S>
+) : EventProcessor<E> {
     private val stateReduce = StateReduce(state, stateMachineBuilder.buildUpdateHandler())
     private val exceptionHandler = stateMachineBuilder.buildExceptionHandler()
     private val eventHandler = stateMachineBuilder.buildEventHandler()
