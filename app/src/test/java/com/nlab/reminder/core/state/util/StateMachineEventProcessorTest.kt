@@ -38,13 +38,13 @@ internal class StateMachineEventProcessorTest {
 
     @Before
     fun setup() {
-        recoveryExceptionHandler = StateMachinePlugin.defaultErrorHandler
-        StateMachinePlugin.defaultErrorHandler = {}
+        recoveryExceptionHandler = DeprecatedStateMachinePlugin.defaultErrorHandler
+        DeprecatedStateMachinePlugin.defaultErrorHandler = {}
     }
 
     @After
     fun tearDown() {
-        StateMachinePlugin.defaultErrorHandler = recoveryExceptionHandler
+        DeprecatedStateMachinePlugin.defaultErrorHandler = recoveryExceptionHandler
     }
 
     private fun createTestStateMachineEventProcessor(

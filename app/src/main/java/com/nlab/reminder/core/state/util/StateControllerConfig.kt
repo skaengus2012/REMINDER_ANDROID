@@ -16,12 +16,10 @@
 
 package com.nlab.reminder.core.state.util
 
-import kotlinx.coroutines.CoroutineDispatcher
-
 /**
- * @author Doohyun
+ * @author thalys
  */
-object StateMachinePlugin {
-    var defaultDispatcher: CoroutineDispatcher? = null
-    var defaultExceptionHandler: ((Throwable) -> Unit)? = null
-}
+data class StateControllerConfig(
+    val isPluginDispatcherEnabled: Boolean = true,
+    val isPluginErrorHandlerEnabled: Boolean = true
+)

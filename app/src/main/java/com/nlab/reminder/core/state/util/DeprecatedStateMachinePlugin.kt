@@ -14,14 +14,11 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.state
-
-import kotlinx.coroutines.CoroutineDispatcher
+package com.nlab.reminder.core.state.util
 
 /**
  * @author Doohyun
  */
-object StateMachinePlugin {
-    var defaultDispatcher: CoroutineDispatcher? = null
-    var defaultExceptionHandler: ((Throwable) -> Unit)? = null
+object DeprecatedStateMachinePlugin {
+    var defaultErrorHandler: (Throwable) -> Unit = {}
 }
