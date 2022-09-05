@@ -16,7 +16,21 @@
 
 package com.nlab.reminder.core.effect
 
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.withContext
+
 /**
  * @author thalys
  */
-data class TestSideEffectMessage(val value: Any) : SideEffect.Message
+internal class SideEffectImpl<T : SideEffect.Message>(
+    private val messageChannel: Channel<T>,
+    private val dispatcher: CoroutineDispatcher
+) : SideEffect<T> {
+    override val message: Flow<T> = messageChannel.receiveAsFlow()
+    override suspend fun send(effect: T) = withContext(dispatcher) {
+        messageChannel.send(effect)
+    }
+}

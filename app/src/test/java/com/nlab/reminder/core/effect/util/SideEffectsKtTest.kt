@@ -17,7 +17,7 @@
 package com.nlab.reminder.core.effect.util
 
 import com.nlab.reminder.core.effect.SendSideEffect
-import com.nlab.reminder.core.effect.TestSideEffectMessage
+import com.nlab.reminder.core.effect.DepreTestSideEffectMessage
 import com.nlab.reminder.test.genInt
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -37,10 +37,10 @@ class SideEffectsKtTest {
     @Test
     fun `notify message when sideEffect invoked`() = runTest {
         Dispatchers.setMain(Dispatchers.Unconfined)
-        val testSideEffect: SendSideEffect<TestSideEffectMessage> by sideEffect()
+        val testSideEffect: SendSideEffect<DepreTestSideEffectMessage> by sideEffect()
         val tryCount = genInt("##").coerceAtMost(30)
         (1..tryCount)
-            .map { TestSideEffectMessage(it) }
+            .map { DepreTestSideEffectMessage(it) }
             .forEach { message -> testSideEffect.send(message) }
         assertThat(
             testSideEffect.event

@@ -17,7 +17,7 @@
 package com.nlab.reminder.core.effect.impl
 
 import com.nlab.reminder.core.effect.SendSideEffect
-import com.nlab.reminder.core.effect.TestSideEffectMessage
+import com.nlab.reminder.core.effect.DepreTestSideEffectMessage
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.fold
@@ -51,11 +51,11 @@ class DefaultSideEffectTest {
     }
 
     private fun joinSendJobsAndReceiveTest(
-        sendSideEffect: SendSideEffect<TestSideEffectMessage>,
+        sendSideEffect: SendSideEffect<DepreTestSideEffectMessage>,
         testCount: Int
     ) = runTest {
         (1..testCount)
-            .map { number -> launch { sendSideEffect.send(TestSideEffectMessage(number)) } }
+            .map { number -> launch { sendSideEffect.send(DepreTestSideEffectMessage(number)) } }
             .joinAll()
 
         assertThat(

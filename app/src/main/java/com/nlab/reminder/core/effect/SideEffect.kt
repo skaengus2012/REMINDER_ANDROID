@@ -16,7 +16,14 @@
 
 package com.nlab.reminder.core.effect
 
+import kotlinx.coroutines.flow.Flow
+
 /**
  * @author thalys
  */
-data class TestSideEffectMessage(val value: Any) : SideEffect.Message
+sealed interface SideEffect<T : SideEffect.Message> {
+    val message: Flow<T>
+    suspend fun send(effect: T)
+
+    interface Message
+}

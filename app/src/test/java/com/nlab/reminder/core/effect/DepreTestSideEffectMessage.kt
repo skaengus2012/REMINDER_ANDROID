@@ -17,6 +17,6 @@
 package com.nlab.reminder.core.effect
 
 /**
- * @author thalys
+ * @author Doohyun
  */
-data class TestSideEffectMessage(val value: Any) : SideEffect.Message
+data class DepreTestSideEffectMessage(val number: Int) : DeprecatedSideEffect.Message
