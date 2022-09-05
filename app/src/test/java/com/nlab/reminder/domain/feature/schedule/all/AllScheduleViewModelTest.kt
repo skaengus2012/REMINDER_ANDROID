@@ -37,6 +37,7 @@ import org.mockito.kotlin.*
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class AllScheduleViewModelTest {
+    /**
     @Before
     fun setUp() {
         Dispatchers.setMain(Dispatchers.Unconfined)
@@ -82,4 +83,5 @@ class AllScheduleViewModelTest {
             })
         )
     }
+    */
 }

@@ -16,12 +16,14 @@
 
 package com.nlab.reminder.domain.feature.schedule.all
 
+import com.nlab.reminder.core.state.util.controlIn
 import com.nlab.reminder.domain.common.schedule.Schedule
 import com.nlab.reminder.domain.common.schedule.UpdateCompleteUseCase
 import com.nlab.reminder.domain.common.schedule.genSchedule
 import com.nlab.reminder.test.genBoolean
+import com.nlab.reminder.test.genFlowObserveDispatcher
 import com.nlab.reminder.test.once
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.*
@@ -34,93 +36,125 @@ import org.mockito.kotlin.*
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class AllScheduleStateMachineKtTest {
-    private val dummyEvents: Set<AllScheduleEvent> = setOf(
+    private fun genEvents(): Set<AllScheduleEvent> = setOf(
         AllScheduleEvent.Fetch,
         AllScheduleEvent.AllScheduleReportLoaded(genAllScheduleReport()),
         AllScheduleEvent.OnScheduleCompleteUpdateClicked(genSchedule().id(), genBoolean())
     )
 
-    private val dummyStates: Set<AllScheduleState> = setOf(
+    private fun genStates(): Set<AllScheduleState> = setOf(
         AllScheduleState.Init,
         AllScheduleState.Loading,
         AllScheduleState.Loaded(genAllScheduleReport())
     )
 
-    @Test
-    fun `holds injected state when machine created`() = runTest {
-        val initState: AllScheduleState = AllScheduleState.Loaded(genAllScheduleReport())
-        val stateMachine: AllScheduleStateMachine = genStateMachine(initState = initState)
-        assertThat(stateMachine.state.value, sameInstance(initState))
-    }
+    private fun genStateMachine(
+        getAllScheduleReport: GetAllScheduleReportUseCase = mock { onBlocking { mock() } doReturn emptyFlow() },
+        updateScheduleComplete: UpdateCompleteUseCase = mock()
+    ): AllScheduleStateMachine = AllScheduleStateMachine(
+        getAllScheduleReport,
+        updateScheduleComplete
+    )
 
     @Test
-    fun `keep state init even when event occurs until fetched`() = runTest {
-        val initState: AllScheduleState = AllScheduleState.Init
-        val stateMachine: AllScheduleStateMachine = genStateMachine(initState = initState)
-        dummyEvents
-            .asSequence()
-            .filter { it !is AllScheduleEvent.Fetch }
-            .forEach { event ->
-                stateMachine.send(event).join()
-                assertThat(stateMachine.state.value, sameInstance(initState))
-            }
-
-        stateMachine.send(AllScheduleEvent.Fetch).join()
-        assertThat(stateMachine.state.value, not(sameInstance(initState)))
-    }
-
-    @Test
-    fun `fetch is executed when state is init`() = runTest {
-        dummyStates
-            .asSequence()
-            .filter { it !is AllScheduleState.Init }
-            .map { state -> state to genStateMachine(initState = state) }
-            .forEach { (initState, stateMachine) ->
-                stateMachine.send(AllScheduleEvent.Fetch).join()
-                assertThat(stateMachine.state.value, sameInstance(initState))
-            }
-        val stateMachine: AllScheduleStateMachine = genStateMachine(initState = AllScheduleState.Init)
-        stateMachine.send(AllScheduleEvent.Fetch).join()
-        assertThat(stateMachine.state.value, equalTo(AllScheduleState.Loading))
-    }
-
-    @Test
-    fun `Notify AllScheduleReport when AllScheduleReportLoaded event received after loading`() = runTest {
-        val report: AllScheduleReport = genAllScheduleReport()
-        val event: AllScheduleEvent = AllScheduleEvent.AllScheduleReportLoaded(report)
-        dummyStates
-            .asSequence()
-            .map { state -> state to genStateMachine(initState = state) }
-            .forEach { (initState, stateMachine) ->
-                stateMachine
-                    .send(event)
-                    .join()
-                assertThat(
-                    stateMachine.state.value,
-                    equalTo(
-                        if (initState is AllScheduleState.Init) initState
-                        else AllScheduleState.Loaded(report)
-                    )
-                )
-            }
-    }
-
-    @Test
-    fun `Notify loaded when fetch is called`() = runTest {
-        val testReport: AllScheduleReport = genAllScheduleReport()
-        val getAllScheduleReportUseCase: GetAllScheduleReportUseCase = mock {
-            whenever(mock()) doReturn flow { emit(testReport) }
-        }
-        val stateMachine: AllScheduleStateMachine = genStateMachine(
-            getAllScheduleReport = getAllScheduleReportUseCase
-        )
-        stateMachine
+    fun `update to loading when state was init and fetch sent`() = runTest {
+        val stateController = genStateMachine().controlIn(CoroutineScope(Dispatchers.Default), AllScheduleState.Init)
+        stateController
             .send(AllScheduleEvent.Fetch)
             .join()
+        assertThat(stateController.state.value, equalTo(AllScheduleState.Loading))
+    }
+
+    @Test
+    fun `never updated when state was not init and fetch sent`() = runTest {
+        val initAndStateControllers =
+            genStates()
+                .filter { it != AllScheduleState.Init }
+                .map { state -> state to genStateMachine().controlIn(CoroutineScope(Dispatchers.Default), state) }
+        initAndStateControllers
+            .map { it.second }
+            .map { it.send(AllScheduleEvent.Fetch) }
+            .joinAll()
+
         assertThat(
-            stateMachine.state.value,
-            equalTo(AllScheduleState.Loaded(testReport))
+            initAndStateControllers.all { (initState, controller) -> initState == controller.state.value },
+            equalTo(true)
         )
+    }
+
+    @Test
+    fun `update to Loaded when state was not init and AllScheduleReportLoaded sent`() = runTest {
+        val allScheduleReport = genAllScheduleReport()
+        val stateControllers =
+            genStates()
+                .filter { it != AllScheduleState.Init }
+                .map { genStateMachine().controlIn(CoroutineScope(Dispatchers.Default), it) }
+        stateControllers
+            .map { it.send(AllScheduleEvent.AllScheduleReportLoaded(allScheduleReport)) }
+            .joinAll()
+        assertThat(
+            stateControllers.map { it.state.value }.all { it == AllScheduleState.Loaded(allScheduleReport) },
+            equalTo(true)
+        )
+    }
+
+    @Test
+    fun `never updated when state was init and AllScheduleReportLoaded sent`() = runTest {
+        val stateController = genStateMachine().controlIn(CoroutineScope(Dispatchers.Default), AllScheduleState.Init)
+        stateController
+            .send(AllScheduleEvent.AllScheduleReportLoaded(genAllScheduleReport()))
+            .join()
+        assertThat(stateController.state.value, equalTo(AllScheduleState.Init))
+    }
+
+    @Test
+    fun `never updated when any event excluded fetch and AllScheduleReportLoaded sent`() = runTest {
+        val initAndStateControllers = genStates().map { state ->
+            state to genStateMachine().controlIn(CoroutineScope(Dispatchers.Default), state)
+        }
+        assertThat(
+            genEvents()
+                .asSequence()
+                .filterNot { it is AllScheduleEvent.Fetch }
+                .filterNot { it is AllScheduleEvent.AllScheduleReportLoaded }
+                .map { event ->
+                    initAndStateControllers.map { (initState, controller) ->
+                        async {
+                            controller
+                                .send(event)
+                                .join()
+                            controller.state.value == initState
+                        }
+                    }
+                }
+                .flatten()
+                .toList()
+                .all { it.await() },
+            equalTo(true)
+        )
+    }
+
+    @Test
+    fun `subscribe allScheduleReport snapshot when state was init and fetch sent`() = runTest {
+        val expected = genAllScheduleReport()
+        val getAllScheduleReport: GetAllScheduleReportUseCase =  mock {
+            onBlocking { mock() } doReturn flow { emit(expected) }
+        }
+        val stateController =
+            genStateMachine(getAllScheduleReport = getAllScheduleReport)
+                .controlIn(CoroutineScope(Dispatchers.Unconfined), AllScheduleState.Init)
+        stateController
+            .send(AllScheduleEvent.Fetch)
+            .join()
+
+        val deferred = CompletableDeferred<AllScheduleReport>()
+        stateController
+            .state
+            .filterIsInstance<AllScheduleState.Loaded>()
+            .onEach { deferred.complete(it.allSchedulesReport) }
+            .launchIn(genFlowObserveDispatcher())
+
+        assertThat(deferred.await(), equalTo(expected))
     }
 
     @Test
@@ -128,11 +162,10 @@ class AllScheduleStateMachineKtTest {
         val schedule: Schedule = genSchedule()
         val isComplete: Boolean = genBoolean()
         val updateCompleteUseCase: UpdateCompleteUseCase = mock()
-        val stateMachine: AllScheduleStateMachine = genStateMachine(
-            initState = AllScheduleState.Loaded(genAllScheduleReport()),
-            updateScheduleComplete = updateCompleteUseCase
-        )
-        stateMachine
+        val stateController =
+            genStateMachine(updateScheduleComplete = updateCompleteUseCase)
+                .controlIn(CoroutineScope(Dispatchers.Unconfined), AllScheduleState.Loaded(genAllScheduleReport()))
+        stateController
             .send(AllScheduleEvent.OnScheduleCompleteUpdateClicked(schedule.id(), isComplete))
             .join()
         verify(updateCompleteUseCase, once())(schedule.id(), isComplete)

@@ -18,7 +18,7 @@ package com.nlab.reminder.domain.feature.schedule.all
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nlab.reminder.core.state.util.fetchedFlow
+import com.nlab.reminder.core.state.util.controlIn
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
@@ -26,18 +26,18 @@ import javax.inject.Inject
 /**
  * @author Doohyun
  */
+// TODO apply new viewEffect and make test  https://github.com/skaengus2012/REMINDER_ANDROID/issues/51
 @HiltViewModel
 class AllScheduleViewModel @Inject constructor(
     stateMachineFactory: AllScheduleStateMachineFactory
 ) : ViewModel() {
-    private val stateMachine: AllScheduleStateMachine = stateMachineFactory.create(viewModelScope)
+    private val stateController =
+        stateMachineFactory.create()
+            .controlIn(viewModelScope, AllScheduleState.Init, fetchEvent = AllScheduleEvent.Fetch)
 
-    val state: StateFlow<AllScheduleState> =
-        stateMachine
-            .state
-            .fetchedFlow(viewModelScope, onFetch = { invoke(AllScheduleEvent.Fetch) })
+    val state: StateFlow<AllScheduleState> = stateController.state
 
     fun invoke(action: AllScheduleEvent) {
-        stateMachine.send(action)
+        stateController.send(action)
     }
 }

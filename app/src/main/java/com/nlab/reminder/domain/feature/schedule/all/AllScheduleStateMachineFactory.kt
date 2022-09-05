@@ -25,13 +25,8 @@ import kotlinx.coroutines.CoroutineScope
 class AllScheduleStateMachineFactory(
     private val getAllScheduleReport: GetAllScheduleReportUseCase,
     private val updateScheduleComplete: UpdateCompleteUseCase,
-    private val initState: AllScheduleState = AllScheduleState.Init
 ) {
-    fun create(
-        scope: CoroutineScope
-    ): AllScheduleStateMachine = AllScheduleStateMachine(
-        scope,
-        initState,
+    fun create(): AllScheduleStateMachine = AllScheduleStateMachine(
         getAllScheduleReport,
         updateScheduleComplete
     )
