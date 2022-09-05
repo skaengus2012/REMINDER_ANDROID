@@ -3,6 +3,11 @@ codecov:
   bot: "codecov_bot"
   require_ci_to_pass: true
 
+coverage:
+  round: nearest
+  range: 80..100
+  precision: 2
+
 comment:
   layout: "reach,diff,flags,files,footer"
   behavior: default
