@@ -16,16 +16,15 @@
 
 package com.nlab.reminder.domain.feature.home.tag.rename
 
-import kotlinx.coroutines.CoroutineScope
+import com.nlab.reminder.core.util.test.annotation.Generated
 
 /**
  * @author Doohyun
  */
-class HomeTagRenameStateMachineFactory(
-    private val initState: HomeTagRenameState
-) {
+// TODO remove this new viewEffect and make test  https://github.com/skaengus2012/REMINDER_ANDROID/issues/51
+@Generated
+class HomeTagRenameStateMachineFactory {
     fun create(
-        scope: CoroutineScope,
         homeTagRenameSideEffect: SendHomeTagRenameSideEffect
-    ): HomeTagRenameStateMachine = HomeTagRenameStateMachine(scope, initState, homeTagRenameSideEffect)
+    ): HomeTagRenameStateMachine = HomeTagRenameStateMachine(homeTagRenameSideEffect)
 }

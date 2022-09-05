@@ -16,19 +16,14 @@
 
 package com.nlab.reminder.domain.feature.home.tag.rename
 
-import com.nlab.reminder.core.state.StateController
 import com.nlab.reminder.core.state.util.StateMachine
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 
-typealias HomeTagRenameStateMachine = StateController<HomeTagRenameEvent, HomeTagRenameState>
+typealias HomeTagRenameStateMachine = StateMachine<HomeTagRenameEvent, HomeTagRenameState>
 
 fun HomeTagRenameStateMachine(
-    scope: CoroutineScope,
-    initState: HomeTagRenameState,
     homeTagRenameSideEffect: SendHomeTagRenameSideEffect
-): HomeTagRenameStateMachine = StateMachine(scope, initState) {
-    updateTo { (event, state) ->
+): HomeTagRenameStateMachine = StateMachine {
+    update { (event, state) ->
         when (event) {
             is HomeTagRenameEvent.OnRenameTextInput -> state.copy(currentText = event.text)
             is HomeTagRenameEvent.OnRenameTextClearClicked -> state.copy(currentText = "")
@@ -41,10 +36,10 @@ fun HomeTagRenameStateMachine(
     }
 
     sideEffectBy<HomeTagRenameEvent.OnConfirmClicked> { (_, state) ->
-        scope.launch { homeTagRenameSideEffect.complete(state.currentText) }
+        homeTagRenameSideEffect.complete(state.currentText)
     }
 
     sideEffectBy<HomeTagRenameEvent.OnCancelClicked> {
-        scope.launch { homeTagRenameSideEffect.dismiss() }
+        homeTagRenameSideEffect.dismiss()
     }
 }

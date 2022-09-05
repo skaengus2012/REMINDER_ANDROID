@@ -16,6 +16,7 @@
 
 package com.nlab.reminder.domain.feature.home.tag.rename
 
+import com.nlab.reminder.test.genBoolean
 import com.nlab.reminder.test.genBothify
 
 /**
@@ -23,5 +24,5 @@ import com.nlab.reminder.test.genBothify
  */
 fun genHomeTagRenameState(
     currentText: String = genBothify(),
-    isKeyboardShowWhenViewCreated: Boolean = true
+    isKeyboardShowWhenViewCreated: Boolean = genBoolean()
 ): HomeTagRenameState = HomeTagRenameState(currentText, isKeyboardShowWhenViewCreated)
