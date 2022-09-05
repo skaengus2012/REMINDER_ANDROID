@@ -21,8 +21,10 @@ import com.nlab.reminder.core.state.StateControllerImpl
 import com.nlab.reminder.core.state.StateMachineBuilder
 import com.nlab.reminder.core.state.StateMachineEventProcessor
 import com.nlab.reminder.core.util.test.annotation.Generated
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.plus
 
 /**
  * @author thalys
@@ -38,10 +40,11 @@ inline fun <E : Event, S : State> StateMachine(
 fun <E : Event, S : State> StateMachine<E, S>.controlIn(
     scope: CoroutineScope,
     initState: S,
+    config: StateControllerConfig = StateControllerConfig()
 ): StateController<E, S> {
     val state = MutableStateFlow(initState)
     return StateControllerImpl(
-        StateMachineEventProcessor(scope, state, stateMachineBuilder = this),
+        PluginStateMachineEventProcessor(stateMachine = this, scope, state, config),
         state.asStateFlow()
     )
 }
@@ -49,10 +52,11 @@ fun <E : Event, S : State> StateMachine<E, S>.controlIn(
 fun <E : Event, S : State> StateMachine<E, S>.controlIn(
     scope: CoroutineScope,
     initState: S,
-    fetchEvent: E
+    fetchEvent: E,
+    config: StateControllerConfig = StateControllerConfig()
 ): StateController<E, S> {
     val state = MutableStateFlow(initState)
-    val eventProcessor: EventProcessor<E> = StateMachineEventProcessor(scope, state, stateMachineBuilder = this)
+    val eventProcessor: EventProcessor<E> = PluginStateMachineEventProcessor(stateMachine = this, scope, state, config)
     return StateControllerImpl(
         eventProcessor,
         state.asStateFlow()
@@ -60,6 +64,29 @@ fun <E : Event, S : State> StateMachine<E, S>.controlIn(
             .stateIn(scope, SharingStarted.Lazily, initState)
     )
 }
+
+@Suppress("FunctionName")
+private fun <E : Event, S : State> PluginStateMachineEventProcessor(
+    stateMachine: StateMachine<E, S>,
+    scope: CoroutineScope,
+    stateFlow: MutableStateFlow<S>,
+    config: StateControllerConfig
+): EventProcessor<E> = StateMachineEventProcessor(
+    state = stateFlow,
+    scope = with(scope) {
+        val defaultDispatcher: CoroutineDispatcher? = StateMachinePlugin.defaultDispatcher
+        if (defaultDispatcher != null && config.isPluginDispatcherEnabled) {
+            this + defaultDispatcher
+        } else {
+            this
+        }
+    },
+    stateMachineBuilder = stateMachine.apply {
+        if (config.isPluginErrorHandlerEnabled) {
+            catch { StateMachinePlugin.defaultExceptionHandler?.invoke(it) }
+        }
+    }
+)
 
 // Jacoco could not measure coverage in onStart suspend function..
 private fun <E : Event, S : State> onStartToFetchConverter(

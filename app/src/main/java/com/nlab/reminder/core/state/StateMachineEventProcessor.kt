@@ -19,19 +19,23 @@ package com.nlab.reminder.core.state
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.plus
 
 /**
  * @author thalys
  */
-class StateMachineEventProcessor<E : Event, S : State> internal constructor(
+@Suppress("FunctionName")
+internal fun <E : Event, S : State> StateMachineEventProcessor(
     scope: CoroutineScope,
-    stateReduce: StateReduce<E, S>,
-    exceptionHandlers: List<(Throwable) -> Unit>,
-    eventHandler: suspend (EventProcessor<E>).(UpdateSource<E, S>) -> Unit,
-) : EventProcessor<E> {
+    state: MutableStateFlow<S>,
+    stateMachineBuilder: StateMachineBuilder<E, S>
+): EventProcessor<E> = object : EventProcessor<E> {
+    private val stateReduce = StateReduce(state, stateMachineBuilder.buildUpdateHandler())
+    private val exceptionHandler = stateMachineBuilder.buildExceptionHandler()
+    private val eventHandler = stateMachineBuilder.buildEventHandler()
     private val internalActionProcessor = EventProcessorImpl<E>(
-        scope = scope + CoroutineExceptionHandler { _, e -> exceptionHandlers.forEach { it(e) } },
+        scope = scope + CoroutineExceptionHandler { _, e -> exceptionHandler(e) },
         onEventReceived = { event -> eventHandler(stateReduce.getSourceAndUpdate(event)) }
     )
 

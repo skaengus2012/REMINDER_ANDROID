@@ -39,7 +39,7 @@ class StateMachineEventProcessorTest {
         scope: CoroutineScope = CoroutineScope(Dispatchers.Default),
         state: MutableStateFlow<TestState> = MutableStateFlow(TestState.StateInit()),
         stateMachineBuilder: StateMachineBuilder<TestEvent, TestState> = StateMachineBuilder()
-    ): StateMachineEventProcessor<TestEvent, TestState> = StateMachineEventProcessor(scope, state, stateMachineBuilder)
+    ): EventProcessor<TestEvent> = StateMachineEventProcessor(scope, state, stateMachineBuilder)
 
     @Test
     fun `update to state1 when test1 event sent`() = runTest {
