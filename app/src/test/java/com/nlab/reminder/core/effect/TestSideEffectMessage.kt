@@ -19,4 +19,4 @@ package com.nlab.reminder.core.effect
 /**
  * @author Doohyun
  */
-data class TestSideEffectMessage(val number: Int) : SideEffect.Message
+data class TestSideEffectMessage(val number: Int) : DeprecatedSideEffect.Message

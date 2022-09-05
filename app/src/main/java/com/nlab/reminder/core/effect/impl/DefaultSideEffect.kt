@@ -17,7 +17,7 @@
 package com.nlab.reminder.core.effect.impl
 
 import com.nlab.reminder.core.effect.SendSideEffect
-import com.nlab.reminder.core.effect.SideEffect
+import com.nlab.reminder.core.effect.DeprecatedSideEffect
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -27,7 +27,7 @@ import kotlinx.coroutines.withContext
 /**
  * @author Doohyun
  */
-internal class DefaultSideEffect<T : SideEffect.Message>(
+internal class DefaultSideEffect<T : DeprecatedSideEffect.Message>(
     private val eventChannel: Channel<T>,
     private val dispatcher: CoroutineDispatcher
 ) : SendSideEffect<T> {

@@ -17,13 +17,13 @@
 package com.nlab.reminder.core.effect.impl
 
 import com.nlab.reminder.core.effect.SendSideEffect
-import com.nlab.reminder.core.effect.SideEffect
+import com.nlab.reminder.core.effect.DeprecatedSideEffect
 import kotlin.reflect.KProperty
 
 /**
  * @author Doohyun
  */
-class SideEffectDelegate<T : SideEffect.Message>(
+class SideEffectDelegate<T : DeprecatedSideEffect.Message>(
     private val sideEffect: SendSideEffect<T>
 ) {
     operator fun getValue(t: Any?, property: KProperty<*>): SendSideEffect<T> {

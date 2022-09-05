@@ -17,7 +17,7 @@
 package com.nlab.reminder.domain.feature.home.tag.rename
 
 import com.nlab.reminder.core.effect.SendSideEffect
-import com.nlab.reminder.core.effect.SideEffect
+import com.nlab.reminder.core.effect.DeprecatedSideEffect
 import com.nlab.reminder.core.util.test.annotation.Generated
 
 /**
@@ -25,9 +25,9 @@ import com.nlab.reminder.core.util.test.annotation.Generated
  */
 
 typealias SendHomeTagRenameSideEffect = SendSideEffect<HomeTagRenameSideEffectMessage>
-typealias HomeTagRenameSideEffect = SideEffect<HomeTagRenameSideEffectMessage>
+typealias HomeTagRenameSideEffect = DeprecatedSideEffect<HomeTagRenameSideEffectMessage>
 
-sealed class HomeTagRenameSideEffectMessage private constructor() : SideEffect.Message {
+sealed class HomeTagRenameSideEffectMessage private constructor() : DeprecatedSideEffect.Message {
     @Generated
     data class Complete(val rename: String) : HomeTagRenameSideEffectMessage()
     object Dismiss : HomeTagRenameSideEffectMessage()

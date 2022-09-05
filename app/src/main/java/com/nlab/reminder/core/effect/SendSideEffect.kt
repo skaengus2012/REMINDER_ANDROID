@@ -19,6 +19,6 @@ package com.nlab.reminder.core.effect
 /**
  * @author Doohyun
  */
-interface SendSideEffect<T : SideEffect.Message> : SideEffect<T> {
+interface SendSideEffect<T : DeprecatedSideEffect.Message> : DeprecatedSideEffect<T> {
     suspend fun send(effect: T)
 }

@@ -21,7 +21,7 @@ import kotlinx.coroutines.flow.Flow
 /**
  * @author Doohyun
  */
-interface SideEffect<T : SideEffect.Message> {
+interface DeprecatedSideEffect<T : DeprecatedSideEffect.Message> {
     val event: Flow<T>
     interface Message
 }
