@@ -29,6 +29,7 @@ import org.mockito.kotlin.whenever
 /**
  * @author Doohyun
  */
+/**
 fun genAllScheduleStateMachineFactory(
     getAllScheduleReport: GetAllScheduleReportUseCase = mock(),
     updateScheduleComplete: UpdateCompleteUseCase = mock(),
@@ -68,4 +69,4 @@ fun genAllScheduleMockingViewModelComponent(
 
     val viewModel = AllScheduleViewModel(stateMachineFactory)
     return Triple(viewModel, stateMachine, stateMachineFactory)
-}
+}*/
