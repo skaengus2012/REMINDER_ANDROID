@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.feature.home.tag.rename
+package com.nlab.reminder.domain.feature.home.tag.rename.view
+
+import com.nlab.reminder.core.util.test.annotation.Generated
 
 /**
- * @author Doohyun
+ * @author thalys
  */
-fun HomeTagRenameStateMachineFactory(
-    initText: String
-): HomeTagRenameStateMachineFactory = HomeTagRenameStateMachineFactory(
-    HomeTagRenameState(currentText = initText, isKeyboardShowWhenViewCreated = true)
-)
+@Generated
+data class HomeTagRenameInitText(val value: String)

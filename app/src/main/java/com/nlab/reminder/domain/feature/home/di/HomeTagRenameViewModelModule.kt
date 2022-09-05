@@ -19,6 +19,7 @@ package com.nlab.reminder.domain.feature.home.di
 import androidx.lifecycle.SavedStateHandle
 import com.nlab.reminder.domain.common.android.lifecycle.tag
 import com.nlab.reminder.domain.feature.home.tag.rename.HomeTagRenameStateMachineFactory
+import com.nlab.reminder.domain.feature.home.tag.rename.view.HomeTagRenameInitText
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -31,7 +32,12 @@ import dagger.hilt.android.components.ViewModelComponent
 @InstallIn(ViewModelComponent::class)
 class HomeTagRenameViewModelModule {
     @Provides
-    fun provideHomeTagRenameStateMachineFactory(
-        savedStateHandle: SavedStateHandle
-    ): HomeTagRenameStateMachineFactory = HomeTagRenameStateMachineFactory(initText = savedStateHandle.tag.name)
+    fun provideInitText(savedStateHandle: SavedStateHandle): HomeTagRenameInitText {
+        return HomeTagRenameInitText(savedStateHandle.tag.name)
+    }
+
+    @Provides
+    fun provideHomeTagRenameStateMachineFactory(): HomeTagRenameStateMachineFactory {
+        return HomeTagRenameStateMachineFactory()
+    }
 }
