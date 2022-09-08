@@ -31,7 +31,7 @@ typealias HomeTagRenameSideEffect = SideEffectReceiver<HomeTagRenameSideEffectMe
 sealed class HomeTagRenameSideEffectMessage private constructor() : SideEffect {
     @Generated
     data class Complete(val rename: String) : HomeTagRenameSideEffectMessage()
-    object Dismiss : HomeTagRenameSideEffectMessage()
+    object Cancel : HomeTagRenameSideEffectMessage()
 }
 
 suspend fun SendHomeTagRenameSideEffect.complete(renameMessage: String) {
@@ -39,5 +39,5 @@ suspend fun SendHomeTagRenameSideEffect.complete(renameMessage: String) {
 }
 
 suspend fun SendHomeTagRenameSideEffect.dismiss() {
-    post(HomeTagRenameSideEffectMessage.Dismiss)
+    post(HomeTagRenameSideEffectMessage.Cancel)
 }

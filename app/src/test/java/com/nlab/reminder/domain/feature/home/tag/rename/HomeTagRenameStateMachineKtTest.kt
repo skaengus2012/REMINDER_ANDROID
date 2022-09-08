@@ -135,6 +135,6 @@ class HomeTagRenameStateMachineKtTest {
         stateMachine
             .send(HomeTagRenameEvent.OnCancelClicked)
             .join()
-        verify(sideEffect, once()).post(HomeTagRenameSideEffectMessage.Dismiss)
+        verify(sideEffect, once()).post(HomeTagRenameSideEffectMessage.Cancel)
     }
 }

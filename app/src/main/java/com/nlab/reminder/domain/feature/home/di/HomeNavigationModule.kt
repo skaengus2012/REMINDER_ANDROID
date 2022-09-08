@@ -16,22 +16,15 @@
 
 package com.nlab.reminder.domain.feature.home.di
 
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.setFragmentResultListener
-import androidx.fragment.app.viewModels
-import com.nlab.reminder.core.effect.message.navigation.android.NavigationMediator
-import com.nlab.reminder.core.effect.message.navigation.android.util.NavigationMediator
-import com.nlab.reminder.core.entrypoint.util.EntryBlock
+import androidx.navigation.NavController
+import com.nlab.reminder.core.android.navigation.navcontroller.condition
+import com.nlab.reminder.core.android.navigation.util.NavigationTable
 import com.nlab.reminder.domain.feature.home.*
-import com.nlab.reminder.domain.feature.home.view.HomeFragmentDirections
-import com.nlab.reminder.domain.feature.home.tag.config.view.HomeTagConfigDialogFragment
-import com.nlab.reminder.domain.feature.home.tag.delete.view.HomeTagDeleteDialogFragment
-import com.nlab.reminder.domain.feature.home.tag.rename.view.HomeTagRenameDialogFragment
+import com.nlab.reminder.domain.feature.home.view.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.FragmentComponent
-import dagger.multibindings.IntoSet
 
 /**
  * @author Doohyun
@@ -41,68 +34,29 @@ import dagger.multibindings.IntoSet
 class HomeNavigationModule {
     @HomeScope
     @Provides
-    fun provideFragmentNavigateUseCase(
-        navigateWithGlobalAction: NavigationMediator
-    ): NavigationMediator = NavigationMediator { navController, message ->
-        when (message) {
-            is HomeTagConfigNavigationMessage ->
-                HomeFragmentDirections
-                    .actionHomeFragmentToHomeConfigDialogFragment(REQUEST_KEY_HOME_TO_HOME_TAG_CONFIG, message.tag)
-                    .run(navController::navigate)
-
-            is HomeTagRenameNavigationMessage -> {
-                HomeFragmentDirections
-                    .actionHomeFragmentToHomeTagRenameDialogFragment(
-                        REQUEST_KEY_HOME_TO_HOME_TAG_RENAME,
-                        message.tag,
-                        message.usageCount
-                    )
-                    .run(navController::navigate)
-            }
-
-            is HomeTagDeleteNavigationMessage -> {
-                HomeFragmentDirections
-                    .actionHomeFragmentToHomeTagDeleteDialogFragment(
-                        REQUEST_KEY_HOME_TO_HOME_TAG_DELETE,
-                        message.tag,
-                        message.usageCount
-                    )
-                    .run(navController::navigate)
-            }
-
-            else -> navigateWithGlobalAction(navController, message)
+    fun provideNavControllerTable(): NavigationTable<NavController> = NavigationTable {
+        condition<HomeTagConfigNavigation> { (navController, navigation) ->
+            HomeFragmentDirections
+                .actionHomeFragmentToHomeConfigDialogFragment(navigation.requestKey, navigation.tag)
+                .run(navController::navigate)
         }
-    }
-
-    @HomeScope
-    @IntoSet
-    @Provides
-    fun provideHomeFragmentResultReceiver(fragment: Fragment) = EntryBlock {
-        val viewModel: HomeViewModel by fragment.viewModels()
-        fragment.setFragmentResultListener(
-            requestKey = REQUEST_KEY_HOME_TO_HOME_TAG_CONFIG,
-            listener = HomeTagConfigDialogFragment.resultListenerOf(
-                onRenameClicked = { tag -> viewModel.onTagRenameRequestClicked(tag) },
-                onDeleteClicked = { tag -> viewModel.onTagDeleteRequestClicked(tag) }
-            )
-        )
-        fragment.setFragmentResultListener(
-            requestKey = REQUEST_KEY_HOME_TO_HOME_TAG_RENAME,
-            listener = HomeTagRenameDialogFragment.resultListenerOf(
-                onConfirmClicked = { tag, rename -> viewModel.onTagRenameConfirmClicked(tag, rename) }
-            )
-        )
-        fragment.setFragmentResultListener(
-            requestKey = REQUEST_KEY_HOME_TO_HOME_TAG_DELETE,
-            listener = HomeTagDeleteDialogFragment.resultListenerOf(
-                onDeleteClicked =  { tag -> viewModel.onTagDeleteConfirmClicked(tag) }
-            )
-        )
-    }
-
-    companion object {
-        private const val REQUEST_KEY_HOME_TO_HOME_TAG_CONFIG = "requestKeyHomeToHomeTagConfig"
-        private const val REQUEST_KEY_HOME_TO_HOME_TAG_RENAME = "requestKeyHomeToHomeTagRename"
-        private const val REQUEST_KEY_HOME_TO_HOME_TAG_DELETE = "requestKeyHomeToHomeTagDelete"
+        condition<HomeTagRenameNavigation> { (navController, navigation) ->
+            HomeFragmentDirections
+                .actionHomeFragmentToHomeTagRenameDialogFragment(
+                    navigation.requestKey,
+                    navigation.tag,
+                    navigation.usageCount
+                )
+                .run(navController::navigate)
+        }
+        condition<HomeTagDeleteNavigation> { (navController, navigation) ->
+            HomeFragmentDirections
+                .actionHomeFragmentToHomeTagRenameDialogFragment(
+                    navigation.requestKey,
+                    navigation.tag,
+                    navigation.usageCount
+                )
+                .run(navController::navigate)
+        }
     }
 }

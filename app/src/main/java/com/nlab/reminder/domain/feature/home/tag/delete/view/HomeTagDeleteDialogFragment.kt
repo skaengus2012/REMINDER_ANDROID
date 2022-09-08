@@ -20,16 +20,16 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.nlab.reminder.R
-import com.nlab.reminder.core.android.view.clicks
+import com.nlab.reminder.core.android.view.throttleClicks
 import com.nlab.reminder.databinding.FragmentHomeTagDeleteDialogBinding
-import com.nlab.reminder.domain.common.android.view.fragment.sendResultAndDismiss
-import com.nlab.reminder.domain.common.tag.Tag
+import com.nlab.reminder.domain.common.android.fragment.sendResultAndDismiss
+import com.nlab.reminder.domain.feature.home.view.HomeTagDeleteResult
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 
 /**
@@ -58,51 +58,19 @@ class HomeTagDeleteDialogFragment : BottomSheetDialogFragment() {
             )
         }
 
-        binding.cancelButton.clicks()
-            .onEach {
-                sendResultAndDismiss(
-                    requestKey = args.requestKey,
-                    result = bundleOf(
-                        RESULT_TYPE to RESULT_TYPE_DISMISS_REQUEST,
-                        RESULT_TAG to args.tag
-                    )
-                )
-            }
+        binding.cancelButton.throttleClicks()
+            .map { HomeTagDeleteResult(args.tag, isConfirmed = false) }
+            .onEach { result -> sendResultAndDismiss(args.requestKey, result) }
             .launchIn(viewLifecycleOwner.lifecycleScope)
 
-        binding.confirmButton.clicks()
-            .onEach {
-                sendResultAndDismiss(
-                    requestKey = args.requestKey,
-                    result = bundleOf(
-                        RESULT_TYPE to RESULT_TYPE_CONFIRM_REQUEST,
-                        RESULT_TAG to args.tag
-                    )
-                )
-            }
+        binding.confirmButton.throttleClicks()
+            .map { HomeTagDeleteResult(args.tag, isConfirmed = true) }
+            .onEach { result -> sendResultAndDismiss(args.requestKey, result) }
             .launchIn(viewLifecycleOwner.lifecycleScope)
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-    companion object {
-        private const val RESULT_TAG = "homeTagDeleteDialogResultTag"
-        private const val RESULT_TYPE = "homeTagDeleteDialogResultType"
-        private const val RESULT_TYPE_DISMISS_REQUEST = "dismissRequest"
-        private const val RESULT_TYPE_CONFIRM_REQUEST = "confirmRequest"
-
-        fun resultListenerOf(
-            onDeleteClicked: (Tag) -> Unit,
-            onCancelClicked: (Tag) -> Unit = {}
-        ) = { _: String, bundle: Bundle ->
-            val resultTag2: Tag = requireNotNull(bundle.getParcelable(RESULT_TAG))
-            when (requireNotNull(bundle.getString(RESULT_TYPE))) {
-                RESULT_TYPE_DISMISS_REQUEST -> onCancelClicked(resultTag2)
-                RESULT_TYPE_CONFIRM_REQUEST -> onDeleteClicked(resultTag2)
-            }
-        }
     }
 }

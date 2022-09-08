@@ -29,10 +29,11 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import com.nlab.reminder.R
+import com.nlab.reminder.core.android.fragment.viewLifecycleScope
 import com.nlab.reminder.core.android.view.clicks
 import com.nlab.reminder.core.android.view.textChanged
 import com.nlab.reminder.databinding.FragmentHomeTagRenameDialogBinding
-import com.nlab.reminder.domain.common.android.view.fragment.sendResultAndDismiss
+import com.nlab.reminder.domain.common.android.fragment.sendResultAndDismiss
 import com.nlab.reminder.domain.common.tag.Tag
 import com.nlab.reminder.domain.feature.home.tag.rename.*
 import dagger.hilt.android.AndroidEntryPoint
@@ -89,8 +90,7 @@ class HomeTagRenameDialogFragment : DialogFragment() {
             .onEach { viewModel.onConfirmClicked() }
             .launchIn(viewLifecycleOwner.lifecycleScope)
 
-        viewModel.homeTagRenameSideEffect
-            .sideEffect
+        viewModel.homeTagRenameSideEffect.sideEffect
             .onEach { receiveSideEffect(it) }
             .launchIn(viewLifecycleOwner.lifecycleScope)
 
@@ -110,7 +110,7 @@ class HomeTagRenameDialogFragment : DialogFragment() {
             .also { editText ->
                 if (homeTagRenameState.isKeyboardShowWhenViewCreated.not()) return@also
 
-                lifecycleScope.launchWhenResumed {
+                viewLifecycleScope.launchWhenResumed {
                     delay(100) // keyboard not showing without delay...
                     viewModel.onKeyboardShownWhenViewCreated()
                     if (editText.requestFocus()) {
@@ -124,11 +124,10 @@ class HomeTagRenameDialogFragment : DialogFragment() {
     }
 
     private fun receiveSideEffect(message: HomeTagRenameSideEffectMessage) {
-        sendResultAndDismiss(
-            requestKey = args.requestKey,
+        sendResultAndDismiss(args.requestKey,
             result = when (message) {
-                is HomeTagRenameSideEffectMessage.Dismiss -> bundleOf(
-                    RESULT_TYPE to RESULT_TYPE_DISMISS_REQUEST,
+                is HomeTagRenameSideEffectMessage.Cancel -> bundleOf(
+                    RESULT_TYPE to RESULT_TYPE_CANCEL_REQUEST,
                     RESULT_TAG to args.tag
                 )
 
@@ -150,21 +149,14 @@ class HomeTagRenameDialogFragment : DialogFragment() {
         private const val RESULT_TAG = "homeTagRenameDialogResultTag"
         private const val RESULT_RENAME = "homeTagRenameDialogResultRename"
         private const val RESULT_TYPE = "homeTagRenameDialogResultType"
-        private const val RESULT_TYPE_DISMISS_REQUEST = "dismissRequest"
+        private const val RESULT_TYPE_CANCEL_REQUEST = "cancelRequest"
         private const val RESULT_TYPE_CONFIRM_REQUEST = "confirmRequest"
 
-        fun resultListenerOf(
-            onConfirmClicked: (inputtedTag: Tag, rename: String) -> Unit,
-            onCancelClicked: (inputtedTag: Tag) -> Unit = {}
-        ) = { _: String, bundle: Bundle ->
-            val resultTag: Tag = requireNotNull(bundle.getParcelable(RESULT_TAG))
-            when (requireNotNull(bundle.getString(RESULT_TYPE))) {
-                RESULT_TYPE_DISMISS_REQUEST -> onCancelClicked(resultTag)
-                RESULT_TYPE_CONFIRM_REQUEST -> onConfirmClicked(
-                    resultTag,
-                    requireNotNull(bundle.getString(RESULT_RENAME))
-                )
-            }
-        }
+        fun tagOf(bundle: Bundle): Tag = requireNotNull(bundle.getParcelable(RESULT_TAG))
+        fun renameOf(bundle: Bundle): String = bundle.getString(RESULT_RENAME) ?: ""
+        fun isConfirmedOf(bundle: Bundle): Boolean =
+            requireNotNull(bundle.getString(RESULT_TYPE)) == RESULT_TYPE_CONFIRM_REQUEST
+        fun isCancelledOf(bundle: Bundle): Boolean =
+            requireNotNull(bundle.getString(RESULT_TYPE)) == RESULT_TYPE_CANCEL_REQUEST
     }
 }

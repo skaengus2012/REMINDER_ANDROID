@@ -16,28 +16,31 @@
 
 package com.nlab.reminder.internal.common.di
 
+import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
-import com.nlab.reminder.R
-import com.nlab.reminder.core.android.navigation.navcontroller.condition
+import androidx.navigation.fragment.findNavController
+import com.nlab.reminder.core.android.navigation.NavigationController
+import com.nlab.reminder.core.android.navigation.util.NavigationController
 import com.nlab.reminder.core.android.navigation.util.NavigationTable
-import com.nlab.reminder.domain.common.android.navigation.AllScheduleEndNavigation
+import com.nlab.reminder.core.android.navigation.util.Navigator
 import dagger.Module
 import dagger.Provides
-import dagger.Reusable
 import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
+import dagger.hilt.android.components.FragmentComponent
+import dagger.hilt.android.scopes.FragmentScoped
 
 /**
  * @author Doohyun
  */
 @Module
-@InstallIn(SingletonComponent::class)
-class NavigationModule {
-    @Reusable
+@InstallIn(FragmentComponent::class)
+class FragmentModule {
+    @FragmentScoped
     @Provides
-    fun provideNavControllerTable(): NavigationTable<NavController> = NavigationTable {
-        condition<AllScheduleEndNavigation> { (handler: NavController) ->
-            handler.navigate(R.id.action_global_allScheduleFragment)
-        }
-    }
+    fun provideNavigationController(
+        fragment: Fragment,
+        table: NavigationTable<NavController>
+    ): NavigationController = NavigationController(
+        Navigator(table, getHandler = { fragment.findNavController() })
+    )
 }
