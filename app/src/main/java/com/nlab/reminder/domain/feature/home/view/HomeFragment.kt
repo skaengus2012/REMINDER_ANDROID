@@ -57,10 +57,6 @@ class HomeFragment : Fragment() {
         val homeItemAdapter = HomeItemAdapter()
         val renderWhenLoaded = renderWhenLoadedFunc(homeItemAdapter)
 
-        entryPointInit.initialize(
-            navigationEffect = viewModel.navigationEffect
-        )
-
         binding.categoryRecyclerview
             .apply { itemAnimator = null }
             .apply { adapter = homeItemAdapter }

@@ -19,8 +19,8 @@ package com.nlab.reminder.core.effect.message.navigation.android.fragment.util
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.nlab.reminder.core.effect.message.navigation.NavigationEffectReceiver
-import com.nlab.reminder.core.effect.message.navigation.android.util.*
 import com.nlab.reminder.core.effect.message.navigation.android.NavigationMediator
+import com.nlab.reminder.core.effect.message.navigation.android.util.NavigationEffectReceiver
 
 /**
  * @author Doohyun

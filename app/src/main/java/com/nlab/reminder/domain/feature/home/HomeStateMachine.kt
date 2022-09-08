@@ -16,12 +16,8 @@
 
 package com.nlab.reminder.domain.feature.home
 
-import com.nlab.reminder.core.effect.message.navigation.SendNavigationEffect
+import com.nlab.reminder.core.effect.SideEffectSender
 import com.nlab.reminder.core.state.util.StateMachine
-import com.nlab.reminder.domain.common.effect.message.navigation.util.navigateAllEnd
-import com.nlab.reminder.domain.common.effect.message.navigation.util.navigateTagEnd
-import com.nlab.reminder.domain.common.effect.message.navigation.util.navigateTimetableEnd
-import com.nlab.reminder.domain.common.effect.message.navigation.util.navigateTodayEnd
 
 typealias HomeStateMachine = StateMachine<HomeEvent, HomeState>
 
@@ -29,7 +25,7 @@ typealias HomeStateMachine = StateMachine<HomeEvent, HomeState>
  * @author Doohyun
  */
 fun HomeStateMachine(
-    navigationEffect: SendNavigationEffect,
+    homeSideEffect: SideEffectSender<HomeSideEffect>,
     getHomeSummary: GetHomeSummaryUseCase,
     getTagUsageCount: GetTagUsageCountUseCase,
     modifyTagName: ModifyTagNameUseCase,
@@ -54,31 +50,31 @@ fun HomeStateMachine(
     }
 
     sideEffectOn<HomeEvent.OnTodayCategoryClicked, HomeState.Loaded> {
-        navigationEffect.navigateTodayEnd()
+        homeSideEffect.post(HomeSideEffect.NavigateToday)
     }
 
     sideEffectOn<HomeEvent.OnTimetableCategoryClicked, HomeState.Loaded> {
-        navigationEffect.navigateTimetableEnd()
+        homeSideEffect.post(HomeSideEffect.NavigateTimetable)
     }
 
     sideEffectOn<HomeEvent.OnAllCategoryClicked, HomeState.Loaded> {
-        navigationEffect.navigateAllEnd()
+        homeSideEffect.post(HomeSideEffect.NavigateAllSchedule)
     }
 
     sideEffectOn<HomeEvent.OnTagClicked, HomeState.Loaded> { (event) ->
-        navigationEffect.navigateTagEnd(event.tag)
+        homeSideEffect.post(HomeSideEffect.NavigateTag(event.tag))
     }
 
     sideEffectOn<HomeEvent.OnTagLongClicked, HomeState.Loaded> { (event) ->
-        navigationEffect.send(HomeTagConfigNavigationMessage(event.tag))
+        homeSideEffect.post(HomeSideEffect.NavigateTagConfig(event.tag))
     }
 
     sideEffectOn<HomeEvent.OnTagRenameRequestClicked, HomeState.Loaded> { (event) ->
-        navigationEffect.send(HomeTagRenameNavigationMessage(event.tag, getTagUsageCount(event.tag)))
+        homeSideEffect.post(HomeSideEffect.NavigateTagRename(event.tag, getTagUsageCount(event.tag)))
     }
 
     sideEffectOn<HomeEvent.OnTagDeleteRequestClicked, HomeState.Loaded> { (event) ->
-        navigationEffect.send(HomeTagDeleteNavigationMessage(event.tag, getTagUsageCount(event.tag)))
+        homeSideEffect.post(HomeSideEffect.NavigateTagDelete(event.tag, getTagUsageCount(event.tag)))
     }
 
     sideEffectOn<HomeEvent.OnTagRenameConfirmClicked, HomeState.Loaded> { (event) ->

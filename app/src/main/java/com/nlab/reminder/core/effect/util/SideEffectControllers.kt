@@ -13,12 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+@file:Generated
+package com.nlab.reminder.core.effect.util
 
-package com.nlab.reminder.core.effect
+import com.nlab.reminder.core.effect.SideEffect
+import com.nlab.reminder.core.effect.SideEffectController
+import com.nlab.reminder.core.util.test.annotation.Generated
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
 
 /**
- * @author Doohyun
+ * @author thalys
  */
-interface SendSideEffect<T : DeprecatedSideEffect.Message> : DeprecatedSideEffect<T> {
-    suspend fun send(effect: T)
-}
+@Suppress("FunctionName")
+fun <T : SideEffect> SideEffectController(
+    eventChannel: Channel<T> = Channel(Channel.BUFFERED),
+    dispatcher: CoroutineDispatcher = Dispatchers.Main
+): SideEffectController<T> = SideEffectController(eventChannel, dispatcher)

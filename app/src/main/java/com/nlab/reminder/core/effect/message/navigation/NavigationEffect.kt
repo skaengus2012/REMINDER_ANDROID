@@ -16,12 +16,13 @@
 
 package com.nlab.reminder.core.effect.message.navigation
 
-import com.nlab.reminder.core.effect.SendSideEffect
-import com.nlab.reminder.core.effect.DeprecatedSideEffect
+import com.nlab.reminder.core.effect.SideEffect
+import com.nlab.reminder.core.effect.SideEffectSender
+import com.nlab.reminder.core.effect.SideEffectReceiver
 
 /**
  * @author Doohyun
  */
-interface NavigationMessage : DeprecatedSideEffect.Message
-typealias SendNavigationEffect = SendSideEffect<NavigationMessage>
-typealias NavigationEffect = DeprecatedSideEffect<NavigationMessage>
+interface NavigationMessage : SideEffect
+typealias SendNavigationEffect = SideEffectSender<NavigationMessage>
+typealias NavigationEffect = SideEffectReceiver<NavigationMessage>

@@ -16,12 +16,9 @@
 
 package com.nlab.reminder.core.effect
 
-import kotlinx.coroutines.flow.Flow
-
 /**
  * @author Doohyun
  */
-interface DeprecatedSideEffect<T : DeprecatedSideEffect.Message> {
-    val event: Flow<T>
-    interface Message
+sealed interface SideEffectSender<T : SideEffect> {
+    suspend fun post(sideEffect: T)
 }

@@ -25,4 +25,5 @@ package com.nlab.reminder.core.util.test.annotation
  * @see <a href="https://github.com/jacoco/jacoco/pull/731">jacoco issue</a>
  */
 @Retention(AnnotationRetention.BINARY)
+@Target(AnnotationTarget.CLASS, AnnotationTarget.FILE, AnnotationTarget.FUNCTION)
 annotation class Generated

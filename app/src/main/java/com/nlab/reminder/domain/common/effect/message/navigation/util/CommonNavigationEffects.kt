@@ -26,7 +26,7 @@ import com.nlab.reminder.domain.common.tag.Tag
 /**
  * @author Doohyun
  */
-suspend fun SendNavigationEffect.navigateAllEnd() = send(AllEndNavigationMessage)
-suspend fun SendNavigationEffect.navigateTagEnd(tag: Tag) = send(TagEndNavigationMessage(tag))
-suspend fun SendNavigationEffect.navigateTimetableEnd() = send(TimetableEndNavigationMessage)
-suspend fun SendNavigationEffect.navigateTodayEnd() = send(TodayEndNavigationMessage)
+suspend fun SendNavigationEffect.navigateAllEnd() = post(AllEndNavigationMessage)
+suspend fun SendNavigationEffect.navigateTagEnd(tag: Tag) = post(TagEndNavigationMessage(tag))
+suspend fun SendNavigationEffect.navigateTimetableEnd() = post(TimetableEndNavigationMessage)
+suspend fun SendNavigationEffect.navigateTodayEnd() = post(TodayEndNavigationMessage)

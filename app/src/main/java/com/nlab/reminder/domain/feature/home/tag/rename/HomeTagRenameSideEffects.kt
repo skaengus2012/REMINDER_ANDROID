@@ -16,27 +16,28 @@
 
 package com.nlab.reminder.domain.feature.home.tag.rename
 
-import com.nlab.reminder.core.effect.SendSideEffect
-import com.nlab.reminder.core.effect.DeprecatedSideEffect
+import com.nlab.reminder.core.effect.SideEffect
+import com.nlab.reminder.core.effect.SideEffectSender
+import com.nlab.reminder.core.effect.SideEffectReceiver
 import com.nlab.reminder.core.util.test.annotation.Generated
 
 /**
  * @author Doohyun
  */
 
-typealias SendHomeTagRenameSideEffect = SendSideEffect<HomeTagRenameSideEffectMessage>
-typealias HomeTagRenameSideEffect = DeprecatedSideEffect<HomeTagRenameSideEffectMessage>
+typealias SendHomeTagRenameSideEffect = SideEffectSender<HomeTagRenameSideEffectMessage>
+typealias HomeTagRenameSideEffect = SideEffectReceiver<HomeTagRenameSideEffectMessage>
 
-sealed class HomeTagRenameSideEffectMessage private constructor() : DeprecatedSideEffect.Message {
+sealed class HomeTagRenameSideEffectMessage private constructor() : SideEffect {
     @Generated
     data class Complete(val rename: String) : HomeTagRenameSideEffectMessage()
     object Dismiss : HomeTagRenameSideEffectMessage()
 }
 
 suspend fun SendHomeTagRenameSideEffect.complete(renameMessage: String) {
-    send(HomeTagRenameSideEffectMessage.Complete(renameMessage))
+    post(HomeTagRenameSideEffectMessage.Complete(renameMessage))
 }
 
 suspend fun SendHomeTagRenameSideEffect.dismiss() {
-    send(HomeTagRenameSideEffectMessage.Dismiss)
+    post(HomeTagRenameSideEffectMessage.Dismiss)
 }

@@ -14,9 +14,20 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.effect
+package com.nlab.reminder.domain.feature.home
+
+import com.nlab.reminder.core.effect.SideEffect
+import com.nlab.reminder.domain.common.tag.Tag
 
 /**
  * @author thalys
  */
-data class TestSideEffectMessage(val value: Any) : SideEffect.Message
+sealed class HomeSideEffect : SideEffect {
+    object NavigateToday : HomeSideEffect()
+    object NavigateTimetable : HomeSideEffect()
+    object NavigateAllSchedule : HomeSideEffect()
+    data class NavigateTag(val tag: Tag) : HomeSideEffect()
+    data class NavigateTagConfig(val tag: Tag) : HomeSideEffect()
+    data class NavigateTagRename(val tag: Tag, val usageCount: Long) : HomeSideEffect()
+    data class NavigateTagDelete(val tag: Tag, val usageCount: Long) : HomeSideEffect()
+}

@@ -33,7 +33,7 @@ inline fun NavigationEffectReceiver(
     crossinline onNavigationMessageReceived: (NavigationMessage) -> Unit
 ): NavigationEffectReceiver = object : NavigationEffectReceiver {
     override fun register(navigationEffect: NavigationEffect) {
-        navigationEffect.event
+        navigationEffect.sideEffect
             .flowWithLifecycle(lifecycleOwner().lifecycle)
             .onEach { onNavigationMessageReceived(it) }
             .launchIn(lifecycleOwner().lifecycleScope)

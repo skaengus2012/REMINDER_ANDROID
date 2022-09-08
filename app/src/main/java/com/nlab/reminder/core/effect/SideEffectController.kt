@@ -14,20 +14,23 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.effect.util
+package com.nlab.reminder.core.effect
 
-import com.nlab.reminder.core.effect.DeprecatedSideEffect
-import com.nlab.reminder.core.effect.impl.DefaultSideEffect
-import com.nlab.reminder.core.effect.impl.SideEffectDelegate
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.withContext
 
 /**
- * @author Doohyun
+ * @author thalys
  */
-@Suppress("FunctionName")
-fun <T : DeprecatedSideEffect.Message> sideEffect(
-    eventChannel: Channel<T> = Channel(Channel.BUFFERED),
-    dispatcher: CoroutineDispatcher = Dispatchers.Main
-) = SideEffectDelegate(DefaultSideEffect(eventChannel, dispatcher))
+class SideEffectController<T : SideEffect> internal constructor(
+    private val channel: Channel<T>,
+    private val dispatcher: CoroutineDispatcher
+) : SideEffectReceiver<T>, SideEffectSender<T> {
+    override val sideEffect: Flow<T> = channel.receiveAsFlow()
+    override suspend fun post(sideEffect: T) = withContext(dispatcher) {
+        channel.send(sideEffect)
+    }
+}

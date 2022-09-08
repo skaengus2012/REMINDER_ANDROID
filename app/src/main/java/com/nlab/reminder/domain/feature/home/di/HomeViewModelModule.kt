@@ -16,11 +16,15 @@
 
 package com.nlab.reminder.domain.feature.home.di
 
+import com.nlab.reminder.core.effect.SideEffectController
+import com.nlab.reminder.core.effect.SideEffectReceiver
+import com.nlab.reminder.core.effect.util.SideEffectController
 import com.nlab.reminder.domain.feature.home.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
+import dagger.hilt.android.scopes.ViewModelScoped
 
 /**
  * @author Doohyun
@@ -28,11 +32,27 @@ import dagger.hilt.android.components.ViewModelComponent
 @Module
 @InstallIn(ViewModelComponent::class)
 class HomeViewModelModule {
+    @ViewModelScoped
     @Provides
-    fun provideHomeStateMachineFactory(
+    fun provideHomeSideEffectController(): SideEffectController<HomeSideEffect> = SideEffectController()
+
+    @Provides
+    fun provideHomeSideEffectReceiver(
+        controller: SideEffectController<HomeSideEffect>
+    ): SideEffectReceiver<HomeSideEffect> = controller
+
+    @Provides
+    fun provideHomeStateMachine(
+        homeSideEffect: SideEffectController<HomeSideEffect>,
         getHomeSummary: GetHomeSummaryUseCase,
         getTagUsageCount: GetTagUsageCountUseCase,
         modifyTagName: ModifyTagNameUseCase,
-        deleteTag: DeleteTagUseCase,
-    ): HomeStateMachineFactory = HomeStateMachineFactory(getHomeSummary, getTagUsageCount, modifyTagName, deleteTag)
+        deleteTag: DeleteTagUseCase
+    ): HomeStateMachine = HomeStateMachine(
+        homeSideEffect,
+        getHomeSummary,
+        getTagUsageCount,
+        modifyTagName,
+        deleteTag
+    )
 }

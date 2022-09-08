@@ -37,24 +37,24 @@ import kotlin.coroutines.ContinuationInterceptor
     ExperimentalCoroutinesApi::class,
     DelicateCoroutinesApi::class
 )
-class SideEffectImplTest {
+class SideEffectControllerTest {
     @Test
-    fun `channel send when sideEffect sent message`() = runTest {
-        val message = TestSideEffectMessage(genBoolean())
-        val channel: Channel<TestSideEffectMessage> = mock()
+    fun `channel send when controller sent sideEffect`() = runTest {
+        val message = TestSideEffect(genBoolean())
+        val channel: Channel<TestSideEffect> = mock()
 
-        SideEffectImpl(channel, Dispatchers.Default).send(message)
+        SideEffectController(channel, Dispatchers.Default).post(message)
         verify(channel, once()).send(message)
     }
 
     @Test
-    fun `sent message on single dispatcher`() = runTest {
+    fun `sent sideEffect on single dispatcher`() = runTest {
         val testDispatcher = newSingleThreadContext("SingleDispatcher")
-        val message = TestSideEffectMessage(genBoolean())
-        val channel: Channel<TestSideEffectMessage> = Channel(Channel.UNLIMITED)
+        val message = TestSideEffect(genBoolean())
+        val channel: Channel<TestSideEffect> = Channel(Channel.UNLIMITED)
         val isContextEquals = CompletableDeferred<Boolean>()
-        val fakeChannel: Channel<TestSideEffectMessage> = object : Channel<TestSideEffectMessage> by channel {
-            override suspend fun send(element: TestSideEffectMessage) {
+        val fakeChannel: Channel<TestSideEffect> = object : Channel<TestSideEffect> by channel {
+            override suspend fun send(element: TestSideEffect) {
                 val curContext = coroutineScope {
                     coroutineContext[ContinuationInterceptor]
                 }
@@ -66,21 +66,21 @@ class SideEffectImplTest {
             }
         }
 
-        SideEffectImpl(fakeChannel, testDispatcher).send(message)
+        SideEffectController(fakeChannel, testDispatcher).post(message)
         assertThat(isContextEquals.await(), equalTo(true))
     }
 
     @Test
     fun `notify 100 times message after sending message 100 times`() = runTest {
         val testCount = 100
-        val sideEffect = SideEffectImpl<TestSideEffectMessage>(Channel(Channel.UNLIMITED), Dispatchers.Default)
+        val controller = SideEffectController<TestSideEffect>(Channel(Channel.UNLIMITED), Dispatchers.Default)
         (1..testCount)
-            .map { number -> launch { sideEffect.send(TestSideEffectMessage(number)) } }
+            .map { number -> launch { controller.post(TestSideEffect(number)) } }
             .joinAll()
 
         assertThat(
             withContext(Dispatchers.Default) {
-                sideEffect.message
+                controller.sideEffect
                     .take(testCount)
                     .fold(0) { acc, message -> acc + message.value as Int }
             },
