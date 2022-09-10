@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.nlab.reminder.domain.feature.home
 
 import com.nlab.reminder.core.state.Event
+import com.nlab.reminder.core.util.test.annotation.Generated
 import com.nlab.reminder.domain.common.tag.Tag
 
 /**
@@ -24,14 +24,14 @@ import com.nlab.reminder.domain.common.tag.Tag
  */
 sealed class HomeEvent private constructor() : Event {
     object Fetch : HomeEvent()
-    data class OnHomeSummaryLoaded(val homeSummary: HomeSummary) : HomeEvent()
     object OnTodayCategoryClicked : HomeEvent()
     object OnTimetableCategoryClicked : HomeEvent()
     object OnAllCategoryClicked : HomeEvent()
-    data class OnTagClicked(val tag: Tag) : HomeEvent()
-    data class OnTagLongClicked(val tag: Tag) : HomeEvent()
-    data class OnTagRenameRequestClicked(val tag: Tag) : HomeEvent()
-    data class OnTagRenameConfirmClicked(val originalTag: Tag, val renameText: String) : HomeEvent()
-    data class OnTagDeleteRequestClicked(val tag: Tag) : HomeEvent()
-    data class OnTagDeleteConfirmClicked(val tag: Tag) : HomeEvent()
+    @Generated data class OnHomeSummaryLoaded(val homeSummary: HomeSummary) : HomeEvent()
+    @Generated data class OnTagClicked(val tag: Tag) : HomeEvent()
+    @Generated data class OnTagLongClicked(val tag: Tag) : HomeEvent()
+    @Generated data class OnTagRenameRequestClicked(val tag: Tag) : HomeEvent()
+    @Generated data class OnTagRenameConfirmClicked(val originalTag: Tag, val renameText: String) : HomeEvent()
+    @Generated data class OnTagDeleteRequestClicked(val tag: Tag) : HomeEvent()
+    @Generated data class OnTagDeleteConfirmClicked(val tag: Tag) : HomeEvent()
 }

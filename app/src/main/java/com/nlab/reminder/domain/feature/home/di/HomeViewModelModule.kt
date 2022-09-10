@@ -16,11 +16,15 @@
 
 package com.nlab.reminder.domain.feature.home.di
 
+import com.nlab.reminder.core.effect.SideEffectSender
+import com.nlab.reminder.core.state.StateController
+import com.nlab.reminder.core.state.util.controlIn
 import com.nlab.reminder.domain.feature.home.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
+import kotlinx.coroutines.CoroutineScope
 
 /**
  * @author Doohyun
@@ -29,10 +33,18 @@ import dagger.hilt.android.components.ViewModelComponent
 @InstallIn(ViewModelComponent::class)
 class HomeViewModelModule {
     @Provides
-    fun provideHomeStateMachineFactory(
+    fun provideHomeStateController(
         getHomeSummary: GetHomeSummaryUseCase,
         getTagUsageCount: GetTagUsageCountUseCase,
         modifyTagName: ModifyTagNameUseCase,
-        deleteTag: DeleteTagUseCase,
-    ): HomeStateMachineFactory = HomeStateMachineFactory(getHomeSummary, getTagUsageCount, modifyTagName, deleteTag)
+        deleteTag: DeleteTagUseCase
+    ): HomeStateControllerFactory =
+        object : HomeStateControllerFactory {
+            override fun create(
+                scope: CoroutineScope,
+                homeSideEffect: SideEffectSender<HomeSideEffect>
+            ): StateController<HomeEvent, HomeState> =
+                HomeStateMachine(homeSideEffect, getHomeSummary, getTagUsageCount, modifyTagName, deleteTag)
+                    .controlIn(scope, initState = HomeState.Init, fetchEvent = HomeEvent.Fetch)
+        }
 }

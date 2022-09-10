@@ -21,6 +21,6 @@ import kotlinx.coroutines.Job
 /**
  * @author Doohyun
  */
-interface EventProcessor<E : Event> {
+sealed interface EventProcessor<E : Event> {
     fun send(event: E): Job
 }

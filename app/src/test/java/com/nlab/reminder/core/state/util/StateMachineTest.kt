@@ -16,10 +16,14 @@
 
 package com.nlab.reminder.core.state.util
 
+import com.nlab.reminder.core.state.StateController
 import com.nlab.reminder.core.state.TestEvent
 import com.nlab.reminder.core.state.TestState
+import com.nlab.reminder.test.genFlowObserveDispatcher
 import com.nlab.reminder.test.instanceOf
+import com.nlab.reminder.test.once
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.test.*
 import org.junit.Test
 import org.hamcrest.MatcherAssert.assertThat
@@ -30,12 +34,10 @@ import org.mockito.kotlin.*
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class StateMachineTest {
-    private val scope = CoroutineScope(Dispatchers.Default)
-
     @Test
-    fun `notify state1 when when state is StateInit and Action1 receives`() = runTest {
-        val stateMachine = StateMachine<TestEvent, TestState>(scope, TestState.StateInit()) {
-            updateTo { (action, old) ->
+    fun `update to state1 when state was init and testAction1 sent`() = runTest {
+        val stateMachine = StateMachine<TestEvent, TestState> {
+            update { (action, old) ->
                 when (action) {
                     is TestEvent.Event1 -> {
                         if (old is TestState.StateInit) TestState.State1()
@@ -45,37 +47,30 @@ class StateMachineTest {
                 }
             }
         }
-
-        stateMachine
+        val stateController = stateMachine.controlIn(CoroutineScope(Dispatchers.Default), TestState.StateInit())
+        stateController
             .send(TestEvent.Event1())
             .join()
         assertThat(
-            stateMachine.state.value,
+            stateController.state.value,
             instanceOf(TestState.State1::class)
         )
     }
 
     @Test
-    fun `invoked testAction1, testAction2 when stateMachine send TestAction1, TestAction2`() = runTest {
-        val testEvent1: (UpdateSource<TestEvent.Event1, TestState>) -> Unit = mock()
-        val testEvent2: (UpdateSource<TestEvent.Event2, TestState>) -> Unit = mock()
-        val stateMachine = StateMachine<TestEvent, TestState>(scope, TestState.StateInit()) {
-            sideEffectBy { testEvent1(it) }
-            sideEffectBy { testEvent2(it) }
+    fun `sent testAction1 by fetching when stateController state started publish`() = runTest {
+        val action: () -> Unit = mock()
+        val stateMachine = StateMachine<TestEvent, TestState> {
+            update { TestState.State1() }
+            handle { action() }
         }
+        val controller: StateController<TestEvent, TestState> =
+            stateMachine.controlIn(CoroutineScope(Dispatchers.Unconfined), TestState.StateInit(), TestEvent.Event1())
+        verify(action, never())()
+        assertThat(controller.state.value, instanceOf(TestState.StateInit::class))
 
-        repeat(2) {
-            stateMachine
-                .send(TestEvent.Event1())
-                .join()
-        }
-
-        repeat(3) {
-            stateMachine
-                .send(TestEvent.Event2())
-                .join()
-        }
-        verify(testEvent1, times(2))(any())
-        verify(testEvent2, times(3))(any())
+        controller.state.launchIn(genFlowObserveDispatcher())
+        verify(action, once())()
+        assertThat(controller.state.value, instanceOf(TestState.State1::class))
     }
 }

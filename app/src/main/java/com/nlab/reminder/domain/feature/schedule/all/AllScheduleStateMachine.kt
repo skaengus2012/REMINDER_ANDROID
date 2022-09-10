@@ -16,24 +16,18 @@
 
 package com.nlab.reminder.domain.feature.schedule.all
 
-import com.nlab.reminder.core.state.StateMachine
 import com.nlab.reminder.core.state.util.StateMachine
 import com.nlab.reminder.domain.common.schedule.UpdateCompleteUseCase
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
-
-typealias AllScheduleStateMachine = StateMachine<AllScheduleEvent, AllScheduleState>
 
 /**
  * @author Doohyun
  */
+@Suppress("FunctionName")
 fun AllScheduleStateMachine(
-    scope: CoroutineScope,
-    initState: AllScheduleState,
     getAllScheduleReport: GetAllScheduleReportUseCase,
     updateScheduleComplete: UpdateCompleteUseCase
-): AllScheduleStateMachine = StateMachine(scope, initState) {
-    updateTo { (event, state) ->
+): StateMachine<AllScheduleEvent, AllScheduleState> = StateMachine {
+    update { (event, state) ->
         when (event) {
             is AllScheduleEvent.Fetch -> {
                 if (state is AllScheduleState.Init) AllScheduleState.Loading
@@ -47,11 +41,11 @@ fun AllScheduleStateMachine(
         }
     }
 
-    sideEffectOn<AllScheduleEvent.Fetch, AllScheduleState.Init> {
-        scope.launch { getAllScheduleReport().collect { send(AllScheduleEvent.AllScheduleReportLoaded(it)) } }
+    handleOn<AllScheduleEvent.Fetch, AllScheduleState.Init> {
+        getAllScheduleReport().collect { send(AllScheduleEvent.AllScheduleReportLoaded(it)) }
     }
 
-    sideEffectOn<AllScheduleEvent.OnScheduleCompleteUpdateClicked, AllScheduleState.Loaded> { (event) ->
-        scope.launch { updateScheduleComplete(event.scheduleId, event.isComplete) }
+    handleOn<AllScheduleEvent.OnScheduleCompleteUpdateClicked, AllScheduleState.Loaded> { (event) ->
+        updateScheduleComplete(event.scheduleId, event.isComplete)
     }
 }

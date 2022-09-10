@@ -18,13 +18,10 @@ package com.nlab.reminder.domain.feature.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nlab.reminder.core.effect.message.navigation.NavigationEffect
-import com.nlab.reminder.core.effect.message.navigation.SendNavigationEffect
-import com.nlab.reminder.core.effect.util.sideEffect
-import com.nlab.reminder.core.state.util.fetchedFlow
+import com.nlab.reminder.core.effect.util.SideEffectController
+import com.nlab.reminder.core.effect.util.asReceived
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
 /**
@@ -32,16 +29,12 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    stateMachineFactory: HomeStateMachineFactory
+    stateControllerFactory: HomeStateControllerFactory
 ) : ViewModel() {
-    private val _navigationEffect: SendNavigationEffect by sideEffect()
-    private val stateMachine: HomeStateMachine = stateMachineFactory.create(viewModelScope, _navigationEffect)
+    private val sideEffectController = SideEffectController<HomeSideEffect>()
+    private val stateController = stateControllerFactory.create(viewModelScope, sideEffectController)
 
-    val navigationEffect: NavigationEffect = _navigationEffect
-    val state: StateFlow<HomeState> =
-        stateMachine
-            .state
-            .fetchedFlow(viewModelScope, onFetch = { invoke(HomeEvent.Fetch) })
-
-    fun invoke(event: HomeEvent): Job = stateMachine.send(event)
+    val homeSideEffect = sideEffectController.asReceived()
+    val state = stateController.state
+    fun invoke(event: HomeEvent): Job = stateController.send(event)
 }

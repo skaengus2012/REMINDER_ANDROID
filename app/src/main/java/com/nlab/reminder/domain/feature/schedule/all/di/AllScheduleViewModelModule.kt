@@ -16,17 +16,19 @@
 
 package com.nlab.reminder.domain.feature.schedule.all.di
 
+import com.nlab.reminder.core.state.StateController
+import com.nlab.reminder.core.state.util.controlIn
 import com.nlab.reminder.domain.common.schedule.DoneScheduleShownRepository
 import com.nlab.reminder.domain.common.schedule.ScheduleRepository
 import com.nlab.reminder.domain.common.schedule.ScheduleUiStateFlowFactory
 import com.nlab.reminder.domain.common.schedule.UpdateCompleteUseCase
-import com.nlab.reminder.domain.feature.schedule.all.AllScheduleScope
-import com.nlab.reminder.domain.feature.schedule.all.AllScheduleStateMachineFactory
+import com.nlab.reminder.domain.feature.schedule.all.*
 import com.nlab.reminder.domain.feature.schedule.all.impl.DefaultGetAllScheduleReportUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 
 /**
@@ -41,13 +43,19 @@ class AllScheduleViewModelModule {
         scheduleUiStateFlowFactory: ScheduleUiStateFlowFactory,
         updateCompleteUseCase: UpdateCompleteUseCase,
         @AllScheduleScope doneScheduleShownRepository: DoneScheduleShownRepository
-    ): AllScheduleStateMachineFactory = AllScheduleStateMachineFactory(
-        getAllScheduleReport = DefaultGetAllScheduleReportUseCase(
-            doneScheduleShownRepository,
-            scheduleRepository,
-            scheduleUiStateFlowFactory,
-            dispatcher = Dispatchers.Default
-        ),
-        updateScheduleComplete = updateCompleteUseCase
-    )
+    ): AllScheduleStateControllerFactory =
+        object : AllScheduleStateControllerFactory {
+            override fun create(scope: CoroutineScope): StateController<AllScheduleEvent, AllScheduleState> {
+                val stateMachine = AllScheduleStateMachine(
+                    getAllScheduleReport = DefaultGetAllScheduleReportUseCase(
+                        doneScheduleShownRepository,
+                        scheduleRepository,
+                        scheduleUiStateFlowFactory,
+                        dispatcher = Dispatchers.Default
+                    ),
+                    updateScheduleComplete = updateCompleteUseCase
+                )
+                return stateMachine.controlIn(scope, AllScheduleState.Init, fetchEvent = AllScheduleEvent.Fetch)
+            }
+        }
 }

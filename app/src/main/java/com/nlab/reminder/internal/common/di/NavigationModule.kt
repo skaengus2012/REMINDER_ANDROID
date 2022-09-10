@@ -16,11 +16,11 @@
 
 package com.nlab.reminder.internal.common.di
 
+import androidx.navigation.NavController
 import com.nlab.reminder.R
-import com.nlab.reminder.core.effect.message.navigation.android.NavigationMediator
-import com.nlab.reminder.core.effect.message.navigation.android.util.NavigationMediator
-import com.nlab.reminder.domain.common.effect.message.navigation.*
-import com.nlab.reminder.domain.common.effect.message.navigation.android.runner.*
+import com.nlab.reminder.core.android.navigation.navcontroller.condition
+import com.nlab.reminder.core.android.navigation.util.NavigationTable
+import com.nlab.reminder.domain.common.android.navigation.AllScheduleEndNavigation
 import dagger.Module
 import dagger.Provides
 import dagger.Reusable
@@ -35,26 +35,9 @@ import dagger.hilt.components.SingletonComponent
 class NavigationModule {
     @Reusable
     @Provides
-    fun provideFragmentNavigateUseCase(
-        navigateTodayEnd: TodayEndNavigationEffectRunner,
-        navigateTimeTable: TimetableEndNavigationEffectRunner,
-        navigateTagEnd: TagEndNavigationEffectRunner
-    ): NavigationMediator = NavigationMediator { navController, message ->
-        when (message) {
-            is TodayEndNavigationMessage -> navigateTodayEnd(navController)
-            is TimetableEndNavigationMessage -> navigateTimeTable(navController)
-            is AllEndNavigationMessage -> navController.navigate(R.id.action_global_allScheduleFragment)
-            is TagEndNavigationMessage -> navigateTagEnd(navController, message.tag)
-            else -> Unit
+    fun provideNavControllerTable(): NavigationTable<NavController> = NavigationTable {
+        condition<AllScheduleEndNavigation> { (handler: NavController) ->
+            handler.navigate(R.id.action_global_allScheduleFragment)
         }
     }
-
-    @Provides
-    fun provideTodayEndNavigate() = TodayEndNavigationEffectRunner()
-
-    @Provides
-    fun provideTimetableEndNavigate() = TimetableEndNavigationEffectRunner()
-
-    @Provides
-    fun provideTagEndNavigate() = TagEndNavigationEffectRunner()
 }

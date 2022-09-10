@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.nlab.reminder.domain.feature.home
 
 import com.nlab.reminder.domain.common.tag.Tag
@@ -21,6 +20,7 @@ import com.nlab.reminder.domain.common.tag.Tag
 /**
  * @author Doohyun
  */
+
 fun HomeViewModel.onTodayCategoryClicked() = invoke(HomeEvent.OnTodayCategoryClicked)
 fun HomeViewModel.onTimetableCategoryClicked() = invoke(HomeEvent.OnTimetableCategoryClicked)
 fun HomeViewModel.onAllCategoryClicked() = invoke(HomeEvent.OnAllCategoryClicked)

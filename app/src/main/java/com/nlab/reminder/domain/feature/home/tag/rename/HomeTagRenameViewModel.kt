@@ -18,9 +18,10 @@ package com.nlab.reminder.domain.feature.home.tag.rename
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nlab.reminder.core.effect.util.sideEffect
+import com.nlab.reminder.core.effect.util.SideEffectController
+import com.nlab.reminder.core.effect.util.asReceived
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.Job
 import javax.inject.Inject
 
 /**
@@ -28,16 +29,13 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class HomeTagRenameViewModel @Inject constructor(
-    stateMachineFactory: HomeTagRenameStateMachineFactory
+    stateControllerFactory: HomeTagRenameStateControllerFactory
 ) : ViewModel() {
-    private val _homeTagRenameSideEffect: SendHomeTagRenameSideEffect by sideEffect()
-    private val stateMachine: HomeTagRenameStateMachine =
-        stateMachineFactory.create(viewModelScope, _homeTagRenameSideEffect)
+    private val sideEffectController = SideEffectController<HomeTagRenameSideEffect>()
+    private val stateController = stateControllerFactory.create(viewModelScope, sideEffectController)
 
-    val homeTagRenameSideEffect: HomeTagRenameSideEffect = _homeTagRenameSideEffect
-    val state: StateFlow<HomeTagRenameState> = stateMachine.state
+    val homeTagRenameSideEffect = sideEffectController.asReceived()
+    val state = stateController.state
 
-    fun invoke(event: HomeTagRenameEvent) {
-        stateMachine.send(event)
-    }
+    fun invoke(event: HomeTagRenameEvent): Job = stateController.send(event)
 }

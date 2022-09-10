@@ -16,14 +16,14 @@
 
 package com.nlab.reminder.domain.feature.schedule.all
 
-import kotlinx.coroutines.CoroutineScope
+import com.nlab.reminder.core.state.StateController
+import com.nlab.reminder.domain.common.schedule.genSchedule
+import com.nlab.reminder.test.genBoolean
+import com.nlab.reminder.test.once
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.resetMain
-import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.*
@@ -37,6 +37,10 @@ import org.mockito.kotlin.*
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class AllScheduleViewModelTest {
+    private val sampleEvent: AllScheduleEvent =
+        AllScheduleEvent.OnScheduleCompleteUpdateClicked(genSchedule().id(), isComplete = genBoolean())
+    private val sampleState: AllScheduleState = AllScheduleState.Loaded(genAllScheduleReport())
+
     @Before
     fun setUp() {
         Dispatchers.setMain(Dispatchers.Unconfined)
@@ -48,38 +52,27 @@ class AllScheduleViewModelTest {
     }
 
     @Test
-    fun `notify event to stateMachine when viewModel event invoked`() {
-        val (viewModel, stateMachine) = genAllScheduleMockingViewModelComponent()
-        val event = AllScheduleEvent.Fetch
-        viewModel.invoke(event)
-        verify(stateMachine, times(1)).send(event)
-    }
-
-    @Test
-    fun `invoke fetch when subscribing home state`() = runTest {
-        val (viewModel, stateMachine) = genAllScheduleMockingViewModelComponent()
-        CoroutineScope(Dispatchers.Unconfined).launch { viewModel.state.collect() }
-        verify(stateMachine, times(1)).send(AllScheduleEvent.Fetch)
-    }
-
-    @Test
-    fun `Notify state when state subscribed`() = runTest {
-        val actualStates = mutableListOf<AllScheduleState>()
-        val expectedReport: AllScheduleReport = genAllScheduleReport()
-
-        val viewModel: AllScheduleViewModel = genAllScheduleViewModel(
-            getAllScheduleReport = mock {
-                whenever(mock()) doReturn flowOf(expectedReport)
+    fun `stateController send event when viewModel sent`() {
+        val stateController: StateController<AllScheduleEvent, AllScheduleState> = mock()
+        val viewModel = AllScheduleViewModel(
+            stateControllerFactory = mock {
+                whenever(mock.create(any())) doReturn stateController
             }
         )
-        CoroutineScope(Dispatchers.Unconfined).launch { viewModel.state.collect(actualStates::add) }
-        assertThat(
-            actualStates,
-            equalTo(buildList {
-                add(AllScheduleState.Init)
-                add(AllScheduleState.Loading)
-                add(AllScheduleState.Loaded(expectedReport))
-            })
+
+        viewModel.invoke(sampleEvent)
+        verify(stateController, once()).send(sampleEvent)
+    }
+
+    @Test
+    fun `notify state when stateController flow published`() {
+        val stateController: StateController<AllScheduleEvent, AllScheduleState> = mock {
+            whenever(mock.state) doReturn MutableStateFlow(sampleState)
+        }
+        val viewModel = AllScheduleViewModel(
+            stateControllerFactory = mock { whenever(mock.create(any())) doReturn stateController }
         )
+
+        assertThat(viewModel.state.value, equalTo(sampleState))
     }
 }

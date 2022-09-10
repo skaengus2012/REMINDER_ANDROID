@@ -18,8 +18,8 @@ package com.nlab.reminder.domain.feature.schedule.all
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nlab.reminder.core.state.util.fetchedFlow
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
@@ -28,16 +28,11 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class AllScheduleViewModel @Inject constructor(
-    stateMachineFactory: AllScheduleStateMachineFactory
+    stateControllerFactory: AllScheduleStateControllerFactory
 ) : ViewModel() {
-    private val stateMachine: AllScheduleStateMachine = stateMachineFactory.create(viewModelScope)
+    private val stateController = stateControllerFactory.create(viewModelScope)
 
-    val state: StateFlow<AllScheduleState> =
-        stateMachine
-            .state
-            .fetchedFlow(viewModelScope, onFetch = { invoke(AllScheduleEvent.Fetch) })
+    val state: StateFlow<AllScheduleState> = stateController.state
 
-    fun invoke(action: AllScheduleEvent) {
-        stateMachine.send(action)
-    }
+    fun invoke(action: AllScheduleEvent): Job = stateController.send(action)
 }
