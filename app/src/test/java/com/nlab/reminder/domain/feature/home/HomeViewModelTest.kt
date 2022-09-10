@@ -41,6 +41,10 @@ import org.mockito.kotlin.*
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class HomeViewModelTest {
+    private val sampleEvent: HomeEvent = HomeEvent.OnTodayCategoryClicked
+    private val sampleState: HomeState = HomeState.Loaded(genHomeSummary())
+    private val sampleEffect: HomeSideEffect = HomeSideEffect.NavigateToday
+
     @Before
     fun setup() {
         Dispatchers.setMain(Dispatchers.Unconfined)
@@ -53,7 +57,6 @@ class HomeViewModelTest {
 
     @Test
     fun `stateController send event when viewModel sent`() {
-        val event: HomeEvent = HomeEvent.OnTodayCategoryClicked
         val stateController: StateController<HomeEvent, HomeState> = mock()
         val viewModel = HomeViewModel(
             stateControllerFactory = mock {
@@ -61,13 +64,24 @@ class HomeViewModelTest {
             }
         )
 
-        viewModel.invoke(event)
-        verify(stateController, once()).send(event)
+        viewModel.invoke(sampleEvent)
+        verify(stateController, once()).send(sampleEvent)
+    }
+
+    @Test
+    fun `notify state when stateController flow published`() {
+        val stateController: StateController<HomeEvent, HomeState> = mock {
+            whenever(mock.state) doReturn MutableStateFlow(sampleState)
+        }
+        val viewModel = HomeViewModel(
+            stateControllerFactory = mock { whenever(mock.create(any(), any())) doReturn stateController }
+        )
+
+        assertThat(viewModel.state.value, equalTo(sampleState))
     }
 
     @Test
     fun `notify sideEffect when stateController invoke sideEffect`() = runTest {
-        val event: HomeEvent = HomeEvent.OnTodayCategoryClicked
         val viewModel = HomeViewModel(
             stateControllerFactory = object : HomeStateControllerFactory {
                 override fun create(
@@ -75,7 +89,7 @@ class HomeViewModelTest {
                     homeSideEffect: SideEffectSender<HomeSideEffect>
                 ): StateController<HomeEvent, HomeState> {
                     val fakeStateMachine: StateMachine<HomeEvent, HomeState> = StateMachine {
-                        handle { homeSideEffect.post(HomeSideEffect.NavigateToday) }
+                        handle { homeSideEffect.post(sampleEffect) }
                     }
                     return fakeStateMachine.controlIn(scope, HomeState.Init)
                 }
@@ -86,23 +100,7 @@ class HomeViewModelTest {
         viewModel.homeSideEffect.flow
             .onEach { sideEffectHandler() }
             .launchIn(genFlowObserveDispatcher())
-        viewModel.invoke(event).join()
+        viewModel.invoke(sampleEvent).join()
         verify(sideEffectHandler, once())()
-    }
-
-    @Test
-    fun `notify state when stateController flow published`() {
-        val expectState: HomeState = HomeState.Loaded(genHomeSummary())
-        val stateController: StateController<HomeEvent, HomeState> = mock {
-            whenever(mock.state) doReturn MutableStateFlow(expectState)
-        }
-        val viewModel = HomeViewModel(
-            stateControllerFactory = mock { whenever(mock.create(any(), any())) doReturn stateController }
-        )
-
-        assertThat(
-            viewModel.state.value,
-            equalTo(expectState)
-        )
     }
 }

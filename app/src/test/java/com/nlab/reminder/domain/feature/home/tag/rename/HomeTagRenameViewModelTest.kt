@@ -43,6 +43,10 @@ import org.mockito.kotlin.*
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class HomeTagRenameViewModelTest {
+    private val sampleEvent: HomeTagRenameEvent = HomeTagRenameEvent.OnRenameTextClearClicked
+    private val sampleState: HomeTagRenameState = genHomeTagRenameState()
+    private val sampleEffect: HomeTagRenameSideEffect = HomeTagRenameSideEffect.Cancel
+
     @Before
     fun setup() {
         Dispatchers.setMain(Dispatchers.Unconfined)
@@ -55,7 +59,6 @@ class HomeTagRenameViewModelTest {
 
     @Test
     fun `stateController send event when viewModel sent`() {
-        val event: HomeTagRenameEvent = HomeTagRenameEvent.OnRenameTextClearClicked
         val stateController: StateController<HomeTagRenameEvent, HomeTagRenameState> = mock()
         val viewModel = HomeTagRenameViewModel(
             stateControllerFactory = mock {
@@ -63,13 +66,24 @@ class HomeTagRenameViewModelTest {
             }
         )
 
-        viewModel.invoke(event)
-        verify(stateController, once()).send(event)
+        viewModel.invoke(sampleEvent)
+        verify(stateController, once()).send(sampleEvent)
+    }
+
+    @Test
+    fun `notify state when stateController flow published`() {
+        val stateController: StateController<HomeTagRenameEvent, HomeTagRenameState> = mock {
+            whenever(mock.state) doReturn MutableStateFlow(sampleState)
+        }
+        val viewModel = HomeTagRenameViewModel(
+            stateControllerFactory = mock { whenever(mock.create(any(), any())) doReturn stateController }
+        )
+
+        assertThat(viewModel.state.value, equalTo(sampleState))
     }
 
     @Test
     fun `notify sideEffect when stateController invoke sideEffect`() = runTest {
-        val event: HomeTagRenameEvent = HomeTagRenameEvent.OnCancelClicked
         val viewModel = HomeTagRenameViewModel(
             stateControllerFactory = object : HomeTagRenameStateControllerFactory {
                 override fun create(
@@ -77,7 +91,7 @@ class HomeTagRenameViewModelTest {
                     homeTagRenameSideEffect: SideEffectSender<HomeTagRenameSideEffect>
                 ): StateController<HomeTagRenameEvent, HomeTagRenameState> {
                     val fakeStateMachine: StateMachine<HomeTagRenameEvent, HomeTagRenameState> = StateMachine {
-                        handle { homeTagRenameSideEffect.post(HomeTagRenameSideEffect.Cancel) }
+                        handle { homeTagRenameSideEffect.post(sampleEffect) }
                     }
                     return fakeStateMachine.controlIn(scope, genHomeTagRenameState())
                 }
@@ -88,23 +102,7 @@ class HomeTagRenameViewModelTest {
         viewModel.homeTagRenameSideEffect.flow
             .onEach { sideEffectHandler() }
             .launchIn(genFlowObserveDispatcher())
-        viewModel.invoke(event).join()
+        viewModel.invoke(sampleEvent).join()
         verify(sideEffectHandler, once())()
-    }
-
-    @Test
-    fun `notify state when stateController flow published`() {
-        val expectState: HomeTagRenameState = genHomeTagRenameState()
-        val stateController: StateController<HomeTagRenameEvent, HomeTagRenameState> = mock {
-            whenever(mock.state) doReturn MutableStateFlow(expectState)
-        }
-        val viewModel = HomeTagRenameViewModel(
-            stateControllerFactory = mock { whenever(mock.create(any(), any())) doReturn stateController }
-        )
-
-        assertThat(
-            viewModel.state.value,
-            equalTo(expectState)
-        )
     }
 }

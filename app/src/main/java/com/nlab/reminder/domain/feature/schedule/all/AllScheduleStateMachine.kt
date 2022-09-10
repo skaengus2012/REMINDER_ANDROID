@@ -19,15 +19,14 @@ package com.nlab.reminder.domain.feature.schedule.all
 import com.nlab.reminder.core.state.util.StateMachine
 import com.nlab.reminder.domain.common.schedule.UpdateCompleteUseCase
 
-typealias AllScheduleStateMachine = StateMachine<AllScheduleEvent, AllScheduleState>
-
 /**
  * @author Doohyun
  */
+@Suppress("FunctionName")
 fun AllScheduleStateMachine(
     getAllScheduleReport: GetAllScheduleReportUseCase,
     updateScheduleComplete: UpdateCompleteUseCase
-): AllScheduleStateMachine = StateMachine {
+): StateMachine<AllScheduleEvent, AllScheduleState> = StateMachine {
     update { (event, state) ->
         when (event) {
             is AllScheduleEvent.Fetch -> {

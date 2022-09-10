@@ -27,7 +27,6 @@ import javax.inject.Inject
 /**
  * @author Doohyun
  */
-// TODO apply new viewEffect and make test  https://github.com/skaengus2012/REMINDER_ANDROID/issues/51
 @HiltViewModel
 class HomeTagRenameViewModel @Inject constructor(
     stateControllerFactory: HomeTagRenameStateControllerFactory

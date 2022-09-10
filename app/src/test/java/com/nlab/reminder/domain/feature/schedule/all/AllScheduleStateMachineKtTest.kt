@@ -16,6 +16,7 @@
 
 package com.nlab.reminder.domain.feature.schedule.all
 
+import com.nlab.reminder.core.state.util.StateMachine
 import com.nlab.reminder.core.state.util.controlIn
 import com.nlab.reminder.domain.common.schedule.Schedule
 import com.nlab.reminder.domain.common.schedule.UpdateCompleteUseCase
@@ -51,7 +52,7 @@ class AllScheduleStateMachineKtTest {
     private fun genStateMachine(
         getAllScheduleReport: GetAllScheduleReportUseCase = mock { onBlocking { mock() } doReturn emptyFlow() },
         updateScheduleComplete: UpdateCompleteUseCase = mock()
-    ): AllScheduleStateMachine = AllScheduleStateMachine(
+    ): StateMachine<AllScheduleEvent, AllScheduleState> = AllScheduleStateMachine(
         getAllScheduleReport,
         updateScheduleComplete
     )
