@@ -21,7 +21,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import com.nlab.reminder.R
 import com.nlab.reminder.core.android.fragment.viewLifecycleScope
@@ -64,7 +63,7 @@ class HomeTagConfigDialogFragment : DialogFragment() {
             .throttleClicks()
             .map { HomeTagConfigResult(args.tag, isRenameRequested = false, isDeleteRequested = true) }
             .onEach { result -> popBackStackWithResult(args.requestKey, result) }
-            .launchIn(viewLifecycleOwner.lifecycleScope)
+            .launchIn(viewLifecycleScope)
     }
 
     override fun onDestroyView() {
