@@ -27,7 +27,7 @@ import com.nlab.reminder.R
 import com.nlab.reminder.core.android.fragment.viewLifecycleScope
 import com.nlab.reminder.core.android.view.throttleClicks
 import com.nlab.reminder.databinding.FragmentHomeTagConfigDialogBinding
-import com.nlab.reminder.domain.common.android.fragment.sendResultAndDismiss
+import com.nlab.reminder.domain.common.android.fragment.popBackStackWithResult
 import com.nlab.reminder.domain.feature.home.view.HomeTagConfigResult
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -57,13 +57,13 @@ class HomeTagConfigDialogFragment : DialogFragment() {
         binding.renameButton
             .throttleClicks()
             .map { HomeTagConfigResult(args.tag, isRenameRequested = true, isDeleteRequested = false) }
-            .onEach { result -> sendResultAndDismiss(args.requestKey, result) }
+            .onEach { result -> popBackStackWithResult(args.requestKey, result) }
             .launchIn(viewLifecycleScope)
 
         binding.deleteButton
             .throttleClicks()
             .map { HomeTagConfigResult(args.tag, isRenameRequested = false, isDeleteRequested = true) }
-            .onEach { result -> sendResultAndDismiss(args.requestKey, result) }
+            .onEach { result -> popBackStackWithResult(args.requestKey, result) }
             .launchIn(viewLifecycleOwner.lifecycleScope)
     }
 

@@ -33,7 +33,7 @@ import com.nlab.reminder.core.android.fragment.viewLifecycleScope
 import com.nlab.reminder.core.android.view.clicks
 import com.nlab.reminder.core.android.view.textChanged
 import com.nlab.reminder.databinding.FragmentHomeTagRenameDialogBinding
-import com.nlab.reminder.domain.common.android.fragment.sendResultAndDismiss
+import com.nlab.reminder.domain.common.android.fragment.popBackStackWithResult
 import com.nlab.reminder.domain.common.tag.Tag
 import com.nlab.reminder.domain.feature.home.tag.rename.*
 import dagger.hilt.android.AndroidEntryPoint
@@ -124,7 +124,7 @@ class HomeTagRenameDialogFragment : DialogFragment() {
     }
 
     private fun receiveSideEffect(message: HomeTagRenameSideEffectMessage) {
-        sendResultAndDismiss(args.requestKey,
+        popBackStackWithResult(args.requestKey,
             result = when (message) {
                 is HomeTagRenameSideEffectMessage.Cancel -> bundleOf(
                     RESULT_TYPE to RESULT_TYPE_CANCEL_REQUEST,

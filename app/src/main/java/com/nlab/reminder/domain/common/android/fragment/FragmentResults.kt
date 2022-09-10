@@ -28,9 +28,10 @@ import kotlinx.coroutines.flow.mapNotNull
  * @author Doohyun
  */
 internal const val RESULT_VALUE = "fragmentResult"
-fun DialogFragment.sendResultAndDismiss(requestKey: String, result: Parcelable) {
-    findNavController().popBackStack()
+
+fun Fragment.popBackStackWithResult(requestKey: String, result: Parcelable) {
     setFragmentResult(requestKey, bundleOf(RESULT_VALUE to result))
+    findNavController().popBackStack()
 }
 
 fun <T : Parcelable> Fragment.resultReceives(requestKey: String): Flow<T> =

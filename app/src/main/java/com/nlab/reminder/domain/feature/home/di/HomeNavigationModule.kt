@@ -51,7 +51,7 @@ class HomeNavigationModule {
         }
         condition<HomeTagDeleteNavigation> { (navController, navigation) ->
             HomeFragmentDirections
-                .actionHomeFragmentToHomeTagRenameDialogFragment(
+                .actionHomeFragmentToHomeTagDeleteDialogFragment(
                     navigation.requestKey,
                     navigation.tag,
                     navigation.usageCount

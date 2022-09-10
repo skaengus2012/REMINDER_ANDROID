@@ -20,13 +20,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.nlab.reminder.R
+import com.nlab.reminder.core.android.fragment.viewLifecycleScope
 import com.nlab.reminder.core.android.view.throttleClicks
 import com.nlab.reminder.databinding.FragmentHomeTagDeleteDialogBinding
-import com.nlab.reminder.domain.common.android.fragment.sendResultAndDismiss
+import com.nlab.reminder.domain.common.android.fragment.popBackStackWithResult
 import com.nlab.reminder.domain.feature.home.view.HomeTagDeleteResult
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -58,15 +58,17 @@ class HomeTagDeleteDialogFragment : BottomSheetDialogFragment() {
             )
         }
 
-        binding.cancelButton.throttleClicks()
+        binding.cancelButton
+            .throttleClicks()
             .map { HomeTagDeleteResult(args.tag, isConfirmed = false) }
-            .onEach { result -> sendResultAndDismiss(args.requestKey, result) }
-            .launchIn(viewLifecycleOwner.lifecycleScope)
+            .onEach { result -> popBackStackWithResult(args.requestKey, result) }
+            .launchIn(viewLifecycleScope)
 
-        binding.confirmButton.throttleClicks()
+        binding.confirmButton
+            .throttleClicks()
             .map { HomeTagDeleteResult(args.tag, isConfirmed = true) }
-            .onEach { result -> sendResultAndDismiss(args.requestKey, result) }
-            .launchIn(viewLifecycleOwner.lifecycleScope)
+            .onEach { result -> popBackStackWithResult(args.requestKey, result) }
+            .launchIn(viewLifecycleScope)
     }
 
     override fun onDestroyView() {
