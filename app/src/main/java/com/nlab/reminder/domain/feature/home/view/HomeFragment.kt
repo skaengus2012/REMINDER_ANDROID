@@ -24,6 +24,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import com.nlab.reminder.core.android.fragment.viewLifecycle
+import com.nlab.reminder.core.android.fragment.viewLifecycleScope
 import com.nlab.reminder.core.android.navigation.NavigationController
 import com.nlab.reminder.databinding.FragmentHomeBinding
 import com.nlab.reminder.domain.common.android.fragment.handleSideEffect
@@ -122,21 +124,21 @@ class HomeFragment : Fragment() {
 
         viewModel.state
             .filterIsInstance<HomeState.Init>()
-            .flowWithLifecycle(viewLifecycleOwner.lifecycle)
+            .flowWithLifecycle(viewLifecycle)
             .distinctUntilChanged()
             .onEach { renderWhenInit() }
-            .launchIn(viewLifecycleOwner.lifecycleScope)
+            .launchIn(viewLifecycleScope)
 
         viewModel.state
             .filterIsInstance<HomeState.Loading>()
-            .flowWithLifecycle(viewLifecycleOwner.lifecycle)
+            .flowWithLifecycle(viewLifecycle)
             .distinctUntilChanged()
             .onEach { renderWhenLoading() }
-            .launchIn(viewLifecycleOwner.lifecycleScope)
+            .launchIn(viewLifecycleScope)
 
         viewModel.state
             .filterIsInstance<HomeState.Loaded>()
-            .flowWithLifecycle(viewLifecycleOwner.lifecycle)
+            .flowWithLifecycle(viewLifecycle)
             .distinctUntilChanged()
             .map { state ->
                 state.toHomeItems(
@@ -149,7 +151,7 @@ class HomeFragment : Fragment() {
             }
             .flowOn(Dispatchers.Default)
             .onEach { homeListItem -> renderWhenLoaded(homeListItem) }
-            .launchIn(viewLifecycleOwner.lifecycleScope)
+            .launchIn(viewLifecycleScope)
     }
 
     private fun renderWhenInit() {
