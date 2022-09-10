@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.nlab.reminder.domain.feature.home
 
 import com.nlab.reminder.core.effect.SideEffect
+import com.nlab.reminder.core.util.test.annotation.Generated
 import com.nlab.reminder.domain.common.tag.Tag
 
 /**
@@ -26,8 +26,8 @@ sealed class HomeSideEffect : SideEffect {
     object NavigateToday : HomeSideEffect()
     object NavigateTimetable : HomeSideEffect()
     object NavigateAllSchedule : HomeSideEffect()
-    data class NavigateTag(val tag: Tag) : HomeSideEffect()
-    data class NavigateTagConfig(val tag: Tag) : HomeSideEffect()
-    data class NavigateTagRename(val tag: Tag, val usageCount: Long) : HomeSideEffect()
-    data class NavigateTagDelete(val tag: Tag, val usageCount: Long) : HomeSideEffect()
+    @Generated data class NavigateTag(val tag: Tag) : HomeSideEffect()
+    @Generated data class NavigateTagConfig(val tag: Tag) : HomeSideEffect()
+    @Generated data class NavigateTagRename(val tag: Tag, val usageCount: Long) : HomeSideEffect()
+    @Generated data class NavigateTagDelete(val tag: Tag, val usageCount: Long) : HomeSideEffect()
 }

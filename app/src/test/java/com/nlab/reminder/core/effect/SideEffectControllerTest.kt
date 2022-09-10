@@ -80,7 +80,7 @@ class SideEffectControllerTest {
 
         assertThat(
             withContext(Dispatchers.Default) {
-                controller.sideEffect
+                controller.flow
                     .take(testCount)
                     .fold(0) { acc, message -> acc + message.value as Int }
             },

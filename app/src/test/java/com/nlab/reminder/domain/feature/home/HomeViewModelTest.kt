@@ -16,59 +16,31 @@
 
 package com.nlab.reminder.domain.feature.home
 
-import com.nlab.reminder.domain.common.effect.message.navigation.AllEndNavigationMessage
-import com.nlab.reminder.domain.common.effect.message.navigation.TagEndNavigationMessage
-import com.nlab.reminder.domain.common.effect.message.navigation.TimetableEndNavigationMessage
-import com.nlab.reminder.domain.common.effect.message.navigation.TodayEndNavigationMessage
-import com.nlab.reminder.domain.common.tag.Tag
-import com.nlab.reminder.domain.common.tag.genTag
-import com.nlab.reminder.test.genBothify
-import com.nlab.reminder.test.genLong
+import com.nlab.reminder.core.effect.SideEffectSender
+import com.nlab.reminder.core.state.StateController
+import com.nlab.reminder.core.state.util.StateMachine
+import com.nlab.reminder.core.state.util.controlIn
+import com.nlab.reminder.test.genFlowObserveDispatcher
+import com.nlab.reminder.test.once
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import org.junit.Before
-import org.junit.Test
-import org.mockito.kotlin.*
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.After
+import org.junit.Before
+import org.junit.Test
+import org.mockito.kotlin.*
 
 /**
  * @author Doohyun
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class HomeViewModelTest {
-    /**
-    private fun createMockingViewModelComponent(
-        state: MutableStateFlow<HomeState> = MutableStateFlow(HomeState.Init)
-    ): Triple<HomeViewModel, HomeStateMachine, HomeStateMachineFactory> {
-        val stateMachine: HomeStateMachine = mock { whenever(mock.state) doReturn state }
-        val stateMachineFactory: HomeStateMachineFactory = mock {
-            whenever(
-                mock.create(
-                    scope = any(),
-                    navigationEffect = any()
-                )
-            ) doReturn stateMachine
-        }
-
-        val viewModel = HomeViewModel(stateMachineFactory)
-        return Triple(viewModel, stateMachine, stateMachineFactory)
-    }
-
-    private fun createViewModel(
-        getHomeSummary: GetHomeSummaryUseCase = mock(),
-        getTagUsageCount: GetTagUsageCountUseCase = mock(),
-        modifyTagName: ModifyTagNameUseCase = mock(),
-        deleteTag: DeleteTagUseCase = mock(),
-        initState: HomeState = HomeState.Init
-    ): HomeViewModel = HomeViewModel(
-        HomeStateMachineFactory(getHomeSummary, getTagUsageCount, modifyTagName, deleteTag, initState)
-    )
-
     @Before
     fun setup() {
         Dispatchers.setMain(Dispatchers.Unconfined)
@@ -80,90 +52,57 @@ class HomeViewModelTest {
     }
 
     @Test
-    fun `notify event to stateMachine when viewModel event invoked`() {
-        val (viewModel, stateMachine) = createMockingViewModelComponent()
-        val event = HomeEvent.Fetch
+    fun `stateController send event when viewModel sent`() {
+        val event: HomeEvent = HomeEvent.OnTodayCategoryClicked
+        val stateController: StateController<HomeEvent, HomeState> = mock()
+        val viewModel = HomeViewModel(
+            stateControllerFactory = mock {
+                whenever(mock.create(any(), any())) doReturn stateController
+            }
+        )
+
         viewModel.invoke(event)
-        verify(stateMachine, times(1)).send(event)
+        verify(stateController, once()).send(event)
     }
 
     @Test
-    fun `invoke fetch when subscribing home state`() = runTest {
-        val (viewModel, stateMachine) = createMockingViewModelComponent()
-        CoroutineScope(Dispatchers.Unconfined).launch { viewModel.state.collect() }
-        verify(stateMachine, times(1)).send(HomeEvent.Fetch)
-    }
-
-    @Test
-    fun `Notify state when state subscribed`() = runTest {
-        val actualHomeStates = mutableListOf<HomeState>()
-        val expectedSummary: HomeSummary = genHomeSummary()
-
-        val viewModel: HomeViewModel = createViewModel(
-            getHomeSummary = mock {
-                whenever(mock()) doReturn flowOf(expectedSummary)
+    fun `notify sideEffect when stateController invoke sideEffect`() = runTest {
+        val event: HomeEvent = HomeEvent.OnTodayCategoryClicked
+        val viewModel = HomeViewModel(
+            stateControllerFactory = object : HomeStateControllerFactory {
+                override fun create(
+                    scope: CoroutineScope,
+                    homeSideEffect: SideEffectSender<HomeSideEffect>
+                ): StateController<HomeEvent, HomeState> {
+                    val fakeStateMachine: StateMachine<HomeEvent, HomeState> = StateMachine {
+                        sideEffect { homeSideEffect.post(HomeSideEffect.NavigateToday) }
+                    }
+                    return fakeStateMachine.controlIn(scope, HomeState.Init)
+                }
             }
         )
-        CoroutineScope(Dispatchers.Unconfined).launch { viewModel.state.collect(actualHomeStates::add) }
-        assertThat(
-            actualHomeStates,
-            equalTo(buildList {
-                add(HomeState.Init)
-                add(HomeState.Loading)
-                add(HomeState.Loaded(expectedSummary))
-            })
-        )
+        val sideEffectHandler: () -> Unit = mock()
+
+        viewModel.homeSideEffect.flow
+            .onEach { sideEffectHandler() }
+            .launchIn(genFlowObserveDispatcher())
+        viewModel.invoke(event).join()
+        verify(sideEffectHandler, once())()
     }
 
     @Test
-    fun `notify navigation message when navigation event invoked`() = runTest {
-        val testUsageCount: Long = genLong()
-        val testTag: Tag = genTag()
-        val viewModel: HomeViewModel = createViewModel(
-            initState = HomeState.Loaded(genHomeSummary()),
-            getTagUsageCount = mock {
-                whenever(mock(testTag)) doReturn testUsageCount
-            }
+    fun `notify state when stateController flow published`() {
+        val expectState: HomeState = HomeState.Loaded(genHomeSummary())
+        val stateController: StateController<HomeEvent, HomeState> = mock {
+            whenever(mock.state) doReturn MutableStateFlow(expectState)
+        }
+        val viewModel = HomeViewModel(
+            stateControllerFactory = mock { whenever(mock.create(any(), any())) doReturn stateController }
         )
 
-        viewModel.onTodayCategoryClicked()
-        viewModel.onTimetableCategoryClicked()
-        viewModel.onAllCategoryClicked()
-        viewModel.onTagClicked(testTag)
-        viewModel.onTagLongClicked(testTag)
-        viewModel.onTagRenameRequestClicked(testTag)
-        viewModel.onTagDeleteRequestClicked(testTag)
         assertThat(
-            viewModel.navigationEffect
-                .event
-                .take(7)
-                .toList(),
-            equalTo(
-                listOf(
-                    TodayEndNavigationMessage,
-                    TimetableEndNavigationMessage,
-                    AllEndNavigationMessage,
-                    TagEndNavigationMessage(testTag),
-                    HomeTagConfigNavigationMessage(testTag),
-                    HomeTagRenameNavigationMessage(testTag, testUsageCount),
-                    HomeTagDeleteNavigationMessage(testTag, testUsageCount)
-                )
-            )
+            viewModel.state.value,
+            equalTo(expectState)
         )
     }
-
-    @Test
-    fun testExtraExtensions() {
-        val renameText = genBothify()
-        val testTag: Tag = genTag()
-        val (viewModel, stateMachine) = createMockingViewModelComponent()
-
-        viewModel.onTagRenameConfirmClicked(testTag, renameText)
-        viewModel.onTagDeleteConfirmClicked(testTag)
-
-        verify(stateMachine, times(1))
-            .send(HomeEvent.OnTagRenameConfirmClicked(testTag, renameText))
-        verify(stateMachine, times(1))
-            .send(HomeEvent.OnTagDeleteConfirmClicked(testTag))
-    }*/
 }

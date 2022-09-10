@@ -32,7 +32,7 @@ inline fun <S : SideEffect> Fragment.handleSideEffect(
     sideEffectReceiver: SideEffectReceiver<S>,
     crossinline onReceive: suspend (S) -> Unit
 ) {
-    sideEffectReceiver.sideEffect
+    sideEffectReceiver.flow
         .flowWithLifecycle(viewLifecycle)
         .onEach { onReceive(it) }
         .launchIn(viewLifecycleScope)

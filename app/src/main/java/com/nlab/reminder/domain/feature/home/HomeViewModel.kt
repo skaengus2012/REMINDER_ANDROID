@@ -19,7 +19,7 @@ package com.nlab.reminder.domain.feature.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nlab.reminder.core.effect.SideEffectReceiver
-import com.nlab.reminder.core.state.util.controlIn
+import com.nlab.reminder.core.effect.util.SideEffectController
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.StateFlow
@@ -28,13 +28,14 @@ import javax.inject.Inject
 /**
  * @author Doohyun
  */
-// TODO apply new viewEffect and make test  https://github.com/skaengus2012/REMINDER_ANDROID/issues/51
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    stateMachine: HomeStateMachine,
-    val homeSideEffect: SideEffectReceiver<HomeSideEffect>
+    stateControllerFactory: HomeStateControllerFactory
 ) : ViewModel() {
-    private val stateController = stateMachine.controlIn(viewModelScope, HomeState.Init, fetchEvent = HomeEvent.Fetch)
+    private val sideEffectController = SideEffectController<HomeSideEffect>()
+    private val stateController = stateControllerFactory.create(viewModelScope, sideEffectController)
+
+    val homeSideEffect: SideEffectReceiver<HomeSideEffect> = sideEffectController
     val state: StateFlow<HomeState> = stateController.state
     fun invoke(event: HomeEvent): Job = stateController.send(event)
 }

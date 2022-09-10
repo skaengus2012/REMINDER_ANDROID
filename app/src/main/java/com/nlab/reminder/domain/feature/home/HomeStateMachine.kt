@@ -19,18 +19,17 @@ package com.nlab.reminder.domain.feature.home
 import com.nlab.reminder.core.effect.SideEffectSender
 import com.nlab.reminder.core.state.util.StateMachine
 
-typealias HomeStateMachine = StateMachine<HomeEvent, HomeState>
-
 /**
  * @author Doohyun
  */
+@Suppress("FunctionName")
 fun HomeStateMachine(
     homeSideEffect: SideEffectSender<HomeSideEffect>,
     getHomeSummary: GetHomeSummaryUseCase,
     getTagUsageCount: GetTagUsageCountUseCase,
     modifyTagName: ModifyTagNameUseCase,
     deleteTag: DeleteTagUseCase
-): HomeStateMachine = StateMachine {
+): StateMachine<HomeEvent, HomeState> = StateMachine {
     update { (event, state) ->
         when (event) {
             is HomeEvent.Fetch -> {

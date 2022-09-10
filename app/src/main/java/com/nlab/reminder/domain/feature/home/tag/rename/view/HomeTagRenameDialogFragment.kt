@@ -90,7 +90,7 @@ class HomeTagRenameDialogFragment : DialogFragment() {
             .onEach { viewModel.onConfirmClicked() }
             .launchIn(viewLifecycleOwner.lifecycleScope)
 
-        viewModel.homeTagRenameSideEffect.sideEffect
+        viewModel.homeTagRenameSideEffect.flow
             .onEach { receiveSideEffect(it) }
             .launchIn(viewLifecycleOwner.lifecycleScope)
 

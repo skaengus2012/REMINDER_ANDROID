@@ -22,5 +22,5 @@ import kotlinx.coroutines.flow.Flow
  * @author Doohyun
  */
 sealed interface SideEffectReceiver<T : SideEffect> {
-    val sideEffect: Flow<T>
+    val flow: Flow<T>
 }

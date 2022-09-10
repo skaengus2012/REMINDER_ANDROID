@@ -16,15 +16,15 @@
 
 package com.nlab.reminder.domain.feature.home.di
 
-import com.nlab.reminder.core.effect.SideEffectController
-import com.nlab.reminder.core.effect.SideEffectReceiver
-import com.nlab.reminder.core.effect.util.SideEffectController
+import com.nlab.reminder.core.effect.SideEffectSender
+import com.nlab.reminder.core.state.StateController
+import com.nlab.reminder.core.state.util.controlIn
 import com.nlab.reminder.domain.feature.home.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
-import dagger.hilt.android.scopes.ViewModelScoped
+import kotlinx.coroutines.CoroutineScope
 
 /**
  * @author Doohyun
@@ -32,27 +32,18 @@ import dagger.hilt.android.scopes.ViewModelScoped
 @Module
 @InstallIn(ViewModelComponent::class)
 class HomeViewModelModule {
-    @ViewModelScoped
     @Provides
-    fun provideHomeSideEffectController(): SideEffectController<HomeSideEffect> = SideEffectController()
-
-    @Provides
-    fun provideHomeSideEffectReceiver(
-        controller: SideEffectController<HomeSideEffect>
-    ): SideEffectReceiver<HomeSideEffect> = controller
-
-    @Provides
-    fun provideHomeStateMachine(
-        homeSideEffect: SideEffectController<HomeSideEffect>,
+    fun provideHomeStateController(
         getHomeSummary: GetHomeSummaryUseCase,
         getTagUsageCount: GetTagUsageCountUseCase,
         modifyTagName: ModifyTagNameUseCase,
         deleteTag: DeleteTagUseCase
-    ): HomeStateMachine = HomeStateMachine(
-        homeSideEffect,
-        getHomeSummary,
-        getTagUsageCount,
-        modifyTagName,
-        deleteTag
-    )
+    ): HomeStateControllerFactory = object : HomeStateControllerFactory {
+        override fun create(
+            scope: CoroutineScope,
+            homeSideEffect: SideEffectSender<HomeSideEffect>
+        ): StateController<HomeEvent, HomeState> =
+            HomeStateMachine(homeSideEffect, getHomeSummary, getTagUsageCount, modifyTagName, deleteTag)
+                .controlIn(scope, initState = HomeState.Init, fetchEvent = HomeEvent.Fetch)
+    }
 }

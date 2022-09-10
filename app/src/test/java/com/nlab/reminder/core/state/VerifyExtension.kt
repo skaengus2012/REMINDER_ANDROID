@@ -14,23 +14,19 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.effect
+package com.nlab.reminder.core.state
 
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.withContext
+import com.nlab.reminder.test.once
+import org.mockito.kotlin.verify
 
 /**
- * @author thalys
+ * @author Doohyun
  */
-class SideEffectController<T : SideEffect> internal constructor(
-    private val channel: Channel<T>,
-    private val dispatcher: CoroutineDispatcher
-) : SideEffectReceiver<T>, SideEffectSender<T> {
-    override val flow: Flow<T> = channel.receiveAsFlow()
-    override suspend fun post(sideEffect: T) = withContext(dispatcher) {
-        channel.send(sideEffect)
-    }
+fun <E : Event, S : State> verifyStateSendExtension(
+    stateController: StateController<E, S>,
+    expectEvent: E,
+    invoke: () -> Unit
+) {
+    invoke()
+    verify(stateController, once()).send(expectEvent)
 }

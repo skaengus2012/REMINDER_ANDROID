@@ -60,7 +60,7 @@ class HomeStateMachineKtTest {
         getTagUsageCount: GetTagUsageCountUseCase = mock(),
         modifyTagName: ModifyTagNameUseCase = mock(),
         deleteTag: DeleteTagUseCase = mock()
-    ): HomeStateMachine = HomeStateMachine(
+    ) = HomeStateMachine(
         homeSideEffect,
         getHomeSummary,
         getTagUsageCount,
