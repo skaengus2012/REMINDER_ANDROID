@@ -75,7 +75,7 @@ class HomeViewModelTest {
                     homeSideEffect: SideEffectSender<HomeSideEffect>
                 ): StateController<HomeEvent, HomeState> {
                     val fakeStateMachine: StateMachine<HomeEvent, HomeState> = StateMachine {
-                        sideEffect { homeSideEffect.post(HomeSideEffect.NavigateToday) }
+                        handle { homeSideEffect.post(HomeSideEffect.NavigateToday) }
                     }
                     return fakeStateMachine.controlIn(scope, HomeState.Init)
                 }

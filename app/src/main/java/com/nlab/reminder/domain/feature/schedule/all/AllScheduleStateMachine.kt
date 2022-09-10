@@ -42,11 +42,11 @@ fun AllScheduleStateMachine(
         }
     }
 
-    sideEffectOn<AllScheduleEvent.Fetch, AllScheduleState.Init> {
+    handleOn<AllScheduleEvent.Fetch, AllScheduleState.Init> {
         getAllScheduleReport().collect { send(AllScheduleEvent.AllScheduleReportLoaded(it)) }
     }
 
-    sideEffectOn<AllScheduleEvent.OnScheduleCompleteUpdateClicked, AllScheduleState.Loaded> { (event) ->
+    handleOn<AllScheduleEvent.OnScheduleCompleteUpdateClicked, AllScheduleState.Loaded> { (event) ->
         updateScheduleComplete(event.scheduleId, event.isComplete)
     }
 }

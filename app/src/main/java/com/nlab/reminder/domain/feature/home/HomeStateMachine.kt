@@ -44,43 +44,43 @@ fun HomeStateMachine(
         }
     }
 
-    sideEffectOn<HomeEvent.Fetch, HomeState.Init> {
+    handleOn<HomeEvent.Fetch, HomeState.Init> {
         getHomeSummary().collect { send(HomeEvent.OnHomeSummaryLoaded(it)) }
     }
 
-    sideEffectOn<HomeEvent.OnTodayCategoryClicked, HomeState.Loaded> {
+    handleOn<HomeEvent.OnTodayCategoryClicked, HomeState.Loaded> {
         homeSideEffect.post(HomeSideEffect.NavigateToday)
     }
 
-    sideEffectOn<HomeEvent.OnTimetableCategoryClicked, HomeState.Loaded> {
+    handleOn<HomeEvent.OnTimetableCategoryClicked, HomeState.Loaded> {
         homeSideEffect.post(HomeSideEffect.NavigateTimetable)
     }
 
-    sideEffectOn<HomeEvent.OnAllCategoryClicked, HomeState.Loaded> {
+    handleOn<HomeEvent.OnAllCategoryClicked, HomeState.Loaded> {
         homeSideEffect.post(HomeSideEffect.NavigateAllSchedule)
     }
 
-    sideEffectOn<HomeEvent.OnTagClicked, HomeState.Loaded> { (event) ->
+    handleOn<HomeEvent.OnTagClicked, HomeState.Loaded> { (event) ->
         homeSideEffect.post(HomeSideEffect.NavigateTag(event.tag))
     }
 
-    sideEffectOn<HomeEvent.OnTagLongClicked, HomeState.Loaded> { (event) ->
+    handleOn<HomeEvent.OnTagLongClicked, HomeState.Loaded> { (event) ->
         homeSideEffect.post(HomeSideEffect.NavigateTagConfig(event.tag))
     }
 
-    sideEffectOn<HomeEvent.OnTagRenameRequestClicked, HomeState.Loaded> { (event) ->
+    handleOn<HomeEvent.OnTagRenameRequestClicked, HomeState.Loaded> { (event) ->
         homeSideEffect.post(HomeSideEffect.NavigateTagRename(event.tag, getTagUsageCount(event.tag)))
     }
 
-    sideEffectOn<HomeEvent.OnTagDeleteRequestClicked, HomeState.Loaded> { (event) ->
+    handleOn<HomeEvent.OnTagDeleteRequestClicked, HomeState.Loaded> { (event) ->
         homeSideEffect.post(HomeSideEffect.NavigateTagDelete(event.tag, getTagUsageCount(event.tag)))
     }
 
-    sideEffectOn<HomeEvent.OnTagRenameConfirmClicked, HomeState.Loaded> { (event) ->
+    handleOn<HomeEvent.OnTagRenameConfirmClicked, HomeState.Loaded> { (event) ->
         modifyTagName(originalTag = event.originalTag, newText = event.renameText)
     }
 
-    sideEffectOn<HomeEvent.OnTagDeleteConfirmClicked, HomeState.Loaded> { (event) ->
+    handleOn<HomeEvent.OnTagDeleteConfirmClicked, HomeState.Loaded> { (event) ->
         deleteTag(event.tag)
     }
 }

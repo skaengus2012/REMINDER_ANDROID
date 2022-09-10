@@ -62,7 +62,7 @@ class StateMachineTest {
         val action: () -> Unit = mock()
         val stateMachine = StateMachine<TestEvent, TestState> {
             update { TestState.State1() }
-            sideEffect { action() }
+            handle { action() }
         }
         val controller: StateController<TestEvent, TestState> =
             stateMachine.controlIn(CoroutineScope(Dispatchers.Unconfined), TestState.StateInit(), TestEvent.Event1())

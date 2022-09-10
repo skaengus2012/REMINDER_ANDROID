@@ -35,11 +35,11 @@ fun HomeTagRenameStateMachine(
         }
     }
 
-    sideEffectBy<HomeTagRenameEvent.OnConfirmClicked> { (_, state) ->
+    handleBy<HomeTagRenameEvent.OnConfirmClicked> { (_, state) ->
         homeTagRenameSideEffect.complete(state.currentText)
     }
 
-    sideEffectBy<HomeTagRenameEvent.OnCancelClicked> {
+    handleBy<HomeTagRenameEvent.OnCancelClicked> {
         homeTagRenameSideEffect.dismiss()
     }
 }
