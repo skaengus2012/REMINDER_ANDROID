@@ -16,6 +16,8 @@
 
 package com.nlab.reminder.domain.feature.home.tag.rename
 
+import com.nlab.reminder.core.effect.SideEffectSender
+import com.nlab.reminder.core.state.util.StateMachine
 import com.nlab.reminder.core.state.util.controlIn
 import com.nlab.reminder.test.genBothify
 import com.nlab.reminder.test.genLetterify
@@ -43,8 +45,8 @@ class HomeTagRenameStateMachineKtTest {
     )
 
     private fun genStateMachine(
-        homeTagRenameSideEffect: SendHomeTagRenameSideEffect = mock()
-    ): HomeTagRenameStateMachine = HomeTagRenameStateMachine(homeTagRenameSideEffect)
+        homeTagRenameSideEffect: SideEffectSender<HomeTagRenameSideEffect> = mock()
+    ): StateMachine<HomeTagRenameEvent, HomeTagRenameState> = HomeTagRenameStateMachine(homeTagRenameSideEffect)
 
     @Test
     fun `update currentText state when OnRenameTextInput sent`() = runTest {
@@ -116,25 +118,25 @@ class HomeTagRenameStateMachineKtTest {
     @Test
     fun `notify complete when confirm clicked`() = runTest {
         val changeText = genBothify()
-        val sideEffect: SendHomeTagRenameSideEffect = mock()
+        val sideEffect: SideEffectSender<HomeTagRenameSideEffect> = mock()
         val stateController = genStateMachine(sideEffect)
             .controlIn(CoroutineScope(Dispatchers.Default), genHomeTagRenameState(currentText = changeText))
 
         stateController
             .send(HomeTagRenameEvent.OnConfirmClicked)
             .join()
-        verify(sideEffect, once()).post(HomeTagRenameSideEffectMessage.Complete(changeText))
+        verify(sideEffect, once()).post(HomeTagRenameSideEffect.Complete(changeText))
     }
 
     @Test
     fun `notify dismiss when cancel clicked`() = runTest {
-        val sideEffect: SendHomeTagRenameSideEffect = mock()
+        val sideEffect: SideEffectSender<HomeTagRenameSideEffect> = mock()
         val stateMachine = genStateMachine(sideEffect)
             .controlIn(CoroutineScope(Dispatchers.Default), genHomeTagRenameState())
 
         stateMachine
             .send(HomeTagRenameEvent.OnCancelClicked)
             .join()
-        verify(sideEffect, once()).post(HomeTagRenameSideEffectMessage.Cancel)
+        verify(sideEffect, once()).post(HomeTagRenameSideEffect.Cancel)
     }
 }

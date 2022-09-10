@@ -22,20 +22,20 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import androidx.core.content.getSystemService
-import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.flowWithLifecycle
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import com.nlab.reminder.R
+import com.nlab.reminder.core.android.fragment.viewLifecycle
 import com.nlab.reminder.core.android.fragment.viewLifecycleScope
 import com.nlab.reminder.core.android.view.clicks
 import com.nlab.reminder.core.android.view.textChanged
 import com.nlab.reminder.databinding.FragmentHomeTagRenameDialogBinding
+import com.nlab.reminder.domain.common.android.fragment.handleSideEffect
 import com.nlab.reminder.domain.common.android.fragment.popBackStackWithResult
-import com.nlab.reminder.domain.common.tag.Tag
 import com.nlab.reminder.domain.feature.home.tag.rename.*
+import com.nlab.reminder.domain.feature.home.view.HomeTagRenameResult
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -72,33 +72,51 @@ class HomeTagRenameDialogFragment : DialogFragment() {
             )
         }
 
-        binding.renameEdittext.textChanged()
+        binding.renameEdittext
+            .textChanged()
             .map { it.text?.toString() ?: "" }
             .distinctUntilChanged()
             .onEach { viewModel.onRenameTextInput(it) }
-            .launchIn(viewLifecycleOwner.lifecycleScope)
+            .launchIn(viewLifecycleScope)
 
-        binding.clearButton.clicks()
+        binding.clearButton
+            .clicks()
             .onEach { viewModel.onRenameTextClearClicked() }
-            .launchIn(viewLifecycleOwner.lifecycleScope)
+            .launchIn(viewLifecycleScope)
 
-        binding.cancelButton.clicks()
+        binding.cancelButton
+            .clicks()
             .onEach { viewModel.onCancelClicked() }
-            .launchIn(viewLifecycleOwner.lifecycleScope)
+            .launchIn(viewLifecycleScope)
 
-        binding.okButton.clicks()
+        binding.okButton
+            .clicks()
             .onEach { viewModel.onConfirmClicked() }
-            .launchIn(viewLifecycleOwner.lifecycleScope)
+            .launchIn(viewLifecycleScope)
 
-        viewModel.homeTagRenameSideEffect.flow
-            .onEach { receiveSideEffect(it) }
-            .launchIn(viewLifecycleOwner.lifecycleScope)
+        handleSideEffect(viewModel.homeTagRenameSideEffect) { sideEffect ->
+            popBackStackWithResult(
+                args.requestKey,
+                result = when (sideEffect) {
+                    is HomeTagRenameSideEffect.Cancel -> HomeTagRenameResult(
+                        args.tag,
+                        rename = "",
+                        isConfirmed = false
+                    )
+
+                    is HomeTagRenameSideEffect.Complete -> HomeTagRenameResult(
+                        args.tag,
+                        rename = sideEffect.rename,
+                        isConfirmed = true
+                    )
+                }
+            )
+        }
 
         viewModel.state
-            .flowWithLifecycle(viewLifecycleOwner.lifecycle)
-            .distinctUntilChanged()
+            .flowWithLifecycle(viewLifecycle)
             .onEach { render(it) }
-            .launchIn(viewLifecycleOwner.lifecycleScope)
+            .launchIn(viewLifecycleScope)
     }
 
     private fun render(homeTagRenameState: HomeTagRenameState) {
@@ -123,40 +141,8 @@ class HomeTagRenameDialogFragment : DialogFragment() {
             }
     }
 
-    private fun receiveSideEffect(message: HomeTagRenameSideEffectMessage) {
-        popBackStackWithResult(args.requestKey,
-            result = when (message) {
-                is HomeTagRenameSideEffectMessage.Cancel -> bundleOf(
-                    RESULT_TYPE to RESULT_TYPE_CANCEL_REQUEST,
-                    RESULT_TAG to args.tag
-                )
-
-                is HomeTagRenameSideEffectMessage.Complete -> bundleOf(
-                    RESULT_TYPE to RESULT_TYPE_CONFIRM_REQUEST,
-                    RESULT_TAG to args.tag,
-                    RESULT_RENAME to message.rename
-                )
-            }
-        )
-    }
-
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-    companion object {
-        private const val RESULT_TAG = "homeTagRenameDialogResultTag"
-        private const val RESULT_RENAME = "homeTagRenameDialogResultRename"
-        private const val RESULT_TYPE = "homeTagRenameDialogResultType"
-        private const val RESULT_TYPE_CANCEL_REQUEST = "cancelRequest"
-        private const val RESULT_TYPE_CONFIRM_REQUEST = "confirmRequest"
-
-        fun tagOf(bundle: Bundle): Tag = requireNotNull(bundle.getParcelable(RESULT_TAG))
-        fun renameOf(bundle: Bundle): String = bundle.getString(RESULT_RENAME) ?: ""
-        fun isConfirmedOf(bundle: Bundle): Boolean =
-            requireNotNull(bundle.getString(RESULT_TYPE)) == RESULT_TYPE_CONFIRM_REQUEST
-        fun isCancelledOf(bundle: Bundle): Boolean =
-            requireNotNull(bundle.getString(RESULT_TYPE)) == RESULT_TYPE_CANCEL_REQUEST
     }
 }

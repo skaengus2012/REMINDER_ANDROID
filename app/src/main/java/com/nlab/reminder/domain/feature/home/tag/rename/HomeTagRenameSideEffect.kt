@@ -17,27 +17,12 @@
 package com.nlab.reminder.domain.feature.home.tag.rename
 
 import com.nlab.reminder.core.effect.SideEffect
-import com.nlab.reminder.core.effect.SideEffectSender
-import com.nlab.reminder.core.effect.SideEffectReceiver
 import com.nlab.reminder.core.util.test.annotation.Generated
 
 /**
  * @author Doohyun
  */
-
-typealias SendHomeTagRenameSideEffect = SideEffectSender<HomeTagRenameSideEffectMessage>
-typealias HomeTagRenameSideEffect = SideEffectReceiver<HomeTagRenameSideEffectMessage>
-
-sealed class HomeTagRenameSideEffectMessage private constructor() : SideEffect {
-    @Generated
-    data class Complete(val rename: String) : HomeTagRenameSideEffectMessage()
-    object Cancel : HomeTagRenameSideEffectMessage()
-}
-
-suspend fun SendHomeTagRenameSideEffect.complete(renameMessage: String) {
-    post(HomeTagRenameSideEffectMessage.Complete(renameMessage))
-}
-
-suspend fun SendHomeTagRenameSideEffect.dismiss() {
-    post(HomeTagRenameSideEffectMessage.Cancel)
+sealed class HomeTagRenameSideEffect : SideEffect {
+    @Generated data class Complete(val rename: String) : HomeTagRenameSideEffect()
+    object Cancel : HomeTagRenameSideEffect()
 }

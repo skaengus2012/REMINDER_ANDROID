@@ -18,11 +18,10 @@ package com.nlab.reminder.domain.feature.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nlab.reminder.core.effect.SideEffectReceiver
 import com.nlab.reminder.core.effect.util.SideEffectController
+import com.nlab.reminder.core.effect.util.asReceived
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
 /**
@@ -35,7 +34,7 @@ class HomeViewModel @Inject constructor(
     private val sideEffectController = SideEffectController<HomeSideEffect>()
     private val stateController = stateControllerFactory.create(viewModelScope, sideEffectController)
 
-    val homeSideEffect: SideEffectReceiver<HomeSideEffect> = sideEffectController
-    val state: StateFlow<HomeState> = stateController.state
+    val homeSideEffect = sideEffectController.asReceived()
+    val state = stateController.state
     fun invoke(event: HomeEvent): Job = stateController.send(event)
 }

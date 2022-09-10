@@ -18,6 +18,7 @@ package com.nlab.reminder.core.effect.util
 
 import com.nlab.reminder.core.effect.SideEffect
 import com.nlab.reminder.core.effect.SideEffectController
+import com.nlab.reminder.core.effect.SideEffectReceiver
 import com.nlab.reminder.core.util.test.annotation.Generated
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -31,3 +32,6 @@ fun <T : SideEffect> SideEffectController(
     eventChannel: Channel<T> = Channel(Channel.BUFFERED),
     dispatcher: CoroutineDispatcher = Dispatchers.Main
 ): SideEffectController<T> = SideEffectController(eventChannel, dispatcher)
+
+
+fun <T : SideEffect> SideEffectController<T>.asReceived(): SideEffectReceiver<T> = this

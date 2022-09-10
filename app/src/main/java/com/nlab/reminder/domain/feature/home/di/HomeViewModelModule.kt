@@ -38,12 +38,13 @@ class HomeViewModelModule {
         getTagUsageCount: GetTagUsageCountUseCase,
         modifyTagName: ModifyTagNameUseCase,
         deleteTag: DeleteTagUseCase
-    ): HomeStateControllerFactory = object : HomeStateControllerFactory {
-        override fun create(
-            scope: CoroutineScope,
-            homeSideEffect: SideEffectSender<HomeSideEffect>
-        ): StateController<HomeEvent, HomeState> =
-            HomeStateMachine(homeSideEffect, getHomeSummary, getTagUsageCount, modifyTagName, deleteTag)
-                .controlIn(scope, initState = HomeState.Init, fetchEvent = HomeEvent.Fetch)
-    }
+    ): HomeStateControllerFactory =
+        object : HomeStateControllerFactory {
+            override fun create(
+                scope: CoroutineScope,
+                homeSideEffect: SideEffectSender<HomeSideEffect>
+            ): StateController<HomeEvent, HomeState> =
+                HomeStateMachine(homeSideEffect, getHomeSummary, getTagUsageCount, modifyTagName, deleteTag)
+                    .controlIn(scope, initState = HomeState.Init, fetchEvent = HomeEvent.Fetch)
+        }
 }

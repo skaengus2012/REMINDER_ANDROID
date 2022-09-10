@@ -14,12 +14,18 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.feature.home.tag.rename.view
+package com.nlab.reminder.domain.feature.home.tag.rename
 
-import com.nlab.reminder.core.util.test.annotation.Generated
+import com.nlab.reminder.core.effect.SideEffectSender
+import com.nlab.reminder.core.state.StateController
+import kotlinx.coroutines.CoroutineScope
 
 /**
- * @author thalys
+ * @author Doohyun
  */
-@Generated
-data class HomeTagRenameInitText(val value: String)
+interface HomeTagRenameStateControllerFactory {
+    fun create(
+        scope: CoroutineScope,
+        homeTagRenameSideEffect: SideEffectSender<HomeTagRenameSideEffect>
+    ): StateController<HomeTagRenameEvent, HomeTagRenameState>
+}
