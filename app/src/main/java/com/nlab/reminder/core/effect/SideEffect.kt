@@ -16,12 +16,7 @@
 
 package com.nlab.reminder.core.effect
 
-import kotlinx.coroutines.flow.Flow
-
 /**
- * @author Doohyun
+ * @author thalys
  */
-interface SideEffect<T : SideEffect.Message> {
-    val event: Flow<T>
-    interface Message
-}
+interface SideEffect

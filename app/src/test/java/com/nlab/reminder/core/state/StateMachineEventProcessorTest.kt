@@ -84,29 +84,29 @@ class StateMachineEventProcessorTest {
     }
 
     @Test
-    fun `invoked sideEffect when any event sent`() {
+    fun `handled when any event sent`() {
         val expectedTest1EventCount = genInt("##")
         val expectedTest2EventCount = genInt("##")
         val action: () -> Unit = mock()
-        sendEventWithSideEffect(
+        sendEventWithHandleConfig(
             expectedTest1EventCount,
             expectedTest2EventCount,
-            sideEffectConfig = {
-                sideEffect { action() }
+            handleConfig = {
+                handle { action() }
             }
         )
         verify(action, times(expectedTest1EventCount + expectedTest2EventCount))()
     }
 
     @Test
-    fun `invoked sideEffect when event is TestEvent1`() {
+    fun `handled when event is TestEvent1`() {
         val expectedTest1EventCount = genInt("##")
         val action: () -> Unit = mock()
-        sendEventWithSideEffect(
+        sendEventWithHandleConfig(
             expectedTest1EventCount,
             expectedTest2EventCount = genInt("##"),
-            sideEffectConfig = {
-                sideEffect(
+            handleConfig = {
+                handle(
                     filter = { (event) -> event is TestEvent.Event1 },
                     block = { action() }
                 )
@@ -116,26 +116,26 @@ class StateMachineEventProcessorTest {
     }
 
     @Test
-    fun `invoked sideEffect when event instance is TestEvent1`() {
+    fun `handled when event instance is TestEvent1`() {
         val expectedTest1EventCount = genInt("##")
         val action: () -> Unit = mock()
-        sendEventWithSideEffect(
+        sendEventWithHandleConfig(
             expectedTest1EventCount,
             expectedTest2EventCount = genInt("##"),
-            sideEffectConfig = {
-                sideEffectBy<TestEvent.Event1> { action() }
+            handleConfig = {
+                handleBy<TestEvent.Event1> { action() }
             }
         )
         verify(action, times(expectedTest1EventCount))()
     }
 
     @Test
-    fun `invoked sideEffect when current was state1`() {
+    fun `handled when current was state1`() {
         val expectedTest1EventCount = genInt("##")
         val expectedTest2EventCount = genInt("##")
         val action: () -> Unit = mock()
         val sideEffectConfig: (StateMachineBuilder<TestEvent, TestState>).() -> Unit = {
-            sideEffectWhen<TestState.State1> { action() }
+            handleWhen<TestState.State1> { action() }
         }
         val initStates = listOf(
             TestState.StateInit(),
@@ -144,7 +144,7 @@ class StateMachineEventProcessorTest {
         )
 
         initStates.forEach { initState ->
-            sendEventWithSideEffect(
+            sendEventWithHandleConfig(
                 expectedTest1EventCount,
                 expectedTest2EventCount,
                 state = MutableStateFlow(initState),
@@ -155,11 +155,11 @@ class StateMachineEventProcessorTest {
     }
 
     @Test
-    fun `invoked sideEffect when current was state1 and event instance is TestEvent1`() {
+    fun `handled when current was state1 and event instance is TestEvent1`() {
         val expectedTest1EventCount = genInt("##")
         val action: () -> Unit = mock()
         val sideEffectConfig: (StateMachineBuilder<TestEvent, TestState>).() -> Unit = {
-            sideEffectOn<TestEvent.Event1, TestState.State1> { action() }
+            handleOn<TestEvent.Event1, TestState.State1> { action() }
         }
         val initStates = listOf(
             TestState.StateInit(),
@@ -168,7 +168,7 @@ class StateMachineEventProcessorTest {
         )
 
         initStates.forEach { initState ->
-            sendEventWithSideEffect(
+            sendEventWithHandleConfig(
                 expectedTest1EventCount,
                 expectedTest2EventCount = genInt("##"),
                 state = MutableStateFlow(initState),
@@ -178,17 +178,15 @@ class StateMachineEventProcessorTest {
         verify(action, times(expectedTest1EventCount))()
     }
 
-    private fun sendEventWithSideEffect(
+    private fun sendEventWithHandleConfig(
         expectedTest1EventCount: Int,
         expectedTest2EventCount: Int,
         state: MutableStateFlow<TestState> = MutableStateFlow(TestState.StateInit()),
-        sideEffectConfig: (StateMachineBuilder<TestEvent, TestState>).() -> Unit,
+        handleConfig: (StateMachineBuilder<TestEvent, TestState>).() -> Unit,
     ) = runTest {
         val eventProcessor = createTestStateMachineEventProcessor(
             state = state,
-            stateMachineBuilder = StateMachineBuilder<TestEvent, TestState>().apply {
-                sideEffectConfig(this)
-            }
+            stateMachineBuilder = StateMachineBuilder<TestEvent, TestState>().apply { handleConfig(this) }
         )
         val jobs: List<Job> =
             List(expectedTest1EventCount) { eventProcessor.send(TestEvent.Event1()) } +
@@ -197,7 +195,7 @@ class StateMachineEventProcessorTest {
     }
 
     @Test
-    fun `invoked sideEffect with before state when after update`() = runTest {
+    fun `handled with before state when after update`() = runTest {
         val updateSource: UpdateSource<TestEvent, TestState> = UpdateSource(
             TestEvent.Event1(),
             TestState.State2(),
@@ -210,7 +208,7 @@ class StateMachineEventProcessorTest {
             state = MutableStateFlow(updateSource.before),
             stateMachineBuilder = StateMachineBuilder<TestEvent, TestState>().apply {
                 update { updateFunction(it) }
-                sideEffect { sideEffectFunction(it) }
+                handle { sideEffectFunction(it) }
             }
         )
         eventProcessor
@@ -223,7 +221,7 @@ class StateMachineEventProcessorTest {
     }
 
     @Test
-    fun `handled exceptions when trying to update with testEvent1`() = runTest {
+    fun `catch when trying to update with testEvent1`() = runTest {
         testExceptionHandler { stateMachineBuilder, throwable ->
             stateMachineBuilder.update { (event, before) ->
                 when(event) {
@@ -235,9 +233,9 @@ class StateMachineEventProcessorTest {
     }
 
     @Test
-    fun `handled exceptions when sideEffect executed by testEvent1`() = runTest {
+    fun `catch when sideEffect executed by testEvent1`() = runTest {
         testExceptionHandler { stateMachineBuilder, throwable ->
-            stateMachineBuilder.sideEffectBy<TestEvent.Event1> { throw throwable }
+            stateMachineBuilder.handleBy<TestEvent.Event1> { throw throwable }
         }
     }
 

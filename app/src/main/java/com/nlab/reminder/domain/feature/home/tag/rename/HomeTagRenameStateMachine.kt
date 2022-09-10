@@ -16,13 +16,16 @@
 
 package com.nlab.reminder.domain.feature.home.tag.rename
 
+import com.nlab.reminder.core.effect.SideEffectSender
 import com.nlab.reminder.core.state.util.StateMachine
 
-typealias HomeTagRenameStateMachine = StateMachine<HomeTagRenameEvent, HomeTagRenameState>
-
+/**
+ * @author Doohyun
+ */
+@Suppress("FunctionName")
 fun HomeTagRenameStateMachine(
-    homeTagRenameSideEffect: SendHomeTagRenameSideEffect
-): HomeTagRenameStateMachine = StateMachine {
+    homeTagRenameSideEffect: SideEffectSender<HomeTagRenameSideEffect>
+): StateMachine<HomeTagRenameEvent, HomeTagRenameState> = StateMachine {
     update { (event, state) ->
         when (event) {
             is HomeTagRenameEvent.OnRenameTextInput -> state.copy(currentText = event.text)
@@ -30,16 +33,15 @@ fun HomeTagRenameStateMachine(
             is HomeTagRenameEvent.OnKeyboardShownWhenViewCreated -> {
                 state.copy(isKeyboardShowWhenViewCreated = false)
             }
-
             else -> state
         }
     }
 
-    sideEffectBy<HomeTagRenameEvent.OnConfirmClicked> { (_, state) ->
-        homeTagRenameSideEffect.complete(state.currentText)
+    handleBy<HomeTagRenameEvent.OnConfirmClicked> { (_, state) ->
+        homeTagRenameSideEffect.post(HomeTagRenameSideEffect.Complete(state.currentText))
     }
 
-    sideEffectBy<HomeTagRenameEvent.OnCancelClicked> {
-        homeTagRenameSideEffect.dismiss()
+    handleBy<HomeTagRenameEvent.OnCancelClicked> {
+        homeTagRenameSideEffect.post(HomeTagRenameSideEffect.Cancel)
     }
 }

@@ -16,13 +16,8 @@
 
 package com.nlab.reminder.domain.feature.home
 
-import com.nlab.reminder.core.effect.message.navigation.NavigationMessage
-import com.nlab.reminder.core.effect.message.navigation.SendNavigationEffect
+import com.nlab.reminder.core.effect.SideEffectSender
 import com.nlab.reminder.core.state.util.controlIn
-import com.nlab.reminder.domain.common.effect.message.navigation.AllEndNavigationMessage
-import com.nlab.reminder.domain.common.effect.message.navigation.TagEndNavigationMessage
-import com.nlab.reminder.domain.common.effect.message.navigation.TimetableEndNavigationMessage
-import com.nlab.reminder.domain.common.effect.message.navigation.TodayEndNavigationMessage
 import com.nlab.reminder.domain.common.tag.Tag
 import com.nlab.reminder.domain.common.tag.genTag
 import com.nlab.reminder.domain.common.tag.genTagWithResource
@@ -60,13 +55,13 @@ class HomeStateMachineKtTest {
     )
 
     private fun genStateMachine(
-        navigationEffect: SendNavigationEffect = mock(),
+        homeSideEffect: SideEffectSender<HomeSideEffect> = mock(),
         getHomeSummary: GetHomeSummaryUseCase = mock { onBlocking { mock() } doReturn emptyFlow() },
         getTagUsageCount: GetTagUsageCountUseCase = mock(),
         modifyTagName: ModifyTagNameUseCase = mock(),
         deleteTag: DeleteTagUseCase = mock()
-    ): HomeStateMachine = HomeStateMachine(
-        navigationEffect,
+    ) = HomeStateMachine(
+        homeSideEffect,
         getHomeSummary,
         getTagUsageCount,
         modifyTagName,
@@ -178,7 +173,7 @@ class HomeStateMachineKtTest {
     fun `navigate today end when today category clicked`() = runTest {
         testNavigationEnd(
             navigateEvent = HomeEvent.OnTodayCategoryClicked,
-            expectedNavigationMessage = TodayEndNavigationMessage
+            expectedSideEffectMessage = HomeSideEffect.NavigateToday
         )
     }
 
@@ -186,7 +181,7 @@ class HomeStateMachineKtTest {
     fun `navigate timetable end when timetable category clicked`() = runTest {
         testNavigationEnd(
             navigateEvent = HomeEvent.OnTimetableCategoryClicked,
-            expectedNavigationMessage = TimetableEndNavigationMessage
+            expectedSideEffectMessage = HomeSideEffect.NavigateTimetable
         )
     }
 
@@ -194,7 +189,7 @@ class HomeStateMachineKtTest {
     fun `navigate all end when all category clicked`() = runTest {
         testNavigationEnd(
             navigateEvent = HomeEvent.OnAllCategoryClicked,
-            expectedNavigationMessage = AllEndNavigationMessage
+            expectedSideEffectMessage = HomeSideEffect.NavigateAllSchedule
         )
     }
 
@@ -209,7 +204,7 @@ class HomeStateMachineKtTest {
             testNavigationEnd(
                 initState = HomeState.Loaded(homeSummary),
                 navigateEvent = HomeEvent.OnTagClicked(testTag),
-                expectedNavigationMessage = TagEndNavigationMessage(testTag)
+                expectedSideEffectMessage = HomeSideEffect.NavigateTag(testTag)
             )
         }
     }
@@ -225,7 +220,7 @@ class HomeStateMachineKtTest {
             testNavigationEnd(
                 initState = HomeState.Loaded(homeSummary),
                 navigateEvent = HomeEvent.OnTagLongClicked(testTag),
-                expectedNavigationMessage = HomeTagConfigNavigationMessage(testTag)
+                expectedSideEffectMessage = HomeSideEffect.NavigateTagConfig(testTag)
             )
         }
     }
@@ -243,7 +238,7 @@ class HomeStateMachineKtTest {
                 getTagUsageCount = mock { whenever(mock(testTag)) doReturn testUsageCount },
                 initState = HomeState.Loaded(homeSummary),
                 navigateEvent = HomeEvent.OnTagRenameRequestClicked(testTag),
-                expectedNavigationMessage = HomeTagRenameNavigationMessage(testTag, testUsageCount)
+                expectedSideEffectMessage = HomeSideEffect.NavigateTagRename(testTag, testUsageCount)
             )
         }
     }
@@ -261,7 +256,7 @@ class HomeStateMachineKtTest {
                 getTagUsageCount = mock { whenever(mock(testTag)) doReturn testUsageCount },
                 initState = HomeState.Loaded(homeSummary),
                 navigateEvent = HomeEvent.OnTagDeleteRequestClicked(testTag),
-                expectedNavigationMessage = HomeTagDeleteNavigationMessage(testTag, testUsageCount)
+                expectedSideEffectMessage = HomeSideEffect.NavigateTagDelete(testTag, testUsageCount)
             )
         }
     }
@@ -270,14 +265,14 @@ class HomeStateMachineKtTest {
         getTagUsageCount: GetTagUsageCountUseCase = mock(),
         initState: HomeState = HomeState.Loaded(genHomeSummary()),
         navigateEvent: HomeEvent,
-        expectedNavigationMessage: NavigationMessage,
+        expectedSideEffectMessage: HomeSideEffect,
     ) {
-        val navigationEffect: SendNavigationEffect = mock()
-        genStateMachine(navigationEffect = navigationEffect, getTagUsageCount = getTagUsageCount)
+        val homeSideEffect: SideEffectSender<HomeSideEffect> = mock()
+        genStateMachine(homeSideEffect = homeSideEffect, getTagUsageCount = getTagUsageCount)
             .controlIn(CoroutineScope(Dispatchers.Default), initState)
             .send(navigateEvent)
             .join()
-        verify(navigationEffect, once()).send(expectedNavigationMessage)
+        verify(homeSideEffect, once()).post(expectedSideEffectMessage)
     }
 
     @Test

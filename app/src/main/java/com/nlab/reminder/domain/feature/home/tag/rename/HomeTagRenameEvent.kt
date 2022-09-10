@@ -20,8 +20,7 @@ import com.nlab.reminder.core.state.Event
 import com.nlab.reminder.core.util.test.annotation.Generated
 
 sealed class HomeTagRenameEvent private constructor() : Event {
-    @Generated
-    data class OnRenameTextInput(val text: String) : HomeTagRenameEvent()
+    @Generated data class OnRenameTextInput(val text: String) : HomeTagRenameEvent()
     object OnRenameTextClearClicked : HomeTagRenameEvent()
     object OnKeyboardShownWhenViewCreated : HomeTagRenameEvent()
     object OnCancelClicked : HomeTagRenameEvent()

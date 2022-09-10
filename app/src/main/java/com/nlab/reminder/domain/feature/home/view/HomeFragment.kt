@@ -24,8 +24,13 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import com.nlab.reminder.core.entrypoint.EntryPointInit
+import com.nlab.reminder.core.android.fragment.viewLifecycle
+import com.nlab.reminder.core.android.fragment.viewLifecycleScope
+import com.nlab.reminder.core.android.navigation.NavigationController
 import com.nlab.reminder.databinding.FragmentHomeBinding
+import com.nlab.reminder.domain.common.android.fragment.handleSideEffect
+import com.nlab.reminder.domain.common.android.fragment.resultReceives
+import com.nlab.reminder.domain.common.android.navigation.navigateToAllScheduleEnd
 import com.nlab.reminder.domain.feature.home.*
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -44,7 +49,31 @@ class HomeFragment : Fragment() {
 
     @HomeScope
     @Inject
-    lateinit var entryPointInit: EntryPointInit
+    lateinit var navigationController: NavigationController
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        resultReceives<HomeTagConfigResult>(REQUEST_KEY_HOME_TO_HOME_TAG_CONFIG)
+            .onEach { result ->
+                when {
+                    result.isRenameRequested -> viewModel.onTagRenameRequestClicked(result.tag)
+                    result.isDeleteRequested -> viewModel.onTagDeleteRequestClicked(result.tag)
+                }
+            }
+            .launchIn(lifecycleScope)
+
+        resultReceives<HomeTagRenameResult>(REQUEST_KEY_HOME_TO_HOME_TAG_RENAME)
+            .filter { it.isConfirmed }
+            .onEach { result -> viewModel.onTagRenameConfirmClicked(result.tag, result.rename) }
+            .launchIn(lifecycleScope)
+
+        resultReceives<HomeTagDeleteResult>(REQUEST_KEY_HOME_TO_HOME_TAG_DELETE)
+            .filter { it.isConfirmed }
+            .map { it.tag }
+            .onEach { tag -> viewModel.onTagDeleteConfirmClicked(tag) }
+            .launchIn(lifecycleScope)
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentHomeBinding.inflate(inflater, container, false)
@@ -57,31 +86,59 @@ class HomeFragment : Fragment() {
         val homeItemAdapter = HomeItemAdapter()
         val renderWhenLoaded = renderWhenLoadedFunc(homeItemAdapter)
 
-        entryPointInit.initialize(
-            navigationEffect = viewModel.navigationEffect
-        )
-
         binding.categoryRecyclerview
             .apply { itemAnimator = null }
             .apply { adapter = homeItemAdapter }
 
+        handleSideEffect(viewModel.homeSideEffect) { sideEffect ->
+            when (sideEffect) {
+                is HomeSideEffect.NavigateToday -> {
+
+                }
+                is HomeSideEffect.NavigateTimetable -> {
+
+                }
+                is HomeSideEffect.NavigateAllSchedule -> {
+                    navigationController.navigateToAllScheduleEnd()
+                }
+                is HomeSideEffect.NavigateTag -> {
+
+                }
+                is HomeSideEffect.NavigateTagConfig -> {
+                    navigationController.navigateToTagConfig(
+                        REQUEST_KEY_HOME_TO_HOME_TAG_CONFIG, sideEffect.tag
+                    )
+                }
+                is HomeSideEffect.NavigateTagRename -> {
+                    navigationController.navigateToTagRename(
+                        REQUEST_KEY_HOME_TO_HOME_TAG_RENAME, sideEffect.tag, sideEffect.usageCount
+                    )
+                }
+                is HomeSideEffect.NavigateTagDelete -> {
+                    navigationController.navigateToTagDelete(
+                        REQUEST_KEY_HOME_TO_HOME_TAG_DELETE, sideEffect.tag, sideEffect.usageCount
+                    )
+                }
+            }
+        }
+
         viewModel.state
             .filterIsInstance<HomeState.Init>()
-            .flowWithLifecycle(viewLifecycleOwner.lifecycle)
+            .flowWithLifecycle(viewLifecycle)
             .distinctUntilChanged()
             .onEach { renderWhenInit() }
-            .launchIn(viewLifecycleOwner.lifecycleScope)
+            .launchIn(viewLifecycleScope)
 
         viewModel.state
             .filterIsInstance<HomeState.Loading>()
-            .flowWithLifecycle(viewLifecycleOwner.lifecycle)
+            .flowWithLifecycle(viewLifecycle)
             .distinctUntilChanged()
             .onEach { renderWhenLoading() }
-            .launchIn(viewLifecycleOwner.lifecycleScope)
+            .launchIn(viewLifecycleScope)
 
         viewModel.state
             .filterIsInstance<HomeState.Loaded>()
-            .flowWithLifecycle(viewLifecycleOwner.lifecycle)
+            .flowWithLifecycle(viewLifecycle)
             .distinctUntilChanged()
             .map { state ->
                 state.toHomeItems(
@@ -94,7 +151,7 @@ class HomeFragment : Fragment() {
             }
             .flowOn(Dispatchers.Default)
             .onEach { homeListItem -> renderWhenLoaded(homeListItem) }
-            .launchIn(viewLifecycleOwner.lifecycleScope)
+            .launchIn(viewLifecycleScope)
     }
 
     private fun renderWhenInit() {
@@ -113,5 +170,11 @@ class HomeFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    companion object {
+        private const val REQUEST_KEY_HOME_TO_HOME_TAG_CONFIG = "requestKeyHomeToHomeTagConfig"
+        private const val REQUEST_KEY_HOME_TO_HOME_TAG_RENAME = "requestKeyHomeToHomeTagRename"
+        private const val REQUEST_KEY_HOME_TO_HOME_TAG_DELETE = "requestKeyHomeToHomeTagDelete"
     }
 }

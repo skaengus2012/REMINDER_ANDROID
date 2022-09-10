@@ -16,27 +16,8 @@
 
 package com.nlab.reminder.domain.feature.home.tag.rename
 
-// TODO apply new viewEffect and make test  https://github.com/skaengus2012/REMINDER_ANDROID/issues/51
-fun HomeTagRenameViewModel.onRenameTextInput(text: String) {
-    invoke(HomeTagRenameEvent.OnRenameTextInput(text))
-}
-
-// TODO apply new viewEffect and make test  https://github.com/skaengus2012/REMINDER_ANDROID/issues/51
-fun HomeTagRenameViewModel.onRenameTextClearClicked() {
-    invoke(HomeTagRenameEvent.OnRenameTextClearClicked)
-}
-
-// TODO apply new viewEffect and make test  https://github.com/skaengus2012/REMINDER_ANDROID/issues/51
-fun HomeTagRenameViewModel.onKeyboardShownWhenViewCreated() {
-    invoke(HomeTagRenameEvent.OnKeyboardShownWhenViewCreated)
-}
-
-// TODO apply new viewEffect and make test  https://github.com/skaengus2012/REMINDER_ANDROID/issues/51
-fun HomeTagRenameViewModel.onCancelClicked() {
-    invoke(HomeTagRenameEvent.OnCancelClicked)
-}
-
-// TODO apply new viewEffect and make test  https://github.com/skaengus2012/REMINDER_ANDROID/issues/51
-fun HomeTagRenameViewModel.onConfirmClicked() {
-    invoke(HomeTagRenameEvent.OnConfirmClicked)
-}
+fun HomeTagRenameViewModel.onRenameTextInput(text: String) = invoke(HomeTagRenameEvent.OnRenameTextInput(text))
+fun HomeTagRenameViewModel.onRenameTextClearClicked() = invoke(HomeTagRenameEvent.OnRenameTextClearClicked)
+fun HomeTagRenameViewModel.onKeyboardShownWhenViewCreated() = invoke(HomeTagRenameEvent.OnKeyboardShownWhenViewCreated)
+fun HomeTagRenameViewModel.onCancelClicked() = invoke(HomeTagRenameEvent.OnCancelClicked)
+fun HomeTagRenameViewModel.onConfirmClicked() = invoke(HomeTagRenameEvent.OnConfirmClicked)

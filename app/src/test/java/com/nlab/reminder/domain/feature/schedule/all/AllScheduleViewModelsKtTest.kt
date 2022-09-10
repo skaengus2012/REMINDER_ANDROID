@@ -16,46 +16,32 @@
 
 package com.nlab.reminder.domain.feature.schedule.all
 
+import com.nlab.reminder.core.state.StateController
+import com.nlab.reminder.core.state.verifyStateSendExtension
 import com.nlab.reminder.domain.common.schedule.Schedule
 import com.nlab.reminder.domain.common.schedule.genSchedule
 import com.nlab.reminder.test.genBoolean
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.resetMain
-import kotlinx.coroutines.test.setMain
-import org.junit.After
-import org.junit.Before
 import org.junit.Test
-import org.mockito.kotlin.times
-import org.mockito.kotlin.verify
+import org.mockito.kotlin.*
 
 /**
  * @author Doohyun
  */
-@OptIn(ExperimentalCoroutinesApi::class)
 class AllScheduleViewModelsKtTest {
-   /**
-    @Before
-    fun setUp() {
-        Dispatchers.setMain(Dispatchers.Unconfined)
-    }
-
-    @After
-    fun tearDown() {
-        Dispatchers.resetMain()
-    }
-
     @Test
     fun testExtensions() {
+        val stateController: StateController<AllScheduleEvent, AllScheduleState> = mock()
         val schedule: Schedule = genSchedule()
         val isComplete: Boolean = genBoolean()
-        val events = listOf(
-            AllScheduleEvent.OnScheduleCompleteUpdateClicked(schedule.id(), isComplete)
+        val viewModel = AllScheduleViewModel(
+            stateControllerFactory = mock {
+                whenever(mock.create(any())) doReturn stateController
+            }
         )
-        val (viewModel, stateMachine) = genAllScheduleMockingViewModelComponent()
 
-        viewModel.onScheduleCompleteUpdateClicked(schedule.id(), isComplete)
-
-        events.forEach { action -> verify(stateMachine, times(1)).send(action) }
-    }*/
+        verifyStateSendExtension(
+            stateController,
+            AllScheduleEvent.OnScheduleCompleteUpdateClicked(schedule.id(), isComplete)
+        ) { viewModel.onScheduleCompleteUpdateClicked(schedule.id(), isComplete) }
+    }
 }

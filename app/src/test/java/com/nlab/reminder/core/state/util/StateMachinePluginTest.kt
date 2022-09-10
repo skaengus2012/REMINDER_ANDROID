@@ -83,7 +83,7 @@ class StateMachinePluginTest {
     private fun genThrowableAndStateMachine(): Pair<Throwable, StateMachine<TestEvent, TestState>> {
         val exception = Throwable()
         return exception to StateMachine {
-            sideEffect { throw exception }
+            handle { throw exception }
         }
     }
 
@@ -115,7 +115,7 @@ class StateMachinePluginTest {
     private fun genIsContextEqualsAndStateMachine(): Pair<Deferred<Boolean>, StateMachine<TestEvent, TestState>> {
         val result = CompletableDeferred<Boolean>()
         return result to StateMachine {
-            sideEffect {
+            handle {
                 val curContext = coroutineScope {
                     coroutineContext[ContinuationInterceptor]
                 }

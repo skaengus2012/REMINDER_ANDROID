@@ -18,32 +18,23 @@ package com.nlab.reminder.domain.feature.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nlab.reminder.core.effect.message.navigation.NavigationEffect
-import com.nlab.reminder.core.effect.message.navigation.SendNavigationEffect
-import com.nlab.reminder.core.effect.util.sideEffect
-import com.nlab.reminder.core.state.util.controlIn
-import com.nlab.reminder.core.util.test.annotation.Generated
+import com.nlab.reminder.core.effect.util.SideEffectController
+import com.nlab.reminder.core.effect.util.asReceived
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
 /**
  * @author Doohyun
  */
-// TODO apply new viewEffect and make test  https://github.com/skaengus2012/REMINDER_ANDROID/issues/51
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    stateMachineFactory: HomeStateMachineFactory
+    stateControllerFactory: HomeStateControllerFactory
 ) : ViewModel() {
-    private val _navigationEffect: SendNavigationEffect by sideEffect()
-    private val stateController =
-        stateMachineFactory
-            .create(_navigationEffect)
-            .controlIn(viewModelScope, HomeState.Init, fetchEvent = HomeEvent.Fetch)
+    private val sideEffectController = SideEffectController<HomeSideEffect>()
+    private val stateController = stateControllerFactory.create(viewModelScope, sideEffectController)
 
-    val navigationEffect: NavigationEffect = _navigationEffect
-    val state: StateFlow<HomeState> = stateController.state
-
+    val homeSideEffect = sideEffectController.asReceived()
+    val state = stateController.state
     fun invoke(event: HomeEvent): Job = stateController.send(event)
 }

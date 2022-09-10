@@ -49,7 +49,7 @@ class StateMachineBuilder<E : Event, S : State> {
         onExceptionHandlers += { throwable -> block(StateMachineBuildScope, throwable) }
     }
 
-    fun sideEffect(
+    fun handle(
         filter: (UpdateSource<E, S>) -> Boolean = { true },
         block: suspend (StateMachineBuildSideEffect<E>).(UpdateSource<E, S>) -> Unit
     ) {
@@ -62,48 +62,48 @@ class StateMachineBuilder<E : Event, S : State> {
 
     // Jacoco could not measure coverage for functions that were directly processed as inline.
     // So I created a wrapping function
-    fun <T : E> sideEffectBy(
+    fun <T : E> handleBy(
         eventClazz: Class<T>,
         block: suspend (StateMachineBuildSideEffect<E>).(UpdateSource<T, S>) -> Unit
     ) {
-        sideEffect(
+        handle(
             filter = { updateSource -> eventClazz.isInstance(updateSource.event) },
             block = { updateSource -> block(UpdateSource(eventClazz.cast(updateSource.event)!!, updateSource.before)) }
         )
     }
 
-    inline fun <reified T : E> sideEffectBy(
+    inline fun <reified T : E> handleBy(
         noinline block: suspend (StateMachineBuildSideEffect<E>).(UpdateSource<T, S>) -> Unit
     ) {
-        sideEffectBy(T::class.java, block)
+        handleBy(T::class.java, block)
     }
 
     // Jacoco could not measure coverage for functions that were directly processed as inline.
     // So I created a wrapping function
-    fun <U : S> sideEffectWhen(
+    fun <U : S> handleWhen(
         stateClazz: Class<U>,
         block: suspend (StateMachineBuildSideEffect<E>).(UpdateSource<E, U>) -> Unit
     ) {
-        sideEffect(
+        handle(
             filter = { updateSource -> stateClazz.isInstance(updateSource.before) },
             block = { updateSource -> block(UpdateSource(updateSource.event, stateClazz.cast(updateSource.before)!!)) }
         )
     }
 
-    inline fun <reified U : S> sideEffectWhen(
+    inline fun <reified U : S> handleWhen(
         noinline block: suspend (StateMachineBuildSideEffect<E>).(UpdateSource<E, U>) -> Unit
     ) {
-        sideEffectWhen(U::class.java, block)
+        handleWhen(U::class.java, block)
     }
 
     // Jacoco could not measure coverage for functions that were directly processed as inline.
     // So I created a wrapping function
-    fun <T : E, U : S> sideEffectOn(
+    fun <T : E, U : S> handleOn(
         eventClazz: Class<T>,
         stateClazz: Class<U>,
         block: suspend (StateMachineBuildSideEffect<E>).(UpdateSource<T, U>) -> Unit
     ) {
-        sideEffect(
+        handle(
             filter = { updateSource ->
                 eventClazz.isInstance(updateSource.event) && stateClazz.isInstance(updateSource.before)
             },
@@ -118,9 +118,9 @@ class StateMachineBuilder<E : Event, S : State> {
         )
     }
 
-    inline fun <reified T : E, reified U : S> sideEffectOn(
+    inline fun <reified T : E, reified U : S> handleOn(
         noinline block: suspend (StateMachineBuildSideEffect<E>).(UpdateSource<T, U>) -> Unit
     ) {
-        sideEffectOn(T::class.java, U::class.java, block)
+        handleOn(T::class.java, U::class.java, block)
     }
 }
