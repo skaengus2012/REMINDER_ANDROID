@@ -24,6 +24,7 @@ import com.nlab.reminder.domain.common.tag.genTagWithResource
 import com.nlab.reminder.test.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
@@ -45,7 +46,8 @@ class HomeStateMachineKtTest {
         HomeEvent.OnTagRenameConfirmClicked(genTag(), renameText = genLetterify()),
         HomeEvent.OnTagDeleteRequestClicked(genTag()),
         HomeEvent.OnTagDeleteConfirmClicked(genTag()),
-        HomeEvent.OnSnapshotLoaded(genHomeSnapshot())
+        HomeEvent.OnSnapshotLoaded(genHomeSnapshot()),
+        HomeEvent.OnSnapshotLoadFailed(Throwable())
     )
 
     private fun genStates(): Set<HomeState> = setOf(
@@ -120,7 +122,7 @@ class HomeStateMachineKtTest {
     }
 
     @Test
-    fun `never updated when any event excluded fetch and OnHomeSummaryLoaded sent`() = runTest {
+    fun `never updated when any event excluded fetch and OnHomeSummaryLoaded and OnSnapshotLoadFailed sent`() = runTest {
         val initAndStateControllers = genStates().map { state ->
             state to genStateMachine().controlIn(CoroutineScope(Dispatchers.Default), state)
         }
@@ -129,6 +131,7 @@ class HomeStateMachineKtTest {
                 .asSequence()
                 .filterNot { it is HomeEvent.Fetch }
                 .filterNot { it is HomeEvent.OnSnapshotLoaded }
+                .filterNot { it is HomeEvent.OnSnapshotLoadFailed }
                 .map { event ->
                     initAndStateControllers.map { (initState, controller) ->
                         async {
@@ -147,26 +150,61 @@ class HomeStateMachineKtTest {
     }
 
     @Test
-    fun `subscribe homeSummary snapshot when state was init and fetch sent`() = runTest {
+    fun `start homeSnapshot subscription when state was init and fetch sent`() {
+        testHomeSnapshotSubscription(initState = HomeState.Init, event = HomeEvent.Fetch)
+    }
+
+    @Test
+    fun `start homeSnapshot subscription when state was error and retry sent`() {
+        testHomeSnapshotSubscription(
+            initState = HomeState.Error(Throwable(), HomeState.Init),
+            event = HomeEvent.OnRetryClicked
+        )
+    }
+
+    private fun testHomeSnapshotSubscription(initState: HomeState, event: HomeEvent) = runTest {
         val expected = genHomeSnapshot()
-        val getHomeSummary: GetHomeSnapshotUseCase =  mock {
+        val getHomeSnapshot: GetHomeSnapshotUseCase =  mock {
             onBlocking { mock() } doReturn flow { emit(expected) }
         }
         val stateController =
-            genStateMachine(getHomeSnapshot = getHomeSummary)
-                .controlIn(CoroutineScope(Dispatchers.Unconfined), HomeState.Init)
+            genStateMachine(getHomeSnapshot = getHomeSnapshot)
+                .controlIn(CoroutineScope(Dispatchers.Unconfined), initState)
         stateController
-            .send(HomeEvent.Fetch)
+            .send(event)
             .join()
 
         val deferred = CompletableDeferred<HomeSnapshot>()
-        stateController
-            .state
+        stateController.state
             .filterIsInstance<HomeState.Loaded>()
             .onEach { deferred.complete(it.snapshot) }
             .launchIn(genFlowObserveDispatcher())
 
         assertThat(deferred.await(), equalTo(expected))
+    }
+
+    @Test
+    fun `send HomeSnapshotLoadFailed when getHomeSnapshot occurred error`() = runTest {
+        val expectedSnapshot = genHomeSnapshot()
+        val getHomeSnapshot: GetHomeSnapshotUseCase = mock {
+            onBlocking { mock() } doReturn flow { emit(expectedSnapshot); delay(1_000); throw Throwable() }
+                .flowOn(genFlowExecutionDispatcher(testScheduler))
+        }
+        val stateController =
+            genStateMachine(getHomeSnapshot = getHomeSnapshot)
+                .controlIn(CoroutineScope(Dispatchers.Unconfined), HomeState.Init)
+        stateController
+            .send(HomeEvent.Fetch)
+            .join()
+
+        val deferred = CompletableDeferred<HomeState.Error>()
+        stateController.state
+            .filterIsInstance<HomeState.Error>()
+            .onEach { state -> deferred.complete(state) }
+            .launchIn(genFlowObserveDispatcher())
+
+        advanceTimeBy(1_200)
+        assertThat(deferred.await().before, equalTo(HomeState.Loaded(expectedSnapshot)))
     }
 
     @Test

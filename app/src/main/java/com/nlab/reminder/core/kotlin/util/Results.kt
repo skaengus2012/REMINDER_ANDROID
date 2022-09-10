@@ -23,7 +23,7 @@ package com.nlab.reminder.core.kotlin.util
 inline fun <T> catching(block: () -> T): Result<T> =
     try {
         Result.Success(block())
-    } catch (e: Exception) {
+    } catch (e: Throwable) {
         Result.Failure(e)
     }
 
@@ -37,8 +37,15 @@ val <T> Result<T>.isFailure get() = when (this) {
     is Result.Failure -> true
 }
 
-inline fun <T> Result<T>.onFailure(action: (Throwable) -> Unit) {
+fun <T> Result<T>.getValueOrThrow(): T = when (this) {
+    is Result.Success -> value
+    is Result.Failure -> throw throwable
+}
+
+inline fun <T> Result<T>.onFailure(action: (Throwable) -> Unit): Result<T> {
     if (this is Result.Failure) {
         action(throwable)
     }
+
+    return this
 }

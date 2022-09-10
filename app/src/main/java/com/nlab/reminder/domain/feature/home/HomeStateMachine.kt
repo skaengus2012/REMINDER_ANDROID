@@ -17,6 +17,9 @@
 package com.nlab.reminder.domain.feature.home
 
 import com.nlab.reminder.core.effect.SideEffectSender
+import com.nlab.reminder.core.kotlin.util.catching
+import com.nlab.reminder.core.kotlin.util.getValueOrThrow
+import com.nlab.reminder.core.kotlin.util.onFailure
 import com.nlab.reminder.core.state.util.StateMachine
 
 /**
@@ -40,12 +43,21 @@ fun HomeStateMachine(
                 if (state is HomeState.Init) state
                 else HomeState.Loaded(event.snapshot)
             }
+            is HomeEvent.OnSnapshotLoadFailed -> {
+                HomeState.Error(event.throwable, state)
+            }
             else -> state
         }
     }
 
-    handleOn<HomeEvent.Fetch, HomeState.Init> {
-        getHomeSnapshot().collect { send(HomeEvent.OnSnapshotLoaded(it)) }
+    handle { (event, state) ->
+        val isFetched: Boolean = (state is HomeState.Init && event is HomeEvent.Fetch)
+        val isRetried: Boolean = (state is HomeState.Error && event is HomeEvent.OnRetryClicked)
+        if (isFetched || isRetried) {
+            catching { getHomeSnapshot().collect { snapshot -> send(HomeEvent.OnSnapshotLoaded(snapshot)) } }
+                .onFailure { e -> send(HomeEvent.OnSnapshotLoadFailed(e)).join() }
+                .getValueOrThrow()
+        }
     }
 
     handleOn<HomeEvent.OnTodayCategoryClicked, HomeState.Loaded> {

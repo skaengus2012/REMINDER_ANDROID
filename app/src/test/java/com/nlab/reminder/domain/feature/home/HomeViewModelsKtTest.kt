@@ -38,6 +38,12 @@ class HomeViewModelsKtTest {
                 whenever(mock.create(any(), any())) doReturn stateController
             }
         )
+
+        verifyStateSendExtension(
+            stateController,
+            HomeEvent.OnRetryClicked
+        ) { viewModel.onRetryClicked() }
+
         verifyStateSendExtension(
             stateController,
             HomeEvent.OnTodayCategoryClicked

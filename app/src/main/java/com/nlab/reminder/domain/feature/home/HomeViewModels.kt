@@ -20,7 +20,7 @@ import com.nlab.reminder.domain.common.tag.Tag
 /**
  * @author Doohyun
  */
-
+fun HomeViewModel.onRetryClicked() = invoke(HomeEvent.OnRetryClicked)
 fun HomeViewModel.onTodayCategoryClicked() = invoke(HomeEvent.OnTodayCategoryClicked)
 fun HomeViewModel.onTimetableCategoryClicked() = invoke(HomeEvent.OnTimetableCategoryClicked)
 fun HomeViewModel.onAllCategoryClicked() = invoke(HomeEvent.OnAllCategoryClicked)
