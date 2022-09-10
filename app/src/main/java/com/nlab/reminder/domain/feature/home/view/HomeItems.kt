@@ -32,21 +32,21 @@ inline fun HomeState.Loaded.toHomeItems(
 ): List<HomeItem> = buildList {
     this += HomeItem.CategoryItem(
         categoryResource = CategoryResource.TODAY,
-        count = homeSummary.todayNotificationCount,
+        count = snapshot.todayNotificationCount,
         onItemClicked = onTodayCategoryClicked
     )
     this += HomeItem.CategoryItem(
         categoryResource = CategoryResource.TIME_TABLE,
-        count = homeSummary.timetableNotificationCount,
+        count = snapshot.timetableNotificationCount,
         onItemClicked = onTimetableCategoryClicked
     )
     this += HomeItem.CategoryItem(
         categoryResource = CategoryResource.ALL,
-        count = homeSummary.allNotificationCount,
+        count = snapshot.allNotificationCount,
         onItemClicked = onAllCategoryClicked
     )
     this += HomeItem.TagHolderItem(
-        homeSummary.tags.map { (tag, tagStyleResource) ->
+        snapshot.tags.map { (tag, tagStyleResource) ->
             TagItem(
                 tag,
                 tagStyleResource,

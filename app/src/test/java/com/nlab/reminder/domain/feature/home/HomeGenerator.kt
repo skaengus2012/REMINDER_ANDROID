@@ -23,9 +23,9 @@ import com.nlab.reminder.test.genLong
 /**
  * @author Doohyun
  */
-fun genHomeSummary(
+fun genHomeSnapshot(
     todayNotificationCount: Long = genLong(),
     timetableNotificationCount: Long = genLong(),
     allNotificationCount: Long = genLong(),
     tags: List<TagWithResource> = List(genInt("#")) { genTagWithResource() }
-): HomeSummary = HomeSummary(todayNotificationCount, timetableNotificationCount, allNotificationCount, tags)
+): HomeSnapshot = HomeSnapshot(todayNotificationCount, timetableNotificationCount, allNotificationCount, tags)

@@ -27,7 +27,7 @@ sealed class HomeEvent private constructor() : Event {
     object OnTodayCategoryClicked : HomeEvent()
     object OnTimetableCategoryClicked : HomeEvent()
     object OnAllCategoryClicked : HomeEvent()
-    @Generated data class OnHomeSummaryLoaded(val homeSummary: HomeSummary) : HomeEvent()
+    @Generated data class OnSnapshotLoaded(val snapshot: HomeSnapshot) : HomeEvent()
     @Generated data class OnTagClicked(val tag: Tag) : HomeEvent()
     @Generated data class OnTagLongClicked(val tag: Tag) : HomeEvent()
     @Generated data class OnTagRenameRequestClicked(val tag: Tag) : HomeEvent()

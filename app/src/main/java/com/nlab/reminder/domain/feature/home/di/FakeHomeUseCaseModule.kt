@@ -33,7 +33,7 @@ class FakeHomeUseCaseModule {
     @Provides
     fun provideGetHomeSummaryUseCase(
         tagRepository: TagRepository
-    ): GetHomeSummaryUseCase = FakeGetHomeSummaryUseCase(tagRepository)
+    ): GetHomeSnapshotUseCase = FakeGetHomeSnapshotUseCase(tagRepository)
 
     @Provides
     fun provideModifyTagNameUseCase(): ModifyTagNameUseCase = FakeModifyTagNameUseCase()

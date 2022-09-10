@@ -20,8 +20,8 @@ import com.nlab.reminder.core.kotlin.coroutine.flow.map
 import com.nlab.reminder.core.util.test.annotation.Generated
 import com.nlab.reminder.domain.common.tag.TagRepository
 import com.nlab.reminder.domain.common.tag.TagStyleResource
-import com.nlab.reminder.domain.feature.home.GetHomeSummaryUseCase
-import com.nlab.reminder.domain.feature.home.HomeSummary
+import com.nlab.reminder.domain.feature.home.GetHomeSnapshotUseCase
+import com.nlab.reminder.domain.feature.home.HomeSnapshot
 import com.nlab.reminder.domain.feature.home.TagWithResource
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -32,16 +32,16 @@ import kotlinx.coroutines.flow.flowOn
  * @author Doohyun
  */
 @Deprecated(message = "Fake UseCase was used")
-class FakeGetHomeSummaryUseCase(
+class FakeGetHomeSnapshotUseCase(
     private val tagRepository: TagRepository,
     private val dispatcher: CoroutineDispatcher = Dispatchers.Default
-) : GetHomeSummaryUseCase {
+) : GetHomeSnapshotUseCase {
     @Generated
-    override suspend fun invoke(): Flow<HomeSummary> {
+    override suspend fun invoke(): Flow<HomeSnapshot> {
         // TODO with scheduleEntityModel
         return tagRepository.get()
             .map { tags ->
-                HomeSummary(
+                HomeSnapshot(
                     todayNotificationCount = (0..50).random().toLong(),
                     timetableNotificationCount = (0..50).random().toLong(),
                     allNotificationCount = (0..50).random().toLong(),

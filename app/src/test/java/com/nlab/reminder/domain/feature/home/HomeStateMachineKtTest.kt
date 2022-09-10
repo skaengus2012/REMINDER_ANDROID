@@ -45,24 +45,24 @@ class HomeStateMachineKtTest {
         HomeEvent.OnTagRenameConfirmClicked(genTag(), renameText = genLetterify()),
         HomeEvent.OnTagDeleteRequestClicked(genTag()),
         HomeEvent.OnTagDeleteConfirmClicked(genTag()),
-        HomeEvent.OnHomeSummaryLoaded(genHomeSummary())
+        HomeEvent.OnSnapshotLoaded(genHomeSnapshot())
     )
 
     private fun genStates(): Set<HomeState> = setOf(
         HomeState.Init,
         HomeState.Loading,
-        HomeState.Loaded(genHomeSummary())
+        HomeState.Loaded(genHomeSnapshot())
     )
 
     private fun genStateMachine(
         homeSideEffect: SideEffectSender<HomeSideEffect> = mock(),
-        getHomeSummary: GetHomeSummaryUseCase = mock { onBlocking { mock() } doReturn emptyFlow() },
+        getHomeSnapshot: GetHomeSnapshotUseCase = mock { onBlocking { mock() } doReturn emptyFlow() },
         getTagUsageCount: GetTagUsageCountUseCase = mock(),
         modifyTagName: ModifyTagNameUseCase = mock(),
         deleteTag: DeleteTagUseCase = mock()
     ) = HomeStateMachine(
         homeSideEffect,
-        getHomeSummary,
+        getHomeSnapshot,
         getTagUsageCount,
         modifyTagName,
         deleteTag
@@ -96,13 +96,13 @@ class HomeStateMachineKtTest {
 
     @Test
     fun `update to Loaded when state was not init and OnHomeSummaryLoaded sent`() = runTest {
-        val homeSummary = genHomeSummary()
+        val homeSummary = genHomeSnapshot()
         val stateControllers =
             genStates()
                 .filter { it != HomeState.Init }
                 .map { genStateMachine().controlIn(CoroutineScope(Dispatchers.Default), it) }
         stateControllers
-            .map { it.send(HomeEvent.OnHomeSummaryLoaded(homeSummary)) }
+            .map { it.send(HomeEvent.OnSnapshotLoaded(homeSummary)) }
             .joinAll()
         assertThat(
             stateControllers.map { it.state.value }.all { it == HomeState.Loaded(homeSummary) },
@@ -114,7 +114,7 @@ class HomeStateMachineKtTest {
     fun `never updated when state was init and OnHomeSummaryLoaded sent`() = runTest {
         val stateController = genStateMachine().controlIn(CoroutineScope(Dispatchers.Default), HomeState.Init)
         stateController
-            .send(HomeEvent.OnHomeSummaryLoaded(genHomeSummary()))
+            .send(HomeEvent.OnSnapshotLoaded(genHomeSnapshot()))
             .join()
         assertThat(stateController.state.value, equalTo(HomeState.Init))
     }
@@ -128,7 +128,7 @@ class HomeStateMachineKtTest {
             genEvents()
                 .asSequence()
                 .filterNot { it is HomeEvent.Fetch }
-                .filterNot { it is HomeEvent.OnHomeSummaryLoaded }
+                .filterNot { it is HomeEvent.OnSnapshotLoaded }
                 .map { event ->
                     initAndStateControllers.map { (initState, controller) ->
                         async {
@@ -148,22 +148,22 @@ class HomeStateMachineKtTest {
 
     @Test
     fun `subscribe homeSummary snapshot when state was init and fetch sent`() = runTest {
-        val expected = genHomeSummary()
-        val getHomeSummary: GetHomeSummaryUseCase =  mock {
+        val expected = genHomeSnapshot()
+        val getHomeSummary: GetHomeSnapshotUseCase =  mock {
             onBlocking { mock() } doReturn flow { emit(expected) }
         }
         val stateController =
-            genStateMachine(getHomeSummary = getHomeSummary)
+            genStateMachine(getHomeSnapshot = getHomeSummary)
                 .controlIn(CoroutineScope(Dispatchers.Unconfined), HomeState.Init)
         stateController
             .send(HomeEvent.Fetch)
             .join()
 
-        val deferred = CompletableDeferred<HomeSummary>()
+        val deferred = CompletableDeferred<HomeSnapshot>()
         stateController
             .state
             .filterIsInstance<HomeState.Loaded>()
-            .onEach { deferred.complete(it.homeSummary) }
+            .onEach { deferred.complete(it.snapshot) }
             .launchIn(genFlowObserveDispatcher())
 
         assertThat(deferred.await(), equalTo(expected))
@@ -197,8 +197,8 @@ class HomeStateMachineKtTest {
     fun `navigate tag end when tag element clicked`() = runTest {
         val testTag: Tag = genTag()
         val testSummaries = listOf(
-            genHomeSummary(tags = listOf(genTagWithResource(testTag))),
-            genHomeSummary(tags = emptyList())
+            genHomeSnapshot(tags = listOf(genTagWithResource(testTag))),
+            genHomeSnapshot(tags = emptyList())
         )
         testSummaries.forEach { homeSummary ->
             testNavigationEnd(
@@ -213,8 +213,8 @@ class HomeStateMachineKtTest {
     fun `navigate tag config end when tag element long clicked`() = runTest {
         val testTag: Tag = genTag()
         val testSummaries = listOf(
-            genHomeSummary(tags = listOf(genTagWithResource(testTag))),
-            genHomeSummary(tags = emptyList())
+            genHomeSnapshot(tags = listOf(genTagWithResource(testTag))),
+            genHomeSnapshot(tags = emptyList())
         )
         testSummaries.forEach { homeSummary ->
             testNavigationEnd(
@@ -230,8 +230,8 @@ class HomeStateMachineKtTest {
         val testTag: Tag = genTag()
         val testUsageCount = genLong()
         val testSummaries = listOf(
-            genHomeSummary(tags = listOf(genTagWithResource(testTag))),
-            genHomeSummary(tags = emptyList())
+            genHomeSnapshot(tags = listOf(genTagWithResource(testTag))),
+            genHomeSnapshot(tags = emptyList())
         )
         testSummaries.forEach { homeSummary ->
             testNavigationEnd(
@@ -248,8 +248,8 @@ class HomeStateMachineKtTest {
         val testTag: Tag = genTag()
         val testUsageCount = genLong()
         val testSummaries = listOf(
-            genHomeSummary(tags = listOf(genTagWithResource(testTag))),
-            genHomeSummary(tags = emptyList())
+            genHomeSnapshot(tags = listOf(genTagWithResource(testTag))),
+            genHomeSnapshot(tags = emptyList())
         )
         testSummaries.forEach { homeSummary ->
             testNavigationEnd(
@@ -263,7 +263,7 @@ class HomeStateMachineKtTest {
 
     private suspend fun testNavigationEnd(
         getTagUsageCount: GetTagUsageCountUseCase = mock(),
-        initState: HomeState = HomeState.Loaded(genHomeSummary()),
+        initState: HomeState = HomeState.Loaded(genHomeSnapshot()),
         navigateEvent: HomeEvent,
         expectedSideEffectMessage: HomeSideEffect,
     ) {
@@ -282,7 +282,7 @@ class HomeStateMachineKtTest {
         val modifyTagNameUseCase: ModifyTagNameUseCase = mock()
         val stateMachine =
             genStateMachine(modifyTagName = modifyTagNameUseCase)
-                .controlIn(CoroutineScope(Dispatchers.Default), HomeState.Loaded(genHomeSummary()))
+                .controlIn(CoroutineScope(Dispatchers.Default), HomeState.Loaded(genHomeSnapshot()))
 
         stateMachine
             .send(HomeEvent.OnTagRenameConfirmClicked(testTag, renameText))
@@ -296,7 +296,7 @@ class HomeStateMachineKtTest {
         val testTag: Tag = genTag()
         val stateMachine =
             genStateMachine(deleteTag = deleteTagUseCase)
-                .controlIn(CoroutineScope(Dispatchers.Default), HomeState.Loaded(genHomeSummary()))
+                .controlIn(CoroutineScope(Dispatchers.Default), HomeState.Loaded(genHomeSnapshot()))
         stateMachine
             .send(HomeEvent.OnTagDeleteConfirmClicked(testTag))
             .join()

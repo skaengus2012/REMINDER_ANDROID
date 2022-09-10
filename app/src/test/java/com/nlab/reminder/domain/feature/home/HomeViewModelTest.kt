@@ -42,7 +42,7 @@ import org.mockito.kotlin.*
 @OptIn(ExperimentalCoroutinesApi::class)
 class HomeViewModelTest {
     private val sampleEvent: HomeEvent = HomeEvent.OnTodayCategoryClicked
-    private val sampleState: HomeState = HomeState.Loaded(genHomeSummary())
+    private val sampleState: HomeState = HomeState.Loaded(genHomeSnapshot())
     private val sampleEffect: HomeSideEffect = HomeSideEffect.NavigateToday
 
     @Before

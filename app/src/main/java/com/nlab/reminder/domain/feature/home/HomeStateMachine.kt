@@ -25,7 +25,7 @@ import com.nlab.reminder.core.state.util.StateMachine
 @Suppress("FunctionName")
 fun HomeStateMachine(
     homeSideEffect: SideEffectSender<HomeSideEffect>,
-    getHomeSummary: GetHomeSummaryUseCase,
+    getHomeSnapshot: GetHomeSnapshotUseCase,
     getTagUsageCount: GetTagUsageCountUseCase,
     modifyTagName: ModifyTagNameUseCase,
     deleteTag: DeleteTagUseCase
@@ -36,16 +36,16 @@ fun HomeStateMachine(
                 if (state is HomeState.Init) HomeState.Loading
                 else state
             }
-            is HomeEvent.OnHomeSummaryLoaded -> {
+            is HomeEvent.OnSnapshotLoaded -> {
                 if (state is HomeState.Init) state
-                else HomeState.Loaded(event.homeSummary)
+                else HomeState.Loaded(event.snapshot)
             }
             else -> state
         }
     }
 
     handleOn<HomeEvent.Fetch, HomeState.Init> {
-        getHomeSummary().collect { send(HomeEvent.OnHomeSummaryLoaded(it)) }
+        getHomeSnapshot().collect { send(HomeEvent.OnSnapshotLoaded(it)) }
     }
 
     handleOn<HomeEvent.OnTodayCategoryClicked, HomeState.Loaded> {

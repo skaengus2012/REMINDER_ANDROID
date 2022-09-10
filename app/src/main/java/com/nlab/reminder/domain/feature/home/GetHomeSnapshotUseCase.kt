@@ -16,15 +16,11 @@
 
 package com.nlab.reminder.domain.feature.home
 
-import com.nlab.reminder.core.util.test.annotation.Generated
+import kotlinx.coroutines.flow.Flow
 
 /**
  * @author Doohyun
  */
-@Generated
-data class HomeSummary(
-    val todayNotificationCount: Long,
-    val timetableNotificationCount: Long,
-    val allNotificationCount: Long,
-    val tags: List<TagWithResource>
-)
+interface GetHomeSnapshotUseCase {
+    suspend operator fun invoke(): Flow<HomeSnapshot>
+}

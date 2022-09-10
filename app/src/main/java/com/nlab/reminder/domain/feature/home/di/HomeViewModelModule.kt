@@ -34,7 +34,7 @@ import kotlinx.coroutines.CoroutineScope
 class HomeViewModelModule {
     @Provides
     fun provideHomeStateController(
-        getHomeSummary: GetHomeSummaryUseCase,
+        getHomeSummary: GetHomeSnapshotUseCase,
         getTagUsageCount: GetTagUsageCountUseCase,
         modifyTagName: ModifyTagNameUseCase,
         deleteTag: DeleteTagUseCase
