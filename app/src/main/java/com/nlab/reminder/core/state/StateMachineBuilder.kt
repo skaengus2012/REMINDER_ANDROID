@@ -16,6 +16,9 @@
 
 package com.nlab.reminder.core.state
 
+import kotlin.reflect.KClass
+import kotlin.reflect.cast
+
 /**
  * @author thalys
  */
@@ -63,44 +66,44 @@ class StateMachineBuilder<E : Event, S : State> {
     // Jacoco could not measure coverage for functions that were directly processed as inline.
     // So I created a wrapping function
     fun <T : E> handleBy(
-        eventClazz: Class<T>,
+        eventClazz: KClass<T>,
         block: suspend (StateMachineBuildSideEffect<E>).(UpdateSource<T, S>) -> Unit
     ) {
         handle(
             filter = { updateSource -> eventClazz.isInstance(updateSource.event) },
-            block = { updateSource -> block(UpdateSource(eventClazz.cast(updateSource.event)!!, updateSource.before)) }
+            block = { updateSource -> block(UpdateSource(eventClazz.cast(updateSource.event), updateSource.before)) }
         )
     }
 
     inline fun <reified T : E> handleBy(
         noinline block: suspend (StateMachineBuildSideEffect<E>).(UpdateSource<T, S>) -> Unit
     ) {
-        handleBy(T::class.java, block)
+        handleBy(T::class, block)
     }
 
     // Jacoco could not measure coverage for functions that were directly processed as inline.
     // So I created a wrapping function
     fun <U : S> handleWhen(
-        stateClazz: Class<U>,
+        stateClazz: KClass<U>,
         block: suspend (StateMachineBuildSideEffect<E>).(UpdateSource<E, U>) -> Unit
     ) {
         handle(
             filter = { updateSource -> stateClazz.isInstance(updateSource.before) },
-            block = { updateSource -> block(UpdateSource(updateSource.event, stateClazz.cast(updateSource.before)!!)) }
+            block = { updateSource -> block(UpdateSource(updateSource.event, stateClazz.cast(updateSource.before))) }
         )
     }
 
     inline fun <reified U : S> handleWhen(
         noinline block: suspend (StateMachineBuildSideEffect<E>).(UpdateSource<E, U>) -> Unit
     ) {
-        handleWhen(U::class.java, block)
+        handleWhen(U::class, block)
     }
 
     // Jacoco could not measure coverage for functions that were directly processed as inline.
     // So I created a wrapping function
     fun <T : E, U : S> handleOn(
-        eventClazz: Class<T>,
-        stateClazz: Class<U>,
+        eventClazz: KClass<T>,
+        stateClazz: KClass<U>,
         block: suspend (StateMachineBuildSideEffect<E>).(UpdateSource<T, U>) -> Unit
     ) {
         handle(
@@ -110,8 +113,8 @@ class StateMachineBuilder<E : Event, S : State> {
             block = { updateSource ->
                 block(
                     UpdateSource(
-                        eventClazz.cast(updateSource.event)!!,
-                        stateClazz.cast(updateSource.before)!!
+                        eventClazz.cast(updateSource.event),
+                        stateClazz.cast(updateSource.before)
                     )
                 )
             }
@@ -121,6 +124,6 @@ class StateMachineBuilder<E : Event, S : State> {
     inline fun <reified T : E, reified U : S> handleOn(
         noinline block: suspend (StateMachineBuildSideEffect<E>).(UpdateSource<T, U>) -> Unit
     ) {
-        handleOn(T::class.java, U::class.java, block)
+        handleOn(T::class, U::class, block)
     }
 }

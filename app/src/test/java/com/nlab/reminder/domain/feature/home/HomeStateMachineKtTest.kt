@@ -52,8 +52,9 @@ class HomeStateMachineKtTest {
 
     private fun genStates(): Set<HomeState> = setOf(
         HomeState.Init,
-        HomeState.Loading,
-        HomeState.Loaded(genHomeSnapshot())
+        HomeState.Loading(HomeState.Init),
+        HomeState.Loaded(genHomeSnapshot()),
+        HomeState.Error(Throwable())
     )
 
     private fun genStateMachine(
@@ -71,23 +72,41 @@ class HomeStateMachineKtTest {
     )
 
     @Test
-    fun `update to loading when state was init and fetch sent`() = runTest {
-        val stateController = genStateMachine().controlIn(CoroutineScope(Dispatchers.Default), HomeState.Init)
-        stateController
-            .send(HomeEvent.Fetch)
-            .join()
-        assertThat(stateController.state.value, equalTo(HomeState.Loading))
+    fun `update to loading when state was init and fetch sent`() {
+        testUpdateToLoadingCase(initState = HomeState.Init, invokeEvent = HomeEvent.Fetch)
     }
 
     @Test
-    fun `never updated when state was not init and fetch sent`() = runTest {
+    fun `update to loading when state was error and OnRetryClicked sent`() {
+        testUpdateToLoadingCase(initState = HomeState.Error(Throwable()), invokeEvent = HomeEvent.OnRetryClicked)
+    }
+
+    private fun testUpdateToLoadingCase(initState: HomeState, invokeEvent: HomeEvent) = runTest {
+        val stateController = genStateMachine().controlIn(CoroutineScope(Dispatchers.Default), initState)
+        stateController
+            .send(invokeEvent)
+            .join()
+        assertThat(stateController.state.value, equalTo(HomeState.Loading(initState)))
+    }
+
+    @Test
+    fun `never updated when state was not init and fetch sent`() {
+        testNeverUpdateToLoadingCase<HomeState.Init>(invokeEvent = HomeEvent.Fetch)
+    }
+
+    @Test
+    fun `never updated when state was not error and OnRetryClicked sent`() {
+        testNeverUpdateToLoadingCase<HomeState.Error>(invokeEvent = HomeEvent.OnRetryClicked)
+    }
+
+    private inline fun <reified T : HomeState> testNeverUpdateToLoadingCase(invokeEvent: HomeEvent) = runTest {
         val initAndStateControllers =
             genStates()
-                .filter { it != HomeState.Init }
+                .filterNot { state -> T::class.isInstance(state) }
                 .map { state -> state to genStateMachine().controlIn(CoroutineScope(Dispatchers.Default), state) }
         initAndStateControllers
             .map { it.second }
-            .map { it.send(HomeEvent.Fetch) }
+            .map { it.send(invokeEvent) }
             .joinAll()
 
         assertThat(
@@ -122,7 +141,7 @@ class HomeStateMachineKtTest {
     }
 
     @Test
-    fun `never updated when any event excluded fetch and OnHomeSummaryLoaded and OnSnapshotLoadFailed sent`() = runTest {
+    fun `never updated when any event excluded fetch, OnHomeSummaryLoaded, OnSnapshotLoadFailed and OnRetryClicked sent`() = runTest {
         val initAndStateControllers = genStates().map { state ->
             state to genStateMachine().controlIn(CoroutineScope(Dispatchers.Default), state)
         }
@@ -132,6 +151,7 @@ class HomeStateMachineKtTest {
                 .filterNot { it is HomeEvent.Fetch }
                 .filterNot { it is HomeEvent.OnSnapshotLoaded }
                 .filterNot { it is HomeEvent.OnSnapshotLoadFailed }
+                .filterNot { it is HomeEvent.OnRetryClicked }
                 .map { event ->
                     initAndStateControllers.map { (initState, controller) ->
                         async {
@@ -157,7 +177,7 @@ class HomeStateMachineKtTest {
     @Test
     fun `start homeSnapshot subscription when state was error and retry sent`() {
         testHomeSnapshotSubscription(
-            initState = HomeState.Error(Throwable(), HomeState.Init),
+            initState = HomeState.Error(Throwable()),
             event = HomeEvent.OnRetryClicked
         )
     }
@@ -204,7 +224,7 @@ class HomeStateMachineKtTest {
             .launchIn(genFlowObserveDispatcher())
 
         advanceTimeBy(1_200)
-        assertThat(deferred.await().before, equalTo(HomeState.Loaded(expectedSnapshot)))
+        assertThat(deferred.await(), instanceOf(HomeState.Error::class))
     }
 
     @Test

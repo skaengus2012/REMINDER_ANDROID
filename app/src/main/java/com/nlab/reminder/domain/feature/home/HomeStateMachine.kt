@@ -36,7 +36,7 @@ fun HomeStateMachine(
     update { (event, state) ->
         when (event) {
             is HomeEvent.Fetch -> {
-                if (state is HomeState.Init) HomeState.Loading
+                if (state is HomeState.Init) HomeState.Loading(state)
                 else state
             }
             is HomeEvent.OnSnapshotLoaded -> {
@@ -44,7 +44,11 @@ fun HomeStateMachine(
                 else HomeState.Loaded(event.snapshot)
             }
             is HomeEvent.OnSnapshotLoadFailed -> {
-                HomeState.Error(event.throwable, state)
+                HomeState.Error(event.throwable)
+            }
+            is HomeEvent.OnRetryClicked -> {
+                if (state is HomeState.Error) HomeState.Loading(state)
+                else state
             }
             else -> state
         }
