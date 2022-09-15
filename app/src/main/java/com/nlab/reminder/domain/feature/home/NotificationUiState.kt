@@ -16,21 +16,14 @@
 
 package com.nlab.reminder.domain.feature.home
 
-import com.nlab.reminder.core.state.State
 import com.nlab.reminder.core.util.test.annotation.Generated
 
 /**
- * @author Doohyun
+ * @author thalys
  */
-sealed class HomeState private constructor() : State {
-    object Init : HomeState()
-
-    @Generated
-    data class Error(val throwable: Throwable) : HomeState()
-
-    @Generated
-    data class Loading(val before: HomeState) : HomeState()
-
-    @Generated
-    data class Loaded(val snapshot: HomeSnapshot) : HomeState()
-}
+@Generated
+data class NotificationUiState(
+    val todayCount: String,
+    val timetableCount: String,
+    val allCount: String,
+)

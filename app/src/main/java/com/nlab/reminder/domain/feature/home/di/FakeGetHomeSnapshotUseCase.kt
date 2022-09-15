@@ -20,9 +20,7 @@ import com.nlab.reminder.core.kotlin.coroutine.flow.map
 import com.nlab.reminder.core.util.test.annotation.Generated
 import com.nlab.reminder.domain.common.tag.TagRepository
 import com.nlab.reminder.domain.common.tag.TagStyleResource
-import com.nlab.reminder.domain.feature.home.GetHomeSnapshotUseCase
-import com.nlab.reminder.domain.feature.home.HomeSnapshot
-import com.nlab.reminder.domain.feature.home.TagWithResource
+import com.nlab.reminder.domain.feature.home.*
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -42,9 +40,11 @@ class FakeGetHomeSnapshotUseCase(
         return tagRepository.get()
             .map { tags ->
                 HomeSnapshot(
-                    todayNotificationCount = (0..50).random().toLong(),
-                    timetableNotificationCount = (0..50).random().toLong(),
-                    allNotificationCount = (0..50).random().toLong(),
+                    NotificationUiState(
+                        todayCount = (0..50).random().toString(),
+                        timetableCount = (0..50).random().toString(),
+                        allCount = (0..50).random().toString(),
+                    ),
                     tags = tags.map { tag ->
                         TagWithResource(
                             tag,

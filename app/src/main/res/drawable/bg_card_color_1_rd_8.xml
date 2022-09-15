@@ -14,13 +14,12 @@
   ~ limitations under the License.
   -->
 
-<resources>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:shape="rectangle">
 
-	<style name="BaseAppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-		<item name="android:windowBackground">?attr/bg_1</item>
-		<item name="android:statusBarColor">?android:windowBackground</item>
-		<!-- home -->
-		<item name="bg_card_color_1">@color/white</item>
-	</style>
-
-</resources>
+    <solid
+        android:color="?attr/bg_card_color_1"
+        tools:color="@color/bg_card_1_light" />
+    <corners android:radius="8dp" />
+</shape>

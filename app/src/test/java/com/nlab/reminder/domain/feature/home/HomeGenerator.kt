@@ -28,4 +28,11 @@ fun genHomeSnapshot(
     timetableNotificationCount: Long = genLong(),
     allNotificationCount: Long = genLong(),
     tags: List<TagWithResource> = List(genInt("#")) { genTagWithResource() }
-): HomeSnapshot = HomeSnapshot(todayNotificationCount, timetableNotificationCount, allNotificationCount, tags)
+): HomeSnapshot = HomeSnapshot(
+    NotificationUiState(
+        todayNotificationCount.toString(),
+        timetableNotificationCount.toString(),
+        allNotificationCount.toString()
+    ),
+    tags
+)

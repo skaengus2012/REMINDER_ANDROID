@@ -16,24 +16,18 @@
 
 package com.nlab.reminder.domain.feature.home.view
 
-import com.nlab.reminder.core.android.recyclerview.HashIdentifier
-import com.nlab.reminder.domain.common.android.view.recyclerview.ItemModel
-import com.nlab.reminder.domain.common.tag.view.TagItem
-import java.util.*
+import androidx.recyclerview.widget.DiffUtil
+import com.nlab.reminder.domain.feature.home.NotificationUiState
 
-@ItemModel
-sealed class HomeItem private constructor() : HashIdentifier {
-    data class CategoryItem(
-        val categoryResource: CategoryResource,
-        val count: Long,
-        val onItemClicked: () -> Unit
-    ) : HomeItem() {
-        override val hashId: Int = Objects.hash(categoryResource, count)
+/**
+ * @author thalys
+ */
+class NotificationSnapshotDiffItemCallback : DiffUtil.ItemCallback<NotificationUiState>() {
+    override fun areItemsTheSame(oldItem: NotificationUiState, newItem: NotificationUiState): Boolean {
+        return oldItem === newItem
     }
 
-    data class TagHolderItem(
-        val tagItems: List<TagItem>
-    ) : HomeItem() {
-        override val hashId: Int = Objects.hash(tagItems.map { it.tagId })
+    override fun areContentsTheSame(oldItem: NotificationUiState, newItem: NotificationUiState): Boolean {
+        return oldItem == newItem
     }
 }

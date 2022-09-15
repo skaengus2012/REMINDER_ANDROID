@@ -24,6 +24,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.ConcatAdapter
+import com.nlab.reminder.R
 import com.nlab.reminder.core.android.fragment.viewLifecycle
 import com.nlab.reminder.core.android.fragment.viewLifecycleScope
 import com.nlab.reminder.core.android.navigation.NavigationController
@@ -31,6 +33,7 @@ import com.nlab.reminder.databinding.FragmentHomeBinding
 import com.nlab.reminder.domain.common.android.fragment.handleSideEffect
 import com.nlab.reminder.domain.common.android.fragment.resultReceives
 import com.nlab.reminder.domain.common.android.navigation.navigateToAllScheduleEnd
+import com.nlab.reminder.domain.common.android.view.recyclerview.SimpleLayoutAdapter
 import com.nlab.reminder.domain.feature.home.*
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -83,12 +86,17 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val homeItemAdapter = HomeItemAdapter()
-        val renderWhenLoaded = renderWhenLoadedFunc(homeItemAdapter)
+        val logoAdapter = SimpleLayoutAdapter(R.layout.view_item_home_logo)
+        val categoryAdapter = HomeCategoryAdapter(
+            onTodayNavClicked = viewModel::onTodayCategoryClicked,
+            onTimetableNavClicked = viewModel::onTimetableCategoryClicked,
+            onAllNavClicked = viewModel::onAllCategoryClicked
+        )
+        val renderWhenLoaded = renderWhenLoadedFunc(categoryAdapter)
 
-        binding.categoryRecyclerview
+        binding.recyclerviewContent
             .apply { itemAnimator = null }
-            .apply { adapter = homeItemAdapter }
+            .apply { adapter = ConcatAdapter(logoAdapter, categoryAdapter) }
 
         handleSideEffect(viewModel.homeSideEffect) { sideEffect ->
             when (sideEffect) {
@@ -125,46 +133,35 @@ class HomeFragment : Fragment() {
         viewModel.state
             .filterIsInstance<HomeState.Init>()
             .flowWithLifecycle(viewLifecycle)
-            .distinctUntilChanged()
             .onEach { renderWhenInit() }
             .launchIn(viewLifecycleScope)
 
         viewModel.state
             .filterIsInstance<HomeState.Loading>()
             .flowWithLifecycle(viewLifecycle)
-            .distinctUntilChanged()
             .onEach { renderWhenLoading() }
             .launchIn(viewLifecycleScope)
 
         viewModel.state
             .filterIsInstance<HomeState.Loaded>()
-            .flowWithLifecycle(viewLifecycle)
-            .distinctUntilChanged()
-            .map { state ->
-                state.toHomeItems(
-                    onTodayCategoryClicked = viewModel::onTodayCategoryClicked,
-                    onTimetableCategoryClicked = viewModel::onTimetableCategoryClicked,
-                    onAllCategoryClicked = viewModel::onAllCategoryClicked,
-                    onTagClicked = viewModel::onTagClicked,
-                    onTagLongClicked = viewModel::onTagLongClicked
-                )
-            }
+            .map { state -> state.snapshot }
             .flowOn(Dispatchers.Default)
+            .flowWithLifecycle(viewLifecycle)
             .onEach { homeListItem -> renderWhenLoaded(homeListItem) }
             .launchIn(viewLifecycleScope)
     }
 
     private fun renderWhenInit() {
-        binding.categoryRecyclerview.visibility = View.GONE
+        binding.recyclerviewContent.visibility = View.GONE
     }
 
     private fun renderWhenLoading() {
-        binding.categoryRecyclerview.visibility = View.GONE
+        binding.recyclerviewContent.visibility = View.GONE
     }
 
-    private fun renderWhenLoadedFunc(homeItemAdapter: HomeItemAdapter) = { homeItems: List<HomeItem> ->
-        binding.categoryRecyclerview.visibility = View.VISIBLE
-        homeItemAdapter.submitList(homeItems)
+    private fun renderWhenLoadedFunc(categoryAdapter: HomeCategoryAdapter) = { snapshot: HomeSnapshot ->
+        binding.recyclerviewContent.visibility = View.VISIBLE
+        categoryAdapter.submitList(listOf(snapshot.notification))
     }
 
     override fun onDestroyView() {

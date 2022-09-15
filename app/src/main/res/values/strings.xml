@@ -28,6 +28,11 @@
     <string name="ok">OK</string>
 
     <!-- home -->
+    <string name="home_category_header">나의 할일</string>
+    <string name="home_category_today">오늘</string>
+    <string name="home_category_timetable">예정</string>
+    <string name="home_category_all">전체</string>
+
     <string name="home_tag_config_label_rename">Rename Tag</string>
     <string name="home_tag_config_label_delete">Delete Tag</string>
     <string name="home_tag_rename_edittext_hint">input tag</string>

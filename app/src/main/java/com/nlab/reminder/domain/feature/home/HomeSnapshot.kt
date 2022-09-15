@@ -23,8 +23,6 @@ import com.nlab.reminder.core.util.test.annotation.Generated
  */
 @Generated
 data class HomeSnapshot(
-    val todayNotificationCount: Long,
-    val timetableNotificationCount: Long,
-    val allNotificationCount: Long,
+    val notification: NotificationUiState,
     val tags: List<TagWithResource>
 )
