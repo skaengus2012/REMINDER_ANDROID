@@ -18,7 +18,6 @@
 	<color name="black">#000000</color>
 	<color name="black_light">#1C1C1E</color>
 
-	<color name="gray_light">#F2F2F6</color>
 	<color name="gray_50">#FAFAFA</color>
 	<color name="gray_100">#F5F5F5</color>
 	<color name="gray_400">#BDBDBD</color>
@@ -52,4 +51,11 @@
 	<color name="schedule_checkbox_checked_color">@color/point_color_1</color>
 	<color name="schedule_checkbox_unchecked_color">@color/gray_500</color>
 	<color name="schedule_line_color">@color/gray_400</color>
+
+	<!-- light theme color -->
+	<color name="background_light">#F2F2F6</color>
+
+	<!-- dark theme color -->
+	<color name="background_dark">@color/black</color>
+
 </resources>

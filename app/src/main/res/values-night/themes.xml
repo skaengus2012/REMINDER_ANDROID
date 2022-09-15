@@ -28,6 +28,7 @@
         <item name="colorControlHighlight">@color/gray_900</item>
 
         <item name="defaultTextColor">@color/white</item>
+        <item name="android:windowBackground">@color/background_dark</item>
 
         <!-- home -->
         <item name="cardBackground">@color/black_light</item>

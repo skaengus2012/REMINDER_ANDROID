@@ -17,6 +17,7 @@
 <resources>
 
 	<style name="AppTheme" parent="BaseAppTheme">
+		<item name="android:windowBackground">@color/background_light</item>
 		<item name="android:windowLightStatusBar">true</item>
 		<item name="colorControlHighlight">@color/gray_100</item>
 	</style>
