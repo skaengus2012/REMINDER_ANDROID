@@ -23,7 +23,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.nlab.reminder.core.android.view.initWithLifecycleOwner
 import com.nlab.reminder.core.android.view.throttleClicks
-import com.nlab.reminder.databinding.ViewItemHomeCategoriesBinding
+import com.nlab.reminder.databinding.ViewItemHomeCategoryBinding
 import com.nlab.reminder.domain.feature.home.NotificationUiState
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -38,7 +38,7 @@ class HomeCategoryAdapter(
 ) : ListAdapter<NotificationUiState, HomeCategoryAdapter.ViewHolder>(HomeCategoryDiffItemCallback()) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(
-            ViewItemHomeCategoriesBinding.inflate(LayoutInflater.from(parent.context), parent, false),
+            ViewItemHomeCategoryBinding.inflate(LayoutInflater.from(parent.context), parent, false),
             onTodayNavClicked,
             onTimetableNavClicked,
             onAllNavClicked
@@ -50,7 +50,7 @@ class HomeCategoryAdapter(
     }
 
     class ViewHolder(
-        private val binding: ViewItemHomeCategoriesBinding,
+        private val binding: ViewItemHomeCategoryBinding,
         onTodayNavClicked: () -> Unit,
         onTimetableNavClicked: () -> Unit,
         onAllNavClicked: () -> Unit
