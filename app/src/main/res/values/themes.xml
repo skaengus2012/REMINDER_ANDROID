@@ -16,17 +16,17 @@
 
 <resources>
 
-	<style name="AppTheme" parent="BaseAppTheme">
-		<item name="android:windowLightStatusBar">true</item>
-		<item name="colorControlHighlight">@color/gray_100</item>
+    <style name="AppTheme" parent="BaseAppTheme">
+        <item name="android:windowLightStatusBar">true</item>
 
-		<!-- common -->
-		<item name="bg_color_1">@color/bg_1_light</item>
-		<item name="bg_color_card_1">@color/bg_card_1_light</item>
-		<item name="bg_color_tag">@color/bg_tag_light</item>
-		<item name="font_color_1">@color/font_1_light</item>
-		<item name="font_color_2">@color/font_2_light</item>
-		<item name="font_color_tag">@color/font_tag_light</item>
-	</style>
+        <!-- common -->
+        <item name="bg_color_1">@color/bg_1_light</item>
+        <item name="bg_color_card_1">@color/bg_card_1_light</item>
+        <item name="bg_color_tag">@color/bg_tag_light</item>
+        <item name="bg_color_ripple_1">@color/bg_ripple_1_light</item>
+        <item name="font_color_1">@color/font_1_light</item>
+        <item name="font_color_2">@color/font_2_light</item>
+        <item name="font_color_tag">@color/font_tag_light</item>
+    </style>
 
 </resources>

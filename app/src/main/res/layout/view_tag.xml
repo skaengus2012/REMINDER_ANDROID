@@ -28,7 +28,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:background="@drawable/bg_tag"
+        android:background="@drawable/bg_tag_ripple_1"
         android:clickable="false"
         android:ellipsize="end"
         android:maxLines="1"

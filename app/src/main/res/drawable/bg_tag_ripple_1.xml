@@ -14,10 +14,10 @@
   ~ limitations under the License.
   -->
 
-<resources>
-	<style name="BaseAppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-		<item name="android:windowBackground">?attr/bg_color_1</item>
-		<item name="android:statusBarColor">?attr/bg_color_1</item>
-		<item name="colorControlHighlight">?attr/bg_color_ripple_1</item>
-	</style>
-</resources>
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:color="?attr/bg_color_ripple_1"
+    tools:color="@color/bg_ripple_1_light">
+
+    <item android:drawable="@drawable/bg_tag" />
+</ripple>
