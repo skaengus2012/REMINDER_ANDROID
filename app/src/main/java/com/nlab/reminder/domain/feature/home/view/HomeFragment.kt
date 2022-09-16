@@ -92,11 +92,16 @@ class HomeFragment : Fragment() {
             onTimetableNavClicked = viewModel::onTimetableCategoryClicked,
             onAllNavClicked = viewModel::onAllCategoryClicked
         )
-        val renderWhenLoaded = renderWhenLoadedFunc(categoryAdapter)
+        val tagCardAdapter = HomeTagCardAdapter(
+            onTagClicked = viewModel::onTagClicked,
+            onTagLongClicked = viewModel::onTagLongClicked
+        )
+
+        val renderWhenLoaded = renderWhenLoadedFunc(categoryAdapter, tagCardAdapter)
 
         binding.recyclerviewContent
             .apply { itemAnimator = null }
-            .apply { adapter = ConcatAdapter(logoAdapter, categoryAdapter) }
+            .apply { adapter = ConcatAdapter(logoAdapter, categoryAdapter, tagCardAdapter) }
 
         handleSideEffect(viewModel.homeSideEffect) { sideEffect ->
             when (sideEffect) {
@@ -159,9 +164,13 @@ class HomeFragment : Fragment() {
         binding.recyclerviewContent.visibility = View.GONE
     }
 
-    private fun renderWhenLoadedFunc(categoryAdapter: HomeCategoryAdapter) = { snapshot: HomeSnapshot ->
+    private fun renderWhenLoadedFunc(
+        categoryAdapter: HomeCategoryAdapter,
+        tagCardAdapter: HomeTagCardAdapter,
+    ) = { snapshot: HomeSnapshot ->
         binding.recyclerviewContent.visibility = View.VISIBLE
         categoryAdapter.submitList(listOf(snapshot.notification))
+        tagCardAdapter.submitList(listOf(snapshot.tags))
     }
 
     override fun onDestroyView() {

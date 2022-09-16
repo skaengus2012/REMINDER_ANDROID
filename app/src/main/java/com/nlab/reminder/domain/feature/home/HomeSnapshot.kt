@@ -17,6 +17,7 @@
 package com.nlab.reminder.domain.feature.home
 
 import com.nlab.reminder.core.util.test.annotation.Generated
+import com.nlab.reminder.domain.common.tag.Tag
 
 /**
  * @author Doohyun
@@ -24,5 +25,5 @@ import com.nlab.reminder.core.util.test.annotation.Generated
 @Generated
 data class HomeSnapshot(
     val notification: NotificationUiState,
-    val tags: List<TagWithResource>
+    val tags: List<Tag>
 )

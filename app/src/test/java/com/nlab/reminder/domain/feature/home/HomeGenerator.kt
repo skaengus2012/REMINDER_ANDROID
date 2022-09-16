@@ -16,8 +16,8 @@
 
 package com.nlab.reminder.domain.feature.home
 
-import com.nlab.reminder.domain.common.tag.genTagWithResource
-import com.nlab.reminder.test.genInt
+import com.nlab.reminder.domain.common.tag.Tag
+import com.nlab.reminder.domain.common.tag.genTags
 import com.nlab.reminder.test.genLong
 
 /**
@@ -27,7 +27,7 @@ fun genHomeSnapshot(
     todayNotificationCount: Long = genLong(),
     timetableNotificationCount: Long = genLong(),
     allNotificationCount: Long = genLong(),
-    tags: List<TagWithResource> = List(genInt("#")) { genTagWithResource() }
+    tags: List<Tag> = genTags()
 ): HomeSnapshot = HomeSnapshot(
     NotificationUiState(
         todayNotificationCount.toString(),

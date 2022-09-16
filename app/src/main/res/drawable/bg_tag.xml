@@ -14,16 +14,15 @@
   ~ limitations under the License.
   -->
 
-<resources>
-    <!-- common -->
-    <string name="cancel">Cancel</string>
-    <string name="ok">OK</string>
-    <string name="common_tag_empty">No tags assigned to the schedule.</string>
-
-    <!-- home -->
-    <string name="home_category_header">My Todo</string>
-    <string name="home_category_today">Today</string>
-    <string name="home_category_timetable">Scheduled</string>
-    <string name="home_category_all">All</string>
-    <string name="home_tag_header">My Tags</string>
-</resources>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:shape="rectangle">
+    <size android:height="@dimen/tag_height" />
+    <solid
+        android:color="?attr/bg_color_tag"
+        tools:color="@color/bg_tag_light" />
+    <corners
+        android:bottomLeftRadius="@dimen/tag_radius"
+        android:topLeftRadius="@dimen/tag_radius"
+        android:topRightRadius="@dimen/tag_radius" />
+</shape>

@@ -28,6 +28,7 @@
         android:id="@+id/textview_header"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:paddingBottom="17dp"
         android:text="@string/home_category_header"
         android:textColor="?attr/font_color_1"
         android:textSize="17sp"
@@ -40,7 +41,6 @@
         android:id="@+id/btn_nav_today"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="14dp"
         android:layout_marginEnd="6.5dp"
         android:background="@drawable/bg_card_color_1_rd_8"
         android:contentDescription="@string/home_category_today"
@@ -65,7 +65,7 @@
         app:layout_constraintStart_toStartOf="@id/btn_nav_today"
         app:layout_constraintTop_toTopOf="@id/btn_nav_today"
         app:layout_constraintVertical_chainStyle="packed"
-        app:tint="?attr/bg_1"
+        app:tint="?attr/bg_color_1"
         tools:tint="@color/bg_1_light" />
 
     <TextView
@@ -136,7 +136,7 @@
         app:layout_constraintStart_toStartOf="@id/btn_nav_timetable"
         app:layout_constraintTop_toTopOf="@id/btn_nav_timetable"
         app:layout_constraintVertical_chainStyle="packed"
-        app:tint="?attr/bg_1"
+        app:tint="?attr/bg_color_1"
         tools:tint="@color/bg_1_light" />
 
     <TextView
@@ -207,7 +207,7 @@
         app:layout_constraintStart_toStartOf="@id/btn_nav_all"
         app:layout_constraintTop_toTopOf="@id/btn_nav_all"
         app:layout_constraintVertical_chainStyle="packed"
-        app:tint="?attr/bg_1"
+        app:tint="?attr/bg_color_1"
         tools:tint="@color/bg_1_light" />
 
     <TextView

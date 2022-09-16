@@ -22,7 +22,7 @@ import com.nlab.reminder.domain.feature.home.NotificationUiState
 /**
  * @author thalys
  */
-class NotificationSnapshotDiffItemCallback : DiffUtil.ItemCallback<NotificationUiState>() {
+class HomeCategoryDiffItemCallback : DiffUtil.ItemCallback<NotificationUiState>() {
     override fun areItemsTheSame(oldItem: NotificationUiState, newItem: NotificationUiState): Boolean {
         return oldItem === newItem
     }

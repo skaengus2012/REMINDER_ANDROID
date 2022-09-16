@@ -20,7 +20,6 @@ import com.nlab.reminder.core.effect.SideEffectSender
 import com.nlab.reminder.core.state.util.controlIn
 import com.nlab.reminder.domain.common.tag.Tag
 import com.nlab.reminder.domain.common.tag.genTag
-import com.nlab.reminder.domain.common.tag.genTagWithResource
 import com.nlab.reminder.test.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -255,7 +254,7 @@ class HomeStateMachineKtTest {
     fun `navigate tag end when tag element clicked`() = runTest {
         val testTag: Tag = genTag()
         val testSummaries = listOf(
-            genHomeSnapshot(tags = listOf(genTagWithResource(testTag))),
+            genHomeSnapshot(tags = listOf(testTag)),
             genHomeSnapshot(tags = emptyList())
         )
         testSummaries.forEach { homeSummary ->
@@ -271,7 +270,7 @@ class HomeStateMachineKtTest {
     fun `navigate tag config end when tag element long clicked`() = runTest {
         val testTag: Tag = genTag()
         val testSummaries = listOf(
-            genHomeSnapshot(tags = listOf(genTagWithResource(testTag))),
+            genHomeSnapshot(tags = listOf(testTag)),
             genHomeSnapshot(tags = emptyList())
         )
         testSummaries.forEach { homeSummary ->
@@ -288,7 +287,7 @@ class HomeStateMachineKtTest {
         val testTag: Tag = genTag()
         val testUsageCount = genLong()
         val testSummaries = listOf(
-            genHomeSnapshot(tags = listOf(genTagWithResource(testTag))),
+            genHomeSnapshot(tags = listOf(testTag)),
             genHomeSnapshot(tags = emptyList())
         )
         testSummaries.forEach { homeSummary ->
@@ -306,7 +305,7 @@ class HomeStateMachineKtTest {
         val testTag: Tag = genTag()
         val testUsageCount = genLong()
         val testSummaries = listOf(
-            genHomeSnapshot(tags = listOf(genTagWithResource(testTag))),
+            genHomeSnapshot(tags = listOf(testTag)),
             genHomeSnapshot(tags = emptyList())
         )
         testSummaries.forEach { homeSummary ->

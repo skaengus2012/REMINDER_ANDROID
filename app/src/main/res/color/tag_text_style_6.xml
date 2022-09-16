@@ -15,6 +15,6 @@
   -->
 
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-	<item android:color="?attr/bg_card_color_1" android:state_pressed="true" />
+	<item android:color="?attr/bg_color_card_1" android:state_pressed="true" />
 	<item android:color="@color/point_color_3" />
 </selector>

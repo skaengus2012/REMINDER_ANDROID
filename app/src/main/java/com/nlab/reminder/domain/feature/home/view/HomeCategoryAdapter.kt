@@ -35,7 +35,7 @@ class HomeCategoryAdapter(
     private val onTodayNavClicked: () -> Unit,
     private val onTimetableNavClicked: () -> Unit,
     private val onAllNavClicked: () -> Unit
-) : ListAdapter<NotificationUiState, HomeCategoryAdapter.ViewHolder>(NotificationSnapshotDiffItemCallback()) {
+) : ListAdapter<NotificationUiState, HomeCategoryAdapter.ViewHolder>(HomeCategoryDiffItemCallback()) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(
             ViewItemHomeCategoriesBinding.inflate(LayoutInflater.from(parent.context), parent, false),

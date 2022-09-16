@@ -48,9 +48,8 @@ class HomeTagConfigDialogFragment : DialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         binding.tagTextview.apply {
-            text = context.getString(R.string.tag_format, args.tag.name)
+            text = context.getString(R.string.format_tag, args.tag.name)
         }
 
         binding.renameButton

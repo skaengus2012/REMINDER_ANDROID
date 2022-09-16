@@ -54,13 +54,16 @@
 	<!-- light theme color -->
 	<color name="bg_1_light">#F2F2F6</color>
 	<color name="bg_card_1_light">@color/white</color>
+	<color name="bg_tag_light">#EEEEEF</color>
 	<color name="font_1_light">#393939</color>
 	<color name="font_2_light">#8A8A8D</color>
+	<color name="font_tag_light">#838387</color>
 
 	<!-- dark theme color -->
 	<color name="bg_1_dark">@color/black</color>
 	<color name="bg_card_1_dark">#1C1C1C</color>
+	<color name="bg_tag_dark">#2F2F2F</color>
 	<color name="font_1_dark">@color/white</color>
 	<color name="font_2_dark">#B7B7B7</color>
-
+	<color name="font_tag_dark">#838387</color>
 </resources>

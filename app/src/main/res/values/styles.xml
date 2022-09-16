@@ -15,12 +15,8 @@
   -->
 
 <resources>
-
 	<style name="BaseAppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-		<item name="android:windowBackground">?attr/bg_1</item>
-		<item name="android:statusBarColor">?android:windowBackground</item>
-		<!-- home -->
-		<item name="bg_card_color_1">@color/white</item>
+		<item name="android:windowBackground">?attr/bg_color_1</item>
+		<item name="android:statusBarColor">?attr/bg_color_1</item>
 	</style>
-
 </resources>

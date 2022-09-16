@@ -19,7 +19,7 @@
     android:shape="rectangle">
 
     <solid
-        android:color="?attr/bg_card_color_1"
+        android:color="?attr/bg_color_card_1"
         tools:color="@color/bg_card_1_light" />
     <corners android:radius="8dp" />
 </shape>
