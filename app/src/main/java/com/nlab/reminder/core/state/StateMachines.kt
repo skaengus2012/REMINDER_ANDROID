@@ -14,14 +14,9 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.state.util
+package com.nlab.reminder.core.state
 
-import com.nlab.reminder.core.state.*
-import com.nlab.reminder.core.state.StateControllerImpl
-import com.nlab.reminder.core.state.StateMachineBuilder
-import com.nlab.reminder.core.state.StateMachineEventProcessor
 import com.nlab.reminder.core.util.test.annotation.Generated
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.plus
@@ -29,35 +24,33 @@ import kotlinx.coroutines.plus
 /**
  * @author thalys
  */
-typealias StateMachine<E, S> = StateMachineBuilder<E, S>
-
 @Generated
 @Suppress("FunctionName")
 inline fun <E : Event, S : State> StateMachine(
     block: StateMachine<E, S>.() -> Unit
 ): StateMachine<E, S> = StateMachine<E, S>().apply(block)
 
-fun <E : Event, S : State> StateMachine<E, S>.controlIn(
+fun <E : Event, S : State> StateMachine<E, S>.asContainer(
     scope: CoroutineScope,
     initState: S,
-    config: StateControllerConfig = StateControllerConfig()
-): StateController<E, S> {
+    config: StateMachineConfig = StateMachinePlugin.toConfig()
+): StateContainer<E, S> {
     val state = MutableStateFlow(initState)
-    return StateControllerImpl(
-        PluginStateMachineEventProcessor(stateMachine = this, scope, state, config),
+    return StateContainerImpl(
+        ConfigurableEventProcessor(stateMachine = this, scope, state, config),
         state.asStateFlow()
     )
 }
 
-fun <E : Event, S : State> StateMachine<E, S>.controlIn(
+fun <E : Event, S : State> StateMachine<E, S>.asContainer(
     scope: CoroutineScope,
     initState: S,
     fetchEvent: E,
-    config: StateControllerConfig = StateControllerConfig()
-): StateController<E, S> {
+    config: StateMachineConfig = StateMachinePlugin.toConfig()
+): StateContainer<E, S> {
     val state = MutableStateFlow(initState)
-    val eventProcessor: EventProcessor<E> = PluginStateMachineEventProcessor(stateMachine = this, scope, state, config)
-    return StateControllerImpl(
+    val eventProcessor: EventProcessor<E> = ConfigurableEventProcessor(stateMachine = this, scope, state, config)
+    return StateContainerImpl(
         eventProcessor,
         state.asStateFlow()
             .onStart(onStartToFetchConverter(eventProcessor, fetchEvent))
@@ -66,25 +59,17 @@ fun <E : Event, S : State> StateMachine<E, S>.controlIn(
 }
 
 @Suppress("FunctionName")
-private fun <E : Event, S : State> PluginStateMachineEventProcessor(
+private fun <E : Event, S : State> ConfigurableEventProcessor(
     stateMachine: StateMachine<E, S>,
     scope: CoroutineScope,
     stateFlow: MutableStateFlow<S>,
-    config: StateControllerConfig
+    config: StateMachineConfig
 ): EventProcessor<E> = StateMachineEventProcessor(
     state = stateFlow,
-    scope = with(scope) {
-        val defaultDispatcher: CoroutineDispatcher? = StateMachinePlugin.defaultDispatcher
-        if (defaultDispatcher != null && config.isPluginDispatcherEnabled) {
-            this + defaultDispatcher
-        } else {
-            this
-        }
-    },
-    stateMachineBuilder = stateMachine.apply {
-        if (config.isPluginErrorHandlerEnabled) {
-            catch { StateMachinePlugin.defaultExceptionHandler?.invoke(it) }
-        }
+    scope = if (config.dispatcher == null) scope else scope + config.dispatcher,
+    stateMachine = stateMachine.apply {
+        val exceptionHandler = config.exceptionHandler ?: return@apply
+        catch { exceptionHandler(it) }
     }
 )
 

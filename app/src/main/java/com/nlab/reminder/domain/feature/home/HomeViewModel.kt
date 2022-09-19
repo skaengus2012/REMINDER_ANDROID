@@ -22,6 +22,7 @@ import com.nlab.reminder.core.effect.util.SideEffectController
 import com.nlab.reminder.core.effect.util.asReceived
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
 /**
@@ -29,12 +30,12 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    stateControllerFactory: HomeStateControllerFactory
+    stateContainerFactory: HomeStateContainerFactory
 ) : ViewModel() {
     private val sideEffectController = SideEffectController<HomeSideEffect>()
-    private val stateController = stateControllerFactory.create(viewModelScope, sideEffectController)
+    private val stateContainer = stateContainerFactory.create(viewModelScope, sideEffectController)
 
-    val homeSideEffect = sideEffectController.asReceived()
-    val state = stateController.state
-    fun invoke(event: HomeEvent): Job = stateController.send(event)
+    val sideEffectFlow = sideEffectController.asReceived()
+    val stateFlow: StateFlow<HomeState> = stateContainer.stateFlow
+    fun invoke(event: HomeEvent): Job = stateContainer.send(event)
 }

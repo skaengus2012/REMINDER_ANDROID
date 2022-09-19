@@ -16,6 +16,8 @@
 
 package com.nlab.reminder.core.state
 
+import com.nlab.reminder.test.genInt
+
 /**
  * @author Doohyun
  */
@@ -23,4 +25,13 @@ internal sealed class TestState private constructor() : State {
     class StateInit : TestState()
     class State1 : TestState()
     class State2 : TestState()
+
+    companion object {
+        fun genState(): TestState = when (genInt() % 3) {
+            0 -> StateInit()
+            1 -> State1()
+            2 -> State2()
+            else -> throw IllegalStateException("Failed to create TestState")
+        }
+    }
 }

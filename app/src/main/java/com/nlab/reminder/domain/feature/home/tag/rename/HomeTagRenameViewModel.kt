@@ -29,13 +29,13 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class HomeTagRenameViewModel @Inject constructor(
-    stateControllerFactory: HomeTagRenameStateControllerFactory
+    stateControllerFactory: HomeTagRenameStateContainerFactory
 ) : ViewModel() {
     private val sideEffectController = SideEffectController<HomeTagRenameSideEffect>()
-    private val stateController = stateControllerFactory.create(viewModelScope, sideEffectController)
+    private val stateContainer = stateControllerFactory.create(viewModelScope, sideEffectController)
 
     val homeTagRenameSideEffect = sideEffectController.asReceived()
-    val state = stateController.state
+    val state = stateContainer.stateFlow
 
-    fun invoke(event: HomeTagRenameEvent): Job = stateController.send(event)
+    fun invoke(event: HomeTagRenameEvent): Job = stateContainer.send(event)
 }

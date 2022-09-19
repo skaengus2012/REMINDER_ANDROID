@@ -14,18 +14,19 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.feature.home.tag.rename
-
-import com.nlab.reminder.core.effect.SideEffectSender
-import com.nlab.reminder.core.state.StateController
-import kotlinx.coroutines.CoroutineScope
+package com.nlab.reminder.core.state
 
 /**
- * @author Doohyun
+ * @author thalys
  */
-interface HomeTagRenameStateControllerFactory {
-    fun create(
-        scope: CoroutineScope,
-        homeTagRenameSideEffect: SideEffectSender<HomeTagRenameSideEffect>
-    ): StateController<HomeTagRenameEvent, HomeTagRenameState>
+class ConcatHandleBuilder<E : P, P : Event, S : State> : HandleBuilder<E, P, S>() {
+    private val handles: MutableList<suspend StateMachineHandleScope<P>.(UpdateSource<E, S>) -> Unit> = mutableListOf()
+
+    fun add(handle: suspend StateMachineHandleScope<P>.(UpdateSource<E, S>) -> Unit) {
+        handles += handle
+    }
+
+    override fun build(): suspend StateMachineHandleScope<P>.(UpdateSource<E, S>) -> Unit = { updateSource ->
+        handles.forEach { handle -> handle(updateSource) }
+    }
 }

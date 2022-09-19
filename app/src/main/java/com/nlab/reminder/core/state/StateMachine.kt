@@ -22,43 +22,41 @@ import kotlin.reflect.cast
 /**
  * @author thalys
  */
-@StateMachineBuildMarker
-class StateMachineBuilder<E : Event, S : State> {
-    private val stateConverters: MutableList<(UpdateSource<E, S>) -> S> = mutableListOf()
-    private val onExceptionHandlers: MutableList<(Throwable) -> Unit> = mutableListOf()
+@StateMachineDsl
+class StateMachine<E : Event, S : State> {
+    private val reduceBuilder: StateMachineReduceBuilder<E, S> = StateMachineReduceBuilder()
+    private val handleBuilder: StateMachineHandleBuilder<E, S> = StateMachineHandleBuilder()
+    private val onExceptionHandlers: MutableList<StateMachineScope.(Throwable) -> Unit> = mutableListOf()
     private val onEventHandlers: MutableList<suspend (EventProcessor<E>, UpdateSource<E, S>) -> Unit> = mutableListOf()
 
-    internal fun buildUpdateHandler(): (UpdateSource<E, S>) -> S = { inputSource ->
-        stateConverters
-            .asSequence()
-            .map { updateTo -> updateTo(inputSource) }
-            .find { newState -> newState != inputSource.before }
-            ?: inputSource.before
+    internal fun buildReduce(): StateMachineScope.(UpdateSource<E, S>) -> S = reduceBuilder.build()
+    internal fun buildHandle(): suspend (StateMachineHandleScope<E>, UpdateSource<E, S>) -> Unit = handleBuilder.build()
+    internal fun buildExceptionHandler(): StateMachineScope.(Throwable) -> Unit = { throwable ->
+        this@StateMachine.onExceptionHandlers.forEach { it(throwable) }
     }
 
-    internal fun buildExceptionHandler(): (Throwable) -> Unit = { throwable ->
-        onExceptionHandlers.forEach { handler -> handler(throwable) }
+    fun reduce(block: (StateMachineReduceBuilder<E, S>).() -> Unit) {
+        reduceBuilder.apply(block)
     }
 
-    internal fun buildEventHandler(): suspend (EventProcessor<E>).(UpdateSource<E, S>) -> Unit = { updateSource ->
-        onEventHandlers.forEach { handler -> handler.invoke(this, updateSource) }
+    fun handled(block: (StateMachineHandleBuilder<E, S>).() -> Unit) {
+        handleBuilder.apply(block)
     }
 
-    fun update(block: (StateMachineBuildScope).(UpdateSource<E, S>) -> S) {
-        stateConverters += { updateSource -> block(StateMachineBuildScope, updateSource) }
+    fun catch(block: (StateMachineScope).(Throwable) -> Unit) {
+        onExceptionHandlers += { StateMachineScope.block(it) }
     }
 
-    fun catch(block: (StateMachineBuildScope).(Throwable) -> Unit) {
-        onExceptionHandlers += { throwable -> block(StateMachineBuildScope, throwable) }
+    fun update(block: (StateMachineScope).(UpdateSource<E, S>) -> S) {
     }
 
     fun handle(
         filter: (UpdateSource<E, S>) -> Boolean = { true },
-        block: suspend (StateMachineBuildSideEffect<E>).(UpdateSource<E, S>) -> Unit
+        block: suspend (StateMachineHandleScope<E>).(UpdateSource<E, S>) -> Unit
     ) {
         onEventHandlers += { eventProcessor, updateSource ->
             if (filter(updateSource)) {
-                block.invoke(StateMachineBuildSideEffect(eventProcessor), updateSource)
+            //    block.invoke(StateMachineHandleScope(eventProcessor), updateSource)
             }
         }
     }
@@ -67,7 +65,7 @@ class StateMachineBuilder<E : Event, S : State> {
     // So I created a wrapping function
     fun <T : E> handleBy(
         eventClazz: KClass<T>,
-        block: suspend (StateMachineBuildSideEffect<E>).(UpdateSource<T, S>) -> Unit
+        block: suspend (StateMachineHandleScope<E>).(UpdateSource<T, S>) -> Unit
     ) {
         handle(
             filter = { updateSource -> eventClazz.isInstance(updateSource.event) },
@@ -76,7 +74,7 @@ class StateMachineBuilder<E : Event, S : State> {
     }
 
     inline fun <reified T : E> handleBy(
-        noinline block: suspend (StateMachineBuildSideEffect<E>).(UpdateSource<T, S>) -> Unit
+        noinline block: suspend (StateMachineHandleScope<E>).(UpdateSource<T, S>) -> Unit
     ) {
         handleBy(T::class, block)
     }
@@ -85,7 +83,7 @@ class StateMachineBuilder<E : Event, S : State> {
     // So I created a wrapping function
     fun <U : S> handleWhen(
         stateClazz: KClass<U>,
-        block: suspend (StateMachineBuildSideEffect<E>).(UpdateSource<E, U>) -> Unit
+        block: suspend (StateMachineHandleScope<E>).(UpdateSource<E, U>) -> Unit
     ) {
         handle(
             filter = { updateSource -> stateClazz.isInstance(updateSource.before) },
@@ -94,7 +92,7 @@ class StateMachineBuilder<E : Event, S : State> {
     }
 
     inline fun <reified U : S> handleWhen(
-        noinline block: suspend (StateMachineBuildSideEffect<E>).(UpdateSource<E, U>) -> Unit
+        noinline block: suspend (StateMachineHandleScope<E>).(UpdateSource<E, U>) -> Unit
     ) {
         handleWhen(U::class, block)
     }
@@ -104,7 +102,7 @@ class StateMachineBuilder<E : Event, S : State> {
     fun <T : E, U : S> handleOn(
         eventClazz: KClass<T>,
         stateClazz: KClass<U>,
-        block: suspend (StateMachineBuildSideEffect<E>).(UpdateSource<T, U>) -> Unit
+        block: suspend (StateMachineHandleScope<E>).(UpdateSource<T, U>) -> Unit
     ) {
         handle(
             filter = { updateSource ->
@@ -122,7 +120,7 @@ class StateMachineBuilder<E : Event, S : State> {
     }
 
     inline fun <reified T : E, reified U : S> handleOn(
-        noinline block: suspend (StateMachineBuildSideEffect<E>).(UpdateSource<T, U>) -> Unit
+        noinline block: suspend (StateMachineHandleScope<E>).(UpdateSource<T, U>) -> Unit
     ) {
         handleOn(T::class, U::class, block)
     }

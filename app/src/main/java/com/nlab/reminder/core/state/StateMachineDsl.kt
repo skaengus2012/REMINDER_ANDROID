@@ -14,12 +14,10 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.state.util
+package com.nlab.reminder.core.state
 
 /**
  * @author thalys
  */
-data class StateControllerConfig(
-    val isPluginDispatcherEnabled: Boolean = true,
-    val isPluginErrorHandlerEnabled: Boolean = true
-)
+@DslMarker
+annotation class StateMachineDsl

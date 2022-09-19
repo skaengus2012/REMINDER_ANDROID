@@ -17,15 +17,15 @@
 package com.nlab.reminder.domain.feature.home.tag.rename
 
 import com.nlab.reminder.core.effect.SideEffectSender
-import com.nlab.reminder.core.state.util.StateMachine
+import com.nlab.reminder.core.state.StateMachine
 
 /**
  * @author Doohyun
  */
 @Suppress("FunctionName")
-fun HomeTagRenameStateMachine(
+fun HomeTagRenameStateComponent(
     homeTagRenameSideEffect: SideEffectSender<HomeTagRenameSideEffect>
-): StateMachine<HomeTagRenameEvent, HomeTagRenameState> = StateMachine {
+) = StateMachine<HomeTagRenameEvent, HomeTagRenameState> {
     update { (event, state) ->
         when (event) {
             is HomeTagRenameEvent.OnRenameTextInput -> state.copy(currentText = event.text)

@@ -18,8 +18,8 @@ package com.nlab.reminder.domain.feature.home.di
 
 import androidx.lifecycle.SavedStateHandle
 import com.nlab.reminder.core.effect.SideEffectSender
-import com.nlab.reminder.core.state.StateController
-import com.nlab.reminder.core.state.util.controlIn
+import com.nlab.reminder.core.state.StateContainer
+import com.nlab.reminder.core.state.asContainer
 import com.nlab.reminder.domain.common.android.lifecycle.tag
 import com.nlab.reminder.domain.feature.home.tag.rename.*
 import dagger.Module
@@ -37,14 +37,14 @@ class HomeTagRenameViewModelModule {
     @Provides
     fun provideHomeTagRenameStateMachineFactory(
         savedStateHandle: SavedStateHandle
-    ): HomeTagRenameStateControllerFactory =
-        object : HomeTagRenameStateControllerFactory {
+    ): HomeTagRenameStateContainerFactory =
+        object : HomeTagRenameStateContainerFactory {
             override fun create(
                 scope: CoroutineScope,
                 homeTagRenameSideEffect: SideEffectSender<HomeTagRenameSideEffect>
-            ): StateController<HomeTagRenameEvent, HomeTagRenameState> =
-                HomeTagRenameStateMachine(homeTagRenameSideEffect)
-                    .controlIn(
+            ): StateContainer<HomeTagRenameEvent, HomeTagRenameState> =
+                HomeTagRenameStateComponent(homeTagRenameSideEffect)
+                    .asContainer(
                         scope,
                         HomeTagRenameState(
                             currentText = savedStateHandle.tag.name,

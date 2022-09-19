@@ -18,18 +18,18 @@ package com.nlab.reminder.test
 
 import androidx.lifecycle.ViewModel
 import com.nlab.reminder.core.state.State
-import com.nlab.reminder.core.state.StateController
+import com.nlab.reminder.core.state.StateContainer
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
-inline fun <S : State, VM : ViewModel, reified SM : StateController<*, S>, reified F> createMockingViewModelComponent(
+inline fun <S : State, VM : ViewModel, reified SM : StateContainer<*, S>, reified F> createMockingViewModelComponent(
     state: MutableStateFlow<S>,
     createViewModel: (F) -> VM,
     wheneverMocking: (F) -> SM,
 ): Triple<VM, SM, F> {
-    val stateMachine: SM = mock { whenever(mock.state) doReturn state }
+    val stateMachine: SM = mock { whenever(mock.stateFlow) doReturn state }
     val stateMachineFactory: F = mock { whenever(wheneverMocking(mock)) doReturn stateMachine }
     val viewModel: VM = createViewModel(stateMachineFactory)
     return Triple(viewModel, stateMachine, stateMachineFactory)

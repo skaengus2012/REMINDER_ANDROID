@@ -14,14 +14,10 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.feature.schedule.all
-
-import com.nlab.reminder.core.state.StateController
-import kotlinx.coroutines.CoroutineScope
+package com.nlab.reminder.core.state
 
 /**
- * @author Doohyun
+ * @author thalys
  */
-interface AllScheduleStateControllerFactory {
-    fun create(scope: CoroutineScope): StateController<AllScheduleEvent, AllScheduleState>
-}
+@StateMachineDsl
+object StateMachineScope

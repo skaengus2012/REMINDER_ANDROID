@@ -16,38 +16,128 @@
 
 package com.nlab.reminder.core.state
 
-import com.nlab.reminder.test.genInt
-import com.nlab.reminder.test.once
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
-import org.hamcrest.CoreMatchers.*
-import org.hamcrest.MatcherAssert.*
 import org.junit.Test
-import org.mockito.kotlin.*
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.times
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
 
 /**
  * @author thalys
  */
 @OptIn(ExperimentalCoroutinesApi::class)
-class StateMachineEventProcessorTest {
-    private fun createTestStateMachineEventProcessor(
-        scope: CoroutineScope = CoroutineScope(Dispatchers.Default),
-        state: MutableStateFlow<TestState> = MutableStateFlow(TestState.StateInit()),
-        stateMachineBuilder: StateMachineBuilder<TestEvent, TestState> = StateMachineBuilder()
-    ): EventProcessor<TestEvent> = StateMachineEventProcessor(scope, state, stateMachineBuilder)
+class StateHostReduceBuilderTest {
+    @Test
+    fun `update to state2 when current was any state`() = runTest {
+        val expectedState: TestState = TestState.State2()
+        testReduceTemplate(
+            expectedState = expectedState,
+            block = {
+                reduce {
+                    anyEvent {
+                        anyState { expectedState }
+                    }
+                }
+            }
+        )
+    }
 
+    @Test
+    fun `update to state1 when current was specific state`() = runTest {
+        val fixedInitState: TestState = TestState.genState()
+        val expectedState: TestState = TestState.State2()
+        testReduceTemplate(
+            initState = fixedInitState,
+            expectedState = expectedState,
+            block = {
+                reduce {
+                    anyEvent {
+                        filteredState(
+                            predicate = { before -> before === fixedInitState },
+                            block = { expectedState }
+                        )
+                    }
+                }
+            }
+        )
+    }
+
+    @Test
+    fun `not update when current was not specific state`() = runTest {
+        val fixedInitState: TestState = TestState.genState()
+        testReduceTemplate(
+            initState = fixedInitState,
+            expectedState = fixedInitState,
+            block = {
+                reduce {
+                    anyEvent {
+                        filteredState(
+                            predicate = { before -> before !== fixedInitState },
+                            block = { TestState.State2() }
+                        )
+                    }
+                }
+            }
+        )
+    }
+
+    @Test
+    fun `update to state1 when current was init`() = runTest {
+        val expectedState = TestState.State1()
+        testReduceTemplate(
+            input = TestEvent.genEvent(),
+            initState = TestState.StateInit(),
+            expectedState = expectedState,
+            block = {
+                reduce {
+                    anyEvent {
+                        state<TestState.StateInit> { expectedState }
+                    }
+                }
+            }
+        )
+    }
+
+    @Test
+    fun `update to state2 when current was not init`() = runTest {
+        val expectedState: TestState = TestState.State2()
+        testReduceTemplate(
+            input = TestEvent.genEvent(),
+            initState = TestState.State1(),
+            expectedState = expectedState,
+            block = {
+                reduce {
+                    anyEvent {
+                        stateNot<TestState.StateInit> { expectedState }
+                    }
+                }
+            }
+        )
+    }
+
+    @Test
+    fun `not update when current was init`() = runTest {
+        val fixedInitState: TestState = TestState.StateInit()
+        testReduceTemplate(
+            input = TestEvent.genEvent(),
+            initState = fixedInitState,
+            expectedState = fixedInitState,
+            block = {
+                reduce {
+                    anyEvent {
+                        stateNot<TestState.StateInit> { TestState.State2() }
+                    }
+                }
+            }
+        )
+    }
+
+    /**
     @Test
     fun `update to state1 when test1 event sent`() = runTest {
         val expectedNextState = TestState.State1()
         val state = MutableStateFlow<TestState>(TestState.StateInit())
         val eventProcessor = createTestStateMachineEventProcessor(
             state = state,
-            stateMachineBuilder = StateMachineBuilder<TestEvent, TestState>().apply {
+            stateMachine = StateMachine<TestEvent, TestState>().apply {
                 update { (event, before) ->
                     when (event) {
                         is TestEvent.Event1 -> expectedNextState
@@ -68,7 +158,7 @@ class StateMachineEventProcessorTest {
         val state = MutableStateFlow<TestState>(initState)
         val eventProcessor = createTestStateMachineEventProcessor(
             state = state,
-            stateMachineBuilder = StateMachineBuilder<TestEvent, TestState>().apply {
+            stateMachine = StateMachine<TestEvent, TestState>().apply {
                 update { (event, before) ->
                     when (event) {
                         is TestEvent.Event1 -> TestState.State1()
@@ -134,7 +224,7 @@ class StateMachineEventProcessorTest {
         val expectedTest1EventCount = genInt("##")
         val expectedTest2EventCount = genInt("##")
         val action: () -> Unit = mock()
-        val sideEffectConfig: (StateMachineBuilder<TestEvent, TestState>).() -> Unit = {
+        val sideEffectConfig: (StateMachine<TestEvent, TestState>).() -> Unit = {
             handleWhen<TestState.State1> { action() }
         }
         val initStates = listOf(
@@ -158,7 +248,7 @@ class StateMachineEventProcessorTest {
     fun `handled when current was state1 and event instance is TestEvent1`() {
         val expectedTest1EventCount = genInt("##")
         val action: () -> Unit = mock()
-        val sideEffectConfig: (StateMachineBuilder<TestEvent, TestState>).() -> Unit = {
+        val sideEffectConfig: (StateMachine<TestEvent, TestState>).() -> Unit = {
             handleOn<TestEvent.Event1, TestState.State1> { action() }
         }
         val initStates = listOf(
@@ -182,11 +272,11 @@ class StateMachineEventProcessorTest {
         expectedTest1EventCount: Int,
         expectedTest2EventCount: Int,
         state: MutableStateFlow<TestState> = MutableStateFlow(TestState.StateInit()),
-        handleConfig: (StateMachineBuilder<TestEvent, TestState>).() -> Unit,
+        handleConfig: (StateMachine<TestEvent, TestState>).() -> Unit,
     ) = runTest {
         val eventProcessor = createTestStateMachineEventProcessor(
             state = state,
-            stateMachineBuilder = StateMachineBuilder<TestEvent, TestState>().apply { handleConfig(this) }
+            stateMachine = StateMachine<TestEvent, TestState>().apply { handleConfig(this) }
         )
         val jobs: List<Job> =
             List(expectedTest1EventCount) { eventProcessor.send(TestEvent.Event1()) } +
@@ -206,7 +296,7 @@ class StateMachineEventProcessorTest {
         val sideEffectFunction: (UpdateSource<TestEvent, TestState>) -> Unit = mock()
         val eventProcessor = createTestStateMachineEventProcessor(
             state = MutableStateFlow(updateSource.before),
-            stateMachineBuilder = StateMachineBuilder<TestEvent, TestState>().apply {
+            stateMachine = StateMachine<TestEvent, TestState>().apply {
                 update { updateFunction(it) }
                 handle { sideEffectFunction(it) }
             }
@@ -218,45 +308,5 @@ class StateMachineEventProcessorTest {
         val executionOrder = inOrder(updateFunction, sideEffectFunction)
         executionOrder.verify(updateFunction, once())(updateSource)
         executionOrder.verify(sideEffectFunction, once())(updateSource)
-    }
-
-    @Test
-    fun `catch when trying to update with testEvent1`() = runTest {
-        testExceptionHandler { stateMachineBuilder, throwable ->
-            stateMachineBuilder.update { (event, before) ->
-                when(event) {
-                    is TestEvent.Event1 -> throw throwable
-                    is TestEvent.Event2 -> before
-                }
-            }
-        }
-    }
-
-    @Test
-    fun `catch when sideEffect executed by testEvent1`() = runTest {
-        testExceptionHandler { stateMachineBuilder, throwable ->
-            stateMachineBuilder.handleBy<TestEvent.Event1> { throw throwable }
-        }
-    }
-
-    private suspend fun testExceptionHandler(
-        throwableConfig: (StateMachineBuilder<TestEvent, TestState>, Throwable) -> Unit
-    ) {
-        val exception = Throwable()
-        val firstErrorHandler: (Throwable) -> Unit = mock()
-        val secondErrorHandler: (Throwable) -> Unit = mock()
-        val eventProcessor = createTestStateMachineEventProcessor(
-            stateMachineBuilder = StateMachineBuilder<TestEvent, TestState>().apply {
-                catch { e -> firstErrorHandler(e) }
-                catch { e -> secondErrorHandler(e) }
-                throwableConfig(this, exception)
-            }
-        )
-
-        eventProcessor
-            .send(TestEvent.Event1())
-            .join()
-        verify(firstErrorHandler, once())(exception)
-        verify(secondErrorHandler, once())(exception)
-    }
+    }*/
 }

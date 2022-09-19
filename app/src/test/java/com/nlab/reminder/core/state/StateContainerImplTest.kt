@@ -16,11 +16,22 @@
 
 package com.nlab.reminder.core.state
 
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
+import org.junit.Test
+import org.mockito.kotlin.*
+
 /**
- * @author thalys
+ * @author Doohyun
  */
-@StateMachineBuildMarker
-@JvmInline
-value class StateMachineBuildSideEffect<E : Event>(
-    private val eventProcessor: EventProcessor<E>
-) : EventProcessor<E> by eventProcessor
+@OptIn(ExperimentalCoroutinesApi::class)
+internal class StateContainerImplTest {
+    @Test
+    fun `eventProcessor sent event when state container sent`() = runTest {
+        val eventProcessor: EventProcessor<TestEvent> = mock()
+        val stateMachine = StateContainerImpl<TestEvent, TestState>(eventProcessor, mock())
+        val event = TestEvent.Event1()
+        stateMachine.send(event)
+        verify(eventProcessor, times(1)).send(event)
+    }
+}

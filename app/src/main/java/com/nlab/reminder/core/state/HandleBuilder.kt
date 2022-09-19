@@ -19,5 +19,6 @@ package com.nlab.reminder.core.state
 /**
  * @author thalys
  */
-@DslMarker
-annotation class StateMachineBuildMarker
+abstract class HandleBuilder<E : P, P : Event, S : State> {
+    internal abstract fun build(): suspend StateMachineHandleScope<P>.(UpdateSource<E, S>) -> Unit
+}

@@ -17,8 +17,8 @@
 package com.nlab.reminder.domain.feature.home.di
 
 import com.nlab.reminder.core.effect.SideEffectSender
-import com.nlab.reminder.core.state.StateController
-import com.nlab.reminder.core.state.util.controlIn
+import com.nlab.reminder.core.state.StateContainer
+import com.nlab.reminder.core.state.asContainer
 import com.nlab.reminder.domain.feature.home.*
 import dagger.Module
 import dagger.Provides
@@ -38,13 +38,13 @@ class HomeViewModelModule {
         getTagUsageCount: GetTagUsageCountUseCase,
         modifyTagName: ModifyTagNameUseCase,
         deleteTag: DeleteTagUseCase
-    ): HomeStateControllerFactory =
-        object : HomeStateControllerFactory {
+    ): HomeStateContainerFactory =
+        object : HomeStateContainerFactory {
             override fun create(
                 scope: CoroutineScope,
                 homeSideEffect: SideEffectSender<HomeSideEffect>
-            ): StateController<HomeEvent, HomeState> =
+            ): StateContainer<HomeEvent, HomeState> =
                 HomeStateMachine(homeSideEffect, getHomeSummary, getTagUsageCount, modifyTagName, deleteTag)
-                    .controlIn(scope, initState = HomeState.Init, fetchEvent = HomeEvent.Fetch)
+                    .asContainer(scope, initState = HomeState.Init, fetchEvent = HomeEvent.Fetch)
         }
 }

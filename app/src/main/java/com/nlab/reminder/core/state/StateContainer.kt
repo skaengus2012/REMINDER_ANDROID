@@ -16,18 +16,11 @@
 
 package com.nlab.reminder.core.state
 
-import com.nlab.reminder.test.genInt
+import kotlinx.coroutines.flow.StateFlow
 
 /**
  * @author Doohyun
  */
-internal sealed class TestEvent private constructor() : Event {
-    class Event1 : TestEvent()
-    class Event2 : TestEvent()
-
-    companion object {
-        fun genEvent(): TestEvent {
-            return if (genInt() % 2 == 0) Event1() else Event2()
-        }
-    }
+sealed interface StateContainer<E : Event, S : State> : EventProcessor<E> {
+    val stateFlow: StateFlow<S>
 }

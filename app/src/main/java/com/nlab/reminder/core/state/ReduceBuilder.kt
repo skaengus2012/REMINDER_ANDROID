@@ -14,18 +14,11 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.feature.home
-
-import com.nlab.reminder.core.effect.SideEffectSender
-import com.nlab.reminder.core.state.StateController
-import kotlinx.coroutines.CoroutineScope
+package com.nlab.reminder.core.state
 
 /**
- * @author Doohyun
+ * @author thalys
  */
-interface HomeStateControllerFactory {
-    fun create(
-        scope: CoroutineScope,
-        homeSideEffect: SideEffectSender<HomeSideEffect>,
-    ): StateController<HomeEvent, HomeState>
+abstract class ReduceBuilder<E : Event, S : R, R : State> {
+    internal abstract fun build(): StateMachineScope.(UpdateSource<E, S>) -> R
 }

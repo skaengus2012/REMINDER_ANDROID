@@ -19,19 +19,31 @@ package com.nlab.reminder.core.state
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
-import org.mockito.kotlin.*
 
 /**
- * @author Doohyun
+ * @author thalys
  */
 @OptIn(ExperimentalCoroutinesApi::class)
-internal class StateControllerImplTest {
+class StateMachineCatchTest {
     @Test
-    fun `eventProcessor sent event when state machine sent`() = runTest {
-        val eventProcessor: EventProcessor<TestEvent> = mock()
-        val stateMachine = StateControllerImpl<TestEvent, TestState>(eventProcessor, mock())
-        val event = TestEvent.Event1()
-        stateMachine.send(event)
-        verify(eventProcessor, times(1)).send(event)
+    fun `catch when trying to update with event1`() = runTest {
+        testCatchTemplate(input = TestEvent.Event1()) { throwable ->
+            reduce {
+                event<TestEvent.Event1> {
+                    anyState { throw throwable }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `catch when handled by event1`() = runTest {
+        testCatchTemplate(input = TestEvent.Event1()) { throwable ->
+            handled {
+                event<TestEvent.Event1> {
+                    anyState { throw throwable }
+                }
+            }
+        }
     }
 }

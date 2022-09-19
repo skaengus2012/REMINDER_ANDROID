@@ -14,14 +14,18 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.state
+package com.nlab.reminder.domain.feature.home.tag.rename
 
-import kotlinx.coroutines.flow.*
+import com.nlab.reminder.core.effect.SideEffectSender
+import com.nlab.reminder.core.state.StateContainer
+import kotlinx.coroutines.CoroutineScope
 
 /**
  * @author Doohyun
  */
-internal class StateControllerImpl<E : Event, S : State>(
-    eventProcessor: EventProcessor<E>,
-    override val state: StateFlow<S>,
-) : StateController<E, S>, EventProcessor<E> by eventProcessor
+interface HomeTagRenameStateContainerFactory {
+    fun create(
+        scope: CoroutineScope,
+        homeTagRenameSideEffect: SideEffectSender<HomeTagRenameSideEffect>
+    ): StateContainer<HomeTagRenameEvent, HomeTagRenameState>
+}

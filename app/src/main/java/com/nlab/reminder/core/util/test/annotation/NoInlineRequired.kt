@@ -14,18 +14,12 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.state
-
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.getAndUpdate
+package com.nlab.reminder.core.util.test.annotation
 
 /**
- * @author Doohyun
+ * When writing inline, jacoco does not recognize it 😭.
+ *
+ * @author thalys
  */
-internal class StateReduce<E : Event, S : State>(
-    private val state: MutableStateFlow<S>,
-    private val reducer: (UpdateSource<E, S>) -> S
-) {
-    fun getSourceAndUpdate(event: E): UpdateSource<E, S> =
-        UpdateSource(event, before = state.getAndUpdate { old -> reducer(UpdateSource(event, old)) })
-}
+@Retention(AnnotationRetention.SOURCE)
+annotation class NoInlineRequired

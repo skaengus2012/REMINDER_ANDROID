@@ -23,10 +23,10 @@ import org.mockito.kotlin.verify
  * @author Doohyun
  */
 fun <E : Event, S : State> verifyStateSendExtension(
-    stateController: StateController<E, S>,
+    stateContainer: StateContainer<E, S>,
     expectEvent: E,
     invoke: () -> Unit
 ) {
     invoke()
-    verify(stateController, once()).send(expectEvent)
+    verify(stateContainer, once()).send(expectEvent)
 }

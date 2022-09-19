@@ -103,7 +103,7 @@ class HomeFragment : Fragment() {
             .apply { itemAnimator = null }
             .apply { adapter = ConcatAdapter(logoAdapter, categoryAdapter, tagCardAdapter) }
 
-        handleSideEffect(viewModel.homeSideEffect) { sideEffect ->
+        handleSideEffect(viewModel.sideEffectFlow) { sideEffect ->
             when (sideEffect) {
                 is HomeSideEffect.NavigateToday -> {
 
@@ -135,19 +135,19 @@ class HomeFragment : Fragment() {
             }
         }
 
-        viewModel.state
+        viewModel.stateFlow
             .filterIsInstance<HomeState.Init>()
             .flowWithLifecycle(viewLifecycle)
             .onEach { renderWhenInit() }
             .launchIn(viewLifecycleScope)
 
-        viewModel.state
+        viewModel.stateFlow
             .filterIsInstance<HomeState.Loading>()
             .flowWithLifecycle(viewLifecycle)
             .onEach { renderWhenLoading() }
             .launchIn(viewLifecycleScope)
 
-        viewModel.state
+        viewModel.stateFlow
             .filterIsInstance<HomeState.Loaded>()
             .map { state -> state.snapshot }
             .flowOn(Dispatchers.Default)

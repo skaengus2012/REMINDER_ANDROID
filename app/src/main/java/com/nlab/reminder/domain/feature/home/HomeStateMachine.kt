@@ -20,7 +20,7 @@ import com.nlab.reminder.core.effect.SideEffectSender
 import com.nlab.reminder.core.kotlin.util.catching
 import com.nlab.reminder.core.kotlin.util.getValueOrThrow
 import com.nlab.reminder.core.kotlin.util.onFailure
-import com.nlab.reminder.core.state.util.StateMachine
+import com.nlab.reminder.core.state.StateMachine
 
 /**
  * @author Doohyun
@@ -32,7 +32,7 @@ fun HomeStateMachine(
     getTagUsageCount: GetTagUsageCountUseCase,
     modifyTagName: ModifyTagNameUseCase,
     deleteTag: DeleteTagUseCase
-): StateMachine<HomeEvent, HomeState> = StateMachine {
+) = StateMachine<HomeEvent, HomeState> {
     update { (event, state) ->
         when (event) {
             is HomeEvent.Fetch -> {

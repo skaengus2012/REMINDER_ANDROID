@@ -14,20 +14,14 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.state
+package com.nlab.reminder.domain.feature.schedule.all
 
-import com.nlab.reminder.test.genInt
+import com.nlab.reminder.core.state.StateContainer
+import kotlinx.coroutines.CoroutineScope
 
 /**
  * @author Doohyun
  */
-internal sealed class TestEvent private constructor() : Event {
-    class Event1 : TestEvent()
-    class Event2 : TestEvent()
-
-    companion object {
-        fun genEvent(): TestEvent {
-            return if (genInt() % 2 == 0) Event1() else Event2()
-        }
-    }
+interface AllScheduleStateContainerFactory {
+    fun create(scope: CoroutineScope): StateContainer<AllScheduleEvent, AllScheduleState>
 }

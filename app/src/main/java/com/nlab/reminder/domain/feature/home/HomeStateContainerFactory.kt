@@ -14,13 +14,18 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.state
+package com.nlab.reminder.domain.feature.home
 
-import kotlinx.coroutines.flow.StateFlow
+import com.nlab.reminder.core.effect.SideEffectSender
+import com.nlab.reminder.core.state.StateContainer
+import kotlinx.coroutines.CoroutineScope
 
 /**
  * @author Doohyun
  */
-sealed interface StateController<E : Event, S : State> : EventProcessor<E> {
-    val state: StateFlow<S>
+interface HomeStateContainerFactory {
+    fun create(
+        scope: CoroutineScope,
+        homeSideEffect: SideEffectSender<HomeSideEffect>,
+    ): StateContainer<HomeEvent, HomeState>
 }

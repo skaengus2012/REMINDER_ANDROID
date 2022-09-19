@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.state.util
+package com.nlab.reminder.core.state
 
-import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.*
 
 /**
  * @author Doohyun
  */
-object StateMachinePlugin {
-    var defaultDispatcher: CoroutineDispatcher? = null
-    var defaultExceptionHandler: ((Throwable) -> Unit)? = null
-}
+internal class StateContainerImpl<E : Event, S : State>(
+    eventProcessor: EventProcessor<E>,
+    override val stateFlow: StateFlow<S>,
+) : StateContainer<E, S>, EventProcessor<E> by eventProcessor

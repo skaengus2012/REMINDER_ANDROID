@@ -16,18 +16,19 @@
 
 package com.nlab.reminder.core.state
 
-import com.nlab.reminder.test.genInt
+import com.nlab.reminder.core.util.test.annotation.Generated
+import kotlinx.coroutines.CoroutineDispatcher
 
 /**
  * @author Doohyun
  */
-internal sealed class TestEvent private constructor() : Event {
-    class Event1 : TestEvent()
-    class Event2 : TestEvent()
+@Generated
+object StateMachinePlugin {
+    var defaultDispatcher: CoroutineDispatcher? = null
+    var defaultExceptionHandler: ((Throwable) -> Unit)? = null
 
-    companion object {
-        fun genEvent(): TestEvent {
-            return if (genInt() % 2 == 0) Event1() else Event2()
-        }
-    }
+    fun toConfig(): StateMachineConfig = StateMachineConfig(
+        dispatcher = defaultDispatcher,
+        exceptionHandler = defaultExceptionHandler
+    )
 }
