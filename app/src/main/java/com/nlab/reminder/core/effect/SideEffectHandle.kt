@@ -19,6 +19,6 @@ package com.nlab.reminder.core.effect
 /**
  * @author Doohyun
  */
-sealed interface SideEffectSender<T : SideEffect> {
-    suspend fun post(sideEffect: T)
+sealed interface SideEffectHandle<T : SideEffect> {
+    suspend fun handle(sideEffect: T)
 }

@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.nlab.reminder.core.state
 
-import com.nlab.reminder.core.kotlin.coroutine.flow.map
-import com.nlab.reminder.core.util.test.annotation.Generated
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 
 /**
  * @author thalys
@@ -28,11 +28,14 @@ class StateMachineHandleScope<E : Event> internal constructor(
     private val subscriptionCount: StateFlow<Int>,
     private val eventProcessor: EventProcessor<E>
 ) : EventProcessor<E> by eventProcessor {
-    @Generated
-    suspend fun <T> Flow<T>.collectWithMachine(flowCollector: FlowCollector<T>) {
-        subscriptionCount
-            .map { count -> count > 0 }
-            .distinctUntilChanged()
-            .collectLatest { isActive -> if (isActive) collect(flowCollector) }
+    suspend fun <T> Flow<T>.collectWhileSubscribed(flowCollector: FlowCollector<T>) {
+        coroutineScope {
+            launch(start = CoroutineStart.UNDISPATCHED) {
+                subscriptionCount
+                    .map { it > 0 }
+                    .distinctUntilChanged()
+                    .collectLatest { isActive -> if (isActive) collect(flowCollector) }
+            }
+        }
     }
 }

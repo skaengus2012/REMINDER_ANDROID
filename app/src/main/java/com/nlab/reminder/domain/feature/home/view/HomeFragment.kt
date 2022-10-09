@@ -30,13 +30,11 @@ import com.nlab.reminder.core.android.fragment.viewLifecycle
 import com.nlab.reminder.core.android.fragment.viewLifecycleScope
 import com.nlab.reminder.core.android.navigation.NavigationController
 import com.nlab.reminder.databinding.FragmentHomeBinding
-import com.nlab.reminder.domain.common.android.fragment.handleSideEffect
 import com.nlab.reminder.domain.common.android.fragment.resultReceives
 import com.nlab.reminder.domain.common.android.navigation.navigateToAllScheduleEnd
 import com.nlab.reminder.domain.common.android.view.recyclerview.SimpleLayoutAdapter
 import com.nlab.reminder.domain.feature.home.*
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
@@ -103,37 +101,10 @@ class HomeFragment : Fragment() {
             .apply { itemAnimator = null }
             .apply { adapter = ConcatAdapter(logoAdapter, categoryAdapter, tagCardAdapter) }
 
-        handleSideEffect(viewModel.sideEffectFlow) { sideEffect ->
-            when (sideEffect) {
-                is HomeSideEffect.NavigateToday -> {
-
-                }
-                is HomeSideEffect.NavigateTimetable -> {
-
-                }
-                is HomeSideEffect.NavigateAllSchedule -> {
-                    navigationController.navigateToAllScheduleEnd()
-                }
-                is HomeSideEffect.NavigateTag -> {
-
-                }
-                is HomeSideEffect.NavigateTagConfig -> {
-                    navigationController.navigateToTagConfig(
-                        REQUEST_KEY_HOME_TO_HOME_TAG_CONFIG, sideEffect.tag
-                    )
-                }
-                is HomeSideEffect.NavigateTagRename -> {
-                    navigationController.navigateToTagRename(
-                        REQUEST_KEY_HOME_TO_HOME_TAG_RENAME, sideEffect.tag, sideEffect.usageCount
-                    )
-                }
-                is HomeSideEffect.NavigateTagDelete -> {
-                    navigationController.navigateToTagDelete(
-                        REQUEST_KEY_HOME_TO_HOME_TAG_DELETE, sideEffect.tag, sideEffect.usageCount
-                    )
-                }
-            }
-        }
+        viewModel.homeSideEffectFlow
+            .flowWithLifecycle(viewLifecycle)
+            .onEach(this::handleSideEffect)
+            .launchIn(viewLifecycleScope)
 
         viewModel.stateFlow
             .filterIsInstance<HomeState.Init>()
@@ -149,11 +120,41 @@ class HomeFragment : Fragment() {
 
         viewModel.stateFlow
             .filterIsInstance<HomeState.Loaded>()
-            .map { state -> state.snapshot }
-            .flowOn(Dispatchers.Default)
             .flowWithLifecycle(viewLifecycle)
-            .onEach { homeListItem -> renderWhenLoaded(homeListItem) }
+            .onEach { state -> renderWhenLoaded(state.snapshot) }
             .launchIn(viewLifecycleScope)
+    }
+
+    private fun handleSideEffect(sideEffect: HomeSideEffect) {
+        when (sideEffect) {
+            is HomeSideEffect.NavigateToday -> {
+
+            }
+            is HomeSideEffect.NavigateTimetable -> {
+
+            }
+            is HomeSideEffect.NavigateAllSchedule -> {
+                navigationController.navigateToAllScheduleEnd()
+            }
+            is HomeSideEffect.NavigateTag -> {
+
+            }
+            is HomeSideEffect.NavigateTagConfig -> {
+                navigationController.navigateToTagConfig(
+                    REQUEST_KEY_HOME_TO_HOME_TAG_CONFIG, sideEffect.tag
+                )
+            }
+            is HomeSideEffect.NavigateTagRename -> {
+                navigationController.navigateToTagRename(
+                    REQUEST_KEY_HOME_TO_HOME_TAG_RENAME, sideEffect.tag, sideEffect.usageCount
+                )
+            }
+            is HomeSideEffect.NavigateTagDelete -> {
+                navigationController.navigateToTagDelete(
+                    REQUEST_KEY_HOME_TO_HOME_TAG_DELETE, sideEffect.tag, sideEffect.usageCount
+                )
+            }
+        }
     }
 
     private fun renderWhenInit() {

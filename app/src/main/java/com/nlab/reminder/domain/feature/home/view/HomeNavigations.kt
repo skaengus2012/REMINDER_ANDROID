@@ -17,7 +17,6 @@
 
 package com.nlab.reminder.domain.feature.home.view
 
-import android.os.Bundle
 import android.os.Parcelable
 import com.nlab.reminder.core.android.navigation.Navigation
 import com.nlab.reminder.core.android.navigation.NavigationController
@@ -51,15 +50,12 @@ data class HomeTagDeleteResult(
     val tag: Tag,
     val isConfirmed: Boolean
 ) : Parcelable
-class HomeNavigationResultFactory(
-    val fromTagConfig: (Bundle) -> HomeTagConfigResult,
-    val fromTagRename: (Bundle) -> HomeTagRenameResult,
-    val fromTagDelete: (Bundle) -> HomeTagDeleteResult
-)
 
 fun NavigationController.navigateToTagConfig(requestKey: String, tag: Tag) =
     navigateTo(HomeTagConfigNavigation(requestKey, tag))
+
 fun NavigationController.navigateToTagDelete(requestKey: String, tag: Tag, usageCount: Long) =
     navigateTo(HomeTagDeleteNavigation(requestKey, tag, usageCount))
+
 fun NavigationController.navigateToTagRename(requestKey: String, tag: Tag, usageCount: Long) =
     navigateTo(HomeTagRenameNavigation(requestKey, tag, usageCount))

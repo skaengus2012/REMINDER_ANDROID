@@ -37,13 +37,13 @@ import kotlin.coroutines.ContinuationInterceptor
     ExperimentalCoroutinesApi::class,
     DelicateCoroutinesApi::class
 )
-class SideEffectControllerTest {
+class SideEffectContainerTest {
     @Test
     fun `channel send when controller sent sideEffect`() = runTest {
         val message = TestSideEffect(genBoolean())
         val channel: Channel<TestSideEffect> = mock()
 
-        SideEffectController(channel, Dispatchers.Default).post(message)
+        SideEffectContainer(channel, Dispatchers.Default).handle(message)
         verify(channel, once()).send(message)
     }
 
@@ -66,21 +66,21 @@ class SideEffectControllerTest {
             }
         }
 
-        SideEffectController(fakeChannel, testDispatcher).post(message)
+        SideEffectContainer(fakeChannel, testDispatcher).handle(message)
         assertThat(isContextEquals.await(), equalTo(true))
     }
 
     @Test
     fun `notify 100 times message after sending message 100 times`() = runTest {
         val testCount = 100
-        val controller = SideEffectController<TestSideEffect>(Channel(Channel.UNLIMITED), Dispatchers.Default)
+        val controller = SideEffectContainer<TestSideEffect>(Channel(Channel.UNLIMITED), Dispatchers.Default)
         (1..testCount)
-            .map { number -> launch { controller.post(TestSideEffect(number)) } }
+            .map { number -> launch { controller.handle(TestSideEffect(number)) } }
             .joinAll()
 
         assertThat(
             withContext(Dispatchers.Default) {
-                controller.flow
+                controller.sideEffectFlow
                     .take(testCount)
                     .fold(0) { acc, message -> acc + message.value as Int }
             },

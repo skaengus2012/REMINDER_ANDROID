@@ -16,20 +16,7 @@
 
 package com.nlab.reminder.domain.feature.home.tag.rename
 
-import com.nlab.reminder.core.effect.SideEffectSender
-import com.nlab.reminder.test.genBothify
-import com.nlab.reminder.test.genLetterify
-import com.nlab.reminder.test.once
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.async
-import kotlinx.coroutines.test.runTest
-import org.hamcrest.CoreMatchers.equalTo
-import org.hamcrest.MatcherAssert.assertThat
-import org.junit.Test
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
 
 /**
  * @author Doohyun

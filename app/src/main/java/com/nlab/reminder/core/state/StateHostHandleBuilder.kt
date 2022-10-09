@@ -25,7 +25,7 @@ import kotlin.reflect.cast
  */
 @StateMachineDsl
 class StateHostHandleBuilder<E : P, P : Event, S : State> : HandleBuilder<E, P, S>() {
-    private val concatHandleBuilder = ConcatHandleBuilder<E, P, S>()
+    private val concatHandleBuilder = AsyncConcatHandleBuilder<E, P, S>()
 
     override fun build(): suspend StateMachineHandleScope<P>.(UpdateSource<E, S>) -> Unit {
         return concatHandleBuilder.build()

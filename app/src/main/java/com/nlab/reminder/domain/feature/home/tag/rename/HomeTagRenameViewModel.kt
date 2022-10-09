@@ -18,8 +18,8 @@ package com.nlab.reminder.domain.feature.home.tag.rename
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nlab.reminder.core.effect.util.SideEffectController
-import com.nlab.reminder.core.effect.util.asReceived
+import com.nlab.reminder.core.effect.SideEffectContainer
+import com.nlab.reminder.core.effect.asReceived
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import javax.inject.Inject
@@ -31,7 +31,7 @@ import javax.inject.Inject
 class HomeTagRenameViewModel @Inject constructor(
     stateControllerFactory: HomeTagRenameStateContainerFactory
 ) : ViewModel() {
-    private val sideEffectController = SideEffectController<HomeTagRenameSideEffect>()
+    private val sideEffectController = SideEffectContainer<HomeTagRenameSideEffect>()
     private val stateContainer = stateControllerFactory.create(viewModelScope, sideEffectController)
 
     val homeTagRenameSideEffect = sideEffectController.asReceived()

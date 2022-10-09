@@ -16,9 +16,10 @@
 
 package com.nlab.reminder.domain.feature.home
 
-import com.nlab.reminder.core.effect.SideEffectSender
+import com.nlab.reminder.core.effect.SideEffectHandle
 import com.nlab.reminder.core.state.StateMachine
 import com.nlab.reminder.core.state.StateContainer
+import com.nlab.reminder.core.state.asContainer
 import com.nlab.reminder.test.genFlowObserveDispatcher
 import com.nlab.reminder.test.once
 import kotlinx.coroutines.*
@@ -40,11 +41,6 @@ import org.mockito.kotlin.*
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class HomeViewModelTest {
-    /**
-    private val sampleEvent: HomeEvent = HomeEvent.OnTodayCategoryClicked
-    private val sampleState: HomeState = HomeState.Loaded(genHomeSnapshot())
-    private val sampleEffect: HomeSideEffect = HomeSideEffect.NavigateToday
-
     @Before
     fun setup() {
         Dispatchers.setMain(Dispatchers.Unconfined)
@@ -57,6 +53,7 @@ class HomeViewModelTest {
 
     @Test
     fun `stateController send event when viewModel sent`() {
+        val sampleEvent = genHomeEventSample()
         val stateContainer: StateContainer<HomeEvent, HomeState> = mock()
         val viewModel = HomeViewModel(
             stateContainerFactory = mock {
@@ -64,12 +61,13 @@ class HomeViewModelTest {
             }
         )
 
-        viewModel.invoke(sampleEvent)
+        viewModel.send(sampleEvent)
         verify(stateContainer, once()).send(sampleEvent)
     }
 
     @Test
     fun `notify state when stateController flow published`() {
+        val sampleState = genHomeStateSample()
         val stateContainer: StateContainer<HomeEvent, HomeState> = mock {
             whenever(mock.stateFlow) doReturn MutableStateFlow(sampleState)
         }
@@ -82,14 +80,19 @@ class HomeViewModelTest {
 
     @Test
     fun `notify sideEffect when stateController invoke sideEffect`() = runTest {
+        val sampleEvent = genHomeEventSample()
         val viewModel = HomeViewModel(
             stateContainerFactory = object : HomeStateContainerFactory {
                 override fun create(
                     scope: CoroutineScope,
-                    homeSideEffect: SideEffectSender<HomeSideEffect>
+                    homeSideEffectHandle: SideEffectHandle<HomeSideEffect>
                 ): StateContainer<HomeEvent, HomeState> {
                     val fakeStateComponent = StateMachine<HomeEvent, HomeState> {
-                        handle { homeSideEffect.post(sampleEffect) }
+                        handled {
+                            anyEvent {
+                                anyState { homeSideEffectHandle.handle(genHomeSideEffectSample()) }
+                            }
+                        }
                     }
                     return fakeStateComponent.asContainer(scope, HomeState.Init)
                 }
@@ -97,10 +100,10 @@ class HomeViewModelTest {
         )
         val sideEffectHandler: () -> Unit = mock()
 
-        viewModel.sideEffectFlow.flow
+        viewModel.homeSideEffectFlow
             .onEach { sideEffectHandler() }
             .launchIn(genFlowObserveDispatcher())
-        viewModel.invoke(sampleEvent).join()
+        viewModel.send(sampleEvent).join()
         verify(sideEffectHandler, once())()
-    }*/
+    }
 }

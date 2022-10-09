@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.effect
+package com.nlab.reminder.core.kotlin.coroutine
 
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.currentCoroutineContext
 
 /**
- * @author Doohyun
+ * @author thalys
  */
-sealed interface SideEffectReceiver<T : SideEffect> {
-    val sideEffectFlow: Flow<T>
+suspend inline fun generateCurrentCoroutineScope(block: CoroutineScope.() -> Unit) {
+    block(CoroutineScope(currentCoroutineContext()))
 }

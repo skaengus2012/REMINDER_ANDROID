@@ -37,7 +37,7 @@ val <T> Result<T>.isFailure get() = when (this) {
     is Result.Failure -> true
 }
 
-fun <T> Result<T>.getValueOrThrow(): T = when (this) {
+fun <T> Result<T>.getOrThrow(): T = when (this) {
     is Result.Success -> value
     is Result.Failure -> throw throwable
 }

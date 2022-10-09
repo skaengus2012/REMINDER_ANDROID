@@ -14,24 +14,14 @@
  * limitations under the License.
  */
 @file:Generated
-package com.nlab.reminder.core.effect.util
+package com.nlab.reminder.core.effect
 
-import com.nlab.reminder.core.effect.SideEffect
-import com.nlab.reminder.core.effect.SideEffectController
-import com.nlab.reminder.core.effect.SideEffectReceiver
 import com.nlab.reminder.core.util.test.annotation.Generated
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.channels.Channel
 
 /**
  * @author thalys
  */
-@Suppress("FunctionName")
-fun <T : SideEffect> SideEffectController(
-    eventChannel: Channel<T> = Channel(Channel.BUFFERED),
-    dispatcher: CoroutineDispatcher = Dispatchers.Main
-): SideEffectController<T> = SideEffectController(eventChannel, dispatcher)
 
 
-fun <T : SideEffect> SideEffectController<T>.asReceived(): SideEffectReceiver<T> = this
+
+fun <T : SideEffect> SideEffectContainer<T>.asReceived(): SideEffectReceiver<T> = this

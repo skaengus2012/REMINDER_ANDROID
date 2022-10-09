@@ -16,7 +16,7 @@
 
 package com.nlab.reminder.domain.feature.home.tag.rename
 
-import com.nlab.reminder.core.effect.SideEffectSender
+import com.nlab.reminder.core.effect.SideEffectHandle
 import com.nlab.reminder.core.state.StateMachine
 
 /**
@@ -24,7 +24,7 @@ import com.nlab.reminder.core.state.StateMachine
  */
 @Suppress("FunctionName")
 fun HomeTagRenameStateComponent(
-    homeTagRenameSideEffect: SideEffectSender<HomeTagRenameSideEffect>
+    homeTagRenameSideEffect: SideEffectHandle<HomeTagRenameSideEffect>
 ) = StateMachine<HomeTagRenameEvent, HomeTagRenameState> {
     update { (event, state) ->
         when (event) {
@@ -38,10 +38,10 @@ fun HomeTagRenameStateComponent(
     }
 
     handleBy<HomeTagRenameEvent.OnConfirmClicked> { (_, state) ->
-        homeTagRenameSideEffect.post(HomeTagRenameSideEffect.Complete(state.currentText))
+        homeTagRenameSideEffect.handle(HomeTagRenameSideEffect.Complete(state.currentText))
     }
 
     handleBy<HomeTagRenameEvent.OnCancelClicked> {
-        homeTagRenameSideEffect.post(HomeTagRenameSideEffect.Cancel)
+        homeTagRenameSideEffect.handle(HomeTagRenameSideEffect.Cancel)
     }
 }

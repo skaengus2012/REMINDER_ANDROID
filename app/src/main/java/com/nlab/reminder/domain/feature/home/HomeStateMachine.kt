@@ -16,87 +16,83 @@
 
 package com.nlab.reminder.domain.feature.home
 
-import com.nlab.reminder.core.effect.SideEffectSender
+import com.nlab.reminder.core.effect.SideEffectHandle
 import com.nlab.reminder.core.kotlin.util.catching
-import com.nlab.reminder.core.kotlin.util.getValueOrThrow
+import com.nlab.reminder.core.kotlin.util.getOrThrow
 import com.nlab.reminder.core.kotlin.util.onFailure
 import com.nlab.reminder.core.state.StateMachine
+import com.nlab.reminder.core.state.StateMachineHandleScope
+import kotlinx.coroutines.flow.*
 
 /**
  * @author Doohyun
  */
 @Suppress("FunctionName")
 fun HomeStateMachine(
-    homeSideEffect: SideEffectSender<HomeSideEffect>,
+    homeSideEffectHandle: SideEffectHandle<HomeSideEffect>,
     getHomeSnapshot: GetHomeSnapshotUseCase,
     getTagUsageCount: GetTagUsageCountUseCase,
     modifyTagName: ModifyTagNameUseCase,
     deleteTag: DeleteTagUseCase
-) = StateMachine<HomeEvent, HomeState> {
-    update { (event, state) ->
-        when (event) {
-            is HomeEvent.Fetch -> {
-                if (state is HomeState.Init) HomeState.Loading(state)
-                else state
-            }
-            is HomeEvent.OnSnapshotLoaded -> {
-                if (state is HomeState.Init) state
-                else HomeState.Loaded(event.snapshot)
-            }
-            is HomeEvent.OnSnapshotLoadFailed -> {
-                HomeState.Error(event.throwable)
-            }
-            is HomeEvent.OnRetryClicked -> {
-                if (state is HomeState.Error) HomeState.Loading(state)
-                else state
-            }
-            else -> state
+): StateMachine<HomeEvent, HomeState> = StateMachine {
+    reduce {
+        event<HomeEvent.Fetch> {
+            state<HomeState.Init> { HomeState.Loading(it.before) }
+        }
+
+        event<HomeEvent.OnRetryClicked> {
+            state<HomeState.Error> { HomeState.Loading(it.before) }
+        }
+
+        event<HomeEvent.OnSnapshotLoaded> {
+            stateNot<HomeState.Init> { (event) -> HomeState.Loaded(event.snapshot) }
+        }
+
+        event<HomeEvent.OnSnapshotLoadFailed> {
+            anyState { (event) -> HomeState.Error(event.throwable) }
         }
     }
 
-    handle { (event, state) ->
-        val isFetched: Boolean = (state is HomeState.Init && event is HomeEvent.Fetch)
-        val isRetried: Boolean = (state is HomeState.Error && event is HomeEvent.OnRetryClicked)
-        if (isFetched || isRetried) {
-            catching { getHomeSnapshot().collect { snapshot -> send(HomeEvent.OnSnapshotLoaded(snapshot)) } }
-                .onFailure { e -> send(HomeEvent.OnSnapshotLoadFailed(e)).join() }
-                .getValueOrThrow()
+    handled {
+        suspend fun StateMachineHandleScope<in HomeEvent>.collectSnapshot() {
+            val collectResult = catching {
+                getHomeSnapshot()
+                    .map(HomeEvent::OnSnapshotLoaded)
+                    .collectWhileSubscribed { event -> send(event) }
+            }
+            collectResult
+                .onFailure { send(HomeEvent.OnSnapshotLoadFailed(it)).join() }
+                .getOrThrow()
+        }
+
+        state<HomeState.Init> {
+            event<HomeEvent.Fetch> { collectSnapshot() }
+        }
+
+        state<HomeState.Error> {
+            event<HomeEvent.OnRetryClicked> { collectSnapshot() }
         }
     }
 
-    handleOn<HomeEvent.OnTodayCategoryClicked, HomeState.Loaded> {
-        homeSideEffect.post(HomeSideEffect.NavigateToday)
-    }
-
-    handleOn<HomeEvent.OnTimetableCategoryClicked, HomeState.Loaded> {
-        homeSideEffect.post(HomeSideEffect.NavigateTimetable)
-    }
-
-    handleOn<HomeEvent.OnAllCategoryClicked, HomeState.Loaded> {
-        homeSideEffect.post(HomeSideEffect.NavigateAllSchedule)
-    }
-
-    handleOn<HomeEvent.OnTagClicked, HomeState.Loaded> { (event) ->
-        homeSideEffect.post(HomeSideEffect.NavigateTag(event.tag))
-    }
-
-    handleOn<HomeEvent.OnTagLongClicked, HomeState.Loaded> { (event) ->
-        homeSideEffect.post(HomeSideEffect.NavigateTagConfig(event.tag))
-    }
-
-    handleOn<HomeEvent.OnTagRenameRequestClicked, HomeState.Loaded> { (event) ->
-        homeSideEffect.post(HomeSideEffect.NavigateTagRename(event.tag, getTagUsageCount(event.tag)))
-    }
-
-    handleOn<HomeEvent.OnTagDeleteRequestClicked, HomeState.Loaded> { (event) ->
-        homeSideEffect.post(HomeSideEffect.NavigateTagDelete(event.tag, getTagUsageCount(event.tag)))
-    }
-
-    handleOn<HomeEvent.OnTagRenameConfirmClicked, HomeState.Loaded> { (event) ->
-        modifyTagName(originalTag = event.originalTag, newText = event.renameText)
-    }
-
-    handleOn<HomeEvent.OnTagDeleteConfirmClicked, HomeState.Loaded> { (event) ->
-        deleteTag(event.tag)
+    handled {
+        state<HomeState.Loaded> {
+            event<HomeEvent.OnTodayCategoryClicked> { homeSideEffectHandle.handle(HomeSideEffect.NavigateToday) }
+            event<HomeEvent.OnTimetableCategoryClicked> { homeSideEffectHandle.handle(HomeSideEffect.NavigateTimetable) }
+            event<HomeEvent.OnAllCategoryClicked> { homeSideEffectHandle.handle(HomeSideEffect.NavigateAllSchedule) }
+            event<HomeEvent.OnTagClicked> { (event) -> homeSideEffectHandle.handle(HomeSideEffect.NavigateTag(event.tag)) }
+            event<HomeEvent.OnTagLongClicked> { (event) ->
+                homeSideEffectHandle.handle(HomeSideEffect.NavigateTagConfig(event.tag))
+            }
+            event<HomeEvent.OnTagRenameRequestClicked> { (event) ->
+                homeSideEffectHandle.handle(HomeSideEffect.NavigateTagRename(event.tag, getTagUsageCount(event.tag)))
+            }
+            event<HomeEvent.OnTagDeleteRequestClicked> { (event) ->
+                homeSideEffectHandle.handle(HomeSideEffect.NavigateTagDelete(event.tag, getTagUsageCount(event.tag)))
+            }
+            event<HomeEvent.OnTagRenameConfirmClicked> { (event) ->
+                modifyTagName(originalTag = event.originalTag, newText = event.renameText)
+            }
+            event<HomeEvent.OnTagDeleteConfirmClicked> { (event) -> deleteTag(event.tag) }
+        }
     }
 }

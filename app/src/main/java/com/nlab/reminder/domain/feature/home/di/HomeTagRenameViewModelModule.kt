@@ -17,7 +17,7 @@
 package com.nlab.reminder.domain.feature.home.di
 
 import androidx.lifecycle.SavedStateHandle
-import com.nlab.reminder.core.effect.SideEffectSender
+import com.nlab.reminder.core.effect.SideEffectHandle
 import com.nlab.reminder.core.state.StateContainer
 import com.nlab.reminder.core.state.asContainer
 import com.nlab.reminder.domain.common.android.lifecycle.tag
@@ -41,7 +41,7 @@ class HomeTagRenameViewModelModule {
         object : HomeTagRenameStateContainerFactory {
             override fun create(
                 scope: CoroutineScope,
-                homeTagRenameSideEffect: SideEffectSender<HomeTagRenameSideEffect>
+                homeTagRenameSideEffect: SideEffectHandle<HomeTagRenameSideEffect>
             ): StateContainer<HomeTagRenameEvent, HomeTagRenameState> =
                 HomeTagRenameStateComponent(homeTagRenameSideEffect)
                     .asContainer(

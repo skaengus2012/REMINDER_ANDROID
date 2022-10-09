@@ -16,7 +16,7 @@
 
 package com.nlab.reminder.domain.feature.home
 
-import com.nlab.reminder.core.effect.SideEffectSender
+import com.nlab.reminder.core.effect.SideEffectHandle
 import com.nlab.reminder.core.state.StateContainer
 import kotlinx.coroutines.CoroutineScope
 
@@ -26,6 +26,6 @@ import kotlinx.coroutines.CoroutineScope
 interface HomeStateContainerFactory {
     fun create(
         scope: CoroutineScope,
-        homeSideEffect: SideEffectSender<HomeSideEffect>,
+        homeSideEffectHandle: SideEffectHandle<HomeSideEffect>,
     ): StateContainer<HomeEvent, HomeState>
 }

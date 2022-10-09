@@ -28,7 +28,6 @@ import org.mockito.kotlin.*
  * @author Doohyun
  */
 class HomeViewModelsKtTest {
-    /**
     @Test
     fun testExtensions() {
         val stateContainer: StateContainer<HomeEvent, HomeState> = mock()
@@ -89,5 +88,5 @@ class HomeViewModelsKtTest {
             stateContainer,
             HomeEvent.OnTagDeleteConfirmClicked(tag)
         ) { viewModel.onTagDeleteConfirmClicked(tag) }
-    }*/
+    }
 }

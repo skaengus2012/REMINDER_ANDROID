@@ -16,13 +16,14 @@
 
 package com.nlab.reminder.core.state
 
-import com.nlab.reminder.test.genInt
+import com.nlab.reminder.test.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
+import org.mockito.kotlin.mock
 
 /**
  * @author thalys
@@ -36,28 +37,27 @@ class StateMachineHandleScopeTest {
             var number = startNumber
             while (true) emit(number++)
         }
-        val actionFlow: MutableSharedFlow<Int> = MutableSharedFlow()
-        val state = MutableStateFlow<TestState>(TestState.StateInit())
-        val eventProcessor = genTestStateMachineEventProcessor(state = state, stateMachine = StateMachine {
-            handled {
-                event<TestEvent.Event1> {
-                    state<TestState.StateInit> {
-                        // jacoco make branch if middle operator not existed
-                        sequenceFlow.take(10).collectWithMachine(actionFlow::emit)
-                    }
-                }
+        val sequenceRouteFlow: MutableSharedFlow<Int> = MutableSharedFlow()
+        val state = MutableStateFlow(Unit)
+        val scope = StateMachineHandleScope<TestEvent>(state.subscriptionCount, mock())
+        val subscribeJob: Job = launch(Dispatchers.Default) {
+            scope.run {
+                sequenceFlow.collectWhileSubscribed(sequenceRouteFlow::emit)
             }
-        })
-        suspend fun getActionEmitResult(): Int {
+        }
+
+        suspend fun getRouteResult(): Int {
             val job = launch { state.collect() }
-            val emitResult = actionFlow.take(1).first()
+            val emitResult = sequenceRouteFlow.take(1).first()
             job.cancelAndJoin()
             state.subscriptionCount.filter { it == 0 }.take(1).collect()
 
             return emitResult
         }
 
-        eventProcessor.send(TestEvent.Event1())
-        assertThat(getActionEmitResult() + getActionEmitResult(), equalTo(startNumber * 2))
+        val totalResult = getRouteResult() + getRouteResult()
+        subscribeJob.cancelAndJoin()
+
+        assertThat(totalResult, equalTo(startNumber * 2))
     }
 }

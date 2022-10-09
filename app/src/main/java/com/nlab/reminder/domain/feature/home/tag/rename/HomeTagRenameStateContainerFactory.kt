@@ -16,7 +16,7 @@
 
 package com.nlab.reminder.domain.feature.home.tag.rename
 
-import com.nlab.reminder.core.effect.SideEffectSender
+import com.nlab.reminder.core.effect.SideEffectHandle
 import com.nlab.reminder.core.state.StateContainer
 import kotlinx.coroutines.CoroutineScope
 
@@ -26,6 +26,6 @@ import kotlinx.coroutines.CoroutineScope
 interface HomeTagRenameStateContainerFactory {
     fun create(
         scope: CoroutineScope,
-        homeTagRenameSideEffect: SideEffectSender<HomeTagRenameSideEffect>
+        homeTagRenameSideEffect: SideEffectHandle<HomeTagRenameSideEffect>
     ): StateContainer<HomeTagRenameEvent, HomeTagRenameState>
 }

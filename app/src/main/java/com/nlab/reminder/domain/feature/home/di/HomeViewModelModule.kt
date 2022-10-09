@@ -16,7 +16,7 @@
 
 package com.nlab.reminder.domain.feature.home.di
 
-import com.nlab.reminder.core.effect.SideEffectSender
+import com.nlab.reminder.core.effect.SideEffectHandle
 import com.nlab.reminder.core.state.StateContainer
 import com.nlab.reminder.core.state.asContainer
 import com.nlab.reminder.domain.feature.home.*
@@ -42,9 +42,9 @@ class HomeViewModelModule {
         object : HomeStateContainerFactory {
             override fun create(
                 scope: CoroutineScope,
-                homeSideEffect: SideEffectSender<HomeSideEffect>
+                homeSideEffectHandle: SideEffectHandle<HomeSideEffect>
             ): StateContainer<HomeEvent, HomeState> =
-                HomeStateMachine(homeSideEffect, getHomeSummary, getTagUsageCount, modifyTagName, deleteTag)
+                HomeStateMachine(homeSideEffectHandle, getHomeSummary, getTagUsageCount, modifyTagName, deleteTag)
                     .asContainer(scope, initState = HomeState.Init, fetchEvent = HomeEvent.Fetch)
         }
 }
