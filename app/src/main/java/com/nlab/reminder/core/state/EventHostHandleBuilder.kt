@@ -31,10 +31,12 @@ class EventHostHandleBuilder<E : Event, S : State> : HandleBuilder<E, E, S>() {
         return concatHandleBuilder.build()
     }
 
+    @StateMachineStyleDsl
     fun anyEvent(block: suspend StateMachineHandleScope<E>.(UpdateSource<E, S>) -> Unit) {
         concatHandleBuilder.add(block)
     }
 
+    @StateMachineStyleDsl
     fun filteredEvent(
         predicate: (E) -> Boolean,
         block: suspend StateMachineHandleScope<E>.(UpdateSource<E, S>) -> Unit
@@ -45,6 +47,7 @@ class EventHostHandleBuilder<E : Event, S : State> : HandleBuilder<E, E, S>() {
     }
 
     @NoInlineRequired
+    @StateMachineStyleDsl
     fun <T : E> event(
         clazz: KClass<T>,
         block: suspend StateMachineHandleScope<E>.(UpdateSource<T, S>) -> Unit
@@ -55,6 +58,7 @@ class EventHostHandleBuilder<E : Event, S : State> : HandleBuilder<E, E, S>() {
         )
     }
 
+    @StateMachineStyleDsl
     inline fun <reified T : E> event(
         noinline block: suspend StateMachineHandleScope<E>.(UpdateSource<T, S>) -> Unit
     ) {
@@ -62,6 +66,7 @@ class EventHostHandleBuilder<E : Event, S : State> : HandleBuilder<E, E, S>() {
     }
 
     @NoInlineRequired
+    @StateMachineStyleDsl
     fun <T : E> eventNot(
         clazz: KClass<T>,
         block: suspend StateMachineHandleScope<E>.(UpdateSource<E, S>) -> Unit
@@ -69,6 +74,7 @@ class EventHostHandleBuilder<E : Event, S : State> : HandleBuilder<E, E, S>() {
         filteredEvent(predicate = { event -> clazz.isInstance(event).not() }, block)
     }
 
+    @StateMachineStyleDsl
     inline fun <reified T : E> eventNot(
         noinline block: suspend StateMachineHandleScope<E>.(UpdateSource<E, S>) -> Unit
     ) {

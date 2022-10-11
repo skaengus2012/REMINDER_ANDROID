@@ -33,10 +33,12 @@ class StateHostReduceBuilder<E : Event, S : State>(
         return concatComponentBuilder.build()
     }
 
+    @StateMachineStyleDsl
     fun anyState(block: (StateMachineScope).(UpdateSource<E, S>) -> S) {
         concatComponentBuilder.add(block)
     }
 
+    @StateMachineStyleDsl
     fun filteredState(
         predicate: (S) -> Boolean,
         block: (StateMachineScope).(UpdateSource<E, S>) -> S
@@ -48,6 +50,7 @@ class StateHostReduceBuilder<E : Event, S : State>(
     }
 
     @NoInlineRequired
+    @StateMachineStyleDsl
     fun <T : S> state(
         clazz: KClass<T>,
         block: (StateMachineScope).(UpdateSource<E, T>) -> S
@@ -58,6 +61,7 @@ class StateHostReduceBuilder<E : Event, S : State>(
         )
     }
 
+    @StateMachineStyleDsl
     inline fun <reified T : S> state(
         noinline block: (StateMachineScope).(UpdateSource<E, T>) -> S
     ) {
@@ -65,6 +69,7 @@ class StateHostReduceBuilder<E : Event, S : State>(
     }
 
     @NoInlineRequired
+    @StateMachineStyleDsl
     fun <T : S> stateNot(
         clazz: KClass<T>,
         block: (StateMachineScope).(UpdateSource<E, S>) -> S
@@ -72,6 +77,7 @@ class StateHostReduceBuilder<E : Event, S : State>(
         filteredState(predicate = { before -> clazz.isInstance(before).not() }, block)
     }
 
+    @StateMachineStyleDsl
     inline fun <reified T : S> stateNot(noinline block: (StateMachineScope).(UpdateSource<E, S>) -> S) {
         stateNot(T::class, block)
     }

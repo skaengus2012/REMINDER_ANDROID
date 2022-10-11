@@ -35,14 +35,17 @@ class StateMachine<E : Event, S : State> {
         this@StateMachine.onExceptionHandlers.forEach { it(throwable) }
     }
 
+    @StateMachineStyleDsl
     fun reduce(block: (StateMachineReduceBuilder<E, S>).() -> Unit) {
         reduceBuilder.apply(block)
     }
 
+    @StateMachineStyleDsl
     fun handled(block: (StateMachineHandleBuilder<E, S>).() -> Unit) {
         handleBuilder.apply(block)
     }
 
+    @StateMachineStyleDsl
     fun catch(block: (StateMachineScope).(Throwable) -> Unit) {
         onExceptionHandlers += { StateMachineScope.block(it) }
     }

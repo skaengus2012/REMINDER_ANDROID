@@ -30,6 +30,7 @@ class StateMachineHandleBuilder<E : Event, S : State> : HandleBuilder<E, E, S>()
         return concatHandleBuilder.build()
     }
 
+    @StateMachineStyleDsl
     fun anyEvent(block: StateHostHandleBuilder<E, E, S>.() -> Unit) {
         StateHostHandleBuilder<E, E, S>()
             .apply(block)
@@ -37,6 +38,7 @@ class StateMachineHandleBuilder<E : Event, S : State> : HandleBuilder<E, E, S>()
             .also(concatHandleBuilder::add)
     }
 
+    @StateMachineStyleDsl
     fun filteredEvent(predicate: (E) -> Boolean, block: StateHostHandleBuilder<E, E, S>.() -> Unit) {
         val handle = StateHostHandleBuilder<E, E, S>()
             .apply(block)
@@ -46,6 +48,7 @@ class StateMachineHandleBuilder<E : Event, S : State> : HandleBuilder<E, E, S>()
         }
     }
 
+    @StateMachineStyleDsl
     fun <T : E> event(eventClazz: KClass<T>, block: StateHostHandleBuilder<T, E, S>.() -> Unit) {
         val handle = StateHostHandleBuilder<T, E, S>()
             .apply(block)
@@ -55,18 +58,22 @@ class StateMachineHandleBuilder<E : Event, S : State> : HandleBuilder<E, E, S>()
         }
     }
 
+    @StateMachineStyleDsl
     inline fun <reified T : E> event(noinline block: StateHostHandleBuilder<T, E, S>.() -> Unit) {
         event(T::class, block)
     }
 
+    @StateMachineStyleDsl
     fun <T : E> eventNot(eventClazz: KClass<T>, block: StateHostHandleBuilder<E, E, S>.() -> Unit) {
         filteredEvent(predicate = { event -> eventClazz.isInstance(event).not() }, block)
     }
 
+    @StateMachineStyleDsl
     inline fun <reified T : E> eventNot(noinline block: StateHostHandleBuilder<E, E, S>.() -> Unit) {
         eventNot(T::class, block)
     }
 
+    @StateMachineStyleDsl
     fun anyState(block: EventHostHandleBuilder<E, S>.() -> Unit) {
         EventHostHandleBuilder<E, S>()
             .apply(block)
@@ -74,6 +81,7 @@ class StateMachineHandleBuilder<E : Event, S : State> : HandleBuilder<E, E, S>()
             .also(concatHandleBuilder::add)
     }
 
+    @StateMachineStyleDsl
     fun filteredState(predicate: (S) -> Boolean, block: EventHostHandleBuilder<E, S>.() -> Unit) {
         val handle = EventHostHandleBuilder<E, S>()
             .apply(block)
@@ -83,6 +91,7 @@ class StateMachineHandleBuilder<E : Event, S : State> : HandleBuilder<E, E, S>()
         }
     }
 
+    @StateMachineStyleDsl
     fun <T : S> state(stateClazz: KClass<T>, block: EventHostHandleBuilder<E, T>.() -> Unit) {
         val handle = EventHostHandleBuilder<E, T>()
             .apply(block)
@@ -92,14 +101,17 @@ class StateMachineHandleBuilder<E : Event, S : State> : HandleBuilder<E, E, S>()
         }
     }
 
+    @StateMachineStyleDsl
     inline fun <reified T : S> state(noinline block: EventHostHandleBuilder<E, T>.() -> Unit) {
         state(T::class, block)
     }
 
+    @StateMachineStyleDsl
     fun <T : S> stateNot(stateClazz: KClass<T>, block: EventHostHandleBuilder<E, S>.() -> Unit) {
         filteredState(predicate = { state -> stateClazz.isInstance(state).not() }, block)
     }
 
+    @StateMachineStyleDsl
     inline fun <reified T : S> stateNot(noinline block: EventHostHandleBuilder<E, S>.() -> Unit) {
         stateNot(T::class, block)
     }

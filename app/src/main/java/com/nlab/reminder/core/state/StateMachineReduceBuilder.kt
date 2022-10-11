@@ -27,7 +27,6 @@ class StateMachineReduceBuilder<E : Event, S : State> : ReduceBuilder<E, S, S>()
     private val defaultReduce: StateMachineScope.(UpdateSource<E, S>) -> S = createDefaultReduce()
     private val concatReduceBuilder: ConcatReduceBuilder<E, S, S> = ConcatReduceBuilder(defaultReduce)
 
-
     override fun build(): StateMachineScope.(UpdateSource<E, S>) -> S {
         return concatReduceBuilder.build()
     }
@@ -40,6 +39,7 @@ class StateMachineReduceBuilder<E : Event, S : State> : ReduceBuilder<E, S, S>()
         return EventHostReduceBuilder(createDefaultReduce())
     }
 
+    @StateMachineStyleDsl
     fun anyEvent(block: StateHostReduceBuilder<E, S>.() -> Unit) {
         createStateHostReduceBuilder<E>()
             .apply(block)
@@ -47,6 +47,7 @@ class StateMachineReduceBuilder<E : Event, S : State> : ReduceBuilder<E, S, S>()
             .also(concatReduceBuilder::add)
     }
 
+    @StateMachineStyleDsl
     fun filteredEvent(
         predicate: (E) -> Boolean,
         block: StateHostReduceBuilder<E, S>.() -> Unit
@@ -60,6 +61,7 @@ class StateMachineReduceBuilder<E : Event, S : State> : ReduceBuilder<E, S, S>()
         }
     }
 
+    @StateMachineStyleDsl
     fun <T : E> event(eventClazz: KClass<T>, block: StateHostReduceBuilder<T, S>.() -> Unit) {
         val reduce = createStateHostReduceBuilder<T>()
             .apply(block)
@@ -71,18 +73,22 @@ class StateMachineReduceBuilder<E : Event, S : State> : ReduceBuilder<E, S, S>()
         }
     }
 
+    @StateMachineStyleDsl
     inline fun <reified T : E> event(noinline block: StateHostReduceBuilder<T, S>.() -> Unit) {
         event(T::class, block)
     }
 
+    @StateMachineStyleDsl
     fun <T : E> eventNot(eventClazz: KClass<T>, block: StateHostReduceBuilder<E, S>.() -> Unit) {
         filteredEvent(predicate = { event -> eventClazz.isInstance(event).not() }, block)
     }
 
+    @StateMachineStyleDsl
     inline fun <reified T : E> eventNot(noinline block: StateHostReduceBuilder<E, S>.() -> Unit) {
         eventNot(T::class, block)
     }
 
+    @StateMachineStyleDsl
     fun anyState(block: EventHostReduceBuilder<E, S, S>.() -> Unit) {
         createEventHostReduceBuilder<S>()
             .apply(block)
@@ -90,6 +96,7 @@ class StateMachineReduceBuilder<E : Event, S : State> : ReduceBuilder<E, S, S>()
             .also(concatReduceBuilder::add)
     }
 
+    @StateMachineStyleDsl
     fun filteredState(predicate: (S) -> Boolean, block: EventHostReduceBuilder<E, S, S>.() -> Unit) {
         val reduce = createEventHostReduceBuilder<S>()
             .apply(block)
@@ -100,6 +107,7 @@ class StateMachineReduceBuilder<E : Event, S : State> : ReduceBuilder<E, S, S>()
         }
     }
 
+    @StateMachineStyleDsl
     fun <T : S> state(stateClazz: KClass<T>, block: EventHostReduceBuilder<E, T, S>.() -> Unit) {
         val reduce = createEventHostReduceBuilder<T>()
             .apply(block)
@@ -111,14 +119,17 @@ class StateMachineReduceBuilder<E : Event, S : State> : ReduceBuilder<E, S, S>()
         }
     }
 
+    @StateMachineStyleDsl
     inline fun <reified T : S> state(noinline block: EventHostReduceBuilder<E, T, S>.() -> Unit) {
         state(T::class, block)
     }
 
+    @StateMachineStyleDsl
     fun <T : S> stateNot(stateClazz: KClass<T>, block: EventHostReduceBuilder<E, S, S>.() -> Unit) {
         filteredState(predicate = { state -> stateClazz.isInstance(state).not() }, block)
     }
 
+    @StateMachineStyleDsl
     inline fun <reified T : S> stateNot(noinline block: EventHostReduceBuilder<E, S, S>.() -> Unit) {
         stateNot(T::class, block)
     }

@@ -19,5 +19,5 @@ package com.nlab.reminder.core.state
 /**
  * @author thalys
  */
-@DslMarker
-annotation class StateMachineDsl
+@DslMarker annotation class StateMachineDsl
+@DslMarker annotation class StateMachineStyleDsl
