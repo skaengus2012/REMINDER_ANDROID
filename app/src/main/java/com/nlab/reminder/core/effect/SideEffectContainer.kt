@@ -31,7 +31,7 @@ class SideEffectContainer<T : SideEffect>(
     private val dispatcher: CoroutineDispatcher = Dispatchers.Main
 ) : SideEffectReceiver<T>, SideEffectHandle<T> {
     override val sideEffectFlow: Flow<T> = channel.receiveAsFlow()
-    override suspend fun handle(sideEffect: T) = withContext(dispatcher) {
+    override suspend fun post(sideEffect: T) = withContext(dispatcher) {
         channel.send(sideEffect)
     }
 }

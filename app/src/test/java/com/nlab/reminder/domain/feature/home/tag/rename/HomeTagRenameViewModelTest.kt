@@ -16,18 +16,33 @@
 
 package com.nlab.reminder.domain.feature.home.tag.rename
 
+import com.nlab.reminder.core.effect.SideEffectHandle
+import com.nlab.reminder.core.state.StateContainer
+import com.nlab.reminder.core.state.StateMachine
+import com.nlab.reminder.core.state.asContainer
+import com.nlab.reminder.test.genFlowObserveDispatcher
+import com.nlab.reminder.test.once
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
+import org.hamcrest.CoreMatchers.equalTo
+import org.hamcrest.MatcherAssert.assertThat
+import org.junit.After
+import org.junit.Before
+import org.junit.Test
+import org.mockito.kotlin.*
 
 /**
  * @author Doohyun
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class HomeTagRenameViewModelTest {
-    /**
-    private val sampleEvent: HomeTagRenameEvent = HomeTagRenameEvent.OnRenameTextClearClicked
-    private val sampleState: HomeTagRenameState = genHomeTagRenameState()
-    private val sampleEffect: HomeTagRenameSideEffect = HomeTagRenameSideEffect.Cancel
-
     @Before
     fun setup() {
         Dispatchers.setMain(Dispatchers.Unconfined)
@@ -40,6 +55,7 @@ class HomeTagRenameViewModelTest {
 
     @Test
     fun `stateController send event when viewModel sent`() {
+        val sampleEvent = genHomeTagRenameEventSample()
         val stateContainer: StateContainer<HomeTagRenameEvent, HomeTagRenameState> = mock()
         val viewModel = HomeTagRenameViewModel(
             stateControllerFactory = mock {
@@ -47,12 +63,13 @@ class HomeTagRenameViewModelTest {
             }
         )
 
-        viewModel.invoke(sampleEvent)
+        viewModel.send(sampleEvent)
         verify(stateContainer, once()).send(sampleEvent)
     }
 
     @Test
     fun `notify state when stateController flow published`() {
+        val sampleState = genHomeTagRenameStateSample()
         val stateContainer: StateContainer<HomeTagRenameEvent, HomeTagRenameState> = mock {
             whenever(mock.stateFlow) doReturn MutableStateFlow(sampleState)
         }
@@ -60,19 +77,24 @@ class HomeTagRenameViewModelTest {
             stateControllerFactory = mock { whenever(mock.create(any(), any())) doReturn stateContainer }
         )
 
-        assertThat(viewModel.state.value, equalTo(sampleState))
+        assertThat(viewModel.stateFlow.value, equalTo(sampleState))
     }
 
     @Test
     fun `notify sideEffect when stateController invoke sideEffect`() = runTest {
+        val sampleSideEffect = genHomeSideEffectSample()
         val viewModel = HomeTagRenameViewModel(
             stateControllerFactory = object : HomeTagRenameStateContainerFactory {
                 override fun create(
                     scope: CoroutineScope,
-                    homeTagRenameSideEffect: SideEffectSender<HomeTagRenameSideEffect>
+                    homeTagRenameSideEffect: SideEffectHandle<HomeTagRenameSideEffect>
                 ): StateContainer<HomeTagRenameEvent, HomeTagRenameState> {
                     val fakeStateMachine: StateMachine<HomeTagRenameEvent, HomeTagRenameState> = StateMachine {
-                        handle { homeTagRenameSideEffect.post(sampleEffect) }
+                        handled {
+                            anyEvent {
+                                anyState { homeTagRenameSideEffect.post(sampleSideEffect) }
+                            }
+                        }
                     }
                     return fakeStateMachine.asContainer(scope, genHomeTagRenameState())
                 }
@@ -80,10 +102,12 @@ class HomeTagRenameViewModelTest {
         )
         val sideEffectHandler: () -> Unit = mock()
 
-        viewModel.homeTagRenameSideEffect.flow
+        viewModel.homeTagRenameSideEffectFlow
             .onEach { sideEffectHandler() }
             .launchIn(genFlowObserveDispatcher())
-        viewModel.invoke(sampleEvent).join()
+        viewModel
+            .send(genHomeTagRenameEventSample())
+            .join()
         verify(sideEffectHandler, once())()
-    }*/
+    }
 }

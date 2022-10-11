@@ -50,7 +50,7 @@ fun genHomeStates(): Set<HomeState> = setOf(
     HomeState.Error(Throwable())
 )
 
-fun genHomeEvent(): Set<HomeEvent> = setOf(
+fun genHomeEvents(): Set<HomeEvent> = setOf(
     HomeEvent.Fetch,
     HomeEvent.OnTodayCategoryClicked,
     HomeEvent.OnTimetableCategoryClicked,
@@ -66,7 +66,7 @@ fun genHomeEvent(): Set<HomeEvent> = setOf(
     HomeEvent.OnTagDeleteConfirmClicked(genTag())
 )
 
-fun genHomeSideEffect(): Set<HomeSideEffect> = setOf(
+fun genHomeSideEffects(): Set<HomeSideEffect> = setOf(
     HomeSideEffect.NavigateToday,
     HomeSideEffect.NavigateTimetable,
     HomeSideEffect.NavigateAllSchedule,
@@ -77,8 +77,8 @@ fun genHomeSideEffect(): Set<HomeSideEffect> = setOf(
 )
 
 fun genHomeStateSample(): HomeState = genHomeStates().first()
-fun genHomeEventSample(): HomeEvent = genHomeEvent().first()
-fun genHomeSideEffectSample(): HomeSideEffect = genHomeSideEffect().first()
+fun genHomeEventSample(): HomeEvent = genHomeEvents().first()
+fun genHomeSideEffectSample(): HomeSideEffect = genHomeSideEffects().first()
 
 fun genHomeStateMachine(
     homeSideEffectHandle: SideEffectHandle<HomeSideEffect> = mock(),

@@ -29,7 +29,6 @@ import org.mockito.kotlin.whenever
  * @author Doohyun
  */
 class HomeTagRenameViewModelsKtTest {
-    /**
     @Test
     fun testExtensions() {
         val stateContainer: StateContainer<HomeTagRenameEvent, HomeTagRenameState> = mock()
@@ -64,5 +63,5 @@ class HomeTagRenameViewModelsKtTest {
             stateContainer,
             HomeTagRenameEvent.OnConfirmClicked
         ) { viewModel.onConfirmClicked() }
-    }*/
+    }
 }

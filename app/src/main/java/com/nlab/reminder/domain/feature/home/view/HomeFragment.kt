@@ -125,35 +125,33 @@ class HomeFragment : Fragment() {
             .launchIn(viewLifecycleScope)
     }
 
-    private fun handleSideEffect(sideEffect: HomeSideEffect) {
-        when (sideEffect) {
-            is HomeSideEffect.NavigateToday -> {
+    private fun handleSideEffect(sideEffect: HomeSideEffect) = when (sideEffect) {
+        is HomeSideEffect.NavigateToday -> {
 
-            }
-            is HomeSideEffect.NavigateTimetable -> {
+        }
+        is HomeSideEffect.NavigateTimetable -> {
 
-            }
-            is HomeSideEffect.NavigateAllSchedule -> {
-                navigationController.navigateToAllScheduleEnd()
-            }
-            is HomeSideEffect.NavigateTag -> {
+        }
+        is HomeSideEffect.NavigateAllSchedule -> {
+            navigationController.navigateToAllScheduleEnd()
+        }
+        is HomeSideEffect.NavigateTag -> {
 
-            }
-            is HomeSideEffect.NavigateTagConfig -> {
-                navigationController.navigateToTagConfig(
-                    REQUEST_KEY_HOME_TO_HOME_TAG_CONFIG, sideEffect.tag
-                )
-            }
-            is HomeSideEffect.NavigateTagRename -> {
-                navigationController.navigateToTagRename(
-                    REQUEST_KEY_HOME_TO_HOME_TAG_RENAME, sideEffect.tag, sideEffect.usageCount
-                )
-            }
-            is HomeSideEffect.NavigateTagDelete -> {
-                navigationController.navigateToTagDelete(
-                    REQUEST_KEY_HOME_TO_HOME_TAG_DELETE, sideEffect.tag, sideEffect.usageCount
-                )
-            }
+        }
+        is HomeSideEffect.NavigateTagConfig -> {
+            navigationController.navigateToTagConfig(
+                REQUEST_KEY_HOME_TO_HOME_TAG_CONFIG, sideEffect.tag
+            )
+        }
+        is HomeSideEffect.NavigateTagRename -> {
+            navigationController.navigateToTagRename(
+                REQUEST_KEY_HOME_TO_HOME_TAG_RENAME, sideEffect.tag, sideEffect.usageCount
+            )
+        }
+        is HomeSideEffect.NavigateTagDelete -> {
+            navigationController.navigateToTagDelete(
+                REQUEST_KEY_HOME_TO_HOME_TAG_DELETE, sideEffect.tag, sideEffect.usageCount
+            )
         }
     }
 

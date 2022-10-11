@@ -19,9 +19,10 @@ package com.nlab.reminder.domain.feature.home.tag.rename
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nlab.reminder.core.effect.SideEffectContainer
-import com.nlab.reminder.core.effect.asReceived
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
 /**
@@ -31,11 +32,11 @@ import javax.inject.Inject
 class HomeTagRenameViewModel @Inject constructor(
     stateControllerFactory: HomeTagRenameStateContainerFactory
 ) : ViewModel() {
-    private val sideEffectController = SideEffectContainer<HomeTagRenameSideEffect>()
-    private val stateContainer = stateControllerFactory.create(viewModelScope, sideEffectController)
+    private val sideEffectContainer = SideEffectContainer<HomeTagRenameSideEffect>()
+    private val stateContainer = stateControllerFactory.create(viewModelScope, sideEffectContainer)
 
-    val homeTagRenameSideEffect = sideEffectController.asReceived()
-    val state = stateContainer.stateFlow
+    val homeTagRenameSideEffectFlow: Flow<HomeTagRenameSideEffect> = sideEffectContainer.sideEffectFlow
+    val stateFlow: StateFlow<HomeTagRenameState> = stateContainer.stateFlow
 
-    fun invoke(event: HomeTagRenameEvent): Job = stateContainer.send(event)
+    fun send(event: HomeTagRenameEvent): Job = stateContainer.send(event)
 }

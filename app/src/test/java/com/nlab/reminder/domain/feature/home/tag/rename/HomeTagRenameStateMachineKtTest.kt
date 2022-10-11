@@ -16,35 +16,38 @@
 
 package com.nlab.reminder.domain.feature.home.tag.rename
 
+import com.nlab.reminder.core.effect.SideEffectHandle
+import com.nlab.reminder.core.state.asContainer
+import com.nlab.reminder.test.genBothify
+import com.nlab.reminder.test.genLetterify
+import com.nlab.reminder.test.once
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
+import org.hamcrest.CoreMatchers.equalTo
+import org.hamcrest.MatcherAssert.assertThat
+import org.junit.Test
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 
 /**
  * @author Doohyun
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class HomeTagRenameStateMachineKtTest {
-    /**
-    private fun genEvents(): Set<HomeTagRenameEvent> = setOf(
-        HomeTagRenameEvent.OnConfirmClicked,
-        HomeTagRenameEvent.OnCancelClicked,
-        HomeTagRenameEvent.OnRenameTextInput(text = genBothify())
-    )
-
-    private fun genStateMachine(
-        homeTagRenameSideEffect: SideEffectSender<HomeTagRenameSideEffect> = mock()
-    ) = HomeTagRenameStateComponent(homeTagRenameSideEffect)
-
     @Test
     fun `update currentText state when OnRenameTextInput sent`() = runTest {
         val changeText = genBothify(string = "????####")
         val initState: HomeTagRenameState = genHomeTagRenameState(currentText = genLetterify("???"))
-        val stateController =
-            genStateMachine().asContainer(CoroutineScope(Dispatchers.Default), initState)
-        stateController
+        val stateContainer =
+            genHomeTagRenameStateMachine()
+                .asContainer(CoroutineScope(Dispatchers.Default), initState)
+        stateContainer
             .send(HomeTagRenameEvent.OnRenameTextInput(changeText))
             .join()
         assertThat(
-            stateController.stateFlow.value,
+            stateContainer.stateFlow.value,
             equalTo(initState.copy(currentText = changeText))
         )
     }
@@ -52,13 +55,14 @@ class HomeTagRenameStateMachineKtTest {
     @Test
     fun `clear currentText state when OnRenameTextClearClicked sent`() = runTest {
         val initState: HomeTagRenameState = genHomeTagRenameState(currentText = genLetterify("?"))
-        val stateController =
-            genStateMachine().asContainer(CoroutineScope(Dispatchers.Default), initState)
-        stateController
+        val stateContainer =
+            genHomeTagRenameStateMachine()
+                .asContainer(CoroutineScope(Dispatchers.Default), initState)
+        stateContainer
             .send(HomeTagRenameEvent.OnRenameTextClearClicked)
             .join()
         assertThat(
-            stateController.stateFlow.value,
+            stateContainer.stateFlow.value,
             equalTo(initState.copy(currentText = ""))
         )
     }
@@ -66,49 +70,27 @@ class HomeTagRenameStateMachineKtTest {
     @Test
     fun `update disable keyboard shown onViewCreated when OnKeyboardShownWhenViewCreated sent`() = runTest {
         val initState: HomeTagRenameState = genHomeTagRenameState(isKeyboardShowWhenViewCreated = true)
-        val stateController =
-            genStateMachine().asContainer(CoroutineScope(Dispatchers.Default), initState)
-        stateController
+        val stateContainer =
+            genHomeTagRenameStateMachine()
+                .asContainer(CoroutineScope(Dispatchers.Default), initState)
+        stateContainer
             .send(HomeTagRenameEvent.OnKeyboardShownWhenViewCreated)
             .join()
         assertThat(
-            stateController.stateFlow.value,
+            stateContainer.stateFlow.value,
             equalTo(initState.copy(isKeyboardShowWhenViewCreated = false))
-        )
-    }
-
-    @Test
-    fun `never updated when any event excluded OnRenameTextInput, OnRenameTextClearClicked, OnKeyboardShownWhenViewCreated sent`() = runTest {
-        val initState: HomeTagRenameState = genHomeTagRenameState()
-        val stateController =
-            genStateMachine().asContainer(CoroutineScope(Dispatchers.Default), initState)
-        assertThat(
-
-        genEvents()
-            .asSequence()
-            .filterNot { it is HomeTagRenameEvent.OnRenameTextInput }
-            .filterNot { it is HomeTagRenameEvent.OnRenameTextClearClicked }
-            .filterNot { it is HomeTagRenameEvent.OnKeyboardShownWhenViewCreated }
-            .map { event ->
-                async {
-                    stateController.send(event).join()
-                    stateController.stateFlow.value == initState
-                }
-            }
-            .toList()
-            .all { it.await() },
-            equalTo(true)
         )
     }
 
     @Test
     fun `notify complete when confirm clicked`() = runTest {
         val changeText = genBothify()
-        val sideEffect: SideEffectSender<HomeTagRenameSideEffect> = mock()
-        val stateController = genStateMachine(sideEffect)
-            .asContainer(CoroutineScope(Dispatchers.Default), genHomeTagRenameState(currentText = changeText))
+        val sideEffect: SideEffectHandle<HomeTagRenameSideEffect> = mock()
+        val stateContainer =
+            genHomeTagRenameStateMachine(sideEffect)
+                .asContainer(CoroutineScope(Dispatchers.Default), genHomeTagRenameState(currentText = changeText))
 
-        stateController
+        stateContainer
             .send(HomeTagRenameEvent.OnConfirmClicked)
             .join()
         verify(sideEffect, once()).post(HomeTagRenameSideEffect.Complete(changeText))
@@ -116,13 +98,14 @@ class HomeTagRenameStateMachineKtTest {
 
     @Test
     fun `notify dismiss when cancel clicked`() = runTest {
-        val sideEffect: SideEffectSender<HomeTagRenameSideEffect> = mock()
-        val stateMachine = genStateMachine(sideEffect)
-            .asContainer(CoroutineScope(Dispatchers.Default), genHomeTagRenameState())
+        val sideEffect: SideEffectHandle<HomeTagRenameSideEffect> = mock()
+        val stateContainer =
+            genHomeTagRenameStateMachine(sideEffect)
+                .asContainer(CoroutineScope(Dispatchers.Default), genHomeTagRenameState())
 
-        stateMachine
+        stateContainer
             .send(HomeTagRenameEvent.OnCancelClicked)
             .join()
         verify(sideEffect, once()).post(HomeTagRenameSideEffect.Cancel)
-    }*/
+    }
 }

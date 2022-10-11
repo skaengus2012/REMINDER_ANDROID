@@ -43,7 +43,7 @@ class HomeTagRenameViewModelModule {
                 scope: CoroutineScope,
                 homeTagRenameSideEffect: SideEffectHandle<HomeTagRenameSideEffect>
             ): StateContainer<HomeTagRenameEvent, HomeTagRenameState> =
-                HomeTagRenameStateComponent(homeTagRenameSideEffect)
+                HomeTagRenameStateMachine(homeTagRenameSideEffect)
                     .asContainer(
                         scope,
                         HomeTagRenameState(

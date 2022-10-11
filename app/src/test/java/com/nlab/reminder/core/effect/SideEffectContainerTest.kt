@@ -43,7 +43,7 @@ class SideEffectContainerTest {
         val message = TestSideEffect(genBoolean())
         val channel: Channel<TestSideEffect> = mock()
 
-        SideEffectContainer(channel, Dispatchers.Default).handle(message)
+        SideEffectContainer(channel, Dispatchers.Default).post(message)
         verify(channel, once()).send(message)
     }
 
@@ -66,7 +66,7 @@ class SideEffectContainerTest {
             }
         }
 
-        SideEffectContainer(fakeChannel, testDispatcher).handle(message)
+        SideEffectContainer(fakeChannel, testDispatcher).post(message)
         assertThat(isContextEquals.await(), equalTo(true))
     }
 
@@ -75,7 +75,7 @@ class SideEffectContainerTest {
         val testCount = 100
         val controller = SideEffectContainer<TestSideEffect>(Channel(Channel.UNLIMITED), Dispatchers.Default)
         (1..testCount)
-            .map { number -> launch { controller.handle(TestSideEffect(number)) } }
+            .map { number -> launch { controller.post(TestSideEffect(number)) } }
             .joinAll()
 
         assertThat(

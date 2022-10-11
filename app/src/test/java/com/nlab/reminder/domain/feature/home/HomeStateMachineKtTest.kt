@@ -258,7 +258,7 @@ class HomeStateMachineKtTest {
             .asContainer(CoroutineScope(Dispatchers.Default), initState)
             .send(navigateEvent)
             .join()
-        verify(homeSideEffectHandle, once()).handle(expectedSideEffect)
+        verify(homeSideEffectHandle, once()).post(expectedSideEffect)
     }
 
     @Test

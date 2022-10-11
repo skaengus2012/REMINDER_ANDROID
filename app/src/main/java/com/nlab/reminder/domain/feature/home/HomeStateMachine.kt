@@ -29,7 +29,7 @@ import kotlinx.coroutines.flow.*
  */
 @Suppress("FunctionName")
 fun HomeStateMachine(
-    homeSideEffectHandle: SideEffectHandle<HomeSideEffect>,
+    sideEffectHandle: SideEffectHandle<HomeSideEffect>,
     getHomeSnapshot: GetHomeSnapshotUseCase,
     getTagUsageCount: GetTagUsageCountUseCase,
     modifyTagName: ModifyTagNameUseCase,
@@ -76,18 +76,18 @@ fun HomeStateMachine(
 
     handled {
         state<HomeState.Loaded> {
-            event<HomeEvent.OnTodayCategoryClicked> { homeSideEffectHandle.handle(HomeSideEffect.NavigateToday) }
-            event<HomeEvent.OnTimetableCategoryClicked> { homeSideEffectHandle.handle(HomeSideEffect.NavigateTimetable) }
-            event<HomeEvent.OnAllCategoryClicked> { homeSideEffectHandle.handle(HomeSideEffect.NavigateAllSchedule) }
-            event<HomeEvent.OnTagClicked> { (event) -> homeSideEffectHandle.handle(HomeSideEffect.NavigateTag(event.tag)) }
+            event<HomeEvent.OnTodayCategoryClicked> { sideEffectHandle.post(HomeSideEffect.NavigateToday) }
+            event<HomeEvent.OnTimetableCategoryClicked> { sideEffectHandle.post(HomeSideEffect.NavigateTimetable) }
+            event<HomeEvent.OnAllCategoryClicked> { sideEffectHandle.post(HomeSideEffect.NavigateAllSchedule) }
+            event<HomeEvent.OnTagClicked> { (event) -> sideEffectHandle.post(HomeSideEffect.NavigateTag(event.tag)) }
             event<HomeEvent.OnTagLongClicked> { (event) ->
-                homeSideEffectHandle.handle(HomeSideEffect.NavigateTagConfig(event.tag))
+                sideEffectHandle.post(HomeSideEffect.NavigateTagConfig(event.tag))
             }
             event<HomeEvent.OnTagRenameRequestClicked> { (event) ->
-                homeSideEffectHandle.handle(HomeSideEffect.NavigateTagRename(event.tag, getTagUsageCount(event.tag)))
+                sideEffectHandle.post(HomeSideEffect.NavigateTagRename(event.tag, getTagUsageCount(event.tag)))
             }
             event<HomeEvent.OnTagDeleteRequestClicked> { (event) ->
-                homeSideEffectHandle.handle(HomeSideEffect.NavigateTagDelete(event.tag, getTagUsageCount(event.tag)))
+                sideEffectHandle.post(HomeSideEffect.NavigateTagDelete(event.tag, getTagUsageCount(event.tag)))
             }
             event<HomeEvent.OnTagRenameConfirmClicked> { (event) ->
                 modifyTagName(originalTag = event.originalTag, newText = event.renameText)

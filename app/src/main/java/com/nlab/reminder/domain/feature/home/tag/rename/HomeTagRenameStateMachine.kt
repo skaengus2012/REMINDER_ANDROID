@@ -23,25 +23,25 @@ import com.nlab.reminder.core.state.StateMachine
  * @author Doohyun
  */
 @Suppress("FunctionName")
-fun HomeTagRenameStateComponent(
-    homeTagRenameSideEffect: SideEffectHandle<HomeTagRenameSideEffect>
+fun HomeTagRenameStateMachine(
+    sideEffectHandle: SideEffectHandle<HomeTagRenameSideEffect>
 ) = StateMachine<HomeTagRenameEvent, HomeTagRenameState> {
-    update { (event, state) ->
-        when (event) {
-            is HomeTagRenameEvent.OnRenameTextInput -> state.copy(currentText = event.text)
-            is HomeTagRenameEvent.OnRenameTextClearClicked -> state.copy(currentText = "")
-            is HomeTagRenameEvent.OnKeyboardShownWhenViewCreated -> {
-                state.copy(isKeyboardShowWhenViewCreated = false)
+    reduce {
+        anyState {
+            event<HomeTagRenameEvent.OnRenameTextInput> { (event, before) -> before.copy(currentText = event.text) }
+            event<HomeTagRenameEvent.OnRenameTextClearClicked> { (_, before) -> before.copy(currentText = "") }
+            event<HomeTagRenameEvent.OnKeyboardShownWhenViewCreated> { (_, before) ->
+                before.copy(isKeyboardShowWhenViewCreated = false)
             }
-            else -> state
         }
     }
 
-    handleBy<HomeTagRenameEvent.OnConfirmClicked> { (_, state) ->
-        homeTagRenameSideEffect.handle(HomeTagRenameSideEffect.Complete(state.currentText))
-    }
-
-    handleBy<HomeTagRenameEvent.OnCancelClicked> {
-        homeTagRenameSideEffect.handle(HomeTagRenameSideEffect.Cancel)
+    handled {
+        anyState {
+            event<HomeTagRenameEvent.OnConfirmClicked> { (_, before) ->
+                sideEffectHandle.post(HomeTagRenameSideEffect.Complete(before.currentText))
+            }
+            event<HomeTagRenameEvent.OnCancelClicked> { sideEffectHandle.post(HomeTagRenameSideEffect.Cancel) }
+        }
     }
 }
