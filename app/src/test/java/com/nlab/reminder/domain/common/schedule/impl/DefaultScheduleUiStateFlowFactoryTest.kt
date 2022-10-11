@@ -21,7 +21,7 @@ import com.nlab.reminder.domain.common.schedule.*
 import com.nlab.reminder.test.genBoolean
 import com.nlab.reminder.test.genBothify
 import com.nlab.reminder.test.genFlowExecutionDispatcher
-import com.nlab.reminder.test.genFlowObserveDispatcher
+import com.nlab.reminder.test.genFlowObserveCoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
@@ -61,7 +61,7 @@ class DefaultScheduleUiStateFlowFactoryTest {
         scheduleUiStateFlowFactory
             .combineWith(schedulesFlow)
             .onEach { acc += it.first() }
-            .launchIn(genFlowObserveDispatcher())
+            .launchIn(genFlowObserveCoroutineScope())
 
         advanceTimeBy(1_500)
         assertThat(

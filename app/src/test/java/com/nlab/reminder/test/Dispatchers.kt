@@ -25,7 +25,7 @@ import kotlinx.coroutines.test.TestCoroutineScheduler
 /**
  * @author Doohyun
  */
-fun genFlowObserveDispatcher() = CoroutineScope(Dispatchers.Unconfined)
-
 @ExperimentalCoroutinesApi
 fun genFlowExecutionDispatcher(testScheduler: TestCoroutineScheduler) = StandardTestDispatcher(testScheduler)
+fun genFlowObserveDispatcher() = Dispatchers.Unconfined
+fun genFlowObserveCoroutineScope() = CoroutineScope(genFlowObserveDispatcher())

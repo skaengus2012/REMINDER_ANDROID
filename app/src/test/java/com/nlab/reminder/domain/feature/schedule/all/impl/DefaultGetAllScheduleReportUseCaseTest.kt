@@ -73,7 +73,7 @@ class DefaultGetAllScheduleReportUseCaseTest {
         val actualReports = mutableListOf<AllScheduleReport>()
         getAllScheduleReport()
             .onEach(actualReports::add)
-            .launchIn(genFlowObserveDispatcher())
+            .launchIn(genFlowObserveCoroutineScope())
         assertThat(
             actualReports,
             equalTo(

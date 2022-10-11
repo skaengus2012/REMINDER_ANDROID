@@ -75,7 +75,7 @@ class LocalScheduleRepositoryTest {
         LocalScheduleRepository(scheduleDao)
             .get(scheduleItemRequest)
             .onEach { actualSchedules += it.first() }
-            .launchIn(genFlowObserveDispatcher())
+            .launchIn(genFlowObserveCoroutineScope())
 
         advanceTimeBy(2_000)
         assertThat(actualSchedules, equalTo(listOf(firstSchedule, secondSchedule)))

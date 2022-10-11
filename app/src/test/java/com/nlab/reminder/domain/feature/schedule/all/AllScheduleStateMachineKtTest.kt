@@ -21,7 +21,7 @@ import com.nlab.reminder.domain.common.schedule.Schedule
 import com.nlab.reminder.domain.common.schedule.UpdateCompleteUseCase
 import com.nlab.reminder.domain.common.schedule.genSchedule
 import com.nlab.reminder.test.genBoolean
-import com.nlab.reminder.test.genFlowObserveDispatcher
+import com.nlab.reminder.test.genFlowObserveCoroutineScope
 import com.nlab.reminder.test.once
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.filterIsInstance
@@ -87,7 +87,7 @@ class AllScheduleStateMachineKtTest {
             .stateFlow
             .filterIsInstance<AllScheduleState.Loaded>()
             .onEach { deferred.complete(it.allSchedulesReport) }
-            .launchIn(genFlowObserveDispatcher())
+            .launchIn(genFlowObserveCoroutineScope())
 
         assertThat(deferred.await(), equalTo(expected))
     }

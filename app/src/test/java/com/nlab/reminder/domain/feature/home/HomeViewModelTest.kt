@@ -20,7 +20,7 @@ import com.nlab.reminder.core.effect.SideEffectHandle
 import com.nlab.reminder.core.state.StateMachine
 import com.nlab.reminder.core.state.StateContainer
 import com.nlab.reminder.core.state.asContainer
-import com.nlab.reminder.test.genFlowObserveDispatcher
+import com.nlab.reminder.test.genFlowObserveCoroutineScope
 import com.nlab.reminder.test.once
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -102,7 +102,7 @@ class HomeViewModelTest {
 
         viewModel.homeSideEffectFlow
             .onEach { sideEffectHandler() }
-            .launchIn(genFlowObserveDispatcher())
+            .launchIn(genFlowObserveCoroutineScope())
         viewModel.send(sampleEvent).join()
         verify(sideEffectHandler, once())()
     }
