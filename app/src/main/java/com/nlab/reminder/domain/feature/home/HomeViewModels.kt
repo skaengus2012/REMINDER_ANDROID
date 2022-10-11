@@ -20,13 +20,13 @@ import com.nlab.reminder.domain.common.tag.Tag
 /**
  * @author Doohyun
  */
-
-fun HomeViewModel.onTodayCategoryClicked() = invoke(HomeEvent.OnTodayCategoryClicked)
-fun HomeViewModel.onTimetableCategoryClicked() = invoke(HomeEvent.OnTimetableCategoryClicked)
-fun HomeViewModel.onAllCategoryClicked() = invoke(HomeEvent.OnAllCategoryClicked)
-fun HomeViewModel.onTagClicked(tag: Tag) = invoke(HomeEvent.OnTagClicked(tag))
-fun HomeViewModel.onTagLongClicked(tag: Tag) = invoke(HomeEvent.OnTagLongClicked(tag))
-fun HomeViewModel.onTagRenameRequestClicked(tag: Tag) = invoke(HomeEvent.OnTagRenameRequestClicked(tag))
-fun HomeViewModel.onTagRenameConfirmClicked(originalTag: Tag, renameText: String) = invoke(HomeEvent.OnTagRenameConfirmClicked(originalTag, renameText))
-fun HomeViewModel.onTagDeleteRequestClicked(tag: Tag) = invoke(HomeEvent.OnTagDeleteRequestClicked(tag))
-fun HomeViewModel.onTagDeleteConfirmClicked(tag: Tag) = invoke(HomeEvent.OnTagDeleteConfirmClicked(tag))
+fun HomeViewModel.onRetryClicked() = send(HomeEvent.OnRetryClicked)
+fun HomeViewModel.onTodayCategoryClicked() = send(HomeEvent.OnTodayCategoryClicked)
+fun HomeViewModel.onTimetableCategoryClicked() = send(HomeEvent.OnTimetableCategoryClicked)
+fun HomeViewModel.onAllCategoryClicked() = send(HomeEvent.OnAllCategoryClicked)
+fun HomeViewModel.onTagClicked(tag: Tag) = send(HomeEvent.OnTagClicked(tag))
+fun HomeViewModel.onTagLongClicked(tag: Tag) = send(HomeEvent.OnTagLongClicked(tag))
+fun HomeViewModel.onTagRenameRequestClicked(tag: Tag) = send(HomeEvent.OnTagRenameRequestClicked(tag))
+fun HomeViewModel.onTagRenameConfirmClicked(originalTag: Tag, renameText: String) = send(HomeEvent.OnTagRenameConfirmClicked(originalTag, renameText))
+fun HomeViewModel.onTagDeleteRequestClicked(tag: Tag) = send(HomeEvent.OnTagDeleteRequestClicked(tag))
+fun HomeViewModel.onTagDeleteConfirmClicked(tag: Tag) = send(HomeEvent.OnTagDeleteConfirmClicked(tag))

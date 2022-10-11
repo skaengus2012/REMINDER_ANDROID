@@ -25,7 +25,7 @@ import com.nlab.reminder.internal.common.android.database.TagDao
 import com.nlab.reminder.internal.common.android.database.toEntity
 import com.nlab.reminder.internal.common.database.toEntities
 import com.nlab.reminder.test.genFlowExecutionDispatcher
-import com.nlab.reminder.test.genFlowObserveDispatcher
+import com.nlab.reminder.test.genFlowObserveCoroutineScope
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
@@ -75,7 +75,7 @@ class LocalTagRepositoryTest {
         createTagRepository(tagDao = tagDao)
             .get()
             .onEach(actualTags::add)
-            .launchIn(genFlowObserveDispatcher())
+            .launchIn(genFlowObserveCoroutineScope())
 
         advanceTimeBy(1_000)
         assertThat(actualTags, equalTo(listOf(firstTags, secondTags)))

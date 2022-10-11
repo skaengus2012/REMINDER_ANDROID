@@ -16,8 +16,8 @@
 
 package com.nlab.reminder.domain.feature.home.tag.rename
 
-fun HomeTagRenameViewModel.onRenameTextInput(text: String) = invoke(HomeTagRenameEvent.OnRenameTextInput(text))
-fun HomeTagRenameViewModel.onRenameTextClearClicked() = invoke(HomeTagRenameEvent.OnRenameTextClearClicked)
-fun HomeTagRenameViewModel.onKeyboardShownWhenViewCreated() = invoke(HomeTagRenameEvent.OnKeyboardShownWhenViewCreated)
-fun HomeTagRenameViewModel.onCancelClicked() = invoke(HomeTagRenameEvent.OnCancelClicked)
-fun HomeTagRenameViewModel.onConfirmClicked() = invoke(HomeTagRenameEvent.OnConfirmClicked)
+fun HomeTagRenameViewModel.onRenameTextInput(text: String) = send(HomeTagRenameEvent.OnRenameTextInput(text))
+fun HomeTagRenameViewModel.onRenameTextClearClicked() = send(HomeTagRenameEvent.OnRenameTextClearClicked)
+fun HomeTagRenameViewModel.onKeyboardShownWhenViewCreated() = send(HomeTagRenameEvent.OnKeyboardShownWhenViewCreated)
+fun HomeTagRenameViewModel.onCancelClicked() = send(HomeTagRenameEvent.OnCancelClicked)
+fun HomeTagRenameViewModel.onConfirmClicked() = send(HomeTagRenameEvent.OnConfirmClicked)

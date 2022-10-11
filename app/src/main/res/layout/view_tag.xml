@@ -15,36 +15,33 @@
   -->
 
 <FrameLayout
-	xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:tools="http://schemas.android.com/tools"
-	android:id="@+id/tag_layout"
-	android:layout_width="wrap_content"
-	android:layout_height="wrap_content"
-	android:layout_marginStart="7dp"
-	android:layout_marginTop="6dp"
-	android:layout_marginEnd="7dp"
-	android:layout_marginBottom="6dp">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/tag_layout"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_margin="6.5dp"
+    tools:background="@color/bg_card_1_light">
 
-	<androidx.appcompat.widget.AppCompatButton
-		android:id="@+id/tag_button"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_gravity="center"
-		android:clickable="false"
-		android:ellipsize="end"
-		android:fontFamily="@font/dangam_asac"
-		android:maxLines="1"
-		android:minWidth="0dp"
-		android:minHeight="0dp"
-		android:paddingStart="13dp"
-		android:paddingTop="12dp"
-		android:paddingEnd="13dp"
-		android:paddingBottom="12dp"
-		android:stateListAnimator="@null"
-		android:textAllCaps="false"
-		android:textSize="18sp"
-		tools:background="@drawable/bg_tag_style_1"
-		tools:text="# 돈내는거 돈내는거 돈내는거 돈내는거 돈내는거 돈내는거 돈내는거 돈내는거 돈내는거 돈내는거 돈내는거"
-		tools:textColor="@color/white" />
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btn_tag"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@drawable/bg_tag_ripple_1"
+        android:clickable="false"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:minWidth="0dp"
+        android:minHeight="0dp"
+        android:paddingHorizontal="12dp"
+        android:paddingTop="5dp"
+        android:paddingBottom="4dp"
+        android:stateListAnimator="@null"
+        android:textAllCaps="false"
+        android:textColor="?attr/font_color_tag"
+        android:textSize="14sp"
+        tools:text="#돈내는거 돈내는거 돈내는거 돈내는거 돈내는거 돈내는거 돈내는거 돈내는거 돈내는거 돈내는거 돈내는거"
+        tools:textColor="@color/font_tag_light" />
 
 </FrameLayout>

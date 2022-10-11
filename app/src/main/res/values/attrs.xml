@@ -15,7 +15,12 @@
   -->
 
 <resources>
-	<attr name="defaultTextColor" format="color" />
-
-	<attr name="cardBackground" format="color" />
+	<!-- common -->
+	<attr name="bg_color_1" format="color"/>
+	<attr name="bg_color_card_1" format="color" />
+	<attr name="bg_color_tag" format="color" />
+	<attr name="bg_color_ripple_1" format="color" />
+	<attr name="font_color_1" format="color" />
+	<attr name="font_color_2" format="color" />
+	<attr name="font_color_tag" format="color" />
 </resources>

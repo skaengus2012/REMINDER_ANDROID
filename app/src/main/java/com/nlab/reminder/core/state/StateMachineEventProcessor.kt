@@ -20,30 +20,38 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.getAndUpdate
 import kotlinx.coroutines.plus
 
 /**
  * @author thalys
  */
-@Suppress("FunctionName")
-internal fun <E : Event, S : State> StateMachineEventProcessor(
+internal class StateMachineEventProcessor<E : Event, S : State>(
     scope: CoroutineScope,
-    state: MutableStateFlow<S>,
-    stateMachineBuilder: StateMachineBuilder<E, S>
-): EventProcessor<E> = InternalEventProcessor(scope, state, stateMachineBuilder)
-
-private class InternalEventProcessor<E : Event, S : State>(
-    scope: CoroutineScope,
-    state: MutableStateFlow<S>,
-    stateMachineBuilder: StateMachineBuilder<E, S>
+    private val state: MutableStateFlow<S>,
+    stateMachine: StateMachine<E, S>
 ) : EventProcessor<E> {
-    private val stateReduce = StateReduce(state, stateMachineBuilder.buildUpdateHandler())
-    private val exceptionHandler = stateMachineBuilder.buildExceptionHandler()
-    private val eventHandler = stateMachineBuilder.buildEventHandler()
+    private val scope = StateMachineHandleScope(state.subscriptionCount, eventProcessor = this)
+    private val reduce = stateMachine.buildReduce()
+    private val handle = stateMachine.buildHandle()
+    private val exceptionHandler = stateMachine.buildExceptionHandler()
     private val internalActionProcessor = EventProcessorImpl<E>(
-        scope = scope + CoroutineExceptionHandler { _, e -> exceptionHandler(e) },
-        onEventReceived = { event -> eventHandler(stateReduce.getSourceAndUpdate(event)) }
+        scope = scope + CoroutineExceptionHandler { _, e -> StateMachineScope.exceptionHandler(e) },
+        onEventReceived = { event ->
+            handleSource(getAndUpdate(event))
+        }
     )
+
+    private fun getAndUpdate(event: E): UpdateSource<E, S> {
+        return UpdateSource(
+            event,
+            before = state.getAndUpdate { old -> StateMachineScope.reduce(UpdateSource(event, old)) }
+        )
+    }
+
+    private suspend fun handleSource(updateSource: UpdateSource<E, S>) {
+        handle(scope, updateSource)
+    }
 
     override fun send(event: E): Job = internalActionProcessor.send(event)
 }

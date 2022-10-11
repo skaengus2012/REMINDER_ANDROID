@@ -24,16 +24,17 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.ConcatAdapter
+import com.nlab.reminder.R
 import com.nlab.reminder.core.android.fragment.viewLifecycle
 import com.nlab.reminder.core.android.fragment.viewLifecycleScope
 import com.nlab.reminder.core.android.navigation.NavigationController
 import com.nlab.reminder.databinding.FragmentHomeBinding
-import com.nlab.reminder.domain.common.android.fragment.handleSideEffect
 import com.nlab.reminder.domain.common.android.fragment.resultReceives
 import com.nlab.reminder.domain.common.android.navigation.navigateToAllScheduleEnd
+import com.nlab.reminder.domain.common.android.view.recyclerview.SimpleLayoutAdapter
 import com.nlab.reminder.domain.feature.home.*
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
@@ -83,88 +84,92 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val homeItemAdapter = HomeItemAdapter()
-        val renderWhenLoaded = renderWhenLoadedFunc(homeItemAdapter)
+        val logoAdapter = SimpleLayoutAdapter(R.layout.view_item_home_logo)
+        val categoryAdapter = HomeCategoryAdapter(
+            onTodayNavClicked = viewModel::onTodayCategoryClicked,
+            onTimetableNavClicked = viewModel::onTimetableCategoryClicked,
+            onAllNavClicked = viewModel::onAllCategoryClicked
+        )
+        val tagCardAdapter = HomeTagCardAdapter(
+            onTagClicked = viewModel::onTagClicked,
+            onTagLongClicked = viewModel::onTagLongClicked
+        )
 
-        binding.categoryRecyclerview
+        val renderWhenLoaded = renderWhenLoadedFunc(categoryAdapter, tagCardAdapter)
+
+        binding.recyclerviewContent
             .apply { itemAnimator = null }
-            .apply { adapter = homeItemAdapter }
+            .apply { adapter = ConcatAdapter(logoAdapter, categoryAdapter, tagCardAdapter) }
 
-        handleSideEffect(viewModel.homeSideEffect) { sideEffect ->
-            when (sideEffect) {
-                is HomeSideEffect.NavigateToday -> {
+        viewModel.homeSideEffectFlow
+            .flowWithLifecycle(viewLifecycle)
+            .onEach(this::handleSideEffect)
+            .launchIn(viewLifecycleScope)
 
-                }
-                is HomeSideEffect.NavigateTimetable -> {
-
-                }
-                is HomeSideEffect.NavigateAllSchedule -> {
-                    navigationController.navigateToAllScheduleEnd()
-                }
-                is HomeSideEffect.NavigateTag -> {
-
-                }
-                is HomeSideEffect.NavigateTagConfig -> {
-                    navigationController.navigateToTagConfig(
-                        REQUEST_KEY_HOME_TO_HOME_TAG_CONFIG, sideEffect.tag
-                    )
-                }
-                is HomeSideEffect.NavigateTagRename -> {
-                    navigationController.navigateToTagRename(
-                        REQUEST_KEY_HOME_TO_HOME_TAG_RENAME, sideEffect.tag, sideEffect.usageCount
-                    )
-                }
-                is HomeSideEffect.NavigateTagDelete -> {
-                    navigationController.navigateToTagDelete(
-                        REQUEST_KEY_HOME_TO_HOME_TAG_DELETE, sideEffect.tag, sideEffect.usageCount
-                    )
-                }
-            }
-        }
-
-        viewModel.state
+        viewModel.stateFlow
             .filterIsInstance<HomeState.Init>()
             .flowWithLifecycle(viewLifecycle)
-            .distinctUntilChanged()
             .onEach { renderWhenInit() }
             .launchIn(viewLifecycleScope)
 
-        viewModel.state
+        viewModel.stateFlow
             .filterIsInstance<HomeState.Loading>()
             .flowWithLifecycle(viewLifecycle)
-            .distinctUntilChanged()
             .onEach { renderWhenLoading() }
             .launchIn(viewLifecycleScope)
 
-        viewModel.state
+        viewModel.stateFlow
             .filterIsInstance<HomeState.Loaded>()
             .flowWithLifecycle(viewLifecycle)
-            .distinctUntilChanged()
-            .map { state ->
-                state.toHomeItems(
-                    onTodayCategoryClicked = viewModel::onTodayCategoryClicked,
-                    onTimetableCategoryClicked = viewModel::onTimetableCategoryClicked,
-                    onAllCategoryClicked = viewModel::onAllCategoryClicked,
-                    onTagClicked = viewModel::onTagClicked,
-                    onTagLongClicked = viewModel::onTagLongClicked
-                )
-            }
-            .flowOn(Dispatchers.Default)
-            .onEach { homeListItem -> renderWhenLoaded(homeListItem) }
+            .onEach { state -> renderWhenLoaded(state.snapshot) }
             .launchIn(viewLifecycleScope)
     }
 
+    private fun handleSideEffect(sideEffect: HomeSideEffect) = when (sideEffect) {
+        is HomeSideEffect.NavigateToday -> {
+
+        }
+        is HomeSideEffect.NavigateTimetable -> {
+
+        }
+        is HomeSideEffect.NavigateAllSchedule -> {
+            navigationController.navigateToAllScheduleEnd()
+        }
+        is HomeSideEffect.NavigateTag -> {
+
+        }
+        is HomeSideEffect.NavigateTagConfig -> {
+            navigationController.navigateToTagConfig(
+                REQUEST_KEY_HOME_TO_HOME_TAG_CONFIG, sideEffect.tag
+            )
+        }
+        is HomeSideEffect.NavigateTagRename -> {
+            navigationController.navigateToTagRename(
+                REQUEST_KEY_HOME_TO_HOME_TAG_RENAME, sideEffect.tag, sideEffect.usageCount
+            )
+        }
+        is HomeSideEffect.NavigateTagDelete -> {
+            navigationController.navigateToTagDelete(
+                REQUEST_KEY_HOME_TO_HOME_TAG_DELETE, sideEffect.tag, sideEffect.usageCount
+            )
+        }
+    }
+
     private fun renderWhenInit() {
-        binding.categoryRecyclerview.visibility = View.GONE
+        binding.recyclerviewContent.visibility = View.GONE
     }
 
     private fun renderWhenLoading() {
-        binding.categoryRecyclerview.visibility = View.GONE
+        binding.recyclerviewContent.visibility = View.GONE
     }
 
-    private fun renderWhenLoadedFunc(homeItemAdapter: HomeItemAdapter) = { homeItems: List<HomeItem> ->
-        binding.categoryRecyclerview.visibility = View.VISIBLE
-        homeItemAdapter.submitList(homeItems)
+    private fun renderWhenLoadedFunc(
+        categoryAdapter: HomeCategoryAdapter,
+        tagCardAdapter: HomeTagCardAdapter,
+    ) = { snapshot: HomeSnapshot ->
+        binding.recyclerviewContent.visibility = View.VISIBLE
+        categoryAdapter.submitList(listOf(snapshot.notification))
+        tagCardAdapter.submitList(listOf(snapshot.tags))
     }
 
     override fun onDestroyView() {

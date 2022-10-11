@@ -16,7 +16,7 @@
 
 package com.nlab.reminder.domain.feature.home
 
-import com.nlab.reminder.core.state.StateController
+import com.nlab.reminder.core.state.StateContainer
 import com.nlab.reminder.core.state.verifyStateSendExtension
 import com.nlab.reminder.domain.common.tag.Tag
 import com.nlab.reminder.domain.common.tag.genTag
@@ -30,56 +30,62 @@ import org.mockito.kotlin.*
 class HomeViewModelsKtTest {
     @Test
     fun testExtensions() {
-        val stateController: StateController<HomeEvent, HomeState> = mock()
+        val stateContainer: StateContainer<HomeEvent, HomeState> = mock()
         val tag: Tag = genTag()
         val randomString: String = genBothify()
         val viewModel = HomeViewModel(
-            stateControllerFactory = mock {
-                whenever(mock.create(any(), any())) doReturn stateController
+            stateContainerFactory = mock {
+                whenever(mock.create(any(), any())) doReturn stateContainer
             }
         )
+
         verifyStateSendExtension(
-            stateController,
+            stateContainer,
+            HomeEvent.OnRetryClicked
+        ) { viewModel.onRetryClicked() }
+
+        verifyStateSendExtension(
+            stateContainer,
             HomeEvent.OnTodayCategoryClicked
         ) { viewModel.onTodayCategoryClicked() }
 
         verifyStateSendExtension(
-            stateController,
+            stateContainer,
             HomeEvent.OnTimetableCategoryClicked
         ) { viewModel.onTimetableCategoryClicked() }
 
         verifyStateSendExtension(
-            stateController,
+            stateContainer,
             HomeEvent.OnAllCategoryClicked
         ) { viewModel.onAllCategoryClicked() }
 
         verifyStateSendExtension(
-            stateController,
+            stateContainer,
             HomeEvent.OnTagClicked(tag)
         ) { viewModel.onTagClicked(tag) }
 
         verifyStateSendExtension(
-            stateController,
+            stateContainer,
             HomeEvent.OnTagLongClicked(tag)
         ) { viewModel.onTagLongClicked(tag) }
 
         verifyStateSendExtension(
-            stateController,
+            stateContainer,
             HomeEvent.OnTagRenameRequestClicked(tag)
         ) { viewModel.onTagRenameRequestClicked(tag) }
 
         verifyStateSendExtension(
-            stateController,
+            stateContainer,
             HomeEvent.OnTagRenameConfirmClicked(tag, randomString)
         ) { viewModel.onTagRenameConfirmClicked(tag, randomString) }
 
         verifyStateSendExtension(
-            stateController,
+            stateContainer,
             HomeEvent.OnTagDeleteRequestClicked(tag)
         ) { viewModel.onTagDeleteRequestClicked(tag) }
 
         verifyStateSendExtension(
-            stateController,
+            stateContainer,
             HomeEvent.OnTagDeleteConfirmClicked(tag)
         ) { viewModel.onTagDeleteConfirmClicked(tag) }
     }

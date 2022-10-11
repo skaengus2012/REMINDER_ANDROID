@@ -28,11 +28,10 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class AllScheduleViewModel @Inject constructor(
-    stateControllerFactory: AllScheduleStateControllerFactory
+    stateControllerFactory: AllScheduleStateContainerFactory
 ) : ViewModel() {
-    private val stateController = stateControllerFactory.create(viewModelScope)
+    private val stateContainer = stateControllerFactory.create(viewModelScope)
 
-    val state: StateFlow<AllScheduleState> = stateController.state
-
-    fun invoke(action: AllScheduleEvent): Job = stateController.send(action)
+    val stateFlow: StateFlow<AllScheduleState> = stateContainer.stateFlow
+    fun send(event: AllScheduleEvent): Job = stateContainer.send(event)
 }

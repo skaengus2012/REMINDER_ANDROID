@@ -16,7 +16,7 @@
 
 package com.nlab.reminder.domain.feature.home.tag.rename
 
-import com.nlab.reminder.core.state.StateController
+import com.nlab.reminder.core.state.StateContainer
 import com.nlab.reminder.core.state.verifyStateSendExtension
 import com.nlab.reminder.test.genBothify
 import org.junit.Test
@@ -31,36 +31,36 @@ import org.mockito.kotlin.whenever
 class HomeTagRenameViewModelsKtTest {
     @Test
     fun testExtensions() {
-        val stateController: StateController<HomeTagRenameEvent, HomeTagRenameState> = mock()
+        val stateContainer: StateContainer<HomeTagRenameEvent, HomeTagRenameState> = mock()
         val randomString: String = genBothify()
         val viewModel = HomeTagRenameViewModel(
             stateControllerFactory = mock {
-                whenever(mock.create(any(), any())) doReturn stateController
+                whenever(mock.create(any(), any())) doReturn stateContainer
             }
         )
 
         verifyStateSendExtension(
-            stateController,
+            stateContainer,
             HomeTagRenameEvent.OnRenameTextInput(randomString)
         ) { viewModel.onRenameTextInput(randomString) }
 
         verifyStateSendExtension(
-            stateController,
+            stateContainer,
             HomeTagRenameEvent.OnRenameTextClearClicked
         ) { viewModel.onRenameTextClearClicked() }
 
         verifyStateSendExtension(
-            stateController,
+            stateContainer,
             HomeTagRenameEvent.OnKeyboardShownWhenViewCreated
         ) { viewModel.onKeyboardShownWhenViewCreated() }
 
         verifyStateSendExtension(
-            stateController,
+            stateContainer,
             HomeTagRenameEvent.OnCancelClicked
         ) { viewModel.onCancelClicked() }
 
         verifyStateSendExtension(
-            stateController,
+            stateContainer,
             HomeTagRenameEvent.OnConfirmClicked
         ) { viewModel.onConfirmClicked() }
     }

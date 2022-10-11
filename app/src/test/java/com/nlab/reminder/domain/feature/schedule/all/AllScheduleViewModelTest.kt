@@ -16,7 +16,7 @@
 
 package com.nlab.reminder.domain.feature.schedule.all
 
-import com.nlab.reminder.core.state.StateController
+import com.nlab.reminder.core.state.StateContainer
 import com.nlab.reminder.domain.common.schedule.genSchedule
 import com.nlab.reminder.test.genBoolean
 import com.nlab.reminder.test.once
@@ -37,10 +37,6 @@ import org.mockito.kotlin.*
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class AllScheduleViewModelTest {
-    private val sampleEvent: AllScheduleEvent =
-        AllScheduleEvent.OnScheduleCompleteUpdateClicked(genSchedule().id(), isComplete = genBoolean())
-    private val sampleState: AllScheduleState = AllScheduleState.Loaded(genAllScheduleReport())
-
     @Before
     fun setUp() {
         Dispatchers.setMain(Dispatchers.Unconfined)
@@ -53,26 +49,28 @@ class AllScheduleViewModelTest {
 
     @Test
     fun `stateController send event when viewModel sent`() {
-        val stateController: StateController<AllScheduleEvent, AllScheduleState> = mock()
+        val sampleEvent = genAllScheduleEventSample()
+        val stateContainer: StateContainer<AllScheduleEvent, AllScheduleState> = mock()
         val viewModel = AllScheduleViewModel(
             stateControllerFactory = mock {
-                whenever(mock.create(any())) doReturn stateController
+                whenever(mock.create(any())) doReturn stateContainer
             }
         )
 
-        viewModel.invoke(sampleEvent)
-        verify(stateController, once()).send(sampleEvent)
+        viewModel.send(sampleEvent)
+        verify(stateContainer, once()).send(sampleEvent)
     }
 
     @Test
     fun `notify state when stateController flow published`() {
-        val stateController: StateController<AllScheduleEvent, AllScheduleState> = mock {
-            whenever(mock.state) doReturn MutableStateFlow(sampleState)
+        val sampleState = genAllScheduleStateSample()
+        val stateContainer: StateContainer<AllScheduleEvent, AllScheduleState> = mock {
+            whenever(mock.stateFlow) doReturn MutableStateFlow(sampleState)
         }
         val viewModel = AllScheduleViewModel(
-            stateControllerFactory = mock { whenever(mock.create(any())) doReturn stateController }
+            stateControllerFactory = mock { whenever(mock.create(any())) doReturn stateContainer }
         )
 
-        assertThat(viewModel.state.value, equalTo(sampleState))
+        assertThat(viewModel.stateFlow.value, equalTo(sampleState))
     }
 }

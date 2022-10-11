@@ -16,8 +16,8 @@
 
 package com.nlab.reminder.domain.feature.schedule.all.di
 
-import com.nlab.reminder.core.state.StateController
-import com.nlab.reminder.core.state.util.controlIn
+import com.nlab.reminder.core.state.StateContainer
+import com.nlab.reminder.core.state.asContainer
 import com.nlab.reminder.domain.common.schedule.DoneScheduleShownRepository
 import com.nlab.reminder.domain.common.schedule.ScheduleRepository
 import com.nlab.reminder.domain.common.schedule.ScheduleUiStateFlowFactory
@@ -43,9 +43,9 @@ class AllScheduleViewModelModule {
         scheduleUiStateFlowFactory: ScheduleUiStateFlowFactory,
         updateCompleteUseCase: UpdateCompleteUseCase,
         @AllScheduleScope doneScheduleShownRepository: DoneScheduleShownRepository
-    ): AllScheduleStateControllerFactory =
-        object : AllScheduleStateControllerFactory {
-            override fun create(scope: CoroutineScope): StateController<AllScheduleEvent, AllScheduleState> {
+    ): AllScheduleStateContainerFactory =
+        object : AllScheduleStateContainerFactory {
+            override fun create(scope: CoroutineScope): StateContainer<AllScheduleEvent, AllScheduleState> {
                 val stateMachine = AllScheduleStateMachine(
                     getAllScheduleReport = DefaultGetAllScheduleReportUseCase(
                         doneScheduleShownRepository,
@@ -55,7 +55,7 @@ class AllScheduleViewModelModule {
                     ),
                     updateScheduleComplete = updateCompleteUseCase
                 )
-                return stateMachine.controlIn(scope, AllScheduleState.Init, fetchEvent = AllScheduleEvent.Fetch)
+                return stateMachine.asContainer(scope, AllScheduleState.Init, fetchEvent = AllScheduleEvent.Fetch)
             }
         }
 }

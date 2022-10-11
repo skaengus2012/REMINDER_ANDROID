@@ -16,11 +16,11 @@
 
 package com.nlab.reminder.domain.feature.home
 
-import com.nlab.reminder.core.effect.SideEffectSender
-import com.nlab.reminder.core.state.util.controlIn
+import com.nlab.reminder.core.effect.SideEffectHandle
+import com.nlab.reminder.core.state.asContainer
+import com.nlab.reminder.core.state.asContainerWithSubscription
 import com.nlab.reminder.domain.common.tag.Tag
 import com.nlab.reminder.domain.common.tag.genTag
-import com.nlab.reminder.domain.common.tag.genTagWithResource
 import com.nlab.reminder.test.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -35,145 +35,131 @@ import org.mockito.kotlin.*
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class HomeStateMachineKtTest {
-    private fun genEvents(): Set<HomeEvent> = setOf(
-        HomeEvent.Fetch,
-        HomeEvent.OnTodayCategoryClicked,
-        HomeEvent.OnTimetableCategoryClicked,
-        HomeEvent.OnAllCategoryClicked,
-        HomeEvent.OnTagClicked(genTag()),
-        HomeEvent.OnTagLongClicked(genTag()),
-        HomeEvent.OnTagRenameConfirmClicked(genTag(), renameText = genLetterify()),
-        HomeEvent.OnTagDeleteRequestClicked(genTag()),
-        HomeEvent.OnTagDeleteConfirmClicked(genTag()),
-        HomeEvent.OnHomeSummaryLoaded(genHomeSummary())
-    )
-
-    private fun genStates(): Set<HomeState> = setOf(
-        HomeState.Init,
-        HomeState.Loading,
-        HomeState.Loaded(genHomeSummary())
-    )
-
-    private fun genStateMachine(
-        homeSideEffect: SideEffectSender<HomeSideEffect> = mock(),
-        getHomeSummary: GetHomeSummaryUseCase = mock { onBlocking { mock() } doReturn emptyFlow() },
-        getTagUsageCount: GetTagUsageCountUseCase = mock(),
-        modifyTagName: ModifyTagNameUseCase = mock(),
-        deleteTag: DeleteTagUseCase = mock()
-    ) = HomeStateMachine(
-        homeSideEffect,
-        getHomeSummary,
-        getTagUsageCount,
-        modifyTagName,
-        deleteTag
-    )
-
     @Test
     fun `update to loading when state was init and fetch sent`() = runTest {
-        val stateController = genStateMachine().controlIn(CoroutineScope(Dispatchers.Default), HomeState.Init)
-        stateController
-            .send(HomeEvent.Fetch)
-            .join()
-        assertThat(stateController.state.value, equalTo(HomeState.Loading))
+        testReduceTemplate(
+            input = HomeEvent.Fetch,
+            initState = HomeState.Init,
+            expectedState = HomeState.Loading(HomeState.Init)
+        )
     }
 
     @Test
-    fun `never updated when state was not init and fetch sent`() = runTest {
-        val initAndStateControllers =
-            genStates()
-                .filter { it != HomeState.Init }
-                .map { state -> state to genStateMachine().controlIn(CoroutineScope(Dispatchers.Default), state) }
-        initAndStateControllers
-            .map { it.second }
-            .map { it.send(HomeEvent.Fetch) }
-            .joinAll()
-
-        assertThat(
-            initAndStateControllers.all { (initState, controller) -> initState == controller.state.value },
-            equalTo(true)
+    fun `update to loading when state was error and OnRetryClicked sent`() = runTest {
+        val throwable = Throwable()
+        testReduceTemplate(
+            input = HomeEvent.OnRetryClicked,
+            initState = HomeState.Error(throwable),
+            expectedState = HomeState.Loading(HomeState.Error(throwable))
         )
     }
 
     @Test
     fun `update to Loaded when state was not init and OnHomeSummaryLoaded sent`() = runTest {
-        val homeSummary = genHomeSummary()
-        val stateControllers =
-            genStates()
-                .filter { it != HomeState.Init }
-                .map { genStateMachine().controlIn(CoroutineScope(Dispatchers.Default), it) }
-        stateControllers
-            .map { it.send(HomeEvent.OnHomeSummaryLoaded(homeSummary)) }
+        val input = HomeEvent.OnSnapshotLoaded(genHomeSnapshot())
+        genHomeStates()
+            .filter { it != HomeState.Init }
+            .map { initState ->
+                launch { testReduceTemplate(input, initState, expectedState = HomeState.Loaded(input.snapshot)) }
+            }
             .joinAll()
+    }
+
+    @Test
+    fun `update to error when OnSnapshotLoadFailed sent`() = runTest {
+        val input = HomeEvent.OnSnapshotLoadFailed(Throwable())
+        testReduceTemplate(
+            input,
+            initState = genHomeStates().first(),
+            expectedState = HomeState.Error(input.throwable)
+        )
+    }
+
+    private suspend fun testReduceTemplate(
+        input: HomeEvent,
+        initState: HomeState,
+        expectedState: HomeState
+    ) {
+        val stateContainer =
+            genHomeStateMachine().asContainer(CoroutineScope(Dispatchers.Default), initState)
+        stateContainer.send(input)
+
         assertThat(
-            stateControllers.map { it.state.value }.all { it == HomeState.Loaded(homeSummary) },
-            equalTo(true)
+            stateContainer.stateFlow
+                .filter { state -> state != initState }
+                .take(1)
+                .first(),
+            equalTo(expectedState)
         )
     }
 
     @Test
-    fun `never updated when state was init and OnHomeSummaryLoaded sent`() = runTest {
-        val stateController = genStateMachine().controlIn(CoroutineScope(Dispatchers.Default), HomeState.Init)
-        stateController
-            .send(HomeEvent.OnHomeSummaryLoaded(genHomeSummary()))
-            .join()
-        assertThat(stateController.state.value, equalTo(HomeState.Init))
+    fun `start collecting homeSnapshot when state was init, fetch sent`() = runTest {
+        testHomeSnapshotSubscription(HomeState.Init, HomeEvent.Fetch)
     }
 
     @Test
-    fun `never updated when any event excluded fetch and OnHomeSummaryLoaded sent`() = runTest {
-        val initAndStateControllers = genStates().map { state ->
-            state to genStateMachine().controlIn(CoroutineScope(Dispatchers.Default), state)
+    fun `start collecting homeSnapshot when state was error, OnRetryClicked sent`() = runTest {
+        testHomeSnapshotSubscription(HomeState.Error(Throwable()), HomeEvent.OnRetryClicked)
+    }
+
+    private suspend fun testHomeSnapshotSubscription(initState: HomeState, event: HomeEvent) {
+        val expected = genHomeSnapshot()
+        val getHomeSnapshot: GetHomeSnapshotUseCase = mock {
+            whenever(mock()) doReturn flow { emit(expected) }
         }
+        val stateContainer =
+            genHomeStateMachine(getHomeSnapshot = getHomeSnapshot)
+                .asContainerWithSubscription(CoroutineScope(Dispatchers.Default), initState)
+        stateContainer.send(event)
         assertThat(
-            genEvents()
-                .asSequence()
-                .filterNot { it is HomeEvent.Fetch }
-                .filterNot { it is HomeEvent.OnHomeSummaryLoaded }
-                .map { event ->
-                    initAndStateControllers.map { (initState, controller) ->
-                        async {
-                            controller
-                                .send(event)
-                                .join()
-                            controller.state.value == initState
-                        }
-                    }
-                }
-                .flatten()
-                .toList()
-                .all { it.await() },
-            equalTo(true)
+            stateContainer.stateFlow
+                .filterIsInstance<HomeState.Loaded>()
+                .map { it.snapshot }
+                .first(),
+            equalTo(expected)
         )
     }
 
     @Test
-    fun `subscribe homeSummary snapshot when state was init and fetch sent`() = runTest {
-        val expected = genHomeSummary()
-        val getHomeSummary: GetHomeSummaryUseCase =  mock {
-            onBlocking { mock() } doReturn flow { emit(expected) }
+    fun `send HomeSnapshotLoadFailed when getHomeSnapshot occurred error`() = runTest {
+        val throwable = Throwable()
+        val getHomeSnapshot: GetHomeSnapshotUseCase = mock {
+            whenever(mock()) doReturn flow { throw throwable }
         }
         val stateController =
-            genStateMachine(getHomeSummary = getHomeSummary)
-                .controlIn(CoroutineScope(Dispatchers.Unconfined), HomeState.Init)
+            genHomeStateMachine(getHomeSnapshot = getHomeSnapshot)
+                .asContainerWithSubscription(CoroutineScope(Dispatchers.Default), HomeState.Init)
+        val errorDeferred = async {
+            stateController.stateFlow
+                .filterIsInstance<HomeState.Error>()
+                .first()
+        }
+        stateController.send(HomeEvent.Fetch).join()
+        assertThat(errorDeferred.await(), instanceOf(HomeState.Error::class))
+    }
+
+    @Test
+    fun `throw exception when getHomeSnapshot occurred error`() = runTest {
+        val getHomeSnapshot: GetHomeSnapshotUseCase = mock {
+            whenever(mock()) doReturn flow { throw Throwable() }
+        }
+        val catchUseCase: (Throwable) -> Unit = mock()
+        val stateController =
+            genHomeStateMachine(getHomeSnapshot = getHomeSnapshot)
+                .apply { catch { catchUseCase(it) } }
+                .asContainerWithSubscription(CoroutineScope(Dispatchers.Default), HomeState.Init)
         stateController
             .send(HomeEvent.Fetch)
             .join()
-
-        val deferred = CompletableDeferred<HomeSummary>()
-        stateController
-            .state
-            .filterIsInstance<HomeState.Loaded>()
-            .onEach { deferred.complete(it.homeSummary) }
-            .launchIn(genFlowObserveDispatcher())
-
-        assertThat(deferred.await(), equalTo(expected))
+        verify(catchUseCase, once())(any())
     }
 
     @Test
     fun `navigate today end when today category clicked`() = runTest {
         testNavigationEnd(
             navigateEvent = HomeEvent.OnTodayCategoryClicked,
-            expectedSideEffectMessage = HomeSideEffect.NavigateToday
+            expectedSideEffect = HomeSideEffect.NavigateToday
         )
     }
 
@@ -181,7 +167,7 @@ class HomeStateMachineKtTest {
     fun `navigate timetable end when timetable category clicked`() = runTest {
         testNavigationEnd(
             navigateEvent = HomeEvent.OnTimetableCategoryClicked,
-            expectedSideEffectMessage = HomeSideEffect.NavigateTimetable
+            expectedSideEffect = HomeSideEffect.NavigateTimetable
         )
     }
 
@@ -189,22 +175,22 @@ class HomeStateMachineKtTest {
     fun `navigate all end when all category clicked`() = runTest {
         testNavigationEnd(
             navigateEvent = HomeEvent.OnAllCategoryClicked,
-            expectedSideEffectMessage = HomeSideEffect.NavigateAllSchedule
+            expectedSideEffect = HomeSideEffect.NavigateAllSchedule
         )
     }
 
     @Test
     fun `navigate tag end when tag element clicked`() = runTest {
         val testTag: Tag = genTag()
-        val testSummaries = listOf(
-            genHomeSummary(tags = listOf(genTagWithResource(testTag))),
-            genHomeSummary(tags = emptyList())
+        val testSnapshots = listOf(
+            genHomeSnapshot(tags = listOf(testTag)),
+            genHomeSnapshot(tags = emptyList())
         )
-        testSummaries.forEach { homeSummary ->
+        testSnapshots.forEach { homeSummary ->
             testNavigationEnd(
                 initState = HomeState.Loaded(homeSummary),
                 navigateEvent = HomeEvent.OnTagClicked(testTag),
-                expectedSideEffectMessage = HomeSideEffect.NavigateTag(testTag)
+                expectedSideEffect = HomeSideEffect.NavigateTag(testTag)
             )
         }
     }
@@ -213,14 +199,14 @@ class HomeStateMachineKtTest {
     fun `navigate tag config end when tag element long clicked`() = runTest {
         val testTag: Tag = genTag()
         val testSummaries = listOf(
-            genHomeSummary(tags = listOf(genTagWithResource(testTag))),
-            genHomeSummary(tags = emptyList())
+            genHomeSnapshot(tags = listOf(testTag)),
+            genHomeSnapshot(tags = emptyList())
         )
         testSummaries.forEach { homeSummary ->
             testNavigationEnd(
                 initState = HomeState.Loaded(homeSummary),
                 navigateEvent = HomeEvent.OnTagLongClicked(testTag),
-                expectedSideEffectMessage = HomeSideEffect.NavigateTagConfig(testTag)
+                expectedSideEffect = HomeSideEffect.NavigateTagConfig(testTag)
             )
         }
     }
@@ -230,15 +216,15 @@ class HomeStateMachineKtTest {
         val testTag: Tag = genTag()
         val testUsageCount = genLong()
         val testSummaries = listOf(
-            genHomeSummary(tags = listOf(genTagWithResource(testTag))),
-            genHomeSummary(tags = emptyList())
+            genHomeSnapshot(tags = listOf(testTag)),
+            genHomeSnapshot(tags = emptyList())
         )
         testSummaries.forEach { homeSummary ->
             testNavigationEnd(
                 getTagUsageCount = mock { whenever(mock(testTag)) doReturn testUsageCount },
                 initState = HomeState.Loaded(homeSummary),
                 navigateEvent = HomeEvent.OnTagRenameRequestClicked(testTag),
-                expectedSideEffectMessage = HomeSideEffect.NavigateTagRename(testTag, testUsageCount)
+                expectedSideEffect = HomeSideEffect.NavigateTagRename(testTag, testUsageCount)
             )
         }
     }
@@ -248,31 +234,31 @@ class HomeStateMachineKtTest {
         val testTag: Tag = genTag()
         val testUsageCount = genLong()
         val testSummaries = listOf(
-            genHomeSummary(tags = listOf(genTagWithResource(testTag))),
-            genHomeSummary(tags = emptyList())
+            genHomeSnapshot(tags = listOf(testTag)),
+            genHomeSnapshot(tags = emptyList())
         )
         testSummaries.forEach { homeSummary ->
             testNavigationEnd(
                 getTagUsageCount = mock { whenever(mock(testTag)) doReturn testUsageCount },
                 initState = HomeState.Loaded(homeSummary),
                 navigateEvent = HomeEvent.OnTagDeleteRequestClicked(testTag),
-                expectedSideEffectMessage = HomeSideEffect.NavigateTagDelete(testTag, testUsageCount)
+                expectedSideEffect = HomeSideEffect.NavigateTagDelete(testTag, testUsageCount)
             )
         }
     }
 
     private suspend fun testNavigationEnd(
         getTagUsageCount: GetTagUsageCountUseCase = mock(),
-        initState: HomeState = HomeState.Loaded(genHomeSummary()),
+        initState: HomeState = HomeState.Loaded(genHomeSnapshot()),
         navigateEvent: HomeEvent,
-        expectedSideEffectMessage: HomeSideEffect,
+        expectedSideEffect: HomeSideEffect,
     ) {
-        val homeSideEffect: SideEffectSender<HomeSideEffect> = mock()
-        genStateMachine(homeSideEffect = homeSideEffect, getTagUsageCount = getTagUsageCount)
-            .controlIn(CoroutineScope(Dispatchers.Default), initState)
+        val homeSideEffectHandle: SideEffectHandle<HomeSideEffect> = mock()
+        genHomeStateMachine(homeSideEffectHandle = homeSideEffectHandle, getTagUsageCount = getTagUsageCount)
+            .asContainer(CoroutineScope(Dispatchers.Default), initState)
             .send(navigateEvent)
             .join()
-        verify(homeSideEffect, once()).post(expectedSideEffectMessage)
+        verify(homeSideEffectHandle, once()).post(expectedSideEffect)
     }
 
     @Test
@@ -280,11 +266,11 @@ class HomeStateMachineKtTest {
         val renameText = genBothify()
         val testTag: Tag = genTag()
         val modifyTagNameUseCase: ModifyTagNameUseCase = mock()
-        val stateMachine =
-            genStateMachine(modifyTagName = modifyTagNameUseCase)
-                .controlIn(CoroutineScope(Dispatchers.Default), HomeState.Loaded(genHomeSummary()))
+        val stateContainer =
+            genHomeStateMachine(modifyTagName = modifyTagNameUseCase)
+                .asContainer(CoroutineScope(Dispatchers.Default), HomeState.Loaded(genHomeSnapshot()))
 
-        stateMachine
+        stateContainer
             .send(HomeEvent.OnTagRenameConfirmClicked(testTag, renameText))
             .join()
         verify(modifyTagNameUseCase, once())(testTag, renameText)
@@ -294,10 +280,10 @@ class HomeStateMachineKtTest {
     fun `delete tag when delete confirm invoked`() = runTest {
         val deleteTagUseCase: DeleteTagUseCase = mock()
         val testTag: Tag = genTag()
-        val stateMachine =
-            genStateMachine(deleteTag = deleteTagUseCase)
-                .controlIn(CoroutineScope(Dispatchers.Default), HomeState.Loaded(genHomeSummary()))
-        stateMachine
+        val stateContainer =
+            genHomeStateMachine(deleteTag = deleteTagUseCase)
+                .asContainer(CoroutineScope(Dispatchers.Default), HomeState.Loaded(genHomeSnapshot()))
+        stateContainer
             .send(HomeEvent.OnTagDeleteConfirmClicked(testTag))
             .join()
         verify(deleteTagUseCase, once())(testTag)

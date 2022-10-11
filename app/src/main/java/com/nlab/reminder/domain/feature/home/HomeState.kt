@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.nlab.reminder.domain.feature.home
 
 import com.nlab.reminder.core.state.State
@@ -23,6 +24,13 @@ import com.nlab.reminder.core.util.test.annotation.Generated
  */
 sealed class HomeState private constructor() : State {
     object Init : HomeState()
-    object Loading : HomeState()
-    @Generated data class Loaded(val homeSummary: HomeSummary) : HomeState()
+
+    @Generated
+    data class Error(val throwable: Throwable) : HomeState()
+
+    @Generated
+    data class Loading(val before: HomeState) : HomeState()
+
+    @Generated
+    data class Loaded(val snapshot: HomeSnapshot) : HomeState()
 }

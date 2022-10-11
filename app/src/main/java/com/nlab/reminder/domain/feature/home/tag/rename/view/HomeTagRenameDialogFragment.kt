@@ -32,7 +32,6 @@ import com.nlab.reminder.core.android.fragment.viewLifecycleScope
 import com.nlab.reminder.core.android.view.clicks
 import com.nlab.reminder.core.android.view.textChanged
 import com.nlab.reminder.databinding.FragmentHomeTagRenameDialogBinding
-import com.nlab.reminder.domain.common.android.fragment.handleSideEffect
 import com.nlab.reminder.domain.common.android.fragment.popBackStackWithResult
 import com.nlab.reminder.domain.feature.home.tag.rename.*
 import com.nlab.reminder.domain.feature.home.view.HomeTagRenameResult
@@ -94,29 +93,33 @@ class HomeTagRenameDialogFragment : DialogFragment() {
             .onEach { viewModel.onConfirmClicked() }
             .launchIn(viewLifecycleScope)
 
-        handleSideEffect(viewModel.homeTagRenameSideEffect) { sideEffect ->
-            popBackStackWithResult(
-                args.requestKey,
-                result = when (sideEffect) {
-                    is HomeTagRenameSideEffect.Cancel -> HomeTagRenameResult(
-                        args.tag,
-                        rename = "",
-                        isConfirmed = false
-                    )
-
-                    is HomeTagRenameSideEffect.Complete -> HomeTagRenameResult(
-                        args.tag,
-                        rename = sideEffect.rename,
-                        isConfirmed = true
-                    )
-                }
-            )
-        }
-
-        viewModel.state
+        viewModel.homeTagRenameSideEffectFlow
             .flowWithLifecycle(viewLifecycle)
-            .onEach { render(it) }
+            .onEach(this::handleSideEffect)
             .launchIn(viewLifecycleScope)
+
+        viewModel.stateFlow
+            .flowWithLifecycle(viewLifecycle)
+            .onEach(this::render)
+            .launchIn(viewLifecycleScope)
+    }
+
+    private fun handleSideEffect(sideEffect: HomeTagRenameSideEffect) {
+        popBackStackWithResult(
+            args.requestKey, result = when (sideEffect) {
+                is HomeTagRenameSideEffect.Cancel -> HomeTagRenameResult(
+                    args.tag,
+                    rename = "",
+                    isConfirmed = false
+                )
+
+                is HomeTagRenameSideEffect.Complete -> HomeTagRenameResult(
+                    args.tag,
+                    rename = sideEffect.rename,
+                    isConfirmed = true
+                )
+            }
+        )
     }
 
     private fun render(homeTagRenameState: HomeTagRenameState) {

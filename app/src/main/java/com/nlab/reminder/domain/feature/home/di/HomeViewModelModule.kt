@@ -16,9 +16,9 @@
 
 package com.nlab.reminder.domain.feature.home.di
 
-import com.nlab.reminder.core.effect.SideEffectSender
-import com.nlab.reminder.core.state.StateController
-import com.nlab.reminder.core.state.util.controlIn
+import com.nlab.reminder.core.effect.SideEffectHandle
+import com.nlab.reminder.core.state.StateContainer
+import com.nlab.reminder.core.state.asContainer
 import com.nlab.reminder.domain.feature.home.*
 import dagger.Module
 import dagger.Provides
@@ -34,17 +34,17 @@ import kotlinx.coroutines.CoroutineScope
 class HomeViewModelModule {
     @Provides
     fun provideHomeStateController(
-        getHomeSummary: GetHomeSummaryUseCase,
+        getHomeSummary: GetHomeSnapshotUseCase,
         getTagUsageCount: GetTagUsageCountUseCase,
         modifyTagName: ModifyTagNameUseCase,
         deleteTag: DeleteTagUseCase
-    ): HomeStateControllerFactory =
-        object : HomeStateControllerFactory {
+    ): HomeStateContainerFactory =
+        object : HomeStateContainerFactory {
             override fun create(
                 scope: CoroutineScope,
-                homeSideEffect: SideEffectSender<HomeSideEffect>
-            ): StateController<HomeEvent, HomeState> =
-                HomeStateMachine(homeSideEffect, getHomeSummary, getTagUsageCount, modifyTagName, deleteTag)
-                    .controlIn(scope, initState = HomeState.Init, fetchEvent = HomeEvent.Fetch)
+                homeSideEffectHandle: SideEffectHandle<HomeSideEffect>
+            ): StateContainer<HomeEvent, HomeState> =
+                HomeStateMachine(homeSideEffectHandle, getHomeSummary, getTagUsageCount, modifyTagName, deleteTag)
+                    .asContainer(scope, initState = HomeState.Init, fetchEvent = HomeEvent.Fetch)
         }
 }
