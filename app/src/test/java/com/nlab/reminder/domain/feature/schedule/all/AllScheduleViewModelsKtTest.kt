@@ -28,7 +28,6 @@ import org.mockito.kotlin.*
  * @author Doohyun
  */
 class AllScheduleViewModelsKtTest {
-    /**
     @Test
     fun testExtensions() {
         val stateContainer: StateContainer<AllScheduleEvent, AllScheduleState> = mock()
@@ -44,5 +43,5 @@ class AllScheduleViewModelsKtTest {
             stateContainer,
             AllScheduleEvent.OnScheduleCompleteUpdateClicked(schedule.id(), isComplete)
         ) { viewModel.onScheduleCompleteUpdateClicked(schedule.id(), isComplete) }
-    }*/
+    }
 }

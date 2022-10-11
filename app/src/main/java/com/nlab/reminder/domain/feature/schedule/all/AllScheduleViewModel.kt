@@ -32,7 +32,6 @@ class AllScheduleViewModel @Inject constructor(
 ) : ViewModel() {
     private val stateContainer = stateControllerFactory.create(viewModelScope)
 
-    val state: StateFlow<AllScheduleState> = stateContainer.stateFlow
-
-    fun invoke(action: AllScheduleEvent): Job = stateContainer.send(action)
+    val stateFlow: StateFlow<AllScheduleState> = stateContainer.stateFlow
+    fun send(event: AllScheduleEvent): Job = stateContainer.send(event)
 }

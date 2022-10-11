@@ -28,7 +28,7 @@ class StateMachineHandleBuilderTest {
     @Test
     fun `handle when any event sent`() = runTest {
         testOnceHandleTemplate { action ->
-            handled {
+            handle {
                 anyEvent {
                     anyState { action() }
                 }
@@ -40,7 +40,7 @@ class StateMachineHandleBuilderTest {
     fun `handle when specific event sent`() = runTest {
         val fixedEvent: TestEvent = TestEvent.genEvent()
         testOnceHandleTemplate(input = fixedEvent) { action ->
-            handled {
+            handle {
                 filteredEvent(predicate = { event -> event === fixedEvent }) {
                     anyState { action() }
                 }
@@ -52,7 +52,7 @@ class StateMachineHandleBuilderTest {
     fun `never handled when not specific event sent`() = runTest {
         val fixedEvent: TestEvent = TestEvent.genEvent()
         testNeverHandleTemplate(input = fixedEvent) { action ->
-            handled {
+            handle {
                 filteredEvent(predicate = { event -> event !== fixedEvent }) {
                     anyState { action() }
                 }
@@ -63,7 +63,7 @@ class StateMachineHandleBuilderTest {
     @Test
     fun `handle when event1 sent`() = runTest {
         testOnceHandleTemplate(input = TestEvent.Event1()) { action ->
-            handled {
+            handle {
                 event<TestEvent.Event1> {
                     anyState { action() }
                 }
@@ -74,7 +74,7 @@ class StateMachineHandleBuilderTest {
     @Test
     fun `never handled when event excluded event1 sent`() = runTest {
         testNeverHandleTemplate(input = TestEvent.Event2()) { action ->
-            handled {
+            handle {
                 event<TestEvent.Event1> {
                     anyState { action() }
                 }
@@ -85,7 +85,7 @@ class StateMachineHandleBuilderTest {
     @Test
     fun `handle when event excluded event1 sent`() = runTest {
         testOnceHandleTemplate(input = TestEvent.Event2()) { action ->
-            handled {
+            handle {
                 eventNot<TestEvent.Event1> {
                     anyState { action() }
                 }
@@ -96,7 +96,7 @@ class StateMachineHandleBuilderTest {
     @Test
     fun `never handled when event1 sent`() = runTest {
         testNeverHandleTemplate(input = TestEvent.Event1()) { action ->
-            handled {
+            handle {
                 eventNot<TestEvent.Event1> {
                     anyState { action() }
                 }
@@ -107,7 +107,7 @@ class StateMachineHandleBuilderTest {
     @Test
     fun `handle when current was any state`() = runTest {
         testOnceHandleTemplate { action ->
-            handled {
+            handle {
                 anyState {
                     anyEvent { action() }
                 }
@@ -119,7 +119,7 @@ class StateMachineHandleBuilderTest {
     fun `handle when current was specific state`() = runTest {
         val fixedState: TestState = TestState.genState()
         testOnceHandleTemplate(initState = fixedState) { action ->
-            handled {
+            handle {
                 filteredState(predicate = { state -> state === fixedState }) {
                     anyEvent { action() }
                 }
@@ -131,7 +131,7 @@ class StateMachineHandleBuilderTest {
     fun `never handled when current was specific state`() = runTest {
         val fixedState: TestState = TestState.genState()
         testNeverHandleTemplate(initState = fixedState) { action ->
-            handled {
+            handle {
                 filteredState(predicate = { state -> state !== fixedState }) {
                     anyEvent { action() }
                 }
@@ -142,7 +142,7 @@ class StateMachineHandleBuilderTest {
     @Test
     fun `handle when current was init`() = runTest {
         testOnceHandleTemplate(initState = TestState.StateInit()) { action ->
-            handled {
+            handle {
                 state<TestState.StateInit> {
                     anyEvent { action() }
                 }
@@ -153,7 +153,7 @@ class StateMachineHandleBuilderTest {
     @Test
     fun `never handled when current was not init`() = runTest {
         testNeverHandleTemplate(initState = TestState.State1()) { action ->
-            handled {
+            handle {
                 state<TestState.StateInit> {
                     anyEvent { action() }
                 }
@@ -164,7 +164,7 @@ class StateMachineHandleBuilderTest {
     @Test
     fun `handle when current was not init`() = runTest {
         testOnceHandleTemplate(initState = TestState.State1()) { action ->
-            handled {
+            handle {
                 stateNot<TestState.StateInit> {
                     anyEvent { action() }
                 }
@@ -175,7 +175,7 @@ class StateMachineHandleBuilderTest {
     @Test
     fun `never handled when current was init`() = runTest {
         testNeverHandleTemplate(initState = TestState.StateInit()) { action ->
-            handled {
+            handle {
                 stateNot<TestState.StateInit> {
                     anyEvent { action() }
                 }

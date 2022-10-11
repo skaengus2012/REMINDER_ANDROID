@@ -53,7 +53,7 @@ fun HomeStateMachine(
         }
     }
 
-    handled {
+    handle {
         suspend fun StateMachineHandleScope<in HomeEvent>.collectSnapshot() {
             val collectResult = catching {
                 getHomeSnapshot()
@@ -74,7 +74,7 @@ fun HomeStateMachine(
         }
     }
 
-    handled {
+    handle {
         state<HomeState.Loaded> {
             event<HomeEvent.OnTodayCategoryClicked> { sideEffectHandle.post(HomeSideEffect.NavigateToday) }
             event<HomeEvent.OnTimetableCategoryClicked> { sideEffectHandle.post(HomeSideEffect.NavigateTimetable) }

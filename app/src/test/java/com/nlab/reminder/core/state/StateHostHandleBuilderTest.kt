@@ -28,7 +28,7 @@ class StateHostHandleBuilderTest {
     @Test
     fun `handled when current was any state`() = runTest {
         testOnceHandleTemplate { action ->
-            handled {
+            handle {
                 anyEvent {
                     anyState { action() }
                 }
@@ -40,7 +40,7 @@ class StateHostHandleBuilderTest {
     fun `handled when current was specific state`() = runTest {
         val fixedInitState = TestState.genState()
         testOnceHandleTemplate(initState = fixedInitState) { action ->
-            handled {
+            handle {
                 anyEvent {
                     filteredState(predicate = { state -> state === fixedInitState }) { action() }
                 }
@@ -52,7 +52,7 @@ class StateHostHandleBuilderTest {
     fun `never handled when current was specific state`() = runTest {
         val fixedInitState = TestState.genState()
         testNeverHandleTemplate(initState = fixedInitState) { action ->
-            handled {
+            handle {
                 anyEvent {
                     filteredState(predicate = { state -> state !== fixedInitState }) { action() }
                 }
@@ -63,7 +63,7 @@ class StateHostHandleBuilderTest {
     @Test
     fun `handled when current was init`() = runTest {
         testOnceHandleTemplate(initState = TestState.StateInit()) { action ->
-            handled {
+            handle {
                 anyEvent {
                     state<TestState.StateInit> { action() }
                 }
@@ -74,7 +74,7 @@ class StateHostHandleBuilderTest {
     @Test
     fun `handled when current was not init`() = runTest {
         testOnceHandleTemplate(initState = TestState.State1()) { action ->
-            handled {
+            handle {
                 anyEvent {
                     stateNot<TestState.StateInit> { action() }
                 }
@@ -85,7 +85,7 @@ class StateHostHandleBuilderTest {
     @Test
     fun `never handled when current was init`() = runTest {
         testNeverHandleTemplate(initState = TestState.StateInit()) { action ->
-            handled {
+            handle {
                 anyEvent {
                     stateNot<TestState.StateInit> { action() }
                 }

@@ -23,29 +23,28 @@ import com.nlab.reminder.domain.common.schedule.UpdateCompleteUseCase
  * @author Doohyun
  */
 @Suppress("FunctionName")
-fun AllScheduleStateComponent(
+fun AllScheduleStateMachine(
     getAllScheduleReport: GetAllScheduleReportUseCase,
     updateScheduleComplete: UpdateCompleteUseCase
-) = StateMachine<AllScheduleEvent, AllScheduleState> {
-    update { (event, state) ->
-        when (event) {
-            is AllScheduleEvent.Fetch -> {
-                if (state is AllScheduleState.Init) AllScheduleState.Loading
-                else state
-            }
-            is AllScheduleEvent.AllScheduleReportLoaded -> {
-                if (state is AllScheduleState.Init) state
-                else AllScheduleState.Loaded(event.allSchedulesReport)
-            }
-            else -> state
+): StateMachine<AllScheduleEvent, AllScheduleState> = StateMachine {
+    reduce {
+        event<AllScheduleEvent.Fetch> {
+            state<AllScheduleState.Init> { AllScheduleState.Loading }
+        }
+        event<AllScheduleEvent.AllScheduleReportLoaded> {
+            stateNot<AllScheduleState.Init> { (event) -> AllScheduleState.Loaded(event.allSchedulesReport) }
         }
     }
 
-    handleOn<AllScheduleEvent.Fetch, AllScheduleState.Init> {
-        getAllScheduleReport().collect { send(AllScheduleEvent.AllScheduleReportLoaded(it)) }
-    }
+    handle {
+        event<AllScheduleEvent.Fetch> {
+            state<AllScheduleState.Init> {
+                getAllScheduleReport().collect { send(AllScheduleEvent.AllScheduleReportLoaded(it)) }
+            }
+        }
 
-    handleOn<AllScheduleEvent.OnScheduleCompleteUpdateClicked, AllScheduleState.Loaded> { (event) ->
-        updateScheduleComplete(event.scheduleId, event.isComplete)
+        event<AllScheduleEvent.OnScheduleCompleteUpdateClicked> {
+            state<AllScheduleState.Loaded> { (event) -> updateScheduleComplete(event.scheduleId, event.isComplete) }
+        }
     }
 }

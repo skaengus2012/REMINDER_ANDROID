@@ -29,8 +29,8 @@ import kotlinx.coroutines.withContext
 class SideEffectContainer<T : SideEffect>(
     private val channel: Channel<T> = Channel(Channel.BUFFERED),
     private val dispatcher: CoroutineDispatcher = Dispatchers.Main
-) : SideEffectReceiver<T>, SideEffectHandle<T> {
-    override val sideEffectFlow: Flow<T> = channel.receiveAsFlow()
+) : SideEffectHandle<T> {
+    val sideEffectFlow: Flow<T> = channel.receiveAsFlow()
     override suspend fun post(sideEffect: T) = withContext(dispatcher) {
         channel.send(sideEffect)
     }

@@ -46,7 +46,7 @@ class AllScheduleViewModelModule {
     ): AllScheduleStateContainerFactory =
         object : AllScheduleStateContainerFactory {
             override fun create(scope: CoroutineScope): StateContainer<AllScheduleEvent, AllScheduleState> {
-                val stateMachine = AllScheduleStateComponent(
+                val stateMachine = AllScheduleStateMachine(
                     getAllScheduleReport = DefaultGetAllScheduleReportUseCase(
                         doneScheduleShownRepository,
                         scheduleRepository,

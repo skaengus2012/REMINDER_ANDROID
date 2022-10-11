@@ -55,7 +55,7 @@ class StateMachinePluginTest {
     fun `handled by defaultExceptionHandler when error occurred`() = runTest {
         val exception = Throwable()
         val stateMachine = StateMachine<TestEvent, TestState> {
-            handled {
+            handle {
                 anyEvent {
                     anyState {
                         throw exception
@@ -74,7 +74,7 @@ class StateMachinePluginTest {
     fun `handled on defaultDispatcher`() = runTest {
         val result = CompletableDeferred<Boolean>()
         val stateMachine = StateMachine<TestEvent, TestState> {
-            handled {
+            handle {
                 anyEvent {
                     anyState {
                         val curContext = coroutineScope {

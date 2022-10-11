@@ -39,7 +39,7 @@ class StateMachineCatchTest {
     @Test
     fun `catch when handled by event1`() = runTest {
         testCatchTemplate(input = TestEvent.Event1()) { throwable ->
-            handled {
+            handle {
                 event<TestEvent.Event1> {
                     anyState { throw throwable }
                 }

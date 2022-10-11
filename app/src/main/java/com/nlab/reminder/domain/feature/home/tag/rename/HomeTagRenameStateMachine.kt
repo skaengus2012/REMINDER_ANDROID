@@ -36,7 +36,7 @@ fun HomeTagRenameStateMachine(
         }
     }
 
-    handled {
+    handle {
         anyState {
             event<HomeTagRenameEvent.OnConfirmClicked> { (_, before) ->
                 sideEffectHandle.post(HomeTagRenameSideEffect.Complete(before.currentText))

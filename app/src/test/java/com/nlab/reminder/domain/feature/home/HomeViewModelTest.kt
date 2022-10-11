@@ -88,7 +88,7 @@ class HomeViewModelTest {
                     homeSideEffectHandle: SideEffectHandle<HomeSideEffect>
                 ): StateContainer<HomeEvent, HomeState> {
                     val fakeStateComponent = StateMachine<HomeEvent, HomeState> {
-                        handled {
+                        handle {
                             anyEvent {
                                 anyState { homeSideEffectHandle.post(genHomeSideEffectSample()) }
                             }

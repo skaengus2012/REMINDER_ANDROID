@@ -66,7 +66,7 @@ class AllScheduleFragment : Fragment() {
             .apply { itemAnimator = ScheduleItemAnimator() }
             .apply { adapter = scheduleAdapter }
 
-        viewModel.state
+        viewModel.stateFlow
             .filterIsInstance<AllScheduleState.Loaded>()
             .flowWithLifecycle(viewLifecycle)
             .map { it.allSchedulesReport }

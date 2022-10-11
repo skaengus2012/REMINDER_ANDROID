@@ -90,7 +90,7 @@ class HomeTagRenameViewModelTest {
                     homeTagRenameSideEffect: SideEffectHandle<HomeTagRenameSideEffect>
                 ): StateContainer<HomeTagRenameEvent, HomeTagRenameState> {
                     val fakeStateMachine: StateMachine<HomeTagRenameEvent, HomeTagRenameState> = StateMachine {
-                        handled {
+                        handle {
                             anyEvent {
                                 anyState { homeTagRenameSideEffect.post(sampleSideEffect) }
                             }

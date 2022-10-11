@@ -28,7 +28,7 @@ class EventHostHandleBuilderTest {
     @Test
     fun `handle when any event sent`() = runTest {
         testOnceHandleTemplate { action ->
-            handled {
+            handle {
                 anyState {
                     anyEvent { action() }
                 }
@@ -40,7 +40,7 @@ class EventHostHandleBuilderTest {
     fun `handle when specific event sent`() = runTest {
         val fixedEvent: TestEvent = TestEvent.genEvent()
         testOnceHandleTemplate(input = fixedEvent) { action ->
-            handled {
+            handle {
                 anyState {
                     filteredEvent(predicate = { event -> event === fixedEvent }) { action() }
                 }
@@ -52,7 +52,7 @@ class EventHostHandleBuilderTest {
     fun `never handled when not specific event sent`() = runTest {
         val fixedEvent: TestEvent = TestEvent.genEvent()
         testNeverHandleTemplate(input = fixedEvent) { action ->
-            handled {
+            handle {
                 anyState {
                     filteredEvent(predicate = { event -> event !== fixedEvent }) { action() }
                 }
@@ -63,7 +63,7 @@ class EventHostHandleBuilderTest {
     @Test
     fun `handle when event1 sent`() = runTest {
         testOnceHandleTemplate(input = TestEvent.Event1()) { action ->
-            handled {
+            handle {
                 anyState {
                     event<TestEvent.Event1> { action() }
                 }
@@ -74,7 +74,7 @@ class EventHostHandleBuilderTest {
     @Test
     fun `handle when event excluded event1 sent`() = runTest {
         testOnceHandleTemplate(input = TestEvent.Event2()) { action ->
-            handled {
+            handle {
                 anyState {
                     eventNot<TestEvent.Event1> { action() }
                 }
@@ -85,7 +85,7 @@ class EventHostHandleBuilderTest {
     @Test
     fun `never handled when event1 sent`() = runTest {
         testNeverHandleTemplate(input = TestEvent.Event1()) { action ->
-            handled {
+            handle {
                 anyState {
                     eventNot<TestEvent.Event1> { action() }
                 }

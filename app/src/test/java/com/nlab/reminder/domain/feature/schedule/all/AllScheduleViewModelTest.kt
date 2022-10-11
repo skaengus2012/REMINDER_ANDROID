@@ -37,11 +37,6 @@ import org.mockito.kotlin.*
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class AllScheduleViewModelTest {
-    /**
-    private val sampleEvent: AllScheduleEvent =
-        AllScheduleEvent.OnScheduleCompleteUpdateClicked(genSchedule().id(), isComplete = genBoolean())
-    private val sampleState: AllScheduleState = AllScheduleState.Loaded(genAllScheduleReport())
-
     @Before
     fun setUp() {
         Dispatchers.setMain(Dispatchers.Unconfined)
@@ -54,6 +49,7 @@ class AllScheduleViewModelTest {
 
     @Test
     fun `stateController send event when viewModel sent`() {
+        val sampleEvent = genAllScheduleEventSample()
         val stateContainer: StateContainer<AllScheduleEvent, AllScheduleState> = mock()
         val viewModel = AllScheduleViewModel(
             stateControllerFactory = mock {
@@ -61,12 +57,13 @@ class AllScheduleViewModelTest {
             }
         )
 
-        viewModel.invoke(sampleEvent)
+        viewModel.send(sampleEvent)
         verify(stateContainer, once()).send(sampleEvent)
     }
 
     @Test
     fun `notify state when stateController flow published`() {
+        val sampleState = genAllScheduleStateSample()
         val stateContainer: StateContainer<AllScheduleEvent, AllScheduleState> = mock {
             whenever(mock.stateFlow) doReturn MutableStateFlow(sampleState)
         }
@@ -74,6 +71,6 @@ class AllScheduleViewModelTest {
             stateControllerFactory = mock { whenever(mock.create(any())) doReturn stateContainer }
         )
 
-        assertThat(viewModel.state.value, equalTo(sampleState))
-    }*/
+        assertThat(viewModel.stateFlow.value, equalTo(sampleState))
+    }
 }

@@ -58,7 +58,7 @@ class StateMachineKtTest {
     fun `sent event1 by fetching when container started publish`() = runTest {
         val action: () -> Unit = mock()
         val stateMachine = StateMachine<TestEvent, TestState> {
-            handled {
+            handle {
                 anyState {
                     event<TestEvent.Event1> { action() }
                 }
