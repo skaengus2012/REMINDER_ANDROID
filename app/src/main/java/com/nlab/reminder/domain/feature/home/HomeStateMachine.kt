@@ -22,6 +22,7 @@ import com.nlab.reminder.core.kotlin.util.getOrThrow
 import com.nlab.reminder.core.kotlin.util.onFailure
 import com.nlab.reminder.core.state.StateMachine
 import com.nlab.reminder.core.state.StateMachineHandleScope
+import com.nlab.reminder.domain.common.tag.TagRepository
 import kotlinx.coroutines.flow.*
 
 /**
@@ -31,9 +32,7 @@ import kotlinx.coroutines.flow.*
 fun HomeStateMachine(
     sideEffectHandle: SideEffectHandle<HomeSideEffect>,
     getHomeSnapshot: GetHomeSnapshotUseCase,
-    getTagUsageCount: GetTagUsageCountUseCase,
-    modifyTagName: ModifyTagNameUseCase,
-    deleteTag: DeleteTagUseCase
+    tagRepository: TagRepository
 ): StateMachine<HomeEvent, HomeState> = StateMachine {
     reduce {
         event<HomeEvent.Fetch> {
@@ -84,15 +83,16 @@ fun HomeStateMachine(
                 sideEffectHandle.post(HomeSideEffect.NavigateTagConfig(event.tag))
             }
             event<HomeEvent.OnTagRenameRequestClicked> { (event) ->
-                sideEffectHandle.post(HomeSideEffect.NavigateTagRename(event.tag, getTagUsageCount(event.tag)))
+                sideEffectHandle.post(
+                    HomeSideEffect.NavigateTagRename(event.tag, tagRepository.getUsageCount(event.tag))
+                )
             }
             event<HomeEvent.OnTagDeleteRequestClicked> { (event) ->
-                sideEffectHandle.post(HomeSideEffect.NavigateTagDelete(event.tag, getTagUsageCount(event.tag)))
+                sideEffectHandle.post(
+                    HomeSideEffect.NavigateTagDelete(event.tag, tagRepository.getUsageCount(event.tag))
+                )
             }
-            event<HomeEvent.OnTagRenameConfirmClicked> { (event) ->
-                modifyTagName(originalTag = event.originalTag, newText = event.renameText)
-            }
-            event<HomeEvent.OnTagDeleteConfirmClicked> { (event) -> deleteTag(event.tag) }
+            event<HomeEvent.OnTagDeleteConfirmClicked> { (event) -> tagRepository.delete(event.tag) }
         }
     }
 }

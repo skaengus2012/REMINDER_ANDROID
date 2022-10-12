@@ -18,6 +18,7 @@ package com.nlab.reminder.domain.feature.home
 
 import com.nlab.reminder.core.effect.SideEffectHandle
 import com.nlab.reminder.domain.common.tag.Tag
+import com.nlab.reminder.domain.common.tag.TagRepository
 import com.nlab.reminder.domain.common.tag.genTag
 import com.nlab.reminder.domain.common.tag.genTags
 import com.nlab.reminder.test.genBothify
@@ -25,6 +26,7 @@ import com.nlab.reminder.test.genLong
 import kotlinx.coroutines.flow.emptyFlow
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 /**
  * @author Doohyun
@@ -82,14 +84,10 @@ fun genHomeSideEffectSample(): HomeSideEffect = genHomeSideEffects().first()
 
 fun genHomeStateMachine(
     homeSideEffectHandle: SideEffectHandle<HomeSideEffect> = mock(),
-    getHomeSnapshot: GetHomeSnapshotUseCase = mock { onBlocking { mock() } doReturn emptyFlow() },
-    getTagUsageCount: GetTagUsageCountUseCase = mock(),
-    modifyTagName: ModifyTagNameUseCase = mock(),
-    deleteTag: DeleteTagUseCase = mock()
+    getHomeSnapshot: GetHomeSnapshotUseCase = mock { whenever(mock()) doReturn emptyFlow() },
+    tagRepository: TagRepository = mock()
 ) = HomeStateMachine(
     homeSideEffectHandle,
     getHomeSnapshot,
-    getTagUsageCount,
-    modifyTagName,
-    deleteTag
+    tagRepository
 )

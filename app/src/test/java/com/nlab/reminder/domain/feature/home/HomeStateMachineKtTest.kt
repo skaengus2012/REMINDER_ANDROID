@@ -20,6 +20,7 @@ import com.nlab.reminder.core.effect.SideEffectHandle
 import com.nlab.reminder.core.state.asContainer
 import com.nlab.reminder.core.state.asContainerWithSubscription
 import com.nlab.reminder.domain.common.tag.Tag
+import com.nlab.reminder.domain.common.tag.TagRepository
 import com.nlab.reminder.domain.common.tag.genTag
 import com.nlab.reminder.test.*
 import kotlinx.coroutines.*
@@ -182,79 +183,55 @@ class HomeStateMachineKtTest {
     @Test
     fun `navigate tag end when tag element clicked`() = runTest {
         val testTag: Tag = genTag()
-        val testSnapshots = listOf(
-            genHomeSnapshot(tags = listOf(testTag)),
-            genHomeSnapshot(tags = emptyList())
+        testNavigationEnd(
+            initState = HomeState.Loaded(genHomeSnapshot()),
+            navigateEvent = HomeEvent.OnTagClicked(testTag),
+            expectedSideEffect = HomeSideEffect.NavigateTag(testTag)
         )
-        testSnapshots.forEach { homeSummary ->
-            testNavigationEnd(
-                initState = HomeState.Loaded(homeSummary),
-                navigateEvent = HomeEvent.OnTagClicked(testTag),
-                expectedSideEffect = HomeSideEffect.NavigateTag(testTag)
-            )
-        }
     }
 
     @Test
     fun `navigate tag config end when tag element long clicked`() = runTest {
         val testTag: Tag = genTag()
-        val testSummaries = listOf(
-            genHomeSnapshot(tags = listOf(testTag)),
-            genHomeSnapshot(tags = emptyList())
+        testNavigationEnd(
+            initState = HomeState.Loaded(genHomeSnapshot()),
+            navigateEvent = HomeEvent.OnTagLongClicked(testTag),
+            expectedSideEffect = HomeSideEffect.NavigateTagConfig(testTag)
         )
-        testSummaries.forEach { homeSummary ->
-            testNavigationEnd(
-                initState = HomeState.Loaded(homeSummary),
-                navigateEvent = HomeEvent.OnTagLongClicked(testTag),
-                expectedSideEffect = HomeSideEffect.NavigateTagConfig(testTag)
-            )
-        }
     }
 
     @Test
     fun `navigate tag rename config when tag rename request invoked`() = runTest {
         val testTag: Tag = genTag()
         val testUsageCount = genLong()
-        val testSummaries = listOf(
-            genHomeSnapshot(tags = listOf(testTag)),
-            genHomeSnapshot(tags = emptyList())
+        testNavigationEnd(
+            tagRepository = mock { whenever(mock.getUsageCount(testTag)) doReturn testUsageCount },
+            initState = HomeState.Loaded(genHomeSnapshot()),
+            navigateEvent = HomeEvent.OnTagRenameRequestClicked(testTag),
+            expectedSideEffect = HomeSideEffect.NavigateTagRename(testTag, testUsageCount)
         )
-        testSummaries.forEach { homeSummary ->
-            testNavigationEnd(
-                getTagUsageCount = mock { whenever(mock(testTag)) doReturn testUsageCount },
-                initState = HomeState.Loaded(homeSummary),
-                navigateEvent = HomeEvent.OnTagRenameRequestClicked(testTag),
-                expectedSideEffect = HomeSideEffect.NavigateTagRename(testTag, testUsageCount)
-            )
-        }
     }
 
     @Test
     fun `navigate tag delete confirm when tag delete request invoked`() = runTest {
         val testTag: Tag = genTag()
         val testUsageCount = genLong()
-        val testSummaries = listOf(
-            genHomeSnapshot(tags = listOf(testTag)),
-            genHomeSnapshot(tags = emptyList())
+        testNavigationEnd(
+            tagRepository = mock { whenever(mock.getUsageCount(testTag)) doReturn testUsageCount },
+            initState = HomeState.Loaded(genHomeSnapshot()),
+            navigateEvent = HomeEvent.OnTagDeleteRequestClicked(testTag),
+            expectedSideEffect = HomeSideEffect.NavigateTagDelete(testTag, testUsageCount)
         )
-        testSummaries.forEach { homeSummary ->
-            testNavigationEnd(
-                getTagUsageCount = mock { whenever(mock(testTag)) doReturn testUsageCount },
-                initState = HomeState.Loaded(homeSummary),
-                navigateEvent = HomeEvent.OnTagDeleteRequestClicked(testTag),
-                expectedSideEffect = HomeSideEffect.NavigateTagDelete(testTag, testUsageCount)
-            )
-        }
     }
 
     private suspend fun testNavigationEnd(
-        getTagUsageCount: GetTagUsageCountUseCase = mock(),
+        tagRepository: TagRepository = mock(),
         initState: HomeState = HomeState.Loaded(genHomeSnapshot()),
         navigateEvent: HomeEvent,
         expectedSideEffect: HomeSideEffect,
     ) {
         val homeSideEffectHandle: SideEffectHandle<HomeSideEffect> = mock()
-        genHomeStateMachine(homeSideEffectHandle = homeSideEffectHandle, getTagUsageCount = getTagUsageCount)
+        genHomeStateMachine(homeSideEffectHandle = homeSideEffectHandle, tagRepository = tagRepository)
             .asContainer(CoroutineScope(Dispatchers.Default), initState)
             .send(navigateEvent)
             .join()
@@ -262,30 +239,15 @@ class HomeStateMachineKtTest {
     }
 
     @Test
-    fun `modify tags when tag rename confirmed`() = runTest {
-        val renameText = genBothify()
-        val testTag: Tag = genTag()
-        val modifyTagNameUseCase: ModifyTagNameUseCase = mock()
-        val stateContainer =
-            genHomeStateMachine(modifyTagName = modifyTagNameUseCase)
-                .asContainer(CoroutineScope(Dispatchers.Default), HomeState.Loaded(genHomeSnapshot()))
-
-        stateContainer
-            .send(HomeEvent.OnTagRenameConfirmClicked(testTag, renameText))
-            .join()
-        verify(modifyTagNameUseCase, once())(testTag, renameText)
-    }
-
-    @Test
     fun `delete tag when delete confirm invoked`() = runTest {
-        val deleteTagUseCase: DeleteTagUseCase = mock()
         val testTag: Tag = genTag()
+        val tagRepository: TagRepository = mock()
         val stateContainer =
-            genHomeStateMachine(deleteTag = deleteTagUseCase)
+            genHomeStateMachine(tagRepository = tagRepository)
                 .asContainer(CoroutineScope(Dispatchers.Default), HomeState.Loaded(genHomeSnapshot()))
         stateContainer
             .send(HomeEvent.OnTagDeleteConfirmClicked(testTag))
             .join()
-        verify(deleteTagUseCase, once())(testTag)
+        verify(tagRepository, once()).delete(testTag)
     }
 }

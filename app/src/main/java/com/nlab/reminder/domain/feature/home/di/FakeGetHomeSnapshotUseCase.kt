@@ -34,7 +34,7 @@ class FakeGetHomeSnapshotUseCase(
     private val dispatcher: CoroutineDispatcher = Dispatchers.Default
 ) : GetHomeSnapshotUseCase {
     @Generated
-    override suspend fun invoke(): Flow<HomeSnapshot> {
+    override fun invoke(): Flow<HomeSnapshot> {
         // TODO with scheduleEntityModel
         return tagRepository.get()
             .map { tags ->
