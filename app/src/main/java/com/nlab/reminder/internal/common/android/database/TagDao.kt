@@ -20,6 +20,7 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -32,6 +33,9 @@ interface TagDao {
 
     @Delete
     suspend fun delete(tag: TagEntity)
+
+    @Update
+    suspend fun update(tag: TagEntity)
 
     @Query("SELECT * FROM tag")
     fun find(): Flow<List<TagEntity>>

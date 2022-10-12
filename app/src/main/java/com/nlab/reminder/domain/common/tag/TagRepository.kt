@@ -17,12 +17,14 @@
 package com.nlab.reminder.domain.common.tag
 
 import kotlinx.coroutines.flow.Flow
+import com.nlab.reminder.core.kotlin.util.Result
 
 /**
  * @author Doohyun
  */
 interface TagRepository {
     fun get(): Flow<List<Tag>>
-    suspend fun getUsageCount(tag: Tag): Long
-    suspend fun delete(tag: Tag)
+    suspend fun getUsageCount(tag: Tag): Result<Long>
+    suspend fun updateName(tag: Tag, name: String): Result<Unit>
+    suspend fun delete(tag: Tag): Result<Unit>
 }

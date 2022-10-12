@@ -42,9 +42,27 @@ fun <T> Result<T>.getOrThrow(): T = when (this) {
     is Result.Failure -> throw throwable
 }
 
+fun <T> Result<T>.getOrNull(): T? = when (this) {
+    is Result.Success -> value
+    is Result.Failure -> null
+}
+
+inline fun <T, U> Result<T>.map(transform: (T) -> U): Result<U> = when (this) {
+    is Result.Success -> Result.Success(transform(value))
+    is Result.Failure -> Result.Failure(throwable)
+}
+
 inline fun <T> Result<T>.onFailure(action: (Throwable) -> Unit): Result<T> {
     if (this is Result.Failure) {
         action(throwable)
+    }
+
+    return this
+}
+
+inline fun <T> Result<T>.onSuccess(action: (T) -> Unit): Result<T> {
+    if (this is Result.Success) {
+        action(value)
     }
 
     return this

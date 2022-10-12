@@ -16,6 +16,7 @@
 
 package com.nlab.reminder.domain.feature.home
 
+import com.nlab.reminder.core.kotlin.util.Result
 import com.nlab.reminder.core.effect.SideEffectHandle
 import com.nlab.reminder.core.state.asContainer
 import com.nlab.reminder.core.state.asContainerWithSubscription
@@ -159,7 +160,7 @@ class HomeStateMachineKtTest {
     @Test
     fun `navigate today end when today category clicked`() = runTest {
         testNavigationEnd(
-            navigateEvent = HomeEvent.OnTodayCategoryClicked,
+            event = HomeEvent.OnTodayCategoryClicked,
             expectedSideEffect = HomeSideEffect.NavigateToday
         )
     }
@@ -167,7 +168,7 @@ class HomeStateMachineKtTest {
     @Test
     fun `navigate timetable end when timetable category clicked`() = runTest {
         testNavigationEnd(
-            navigateEvent = HomeEvent.OnTimetableCategoryClicked,
+            event = HomeEvent.OnTimetableCategoryClicked,
             expectedSideEffect = HomeSideEffect.NavigateTimetable
         )
     }
@@ -175,7 +176,7 @@ class HomeStateMachineKtTest {
     @Test
     fun `navigate all end when all category clicked`() = runTest {
         testNavigationEnd(
-            navigateEvent = HomeEvent.OnAllCategoryClicked,
+            event = HomeEvent.OnAllCategoryClicked,
             expectedSideEffect = HomeSideEffect.NavigateAllSchedule
         )
     }
@@ -185,57 +186,90 @@ class HomeStateMachineKtTest {
         val testTag: Tag = genTag()
         testNavigationEnd(
             initState = HomeState.Loaded(genHomeSnapshot()),
-            navigateEvent = HomeEvent.OnTagClicked(testTag),
+            event = HomeEvent.OnTagClicked(testTag),
             expectedSideEffect = HomeSideEffect.NavigateTag(testTag)
         )
     }
 
     @Test
-    fun `navigate tag config end when tag element long clicked`() = runTest {
+    fun `show tag config popup end when tag element long clicked`() = runTest {
         val testTag: Tag = genTag()
         testNavigationEnd(
             initState = HomeState.Loaded(genHomeSnapshot()),
-            navigateEvent = HomeEvent.OnTagLongClicked(testTag),
-            expectedSideEffect = HomeSideEffect.NavigateTagConfig(testTag)
+            event = HomeEvent.OnTagLongClicked(testTag),
+            expectedSideEffect = HomeSideEffect.ShowTagConfigPopup(testTag)
         )
     }
 
     @Test
-    fun `navigate tag rename config when tag rename request invoked`() = runTest {
+    fun `show tag rename popup when tag rename request invoked`() = runTest {
         val testTag: Tag = genTag()
         val testUsageCount = genLong()
         testNavigationEnd(
-            tagRepository = mock { whenever(mock.getUsageCount(testTag)) doReturn testUsageCount },
+            tagRepository = mock { whenever(mock.getUsageCount(testTag)) doReturn Result.Success(testUsageCount) },
             initState = HomeState.Loaded(genHomeSnapshot()),
-            navigateEvent = HomeEvent.OnTagRenameRequestClicked(testTag),
-            expectedSideEffect = HomeSideEffect.NavigateTagRename(testTag, testUsageCount)
+            event = HomeEvent.OnTagRenameRequestClicked(testTag),
+            expectedSideEffect = HomeSideEffect.ShowTagRenamePopup(testTag, testUsageCount)
         )
     }
 
     @Test
-    fun `navigate tag delete confirm when tag delete request invoked`() = runTest {
+    fun `show error popup when tag rename request failed`() = runTest {
+        testShowErrorPopupByTagRepository(
+            tagRepository = mock {
+                whenever(mock.getUsageCount(any())) doReturn Result.Failure(Throwable())
+            },
+            event = HomeEvent.OnTagRenameRequestClicked(genTag())
+        )
+    }
+
+    @Test
+    fun `show tag delete popup when tag delete request invoked`() = runTest {
         val testTag: Tag = genTag()
         val testUsageCount = genLong()
         testNavigationEnd(
-            tagRepository = mock { whenever(mock.getUsageCount(testTag)) doReturn testUsageCount },
+            tagRepository = mock { whenever(mock.getUsageCount(testTag)) doReturn Result.Success(testUsageCount) },
             initState = HomeState.Loaded(genHomeSnapshot()),
-            navigateEvent = HomeEvent.OnTagDeleteRequestClicked(testTag),
-            expectedSideEffect = HomeSideEffect.NavigateTagDelete(testTag, testUsageCount)
+            event = HomeEvent.OnTagDeleteRequestClicked(testTag),
+            expectedSideEffect = HomeSideEffect.ShowTagDeletePopup(testTag, testUsageCount)
+        )
+    }
+
+    @Test
+    fun `show error popup when tag delete request failed`() = runTest {
+        testShowErrorPopupByTagRepository(
+            tagRepository = mock {
+                whenever(mock.getUsageCount(any())) doReturn Result.Failure(Throwable())
+            },
+            event = HomeEvent.OnTagDeleteRequestClicked(genTag())
         )
     }
 
     private suspend fun testNavigationEnd(
         tagRepository: TagRepository = mock(),
         initState: HomeState = HomeState.Loaded(genHomeSnapshot()),
-        navigateEvent: HomeEvent,
+        event: HomeEvent,
         expectedSideEffect: HomeSideEffect,
     ) {
         val homeSideEffectHandle: SideEffectHandle<HomeSideEffect> = mock()
-        genHomeStateMachine(homeSideEffectHandle = homeSideEffectHandle, tagRepository = tagRepository)
+        genHomeStateMachine(sideEffectHandle = homeSideEffectHandle, tagRepository = tagRepository)
             .asContainer(CoroutineScope(Dispatchers.Default), initState)
-            .send(navigateEvent)
+            .send(event)
             .join()
         verify(homeSideEffectHandle, once()).post(expectedSideEffect)
+    }
+
+    private suspend fun testShowErrorPopupByTagRepository(
+        tagRepository: TagRepository,
+        event: HomeEvent
+    ) {
+        val sideEffectHandle: SideEffectHandle<HomeSideEffect> = mock()
+
+        genHomeStateMachine(sideEffectHandle = sideEffectHandle, tagRepository = tagRepository)
+            .asContainer(CoroutineScope(Dispatchers.Default), HomeState.Loaded(genHomeSnapshot()))
+            .send(event)
+            .join()
+        verify(sideEffectHandle, once()).post(HomeSideEffect.ShowErrorPopup)
     }
 
     @Test
@@ -249,5 +283,15 @@ class HomeStateMachineKtTest {
             .send(HomeEvent.OnTagDeleteConfirmClicked(testTag))
             .join()
         verify(tagRepository, once()).delete(testTag)
+    }
+
+    @Test
+    fun `show error popup when tag delete failed`() = runTest {
+        testShowErrorPopupByTagRepository(
+            tagRepository = mock {
+                whenever(mock.delete(any())) doReturn Result.Failure(Throwable())
+            },
+            event = HomeEvent.OnTagDeleteConfirmClicked(genTag())
+        )
     }
 }

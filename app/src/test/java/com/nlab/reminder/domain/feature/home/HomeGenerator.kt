@@ -73,9 +73,9 @@ fun genHomeSideEffects(): Set<HomeSideEffect> = setOf(
     HomeSideEffect.NavigateTimetable,
     HomeSideEffect.NavigateAllSchedule,
     HomeSideEffect.NavigateTag(genTag()),
-    HomeSideEffect.NavigateTagConfig(genTag()),
-    HomeSideEffect.NavigateTagRename(genTag(), genLong()),
-    HomeSideEffect.NavigateTagDelete(genTag(), genLong())
+    HomeSideEffect.ShowTagConfigPopup(genTag()),
+    HomeSideEffect.ShowTagRenamePopup(genTag(), genLong()),
+    HomeSideEffect.ShowTagDeletePopup(genTag(), genLong())
 )
 
 fun genHomeStateSample(): HomeState = genHomeStates().first()
@@ -83,11 +83,11 @@ fun genHomeEventSample(): HomeEvent = genHomeEvents().first()
 fun genHomeSideEffectSample(): HomeSideEffect = genHomeSideEffects().first()
 
 fun genHomeStateMachine(
-    homeSideEffectHandle: SideEffectHandle<HomeSideEffect> = mock(),
+    sideEffectHandle: SideEffectHandle<HomeSideEffect> = mock(),
     getHomeSnapshot: GetHomeSnapshotUseCase = mock { whenever(mock()) doReturn emptyFlow() },
     tagRepository: TagRepository = mock()
 ) = HomeStateMachine(
-    homeSideEffectHandle,
+    sideEffectHandle,
     getHomeSnapshot,
     tagRepository
 )

@@ -17,9 +17,7 @@
 package com.nlab.reminder.domain.feature.home
 
 import com.nlab.reminder.core.effect.SideEffectHandle
-import com.nlab.reminder.core.kotlin.util.catching
-import com.nlab.reminder.core.kotlin.util.getOrThrow
-import com.nlab.reminder.core.kotlin.util.onFailure
+import com.nlab.reminder.core.kotlin.util.*
 import com.nlab.reminder.core.state.StateMachine
 import com.nlab.reminder.core.state.StateMachineHandleScope
 import com.nlab.reminder.domain.common.tag.TagRepository
@@ -80,19 +78,27 @@ fun HomeStateMachine(
             event<HomeEvent.OnAllCategoryClicked> { sideEffectHandle.post(HomeSideEffect.NavigateAllSchedule) }
             event<HomeEvent.OnTagClicked> { (event) -> sideEffectHandle.post(HomeSideEffect.NavigateTag(event.tag)) }
             event<HomeEvent.OnTagLongClicked> { (event) ->
-                sideEffectHandle.post(HomeSideEffect.NavigateTagConfig(event.tag))
+                sideEffectHandle.post(HomeSideEffect.ShowTagConfigPopup(event.tag))
             }
             event<HomeEvent.OnTagRenameRequestClicked> { (event) ->
                 sideEffectHandle.post(
-                    HomeSideEffect.NavigateTagRename(event.tag, tagRepository.getUsageCount(event.tag))
+                    sideEffect = tagRepository.getUsageCount(event.tag)
+                        .map { usageCount -> HomeSideEffect.ShowTagRenamePopup(event.tag, usageCount) }
+                        .getOrNull()
+                        ?: HomeSideEffect.ShowErrorPopup
                 )
             }
             event<HomeEvent.OnTagDeleteRequestClicked> { (event) ->
                 sideEffectHandle.post(
-                    HomeSideEffect.NavigateTagDelete(event.tag, tagRepository.getUsageCount(event.tag))
+                    sideEffect = tagRepository.getUsageCount(event.tag)
+                        .map { usageCount -> HomeSideEffect.ShowTagDeletePopup(event.tag, usageCount) }
+                        .getOrNull()
+                        ?: HomeSideEffect.ShowErrorPopup
                 )
             }
-            event<HomeEvent.OnTagDeleteConfirmClicked> { (event) -> tagRepository.delete(event.tag) }
+            event<HomeEvent.OnTagDeleteConfirmClicked> { (event) ->
+                tagRepository.delete(event.tag).onFailure { sideEffectHandle.post(HomeSideEffect.ShowErrorPopup) }
+            }
         }
     }
 }

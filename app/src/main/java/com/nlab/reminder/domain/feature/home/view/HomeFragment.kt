@@ -138,20 +138,23 @@ class HomeFragment : Fragment() {
         is HomeSideEffect.NavigateTag -> {
 
         }
-        is HomeSideEffect.NavigateTagConfig -> {
+        is HomeSideEffect.ShowTagConfigPopup -> {
             navigationController.navigateToTagConfig(
                 REQUEST_KEY_HOME_TO_HOME_TAG_CONFIG, sideEffect.tag
             )
         }
-        is HomeSideEffect.NavigateTagRename -> {
+        is HomeSideEffect.ShowTagRenamePopup -> {
             navigationController.navigateToTagRename(
                 REQUEST_KEY_HOME_TO_HOME_TAG_RENAME, sideEffect.tag, sideEffect.usageCount
             )
         }
-        is HomeSideEffect.NavigateTagDelete -> {
+        is HomeSideEffect.ShowTagDeletePopup -> {
             navigationController.navigateToTagDelete(
                 REQUEST_KEY_HOME_TO_HOME_TAG_DELETE, sideEffect.tag, sideEffect.usageCount
             )
+        }
+        is HomeSideEffect.ShowErrorPopup -> {
+
         }
     }
 

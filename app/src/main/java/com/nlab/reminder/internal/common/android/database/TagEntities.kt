@@ -24,4 +24,4 @@ import com.nlab.reminder.domain.common.tag.Tag
 fun TagEntity.toTag(): Tag = Tag(tagId, name)
 fun List<TagEntity>.toTags(): List<Tag> = map { it.toTag() }
 
-fun Tag.toEntity(): TagEntity = TagEntity(tagId, name)
+fun Tag.toEntity(name: String = this.name): TagEntity = TagEntity(tagId, name)
