@@ -135,6 +135,14 @@ class HomeFragment : Fragment() {
             .flowWithLifecycle(viewLifecycle)
             .onEach { state -> renderWhenLoaded(state.snapshot) }
             .launchIn(viewLifecycleScope)
+
+        viewModel.stateFlow
+            .filterIsInstance<HomeState.Error>()
+            .flowWithLifecycle(viewLifecycle)
+            .onEach { 
+                // TODO render error case
+            }
+            .launchIn(viewLifecycleScope)
     }
 
     private fun handleSideEffect(sideEffect: HomeSideEffect) = when (sideEffect) {
