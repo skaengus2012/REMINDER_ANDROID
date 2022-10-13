@@ -22,6 +22,7 @@ import com.nlab.reminder.domain.common.schedule.UpdateCompleteUseCase
 import com.nlab.reminder.domain.common.schedule.genSchedule
 import com.nlab.reminder.test.genBoolean
 import com.nlab.reminder.test.genFlowObserveCoroutineScope
+import com.nlab.reminder.test.genStateContainerScope
 import com.nlab.reminder.test.once
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.filterIsInstance
@@ -46,7 +47,7 @@ class AllScheduleStateMachineKtTest {
     fun `update to loading when state was init and fetch sent`() = runTest {
         val stateContainer =
             genAllScheduleStateMachine()
-                .asContainer(CoroutineScope(Dispatchers.Default), AllScheduleState.Init)
+                .asContainer(genStateContainerScope(), AllScheduleState.Init)
         stateContainer
             .send(AllScheduleEvent.Fetch)
             .join()
@@ -59,7 +60,7 @@ class AllScheduleStateMachineKtTest {
         val stateContainers =
             genAllScheduleStates()
                 .filter { it != AllScheduleState.Init }
-                .map { genAllScheduleStateMachine().asContainer(CoroutineScope(Dispatchers.Default), it) }
+                .map { genAllScheduleStateMachine().asContainer(genStateContainerScope(), it) }
         stateContainers
             .map { it.send(AllScheduleEvent.AllScheduleReportLoaded(allScheduleReport)) }
             .joinAll()
@@ -77,7 +78,7 @@ class AllScheduleStateMachineKtTest {
         }
         val stateContainer =
             genAllScheduleStateMachine(getAllScheduleReport = getAllScheduleReport)
-                .asContainer(CoroutineScope(Dispatchers.Unconfined), AllScheduleState.Init)
+                .asContainer(genStateContainerScope(), AllScheduleState.Init)
         stateContainer
             .send(AllScheduleEvent.Fetch)
             .join()
@@ -99,7 +100,7 @@ class AllScheduleStateMachineKtTest {
         val updateCompleteUseCase: UpdateCompleteUseCase = mock()
         val stateContainer =
             genAllScheduleStateMachine(updateScheduleComplete = updateCompleteUseCase)
-                .asContainer(CoroutineScope(Dispatchers.Unconfined), AllScheduleState.Loaded(genAllScheduleReport()))
+                .asContainer(genStateContainerScope(), AllScheduleState.Loaded(genAllScheduleReport()))
         stateContainer
             .send(AllScheduleEvent.OnScheduleCompleteUpdateClicked(schedule.id(), isComplete))
             .join()

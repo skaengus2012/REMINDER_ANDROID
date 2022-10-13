@@ -16,16 +16,14 @@
 
 package com.nlab.reminder.core.state
 
+import com.nlab.reminder.test.genStateContainerScope
 import com.nlab.reminder.test.instanceOf
 import com.nlab.reminder.test.once
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 
 /**
@@ -44,18 +42,19 @@ class StateMachineKtTest {
                 }
             }
         }
-        val stateController = stateMachine.asContainer(CoroutineScope(Dispatchers.Default), TestState.StateInit())
-        stateController
+        val stateContainer =
+            stateMachine.asContainer(genStateContainerScope(), TestState.StateInit())
+        stateContainer
             .send(TestEvent.Event1())
             .join()
         assertThat(
-            stateController.stateFlow.value,
+            stateContainer.stateFlow.value,
             instanceOf(TestState.State1::class)
         )
     }
 
     @Test
-    fun `sent event1 by fetching when container started publish`() = runTest {
+    fun `sent event1 by fetching when container created`() = runTest {
         val action: () -> Unit = mock()
         val stateMachine = StateMachine<TestEvent, TestState> {
             handle {
@@ -64,16 +63,8 @@ class StateMachineKtTest {
                 }
             }
         }
-        val controller: StateContainer<TestEvent, TestState> =
-            stateMachine
-                .asContainer(
-                    CoroutineScope(Dispatchers.Unconfined),
-                    TestState.genState(),
-                    fetchEvent = TestEvent.Event1()
-                )
-        verify(action, never())()
-
-        controller.stateFlow.take(1).collect()
+        stateMachine
+            .asContainer(genStateContainerScope(), TestState.genState(), fetchEvent = TestEvent.Event1())
         verify(action, once())()
     }
 }

@@ -96,6 +96,11 @@ fun HomeStateMachine(
                         ?: HomeSideEffect.ShowErrorPopup
                 )
             }
+            event<HomeEvent.OnTagRenameConfirmClicked> { (event) ->
+                tagRepository
+                    .updateName(event.originalTag, event.renameText)
+                    .onFailure { sideEffectHandle.post(HomeSideEffect.ShowErrorPopup) }
+            }
             event<HomeEvent.OnTagDeleteConfirmClicked> { (event) ->
                 tagRepository.delete(event.tag).onFailure { sideEffectHandle.post(HomeSideEffect.ShowErrorPopup) }
             }

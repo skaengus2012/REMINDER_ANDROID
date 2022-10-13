@@ -14,18 +14,23 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.test
+package com.nlab.reminder.internal.common.android.init
 
-import kotlinx.coroutines.CoroutineScope
+import android.content.Context
+import androidx.startup.Initializer
+import com.nlab.reminder.core.state.StateMachinePlugin
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.TestCoroutineScheduler
+import kotlinx.coroutines.flow.SharingStarted
 
 /**
- * @author Doohyun
+ * @author thalys
  */
-@ExperimentalCoroutinesApi
-fun genFlowExecutionDispatcher(testScheduler: TestCoroutineScheduler) = StandardTestDispatcher(testScheduler)
-fun genFlowObserveDispatcher() = Dispatchers.Unconfined
-fun genFlowObserveCoroutineScope() = CoroutineScope(genFlowObserveDispatcher())
+@Suppress("unused")
+class StateMachinePluginInitializer : Initializer<Unit> {
+    override fun create(context: Context) {
+        StateMachinePlugin.defaultDispatcher = Dispatchers.Default
+        StateMachinePlugin.defaultSharingStarted = SharingStarted.WhileSubscribed(5_000)
+    }
+
+    override fun dependencies(): List<Class<out Initializer<*>>> = emptyList()
+}

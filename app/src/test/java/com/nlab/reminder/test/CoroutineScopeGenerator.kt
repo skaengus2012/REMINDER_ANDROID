@@ -14,25 +14,19 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.internal.common.di
+package com.nlab.reminder.test
 
-import com.nlab.reminder.internal.common.InternalCommonScope
-import dagger.Module
-import dagger.Provides
-import dagger.Reusable
-import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestCoroutineScheduler
 
 /**
  * @author Doohyun
  */
-@Module
-@InstallIn(SingletonComponent::class)
-class InternalCoroutineModule {
-    @Reusable
-    @InternalCommonScope
-    @Provides
-    fun provideCoroutineScope(): CoroutineScope = CoroutineScope(Dispatchers.Default)
-}
+@ExperimentalCoroutinesApi
+fun genFlowExecutionDispatcher(testScheduler: TestCoroutineScheduler) = StandardTestDispatcher(testScheduler)
+fun genFlowObserveDispatcher() = Dispatchers.Unconfined
+fun genFlowObserveCoroutineScope() = CoroutineScope(genFlowObserveDispatcher())
+fun genStateContainerScope() = CoroutineScope(Dispatchers.Unconfined)

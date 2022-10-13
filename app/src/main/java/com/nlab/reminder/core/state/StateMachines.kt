@@ -33,12 +33,12 @@ inline fun <E : Event, S : State> StateMachine(
 fun <E : Event, S : State> StateMachine<E, S>.asContainer(
     scope: CoroutineScope,
     initState: S,
-    config: StateMachineConfig = StateMachinePlugin.toConfig()
+    config: StateMachineConfig = StateMachineConfig()
 ): StateContainer<E, S> {
-    val state = MutableStateFlow(initState)
+    val stateFlow = MutableStateFlow(initState)
     return StateContainerImpl(
-        ConfigurableEventProcessor(stateMachine = this, scope, state, config),
-        state.asStateFlow()
+        ConfigurableEventProcessor(stateMachine = this, scope, stateFlow, config),
+        stateFlow.stateIn(scope, config.sharingStarted, initState)
     )
 }
 
@@ -46,15 +46,15 @@ fun <E : Event, S : State> StateMachine<E, S>.asContainer(
     scope: CoroutineScope,
     initState: S,
     fetchEvent: E,
-    config: StateMachineConfig = StateMachinePlugin.toConfig()
+    config: StateMachineConfig = StateMachineConfig()
 ): StateContainer<E, S> {
-    val state = MutableStateFlow(initState)
-    val eventProcessor: EventProcessor<E> = ConfigurableEventProcessor(stateMachine = this, scope, state, config)
+    val stateFlow = MutableStateFlow(initState)
+    val eventProcessor: EventProcessor<E> = ConfigurableEventProcessor(stateMachine = this, scope, stateFlow, config)
     return StateContainerImpl(
         eventProcessor,
-        state.asStateFlow()
+        stateFlow
             .onStart(onStartToFetchConverter(eventProcessor, fetchEvent))
-            .stateIn(scope, SharingStarted.Lazily, initState)
+            .stateIn(scope, config.sharingStarted, initState)
     )
 }
 

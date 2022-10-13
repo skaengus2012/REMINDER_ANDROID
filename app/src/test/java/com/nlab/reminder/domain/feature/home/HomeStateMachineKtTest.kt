@@ -19,7 +19,6 @@ package com.nlab.reminder.domain.feature.home
 import com.nlab.reminder.core.kotlin.util.Result
 import com.nlab.reminder.core.effect.SideEffectHandle
 import com.nlab.reminder.core.state.asContainer
-import com.nlab.reminder.core.state.asContainerWithSubscription
 import com.nlab.reminder.domain.common.tag.Tag
 import com.nlab.reminder.domain.common.tag.TagRepository
 import com.nlab.reminder.domain.common.tag.genTag
@@ -83,7 +82,7 @@ class HomeStateMachineKtTest {
         expectedState: HomeState
     ) {
         val stateContainer =
-            genHomeStateMachine().asContainer(CoroutineScope(Dispatchers.Default), initState)
+            genHomeStateMachine().asContainer(genStateContainerScope(), initState)
         stateContainer.send(input)
 
         assertThat(
@@ -112,7 +111,7 @@ class HomeStateMachineKtTest {
         }
         val stateContainer =
             genHomeStateMachine(getHomeSnapshot = getHomeSnapshot)
-                .asContainerWithSubscription(CoroutineScope(Dispatchers.Default), initState)
+                .asContainer(genStateContainerScope(), initState)
         stateContainer.send(event)
         assertThat(
             stateContainer.stateFlow
@@ -126,32 +125,26 @@ class HomeStateMachineKtTest {
     @Test
     fun `send HomeSnapshotLoadFailed when getHomeSnapshot occurred error`() = runTest {
         val throwable = Throwable()
-        val getHomeSnapshot: GetHomeSnapshotUseCase = mock {
-            whenever(mock()) doReturn flow { throw throwable }
-        }
-        val stateController =
-            genHomeStateMachine(getHomeSnapshot = getHomeSnapshot)
-                .asContainerWithSubscription(CoroutineScope(Dispatchers.Default), HomeState.Init)
+        val stateContainer =
+            genHomeStateMachine(getHomeSnapshot = mock { whenever(mock()) doReturn flow { throw throwable } })
+                .asContainer(genStateContainerScope(), HomeState.Init)
         val errorDeferred = async {
-            stateController.stateFlow
+            stateContainer.stateFlow
                 .filterIsInstance<HomeState.Error>()
                 .first()
         }
-        stateController.send(HomeEvent.Fetch).join()
+        stateContainer.send(HomeEvent.Fetch).join()
         assertThat(errorDeferred.await(), instanceOf(HomeState.Error::class))
     }
 
     @Test
     fun `throw exception when getHomeSnapshot occurred error`() = runTest {
-        val getHomeSnapshot: GetHomeSnapshotUseCase = mock {
-            whenever(mock()) doReturn flow { throw Throwable() }
-        }
         val catchUseCase: (Throwable) -> Unit = mock()
-        val stateController =
-            genHomeStateMachine(getHomeSnapshot = getHomeSnapshot)
+        val stateContainer =
+            genHomeStateMachine(getHomeSnapshot = mock { whenever(mock()) doReturn flow { throw Throwable() } })
                 .apply { catch { catchUseCase(it) } }
-                .asContainerWithSubscription(CoroutineScope(Dispatchers.Default), HomeState.Init)
-        stateController
+                .asContainer(genStateContainerScope(), HomeState.Init)
+        stateContainer
             .send(HomeEvent.Fetch)
             .join()
         verify(catchUseCase, once())(any())
@@ -253,7 +246,7 @@ class HomeStateMachineKtTest {
     ) {
         val homeSideEffectHandle: SideEffectHandle<HomeSideEffect> = mock()
         genHomeStateMachine(sideEffectHandle = homeSideEffectHandle, tagRepository = tagRepository)
-            .asContainer(CoroutineScope(Dispatchers.Default), initState)
+            .asContainer(genStateContainerScope(), initState)
             .send(event)
             .join()
         verify(homeSideEffectHandle, once()).post(expectedSideEffect)
@@ -266,10 +259,34 @@ class HomeStateMachineKtTest {
         val sideEffectHandle: SideEffectHandle<HomeSideEffect> = mock()
 
         genHomeStateMachine(sideEffectHandle = sideEffectHandle, tagRepository = tagRepository)
-            .asContainer(CoroutineScope(Dispatchers.Default), HomeState.Loaded(genHomeSnapshot()))
+            .asContainer(genStateContainerScope(), HomeState.Loaded(genHomeSnapshot()))
             .send(event)
             .join()
         verify(sideEffectHandle, once()).post(HomeSideEffect.ShowErrorPopup)
+    }
+
+    @Test
+    fun `update tag name when rename confirm invoked`() = runTest {
+        val testTag: Tag = genTag()
+        val rename: String = genBothify()
+        val tagRepository: TagRepository = mock()
+        val stateContainer =
+            genHomeStateMachine(tagRepository = tagRepository)
+                .asContainer(genStateContainerScope(), HomeState.Loaded(genHomeSnapshot()))
+        stateContainer
+            .send(HomeEvent.OnTagRenameConfirmClicked(testTag, rename))
+            .join()
+        verify(tagRepository, once()).updateName(testTag, rename)
+    }
+
+    @Test
+    fun `show error popup when rename confirm invoked`() = runTest {
+        testShowErrorPopupByTagRepository(
+            tagRepository = mock {
+                whenever(mock.updateName(any(), any())) doReturn Result.Failure(Throwable())
+            },
+            event = HomeEvent.OnTagRenameConfirmClicked(genTag(), genBothify())
+        )
     }
 
     @Test
@@ -278,7 +295,7 @@ class HomeStateMachineKtTest {
         val tagRepository: TagRepository = mock()
         val stateContainer =
             genHomeStateMachine(tagRepository = tagRepository)
-                .asContainer(CoroutineScope(Dispatchers.Default), HomeState.Loaded(genHomeSnapshot()))
+                .asContainer(genStateContainerScope(), HomeState.Loaded(genHomeSnapshot()))
         stateContainer
             .send(HomeEvent.OnTagDeleteConfirmClicked(testTag))
             .join()

@@ -20,9 +20,8 @@ import com.nlab.reminder.core.effect.SideEffectHandle
 import com.nlab.reminder.core.state.asContainer
 import com.nlab.reminder.test.genBothify
 import com.nlab.reminder.test.genLetterify
+import com.nlab.reminder.test.genStateContainerScope
 import com.nlab.reminder.test.once
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.equalTo
@@ -42,7 +41,7 @@ class HomeTagRenameStateMachineKtTest {
         val initState: HomeTagRenameState = genHomeTagRenameState(currentText = genLetterify("???"))
         val stateContainer =
             genHomeTagRenameStateMachine()
-                .asContainer(CoroutineScope(Dispatchers.Default), initState)
+                .asContainer(genStateContainerScope(), initState)
         stateContainer
             .send(HomeTagRenameEvent.OnRenameTextInput(changeText))
             .join()
@@ -57,7 +56,7 @@ class HomeTagRenameStateMachineKtTest {
         val initState: HomeTagRenameState = genHomeTagRenameState(currentText = genLetterify("?"))
         val stateContainer =
             genHomeTagRenameStateMachine()
-                .asContainer(CoroutineScope(Dispatchers.Default), initState)
+                .asContainer(genStateContainerScope(), initState)
         stateContainer
             .send(HomeTagRenameEvent.OnRenameTextClearClicked)
             .join()
@@ -72,7 +71,7 @@ class HomeTagRenameStateMachineKtTest {
         val initState: HomeTagRenameState = genHomeTagRenameState(isKeyboardShowWhenViewCreated = true)
         val stateContainer =
             genHomeTagRenameStateMachine()
-                .asContainer(CoroutineScope(Dispatchers.Default), initState)
+                .asContainer(genStateContainerScope(), initState)
         stateContainer
             .send(HomeTagRenameEvent.OnKeyboardShownWhenViewCreated)
             .join()
@@ -88,7 +87,7 @@ class HomeTagRenameStateMachineKtTest {
         val sideEffect: SideEffectHandle<HomeTagRenameSideEffect> = mock()
         val stateContainer =
             genHomeTagRenameStateMachine(sideEffect)
-                .asContainer(CoroutineScope(Dispatchers.Default), genHomeTagRenameState(currentText = changeText))
+                .asContainer(genStateContainerScope(), genHomeTagRenameState(currentText = changeText))
 
         stateContainer
             .send(HomeTagRenameEvent.OnConfirmClicked)
@@ -101,8 +100,7 @@ class HomeTagRenameStateMachineKtTest {
         val sideEffect: SideEffectHandle<HomeTagRenameSideEffect> = mock()
         val stateContainer =
             genHomeTagRenameStateMachine(sideEffect)
-                .asContainer(CoroutineScope(Dispatchers.Default), genHomeTagRenameState())
-
+                .asContainer(genStateContainerScope(), genHomeTagRenameState())
         stateContainer
             .send(HomeTagRenameEvent.OnCancelClicked)
             .join()
