@@ -58,6 +58,8 @@ fun genHomeEvents(): Set<HomeEvent> = setOf(
     HomeEvent.OnTimetableCategoryClicked,
     HomeEvent.OnAllCategoryClicked,
     HomeEvent.OnRetryClicked,
+    HomeEvent.OnNewScheduleClicked,
+    HomeEvent.OnPushConfigClicked,
     HomeEvent.OnSnapshotLoaded(genHomeSnapshot()),
     HomeEvent.OnSnapshotLoadFailed(Throwable()),
     HomeEvent.OnTagClicked(genTag()),

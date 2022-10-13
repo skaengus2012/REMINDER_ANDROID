@@ -14,24 +14,81 @@
   ~ limitations under the License.
   -->
 
-<FrameLayout
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_content"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_end="56dp" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerview_content"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
         android:clipToPadding="false"
-        android:visibility="invisible"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+        android:paddingBottom="30dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintBottom_toBottomOf="@id/guideline_content"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.core.widget.ContentLoadingProgressBar
         android:id="@+id/progress"
         style="@style/ContentProgress.Color1.Size36"
-        android:layout_gravity="center"
-        android:visibility="gone" />
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="visible" />
 
-</FrameLayout>
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/button_new_schedule"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:background="@null"
+        android:drawableStart="@drawable/ic_home_new_schedule"
+        android:minHeight="0dp"
+        android:paddingHorizontal="20dp"
+        android:text="@string/home_new_schedule_label"
+        android:textAllCaps="false"
+        android:textColor="@color/point_color_1"
+        android:textSize="17sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/recyclerview_content" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/button_push"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:background="@null"
+        android:drawableStart="@drawable/ic_home_push"
+        android:drawablePadding="10dp"
+        android:minHeight="0dp"
+        android:paddingHorizontal="20dp"
+        android:text="@string/home_push_on_label"
+        android:textAllCaps="false"
+        android:textColor="@color/point_color_1"
+        android:textSize="17sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/recyclerview_content" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/group_content"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:constraint_referenced_ids="recyclerview_content,button_new_schedule,button_push"
+        tools:visibility="visible" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

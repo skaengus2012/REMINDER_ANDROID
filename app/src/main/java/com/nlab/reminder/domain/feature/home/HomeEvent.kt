@@ -28,6 +28,8 @@ sealed class HomeEvent private constructor() : Event {
     object OnTimetableCategoryClicked : HomeEvent()
     object OnAllCategoryClicked : HomeEvent()
     object OnRetryClicked : HomeEvent()
+    object OnNewScheduleClicked : HomeEvent()   // TODO impl using handling
+    object OnPushConfigClicked : HomeEvent()    // TODO impl using handling
     @Generated data class OnSnapshotLoaded(val snapshot: HomeSnapshot) : HomeEvent()
     @Generated data class OnSnapshotLoadFailed(val throwable: Throwable) : HomeEvent()
     @Generated data class OnTagClicked(val tag: Tag) : HomeEvent()

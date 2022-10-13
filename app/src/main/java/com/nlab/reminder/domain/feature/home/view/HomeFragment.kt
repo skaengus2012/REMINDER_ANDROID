@@ -29,6 +29,7 @@ import com.nlab.reminder.R
 import com.nlab.reminder.core.android.fragment.viewLifecycle
 import com.nlab.reminder.core.android.fragment.viewLifecycleScope
 import com.nlab.reminder.core.android.navigation.NavigationController
+import com.nlab.reminder.core.android.view.throttleClicks
 import com.nlab.reminder.databinding.FragmentHomeBinding
 import com.nlab.reminder.domain.common.android.fragment.resultReceives
 import com.nlab.reminder.domain.common.android.navigation.navigateToAllScheduleEnd
@@ -102,6 +103,16 @@ class HomeFragment : Fragment() {
             .apply { itemAnimator = null }
             .apply { adapter = ConcatAdapter(logoAdapter, categoryAdapter, tagCardAdapter) }
 
+        binding.buttonNewSchedule
+            .throttleClicks()
+            .onEach { viewModel.onNewScheduleClicked() }
+            .launchIn(viewLifecycleScope)
+
+        binding.buttonPush
+            .throttleClicks()
+            .onEach { viewModel.onPushConfigClicked() }
+            .launchIn(viewLifecycleScope)
+
         viewModel.homeSideEffectFlow
             .flowWithLifecycle(viewLifecycle)
             .onEach(this::handleSideEffect)
@@ -161,7 +172,7 @@ class HomeFragment : Fragment() {
 
     private fun renderWhenInit() {
         binding.progress.visibility = View.GONE
-        binding.recyclerviewContent.visibility = View.INVISIBLE
+        binding.groupContent.visibility = View.GONE
     }
 
     private fun renderWhenLoading() {
@@ -173,7 +184,7 @@ class HomeFragment : Fragment() {
         tagCardAdapter: HomeTagCardAdapter,
     ) = { snapshot: HomeSnapshot ->
         binding.progress.visibility = View.GONE
-        binding.recyclerviewContent.visibility = View.VISIBLE
+        binding.groupContent.visibility = View.VISIBLE
 
         categoryAdapter.submitList(listOf(snapshot.notification))
         tagCardAdapter.submitList(listOf(snapshot.tags))
