@@ -32,6 +32,7 @@ import com.nlab.reminder.core.android.navigation.NavigationController
 import com.nlab.reminder.databinding.FragmentHomeBinding
 import com.nlab.reminder.domain.common.android.fragment.resultReceives
 import com.nlab.reminder.domain.common.android.navigation.navigateToAllScheduleEnd
+import com.nlab.reminder.domain.common.android.view.loadingFlow
 import com.nlab.reminder.domain.common.android.view.recyclerview.SimpleLayoutAdapter
 import com.nlab.reminder.domain.feature.home.*
 import dagger.hilt.android.AndroidEntryPoint
@@ -113,7 +114,7 @@ class HomeFragment : Fragment() {
             .launchIn(viewLifecycleScope)
 
         viewModel.stateFlow
-            .filterIsInstance<HomeState.Loading>()
+            .loadingFlow<HomeState.Loading>()
             .flowWithLifecycle(viewLifecycle)
             .onEach { renderWhenLoading() }
             .launchIn(viewLifecycleScope)
@@ -159,18 +160,21 @@ class HomeFragment : Fragment() {
     }
 
     private fun renderWhenInit() {
-        binding.recyclerviewContent.visibility = View.GONE
+        binding.progress.visibility = View.GONE
+        binding.recyclerviewContent.visibility = View.INVISIBLE
     }
 
     private fun renderWhenLoading() {
-        binding.recyclerviewContent.visibility = View.GONE
+        binding.progress.visibility = View.VISIBLE
     }
 
     private fun renderWhenLoadedFunc(
         categoryAdapter: HomeCategoryAdapter,
         tagCardAdapter: HomeTagCardAdapter,
     ) = { snapshot: HomeSnapshot ->
+        binding.progress.visibility = View.GONE
         binding.recyclerviewContent.visibility = View.VISIBLE
+
         categoryAdapter.submitList(listOf(snapshot.notification))
         tagCardAdapter.submitList(listOf(snapshot.tags))
     }

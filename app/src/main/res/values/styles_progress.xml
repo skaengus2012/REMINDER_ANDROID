@@ -1,4 +1,4 @@
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (C) 2022 The N's lab Open Source Project
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,15 +15,16 @@
   -->
 
 <resources>
-    <style name="AppTheme" parent="BaseAppTheme">
-        <!-- common -->
-        <item name="bg_color_1">@color/bg_1_dark</item>
-        <item name="bg_color_card_1">@color/bg_card_1_dark</item>
-        <item name="bg_color_tag">@color/bg_tag_dark</item>
-        <item name="bg_color_ripple_1">@color/bg_ripple_1_dark</item>
-        <item name="font_color_1">@color/font_1_dark</item>
-        <item name="font_color_2">@color/font_2_dark</item>
-        <item name="font_color_tag">@color/font_tag_dark</item>
-        <item name="progress_color_1">@color/point_color_1</item>
+    <style name="ContentProgress" parent="Widget.AppCompat.ProgressBar">
+        <item name="android:indeterminateTintMode">src_in</item>
+    </style>
+
+    <style name="ContentProgress.Color1" parent="ContentProgress">
+        <item name="android:indeterminateTint">?attr/progress_color_1</item>
+    </style>
+
+    <style name="ContentProgress.Color1.Size36" parent="ContentProgress.Color1">
+        <item name="android:layout_width">36dp</item>
+        <item name="android:layout_height">36dp</item>
     </style>
 </resources>
