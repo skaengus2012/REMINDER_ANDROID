@@ -14,13 +14,18 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.feature.home
+package com.nlab.reminder.domain.common.android.view
 
-import com.nlab.reminder.domain.common.tag.Tag
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.onEach
 
 /**
- * @author Doohyun
+ * @author thalys
  */
-interface DeleteTagUseCase {
-    suspend operator fun invoke(tag: Tag)
+@OptIn(FlowPreview::class)
+inline fun <reified L> Flow<*>.loadingFlow(delayTimeInMillies: Long = 500): Flow<L> {
+    return debounce(delayTimeInMillies).filterIsInstance()
 }

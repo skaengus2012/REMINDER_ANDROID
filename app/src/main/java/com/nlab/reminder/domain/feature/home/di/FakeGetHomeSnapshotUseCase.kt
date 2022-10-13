@@ -22,8 +22,10 @@ import com.nlab.reminder.domain.common.tag.TagRepository
 import com.nlab.reminder.domain.feature.home.*
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.onStart
 
 /**
  * @author Doohyun
@@ -34,7 +36,7 @@ class FakeGetHomeSnapshotUseCase(
     private val dispatcher: CoroutineDispatcher = Dispatchers.Default
 ) : GetHomeSnapshotUseCase {
     @Generated
-    override suspend fun invoke(): Flow<HomeSnapshot> {
+    override fun invoke(): Flow<HomeSnapshot> {
         // TODO with scheduleEntityModel
         return tagRepository.get()
             .map { tags ->
@@ -48,5 +50,6 @@ class FakeGetHomeSnapshotUseCase(
                 )
             }
             .flowOn(dispatcher)
+            .onStart { delay(1_500) }
     }
 }

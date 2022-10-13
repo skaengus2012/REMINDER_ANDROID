@@ -14,17 +14,23 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.feature.home.di
+package com.nlab.reminder.internal.common.android.init
 
-import com.nlab.reminder.domain.common.tag.Tag
-import com.nlab.reminder.domain.feature.home.ModifyTagNameUseCase
+import android.content.Context
+import androidx.startup.Initializer
+import com.nlab.reminder.core.state.StateMachinePlugin
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.SharingStarted
 
 /**
- * @author Doohyun
+ * @author thalys
  */
-@Deprecated(message = "Fake UseCase was used")
-class FakeModifyTagNameUseCase : ModifyTagNameUseCase {
-    override suspend fun invoke(originalTag: Tag, newText: String) {
-        println("todo implement ModifyTagNameUseCase $originalTag $newText")
+@Suppress("unused")
+class StateMachinePluginInitializer : Initializer<Unit> {
+    override fun create(context: Context) {
+        StateMachinePlugin.defaultDispatcher = Dispatchers.Default
+        StateMachinePlugin.defaultSharingStarted = SharingStarted.WhileSubscribed(5_000)
     }
+
+    override fun dependencies(): List<Class<out Initializer<*>>> = emptyList()
 }

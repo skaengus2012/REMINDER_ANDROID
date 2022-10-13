@@ -16,6 +16,7 @@
 
 package com.nlab.reminder.core.state
 
+import com.nlab.reminder.test.genStateContainerScope
 import com.nlab.reminder.test.once
 import kotlinx.coroutines.*
 import kotlinx.coroutines.test.runTest
@@ -64,7 +65,7 @@ class StateMachinePluginTest {
             }
         }
         stateMachine
-            .asContainer(CoroutineScope(Dispatchers.Unconfined), TestState.StateInit())
+            .asContainer(genStateContainerScope(), TestState.StateInit())
             .send(TestEvent.Event1())
             .join()
         verify(defaultExceptionHandler, once())(exception)
@@ -89,7 +90,7 @@ class StateMachinePluginTest {
             }
         }
 
-        stateMachine.asContainer(CoroutineScope(Dispatchers.Unconfined), TestState.StateInit())
+        stateMachine.asContainer(genStateContainerScope(), TestState.StateInit())
             .send(TestEvent.Event1())
             .join()
         assertThat(result.await(), equalTo(true))

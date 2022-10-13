@@ -18,12 +18,14 @@ package com.nlab.reminder.core.state
 
 import com.nlab.reminder.core.util.test.annotation.Generated
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.SharingStarted
 
 /**
  * @author thalys
  */
 @Generated
 data class StateMachineConfig(
-    val dispatcher: CoroutineDispatcher? = null,
-    val exceptionHandler: ((Throwable) -> Unit)? = null
+    val sharingStarted: SharingStarted = StateMachinePlugin.defaultSharingStarted,
+    val dispatcher: CoroutineDispatcher? = StateMachinePlugin.defaultDispatcher,
+    val exceptionHandler: ((Throwable) -> Unit)? = StateMachinePlugin.defaultExceptionHandler
 )

@@ -26,8 +26,9 @@ sealed class HomeSideEffect : SideEffect {
     object NavigateToday : HomeSideEffect()
     object NavigateTimetable : HomeSideEffect()
     object NavigateAllSchedule : HomeSideEffect()
+    object ShowErrorPopup : HomeSideEffect()
     @Generated data class NavigateTag(val tag: Tag) : HomeSideEffect()
-    @Generated data class NavigateTagConfig(val tag: Tag) : HomeSideEffect()
-    @Generated data class NavigateTagRename(val tag: Tag, val usageCount: Long) : HomeSideEffect()
-    @Generated data class NavigateTagDelete(val tag: Tag, val usageCount: Long) : HomeSideEffect()
+    @Generated data class ShowTagConfigPopup(val tag: Tag) : HomeSideEffect()
+    @Generated data class ShowTagRenamePopup(val tag: Tag, val usageCount: Long) : HomeSideEffect()
+    @Generated data class ShowTagDeletePopup(val tag: Tag, val usageCount: Long) : HomeSideEffect()
 }

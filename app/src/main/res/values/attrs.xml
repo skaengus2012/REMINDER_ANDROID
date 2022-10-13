@@ -23,4 +23,5 @@
 	<attr name="font_color_1" format="color" />
 	<attr name="font_color_2" format="color" />
 	<attr name="font_color_tag" format="color" />
+	<attr name="progress_color_1" format="color" />
 </resources>

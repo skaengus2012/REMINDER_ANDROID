@@ -16,16 +16,17 @@
 
 package com.nlab.reminder.internal.common.tag.impl
 
+import com.nlab.reminder.core.kotlin.util.Result
 import com.nlab.reminder.domain.common.tag.Tag
 import com.nlab.reminder.domain.common.tag.TagRepository
 import com.nlab.reminder.domain.common.tag.genTag
 import com.nlab.reminder.domain.common.tag.genTags
 import com.nlab.reminder.internal.common.android.database.ScheduleTagListDao
 import com.nlab.reminder.internal.common.android.database.TagDao
+import com.nlab.reminder.internal.common.android.database.TagEntity
 import com.nlab.reminder.internal.common.android.database.toEntity
 import com.nlab.reminder.internal.common.database.toEntities
-import com.nlab.reminder.test.genFlowExecutionDispatcher
-import com.nlab.reminder.test.genFlowObserveCoroutineScope
+import com.nlab.reminder.test.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
@@ -43,7 +44,7 @@ import org.mockito.kotlin.*
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class LocalTagRepositoryTest {
-    private fun createTagRepository(
+    private fun genTagRepository(
         tagDao: TagDao = mock(),
         scheduleTagListDao: ScheduleTagListDao = mock()
     ): TagRepository = LocalTagRepository(tagDao, scheduleTagListDao)
@@ -51,9 +52,8 @@ class LocalTagRepositoryTest {
     @Test
     fun `tagDao found when get`() {
         val tagDao: TagDao = mock()
-        val tagRepository: TagRepository = createTagRepository(tagDao = tagDao)
-        tagRepository.get()
-        verify(tagDao, times(1)).find()
+        genTagRepository(tagDao = tagDao).get()
+        verify(tagDao, once()).find()
     }
 
     @Test
@@ -72,7 +72,7 @@ class LocalTagRepositoryTest {
             whenever(mock.find()) doReturn mockFlow.flowOn(executeDispatcher)
         }
 
-        createTagRepository(tagDao = tagDao)
+        genTagRepository(tagDao = tagDao)
             .get()
             .onEach(actualTags::add)
             .launchIn(genFlowObserveCoroutineScope())
@@ -82,22 +82,62 @@ class LocalTagRepositoryTest {
     }
 
     @Test
-    fun `scheduleListDao found tag usage count when repository request findUsageCount`() = runTest {
+    fun `repository get usage count from scheduleTagListDao`() = runTest {
+        val usageCount: Long = genLong()
         val input: Tag = genTag()
-        val scheduleTagListDao: ScheduleTagListDao = mock()
-        val tagRepository: TagRepository = createTagRepository(scheduleTagListDao = scheduleTagListDao)
+        val scheduleTagListDao: ScheduleTagListDao = mock {
+            whenever(mock.findTagUsageCount(input.tagId)) doReturn usageCount
+        }
+        val result = genTagRepository(scheduleTagListDao = scheduleTagListDao).getUsageCount(input)
 
-        tagRepository.getUsageCount(input)
-        verify(scheduleTagListDao, times(1)).findTagUsageCount(tagId = input.tagId)
+        assertThat(result, equalTo(Result.Success(usageCount)))
+    }
+
+    @Test
+    fun `repository return error when scheduleTagListDao occurred error while find by usage count`() = runTest {
+        val exception = RuntimeException()
+        val input: Tag = genTag()
+        val scheduleTagListDao: ScheduleTagListDao = mock { whenever(mock.findTagUsageCount(any())) doThrow exception }
+        val result = genTagRepository(scheduleTagListDao = scheduleTagListDao).getUsageCount(input)
+
+        assertThat(result, equalTo(Result.Failure(exception)))
+    }
+
+    @Test
+    fun `tagDao updated when repository update name requested`() = runTest {
+        val name: String = genBothify()
+        val input: Tag = genTag()
+        val tagDao: TagDao = mock()
+
+        genTagRepository(tagDao = tagDao).updateName(input, name)
+        verify(tagDao, once()).update(TagEntity(input.tagId, name))
+    }
+
+    @Test
+    fun `tagDao return error when repository update name requested`() = runTest {
+        val exception = RuntimeException()
+        val tagDao: TagDao = mock { whenever(mock.update(any())) doThrow exception }
+        val result = genTagRepository(tagDao = tagDao).updateName(genTag(), genBothify())
+
+        assertThat(result, equalTo(Result.Failure(exception)))
     }
 
     @Test
     fun `tagDao delete tag when repository deleting requested`() = runTest {
         val input: Tag = genTag()
         val tagDao: TagDao = mock()
-        val tagRepository: TagRepository = createTagRepository(tagDao = tagDao)
 
-        tagRepository.delete(input)
-        verify(tagDao, times(1)).delete(input.toEntity())
+        genTagRepository(tagDao = tagDao).delete(input)
+        verify(tagDao, once()).delete(input.toEntity())
+    }
+
+    @Test
+    fun `tagDao return error when repository deleting requested`() = runTest {
+        val exception = RuntimeException()
+        val input: Tag = genTag()
+        val tagDao: TagDao = mock { whenever(mock.delete(any())) doThrow exception }
+        val result = genTagRepository(tagDao = tagDao).delete(input)
+
+        assertThat(result, equalTo(Result.Failure(exception)))
     }
 }

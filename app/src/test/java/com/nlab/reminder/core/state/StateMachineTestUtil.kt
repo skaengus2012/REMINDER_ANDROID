@@ -16,9 +16,9 @@
 
 package com.nlab.reminder.core.state
 
+import com.nlab.reminder.test.genStateContainerScope
 import com.nlab.reminder.test.once
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
@@ -32,7 +32,7 @@ import org.mockito.kotlin.verify
 internal fun genTestStateMachineEventProcessor(
     state: MutableStateFlow<TestState> = MutableStateFlow(TestState.StateInit()),
     stateMachine: StateMachine<TestEvent, TestState> = StateMachine(),
-    scope: CoroutineScope = CoroutineScope(Dispatchers.Default)
+    scope: CoroutineScope = genStateContainerScope()
 ): EventProcessor<TestEvent> = StateMachineEventProcessor(scope, state, stateMachine)
 
 internal suspend fun testReduceTemplate(

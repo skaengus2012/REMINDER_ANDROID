@@ -29,9 +29,11 @@ import com.nlab.reminder.R
 import com.nlab.reminder.core.android.fragment.viewLifecycle
 import com.nlab.reminder.core.android.fragment.viewLifecycleScope
 import com.nlab.reminder.core.android.navigation.NavigationController
+import com.nlab.reminder.core.android.view.throttleClicks
 import com.nlab.reminder.databinding.FragmentHomeBinding
 import com.nlab.reminder.domain.common.android.fragment.resultReceives
 import com.nlab.reminder.domain.common.android.navigation.navigateToAllScheduleEnd
+import com.nlab.reminder.domain.common.android.view.loadingFlow
 import com.nlab.reminder.domain.common.android.view.recyclerview.SimpleLayoutAdapter
 import com.nlab.reminder.domain.feature.home.*
 import dagger.hilt.android.AndroidEntryPoint
@@ -101,6 +103,16 @@ class HomeFragment : Fragment() {
             .apply { itemAnimator = null }
             .apply { adapter = ConcatAdapter(logoAdapter, categoryAdapter, tagCardAdapter) }
 
+        binding.buttonNewSchedule
+            .throttleClicks()
+            .onEach { viewModel.onNewScheduleClicked() }
+            .launchIn(viewLifecycleScope)
+
+        binding.buttonPush
+            .throttleClicks()
+            .onEach { viewModel.onPushConfigClicked() }
+            .launchIn(viewLifecycleScope)
+
         viewModel.homeSideEffectFlow
             .flowWithLifecycle(viewLifecycle)
             .onEach(this::handleSideEffect)
@@ -113,7 +125,7 @@ class HomeFragment : Fragment() {
             .launchIn(viewLifecycleScope)
 
         viewModel.stateFlow
-            .filterIsInstance<HomeState.Loading>()
+            .loadingFlow<HomeState.Loading>()
             .flowWithLifecycle(viewLifecycle)
             .onEach { renderWhenLoading() }
             .launchIn(viewLifecycleScope)
@@ -122,6 +134,14 @@ class HomeFragment : Fragment() {
             .filterIsInstance<HomeState.Loaded>()
             .flowWithLifecycle(viewLifecycle)
             .onEach { state -> renderWhenLoaded(state.snapshot) }
+            .launchIn(viewLifecycleScope)
+
+        viewModel.stateFlow
+            .filterIsInstance<HomeState.Error>()
+            .flowWithLifecycle(viewLifecycle)
+            .onEach { 
+                // TODO render error case
+            }
             .launchIn(viewLifecycleScope)
     }
 
@@ -138,36 +158,42 @@ class HomeFragment : Fragment() {
         is HomeSideEffect.NavigateTag -> {
 
         }
-        is HomeSideEffect.NavigateTagConfig -> {
+        is HomeSideEffect.ShowTagConfigPopup -> {
             navigationController.navigateToTagConfig(
                 REQUEST_KEY_HOME_TO_HOME_TAG_CONFIG, sideEffect.tag
             )
         }
-        is HomeSideEffect.NavigateTagRename -> {
+        is HomeSideEffect.ShowTagRenamePopup -> {
             navigationController.navigateToTagRename(
                 REQUEST_KEY_HOME_TO_HOME_TAG_RENAME, sideEffect.tag, sideEffect.usageCount
             )
         }
-        is HomeSideEffect.NavigateTagDelete -> {
+        is HomeSideEffect.ShowTagDeletePopup -> {
             navigationController.navigateToTagDelete(
                 REQUEST_KEY_HOME_TO_HOME_TAG_DELETE, sideEffect.tag, sideEffect.usageCount
             )
         }
+        is HomeSideEffect.ShowErrorPopup -> {
+
+        }
     }
 
     private fun renderWhenInit() {
-        binding.recyclerviewContent.visibility = View.GONE
+        binding.progress.visibility = View.GONE
+        binding.groupContent.visibility = View.GONE
     }
 
     private fun renderWhenLoading() {
-        binding.recyclerviewContent.visibility = View.GONE
+        binding.progress.visibility = View.VISIBLE
     }
 
     private fun renderWhenLoadedFunc(
         categoryAdapter: HomeCategoryAdapter,
         tagCardAdapter: HomeTagCardAdapter,
     ) = { snapshot: HomeSnapshot ->
-        binding.recyclerviewContent.visibility = View.VISIBLE
+        binding.progress.visibility = View.GONE
+        binding.groupContent.visibility = View.VISIBLE
+
         categoryAdapter.submitList(listOf(snapshot.notification))
         tagCardAdapter.submitList(listOf(snapshot.tags))
     }

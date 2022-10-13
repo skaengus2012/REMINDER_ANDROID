@@ -17,6 +17,7 @@
 package com.nlab.reminder.domain.feature.home.tag.rename.view
 
 import android.os.Bundle
+import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -31,6 +32,7 @@ import com.nlab.reminder.core.android.fragment.viewLifecycle
 import com.nlab.reminder.core.android.fragment.viewLifecycleScope
 import com.nlab.reminder.core.android.view.clicks
 import com.nlab.reminder.core.android.view.textChanged
+import com.nlab.reminder.core.android.view.throttleClicks
 import com.nlab.reminder.databinding.FragmentHomeTagRenameDialogBinding
 import com.nlab.reminder.domain.common.android.fragment.popBackStackWithResult
 import com.nlab.reminder.domain.feature.home.tag.rename.*
@@ -79,17 +81,17 @@ class HomeTagRenameDialogFragment : DialogFragment() {
             .launchIn(viewLifecycleScope)
 
         binding.clearButton
-            .clicks()
+            .throttleClicks()
             .onEach { viewModel.onRenameTextClearClicked() }
             .launchIn(viewLifecycleScope)
 
         binding.cancelButton
-            .clicks()
+            .throttleClicks()
             .onEach { viewModel.onCancelClicked() }
             .launchIn(viewLifecycleScope)
 
         binding.okButton
-            .clicks()
+            .throttleClicks()
             .onEach { viewModel.onConfirmClicked() }
             .launchIn(viewLifecycleScope)
 
@@ -125,8 +127,10 @@ class HomeTagRenameDialogFragment : DialogFragment() {
     private fun render(homeTagRenameState: HomeTagRenameState) {
         binding.renameEdittext
             .apply {
-                setText(homeTagRenameState.currentText)
-                setSelection(text.length)
+                if (TextUtils.equals(text, homeTagRenameState.currentText).not()) {
+                    setText(homeTagRenameState.currentText)
+                    setSelection(text.length)
+                }
             }
             .also { editText ->
                 if (homeTagRenameState.isKeyboardShowWhenViewCreated.not()) return@also

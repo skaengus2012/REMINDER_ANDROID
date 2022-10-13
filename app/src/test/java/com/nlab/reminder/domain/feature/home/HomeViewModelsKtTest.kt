@@ -61,6 +61,16 @@ class HomeViewModelsKtTest {
 
         verifyStateSendExtension(
             stateContainer,
+            HomeEvent.OnNewScheduleClicked
+        ) { viewModel.onNewScheduleClicked() }
+
+        verifyStateSendExtension(
+            stateContainer,
+            HomeEvent.OnPushConfigClicked
+        ) { viewModel.onPushConfigClicked() }
+
+        verifyStateSendExtension(
+            stateContainer,
             HomeEvent.OnTagClicked(tag)
         ) { viewModel.onTagClicked(tag) }
 

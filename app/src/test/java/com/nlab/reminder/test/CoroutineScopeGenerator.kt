@@ -14,17 +14,19 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.internal.feature.home
+package com.nlab.reminder.test
 
-import com.nlab.reminder.domain.common.tag.Tag
-import com.nlab.reminder.domain.common.tag.TagRepository
-import com.nlab.reminder.domain.feature.home.DeleteTagUseCase
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestCoroutineScheduler
 
 /**
  * @author Doohyun
  */
-class DefaultDeleteTagUseCase(
-    private val tagRepository: TagRepository
-) : DeleteTagUseCase {
-    override suspend fun invoke(tag: Tag) = tagRepository.delete(tag)
-}
+@ExperimentalCoroutinesApi
+fun genFlowExecutionDispatcher(testScheduler: TestCoroutineScheduler) = StandardTestDispatcher(testScheduler)
+fun genFlowObserveDispatcher() = Dispatchers.Unconfined
+fun genFlowObserveCoroutineScope() = CoroutineScope(genFlowObserveDispatcher())
+fun genStateContainerScope() = CoroutineScope(Dispatchers.Unconfined)
