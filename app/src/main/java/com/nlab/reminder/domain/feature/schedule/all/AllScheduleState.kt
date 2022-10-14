@@ -27,5 +27,5 @@ sealed class AllScheduleState private constructor() : State {
     object Loading : AllScheduleState()
 
     @Generated
-    data class Loaded(val allSchedulesReport: AllScheduleReport) : AllScheduleState()
+    data class Loaded(val allSchedulesReport: AllScheduleSnapshot) : AllScheduleState()
 }

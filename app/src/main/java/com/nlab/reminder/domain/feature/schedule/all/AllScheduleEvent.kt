@@ -24,7 +24,7 @@ import com.nlab.reminder.domain.common.schedule.ScheduleId
  */
 sealed class AllScheduleEvent private constructor() : Event {
     object Fetch : AllScheduleEvent()
-    data class AllScheduleReportLoaded(val allSchedulesReport: AllScheduleReport) : AllScheduleEvent()
+    data class AllScheduleReportLoaded(val allSchedulesReport: AllScheduleSnapshot) : AllScheduleEvent()
     data class OnScheduleCompleteUpdateClicked(
         val scheduleId: ScheduleId,
         val isComplete: Boolean

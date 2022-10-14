@@ -14,16 +14,20 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.feature.schedule.all
+package com.nlab.reminder.domain.common.schedule.impl
 
-import com.nlab.reminder.core.util.test.annotation.Generated
+import com.nlab.reminder.domain.common.schedule.CompleteMark
+import com.nlab.reminder.domain.common.schedule.Schedule
+import com.nlab.reminder.domain.common.schedule.ScheduleId
 import com.nlab.reminder.domain.common.schedule.ScheduleUiState
 
 /**
- * @author Doohyun
+ * @author thalys
  */
-@Generated
-data class AllScheduleReport(
-    val schedules: List<ScheduleUiState>,
-    val isDoneScheduleShown: Boolean
+internal fun ScheduleUiState(
+    schedule: Schedule,
+    completeMarkSnapshot: Map<ScheduleId, CompleteMark>
+): ScheduleUiState = ScheduleUiState(
+    schedule,
+    isCompleteMarked = completeMarkSnapshot[schedule.id()]?.isComplete ?: schedule.isComplete
 )

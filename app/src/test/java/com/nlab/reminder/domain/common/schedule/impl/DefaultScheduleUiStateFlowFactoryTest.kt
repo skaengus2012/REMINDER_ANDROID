@@ -59,7 +59,7 @@ class DefaultScheduleUiStateFlowFactoryTest {
         val scheduleUiStateFlowFactory = DefaultScheduleUiStateFlowFactory(completeMarkRepository)
         val acc: MutableList<ScheduleUiState> = mutableListOf()
         scheduleUiStateFlowFactory
-            .combineWith(schedulesFlow)
+            .with(schedulesFlow)
             .onEach { acc += it.first() }
             .launchIn(genFlowObserveCoroutineScope())
 

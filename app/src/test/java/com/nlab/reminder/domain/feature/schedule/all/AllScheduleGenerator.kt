@@ -32,7 +32,7 @@ import org.mockito.kotlin.whenever
 fun genAllScheduleReport(
     schedules: List<ScheduleUiState> = genScheduleUiStates(),
     isDoneScheduleShown: Boolean = genBoolean()
-): AllScheduleReport = AllScheduleReport(schedules, isDoneScheduleShown)
+): AllScheduleSnapshot = AllScheduleSnapshot(schedules, isDoneScheduleShown)
 
 fun genAllScheduleEvents(): Set<AllScheduleEvent> = setOf(
     AllScheduleEvent.Fetch,
@@ -47,7 +47,7 @@ fun genAllScheduleStates(): Set<AllScheduleState> = setOf(
 )
 
 fun genAllScheduleStateMachine(
-    getAllScheduleReport: GetAllScheduleReportUseCase = mock { whenever(mock()) doReturn emptyFlow() },
+    getAllScheduleReport: GetAllScheduleSnapshotUseCase = mock { whenever(mock()) doReturn emptyFlow() },
     updateScheduleComplete: UpdateCompleteUseCase = mock()
 ) = AllScheduleStateMachine(
     getAllScheduleReport,

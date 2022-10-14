@@ -21,8 +21,6 @@ import kotlinx.coroutines.coroutineScope
 /**
  * @author thalys
  */
-suspend inline fun onRoutine(crossinline action: () -> Unit) {
-    coroutineScope {
-        action()
-    }
+suspend inline fun <T> onRoutine(crossinline action: () -> T) : T {
+    return coroutineScope { action() }
 }

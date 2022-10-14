@@ -25,24 +25,19 @@ import kotlinx.coroutines.flow.*
 class DefaultScheduleUiStateFlowFactory(
     private val completeMarkRepository: CompleteMarkRepository
 ) : ScheduleUiStateFlowFactory {
-    override fun combineWith(scheduleFlow: Flow<List<Schedule>>): Flow<List<ScheduleUiState>> =
+    override fun with(schedules: Flow<List<Schedule>>): Flow<List<ScheduleUiState>> =
         combine(
-            scheduleFlow,
+            schedules,
             completeMarkRepository.get()
                 .onStart { emit(emptyMap()) }
                 .distinctUntilChanged(),
-            transform = ::transformScheduleUiStatesBy
+            transform = ::transformToScheduleUiStates
         )
 
     companion object {
-        private fun transformScheduleUiStatesBy(
+        private fun transformToScheduleUiStates(
             schedules: List<Schedule>,
             completeMarkSnapshot: Map<ScheduleId, CompleteMark>
-        ): List<ScheduleUiState> = schedules.map { schedule ->
-            ScheduleUiState(
-                schedule,
-                isCompleteMarked = completeMarkSnapshot[schedule.id()]?.isComplete ?: schedule.isComplete
-            )
-        }
+        ): List<ScheduleUiState> = schedules.map { schedule -> ScheduleUiState(schedule, completeMarkSnapshot) }
     }
 }

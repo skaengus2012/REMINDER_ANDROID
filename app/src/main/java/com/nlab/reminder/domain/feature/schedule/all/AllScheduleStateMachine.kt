@@ -24,7 +24,7 @@ import com.nlab.reminder.domain.common.schedule.UpdateCompleteUseCase
  */
 @Suppress("FunctionName")
 fun AllScheduleStateMachine(
-    getAllScheduleReport: GetAllScheduleReportUseCase,
+    getAllScheduleSnapshot: GetAllScheduleSnapshotUseCase,
     updateScheduleComplete: UpdateCompleteUseCase
 ): StateMachine<AllScheduleEvent, AllScheduleState> = StateMachine {
     reduce {
@@ -39,7 +39,7 @@ fun AllScheduleStateMachine(
     handle {
         event<AllScheduleEvent.Fetch> {
             state<AllScheduleState.Init> {
-                getAllScheduleReport().collect { send(AllScheduleEvent.AllScheduleReportLoaded(it)) }
+                getAllScheduleSnapshot().collect { send(AllScheduleEvent.AllScheduleReportLoaded(it)) }
             }
         }
 

@@ -17,8 +17,8 @@
 package com.nlab.reminder.domain.feature.schedule.all.impl
 
 import com.nlab.reminder.domain.common.schedule.*
-import com.nlab.reminder.domain.feature.schedule.all.AllScheduleReport
-import com.nlab.reminder.domain.feature.schedule.all.GetAllScheduleReportUseCase
+import com.nlab.reminder.domain.feature.schedule.all.AllScheduleSnapshot
+import com.nlab.reminder.domain.feature.schedule.all.GetAllScheduleSnapshotUseCase
 import com.nlab.reminder.domain.feature.schedule.all.genAllScheduleReport
 import com.nlab.reminder.test.*
 import kotlinx.coroutines.*
@@ -31,7 +31,7 @@ import org.mockito.kotlin.*
 /**
  * @author Doohyun
  */
-class DefaultGetAllScheduleReportUseCaseTest {
+class DefaultGetAllScheduleSnapshotUseCaseTest {
     @Test
     fun `find all schedules when doneScheduleShown was true`() {
         testSchedulesRequest(
@@ -56,21 +56,21 @@ class DefaultGetAllScheduleReportUseCaseTest {
         isDoneScheduleShown: Boolean
     ) {
         val fakeCompleteMark: Boolean = genBoolean()
-        val fakeScheduleUiStateFlowFactory: ScheduleUiStateFlowFactory = object : ScheduleUiStateFlowFactory {
-            override fun combineWith(scheduleFlow: Flow<List<Schedule>>): Flow<List<ScheduleUiState>> {
-                return scheduleFlow.map { schedules -> genScheduleUiStates(schedules, fakeCompleteMark) }
+        val fakeScheduleUiStateFlowFactory: ScheduleUiStateFlowFactory = object : ScheduleUiStateFlowFactory{
+            override fun with(schedules: Flow<List<Schedule>>): Flow<List<ScheduleUiState>> {
+                return schedules.map { schedules -> genScheduleUiStates(schedules, fakeCompleteMark) }
             }
         }
         val scheduleRepository: ScheduleRepository = mock {
             whenever(mock.get(scheduleItemRequest)) doReturn flowOf(expectSchedules)
         }
-        val getAllScheduleReport: GetAllScheduleReportUseCase = DefaultGetAllScheduleReportUseCase(
+        val getAllScheduleReport: GetAllScheduleSnapshotUseCase = DefaultGetAllScheduleSnapshotUseCase(
             doneScheduleShownRepository = mock { whenever(mock.get()) doReturn flowOf(isDoneScheduleShown) },
             scheduleRepository = scheduleRepository,
             scheduleUiStateFlowFactory = fakeScheduleUiStateFlowFactory,
             dispatcher = Dispatchers.Unconfined
         )
-        val actualReports = mutableListOf<AllScheduleReport>()
+        val actualReports = mutableListOf<AllScheduleSnapshot>()
         getAllScheduleReport()
             .onEach(actualReports::add)
             .launchIn(genFlowObserveCoroutineScope())

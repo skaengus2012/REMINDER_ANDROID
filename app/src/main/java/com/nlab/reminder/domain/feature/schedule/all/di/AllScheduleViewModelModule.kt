@@ -23,7 +23,7 @@ import com.nlab.reminder.domain.common.schedule.ScheduleRepository
 import com.nlab.reminder.domain.common.schedule.ScheduleUiStateFlowFactory
 import com.nlab.reminder.domain.common.schedule.UpdateCompleteUseCase
 import com.nlab.reminder.domain.feature.schedule.all.*
-import com.nlab.reminder.domain.feature.schedule.all.impl.DefaultGetAllScheduleReportUseCase
+import com.nlab.reminder.domain.feature.schedule.all.impl.DefaultGetAllScheduleSnapshotUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -47,11 +47,11 @@ class AllScheduleViewModelModule {
         object : AllScheduleStateContainerFactory {
             override fun create(scope: CoroutineScope): StateContainer<AllScheduleEvent, AllScheduleState> {
                 val stateMachine = AllScheduleStateMachine(
-                    getAllScheduleReport = DefaultGetAllScheduleReportUseCase(
+                    getAllScheduleSnapshot = DefaultGetAllScheduleSnapshotUseCase(
                         doneScheduleShownRepository,
                         scheduleRepository,
                         scheduleUiStateFlowFactory,
-                        dispatcher = Dispatchers.Default
+                        Dispatchers.Default
                     ),
                     updateScheduleComplete = updateCompleteUseCase
                 )

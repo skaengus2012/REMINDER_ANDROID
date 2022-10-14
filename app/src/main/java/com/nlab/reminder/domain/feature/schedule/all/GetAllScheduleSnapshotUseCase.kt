@@ -21,6 +21,6 @@ import kotlinx.coroutines.flow.Flow
 /**
  * @author Doohyun
  */
-interface GetAllScheduleReportUseCase {
-    operator fun invoke(): Flow<AllScheduleReport>
+interface GetAllScheduleSnapshotUseCase {
+    operator fun invoke(): Flow<AllScheduleSnapshot>
 }

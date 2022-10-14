@@ -18,15 +18,15 @@ package com.nlab.reminder.domain.feature.schedule.all.view
 
 import com.nlab.reminder.domain.common.schedule.ScheduleUiState
 import com.nlab.reminder.domain.common.schedule.view.ScheduleItem
-import com.nlab.reminder.domain.feature.schedule.all.AllScheduleReport
+import com.nlab.reminder.domain.feature.schedule.all.AllScheduleSnapshot
 
 /**
  * @author Doohyun
  */
 fun AllScheduleLoadedSnapshot(
-    allScheduleReport: AllScheduleReport,
+    allScheduleSnapshot: AllScheduleSnapshot,
     scheduleItemFactory: (ScheduleUiState) -> ScheduleItem
 ): AllScheduleLoadedSnapshot = AllScheduleLoadedSnapshot(
-    doingScheduleItems = allScheduleReport.schedules.map(scheduleItemFactory),
-    isDoneScheduleShown = allScheduleReport.isDoneScheduleShown
+    doingScheduleItems = allScheduleSnapshot.schedules.map(scheduleItemFactory),
+    isDoneScheduleShown = allScheduleSnapshot.isDoneScheduleShown
 )

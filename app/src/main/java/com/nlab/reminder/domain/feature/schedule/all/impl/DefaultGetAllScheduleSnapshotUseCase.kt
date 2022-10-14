@@ -18,8 +18,8 @@ package com.nlab.reminder.domain.feature.schedule.all.impl
 
 import com.nlab.reminder.core.kotlin.coroutine.flow.map
 import com.nlab.reminder.domain.common.schedule.*
-import com.nlab.reminder.domain.feature.schedule.all.AllScheduleReport
-import com.nlab.reminder.domain.feature.schedule.all.GetAllScheduleReportUseCase
+import com.nlab.reminder.domain.feature.schedule.all.AllScheduleSnapshot
+import com.nlab.reminder.domain.feature.schedule.all.GetAllScheduleSnapshotUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
@@ -29,14 +29,14 @@ import kotlinx.coroutines.flow.flowOn
 /**
  * @author Doohyun
  */
-class DefaultGetAllScheduleReportUseCase(
+class DefaultGetAllScheduleSnapshotUseCase(
     private val doneScheduleShownRepository: DoneScheduleShownRepository,
     private val scheduleRepository: ScheduleRepository,
     private val scheduleUiStateFlowFactory: ScheduleUiStateFlowFactory,
     private val dispatcher: CoroutineDispatcher
-) : GetAllScheduleReportUseCase {
+) : GetAllScheduleSnapshotUseCase {
     @FlowPreview
-    override fun invoke(): Flow<AllScheduleReport> =
+    override fun invoke(): Flow<AllScheduleSnapshot> =
         doneScheduleShownRepository.get()
             .flatMapConcat(this::createAllScheduleReportFlow)
             .flowOn(dispatcher)
@@ -47,9 +47,9 @@ class DefaultGetAllScheduleReportUseCase(
             else ScheduleItemRequest.FindByComplete(isComplete = false)
         )
 
-    private fun createAllScheduleReportFlow(isDoneScheduleShown: Boolean): Flow<AllScheduleReport> {
+    private fun createAllScheduleReportFlow(isDoneScheduleShown: Boolean): Flow<AllScheduleSnapshot> {
         return getScheduleFlow(isDoneScheduleShown)
-            .let(scheduleUiStateFlowFactory::combineWith)
-            .map { scheduleItems -> AllScheduleReport(scheduleItems, isDoneScheduleShown) }
+            .let(scheduleUiStateFlowFactory::with)
+            .map { scheduleItems -> AllScheduleSnapshot(scheduleItems, isDoneScheduleShown) }
     }
 }

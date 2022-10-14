@@ -73,7 +73,7 @@ class AllScheduleStateMachineKtTest {
     @Test
     fun `subscribe allScheduleReport snapshot when state was init and fetch sent`() = runTest {
         val expected = genAllScheduleReport()
-        val getAllScheduleReport: GetAllScheduleReportUseCase = mock {
+        val getAllScheduleReport: GetAllScheduleSnapshotUseCase = mock {
             whenever(mock()) doReturn flow { emit(expected) }
         }
         val stateContainer =
@@ -83,7 +83,7 @@ class AllScheduleStateMachineKtTest {
             .send(AllScheduleEvent.Fetch)
             .join()
 
-        val deferred = CompletableDeferred<AllScheduleReport>()
+        val deferred = CompletableDeferred<AllScheduleSnapshot>()
         stateContainer
             .stateFlow
             .filterIsInstance<AllScheduleState.Loaded>()

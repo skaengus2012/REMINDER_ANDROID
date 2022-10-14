@@ -14,13 +14,16 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.common.schedule
+package com.nlab.reminder.domain.feature.schedule.all
 
-import kotlinx.coroutines.flow.Flow
+import com.nlab.reminder.core.util.test.annotation.Generated
+import com.nlab.reminder.domain.common.schedule.ScheduleUiState
 
 /**
  * @author Doohyun
  */
-interface ScheduleUiStateFlowFactory {
-    fun with(schedules: Flow<List<Schedule>>): Flow<List<ScheduleUiState>>
-}
+@Generated
+data class AllScheduleSnapshot(
+    val schedules: List<ScheduleUiState>,
+    val isDoneScheduleShown: Boolean
+)
