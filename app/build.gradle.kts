@@ -161,8 +161,10 @@ dependencies {
     implementation(Dependencies.ANDROID_NAVIGATION_UI)
     implementation(Dependencies.ANDROID_ROOM_RUNTIME)
     implementation(Dependencies.ANDROID_ROOM_KTX)
+    implementation(Dependencies.ANDROID_ROOM_PAGING)
     kapt(Dependencies.ANDROID_ROOM_COMPILER)
     implementation(Dependencies.ANDROID_STARTUP_RUNTIME)
+    implementation(Dependencies.ANDROID_PAGING_RUNTIME)
 
     implementation(Dependencies.GOOGLE_HILT_ANDROID)
     kapt(Dependencies.GOOGLE_HILT_ANDROID_COMPILER)

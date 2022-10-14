@@ -36,6 +36,7 @@ object DependenciesVersions {
     const val ANDROID_NAVIGATION = "2.5.1"
     const val ANDROID_ROOM = "2.4.3"
     const val ANDROID_STARTUP = "1.1.1"
+    const val ANDROID_PAGING = "3.1.1"
 
     const val GOOGLE_HILT = "2.43.2"
     const val GOOGLE_FLEXBOX = "3.0.0"
