@@ -16,6 +16,7 @@
 
 package com.nlab.reminder.internal.common.android.database
 
+import androidx.paging.PagingSource
 import androidx.room.*
 import kotlinx.coroutines.flow.Flow
 
@@ -32,8 +33,16 @@ abstract class ScheduleDao {
     abstract fun find(): Flow<List<ScheduleEntityWithTagEntities>>
 
     @Transaction
+    @Query("SELECT * FROM schedule ORDER BY is_complete, visible_priority")
+    abstract fun findAsPagingSource(): PagingSource<Int, ScheduleEntityWithTagEntities>
+
+    @Transaction
     @Query("SELECT * FROM schedule WHERE is_complete = :isComplete ORDER BY is_complete, visible_priority")
     abstract fun findByComplete(isComplete: Boolean): Flow<List<ScheduleEntityWithTagEntities>>
+
+    @Transaction
+    @Query("SELECT * FROM schedule WHERE is_complete = :isComplete ORDER BY is_complete, visible_priority")
+    abstract fun findAsPagingSourceByComplete(isComplete: Boolean): PagingSource<Int, ScheduleEntityWithTagEntities>
 
     @Query("UPDATE schedule SET is_complete = :isComplete WHERE schedule_id = :scheduleId")
     abstract suspend fun updateComplete(scheduleId: Long, isComplete: Boolean)
