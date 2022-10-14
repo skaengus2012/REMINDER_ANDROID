@@ -16,11 +16,16 @@
 
 package com.nlab.reminder.internal.common.schedule.impl
 
+import androidx.paging.AsyncPagingDataDiffer
+import androidx.paging.PagingConfig
+import androidx.paging.PagingSource
+import androidx.paging.PagingState
 import com.nlab.reminder.core.kotlin.util.isFailure
 import com.nlab.reminder.core.kotlin.util.isSuccess
 import com.nlab.reminder.domain.common.schedule.*
 import com.nlab.reminder.domain.common.tag.genTags
 import com.nlab.reminder.internal.common.android.database.*
+import com.nlab.reminder.internal.common.database.genScheduleEntityWithTagEntitiesList
 import com.nlab.reminder.internal.common.database.toScheduleEntityWithTagEntities
 import com.nlab.reminder.test.*
 import kotlinx.coroutines.*
@@ -28,6 +33,8 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.test.*
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.*
+import org.junit.After
+import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.*
 
@@ -36,49 +43,110 @@ import org.mockito.kotlin.*
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class LocalScheduleRepositoryTest {
+    @Before
+    fun setUp() = runTest {
+        Dispatchers.setMain(genFlowExecutionDispatcher(testScheduler))
+    }
+
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
+    }
+
     @Test
-    fun `observe 2 times schedules when ScheduleDao sent 2 times notifications`() = runTest {
+    fun `notify 2 times schedules when ScheduleDao sent 2 times data`() = runTest {
         val isComplete: Boolean = genBoolean()
 
-        observeSchedulesWhenScheduleDaoNotified2Times(
+        notifySchedulesWhenScheduleDaoSent2TimesData(
             ScheduleItemRequest.Find,
             setupMock = { scheduleDao, mockFlow -> whenever(scheduleDao.find()) doReturn mockFlow }
         )
-        observeSchedulesWhenScheduleDaoNotified2Times(
+        notifySchedulesWhenScheduleDaoSent2TimesData(
             ScheduleItemRequest.FindByComplete(isComplete),
             setupMock = { scheduleDao, mockFlow -> whenever(scheduleDao.findByComplete(isComplete)) doReturn mockFlow }
         )
     }
 
-    private fun observeSchedulesWhenScheduleDaoNotified2Times(
+    private fun notifySchedulesWhenScheduleDaoSent2TimesData(
         scheduleItemRequest: ScheduleItemRequest,
         setupMock: (ScheduleDao, Flow<List<ScheduleEntityWithTagEntities>>) -> Unit
     ) = runTest {
         val executeDispatcher = genFlowExecutionDispatcher(testScheduler)
-        val firstSchedule = genSchedule(tags = emptyList())
-        val secondSchedule = genSchedule(tags = genTags().sortedBy { it.name })
+        val expectedSchedules: List<Schedule> = listOf(
+            genSchedule(tags = emptyList()),
+            genSchedule(tags = genTags().sortedBy { it.name })
+        )
+        val delayBetweenElements = 500L
         val scheduleDao: ScheduleDao = mock {
             setupMock(mock, flow {
-                firstSchedule.toScheduleEntityWithTagEntities()
+                expectedSchedules[0].toScheduleEntityWithTagEntities()
                     .let(::listOf)
                     .also { emit(it) }
 
-                delay(1_000)
-                secondSchedule.toScheduleEntityWithTagEntities()
+                delay(delayBetweenElements)
+                expectedSchedules[1].toScheduleEntityWithTagEntities()
                     .let { entity -> entity.copy(tagEntities = entity.tagEntities.sortedBy { it.name }.reversed()) }
                     .let(::listOf)
                     .also { emit(it) }
             }.flowOn(executeDispatcher))
         }
         val actualSchedules = mutableListOf<Schedule>()
-
         LocalScheduleRepository(scheduleDao)
             .get(scheduleItemRequest)
             .onEach { actualSchedules += it.first() }
             .launchIn(genFlowObserveCoroutineScope())
 
-        advanceTimeBy(2_000)
-        assertThat(actualSchedules, equalTo(listOf(firstSchedule, secondSchedule)))
+        advanceTimeBy(delayTimeMillis = delayBetweenElements * 2)
+        assertThat(actualSchedules, equalTo(expectedSchedules))
+    }
+
+    @Test
+    fun `notify schedules when ScheduleDao sent pagingSource`() = runTest {
+        val isComplete: Boolean = genBoolean()
+
+        notifyScheduleWhenScheduleDaoSentPagingSource(
+            ScheduleItemRequest.Find,
+            setupMock = { scheduleDao, pagingSource ->
+                whenever(scheduleDao.findAsPagingSource()) doReturn pagingSource
+            }
+        )
+
+        notifyScheduleWhenScheduleDaoSentPagingSource(
+            ScheduleItemRequest.FindByComplete(isComplete),
+            setupMock = { scheduleDao, pagingSource ->
+                whenever(scheduleDao.findAsPagingSourceByComplete(isComplete)) doReturn pagingSource
+            }
+        )
+    }
+
+    private fun notifyScheduleWhenScheduleDaoSentPagingSource(
+        ScheduleItemRequest: ScheduleItemRequest,
+        setupMock: (ScheduleDao, PagingSource<Int, ScheduleEntityWithTagEntities>) -> Unit
+    ) = runTest {
+        val expectedEntities = genScheduleEntityWithTagEntitiesList()
+        val scheduleDao: ScheduleDao = mock {
+            setupMock(
+                mock,
+                object : PagingSource<Int, ScheduleEntityWithTagEntities>() {
+                    override fun getRefreshKey(state: PagingState<Int, ScheduleEntityWithTagEntities>): Int? = null
+                    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, ScheduleEntityWithTagEntities> =
+                        LoadResult.Page(data = expectedEntities, prevKey = null, nextKey = null)
+                }
+            )
+        }
+        val differ = AsyncPagingDataDiffer(
+            diffCallback = IdentityItemCallback<Schedule>(),
+            updateCallback = NoopListCallback(),
+            workerDispatcher = Dispatchers.Main
+        )
+
+        LocalScheduleRepository(scheduleDao)
+            .getAsPagingData(ScheduleItemRequest, PagingConfig(pageSize = genInt()))
+            .onEach { data -> differ.submitData(data) }
+            .launchIn(genFlowObserveCoroutineScope())
+
+        advanceUntilIdle()
+        assertThat(differ.snapshot().items, equalTo(expectedEntities.toSchedules()))
     }
 
     @Test
