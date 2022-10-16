@@ -29,7 +29,7 @@ import kotlinx.coroutines.flow.flowOn
 /**
  * @author Doohyun
  */
-class DefaultGetAllScheduleSnapshotUseCase(
+class DeprecatedDefaultGetAllScheduleSnapshotUseCase(
     private val doneScheduleShownRepository: DoneScheduleShownRepository,
     private val scheduleRepository: ScheduleRepository,
     private val scheduleUiStateFlowFactory: ScheduleUiStateFlowFactory,

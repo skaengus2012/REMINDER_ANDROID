@@ -31,7 +31,7 @@ import org.mockito.kotlin.*
 /**
  * @author Doohyun
  */
-class DefaultGetAllScheduleSnapshotUseCaseTest {
+class DeprecatedDefaultGetAllScheduleSnapshotUseCaseTest {
     @Test
     fun `find all schedules when doneScheduleShown was true`() {
         testSchedulesRequest(
@@ -64,7 +64,7 @@ class DefaultGetAllScheduleSnapshotUseCaseTest {
         val scheduleRepository: ScheduleRepository = mock {
             whenever(mock.get(scheduleItemRequest)) doReturn flowOf(expectSchedules)
         }
-        val getAllScheduleReport: GetAllScheduleSnapshotUseCase = DefaultGetAllScheduleSnapshotUseCase(
+        val getAllScheduleReport: GetAllScheduleSnapshotUseCase = DeprecatedDefaultGetAllScheduleSnapshotUseCase(
             doneScheduleShownRepository = mock { whenever(mock.get()) doReturn flowOf(isDoneScheduleShown) },
             scheduleRepository = scheduleRepository,
             scheduleUiStateFlowFactory = fakeScheduleUiStateFlowFactory,

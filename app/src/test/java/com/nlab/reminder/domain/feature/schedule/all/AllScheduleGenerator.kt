@@ -16,6 +16,7 @@
 
 package com.nlab.reminder.domain.feature.schedule.all
 
+import androidx.paging.PagingData
 import com.nlab.reminder.domain.common.schedule.ScheduleUiState
 import com.nlab.reminder.domain.common.schedule.UpdateCompleteUseCase
 import com.nlab.reminder.domain.common.schedule.genSchedule
@@ -31,8 +32,9 @@ import org.mockito.kotlin.whenever
  */
 fun genAllScheduleReport(
     schedules: List<ScheduleUiState> = genScheduleUiStates(),
-    isDoneScheduleShown: Boolean = genBoolean()
-): AllScheduleSnapshot = AllScheduleSnapshot(schedules, isDoneScheduleShown)
+    isDoneScheduleShown: Boolean = genBoolean(),
+    pagingScheduled: PagingData<ScheduleUiState> = PagingData.empty()
+): AllScheduleSnapshot = AllScheduleSnapshot(schedules, isDoneScheduleShown, pagingScheduled)
 
 fun genAllScheduleEvents(): Set<AllScheduleEvent> = setOf(
     AllScheduleEvent.Fetch,
