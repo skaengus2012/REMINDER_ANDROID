@@ -16,23 +16,13 @@
 
 package com.nlab.reminder.domain.common.schedule.impl
 
-import com.nlab.reminder.core.util.transaction.TransactionId
 import com.nlab.reminder.domain.common.schedule.*
-import com.nlab.reminder.test.genBoolean
-import com.nlab.reminder.test.genBothify
-import com.nlab.reminder.test.genFlowExecutionDispatcher
-import com.nlab.reminder.test.genFlowObserveCoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
-import org.mockito.kotlin.doReturn
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
 
 /**
  * @author Doohyun
@@ -40,38 +30,17 @@ import org.mockito.kotlin.whenever
 @OptIn(ExperimentalCoroutinesApi::class)
 class DefaultScheduleUiStateFlowFactoryTest {
     @Test
-    fun `schedule combined with complete mark after 1000ms`() = runTest {
-        val executeDispatcher = genFlowExecutionDispatcher(testScheduler)
-        val isComplete: Boolean = genBoolean()
-        val schedule: Schedule = genSchedule(isComplete = isComplete)
-        val completeMark = CompleteMark(
-            isComplete.not(),
-            isApplied = genBoolean(),
-            transactionId = TransactionId(genBothify())
-        )
-        val schedulesFlow: Flow<List<Schedule>> = flowOf(listOf(schedule))
-        val completeMarkRepository: CompleteMarkRepository = mock {
-            whenever(mock.get()) doReturn flow {
-                delay(1_000)
-                emit(mapOf(schedule.id() to completeMark))
-            }.flowOn(executeDispatcher)
-        }
-        val scheduleUiStateFlowFactory = DefaultScheduleUiStateFlowFactory(completeMarkRepository)
-        val acc: MutableList<ScheduleUiState> = mutableListOf()
-        scheduleUiStateFlowFactory
-            .with(schedulesFlow)
-            .onEach { acc += it.first() }
-            .launchIn(genFlowObserveCoroutineScope())
+    fun `schedule combined with complete mark`() = runTest {
+        val testFixture = CompleteMarkCombineTestFixture()
+        val scheduleUiStateFlowFactory =
+            DefaultScheduleUiStateFlowFactory(testFixture.completeMarkRepository)
 
-        advanceTimeBy(1_500)
-        assertThat(
-            acc,
-            equalTo(
-                listOf(
-                    genScheduleUiState(schedule),
-                    genScheduleUiState(schedule, isCompleteMarked = isComplete.not())
-                )
-            )
-        )
+        val acc: List<ScheduleUiState> =
+            scheduleUiStateFlowFactory
+                .with(flowOf(listOf(testFixture.schedule)))
+                .take(1)
+                .first()
+
+        assertThat(acc, equalTo(testFixture.expectedScheduleUiStates))
     }
 }

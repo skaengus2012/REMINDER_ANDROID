@@ -16,6 +16,7 @@
 
 package com.nlab.reminder.domain.common.schedule
 
+import com.nlab.reminder.core.util.transaction.TransactionId
 import com.nlab.reminder.domain.common.tag.Tag
 import com.nlab.reminder.domain.common.tag.genTags
 import com.nlab.reminder.test.genBoolean
@@ -53,3 +54,9 @@ fun genScheduleUiStates(
 ): List<ScheduleUiState> = schedules.map { schedule ->
     ScheduleUiState(schedule, isCompleteMarked = isCompleteMarked ?: schedule.isComplete)
 }
+
+fun genCompleteMark(
+    isComplete: Boolean = genBoolean(),
+    isApplied: Boolean = genBoolean(),
+    transactionId: TransactionId = TransactionId(genBothify())
+): CompleteMark = CompleteMark(isComplete, isApplied, transactionId)
