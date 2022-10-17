@@ -16,20 +16,18 @@
 
 package com.nlab.reminder.domain.feature.schedule.all.di
 
+import androidx.paging.PagingConfig
 import com.nlab.reminder.core.state.StateContainer
 import com.nlab.reminder.core.state.asContainer
-import com.nlab.reminder.domain.common.schedule.DoneScheduleShownRepository
-import com.nlab.reminder.domain.common.schedule.ScheduleRepository
-import com.nlab.reminder.domain.common.schedule.ScheduleUiStateFlowFactory
-import com.nlab.reminder.domain.common.schedule.UpdateCompleteUseCase
+import com.nlab.reminder.domain.common.schedule.*
+import com.nlab.reminder.domain.common.schedule.impl.*
 import com.nlab.reminder.domain.feature.schedule.all.*
-import com.nlab.reminder.domain.feature.schedule.all.impl.DeprecatedDefaultGetAllScheduleSnapshotUseCase
+import com.nlab.reminder.domain.feature.schedule.all.impl.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 
 /**
  * @author Doohyun
@@ -40,18 +38,18 @@ class AllScheduleViewModelModule {
     @Provides
     fun provideStateMachineProvider(
         scheduleRepository: ScheduleRepository,
-        scheduleUiStateFlowFactory: ScheduleUiStateFlowFactory,
+        scheduleUiStatePagingFlowFactory: ScheduleUiStatePagingFlowFactory,
         updateCompleteUseCase: UpdateCompleteUseCase,
         @AllScheduleScope doneScheduleShownRepository: DoneScheduleShownRepository
     ): AllScheduleStateContainerFactory =
         object : AllScheduleStateContainerFactory {
             override fun create(scope: CoroutineScope): StateContainer<AllScheduleEvent, AllScheduleState> {
                 val stateMachine = AllScheduleStateMachine(
-                    getAllScheduleSnapshot = DeprecatedDefaultGetAllScheduleSnapshotUseCase(
-                        doneScheduleShownRepository,
+                    getAllScheduleSnapshot = DefaultGetAllScheduleSnapshotUseCase(
+                        scope,
+                        PagingConfig(pageSize = 20, enablePlaceholders = false),
                         scheduleRepository,
-                        scheduleUiStateFlowFactory,
-                        Dispatchers.Default
+                        scheduleUiStatePagingFlowFactory
                     ),
                     updateScheduleComplete = updateCompleteUseCase
                 )

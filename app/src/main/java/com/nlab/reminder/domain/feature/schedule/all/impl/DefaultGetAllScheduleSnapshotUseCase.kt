@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.common.schedule.impl
+package com.nlab.reminder.domain.feature.schedule.all.impl
 
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData

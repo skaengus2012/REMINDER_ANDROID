@@ -87,7 +87,7 @@ class AllScheduleStateMachineKtTest {
         stateContainer
             .stateFlow
             .filterIsInstance<AllScheduleState.Loaded>()
-            .onEach { deferred.complete(it.allSchedulesReport) }
+            .onEach { deferred.complete(it.snapshot) }
             .launchIn(genFlowObserveCoroutineScope())
 
         assertThat(deferred.await(), equalTo(expected))

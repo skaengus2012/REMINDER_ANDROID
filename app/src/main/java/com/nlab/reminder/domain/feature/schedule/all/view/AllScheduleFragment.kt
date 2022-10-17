@@ -22,20 +22,18 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.flowWithLifecycle
-import com.nlab.reminder.core.android.fragment.viewLifecycle
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import com.nlab.reminder.core.android.fragment.viewLifecycleScope
-import com.nlab.reminder.core.android.recyclerview.suspendSubmitList
 import com.nlab.reminder.databinding.FragmentAllScheduleBinding
-import com.nlab.reminder.domain.common.schedule.view.DefaultScheduleItemAdapter
-import com.nlab.reminder.domain.common.schedule.view.ScheduleItem
+import com.nlab.reminder.domain.common.schedule.view.DefaultSchedulePagingAdapter
 import com.nlab.reminder.domain.common.schedule.view.ScheduleItemAnimator
 import com.nlab.reminder.domain.feature.schedule.all.AllScheduleState
 import com.nlab.reminder.domain.feature.schedule.all.AllScheduleViewModel
 import com.nlab.reminder.domain.feature.schedule.all.onScheduleCompleteUpdateClicked
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 
 /**
  * @author Doohyun
@@ -47,11 +45,6 @@ class AllScheduleFragment : Fragment() {
     private var _binding: FragmentAllScheduleBinding? = null
     private val binding: FragmentAllScheduleBinding get() = checkNotNull(_binding)
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        postponeEnterTransition()
-    }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         FragmentAllScheduleBinding.inflate(inflater, container, false)
             .also { _binding = it }
@@ -59,40 +52,28 @@ class AllScheduleFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val scheduleAdapter = DefaultScheduleItemAdapter()
-        val renderWhenLoaded = renderWhenLoadedFunc(scheduleAdapter)
+        val scheduleAdapter = DefaultSchedulePagingAdapter(
+            onCompleteClicked = { scheduleUiState ->
+                viewModel.onScheduleCompleteUpdateClicked(
+                    scheduleId = scheduleUiState.schedule.id(),
+                    isComplete = scheduleUiState.isCompleteMarked.not()
+                )
+            }
+        )
 
         binding.contentRecyclerview
             .apply { itemAnimator = ScheduleItemAnimator() }
             .apply { adapter = scheduleAdapter }
 
-        viewModel.stateFlow
-            .filterIsInstance<AllScheduleState.Loaded>()
-            .flowWithLifecycle(viewLifecycle)
-            .map { it.allSchedulesReport }
-            .distinctUntilChanged()
-            .map { report ->
-                AllScheduleLoadedSnapshot(report, scheduleItemFactory = { uiState ->
-                    ScheduleItem(
-                        uiState,
-                        onCompleteToggleClicked = {
-                            viewModel.onScheduleCompleteUpdateClicked(
-                                uiState.schedule.id(), isComplete = uiState.isCompleteMarked.not()
-                            )
-                        }
-                    )
-                })
+        viewLifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.stateFlow
+                    .filterIsInstance<AllScheduleState.Loaded>()
+                    .map { it.snapshot.pagingScheduled }
+                    .distinctUntilChanged()
+                    .collectLatest(scheduleAdapter::submitData)
             }
-            .flowOn(Dispatchers.Default)
-            .onEach(renderWhenLoaded)
-            .launchIn(viewLifecycleScope)
-    }
-
-    private fun renderWhenLoadedFunc(
-        doingScheduleAdapter: DefaultScheduleItemAdapter
-    ): suspend (AllScheduleLoadedSnapshot) -> Unit = { snapshot ->
-        doingScheduleAdapter.suspendSubmitList(snapshot.doingScheduleItems)
-        startPostponedEnterTransition()
+        }
     }
 
     override fun onDestroyView() {

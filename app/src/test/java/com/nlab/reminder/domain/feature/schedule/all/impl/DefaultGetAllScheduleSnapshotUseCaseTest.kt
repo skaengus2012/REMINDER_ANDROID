@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.common.schedule.impl
+package com.nlab.reminder.domain.feature.schedule.all.impl
 
 import androidx.paging.AsyncPagingDataDiffer
 import androidx.paging.PagingConfig
@@ -75,13 +75,13 @@ class DefaultGetAllScheduleSnapshotUseCaseTest {
             scheduleRepository = scheduleRepository,
             scheduleUiStatePagingFlowFactory = fakeScheduleUiStatePagingFlowFactory
         )
+        val snapshot: AllScheduleSnapshot =
+            getAllScheduleSnapshotUseCase().take(1).first()
         val differ = AsyncPagingDataDiffer(
             diffCallback = IdentityItemCallback<ScheduleUiState>(),
             updateCallback = NoopListCallback(),
             workerDispatcher = Dispatchers.Main
         )
-        val snapshot: AllScheduleSnapshot =
-            getAllScheduleSnapshotUseCase().take(1).first()
         differ.submitData(snapshot.pagingScheduled)
 
         advanceUntilIdle()
