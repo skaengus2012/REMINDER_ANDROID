@@ -56,7 +56,7 @@ class AllScheduleStateMachineKtTest {
 
     @Test
     fun `update to Loaded when state was not init and AllScheduleReportLoaded sent`() = runTest {
-        val allScheduleReport = genAllScheduleReport()
+        val allScheduleReport = genAllScheduleSnapshot()
         val stateContainers =
             genAllScheduleStates()
                 .filter { it != AllScheduleState.Init }
@@ -72,7 +72,7 @@ class AllScheduleStateMachineKtTest {
 
     @Test
     fun `subscribe allScheduleReport snapshot when state was init and fetch sent`() = runTest {
-        val expected = genAllScheduleReport()
+        val expected = genAllScheduleSnapshot()
         val getAllScheduleReport: GetAllScheduleSnapshotUseCase = mock {
             whenever(mock()) doReturn flow { emit(expected) }
         }
@@ -100,7 +100,7 @@ class AllScheduleStateMachineKtTest {
         val updateCompleteUseCase: UpdateCompleteUseCase = mock()
         val stateContainer =
             genAllScheduleStateMachine(updateScheduleComplete = updateCompleteUseCase)
-                .asContainer(genStateContainerScope(), AllScheduleState.Loaded(genAllScheduleReport()))
+                .asContainer(genStateContainerScope(), AllScheduleState.Loaded(genAllScheduleSnapshot()))
         stateContainer
             .send(AllScheduleEvent.OnScheduleCompleteUpdateClicked(schedule.id(), isComplete))
             .join()

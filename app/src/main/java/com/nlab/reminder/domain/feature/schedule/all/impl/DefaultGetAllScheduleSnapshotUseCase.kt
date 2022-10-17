@@ -19,36 +19,45 @@ package com.nlab.reminder.domain.feature.schedule.all.impl
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import com.nlab.reminder.core.kotlin.coroutine.flow.map
 import com.nlab.reminder.domain.common.schedule.*
 import com.nlab.reminder.domain.feature.schedule.all.AllScheduleSnapshot
 import com.nlab.reminder.domain.feature.schedule.all.GetAllScheduleSnapshotUseCase
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.*
 
 /**
  * @author thalys
  */
 class DefaultGetAllScheduleSnapshotUseCase(
-    private val coroutineScope: CoroutineScope,
-    private val pagingConfig: PagingConfig,
-    private val scheduleRepository: ScheduleRepository,
+    coroutineScope: CoroutineScope,
+    pagingConfig: PagingConfig,
+    scheduleRepository: ScheduleRepository,
+    private val doneScheduleShownRepository: DoneScheduleShownRepository,
     private val scheduleUiStatePagingFlowFactory: ScheduleUiStatePagingFlowFactory,
 ) : GetAllScheduleSnapshotUseCase {
-    override fun invoke(): Flow<AllScheduleSnapshot> {
-        val isDoneScheduleShown: Boolean = true
-        return getScheduleFlow(isDoneScheduleShown)
+    private val findAllSchedules: Flow<PagingData<Schedule>> =
+        scheduleRepository
+            .getAsPagingData(ScheduleItemRequest.Find, pagingConfig)
             .cachedIn(coroutineScope)
+    private val findNotCompleteSchedules: Flow<PagingData<Schedule>> =
+        scheduleRepository
+            .getAsPagingData(ScheduleItemRequest.FindByComplete(isComplete = false), pagingConfig)
+            .cachedIn(coroutineScope)
+
+    @ExperimentalCoroutinesApi
+    override fun invoke(): Flow<AllScheduleSnapshot> =
+        doneScheduleShownRepository.get()
+            .flatMapLatest(this::getSnapshot)
+            .buffer(0)
+
+    private fun getSnapshot(isDoneScheduleShown: Boolean): Flow<AllScheduleSnapshot> =
+        getSchedules(isDoneScheduleShown)
             .let(scheduleUiStatePagingFlowFactory::with)
             .map { scheduleUiStates -> AllScheduleSnapshot(emptyList(), isDoneScheduleShown, scheduleUiStates) }
-    }
 
-    private fun getScheduleFlow(isDoneScheduleShown: Boolean): Flow<PagingData<Schedule>> =
-        scheduleRepository.getAsPagingData(
-            request = when (isDoneScheduleShown) {
-                true -> ScheduleItemRequest.Find
-                false -> ScheduleItemRequest.FindByComplete(isComplete = false)
-            },
-            pagingConfig
-        )
+    private fun getSchedules(isDoneScheduleShown: Boolean): Flow<PagingData<Schedule>> =
+        if (isDoneScheduleShown) findAllSchedules
+        else findNotCompleteSchedules
 }

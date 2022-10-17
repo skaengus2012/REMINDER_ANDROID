@@ -19,7 +19,7 @@ package com.nlab.reminder.domain.feature.schedule.all.impl
 import com.nlab.reminder.domain.common.schedule.*
 import com.nlab.reminder.domain.feature.schedule.all.AllScheduleSnapshot
 import com.nlab.reminder.domain.feature.schedule.all.GetAllScheduleSnapshotUseCase
-import com.nlab.reminder.domain.feature.schedule.all.genAllScheduleReport
+import com.nlab.reminder.domain.feature.schedule.all.genAllScheduleSnapshot
 import com.nlab.reminder.test.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -58,7 +58,7 @@ class DeprecatedDefaultGetAllScheduleSnapshotUseCaseTest {
         val fakeCompleteMark: Boolean = genBoolean()
         val fakeScheduleUiStateFlowFactory: ScheduleUiStateFlowFactory = object : ScheduleUiStateFlowFactory{
             override fun with(schedules: Flow<List<Schedule>>): Flow<List<ScheduleUiState>> {
-                return schedules.map { schedules -> genScheduleUiStates(schedules, fakeCompleteMark) }
+                return schedules.map { genScheduleUiStates(it, fakeCompleteMark) }
             }
         }
         val scheduleRepository: ScheduleRepository = mock {
@@ -78,7 +78,7 @@ class DeprecatedDefaultGetAllScheduleSnapshotUseCaseTest {
             actualReports,
             equalTo(
                 listOf(
-                    genAllScheduleReport(
+                    genAllScheduleSnapshot(
                         genScheduleUiStates(expectSchedules, fakeCompleteMark),
                         isDoneScheduleShown
                     )

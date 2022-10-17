@@ -47,8 +47,9 @@ class AllScheduleViewModelModule {
                 val stateMachine = AllScheduleStateMachine(
                     getAllScheduleSnapshot = DefaultGetAllScheduleSnapshotUseCase(
                         scope,
-                        PagingConfig(pageSize = 20, enablePlaceholders = false),
+                        PagingConfig(pageSize = 20),
                         scheduleRepository,
+                        doneScheduleShownRepository,
                         scheduleUiStatePagingFlowFactory
                     ),
                     updateScheduleComplete = updateCompleteUseCase

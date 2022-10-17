@@ -18,16 +18,18 @@ package com.nlab.reminder.domain.common.schedule.view
 
 import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
+import com.nlab.reminder.domain.common.schedule.Schedule
 import com.nlab.reminder.domain.common.schedule.ScheduleUiState
 
 /**
  * @author thalys
  */
 class DefaultSchedulePagingAdapter(
+    private val emptyUiState: ScheduleUiState = ScheduleUiState(Schedule.empty(), isCompleteMarked = false),
     private val onCompleteClicked: (ScheduleUiState) -> Unit
 ) : PagingDataAdapter<ScheduleUiState, ScheduleUiStateViewHolder>(ScheduleUiStateDiffCallback()) {
     override fun onBindViewHolder(holder: ScheduleUiStateViewHolder, position: Int) {
-        holder.onBind(getItem(position)!!) // TODO make stub
+        holder.onBind(getItem(position) ?: emptyUiState)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ScheduleUiStateViewHolder {

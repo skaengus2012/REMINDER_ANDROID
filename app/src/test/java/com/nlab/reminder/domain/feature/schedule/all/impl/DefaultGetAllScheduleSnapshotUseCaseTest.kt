@@ -22,14 +22,11 @@ import androidx.paging.PagingData
 import com.nlab.reminder.domain.common.schedule.*
 import com.nlab.reminder.domain.feature.schedule.all.AllScheduleSnapshot
 import com.nlab.reminder.domain.feature.schedule.all.GetAllScheduleSnapshotUseCase
-import com.nlab.reminder.domain.feature.schedule.all.genAllScheduleReport
+import com.nlab.reminder.domain.feature.schedule.all.genAllScheduleSnapshot
 import com.nlab.reminder.test.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.test.advanceUntilIdle
-import kotlinx.coroutines.test.resetMain
-import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
+import kotlinx.coroutines.test.*
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.After
@@ -56,7 +53,44 @@ class DefaultGetAllScheduleSnapshotUseCaseTest {
 
     @Test
     fun `find all schedules when doneScheduleShown was true`() = runTest {
-        val isDoneScheduleShown = true // TODO implements with doneScheduleShownRepository
+        testFindTemplate(
+            isDoneScheduleShown = true,
+            setupMock = { scheduleRepository, pagingConfig, expectSchedules ->
+                whenever(
+                    scheduleRepository
+                        .getAsPagingData(ScheduleItemRequest.Find, pagingConfig)
+                ) doReturn flowOf(PagingData.from(expectSchedules))
+
+                whenever(
+                    scheduleRepository
+                        .getAsPagingData(ScheduleItemRequest.FindByComplete(isComplete = false), pagingConfig)
+                ) doReturn emptyFlow()
+            }
+        )
+    }
+
+    @Test
+    fun `find not complete schedules when doneScheduleShown was false`() = runTest {
+        testFindTemplate(
+            isDoneScheduleShown = false,
+            setupMock = { scheduleRepository, pagingConfig, expectSchedules ->
+                whenever(
+                    scheduleRepository
+                        .getAsPagingData(ScheduleItemRequest.Find, pagingConfig)
+                ) doReturn emptyFlow()
+
+                whenever(
+                    scheduleRepository
+                        .getAsPagingData(ScheduleItemRequest.FindByComplete(isComplete = false), pagingConfig)
+                ) doReturn flowOf(PagingData.from(expectSchedules))
+            }
+        )
+    }
+
+    private suspend fun TestScope.testFindTemplate(
+        isDoneScheduleShown: Boolean,
+        setupMock: (ScheduleRepository, PagingConfig, schedules: List<Schedule>) -> Unit,
+    ) {
         val expectSchedules: List<Schedule> = genSchedules()
         val pagingConfig = PagingConfig(pageSize = expectSchedules.size)
         val fakeCompleteMark: Boolean = genBoolean()
@@ -64,15 +98,12 @@ class DefaultGetAllScheduleSnapshotUseCaseTest {
             override fun with(schedules: Flow<PagingData<Schedule>>): Flow<PagingData<ScheduleUiState>> =
                 schedules.map { genPagingScheduleUiStates(it, fakeCompleteMark) }
         }
-        val scheduleRepository: ScheduleRepository = mock {
-            whenever(mock.getAsPagingData(ScheduleItemRequest.Find, pagingConfig)) doReturn flowOf(
-                PagingData.from(expectSchedules)
-            )
-        }
+        val scheduleRepository: ScheduleRepository = mock { setupMock(mock, pagingConfig, expectSchedules) }
         val getAllScheduleSnapshotUseCase: GetAllScheduleSnapshotUseCase = DefaultGetAllScheduleSnapshotUseCase(
             coroutineScope = CoroutineScope(genFlowExecutionDispatcher(testScheduler)),
             pagingConfig = pagingConfig,
             scheduleRepository = scheduleRepository,
+            doneScheduleShownRepository = mock { whenever(mock.get()) doReturn flowOf(isDoneScheduleShown) },
             scheduleUiStatePagingFlowFactory = fakeScheduleUiStatePagingFlowFactory
         )
         val snapshot: AllScheduleSnapshot =
@@ -88,7 +119,7 @@ class DefaultGetAllScheduleSnapshotUseCaseTest {
         assertThat(
             snapshot.copy(pagingScheduled = PagingData.empty()),
             equalTo(
-                genAllScheduleReport(
+                genAllScheduleSnapshot(
                     emptyList(), // TODO remove
                     isDoneScheduleShown = isDoneScheduleShown,
                     pagingScheduled = PagingData.empty()
@@ -97,7 +128,7 @@ class DefaultGetAllScheduleSnapshotUseCaseTest {
         )
         assertThat(
             differ.snapshot().items,
-            equalTo(genScheduleUiStates(expectSchedules, fakeCompleteMark),)
+            equalTo(genScheduleUiStates(expectSchedules, fakeCompleteMark))
         )
     }
 }
