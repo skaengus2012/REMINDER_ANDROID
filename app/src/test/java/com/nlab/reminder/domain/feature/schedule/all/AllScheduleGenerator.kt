@@ -31,10 +31,9 @@ import org.mockito.kotlin.whenever
  * @author Doohyun
  */
 fun genAllScheduleSnapshot(
-    schedules: List<ScheduleUiState> = genScheduleUiStates(),
     isDoneScheduleShown: Boolean = genBoolean(),
     pagingScheduled: PagingData<ScheduleUiState> = PagingData.empty()
-): AllScheduleSnapshot = AllScheduleSnapshot(schedules, isDoneScheduleShown, pagingScheduled)
+): AllScheduleSnapshot = AllScheduleSnapshot(pagingScheduled, isDoneScheduleShown)
 
 fun genAllScheduleEvents(): Set<AllScheduleEvent> = setOf(
     AllScheduleEvent.Fetch,

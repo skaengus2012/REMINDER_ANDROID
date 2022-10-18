@@ -55,7 +55,7 @@ class DefaultGetAllScheduleSnapshotUseCase(
     private fun getSnapshot(isDoneScheduleShown: Boolean): Flow<AllScheduleSnapshot> =
         getSchedules(isDoneScheduleShown)
             .let(scheduleUiStatePagingFlowFactory::with)
-            .map { scheduleUiStates -> AllScheduleSnapshot(emptyList(), isDoneScheduleShown, scheduleUiStates) }
+            .map { scheduleUiStates -> AllScheduleSnapshot(scheduleUiStates, isDoneScheduleShown) }
 
     private fun getSchedules(isDoneScheduleShown: Boolean): Flow<PagingData<Schedule>> =
         if (isDoneScheduleShown) findAllSchedules

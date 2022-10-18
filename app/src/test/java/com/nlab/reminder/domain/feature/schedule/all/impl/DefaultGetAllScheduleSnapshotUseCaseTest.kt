@@ -120,9 +120,8 @@ class DefaultGetAllScheduleSnapshotUseCaseTest {
             snapshot.copy(pagingScheduled = PagingData.empty()),
             equalTo(
                 genAllScheduleSnapshot(
-                    emptyList(), // TODO remove
-                    isDoneScheduleShown = isDoneScheduleShown,
-                    pagingScheduled = PagingData.empty()
+                    pagingScheduled = PagingData.empty(),
+                    isDoneScheduleShown = isDoneScheduleShown
                 )
             )
         )

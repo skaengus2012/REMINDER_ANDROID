@@ -25,7 +25,6 @@ import com.nlab.reminder.domain.common.schedule.ScheduleUiState
  */
 @Generated
 data class AllScheduleSnapshot(
-    val schedules: List<ScheduleUiState>,
-    val isDoneScheduleShown: Boolean,
-    val pagingScheduled: PagingData<ScheduleUiState> = PagingData.empty()
+    val pagingScheduled: PagingData<ScheduleUiState>,
+    val isDoneScheduleShown: Boolean
 )
