@@ -165,6 +165,7 @@ dependencies {
     kapt(Dependencies.ANDROID_ROOM_COMPILER)
     implementation(Dependencies.ANDROID_STARTUP_RUNTIME)
     implementation(Dependencies.ANDROID_PAGING_RUNTIME)
+    implementation(Dependencies.ANDROID_DATASTORE_PREFERENCES)
 
     implementation(Dependencies.GOOGLE_HILT_ANDROID)
     kapt(Dependencies.GOOGLE_HILT_ANDROID_COMPILER)
