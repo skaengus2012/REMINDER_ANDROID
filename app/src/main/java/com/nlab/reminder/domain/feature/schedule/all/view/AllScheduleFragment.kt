@@ -28,6 +28,7 @@ import com.nlab.reminder.core.android.fragment.viewLifecycleScope
 import com.nlab.reminder.databinding.FragmentAllScheduleBinding
 import com.nlab.reminder.domain.common.schedule.view.DefaultSchedulePagingAdapter
 import com.nlab.reminder.domain.common.schedule.view.ScheduleItemAnimator
+import com.nlab.reminder.domain.common.schedule.view.ScheduleItemTouchMediator
 import com.nlab.reminder.domain.feature.schedule.all.AllScheduleState
 import com.nlab.reminder.domain.feature.schedule.all.AllScheduleViewModel
 import com.nlab.reminder.domain.feature.schedule.all.onScheduleCompleteUpdateClicked
@@ -60,10 +61,19 @@ class AllScheduleFragment : Fragment() {
                 )
             }
         )
+        val scheduleItemTouchMediator = ScheduleItemTouchMediator(viewLifecycleOwner, scheduleAdapter)
 
         binding.contentRecyclerview
+            .apply { scheduleItemTouchMediator.attachToRecyclerView(recyclerView = this) }
             .apply { itemAnimator = ScheduleItemAnimator() }
             .apply { adapter = scheduleAdapter }
+
+        scheduleItemTouchMediator.dragEndedFlow
+            .onEach {
+                // TODO make order save.
+                println("TODO make order save.")
+            }
+            .launchIn(viewLifecycleScope)
 
         viewLifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
