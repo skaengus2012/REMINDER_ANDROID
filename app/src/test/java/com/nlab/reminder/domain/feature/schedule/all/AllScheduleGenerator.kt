@@ -16,6 +16,7 @@
 
 package com.nlab.reminder.domain.feature.schedule.all
 
+import androidx.paging.PagingData
 import com.nlab.reminder.domain.common.schedule.ScheduleUiState
 import com.nlab.reminder.domain.common.schedule.UpdateCompleteUseCase
 import com.nlab.reminder.domain.common.schedule.genSchedule
@@ -29,25 +30,25 @@ import org.mockito.kotlin.whenever
 /**
  * @author Doohyun
  */
-fun genAllScheduleReport(
-    schedules: List<ScheduleUiState> = genScheduleUiStates(),
-    isDoneScheduleShown: Boolean = genBoolean()
-): AllScheduleReport = AllScheduleReport(schedules, isDoneScheduleShown)
+fun genAllScheduleSnapshot(
+    isDoneScheduleShown: Boolean = genBoolean(),
+    pagingScheduled: PagingData<ScheduleUiState> = PagingData.empty()
+): AllScheduleSnapshot = AllScheduleSnapshot(pagingScheduled, isDoneScheduleShown)
 
 fun genAllScheduleEvents(): Set<AllScheduleEvent> = setOf(
     AllScheduleEvent.Fetch,
-    AllScheduleEvent.AllScheduleReportLoaded(genAllScheduleReport()),
+    AllScheduleEvent.AllScheduleReportLoaded(genAllScheduleSnapshot()),
     AllScheduleEvent.OnScheduleCompleteUpdateClicked(genSchedule().id(), genBoolean())
 )
 
 fun genAllScheduleStates(): Set<AllScheduleState> = setOf(
     AllScheduleState.Init,
     AllScheduleState.Loading,
-    AllScheduleState.Loaded(genAllScheduleReport())
+    AllScheduleState.Loaded(genAllScheduleSnapshot())
 )
 
 fun genAllScheduleStateMachine(
-    getAllScheduleReport: GetAllScheduleReportUseCase = mock { whenever(mock()) doReturn emptyFlow() },
+    getAllScheduleReport: GetAllScheduleSnapshotUseCase = mock { whenever(mock()) doReturn emptyFlow() },
     updateScheduleComplete: UpdateCompleteUseCase = mock()
 ) = AllScheduleStateMachine(
     getAllScheduleReport,

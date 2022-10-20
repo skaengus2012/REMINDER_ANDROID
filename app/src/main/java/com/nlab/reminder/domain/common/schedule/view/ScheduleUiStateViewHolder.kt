@@ -23,37 +23,39 @@ import androidx.recyclerview.widget.RecyclerView
 import com.nlab.reminder.core.android.view.initWithLifecycleOwner
 import com.nlab.reminder.core.android.view.throttleClicks
 import com.nlab.reminder.databinding.ViewItemScheduleBinding
+import com.nlab.reminder.domain.common.schedule.ScheduleUiState
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 /**
- * @author Doohyun
+ * @author thalys
  */
-class ScheduleItemViewHolder(
-    private val binding: ViewItemScheduleBinding
+class ScheduleUiStateViewHolder(
+    private val binding: ViewItemScheduleBinding,
+    onCompleteClicked: (position: Int) -> Unit
 ) : RecyclerView.ViewHolder(binding.root) {
-    private var onCompleteToggleClicked: () -> Unit = {}
-
     init {
         binding.initWithLifecycleOwner { lifecycleOwner ->
-            checkboxButton
+            buttonComplete
                 .throttleClicks()
-                .onEach { onCompleteToggleClicked() }
+                .onEach { onCompleteClicked(bindingAdapterPosition) }
                 .launchIn(lifecycleOwner.lifecycleScope)
         }
     }
 
-    fun onBind(scheduleItem: ScheduleItem) {
-        onCompleteToggleClicked = scheduleItem.onCompleteToggleClicked
-
-        binding.titleTextview.text = scheduleItem.title
-        binding.noteTextview.text = scheduleItem.note
-        binding.checkboxButton.isSelected = scheduleItem.isComplete
+    fun onBind(scheduleUiState: ScheduleUiState) {
+        binding.textviewTitle.text = scheduleUiState.schedule.title // TODO low of demeter.
+        binding.textviewNote.text = scheduleUiState.schedule.note
+        binding.buttonComplete.isSelected = scheduleUiState.isCompleteMarked
     }
 
     companion object {
-        fun of(parent: ViewGroup): ScheduleItemViewHolder = ScheduleItemViewHolder(
-            ViewItemScheduleBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        fun of(
+            parent: ViewGroup,
+            onCompleteClicked: (position: Int) -> Unit
+        ): ScheduleUiStateViewHolder = ScheduleUiStateViewHolder(
+            ViewItemScheduleBinding.inflate(LayoutInflater.from(parent.context), parent, false),
+            onCompleteClicked
         )
     }
 }

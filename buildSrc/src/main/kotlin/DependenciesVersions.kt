@@ -21,7 +21,7 @@ import org.gradle.api.JavaVersion
  */
 object DependenciesVersions {
     val JAVA_VERSION = JavaVersion.VERSION_11
-    const val AGP = "7.3.0"
+    const val AGP = "7.3.1"
     const val JACOCO = "0.8.8"
     const val KOTLIN = "1.7.10"
     const val KOTLIN_COROUTINE = "1.6.4"
@@ -36,6 +36,7 @@ object DependenciesVersions {
     const val ANDROID_NAVIGATION = "2.5.1"
     const val ANDROID_ROOM = "2.4.3"
     const val ANDROID_STARTUP = "1.1.1"
+    const val ANDROID_PAGING = "3.1.1"
 
     const val GOOGLE_HILT = "2.43.2"
     const val GOOGLE_FLEXBOX = "3.0.0"

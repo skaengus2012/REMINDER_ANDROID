@@ -22,5 +22,5 @@ import kotlinx.coroutines.flow.Flow
  * @author Doohyun
  */
 interface ScheduleUiStateFlowFactory {
-    fun combineWith(scheduleFlow: Flow<List<Schedule>>): Flow<List<ScheduleUiState>>
+    fun with(schedules: Flow<List<Schedule>>): Flow<List<ScheduleUiState>>
 }

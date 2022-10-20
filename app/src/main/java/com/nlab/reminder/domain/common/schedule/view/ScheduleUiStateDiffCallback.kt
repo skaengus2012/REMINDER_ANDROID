@@ -14,16 +14,20 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.feature.schedule.all
+package com.nlab.reminder.domain.common.schedule.view
 
-import com.nlab.reminder.core.util.test.annotation.Generated
+import androidx.recyclerview.widget.DiffUtil
 import com.nlab.reminder.domain.common.schedule.ScheduleUiState
 
 /**
- * @author Doohyun
+ * @author thalys
  */
-@Generated
-data class AllScheduleReport(
-    val schedules: List<ScheduleUiState>,
-    val isDoneScheduleShown: Boolean
-)
+class ScheduleUiStateDiffCallback : DiffUtil.ItemCallback<ScheduleUiState>() {
+    override fun areItemsTheSame(oldItem: ScheduleUiState, newItem: ScheduleUiState): Boolean {
+        return oldItem.schedule.id() == newItem.schedule.id()
+    }
+
+    override fun areContentsTheSame(oldItem: ScheduleUiState, newItem: ScheduleUiState): Boolean {
+        return oldItem == newItem
+    }
+}

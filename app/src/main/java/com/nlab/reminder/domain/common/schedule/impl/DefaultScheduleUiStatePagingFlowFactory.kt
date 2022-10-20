@@ -16,26 +16,33 @@
 
 package com.nlab.reminder.domain.common.schedule.impl
 
+import androidx.paging.PagingData
+import androidx.paging.map
 import com.nlab.reminder.domain.common.schedule.*
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 
 /**
- * @author Doohyun
+ * @author thalys
  */
-class DefaultScheduleUiStateFlowFactory(
+class DefaultScheduleUiStatePagingFlowFactory(
     private val completeMarkRepository: CompleteMarkRepository
-) : ScheduleUiStateFlowFactory {
-    override fun with(schedules: Flow<List<Schedule>>): Flow<List<ScheduleUiState>> =
-        combine(
-            schedules,
+) : ScheduleUiStatePagingFlowFactory {
+    override fun with(schedules: Flow<PagingData<Schedule>>): Flow<PagingData<ScheduleUiState>> =
+        schedules.combine(
             completeMarkRepository.get().distinctUntilChanged(),
             transform = ::transformToScheduleUiStates
         )
 
     companion object {
         private fun transformToScheduleUiStates(
-            schedules: List<Schedule>,
+            schedules: PagingData<Schedule>,
             completeMarkSnapshot: Map<ScheduleId, CompleteMark>
-        ): List<ScheduleUiState> = schedules.map { schedule -> ScheduleUiState(schedule, completeMarkSnapshot) }
+        ): PagingData<ScheduleUiState> = schedules.map(mapToScheduleUiState(completeMarkSnapshot))
+
+        private fun mapToScheduleUiState(
+            completeMarkSnapshot: Map<ScheduleId, CompleteMark>
+        ): (Schedule) -> ScheduleUiState = { schedule -> ScheduleUiState(schedule, completeMarkSnapshot) }
     }
 }

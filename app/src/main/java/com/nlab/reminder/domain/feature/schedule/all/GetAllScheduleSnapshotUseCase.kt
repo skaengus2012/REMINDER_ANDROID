@@ -14,19 +14,13 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.feature.schedule.all.view
+package com.nlab.reminder.domain.feature.schedule.all
 
-import com.nlab.reminder.domain.common.schedule.ScheduleUiState
-import com.nlab.reminder.domain.common.schedule.view.ScheduleItem
-import com.nlab.reminder.domain.feature.schedule.all.AllScheduleReport
+import kotlinx.coroutines.flow.Flow
 
 /**
  * @author Doohyun
  */
-fun AllScheduleLoadedSnapshot(
-    allScheduleReport: AllScheduleReport,
-    scheduleItemFactory: (ScheduleUiState) -> ScheduleItem
-): AllScheduleLoadedSnapshot = AllScheduleLoadedSnapshot(
-    doingScheduleItems = allScheduleReport.schedules.map(scheduleItemFactory),
-    isDoneScheduleShown = allScheduleReport.isDoneScheduleShown
-)
+interface GetAllScheduleSnapshotUseCase {
+    operator fun invoke(): Flow<AllScheduleSnapshot>
+}

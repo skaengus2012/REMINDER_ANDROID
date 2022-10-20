@@ -18,13 +18,8 @@ package com.nlab.reminder.internal.common.di
 
 import com.nlab.reminder.core.kotlin.coroutine.util.Delay
 import com.nlab.reminder.core.util.transaction.TransactionIdGenerator
-import com.nlab.reminder.domain.common.schedule.CompleteMarkRepository
-import com.nlab.reminder.domain.common.schedule.ScheduleRepository
-import com.nlab.reminder.domain.common.schedule.ScheduleUiStateFlowFactory
-import com.nlab.reminder.domain.common.schedule.UpdateCompleteUseCase
-import com.nlab.reminder.domain.common.schedule.impl.DefaultScheduleUiStateFlowFactory
-import com.nlab.reminder.domain.common.schedule.impl.DefaultUpdateCompleteUseCase
-import com.nlab.reminder.domain.common.schedule.impl.ScopedCompleteMarkRepository
+import com.nlab.reminder.domain.common.schedule.*
+import com.nlab.reminder.domain.common.schedule.impl.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -45,7 +40,7 @@ class ScheduleModule {
     @Provides
     fun provideScheduleUiStateFlowFactory(
         completeMarkRepository: CompleteMarkRepository
-    ): ScheduleUiStateFlowFactory = DefaultScheduleUiStateFlowFactory(completeMarkRepository)
+    ): ScheduleUiStatePagingFlowFactory = DefaultScheduleUiStatePagingFlowFactory(completeMarkRepository)
 
     @Provides
     fun provideUpdateScheduleCompleteUseCase(

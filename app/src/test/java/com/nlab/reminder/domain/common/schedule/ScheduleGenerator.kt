@@ -16,6 +16,9 @@
 
 package com.nlab.reminder.domain.common.schedule
 
+import androidx.paging.PagingData
+import androidx.paging.map
+import com.nlab.reminder.core.util.transaction.TransactionId
 import com.nlab.reminder.domain.common.tag.Tag
 import com.nlab.reminder.domain.common.tag.genTags
 import com.nlab.reminder.test.genBoolean
@@ -38,7 +41,7 @@ fun genSchedule(
 
 fun genSchedules(
     isComplete: Boolean = genBoolean()
-): List<Schedule> = List(genInt("##")) { index ->
+): List<Schedule> = List(genInt("1#")) { index ->
     genSchedule(scheduleId = index.toLong(), isComplete = isComplete)
 }
 
@@ -53,3 +56,16 @@ fun genScheduleUiStates(
 ): List<ScheduleUiState> = schedules.map { schedule ->
     ScheduleUiState(schedule, isCompleteMarked = isCompleteMarked ?: schedule.isComplete)
 }
+
+fun genPagingScheduleUiStates(
+    schedules: PagingData<Schedule>,
+    isCompleteMarked: Boolean? = null
+): PagingData<ScheduleUiState> = schedules.map { schedule ->
+    ScheduleUiState(schedule, isCompleteMarked = isCompleteMarked ?: schedule.isComplete)
+}
+
+fun genCompleteMark(
+    isComplete: Boolean = genBoolean(),
+    isApplied: Boolean = genBoolean(),
+    transactionId: TransactionId = TransactionId(genBothify())
+): CompleteMark = CompleteMark(isComplete, isApplied, transactionId)

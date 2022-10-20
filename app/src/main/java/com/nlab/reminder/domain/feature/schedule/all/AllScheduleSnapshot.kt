@@ -14,10 +14,17 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.common.android.view.recyclerview
+package com.nlab.reminder.domain.feature.schedule.all
+
+import androidx.paging.PagingData
+import com.nlab.reminder.core.util.test.annotation.Generated
+import com.nlab.reminder.domain.common.schedule.ScheduleUiState
 
 /**
  * @author Doohyun
  */
-@Retention(AnnotationRetention.SOURCE)
-annotation class ItemModel
+@Generated
+data class AllScheduleSnapshot(
+    val pagingScheduled: PagingData<ScheduleUiState>,
+    val isDoneScheduleShown: Boolean
+)

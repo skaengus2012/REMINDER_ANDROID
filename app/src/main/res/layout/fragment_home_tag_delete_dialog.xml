@@ -26,7 +26,7 @@
 	android:paddingBottom="30dp">
 
 	<TextView
-		android:id="@+id/title_textview"
+		android:id="@+id/textview_title"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:text="@string/home_tag_config_label_delete"
@@ -46,7 +46,7 @@
 		app:layout_constraintBottom_toTopOf="@id/confirm_button"
 		app:layout_constraintEnd_toEndOf="parent"
 		app:layout_constraintStart_toStartOf="parent"
-		app:layout_constraintTop_toBottomOf="@id/title_textview"
+		app:layout_constraintTop_toBottomOf="@id/textview_title"
 		tools:text="#Hello is used in 4 reminders" />
 
 	<androidx.appcompat.widget.AppCompatButton
