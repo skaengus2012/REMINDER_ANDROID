@@ -17,6 +17,7 @@
 package com.nlab.reminder.domain.feature.schedule.all
 
 import androidx.paging.PagingData
+import com.nlab.reminder.domain.common.schedule.CompletedScheduleShownRepository
 import com.nlab.reminder.domain.common.schedule.ScheduleUiState
 import com.nlab.reminder.domain.common.schedule.ModifyScheduleCompleteUseCase
 import com.nlab.reminder.domain.common.schedule.genSchedule
@@ -49,10 +50,12 @@ fun genAllScheduleStates(): Set<AllScheduleState> = setOf(
 
 fun genAllScheduleStateMachine(
     getAllScheduleSnapshot: GetAllScheduleSnapshotUseCase = mock { whenever(mock()) doReturn emptyFlow() },
-    modifyScheduleComplete: ModifyScheduleCompleteUseCase = mock()
+    modifyScheduleComplete: ModifyScheduleCompleteUseCase = mock(),
+    completedScheduleShownRepository: CompletedScheduleShownRepository = mock()
 ) = AllScheduleStateMachine(
     getAllScheduleSnapshot,
-    modifyScheduleComplete
+    modifyScheduleComplete,
+    completedScheduleShownRepository
 )
 
 fun genAllScheduleEventSample(): AllScheduleEvent = genAllScheduleEvents().first()

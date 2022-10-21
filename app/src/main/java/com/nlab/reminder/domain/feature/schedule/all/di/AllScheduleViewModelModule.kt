@@ -52,7 +52,8 @@ class AllScheduleViewModelModule {
                         completedScheduleShownRepository,
                         scheduleUiStatePagingFlowFactory
                     ),
-                    modifyScheduleComplete = modifyScheduleCompleteUseCase
+                    modifyScheduleComplete = modifyScheduleCompleteUseCase,
+                    completedScheduleShownRepository = completedScheduleShownRepository
                 )
                 return stateMachine.asContainer(scope, AllScheduleState.Init, fetchEvent = AllScheduleEvent.Fetch)
             }

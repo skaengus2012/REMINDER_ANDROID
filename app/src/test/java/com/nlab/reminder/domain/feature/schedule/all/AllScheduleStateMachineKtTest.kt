@@ -17,6 +17,7 @@
 package com.nlab.reminder.domain.feature.schedule.all
 
 import com.nlab.reminder.core.state.asContainer
+import com.nlab.reminder.domain.common.schedule.CompletedScheduleShownRepository
 import com.nlab.reminder.domain.common.schedule.Schedule
 import com.nlab.reminder.domain.common.schedule.ModifyScheduleCompleteUseCase
 import com.nlab.reminder.domain.common.schedule.genSchedule
@@ -105,5 +106,27 @@ class AllScheduleStateMachineKtTest {
             .send(AllScheduleEvent.OnModifyScheduleCompleteClicked(schedule.id(), isComplete))
             .join()
         verify(modifyScheduleCompleteUseCase, once())(schedule.id(), isComplete)
+    }
+
+    @Test
+    fun `hide completed when stateMachine received OnToggleCompletedScheduleShownClicked and snapshot was shown`() =
+        runTest { testOnToggleCompletedScheduleShownClicked(isCompletedScheduleShown = true) }
+
+    @Test
+    fun `show completed when stateMachine received OnToggleCompletedScheduleShownClicked and snapshot was hidden`() =
+        runTest { testOnToggleCompletedScheduleShownClicked(isCompletedScheduleShown = false) }
+
+    private suspend fun testOnToggleCompletedScheduleShownClicked(isCompletedScheduleShown: Boolean) {
+        val completedScheduleShownRepository: CompletedScheduleShownRepository = mock()
+        val stateContainer =
+            genAllScheduleStateMachine(completedScheduleShownRepository = completedScheduleShownRepository)
+                .asContainer(
+                    genStateContainerScope(),
+                    AllScheduleState.Loaded(genAllScheduleSnapshot(isCompletedScheduleShown = isCompletedScheduleShown))
+                )
+        stateContainer
+            .send(AllScheduleEvent.OnToggleCompletedScheduleShownClicked)
+            .join()
+        verify(completedScheduleShownRepository, once()).setShown(isCompletedScheduleShown.not())
     }
 }
