@@ -34,8 +34,8 @@ class AllScheduleViewModelsKtTest {
         val schedule: Schedule = genSchedule()
         val isComplete: Boolean = genBoolean()
         val viewModel = AllScheduleViewModel(
-            stateControllerFactory = mock {
-                whenever(mock.create(any())) doReturn stateContainer
+            stateContainerFactory = mock {
+                whenever(mock.create(any(), any())) doReturn stateContainer
             }
         )
 

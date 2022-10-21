@@ -17,6 +17,7 @@
 package com.nlab.reminder.domain.feature.schedule.all
 
 import androidx.paging.PagingData
+import com.nlab.reminder.core.effect.SideEffectHandle
 import com.nlab.reminder.domain.common.schedule.CompletedScheduleShownRepository
 import com.nlab.reminder.domain.common.schedule.ScheduleUiState
 import com.nlab.reminder.domain.common.schedule.ModifyScheduleCompleteUseCase
@@ -48,11 +49,17 @@ fun genAllScheduleStates(): Set<AllScheduleState> = setOf(
     AllScheduleState.Loaded(genAllScheduleSnapshot())
 )
 
+fun genAllScheduleSideEffects(): Set<AllScheduleSideEffect> = setOf(
+    AllScheduleSideEffect.ShowErrorPopup
+)
+
 fun genAllScheduleStateMachine(
+    sideEffectHandle: SideEffectHandle<AllScheduleSideEffect> = mock(),
     getAllScheduleSnapshot: GetAllScheduleSnapshotUseCase = mock { whenever(mock()) doReturn emptyFlow() },
     modifyScheduleComplete: ModifyScheduleCompleteUseCase = mock(),
     completedScheduleShownRepository: CompletedScheduleShownRepository = mock()
 ) = AllScheduleStateMachine(
+    sideEffectHandle,
     getAllScheduleSnapshot,
     modifyScheduleComplete,
     completedScheduleShownRepository
@@ -60,3 +67,4 @@ fun genAllScheduleStateMachine(
 
 fun genAllScheduleEventSample(): AllScheduleEvent = genAllScheduleEvents().first()
 fun genAllScheduleStateSample(): AllScheduleState = genAllScheduleStates().first()
+fun genAllScheduleSideEffectSample(): AllScheduleSideEffect = genAllScheduleSideEffects().first()

@@ -16,6 +16,8 @@
 
 package com.nlab.reminder.domain.feature.schedule.all
 
+import com.nlab.reminder.core.effect.SideEffectHandle
+import com.nlab.reminder.core.kotlin.util.onFailure
 import com.nlab.reminder.core.state.StateMachine
 import com.nlab.reminder.domain.common.schedule.CompletedScheduleShownRepository
 import com.nlab.reminder.domain.common.schedule.ModifyScheduleCompleteUseCase
@@ -25,6 +27,7 @@ import com.nlab.reminder.domain.common.schedule.ModifyScheduleCompleteUseCase
  */
 @Suppress("FunctionName")
 fun AllScheduleStateMachine(
+    sideEffectHandle: SideEffectHandle<AllScheduleSideEffect>,
     getAllScheduleSnapshot: GetAllScheduleSnapshotUseCase,
     modifyScheduleComplete: ModifyScheduleCompleteUseCase,
     completedScheduleShownRepository: CompletedScheduleShownRepository
@@ -51,6 +54,7 @@ fun AllScheduleStateMachine(
             state<AllScheduleState.Loaded> { (_, state) ->
                 completedScheduleShownRepository
                     .setShown(isShown = state.snapshot.isCompletedScheduleShown.not())
+                    .onFailure { sideEffectHandle.post(AllScheduleSideEffect.ShowErrorPopup) }
             }
         }
     }

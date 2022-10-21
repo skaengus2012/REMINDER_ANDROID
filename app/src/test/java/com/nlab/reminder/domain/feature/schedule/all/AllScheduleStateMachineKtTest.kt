@@ -16,6 +16,7 @@
 
 package com.nlab.reminder.domain.feature.schedule.all
 
+import com.nlab.reminder.core.effect.SideEffectHandle
 import com.nlab.reminder.core.state.asContainer
 import com.nlab.reminder.domain.common.schedule.CompletedScheduleShownRepository
 import com.nlab.reminder.domain.common.schedule.Schedule
@@ -25,6 +26,7 @@ import com.nlab.reminder.test.genBoolean
 import com.nlab.reminder.test.genFlowObserveCoroutineScope
 import com.nlab.reminder.test.genStateContainerScope
 import com.nlab.reminder.test.once
+import com.nlab.reminder.core.kotlin.util.Result
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flow
@@ -34,10 +36,7 @@ import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.*
 import org.junit.Test
-import org.mockito.kotlin.doReturn
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
+import org.mockito.kotlin.*
 
 /**
  * @author Doohyun
@@ -128,5 +127,23 @@ class AllScheduleStateMachineKtTest {
             .send(AllScheduleEvent.OnToggleCompletedScheduleShownClicked)
             .join()
         verify(completedScheduleShownRepository, once()).setShown(isCompletedScheduleShown.not())
+    }
+
+    @Test
+    fun `show error popup when OnToggleCompletedScheduleShownClicked execution failed`() = runTest {
+        val sideEffectHandle: SideEffectHandle<AllScheduleSideEffect> = mock()
+        val completedScheduleShownRepository: CompletedScheduleShownRepository = mock {
+            whenever(mock.setShown(any())) doReturn Result.Failure(Throwable())
+        }
+
+        genAllScheduleStateMachine(
+            sideEffectHandle = sideEffectHandle,
+            completedScheduleShownRepository = completedScheduleShownRepository
+        )
+            .asContainer(genStateContainerScope(), AllScheduleState.Loaded(genAllScheduleSnapshot()))
+            .send(AllScheduleEvent.OnToggleCompletedScheduleShownClicked)
+            .join()
+
+        verify(sideEffectHandle, once()).post(AllScheduleSideEffect.ShowErrorPopup)
     }
 }

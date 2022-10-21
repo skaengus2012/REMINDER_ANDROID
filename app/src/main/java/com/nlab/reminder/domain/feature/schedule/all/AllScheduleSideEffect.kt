@@ -16,16 +16,11 @@
 
 package com.nlab.reminder.domain.feature.schedule.all
 
-import com.nlab.reminder.core.effect.SideEffectHandle
-import com.nlab.reminder.core.state.StateContainer
-import kotlinx.coroutines.CoroutineScope
+import com.nlab.reminder.core.effect.SideEffect
 
 /**
- * @author Doohyun
+ * @author thalys
  */
-interface AllScheduleStateContainerFactory {
-    fun create(
-        scope: CoroutineScope,
-        sideEffectHandle: SideEffectHandle<AllScheduleSideEffect>
-    ): StateContainer<AllScheduleEvent, AllScheduleState>
+sealed class AllScheduleSideEffect : SideEffect {
+    object ShowErrorPopup : AllScheduleSideEffect()
 }

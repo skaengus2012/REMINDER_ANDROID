@@ -17,6 +17,7 @@
 package com.nlab.reminder.domain.feature.schedule.all.di
 
 import androidx.paging.PagingConfig
+import com.nlab.reminder.core.effect.SideEffectHandle
 import com.nlab.reminder.core.state.StateContainer
 import com.nlab.reminder.core.state.asContainer
 import com.nlab.reminder.domain.common.schedule.*
@@ -43,8 +44,12 @@ class AllScheduleViewModelModule {
         @AllScheduleScope completedScheduleShownRepository: CompletedScheduleShownRepository
     ): AllScheduleStateContainerFactory =
         object : AllScheduleStateContainerFactory {
-            override fun create(scope: CoroutineScope): StateContainer<AllScheduleEvent, AllScheduleState> {
+            override fun create(
+                scope: CoroutineScope,
+                sideEffectHandle: SideEffectHandle<AllScheduleSideEffect>
+            ): StateContainer<AllScheduleEvent, AllScheduleState> {
                 val stateMachine = AllScheduleStateMachine(
+                    sideEffectHandle,
                     getAllScheduleSnapshot = DefaultGetAllScheduleSnapshotUseCase(
                         scope,
                         PagingConfig(pageSize = 20),

@@ -16,14 +16,21 @@
 
 package com.nlab.reminder.domain.feature.schedule.all
 
+import com.nlab.reminder.core.effect.SideEffectHandle
 import com.nlab.reminder.core.state.StateContainer
-import com.nlab.reminder.domain.common.schedule.genSchedule
-import com.nlab.reminder.test.genBoolean
+import com.nlab.reminder.core.state.StateMachine
+import com.nlab.reminder.core.state.asContainer
+import com.nlab.reminder.domain.feature.home.*
+import com.nlab.reminder.test.genFlowObserveCoroutineScope
 import com.nlab.reminder.test.once
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.*
@@ -48,12 +55,12 @@ class AllScheduleViewModelTest {
     }
 
     @Test
-    fun `stateController send event when viewModel sent`() {
+    fun `stateContainer send event when viewModel sent`() {
         val sampleEvent = genAllScheduleEventSample()
         val stateContainer: StateContainer<AllScheduleEvent, AllScheduleState> = mock()
         val viewModel = AllScheduleViewModel(
-            stateControllerFactory = mock {
-                whenever(mock.create(any())) doReturn stateContainer
+            stateContainerFactory = mock {
+                whenever(mock.create(any(), any())) doReturn stateContainer
             }
         )
 
@@ -62,15 +69,44 @@ class AllScheduleViewModelTest {
     }
 
     @Test
-    fun `notify state when stateController flow published`() {
+    fun `notify state when stateContainer flow published`() {
         val sampleState = genAllScheduleStateSample()
         val stateContainer: StateContainer<AllScheduleEvent, AllScheduleState> = mock {
             whenever(mock.stateFlow) doReturn MutableStateFlow(sampleState)
         }
         val viewModel = AllScheduleViewModel(
-            stateControllerFactory = mock { whenever(mock.create(any())) doReturn stateContainer }
+            stateContainerFactory = mock { whenever(mock.create(any(), any())) doReturn stateContainer }
         )
 
         assertThat(viewModel.stateFlow.value, equalTo(sampleState))
+    }
+
+    @Test
+    fun `notify sideEffect when stateController invoke sideEffect`() = runTest {
+        val sampleEvent = genAllScheduleEventSample()
+        val viewModel = AllScheduleViewModel(
+            stateContainerFactory = object : AllScheduleStateContainerFactory {
+                override fun create(
+                    scope: CoroutineScope,
+                    sideEffectHandle: SideEffectHandle<AllScheduleSideEffect>
+                ): StateContainer<AllScheduleEvent, AllScheduleState> {
+                    val fakeStateComponent = StateMachine<AllScheduleEvent, AllScheduleState> {
+                        handle {
+                            anyEvent {
+                                anyState { sideEffectHandle.post(genAllScheduleSideEffectSample()) }
+                            }
+                        }
+                    }
+                    return fakeStateComponent.asContainer(scope, genAllScheduleStateSample())
+                }
+            }
+        )
+        val sideEffectHandler: () -> Unit = mock()
+
+        viewModel.allScheduleSideEffectFlow
+            .onEach { sideEffectHandler() }
+            .launchIn(genFlowObserveCoroutineScope())
+        viewModel.send(sampleEvent).join()
+        verify(sideEffectHandler, once())()
     }
 }
