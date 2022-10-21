@@ -1,4 +1,7 @@
 import org.gradle.configurationcache.extensions.capitalized
+import com.android.build.api.dsl.VariantDimension
+import java.io.FileInputStream
+import java.util.Properties
 
 /*
  * Copyright (C) 2022 The N"s lab Open Source Project
@@ -44,6 +47,11 @@ android {
         versionName = AndroidConfig.VERSION_NAME
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        setBuildConfigFromFile(
+            defaultConfig,
+            makePropertiesFromFiles(fileName = "${projectDir.path}${File.separator}config-default.properties")
+        )
 
         kapt {
             arguments {
@@ -188,4 +196,16 @@ dependencies {
     androidTestImplementation(Dependencies.TEST_ANDROID_JUNIT_ESPRESSO)
     androidTestImplementation(Dependencies.TEST_ANDROID_TEST_RUNNER)
     androidTestImplementation(Dependencies.TEST_ANDROID_TEST_RULES)
+}
+
+fun makePropertiesFromFiles(fileName: String): Map<Any, Any> =
+    runCatching { Properties().apply { load(FileInputStream(File(fileName))) } }
+        .getOrNull()
+        ?.toMap()
+        ?: emptyMap()
+
+fun setBuildConfigFromFile(config: VariantDimension, properties: Map<Any, Any>) {
+    properties.forEach { (key, value) ->
+        config.buildConfigField(type = "String", key.toString(), "\"${value}\"")
+    }
 }
