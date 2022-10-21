@@ -35,15 +35,15 @@ class DefaultModifyScheduleCompleteUseCase(
     private val dispatcher: CoroutineDispatcher
 ) : ModifyScheduleCompleteUseCase {
     override suspend fun invoke(scheduleId: ScheduleId, isComplete: Boolean): Result<Unit> = withContext(dispatcher) {
-        completeMarkRepository.insert(completeMarkGroupOf(scheduleId, isComplete))
+        completeMarkRepository.insert(completeMarkTableOf(scheduleId, isComplete))
         delayUntilTransactionPeriod()
 
-        getNotAppliedCompleteMarkSnapshot()
+        getNotAppliedCompleteMarkTable()
             .also { snapshot -> completeMarkRepository.updateToApplied(snapshot) }
-            .let { snapshot -> commitCompleteMarkSnapshotToSchedule(snapshot) }
+            .let { snapshot -> commitCompleteMarkTableToSchedule(snapshot) }
     }
 
-    private fun completeMarkGroupOf(scheduleId: ScheduleId, isComplete: Boolean): Map<ScheduleId, CompleteMark> =
+    private fun completeMarkTableOf(scheduleId: ScheduleId, isComplete: Boolean): CompleteMarkTable =
         mapOf(
             scheduleId to CompleteMark(
                 isComplete,
@@ -52,16 +52,16 @@ class DefaultModifyScheduleCompleteUseCase(
             )
         )
 
-    private suspend fun getNotAppliedCompleteMarkSnapshot(): Map<ScheduleId, CompleteMark> =
+    private suspend fun getNotAppliedCompleteMarkTable(): CompleteMarkTable =
         completeMarkRepository.get()
             .firstOrNull()
             ?.filterNot { it.value.isApplied }
             ?: emptyMap()
 
-    private suspend fun commitCompleteMarkSnapshotToSchedule(snapshot: Map<ScheduleId, CompleteMark>): Result<Unit> =
-        if (snapshot.isEmpty()) Result.Success(Unit)
+    private suspend fun commitCompleteMarkTableToSchedule(table: CompleteMarkTable): Result<Unit> =
+        if (table.isEmpty()) Result.Success(Unit)
         else scheduleRepository.updateComplete(
-            requests = snapshot
+            requests = table
                 .map { ScheduleCompleteRequest(it.key, it.value.isComplete) }
                 .toSet()
         )

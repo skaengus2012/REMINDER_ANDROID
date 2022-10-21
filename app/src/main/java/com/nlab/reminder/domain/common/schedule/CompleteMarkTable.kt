@@ -14,17 +14,9 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.common.schedule.impl
-
-import com.nlab.reminder.domain.common.schedule.*
+package com.nlab.reminder.domain.common.schedule
 
 /**
  * @author thalys
  */
-internal fun ScheduleUiState(
-    schedule: Schedule,
-    completeMarkTable: CompleteMarkTable
-): ScheduleUiState = ScheduleUiState(
-    schedule,
-    isCompleteMarked = completeMarkTable[schedule.id()]?.isComplete ?: schedule.isComplete
-)
+typealias CompleteMarkTable = Map<ScheduleId, CompleteMark>

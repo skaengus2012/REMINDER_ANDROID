@@ -16,9 +16,8 @@
 
 package com.nlab.reminder.domain.common.schedule.impl
 
-import com.nlab.reminder.domain.common.schedule.CompleteMark
 import com.nlab.reminder.domain.common.schedule.CompleteMarkRepository
-import com.nlab.reminder.domain.common.schedule.ScheduleId
+import com.nlab.reminder.domain.common.schedule.CompleteMarkTable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -30,15 +29,15 @@ import kotlinx.coroutines.flow.update
  * @author Doohyun
  */
 class ScopedCompleteMarkRepository : CompleteMarkRepository {
-    private val chunkRequests: MutableStateFlow<Map<ScheduleId, CompleteMark>> = MutableStateFlow(emptyMap())
+    private val chunkRequests: MutableStateFlow<CompleteMarkTable> = MutableStateFlow(emptyMap())
 
-    override fun get(): Flow<Map<ScheduleId, CompleteMark>> = chunkRequests.asStateFlow()
+    override fun get(): Flow<CompleteMarkTable> = chunkRequests.asStateFlow()
 
-    override suspend fun insert(completeMarks: Map<ScheduleId, CompleteMark>) {
+    override suspend fun insert(completeMarks: CompleteMarkTable) {
         chunkRequests.update { old -> old + completeMarks }
     }
 
-    override suspend fun updateToApplied(completeMarks: Map<ScheduleId, CompleteMark>) {
+    override suspend fun updateToApplied(completeMarks: CompleteMarkTable) {
         chunkRequests.update { old ->
             old.mapValues { (key, value) ->
                 if (completeMarks[key] == value) value.copy(isApplied = true)

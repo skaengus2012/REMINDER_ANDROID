@@ -35,7 +35,7 @@ class DefaultScheduleUiStateFlowFactory(
     companion object {
         private fun transformToScheduleUiStates(
             schedules: List<Schedule>,
-            completeMarkSnapshot: Map<ScheduleId, CompleteMark>
-        ): List<ScheduleUiState> = schedules.map { schedule -> ScheduleUiState(schedule, completeMarkSnapshot) }
+            completeMarkTable: CompleteMarkTable
+        ): List<ScheduleUiState> = schedules.map { schedule -> ScheduleUiState(schedule, completeMarkTable) }
     }
 }

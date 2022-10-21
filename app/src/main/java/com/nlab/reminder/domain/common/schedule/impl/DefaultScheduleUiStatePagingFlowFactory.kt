@@ -38,11 +38,11 @@ class DefaultScheduleUiStatePagingFlowFactory(
     companion object {
         private fun transformToScheduleUiStates(
             schedules: PagingData<Schedule>,
-            completeMarkSnapshot: Map<ScheduleId, CompleteMark>
-        ): PagingData<ScheduleUiState> = schedules.map(mapToScheduleUiState(completeMarkSnapshot))
+            completeMarkTable: CompleteMarkTable
+        ): PagingData<ScheduleUiState> = schedules.map(mapToScheduleUiState(completeMarkTable))
 
         private fun mapToScheduleUiState(
-            completeMarkSnapshot: Map<ScheduleId, CompleteMark>
-        ): (Schedule) -> ScheduleUiState = { schedule -> ScheduleUiState(schedule, completeMarkSnapshot) }
+            completeMarkTable: CompleteMarkTable
+        ): (Schedule) -> ScheduleUiState = { schedule -> ScheduleUiState(schedule, completeMarkTable) }
     }
 }

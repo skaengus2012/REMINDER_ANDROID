@@ -22,7 +22,7 @@ import kotlinx.coroutines.flow.Flow
  * @author Doohyun
  */
 interface CompleteMarkRepository {
-    fun get(): Flow<Map<ScheduleId, CompleteMark>>
-    suspend fun insert(completeMarks: Map<ScheduleId, CompleteMark>)
-    suspend fun updateToApplied(completeMarks: Map<ScheduleId, CompleteMark>)
+    fun get(): Flow<CompleteMarkTable>
+    suspend fun insert(completeMarks: CompleteMarkTable)
+    suspend fun updateToApplied(completeMarks: CompleteMarkTable)
 }
