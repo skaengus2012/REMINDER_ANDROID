@@ -17,10 +17,12 @@
 package com.nlab.reminder.domain.common.schedule
 
 import kotlinx.coroutines.flow.Flow
+import com.nlab.reminder.core.kotlin.util.Result
 
 /**
  * @author Doohyun
  */
 interface DoneScheduleShownRepository {
     fun get(): Flow<Boolean>
+    suspend fun setShown(isShown: Boolean): Result<Unit>
 }

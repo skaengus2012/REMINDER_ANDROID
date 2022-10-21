@@ -14,34 +14,31 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.internal.feature.schedule.all.di
+package com.nlab.reminder.internal.common.di
 
+import android.app.Application
+import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.preferencesDataStore
 import com.nlab.reminder.BuildConfig
-import com.nlab.reminder.domain.common.schedule.DoneScheduleShownRepository
-import com.nlab.reminder.domain.feature.schedule.all.AllScheduleScope
-import com.nlab.reminder.internal.common.schedule.impl.LocalDoneScheduleShownRepository
 import dagger.Module
 import dagger.Provides
-import dagger.Reusable
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 
 /**
- * @author Doohyun
+ * @author thalys
  */
 @Module
 @InstallIn(SingletonComponent::class)
-class AllScheduleRepositoryModule {
-    @AllScheduleScope
-    @Reusable
+class DataStoreModule {
     @Provides
-    fun provideDoneScheduleShownRepository(
-        dataStore: DataStore<Preferences>
-    ): DoneScheduleShownRepository = LocalDoneScheduleShownRepository(
-        dataStore,
-        booleanPreferencesKey(BuildConfig.PREFERENCE_KEY_ALL_SCHEDULE_COMPLETE_SHOWN)
-    )
+    fun providePreferenceDataStore(application: Application): DataStore<Preferences> {
+        return application.dataStore
+    }
+
+    companion object {
+        private val Context.dataStore by preferencesDataStore(name = BuildConfig.PREFERENCE_KEY_NAME)
+    }
 }

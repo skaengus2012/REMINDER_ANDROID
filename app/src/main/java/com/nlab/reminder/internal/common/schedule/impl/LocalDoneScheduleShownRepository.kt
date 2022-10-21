@@ -16,16 +16,26 @@
 
 package com.nlab.reminder.internal.common.schedule.impl
 
-import com.nlab.reminder.core.util.test.annotation.Generated
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import com.nlab.reminder.core.kotlin.coroutine.flow.map
+import com.nlab.reminder.core.kotlin.util.Result
 import com.nlab.reminder.domain.common.schedule.DoneScheduleShownRepository
+import com.nlab.reminder.internal.common.android.datastore.EditDataStore
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
 
 /**
- * @author Doohyun
+ * @author thalys
  */
-@Generated
-@Deprecated(message = "Fake Repository was used")
-class FakeDoneScheduleShownRepository : DoneScheduleShownRepository {
-    override fun get(): Flow<Boolean> = flowOf(true)
+class LocalDoneScheduleShownRepository(
+    private val dataStore: DataStore<Preferences>,
+    private val preferencesKey: Preferences.Key<Boolean>
+) : DoneScheduleShownRepository {
+    private val modifyShown = EditDataStore(dataStore)
+
+    override fun get(): Flow<Boolean> =
+        dataStore.data.map { preferences -> preferences[preferencesKey] ?: false }
+
+    override suspend fun setShown(isShown: Boolean): Result<Unit> =
+        modifyShown { preference -> preference[preferencesKey] = isShown }
 }
