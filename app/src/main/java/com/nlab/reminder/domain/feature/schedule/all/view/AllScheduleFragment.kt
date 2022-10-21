@@ -24,14 +24,17 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
+import com.nlab.reminder.R
 import com.nlab.reminder.core.android.fragment.viewLifecycleScope
+import com.nlab.reminder.core.android.view.throttleClicks
 import com.nlab.reminder.databinding.FragmentAllScheduleBinding
 import com.nlab.reminder.domain.common.schedule.view.DefaultSchedulePagingAdapter
 import com.nlab.reminder.domain.common.schedule.view.ScheduleItemAnimator
 import com.nlab.reminder.domain.common.schedule.view.ScheduleItemTouchMediator
 import com.nlab.reminder.domain.feature.schedule.all.AllScheduleState
 import com.nlab.reminder.domain.feature.schedule.all.AllScheduleViewModel
-import com.nlab.reminder.domain.feature.schedule.all.onScheduleCompleteUpdateClicked
+import com.nlab.reminder.domain.feature.schedule.all.onScheduleCompleteModifyClicked
+import com.nlab.reminder.domain.feature.schedule.all.onToggleCompletedScheduleShownClicked
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -55,7 +58,7 @@ class AllScheduleFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val scheduleAdapter = DefaultSchedulePagingAdapter(
             onCompleteClicked = { scheduleUiState ->
-                viewModel.onScheduleCompleteUpdateClicked(
+                viewModel.onScheduleCompleteModifyClicked(
                     scheduleId = scheduleUiState.schedule.id(),
                     isComplete = scheduleUiState.isCompleteMarked.not()
                 )
@@ -72,6 +75,24 @@ class AllScheduleFragment : Fragment() {
             .onEach {
                 // TODO make order save.
                 println("TODO make order save.")
+            }
+            .launchIn(viewLifecycleScope)
+
+        binding.buttonCompletedScheduleShownToggle
+            .throttleClicks()
+            .onEach { viewModel.onToggleCompletedScheduleShownClicked() }
+            .launchIn(viewLifecycleScope)
+
+        viewModel.stateFlow
+            .filterIsInstance<AllScheduleState.Loaded>()
+            .map { it.snapshot }
+            .map { it.isDoneScheduleShown }
+            .distinctUntilChanged()
+            .onEach { isDoneScheduleShown ->
+                binding.buttonCompletedScheduleShownToggle.setText(
+                    if (isDoneScheduleShown) R.string.completed_schedule_hidden
+                    else R.string.completed_schedule_shown
+                )
             }
             .launchIn(viewLifecycleScope)
 

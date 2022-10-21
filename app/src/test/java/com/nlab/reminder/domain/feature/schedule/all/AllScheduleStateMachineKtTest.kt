@@ -62,7 +62,7 @@ class AllScheduleStateMachineKtTest {
                 .filter { it != AllScheduleState.Init }
                 .map { genAllScheduleStateMachine().asContainer(genStateContainerScope(), it) }
         stateContainers
-            .map { it.send(AllScheduleEvent.AllScheduleReportLoaded(allScheduleReport)) }
+            .map { it.send(AllScheduleEvent.OnAllScheduleSnapshotLoaded(allScheduleReport)) }
             .joinAll()
         assertThat(
             stateContainers.map { it.stateFlow.value }.all { it == AllScheduleState.Loaded(allScheduleReport) },
@@ -94,7 +94,7 @@ class AllScheduleStateMachineKtTest {
     }
 
     @Test
-    fun `update schedule complete when stateMachine received update schedule complete`() = runTest {
+    fun `modify schedule complete when stateMachine received update schedule complete`() = runTest {
         val schedule: Schedule = genSchedule()
         val isComplete: Boolean = genBoolean()
         val updateCompleteUseCase: UpdateCompleteUseCase = mock()
@@ -102,7 +102,7 @@ class AllScheduleStateMachineKtTest {
             genAllScheduleStateMachine(updateScheduleComplete = updateCompleteUseCase)
                 .asContainer(genStateContainerScope(), AllScheduleState.Loaded(genAllScheduleSnapshot()))
         stateContainer
-            .send(AllScheduleEvent.OnScheduleCompleteUpdateClicked(schedule.id(), isComplete))
+            .send(AllScheduleEvent.OnScheduleCompleteModifyClicked(schedule.id(), isComplete))
             .join()
         verify(updateCompleteUseCase, once())(schedule.id(), isComplete)
     }

@@ -31,7 +31,7 @@ fun AllScheduleStateMachine(
         event<AllScheduleEvent.Fetch> {
             state<AllScheduleState.Init> { AllScheduleState.Loading }
         }
-        event<AllScheduleEvent.AllScheduleReportLoaded> {
+        event<AllScheduleEvent.OnAllScheduleSnapshotLoaded> {
             stateNot<AllScheduleState.Init> { (event) -> AllScheduleState.Loaded(event.allSchedulesReport) }
         }
     }
@@ -39,11 +39,11 @@ fun AllScheduleStateMachine(
     handle {
         event<AllScheduleEvent.Fetch> {
             state<AllScheduleState.Init> {
-                getAllScheduleSnapshot().collect { send(AllScheduleEvent.AllScheduleReportLoaded(it)) }
+                getAllScheduleSnapshot().collect { send(AllScheduleEvent.OnAllScheduleSnapshotLoaded(it)) }
             }
         }
 
-        event<AllScheduleEvent.OnScheduleCompleteUpdateClicked> {
+        event<AllScheduleEvent.OnScheduleCompleteModifyClicked> {
             state<AllScheduleState.Loaded> { (event) -> updateScheduleComplete(event.scheduleId, event.isComplete) }
         }
     }

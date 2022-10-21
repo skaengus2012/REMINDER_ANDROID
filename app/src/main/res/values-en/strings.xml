@@ -19,6 +19,8 @@
     <string name="cancel">Cancel</string>
     <string name="ok">OK</string>
     <string name="common_tag_empty">No tags assigned to the schedule.</string>
+    <string name="completed_schedule_shown">Show completed</string>
+    <string name="completed_schedule_hidden">Hide completed</string>
 
     <!-- home -->
     <string name="home_category_header">My Todo</string>

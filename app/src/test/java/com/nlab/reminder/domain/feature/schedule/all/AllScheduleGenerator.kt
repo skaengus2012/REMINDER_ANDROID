@@ -20,7 +20,6 @@ import androidx.paging.PagingData
 import com.nlab.reminder.domain.common.schedule.ScheduleUiState
 import com.nlab.reminder.domain.common.schedule.UpdateCompleteUseCase
 import com.nlab.reminder.domain.common.schedule.genSchedule
-import com.nlab.reminder.domain.common.schedule.genScheduleUiStates
 import com.nlab.reminder.test.genBoolean
 import kotlinx.coroutines.flow.emptyFlow
 import org.mockito.kotlin.doReturn
@@ -37,8 +36,9 @@ fun genAllScheduleSnapshot(
 
 fun genAllScheduleEvents(): Set<AllScheduleEvent> = setOf(
     AllScheduleEvent.Fetch,
-    AllScheduleEvent.AllScheduleReportLoaded(genAllScheduleSnapshot()),
-    AllScheduleEvent.OnScheduleCompleteUpdateClicked(genSchedule().id(), genBoolean())
+    AllScheduleEvent.OnToggleCompletedScheduleShownClicked,
+    AllScheduleEvent.OnAllScheduleSnapshotLoaded(genAllScheduleSnapshot()),
+    AllScheduleEvent.OnScheduleCompleteModifyClicked(genSchedule().id(), genBoolean())
 )
 
 fun genAllScheduleStates(): Set<AllScheduleState> = setOf(

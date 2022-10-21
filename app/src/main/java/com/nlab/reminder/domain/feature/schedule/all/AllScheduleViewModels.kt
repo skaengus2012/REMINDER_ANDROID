@@ -21,6 +21,9 @@ import com.nlab.reminder.domain.common.schedule.ScheduleId
 /**
  * @author Doohyun
  */
-fun AllScheduleViewModel.onScheduleCompleteUpdateClicked(scheduleId: ScheduleId, isComplete: Boolean) {
-    send(AllScheduleEvent.OnScheduleCompleteUpdateClicked(scheduleId, isComplete))
-}
+fun AllScheduleViewModel.onToggleCompletedScheduleShownClicked() =
+    send(AllScheduleEvent.OnToggleCompletedScheduleShownClicked)
+fun AllScheduleViewModel.onScheduleCompleteModifyClicked(
+    scheduleId: ScheduleId,
+    isComplete: Boolean
+) = send(AllScheduleEvent.OnScheduleCompleteModifyClicked(scheduleId, isComplete))
