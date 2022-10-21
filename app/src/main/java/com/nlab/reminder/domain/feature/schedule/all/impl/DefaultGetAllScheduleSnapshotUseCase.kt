@@ -34,7 +34,7 @@ class DefaultGetAllScheduleSnapshotUseCase(
     coroutineScope: CoroutineScope,
     pagingConfig: PagingConfig,
     scheduleRepository: ScheduleRepository,
-    private val doneScheduleShownRepository: DoneScheduleShownRepository,
+    private val completedScheduleShownRepository: CompletedScheduleShownRepository,
     private val scheduleUiStatePagingFlowFactory: ScheduleUiStatePagingFlowFactory,
 ) : GetAllScheduleSnapshotUseCase {
     private val findAllSchedules: Flow<PagingData<Schedule>> =
@@ -48,14 +48,14 @@ class DefaultGetAllScheduleSnapshotUseCase(
 
     @ExperimentalCoroutinesApi
     override fun invoke(): Flow<AllScheduleSnapshot> =
-        doneScheduleShownRepository.get()
+        completedScheduleShownRepository.get()
             .flatMapLatest(this::getSnapshot)
             .buffer(0)
 
-    private fun getSnapshot(isDoneScheduleShown: Boolean): Flow<AllScheduleSnapshot> =
-        getSchedules(isDoneScheduleShown)
+    private fun getSnapshot(isCompletedScheduleShown: Boolean): Flow<AllScheduleSnapshot> =
+        getSchedules(isCompletedScheduleShown)
             .let(scheduleUiStatePagingFlowFactory::with)
-            .map { scheduleUiStates -> AllScheduleSnapshot(scheduleUiStates, isDoneScheduleShown) }
+            .map { scheduleUiStates -> AllScheduleSnapshot(scheduleUiStates, isCompletedScheduleShown) }
 
     private fun getSchedules(isDoneScheduleShown: Boolean): Flow<PagingData<Schedule>> =
         if (isDoneScheduleShown) findAllSchedules

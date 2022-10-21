@@ -20,9 +20,9 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import com.nlab.reminder.BuildConfig
-import com.nlab.reminder.domain.common.schedule.DoneScheduleShownRepository
+import com.nlab.reminder.domain.common.schedule.CompletedScheduleShownRepository
 import com.nlab.reminder.domain.feature.schedule.all.AllScheduleScope
-import com.nlab.reminder.internal.common.schedule.impl.LocalDoneScheduleShownRepository
+import com.nlab.reminder.internal.common.schedule.impl.LocalCompletedScheduleShownRepository
 import dagger.Module
 import dagger.Provides
 import dagger.Reusable
@@ -40,7 +40,7 @@ class AllScheduleRepositoryModule {
     @Provides
     fun provideDoneScheduleShownRepository(
         dataStore: DataStore<Preferences>
-    ): DoneScheduleShownRepository = LocalDoneScheduleShownRepository(
+    ): CompletedScheduleShownRepository = LocalCompletedScheduleShownRepository(
         dataStore,
         booleanPreferencesKey(BuildConfig.PREFERENCE_KEY_ALL_SCHEDULE_COMPLETE_SHOWN)
     )

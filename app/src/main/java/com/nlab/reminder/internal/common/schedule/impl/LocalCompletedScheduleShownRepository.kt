@@ -20,17 +20,17 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import com.nlab.reminder.core.kotlin.coroutine.flow.map
 import com.nlab.reminder.core.kotlin.util.Result
-import com.nlab.reminder.domain.common.schedule.DoneScheduleShownRepository
+import com.nlab.reminder.domain.common.schedule.CompletedScheduleShownRepository
 import com.nlab.reminder.internal.common.android.datastore.EditDataStore
 import kotlinx.coroutines.flow.Flow
 
 /**
  * @author thalys
  */
-class LocalDoneScheduleShownRepository(
+class LocalCompletedScheduleShownRepository(
     private val dataStore: DataStore<Preferences>,
     private val preferencesKey: Preferences.Key<Boolean>
-) : DoneScheduleShownRepository {
+) : CompletedScheduleShownRepository {
     private val modifyShown = EditDataStore(dataStore)
 
     override fun get(): Flow<Boolean> =

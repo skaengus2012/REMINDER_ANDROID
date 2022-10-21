@@ -40,7 +40,7 @@ class AllScheduleViewModelModule {
         scheduleRepository: ScheduleRepository,
         scheduleUiStatePagingFlowFactory: ScheduleUiStatePagingFlowFactory,
         modifyScheduleCompleteUseCase: ModifyScheduleCompleteUseCase,
-        @AllScheduleScope doneScheduleShownRepository: DoneScheduleShownRepository
+        @AllScheduleScope completedScheduleShownRepository: CompletedScheduleShownRepository
     ): AllScheduleStateContainerFactory =
         object : AllScheduleStateContainerFactory {
             override fun create(scope: CoroutineScope): StateContainer<AllScheduleEvent, AllScheduleState> {
@@ -49,7 +49,7 @@ class AllScheduleViewModelModule {
                         scope,
                         PagingConfig(pageSize = 20),
                         scheduleRepository,
-                        doneScheduleShownRepository,
+                        completedScheduleShownRepository,
                         scheduleUiStatePagingFlowFactory
                     ),
                     modifyScheduleComplete = modifyScheduleCompleteUseCase

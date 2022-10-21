@@ -30,9 +30,9 @@ import org.mockito.kotlin.whenever
  * @author Doohyun
  */
 fun genAllScheduleSnapshot(
-    isDoneScheduleShown: Boolean = genBoolean(),
+    isCompletedScheduleShown: Boolean = genBoolean(),
     pagingScheduled: PagingData<ScheduleUiState> = PagingData.empty()
-): AllScheduleSnapshot = AllScheduleSnapshot(pagingScheduled, isDoneScheduleShown)
+): AllScheduleSnapshot = AllScheduleSnapshot(pagingScheduled, isCompletedScheduleShown)
 
 fun genAllScheduleEvents(): Set<AllScheduleEvent> = setOf(
     AllScheduleEvent.Fetch,
@@ -48,11 +48,11 @@ fun genAllScheduleStates(): Set<AllScheduleState> = setOf(
 )
 
 fun genAllScheduleStateMachine(
-    getAllScheduleReport: GetAllScheduleSnapshotUseCase = mock { whenever(mock()) doReturn emptyFlow() },
-    updateScheduleComplete: ModifyScheduleCompleteUseCase = mock()
+    getAllScheduleSnapshot: GetAllScheduleSnapshotUseCase = mock { whenever(mock()) doReturn emptyFlow() },
+    modifyScheduleComplete: ModifyScheduleCompleteUseCase = mock()
 ) = AllScheduleStateMachine(
-    getAllScheduleReport,
-    updateScheduleComplete
+    getAllScheduleSnapshot,
+    modifyScheduleComplete
 )
 
 fun genAllScheduleEventSample(): AllScheduleEvent = genAllScheduleEvents().first()

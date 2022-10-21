@@ -22,7 +22,7 @@ import com.nlab.reminder.core.kotlin.util.Result
 /**
  * @author Doohyun
  */
-interface DoneScheduleShownRepository {
+interface CompletedScheduleShownRepository {
     fun get(): Flow<Boolean>
     suspend fun setShown(isShown: Boolean): Result<Unit>
 }

@@ -77,7 +77,7 @@ class AllScheduleStateMachineKtTest {
             whenever(mock()) doReturn flow { emit(expected) }
         }
         val stateContainer =
-            genAllScheduleStateMachine(getAllScheduleReport = getAllScheduleReport)
+            genAllScheduleStateMachine(getAllScheduleSnapshot = getAllScheduleReport)
                 .asContainer(genStateContainerScope(), AllScheduleState.Init)
         stateContainer
             .send(AllScheduleEvent.Fetch)
@@ -99,7 +99,7 @@ class AllScheduleStateMachineKtTest {
         val isComplete: Boolean = genBoolean()
         val modifyScheduleCompleteUseCase: ModifyScheduleCompleteUseCase = mock()
         val stateContainer =
-            genAllScheduleStateMachine(updateScheduleComplete = modifyScheduleCompleteUseCase)
+            genAllScheduleStateMachine(modifyScheduleComplete = modifyScheduleCompleteUseCase)
                 .asContainer(genStateContainerScope(), AllScheduleState.Loaded(genAllScheduleSnapshot()))
         stateContainer
             .send(AllScheduleEvent.OnModifyScheduleCompleteClicked(schedule.id(), isComplete))

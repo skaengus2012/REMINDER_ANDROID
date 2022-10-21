@@ -86,7 +86,7 @@ class AllScheduleFragment : Fragment() {
         viewModel.stateFlow
             .filterIsInstance<AllScheduleState.Loaded>()
             .map { it.snapshot }
-            .map { it.isDoneScheduleShown }
+            .map { it.isCompletedScheduleShown }
             .distinctUntilChanged()
             .onEach { isDoneScheduleShown ->
                 binding.buttonCompletedScheduleShownToggle.setText(

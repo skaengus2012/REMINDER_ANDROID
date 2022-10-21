@@ -41,7 +41,7 @@ import com.nlab.reminder.core.kotlin.util.isSuccess
  * @author thalys
  */
 @OptIn(ExperimentalCoroutinesApi::class)
-class LocalDoneScheduleShownRepositoryTest {
+class LocalCompletedScheduleShownRepositoryTest {
     @Test
     fun `notify is complete shown`() = runTest {
         val expectedShown = genBoolean()
@@ -76,7 +76,7 @@ class LocalDoneScheduleShownRepositoryTest {
             whenever(mock.data) doReturn flowOf(preferences)
         }
         val actualShown: Boolean =
-            LocalDoneScheduleShownRepository(dataStore, preferenceKey)
+            LocalCompletedScheduleShownRepository(dataStore, preferenceKey)
                 .get()
                 .first()
         assertThat(actualShown, equalTo(expectedShown))
@@ -99,7 +99,7 @@ class LocalDoneScheduleShownRepositoryTest {
         }
 
         val result: Result<Unit> =
-            LocalDoneScheduleShownRepository(fakeDataStore, preferenceKey)
+            LocalCompletedScheduleShownRepository(fakeDataStore, preferenceKey)
                 .setShown(expectedShown)
         assertThat(
             result.isSuccess,
@@ -121,7 +121,7 @@ class LocalDoneScheduleShownRepositoryTest {
         }
 
         val result: Result<Unit> =
-            LocalDoneScheduleShownRepository(fakeDataStore, preferenceKey)
+            LocalCompletedScheduleShownRepository(fakeDataStore, preferenceKey)
                 .setShown(expectedShown)
         assertThat(
             result.isFailure,

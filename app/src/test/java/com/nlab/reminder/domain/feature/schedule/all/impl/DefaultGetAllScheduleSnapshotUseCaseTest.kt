@@ -103,7 +103,7 @@ class DefaultGetAllScheduleSnapshotUseCaseTest {
             coroutineScope = CoroutineScope(genFlowExecutionDispatcher(testScheduler)),
             pagingConfig = pagingConfig,
             scheduleRepository = scheduleRepository,
-            doneScheduleShownRepository = mock { whenever(mock.get()) doReturn flowOf(isDoneScheduleShown) },
+            completedScheduleShownRepository = mock { whenever(mock.get()) doReturn flowOf(isDoneScheduleShown) },
             scheduleUiStatePagingFlowFactory = fakeScheduleUiStatePagingFlowFactory
         )
         val snapshot: AllScheduleSnapshot =
@@ -121,7 +121,7 @@ class DefaultGetAllScheduleSnapshotUseCaseTest {
             equalTo(
                 genAllScheduleSnapshot(
                     pagingScheduled = PagingData.empty(),
-                    isDoneScheduleShown = isDoneScheduleShown
+                    isCompletedScheduleShown = isDoneScheduleShown
                 )
             )
         )
