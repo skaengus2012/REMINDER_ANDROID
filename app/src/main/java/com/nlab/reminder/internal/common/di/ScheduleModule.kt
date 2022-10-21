@@ -47,7 +47,7 @@ class ScheduleModule {
         transactionIdGenerator: TransactionIdGenerator,
         scheduleRepository: ScheduleRepository,
         completeMarkRepository: CompleteMarkRepository
-    ): UpdateCompleteUseCase = DefaultUpdateCompleteUseCase(
+    ): ModifyScheduleCompleteUseCase = DefaultModifyScheduleCompleteUseCase(
         transactionIdGenerator,
         scheduleRepository,
         completeMarkRepository,

@@ -26,5 +26,5 @@ sealed class AllScheduleEvent private constructor() : Event {
     object Fetch : AllScheduleEvent()
     object OnToggleCompletedScheduleShownClicked : AllScheduleEvent()
     data class OnAllScheduleSnapshotLoaded(val allSchedulesReport: AllScheduleSnapshot) : AllScheduleEvent()
-    data class OnScheduleCompleteModifyClicked(val scheduleId: ScheduleId, val isComplete: Boolean) : AllScheduleEvent()
+    data class OnModifyScheduleCompleteClicked(val scheduleId: ScheduleId, val isComplete: Boolean) : AllScheduleEvent()
 }

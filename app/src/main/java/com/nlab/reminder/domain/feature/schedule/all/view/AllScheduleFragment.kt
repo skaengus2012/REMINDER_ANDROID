@@ -33,8 +33,8 @@ import com.nlab.reminder.domain.common.schedule.view.ScheduleItemAnimator
 import com.nlab.reminder.domain.common.schedule.view.ScheduleItemTouchMediator
 import com.nlab.reminder.domain.feature.schedule.all.AllScheduleState
 import com.nlab.reminder.domain.feature.schedule.all.AllScheduleViewModel
-import com.nlab.reminder.domain.feature.schedule.all.onScheduleCompleteModifyClicked
 import com.nlab.reminder.domain.feature.schedule.all.onToggleCompletedScheduleShownClicked
+import com.nlab.reminder.domain.feature.schedule.all.onModifyScheduleCompleteClicked
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -58,7 +58,7 @@ class AllScheduleFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val scheduleAdapter = DefaultSchedulePagingAdapter(
             onCompleteClicked = { scheduleUiState ->
-                viewModel.onScheduleCompleteModifyClicked(
+                viewModel.onModifyScheduleCompleteClicked(
                     scheduleId = scheduleUiState.schedule.id(),
                     isComplete = scheduleUiState.isCompleteMarked.not()
                 )

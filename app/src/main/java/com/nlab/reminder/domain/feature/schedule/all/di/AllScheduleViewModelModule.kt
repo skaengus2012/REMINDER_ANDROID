@@ -39,7 +39,7 @@ class AllScheduleViewModelModule {
     fun provideStateMachineProvider(
         scheduleRepository: ScheduleRepository,
         scheduleUiStatePagingFlowFactory: ScheduleUiStatePagingFlowFactory,
-        updateCompleteUseCase: UpdateCompleteUseCase,
+        modifyScheduleCompleteUseCase: ModifyScheduleCompleteUseCase,
         @AllScheduleScope doneScheduleShownRepository: DoneScheduleShownRepository
     ): AllScheduleStateContainerFactory =
         object : AllScheduleStateContainerFactory {
@@ -52,7 +52,7 @@ class AllScheduleViewModelModule {
                         doneScheduleShownRepository,
                         scheduleUiStatePagingFlowFactory
                     ),
-                    updateScheduleComplete = updateCompleteUseCase
+                    modifyScheduleComplete = modifyScheduleCompleteUseCase
                 )
                 return stateMachine.asContainer(scope, AllScheduleState.Init, fetchEvent = AllScheduleEvent.Fetch)
             }

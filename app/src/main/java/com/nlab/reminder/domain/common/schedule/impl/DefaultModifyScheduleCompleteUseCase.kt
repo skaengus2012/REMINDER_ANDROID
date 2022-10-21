@@ -27,13 +27,13 @@ import kotlinx.coroutines.withContext
 /**
  * @author Doohyun
  */
-class DefaultUpdateCompleteUseCase(
+class DefaultModifyScheduleCompleteUseCase(
     private val transactionIdGenerator: TransactionIdGenerator,
     private val scheduleRepository: ScheduleRepository,
     private val completeMarkRepository: CompleteMarkRepository,
     private val delayUntilTransactionPeriod: Delay,
     private val dispatcher: CoroutineDispatcher
-) : UpdateCompleteUseCase {
+) : ModifyScheduleCompleteUseCase {
     override suspend fun invoke(scheduleId: ScheduleId, isComplete: Boolean): Result<Unit> = withContext(dispatcher) {
         completeMarkRepository.insert(completeMarkGroupOf(scheduleId, isComplete))
         delayUntilTransactionPeriod()

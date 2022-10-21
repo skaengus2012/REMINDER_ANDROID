@@ -18,7 +18,7 @@ package com.nlab.reminder.domain.feature.schedule.all
 
 import com.nlab.reminder.core.state.asContainer
 import com.nlab.reminder.domain.common.schedule.Schedule
-import com.nlab.reminder.domain.common.schedule.UpdateCompleteUseCase
+import com.nlab.reminder.domain.common.schedule.ModifyScheduleCompleteUseCase
 import com.nlab.reminder.domain.common.schedule.genSchedule
 import com.nlab.reminder.test.genBoolean
 import com.nlab.reminder.test.genFlowObserveCoroutineScope
@@ -97,13 +97,13 @@ class AllScheduleStateMachineKtTest {
     fun `modify schedule complete when stateMachine received update schedule complete`() = runTest {
         val schedule: Schedule = genSchedule()
         val isComplete: Boolean = genBoolean()
-        val updateCompleteUseCase: UpdateCompleteUseCase = mock()
+        val modifyScheduleCompleteUseCase: ModifyScheduleCompleteUseCase = mock()
         val stateContainer =
-            genAllScheduleStateMachine(updateScheduleComplete = updateCompleteUseCase)
+            genAllScheduleStateMachine(updateScheduleComplete = modifyScheduleCompleteUseCase)
                 .asContainer(genStateContainerScope(), AllScheduleState.Loaded(genAllScheduleSnapshot()))
         stateContainer
-            .send(AllScheduleEvent.OnScheduleCompleteModifyClicked(schedule.id(), isComplete))
+            .send(AllScheduleEvent.OnModifyScheduleCompleteClicked(schedule.id(), isComplete))
             .join()
-        verify(updateCompleteUseCase, once())(schedule.id(), isComplete)
+        verify(modifyScheduleCompleteUseCase, once())(schedule.id(), isComplete)
     }
 }

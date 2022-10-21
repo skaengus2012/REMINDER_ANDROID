@@ -39,14 +39,14 @@ import org.mockito.kotlin.*
  * @author Doohyun
  */
 @OptIn(ExperimentalCoroutinesApi::class)
-class DefaultUpdateCompleteUseCaseTest {
+class DefaultModifyScheduleCompleteUseCaseTest {
     @Test
     fun `completeMark inserted`() = runTest {
         val fixedTxId = genBothify()
         val scheduleId = ScheduleId(genLong())
         val isComplete = genBoolean()
         val completeMarkRepository: CompleteMarkRepository = mock { whenever(mock.get()) doReturn emptyFlow() }
-        val updateCompleteUseCase = DefaultUpdateCompleteUseCase(
+        val updateCompleteUseCase = DefaultModifyScheduleCompleteUseCase(
             transactionIdGenerator = genTransactionIdGenerator(expected = fixedTxId),
             scheduleRepository = mock(),
             completeMarkRepository = completeMarkRepository,
@@ -86,7 +86,7 @@ class DefaultUpdateCompleteUseCaseTest {
             }
         }
         val scheduleRepository: ScheduleRepository = mock()
-        val updateCompleteUseCase = DefaultUpdateCompleteUseCase(
+        val updateCompleteUseCase = DefaultModifyScheduleCompleteUseCase(
             transactionIdGenerator = genTransactionIdGenerator(),
             scheduleRepository = scheduleRepository,
             completeMarkRepository = completeMarkRepository,
@@ -131,7 +131,7 @@ class DefaultUpdateCompleteUseCaseTest {
                 )
             ) doReturn scheduleCompleteResult
         }
-        val updateCompleteUseCase = DefaultUpdateCompleteUseCase(
+        val updateCompleteUseCase = DefaultModifyScheduleCompleteUseCase(
             transactionIdGenerator = genTransactionIdGenerator(),
             scheduleRepository = scheduleRepository,
             completeMarkRepository = completeMarkRepository,
@@ -176,7 +176,7 @@ class DefaultUpdateCompleteUseCaseTest {
         val delayUntilTransactionPeriod: Delay = mock()
         val beforeDelayedOrder = inOrder(completeMarkRepository, delayUntilTransactionPeriod)
         val afterDelayedOrder = inOrder(delayUntilTransactionPeriod, completeMarkRepository)
-        val updateCompleteUseCase = DefaultUpdateCompleteUseCase(
+        val updateCompleteUseCase = DefaultModifyScheduleCompleteUseCase(
             transactionIdGenerator = genTransactionIdGenerator(txId),
             scheduleRepository = mock(),
             completeMarkRepository = completeMarkRepository,

@@ -17,7 +17,7 @@
 package com.nlab.reminder.domain.feature.schedule.all
 
 import com.nlab.reminder.core.state.StateMachine
-import com.nlab.reminder.domain.common.schedule.UpdateCompleteUseCase
+import com.nlab.reminder.domain.common.schedule.ModifyScheduleCompleteUseCase
 
 /**
  * @author Doohyun
@@ -25,7 +25,7 @@ import com.nlab.reminder.domain.common.schedule.UpdateCompleteUseCase
 @Suppress("FunctionName")
 fun AllScheduleStateMachine(
     getAllScheduleSnapshot: GetAllScheduleSnapshotUseCase,
-    updateScheduleComplete: UpdateCompleteUseCase
+    modifyScheduleComplete: ModifyScheduleCompleteUseCase
 ): StateMachine<AllScheduleEvent, AllScheduleState> = StateMachine {
     reduce {
         event<AllScheduleEvent.Fetch> {
@@ -42,9 +42,8 @@ fun AllScheduleStateMachine(
                 getAllScheduleSnapshot().collect { send(AllScheduleEvent.OnAllScheduleSnapshotLoaded(it)) }
             }
         }
-
-        event<AllScheduleEvent.OnScheduleCompleteModifyClicked> {
-            state<AllScheduleState.Loaded> { (event) -> updateScheduleComplete(event.scheduleId, event.isComplete) }
+        event<AllScheduleEvent.OnModifyScheduleCompleteClicked> {
+            state<AllScheduleState.Loaded> { (event) -> modifyScheduleComplete(event.scheduleId, event.isComplete) }
         }
     }
 }
