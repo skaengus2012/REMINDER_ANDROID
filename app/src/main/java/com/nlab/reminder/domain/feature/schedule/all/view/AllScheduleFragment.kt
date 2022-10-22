@@ -24,13 +24,14 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.recyclerview.widget.ItemTouchHelper
 import com.nlab.reminder.R
 import com.nlab.reminder.core.android.fragment.viewLifecycleScope
 import com.nlab.reminder.core.android.view.throttleClicks
 import com.nlab.reminder.databinding.FragmentAllScheduleBinding
 import com.nlab.reminder.domain.common.schedule.view.DefaultSchedulePagingAdapter
 import com.nlab.reminder.domain.common.schedule.view.ScheduleItemAnimator
-import com.nlab.reminder.domain.common.schedule.view.ScheduleItemTouchMediator
+import com.nlab.reminder.domain.common.schedule.view.ScheduleItemTouchCallback
 import com.nlab.reminder.domain.feature.schedule.all.AllScheduleState
 import com.nlab.reminder.domain.feature.schedule.all.AllScheduleViewModel
 import com.nlab.reminder.domain.feature.schedule.all.onToggleCompletedScheduleShownClicked
@@ -64,19 +65,17 @@ class AllScheduleFragment : Fragment() {
                 )
             }
         )
-        val scheduleItemTouchMediator = ScheduleItemTouchMediator(viewLifecycleOwner, scheduleAdapter)
+        val itemTouchCallback = ScheduleItemTouchCallback(
+            scheduleAdapter,
+            onClearViewListener = {
+
+            }
+        )
 
         binding.contentRecyclerview
-            .apply { scheduleItemTouchMediator.attachToRecyclerView(recyclerView = this) }
+            .apply { ItemTouchHelper(itemTouchCallback).attachToRecyclerView(this) }
             .apply { itemAnimator = ScheduleItemAnimator() }
             .apply { adapter = scheduleAdapter }
-
-        scheduleItemTouchMediator.dragEndedFlow
-            .onEach {
-                // TODO make order save.
-                println("TODO make order save.")
-            }
-            .launchIn(viewLifecycleScope)
 
         binding.buttonCompletedScheduleShownToggle
             .throttleClicks()

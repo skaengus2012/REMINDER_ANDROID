@@ -14,17 +14,11 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.common.schedule
-
-import com.nlab.reminder.core.util.test.annotation.Generated
+package com.nlab.reminder.domain.common.schedule.view
 
 /**
- * @author Doohyun
+ * @author thalys
  */
-@Generated
-data class ScheduleUiState(
-    val schedule: Schedule,
-    val isCompleteMarked: Boolean
-) {
-    val isComplete: Boolean get() = schedule.isComplete
+interface ScheduleItemMoveListener {
+    fun onMove(currentPosition: Int, targetPosition: Int): Boolean
 }

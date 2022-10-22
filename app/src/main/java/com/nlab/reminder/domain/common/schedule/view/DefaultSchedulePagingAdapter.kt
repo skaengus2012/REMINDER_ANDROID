@@ -27,7 +27,13 @@ import com.nlab.reminder.domain.common.schedule.ScheduleUiState
 class DefaultSchedulePagingAdapter(
     private val emptyUiState: ScheduleUiState = ScheduleUiState(Schedule.empty(), isCompleteMarked = false),
     private val onCompleteClicked: (ScheduleUiState) -> Unit
-) : PagingDataAdapter<ScheduleUiState, ScheduleUiStateViewHolder>(ScheduleUiStateDiffCallback()) {
+) : PagingDataAdapter<ScheduleUiState, ScheduleUiStateViewHolder>(ScheduleUiStateDiffCallback()),
+    ScheduleItemMoveListener {
+    private val itemMoveDelegate = ScheduleItemMoveDelegate(
+        getItem = this::getItem,
+        notifyItemMoved = this::notifyItemMoved
+    )
+
     override fun onBindViewHolder(holder: ScheduleUiStateViewHolder, position: Int) {
         holder.onBind(getItem(position) ?: emptyUiState)
     }
@@ -37,5 +43,9 @@ class DefaultSchedulePagingAdapter(
             parent,
             onCompleteClicked = { position -> getItem(position)?.also(onCompleteClicked) }
         )
+    }
+
+    override fun onMove(currentPosition: Int, targetPosition: Int): Boolean {
+        return itemMoveDelegate.onMove(currentPosition, targetPosition)
     }
 }

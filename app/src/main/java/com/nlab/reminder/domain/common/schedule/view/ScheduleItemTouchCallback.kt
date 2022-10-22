@@ -26,9 +26,9 @@ import com.nlab.reminder.databinding.ViewItemScheduleBinding
 /**
  * @author thalys
  */
-class ScheduleItemTouchHelperCallback(
-    private val onMoveListener: (currentPosition: Int, targetPosition: Int) -> Boolean = { _, _ -> false },
-    private val onClearViewListener: () -> Unit = {}
+class ScheduleItemTouchCallback(
+    private val onMoveListener: ScheduleItemMoveListener,
+    private val onClearViewListener: () -> Unit
 ) : ItemTouchHelper.SimpleCallback(
     ItemTouchHelper.UP or ItemTouchHelper.DOWN,
     ItemTouchHelper.ACTION_STATE_IDLE
@@ -60,7 +60,7 @@ class ScheduleItemTouchHelperCallback(
         recyclerView: RecyclerView,
         viewHolder: RecyclerView.ViewHolder,
         target: RecyclerView.ViewHolder
-    ): Boolean = onMoveListener(viewHolder.bindingAdapterPosition, target.bindingAdapterPosition)
+    ): Boolean = onMoveListener.onMove(viewHolder.bindingAdapterPosition, target.bindingAdapterPosition)
 
     override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
         super.clearView(recyclerView, viewHolder)
