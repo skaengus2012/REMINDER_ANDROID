@@ -153,10 +153,8 @@ class LocalScheduleRepositoryTest {
     fun `update result for updateComplete was success`() = runTest {
         val schedules: List<Schedule> = genSchedules()
         val completes: List<Boolean> = List(schedules.size) { genBoolean() }
-        val repositoryParam: Set<ScheduleCompleteRequest> =
-            schedules
-                .mapIndexed { index, schedule -> ScheduleCompleteRequest(schedule.id(), completes[index]) }
-                .toSet()
+        val repositoryParam: List<ScheduleCompleteRequest> =
+            schedules.mapIndexed { index, schedule -> ScheduleCompleteRequest(schedule.id(), completes[index]) }
         val daoParam = buildMap {
             schedules.forEachIndexed { index, schedule -> this[schedule.id().value] = completes[index] }
         }
@@ -173,7 +171,7 @@ class LocalScheduleRepositoryTest {
         val scheduleDao: ScheduleDao = mock {
             whenever(mock.updateComplete(any())) doThrow RuntimeException()
         }
-        val updateResult = LocalScheduleRepository(scheduleDao).updateComplete(emptySet())
+        val updateResult = LocalScheduleRepository(scheduleDao).updateComplete(emptyList())
         assertThat(updateResult.isFailure, equalTo(true))
     }
 }

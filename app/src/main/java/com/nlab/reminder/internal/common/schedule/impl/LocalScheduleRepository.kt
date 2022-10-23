@@ -52,7 +52,7 @@ class LocalScheduleRepository(
         return pager.flow.map { pagingData -> pagingData.map(ScheduleEntityWithTagEntities::toSchedule) }
     }
 
-    override suspend fun updateComplete(requests: Set<ScheduleCompleteRequest>): Result<Unit> = catching {
+    override suspend fun updateComplete(requests: List<ScheduleCompleteRequest>): Result<Unit> = catching {
         scheduleDao.updateComplete(
             requests.fold(emptyMap()) { acc, (scheduleId, isComplete) -> acc + (scheduleId.value to isComplete) }
         )
