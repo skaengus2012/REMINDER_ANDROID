@@ -52,7 +52,17 @@ class LocalScheduleRepository(
         return pager.flow.map { pagingData -> pagingData.map(ScheduleEntityWithTagEntities::toSchedule) }
     }
 
-    override suspend fun updateComplete(requests: List<ScheduleCompleteRequest>): Result<Unit> = catching {
-        scheduleDao.updateCompletes(requests.map { request -> request.scheduleId.value to request.isComplete })
-    }
+    override suspend fun updateCompletes(requests: List<ModifyCompleteRequest>): Result<Unit> =
+        catching {
+            scheduleDao.updateCompletes(
+                requests = requests.map { request -> request.scheduleId.value to request.isComplete }
+            )
+        }
+
+    override suspend fun updateVisiblePriorities(requests: List<ModifyVisiblePriorityRequest>): Result<Unit> =
+        catching {
+            scheduleDao.updateVisiblePriorities(
+                requests = requests.map { request -> request.scheduleId.value to request.visiblePriority }
+            )
+        }
 }

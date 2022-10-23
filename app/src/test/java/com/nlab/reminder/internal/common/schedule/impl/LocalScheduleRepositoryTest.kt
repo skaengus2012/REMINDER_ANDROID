@@ -151,26 +151,42 @@ class LocalScheduleRepositoryTest {
 
     @Test
     fun `update result for updateComplete was success`() = runTest {
-        val schedules: List<Schedule> = genSchedules()
-        val completes: List<Boolean> = List(schedules.size) { genBoolean() }
-        val repositoryParam: List<ScheduleCompleteRequest> =
-            schedules.mapIndexed { index, schedule -> ScheduleCompleteRequest(schedule.id(), completes[index]) }
-        val daoParam: List<Pair<Long, Boolean>> =
-            schedules.mapIndexed { index, schedule -> schedule.id().value to completes[index] }
-
+        val (repositoryParam, daoParam) = genRepositoryParamAndDaoParams(
+            genRandomUpdateValue = { genBoolean() },
+            genRequest = { scheduleId, isComplete -> ModifyCompleteRequest(scheduleId, isComplete) }
+        )
         val scheduleDao: ScheduleDao = mock()
-        val updateResult = LocalScheduleRepository(scheduleDao).updateComplete(repositoryParam)
+        val updateResult = LocalScheduleRepository(scheduleDao).updateCompletes(repositoryParam)
 
         verify(scheduleDao, once()).updateCompletes(daoParam)
         assertThat(updateResult.isSuccess, equalTo(true))
     }
 
     @Test
-    fun `update result for updateComplete was failed`() = runTest {
-        val scheduleDao: ScheduleDao = mock {
-            whenever(mock.updateCompletes(any())) doThrow RuntimeException()
-        }
-        val updateResult = LocalScheduleRepository(scheduleDao).updateComplete(emptyList())
-        assertThat(updateResult.isFailure, equalTo(true))
+    fun `update result for updateVisiblePriority was success`() = runTest {
+        val (repositoryParam, daoParam) = genRepositoryParamAndDaoParams(
+            genRandomUpdateValue = { genLong() },
+            genRequest = { scheduleId, visiblePriority -> ModifyVisiblePriorityRequest(scheduleId, visiblePriority) }
+        )
+
+        val scheduleDao: ScheduleDao = mock()
+        val result = LocalScheduleRepository(scheduleDao).updateVisiblePriorities(repositoryParam)
+
+        verify(scheduleDao, once()).updateVisiblePriorities(daoParam)
+        assertThat(result.isSuccess, equalTo(true))
+    }
+
+    private fun <T, U> genRepositoryParamAndDaoParams(
+        genRandomUpdateValue: () -> T,
+        genRequest: (ScheduleId, T) -> U
+    ): Pair<List<U>, List<Pair<Long, T>>> {
+        val schedules: List<Schedule> = genSchedules()
+        val updateValues: List<T> = List(schedules.size) { genRandomUpdateValue() }
+        val repositoryParam: List<U> =
+            schedules.mapIndexed { index, schedule -> genRequest(schedule.id(), updateValues[index]) }
+        val daoParam: List<Pair<Long, T>> =
+            schedules.mapIndexed { index, schedule -> schedule.id().value to updateValues[index] }
+
+        return repositoryParam to daoParam
     }
 }

@@ -19,7 +19,7 @@ package com.nlab.reminder.domain.common.schedule
 import com.nlab.reminder.core.util.test.annotation.Generated
 
 /**
- * @author Doohyun
+ * @author thalys
  */
 @Generated
-data class ScheduleCompleteRequest(val scheduleId: ScheduleId, val isComplete: Boolean)
+data class ModifyVisiblePriorityRequest(val scheduleId: ScheduleId, val visiblePriority: Long)

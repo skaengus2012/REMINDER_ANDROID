@@ -55,6 +55,14 @@ abstract class ScheduleDao {
     )
     abstract fun getMaxVisiblePriority(isComplete: Boolean): Long?
 
+    @Query("UPDATE schedule SET visible_priority = :visiblePriority WHERE schedule_id = :scheduleId")
+    abstract suspend fun updateVisiblePriority(scheduleId: Long, visiblePriority: Long)
+
+    @Transaction
+    open suspend fun updateVisiblePriorities(requests: List<Pair<Long, Long>>) {
+        requests.forEach { (scheduleId, visiblePriority) -> updateVisiblePriority(scheduleId, visiblePriority) }
+    }
+
     @Query(
         """
         UPDATE schedule 
