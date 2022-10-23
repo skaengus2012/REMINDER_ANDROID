@@ -29,7 +29,7 @@ data class Schedule(
     val note: String?,
     val url: String?,
     val tags: List<Tag>,
-    val visiblePriority: Int,
+    val visiblePriority: Long,
     val isComplete: Boolean
 ) {
     fun id(): ScheduleId = ScheduleId(scheduleId)
@@ -42,7 +42,7 @@ data class Schedule(
             note = null,
             url = null,
             tags = emptyList(),
-            visiblePriority = Int.MIN_VALUE,
+            visiblePriority = Long.MIN_VALUE,
             isComplete = false
         )
     }

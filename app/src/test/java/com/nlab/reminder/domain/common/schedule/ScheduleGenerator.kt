@@ -35,7 +35,7 @@ fun genSchedule(
     note: String = genBothify(),
     url: String = genBothify(),
     tags: List<Tag> = genTags(),
-    visiblePriority: Int = genInt(),
+    visiblePriority: Long = genLong(),
     isComplete: Boolean = genBoolean()
 ): Schedule = Schedule(scheduleId, title, note, url, tags, visiblePriority, isComplete)
 
