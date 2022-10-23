@@ -20,7 +20,6 @@ import androidx.paging.AsyncPagingDataDiffer
 import androidx.paging.PagingConfig
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.nlab.reminder.core.kotlin.util.isFailure
 import com.nlab.reminder.core.kotlin.util.isSuccess
 import com.nlab.reminder.domain.common.schedule.*
 import com.nlab.reminder.domain.common.tag.genTags

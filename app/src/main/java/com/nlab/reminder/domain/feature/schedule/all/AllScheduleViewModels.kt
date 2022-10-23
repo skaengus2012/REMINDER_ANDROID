@@ -17,6 +17,7 @@
 package com.nlab.reminder.domain.feature.schedule.all
 
 import com.nlab.reminder.domain.common.schedule.ScheduleId
+import com.nlab.reminder.domain.common.schedule.ScheduleUiState
 
 /**
  * @author Doohyun
@@ -27,3 +28,5 @@ fun AllScheduleViewModel.onModifyScheduleCompleteClicked(
     scheduleId: ScheduleId,
     isComplete: Boolean
 ) = send(AllScheduleEvent.OnModifyScheduleCompleteClicked(scheduleId, isComplete))
+fun AllScheduleViewModel.onDragEnded(snapshot: List<ScheduleUiState>) =
+    send(AllScheduleEvent.OnDragEnded(snapshot))

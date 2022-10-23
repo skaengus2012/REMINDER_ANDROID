@@ -18,8 +18,7 @@ package com.nlab.reminder.domain.feature.schedule.all
 
 import com.nlab.reminder.core.state.StateContainer
 import com.nlab.reminder.core.state.verifyStateSendExtension
-import com.nlab.reminder.domain.common.schedule.Schedule
-import com.nlab.reminder.domain.common.schedule.genSchedule
+import com.nlab.reminder.domain.common.schedule.*
 import com.nlab.reminder.test.genBoolean
 import org.junit.Test
 import org.mockito.kotlin.*
@@ -32,6 +31,7 @@ class AllScheduleViewModelsKtTest {
     fun testExtensions() {
         val stateContainer: StateContainer<AllScheduleEvent, AllScheduleState> = mock()
         val schedule: Schedule = genSchedule()
+        val scheduleUiStates: List<ScheduleUiState> = genScheduleUiStates()
         val isComplete: Boolean = genBoolean()
         val viewModel = AllScheduleViewModel(
             stateContainerFactory = mock {
@@ -48,5 +48,10 @@ class AllScheduleViewModelsKtTest {
             stateContainer,
             AllScheduleEvent.OnModifyScheduleCompleteClicked(schedule.id(), isComplete)
         ) { viewModel.onModifyScheduleCompleteClicked(schedule.id(), isComplete) }
+
+        verifyStateSendExtension(
+            stateContainer,
+            AllScheduleEvent.OnDragEnded(scheduleUiStates)
+        ) { viewModel.onDragEnded(scheduleUiStates) }
     }
 }

@@ -18,10 +18,7 @@ package com.nlab.reminder.domain.feature.schedule.all
 
 import androidx.paging.PagingData
 import com.nlab.reminder.core.effect.SideEffectHandle
-import com.nlab.reminder.domain.common.schedule.CompletedScheduleShownRepository
-import com.nlab.reminder.domain.common.schedule.ScheduleUiState
-import com.nlab.reminder.domain.common.schedule.ModifyScheduleCompleteUseCase
-import com.nlab.reminder.domain.common.schedule.genSchedule
+import com.nlab.reminder.domain.common.schedule.*
 import com.nlab.reminder.test.genBoolean
 import kotlinx.coroutines.flow.emptyFlow
 import org.mockito.kotlin.doReturn
@@ -40,7 +37,8 @@ fun genAllScheduleEvents(): Set<AllScheduleEvent> = setOf(
     AllScheduleEvent.Fetch,
     AllScheduleEvent.OnToggleCompletedScheduleShownClicked,
     AllScheduleEvent.OnAllScheduleSnapshotLoaded(genAllScheduleSnapshot()),
-    AllScheduleEvent.OnModifyScheduleCompleteClicked(genSchedule().id(), genBoolean())
+    AllScheduleEvent.OnModifyScheduleCompleteClicked(genSchedule().id(), genBoolean()),
+    AllScheduleEvent.OnDragEnded(genScheduleUiStates())
 )
 
 fun genAllScheduleStates(): Set<AllScheduleState> = setOf(
