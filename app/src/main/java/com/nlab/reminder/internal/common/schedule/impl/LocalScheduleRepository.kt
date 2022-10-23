@@ -38,7 +38,7 @@ class LocalScheduleRepository(
             is ScheduleItemRequest.FindByComplete -> scheduleDao.findByComplete(request.isComplete)
         }
 
-        return resultFlow.map { entities -> entities.map(ScheduleEntityWithTagEntities::toSchedule)  }
+        return resultFlow.map { entities -> entities.map(ScheduleEntityWithTagEntities::toSchedule) }
     }
 
     override fun getAsPagingData(request: ScheduleItemRequest, pagingConfig: PagingConfig): Flow<PagingData<Schedule>> {
@@ -53,8 +53,6 @@ class LocalScheduleRepository(
     }
 
     override suspend fun updateComplete(requests: List<ScheduleCompleteRequest>): Result<Unit> = catching {
-        scheduleDao.updateComplete(
-            requests.fold(emptyMap()) { acc, (scheduleId, isComplete) -> acc + (scheduleId.value to isComplete) }
-        )
+        scheduleDao.updateComplete(requests.map { request -> request.scheduleId.value to request.isComplete })
     }
 }

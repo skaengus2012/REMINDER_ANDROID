@@ -155,9 +155,8 @@ class LocalScheduleRepositoryTest {
         val completes: List<Boolean> = List(schedules.size) { genBoolean() }
         val repositoryParam: List<ScheduleCompleteRequest> =
             schedules.mapIndexed { index, schedule -> ScheduleCompleteRequest(schedule.id(), completes[index]) }
-        val daoParam = buildMap {
-            schedules.forEachIndexed { index, schedule -> this[schedule.id().value] = completes[index] }
-        }
+        val daoParam: List<Pair<Long, Boolean>> =
+            schedules.mapIndexed { index, schedule -> schedule.id().value to completes[index] }
 
         val scheduleDao: ScheduleDao = mock()
         val updateResult = LocalScheduleRepository(scheduleDao).updateComplete(repositoryParam)
