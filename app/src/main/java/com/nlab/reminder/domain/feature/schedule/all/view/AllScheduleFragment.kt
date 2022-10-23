@@ -23,12 +23,15 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.ItemTouchHelper
 import com.nlab.reminder.R
+import com.nlab.reminder.core.android.fragment.viewLifecycle
 import com.nlab.reminder.core.android.fragment.viewLifecycleScope
 import com.nlab.reminder.core.android.view.throttleClicks
 import com.nlab.reminder.databinding.FragmentAllScheduleBinding
+import com.nlab.reminder.domain.common.android.view.loadingFlow
 import com.nlab.reminder.domain.common.schedule.view.DefaultSchedulePagingAdapter
 import com.nlab.reminder.domain.common.schedule.view.ScheduleItemAnimator
 import com.nlab.reminder.domain.common.schedule.view.ScheduleItemTouchCallback
@@ -50,6 +53,11 @@ class AllScheduleFragment : Fragment() {
     private var _binding: FragmentAllScheduleBinding? = null
     private val binding: FragmentAllScheduleBinding get() = checkNotNull(_binding)
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        postponeEnterTransition()
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         FragmentAllScheduleBinding.inflate(inflater, container, false)
             .also { _binding = it }
@@ -68,7 +76,7 @@ class AllScheduleFragment : Fragment() {
         val itemTouchCallback = ScheduleItemTouchCallback(
             scheduleAdapter,
             onClearViewListener = {
-
+                // TODO implements Drag done.
             }
         )
 
@@ -87,12 +95,22 @@ class AllScheduleFragment : Fragment() {
             .map { it.snapshot }
             .map { it.isCompletedScheduleShown }
             .distinctUntilChanged()
+            .flowWithLifecycle(viewLifecycle)
             .onEach { isDoneScheduleShown ->
                 binding.buttonCompletedScheduleShownToggle.setText(
                     if (isDoneScheduleShown) R.string.completed_schedule_hidden
                     else R.string.completed_schedule_shown
                 )
             }
+            .launchIn(viewLifecycleScope)
+
+        merge(
+            viewModel.stateFlow.filterIsInstance<AllScheduleState.Loaded>(),
+            viewModel.stateFlow.loadingFlow<AllScheduleState.Loading>()
+        )
+            .flowWithLifecycle(viewLifecycle)
+            .take(count = 1)
+            .onEach { startPostponedEnterTransition() }
             .launchIn(viewLifecycleScope)
 
         viewLifecycleScope.launch {
