@@ -44,12 +44,45 @@ abstract class ScheduleDao {
     @Query("SELECT * FROM schedule WHERE is_complete = :isComplete ORDER BY is_complete, visible_priority")
     abstract fun findAsPagingSourceByComplete(isComplete: Boolean): PagingSource<Int, ScheduleEntityWithTagEntities>
 
-    @Query("UPDATE schedule SET is_complete = :isComplete WHERE schedule_id = :scheduleId")
-    abstract suspend fun updateComplete(scheduleId: Long, isComplete: Boolean)
+    @Query(
+        """
+        SELECT visible_priority 
+        FROM schedule 
+        WHERE is_complete = :isComplete
+        ORDER BY visible_priority 
+        DESC LIMIT 1
+        """
+    )
+    abstract fun getMaxVisiblePriority(isComplete: Boolean): Long?
+
+    @Query(
+        """
+        UPDATE schedule 
+        SET is_complete = :isComplete, visible_priority = :visiblePriority 
+        WHERE schedule_id = :scheduleId
+        """
+    )
+    abstract suspend fun updateComplete(scheduleId: Long, isComplete: Boolean, visiblePriority: Long)
 
     @Transaction
-    open suspend fun updateComplete(requests: Map<Long, Boolean>) {
-        requests.forEach { (scheduleId, isComplete) -> updateComplete(scheduleId, isComplete) }
+    open suspend fun updateCompletes(requests: List<Pair<Long, Boolean>>) {
+        updateCompletesInternal(
+            scheduleIds = requests.filter { (_, isComplete) -> isComplete }.map { (scheduleId) -> scheduleId },
+            isComplete = true
+        )
+        updateCompletesInternal(
+            scheduleIds = requests.filter { (_, isComplete) -> isComplete.not() }.map { (scheduleId) -> scheduleId },
+            isComplete = false
+        )
+    }
+
+    private suspend fun updateCompletesInternal(scheduleIds: List<Long>, isComplete: Boolean) {
+        if (scheduleIds.isEmpty()) return
+
+        val maxVisiblePriority: Long = getMaxVisiblePriority(isComplete) ?: -1
+        scheduleIds.forEachIndexed { index, scheduleId ->
+            updateComplete(scheduleId, isComplete, visiblePriority = maxVisiblePriority + index + 1)
+        }
     }
 
     @Delete

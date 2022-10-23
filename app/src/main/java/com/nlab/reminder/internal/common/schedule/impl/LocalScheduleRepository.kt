@@ -53,6 +53,6 @@ class LocalScheduleRepository(
     }
 
     override suspend fun updateComplete(requests: List<ScheduleCompleteRequest>): Result<Unit> = catching {
-        scheduleDao.updateComplete(requests.map { request -> request.scheduleId.value to request.isComplete })
+        scheduleDao.updateCompletes(requests.map { request -> request.scheduleId.value to request.isComplete })
     }
 }

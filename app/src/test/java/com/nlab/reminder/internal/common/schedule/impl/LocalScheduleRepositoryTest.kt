@@ -161,14 +161,14 @@ class LocalScheduleRepositoryTest {
         val scheduleDao: ScheduleDao = mock()
         val updateResult = LocalScheduleRepository(scheduleDao).updateComplete(repositoryParam)
 
-        verify(scheduleDao, once()).updateComplete(daoParam)
+        verify(scheduleDao, once()).updateCompletes(daoParam)
         assertThat(updateResult.isSuccess, equalTo(true))
     }
 
     @Test
     fun `update result for updateComplete was failed`() = runTest {
         val scheduleDao: ScheduleDao = mock {
-            whenever(mock.updateComplete(any())) doThrow RuntimeException()
+            whenever(mock.updateCompletes(any())) doThrow RuntimeException()
         }
         val updateResult = LocalScheduleRepository(scheduleDao).updateComplete(emptyList())
         assertThat(updateResult.isFailure, equalTo(true))
