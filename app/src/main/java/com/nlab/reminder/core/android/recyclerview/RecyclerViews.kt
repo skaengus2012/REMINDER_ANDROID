@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.common.schedule
+package com.nlab.reminder.core.android.recyclerview
 
-import androidx.paging.PagingData
-import kotlinx.coroutines.flow.Flow
+import androidx.recyclerview.widget.RecyclerView
 
 /**
  * @author thalys
  */
-interface ScheduleUiStatePagingFlowFactory {
-    fun with(schedules: Flow<PagingData<Schedule>>): Flow<PagingData<ScheduleUiState>>
-}
+val RecyclerView.ViewHolder.bindingAdapterOptionalPosition: Int?
+    get() = bindingAdapterPosition.takeUnless { it == RecyclerView.NO_POSITION }

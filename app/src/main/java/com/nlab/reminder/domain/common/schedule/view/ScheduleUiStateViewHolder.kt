@@ -20,6 +20,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
+import com.nlab.reminder.core.android.recyclerview.bindingAdapterOptionalPosition
 import com.nlab.reminder.core.android.view.initWithLifecycleOwner
 import com.nlab.reminder.core.android.view.throttleClicks
 import com.nlab.reminder.databinding.ViewItemScheduleBinding
@@ -38,7 +39,7 @@ class ScheduleUiStateViewHolder(
         binding.initWithLifecycleOwner { lifecycleOwner ->
             buttonComplete
                 .throttleClicks()
-                .onEach { onCompleteClicked(bindingAdapterPosition) }
+                .onEach { onCompleteClicked(bindingAdapterOptionalPosition ?: return@onEach) }
                 .launchIn(lifecycleOwner.lifecycleScope)
         }
     }

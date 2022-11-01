@@ -16,15 +16,10 @@
 
 package com.nlab.reminder.internal.common.schedule.impl
 
-import androidx.paging.AsyncPagingDataDiffer
-import androidx.paging.PagingConfig
-import androidx.paging.PagingSource
-import androidx.paging.PagingState
 import com.nlab.reminder.core.kotlin.util.isSuccess
 import com.nlab.reminder.domain.common.schedule.*
 import com.nlab.reminder.domain.common.tag.genTags
 import com.nlab.reminder.internal.common.android.database.*
-import com.nlab.reminder.internal.common.database.genScheduleEntityWithTagEntitiesList
 import com.nlab.reminder.internal.common.database.toScheduleEntityWithTagEntities
 import com.nlab.reminder.test.*
 import kotlinx.coroutines.*
@@ -32,8 +27,6 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.test.*
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.*
-import org.junit.After
-import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.*
 
@@ -42,16 +35,6 @@ import org.mockito.kotlin.*
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class LocalScheduleRepositoryTest {
-    @Before
-    fun setUp() = runTest {
-        Dispatchers.setMain(genFlowExecutionDispatcher(testScheduler))
-    }
-
-    @After
-    fun tearDown() {
-        Dispatchers.resetMain()
-    }
-
     @Test
     fun `notify 2 times schedules when ScheduleDao sent 2 times data`() = runTest {
         val isComplete: Boolean = genBoolean()
@@ -97,55 +80,6 @@ class LocalScheduleRepositoryTest {
 
         advanceTimeBy(delayTimeMillis = delayBetweenElements * 2)
         assertThat(actualSchedules, equalTo(expectedSchedules))
-    }
-
-    @Test
-    fun `notify schedules when ScheduleDao sent pagingSource`() = runTest {
-        val isComplete: Boolean = genBoolean()
-
-        notifyScheduleWhenScheduleDaoSentPagingSource(
-            ScheduleItemRequest.Find,
-            setupMock = { scheduleDao, pagingSource ->
-                whenever(scheduleDao.findAsPagingSource()) doReturn pagingSource
-            }
-        )
-
-        notifyScheduleWhenScheduleDaoSentPagingSource(
-            ScheduleItemRequest.FindByComplete(isComplete),
-            setupMock = { scheduleDao, pagingSource ->
-                whenever(scheduleDao.findAsPagingSourceByComplete(isComplete)) doReturn pagingSource
-            }
-        )
-    }
-
-    private fun notifyScheduleWhenScheduleDaoSentPagingSource(
-        ScheduleItemRequest: ScheduleItemRequest,
-        setupMock: (ScheduleDao, PagingSource<Int, ScheduleEntityWithTagEntities>) -> Unit
-    ) = runTest {
-        val expectedEntities = genScheduleEntityWithTagEntitiesList()
-        val scheduleDao: ScheduleDao = mock {
-            setupMock(
-                mock,
-                object : PagingSource<Int, ScheduleEntityWithTagEntities>() {
-                    override fun getRefreshKey(state: PagingState<Int, ScheduleEntityWithTagEntities>): Int? = null
-                    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, ScheduleEntityWithTagEntities> =
-                        LoadResult.Page(data = expectedEntities, prevKey = null, nextKey = null)
-                }
-            )
-        }
-        val differ = AsyncPagingDataDiffer(
-            diffCallback = IdentityItemCallback<Schedule>(),
-            updateCallback = NoopListCallback(),
-            workerDispatcher = Dispatchers.Main
-        )
-
-        LocalScheduleRepository(scheduleDao)
-            .getAsPagingData(ScheduleItemRequest, PagingConfig(pageSize = genInt()))
-            .onEach { data -> differ.submitData(data) }
-            .launchIn(genFlowObserveCoroutineScope())
-
-        advanceUntilIdle()
-        assertThat(differ.snapshot().items, equalTo(expectedEntities.toSchedules()))
     }
 
     @Test

@@ -32,9 +32,7 @@ object Dependencies {
     const val ANDROID_ROOM_RUNTIME = "androidx.room:room-runtime:${DependenciesVersions.ANDROID_ROOM}"
     const val ANDROID_ROOM_KTX = "androidx.room:room-ktx:${DependenciesVersions.ANDROID_ROOM}"
     const val ANDROID_ROOM_COMPILER = "androidx.room:room-compiler:${DependenciesVersions.ANDROID_ROOM}"
-    const val ANDROID_ROOM_PAGING = "androidx.room:room-paging:${DependenciesVersions.ANDROID_ROOM}"
     const val ANDROID_STARTUP_RUNTIME = "androidx.startup:startup-runtime:${DependenciesVersions.ANDROID_STARTUP}"
-    const val ANDROID_PAGING_RUNTIME = "androidx.paging:paging-runtime:${DependenciesVersions.ANDROID_PAGING}"
     const val ANDROID_DATASTORE_PREFERENCES = "androidx.datastore:datastore-preferences:${DependenciesVersions.ANDROID_DATASTORE_PREFERENCES}"
 
     const val GOOGLE_HILT_ANDROID = "com.google.dagger:hilt-android:${DependenciesVersions.GOOGLE_HILT}"

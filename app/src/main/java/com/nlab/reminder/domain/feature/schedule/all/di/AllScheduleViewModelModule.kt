@@ -16,7 +16,6 @@
 
 package com.nlab.reminder.domain.feature.schedule.all.di
 
-import androidx.paging.PagingConfig
 import com.nlab.reminder.core.effect.SideEffectHandle
 import com.nlab.reminder.core.state.StateContainer
 import com.nlab.reminder.core.state.asContainer
@@ -42,24 +41,23 @@ class AllScheduleViewModelModule {
         scheduleUiStateFlowFactory: ScheduleUiStateFlowFactory,
         modifyScheduleCompleteUseCase: ModifyScheduleCompleteUseCase,
         @AllScheduleScope completedScheduleShownRepository: CompletedScheduleShownRepository
-    ): AllScheduleStateContainerFactory =
-        object : AllScheduleStateContainerFactory {
-            override fun create(
-                scope: CoroutineScope,
-                sideEffectHandle: SideEffectHandle<AllScheduleSideEffect>
-            ): StateContainer<AllScheduleEvent, AllScheduleState> {
-                val stateMachine = AllScheduleStateMachine(
-                    sideEffectHandle,
-                    getAllScheduleSnapshot = DefaultGetAllScheduleSnapshotUseCase(
-                        scheduleRepository,
-                        scheduleUiStateFlowFactory,
-                        completedScheduleShownRepository
-                    ),
-                    modifyScheduleComplete = modifyScheduleCompleteUseCase,
-                    completedScheduleShownRepository = completedScheduleShownRepository,
-                    scheduleRepository = scheduleRepository
-                )
-                return stateMachine.asContainer(scope, AllScheduleState.Init, fetchEvent = AllScheduleEvent.Fetch)
-            }
+    ): AllScheduleStateContainerFactory = object : AllScheduleStateContainerFactory {
+        override fun create(
+            scope: CoroutineScope,
+            sideEffectHandle: SideEffectHandle<AllScheduleSideEffect>
+        ): StateContainer<AllScheduleEvent, AllScheduleState> {
+            val stateMachine = AllScheduleStateMachine(
+                sideEffectHandle,
+                getAllScheduleSnapshot = DefaultGetAllScheduleSnapshotUseCase(
+                    scheduleRepository,
+                    scheduleUiStateFlowFactory,
+                    completedScheduleShownRepository
+                ),
+                modifyScheduleComplete = modifyScheduleCompleteUseCase,
+                completedScheduleShownRepository = completedScheduleShownRepository,
+                scheduleRepository = scheduleRepository
+            )
+            return stateMachine.asContainer(scope, AllScheduleState.Init, fetchEvent = AllScheduleEvent.Fetch)
         }
+    }
 }

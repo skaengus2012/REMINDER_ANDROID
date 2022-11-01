@@ -16,7 +16,6 @@
 
 package com.nlab.reminder.internal.common.schedule.impl
 
-import androidx.paging.*
 import com.nlab.reminder.core.kotlin.coroutine.flow.map
 import com.nlab.reminder.core.kotlin.util.Result
 import com.nlab.reminder.core.kotlin.util.catching
@@ -39,17 +38,6 @@ class LocalScheduleRepository(
         }
 
         return resultFlow.map { entities -> entities.map(ScheduleEntityWithTagEntities::toSchedule) }
-    }
-
-    override fun getAsPagingData(request: ScheduleItemRequest, pagingConfig: PagingConfig): Flow<PagingData<Schedule>> {
-        val pager = Pager(pagingConfig, pagingSourceFactory = {
-            when (request) {
-                is ScheduleItemRequest.Find -> scheduleDao.findAsPagingSource()
-                is ScheduleItemRequest.FindByComplete -> scheduleDao.findAsPagingSourceByComplete(request.isComplete)
-            }
-        })
-
-        return pager.flow.map { pagingData -> pagingData.map(ScheduleEntityWithTagEntities::toSchedule) }
     }
 
     override suspend fun updateCompletes(requests: List<ModifyCompleteRequest>): Result<Unit> =
