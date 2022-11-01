@@ -39,7 +39,7 @@ class AllScheduleViewModelModule {
     @Provides
     fun provideStateMachineProvider(
         scheduleRepository: ScheduleRepository,
-        scheduleUiStatePagingFlowFactory: ScheduleUiStatePagingFlowFactory,
+        scheduleUiStateFlowFactory: ScheduleUiStateFlowFactory,
         modifyScheduleCompleteUseCase: ModifyScheduleCompleteUseCase,
         @AllScheduleScope completedScheduleShownRepository: CompletedScheduleShownRepository
     ): AllScheduleStateContainerFactory =
@@ -51,14 +51,13 @@ class AllScheduleViewModelModule {
                 val stateMachine = AllScheduleStateMachine(
                     sideEffectHandle,
                     getAllScheduleSnapshot = DefaultGetAllScheduleSnapshotUseCase(
-                        scope,
-                        PagingConfig(pageSize = 20),
                         scheduleRepository,
-                        completedScheduleShownRepository,
-                        scheduleUiStatePagingFlowFactory
+                        scheduleUiStateFlowFactory,
+                        completedScheduleShownRepository
                     ),
                     modifyScheduleComplete = modifyScheduleCompleteUseCase,
-                    completedScheduleShownRepository = completedScheduleShownRepository
+                    completedScheduleShownRepository = completedScheduleShownRepository,
+                    scheduleRepository = scheduleRepository
                 )
                 return stateMachine.asContainer(scope, AllScheduleState.Init, fetchEvent = AllScheduleEvent.Fetch)
             }

@@ -16,19 +16,10 @@
 
 package com.nlab.reminder.core.android.recyclerview
 
-import androidx.recyclerview.widget.ListAdapter
-import androidx.recyclerview.widget.RecyclerView
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.suspendCancellableCoroutine
-
 /**
- * @author Doohyun
+ * @author thalys
  */
-@OptIn(ExperimentalCoroutinesApi::class)
-suspend fun <T : Any, VH : RecyclerView.ViewHolder> ListAdapter<T, VH>.suspendSubmitList(newItems: List<T>) {
-    suspendCancellableCoroutine { continuation ->
-        submitList(newItems) {
-            continuation.resume(Unit, null)
-        }
-    }
+sealed class DragPosition {
+    object Empty : DragPosition()
+    data class Success(val from: Int, val to: Int) : DragPosition()
 }

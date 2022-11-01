@@ -18,15 +18,9 @@ package com.nlab.reminder.domain.feature.schedule.all
 
 import com.nlab.reminder.core.effect.SideEffectHandle
 import com.nlab.reminder.core.state.asContainer
-import com.nlab.reminder.domain.common.schedule.CompletedScheduleShownRepository
-import com.nlab.reminder.domain.common.schedule.Schedule
-import com.nlab.reminder.domain.common.schedule.ModifyScheduleCompleteUseCase
-import com.nlab.reminder.domain.common.schedule.genSchedule
-import com.nlab.reminder.test.genBoolean
-import com.nlab.reminder.test.genFlowObserveCoroutineScope
-import com.nlab.reminder.test.genStateContainerScope
-import com.nlab.reminder.test.once
 import com.nlab.reminder.core.kotlin.util.Result
+import com.nlab.reminder.domain.common.schedule.*
+import com.nlab.reminder.test.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flow
@@ -145,5 +139,53 @@ class AllScheduleStateMachineKtTest {
             .join()
 
         verify(sideEffectHandle, once()).post(AllScheduleSideEffect.ShowErrorPopup)
+    }
+
+    @Test
+    fun `never update when received dragEnd event was emptyList`() = runTest {
+        val scheduleRepository: ScheduleRepository = mock()
+
+        genAllScheduleStateMachine(scheduleRepository = scheduleRepository)
+            .asContainer(genStateContainerScope(), AllScheduleState.Loaded(genAllScheduleSnapshot()))
+            .send(AllScheduleEvent.OnDragEnded(emptyList()))
+            .join()
+        verify(scheduleRepository, never()).updateVisiblePriorities(any())
+    }
+
+    @Test
+    fun `never update when received dragEnd event was same by visible priority`() = runTest {
+        val startPriority = genLong()
+        val firstSchedule: Schedule = genSchedule(visiblePriority = startPriority)
+        val secondSchedule: Schedule = genSchedule(visiblePriority = startPriority + 1)
+        val scheduleRepository: ScheduleRepository = mock()
+
+        genAllScheduleStateMachine(scheduleRepository = scheduleRepository)
+            .asContainer(genStateContainerScope(), AllScheduleState.Loaded(genAllScheduleSnapshot()))
+            .send(AllScheduleEvent.OnDragEnded(genScheduleUiStates(listOf(firstSchedule, secondSchedule))))
+            .join()
+        verify(scheduleRepository, once()).updateVisiblePriorities(emptyList())
+    }
+
+    @Test
+    fun `update exclude same visible priority when stateMachine sent dragEnd event`() = runTest {
+        val startPriority = genLong()
+        val schedules: List<Schedule> =
+            List(10) { index -> genSchedule(visiblePriority = startPriority + index.toLong()) }
+                .toMutableList()
+                .apply { add(index = 3, removeAt(5)) }
+        val scheduleRepository: ScheduleRepository = mock()
+        println(schedules.map { it.visiblePriority })
+
+        genAllScheduleStateMachine(scheduleRepository = scheduleRepository)
+            .asContainer(genStateContainerScope(), AllScheduleState.Loaded(genAllScheduleSnapshot()))
+            .send(AllScheduleEvent.OnDragEnded(genScheduleUiStates(schedules)))
+            .join()
+        verify(scheduleRepository, once()).updateVisiblePriorities(
+            listOf(
+                ModifyVisiblePriorityRequest(scheduleId = schedules[3].id(), startPriority + 3),
+                ModifyVisiblePriorityRequest(scheduleId = schedules[4].id(), startPriority + 4),
+                ModifyVisiblePriorityRequest(scheduleId = schedules[5].id(), startPriority + 5)
+            )
+        )
     }
 }

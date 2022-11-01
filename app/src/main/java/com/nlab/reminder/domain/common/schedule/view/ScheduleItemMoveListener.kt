@@ -16,9 +16,25 @@
 
 package com.nlab.reminder.domain.common.schedule.view
 
+import com.nlab.reminder.core.android.recyclerview.ItemMoveListener
+import com.nlab.reminder.domain.common.schedule.ScheduleUiState
+
 /**
  * @author thalys
  */
-interface ScheduleItemMoveListener {
-    fun onMove(currentPosition: Int, targetPosition: Int): Boolean
+class ScheduleItemMoveListener(
+    private val getItem: (position: Int) -> ScheduleUiState?,
+    private val notifyItemMoved: (fromPosition: Int, toPosition: Int) -> Unit
+) : ItemMoveListener {
+    override fun onMove(fromPosition: Int, toPosition: Int): Boolean {
+        val fromState: ScheduleUiState? = getItem(fromPosition)
+        val toState: ScheduleUiState? = getItem(toPosition)
+        val isMoveNeeded: Boolean =
+            fromState != null && toState != null && fromState.isComplete == toState.isComplete
+        if (isMoveNeeded) {
+            notifyItemMoved(fromPosition, toPosition)
+        }
+
+        return true
+    }
 }

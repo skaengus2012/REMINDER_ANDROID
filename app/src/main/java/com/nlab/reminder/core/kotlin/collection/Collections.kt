@@ -14,11 +14,18 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.android.recyclerview
+package com.nlab.reminder.core.kotlin.collection
+
+import kotlin.collections.minOf as kotlinMinOf
+import kotlin.collections.maxOf as kotlinMaxOf
 
 /**
- * @author Doohyun
+ * @author thalys
  */
-interface HashIdentifier {
-    val hashId: Int
+fun <T, R : Comparable<R>> Iterable<T>.minOf(selector: (T) -> R): R {
+    return kotlinMinOf(selector)
+}
+
+fun <T, R : Comparable<R>> Iterable<T>.maxOf(selector: (T) -> R): R {
+    return kotlinMaxOf(selector)
 }

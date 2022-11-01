@@ -17,10 +17,11 @@
 package com.nlab.reminder.domain.feature.schedule.all
 
 import com.nlab.reminder.core.effect.SideEffectHandle
+import com.nlab.reminder.core.kotlin.collection.minOf
+import com.nlab.reminder.core.kotlin.collection.maxOf
 import com.nlab.reminder.core.kotlin.util.onFailure
 import com.nlab.reminder.core.state.StateMachine
-import com.nlab.reminder.domain.common.schedule.CompletedScheduleShownRepository
-import com.nlab.reminder.domain.common.schedule.ModifyScheduleCompleteUseCase
+import com.nlab.reminder.domain.common.schedule.*
 
 /**
  * @author Doohyun
@@ -30,7 +31,8 @@ fun AllScheduleStateMachine(
     sideEffectHandle: SideEffectHandle<AllScheduleSideEffect>,
     getAllScheduleSnapshot: GetAllScheduleSnapshotUseCase,
     modifyScheduleComplete: ModifyScheduleCompleteUseCase,
-    completedScheduleShownRepository: CompletedScheduleShownRepository
+    completedScheduleShownRepository: CompletedScheduleShownRepository,
+    scheduleRepository: ScheduleRepository
 ): StateMachine<AllScheduleEvent, AllScheduleState> = StateMachine {
     reduce {
         event<AllScheduleEvent.Fetch> {
@@ -47,14 +49,36 @@ fun AllScheduleStateMachine(
                 getAllScheduleSnapshot().collect { send(AllScheduleEvent.OnAllScheduleSnapshotLoaded(it)) }
             }
         }
-        event<AllScheduleEvent.OnModifyScheduleCompleteClicked> {
-            state<AllScheduleState.Loaded> { (event) -> modifyScheduleComplete(event.scheduleId, event.isComplete) }
-        }
-        event<AllScheduleEvent.OnToggleCompletedScheduleShownClicked> {
-            state<AllScheduleState.Loaded> { (_, state) ->
+
+        state<AllScheduleState.Loaded> {
+            event<AllScheduleEvent.OnModifyScheduleCompleteClicked> { (event) ->
+                modifyScheduleComplete(event.scheduleId, event.isComplete)
+            }
+            event<AllScheduleEvent.OnToggleCompletedScheduleShownClicked> { (_, state) ->
                 completedScheduleShownRepository
                     .setShown(isShown = state.snapshot.isCompletedScheduleShown.not())
                     .onFailure { sideEffectHandle.post(AllScheduleSideEffect.ShowErrorPopup) }
+            }
+            filteredEvent(predicate = { event ->
+                event is AllScheduleEvent.OnDragEnded && event.draggedSnapshot.isNotEmpty()
+            }) { (event) ->
+                val items: List<ScheduleUiState> = (event as AllScheduleEvent.OnDragEnded).draggedSnapshot
+                val minVisiblePriority: Long = items.minOf { it.schedule.visiblePriority }
+                val maxVisiblePriority: Long = items.maxOf { it.schedule.visiblePriority }
+                val requests: List<ModifyVisiblePriorityRequest> =
+                    items
+                        .mapIndexed { index, uiState ->
+                            Pair(
+                                ModifyVisiblePriorityRequest(
+                                    uiState.schedule.id(),
+                                    minOf(minVisiblePriority + index, maxVisiblePriority)
+                                ),
+                                uiState.schedule.visiblePriority
+                            )
+                        }
+                        .filter { (request, visiblePriority) -> visiblePriority != request.visiblePriority }
+                        .map { (request) -> request }
+                scheduleRepository.updateVisiblePriorities(requests)
             }
         }
     }

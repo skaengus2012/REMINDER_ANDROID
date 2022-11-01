@@ -22,26 +22,21 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.ItemTouchHelper
 import com.nlab.reminder.R
 import com.nlab.reminder.core.android.fragment.viewLifecycle
 import com.nlab.reminder.core.android.fragment.viewLifecycleScope
+import com.nlab.reminder.core.android.recyclerview.DragSnapshot
 import com.nlab.reminder.core.android.view.throttleClicks
 import com.nlab.reminder.databinding.FragmentAllScheduleBinding
 import com.nlab.reminder.domain.common.android.view.loadingFlow
-import com.nlab.reminder.domain.common.schedule.view.DefaultSchedulePagingAdapter
+import com.nlab.reminder.domain.common.schedule.view.DefaultScheduleUiStateAdapter
 import com.nlab.reminder.domain.common.schedule.view.ScheduleItemAnimator
 import com.nlab.reminder.domain.common.schedule.view.ScheduleItemTouchCallback
-import com.nlab.reminder.domain.feature.schedule.all.AllScheduleState
-import com.nlab.reminder.domain.feature.schedule.all.AllScheduleViewModel
-import com.nlab.reminder.domain.feature.schedule.all.onToggleCompletedScheduleShownClicked
-import com.nlab.reminder.domain.feature.schedule.all.onModifyScheduleCompleteClicked
+import com.nlab.reminder.domain.feature.schedule.all.*
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 
 /**
  * @author Doohyun
@@ -65,7 +60,7 @@ class AllScheduleFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val scheduleAdapter = DefaultSchedulePagingAdapter(
+        val scheduleAdapter = DefaultScheduleUiStateAdapter(
             onCompleteClicked = { scheduleUiState ->
                 viewModel.onModifyScheduleCompleteClicked(
                     scheduleId = scheduleUiState.schedule.id(),
@@ -76,13 +71,17 @@ class AllScheduleFragment : Fragment() {
         val itemTouchCallback = ScheduleItemTouchCallback(
             scheduleAdapter,
             onClearViewListener = {
-                // TODO implements Drag done.
+                val snapshot = scheduleAdapter.calculateDraggedSnapshot()
+                if (snapshot is DragSnapshot.Success) {
+                    viewModel.onDragEnded(snapshot.items)
+                }
             }
         )
+        val scheduleItemAnimator = ScheduleItemAnimator()
 
-        binding.contentRecyclerview
+        binding.recyclerviewContent
             .apply { ItemTouchHelper(itemTouchCallback).attachToRecyclerView(this) }
-            .apply { itemAnimator = ScheduleItemAnimator() }
+            .apply { itemAnimator = scheduleItemAnimator }
             .apply { adapter = scheduleAdapter }
 
         binding.buttonCompletedScheduleShownToggle
@@ -113,15 +112,41 @@ class AllScheduleFragment : Fragment() {
             .onEach { startPostponedEnterTransition() }
             .launchIn(viewLifecycleScope)
 
+        viewModel.stateFlow
+            .filterIsInstance<AllScheduleState.Loaded>()
+            .map { it.snapshot.scheduleUiStates }
+            .distinctUntilChanged()
+            .flowWithLifecycle(viewLifecycle)
+            .onEach { items ->
+                scheduleAdapter.submitList(items) {
+                    scheduleAdapter.adjustRecentSwapPositions()
+                }
+
+            }
+            .launchIn(viewLifecycleScope)
+
+        /**
         viewLifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.stateFlow
                     .filterIsInstance<AllScheduleState.Loaded>()
-                    .map { it.snapshot.pagingScheduled }
+                    .map { it.snapshot.scheduleUiStates }
                     .distinctUntilChanged()
-                    .collectLatest(scheduleAdapter::submitData)
+                    .collectLatest { pagingData ->
+                        scheduleAdapter.submitData(pagingData)
+                        viewLifecycleScope.launch {
+                            delay(500)
+                            scheduleAdapter.adjustRecentSwapPositions()
+                            animateDiffHandle.isEnable = true
+                        }
+
+                    //    animateDiffHandle.isEnable = false
+                   //     scheduleAdapter.adjustRecentSwapPositions()
+                    //    scheduleAdapter.notifyDataSetChanged()
+                   //     animateDiffHandle.isEnable = true
+                    }
             }
-        }
+        }*/
     }
 
     override fun onDestroyView() {

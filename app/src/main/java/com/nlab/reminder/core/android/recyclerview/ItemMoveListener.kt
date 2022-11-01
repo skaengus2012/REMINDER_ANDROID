@@ -14,15 +14,11 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.common.schedule.view
-
-import androidx.recyclerview.widget.DefaultItemAnimator
-import androidx.recyclerview.widget.RecyclerView
+package com.nlab.reminder.core.android.recyclerview
 
 /**
- * @author Doohyun
+ * @author thalys
  */
-@Suppress("FunctionName")
-fun ScheduleItemAnimator(): RecyclerView.ItemAnimator = DefaultItemAnimator().apply {
-    changeDuration = 0
+interface ItemMoveListener {
+    fun onMove(fromPosition: Int, toPosition: Int): Boolean
 }

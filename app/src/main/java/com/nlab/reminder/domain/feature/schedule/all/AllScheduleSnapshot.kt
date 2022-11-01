@@ -16,7 +16,6 @@
 
 package com.nlab.reminder.domain.feature.schedule.all
 
-import androidx.paging.PagingData
 import com.nlab.reminder.core.util.test.annotation.Generated
 import com.nlab.reminder.domain.common.schedule.ScheduleUiState
 
@@ -25,6 +24,6 @@ import com.nlab.reminder.domain.common.schedule.ScheduleUiState
  */
 @Generated
 data class AllScheduleSnapshot(
-    val pagingScheduled: PagingData<ScheduleUiState>,
+    val scheduleUiStates: List<ScheduleUiState>,
     val isCompletedScheduleShown: Boolean
 )

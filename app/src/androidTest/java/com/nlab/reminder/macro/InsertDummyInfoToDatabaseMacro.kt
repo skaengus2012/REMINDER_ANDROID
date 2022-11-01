@@ -112,7 +112,12 @@ class InsertDummyInfoToDatabaseMacro {
         scheduleDao.findByComplete(isComplete = false).first().forEach { scheduleDao.delete(it.scheduleEntity) }
 
         inputScheduleEntities.shuffled().forEachIndexed { index, scheduleEntity ->
-            scheduleDao.insert(scheduleEntity.copy(visiblePriority = index.toLong()))
+            scheduleDao.insert(
+                scheduleEntity.copy(
+                    visiblePriority = index.toLong(),
+                    title = "#$index ${scheduleEntity.title}"
+                )
+            )
         }
     }
 

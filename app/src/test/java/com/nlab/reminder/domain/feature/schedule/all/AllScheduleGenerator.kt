@@ -16,7 +16,6 @@
 
 package com.nlab.reminder.domain.feature.schedule.all
 
-import androidx.paging.PagingData
 import com.nlab.reminder.core.effect.SideEffectHandle
 import com.nlab.reminder.domain.common.schedule.*
 import com.nlab.reminder.test.genBoolean
@@ -30,8 +29,8 @@ import org.mockito.kotlin.whenever
  */
 fun genAllScheduleSnapshot(
     isCompletedScheduleShown: Boolean = genBoolean(),
-    pagingScheduled: PagingData<ScheduleUiState> = PagingData.empty()
-): AllScheduleSnapshot = AllScheduleSnapshot(pagingScheduled, isCompletedScheduleShown)
+    uiStates: List<ScheduleUiState> = emptyList()
+): AllScheduleSnapshot = AllScheduleSnapshot(uiStates, isCompletedScheduleShown)
 
 fun genAllScheduleEvents(): Set<AllScheduleEvent> = setOf(
     AllScheduleEvent.Fetch,
@@ -55,12 +54,14 @@ fun genAllScheduleStateMachine(
     sideEffectHandle: SideEffectHandle<AllScheduleSideEffect> = mock(),
     getAllScheduleSnapshot: GetAllScheduleSnapshotUseCase = mock { whenever(mock()) doReturn emptyFlow() },
     modifyScheduleComplete: ModifyScheduleCompleteUseCase = mock(),
-    completedScheduleShownRepository: CompletedScheduleShownRepository = mock()
+    completedScheduleShownRepository: CompletedScheduleShownRepository = mock(),
+    scheduleRepository: ScheduleRepository = mock()
 ) = AllScheduleStateMachine(
     sideEffectHandle,
     getAllScheduleSnapshot,
     modifyScheduleComplete,
-    completedScheduleShownRepository
+    completedScheduleShownRepository,
+    scheduleRepository
 )
 
 fun genAllScheduleEventSample(): AllScheduleEvent = genAllScheduleEvents().first()

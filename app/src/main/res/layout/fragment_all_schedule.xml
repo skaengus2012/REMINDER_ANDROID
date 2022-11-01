@@ -35,11 +35,11 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:orientation="horizontal"
-        app:layout_constraintBottom_toTopOf="@id/content_recyclerview"
+        app:layout_constraintBottom_toTopOf="@id/recyclerview_content"
         app:layout_constraintGuide_begin="@dimen/default_toolbar_height" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/content_recyclerview"
+        android:id="@+id/recyclerview_content"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"

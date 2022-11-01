@@ -40,7 +40,7 @@ class ScheduleModule {
     @Provides
     fun provideScheduleUiStateFlowFactory(
         completeMarkRepository: CompleteMarkRepository
-    ): ScheduleUiStatePagingFlowFactory = DefaultScheduleUiStatePagingFlowFactory(completeMarkRepository)
+    ): ScheduleUiStateFlowFactory = DefaultScheduleUiStateFlowFactory(completeMarkRepository)
 
     @Provides
     fun provideUpdateScheduleCompleteUseCase(

@@ -14,15 +14,28 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.common.schedule.view
-
-import androidx.recyclerview.widget.DefaultItemAnimator
-import androidx.recyclerview.widget.RecyclerView
+package com.nlab.reminder.core.android.recyclerview
 
 /**
- * @author Doohyun
+ * @author thalys
  */
-@Suppress("FunctionName")
-fun ScheduleItemAnimator(): RecyclerView.ItemAnimator = DefaultItemAnimator().apply {
-    changeDuration = 0
+class DragPositionHolder {
+    private var from: Int? = null
+    private var to: Int? = null
+
+    fun snapshot(): DragPosition {
+        val curFrom: Int = from ?: return DragPosition.Empty
+        val curTo: Int = to ?: return DragPosition.Empty
+        return DragPosition.Success(curFrom, curTo)
+    }
+
+    fun setPosition(from: Int, to: Int) {
+        if (this.from == null) this.from = from
+        this.to = to
+    }
+
+    fun clearPosition() {
+        from = null
+        to = null
+    }
 }

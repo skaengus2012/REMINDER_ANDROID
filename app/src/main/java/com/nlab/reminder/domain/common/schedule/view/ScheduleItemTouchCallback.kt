@@ -19,6 +19,7 @@ package com.nlab.reminder.domain.common.schedule.view
 import android.graphics.Canvas
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import com.nlab.reminder.core.android.recyclerview.ItemMoveListener
 import com.nlab.reminder.core.kotlin.util.catching
 import com.nlab.reminder.core.kotlin.util.getOrNull
 import com.nlab.reminder.databinding.ViewItemScheduleBinding
@@ -27,7 +28,7 @@ import com.nlab.reminder.databinding.ViewItemScheduleBinding
  * @author thalys
  */
 class ScheduleItemTouchCallback(
-    private val onMoveListener: ScheduleItemMoveListener,
+    private val onMoveListener: ItemMoveListener,
     private val onClearViewListener: () -> Unit
 ) : ItemTouchHelper.SimpleCallback(
     ItemTouchHelper.UP or ItemTouchHelper.DOWN,

@@ -14,15 +14,12 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.common.schedule.view
-
-import androidx.recyclerview.widget.DefaultItemAnimator
-import androidx.recyclerview.widget.RecyclerView
+package com.nlab.reminder.core.android.recyclerview
 
 /**
- * @author Doohyun
+ * @author thalys
  */
-@Suppress("FunctionName")
-fun ScheduleItemAnimator(): RecyclerView.ItemAnimator = DefaultItemAnimator().apply {
-    changeDuration = 0
+sealed class DragSnapshot<out T> private constructor() {
+    object Empty : DragSnapshot<Nothing>()
+    data class Success<T> internal constructor(val items: List<T>) : DragSnapshot<T>()
 }

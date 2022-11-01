@@ -16,8 +16,6 @@
 
 package com.nlab.reminder.domain.common.schedule
 
-import androidx.paging.PagingData
-import androidx.paging.map
 import com.nlab.reminder.core.util.transaction.TransactionId
 import com.nlab.reminder.domain.common.tag.Tag
 import com.nlab.reminder.domain.common.tag.genTags
@@ -54,13 +52,6 @@ fun genScheduleUiStates(
     schedules: List<Schedule> = genSchedules(),
     isCompleteMarked: Boolean? = null
 ): List<ScheduleUiState> = schedules.map { schedule ->
-    ScheduleUiState(schedule, isCompleteMarked = isCompleteMarked ?: schedule.isComplete)
-}
-
-fun genPagingScheduleUiStates(
-    schedules: PagingData<Schedule>,
-    isCompleteMarked: Boolean? = null
-): PagingData<ScheduleUiState> = schedules.map { schedule ->
     ScheduleUiState(schedule, isCompleteMarked = isCompleteMarked ?: schedule.isComplete)
 }
 
