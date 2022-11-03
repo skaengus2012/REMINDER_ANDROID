@@ -41,11 +41,11 @@ class LocalScheduleRepositoryTest {
 
         notifySchedulesWhenScheduleDaoSent2TimesData(
             ScheduleItemRequest.Find,
-            setupMock = { scheduleDao, mockFlow -> whenever(scheduleDao.find()) doReturn mockFlow }
+            setupMock = { scheduleDao, mockFlow -> whenever(scheduleDao.findAsStream()) doReturn mockFlow }
         )
         notifySchedulesWhenScheduleDaoSent2TimesData(
-            ScheduleItemRequest.FindByComplete(isComplete),
-            setupMock = { scheduleDao, mockFlow -> whenever(scheduleDao.findByComplete(isComplete)) doReturn mockFlow }
+            ScheduleItemRequest.FindWithComplete(isComplete),
+            setupMock = { scheduleDao, mockFlow -> whenever(scheduleDao.findWithCompleteAsStream(isComplete)) doReturn mockFlow }
         )
     }
 

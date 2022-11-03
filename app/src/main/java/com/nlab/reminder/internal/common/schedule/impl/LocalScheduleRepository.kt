@@ -33,8 +33,8 @@ class LocalScheduleRepository(
 ) : ScheduleRepository {
     override fun get(request: ScheduleItemRequest): Flow<List<Schedule>> {
         val resultFlow: Flow<List<ScheduleEntityWithTagEntities>> = when (request) {
-            is ScheduleItemRequest.Find -> scheduleDao.find()
-            is ScheduleItemRequest.FindByComplete -> scheduleDao.findByComplete(request.isComplete)
+            is ScheduleItemRequest.Find -> scheduleDao.findAsStream()
+            is ScheduleItemRequest.FindWithComplete -> scheduleDao.findWithCompleteAsStream(request.isComplete)
         }
 
         return resultFlow.map { entities -> entities.map(ScheduleEntityWithTagEntities::toSchedule) }

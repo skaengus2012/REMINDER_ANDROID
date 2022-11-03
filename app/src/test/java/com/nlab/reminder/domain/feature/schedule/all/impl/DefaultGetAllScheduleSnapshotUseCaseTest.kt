@@ -52,7 +52,7 @@ class DefaultGetAllScheduleSnapshotUseCaseTest {
             isDoneScheduleShown = false,
             setupMock = { scheduleRepository, expectSchedules ->
                 whenever(
-                    scheduleRepository.get(ScheduleItemRequest.FindByComplete(isComplete = false))
+                    scheduleRepository.get(ScheduleItemRequest.FindWithComplete(isComplete = false))
                 ) doReturn flowOf(expectSchedules)
             }
         )

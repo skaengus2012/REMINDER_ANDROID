@@ -29,11 +29,14 @@ abstract class ScheduleDao {
 
     @Transaction
     @Query("SELECT * FROM schedule ORDER BY is_complete, visible_priority")
-    abstract fun find(): Flow<List<ScheduleEntityWithTagEntities>>
+    abstract fun findAsStream(): Flow<List<ScheduleEntityWithTagEntities>>
 
     @Transaction
     @Query("SELECT * FROM schedule WHERE is_complete = :isComplete ORDER BY is_complete, visible_priority")
-    abstract fun findByComplete(isComplete: Boolean): Flow<List<ScheduleEntityWithTagEntities>>
+    abstract fun findWithCompleteAsStream(isComplete: Boolean): Flow<List<ScheduleEntityWithTagEntities>>
+
+    @Query("SELECT * FROM schedule WHERE schedule_id IN (:scheduleIds)")
+    abstract suspend fun findWithScheduleIds(scheduleIds: List<Long>): List<ScheduleEntity>
 
     @Query(
         """
@@ -65,17 +68,29 @@ abstract class ScheduleDao {
 
     @Transaction
     open suspend fun updateCompletes(requests: List<Pair<Long, Boolean>>) {
-        updateCompletesInternal(
-            scheduleIds = requests.filter { (_, isComplete) -> isComplete }.map { (scheduleId) -> scheduleId },
-            isComplete = true
-        )
-        updateCompletesInternal(
-            scheduleIds = requests.filter { (_, isComplete) -> isComplete.not() }.map { (scheduleId) -> scheduleId },
-            isComplete = false
+        val curIdToComplete: Map<Long, Boolean> =
+            findWithScheduleIds(scheduleIds = requests.map { (first) -> first }).associateBy(
+                keySelector = { it.scheduleId },
+                valueTransform = { it.isComplete }
+            )
+        val diffCompleteRequests: List<Pair<Long, Boolean>> =
+            requests
+                .filter { (scheduleId) -> curIdToComplete.containsKey(scheduleId) }
+                .filter { (scheduleId, isComplete) -> curIdToComplete[scheduleId] != isComplete }
+        updateCompletesInternal(diffCompleteRequests, isComplete = true)
+        updateCompletesInternal(diffCompleteRequests, isComplete = false)
+    }
+
+    private suspend fun updateCompletesInternal(requests: List<Pair<Long, Boolean>>, isComplete: Boolean) {
+        updateCompletesWithIds(
+            scheduleIds = requests
+                .filter { (_, mappingComplete) -> mappingComplete == isComplete }
+                .map { (scheduleId) -> scheduleId },
+            isComplete = isComplete
         )
     }
 
-    private suspend fun updateCompletesInternal(scheduleIds: List<Long>, isComplete: Boolean) {
+    private suspend fun updateCompletesWithIds(scheduleIds: List<Long>, isComplete: Boolean) {
         if (scheduleIds.isEmpty()) return
 
         val maxVisiblePriority: Long = getMaxVisiblePriority(isComplete) ?: -1

@@ -34,7 +34,7 @@ class DefaultGetAllScheduleSnapshotUseCase(
     private val findAllSchedules: Flow<List<Schedule>> =
         scheduleRepository.get(ScheduleItemRequest.Find)
     private val findNotCompleteSchedules: Flow<List<Schedule>> =
-        scheduleRepository.get(ScheduleItemRequest.FindByComplete(isComplete = false))
+        scheduleRepository.get(ScheduleItemRequest.FindWithComplete(isComplete = false))
 
     @ExperimentalCoroutinesApi
     override fun invoke(): Flow<AllScheduleSnapshot> =
