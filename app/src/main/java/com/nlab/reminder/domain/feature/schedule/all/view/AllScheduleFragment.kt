@@ -68,15 +68,12 @@ class AllScheduleFragment : Fragment() {
                 )
             }
         )
-        val itemTouchCallback = ScheduleItemTouchCallback(
-            scheduleAdapter,
-            onClearViewListener = {
-                val snapshot = scheduleAdapter.calculateDraggedSnapshot()
-                if (snapshot is DragSnapshot.Success) {
-                    viewModel.onDragEnded(snapshot.items)
-                }
+        val itemTouchCallback = ScheduleItemTouchCallback(scheduleAdapter, onItemMoveEnded = {
+            val snapshot = scheduleAdapter.calculateDraggedSnapshot()
+            if (snapshot is DragSnapshot.Success) {
+                viewModel.onDragEnded(snapshot.items)
             }
-        )
+        })
         val scheduleItemAnimator = ScheduleItemAnimator()
 
         binding.recyclerviewContent
@@ -121,32 +118,8 @@ class AllScheduleFragment : Fragment() {
                 scheduleAdapter.submitList(items) {
                     scheduleAdapter.adjustRecentSwapPositions()
                 }
-
             }
             .launchIn(viewLifecycleScope)
-
-        /**
-        viewLifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.stateFlow
-                    .filterIsInstance<AllScheduleState.Loaded>()
-                    .map { it.snapshot.scheduleUiStates }
-                    .distinctUntilChanged()
-                    .collectLatest { pagingData ->
-                        scheduleAdapter.submitData(pagingData)
-                        viewLifecycleScope.launch {
-                            delay(500)
-                            scheduleAdapter.adjustRecentSwapPositions()
-                            animateDiffHandle.isEnable = true
-                        }
-
-                    //    animateDiffHandle.isEnable = false
-                   //     scheduleAdapter.adjustRecentSwapPositions()
-                    //    scheduleAdapter.notifyDataSetChanged()
-                   //     animateDiffHandle.isEnable = true
-                    }
-            }
-        }*/
     }
 
     override fun onDestroyView() {

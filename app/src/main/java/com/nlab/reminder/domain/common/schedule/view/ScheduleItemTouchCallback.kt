@@ -17,8 +17,10 @@
 package com.nlab.reminder.domain.common.schedule.view
 
 import android.graphics.Canvas
+import android.view.View
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.nlab.reminder.core.android.recyclerview.ItemMoveListener
 import com.nlab.reminder.core.kotlin.util.catching
 import com.nlab.reminder.core.kotlin.util.getOrNull
@@ -28,19 +30,15 @@ import com.nlab.reminder.databinding.ViewItemScheduleBinding
  * @author thalys
  */
 class ScheduleItemTouchCallback(
-    private val onMoveListener: ItemMoveListener,
-    private val onClearViewListener: () -> Unit
-) : ItemTouchHelper.SimpleCallback(
-    ItemTouchHelper.UP or ItemTouchHelper.DOWN,
-    ItemTouchHelper.ACTION_STATE_IDLE
-) {
-    override fun isItemViewSwipeEnabled(): Boolean = false
-    override fun isLongPressDragEnabled(): Boolean = true
-
+    private val onItemMoved: ItemMoveListener,
+    private val onItemMoveEnded: () -> Unit
+) : ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN, ItemTouchHelper.START) {
+    override fun isItemViewSwipeEnabled(): Boolean = true
+    override fun isLongPressDragEnabled(): Boolean = false
     override fun onChildDraw(
         c: Canvas,
         recyclerView: RecyclerView,
-        viewHolder: RecyclerView.ViewHolder,
+        viewHolder: ViewHolder,
         dX: Float,
         dY: Float,
         actionState: Int,
@@ -52,23 +50,24 @@ class ScheduleItemTouchCallback(
             catching { ViewItemScheduleBinding.bind(viewHolder.itemView) }.getOrNull() ?: return
         when (actionState) {
             ItemTouchHelper.ACTION_STATE_DRAG -> {
-             //   binding.itemLayout.scaleX = if (isCurrentlyActive) 0.5f else 1f
+                binding.viewLine.visibility = View.INVISIBLE
+            }
+            ItemTouchHelper.ACTION_STATE_IDLE -> {
+                binding.viewLine.visibility = View.VISIBLE
             }
         }
     }
 
-    override fun onMove(
-        recyclerView: RecyclerView,
-        viewHolder: RecyclerView.ViewHolder,
-        target: RecyclerView.ViewHolder
-    ): Boolean = onMoveListener.onMove(viewHolder.bindingAdapterPosition, target.bindingAdapterPosition)
-
-    override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
-        super.clearView(recyclerView, viewHolder)
-        onClearViewListener()
+    override fun onMove(recyclerView: RecyclerView, viewHolder: ViewHolder, target: ViewHolder): Boolean {
+        return onItemMoved.onMove(viewHolder.bindingAdapterPosition, target.bindingAdapterPosition)
     }
 
-    override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+    override fun clearView(recyclerView: RecyclerView, viewHolder: ViewHolder) {
+        super.clearView(recyclerView, viewHolder)
+        onItemMoveEnded()
+    }
 
+    override fun onSwiped(viewHolder: ViewHolder, direction: Int) {
+        // TODO implement for swipe delete.
     }
 }
