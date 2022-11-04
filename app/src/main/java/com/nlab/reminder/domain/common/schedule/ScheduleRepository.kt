@@ -23,7 +23,7 @@ import kotlinx.coroutines.flow.Flow
  * @author Doohyun
  */
 interface ScheduleRepository {
-    fun get(request: ScheduleItemRequest): Flow<List<Schedule>>
+    fun get(request: ScheduleRequest): Flow<List<Schedule>>
     suspend fun updateCompletes(requests: List<ModifyCompleteRequest>): Result<Unit>
     suspend fun updateVisiblePriorities(requests: List<ModifyVisiblePriorityRequest>): Result<Unit>
 }

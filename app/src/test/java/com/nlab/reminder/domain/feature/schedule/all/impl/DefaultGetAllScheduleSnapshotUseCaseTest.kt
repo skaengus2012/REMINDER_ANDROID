@@ -41,7 +41,7 @@ class DefaultGetAllScheduleSnapshotUseCaseTest {
         testFindTemplate(
             isDoneScheduleShown = true,
             setupMock = { scheduleRepository, expectSchedules ->
-                whenever(scheduleRepository.get(ScheduleItemRequest.Find)) doReturn flowOf(expectSchedules)
+                whenever(scheduleRepository.get(ScheduleRequest.Find)) doReturn flowOf(expectSchedules)
             }
         )
     }
@@ -52,7 +52,7 @@ class DefaultGetAllScheduleSnapshotUseCaseTest {
             isDoneScheduleShown = false,
             setupMock = { scheduleRepository, expectSchedules ->
                 whenever(
-                    scheduleRepository.get(ScheduleItemRequest.FindWithComplete(isComplete = false))
+                    scheduleRepository.get(ScheduleRequest.FindWithComplete(isComplete = false))
                 ) doReturn flowOf(expectSchedules)
             }
         )

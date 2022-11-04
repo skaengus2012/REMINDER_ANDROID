@@ -31,10 +31,10 @@ import kotlinx.coroutines.flow.*
 class LocalScheduleRepository(
     private val scheduleDao: ScheduleDao,
 ) : ScheduleRepository {
-    override fun get(request: ScheduleItemRequest): Flow<List<Schedule>> {
+    override fun get(request: ScheduleRequest): Flow<List<Schedule>> {
         val resultFlow: Flow<List<ScheduleEntityWithTagEntities>> = when (request) {
-            is ScheduleItemRequest.Find -> scheduleDao.findAsStream()
-            is ScheduleItemRequest.FindWithComplete -> scheduleDao.findWithCompleteAsStream(request.isComplete)
+            is ScheduleRequest.Find -> scheduleDao.findAsStream()
+            is ScheduleRequest.FindWithComplete -> scheduleDao.findWithCompleteAsStream(request.isComplete)
         }
 
         return resultFlow.map { entities -> entities.map(ScheduleEntityWithTagEntities::toSchedule) }

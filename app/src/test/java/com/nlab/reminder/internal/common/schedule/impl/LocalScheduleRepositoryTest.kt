@@ -40,17 +40,17 @@ class LocalScheduleRepositoryTest {
         val isComplete: Boolean = genBoolean()
 
         notifySchedulesWhenScheduleDaoSent2TimesData(
-            ScheduleItemRequest.Find,
+            ScheduleRequest.Find,
             setupMock = { scheduleDao, mockFlow -> whenever(scheduleDao.findAsStream()) doReturn mockFlow }
         )
         notifySchedulesWhenScheduleDaoSent2TimesData(
-            ScheduleItemRequest.FindWithComplete(isComplete),
+            ScheduleRequest.FindWithComplete(isComplete),
             setupMock = { scheduleDao, mockFlow -> whenever(scheduleDao.findWithCompleteAsStream(isComplete)) doReturn mockFlow }
         )
     }
 
     private fun notifySchedulesWhenScheduleDaoSent2TimesData(
-        scheduleItemRequest: ScheduleItemRequest,
+        scheduleItemRequest: ScheduleRequest,
         setupMock: (ScheduleDao, Flow<List<ScheduleEntityWithTagEntities>>) -> Unit
     ) = runTest {
         val executeDispatcher = genFlowExecutionDispatcher(testScheduler)
