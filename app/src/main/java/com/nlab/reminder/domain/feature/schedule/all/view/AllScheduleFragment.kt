@@ -32,6 +32,7 @@ import com.nlab.reminder.core.android.fragment.viewLifecycleScope
 import com.nlab.reminder.core.android.lifecycle.event
 import com.nlab.reminder.core.android.recyclerview.DragSnapshot
 import com.nlab.reminder.core.android.recyclerview.scrollState
+import com.nlab.reminder.core.android.recyclerview.suspendSubmitList
 import com.nlab.reminder.core.android.view.throttleClicks
 import com.nlab.reminder.core.kotlin.coroutine.flow.withBefore
 import com.nlab.reminder.databinding.FragmentAllScheduleBinding
@@ -137,9 +138,8 @@ class AllScheduleFragment : Fragment() {
             .distinctUntilChanged()
             .flowWithLifecycle(viewLifecycle)
             .onEach { items ->
-                scheduleAdapter.submitList(items) {
-                    scheduleAdapter.adjustRecentSwapPositions()
-                }
+                scheduleAdapter.suspendSubmitList(items)
+                scheduleAdapter.adjustRecentSwapPositions()
             }
             .launchIn(viewLifecycleScope)
     }
