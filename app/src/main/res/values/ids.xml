@@ -15,16 +15,6 @@
   -->
 
 <resources>
-    <dimen name="default_side_padding">15dp</dimen>
-    <dimen name="default_toolbar_height">45dp</dimen>
-
-    <dimen name="tag_height">29dp</dimen>
-    <dimen name="tag_radius">17.5dp</dimen>
-    <dimen name="tag_stroke_width">1dp</dimen>
-
-    <dimen name="dialog_default_width">300dp</dimen>
-
-    <dimen name="schedule_check_size">22dp</dimen>
-    <dimen name="schedule_check_external_dither">1.5dp</dimen>
-    <dimen name="schedule_clamp_width">60dp</dimen>
+    <item name="tag_schedule_item_touch_callback_swipe_is_clamp" type="id" />
+    <item name="tag_schedule_item_touch_callback_swipe_clear_clamp_anim" type="id" />
 </resources>

@@ -13,81 +13,96 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
-<androidx.constraintlayout.widget.ConstraintLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="?android:windowBackground">
+    android:layout_height="wrap_content">
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/textStart_guideline"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:orientation="vertical"
-        app:layout_constraintGuide_begin="52dp" />
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layout_delete"
+        android:layout_width="@dimen/schedule_clamp_width"
+        android:layout_height="match_parent"
+        android:layout_gravity="end"
+        android:background="@color/bg_delete_clamp">
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/textEnd_guideline"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:orientation="vertical"
-        app:layout_constraintGuide_end="@dimen/default_side_padding" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <ImageButton
-        android:id="@+id/button_complete"
-        android:layout_width="0dp"
-        android:layout_height="42dp"
-        android:background="@android:color/transparent"
-        android:contentDescription="@string/schedule_checkbox_contentDescription"
-        android:paddingHorizontal="@dimen/default_side_padding"
-        android:paddingVertical="10dp"
-        android:scaleType="fitXY"
-        android:src="@drawable/checkbox_schedule"
-        app:layout_constraintEnd_toEndOf="@id/textStart_guideline"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:src="@drawable/checkbox_schedule_checked" />
-
-    <TextView
-        android:id="@+id/textview_title"
-        android:layout_width="0dp"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layout_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:gravity="center_vertical"
-        android:textColor="@color/default_text_color"
-        android:textSize="16sp"
-        app:layout_constraintBottom_toTopOf="@id/textview_note"
-        app:layout_constraintEnd_toEndOf="@id/textEnd_guideline"
-        app:layout_constraintHeight_min="@dimen/schedule_check_size"
-        app:layout_constraintStart_toStartOf="@id/textStart_guideline"
-        app:layout_constraintTop_toTopOf="@id/button_complete"
-        tools:text="@tools:sample/lorem" />
+        android:background="?android:windowBackground">
 
-    <TextView
-        android:id="@+id/textview_note"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="2dp"
-        android:gravity="center_vertical"
-        android:textColor="@color/default_sub_text_color"
-        android:textSize="14sp"
-        app:layout_constraintEnd_toEndOf="@id/textview_title"
-        app:layout_constraintStart_toStartOf="@id/textview_title"
-        app:layout_constraintTop_toBottomOf="@id/textview_title"
-        tools:text="@tools:sample/lorem" />
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/textStart_guideline"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            app:layout_constraintGuide_begin="52dp" />
 
-    <View
-        android:id="@+id/view_line"
-        android:layout_width="0dp"
-        android:layout_height="0.5dp"
-        android:layout_marginTop="13dp"
-        android:background="@color/schedule_line_color"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@id/textview_title"
-        app:layout_constraintTop_toBottomOf="@id/textview_note" />
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/textEnd_guideline"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            app:layout_constraintGuide_end="@dimen/default_side_padding" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <ImageButton
+            android:id="@+id/button_complete"
+            android:layout_width="0dp"
+            android:layout_height="42dp"
+            android:background="@android:color/transparent"
+            android:contentDescription="@string/schedule_checkbox_contentDescription"
+            android:paddingHorizontal="@dimen/default_side_padding"
+            android:paddingVertical="10dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/checkbox_schedule"
+            app:layout_constraintEnd_toEndOf="@id/textStart_guideline"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:src="@drawable/checkbox_schedule_checked" />
+
+        <TextView
+            android:id="@+id/textview_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="center_vertical"
+            android:textColor="@color/default_text_color"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toTopOf="@id/textview_note"
+            app:layout_constraintEnd_toEndOf="@id/textEnd_guideline"
+            app:layout_constraintHeight_min="@dimen/schedule_check_size"
+            app:layout_constraintStart_toStartOf="@id/textStart_guideline"
+            app:layout_constraintTop_toTopOf="@id/button_complete"
+            tools:text="@tools:sample/lorem" />
+
+        <TextView
+            android:id="@+id/textview_note"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:gravity="center_vertical"
+            android:textColor="@color/default_sub_text_color"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="@id/textview_title"
+            app:layout_constraintStart_toStartOf="@id/textview_title"
+            app:layout_constraintTop_toBottomOf="@id/textview_title"
+            tools:text="@tools:sample/lorem" />
+
+        <View
+            android:id="@+id/view_line"
+            android:layout_width="0dp"
+            android:layout_height="0.5dp"
+            android:layout_marginTop="13dp"
+            android:background="@color/schedule_line_color"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@id/textview_title"
+            app:layout_constraintTop_toBottomOf="@id/textview_note" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</FrameLayout>

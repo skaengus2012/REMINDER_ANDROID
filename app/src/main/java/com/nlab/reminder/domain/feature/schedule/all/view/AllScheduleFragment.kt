@@ -22,13 +22,18 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.RecyclerView.*
 import com.nlab.reminder.R
 import com.nlab.reminder.core.android.fragment.viewLifecycle
 import com.nlab.reminder.core.android.fragment.viewLifecycleScope
+import com.nlab.reminder.core.android.lifecycle.event
 import com.nlab.reminder.core.android.recyclerview.DragSnapshot
+import com.nlab.reminder.core.android.recyclerview.scrollState
 import com.nlab.reminder.core.android.view.throttleClicks
+import com.nlab.reminder.core.kotlin.coroutine.flow.withBefore
 import com.nlab.reminder.databinding.FragmentAllScheduleBinding
 import com.nlab.reminder.domain.common.android.view.loadingFlow
 import com.nlab.reminder.domain.common.schedule.view.DefaultScheduleUiStateAdapter
@@ -68,18 +73,35 @@ class AllScheduleFragment : Fragment() {
                 )
             }
         )
-        val itemTouchCallback = ScheduleItemTouchCallback(scheduleAdapter, onItemMoveEnded = {
-            val snapshot = scheduleAdapter.calculateDraggedSnapshot()
-            if (snapshot is DragSnapshot.Success) {
-                viewModel.onDragEnded(snapshot.items)
+        val itemTouchCallback = ScheduleItemTouchCallback(
+            context = requireContext(),
+            onItemMoved = scheduleAdapter::onMove,
+            onItemMoveEnded = {
+                val snapshot = scheduleAdapter.calculateDraggedSnapshot()
+                if (snapshot is DragSnapshot.Success) {
+                    viewModel.onDragEnded(snapshot.items)
+                }
             }
-        })
+        )
         val scheduleItemAnimator = ScheduleItemAnimator()
 
         binding.recyclerviewContent
             .apply { ItemTouchHelper(itemTouchCallback).attachToRecyclerView(this) }
             .apply { itemAnimator = scheduleItemAnimator }
             .apply { adapter = scheduleAdapter }
+
+        viewLifecycle.event()
+            .filter { event -> event == Lifecycle.Event.ON_DESTROY }
+            .onEach { itemTouchCallback.clearResource() }
+            .launchIn(viewLifecycleScope)
+
+        binding.recyclerviewContent
+            .scrollState()
+            .distinctUntilChanged()
+            .withBefore(SCROLL_STATE_IDLE)
+            .filter { (prev, cur) -> prev == SCROLL_STATE_IDLE && cur == SCROLL_STATE_DRAGGING }
+            .onEach { itemTouchCallback.removeSwipeClamp(binding.recyclerviewContent) }
+            .launchIn(viewLifecycleScope)
 
         binding.buttonCompletedScheduleShownToggle
             .throttleClicks()

@@ -15,57 +15,59 @@
   -->
 
 <resources>
-	<color name="black">#000000</color>
+    <color name="black">#000000</color>
 
-	<color name="gray_50">#FAFAFA</color>
-	<color name="gray_100">#F5F5F5</color>
-	<color name="gray_400">#BDBDBD</color>
-	<color name="gray_500">#9E9E9E</color>
-	<color name="gray_800">#424242</color>
-	<color name="gray_900">#212121</color>
+    <color name="white">#FFFFFF</color>
 
-	<color name="white">#FFFFFF</color>
+    <color name="gray_400">#BDBDBD</color>
+    <color name="gray_500">#9E9E9E</color>
+    <color name="gray_800">#424242</color>
 
-	<color name="point_color_1">#44BD98</color>
-	<color name="point_color_2">#BE94F3</color>
-	<color name="point_color_3">#E4A531</color>
+    <color name="red_600">#E53935</color>
 
-	<color name="category_point_today">@color/point_color_1</color>
-	<color name="category_point_timetable">@color/point_color_2</color>
-	<color name="category_point_all">@color/point_color_3</color>
+    <color name="point_color_1">#44BD98</color>
+    <color name="point_color_2">#BE94F3</color>
+    <color name="point_color_3">#E4A531</color>
 
-	<color name="purple_200">#FFBB86FC</color>
-	<color name="purple_500">#FF6200EE</color>
-	<color name="purple_700">#FF3700B3</color>
-	<color name="teal_200">#FF03DAC5</color>
-	<color name="teal_700">#FF018786</color>
+    <color name="category_point_today">@color/point_color_1</color>
+    <color name="category_point_timetable">@color/point_color_2</color>
+    <color name="category_point_all">@color/point_color_3</color>
 
-	<color name="black_opa80">#cc000000</color>
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
 
-	<color name="white_opa80">#CCFFFFFF</color>
+    <color name="black_opa80">#cc000000</color>
 
-	<color name="default_text_color">@color/black</color>
-	<color name="default_sub_text_color">@color/gray_500</color>
+    <color name="white_opa80">#CCFFFFFF</color>
 
-	<color name="schedule_checkbox_checked_color">@color/point_color_1</color>
-	<color name="schedule_checkbox_unchecked_color">@color/gray_500</color>
-	<color name="schedule_line_color">@color/gray_400</color>
+    <color name="default_text_color">@color/black</color>
+    <color name="default_sub_text_color">@color/gray_500</color>
 
-	<!-- light theme color -->
-	<color name="bg_1_light">#F2F2F6</color>
-	<color name="bg_card_1_light">@color/white</color>
-	<color name="bg_tag_light">#EEEEEF</color>
-	<color name="bg_ripple_1_light">#E2E2E2</color>
-	<color name="font_1_light">#393939</color>
-	<color name="font_2_light">#8A8A8D</color>
-	<color name="font_tag_light">#838387</color>
+    <color name="schedule_checkbox_checked_color">@color/point_color_1</color>
+    <color name="schedule_checkbox_unchecked_color">@color/gray_500</color>
+    <color name="schedule_line_color">@color/gray_400</color>
 
-	<!-- dark theme color -->
-	<color name="bg_1_dark">@color/black</color>
-	<color name="bg_card_1_dark">#1C1C1C</color>
-	<color name="bg_tag_dark">#2F2F2F</color>
-	<color name="bg_ripple_1_dark">#49494C</color>
-	<color name="font_1_dark">@color/white</color>
-	<color name="font_2_dark">#B7B7B7</color>
-	<color name="font_tag_dark">#838387</color>
+    <!-- base color -->
+    <color name="bg_delete_clamp">@color/red_600</color>
+
+    <!-- light theme color -->
+    <color name="bg_1_light">#F2F2F6</color>
+    <color name="bg_card_1_light">@color/white</color>
+    <color name="bg_tag_light">#EEEEEF</color>
+    <color name="bg_ripple_1_light">#E2E2E2</color>
+    <color name="font_1_light">#393939</color>
+    <color name="font_2_light">#8A8A8D</color>
+    <color name="font_tag_light">#838387</color>
+
+    <!-- dark theme color -->
+    <color name="bg_1_dark">@color/black</color>
+    <color name="bg_card_1_dark">#1C1C1C</color>
+    <color name="bg_tag_dark">#2F2F2F</color>
+    <color name="bg_ripple_1_dark">#49494C</color>
+    <color name="font_1_dark">@color/white</color>
+    <color name="font_2_dark">#B7B7B7</color>
+    <color name="font_tag_dark">#838387</color>
 </resources>

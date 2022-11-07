@@ -18,23 +18,57 @@ package com.nlab.reminder.domain.common.schedule.view
 
 import android.graphics.Canvas
 import android.view.View
+import android.view.ViewPropertyAnimator
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import com.nlab.reminder.core.android.recyclerview.ItemMoveListener
-import com.nlab.reminder.core.kotlin.util.catching
-import com.nlab.reminder.core.kotlin.util.getOrNull
+import com.nlab.reminder.R
+import com.nlab.reminder.core.android.animation.animatorListenerOf
 import com.nlab.reminder.databinding.ViewItemScheduleBinding
+import kotlin.math.max
+import kotlin.math.min
 
 /**
+ * Implementation of Drag N drop, swipe policy for ScheduleItem.
+ * Please check below reference document docs1, docs2.
+ *
+ * @see <a href="https://www.digitalocean.com/community/tutorials/android-recyclerview-swipe-to-delete-undo">docs1</a>
+ * @see <a href="https://min-wachya.tistory.com/171">docs2</a>
  * @author thalys
  */
 class ScheduleItemTouchCallback(
-    private val onItemMoved: ItemMoveListener,
+    private val clampWidth: Float,
+    private val swipeAnimateDuration: Long,
+    private val onItemMoved: (fromPosition: Int, toPosition: Int) -> Boolean,
     private val onItemMoveEnded: () -> Unit
-) : ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN, ItemTouchHelper.START) {
-    override fun isItemViewSwipeEnabled(): Boolean = true
-    override fun isLongPressDragEnabled(): Boolean = false
+) : ItemTouchHelper.SimpleCallback(
+    ItemTouchHelper.UP or ItemTouchHelper.DOWN,
+    ItemTouchHelper.START or ItemTouchHelper.END
+) {
+    private val disposeSwipeClearedAnimations: MutableSet<ViewPropertyAnimator> = HashSet()
+
+    private var isItemViewSwipeEnabled: Boolean = true
+    private var curDX: Float = 0f
+    private var curPosition: Int? = null
+    private var prevPosition: Int? = null
+
+    override fun isItemViewSwipeEnabled(): Boolean = isItemViewSwipeEnabled
+    override fun isLongPressDragEnabled(): Boolean = true
+
+    override fun onMove(recyclerView: RecyclerView, viewHolder: ViewHolder, target: ViewHolder): Boolean {
+        return onItemMoved(viewHolder.bindingAdapterPosition, target.bindingAdapterPosition)
+    }
+
+    // nothing.
+    override fun onSwiped(viewHolder: ViewHolder, direction: Int) = Unit
+
+    override fun getSwipeEscapeVelocity(defaultValue: Float): Float = defaultValue * 10
+
+    override fun getSwipeThreshold(viewHolder: ViewHolder): Float {
+        viewHolder.isClamped = curDX <= -clampWidth
+        return 2f
+    }
+
     override fun onChildDraw(
         c: Canvas,
         recyclerView: RecyclerView,
@@ -44,30 +78,122 @@ class ScheduleItemTouchCallback(
         actionState: Int,
         isCurrentlyActive: Boolean
     ) {
-        super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+        val binding: ViewItemScheduleBinding = viewHolder.binding
+        if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
+            removePreviousSwipeClamp(recyclerView)
+            getDefaultUIUtil().onDraw(
+                c,
+                recyclerView,
+                binding.swipeView,
+                clampViewPositionHorizontal(dX, isCurrentlyActive, viewHolder.isClamped).also { curDX = it },
+                dY,
+                actionState,
+                isCurrentlyActive
+            )
+        } else {
+            removeSwipeClamp(recyclerView)
+            super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+        }
 
-        val binding: ViewItemScheduleBinding =
-            catching { ViewItemScheduleBinding.bind(viewHolder.itemView) }.getOrNull() ?: return
-        when (actionState) {
-            ItemTouchHelper.ACTION_STATE_DRAG -> {
-                binding.viewLine.visibility = View.INVISIBLE
-            }
-            ItemTouchHelper.ACTION_STATE_IDLE -> {
-                binding.viewLine.visibility = View.VISIBLE
-            }
+        if (actionState == ItemTouchHelper.ACTION_STATE_DRAG) {
+            binding.viewLine.visibility =
+                if (isCurrentlyActive) View.INVISIBLE else View.VISIBLE
         }
     }
 
-    override fun onMove(recyclerView: RecyclerView, viewHolder: ViewHolder, target: ViewHolder): Boolean {
-        return onItemMoved.onMove(viewHolder.bindingAdapterPosition, target.bindingAdapterPosition)
-    }
-
     override fun clearView(recyclerView: RecyclerView, viewHolder: ViewHolder) {
-        super.clearView(recyclerView, viewHolder)
+        val binding: ViewItemScheduleBinding = viewHolder.binding
+        curDX = 0f
+        prevPosition = viewHolder.bindingAdapterPosition
+        getDefaultUIUtil().clearView(binding.swipeView)
         onItemMoveEnded()
     }
 
-    override fun onSwiped(viewHolder: ViewHolder, direction: Int) {
-        // TODO implement for swipe delete.
+    override fun onSelectedChanged(viewHolder: ViewHolder?, actionState: Int) {
+        if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
+            curPosition = viewHolder?.bindingAdapterPosition ?: return
+        }
+
+        getDefaultUIUtil().onSelected(viewHolder?.binding?.swipeView ?: return)
+    }
+
+    private fun clampViewPositionHorizontal(
+        dX: Float,
+        isCurrentlyActive: Boolean,
+        isClamped: Boolean
+    ): Float = min(
+        0f,
+        if (isClamped)
+            if (isCurrentlyActive)
+                if (dX < 0) max(dX / 3 - clampWidth, -clampWidth)
+                else dX - clampWidth
+            else -clampWidth
+        else max(dX / 2, -clampWidth)
+    )
+
+    private fun removeSwipeClampInternal(viewHolder: ViewHolder) {
+        viewHolder.isClamped = false
+
+        val anim = viewHolder.clearClampAnim
+        if (anim != null) return
+        viewHolder.binding.swipeView.let { view ->
+            view.animate()
+                .x(0f)
+                .setDuration(swipeAnimateDuration)
+                .setListener(animatorListenerOf(doOnCancel = {
+                    view.x = 0f
+                    viewHolder.clearClampAnim = null
+                }))
+                .also { disposeSwipeClearedAnimations += it }
+                .start()
+        }
+    }
+
+    private fun removeSwipeClampInternal(recyclerView: RecyclerView, position: Int?) {
+        position
+            ?.let(recyclerView::findViewHolderForAdapterPosition)
+            ?.let(::removeSwipeClampInternal)
+    }
+
+    private fun removePreviousSwipeClamp(recyclerView: RecyclerView) {
+        if (curPosition == prevPosition) return
+
+        removeSwipeClampInternal(recyclerView, prevPosition)
+        prevPosition = null
+    }
+
+    fun removeSwipeClamp(recyclerView: RecyclerView) {
+        removeSwipeClampInternal(recyclerView, prevPosition)
+        removeSwipeClampInternal(recyclerView, curPosition)
+        prevPosition = null
+        curPosition = null
+    }
+
+    fun clearResource() {
+        disposeSwipeClearedAnimations.forEach { it.cancel() }
+        disposeSwipeClearedAnimations.clear()
+        prevPosition = null
+        curPosition = null
+        curDX = 0f
+    }
+
+    fun setItemViewSwipeEnabled(isEnable: Boolean) {
+        isItemViewSwipeEnabled = isEnable
+    }
+
+    companion object {
+        private val ViewItemScheduleBinding.swipeView: View get() = layoutContent
+        private val ViewHolder.binding: ViewItemScheduleBinding get() = ViewItemScheduleBinding.bind(itemView)
+        private var ViewHolder.isClamped: Boolean
+            get() = itemView.getTag(R.id.tag_schedule_item_touch_callback_swipe_is_clamp) as? Boolean ?: false
+            set(value) {
+                itemView.setTag(R.id.tag_schedule_item_touch_callback_swipe_is_clamp, value)
+            }
+        private var ViewHolder.clearClampAnim: ViewPropertyAnimator?
+            get() = itemView
+                .getTag(R.id.tag_schedule_item_touch_callback_swipe_clear_clamp_anim) as? ViewPropertyAnimator
+            set(value) {
+                itemView.setTag(R.id.tag_schedule_item_touch_callback_swipe_clear_clamp_anim, value)
+            }
     }
 }
