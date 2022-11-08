@@ -43,6 +43,8 @@ object Dependencies {
     const val FACEBOOK_FLIPPER = "com.facebook.flipper:flipper:${DependenciesVersions.FACEBOOK_FLIPPER}"
     const val FACEBOOK_SOLOADER = "com.facebook.soloader:soloader:${DependenciesVersions.FACEBOOK_SOLOADER}"
 
+    const val SQUARE_LEAKCANARY = "com.squareup.leakcanary:leakcanary-android:${DependenciesVersions.SQUARE_LEAKCANARY}"
+
     const val TEST_JUNIT = "junit:junit:${DependenciesVersions.TEST_JUNIT}"
     const val TEST_COROUTINES = "org.jetbrains.kotlinx:kotlinx-coroutines-test:${DependenciesVersions.TEST_COROUTINES}"
     const val TEST_MOCKITO = "org.mockito:mockito-inline:${DependenciesVersions.TEST_MOCKITO}"

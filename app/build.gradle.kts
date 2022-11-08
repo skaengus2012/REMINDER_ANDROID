@@ -173,6 +173,8 @@ dependencies {
     debugImplementation(Dependencies.FACEBOOK_FLIPPER)
     debugImplementation(Dependencies.FACEBOOK_SOLOADER)
 
+    debugImplementation(Dependencies.SQUARE_LEAKCANARY)
+
     testImplementation(Dependencies.TEST_JUNIT)
     testImplementation(Dependencies.TEST_COROUTINES)
     testImplementation(Dependencies.TEST_MOCKITO)
