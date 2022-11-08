@@ -97,14 +97,6 @@ class AllScheduleFragment : Fragment() {
             .onEach { itemTouchCallback.clearResource() }
             .launchIn(viewLifecycleScope)
 
-        binding.recyclerviewContent
-            .scrollState()
-            .distinctUntilChanged()
-            .withBefore(SCROLL_STATE_IDLE)
-            .filter { (prev, cur) -> prev == SCROLL_STATE_IDLE && cur == SCROLL_STATE_DRAGGING }
-            .onEach { itemTouchCallback.removeSwipeClamp(binding.recyclerviewContent) }
-            .launchIn(viewLifecycleScope)
-
         binding.buttonCompletedScheduleShownToggle
             .throttleClicks()
             .onEach { viewModel.onToggleCompletedScheduleShownClicked() }
@@ -131,6 +123,21 @@ class AllScheduleFragment : Fragment() {
             .flowWithLifecycle(viewLifecycle)
             .take(count = 1)
             .onEach { startPostponedEnterTransition() }
+            .launchIn(viewLifecycleScope)
+
+        merge(
+            binding.recyclerviewContent
+                .scrollState()
+                .distinctUntilChanged()
+                .withBefore(SCROLL_STATE_IDLE)
+                .filter { (prev, cur) -> prev == SCROLL_STATE_IDLE && cur == SCROLL_STATE_DRAGGING },
+            viewModel.stateFlow
+                .filterIsInstance<AllScheduleState.Loaded>()
+                .map { it.snapshot.scheduleUiStates }
+                .distinctUntilChanged()
+                .flowWithLifecycle(viewLifecycle)
+        )
+            .onEach { itemTouchCallback.removeSwipeClamp(binding.recyclerviewContent) }
             .launchIn(viewLifecycleScope)
 
         viewModel.stateFlow
