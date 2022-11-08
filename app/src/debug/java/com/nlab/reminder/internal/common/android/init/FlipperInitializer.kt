@@ -24,7 +24,10 @@ import com.facebook.flipper.plugins.crashreporter.CrashReporterPlugin
 import com.facebook.flipper.plugins.databases.DatabasesFlipperPlugin
 import com.facebook.flipper.plugins.inspector.DescriptorMapping
 import com.facebook.flipper.plugins.inspector.InspectorFlipperPlugin
+import com.facebook.flipper.plugins.leakcanary2.FlipperLeakEventListener
+import com.facebook.flipper.plugins.leakcanary2.LeakCanary2FlipperPlugin
 import com.facebook.soloader.SoLoader
+import leakcanary.LeakCanary
 
 /**
  * @author Doohyun
@@ -32,6 +35,10 @@ import com.facebook.soloader.SoLoader
 @Suppress("unused")
 class FlipperInitializer : Initializer<Unit> {
     override fun create(context: Context) {
+        LeakCanary.config = LeakCanary.config.run {
+            copy(eventListeners = eventListeners + FlipperLeakEventListener())
+        }
+
         SoLoader.init(context, false)
         if (FlipperUtils.shouldEnableFlipper(context)) {
             AndroidFlipperClient.getInstance(context)
@@ -39,6 +46,7 @@ class FlipperInitializer : Initializer<Unit> {
                     addPlugin(InspectorFlipperPlugin(context, DescriptorMapping.withDefaults()))
                     addPlugin(CrashReporterPlugin.getInstance())
                     addPlugin(DatabasesFlipperPlugin(context))
+                    addPlugin(LeakCanary2FlipperPlugin())
                 }
                 .start()
         }

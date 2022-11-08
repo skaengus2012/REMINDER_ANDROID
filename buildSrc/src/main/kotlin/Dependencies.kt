@@ -41,7 +41,10 @@ object Dependencies {
     const val GOGGLE_FLEXBOX = "com.google.android.flexbox:flexbox:${DependenciesVersions.GOOGLE_FLEXBOX}"
 
     const val FACEBOOK_FLIPPER = "com.facebook.flipper:flipper:${DependenciesVersions.FACEBOOK_FLIPPER}"
+    const val FACEBOOK_FLIPPER_LEAKCANARY = "com.facebook.flipper:flipper-leakcanary2-plugin:${DependenciesVersions.FACEBOOK_FLIPPER}"
     const val FACEBOOK_SOLOADER = "com.facebook.soloader:soloader:${DependenciesVersions.FACEBOOK_SOLOADER}"
+
+    const val SQUARE_LEAKCANARY = "com.squareup.leakcanary:leakcanary-android:${DependenciesVersions.SQUARE_LEAKCANARY}"
 
     const val TEST_JUNIT = "junit:junit:${DependenciesVersions.TEST_JUNIT}"
     const val TEST_COROUTINES = "org.jetbrains.kotlinx:kotlinx-coroutines-test:${DependenciesVersions.TEST_COROUTINES}"

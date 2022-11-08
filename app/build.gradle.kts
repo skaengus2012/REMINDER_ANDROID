@@ -171,7 +171,10 @@ dependencies {
     implementation(Dependencies.GOGGLE_FLEXBOX)
 
     debugImplementation(Dependencies.FACEBOOK_FLIPPER)
+    debugImplementation(Dependencies.FACEBOOK_FLIPPER_LEAKCANARY)
     debugImplementation(Dependencies.FACEBOOK_SOLOADER)
+
+    debugImplementation(Dependencies.SQUARE_LEAKCANARY)
 
     testImplementation(Dependencies.TEST_JUNIT)
     testImplementation(Dependencies.TEST_COROUTINES)
