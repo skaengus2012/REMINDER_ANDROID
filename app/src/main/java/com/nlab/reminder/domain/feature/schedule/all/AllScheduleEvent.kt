@@ -28,5 +28,6 @@ sealed class AllScheduleEvent private constructor() : Event {
     object OnToggleCompletedScheduleShownClicked : AllScheduleEvent()
     data class OnAllScheduleSnapshotLoaded(val allSchedulesReport: AllScheduleSnapshot) : AllScheduleEvent()
     data class OnModifyScheduleCompleteClicked(val scheduleId: ScheduleId, val isComplete: Boolean) : AllScheduleEvent()
-    data class OnDragEnded(val draggedSnapshot: List<ScheduleUiState>) : AllScheduleEvent()
+    data class OnDragScheduleEnded(val draggedSnapshot: List<ScheduleUiState>) : AllScheduleEvent()
+    data class OnDeleteScheduleClicked(val scheduleId: ScheduleId) : AllScheduleEvent()
 }

@@ -72,7 +72,8 @@ class AllScheduleFragment : Fragment() {
                     scheduleId = scheduleUiState.schedule.id(),
                     isComplete = scheduleUiState.isCompleteMarked.not()
                 )
-            }
+            },
+            onDeleteClicked = { scheduleUiState -> viewModel.onDeleteScheduleClicked(scheduleUiState.schedule.id()) }
         )
         val itemTouchCallback = ScheduleItemTouchCallback(
             context = requireContext(),
@@ -80,7 +81,7 @@ class AllScheduleFragment : Fragment() {
             onItemMoveEnded = {
                 val snapshot = scheduleAdapter.calculateDraggedSnapshot()
                 if (snapshot is DragSnapshot.Success) {
-                    viewModel.onDragEnded(snapshot.items)
+                    viewModel.onDragScheduleEnded(snapshot.items)
                 }
             }
         )

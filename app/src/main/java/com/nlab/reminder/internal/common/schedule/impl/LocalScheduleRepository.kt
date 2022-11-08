@@ -53,4 +53,7 @@ class LocalScheduleRepository(
                 requests = requests.map { request -> request.scheduleId.value to request.visiblePriority }
             )
         }
+
+    override suspend fun delete(scheduleId: ScheduleId): Result<Unit> =
+        catching { scheduleDao.deleteByScheduleId(scheduleId.value) }
 }

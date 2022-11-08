@@ -54,15 +54,17 @@ fun AllScheduleStateMachine(
             event<AllScheduleEvent.OnModifyScheduleCompleteClicked> { (event) ->
                 modifyScheduleComplete(event.scheduleId, event.isComplete)
             }
+
             event<AllScheduleEvent.OnToggleCompletedScheduleShownClicked> { (_, state) ->
                 completedScheduleShownRepository
                     .setShown(isShown = state.snapshot.isCompletedScheduleShown.not())
                     .onFailure { sideEffectHandle.post(AllScheduleSideEffect.ShowErrorPopup) }
             }
+
             filteredEvent(predicate = { event ->
-                event is AllScheduleEvent.OnDragEnded && event.draggedSnapshot.isNotEmpty()
+                event is AllScheduleEvent.OnDragScheduleEnded && event.draggedSnapshot.isNotEmpty()
             }) { (event) ->
-                val items: List<ScheduleUiState> = (event as AllScheduleEvent.OnDragEnded).draggedSnapshot
+                val items: List<ScheduleUiState> = (event as AllScheduleEvent.OnDragScheduleEnded).draggedSnapshot
                 val minVisiblePriority: Long = items.minOf { it.schedule.visiblePriority }
                 val maxVisiblePriority: Long = items.maxOf { it.schedule.visiblePriority }
                 val requests: List<ModifyVisiblePriorityRequest> =
@@ -80,6 +82,8 @@ fun AllScheduleStateMachine(
                         .map { (request) -> request }
                 scheduleRepository.updateVisiblePriorities(requests)
             }
+
+            event<AllScheduleEvent.OnDeleteScheduleClicked> { (event) -> scheduleRepository.delete(event.scheduleId) }
         }
     }
 }

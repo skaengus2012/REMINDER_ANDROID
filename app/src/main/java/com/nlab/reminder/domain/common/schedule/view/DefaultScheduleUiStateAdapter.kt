@@ -27,6 +27,7 @@ import com.nlab.reminder.domain.common.schedule.ScheduleUiState
  */
 class DefaultScheduleUiStateAdapter(
     private val onCompleteClicked: (ScheduleUiState) -> Unit,
+    private val onDeleteClicked: (ScheduleUiState) -> Unit,
 ) : ListAdapter<ScheduleUiState, ScheduleUiStateViewHolder>(ScheduleUiStateDiffCallback()),
     DraggableAdapter<ScheduleUiState> {
     private val draggableAdapterDelegate = ListItemDraggableAdapterDelegate(
@@ -38,7 +39,8 @@ class DefaultScheduleUiStateAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ScheduleUiStateViewHolder =
         ScheduleUiStateViewHolder.of(
             parent,
-            onCompleteClicked = { position -> getItem(position)?.also(onCompleteClicked) }
+            onCompleteClicked = { position -> getItem(position)?.also(onCompleteClicked) },
+            onDeleteClicked = { position -> getItem(position)?.also(onDeleteClicked) }
         )
 
     override fun onBindViewHolder(holder: ScheduleUiStateViewHolder, position: Int) {

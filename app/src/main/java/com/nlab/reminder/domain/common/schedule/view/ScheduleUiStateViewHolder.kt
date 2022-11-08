@@ -33,13 +33,19 @@ import kotlinx.coroutines.flow.onEach
  */
 class ScheduleUiStateViewHolder(
     private val binding: ViewItemScheduleBinding,
-    onCompleteClicked: (position: Int) -> Unit
+    onCompleteClicked: (Int) -> Unit,
+    onDeleteClicked: (Int) -> Unit
 ) : RecyclerView.ViewHolder(binding.root) {
     init {
         binding.initWithLifecycleOwner { lifecycleOwner ->
             buttonComplete
                 .throttleClicks()
                 .onEach { onCompleteClicked(bindingAdapterOptionalPosition ?: return@onEach) }
+                .launchIn(lifecycleOwner.lifecycleScope)
+
+            layoutDelete
+                .throttleClicks()
+                .onEach { onDeleteClicked(bindingAdapterOptionalPosition ?: return@onEach) }
                 .launchIn(lifecycleOwner.lifecycleScope)
         }
     }
@@ -53,10 +59,12 @@ class ScheduleUiStateViewHolder(
     companion object {
         fun of(
             parent: ViewGroup,
-            onCompleteClicked: (position: Int) -> Unit
+            onCompleteClicked: (position: Int) -> Unit,
+            onDeleteClicked: (position: Int) -> Unit,
         ): ScheduleUiStateViewHolder = ScheduleUiStateViewHolder(
             ViewItemScheduleBinding.inflate(LayoutInflater.from(parent.context), parent, false),
-            onCompleteClicked
+            onCompleteClicked,
+            onDeleteClicked
         )
     }
 }

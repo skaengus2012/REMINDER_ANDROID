@@ -26,4 +26,5 @@ interface ScheduleRepository {
     fun get(request: ScheduleRequest): Flow<List<Schedule>>
     suspend fun updateCompletes(requests: List<ModifyCompleteRequest>): Result<Unit>
     suspend fun updateVisiblePriorities(requests: List<ModifyVisiblePriorityRequest>): Result<Unit>
+    suspend fun delete(scheduleId: ScheduleId): Result<Unit>
 }

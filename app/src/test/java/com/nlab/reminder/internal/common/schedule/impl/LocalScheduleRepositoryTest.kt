@@ -83,8 +83,8 @@ class LocalScheduleRepositoryTest {
     }
 
     @Test
-    fun `update result for updateComplete was success`() = runTest {
-        val (repositoryParam, daoParam) = genRepositoryParamAndDaoParams(
+    fun `result for updateComplete was success`() = runTest {
+        val (repositoryParam, daoParam) = genRepositoryParamAndDaoParamsForUpdate(
             genRandomUpdateValue = { genBoolean() },
             genRequest = { scheduleId, isComplete -> ModifyCompleteRequest(scheduleId, isComplete) }
         )
@@ -96,8 +96,8 @@ class LocalScheduleRepositoryTest {
     }
 
     @Test
-    fun `update result for updateVisiblePriority was success`() = runTest {
-        val (repositoryParam, daoParam) = genRepositoryParamAndDaoParams(
+    fun `result for updateVisiblePriority was success`() = runTest {
+        val (repositoryParam, daoParam) = genRepositoryParamAndDaoParamsForUpdate(
             genRandomUpdateValue = { genLong() },
             genRequest = { scheduleId, visiblePriority -> ModifyVisiblePriorityRequest(scheduleId, visiblePriority) }
         )
@@ -109,7 +109,7 @@ class LocalScheduleRepositoryTest {
         assertThat(result.isSuccess, equalTo(true))
     }
 
-    private fun <T, U> genRepositoryParamAndDaoParams(
+    private fun <T, U> genRepositoryParamAndDaoParamsForUpdate(
         genRandomUpdateValue: () -> T,
         genRequest: (ScheduleId, T) -> U
     ): Pair<List<U>, List<Pair<Long, T>>> {
@@ -121,5 +121,15 @@ class LocalScheduleRepositoryTest {
             schedules.mapIndexed { index, schedule -> schedule.id().value to updateValues[index] }
 
         return repositoryParam to daoParam
+    }
+
+    @Test
+    fun `result for delete was success`() = runTest {
+        val schedule: Schedule = genSchedule()
+        val scheduleDao: ScheduleDao = mock()
+        val result = LocalScheduleRepository(scheduleDao).delete(schedule.id())
+
+        verify(scheduleDao, once()).deleteByScheduleId(schedule.id().value)
+        assertThat(result.isSuccess, equalTo(true))
     }
 }

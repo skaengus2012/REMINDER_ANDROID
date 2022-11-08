@@ -51,7 +51,12 @@ class AllScheduleViewModelsKtTest {
 
         verifyStateSendExtension(
             stateContainer,
-            AllScheduleEvent.OnDragEnded(scheduleUiStates)
-        ) { viewModel.onDragEnded(scheduleUiStates) }
+            AllScheduleEvent.OnDragScheduleEnded(scheduleUiStates)
+        ) { viewModel.onDragScheduleEnded(scheduleUiStates) }
+
+        verifyStateSendExtension(
+            stateContainer,
+            AllScheduleEvent.OnDeleteScheduleClicked(schedule.id())
+        ) { viewModel.onDeleteScheduleClicked(schedule.id()) }
     }
 }

@@ -101,4 +101,7 @@ abstract class ScheduleDao {
 
     @Delete
     abstract suspend fun delete(schedule: ScheduleEntity)
+
+    @Query("DELETE FROM schedule WHERE schedule_id = :scheduleId")
+    abstract suspend fun deleteByScheduleId(scheduleId: Long)
 }
