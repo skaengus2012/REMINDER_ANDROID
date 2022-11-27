@@ -35,6 +35,6 @@ class ScheduleItemMoveListener(
             notifyItemMoved(fromPosition, toPosition)
         }
 
-        return true
+        return isMoveNeeded
     }
 }
