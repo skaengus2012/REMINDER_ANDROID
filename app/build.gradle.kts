@@ -180,6 +180,8 @@ dependencies {
     implementation(Dependencies.GLIDE)
     kapt(Dependencies.GLIDE_COMPILER)
 
+    implementation(Dependencies.JSOUP)
+
     debugImplementation(Dependencies.FACEBOOK_FLIPPER)
     debugImplementation(Dependencies.FACEBOOK_FLIPPER_LEAKCANARY)
     debugImplementation(Dependencies.FACEBOOK_SOLOADER)

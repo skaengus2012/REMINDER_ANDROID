@@ -43,6 +43,8 @@ object DependenciesVersions {
 
     const val GLIDE = "4.14.2"
 
+    const val JSOUP = "1.13.1"
+
     const val FACEBOOK_FLIPPER = "0.173.0"
     const val FACEBOOK_SOLOADER = "0.10.4"
 

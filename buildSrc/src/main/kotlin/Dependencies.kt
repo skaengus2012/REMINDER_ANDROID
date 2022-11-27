@@ -42,6 +42,8 @@ object Dependencies {
     const val GLIDE = "com.github.bumptech.glide:glide:${DependenciesVersions.GLIDE}"
     const val GLIDE_COMPILER = "om.github.bumptech.glide:compiler:${DependenciesVersions.GLIDE}"
 
+    const val JSOUP = "org.jsoup:jsoup:${DependenciesVersions.JSOUP}"
+
     const val FACEBOOK_FLIPPER = "com.facebook.flipper:flipper:${DependenciesVersions.FACEBOOK_FLIPPER}"
     const val FACEBOOK_FLIPPER_LEAKCANARY = "com.facebook.flipper:flipper-leakcanary2-plugin:${DependenciesVersions.FACEBOOK_FLIPPER}"
     const val FACEBOOK_SOLOADER = "com.facebook.soloader:soloader:${DependenciesVersions.FACEBOOK_SOLOADER}"
