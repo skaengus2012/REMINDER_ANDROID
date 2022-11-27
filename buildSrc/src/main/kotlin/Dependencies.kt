@@ -42,6 +42,8 @@ object Dependencies {
     const val GLIDE = "com.github.bumptech.glide:glide:${DependenciesVersions.GLIDE}"
     const val GLIDE_COMPILER = "com.github.bumptech.glide:compiler:${DependenciesVersions.GLIDE}"
 
+    const val TIMBER = "com.jakewharton.timber:timber:${DependenciesVersions.TIMBER}"
+
     const val JSOUP = "org.jsoup:jsoup:${DependenciesVersions.JSOUP}"
 
     const val FACEBOOK_FLIPPER = "com.facebook.flipper:flipper:${DependenciesVersions.FACEBOOK_FLIPPER}"
