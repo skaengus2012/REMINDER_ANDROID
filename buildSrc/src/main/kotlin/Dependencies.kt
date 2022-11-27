@@ -39,6 +39,9 @@ object Dependencies {
     const val GOOGLE_HILT_ANDROID_COMPILER = "com.google.dagger:hilt-android-compiler:${DependenciesVersions.GOOGLE_HILT}"
     const val GOGGLE_FLEXBOX = "com.google.android.flexbox:flexbox:${DependenciesVersions.GOOGLE_FLEXBOX}"
 
+    const val GLIDE = "com.github.bumptech.glide:glide:${DependenciesVersions.GLIDE}"
+    const val GLIDE_COMPILER = "om.github.bumptech.glide:compiler:${DependenciesVersions.GLIDE}"
+
     const val FACEBOOK_FLIPPER = "com.facebook.flipper:flipper:${DependenciesVersions.FACEBOOK_FLIPPER}"
     const val FACEBOOK_FLIPPER_LEAKCANARY = "com.facebook.flipper:flipper-leakcanary2-plugin:${DependenciesVersions.FACEBOOK_FLIPPER}"
     const val FACEBOOK_SOLOADER = "com.facebook.soloader:soloader:${DependenciesVersions.FACEBOOK_SOLOADER}"

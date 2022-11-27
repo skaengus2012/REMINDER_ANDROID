@@ -177,6 +177,9 @@ dependencies {
     kapt(Dependencies.GOOGLE_HILT_ANDROID_COMPILER)
     implementation(Dependencies.GOGGLE_FLEXBOX)
 
+    implementation(Dependencies.GLIDE)
+    kapt(Dependencies.GLIDE_COMPILER)
+
     debugImplementation(Dependencies.FACEBOOK_FLIPPER)
     debugImplementation(Dependencies.FACEBOOK_FLIPPER_LEAKCANARY)
     debugImplementation(Dependencies.FACEBOOK_SOLOADER)

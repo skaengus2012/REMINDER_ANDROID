@@ -41,6 +41,8 @@ object DependenciesVersions {
     const val GOOGLE_HILT = "2.44"
     const val GOOGLE_FLEXBOX = "3.0.0"
 
+    const val GLIDE = "4.14.2"
+
     const val FACEBOOK_FLIPPER = "0.173.0"
     const val FACEBOOK_SOLOADER = "0.10.4"
 
