@@ -40,7 +40,7 @@ object Dependencies {
     const val GOGGLE_FLEXBOX = "com.google.android.flexbox:flexbox:${DependenciesVersions.GOOGLE_FLEXBOX}"
 
     const val GLIDE = "com.github.bumptech.glide:glide:${DependenciesVersions.GLIDE}"
-    const val GLIDE_COMPILER = "om.github.bumptech.glide:compiler:${DependenciesVersions.GLIDE}"
+    const val GLIDE_COMPILER = "com.github.bumptech.glide:compiler:${DependenciesVersions.GLIDE}"
 
     const val JSOUP = "org.jsoup:jsoup:${DependenciesVersions.JSOUP}"
 
