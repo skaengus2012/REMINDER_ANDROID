@@ -33,17 +33,4 @@ data class Schedule(
     val isComplete: Boolean
 ) {
     fun id(): ScheduleId = ScheduleId(scheduleId)
-
-    companion object {
-        @Generated
-        fun empty(): Schedule = Schedule(
-            scheduleId = Long.MIN_VALUE,
-            title = "",
-            note = null,
-            link = null,
-            tags = emptyList(),
-            visiblePriority = Long.MIN_VALUE,
-            isComplete = false
-        )
-    }
 }
