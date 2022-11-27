@@ -23,5 +23,5 @@ import com.nlab.reminder.domain.common.schedule.Schedule
  * @author thalys
  */
 fun CompleteMarkTable.isCompleteMarked(schedule: Schedule): Boolean {
-    return this[schedule.id()]?.isComplete ?: schedule.isComplete
+    return this[schedule.id]?.isComplete ?: schedule.isComplete
 }

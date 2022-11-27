@@ -33,7 +33,7 @@ fun ScheduleEntity.toSchedule(tags: List<Tag> = emptyList()): Schedule = Schedul
 )
 
 fun Schedule.toEntity(): ScheduleEntity = ScheduleEntity(
-    scheduleId = id().value,
+    scheduleId = id.value,
     title = title,
     description = note,
     link = link,

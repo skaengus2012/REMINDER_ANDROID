@@ -24,7 +24,7 @@ import com.nlab.reminder.domain.common.schedule.ScheduleUiState
  */
 class ScheduleUiStateDiffCallback : DiffUtil.ItemCallback<ScheduleUiState>() {
     override fun areItemsTheSame(oldItem: ScheduleUiState, newItem: ScheduleUiState): Boolean {
-        return oldItem.schedule.id() == newItem.schedule.id()
+        return oldItem.id == newItem.id
     }
 
     override fun areContentsTheSame(oldItem: ScheduleUiState, newItem: ScheduleUiState): Boolean {

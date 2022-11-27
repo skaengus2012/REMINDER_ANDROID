@@ -31,7 +31,7 @@ data class CompleteMarkCombineTestFixture(
     val isComplete: Boolean = genBoolean(),
     val schedule: Schedule = genSchedule(isComplete = isComplete),
     val completeMarkRepository: CompleteMarkRepository = mock {
-        whenever(mock.get()) doReturn flowOf(mapOf(schedule.id() to genCompleteMark(isComplete = isComplete.not())))
+        whenever(mock.get()) doReturn flowOf(mapOf(schedule.id to genCompleteMark(isComplete = isComplete.not())))
     },
     val expectedScheduleUiStates: List<ScheduleUiState> =
         listOf(genScheduleUiState(schedule, isCompleteMarked = isComplete.not()))

@@ -65,17 +65,17 @@ fun AllScheduleStateMachine(
                 event is AllScheduleEvent.OnDragScheduleEnded && event.draggedSnapshot.isNotEmpty()
             }) { (event) ->
                 val items: List<ScheduleUiState> = (event as AllScheduleEvent.OnDragScheduleEnded).draggedSnapshot
-                val minVisiblePriority: Long = items.minOf { it.schedule.visiblePriority }
-                val maxVisiblePriority: Long = items.maxOf { it.schedule.visiblePriority }
+                val minVisiblePriority: Long = items.minOf { it.visiblePriority }
+                val maxVisiblePriority: Long = items.maxOf { it.visiblePriority }
                 val requests: List<ModifyVisiblePriorityRequest> =
                     items
                         .mapIndexed { index, uiState ->
                             Pair(
                                 ModifyVisiblePriorityRequest(
-                                    uiState.schedule.id(),
+                                    uiState.id,
                                     minOf(minVisiblePriority + index, maxVisiblePriority)
                                 ),
-                                uiState.schedule.visiblePriority
+                                uiState.visiblePriority
                             )
                         }
                         .filter { (request, visiblePriority) -> visiblePriority != request.visiblePriority }

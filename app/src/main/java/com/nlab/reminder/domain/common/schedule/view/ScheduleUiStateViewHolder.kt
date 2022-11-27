@@ -51,8 +51,8 @@ class ScheduleUiStateViewHolder(
     }
 
     fun onBind(scheduleUiState: ScheduleUiState) {
-        binding.textviewTitle.text = scheduleUiState.schedule.title // TODO low of demeter.
-        binding.textviewNote.text = scheduleUiState.schedule.note
+        binding.textviewTitle.text = scheduleUiState.title
+        binding.textviewNote.text = scheduleUiState.note
         binding.buttonComplete.isSelected = scheduleUiState.isCompleteMarked
     }
 

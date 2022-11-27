@@ -31,7 +31,7 @@ class CompleteMarkTablesKtTest {
         val expectedCompleteMarked: Boolean = genBoolean()
         val schedule: Schedule = genSchedule()
         val completeMarkTable: CompleteMarkTable =
-            mapOf(schedule.id() to genCompleteMark(isComplete = expectedCompleteMarked))
+            mapOf(schedule.id to genCompleteMark(isComplete = expectedCompleteMarked))
 
         assertThat(completeMarkTable.isCompleteMarked(schedule), equalTo(expectedCompleteMarked))
     }

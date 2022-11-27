@@ -32,5 +32,5 @@ data class Schedule(
     val visiblePriority: Long,
     val isComplete: Boolean
 ) {
-    fun id(): ScheduleId = ScheduleId(scheduleId)
+    val id: ScheduleId = ScheduleId(scheduleId)
 }

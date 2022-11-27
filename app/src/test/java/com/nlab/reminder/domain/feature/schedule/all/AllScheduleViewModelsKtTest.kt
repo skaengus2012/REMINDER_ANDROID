@@ -46,8 +46,8 @@ class AllScheduleViewModelsKtTest {
 
         verifyStateSendExtension(
             stateContainer,
-            AllScheduleEvent.OnModifyScheduleCompleteClicked(schedule.id(), isComplete)
-        ) { viewModel.onModifyScheduleCompleteClicked(schedule.id(), isComplete) }
+            AllScheduleEvent.OnModifyScheduleCompleteClicked(schedule.id, isComplete)
+        ) { viewModel.onModifyScheduleCompleteClicked(schedule.id, isComplete) }
 
         verifyStateSendExtension(
             stateContainer,
@@ -56,7 +56,7 @@ class AllScheduleViewModelsKtTest {
 
         verifyStateSendExtension(
             stateContainer,
-            AllScheduleEvent.OnDeleteScheduleClicked(schedule.id())
-        ) { viewModel.onDeleteScheduleClicked(schedule.id()) }
+            AllScheduleEvent.OnDeleteScheduleClicked(schedule.id)
+        ) { viewModel.onDeleteScheduleClicked(schedule.id) }
     }
 }

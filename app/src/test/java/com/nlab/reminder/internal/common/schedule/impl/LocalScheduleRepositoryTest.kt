@@ -116,9 +116,9 @@ class LocalScheduleRepositoryTest {
         val schedules: List<Schedule> = genSchedules()
         val updateValues: List<T> = List(schedules.size) { genRandomUpdateValue() }
         val repositoryParam: List<U> =
-            schedules.mapIndexed { index, schedule -> genRequest(schedule.id(), updateValues[index]) }
+            schedules.mapIndexed { index, schedule -> genRequest(schedule.id, updateValues[index]) }
         val daoParam: List<Pair<Long, T>> =
-            schedules.mapIndexed { index, schedule -> schedule.id().value to updateValues[index] }
+            schedules.mapIndexed { index, schedule -> schedule.id.value to updateValues[index] }
 
         return repositoryParam to daoParam
     }
@@ -127,9 +127,9 @@ class LocalScheduleRepositoryTest {
     fun `result for delete was success`() = runTest {
         val schedule: Schedule = genSchedule()
         val scheduleDao: ScheduleDao = mock()
-        val result = LocalScheduleRepository(scheduleDao).delete(schedule.id())
+        val result = LocalScheduleRepository(scheduleDao).delete(schedule.id)
 
-        verify(scheduleDao, once()).deleteByScheduleId(schedule.id().value)
+        verify(scheduleDao, once()).deleteByScheduleId(schedule.id.value)
         assertThat(result.isSuccess, equalTo(true))
     }
 }
