@@ -14,19 +14,14 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.common.schedule
+package com.nlab.reminder.domain.common.schedule.impl
 
-import com.nlab.reminder.core.util.link.LinkThumbnail
-import com.nlab.reminder.core.util.test.annotation.Generated
+import com.nlab.reminder.domain.common.schedule.CompleteMarkTable
+import com.nlab.reminder.domain.common.schedule.Schedule
 
 /**
- * @author Doohyun
+ * @author thalys
  */
-@Generated
-data class ScheduleUiState(
-    val schedule: Schedule,
-    val linkThumbnail: LinkThumbnail?,
-    val isCompleteMarked: Boolean,
-) {
-    val isComplete: Boolean get() = schedule.isComplete
+fun CompleteMarkTable.isCompleteMarked(schedule: Schedule): Boolean {
+    return this[schedule.id()]?.isComplete ?: schedule.isComplete
 }

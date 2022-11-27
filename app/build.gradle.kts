@@ -110,6 +110,7 @@ android {
                 "**/kotlin/**",
                 "**/view/**",
                 "**/test/**",
+                "**/infra/**",
                 "**/di/**",
                 "**/*Args*.*",          /* filtering Navigation Component generated classes */
                 "**/*Directions*.*"     /* filtering Navigation Component generated classes */

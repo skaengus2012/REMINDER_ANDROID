@@ -18,6 +18,7 @@ package com.nlab.reminder.domain.common.schedule.impl
 
 import com.nlab.reminder.domain.common.schedule.*
 import com.nlab.reminder.test.genBoolean
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
@@ -34,4 +35,6 @@ data class CompleteMarkCombineTestFixture(
     },
     val expectedScheduleUiStates: List<ScheduleUiState> =
         listOf(genScheduleUiState(schedule, isCompleteMarked = isComplete.not()))
-)
+) {
+    val schedulesFlow: Flow<List<Schedule>> = flowOf(listOf(schedule))
+}

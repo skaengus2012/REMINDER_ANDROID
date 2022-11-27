@@ -16,15 +16,13 @@
 
 package com.nlab.reminder.domain.common.schedule.impl
 
-import com.nlab.reminder.domain.common.schedule.*
+import com.nlab.reminder.core.kotlin.util.getOrNull
+import com.nlab.reminder.core.util.link.LinkThumbnail
+import com.nlab.reminder.core.util.link.LinkThumbnailRepository
+import com.nlab.reminder.domain.common.schedule.Schedule
 
 /**
  * @author thalys
  */
-internal fun ScheduleUiState(
-    schedule: Schedule,
-    completeMarkTable: CompleteMarkTable
-): ScheduleUiState = ScheduleUiState(
-    schedule,
-    isCompleteMarked = completeMarkTable[schedule.id()]?.isComplete ?: schedule.isComplete
-)
+suspend fun LinkThumbnailRepository.findLinkThumbnail(schedule: Schedule): LinkThumbnail? =
+    schedule.link?.let { this.get(it) }?.getOrNull()

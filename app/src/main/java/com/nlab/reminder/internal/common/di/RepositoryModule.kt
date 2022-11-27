@@ -28,7 +28,7 @@ import com.nlab.reminder.internal.common.android.database.ScheduleTagListDao
 import com.nlab.reminder.internal.common.android.database.TagDao
 import com.nlab.reminder.internal.common.schedule.impl.LocalScheduleRepository
 import com.nlab.reminder.internal.common.tag.impl.LocalTagRepository
-import com.nlab.reminder.internal.util.link.impl.JsoupLinkThumbnailRepository
+import com.nlab.reminder.core.util.link.infra.JsoupLinkThumbnailRepository
 import dagger.Module
 import dagger.Provides
 import dagger.Reusable

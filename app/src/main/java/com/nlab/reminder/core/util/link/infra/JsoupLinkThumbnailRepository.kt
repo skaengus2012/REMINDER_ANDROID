@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package com.nlab.reminder.internal.util.link.impl
+package com.nlab.reminder.core.util.link.infra
 
 import com.nlab.reminder.core.kotlin.util.Result
 import com.nlab.reminder.core.kotlin.util.catching
 import com.nlab.reminder.core.util.link.LinkThumbnail
 import com.nlab.reminder.core.util.link.LinkThumbnailRepository
+import com.nlab.reminder.core.util.test.annotation.Generated
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -28,6 +28,7 @@ import org.jsoup.Jsoup
 /**
  * @author thalys
  */
+@Generated
 class JsoupLinkThumbnailRepository(
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : LinkThumbnailRepository {

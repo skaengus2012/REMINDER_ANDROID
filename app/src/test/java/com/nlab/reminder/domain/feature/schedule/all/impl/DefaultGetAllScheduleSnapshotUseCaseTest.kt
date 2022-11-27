@@ -69,7 +69,7 @@ class DefaultGetAllScheduleSnapshotUseCaseTest {
             scheduleRepository = scheduleRepository,
             scheduleUiStateFlowFactory = object : ScheduleUiStateFlowFactory {
                 override fun with(schedules: Flow<List<Schedule>>): Flow<List<ScheduleUiState>> =
-                    schedules.map { genScheduleUiStates(it, fakeCompleteMark) }
+                    schedules.map { genScheduleUiStates(it, isCompleteMarked = fakeCompleteMark) }
             },
             completedScheduleShownRepository = mock { whenever(mock.get()) doReturn flowOf(isDoneScheduleShown) },
         )
@@ -79,7 +79,7 @@ class DefaultGetAllScheduleSnapshotUseCaseTest {
             snapshot,
             equalTo(
                 genAllScheduleSnapshot(
-                    uiStates = genScheduleUiStates(expectSchedules, fakeCompleteMark),
+                    uiStates = genScheduleUiStates(expectSchedules, isCompleteMarked = fakeCompleteMark),
                     isCompletedScheduleShown = isDoneScheduleShown
                 )
             )

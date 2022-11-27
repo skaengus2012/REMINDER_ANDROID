@@ -16,10 +16,8 @@
 
 package com.nlab.reminder.domain.common.schedule.impl
 
-import com.nlab.reminder.domain.common.schedule.Schedule
-import com.nlab.reminder.domain.common.schedule.genCompleteMark
-import com.nlab.reminder.domain.common.schedule.genSchedule
-import com.nlab.reminder.domain.common.schedule.ScheduleUiState
+import com.nlab.reminder.domain.common.schedule.*
+import com.nlab.reminder.test.genBoolean
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
@@ -27,25 +25,22 @@ import org.junit.Test
 /**
  * @author thalys
  */
-class ScheduleUiStatesKtTest {
+class CompleteMarkTablesKtTest {
     @Test
-    fun `created scheduleUiState with isComplete of completeMark`() {
+    fun `get tables info when table has value`() {
+        val expectedCompleteMarked: Boolean = genBoolean()
         val schedule: Schedule = genSchedule()
-        val completeMarkSnapshot = mapOf(schedule.id() to genCompleteMark(isComplete = schedule.isComplete.not()))
-        val expectedScheduleUiState = ScheduleUiState(schedule, completeMarkSnapshot)
-        assertThat(
-            expectedScheduleUiState,
-            equalTo(ScheduleUiState(schedule, schedule.isComplete.not()))
-        )
+        val completeMarkTable: CompleteMarkTable =
+            mapOf(schedule.id() to genCompleteMark(isComplete = expectedCompleteMarked))
+
+        assertThat(completeMarkTable.isCompleteMarked(schedule), equalTo(expectedCompleteMarked))
     }
 
     @Test
     fun `created scheduleUiState with owners complete when snapshot was empty`() {
         val schedule: Schedule = genSchedule()
-        val expectedScheduleUiState = ScheduleUiState(schedule, emptyMap())
-        assertThat(
-            expectedScheduleUiState,
-            equalTo(ScheduleUiState(schedule, schedule.isComplete))
-        )
+        val completeMarkTable: CompleteMarkTable = emptyMap()
+
+        assertThat(completeMarkTable.isCompleteMarked(schedule), equalTo(schedule.isComplete))
     }
 }
