@@ -27,7 +27,7 @@ data class Schedule(
     private val scheduleId: Long,
     val title: String,
     val note: String?,
-    val url: String?,
+    val link: String?,
     val tags: List<Tag>,
     val visiblePriority: Long,
     val isComplete: Boolean
@@ -40,7 +40,7 @@ data class Schedule(
             scheduleId = Long.MIN_VALUE,
             title = "",
             note = null,
-            url = null,
+            link = null,
             tags = emptyList(),
             visiblePriority = Long.MIN_VALUE,
             isComplete = false

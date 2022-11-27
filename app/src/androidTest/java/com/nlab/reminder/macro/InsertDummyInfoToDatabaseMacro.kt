@@ -50,7 +50,7 @@ class InsertDummyInfoToDatabaseMacro {
             ScheduleEntity(
                 title = "Programming STUDY!",
                 description = "Good to know about [${faker.programmingLanguage().name()}] with ${faker.name().fullName()}",
-                url = "https://github.com/skaengus2012/REMINDER_ANDROID",
+                link = "https://github.com/skaengus2012/REMINDER_ANDROID",
                 visiblePriority = 0,
                 isComplete = false
             )

@@ -28,7 +28,7 @@ data class ScheduleEntity(
     @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "schedule_id") val scheduleId: Long = 0,
     @ColumnInfo(name = "title") val title: String,
     @ColumnInfo(name = "description") val description: String? = null,
-    @ColumnInfo(name = "url") val url: String? = null,
+    @ColumnInfo(name = "link") val link: String? = null,
     @ColumnInfo(name = "visible_priority") val visiblePriority: Long = 0,
     @ColumnInfo(name = "is_complete") val isComplete: Boolean = false,
 )
