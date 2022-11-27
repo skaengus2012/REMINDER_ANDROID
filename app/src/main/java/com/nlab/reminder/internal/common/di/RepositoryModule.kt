@@ -16,6 +16,11 @@
 
 package com.nlab.reminder.internal.common.di
 
+import com.nlab.reminder.core.kotlin.util.Result
+import com.nlab.reminder.core.kotlin.util.onFailure
+import com.nlab.reminder.core.util.link.LinkThumbnail
+import com.nlab.reminder.core.util.link.LinkThumbnailRepository
+import com.nlab.reminder.core.util.link.impl.CachedLinkThumbnailRepository
 import com.nlab.reminder.domain.common.schedule.ScheduleRepository
 import com.nlab.reminder.domain.common.tag.TagRepository
 import com.nlab.reminder.internal.common.android.database.ScheduleDao
@@ -23,11 +28,13 @@ import com.nlab.reminder.internal.common.android.database.ScheduleTagListDao
 import com.nlab.reminder.internal.common.android.database.TagDao
 import com.nlab.reminder.internal.common.schedule.impl.LocalScheduleRepository
 import com.nlab.reminder.internal.common.tag.impl.LocalTagRepository
+import com.nlab.reminder.internal.util.link.impl.JsoupLinkThumbnailRepository
 import dagger.Module
 import dagger.Provides
 import dagger.Reusable
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import timber.log.Timber
 
 /**
  * @author Doohyun
@@ -47,4 +54,16 @@ class RepositoryModule {
         tagDao: TagDao,
         scheduleTagListDao: ScheduleTagListDao
     ): TagRepository = LocalTagRepository(tagDao, scheduleTagListDao)
+
+    @Reusable
+    @Provides
+    fun provideLinkThumbnailRepository(): LinkThumbnailRepository = object : LinkThumbnailRepository {
+        private val internalRepository: LinkThumbnailRepository = CachedLinkThumbnailRepository(
+            JsoupLinkThumbnailRepository()
+        )
+
+        override suspend fun get(link: String): Result<LinkThumbnail> {
+            return internalRepository.get(link).onFailure { e -> Timber.w(e, "LinkThumbnail load failed.") }
+        }
+    }
 }

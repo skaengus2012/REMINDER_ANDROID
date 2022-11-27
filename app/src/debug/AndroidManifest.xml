@@ -32,6 +32,9 @@
             <meta-data
                 android:name="com.nlab.reminder.internal.common.android.init.FlipperInitializer"
                 android:value="androidx.startup" />
+            <meta-data
+                android:name="com.nlab.reminder.internal.common.android.init.TimberInitializer"
+                android:value="androidx.startup" />
         </provider>
 
     </application>

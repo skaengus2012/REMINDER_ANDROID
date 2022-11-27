@@ -18,6 +18,8 @@
 	xmlns:tools="http://schemas.android.com/tools"
 	package="com.nlab.reminder">
 
+	<uses-permission android:name="android.permission.INTERNET" />
+
 	<application
 		android:name=".ReminderApplication"
 		android:icon="@mipmap/ic_launcher"
