@@ -17,7 +17,7 @@
 package com.nlab.reminder.domain.common.schedule
 
 import com.nlab.reminder.domain.common.util.link.LinkMetadata
-import com.nlab.reminder.core.util.transaction.TransactionId
+import com.nlab.reminder.domain.common.util.transaction.TransactionId
 import com.nlab.reminder.domain.common.tag.Tag
 import com.nlab.reminder.domain.common.tag.genTags
 import com.nlab.reminder.test.genBoolean

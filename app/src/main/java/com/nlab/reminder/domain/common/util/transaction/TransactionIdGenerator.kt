@@ -14,17 +14,11 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.util.transaction.impl
-
-import com.nlab.reminder.core.util.transaction.TransactionId
-import com.nlab.reminder.core.util.transaction.TransactionIdGenerator
+package com.nlab.reminder.domain.common.util.transaction
 
 /**
  * @author Doohyun
  */
-class DefaultTransactionIdGenerator(
-    private val randomPrefix: () -> String,
-    private val timestamp: () -> Long,
-) : TransactionIdGenerator {
-    override fun generate(): TransactionId = TransactionId("${randomPrefix()}_${timestamp()}")
+interface TransactionIdGenerator {
+    fun generate(): TransactionId
 }

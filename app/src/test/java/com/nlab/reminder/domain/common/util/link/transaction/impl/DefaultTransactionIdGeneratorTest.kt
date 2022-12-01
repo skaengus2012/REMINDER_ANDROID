@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.util.transaction.impl
+package com.nlab.reminder.domain.common.util.link.transaction.impl
 
-import com.nlab.reminder.core.util.transaction.TransactionId
-import com.nlab.reminder.core.util.transaction.TransactionIdGenerator
+import com.nlab.reminder.domain.common.util.transaction.TransactionId
+import com.nlab.reminder.domain.common.util.transaction.TransactionIdGenerator
+import com.nlab.reminder.domain.common.util.transaction.impl.DefaultTransactionIdGenerator
 import com.nlab.reminder.test.genBothify
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.*

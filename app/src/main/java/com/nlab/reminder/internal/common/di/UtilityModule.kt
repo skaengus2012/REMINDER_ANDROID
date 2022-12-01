@@ -16,8 +16,8 @@
 
 package com.nlab.reminder.internal.common.di
 
-import com.nlab.reminder.core.util.transaction.TransactionIdGenerator
-import com.nlab.reminder.core.util.transaction.impl.DefaultTransactionIdGenerator
+import com.nlab.reminder.domain.common.util.transaction.TransactionIdGenerator
+import com.nlab.reminder.domain.common.util.transaction.impl.DefaultTransactionIdGenerator
 import dagger.Module
 import dagger.Provides
 import dagger.Reusable

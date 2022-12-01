@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.util.transaction
+package com.nlab.reminder.domain.common.util.transaction
+
+import com.nlab.reminder.core.util.test.annotation.Generated
 
 /**
  * @author Doohyun
  */
-interface TransactionIdGenerator {
-    fun generate(): TransactionId
-}
+@Generated
+@JvmInline
+value class TransactionId(val value: String)

@@ -16,7 +16,7 @@
 
 package com.nlab.reminder.domain.common.schedule.impl
 
-import com.nlab.reminder.core.util.transaction.TransactionId
+import com.nlab.reminder.domain.common.util.transaction.TransactionId
 import com.nlab.reminder.domain.common.schedule.*
 import com.nlab.reminder.test.genBoolean
 import com.nlab.reminder.test.genBothify

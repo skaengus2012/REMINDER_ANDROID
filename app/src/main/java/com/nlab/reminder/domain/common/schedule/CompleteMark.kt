@@ -17,7 +17,7 @@
 package com.nlab.reminder.domain.common.schedule
 
 import com.nlab.reminder.core.util.test.annotation.Generated
-import com.nlab.reminder.core.util.transaction.TransactionId
+import com.nlab.reminder.domain.common.util.transaction.TransactionId
 
 @Generated
 data class CompleteMark(

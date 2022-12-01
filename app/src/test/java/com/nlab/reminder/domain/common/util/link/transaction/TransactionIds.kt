@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.util.transaction
+package com.nlab.reminder.domain.common.util.link.transaction
 
+import com.nlab.reminder.domain.common.util.transaction.TransactionId
+import com.nlab.reminder.domain.common.util.transaction.TransactionIdGenerator
 import com.nlab.reminder.test.genBothify
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock

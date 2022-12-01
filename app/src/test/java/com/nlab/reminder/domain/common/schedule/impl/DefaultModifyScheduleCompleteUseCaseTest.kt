@@ -17,8 +17,8 @@
 package com.nlab.reminder.domain.common.schedule.impl
 
 import com.nlab.reminder.core.kotlin.coroutine.Delay
-import com.nlab.reminder.core.util.transaction.TransactionId
-import com.nlab.reminder.core.util.transaction.genTransactionIdGenerator
+import com.nlab.reminder.domain.common.util.transaction.TransactionId
+import com.nlab.reminder.domain.common.util.link.transaction.genTransactionIdGenerator
 import com.nlab.reminder.core.kotlin.util.Result
 import com.nlab.reminder.domain.common.schedule.*
 import com.nlab.reminder.test.genBoolean
