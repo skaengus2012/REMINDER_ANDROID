@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.util.link.impl
+package com.nlab.reminder.domain.common.util.link.impl
 
 import com.nlab.reminder.core.kotlin.util.Result
 import com.nlab.reminder.core.kotlin.util.getOrThrow
-import com.nlab.reminder.core.util.link.LinkThumbnail
-import com.nlab.reminder.core.util.link.LinkThumbnailRepository
-import com.nlab.reminder.core.util.link.genLinkThumbnail
+import com.nlab.reminder.domain.common.util.link.LinkMetadata
+import com.nlab.reminder.domain.common.util.link.LinkMetadataRepository
+import com.nlab.reminder.domain.common.util.link.genLinkMetadata
 import com.nlab.reminder.test.genBothify
 import com.nlab.reminder.test.once
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -34,12 +34,12 @@ import org.mockito.kotlin.*
  * @author thalys
  */
 @ExperimentalCoroutinesApi
-class CachedLinkThumbnailRepositoryTest {
+class CachedLinkMetadataRepositoryTest {
     @Test
     fun `try loading from internal repository when cache was not hit`() = runTest {
         val link: String = genBothify()
-        val internalRepository: LinkThumbnailRepository = mock()
-        val cachedRepository = CachedLinkThumbnailRepository(internalRepository)
+        val internalRepository: LinkMetadataRepository = mock()
+        val cachedRepository = CachedLinkMetadataRepository(internalRepository)
         cachedRepository.get(link)
 
         verify(internalRepository, once()).get(link)
@@ -49,13 +49,13 @@ class CachedLinkThumbnailRepositoryTest {
     fun `skip loading from internal repository when cache was hit`() = runTest {
         val repeatCount = 10
         val link: String = genBothify()
-        val expectedThumbnail: LinkThumbnail = genLinkThumbnail()
-        val internalRepository: LinkThumbnailRepository = mock {
+        val expectedThumbnail: LinkMetadata = genLinkMetadata()
+        val internalRepository: LinkMetadataRepository = mock {
             whenever(mock.get(link)) doReturn Result.Success(expectedThumbnail)
         }
-        val cachedRepository = CachedLinkThumbnailRepository(internalRepository)
+        val cachedRepository = CachedLinkMetadataRepository(internalRepository)
 
-        val results = mutableListOf<LinkThumbnail>()
+        val results = mutableListOf<LinkMetadata>()
         repeat(repeatCount) { results += cachedRepository.get(link).getOrThrow() }
 
         assertThat(results, equalTo(List(10) { expectedThumbnail }))

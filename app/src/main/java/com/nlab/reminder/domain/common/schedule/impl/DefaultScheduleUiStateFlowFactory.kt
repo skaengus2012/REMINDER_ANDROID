@@ -16,7 +16,7 @@
 
 package com.nlab.reminder.domain.common.schedule.impl
 
-import com.nlab.reminder.core.util.link.LinkThumbnailRepository
+import com.nlab.reminder.domain.common.util.link.LinkMetadataRepository
 import com.nlab.reminder.core.util.test.annotation.Generated
 import com.nlab.reminder.domain.common.schedule.*
 import kotlinx.coroutines.flow.*
@@ -26,7 +26,7 @@ import kotlinx.coroutines.flow.*
  */
 class DefaultScheduleUiStateFlowFactory(
     private val completeMarkRepository: CompleteMarkRepository,
-    private val linkThumbnailRepository: LinkThumbnailRepository
+    private val linkThumbnailRepository: LinkMetadataRepository
 ) : ScheduleUiStateFlowFactory {
     override fun with(schedules: Flow<List<Schedule>>): Flow<List<ScheduleUiState>> =
         combine(
@@ -42,7 +42,7 @@ class DefaultScheduleUiStateFlowFactory(
     ): List<ScheduleUiState> = schedules.map { schedule ->
         ScheduleUiState(
             schedule,
-            linkThumbnail = linkThumbnailRepository.findLinkThumbnail(schedule),
+            linkMetadata = linkThumbnailRepository.findLinkMetadata(schedule),
             isCompleteMarked = completeMarkTable.isCompleteMarked(schedule)
         )
     }

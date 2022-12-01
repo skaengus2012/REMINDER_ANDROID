@@ -14,24 +14,24 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.util.link.impl
+package com.nlab.reminder.domain.common.util.link.impl
 
-import com.nlab.reminder.core.util.link.LinkThumbnail
-import com.nlab.reminder.core.util.link.LinkThumbnailRepository
+import com.nlab.reminder.domain.common.util.link.LinkMetadata
+import com.nlab.reminder.domain.common.util.link.LinkMetadataRepository
 import com.nlab.reminder.core.kotlin.util.Result
 import com.nlab.reminder.core.kotlin.util.onSuccess
 
 /**
  * @author thalys
  */
-class CachedLinkThumbnailRepository(
-    private val internalRepository: LinkThumbnailRepository
-) : LinkThumbnailRepository {
-    private val caches= hashMapOf<String, LinkThumbnail>()
+class CachedLinkMetadataRepository(
+    private val internalRepository: LinkMetadataRepository
+) : LinkMetadataRepository {
+    private val caches= hashMapOf<String, LinkMetadata>()
 
-    override suspend fun get(link: String): Result<LinkThumbnail> {
-        val result: Result<LinkThumbnail>
-        val curCache: LinkThumbnail? = caches[link]
+    override suspend fun get(link: String): Result<LinkMetadata> {
+        val result: Result<LinkMetadata>
+        val curCache: LinkMetadata? = caches[link]
         if (curCache == null) {
             result = internalRepository.get(link).also { ret ->
                 ret.onSuccess { linkThumbnail -> caches[link] = linkThumbnail }

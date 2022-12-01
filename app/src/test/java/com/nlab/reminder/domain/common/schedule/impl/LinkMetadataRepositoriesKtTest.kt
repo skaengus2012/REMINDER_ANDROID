@@ -16,19 +16,18 @@
 
 package com.nlab.reminder.domain.common.schedule.impl
 
-import com.nlab.reminder.core.util.link.LinkThumbnailRepository
+import com.nlab.reminder.domain.common.util.link.LinkMetadataRepository
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import com.nlab.reminder.core.kotlin.util.Result
-import com.nlab.reminder.core.util.link.LinkThumbnail
-import com.nlab.reminder.core.util.link.genLinkThumbnail
+import com.nlab.reminder.domain.common.util.link.LinkMetadata
+import com.nlab.reminder.domain.common.util.link.genLinkMetadata
 import com.nlab.reminder.domain.common.schedule.Schedule
 import com.nlab.reminder.domain.common.schedule.genSchedule
 import com.nlab.reminder.test.genBothify
-import junit.framework.TestCase.assertNull
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.equalTo
@@ -38,39 +37,45 @@ import org.hamcrest.MatcherAssert.assertThat
  * @author thalys
  */
 @ExperimentalCoroutinesApi
-class LinkThumbnailRepositoriesKtTest {
+class LinkMetadataRepositoriesKtTest {
     @Test
     fun `get linkThumbnail when repository request was succeed`() = runTest {
-        val expectedLinkThumbnail: LinkThumbnail = genLinkThumbnail()
+        val expectedLinkMetadata: LinkMetadata = genLinkMetadata()
         val link: String = genBothify()
         val schedule: Schedule = genSchedule(link = link)
-        val linkThumbnailRepository: LinkThumbnailRepository = mock {
-            whenever(mock.get(link)) doReturn Result.Success(expectedLinkThumbnail)
+        val linkThumbnailRepository: LinkMetadataRepository = mock {
+            whenever(mock.get(link)) doReturn Result.Success(expectedLinkMetadata)
         }
 
         assertThat(
-            linkThumbnailRepository.findLinkThumbnail(schedule),
-            equalTo(expectedLinkThumbnail)
+            linkThumbnailRepository.findLinkMetadata(schedule),
+            equalTo(expectedLinkMetadata)
         )
     }
 
     @Test
-    fun `get null when repository request was failed`() = runTest {
+    fun `get empty when repository request was failed`() = runTest {
         val schedule: Schedule = genSchedule(link = genBothify())
-        val linkThumbnailRepository: LinkThumbnailRepository = mock {
+        val linkThumbnailRepository: LinkMetadataRepository = mock {
             whenever(mock.get(any())) doReturn Result.Failure(RuntimeException())
         }
 
-        assertNull(linkThumbnailRepository.findLinkThumbnail(schedule))
+        assertThat(
+            linkThumbnailRepository.findLinkMetadata(schedule),
+            equalTo(LinkMetadata.Empty)
+        )
     }
 
     @Test
-    fun `get null when schedule was null`() = runTest {
+    fun `get empty when schedule was null`() = runTest {
         val schedule: Schedule = genSchedule(link = null)
-        val linkThumbnailRepository: LinkThumbnailRepository = mock {
-            whenever(mock.get(any())) doReturn Result.Success(genLinkThumbnail())
+        val linkThumbnailRepository: LinkMetadataRepository = mock {
+            whenever(mock.get(any())) doReturn Result.Success(genLinkMetadata())
         }
 
-        assertNull(linkThumbnailRepository.findLinkThumbnail(schedule))
+        assertThat(
+            linkThumbnailRepository.findLinkMetadata(schedule),
+            equalTo(LinkMetadata.Empty)
+        )
     }
 }

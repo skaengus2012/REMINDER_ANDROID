@@ -17,7 +17,7 @@
 package com.nlab.reminder.internal.common.di
 
 import com.nlab.reminder.core.kotlin.coroutine.util.Delay
-import com.nlab.reminder.core.util.link.LinkThumbnailRepository
+import com.nlab.reminder.domain.common.util.link.LinkMetadataRepository
 import com.nlab.reminder.core.util.transaction.TransactionIdGenerator
 import com.nlab.reminder.domain.common.schedule.*
 import com.nlab.reminder.domain.common.schedule.impl.*
@@ -41,7 +41,7 @@ class ScheduleModule {
     @Provides
     fun provideScheduleUiStateFlowFactory(
         completeMarkRepository: CompleteMarkRepository,
-        linkThumbnailRepository: LinkThumbnailRepository
+        linkThumbnailRepository: LinkMetadataRepository
     ): ScheduleUiStateFlowFactory = DefaultScheduleUiStateFlowFactory(completeMarkRepository, linkThumbnailRepository)
 
     @Provides

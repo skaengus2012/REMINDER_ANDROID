@@ -13,13 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nlab.reminder.core.util.link.infra
+package com.nlab.reminder.domain.common.util.link.infra
 
 import com.nlab.reminder.core.kotlin.util.Result
 import com.nlab.reminder.core.kotlin.util.catching
-import com.nlab.reminder.core.util.link.LinkThumbnail
-import com.nlab.reminder.core.util.link.LinkThumbnailRepository
-import com.nlab.reminder.core.util.test.annotation.Generated
+import com.nlab.reminder.domain.common.util.link.LinkMetadata
+import com.nlab.reminder.domain.common.util.link.LinkMetadataRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -28,20 +27,28 @@ import org.jsoup.Jsoup
 /**
  * @author thalys
  */
-@Generated
-class JsoupLinkThumbnailRepository(
+class JsoupLinkMetadataRepository(
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
-) : LinkThumbnailRepository {
-    override suspend fun get(link: String): Result<LinkThumbnail> = withContext(dispatcher) {
+) : LinkMetadataRepository {
+    override suspend fun get(link: String): Result<LinkMetadata> = withContext(dispatcher) {
         catching {
-            LinkThumbnail(
-                value = Jsoup.connect(link)
+            val tagNameToValues: Map<String, String> = buildMap {
+                Jsoup.connect(link)
                     .get()
                     .select("meta[property^=og:]")
-                    ?.find { element -> element.attr("property") == "og:image" }
-                    ?.attr("content")
-                    ?: ""
+                    .asSequence()
+                    .filter { element -> element.toProperty() in TAGS_REQUIRED }
+                    .forEach { element -> put(element.toProperty(), element.toContent()) }
+            }
+
+            LinkMetadata(
+                title = tagNameToValues.get(OG_TITLE) ?: "",
+                imageUrl = tagNameToValues.get(OG_IMAGE) ?: ""
             )
         }
+    }
+
+    companion object {
+        private val TAGS_REQUIRED: Set<String> = setOf(OG_TITLE, OG_IMAGE)
     }
 }

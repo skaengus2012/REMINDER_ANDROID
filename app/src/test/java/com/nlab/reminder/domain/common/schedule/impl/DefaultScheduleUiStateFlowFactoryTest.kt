@@ -16,9 +16,9 @@
 
 package com.nlab.reminder.domain.common.schedule.impl
 
-import com.nlab.reminder.core.util.link.LinkThumbnail
-import com.nlab.reminder.core.util.link.LinkThumbnailRepository
-import com.nlab.reminder.core.util.link.genLinkThumbnail
+import com.nlab.reminder.domain.common.util.link.LinkMetadata
+import com.nlab.reminder.domain.common.util.link.LinkMetadataRepository
+import com.nlab.reminder.domain.common.util.link.genLinkMetadata
 import com.nlab.reminder.domain.common.schedule.*
 import com.nlab.reminder.core.kotlin.util.Result
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -44,20 +44,20 @@ class DefaultScheduleUiStateFlowFactoryTest {
 
     @Test
     fun `set link from linkThumbnailRepository`() = runTest {
-        val expectedLinkThumbnail: LinkThumbnail = genLinkThumbnail()
-        val linkThumbnailRepository: LinkThumbnailRepository = mock {
-            whenever(mock.get(any())) doReturn Result.Success(expectedLinkThumbnail)
+        val expectedLinkMetadata: LinkMetadata = genLinkMetadata()
+        val linkThumbnailRepository: LinkMetadataRepository = mock {
+            whenever(mock.get(any())) doReturn Result.Success(expectedLinkMetadata)
         }
         testTemplate(
             linkThumbnailRepository,
             decorateExpectedScheduleUiState = { scheduleUiState ->
-                scheduleUiState.copy(linkThumbnail = expectedLinkThumbnail)
+                scheduleUiState.copy(linkMetadata = expectedLinkMetadata)
             }
         )
     }
 
     private suspend fun testTemplate(
-        linkThumbnailRepository: LinkThumbnailRepository = mock(),
+        linkThumbnailRepository: LinkMetadataRepository = mock(),
         decorateExpectedScheduleUiState: (ScheduleUiState) -> ScheduleUiState = { it }
     ) {
         val completeMarkTestFixture = CompleteMarkCombineTestFixture()

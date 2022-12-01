@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.common.schedule.impl
+package com.nlab.reminder.domain.common.util.link
 
-import com.nlab.reminder.core.kotlin.util.getOrNull
-import com.nlab.reminder.domain.common.util.link.LinkMetadata
-import com.nlab.reminder.domain.common.util.link.LinkMetadataRepository
-import com.nlab.reminder.domain.common.schedule.Schedule
+import com.nlab.reminder.test.genBothify
 
 /**
  * @author thalys
  */
-suspend fun LinkMetadataRepository.findLinkMetadata(schedule: Schedule): LinkMetadata =
-    schedule.link?.let { get(it) }?.getOrNull() ?: LinkMetadata.Empty
+fun genLinkMetadata(
+    title: String = genBothify(),
+    image: String = genBothify()
+): LinkMetadata = LinkMetadata(title, image)

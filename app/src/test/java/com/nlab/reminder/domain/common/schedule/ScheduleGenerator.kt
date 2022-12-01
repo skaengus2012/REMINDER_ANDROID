@@ -16,7 +16,7 @@
 
 package com.nlab.reminder.domain.common.schedule
 
-import com.nlab.reminder.core.util.link.LinkThumbnail
+import com.nlab.reminder.domain.common.util.link.LinkMetadata
 import com.nlab.reminder.core.util.transaction.TransactionId
 import com.nlab.reminder.domain.common.tag.Tag
 import com.nlab.reminder.domain.common.tag.genTags
@@ -46,20 +46,20 @@ fun genSchedules(
 
 fun genScheduleUiState(
     schedule: Schedule = genSchedule(),
-    linkThumbnail: LinkThumbnail? = null,
+    linkMetadata: LinkMetadata = LinkMetadata.Empty,
     isCompleteMarked: Boolean? = null
 ): ScheduleUiState = ScheduleUiState(
     schedule,
-    linkThumbnail,
+    linkMetadata,
     isCompleteMarked = isCompleteMarked ?: schedule.isComplete
 )
 
 fun genScheduleUiStates(
     schedules: List<Schedule> = genSchedules(),
-    linkThumbnail: LinkThumbnail? = null,
+    linkMetadata: LinkMetadata = LinkMetadata.Empty,
     isCompleteMarked: Boolean? = null
 ): List<ScheduleUiState> = schedules.map { schedule ->
-    ScheduleUiState(schedule, linkThumbnail, isCompleteMarked = isCompleteMarked ?: schedule.isComplete)
+    ScheduleUiState(schedule, linkMetadata, isCompleteMarked = isCompleteMarked ?: schedule.isComplete)
 }
 
 fun genCompleteMark(

@@ -13,12 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.nlab.reminder.domain.common.util.link.infra
 
-package com.nlab.reminder.core.util.link
-
-import com.nlab.reminder.test.genBothify
+import org.jsoup.nodes.Element
 
 /**
  * @author thalys
  */
-fun genLinkThumbnail(value: String = genBothify()): LinkThumbnail = LinkThumbnail(value)
+internal const val OG_TITLE = "og:title"
+internal const val OG_IMAGE = "og:image"
+
+internal fun Element.toProperty(): String = attr("property")
+internal fun Element.toContent(): String = attr("content")

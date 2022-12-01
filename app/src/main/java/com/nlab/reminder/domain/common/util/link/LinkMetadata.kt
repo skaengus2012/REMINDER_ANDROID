@@ -14,13 +14,19 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.util.link
+package com.nlab.reminder.domain.common.util.link
 
-import com.nlab.reminder.core.kotlin.util.Result
+import com.nlab.reminder.core.util.test.annotation.Generated
 
 /**
  * @author thalys
  */
-interface LinkThumbnailRepository {
-    suspend fun get(link: String): Result<LinkThumbnail>
+@Generated
+data class LinkMetadata(val title: String, val imageUrl: String) {
+    companion object {
+        val Empty: LinkMetadata = LinkMetadata(
+            title = "",
+            imageUrl = ""
+        )
+    }
 }
