@@ -28,6 +28,7 @@
     <string name="common_tag_empty">스케줄에 지정된 태그가 없습니다.</string>
     <string name="completed_schedule_shown">완료된 항목 보기</string>
     <string name="completed_schedule_hidden">완료된 항목 가리기</string>
+    <string name="open_link">링크 열기</string>
 
     <!-- home -->
     <string name="home_category_header">나의 할일</string>

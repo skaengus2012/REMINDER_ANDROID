@@ -14,22 +14,13 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.common.util.link
+package com.nlab.reminder.internal.common.infra.glide
 
-import com.nlab.reminder.core.util.test.annotation.Generated
+import com.bumptech.glide.annotation.GlideModule
+import com.bumptech.glide.module.AppGlideModule
 
 /**
  * @author thalys
  */
-@Generated
-data class LinkMetadata(val title: String, val imageUrl: String) {
-    val isTitleVisible: Boolean get() = title.isBlank().not()
-    val isImageVisible: Boolean get() = imageUrl.isBlank().not()
-
-    companion object {
-        val Empty: LinkMetadata = LinkMetadata(
-            title = "",
-            imageUrl = ""
-        )
-    }
-}
+@GlideModule
+class ReminderGlideModule : AppGlideModule()

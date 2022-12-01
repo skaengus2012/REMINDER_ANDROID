@@ -73,7 +73,10 @@ class AllScheduleFragment : Fragment() {
                     isComplete = scheduleUiState.isCompleteMarked.not()
                 )
             },
-            onDeleteClicked = { scheduleUiState -> viewModel.onDeleteScheduleClicked(scheduleUiState.id) }
+            onDeleteClicked = { scheduleUiState -> viewModel.onDeleteScheduleClicked(scheduleUiState.id) },
+            onLinkClicked = {
+                // TODO implements link.
+            }
         )
         val itemTouchCallback = ScheduleItemTouchCallback(
             context = requireContext(),

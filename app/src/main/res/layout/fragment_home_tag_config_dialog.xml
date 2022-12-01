@@ -30,7 +30,7 @@
 			android:id="@+id/tag_textview"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:textColor="@color/default_text_color"
+			android:textColor="?attr/font_color_1"
 			app:layout_constraintEnd_toEndOf="parent"
 			app:layout_constraintStart_toStartOf="parent"
 			app:layout_constraintTop_toTopOf="parent"
@@ -42,7 +42,7 @@
 			android:layout_height="50dp"
 			android:text="@string/home_tag_config_label_rename"
 			android:textAllCaps="false"
-			android:textColor="@color/default_text_color"
+			android:textColor="?attr/font_color_1"
 			app:layout_constraintBottom_toTopOf="@id/delete_button"
 			app:layout_constraintTop_toBottomOf="@id/tag_textview" />
 
@@ -52,7 +52,7 @@
 			android:layout_height="50dp"
 			android:text="@string/home_tag_config_label_delete"
 			android:textAllCaps="false"
-			android:textColor="@color/default_text_color"
+			android:textColor="?attr/font_color_1"
 			app:layout_constraintBottom_toBottomOf="parent"
 			app:layout_constraintTop_toBottomOf="@id/rename_button" />
 

@@ -36,4 +36,5 @@ data class ScheduleUiState(
     val tags: List<Tag> get() = schedule.tags
     val visiblePriority: Long get() = schedule.visiblePriority
     val isComplete: Boolean get() = schedule.isComplete
+    val isLinkCardVisible: Boolean get() = link.isBlank().not()
 }

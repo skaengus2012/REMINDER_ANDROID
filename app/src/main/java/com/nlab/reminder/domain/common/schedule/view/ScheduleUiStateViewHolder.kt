@@ -16,10 +16,17 @@
 
 package com.nlab.reminder.domain.common.schedule.view
 
+import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.graphics.drawable.DrawableCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.nlab.reminder.R
+import com.nlab.reminder.core.android.content.getThemeColor
 import com.nlab.reminder.core.android.recyclerview.bindingAdapterOptionalPosition
 import com.nlab.reminder.core.android.view.initWithLifecycleOwner
 import com.nlab.reminder.core.android.view.throttleClicks
@@ -34,8 +41,15 @@ import kotlinx.coroutines.flow.onEach
 class ScheduleUiStateViewHolder(
     private val binding: ViewItemScheduleBinding,
     onCompleteClicked: (Int) -> Unit,
-    onDeleteClicked: (Int) -> Unit
+    onDeleteClicked: (Int) -> Unit,
+    onLinkClicked: (Int) -> Unit
 ) : RecyclerView.ViewHolder(binding.root) {
+    private val linkThumbnailPlaceHolderDrawable: Drawable? = with(itemView) {
+        AppCompatResources.getDrawable(context, R.drawable.ic_schedule_link_error)
+            ?.let(DrawableCompat::wrap)
+            ?.apply { DrawableCompat.setTint(mutate(), context.getThemeColor(R.attr.tint_schedule_placeholder)) }
+    }
+
     init {
         binding.initWithLifecycleOwner { lifecycleOwner ->
             buttonComplete
@@ -47,6 +61,11 @@ class ScheduleUiStateViewHolder(
                 .throttleClicks()
                 .onEach { onDeleteClicked(bindingAdapterOptionalPosition ?: return@onEach) }
                 .launchIn(lifecycleOwner.lifecycleScope)
+
+            cardLink
+                .throttleClicks()
+                .onEach { onLinkClicked(bindingAdapterOptionalPosition ?: return@onEach) }
+                .launchIn(lifecycleOwner.lifecycleScope)
         }
     }
 
@@ -54,6 +73,20 @@ class ScheduleUiStateViewHolder(
         binding.textviewTitle.text = scheduleUiState.title
         binding.textviewNote.text = scheduleUiState.note
         binding.buttonComplete.isSelected = scheduleUiState.isCompleteMarked
+        binding.cardLink.visibility = if (scheduleUiState.isLinkCardVisible) View.VISIBLE else View.GONE
+        binding.textviewLink.text = scheduleUiState.link
+        binding.textviewTitleLink
+            .apply { visibility = if (scheduleUiState.linkMetadata.isTitleVisible) View.VISIBLE else View.GONE }
+            .apply { text = scheduleUiState.linkMetadata.title }
+        binding.imageviewBgLinkThumbnail
+            .apply { visibility = if (scheduleUiState.linkMetadata.isImageVisible) View.VISIBLE else View.GONE }
+            .apply {
+                Glide.with(context)
+                    .load(scheduleUiState.linkMetadata.imageUrl)
+                    .centerCrop()
+                    .placeholder(linkThumbnailPlaceHolderDrawable)
+                    .into(this)
+            }
     }
 
     companion object {
@@ -61,10 +94,12 @@ class ScheduleUiStateViewHolder(
             parent: ViewGroup,
             onCompleteClicked: (position: Int) -> Unit,
             onDeleteClicked: (position: Int) -> Unit,
+            onLinkClicked: (position: Int) -> Unit
         ): ScheduleUiStateViewHolder = ScheduleUiStateViewHolder(
             ViewItemScheduleBinding.inflate(LayoutInflater.from(parent.context), parent, false),
             onCompleteClicked,
-            onDeleteClicked
+            onDeleteClicked,
+            onLinkClicked
         )
     }
 }

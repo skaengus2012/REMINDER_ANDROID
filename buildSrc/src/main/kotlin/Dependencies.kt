@@ -34,6 +34,7 @@ object Dependencies {
     const val ANDROID_ROOM_COMPILER = "androidx.room:room-compiler:${DependenciesVersions.ANDROID_ROOM}"
     const val ANDROID_STARTUP_RUNTIME = "androidx.startup:startup-runtime:${DependenciesVersions.ANDROID_STARTUP}"
     const val ANDROID_DATASTORE_PREFERENCES = "androidx.datastore:datastore-preferences:${DependenciesVersions.ANDROID_DATASTORE_PREFERENCES}"
+    const val ANDROID_CARDVIEW = "androidx.cardview:cardview:${DependenciesVersions.ANDROID_CARDVIEW}"
 
     const val GOOGLE_HILT_ANDROID = "com.google.dagger:hilt-android:${DependenciesVersions.GOOGLE_HILT}"
     const val GOOGLE_HILT_ANDROID_COMPILER = "com.google.dagger:hilt-android-compiler:${DependenciesVersions.GOOGLE_HILT}"
