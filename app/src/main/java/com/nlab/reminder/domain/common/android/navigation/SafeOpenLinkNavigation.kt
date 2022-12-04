@@ -13,16 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nlab.reminder.domain.feature.schedule.all
 
-import com.nlab.reminder.core.effect.SideEffect
-import com.nlab.reminder.core.util.test.annotation.Generated
+package com.nlab.reminder.domain.common.android.navigation
+
+import androidx.annotation.StringRes
+import com.nlab.reminder.R
+import com.nlab.reminder.core.android.navigation.Navigation
+import com.nlab.reminder.core.android.navigation.NavigationController
 
 /**
  * @author thalys
  */
-sealed class AllScheduleSideEffect : SideEffect {
-    object ShowErrorPopup : AllScheduleSideEffect()
-    @Generated
-    data class NavigateScheduleLink(val link: String) : AllScheduleSideEffect()
+data class SafeOpenLinkNavigation(val link: String, @StringRes val errorMessageRes: Int) : Navigation
+fun NavigationController.openLinkSafety(
+    link: String,
+    @StringRes errorMessageRes: Int = R.string.open_link_default_error
+) {
+    navigateTo(SafeOpenLinkNavigation(link, errorMessageRes))
 }

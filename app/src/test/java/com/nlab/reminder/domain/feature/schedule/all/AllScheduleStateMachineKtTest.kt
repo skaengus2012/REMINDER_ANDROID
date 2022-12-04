@@ -42,9 +42,7 @@ class AllScheduleStateMachineKtTest {
         val stateContainer =
             genAllScheduleStateMachine()
                 .asContainer(genStateContainerScope(), AllScheduleState.Init)
-        stateContainer
-            .send(AllScheduleEvent.Fetch)
-            .join()
+        stateContainer.send(AllScheduleEvent.Fetch)
         assertThat(stateContainer.stateFlow.value, equalTo(AllScheduleState.Loading))
     }
 
@@ -73,9 +71,7 @@ class AllScheduleStateMachineKtTest {
         val stateContainer =
             genAllScheduleStateMachine(getAllScheduleSnapshot = getAllScheduleReport)
                 .asContainer(genStateContainerScope(), AllScheduleState.Init)
-        stateContainer
-            .send(AllScheduleEvent.Fetch)
-            .join()
+        stateContainer.send(AllScheduleEvent.Fetch)
 
         val deferred = CompletableDeferred<AllScheduleSnapshot>()
         stateContainer
@@ -199,5 +195,28 @@ class AllScheduleStateMachineKtTest {
             .send(AllScheduleEvent.OnDeleteScheduleClicked(schedule.id))
             .join()
         verify(scheduleRepository, once()).delete(schedule.id)
+    }
+
+    @Test
+    fun `navigate schedule link when stateMachine sent scheduleLinkClicked event`() = runTest {
+        val link: String = genBothify()
+        val schedule: Schedule = genSchedule(link = link)
+        val sideEffectHandle: SideEffectHandle<AllScheduleSideEffect> = mock()
+        genAllScheduleStateMachine(sideEffectHandle = sideEffectHandle)
+            .asContainer(genStateContainerScope(), AllScheduleState.Loaded(genAllScheduleSnapshot()))
+            .send(AllScheduleEvent.OnScheduleLinkClicked(genScheduleUiState(schedule)))
+            .join()
+        verify(sideEffectHandle, once()).post(AllScheduleSideEffect.NavigateScheduleLink(link))
+    }
+
+    @Test
+    fun `nothing work when stateMachine sent scheduleLinkClicked event and schedule link was empty`() = runTest {
+        val schedule: Schedule = genSchedule(link = "")
+        val sideEffectHandle: SideEffectHandle<AllScheduleSideEffect> = mock()
+        genAllScheduleStateMachine(sideEffectHandle = sideEffectHandle)
+            .asContainer(genStateContainerScope(), AllScheduleState.Loaded(genAllScheduleSnapshot()))
+            .send(AllScheduleEvent.OnScheduleLinkClicked(genScheduleUiState(schedule)))
+            .join()
+        verify(sideEffectHandle, never()).post(any())
     }
 }

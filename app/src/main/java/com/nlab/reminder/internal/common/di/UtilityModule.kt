@@ -16,6 +16,8 @@
 
 package com.nlab.reminder.internal.common.di
 
+import android.app.Application
+import com.nlab.reminder.core.android.widget.ToastHandle
 import com.nlab.reminder.domain.common.util.transaction.TransactionIdGenerator
 import com.nlab.reminder.domain.common.util.transaction.impl.DefaultTransactionIdGenerator
 import dagger.Module
@@ -24,6 +26,7 @@ import dagger.Reusable
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import java.util.*
+import javax.inject.Singleton
 
 /**
  * @author Doohyun
@@ -37,4 +40,8 @@ class UtilityModule {
         randomPrefix = { UUID.randomUUID().toString() },
         timestamp = { Calendar.getInstance().timeInMillis }
     )
+
+    @Singleton
+    @Provides
+    fun provideToastHandle(application: Application): ToastHandle = ToastHandle(application)
 }

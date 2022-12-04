@@ -28,4 +28,3 @@ inline fun <reified N : Navigation> NavigationTableBuilder<NavController>.condit
 ) {
     condition(N::class.java, handle)
 }
-

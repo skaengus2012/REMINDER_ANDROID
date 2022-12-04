@@ -46,7 +46,8 @@ fun AllScheduleStateMachine(
     handle {
         event<AllScheduleEvent.Fetch> {
             state<AllScheduleState.Init> {
-                getAllScheduleSnapshot().collect { send(AllScheduleEvent.OnAllScheduleSnapshotLoaded(it)) }
+                getAllScheduleSnapshot()
+                    .collectWhileSubscribed { send(AllScheduleEvent.OnAllScheduleSnapshotLoaded(it)) }
             }
         }
 
@@ -84,6 +85,13 @@ fun AllScheduleStateMachine(
             }
 
             event<AllScheduleEvent.OnDeleteScheduleClicked> { (event) -> scheduleRepository.delete(event.scheduleId) }
+
+            event<AllScheduleEvent.OnScheduleLinkClicked> { (event) ->
+                val link = event.scheduleUiState.link
+                if (link.isNotEmpty()) {
+                    sideEffectHandle.post(AllScheduleSideEffect.NavigateScheduleLink(link))
+                }
+            }
         }
     }
 }

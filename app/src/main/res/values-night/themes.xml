@@ -23,6 +23,7 @@
         <item name="bg_color_tag">@color/bg_tag_dark</item>
         <item name="bg_color_ripple_1">@color/bg_ripple_1_dark</item>
         <item name="bg_color_line_1">@color/bg_line_1_dark</item>
+        <item name="bg_color_stroke_1">@color/bg_stroke_1_dark</item>
         <item name="font_color_1">@color/font_1_dark</item>
         <item name="font_color_2">@color/font_2_dark</item>
         <item name="font_color_tag">@color/font_tag_dark</item>

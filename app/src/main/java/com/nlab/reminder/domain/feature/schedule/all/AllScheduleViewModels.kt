@@ -35,3 +35,6 @@ fun AllScheduleViewModel.onDragScheduleEnded(draggedSnapshot: List<ScheduleUiSta
 
 fun AllScheduleViewModel.onDeleteScheduleClicked(scheduleId: ScheduleId) =
     send(AllScheduleEvent.OnDeleteScheduleClicked(scheduleId))
+
+fun AllScheduleViewModel.onScheduleLinkClicked(scheduleUiState: ScheduleUiState) =
+    send(AllScheduleEvent.OnScheduleLinkClicked(scheduleUiState))

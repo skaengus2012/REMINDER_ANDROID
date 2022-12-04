@@ -13,16 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nlab.reminder.domain.feature.schedule.all
 
-import com.nlab.reminder.core.effect.SideEffect
-import com.nlab.reminder.core.util.test.annotation.Generated
+package com.nlab.reminder.core.android.navigation.activity
+
+import androidx.fragment.app.FragmentActivity
+import com.nlab.reminder.core.android.navigation.Navigation
+import com.nlab.reminder.core.android.navigation.util.*
 
 /**
- * @author thalys
+ * @author Doohyun
  */
-sealed class AllScheduleSideEffect : SideEffect {
-    object ShowErrorPopup : AllScheduleSideEffect()
-    @Generated
-    data class NavigateScheduleLink(val link: String) : AllScheduleSideEffect()
+inline fun <reified N : Navigation> NavigationTableBuilder<FragmentActivity>.condition(
+    noinline handle: (NavigationTableBuildScope).(NavigationSource<FragmentActivity, N>) -> Unit
+) {
+    condition(N::class.java, handle)
 }

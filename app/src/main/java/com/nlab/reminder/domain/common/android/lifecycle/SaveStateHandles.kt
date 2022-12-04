@@ -23,5 +23,4 @@ import com.nlab.reminder.domain.common.tag.Tag
  * @see <a href="./nav_main.xml">argument defined</a>
  * @author Doohyun
  */
-val SavedStateHandle.requestKey: String get() = checkNotNull(get<String>("requestKey"))
 val SavedStateHandle.tag: Tag get() = checkNotNull(get<Tag>("tag"))

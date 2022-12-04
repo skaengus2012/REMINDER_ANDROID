@@ -16,16 +16,23 @@
 
 package com.nlab.reminder.internal.common.di
 
+import android.content.Intent
+import android.net.Uri
+import androidx.fragment.app.FragmentActivity
 import androidx.navigation.NavController
 import com.nlab.reminder.R
+import com.nlab.reminder.core.android.navigation.activity.condition
 import com.nlab.reminder.core.android.navigation.navcontroller.condition
 import com.nlab.reminder.core.android.navigation.util.NavigationTable
+import com.nlab.reminder.core.android.widget.ToastHandle
 import com.nlab.reminder.domain.common.android.navigation.AllScheduleEndNavigation
+import com.nlab.reminder.domain.common.android.navigation.SafeOpenLinkNavigation
 import dagger.Module
 import dagger.Provides
 import dagger.Reusable
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import timber.log.Timber
 
 /**
  * @author Doohyun
@@ -36,8 +43,23 @@ class NavigationModule {
     @Reusable
     @Provides
     fun provideNavControllerTable(): NavigationTable<NavController> = NavigationTable {
-        condition<AllScheduleEndNavigation> { (handler: NavController) ->
-            handler.navigate(R.id.action_global_allScheduleFragment)
+        condition<AllScheduleEndNavigation> { (navController) ->
+            navController.navigate(R.id.action_global_allScheduleFragment)
+        }
+    }
+
+    @Reusable
+    @Provides
+    fun provide(
+        toastHandle: ToastHandle
+    ): NavigationTable<FragmentActivity> = NavigationTable {
+        condition<SafeOpenLinkNavigation> { (activity, navigation) ->
+            try {
+                activity.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(navigation.link)))
+            } catch (e: Throwable) {
+                Timber.e(e)
+                toastHandle.showToast(navigation.errorMessageRes)
+            }
         }
     }
 }

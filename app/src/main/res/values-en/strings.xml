@@ -22,6 +22,7 @@
     <string name="completed_schedule_shown">Show completed</string>
     <string name="completed_schedule_hidden">Hide completed</string>
     <string name="open_link">Open link</string>
+    <string name="open_link_default_error">This link is not executable.</string>
 
     <!-- home -->
     <string name="home_category_header">My Todo</string>

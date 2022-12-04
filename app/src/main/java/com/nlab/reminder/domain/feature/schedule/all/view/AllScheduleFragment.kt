@@ -30,12 +30,14 @@ import com.nlab.reminder.R
 import com.nlab.reminder.core.android.fragment.viewLifecycle
 import com.nlab.reminder.core.android.fragment.viewLifecycleScope
 import com.nlab.reminder.core.android.lifecycle.event
+import com.nlab.reminder.core.android.navigation.NavigationController
 import com.nlab.reminder.core.android.recyclerview.DragSnapshot
 import com.nlab.reminder.core.android.recyclerview.scrollState
 import com.nlab.reminder.core.android.recyclerview.suspendSubmitList
 import com.nlab.reminder.core.android.view.throttleClicks
 import com.nlab.reminder.core.kotlin.coroutine.flow.withBefore
 import com.nlab.reminder.databinding.FragmentAllScheduleBinding
+import com.nlab.reminder.domain.common.android.navigation.openLinkSafety
 import com.nlab.reminder.domain.common.android.view.loadingFlow
 import com.nlab.reminder.domain.common.schedule.view.DefaultScheduleUiStateAdapter
 import com.nlab.reminder.domain.common.schedule.view.ScheduleItemAnimator
@@ -43,6 +45,7 @@ import com.nlab.reminder.domain.common.schedule.view.ScheduleItemTouchCallback
 import com.nlab.reminder.domain.feature.schedule.all.*
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.*
+import javax.inject.Inject
 
 /**
  * @author Doohyun
@@ -53,6 +56,9 @@ class AllScheduleFragment : Fragment() {
 
     private var _binding: FragmentAllScheduleBinding? = null
     private val binding: FragmentAllScheduleBinding get() = checkNotNull(_binding)
+
+    @Inject
+    lateinit var navigationController: NavigationController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -74,9 +80,7 @@ class AllScheduleFragment : Fragment() {
                 )
             },
             onDeleteClicked = { scheduleUiState -> viewModel.onDeleteScheduleClicked(scheduleUiState.id) },
-            onLinkClicked = {
-                // TODO implements link.
-            }
+            onLinkClicked = viewModel::onScheduleLinkClicked
         )
         val itemTouchCallback = ScheduleItemTouchCallback(
             context = requireContext(),
@@ -153,6 +157,19 @@ class AllScheduleFragment : Fragment() {
                 scheduleAdapter.adjustRecentSwapPositions()
             }
             .launchIn(viewLifecycleScope)
+
+        viewModel.allScheduleSideEffectFlow
+            .onEach(this::handleSideEffect)
+            .launchIn(viewLifecycleScope)
+    }
+
+    private fun handleSideEffect(sideEffect: AllScheduleSideEffect) = when (sideEffect) {
+        is AllScheduleSideEffect.ShowErrorPopup -> {
+            // TODO implement error popup
+        }
+        is AllScheduleSideEffect.NavigateScheduleLink -> {
+            navigationController.openLinkSafety(sideEffect.link)
+        }
     }
 
     override fun onDestroyView() {
