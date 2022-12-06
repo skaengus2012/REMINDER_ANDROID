@@ -14,22 +14,22 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.common.schedule.view
+package com.nlab.reminder.core.android.view
 
-import android.content.Context
-import com.nlab.reminder.R
-import com.nlab.reminder.core.android.content.getDimension
+import android.view.MotionEvent
+import android.view.View
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 
 /**
  * @author thalys
  */
-fun ScheduleItemTouchCallback(
-    context: Context,
-    onItemMoved: (fromPosition: Int, toPosition: Int) -> Boolean,
-    onItemMoveEnded: () -> Unit
-): ScheduleItemTouchCallback = ScheduleItemTouchCallback(
-    clampWidth = context.getDimension(R.dimen.schedule_clamp_width),
-    draggedWhenLinkImageVisibleHeight = context.getDimension(R.dimen.schedule_dragged_when_link_thumbnail_height),
-    onItemMoved = onItemMoved,
-    onItemMoveEnded = onItemMoveEnded
-)
+fun View.touchs(): Flow<MotionEvent> = callbackFlow {
+    setOnTouchListener { v, event ->
+        trySend(event)
+        v.performClick()
+    }
+
+    awaitClose { setOnTouchListener(null) }
+}

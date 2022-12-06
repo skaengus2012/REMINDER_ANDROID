@@ -17,4 +17,6 @@
 <resources>
     <item name="tag_schedule_item_touch_callback_swipe_is_clamp" type="id" />
     <item name="tag_schedule_item_touch_callback_swipe_clear_clamp_anim" type="id" />
+    <item name="tag_schedule_item_touch_callback_scale_id" type="id" />
+    <item name="tag_schedule_item_touch_callback_scale_clear_anim" type="id" />
 </resources>

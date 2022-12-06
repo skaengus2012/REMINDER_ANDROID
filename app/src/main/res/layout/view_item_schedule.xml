@@ -96,7 +96,7 @@
             android:id="@+id/card_link"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
+            android:layout_marginTop="7.5dp"
             android:background="?attr/bg_color_card_2"
             android:contentDescription="@string/open_link"
             android:descendantFocusability="blocksDescendants"
@@ -105,8 +105,10 @@
             app:cardElevation="0dp"
             app:layout_constraintBottom_toTopOf="@id/view_line"
             app:layout_constraintEnd_toEndOf="@id/textEnd_guideline"
+            app:layout_constraintHorizontal_bias="0"
             app:layout_constraintStart_toStartOf="@id/textStart_guideline"
             app:layout_constraintTop_toBottomOf="@id/textview_note"
+            app:layout_constraintWidth_max="500dp"
             app:strokeColor="?attr/bg_color_stroke_1"
             app:strokeWidth="0.5dp"
             tools:visibility="visible">
@@ -128,7 +130,6 @@
                     app:layout_constraintHorizontal_bias="0"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintWidth_max="500dp"
                     tools:srcCompat="@drawable/ic_schedule_link_error"
                     tools:tint="?attr/tint_schedule_placeholder" />
 

@@ -80,12 +80,13 @@ class ScheduleUiStateViewHolder(
             .apply { text = scheduleUiState.linkMetadata.title }
         binding.imageviewBgLinkThumbnail
             .apply { visibility = if (scheduleUiState.linkMetadata.isImageVisible) View.VISIBLE else View.GONE }
-            .apply {
-                Glide.with(context)
+            .takeIf { it.visibility == View.VISIBLE }
+            ?.let { view ->
+                Glide.with(view.context)
                     .load(scheduleUiState.linkMetadata.imageUrl)
                     .centerCrop()
                     .placeholder(linkThumbnailPlaceHolderDrawable)
-                    .into(this)
+                    .into(view)
             }
     }
 

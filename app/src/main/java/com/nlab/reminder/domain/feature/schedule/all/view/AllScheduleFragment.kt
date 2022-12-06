@@ -35,6 +35,7 @@ import com.nlab.reminder.core.android.recyclerview.DragSnapshot
 import com.nlab.reminder.core.android.recyclerview.scrollState
 import com.nlab.reminder.core.android.recyclerview.suspendSubmitList
 import com.nlab.reminder.core.android.view.throttleClicks
+import com.nlab.reminder.core.android.view.touchs
 import com.nlab.reminder.core.kotlin.coroutine.flow.withBefore
 import com.nlab.reminder.databinding.FragmentAllScheduleBinding
 import com.nlab.reminder.domain.common.android.navigation.openLinkSafety
@@ -72,6 +73,7 @@ class AllScheduleFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         val scheduleAdapter = DefaultScheduleUiStateAdapter(
             onCompleteClicked = { scheduleUiState ->
                 viewModel.onModifyScheduleCompleteClicked(
@@ -98,6 +100,12 @@ class AllScheduleFragment : Fragment() {
             .apply { ItemTouchHelper(itemTouchCallback).attachToRecyclerView(this) }
             .apply { itemAnimator = scheduleItemAnimator }
             .apply { adapter = scheduleAdapter }
+
+        binding.recyclerviewContent.touchs()
+            .map { it.x }
+            .distinctUntilChanged()
+            .onEach { itemTouchCallback.setContainerX(it) }
+            .launchIn(viewLifecycleScope)
 
         viewLifecycle.event()
             .filter { event -> event == Lifecycle.Event.ON_DESTROY }

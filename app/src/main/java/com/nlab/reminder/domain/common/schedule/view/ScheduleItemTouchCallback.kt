@@ -38,7 +38,7 @@ import kotlin.math.min
  */
 class ScheduleItemTouchCallback(
     private val clampWidth: Float,
-    private val swipeAnimateDuration: Long,
+    private val draggedWhenLinkImageVisibleHeight: Float,
     private val onItemMoved: (fromPosition: Int, toPosition: Int) -> Boolean,
     private val onItemMoveEnded: () -> Unit
 ) : ItemTouchHelper.SimpleCallback(
@@ -47,8 +47,10 @@ class ScheduleItemTouchCallback(
 ) {
     private val disposeSwipeClearedAnimations: MutableSet<ViewPropertyAnimator> = HashSet()
 
+    private var disposeScaleAnimation: ViewPropertyAnimator? = null
     private var isItemViewSwipeEnabled: Boolean = true
     private var curDX: Float = 0f
+    private var curContainerX: Float = 0f
     private var curPosition: Int? = null
     private var prevPosition: Int? = null
 
@@ -96,8 +98,30 @@ class ScheduleItemTouchCallback(
         }
 
         if (actionState == ItemTouchHelper.ACTION_STATE_DRAG) {
-            binding.viewLine.visibility =
-                if (isCurrentlyActive) View.INVISIBLE else View.VISIBLE
+            with(binding) {
+                viewLine.visibility = if (isCurrentlyActive) View.INVISIBLE else View.VISIBLE
+
+                if (imageviewBgLinkThumbnail.visibility == View.VISIBLE) {
+                    root.translationX = if (isCurrentlyActive.not()) 0f else curContainerX - (root.width / 2f)
+
+                    val scaleP: Float =
+                        if (isCurrentlyActive.not()) 1f
+                        else (draggedWhenLinkImageVisibleHeight / root.height).coerceAtMost(1f)
+                    if (scaleP != root.requestedScale) {
+                        disposeScaleAnimation?.cancel()
+                        root.requestedScale = scaleP
+                        root.animate().scaleX(scaleP).scaleY(scaleP)
+                            .setDuration(SCALE_ANIMATE_DURATION)
+                            .setListener(animatorListenerOf(doOnCancel = {
+                                root.clearScaleAnim = null
+                                root.scaleX = 1f
+                                root.scaleY = 1f
+                            }))
+                            .also { disposeScaleAnimation = it }
+                            .start()
+                    }
+                }
+            }
         }
     }
 
@@ -139,7 +163,7 @@ class ScheduleItemTouchCallback(
         viewHolder.binding.swipeView.let { view ->
             view.animate()
                 .x(0f)
-                .setDuration(swipeAnimateDuration)
+                .setDuration(SWIPE_ANIMATE_DURATION)
                 .setListener(animatorListenerOf(doOnCancel = {
                     view.x = 0f
                     viewHolder.clearClampAnim = null
@@ -172,8 +196,11 @@ class ScheduleItemTouchCallback(
     fun clearResource() {
         disposeSwipeClearedAnimations.forEach { it.cancel() }
         disposeSwipeClearedAnimations.clear()
+        disposeScaleAnimation?.cancel()
+        disposeScaleAnimation = null
         prevPosition = null
         curPosition = null
+        curContainerX = 0f
         curDX = 0f
     }
 
@@ -181,7 +208,14 @@ class ScheduleItemTouchCallback(
         isItemViewSwipeEnabled = isEnable
     }
 
+    fun setContainerX(containerX: Float) {
+        curContainerX = containerX
+    }
+
     companion object {
+        private const val SWIPE_ANIMATE_DURATION: Long = 100L
+        private const val SCALE_ANIMATE_DURATION: Long = 100L
+
         private val ViewItemScheduleBinding.swipeView: View get() = layoutContent
         private val ViewHolder.binding: ViewItemScheduleBinding get() = ViewItemScheduleBinding.bind(itemView)
         private var ViewHolder.isClamped: Boolean
@@ -194,6 +228,16 @@ class ScheduleItemTouchCallback(
                 .getTag(R.id.tag_schedule_item_touch_callback_swipe_clear_clamp_anim) as? ViewPropertyAnimator
             set(value) {
                 itemView.setTag(R.id.tag_schedule_item_touch_callback_swipe_clear_clamp_anim, value)
+            }
+        private var View.requestedScale: Float?
+            get() = getTag(R.id.tag_schedule_item_touch_callback_scale_id) as? Float
+            set(value) {
+                setTag(R.id.tag_schedule_item_touch_callback_scale_id, value)
+            }
+        private var View.clearScaleAnim: ViewPropertyAnimator?
+            get() = getTag(R.id.tag_schedule_item_touch_callback_scale_clear_anim) as? ViewPropertyAnimator
+            set(value) {
+                setTag(R.id.tag_schedule_item_touch_callback_scale_clear_anim, value)
             }
     }
 }

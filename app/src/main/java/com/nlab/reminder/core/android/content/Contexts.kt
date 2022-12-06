@@ -21,6 +21,7 @@ import android.content.res.TypedArray
 import android.graphics.Color
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
+import androidx.annotation.DimenRes
 
 /**
  * @author thalys
@@ -39,4 +40,8 @@ fun Context.getThemeColor(@AttrRes attrRes: Int, @ColorInt defaultColor: Int = C
         intArrayOf(attrRes),
         transform = { typedArray, position -> typedArray.getColor(position, defaultColor) }
     )[0] as Int
+}
+
+fun Context.getDimension(@DimenRes id: Int): Float {
+    return resources.getDimension(id)
 }
