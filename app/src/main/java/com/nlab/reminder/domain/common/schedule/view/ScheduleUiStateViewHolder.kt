@@ -72,9 +72,16 @@ class ScheduleUiStateViewHolder(
     fun onBind(scheduleUiState: ScheduleUiState) {
         binding.textviewTitle.text = scheduleUiState.title
         binding.textviewNote.text = scheduleUiState.note
-        binding.buttonComplete.isSelected = scheduleUiState.isCompleteMarked
         binding.cardLink.visibility = if (scheduleUiState.isLinkCardVisible) View.VISIBLE else View.GONE
         binding.textviewLink.text = scheduleUiState.link
+        binding.buttonComplete
+            .apply { isSelected = scheduleUiState.isCompleteMarked }
+            .apply {
+                contentDescription = context.getString(
+                    if (scheduleUiState.isCompleteMarked) R.string.schedule_incomplete_checkbox_contentDescription
+                    else R.string.schedule_complete_checkbox_contentDescription
+                )
+            }
         binding.textviewTitleLink
             .apply { visibility = if (scheduleUiState.linkMetadata.isTitleVisible) View.VISIBLE else View.GONE }
             .apply { text = scheduleUiState.linkMetadata.title }

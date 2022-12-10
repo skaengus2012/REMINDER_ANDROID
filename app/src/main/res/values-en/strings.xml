@@ -25,6 +25,10 @@
     <string name="open_link_default_error">This link is not executable.</string>
     <string name="delete">Delete</string>
 
+    <!-- schedule -->
+    <string name="schedule_complete_checkbox_contentDescription">complete</string>
+    <string name="schedule_incomplete_checkbox_contentDescription">reschedule</string>
+
     <!-- home -->
     <string name="home_category_header">My Todo</string>
     <string name="home_category_today">Today</string>

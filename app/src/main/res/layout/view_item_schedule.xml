@@ -81,7 +81,6 @@
             android:layout_width="0dp"
             android:layout_height="42dp"
             android:background="@android:color/transparent"
-            android:contentDescription="@string/schedule_checkbox_contentDescription"
             android:paddingHorizontal="@dimen/default_side_padding"
             android:paddingVertical="10dp"
             android:scaleType="fitXY"
@@ -89,7 +88,8 @@
             app:layout_constraintEnd_toEndOf="@id/textStart_guideline"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:src="@drawable/checkbox_schedule_checked" />
+            tools:src="@drawable/checkbox_schedule_checked"
+            tools:ignore="ContentDescription" />
 
         <TextView
             android:id="@+id/textview_title"

@@ -32,6 +32,10 @@
     <string name="open_link_default_error">실행할 수 없는 링크입니다.</string>
     <string name="delete">삭제</string>
 
+    <!-- schedule -->
+    <string name="schedule_complete_checkbox_contentDescription">완료</string>
+    <string name="schedule_incomplete_checkbox_contentDescription">다시 스케줄</string>
+
     <!-- home -->
     <string name="home_category_header">나의 할일</string>
     <string name="home_category_today">오늘</string>
@@ -57,7 +61,4 @@
         <item quantity="one">#%1$s will be updated in %2$d reminder.</item>
         <item quantity="other">#%1$s will be updated in %2$d reminders.</item>
     </plurals>
-
-    <!-- schedule -->
-    <string name="schedule_checkbox_contentDescription">toggle schedule</string>
 </resources>
