@@ -30,6 +30,7 @@
     <string name="completed_schedule_hidden">완료된 항목 가리기</string>
     <string name="open_link">링크 열기</string>
     <string name="open_link_default_error">실행할 수 없는 링크입니다.</string>
+    <string name="delete">삭제</string>
 
     <!-- home -->
     <string name="home_category_header">나의 할일</string>

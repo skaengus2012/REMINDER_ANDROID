@@ -27,6 +27,33 @@
         android:layout_gravity="end"
         android:background="@color/bg_delete_clamp">
 
+        <ImageView
+            android:id="@+id/imageview_trash"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginBottom="1dp"
+            android:importantForAccessibility="no"
+            app:layout_constraintBottom_toTopOf="@id/textview_delete"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="packed"
+            app:srcCompat="@drawable/ic_trash"
+            app:tint="@color/white" />
+
+        <TextView
+            android:id="@+id/textview_delete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="1dp"
+            android:text="@string/delete"
+            android:textColor="@color/white"
+            android:textSize="11sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/imageview_trash" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
