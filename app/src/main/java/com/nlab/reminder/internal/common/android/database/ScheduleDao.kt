@@ -33,10 +33,10 @@ abstract class ScheduleDao {
 
     @Transaction
     @Query("SELECT * FROM schedule WHERE is_complete = :isComplete ORDER BY is_complete, visible_priority")
-    abstract fun findWithCompleteAsStream(isComplete: Boolean): Flow<List<ScheduleEntityWithTagEntities>>
+    abstract fun findByCompleteAsStream(isComplete: Boolean): Flow<List<ScheduleEntityWithTagEntities>>
 
     @Query("SELECT * FROM schedule WHERE schedule_id IN (:scheduleIds)")
-    abstract suspend fun findWithScheduleIds(scheduleIds: List<Long>): List<ScheduleEntity>
+    abstract suspend fun findByScheduleIds(scheduleIds: List<Long>): List<ScheduleEntity>
 
     @Query(
         """
@@ -69,7 +69,7 @@ abstract class ScheduleDao {
     @Transaction
     open suspend fun updateCompletes(requests: List<Pair<Long, Boolean>>) {
         val curIdToComplete: Map<Long, Boolean> =
-            findWithScheduleIds(scheduleIds = requests.map { (first) -> first }).associateBy(
+            findByScheduleIds(scheduleIds = requests.map { (first) -> first }).associateBy(
                 keySelector = { it.scheduleId },
                 valueTransform = { it.isComplete }
             )
@@ -104,4 +104,7 @@ abstract class ScheduleDao {
 
     @Query("DELETE FROM schedule WHERE schedule_id = :scheduleId")
     abstract suspend fun deleteByScheduleId(scheduleId: Long)
+
+    @Query("DELETE FROM schedule WHERE is_complete = :isComplete")
+    abstract suspend fun deleteByComplete(isComplete: Boolean)
 }

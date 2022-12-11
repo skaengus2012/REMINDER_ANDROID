@@ -186,7 +186,7 @@ class AllScheduleStateMachineKtTest {
     }
 
     @Test
-    fun `delete schedule when stateMachine sent deleteClicked event`() = runTest {
+    fun `delete specific schedule when stateMachine sent deleteClicked event`() = runTest {
         val schedule: Schedule = genSchedule()
         val scheduleRepository: ScheduleRepository = mock()
 
@@ -194,7 +194,7 @@ class AllScheduleStateMachineKtTest {
             .asContainer(genStateContainerScope(), AllScheduleState.Loaded(genAllScheduleSnapshot()))
             .send(AllScheduleEvent.OnDeleteScheduleClicked(schedule.id))
             .join()
-        verify(scheduleRepository, once()).delete(schedule.id)
+        verify(scheduleRepository, once()).delete(DeleteScheduleRequest.ByScheduleId(schedule.id))
     }
 
     @Test

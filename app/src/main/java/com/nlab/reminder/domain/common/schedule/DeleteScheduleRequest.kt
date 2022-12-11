@@ -16,15 +16,14 @@
 
 package com.nlab.reminder.domain.common.schedule
 
-import com.nlab.reminder.core.kotlin.util.Result
-import kotlinx.coroutines.flow.Flow
+import com.nlab.reminder.core.util.test.annotation.Generated
 
 /**
- * @author Doohyun
+ * @author thalys
  */
-interface ScheduleRepository {
-    fun get(request: GetScheduleRequest): Flow<List<Schedule>>
-    suspend fun updateCompletes(requests: List<ModifyCompleteRequest>): Result<Unit>
-    suspend fun updateVisiblePriorities(requests: List<ModifyVisiblePriorityRequest>): Result<Unit>
-    suspend fun delete(request: DeleteScheduleRequest): Result<Unit>
+sealed class DeleteScheduleRequest private constructor() {
+    @Generated
+    data class ByScheduleId(val scheduleId: ScheduleId) : DeleteScheduleRequest()
+    @Generated
+    data class ByComplete(val isComplete: Boolean) : DeleteScheduleRequest()
 }

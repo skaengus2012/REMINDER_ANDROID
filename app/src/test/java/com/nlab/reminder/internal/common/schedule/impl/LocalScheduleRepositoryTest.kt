@@ -40,17 +40,21 @@ class LocalScheduleRepositoryTest {
         val isComplete: Boolean = genBoolean()
 
         notifySchedulesWhenScheduleDaoSent2TimesData(
-            ScheduleRequest.Find,
-            setupMock = { scheduleDao, mockFlow -> whenever(scheduleDao.findAsStream()) doReturn mockFlow }
+            GetScheduleRequest.All,
+            setupMock = { scheduleDao, mockFlow ->
+                whenever(scheduleDao.findAsStream()) doReturn mockFlow
+            }
         )
         notifySchedulesWhenScheduleDaoSent2TimesData(
-            ScheduleRequest.FindWithComplete(isComplete),
-            setupMock = { scheduleDao, mockFlow -> whenever(scheduleDao.findWithCompleteAsStream(isComplete)) doReturn mockFlow }
+            GetScheduleRequest.ByComplete(isComplete),
+            setupMock = { scheduleDao, mockFlow ->
+                whenever(scheduleDao.findByCompleteAsStream(isComplete)) doReturn mockFlow
+            }
         )
     }
 
     private fun notifySchedulesWhenScheduleDaoSent2TimesData(
-        scheduleItemRequest: ScheduleRequest,
+        scheduleItemRequest: GetScheduleRequest,
         setupMock: (ScheduleDao, Flow<List<ScheduleEntityWithTagEntities>>) -> Unit
     ) = runTest {
         val executeDispatcher = genFlowExecutionDispatcher(testScheduler)
@@ -124,12 +128,20 @@ class LocalScheduleRepositoryTest {
     }
 
     @Test
-    fun `result for delete was success`() = runTest {
+    fun `result for delete by specific scheduleId was success`() = runTest {
         val schedule: Schedule = genSchedule()
-        val scheduleDao: ScheduleDao = mock()
-        val result = LocalScheduleRepository(scheduleDao).delete(schedule.id)
+        testDeleteTemplate(DeleteScheduleRequest.ByScheduleId(schedule.id)) { scheduleDao ->
+            scheduleDao.deleteByScheduleId(schedule.id.value)
+        }
+    }
 
-        verify(scheduleDao, once()).deleteByScheduleId(schedule.id.value)
+    private suspend fun testDeleteTemplate(
+        deleteRequest: DeleteScheduleRequest,
+        verifyDao: suspend (ScheduleDao) -> Unit
+    ) {
+        val scheduleDao: ScheduleDao = mock()
+        val result = LocalScheduleRepository(scheduleDao).delete(deleteRequest)
+        verifyDao(scheduleDao)
         assertThat(result.isSuccess, equalTo(true))
     }
 }

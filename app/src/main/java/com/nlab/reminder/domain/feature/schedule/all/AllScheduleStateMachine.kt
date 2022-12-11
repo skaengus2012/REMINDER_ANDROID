@@ -84,7 +84,9 @@ fun AllScheduleStateMachine(
                 scheduleRepository.updateVisiblePriorities(requests)
             }
 
-            event<AllScheduleEvent.OnDeleteScheduleClicked> { (event) -> scheduleRepository.delete(event.scheduleId) }
+            event<AllScheduleEvent.OnDeleteScheduleClicked> { (event) ->
+                scheduleRepository.delete(DeleteScheduleRequest.ByScheduleId(event.scheduleId))
+            }
 
             event<AllScheduleEvent.OnScheduleLinkClicked> { (event) ->
                 val link = event.scheduleUiState.link

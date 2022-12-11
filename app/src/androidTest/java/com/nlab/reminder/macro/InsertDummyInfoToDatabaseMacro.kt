@@ -108,8 +108,8 @@ class InsertDummyInfoToDatabaseMacro {
     }
 
     private suspend fun resetScheduleEntities() {
-        scheduleDao.findWithCompleteAsStream(isComplete = true).first().forEach { scheduleDao.delete(it.scheduleEntity) }
-        scheduleDao.findWithCompleteAsStream(isComplete = false).first().forEach { scheduleDao.delete(it.scheduleEntity) }
+        scheduleDao.findByCompleteAsStream(isComplete = true).first().forEach { scheduleDao.delete(it.scheduleEntity) }
+        scheduleDao.findByCompleteAsStream(isComplete = false).first().forEach { scheduleDao.delete(it.scheduleEntity) }
 
         inputScheduleEntities.shuffled().forEachIndexed { index, scheduleEntity ->
             scheduleDao.insert(
@@ -123,7 +123,7 @@ class InsertDummyInfoToDatabaseMacro {
 
     private suspend fun resetScheduleTagList() {
         val tagEntities = tagDao.find().first()
-        scheduleDao.findWithCompleteAsStream(isComplete = false)
+        scheduleDao.findByCompleteAsStream(isComplete = false)
             .first()
             .map { it.scheduleEntity }
             .map { scheduleEntity ->

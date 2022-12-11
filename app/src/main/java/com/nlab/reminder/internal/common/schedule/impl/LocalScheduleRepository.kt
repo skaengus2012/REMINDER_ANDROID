@@ -31,10 +31,10 @@ import kotlinx.coroutines.flow.*
 class LocalScheduleRepository(
     private val scheduleDao: ScheduleDao,
 ) : ScheduleRepository {
-    override fun get(request: ScheduleRequest): Flow<List<Schedule>> {
+    override fun get(request: GetScheduleRequest): Flow<List<Schedule>> {
         val resultFlow: Flow<List<ScheduleEntityWithTagEntities>> = when (request) {
-            is ScheduleRequest.Find -> scheduleDao.findAsStream()
-            is ScheduleRequest.FindWithComplete -> scheduleDao.findWithCompleteAsStream(request.isComplete)
+            is GetScheduleRequest.All -> scheduleDao.findAsStream()
+            is GetScheduleRequest.ByComplete -> scheduleDao.findByCompleteAsStream(request.isComplete)
         }
 
         return resultFlow.map { entities -> entities.map(ScheduleEntityWithTagEntities::toSchedule) }
@@ -54,6 +54,10 @@ class LocalScheduleRepository(
             )
         }
 
-    override suspend fun delete(scheduleId: ScheduleId): Result<Unit> =
-        catching { scheduleDao.deleteByScheduleId(scheduleId.value) }
+    override suspend fun delete(request: DeleteScheduleRequest): Result<Unit> = catching {
+        when (request) {
+            is DeleteScheduleRequest.ByScheduleId -> scheduleDao.deleteByScheduleId(request.scheduleId.value)
+            else -> TODO()
+        }
+    }
 }
