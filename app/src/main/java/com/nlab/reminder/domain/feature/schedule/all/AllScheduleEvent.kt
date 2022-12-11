@@ -26,6 +26,7 @@ import com.nlab.reminder.domain.common.schedule.ScheduleUiState
 sealed class AllScheduleEvent private constructor() : Event {
     object Fetch : AllScheduleEvent()
     object OnToggleCompletedScheduleShownClicked : AllScheduleEvent()
+    object OnDeleteCompletedScheduleClicked : AllScheduleEvent()
     data class OnAllScheduleSnapshotLoaded(val allSchedulesReport: AllScheduleSnapshot) : AllScheduleEvent()
     data class OnModifyScheduleCompleteClicked(val scheduleId: ScheduleId, val isComplete: Boolean) : AllScheduleEvent()
     data class OnDragScheduleEnded(val draggedSnapshot: List<ScheduleUiState>) : AllScheduleEvent()
