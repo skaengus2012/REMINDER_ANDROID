@@ -18,6 +18,7 @@ package com.nlab.reminder.domain.feature.schedule.all.impl
 
 import com.nlab.reminder.core.kotlin.coroutine.flow.map
 import com.nlab.reminder.domain.common.schedule.*
+import com.nlab.reminder.domain.common.schedule.visibleconfig.CompletedScheduleShownRepository
 import com.nlab.reminder.domain.feature.schedule.all.AllScheduleSnapshot
 import com.nlab.reminder.domain.feature.schedule.all.GetAllScheduleSnapshotUseCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi

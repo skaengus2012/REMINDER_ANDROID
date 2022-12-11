@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.internal.common.schedule.impl
+package com.nlab.reminder.internal.common.schedule.visibleconfig.impl
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.MutablePreferences
@@ -36,6 +36,7 @@ import org.mockito.kotlin.*
 import com.nlab.reminder.core.kotlin.util.Result
 import com.nlab.reminder.core.kotlin.util.isFailure
 import com.nlab.reminder.core.kotlin.util.isSuccess
+import com.nlab.reminder.internal.common.schedule.visibleconfig.impl.LocalCompletedScheduleShownRepository
 
 /**
  * @author thalys

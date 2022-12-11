@@ -22,6 +22,7 @@ import com.nlab.reminder.core.kotlin.collection.maxOf
 import com.nlab.reminder.core.kotlin.util.onFailure
 import com.nlab.reminder.core.state.StateMachine
 import com.nlab.reminder.domain.common.schedule.*
+import com.nlab.reminder.domain.common.schedule.visibleconfig.*
 
 /**
  * @author Doohyun

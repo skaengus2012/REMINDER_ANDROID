@@ -20,6 +20,7 @@ import com.nlab.reminder.core.effect.SideEffectHandle
 import com.nlab.reminder.core.state.StateContainer
 import com.nlab.reminder.core.state.asContainer
 import com.nlab.reminder.domain.common.schedule.*
+import com.nlab.reminder.domain.common.schedule.visibleconfig.CompletedScheduleShownRepository
 import com.nlab.reminder.domain.common.schedule.impl.*
 import com.nlab.reminder.domain.feature.schedule.all.*
 import com.nlab.reminder.domain.feature.schedule.all.impl.*

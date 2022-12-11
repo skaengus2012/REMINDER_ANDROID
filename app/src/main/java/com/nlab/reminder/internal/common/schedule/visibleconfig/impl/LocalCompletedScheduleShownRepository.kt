@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.internal.common.schedule.impl
+package com.nlab.reminder.internal.common.schedule.visibleconfig.impl
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import com.nlab.reminder.core.kotlin.coroutine.flow.map
 import com.nlab.reminder.core.kotlin.util.Result
-import com.nlab.reminder.domain.common.schedule.CompletedScheduleShownRepository
+import com.nlab.reminder.domain.common.schedule.visibleconfig.CompletedScheduleShownRepository
 import com.nlab.reminder.internal.common.android.datastore.EditDataStore
 import kotlinx.coroutines.flow.Flow
 

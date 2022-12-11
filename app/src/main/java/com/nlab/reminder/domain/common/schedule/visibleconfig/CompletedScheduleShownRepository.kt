@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.common.schedule
+package com.nlab.reminder.domain.common.schedule.visibleconfig
 
 import kotlinx.coroutines.flow.Flow
 import com.nlab.reminder.core.kotlin.util.Result
