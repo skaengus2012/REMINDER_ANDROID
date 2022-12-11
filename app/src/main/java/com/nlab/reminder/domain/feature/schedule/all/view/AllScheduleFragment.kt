@@ -117,6 +117,11 @@ class AllScheduleFragment : Fragment() {
             .onEach { viewModel.onToggleCompletedScheduleShownClicked() }
             .launchIn(viewLifecycleScope)
 
+        binding.buttonDeleteAllIfCompleted
+            .throttleClicks()
+            .onEach { viewModel.onDeleteCompletedScheduleClicked() }
+            .launchIn(viewLifecycleScope)
+
         viewModel.stateFlow
             .filterIsInstance<AllScheduleState.Loaded>()
             .map { it.snapshot }
@@ -125,8 +130,8 @@ class AllScheduleFragment : Fragment() {
             .flowWithLifecycle(viewLifecycle)
             .onEach { isDoneScheduleShown ->
                 binding.buttonCompletedScheduleShownToggle.setText(
-                    if (isDoneScheduleShown) R.string.completed_schedule_hidden
-                    else R.string.completed_schedule_shown
+                    if (isDoneScheduleShown) R.string.schedule_completed_hidden
+                    else R.string.schedule_completed_shown
                 )
             }
             .launchIn(viewLifecycleScope)

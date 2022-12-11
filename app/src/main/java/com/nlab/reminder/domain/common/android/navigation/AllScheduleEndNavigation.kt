@@ -13,13 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@file:Generated
-
 package com.nlab.reminder.domain.common.android.navigation
 
 import com.nlab.reminder.core.android.navigation.Navigation
 import com.nlab.reminder.core.android.navigation.NavigationController
-import com.nlab.reminder.core.util.test.annotation.Generated
 
 /**
  * @author Doohyun

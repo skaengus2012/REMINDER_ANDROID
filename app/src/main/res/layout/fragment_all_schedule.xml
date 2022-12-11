@@ -24,19 +24,21 @@
     <Button
         android:id="@+id/button_completed_schedule_shown_toggle"
         android:layout_width="wrap_content"
-        android:layout_height="0dp"
+        android:layout_height="@dimen/default_toolbar_height"
         android:textColor="@color/white"
-        app:layout_constraintBottom_toBottomOf="@id/toolbar_guideline"
+        app:layout_constraintBottom_toTopOf="@id/button_delete_all_if_completed"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/toolbar_guideline"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:orientation="horizontal"
+    <Button
+        android:id="@+id/button_delete_all_if_completed"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/default_toolbar_height"
+        android:text="@string/schedule_erase_all_if_completed"
+        android:textColor="@color/white"
         app:layout_constraintBottom_toTopOf="@id/recyclerview_content"
-        app:layout_constraintGuide_begin="@dimen/default_toolbar_height" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/button_completed_schedule_shown_toggle" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerview_content"
@@ -46,6 +48,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/toolbar_guideline" />
+        app:layout_constraintTop_toBottomOf="@id/button_delete_all_if_completed" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -26,8 +26,6 @@
     <string name="cancel">취소</string>
     <string name="ok">확인</string>
     <string name="common_tag_empty">스케줄에 지정된 태그가 없습니다.</string>
-    <string name="completed_schedule_shown">완료된 항목 보기</string>
-    <string name="completed_schedule_hidden">완료된 항목 가리기</string>
     <string name="open_link">링크 열기</string>
     <string name="open_link_default_error">실행할 수 없는 링크입니다.</string>
     <string name="delete">삭제</string>
@@ -35,6 +33,9 @@
     <!-- schedule -->
     <string name="schedule_complete_checkbox_contentDescription">완료</string>
     <string name="schedule_incomplete_checkbox_contentDescription">다시 스케줄</string>
+    <string name="schedule_completed_shown">완료된 항목 보기</string>
+    <string name="schedule_completed_hidden">완료된 항목 가리기</string>
+    <string name="schedule_erase_all_if_completed">지우기</string>
 
     <!-- home -->
     <string name="home_category_header">나의 할일</string>

@@ -19,8 +19,6 @@
     <string name="cancel">Cancel</string>
     <string name="ok">OK</string>
     <string name="common_tag_empty">No tags assigned to the schedule.</string>
-    <string name="completed_schedule_shown">Show completed</string>
-    <string name="completed_schedule_hidden">Hide completed</string>
     <string name="open_link">Open link</string>
     <string name="open_link_default_error">This link is not executable.</string>
     <string name="delete">Delete</string>
@@ -28,6 +26,9 @@
     <!-- schedule -->
     <string name="schedule_complete_checkbox_contentDescription">complete</string>
     <string name="schedule_incomplete_checkbox_contentDescription">reschedule</string>
+    <string name="schedule_completed_shown">Show completed</string>
+    <string name="schedule_completed_hidden">Hide completed</string>
+    <string name="schedule_erase_all_if_completed">Erase</string> <!-- TODO xlt 확인 필요. -->
 
     <!-- home -->
     <string name="home_category_header">My Todo</string>
