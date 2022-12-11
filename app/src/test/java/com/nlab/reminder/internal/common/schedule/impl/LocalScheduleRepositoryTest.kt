@@ -137,6 +137,14 @@ class LocalScheduleRepositoryTest {
         }
     }
 
+    @Test
+    fun `result for delete by completed was success`() = runTest {
+        val isComplete: Boolean = genBoolean()
+        testDeleteTemplate(DeleteRequest.ByComplete(isComplete)) { scheduleDao ->
+            scheduleDao.deleteByComplete(isComplete)
+        }
+    }
+
     private suspend fun testDeleteTemplate(request: DeleteRequest, verifyDao: suspend (ScheduleDao) -> Unit) {
         val scheduleDao: ScheduleDao = mock()
         val result = LocalScheduleRepository(scheduleDao).delete(request)
