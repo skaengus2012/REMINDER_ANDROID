@@ -60,5 +60,7 @@ class DefaultModifyScheduleCompleteUseCase(
 
     private suspend fun commitCompleteMarkTableToSchedule(table: CompleteMarkTable): Result<Unit> =
         if (table.isEmpty()) Result.Success(Unit)
-        else scheduleRepository.updateCompletes(table.map { ModifyCompleteRequest(it.key, it.value.isComplete) })
+        else scheduleRepository.update(
+            UpdateRequest.Completes(table.map { ModifyCompleteRequest(it.key, it.value.isComplete) })
+        )
 }

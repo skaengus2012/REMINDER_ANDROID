@@ -96,7 +96,9 @@ class DefaultModifyScheduleCompleteUseCaseTest {
 
         updateCompleteUseCase(ScheduleId(genLong()), genBoolean())
 
-        verify(scheduleRepository, once()).updateCompletes(listOf(ModifyCompleteRequest(testScheduleId, testComplete)))
+        verify(scheduleRepository, once()).update(
+            UpdateRequest.Completes(listOf(ModifyCompleteRequest(testScheduleId, testComplete)))
+        )
     }
 
     private suspend fun mapScheduleCompleteResultToTotalResult(scheduleCompleteResult: Result<Unit>): Result<Unit> {
@@ -117,14 +119,7 @@ class DefaultModifyScheduleCompleteUseCaseTest {
         }
         val scheduleRepository: ScheduleRepository = mock {
             whenever(
-                mock.updateCompletes(
-                    listOf(
-                        ModifyCompleteRequest(
-                            scheduleId,
-                            isComplete
-                        )
-                    )
-                )
+                mock.update(UpdateRequest.Completes(listOf(ModifyCompleteRequest(scheduleId, isComplete))))
             ) doReturn scheduleCompleteResult
         }
         val updateCompleteUseCase = DefaultModifyScheduleCompleteUseCase(

@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.nlab.reminder.domain.common.schedule
 
 import com.nlab.reminder.core.util.test.annotation.Generated
@@ -21,5 +20,27 @@ import com.nlab.reminder.core.util.test.annotation.Generated
 /**
  * @author thalys
  */
+sealed class GetRequest private constructor() {
+    object All : GetRequest()
+    @Generated
+    data class ByComplete(val isComplete: Boolean) : GetRequest()
+}
+
+sealed class UpdateRequest private constructor() {
+    @Generated
+    data class Completes(val values: List<ModifyCompleteRequest>) : UpdateRequest()
+    @Generated
+    data class VisiblePriorities(val values: List<ModifyVisiblePriorityRequest>) : UpdateRequest()
+}
+
+sealed class DeleteRequest private constructor() {
+    @Generated
+    data class ById(val scheduleId: ScheduleId) : DeleteRequest()
+    @Generated
+    data class ByComplete(val isComplete: Boolean) : DeleteRequest()
+}
+
+@Generated
+data class ModifyCompleteRequest(val scheduleId: ScheduleId, val isComplete: Boolean)
 @Generated
 data class ModifyVisiblePriorityRequest(val scheduleId: ScheduleId, val visiblePriority: Long)

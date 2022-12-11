@@ -145,7 +145,7 @@ class AllScheduleStateMachineKtTest {
             .asContainer(genStateContainerScope(), AllScheduleState.Loaded(genAllScheduleSnapshot()))
             .send(AllScheduleEvent.OnDragScheduleEnded(emptyList()))
             .join()
-        verify(scheduleRepository, never()).updateVisiblePriorities(any())
+        verify(scheduleRepository, never()).update(any())
     }
 
     @Test
@@ -159,7 +159,7 @@ class AllScheduleStateMachineKtTest {
             .asContainer(genStateContainerScope(), AllScheduleState.Loaded(genAllScheduleSnapshot()))
             .send(AllScheduleEvent.OnDragScheduleEnded(genScheduleUiStates(listOf(firstSchedule, secondSchedule))))
             .join()
-        verify(scheduleRepository, once()).updateVisiblePriorities(emptyList())
+        verify(scheduleRepository, once()).update(UpdateRequest.VisiblePriorities(emptyList()))
     }
 
     @Test
@@ -176,11 +176,13 @@ class AllScheduleStateMachineKtTest {
             .asContainer(genStateContainerScope(), AllScheduleState.Loaded(genAllScheduleSnapshot()))
             .send(AllScheduleEvent.OnDragScheduleEnded(genScheduleUiStates(schedules)))
             .join()
-        verify(scheduleRepository, once()).updateVisiblePriorities(
-            listOf(
-                ModifyVisiblePriorityRequest(scheduleId = schedules[3].id, startPriority + 3),
-                ModifyVisiblePriorityRequest(scheduleId = schedules[4].id, startPriority + 4),
-                ModifyVisiblePriorityRequest(scheduleId = schedules[5].id, startPriority + 5)
+        verify(scheduleRepository, once()).update(
+            UpdateRequest.VisiblePriorities(
+                listOf(
+                    ModifyVisiblePriorityRequest(scheduleId = schedules[3].id, startPriority + 3),
+                    ModifyVisiblePriorityRequest(scheduleId = schedules[4].id, startPriority + 4),
+                    ModifyVisiblePriorityRequest(scheduleId = schedules[5].id, startPriority + 5)
+                )
             )
         )
     }
@@ -194,7 +196,7 @@ class AllScheduleStateMachineKtTest {
             .asContainer(genStateContainerScope(), AllScheduleState.Loaded(genAllScheduleSnapshot()))
             .send(AllScheduleEvent.OnDeleteScheduleClicked(schedule.id))
             .join()
-        verify(scheduleRepository, once()).delete(DeleteScheduleRequest.ByScheduleId(schedule.id))
+        verify(scheduleRepository, once()).delete(DeleteRequest.ById(schedule.id))
     }
 
     @Test

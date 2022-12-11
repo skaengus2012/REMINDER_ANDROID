@@ -32,9 +32,9 @@ class DefaultGetAllScheduleSnapshotUseCase(
     private val completedScheduleShownRepository: CompletedScheduleShownRepository,
 ) : GetAllScheduleSnapshotUseCase {
     private val findAllSchedules: Flow<List<Schedule>> =
-        scheduleRepository.get(GetScheduleRequest.All)
+        scheduleRepository.get(GetRequest.All)
     private val findNotCompleteSchedules: Flow<List<Schedule>> =
-        scheduleRepository.get(GetScheduleRequest.ByComplete(isComplete = false))
+        scheduleRepository.get(GetRequest.ByComplete(isComplete = false))
 
     @ExperimentalCoroutinesApi
     override fun invoke(): Flow<AllScheduleSnapshot> =

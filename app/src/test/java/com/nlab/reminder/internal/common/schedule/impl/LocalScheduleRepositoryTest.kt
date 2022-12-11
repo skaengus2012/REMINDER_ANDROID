@@ -40,13 +40,13 @@ class LocalScheduleRepositoryTest {
         val isComplete: Boolean = genBoolean()
 
         notifySchedulesWhenScheduleDaoSent2TimesData(
-            GetScheduleRequest.All,
+            GetRequest.All,
             setupMock = { scheduleDao, mockFlow ->
                 whenever(scheduleDao.findAsStream()) doReturn mockFlow
             }
         )
         notifySchedulesWhenScheduleDaoSent2TimesData(
-            GetScheduleRequest.ByComplete(isComplete),
+            GetRequest.ByComplete(isComplete),
             setupMock = { scheduleDao, mockFlow ->
                 whenever(scheduleDao.findByCompleteAsStream(isComplete)) doReturn mockFlow
             }
@@ -54,7 +54,7 @@ class LocalScheduleRepositoryTest {
     }
 
     private fun notifySchedulesWhenScheduleDaoSent2TimesData(
-        scheduleItemRequest: GetScheduleRequest,
+        scheduleItemRequest: GetRequest,
         setupMock: (ScheduleDao, Flow<List<ScheduleEntityWithTagEntities>>) -> Unit
     ) = runTest {
         val executeDispatcher = genFlowExecutionDispatcher(testScheduler)
@@ -92,11 +92,9 @@ class LocalScheduleRepositoryTest {
             genRandomUpdateValue = { genBoolean() },
             genRequest = { scheduleId, isComplete -> ModifyCompleteRequest(scheduleId, isComplete) }
         )
-        val scheduleDao: ScheduleDao = mock()
-        val updateResult = LocalScheduleRepository(scheduleDao).updateCompletes(repositoryParam)
-
-        verify(scheduleDao, once()).updateCompletes(daoParam)
-        assertThat(updateResult.isSuccess, equalTo(true))
+        testUpdateTemplate(UpdateRequest.Completes(repositoryParam)) { scheduleDao ->
+            verify(scheduleDao, once()).updateCompletes(daoParam)
+        }
     }
 
     @Test
@@ -105,12 +103,9 @@ class LocalScheduleRepositoryTest {
             genRandomUpdateValue = { genLong() },
             genRequest = { scheduleId, visiblePriority -> ModifyVisiblePriorityRequest(scheduleId, visiblePriority) }
         )
-
-        val scheduleDao: ScheduleDao = mock()
-        val result = LocalScheduleRepository(scheduleDao).updateVisiblePriorities(repositoryParam)
-
-        verify(scheduleDao, once()).updateVisiblePriorities(daoParam)
-        assertThat(result.isSuccess, equalTo(true))
+        testUpdateTemplate(UpdateRequest.VisiblePriorities(repositoryParam)) { scheduleDao ->
+            verify(scheduleDao, once()).updateVisiblePriorities(daoParam)
+        }
     }
 
     private fun <T, U> genRepositoryParamAndDaoParamsForUpdate(
@@ -127,20 +122,24 @@ class LocalScheduleRepositoryTest {
         return repositoryParam to daoParam
     }
 
+    private suspend fun testUpdateTemplate(request: UpdateRequest, verifyDao: suspend (ScheduleDao) -> Unit) {
+        val scheduleDao: ScheduleDao = mock()
+        val result = LocalScheduleRepository(scheduleDao).update(request)
+        verifyDao(scheduleDao)
+        assertThat(result.isSuccess, equalTo(true))
+    }
+
     @Test
     fun `result for delete by specific scheduleId was success`() = runTest {
         val schedule: Schedule = genSchedule()
-        testDeleteTemplate(DeleteScheduleRequest.ByScheduleId(schedule.id)) { scheduleDao ->
+        testDeleteTemplate(DeleteRequest.ById(schedule.id)) { scheduleDao ->
             scheduleDao.deleteByScheduleId(schedule.id.value)
         }
     }
 
-    private suspend fun testDeleteTemplate(
-        deleteRequest: DeleteScheduleRequest,
-        verifyDao: suspend (ScheduleDao) -> Unit
-    ) {
+    private suspend fun testDeleteTemplate(request: DeleteRequest, verifyDao: suspend (ScheduleDao) -> Unit) {
         val scheduleDao: ScheduleDao = mock()
-        val result = LocalScheduleRepository(scheduleDao).delete(deleteRequest)
+        val result = LocalScheduleRepository(scheduleDao).delete(request)
         verifyDao(scheduleDao)
         assertThat(result.isSuccess, equalTo(true))
     }

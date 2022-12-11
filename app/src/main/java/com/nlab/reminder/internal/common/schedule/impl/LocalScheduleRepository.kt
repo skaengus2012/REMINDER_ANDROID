@@ -31,33 +31,34 @@ import kotlinx.coroutines.flow.*
 class LocalScheduleRepository(
     private val scheduleDao: ScheduleDao,
 ) : ScheduleRepository {
-    override fun get(request: GetScheduleRequest): Flow<List<Schedule>> {
+    override fun get(request: GetRequest): Flow<List<Schedule>> {
         val resultFlow: Flow<List<ScheduleEntityWithTagEntities>> = when (request) {
-            is GetScheduleRequest.All -> scheduleDao.findAsStream()
-            is GetScheduleRequest.ByComplete -> scheduleDao.findByCompleteAsStream(request.isComplete)
+            is GetRequest.All -> scheduleDao.findAsStream()
+            is GetRequest.ByComplete -> scheduleDao.findByCompleteAsStream(request.isComplete)
         }
 
         return resultFlow.map { entities -> entities.map(ScheduleEntityWithTagEntities::toSchedule) }
     }
 
-    override suspend fun updateCompletes(requests: List<ModifyCompleteRequest>): Result<Unit> =
-        catching {
+    override suspend fun update(request: UpdateRequest): Result<Unit> = when (request) {
+        // When outside the catch block, jacoco does not recognize. 😭
+        is UpdateRequest.Completes -> catching {
             scheduleDao.updateCompletes(
-                requests = requests.map { request -> request.scheduleId.value to request.isComplete }
+                requests = request.values.map { request -> request.scheduleId.value to request.isComplete }
             )
         }
-
-    override suspend fun updateVisiblePriorities(requests: List<ModifyVisiblePriorityRequest>): Result<Unit> =
-        catching {
+        is UpdateRequest.VisiblePriorities -> catching {
             scheduleDao.updateVisiblePriorities(
-                requests = requests.map { request -> request.scheduleId.value to request.visiblePriority }
+                requests = request.values.map { request -> request.scheduleId.value to request.visiblePriority }
             )
         }
+    }
 
-    override suspend fun delete(request: DeleteScheduleRequest): Result<Unit> = catching {
-        when (request) {
-            is DeleteScheduleRequest.ByScheduleId -> scheduleDao.deleteByScheduleId(request.scheduleId.value)
-            else -> TODO()
+    override suspend fun delete(request: DeleteRequest): Result<Unit> = when (request) {
+        // When outside the catch block, jacoco does not recognize. 😭
+        is DeleteRequest.ById -> catching {
+            scheduleDao.deleteByScheduleId(request.scheduleId.value)
         }
+        else -> TODO()
     }
 }
