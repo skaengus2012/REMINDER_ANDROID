@@ -200,6 +200,16 @@ class AllScheduleStateMachineKtTest {
     }
 
     @Test
+    fun `delete completed schedule when stateMachine sent deletedCompleteScheduleClicked`() = runTest {
+        val scheduleRepository: ScheduleRepository = mock()
+        genAllScheduleStateMachine(scheduleRepository = scheduleRepository)
+            .asContainer(genStateContainerScope(), AllScheduleState.Loaded(genAllScheduleSnapshot()))
+            .send(AllScheduleEvent.OnDeleteCompletedScheduleClicked)
+            .join()
+        verify(scheduleRepository, once()).delete(DeleteRequest.ByComplete(true))
+    }
+
+    @Test
     fun `navigate schedule link when stateMachine sent scheduleLinkClicked event`() = runTest {
         val link: String = genBothify()
         val schedule: Schedule = genSchedule(link = link)

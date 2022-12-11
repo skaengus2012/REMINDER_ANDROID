@@ -62,6 +62,10 @@ fun AllScheduleStateMachine(
                     .onFailure { sideEffectHandle.post(AllScheduleSideEffect.ShowErrorPopup) }
             }
 
+            event<AllScheduleEvent.OnDeleteCompletedScheduleClicked> {
+                scheduleRepository.delete(DeleteRequest.ByComplete(isComplete = true))
+            }
+
             filteredEvent(predicate = { event ->
                 event is AllScheduleEvent.OnDragScheduleEnded && event.draggedSnapshot.isNotEmpty()
             }) { (event) ->
