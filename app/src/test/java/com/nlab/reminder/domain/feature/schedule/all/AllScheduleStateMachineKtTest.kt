@@ -20,13 +20,10 @@ import com.nlab.reminder.core.effect.SideEffectHandle
 import com.nlab.reminder.core.state.asContainer
 import com.nlab.reminder.core.kotlin.util.Result
 import com.nlab.reminder.domain.common.schedule.*
-import com.nlab.reminder.domain.common.schedule.visibleconfig.CompletedScheduleShownRepository
+import com.nlab.reminder.domain.common.schedule.visibleconfig.*
 import com.nlab.reminder.test.*
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.filterIsInstance
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.*
@@ -48,40 +45,61 @@ class AllScheduleStateMachineKtTest {
     }
 
     @Test
-    fun `update to Loaded when state was not init and AllScheduleReportLoaded sent`() = runTest {
-        val allScheduleReport = genAllScheduleSnapshot()
+    fun `update to Loaded when state was not init and StateLoaded sent`() = runTest {
+        val isSelectionEnabled: Boolean = genBoolean()
+        val scheduleSnapshot: AllScheduleSnapshot =
+            genAllScheduleSnapshot(isCompletedScheduleShown = genBoolean(), uiStates = genScheduleUiStates())
         val stateContainers =
             genAllScheduleStates()
                 .filter { it != AllScheduleState.Init }
                 .map { genAllScheduleStateMachine().asContainer(genStateContainerScope(), it) }
         stateContainers
-            .map { it.send(AllScheduleEvent.OnAllScheduleSnapshotLoaded(allScheduleReport)) }
+            .map { it.send(AllScheduleEvent.StateLoaded(scheduleSnapshot, isSelectionEnabled)) }
             .joinAll()
         assertThat(
-            stateContainers.map { it.stateFlow.value }.all { it == AllScheduleState.Loaded(allScheduleReport) },
+            stateContainers.map { it.stateFlow.value }.all { state ->
+                state == AllScheduleState.Loaded(
+                    scheduleUiStates = scheduleSnapshot.scheduleUiStates,
+                    isCompletedScheduleShown = scheduleSnapshot.isCompletedScheduleShown,
+                    isSelectionMode = isSelectionEnabled
+                )
+            },
             equalTo(true)
         )
     }
 
     @Test
-    fun `subscribe allScheduleReport snapshot when state was init and fetch sent`() = runTest {
-        val expected = genAllScheduleSnapshot()
-        val getAllScheduleReport: GetAllScheduleSnapshotUseCase = mock {
-            whenever(mock()) doReturn flow { emit(expected) }
-        }
+    fun `subscribe combined loaded values when state was init and fetch sent`() = runTest {
+        val expectedSnapshot: AllScheduleSnapshot = genAllScheduleSnapshot()
+        val expectedSelectionMode: Boolean = genBoolean()
         val stateContainer =
-            genAllScheduleStateMachine(getAllScheduleSnapshot = getAllScheduleReport)
+            genAllScheduleStateMachine(
+                getAllScheduleSnapshot = mock {
+                    whenever(mock()) doReturn flow { emit(expectedSnapshot) }
+                },
+                selectionModeRepository = mock {
+                    whenever(mock.getEnabledStream()) doReturn MutableStateFlow(expectedSelectionMode)
+                })
                 .asContainer(genStateContainerScope(), AllScheduleState.Init)
+        val actualDeferred = async {
+            stateContainer
+                .stateFlow
+                .filterIsInstance<AllScheduleState.Loaded>()
+                .take(count = 1)
+                .first()
+        }
+
         stateContainer.send(AllScheduleEvent.Fetch)
-
-        val deferred = CompletableDeferred<AllScheduleSnapshot>()
-        stateContainer
-            .stateFlow
-            .filterIsInstance<AllScheduleState.Loaded>()
-            .onEach { deferred.complete(it.snapshot) }
-            .launchIn(genFlowObserveCoroutineScope())
-
-        assertThat(deferred.await(), equalTo(expected))
+        assertThat(
+            actualDeferred.await(),
+            equalTo(
+                AllScheduleState.Loaded(
+                    expectedSnapshot.scheduleUiStates,
+                    isCompletedScheduleShown = expectedSnapshot.isCompletedScheduleShown,
+                    isSelectionMode = expectedSelectionMode
+                )
+            )
+        )
     }
 
     @Test
@@ -91,7 +109,7 @@ class AllScheduleStateMachineKtTest {
         val modifyScheduleCompleteUseCase: ModifyScheduleCompleteUseCase = mock()
         val stateContainer =
             genAllScheduleStateMachine(modifyScheduleComplete = modifyScheduleCompleteUseCase)
-                .asContainer(genStateContainerScope(), AllScheduleState.Loaded(genAllScheduleSnapshot()))
+                .asContainer(genStateContainerScope(), genAllScheduleLoadedState())
         stateContainer
             .send(AllScheduleEvent.OnModifyScheduleCompleteClicked(schedule.id, isComplete))
             .join()
@@ -112,7 +130,9 @@ class AllScheduleStateMachineKtTest {
             genAllScheduleStateMachine(completedScheduleShownRepository = completedScheduleShownRepository)
                 .asContainer(
                     genStateContainerScope(),
-                    AllScheduleState.Loaded(genAllScheduleSnapshot(isCompletedScheduleShown = isCompletedScheduleShown))
+                    genAllScheduleLoadedState(
+                        snapshot = genAllScheduleSnapshot(isCompletedScheduleShown = isCompletedScheduleShown)
+                    )
                 )
         stateContainer
             .send(AllScheduleEvent.OnToggleCompletedScheduleShownClicked)
@@ -131,7 +151,7 @@ class AllScheduleStateMachineKtTest {
             sideEffectHandle = sideEffectHandle,
             completedScheduleShownRepository = completedScheduleShownRepository
         )
-            .asContainer(genStateContainerScope(), AllScheduleState.Loaded(genAllScheduleSnapshot()))
+            .asContainer(genStateContainerScope(), genAllScheduleLoadedState())
             .send(AllScheduleEvent.OnToggleCompletedScheduleShownClicked)
             .join()
 
@@ -143,7 +163,7 @@ class AllScheduleStateMachineKtTest {
         val scheduleRepository: ScheduleRepository = mock()
 
         genAllScheduleStateMachine(scheduleRepository = scheduleRepository)
-            .asContainer(genStateContainerScope(), AllScheduleState.Loaded(genAllScheduleSnapshot()))
+            .asContainer(genStateContainerScope(), genAllScheduleLoadedState())
             .send(AllScheduleEvent.OnDragScheduleEnded(emptyList()))
             .join()
         verify(scheduleRepository, never()).update(any())
@@ -157,7 +177,7 @@ class AllScheduleStateMachineKtTest {
         val scheduleRepository: ScheduleRepository = mock()
 
         genAllScheduleStateMachine(scheduleRepository = scheduleRepository)
-            .asContainer(genStateContainerScope(), AllScheduleState.Loaded(genAllScheduleSnapshot()))
+            .asContainer(genStateContainerScope(), genAllScheduleLoadedState())
             .send(AllScheduleEvent.OnDragScheduleEnded(genScheduleUiStates(listOf(firstSchedule, secondSchedule))))
             .join()
         verify(scheduleRepository, once()).update(UpdateRequest.VisiblePriorities(emptyList()))
@@ -174,7 +194,7 @@ class AllScheduleStateMachineKtTest {
         println(schedules.map { it.visiblePriority })
 
         genAllScheduleStateMachine(scheduleRepository = scheduleRepository)
-            .asContainer(genStateContainerScope(), AllScheduleState.Loaded(genAllScheduleSnapshot()))
+            .asContainer(genStateContainerScope(), genAllScheduleLoadedState())
             .send(AllScheduleEvent.OnDragScheduleEnded(genScheduleUiStates(schedules)))
             .join()
         verify(scheduleRepository, once()).update(
@@ -194,7 +214,7 @@ class AllScheduleStateMachineKtTest {
         val scheduleRepository: ScheduleRepository = mock()
 
         genAllScheduleStateMachine(scheduleRepository = scheduleRepository)
-            .asContainer(genStateContainerScope(), AllScheduleState.Loaded(genAllScheduleSnapshot()))
+            .asContainer(genStateContainerScope(), genAllScheduleLoadedState())
             .send(AllScheduleEvent.OnDeleteScheduleClicked(schedule.id))
             .join()
         verify(scheduleRepository, once()).delete(DeleteRequest.ById(schedule.id))
@@ -204,7 +224,7 @@ class AllScheduleStateMachineKtTest {
     fun `delete completed schedule when stateMachine sent deletedCompleteScheduleClicked`() = runTest {
         val scheduleRepository: ScheduleRepository = mock()
         genAllScheduleStateMachine(scheduleRepository = scheduleRepository)
-            .asContainer(genStateContainerScope(), AllScheduleState.Loaded(genAllScheduleSnapshot()))
+            .asContainer(genStateContainerScope(), genAllScheduleLoadedState())
             .send(AllScheduleEvent.OnDeleteCompletedScheduleClicked)
             .join()
         verify(scheduleRepository, once()).delete(DeleteRequest.ByComplete(true))
@@ -216,7 +236,7 @@ class AllScheduleStateMachineKtTest {
         val schedule: Schedule = genSchedule(link = link)
         val sideEffectHandle: SideEffectHandle<AllScheduleSideEffect> = mock()
         genAllScheduleStateMachine(sideEffectHandle = sideEffectHandle)
-            .asContainer(genStateContainerScope(), AllScheduleState.Loaded(genAllScheduleSnapshot()))
+            .asContainer(genStateContainerScope(), genAllScheduleLoadedState())
             .send(AllScheduleEvent.OnScheduleLinkClicked(genScheduleUiState(schedule)))
             .join()
         verify(sideEffectHandle, once()).post(AllScheduleSideEffect.NavigateScheduleLink(link))
@@ -227,7 +247,7 @@ class AllScheduleStateMachineKtTest {
         val schedule: Schedule = genSchedule(link = "")
         val sideEffectHandle: SideEffectHandle<AllScheduleSideEffect> = mock()
         genAllScheduleStateMachine(sideEffectHandle = sideEffectHandle)
-            .asContainer(genStateContainerScope(), AllScheduleState.Loaded(genAllScheduleSnapshot()))
+            .asContainer(genStateContainerScope(), genAllScheduleLoadedState())
             .send(AllScheduleEvent.OnScheduleLinkClicked(genScheduleUiState(schedule)))
             .join()
         verify(sideEffectHandle, never()).post(any())

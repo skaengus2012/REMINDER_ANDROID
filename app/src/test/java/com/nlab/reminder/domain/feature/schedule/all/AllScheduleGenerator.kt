@@ -18,6 +18,7 @@ package com.nlab.reminder.domain.feature.schedule.all
 
 import com.nlab.reminder.core.effect.SideEffectHandle
 import com.nlab.reminder.domain.common.schedule.*
+import com.nlab.reminder.domain.common.schedule.selection.SelectionModeRepository
 import com.nlab.reminder.domain.common.schedule.visibleconfig.CompletedScheduleShownRepository
 import com.nlab.reminder.test.genBoolean
 import kotlinx.coroutines.flow.emptyFlow
@@ -37,17 +38,29 @@ fun genAllScheduleEvents(): Set<AllScheduleEvent> = setOf(
     AllScheduleEvent.Fetch,
     AllScheduleEvent.OnToggleCompletedScheduleShownClicked,
     AllScheduleEvent.OnDeleteCompletedScheduleClicked,
-    AllScheduleEvent.OnAllScheduleSnapshotLoaded(genAllScheduleSnapshot()),
+    AllScheduleEvent.StateLoaded(
+        genAllScheduleSnapshot(),
+        isSelectionEnabled = genBoolean()
+    ),
     AllScheduleEvent.OnModifyScheduleCompleteClicked(genSchedule().id, genBoolean()),
     AllScheduleEvent.OnDragScheduleEnded(genScheduleUiStates()),
     AllScheduleEvent.OnDeleteScheduleClicked(genSchedule().id),
     AllScheduleEvent.OnScheduleLinkClicked(genScheduleUiState())
 )
 
+fun genAllScheduleLoadedState(
+    snapshot: AllScheduleSnapshot = genAllScheduleSnapshot(),
+    isSelectionMode: Boolean = genBoolean()
+): AllScheduleState.Loaded = AllScheduleState.Loaded(
+    snapshot.scheduleUiStates,
+    isCompletedScheduleShown = snapshot.isCompletedScheduleShown,
+    isSelectionMode = isSelectionMode
+)
+
 fun genAllScheduleStates(): Set<AllScheduleState> = setOf(
     AllScheduleState.Init,
     AllScheduleState.Loading,
-    AllScheduleState.Loaded(genAllScheduleSnapshot())
+    genAllScheduleLoadedState()
 )
 
 fun genAllScheduleSideEffects(): Set<AllScheduleSideEffect> = setOf(
@@ -59,13 +72,15 @@ fun genAllScheduleStateMachine(
     getAllScheduleSnapshot: GetAllScheduleSnapshotUseCase = mock { whenever(mock()) doReturn emptyFlow() },
     modifyScheduleComplete: ModifyScheduleCompleteUseCase = mock(),
     completedScheduleShownRepository: CompletedScheduleShownRepository = mock(),
-    scheduleRepository: ScheduleRepository = mock()
+    scheduleRepository: ScheduleRepository = mock(),
+    selectionModeRepository: SelectionModeRepository = mock()
 ) = AllScheduleStateMachine(
     sideEffectHandle,
     getAllScheduleSnapshot,
     modifyScheduleComplete,
     completedScheduleShownRepository,
-    scheduleRepository
+    scheduleRepository,
+    selectionModeRepository
 )
 
 fun genAllScheduleEventSample(): AllScheduleEvent = genAllScheduleEvents().first()

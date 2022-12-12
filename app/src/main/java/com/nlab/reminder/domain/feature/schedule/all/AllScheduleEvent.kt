@@ -27,7 +27,10 @@ sealed class AllScheduleEvent private constructor() : Event {
     object Fetch : AllScheduleEvent()
     object OnToggleCompletedScheduleShownClicked : AllScheduleEvent()
     object OnDeleteCompletedScheduleClicked : AllScheduleEvent()
-    data class OnAllScheduleSnapshotLoaded(val allSchedulesReport: AllScheduleSnapshot) : AllScheduleEvent()
+    data class StateLoaded(
+        val scheduleSnapshot: AllScheduleSnapshot,
+        val isSelectionEnabled: Boolean
+    ) : AllScheduleEvent()
     data class OnModifyScheduleCompleteClicked(val scheduleId: ScheduleId, val isComplete: Boolean) : AllScheduleEvent()
     data class OnDragScheduleEnded(val draggedSnapshot: List<ScheduleUiState>) : AllScheduleEvent()
     data class OnDeleteScheduleClicked(val scheduleId: ScheduleId) : AllScheduleEvent()

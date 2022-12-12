@@ -124,7 +124,6 @@ class AllScheduleFragment : Fragment() {
 
         viewModel.stateFlow
             .filterIsInstance<AllScheduleState.Loaded>()
-            .map { it.snapshot }
             .map { it.isCompletedScheduleShown }
             .distinctUntilChanged()
             .flowWithLifecycle(viewLifecycle)
@@ -153,7 +152,7 @@ class AllScheduleFragment : Fragment() {
                 .filter { (prev, cur) -> prev == SCROLL_STATE_IDLE && cur == SCROLL_STATE_DRAGGING },
             viewModel.stateFlow
                 .filterIsInstance<AllScheduleState.Loaded>()
-                .map { it.snapshot.scheduleUiStates }
+                .map { it.scheduleUiStates }
                 .distinctUntilChanged()
                 .flowWithLifecycle(viewLifecycle)
         )
@@ -162,7 +161,7 @@ class AllScheduleFragment : Fragment() {
 
         viewModel.stateFlow
             .filterIsInstance<AllScheduleState.Loaded>()
-            .map { it.snapshot.scheduleUiStates }
+            .map { it.scheduleUiStates }
             .distinctUntilChanged()
             .flowWithLifecycle(viewLifecycle)
             .onEach { items ->

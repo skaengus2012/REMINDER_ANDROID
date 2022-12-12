@@ -14,23 +14,13 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.feature.schedule.all
+package com.nlab.reminder.core.kotlin.coroutine.flow
 
-import com.nlab.reminder.core.state.State
-import com.nlab.reminder.core.util.test.annotation.Generated
-import com.nlab.reminder.domain.common.schedule.ScheduleUiState
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine as kotlinCombine
 
 /**
- * @author Doohyun
+ * @author thalys
  */
-sealed class AllScheduleState private constructor() : State {
-    object Init : AllScheduleState()
-    object Loading : AllScheduleState()
-
-    @Generated
-    data class Loaded(
-        val scheduleUiStates: List<ScheduleUiState>,
-        val isCompletedScheduleShown: Boolean,
-        val isSelectionMode: Boolean
-    ) : AllScheduleState()
-}
+fun <T1, T2, R> combine(flow: Flow<T1>, flow2: Flow<T2>, transform: (a: T1, b: T2) -> R): Flow<R> =
+    kotlinCombine(flow, flow2, transform)

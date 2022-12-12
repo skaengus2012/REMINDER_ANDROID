@@ -22,6 +22,7 @@ import com.nlab.reminder.core.state.asContainer
 import com.nlab.reminder.domain.common.schedule.*
 import com.nlab.reminder.domain.common.schedule.visibleconfig.CompletedScheduleShownRepository
 import com.nlab.reminder.domain.common.schedule.impl.*
+import com.nlab.reminder.domain.common.schedule.selection.SelectionModeRepository
 import com.nlab.reminder.domain.feature.schedule.all.*
 import com.nlab.reminder.domain.feature.schedule.all.impl.*
 import dagger.Module
@@ -41,6 +42,7 @@ class AllScheduleViewModelModule {
         scheduleRepository: ScheduleRepository,
         scheduleUiStateFlowFactory: ScheduleUiStateFlowFactory,
         modifyScheduleCompleteUseCase: ModifyScheduleCompleteUseCase,
+        selectionModeRepository: SelectionModeRepository,
         @AllScheduleScope completedScheduleShownRepository: CompletedScheduleShownRepository
     ): AllScheduleStateContainerFactory = object : AllScheduleStateContainerFactory {
         override fun create(
@@ -49,14 +51,15 @@ class AllScheduleViewModelModule {
         ): StateContainer<AllScheduleEvent, AllScheduleState> {
             val stateMachine = AllScheduleStateMachine(
                 sideEffectHandle,
-                getAllScheduleSnapshot = DefaultGetAllScheduleSnapshotUseCase(
+                DefaultGetAllScheduleSnapshotUseCase(
                     scheduleRepository,
                     scheduleUiStateFlowFactory,
                     completedScheduleShownRepository
                 ),
-                modifyScheduleComplete = modifyScheduleCompleteUseCase,
-                completedScheduleShownRepository = completedScheduleShownRepository,
-                scheduleRepository = scheduleRepository
+                modifyScheduleCompleteUseCase,
+                completedScheduleShownRepository,
+                scheduleRepository,
+                selectionModeRepository
             )
             return stateMachine.asContainer(scope, AllScheduleState.Init, fetchEvent = AllScheduleEvent.Fetch)
         }
