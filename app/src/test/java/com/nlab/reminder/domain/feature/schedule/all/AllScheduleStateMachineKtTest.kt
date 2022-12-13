@@ -20,6 +20,7 @@ import com.nlab.reminder.core.effect.SideEffectHandle
 import com.nlab.reminder.core.state.asContainer
 import com.nlab.reminder.core.kotlin.util.Result
 import com.nlab.reminder.domain.common.schedule.*
+import com.nlab.reminder.domain.common.schedule.selection.SelectionModeRepository
 import com.nlab.reminder.domain.common.schedule.visibleconfig.*
 import com.nlab.reminder.test.*
 import kotlinx.coroutines.*
@@ -156,6 +157,29 @@ class AllScheduleStateMachineKtTest {
             .join()
 
         verify(sideEffectHandle, once()).post(AllScheduleSideEffect.ShowErrorPopup)
+    }
+
+    @Test
+    fun `selectionModeRepository setEnabled when selectionMode was false and received OnToggleSelectionModeEnableClicked`() = runTest {
+        testToggleSelectionModeEnableClicked(expectedSelectionModeEnabled = false)
+    }
+
+    @Test
+    fun `selectionModeRepository setEnabled when selectionMode was true and received OnToggleSelectionModeEnableClicked`() = runTest {
+        testToggleSelectionModeEnableClicked(expectedSelectionModeEnabled = true)
+    }
+
+    private suspend fun testToggleSelectionModeEnableClicked(expectedSelectionModeEnabled: Boolean) {
+        val selectionModeRepository: SelectionModeRepository = mock()
+
+        genAllScheduleStateMachine(selectionModeRepository = selectionModeRepository)
+            .asContainer(
+                genStateContainerScope(),
+                genAllScheduleLoadedState(isSelectionMode = expectedSelectionModeEnabled.not())
+            )
+            .send(AllScheduleEvent.OnToggleSelectionModeEnableClicked)
+            .join()
+        verify(selectionModeRepository, once()).setEnabled(expectedSelectionModeEnabled)
     }
 
     @Test

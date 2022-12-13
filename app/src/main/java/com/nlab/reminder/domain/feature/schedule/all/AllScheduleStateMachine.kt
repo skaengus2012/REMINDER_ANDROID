@@ -77,6 +77,10 @@ fun AllScheduleStateMachine(
                     .onFailure { sideEffectHandle.post(AllScheduleSideEffect.ShowErrorPopup) }
             }
 
+            event<AllScheduleEvent.OnToggleSelectionModeEnableClicked> { (_, state) ->
+                selectionModeRepository.setEnabled(state.isSelectionMode.not())
+            }
+
             event<AllScheduleEvent.OnDeleteCompletedScheduleClicked> {
                 scheduleRepository.delete(DeleteRequest.ByComplete(isComplete = true))
             }

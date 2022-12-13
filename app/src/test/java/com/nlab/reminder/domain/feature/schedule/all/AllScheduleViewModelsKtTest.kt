@@ -46,6 +46,11 @@ class AllScheduleViewModelsKtTest {
 
         verifyStateSendExtension(
             stateContainer,
+            AllScheduleEvent.OnToggleSelectionModeEnableClicked
+        ) { viewModel.onToggleSelectionModeEnableClicked() }
+
+        verifyStateSendExtension(
+            stateContainer,
             AllScheduleEvent.OnToggleCompletedScheduleShownClicked
         ) { viewModel.onDeleteCompletedScheduleClicked() }
 

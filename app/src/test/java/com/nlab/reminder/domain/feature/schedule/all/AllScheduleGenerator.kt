@@ -37,6 +37,7 @@ fun genAllScheduleSnapshot(
 fun genAllScheduleEvents(): Set<AllScheduleEvent> = setOf(
     AllScheduleEvent.Fetch,
     AllScheduleEvent.OnToggleCompletedScheduleShownClicked,
+    AllScheduleEvent.OnToggleSelectionModeEnableClicked,
     AllScheduleEvent.OnDeleteCompletedScheduleClicked,
     AllScheduleEvent.StateLoaded(
         genAllScheduleSnapshot(),
