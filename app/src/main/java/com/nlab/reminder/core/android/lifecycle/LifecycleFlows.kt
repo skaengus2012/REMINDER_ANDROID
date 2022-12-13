@@ -21,6 +21,7 @@ import androidx.lifecycle.LifecycleEventObserver
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.filter
 
 /**
  * @author thalys
@@ -30,3 +31,6 @@ fun Lifecycle.event(): Flow<Lifecycle.Event> = callbackFlow {
     addObserver(listener)
     awaitClose { removeObserver(listener) }
 }
+
+fun Flow<Lifecycle.Event>.filterLifecycleEvent(lifecycleEvent: Lifecycle.Event): Flow<Lifecycle.Event> =
+    filter { event -> event == lifecycleEvent }

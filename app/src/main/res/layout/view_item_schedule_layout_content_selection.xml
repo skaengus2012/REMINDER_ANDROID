@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (C) 2022 The N's lab Open Source Project
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~        http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layout_content"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?android:windowBackground">
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_textStart"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        app:layout_constraintGuide_begin="@dimen/schedule_checkbox_touchable_size" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_textStartCompleteSelection"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        app:layout_constraintGuide_begin="@dimen/schedule_checkbox_touchable_size_2x" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_textEnd"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        app:layout_constraintGuide_end="@dimen/schedule_checkbox_touchable_size" />
+
+    <ImageButton
+        android:id="@+id/button_complete"
+        android:layout_width="@dimen/schedule_checkbox_touchable_size"
+        android:layout_height="@dimen/schedule_checkbox_touchable_size"
+        android:alpha="0.5"
+        android:background="@android:color/transparent"
+        android:padding="@dimen/default_side_padding"
+        android:scaleType="fitXY"
+        android:src="@drawable/checkbox_schedule"
+        app:layout_constraintEnd_toEndOf="@id/guideline_textStartCompleteSelection"
+        app:layout_constraintStart_toStartOf="@id/guideline_textStart"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="ContentDescription"
+        tools:src="@drawable/checkbox_schedule_checked" />
+
+    <ImageButton
+        android:id="@+id/button_selection"
+        android:layout_width="@dimen/schedule_checkbox_touchable_size"
+        android:layout_height="@dimen/schedule_checkbox_touchable_size"
+        android:alpha="1"
+        android:background="@android:color/transparent"
+        android:padding="16dp"
+        android:scaleType="fitXY"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/guideline_textStart"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/checkbox_schedule_selection"
+        tools:ignore="ContentDescription" />
+
+    <View
+        android:id="@+id/view_button_complete_hidden"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:clickable="false"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/guideline_textStartCompleteSelection"
+        app:layout_constraintStart_toStartOf="@id/guideline_textStart"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layout_data_holder"
+        android:layout_width="0dp"
+        app:layout_constraintHeight="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@id/view_line"
+        app:layout_constraintEnd_toEndOf="@id/guideline_textEnd"
+        app:layout_constraintHeight_min="@dimen/schedule_checkbox_touchable_size"
+        app:layout_constraintStart_toStartOf="@id/guideline_textStart"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/imageview_drag_handle"
+        android:layout_width="@dimen/schedule_checkbox_touchable_size"
+        android:layout_height="@dimen/schedule_checkbox_touchable_size"
+        android:importantForAccessibility="no"
+        android:padding="14dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/guideline_textEnd"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_drag_handle"
+        app:tint="@color/tint_schedule_drag_handle" />
+
+    <View
+        android:id="@+id/view_line"
+        android:layout_width="0dp"
+        android:layout_height="0.5dp"
+        android:layout_marginTop="15dp"
+        android:background="?attr/bg_color_line_1"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/guideline_textStart"
+        app:layout_constraintTop_toBottomOf="@id/layout_data_holder" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

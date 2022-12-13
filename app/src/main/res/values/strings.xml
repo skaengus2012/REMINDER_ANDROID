@@ -31,11 +31,15 @@
     <string name="delete">삭제</string>
 
     <!-- schedule -->
-    <string name="schedule_complete_checkbox_contentDescription">완료</string>
-    <string name="schedule_incomplete_checkbox_contentDescription">다시 스케줄</string>
+    <string name="schedule_complete_checkbox_contentDescription" formatted="true">%1$s를 완료합니다.</string>
+    <string name="schedule_complete_checkbox_undo_contentDescription" formatted="true">%1$s를 완료 취소합니다.</string>
+    <string name="schedule_selection_checkbox_contentDescription" formatted="true">%1$s 를 선택합니다.</string>
+    <string name="schedule_selection_checkbox_undo_contentDescription" formatted="true">%1$s 를 선택 취소합니다.</string>
     <string name="schedule_completed_shown">완료된 항목 보기</string>
     <string name="schedule_completed_hidden">완료된 항목 가리기</string>
     <string name="schedule_erase_all_if_completed">지우기</string>
+    <string name="schedule_selection_mode_on">스케줄 선택</string>
+    <string name="schedule_selection_mode_off">스케줄 선택해제</string>
 
     <!-- home -->
     <string name="home_category_header">나의 할일</string>

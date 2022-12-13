@@ -30,6 +30,7 @@ import com.nlab.reminder.R
 import com.nlab.reminder.core.android.fragment.viewLifecycle
 import com.nlab.reminder.core.android.fragment.viewLifecycleScope
 import com.nlab.reminder.core.android.lifecycle.event
+import com.nlab.reminder.core.android.lifecycle.filterLifecycleEvent
 import com.nlab.reminder.core.android.navigation.NavigationController
 import com.nlab.reminder.core.android.recyclerview.DragSnapshot
 import com.nlab.reminder.core.android.recyclerview.scrollState
@@ -46,6 +47,7 @@ import com.nlab.reminder.domain.common.schedule.view.ScheduleItemTouchCallback
 import com.nlab.reminder.domain.feature.schedule.all.*
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.*
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -108,13 +110,18 @@ class AllScheduleFragment : Fragment() {
             .launchIn(viewLifecycleScope)
 
         viewLifecycle.event()
-            .filter { event -> event == Lifecycle.Event.ON_DESTROY }
+            .filterLifecycleEvent(Lifecycle.Event.ON_DESTROY)
             .onEach { itemTouchCallback.clearResource() }
             .launchIn(viewLifecycleScope)
 
         binding.buttonCompletedScheduleShownToggle
             .throttleClicks()
             .onEach { viewModel.onToggleCompletedScheduleShownClicked() }
+            .launchIn(viewLifecycleScope)
+
+        binding.buttonSelectionModeOnOff
+            .throttleClicks()
+            .onEach { viewModel.onToggleSelectionModeEnableClicked() }
             .launchIn(viewLifecycleScope)
 
         binding.buttonDeleteAllIfCompleted
@@ -131,6 +138,21 @@ class AllScheduleFragment : Fragment() {
                 binding.buttonCompletedScheduleShownToggle.setText(
                     if (isDoneScheduleShown) R.string.schedule_completed_hidden
                     else R.string.schedule_completed_shown
+                )
+            }
+            .launchIn(viewLifecycleScope)
+
+        viewModel.stateFlow
+            .filterIsInstance<AllScheduleState.Loaded>()
+            .map { it.isSelectionMode }
+            .distinctUntilChanged()
+            .flowWithLifecycle(viewLifecycle)
+            .onEach(scheduleAdapter::setSelectionEnabled)
+            .onEach { isSelectionMode -> itemTouchCallback.isItemViewSwipeEnabled = isSelectionMode.not() }
+            .onEach { isSelectionMode ->
+                binding.buttonSelectionModeOnOff.setText(
+                    if (isSelectionMode) R.string.schedule_selection_mode_off
+                    else R.string.schedule_selection_mode_on
                 )
             }
             .launchIn(viewLifecycleScope)
@@ -152,7 +174,6 @@ class AllScheduleFragment : Fragment() {
                 .filter { (prev, cur) -> prev == SCROLL_STATE_IDLE && cur == SCROLL_STATE_DRAGGING },
             viewModel.stateFlow
                 .filterIsInstance<AllScheduleState.Loaded>()
-                .map { it.scheduleUiStates }
                 .distinctUntilChanged()
                 .flowWithLifecycle(viewLifecycle)
         )

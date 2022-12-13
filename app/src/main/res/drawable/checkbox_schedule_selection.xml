@@ -14,12 +14,7 @@
   ~ limitations under the License.
   -->
 
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-	android:shape="oval">
-	<size
-		android:width="@dimen/schedule_check_size"
-		android:height="@dimen/schedule_check_size" />
-	<stroke
-		android:color="@color/bg_schedule_checkbox_unchecked"
-		android:width="@dimen/schedule_check_external_dither" />
-</shape>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@drawable/ic_selection_check_on" android:state_selected="true" />
+    <item android:drawable="@drawable/checkbox_schedule_unchecked" />
+</selector>

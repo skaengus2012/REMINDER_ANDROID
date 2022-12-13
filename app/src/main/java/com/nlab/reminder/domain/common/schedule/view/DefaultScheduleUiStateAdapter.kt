@@ -21,6 +21,8 @@ import androidx.recyclerview.widget.ListAdapter
 import com.nlab.reminder.core.android.recyclerview.DragSnapshot
 import com.nlab.reminder.core.android.recyclerview.DraggableAdapter
 import com.nlab.reminder.domain.common.schedule.ScheduleUiState
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 /**
  * @author thalys
@@ -31,6 +33,7 @@ class DefaultScheduleUiStateAdapter(
     private val onLinkClicked: (ScheduleUiState) -> Unit
 ) : ListAdapter<ScheduleUiState, ScheduleUiStateViewHolder>(ScheduleUiStateDiffCallback()),
     DraggableAdapter<ScheduleUiState> {
+    private val selectionEnabledFlow: MutableStateFlow<Boolean> = MutableStateFlow(false)
     private val draggableAdapterDelegate = ListItemDraggableAdapterDelegate(
         getSnapshot = this::getCurrentList,
         getItem = this::getItem,
@@ -40,6 +43,7 @@ class DefaultScheduleUiStateAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ScheduleUiStateViewHolder =
         ScheduleUiStateViewHolder.of(
             parent,
+            selectionEnabledFlow.asStateFlow(),
             onCompleteClicked = { position -> getItem(position)?.also(onCompleteClicked) },
             onDeleteClicked = { position -> getItem(position)?.also(onDeleteClicked) },
             onLinkClicked = { position -> getItem(position)?.also(onLinkClicked) }
@@ -59,5 +63,9 @@ class DefaultScheduleUiStateAdapter(
 
     override fun adjustRecentSwapPositions() {
         draggableAdapterDelegate.adjustRecentSwapPositions()
+    }
+
+    fun setSelectionEnabled(isEnable: Boolean) {
+        selectionEnabledFlow.tryEmit(isEnable)
     }
 }

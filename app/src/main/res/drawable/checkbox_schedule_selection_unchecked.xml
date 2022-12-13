@@ -15,11 +15,11 @@
   -->
 
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
-	android:shape="oval">
-	<size
-		android:width="@dimen/schedule_check_size"
-		android:height="@dimen/schedule_check_size" />
-	<stroke
-		android:color="@color/bg_schedule_checkbox_unchecked"
-		android:width="@dimen/schedule_check_external_dither" />
+    android:shape="oval">
+    <size
+        android:width="@dimen/schedule_check_size"
+        android:height="@dimen/schedule_check_size" />
+    <stroke
+        android:color="@color/bg_schedule_checkbox_unchecked"
+        android:width="@dimen/schedule_check_external_dither" />
 </shape>

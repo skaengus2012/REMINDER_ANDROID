@@ -21,17 +21,25 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.graphics.drawable.DrawableCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
+import androidx.transition.*
 import com.bumptech.glide.Glide
 import com.nlab.reminder.R
 import com.nlab.reminder.core.android.content.getThemeColor
+import com.nlab.reminder.core.android.lifecycle.event
+import com.nlab.reminder.core.android.lifecycle.filterLifecycleEvent
 import com.nlab.reminder.core.android.recyclerview.bindingAdapterOptionalPosition
+import com.nlab.reminder.core.android.transition.transitionListenerOf
 import com.nlab.reminder.core.android.view.initWithLifecycleOwner
 import com.nlab.reminder.core.android.view.throttleClicks
 import com.nlab.reminder.databinding.ViewItemScheduleBinding
 import com.nlab.reminder.domain.common.schedule.ScheduleUiState
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -40,6 +48,7 @@ import kotlinx.coroutines.flow.onEach
  */
 class ScheduleUiStateViewHolder(
     private val binding: ViewItemScheduleBinding,
+    selectionEnabledFlow: StateFlow<Boolean>,
     onCompleteClicked: (Int) -> Unit,
     onDeleteClicked: (Int) -> Unit,
     onLinkClicked: (Int) -> Unit
@@ -49,6 +58,9 @@ class ScheduleUiStateViewHolder(
             ?.let(DrawableCompat::wrap)
             ?.apply { DrawableCompat.setTint(mutate(), context.getThemeColor(R.attr.tint_schedule_placeholder)) }
     }
+    private val layoutContentNormalSet: ConstraintSet = ConstraintSet().apply { clone(binding.layoutContent) }
+    private val layoutContentSelectionSet =
+        ConstraintSet().apply { load(itemView.context, R.layout.view_item_schedule_layout_content_selection) }
 
     init {
         binding.initWithLifecycleOwner { lifecycleOwner ->
@@ -66,6 +78,36 @@ class ScheduleUiStateViewHolder(
                 .throttleClicks()
                 .onEach { onLinkClicked(bindingAdapterOptionalPosition ?: return@onEach) }
                 .launchIn(lifecycleOwner.lifecycleScope)
+
+            lifecycleOwner.lifecycle.event()
+                .filterLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+                .onEach {
+                    // clear selection animation.
+                    TransitionManager.endTransitions(layoutContent)
+                }
+                .launchIn(lifecycleOwner.lifecycleScope)
+
+            selectionEnabledFlow
+                .flowWithLifecycle(lifecycleOwner.lifecycle)
+                .onEach { isSelectionMode -> buttonSelection.isEnabled = isSelectionMode }
+                .onEach { isSelectionMode -> buttonComplete.isEnabled = isSelectionMode.not() }
+                .onEach { isSelectionMode ->
+                    TransitionManager.beginDelayedTransition(
+                        layoutContent,
+                        AutoTransition().apply {
+                            duration = 300
+                            addListener(transitionListenerOf(
+                                onStart = { layoutDelete.visibility = View.INVISIBLE },
+                                onEnd = { layoutDelete.visibility = View.VISIBLE },
+                                onCancel = { layoutDelete.visibility = View.VISIBLE }
+                            ))
+                        }
+                    )
+                    val applyConstraintSet: ConstraintSet =
+                        if (isSelectionMode) layoutContentSelectionSet else layoutContentNormalSet
+                    applyConstraintSet.applyTo(layoutContent)
+                }
+                .launchIn(lifecycleOwner.lifecycleScope)
         }
     }
 
@@ -78,9 +120,18 @@ class ScheduleUiStateViewHolder(
             .apply { isSelected = scheduleUiState.isCompleteMarked }
             .apply {
                 contentDescription = context.getString(
-                    if (scheduleUiState.isCompleteMarked) R.string.schedule_incomplete_checkbox_contentDescription
-                    else R.string.schedule_complete_checkbox_contentDescription
+                    if (scheduleUiState.isCompleteMarked) R.string.schedule_complete_checkbox_undo_contentDescription
+                    else R.string.schedule_complete_checkbox_contentDescription,
+                    scheduleUiState.title
                 )
+            }
+        binding.buttonSelection
+            .apply {
+                // TODO just resource test.
+                isSelected = scheduleUiState.id.value.toInt() % 2 == 0
+            }
+            .apply {
+                // TODO selection description
             }
         binding.textviewTitleLink
             .apply { visibility = if (scheduleUiState.linkMetadata.isTitleVisible) View.VISIBLE else View.GONE }
@@ -100,11 +151,13 @@ class ScheduleUiStateViewHolder(
     companion object {
         fun of(
             parent: ViewGroup,
+            selectionEnabledFlow: StateFlow<Boolean>,
             onCompleteClicked: (position: Int) -> Unit,
             onDeleteClicked: (position: Int) -> Unit,
             onLinkClicked: (position: Int) -> Unit
         ): ScheduleUiStateViewHolder = ScheduleUiStateViewHolder(
             ViewItemScheduleBinding.inflate(LayoutInflater.from(parent.context), parent, false),
+            selectionEnabledFlow,
             onCompleteClicked,
             onDeleteClicked,
             onLinkClicked
