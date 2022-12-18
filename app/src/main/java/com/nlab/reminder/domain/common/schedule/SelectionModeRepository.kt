@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.common.schedule.selection
+package com.nlab.reminder.domain.common.schedule
 
 import kotlinx.coroutines.flow.StateFlow
 
@@ -22,6 +22,6 @@ import kotlinx.coroutines.flow.StateFlow
  * @author thalys
  */
 interface SelectionModeRepository {
-    fun getEnabledStream(): StateFlow<Boolean>
+    fun enabledStream(): StateFlow<Boolean>
     suspend fun setEnabled(isEnable: Boolean)
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.common.schedule.selection.impl
+package com.nlab.reminder.domain.common.schedule.impl
 
 import com.nlab.reminder.test.genBoolean
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -38,7 +38,7 @@ class ScopedSelectionModeRepositoryTest {
         val initValue: Boolean = genBoolean()
         val selectionModeRepository = ScopedSelectionModeRepository(initValue)
 
-        assertThat(selectionModeRepository.getEnabledStream().value, equalTo(initValue))
+        assertThat(selectionModeRepository.enabledStream().value, equalTo(initValue))
     }
 
     @Test
@@ -48,7 +48,7 @@ class ScopedSelectionModeRepositoryTest {
         val selectionModeRepository = ScopedSelectionModeRepository(initValue)
         val newValueDeferred = async {
             selectionModeRepository
-                .getEnabledStream()
+                .enabledStream()
                 .drop(1)
                 .take(1)
                 .first()

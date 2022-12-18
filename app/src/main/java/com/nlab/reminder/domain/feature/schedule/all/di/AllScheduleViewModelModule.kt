@@ -22,7 +22,7 @@ import com.nlab.reminder.core.state.asContainer
 import com.nlab.reminder.domain.common.schedule.*
 import com.nlab.reminder.domain.common.schedule.visibleconfig.CompletedScheduleShownRepository
 import com.nlab.reminder.domain.common.schedule.impl.*
-import com.nlab.reminder.domain.common.schedule.selection.SelectionModeRepository
+import com.nlab.reminder.domain.common.schedule.SelectionModeRepository
 import com.nlab.reminder.domain.feature.schedule.all.*
 import com.nlab.reminder.domain.feature.schedule.all.impl.*
 import dagger.Module

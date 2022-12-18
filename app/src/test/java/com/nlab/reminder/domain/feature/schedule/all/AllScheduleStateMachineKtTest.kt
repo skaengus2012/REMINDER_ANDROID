@@ -20,7 +20,7 @@ import com.nlab.reminder.core.effect.SideEffectHandle
 import com.nlab.reminder.core.state.asContainer
 import com.nlab.reminder.core.kotlin.util.Result
 import com.nlab.reminder.domain.common.schedule.*
-import com.nlab.reminder.domain.common.schedule.selection.SelectionModeRepository
+import com.nlab.reminder.domain.common.schedule.SelectionModeRepository
 import com.nlab.reminder.domain.common.schedule.visibleconfig.*
 import com.nlab.reminder.test.*
 import kotlinx.coroutines.*
@@ -79,7 +79,7 @@ class AllScheduleStateMachineKtTest {
                     whenever(mock()) doReturn flow { emit(expectedSnapshot) }
                 },
                 selectionModeRepository = mock {
-                    whenever(mock.getEnabledStream()) doReturn MutableStateFlow(expectedSelectionMode)
+                    whenever(mock.enabledStream()) doReturn MutableStateFlow(expectedSelectionMode)
                 })
                 .asContainer(genStateContainerScope(), AllScheduleState.Init)
         val actualDeferred = async {

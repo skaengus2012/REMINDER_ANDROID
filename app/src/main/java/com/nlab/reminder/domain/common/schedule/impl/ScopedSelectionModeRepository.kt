@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.common.schedule.selection.impl
+package com.nlab.reminder.domain.common.schedule.impl
 
-import com.nlab.reminder.domain.common.schedule.selection.SelectionModeRepository
+import com.nlab.reminder.domain.common.schedule.SelectionModeRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -27,7 +27,7 @@ import kotlinx.coroutines.flow.asStateFlow
 class ScopedSelectionModeRepository(initializeEnabled: Boolean) : SelectionModeRepository {
     private val enabledFlow: MutableStateFlow<Boolean> = MutableStateFlow(initializeEnabled)
 
-    override fun getEnabledStream(): StateFlow<Boolean> {
+    override fun enabledStream(): StateFlow<Boolean> {
         return enabledFlow.asStateFlow()
     }
 

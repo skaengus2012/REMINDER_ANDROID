@@ -23,7 +23,7 @@ import com.nlab.reminder.core.kotlin.coroutine.flow.*
 import com.nlab.reminder.core.kotlin.util.onFailure
 import com.nlab.reminder.core.state.StateMachine
 import com.nlab.reminder.domain.common.schedule.*
-import com.nlab.reminder.domain.common.schedule.selection.SelectionModeRepository
+import com.nlab.reminder.domain.common.schedule.SelectionModeRepository
 import com.nlab.reminder.domain.common.schedule.visibleconfig.*
 
 /**
@@ -58,7 +58,7 @@ fun AllScheduleStateMachine(
             state<AllScheduleState.Init> {
                 combine(
                     getAllScheduleSnapshot(),
-                    selectionModeRepository.getEnabledStream(),
+                    selectionModeRepository.enabledStream(),
                     transform = { allScheduleSnapshot, isSelectionEnabled ->
                         AllScheduleEvent.StateLoaded(allScheduleSnapshot, isSelectionEnabled)
                     }
