@@ -21,8 +21,6 @@ import com.nlab.reminder.domain.common.util.link.LinkMetadataRepository
 import com.nlab.reminder.domain.common.util.transaction.TransactionIdGenerator
 import com.nlab.reminder.domain.common.schedule.*
 import com.nlab.reminder.domain.common.schedule.impl.*
-import com.nlab.reminder.domain.common.schedule.selection.*
-import com.nlab.reminder.domain.common.schedule.selection.impl.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -42,6 +40,10 @@ class ScheduleModule {
 
     @ViewModelScoped
     @Provides
+    fun provideSelectionRepository(): SelectionRepository = ScopedSelectionRepository()
+
+    @ViewModelScoped
+    @Provides
     fun provideSelectionModeRepository(): SelectionModeRepository = ScopedSelectionModeRepository(
         initializeEnabled = false
     )
@@ -49,8 +51,13 @@ class ScheduleModule {
     @Provides
     fun provideScheduleUiStateFlowFactory(
         completeMarkRepository: CompleteMarkRepository,
+        selectionRepository: SelectionRepository,
         linkThumbnailRepository: LinkMetadataRepository
-    ): ScheduleUiStateFlowFactory = DefaultScheduleUiStateFlowFactory(completeMarkRepository, linkThumbnailRepository)
+    ): ScheduleUiStateFlowFactory = DefaultScheduleUiStateFlowFactory(
+        completeMarkRepository,
+        selectionRepository,
+        linkThumbnailRepository
+    )
 
     @Provides
     fun provideUpdateScheduleCompleteUseCase(

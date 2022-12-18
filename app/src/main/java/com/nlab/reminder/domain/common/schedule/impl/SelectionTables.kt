@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.common.schedule
+package com.nlab.reminder.domain.common.schedule.impl
 
-import kotlinx.coroutines.flow.StateFlow
+import com.nlab.reminder.domain.common.schedule.Schedule
+import com.nlab.reminder.domain.common.schedule.SelectionTable
 
 /**
- * @author Doohyun
+ * @author thalys
  */
-interface CompleteMarkRepository {
-    fun get(): StateFlow<CompleteMarkTable>
-    suspend fun insert(completeMarks: CompleteMarkTable)
-    suspend fun updateToApplied(completeMarks: CompleteMarkTable)
+fun SelectionTable.isSelected(schedule: Schedule): Boolean {
+    return this[schedule.id] ?: false
 }

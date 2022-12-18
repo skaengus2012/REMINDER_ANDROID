@@ -38,7 +38,9 @@ class DefaultModifyScheduleCompleteUseCase(
         completeMarkRepository.insert(completeMarkTableOf(scheduleId, isComplete))
         delayUntilTransactionPeriod()
 
-        getNotAppliedCompleteMarkTable()
+        completeMarkRepository.get()
+            .value
+            .filterNot { it.value.isApplied }
             .also { snapshot -> completeMarkRepository.updateToApplied(snapshot) }
             .let { snapshot -> commitCompleteMarkTableToSchedule(snapshot) }
     }
@@ -51,12 +53,6 @@ class DefaultModifyScheduleCompleteUseCase(
                 transactionId = transactionIdGenerator.generate()
             )
         )
-
-    private suspend fun getNotAppliedCompleteMarkTable(): CompleteMarkTable =
-        completeMarkRepository.get()
-            .firstOrNull()
-            ?.filterNot { it.value.isApplied }
-            ?: emptyMap()
 
     private suspend fun commitCompleteMarkTableToSchedule(table: CompleteMarkTable): Result<Unit> =
         if (table.isEmpty()) Result.Success(Unit)

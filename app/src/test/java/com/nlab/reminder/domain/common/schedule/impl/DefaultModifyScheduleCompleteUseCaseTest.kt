@@ -27,8 +27,7 @@ import com.nlab.reminder.test.genLong
 import com.nlab.reminder.test.once
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.*
@@ -45,7 +44,9 @@ class DefaultModifyScheduleCompleteUseCaseTest {
         val fixedTxId = genBothify()
         val scheduleId = ScheduleId(genLong())
         val isComplete = genBoolean()
-        val completeMarkRepository: CompleteMarkRepository = mock { whenever(mock.get()) doReturn emptyFlow() }
+        val completeMarkRepository: CompleteMarkRepository = mock {
+            whenever(mock.get()) doReturn MutableStateFlow(emptyMap())
+        }
         val updateCompleteUseCase = DefaultModifyScheduleCompleteUseCase(
             transactionIdGenerator = genTransactionIdGenerator(expected = fixedTxId),
             scheduleRepository = mock(),
@@ -68,22 +69,20 @@ class DefaultModifyScheduleCompleteUseCaseTest {
         val testScheduleId = ScheduleId(0)
         val testComplete: Boolean = genBoolean()
         val completeMarkRepository: CompleteMarkRepository = mock {
-            whenever(mock.get()) doReturn flow {
-                emit(
-                    mapOf(
-                        testScheduleId to CompleteMark(
-                            isComplete = testComplete,
-                            isApplied = false,
-                            transactionId = TransactionId(genBothify())
-                        ),
-                        ScheduleId(1) to CompleteMark(
-                            isComplete = genBoolean(),
-                            isApplied = true,
-                            transactionId = TransactionId(genBothify())
-                        )
+            whenever(mock.get()) doReturn MutableStateFlow(
+                mapOf(
+                    testScheduleId to CompleteMark(
+                        isComplete = testComplete,
+                        isApplied = false,
+                        transactionId = TransactionId(genBothify())
+                    ),
+                    ScheduleId(1) to CompleteMark(
+                        isComplete = genBoolean(),
+                        isApplied = true,
+                        transactionId = TransactionId(genBothify())
                     )
                 )
-            }
+            )
         }
         val scheduleRepository: ScheduleRepository = mock()
         val updateCompleteUseCase = DefaultModifyScheduleCompleteUseCase(
@@ -105,17 +104,15 @@ class DefaultModifyScheduleCompleteUseCaseTest {
         val scheduleId = ScheduleId(genLong())
         val isComplete = genBoolean()
         val completeMarkRepository: CompleteMarkRepository = mock {
-            whenever(mock.get()) doReturn flow {
-                emit(
-                    mapOf(
-                        scheduleId to CompleteMark(
-                            isComplete,
-                            isApplied = false,
-                            transactionId = TransactionId(genBothify())
-                        )
+            whenever(mock.get()) doReturn MutableStateFlow(
+                mapOf(
+                    scheduleId to CompleteMark(
+                        isComplete,
+                        isApplied = false,
+                        transactionId = TransactionId(genBothify())
                     )
                 )
-            }
+            )
         }
         val scheduleRepository: ScheduleRepository = mock {
             whenever(
@@ -163,7 +160,9 @@ class DefaultModifyScheduleCompleteUseCaseTest {
         val scheduleId = ScheduleId(genLong())
         val isComplete = genBoolean()
         val txId = genBothify()
-        val completeMarkRepository: CompleteMarkRepository = mock { whenever(mock.get()) doReturn emptyFlow() }
+        val completeMarkRepository: CompleteMarkRepository = mock {
+            whenever(mock.get()) doReturn MutableStateFlow(emptyMap())
+        }
         val delayUntilTransactionPeriod: Delay = mock()
         val beforeDelayedOrder = inOrder(completeMarkRepository, delayUntilTransactionPeriod)
         val afterDelayedOrder = inOrder(delayUntilTransactionPeriod, completeMarkRepository)

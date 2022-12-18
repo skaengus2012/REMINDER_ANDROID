@@ -47,19 +47,22 @@ fun genSchedules(
 fun genScheduleUiState(
     schedule: Schedule = genSchedule(),
     linkMetadata: LinkMetadata = LinkMetadata.Empty,
-    isCompleteMarked: Boolean? = null
+    isCompleteMarked: Boolean = genBoolean(),
+    isSelected: Boolean = genBoolean()
 ): ScheduleUiState = ScheduleUiState(
     schedule,
     linkMetadata,
-    isCompleteMarked = isCompleteMarked ?: schedule.isComplete
+    isCompleteMarked,
+    isSelected
 )
 
 fun genScheduleUiStates(
     schedules: List<Schedule> = genSchedules(),
     linkMetadata: LinkMetadata = LinkMetadata.Empty,
-    isCompleteMarked: Boolean? = null
+    isCompleteMarked: Boolean = genBoolean(),
+    isSelected: Boolean = false
 ): List<ScheduleUiState> = schedules.map { schedule ->
-    ScheduleUiState(schedule, linkMetadata, isCompleteMarked = isCompleteMarked ?: schedule.isComplete)
+    genScheduleUiState(schedule, linkMetadata, isCompleteMarked, isSelected)
 }
 
 fun genCompleteMark(

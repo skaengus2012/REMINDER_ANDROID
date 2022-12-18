@@ -16,11 +16,12 @@
 
 package com.nlab.reminder.domain.common.schedule.impl
 
+import com.nlab.reminder.core.kotlin.util.Result
+import com.nlab.reminder.domain.common.schedule.*
 import com.nlab.reminder.domain.common.util.link.LinkMetadata
 import com.nlab.reminder.domain.common.util.link.LinkMetadataRepository
 import com.nlab.reminder.domain.common.util.link.genLinkMetadata
-import com.nlab.reminder.domain.common.schedule.*
-import com.nlab.reminder.core.kotlin.util.Result
+import com.nlab.reminder.test.genBoolean
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.test.runTest
@@ -39,39 +40,78 @@ import org.mockito.kotlin.whenever
 class DefaultScheduleUiStateFlowFactoryTest {
     @Test
     fun `schedule combined with complete mark`() = runTest {
-        testTemplate()
+        val expectCompleteMarked: Boolean = genBoolean()
+        val schedule: Schedule = genSchedule(isComplete = expectCompleteMarked.not())
+        val completeMarkRepository: CompleteMarkRepository = mock {
+            whenever(mock.get()) doReturn MutableStateFlow(
+                mapOf(schedule.id to genCompleteMark(isComplete = expectCompleteMarked))
+            )
+        }
+        testTemplate(schedule, completeMarkRepository = completeMarkRepository) { scheduleUiState ->
+            scheduleUiState.copy(
+                isCompleteMarked = expectCompleteMarked,
+                isSelected = false
+            )
+        }
+    }
+
+    @Test
+    fun `schedule combined with selectionTables`() = runTest {
+        val expectSelected: Boolean = genBoolean()
+        val schedule: Schedule = genSchedule()
+        val selectionRepository: SelectionRepository = mock {
+            whenever(mock.selectionTableStream()) doReturn MutableStateFlow(
+                mapOf(schedule.id to expectSelected)
+            )
+        }
+        testTemplate(schedule, selectionRepository = selectionRepository) { scheduleUiState ->
+            scheduleUiState.copy(
+                isCompleteMarked = schedule.isComplete,
+                isSelected = expectSelected
+            )
+        }
     }
 
     @Test
     fun `set link from linkThumbnailRepository`() = runTest {
         val expectedLinkMetadata: LinkMetadata = genLinkMetadata()
-        val linkThumbnailRepository: LinkMetadataRepository = mock {
+        val schedule: Schedule = genSchedule()
+        val linkMetadataRepository: LinkMetadataRepository = mock {
             whenever(mock.get(any())) doReturn Result.Success(expectedLinkMetadata)
         }
-        testTemplate(
-            linkThumbnailRepository,
-            decorateExpectedScheduleUiState = { scheduleUiState ->
-                scheduleUiState.copy(linkMetadata = expectedLinkMetadata)
-            }
-        )
+
+        testTemplate(schedule, linkMetadataRepository = linkMetadataRepository) { scheduleUiState ->
+            scheduleUiState.copy(
+                isCompleteMarked = schedule.isComplete,
+                isSelected = false,
+                linkMetadata = expectedLinkMetadata
+            )
+        }
     }
 
     private suspend fun testTemplate(
-        linkThumbnailRepository: LinkMetadataRepository = mock(),
+        schedule: Schedule = genSchedule(),
+        completeMarkRepository: CompleteMarkRepository = mock {
+            whenever(mock.get()) doReturn MutableStateFlow(emptyMap())
+        },
+        selectionRepository: SelectionRepository = mock {
+            whenever(mock.selectionTableStream()) doReturn MutableStateFlow(emptyMap())
+        },
+        linkMetadataRepository: LinkMetadataRepository = mock(),
         decorateExpectedScheduleUiState: (ScheduleUiState) -> ScheduleUiState = { it }
     ) {
-        val completeMarkTestFixture = CompleteMarkCombineTestFixture()
         val scheduleUiStateFlowFactory = DefaultScheduleUiStateFlowFactory(
-            completeMarkTestFixture.completeMarkRepository,
-            linkThumbnailRepository
+            completeMarkRepository,
+            selectionRepository,
+            linkMetadataRepository
         )
         val acc: List<ScheduleUiState> =
             scheduleUiStateFlowFactory
-                .with(completeMarkTestFixture.schedulesFlow)
+                .with(flowOf(listOf(schedule)))
                 .take(1)
                 .first()
         assertThat(
-            acc, equalTo(completeMarkTestFixture.expectedScheduleUiStates.map(decorateExpectedScheduleUiState))
+            acc, equalTo(listOf(genScheduleUiState(schedule)).map(decorateExpectedScheduleUiState))
         )
     }
 }

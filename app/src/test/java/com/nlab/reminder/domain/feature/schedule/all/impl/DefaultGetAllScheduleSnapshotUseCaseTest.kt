@@ -62,14 +62,14 @@ class DefaultGetAllScheduleSnapshotUseCaseTest {
         isDoneScheduleShown: Boolean,
         setupMock: (ScheduleRepository, schedules: List<Schedule>) -> Unit,
     ) {
-        val expectSchedules: List<Schedule> = genSchedules()
-        val fakeCompleteMark: Boolean = genBoolean()
-        val scheduleRepository: ScheduleRepository = mock { setupMock(mock, expectSchedules) }
+        val schedules: List<Schedule> = genSchedules()
+        val expectedUiStates: List<ScheduleUiState> = genScheduleUiStates(schedules)
+        val scheduleRepository: ScheduleRepository = mock { setupMock(mock, schedules) }
         val getAllScheduleSnapshotUseCase: GetAllScheduleSnapshotUseCase = DefaultGetAllScheduleSnapshotUseCase(
             scheduleRepository = scheduleRepository,
             scheduleUiStateFlowFactory = object : ScheduleUiStateFlowFactory {
                 override fun with(schedules: Flow<List<Schedule>>): Flow<List<ScheduleUiState>> =
-                    schedules.map { genScheduleUiStates(it, isCompleteMarked = fakeCompleteMark) }
+                    schedules.map { expectedUiStates }
             },
             completedScheduleShownRepository = mock { whenever(mock.get()) doReturn flowOf(isDoneScheduleShown) },
         )
@@ -79,7 +79,7 @@ class DefaultGetAllScheduleSnapshotUseCaseTest {
             snapshot,
             equalTo(
                 genAllScheduleSnapshot(
-                    uiStates = genScheduleUiStates(expectSchedules, isCompleteMarked = fakeCompleteMark),
+                    uiStates = expectedUiStates,
                     isCompletedScheduleShown = isDoneScheduleShown
                 )
             )

@@ -28,6 +28,7 @@ data class ScheduleUiState(
     private val schedule: Schedule,
     val linkMetadata: LinkMetadata,
     val isCompleteMarked: Boolean,
+    val isSelected: Boolean
 ) {
     val id: ScheduleId get() = schedule.id
     val title: String get() = schedule.title

@@ -26,24 +26,28 @@ import kotlinx.coroutines.flow.*
  */
 class DefaultScheduleUiStateFlowFactory(
     private val completeMarkRepository: CompleteMarkRepository,
+    private val selectionRepository: SelectionRepository,
     private val linkThumbnailRepository: LinkMetadataRepository
 ) : ScheduleUiStateFlowFactory {
     override fun with(schedules: Flow<List<Schedule>>): Flow<List<ScheduleUiState>> =
         combine(
             schedules,
-            completeMarkRepository.get().distinctUntilChanged(),
-            transform = ::transformToScheduleUiStates
+            completeMarkRepository.get(),
+            selectionRepository.selectionTableStream(),
+            transform = this::transformToScheduleUiStates
         )
 
     @Generated
     private suspend fun transformToScheduleUiStates(
         schedules: List<Schedule>,
-        completeMarkTable: CompleteMarkTable
+        completeMarkTable: CompleteMarkTable,
+        selectionTable: SelectionTable,
     ): List<ScheduleUiState> = schedules.map { schedule ->
         ScheduleUiState(
             schedule,
             linkMetadata = linkThumbnailRepository.findLinkMetadata(schedule),
-            isCompleteMarked = completeMarkTable.isCompleteMarked(schedule)
+            isCompleteMarked = completeMarkTable.isCompleteMarked(schedule),
+            isSelected = selectionTable.isSelected(schedule)
         )
     }
 }

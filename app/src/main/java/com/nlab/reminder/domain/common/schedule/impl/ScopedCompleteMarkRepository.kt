@@ -18,10 +18,7 @@ package com.nlab.reminder.domain.common.schedule.impl
 
 import com.nlab.reminder.domain.common.schedule.CompleteMarkRepository
 import com.nlab.reminder.domain.common.schedule.CompleteMarkTable
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.*
 
 /**
  * Thread-safe CompleteRequest Manager
@@ -31,7 +28,7 @@ import kotlinx.coroutines.flow.update
 class ScopedCompleteMarkRepository : CompleteMarkRepository {
     private val chunkRequests: MutableStateFlow<CompleteMarkTable> = MutableStateFlow(emptyMap())
 
-    override fun get(): Flow<CompleteMarkTable> = chunkRequests.asStateFlow()
+    override fun get(): StateFlow<CompleteMarkTable> = chunkRequests.asStateFlow()
 
     override suspend fun insert(completeMarks: CompleteMarkTable) {
         chunkRequests.update { old -> old + completeMarks }
