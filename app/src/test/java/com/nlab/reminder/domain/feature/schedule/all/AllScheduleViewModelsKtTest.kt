@@ -73,5 +73,10 @@ class AllScheduleViewModelsKtTest {
             stateContainer,
             AllScheduleEvent.OnScheduleLinkClicked(schedule.id)
         ) { viewModel.onScheduleLinkClicked(schedule.id) }
+
+        verifyStateSendExtension(
+            stateContainer,
+            AllScheduleEvent.OnScheduleSelectionClicked(schedule.id)
+        ) { viewModel.onScheduleSelectionClicked(schedule.id) }
     }
 }
