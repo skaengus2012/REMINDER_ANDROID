@@ -31,6 +31,9 @@ fun AllScheduleViewModel.onToggleSelectionModeEnableClicked() =
 fun AllScheduleViewModel.onDeleteCompletedScheduleClicked() =
     send(AllScheduleEvent.OnDeleteCompletedScheduleClicked)
 
+fun AllScheduleViewModel.onSelectedScheduleDeleteClicked() =
+    send(AllScheduleEvent.OnSelectedScheduleDeleteClicked)
+
 fun AllScheduleViewModel.onModifyScheduleCompleteClicked(
     scheduleId: ScheduleId,
     isComplete: Boolean
