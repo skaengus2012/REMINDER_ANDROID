@@ -43,6 +43,7 @@ class AllScheduleViewModelModule {
         scheduleUiStateFlowFactory: ScheduleUiStateFlowFactory,
         modifyScheduleCompleteUseCase: ModifyScheduleCompleteUseCase,
         selectionModeRepository: SelectionModeRepository,
+        selectionRepository: SelectionRepository,
         @AllScheduleScope completedScheduleShownRepository: CompletedScheduleShownRepository
     ): AllScheduleStateContainerFactory = object : AllScheduleStateContainerFactory {
         override fun create(
@@ -59,7 +60,8 @@ class AllScheduleViewModelModule {
                 modifyScheduleCompleteUseCase,
                 completedScheduleShownRepository,
                 scheduleRepository,
-                selectionModeRepository
+                selectionModeRepository,
+                selectionRepository
             )
             return stateMachine.asContainer(scope, AllScheduleState.Init, fetchEvent = AllScheduleEvent.Fetch)
         }

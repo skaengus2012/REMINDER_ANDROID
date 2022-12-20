@@ -36,7 +36,8 @@ fun AllScheduleStateMachine(
     modifyScheduleComplete: ModifyScheduleCompleteUseCase,
     completedScheduleShownRepository: CompletedScheduleShownRepository,
     scheduleRepository: ScheduleRepository,
-    selectionModeRepository: SelectionModeRepository
+    selectionModeRepository: SelectionModeRepository,
+    selectionRepository: SelectionRepository
 ): StateMachine<AllScheduleEvent, AllScheduleState> = StateMachine {
     reduce {
         event<AllScheduleEvent.Fetch> {
@@ -61,8 +62,8 @@ fun AllScheduleStateMachine(
                     selectionModeRepository.enabledStream(),
                     transform = { allScheduleSnapshot, isSelectionEnabled ->
                         AllScheduleEvent.StateLoaded(allScheduleSnapshot, isSelectionEnabled)
-                    }
-                ).collectWhileSubscribed { send(it) }
+                    })
+                    .collectWhileSubscribed { send(it) }
             }
         }
 
@@ -117,6 +118,14 @@ fun AllScheduleStateMachine(
                     before.scheduleUiStates.find { it.id == event.scheduleId }
                 if (uiState != null && uiState.link.isNotBlank()) {
                     sideEffectHandle.post(AllScheduleSideEffect.NavigateScheduleLink(uiState.link))
+                }
+            }
+
+            event<AllScheduleEvent.OnScheduleSelectionClicked> { (event, before) ->
+                val uiState: ScheduleUiState? =
+                    before.scheduleUiStates.find { it.id == event.scheduleId }
+                if (uiState != null) {
+                    selectionRepository.setSelected(uiState.id, uiState.isSelected.not())
                 }
             }
         }

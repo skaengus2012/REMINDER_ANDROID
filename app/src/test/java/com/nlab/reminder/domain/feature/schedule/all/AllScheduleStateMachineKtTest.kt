@@ -258,7 +258,7 @@ class AllScheduleStateMachineKtTest {
     fun `navigate schedule link when stateMachine sent scheduleLinkClicked event and has uiState`() = runTest {
         val link: String = genBothify()
         val schedule: Schedule = genSchedule(link = link)
-        testScheduleLinkClickedTemplate(
+        testOnScheduleLinkClickedVerifyTemplate(
             schedule,
             AllScheduleEvent.OnScheduleLinkClicked(schedule.id),
             verify = { sideEffectHandle ->
@@ -271,7 +271,7 @@ class AllScheduleStateMachineKtTest {
     fun `nothing work when stateMachine sent scheduleLinkClicked event and schedule hasn't uiState`() = runTest {
         val link: String = genBothify()
         val schedule: Schedule = genSchedule(scheduleId = 0, link = link)
-        testScheduleLinkClickedTemplate(
+        testOnScheduleLinkClickedVerifyTemplate(
             genSchedule(scheduleId = 1),
             AllScheduleEvent.OnScheduleLinkClicked(schedule.id),
             verify = { sideEffectHandle ->
@@ -284,7 +284,7 @@ class AllScheduleStateMachineKtTest {
     fun `nothing work when stateMachine sent scheduleLinkClicked event and schedule has blank link`() = runTest {
         val link = " "
         val schedule: Schedule = genSchedule(link = link)
-        testScheduleLinkClickedTemplate(
+        testOnScheduleLinkClickedVerifyTemplate(
             schedule,
             AllScheduleEvent.OnScheduleLinkClicked(schedule.id),
             verify = { sideEffectHandle ->
@@ -293,7 +293,7 @@ class AllScheduleStateMachineKtTest {
         )
     }
 
-    private suspend inline fun testScheduleLinkClickedTemplate(
+    private suspend inline fun testOnScheduleLinkClickedVerifyTemplate(
         initState: Schedule,
         event: AllScheduleEvent.OnScheduleLinkClicked,
         verify: (SideEffectHandle<AllScheduleSideEffect>) -> Unit
@@ -309,5 +309,61 @@ class AllScheduleStateMachineKtTest {
             .send(event)
             .join()
         verify(sideEffectHandle)
+    }
+
+    @Test
+    fun `nothing work when StateMachine hasn't uiState and OnScheduleSelectionClicked event sent`() = runTest {
+        val testSchedule: Schedule = genSchedule(scheduleId = 1)
+        testOnScheduleSelectionClickedVerifyTemplate(
+            initState = genScheduleUiState(genSchedule(scheduleId = 0)),
+            event = AllScheduleEvent.OnScheduleSelectionClicked(testSchedule.id),
+            verify = { selectionRepository ->
+                verify(selectionRepository, never()).setSelected(testSchedule.id, genBoolean())
+            }
+        )
+    }
+
+    @Test
+    fun `selectionRepository select true when select was false OnScheduleSelectionClicked event sent`() = runTest {
+        val expectedSelect = true
+        val uiState: ScheduleUiState = genScheduleUiState(isSelected = expectedSelect.not())
+        testOnScheduleSelectionClickedVerifyTemplate(
+            initState = uiState,
+            event = AllScheduleEvent.OnScheduleSelectionClicked(uiState.id),
+            verify = { selectionRepository ->
+                verify(selectionRepository, once()).setSelected(uiState.id, expectedSelect)
+            }
+        )
+    }
+
+    @Test
+    fun `selectionRepository select false when select was true OnScheduleSelectionClicked event sent`() = runTest {
+        val expectedSelect = false
+        val uiState: ScheduleUiState = genScheduleUiState(isSelected = expectedSelect.not())
+        testOnScheduleSelectionClickedVerifyTemplate(
+            initState = uiState,
+            event = AllScheduleEvent.OnScheduleSelectionClicked(uiState.id),
+            verify = { selectionRepository ->
+                verify(selectionRepository, once()).setSelected(uiState.id, expectedSelect)
+            }
+        )
+    }
+
+    private suspend inline fun testOnScheduleSelectionClickedVerifyTemplate(
+        initState: ScheduleUiState,
+        event: AllScheduleEvent.OnScheduleSelectionClicked,
+        verify: (SelectionRepository) -> Unit
+    ) {
+        val selectionRepository: SelectionRepository = mock()
+        genAllScheduleStateMachine(selectionRepository = selectionRepository)
+            .asContainer(
+                genStateContainerScope(),
+                genAllScheduleLoadedState(
+                    snapshot = genAllScheduleSnapshot(uiStates = listOf(initState))
+                )
+            )
+            .send(event)
+            .join()
+        verify(selectionRepository)
     }
 }

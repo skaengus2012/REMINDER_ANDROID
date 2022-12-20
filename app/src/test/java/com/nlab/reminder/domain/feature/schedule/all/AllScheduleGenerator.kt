@@ -74,14 +74,16 @@ fun genAllScheduleStateMachine(
     modifyScheduleComplete: ModifyScheduleCompleteUseCase = mock(),
     completedScheduleShownRepository: CompletedScheduleShownRepository = mock(),
     scheduleRepository: ScheduleRepository = mock(),
-    selectionModeRepository: SelectionModeRepository = mock()
+    selectionModeRepository: SelectionModeRepository = mock(),
+    selectionRepository: SelectionRepository = mock()
 ) = AllScheduleStateMachine(
     sideEffectHandle,
     getAllScheduleSnapshot,
     modifyScheduleComplete,
     completedScheduleShownRepository,
     scheduleRepository,
-    selectionModeRepository
+    selectionModeRepository,
+    selectionRepository
 )
 
 fun genAllScheduleEventSample(): AllScheduleEvent = genAllScheduleEvents().first()
