@@ -76,14 +76,15 @@ class AllScheduleFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val scheduleAdapter = DefaultScheduleUiStateAdapter(
-            onCompleteClicked = { scheduleUiState ->
+            onCompleteClicked = { uiState ->
                 viewModel.onModifyScheduleCompleteClicked(
-                    scheduleId = scheduleUiState.id,
-                    isComplete = scheduleUiState.isCompleteMarked.not()
+                    scheduleId = uiState.id,
+                    isComplete = uiState.isCompleteMarked.not()
                 )
             },
-            onDeleteClicked = { scheduleUiState -> viewModel.onDeleteScheduleClicked(scheduleUiState.id) },
-            onLinkClicked = { scheduleUiState -> viewModel.onScheduleLinkClicked(scheduleUiState.id) }
+            onDeleteClicked = { uiState -> viewModel.onDeleteScheduleClicked(uiState.id) },
+            onLinkClicked = { uiState -> viewModel.onScheduleLinkClicked(uiState.id) },
+            onSelectionClicked = { uiState -> viewModel.onScheduleSelectionClicked(uiState.id) }
         )
         val itemTouchCallback = ScheduleItemTouchCallback(
             context = requireContext(),

@@ -51,7 +51,8 @@ class ScheduleUiStateViewHolder(
     selectionEnabledFlow: StateFlow<Boolean>,
     onCompleteClicked: (Int) -> Unit,
     onDeleteClicked: (Int) -> Unit,
-    onLinkClicked: (Int) -> Unit
+    onLinkClicked: (Int) -> Unit,
+    onSelectClicked: (Int) -> Unit
 ) : RecyclerView.ViewHolder(binding.root) {
     private val linkThumbnailPlaceHolderDrawable: Drawable? = with(itemView) {
         AppCompatResources.getDrawable(context, R.drawable.ic_schedule_link_error)
@@ -67,6 +68,11 @@ class ScheduleUiStateViewHolder(
             buttonComplete
                 .throttleClicks()
                 .onEach { onCompleteClicked(bindingAdapterOptionalPosition ?: return@onEach) }
+                .launchIn(lifecycleOwner.lifecycleScope)
+
+            buttonSelection
+                .throttleClicks()
+                .onEach { onSelectClicked(bindingAdapterOptionalPosition ?: return@onEach) }
                 .launchIn(lifecycleOwner.lifecycleScope)
 
             layoutDelete
@@ -126,12 +132,13 @@ class ScheduleUiStateViewHolder(
                 )
             }
         binding.buttonSelection
+            .apply { isSelected = scheduleUiState.isSelected }
             .apply {
-                // TODO just resource test.
-                isSelected = scheduleUiState.id.value.toInt() % 2 == 0
-            }
-            .apply {
-                // TODO selection description
+                contentDescription = context.getString(
+                    if (scheduleUiState.isSelected) R.string.schedule_selection_checkbox_undo_contentDescription
+                    else R.string.schedule_selection_checkbox_contentDescription,
+                    scheduleUiState.title
+                )
             }
         binding.textviewTitleLink
             .apply { visibility = if (scheduleUiState.linkMetadata.isTitleVisible) View.VISIBLE else View.GONE }
@@ -144,6 +151,7 @@ class ScheduleUiStateViewHolder(
                     .load(scheduleUiState.linkMetadata.imageUrl)
                     .centerCrop()
                     .placeholder(linkThumbnailPlaceHolderDrawable)
+                    .error(linkThumbnailPlaceHolderDrawable)
                     .into(view)
             }
     }
@@ -154,13 +162,15 @@ class ScheduleUiStateViewHolder(
             selectionEnabledFlow: StateFlow<Boolean>,
             onCompleteClicked: (position: Int) -> Unit,
             onDeleteClicked: (position: Int) -> Unit,
-            onLinkClicked: (position: Int) -> Unit
+            onLinkClicked: (position: Int) -> Unit,
+            onSelectClicked: (Int) -> Unit
         ): ScheduleUiStateViewHolder = ScheduleUiStateViewHolder(
             ViewItemScheduleBinding.inflate(LayoutInflater.from(parent.context), parent, false),
             selectionEnabledFlow,
             onCompleteClicked,
             onDeleteClicked,
-            onLinkClicked
+            onLinkClicked,
+            onSelectClicked
         )
     }
 }

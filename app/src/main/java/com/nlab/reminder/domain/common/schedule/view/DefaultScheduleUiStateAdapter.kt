@@ -30,7 +30,8 @@ import kotlinx.coroutines.flow.asStateFlow
 class DefaultScheduleUiStateAdapter(
     private val onCompleteClicked: (ScheduleUiState) -> Unit,
     private val onDeleteClicked: (ScheduleUiState) -> Unit,
-    private val onLinkClicked: (ScheduleUiState) -> Unit
+    private val onLinkClicked: (ScheduleUiState) -> Unit,
+    private val onSelectionClicked: (ScheduleUiState) -> Unit
 ) : ListAdapter<ScheduleUiState, ScheduleUiStateViewHolder>(ScheduleUiStateDiffCallback()),
     DraggableAdapter<ScheduleUiState> {
     private val selectionEnabledFlow: MutableStateFlow<Boolean> = MutableStateFlow(false)
@@ -46,7 +47,8 @@ class DefaultScheduleUiStateAdapter(
             selectionEnabledFlow.asStateFlow(),
             onCompleteClicked = { position -> getItem(position)?.also(onCompleteClicked) },
             onDeleteClicked = { position -> getItem(position)?.also(onDeleteClicked) },
-            onLinkClicked = { position -> getItem(position)?.also(onLinkClicked) }
+            onLinkClicked = { position -> getItem(position)?.also(onLinkClicked) },
+            onSelectClicked = { position -> getItem(position)?.also(onSelectionClicked) }
         )
 
     override fun onBindViewHolder(holder: ScheduleUiStateViewHolder, position: Int) {
