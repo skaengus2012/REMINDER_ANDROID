@@ -37,6 +37,8 @@ sealed class DeleteRequest private constructor() {
     @Generated
     data class ById(val scheduleId: ScheduleId) : DeleteRequest()
     @Generated
+    data class ByIds(val scheduleIds: List<ScheduleId>) : DeleteRequest()
+    @Generated
     data class ByComplete(val isComplete: Boolean) : DeleteRequest()
 }
 

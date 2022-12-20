@@ -102,8 +102,8 @@ abstract class ScheduleDao {
     @Delete
     abstract suspend fun delete(schedule: ScheduleEntity)
 
-    @Query("DELETE FROM schedule WHERE schedule_id = :scheduleId")
-    abstract suspend fun deleteByScheduleId(scheduleId: Long)
+    @Query("DELETE FROM schedule WHERE schedule_id IN (:scheduleId)")
+    abstract suspend fun deleteByScheduleIds(scheduleId: List<Long>)
 
     @Query("DELETE FROM schedule WHERE is_complete = :isComplete")
     abstract suspend fun deleteByComplete(isComplete: Boolean)

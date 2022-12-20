@@ -56,7 +56,8 @@ class LocalScheduleRepository(
 
     override suspend fun delete(request: DeleteRequest): Result<Unit> = when (request) {
         // When outside the catch block, jacoco does not recognize. 😭
-        is DeleteRequest.ById -> catching { scheduleDao.deleteByScheduleId(request.scheduleId.value) }
+        is DeleteRequest.ById -> catching { scheduleDao.deleteByScheduleIds(listOf(request.scheduleId.value)) }
+        is DeleteRequest.ByIds -> catching { scheduleDao.deleteByScheduleIds(request.scheduleIds.map { it.value }) }
         is DeleteRequest.ByComplete -> catching { scheduleDao.deleteByComplete(request.isComplete) }
     }
 }

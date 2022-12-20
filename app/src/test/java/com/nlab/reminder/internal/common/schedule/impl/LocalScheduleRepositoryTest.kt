@@ -133,7 +133,15 @@ class LocalScheduleRepositoryTest {
     fun `result for delete by specific scheduleId was success`() = runTest {
         val schedule: Schedule = genSchedule()
         testDeleteTemplate(DeleteRequest.ById(schedule.id)) { scheduleDao ->
-            scheduleDao.deleteByScheduleId(schedule.id.value)
+            scheduleDao.deleteByScheduleIds(listOf(schedule.id.value))
+        }
+    }
+
+    @Test
+    fun `result for delete by specific scheduleIds was success`() = runTest {
+        val schedules: List<Schedule> = genSchedules()
+        testDeleteTemplate(DeleteRequest.ByIds(schedules.map { it.id })) { scheduleDao ->
+            scheduleDao.deleteByScheduleIds(schedules.map { it.id.value })
         }
     }
 
