@@ -255,25 +255,59 @@ class AllScheduleStateMachineKtTest {
     }
 
     @Test
-    fun `navigate schedule link when stateMachine sent scheduleLinkClicked event`() = runTest {
+    fun `navigate schedule link when stateMachine sent scheduleLinkClicked event and has uiState`() = runTest {
         val link: String = genBothify()
         val schedule: Schedule = genSchedule(link = link)
-        val sideEffectHandle: SideEffectHandle<AllScheduleSideEffect> = mock()
-        genAllScheduleStateMachine(sideEffectHandle = sideEffectHandle)
-            .asContainer(genStateContainerScope(), genAllScheduleLoadedState())
-            .send(AllScheduleEvent.OnScheduleLinkClicked(genScheduleUiState(schedule)))
-            .join()
-        verify(sideEffectHandle, once()).post(AllScheduleSideEffect.NavigateScheduleLink(link))
+        testScheduleLinkClickedTemplate(
+            schedule,
+            AllScheduleEvent.OnScheduleLinkClicked(schedule.id),
+            verify = { sideEffectHandle ->
+                verify(sideEffectHandle, once()).post(AllScheduleSideEffect.NavigateScheduleLink(link))
+            }
+        )
     }
 
     @Test
-    fun `nothing work when stateMachine sent scheduleLinkClicked event and schedule link was empty`() = runTest {
-        val schedule: Schedule = genSchedule(link = "")
+    fun `nothing work when stateMachine sent scheduleLinkClicked event and schedule hasn't uiState`() = runTest {
+        val link: String = genBothify()
+        val schedule: Schedule = genSchedule(scheduleId = 0, link = link)
+        testScheduleLinkClickedTemplate(
+            genSchedule(scheduleId = 1),
+            AllScheduleEvent.OnScheduleLinkClicked(schedule.id),
+            verify = { sideEffectHandle ->
+                verify(sideEffectHandle, never()).post(AllScheduleSideEffect.NavigateScheduleLink(link))
+            }
+        )
+    }
+
+    @Test
+    fun `nothing work when stateMachine sent scheduleLinkClicked event and schedule has blank link`() = runTest {
+        val link = " "
+        val schedule: Schedule = genSchedule(link = link)
+        testScheduleLinkClickedTemplate(
+            schedule,
+            AllScheduleEvent.OnScheduleLinkClicked(schedule.id),
+            verify = { sideEffectHandle ->
+                verify(sideEffectHandle, never()).post(AllScheduleSideEffect.NavigateScheduleLink(link))
+            }
+        )
+    }
+
+    private suspend inline fun testScheduleLinkClickedTemplate(
+        initState: Schedule,
+        event: AllScheduleEvent.OnScheduleLinkClicked,
+        verify: (SideEffectHandle<AllScheduleSideEffect>) -> Unit
+    ) {
         val sideEffectHandle: SideEffectHandle<AllScheduleSideEffect> = mock()
         genAllScheduleStateMachine(sideEffectHandle = sideEffectHandle)
-            .asContainer(genStateContainerScope(), genAllScheduleLoadedState())
-            .send(AllScheduleEvent.OnScheduleLinkClicked(genScheduleUiState(schedule)))
+            .asContainer(
+                genStateContainerScope(),
+                genAllScheduleLoadedState(
+                    snapshot = genAllScheduleSnapshot(uiStates = genScheduleUiStates(listOf(initState)))
+                )
+            )
+            .send(event)
             .join()
-        verify(sideEffectHandle, never()).post(any())
+        verify(sideEffectHandle)
     }
 }

@@ -47,7 +47,6 @@ import com.nlab.reminder.domain.common.schedule.view.ScheduleItemTouchCallback
 import com.nlab.reminder.domain.feature.schedule.all.*
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.*
-import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -84,7 +83,7 @@ class AllScheduleFragment : Fragment() {
                 )
             },
             onDeleteClicked = { scheduleUiState -> viewModel.onDeleteScheduleClicked(scheduleUiState.id) },
-            onLinkClicked = viewModel::onScheduleLinkClicked
+            onLinkClicked = { scheduleUiState -> viewModel.onScheduleLinkClicked(scheduleUiState.id) }
         )
         val itemTouchCallback = ScheduleItemTouchCallback(
             context = requireContext(),

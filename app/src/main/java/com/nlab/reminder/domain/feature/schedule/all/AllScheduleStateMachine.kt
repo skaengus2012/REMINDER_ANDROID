@@ -112,10 +112,11 @@ fun AllScheduleStateMachine(
                 scheduleRepository.delete(DeleteRequest.ById(event.scheduleId))
             }
 
-            event<AllScheduleEvent.OnScheduleLinkClicked> { (event) ->
-                val link = event.scheduleUiState.link
-                if (link.isNotEmpty()) {
-                    sideEffectHandle.post(AllScheduleSideEffect.NavigateScheduleLink(link))
+            event<AllScheduleEvent.OnScheduleLinkClicked> { (event, before) ->
+                val uiState: ScheduleUiState? =
+                    before.scheduleUiStates.find { it.id == event.scheduleId }
+                if (uiState != null && uiState.link.isNotBlank()) {
+                    sideEffectHandle.post(AllScheduleSideEffect.NavigateScheduleLink(uiState.link))
                 }
             }
         }
