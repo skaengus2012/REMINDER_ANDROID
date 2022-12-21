@@ -65,6 +65,15 @@ fun AllScheduleStateMachine(
                     })
                     .collectWhileSubscribed { send(it) }
             }
+
+            state<AllScheduleState.Init> {
+                selectionModeRepository.enabledStream()
+                    .collect { isEnabled ->
+                        if (isEnabled.not()) {
+                            selectionRepository.clearSelected()
+                        }
+                    }
+            }
         }
 
         state<AllScheduleState.Loaded> {
@@ -79,8 +88,7 @@ fun AllScheduleStateMachine(
             }
 
             event<AllScheduleEvent.OnToggleSelectionModeEnableClicked> { (_, state) ->
-                val nextSelectionMode: Boolean = state.isSelectionMode.not()
-                selectionModeRepository.setEnabled(nextSelectionMode)
+                selectionModeRepository.setEnabled(state.isSelectionMode.not())
             }
 
             event<AllScheduleEvent.OnDeleteCompletedScheduleClicked> {
