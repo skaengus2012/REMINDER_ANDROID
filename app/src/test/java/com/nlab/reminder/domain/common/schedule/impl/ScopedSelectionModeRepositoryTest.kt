@@ -34,6 +34,12 @@ import org.junit.Test
 @ExperimentalCoroutinesApi
 class ScopedSelectionModeRepositoryTest {
     @Test
+    fun `set default initValue false when not set on constructor`() {
+        val selectionModeRepository = ScopedSelectionModeRepository()
+        assertThat(selectionModeRepository.enabledStream().value, equalTo(false))
+    }
+
+    @Test
     fun `set initValue with constructor parameter`() {
         val initValue: Boolean = genBoolean()
         val selectionModeRepository = ScopedSelectionModeRepository(initValue)
