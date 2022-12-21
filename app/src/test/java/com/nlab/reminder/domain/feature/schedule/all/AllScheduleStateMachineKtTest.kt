@@ -366,4 +366,44 @@ class AllScheduleStateMachineKtTest {
             .join()
         verify(selectionRepository)
     }
+
+    @Test
+    fun `nothing work when selected uiStates was empty and OnSelectedScheduleDeleteClicked clicked`() = runTest {
+        testOnSelectedScheduleDeleteClickedVerifyTemplate(
+            genScheduleUiStates(isSelected = false),
+            verify = { scheduleRepository ->
+                verify(scheduleRepository, never()).delete(any())
+            }
+        )
+    }
+
+    @Test
+    fun `delete selected items when OnSelectedScheduleDeleteClicked clicked`() = runTest {
+        val selectedUiStates: List<ScheduleUiState> = genScheduleUiStates(isSelected = true)
+        val unSelectedUiStates: List<ScheduleUiState> = genScheduleUiStates(isSelected = false)
+        testOnSelectedScheduleDeleteClickedVerifyTemplate(
+            initStates = (selectedUiStates + unSelectedUiStates),
+            verify = { scheduleRepository ->
+                verify(scheduleRepository, once()).delete(DeleteRequest.ByIds(selectedUiStates.map { it.id }))
+            }
+        )
+    }
+
+    private suspend inline fun testOnSelectedScheduleDeleteClickedVerifyTemplate(
+        initStates: List<ScheduleUiState>,
+        verify: (ScheduleRepository) -> Unit
+    ) {
+        val scheduleRepository: ScheduleRepository = mock()
+
+        genAllScheduleStateMachine(scheduleRepository = scheduleRepository)
+            .asContainer(
+                genStateContainerScope(),
+                genAllScheduleLoadedState(
+                    snapshot = genAllScheduleSnapshot(uiStates = initStates)
+                )
+            )
+            .send(AllScheduleEvent.OnSelectedScheduleDeleteClicked)
+            .join()
+        verify(scheduleRepository)
+    }
 }

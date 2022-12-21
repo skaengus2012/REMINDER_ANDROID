@@ -128,6 +128,14 @@ fun AllScheduleStateMachine(
                     selectionRepository.setSelected(uiState.id, uiState.isSelected.not())
                 }
             }
+
+            event<AllScheduleEvent.OnSelectedScheduleDeleteClicked> { (_, state) ->
+                val selectedUiStateIds: List<ScheduleId> =
+                    state.scheduleUiStates.filter { it.isSelected }.map { it.id }
+                if (selectedUiStateIds.isNotEmpty()) {
+                    scheduleRepository.delete(DeleteRequest.ByIds(selectedUiStateIds))
+                }
+            }
         }
     }
 }
