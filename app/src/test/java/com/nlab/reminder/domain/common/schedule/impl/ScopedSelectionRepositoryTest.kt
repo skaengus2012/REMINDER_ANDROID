@@ -16,8 +16,7 @@
 
 package com.nlab.reminder.domain.common.schedule.impl
 
-import com.nlab.reminder.domain.common.schedule.Schedule
-import com.nlab.reminder.domain.common.schedule.genSchedule
+import com.nlab.reminder.domain.common.schedule.*
 import com.nlab.reminder.test.genBoolean
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
@@ -48,5 +47,17 @@ class ScopedSelectionRepositoryTest {
 
         repository.setSelected(schedule.id, isSelect)
         assertThat(notEmptySelectionTable.await(), equalTo(mapOf(schedule.id to isSelect)))
+    }
+
+    @Test
+    fun `set empty selectionTable when cleared`() = runTest {
+        val selectedTable: SelectionTable =
+            genScheduleUiStates(isSelected = true).associate { it.id to it.isSelected }
+        val unSelectedTable: SelectionTable =
+            genScheduleUiStates(isSelected = false).associate { it.id to it.isSelected }
+        val repository = ScopedSelectionRepository(initTable = selectedTable + unSelectedTable)
+        repository.clearSelected()
+
+        assertThat(repository.selectionTableStream().value, equalTo(emptyMap()))
     }
 }

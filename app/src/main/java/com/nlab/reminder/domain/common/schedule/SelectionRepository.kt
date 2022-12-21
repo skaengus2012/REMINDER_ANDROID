@@ -24,4 +24,5 @@ import kotlinx.coroutines.flow.StateFlow
 interface SelectionRepository {
     fun selectionTableStream(): StateFlow<SelectionTable>
     suspend fun setSelected(scheduleId: ScheduleId, isSelect: Boolean)
+    suspend fun clearSelected()
 }

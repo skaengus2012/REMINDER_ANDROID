@@ -27,12 +27,16 @@ import kotlinx.coroutines.flow.update
 /**
  * @author thalys
  */
-class ScopedSelectionRepository : SelectionRepository {
-    private val selectedStateFlow = MutableStateFlow<SelectionTable>(emptyMap())
+class ScopedSelectionRepository(initTable: SelectionTable = emptyMap()) : SelectionRepository {
+    private val selectedStateFlow = MutableStateFlow(initTable)
 
     override fun selectionTableStream(): StateFlow<SelectionTable> = selectedStateFlow.asStateFlow()
 
     override suspend fun setSelected(scheduleId: ScheduleId, isSelect: Boolean) {
         selectedStateFlow.update { old -> old + (scheduleId to isSelect) }
+    }
+
+    override suspend fun clearSelected() {
+        selectedStateFlow.emit(emptyMap())
     }
 }

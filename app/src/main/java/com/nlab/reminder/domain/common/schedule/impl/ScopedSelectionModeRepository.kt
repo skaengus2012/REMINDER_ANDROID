@@ -24,8 +24,8 @@ import kotlinx.coroutines.flow.asStateFlow
 /**
  * @author thalys
  */
-class ScopedSelectionModeRepository(initializeEnabled: Boolean) : SelectionModeRepository {
-    private val enabledFlow: MutableStateFlow<Boolean> = MutableStateFlow(initializeEnabled)
+class ScopedSelectionModeRepository(initEnabled: Boolean = false) : SelectionModeRepository {
+    private val enabledFlow: MutableStateFlow<Boolean> = MutableStateFlow(initEnabled)
 
     override fun enabledStream(): StateFlow<Boolean> {
         return enabledFlow.asStateFlow()

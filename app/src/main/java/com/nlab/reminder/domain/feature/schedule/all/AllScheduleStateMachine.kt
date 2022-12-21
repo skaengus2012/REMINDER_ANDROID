@@ -79,7 +79,8 @@ fun AllScheduleStateMachine(
             }
 
             event<AllScheduleEvent.OnToggleSelectionModeEnableClicked> { (_, state) ->
-                selectionModeRepository.setEnabled(state.isSelectionMode.not())
+                val nextSelectionMode: Boolean = state.isSelectionMode.not()
+                selectionModeRepository.setEnabled(nextSelectionMode)
             }
 
             event<AllScheduleEvent.OnDeleteCompletedScheduleClicked> {

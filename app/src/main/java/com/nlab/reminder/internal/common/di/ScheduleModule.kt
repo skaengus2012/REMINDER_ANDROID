@@ -45,7 +45,7 @@ class ScheduleModule {
     @ViewModelScoped
     @Provides
     fun provideSelectionModeRepository(): SelectionModeRepository = ScopedSelectionModeRepository(
-        initializeEnabled = false
+        initEnabled = false
     )
 
     @Provides
