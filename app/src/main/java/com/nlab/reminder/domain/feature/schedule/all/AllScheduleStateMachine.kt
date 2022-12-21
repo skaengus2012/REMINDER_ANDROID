@@ -144,6 +144,8 @@ fun AllScheduleStateMachine(
                 if (selectedUiStateIds.isNotEmpty()) {
                     scheduleRepository.delete(DeleteRequest.ByIds(selectedUiStateIds))
                 }
+
+                selectionModeRepository.setEnabled(false)
             }
         }
     }

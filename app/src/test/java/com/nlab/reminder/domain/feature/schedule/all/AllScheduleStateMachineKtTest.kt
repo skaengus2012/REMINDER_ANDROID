@@ -432,4 +432,15 @@ class AllScheduleStateMachineKtTest {
             .join()
         verify(scheduleRepository)
     }
+
+    @Test
+    fun `selectionMode was disable when OnSelectedScheduleDeleteClicked clicked`() = runTest {
+        val selectionModeRepository: SelectionModeRepository = mock()
+
+        genAllScheduleStateMachine(selectionModeRepository = selectionModeRepository)
+            .asContainer(genStateContainerScope(), genAllScheduleLoadedState())
+            .send(AllScheduleEvent.OnSelectedScheduleDeleteClicked)
+            .join()
+        verify(selectionModeRepository, once()).setEnabled(false)
+    }
 }
