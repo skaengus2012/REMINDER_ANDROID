@@ -14,23 +14,14 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.kotlin.collection
+package com.nlab.reminder.domain.common.util.link
 
-import kotlin.collections.minOf as kotlinMinOf
-import kotlin.collections.maxOf as kotlinMaxOf
-import kotlin.collections.filter as kotlinFilter
+import kotlinx.coroutines.flow.StateFlow
 
 /**
  * @author thalys
  */
-fun <T, R : Comparable<R>> Iterable<T>.minOf(selector: (T) -> R): R {
-    return kotlinMinOf(selector)
-}
-
-fun <T, R : Comparable<R>> Iterable<T>.maxOf(selector: (T) -> R): R {
-    return kotlinMaxOf(selector)
-}
-
-fun <T> Iterable<T>.filter(predicate: (T) -> Boolean): List<T> {
-    return kotlinFilter(predicate)
+interface LinkMetadataTableRepository {
+    fun getStream(): StateFlow<LinkMetadataTable>
+    suspend fun setLinks(links: List<String>)
 }

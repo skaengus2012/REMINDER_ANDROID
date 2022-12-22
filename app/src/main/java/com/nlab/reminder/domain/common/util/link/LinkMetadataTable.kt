@@ -14,15 +14,9 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.common.schedule.impl
-
-import com.nlab.reminder.core.kotlin.util.getOrNull
-import com.nlab.reminder.domain.common.util.link.LinkMetadata
-import com.nlab.reminder.domain.common.util.link.LinkMetadataRepository
-import com.nlab.reminder.domain.common.schedule.Schedule
+package com.nlab.reminder.domain.common.util.link
 
 /**
  * @author thalys
  */
-suspend fun LinkMetadataRepository.findLinkMetadata(schedule: Schedule): LinkMetadata =
-    schedule.link?.let { get(it) }?.getOrNull() ?: LinkMetadata.Empty
+typealias LinkMetadataTable = Map<String, LinkMetadata>

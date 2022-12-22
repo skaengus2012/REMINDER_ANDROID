@@ -36,7 +36,7 @@ import javax.inject.Singleton
 class UtilityModule {
     @Reusable
     @Provides
-    fun provideCoroutineScope(): TransactionIdGenerator = DefaultTransactionIdGenerator(
+    fun provideTransactionIdGenerator(): TransactionIdGenerator = DefaultTransactionIdGenerator(
         randomPrefix = { UUID.randomUUID().toString() },
         timestamp = { Calendar.getInstance().timeInMillis }
     )

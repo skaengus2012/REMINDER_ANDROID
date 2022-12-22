@@ -20,6 +20,7 @@ import com.nlab.reminder.domain.common.util.link.LinkMetadata
 import com.nlab.reminder.domain.common.util.link.LinkMetadataRepository
 import com.nlab.reminder.core.kotlin.util.Result
 import com.nlab.reminder.core.kotlin.util.onSuccess
+import java.util.concurrent.ConcurrentHashMap
 
 /**
  * @author thalys
@@ -27,7 +28,7 @@ import com.nlab.reminder.core.kotlin.util.onSuccess
 class CachedLinkMetadataRepository(
     private val internalRepository: LinkMetadataRepository
 ) : LinkMetadataRepository {
-    private val caches= hashMapOf<String, LinkMetadata>()
+    private val caches = ConcurrentHashMap<String, LinkMetadata>()
 
     override suspend fun get(link: String): Result<LinkMetadata> {
         val result: Result<LinkMetadata>
