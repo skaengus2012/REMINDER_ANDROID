@@ -19,9 +19,12 @@ package com.nlab.reminder.domain.feature.schedule.all.impl
 import com.nlab.reminder.core.kotlin.coroutine.flow.map
 import com.nlab.reminder.domain.common.schedule.*
 import com.nlab.reminder.domain.common.schedule.visibleconfig.CompletedScheduleShownRepository
+import com.nlab.reminder.domain.common.util.link.LinkMetadata
+import com.nlab.reminder.domain.common.util.link.LinkMetadataTable
+import com.nlab.reminder.domain.common.util.link.LinkMetadataTableRepository
 import com.nlab.reminder.domain.feature.schedule.all.AllScheduleSnapshot
 import com.nlab.reminder.domain.feature.schedule.all.GetAllScheduleSnapshotUseCase
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 
 /**
@@ -29,24 +32,48 @@ import kotlinx.coroutines.flow.*
  */
 class DefaultGetAllScheduleSnapshotUseCase(
     scheduleRepository: ScheduleRepository,
-    private val scheduleUiStateFlowFactory: ScheduleUiStateFlowFactory,
+    private val linkMetadataTableRepository: LinkMetadataTableRepository,
     private val completedScheduleShownRepository: CompletedScheduleShownRepository,
+    private val scheduleUiStateFlowFactory: ScheduleUiStateFlowFactory,
 ) : GetAllScheduleSnapshotUseCase {
     private val findAllSchedules: Flow<List<Schedule>> =
         scheduleRepository.get(GetRequest.All)
     private val findNotCompleteSchedules: Flow<List<Schedule>> =
         scheduleRepository.get(GetRequest.ByComplete(isComplete = false))
 
-    @ExperimentalCoroutinesApi
+    @OptIn(FlowPreview::class)
     override fun invoke(): Flow<AllScheduleSnapshot> =
-        completedScheduleShownRepository.get().flatMapLatest(this::getSnapshot)
+        completedScheduleShownRepository.get().flatMapConcat(this::getSnapshot)
 
     private fun getSnapshot(isCompletedScheduleShown: Boolean): Flow<AllScheduleSnapshot> =
-        getSchedules(isCompletedScheduleShown)
-            .let(scheduleUiStateFlowFactory::with)
-            .map { scheduleUiStates -> AllScheduleSnapshot(scheduleUiStates, isCompletedScheduleShown) }
+        getScheduleUiStateStream(isCompletedScheduleShown).map { scheduleUiStates ->
+            AllScheduleSnapshot(
+                scheduleUiStates,
+                isCompletedScheduleShown
+            )
+        }
 
-    private fun getSchedules(isDoneScheduleShown: Boolean): Flow<List<Schedule>> =
-        if (isDoneScheduleShown) findAllSchedules
+    private fun getScheduleStream(isCompletedScheduleShown: Boolean): Flow<List<Schedule>> =
+        if (isCompletedScheduleShown) findAllSchedules
         else findNotCompleteSchedules
+
+    private fun getScheduleUiStateStream(isCompletedScheduleShown: Boolean): Flow<List<ScheduleUiState>> =
+        combine(
+            getScheduleStream(isCompletedScheduleShown)
+                .let(scheduleUiStateFlowFactory::with)
+                .onEach { uiStates -> linkMetadataTableRepository.setLinks(uiStates.map { it.link }) },
+            linkMetadataTableRepository.getStream(),
+            ::combineScheduleUiStateAndLinkMetadataTable
+        )
+
+    companion object {
+        private fun combineScheduleUiStateAndLinkMetadataTable(
+            scheduleUiStates: List<ScheduleUiState>,
+            linkMetadataTable: LinkMetadataTable
+        ): List<ScheduleUiState> = scheduleUiStates.map { uiState ->
+            val foundLinkMetadata: LinkMetadata? = linkMetadataTable[uiState.link]
+            if (foundLinkMetadata != null) uiState.copy(linkMetadata = foundLinkMetadata)
+            else uiState
+        }
+    }
 }

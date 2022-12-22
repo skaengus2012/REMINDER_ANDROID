@@ -38,7 +38,7 @@ class AllScheduleRepositoryModule {
     @AllScheduleScope
     @Reusable
     @Provides
-    fun provideDoneScheduleShownRepository(
+    fun provideCompletedScheduleShownRepository(
         dataStore: DataStore<Preferences>
     ): CompletedScheduleShownRepository = LocalCompletedScheduleShownRepository(
         dataStore,

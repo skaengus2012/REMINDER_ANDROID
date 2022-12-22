@@ -50,11 +50,9 @@ class ScheduleModule {
     fun provideScheduleUiStateFlowFactory(
         completeMarkRepository: CompleteMarkRepository,
         selectionRepository: SelectionRepository,
-        linkThumbnailRepository: LinkMetadataRepository
     ): ScheduleUiStateFlowFactory = DefaultScheduleUiStateFlowFactory(
         completeMarkRepository,
-        selectionRepository,
-        linkThumbnailRepository
+        selectionRepository
     )
 
     @Provides

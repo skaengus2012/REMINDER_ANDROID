@@ -25,6 +25,8 @@ import dagger.Provides
 import dagger.Reusable
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
 import java.util.*
 import javax.inject.Singleton
 
@@ -44,4 +46,8 @@ class UtilityModule {
     @Singleton
     @Provides
     fun provideToastHandle(application: Application): ToastHandle = ToastHandle(application)
+
+    @Singleton
+    @Provides
+    fun provideGlobalCoroutineScope(): CoroutineScope = CoroutineScope(SupervisorJob())
 }

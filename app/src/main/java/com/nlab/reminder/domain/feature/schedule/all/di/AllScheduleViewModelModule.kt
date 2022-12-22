@@ -23,6 +23,7 @@ import com.nlab.reminder.domain.common.schedule.*
 import com.nlab.reminder.domain.common.schedule.visibleconfig.CompletedScheduleShownRepository
 import com.nlab.reminder.domain.common.schedule.impl.*
 import com.nlab.reminder.domain.common.schedule.SelectionModeRepository
+import com.nlab.reminder.domain.common.util.link.LinkMetadataTableRepository
 import com.nlab.reminder.domain.feature.schedule.all.*
 import com.nlab.reminder.domain.feature.schedule.all.impl.*
 import dagger.Module
@@ -44,6 +45,7 @@ class AllScheduleViewModelModule {
         modifyScheduleCompleteUseCase: ModifyScheduleCompleteUseCase,
         selectionModeRepository: SelectionModeRepository,
         selectionRepository: SelectionRepository,
+        linkMetadataTableRepository: LinkMetadataTableRepository,
         @AllScheduleScope completedScheduleShownRepository: CompletedScheduleShownRepository
     ): AllScheduleStateContainerFactory = object : AllScheduleStateContainerFactory {
         override fun create(
@@ -54,8 +56,9 @@ class AllScheduleViewModelModule {
                 sideEffectHandle,
                 DefaultGetAllScheduleSnapshotUseCase(
                     scheduleRepository,
-                    scheduleUiStateFlowFactory,
-                    completedScheduleShownRepository
+                    linkMetadataTableRepository,
+                    completedScheduleShownRepository,
+                    scheduleUiStateFlowFactory
                 ),
                 modifyScheduleCompleteUseCase,
                 completedScheduleShownRepository,

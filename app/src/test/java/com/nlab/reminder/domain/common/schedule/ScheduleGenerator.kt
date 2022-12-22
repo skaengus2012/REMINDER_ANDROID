@@ -39,9 +39,10 @@ fun genSchedule(
 ): Schedule = Schedule(scheduleId, title, note, link, tags, visiblePriority, isComplete)
 
 fun genSchedules(
-    isComplete: Boolean = genBoolean()
+    isComplete: Boolean = genBoolean(),
+    link: String? = null
 ): List<Schedule> = List(genInt("1#")) { index ->
-    genSchedule(scheduleId = index.toLong(), isComplete = isComplete)
+    genSchedule(scheduleId = index.toLong(), isComplete = isComplete, link = link)
 }
 
 fun genScheduleUiState(
