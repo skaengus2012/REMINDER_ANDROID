@@ -148,6 +148,8 @@ class ScheduleUiStateViewHolder(
             .let { view ->
                 Glide.with(view.context)
                     .load(scheduleUiState.linkMetadata.imageUrl)
+                    .override(1000, 400)
+                    .dontTransform()
                     .optionalCenterCrop()
                     .placeholder(linkThumbnailPlaceHolderDrawable)
                     .error(linkThumbnailPlaceHolderDrawable)
