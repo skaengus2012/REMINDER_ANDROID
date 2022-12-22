@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.ListAdapter
 import com.nlab.reminder.core.android.recyclerview.DragSnapshot
 import com.nlab.reminder.core.android.recyclerview.DraggableAdapter
 import com.nlab.reminder.domain.common.schedule.ScheduleUiState
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
@@ -67,7 +68,12 @@ class DefaultScheduleUiStateAdapter(
         draggableAdapterDelegate.adjustRecentSwapPositions()
     }
 
-    fun setSelectionEnabled(isEnable: Boolean) {
-        selectionEnabledFlow.tryEmit(isEnable)
+    suspend fun setSelectionEnabled(isEnable: Boolean) {
+        if (isEnable.not()) {
+            // Include a delay period because selection animation conflicts occur.
+            delay(100L)
+        }
+
+        selectionEnabledFlow.emit(isEnable)
     }
 }
