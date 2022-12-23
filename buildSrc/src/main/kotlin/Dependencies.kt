@@ -24,6 +24,7 @@ object Dependencies {
     const val ANDROID_MATERIAL = "com.google.android.material:material:${DependenciesVersions.ANDROID_MATERIAL}"
     const val ANDROID_CONSTRAINTLAYOUT = "androidx.constraintlayout:constraintlayout:${DependenciesVersions.ANDROID_CONSTRAINTLAYOUT}"
     const val ANDROID_RECYCLERVIEW = "androidx.recyclerview:recyclerview:${DependenciesVersions.ANDROID_RECYCLERVIEW}"
+    const val ANDROID_RECYCLERVIEW_SELECTION = "androidx.recyclerview:recyclerview-selection:${DependenciesVersions.ANDROID_RECYCLERVIEW_SELECTION}"
     const val ANDROID_LIFECYCLE_VIEWMODEL_KTX = "androidx.lifecycle:lifecycle-viewmodel-ktx:${DependenciesVersions.ANDROID_LIFECYCLE}"
     const val ANDROID_LIFECYCLE_RUNTIME_KTX = "androidx.lifecycle:lifecycle-runtime-ktx:${DependenciesVersions.ANDROID_LIFECYCLE}"
     const val ANDROID_FRAGMENT = "androidx.fragment:fragment-ktx:${DependenciesVersions.ANDROID_FRAGMENT}"

@@ -163,6 +163,7 @@ dependencies {
     implementation(Dependencies.ANDROID_MATERIAL)
     implementation(Dependencies.ANDROID_CONSTRAINTLAYOUT)
     implementation(Dependencies.ANDROID_RECYCLERVIEW)
+    implementation(Dependencies.ANDROID_RECYCLERVIEW_SELECTION)
     implementation(Dependencies.ANDROID_LIFECYCLE_VIEWMODEL_KTX)
     implementation(Dependencies.ANDROID_LIFECYCLE_RUNTIME_KTX)
     implementation(Dependencies.ANDROID_FRAGMENT)

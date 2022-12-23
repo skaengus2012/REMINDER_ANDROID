@@ -31,6 +31,7 @@ object DependenciesVersions {
     const val ANDROID_MATERIAL = "1.6.1"
     const val ANDROID_CONSTRAINTLAYOUT = "2.1.4"
     const val ANDROID_RECYCLERVIEW = "1.2.1"
+    const val ANDROID_RECYCLERVIEW_SELECTION = "1.1.0"
     const val ANDROID_LIFECYCLE = "2.5.1"
     const val ANDROID_FRAGMENT = "1.5.4"
     const val ANDROID_NAVIGATION = "2.5.3"
