@@ -48,14 +48,15 @@ class ScheduleItemTouchCallback(
     private val disposeSwipeClearedAnimations: MutableSet<ViewPropertyAnimator> = HashSet()
 
     private var disposeScaleAnimation: ViewPropertyAnimator? = null
-    private var isItemViewSwipeEnabled: Boolean = true
+    private var isItemViewSwipeEnabled: Boolean = false
+    private var isLongPressDragEnabled: Boolean = false
     private var curDX: Float = 0f
     private var curContainerX: Float = 0f
     private var curPosition: Int? = null
     private var prevPosition: Int? = null
 
     override fun isItemViewSwipeEnabled(): Boolean = isItemViewSwipeEnabled
-    override fun isLongPressDragEnabled(): Boolean = true
+    override fun isLongPressDragEnabled(): Boolean = isLongPressDragEnabled
 
     override fun onMove(recyclerView: RecyclerView, viewHolder: ViewHolder, target: ViewHolder): Boolean {
         return onItemMoved(viewHolder.bindingAdapterPosition, target.bindingAdapterPosition)
@@ -202,6 +203,10 @@ class ScheduleItemTouchCallback(
         curPosition = null
         curContainerX = 0f
         curDX = 0f
+    }
+
+    fun setLongPressDragEnabled(isEnable: Boolean) {
+        isLongPressDragEnabled = isEnable
     }
 
     fun setItemViewSwipeEnabled(isEnable: Boolean) {

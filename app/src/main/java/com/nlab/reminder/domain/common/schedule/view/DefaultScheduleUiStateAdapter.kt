@@ -18,12 +18,12 @@ package com.nlab.reminder.domain.common.schedule.view
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.nlab.reminder.core.android.recyclerview.DragSnapshot
 import com.nlab.reminder.core.android.recyclerview.DraggableAdapter
 import com.nlab.reminder.domain.common.schedule.ScheduleUiState
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.*
 
 /**
  * @author thalys
@@ -32,15 +32,18 @@ class DefaultScheduleUiStateAdapter(
     private val onCompleteClicked: (ScheduleUiState) -> Unit,
     private val onDeleteClicked: (ScheduleUiState) -> Unit,
     private val onLinkClicked: (ScheduleUiState) -> Unit,
-    private val onSelectionClicked: (ScheduleUiState) -> Unit
+    private val onSelectionClicked: (ScheduleUiState) -> Unit,
 ) : ListAdapter<ScheduleUiState, ScheduleUiStateViewHolder>(ScheduleUiStateDiffCallback()),
     DraggableAdapter<ScheduleUiState> {
+    private val _startDragEventFlow: MutableSharedFlow<ViewHolder> = MutableSharedFlow(extraBufferCapacity = 1)
     private val selectionEnabledFlow: MutableStateFlow<Boolean> = MutableStateFlow(false)
     private val draggableAdapterDelegate = ListItemDraggableAdapterDelegate(
         getSnapshot = this::getCurrentList,
         getItem = this::getItem,
         notifyItemMoved = this::notifyItemMoved
     )
+
+    val startDragEventFlow: SharedFlow<ViewHolder> = _startDragEventFlow.asSharedFlow()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ScheduleUiStateViewHolder =
         ScheduleUiStateViewHolder.of(
@@ -49,7 +52,8 @@ class DefaultScheduleUiStateAdapter(
             onCompleteClicked = { position -> getItem(position)?.also(onCompleteClicked) },
             onDeleteClicked = { position -> getItem(position)?.also(onDeleteClicked) },
             onLinkClicked = { position -> getItem(position)?.also(onLinkClicked) },
-            onSelectClicked = { position -> getItem(position)?.also(onSelectionClicked) }
+            onSelectClicked = { position -> getItem(position)?.also(onSelectionClicked) },
+            onDragHandleClicked = { viewHolder -> _startDragEventFlow.tryEmit(viewHolder) }
         )
 
     override fun onBindViewHolder(holder: ScheduleUiStateViewHolder, position: Int) {

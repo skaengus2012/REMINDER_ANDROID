@@ -29,6 +29,7 @@
     <string name="open_link">링크 열기</string>
     <string name="open_link_default_error">실행할 수 없는 링크입니다.</string>
     <string name="delete">삭제</string>
+    <string name="handle_drag">드래그 시작</string>
 
     <!-- schedule -->
     <string name="schedule_complete_checkbox_contentDescription" formatted="true">%1$s를 완료합니다.</string>

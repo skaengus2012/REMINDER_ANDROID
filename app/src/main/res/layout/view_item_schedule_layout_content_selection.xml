@@ -96,12 +96,15 @@
         app:layout_constraintStart_toStartOf="@id/guideline_textStart"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageView
-        android:id="@+id/imageview_drag_handle"
+    <ImageButton
+        android:id="@+id/button_drag_handle"
         android:layout_width="@dimen/schedule_checkbox_touchable_size"
         android:layout_height="@dimen/schedule_checkbox_touchable_size"
+        android:background="?selectableItemBackgroundBorderless"
+        android:contentDescription="@string/handle_drag"
         android:importantForAccessibility="no"
-        android:padding="14dp"
+        android:padding="15dp"
+        android:scaleType="fitXY"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@id/guideline_textEnd"

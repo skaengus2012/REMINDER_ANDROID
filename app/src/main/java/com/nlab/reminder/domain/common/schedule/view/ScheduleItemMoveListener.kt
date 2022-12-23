@@ -34,7 +34,7 @@ class ScheduleItemMoveListener(
         if (isMoveNeeded) {
             notifyItemMoved(fromPosition, toPosition)
         }
-
+        System.out.println("saddsasad $isMoveNeeded")
         return isMoveNeeded
     }
 }

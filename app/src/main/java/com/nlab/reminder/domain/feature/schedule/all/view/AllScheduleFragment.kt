@@ -84,7 +84,7 @@ class AllScheduleFragment : Fragment() {
             },
             onDeleteClicked = { uiState -> viewModel.onDeleteScheduleClicked(uiState.id) },
             onLinkClicked = { uiState -> viewModel.onScheduleLinkClicked(uiState.id) },
-            onSelectionClicked = { uiState -> viewModel.onScheduleSelectionClicked(uiState.id) }
+            onSelectionClicked = { uiState -> viewModel.onScheduleSelectionClicked(uiState.id) },
         )
         val itemTouchCallback = ScheduleItemTouchCallback(
             context = requireContext(),
@@ -96,12 +96,17 @@ class AllScheduleFragment : Fragment() {
                 }
             }
         )
+        val itemTouchHelper = ItemTouchHelper(itemTouchCallback)
         val scheduleItemAnimator = ScheduleItemAnimator()
 
         binding.recyclerviewContent
-            .apply { ItemTouchHelper(itemTouchCallback).attachToRecyclerView(this) }
+            .apply { itemTouchHelper.attachToRecyclerView(this) }
             .apply { itemAnimator = scheduleItemAnimator }
             .apply { adapter = scheduleAdapter }
+
+        scheduleAdapter.startDragEventFlow
+            .onEach(itemTouchHelper::startDrag)
+            .launchIn(viewLifecycleScope)
 
         binding.recyclerviewContent.touchs()
             .map { it.x }
@@ -154,6 +159,7 @@ class AllScheduleFragment : Fragment() {
             .flowWithLifecycle(viewLifecycle)
             .onEach(scheduleAdapter::setSelectionEnabled)
             .onEach { isSelectionMode -> itemTouchCallback.isItemViewSwipeEnabled = isSelectionMode.not() }
+            .onEach { isSelectionMode -> itemTouchCallback.isLongPressDragEnabled = isSelectionMode.not() }
             .onEach { isSelectionMode ->
                 binding.buttonSelectionModeOnOff.setText(
                     if (isSelectionMode) R.string.schedule_selection_mode_off

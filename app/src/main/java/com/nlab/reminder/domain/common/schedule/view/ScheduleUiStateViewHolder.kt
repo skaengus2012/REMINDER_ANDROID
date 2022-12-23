@@ -18,6 +18,7 @@ package com.nlab.reminder.domain.common.schedule.view
 
 import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.content.res.AppCompatResources
@@ -37,9 +38,11 @@ import com.nlab.reminder.core.android.recyclerview.bindingAdapterOptionalPositio
 import com.nlab.reminder.core.android.transition.transitionListenerOf
 import com.nlab.reminder.core.android.view.initWithLifecycleOwner
 import com.nlab.reminder.core.android.view.throttleClicks
+import com.nlab.reminder.core.android.view.touchs
 import com.nlab.reminder.databinding.ViewItemScheduleBinding
 import com.nlab.reminder.domain.common.schedule.ScheduleUiState
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -52,7 +55,8 @@ class ScheduleUiStateViewHolder(
     onCompleteClicked: (Int) -> Unit,
     onDeleteClicked: (Int) -> Unit,
     onLinkClicked: (Int) -> Unit,
-    onSelectClicked: (Int) -> Unit
+    onSelectClicked: (Int) -> Unit,
+    onDragHandleClicked: (RecyclerView.ViewHolder) -> Unit
 ) : RecyclerView.ViewHolder(binding.root) {
     private val linkThumbnailPlaceHolderDrawable: Drawable? = with(itemView) {
         AppCompatResources.getDrawable(context, R.drawable.ic_schedule_link_error)
@@ -83,6 +87,12 @@ class ScheduleUiStateViewHolder(
             cardLink
                 .throttleClicks()
                 .onEach { onLinkClicked(bindingAdapterOptionalPosition ?: return@onEach) }
+                .launchIn(lifecycleOwner.lifecycleScope)
+
+            buttonDragHandle
+                .touchs()
+                .filter { event -> event.action == MotionEvent.ACTION_DOWN }
+                .onEach { onDragHandleClicked(this@ScheduleUiStateViewHolder) }
                 .launchIn(lifecycleOwner.lifecycleScope)
 
             lifecycleOwner.lifecycle.event()
@@ -164,14 +174,16 @@ class ScheduleUiStateViewHolder(
             onCompleteClicked: (position: Int) -> Unit,
             onDeleteClicked: (position: Int) -> Unit,
             onLinkClicked: (position: Int) -> Unit,
-            onSelectClicked: (Int) -> Unit
+            onSelectClicked: (Int) -> Unit,
+            onDragHandleClicked: (RecyclerView.ViewHolder) -> Unit
         ): ScheduleUiStateViewHolder = ScheduleUiStateViewHolder(
             ViewItemScheduleBinding.inflate(LayoutInflater.from(parent.context), parent, false),
             selectionEnabledFlow,
             onCompleteClicked,
             onDeleteClicked,
             onLinkClicked,
-            onSelectClicked
+            onSelectClicked,
+            onDragHandleClicked
         )
     }
 }
