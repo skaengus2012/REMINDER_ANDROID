@@ -42,6 +42,7 @@ import com.nlab.reminder.databinding.FragmentAllScheduleBinding
 import com.nlab.reminder.domain.common.android.navigation.openLinkSafety
 import com.nlab.reminder.domain.common.android.view.loadingFlow
 import com.nlab.reminder.domain.common.schedule.view.DefaultScheduleUiStateAdapter
+import com.nlab.reminder.domain.common.schedule.view.DefaultScheduleUiStateAdapter.*
 import com.nlab.reminder.domain.common.schedule.view.ScheduleItemAnimator
 import com.nlab.reminder.domain.common.schedule.view.ScheduleItemTouchCallback
 import com.nlab.reminder.domain.feature.schedule.all.*
@@ -75,17 +76,7 @@ class AllScheduleFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val scheduleAdapter = DefaultScheduleUiStateAdapter(
-            onCompleteClicked = { uiState ->
-                viewModel.onModifyScheduleCompleteClicked(
-                    scheduleId = uiState.id,
-                    isComplete = uiState.isCompleteMarked.not()
-                )
-            },
-            onDeleteClicked = { uiState -> viewModel.onDeleteScheduleClicked(uiState.id) },
-            onLinkClicked = { uiState -> viewModel.onScheduleLinkClicked(uiState.id) },
-            onSelectionClicked = { uiState -> viewModel.onScheduleSelectionClicked(uiState.id) },
-        )
+        val scheduleAdapter = DefaultScheduleUiStateAdapter()
         val itemTouchCallback = ScheduleItemTouchCallback(
             context = requireContext(),
             onItemMoved = scheduleAdapter::onMove,
@@ -97,14 +88,44 @@ class AllScheduleFragment : Fragment() {
             }
         )
         val itemTouchHelper = ItemTouchHelper(itemTouchCallback)
-        val scheduleItemAnimator = ScheduleItemAnimator()
 
         binding.recyclerviewContent
-            .apply { itemTouchHelper.attachToRecyclerView(this) }
-            .apply { itemAnimator = scheduleItemAnimator }
+            .apply { ItemTouchHelper(itemTouchCallback).attachToRecyclerView(this) }
+            .apply { itemAnimator = ScheduleItemAnimator() }
             .apply { adapter = scheduleAdapter }
 
-        scheduleAdapter.startDragEventFlow
+        scheduleAdapter.itemEvent
+            .filterIsInstance<ItemEvent.OnCompleteClicked>()
+            .map { it.uiState }
+            .onEach { uiState ->
+                viewModel.onModifyScheduleCompleteClicked(
+                    scheduleId = uiState.id,
+                    isComplete = uiState.isCompleteMarked.not()
+                )
+            }
+            .launchIn(viewLifecycleScope)
+
+        scheduleAdapter.itemEvent
+            .filterIsInstance<ItemEvent.OnDeleteClicked>()
+            .map { it.uiState.id }
+            .onEach(viewModel::onDeleteScheduleClicked)
+            .launchIn(viewLifecycleScope)
+
+        scheduleAdapter.itemEvent
+            .filterIsInstance<ItemEvent.OnLinkClicked>()
+            .map { it.uiState.id }
+            .onEach(viewModel::onScheduleLinkClicked)
+            .launchIn(viewLifecycleScope)
+
+        scheduleAdapter.itemEvent
+            .filterIsInstance<ItemEvent.OnSelectionClicked>()
+            .map { it.uiState.id }
+            .onEach(viewModel::onScheduleSelectionClicked)
+            .launchIn(viewLifecycleScope)
+
+        scheduleAdapter.itemEvent
+            .filterIsInstance<ItemEvent.OnDragHandleClicked>()
+            .map { it.viewHolder }
             .onEach(itemTouchHelper::startDrag)
             .launchIn(viewLifecycleScope)
 

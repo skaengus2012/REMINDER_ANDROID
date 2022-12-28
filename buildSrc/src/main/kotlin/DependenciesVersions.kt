@@ -31,7 +31,6 @@ object DependenciesVersions {
     const val ANDROID_MATERIAL = "1.6.1"
     const val ANDROID_CONSTRAINTLAYOUT = "2.1.4"
     const val ANDROID_RECYCLERVIEW = "1.2.1"
-    const val ANDROID_RECYCLERVIEW_SELECTION = "1.1.0"
     const val ANDROID_LIFECYCLE = "2.5.1"
     const val ANDROID_FRAGMENT = "1.5.4"
     const val ANDROID_NAVIGATION = "2.5.3"
@@ -45,8 +44,8 @@ object DependenciesVersions {
     const val GLIDE = "4.14.2"
 
     const val TIMBER = "5.0.1"
-
     const val JSOUP = "1.13.1"
+    const val AFOLLESTED_DRAG_SELECTION_RECYCLERVIEW = "2.4.0"
 
     const val FACEBOOK_FLIPPER = "0.173.0"
     const val FACEBOOK_SOLOADER = "0.10.4"

@@ -24,7 +24,6 @@ object Dependencies {
     const val ANDROID_MATERIAL = "com.google.android.material:material:${DependenciesVersions.ANDROID_MATERIAL}"
     const val ANDROID_CONSTRAINTLAYOUT = "androidx.constraintlayout:constraintlayout:${DependenciesVersions.ANDROID_CONSTRAINTLAYOUT}"
     const val ANDROID_RECYCLERVIEW = "androidx.recyclerview:recyclerview:${DependenciesVersions.ANDROID_RECYCLERVIEW}"
-    const val ANDROID_RECYCLERVIEW_SELECTION = "androidx.recyclerview:recyclerview-selection:${DependenciesVersions.ANDROID_RECYCLERVIEW_SELECTION}"
     const val ANDROID_LIFECYCLE_VIEWMODEL_KTX = "androidx.lifecycle:lifecycle-viewmodel-ktx:${DependenciesVersions.ANDROID_LIFECYCLE}"
     const val ANDROID_LIFECYCLE_RUNTIME_KTX = "androidx.lifecycle:lifecycle-runtime-ktx:${DependenciesVersions.ANDROID_LIFECYCLE}"
     const val ANDROID_FRAGMENT = "androidx.fragment:fragment-ktx:${DependenciesVersions.ANDROID_FRAGMENT}"
@@ -44,8 +43,8 @@ object Dependencies {
     const val GLIDE_COMPILER = "com.github.bumptech.glide:compiler:${DependenciesVersions.GLIDE}"
 
     const val TIMBER = "com.jakewharton.timber:timber:${DependenciesVersions.TIMBER}"
-
     const val JSOUP = "org.jsoup:jsoup:${DependenciesVersions.JSOUP}"
+    const val AFOLLESTED_DRAG_SELECTION_RECYCLERVIEW = "com.afollestad:drag-select-recyclerview:${DependenciesVersions.AFOLLESTED_DRAG_SELECTION_RECYCLERVIEW}"
 
     const val FACEBOOK_FLIPPER = "com.facebook.flipper:flipper:${DependenciesVersions.FACEBOOK_FLIPPER}"
     const val FACEBOOK_FLIPPER_LEAKCANARY = "com.facebook.flipper:flipper-leakcanary2-plugin:${DependenciesVersions.FACEBOOK_FLIPPER}"

@@ -30,4 +30,6 @@
     <dimen name="schedule_check_external_dither">1.5dp</dimen>
     <dimen name="schedule_clamp_width">60dp</dimen>
     <dimen name="schedule_dragged_when_link_thumbnail_height">120dp</dimen>
+
+    <dimen name="test">100dp</dimen>
 </resources>

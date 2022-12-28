@@ -28,33 +28,35 @@ import kotlinx.coroutines.flow.*
 /**
  * @author thalys
  */
-class DefaultScheduleUiStateAdapter(
-    private val onCompleteClicked: (ScheduleUiState) -> Unit,
-    private val onDeleteClicked: (ScheduleUiState) -> Unit,
-    private val onLinkClicked: (ScheduleUiState) -> Unit,
-    private val onSelectionClicked: (ScheduleUiState) -> Unit,
-) : ListAdapter<ScheduleUiState, ScheduleUiStateViewHolder>(ScheduleUiStateDiffCallback()),
+class DefaultScheduleUiStateAdapter :
+    ListAdapter<ScheduleUiState, ScheduleUiStateViewHolder>(ScheduleUiStateDiffCallback()),
     DraggableAdapter<ScheduleUiState> {
-    private val _startDragEventFlow: MutableSharedFlow<ViewHolder> = MutableSharedFlow(extraBufferCapacity = 1)
-    private val selectionEnabledFlow: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    private val _itemEvent = MutableSharedFlow<ItemEvent>(extraBufferCapacity = 1)
+    private val selectionEnabledFlow = MutableStateFlow(false)
     private val draggableAdapterDelegate = ListItemDraggableAdapterDelegate(
         getSnapshot = this::getCurrentList,
         getItem = this::getItem,
         notifyItemMoved = this::notifyItemMoved
     )
 
-    val startDragEventFlow: SharedFlow<ViewHolder> = _startDragEventFlow.asSharedFlow()
+    val itemEvent: SharedFlow<ItemEvent> = _itemEvent.asSharedFlow()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ScheduleUiStateViewHolder =
         ScheduleUiStateViewHolder.of(
             parent,
             selectionEnabledFlow.asStateFlow(),
-            onCompleteClicked = { position -> getItem(position)?.also(onCompleteClicked) },
-            onDeleteClicked = { position -> getItem(position)?.also(onDeleteClicked) },
-            onLinkClicked = { position -> getItem(position)?.also(onLinkClicked) },
-            onSelectClicked = { position -> getItem(position)?.also(onSelectionClicked) },
-            onDragHandleClicked = { viewHolder -> _startDragEventFlow.tryEmit(viewHolder) }
+            onCompleteClicked = { position -> sendItemEventWithUiState(position, ItemEvent::OnCompleteClicked) },
+            onDeleteClicked = { position -> sendItemEventWithUiState(position, ItemEvent::OnDeleteClicked) },
+            onLinkClicked = { position -> sendItemEventWithUiState(position, ItemEvent::OnLinkClicked) },
+            onSelectClicked = { position -> sendItemEventWithUiState(position, ItemEvent::OnSelectionClicked) },
+            onDragHandleClicked = { viewHolder -> _itemEvent.tryEmit(ItemEvent.OnDragHandleClicked(viewHolder)) }
         )
+
+    private inline fun sendItemEventWithUiState(position: Int, getEvent: (ScheduleUiState) -> ItemEvent) {
+        getItem(position)
+            ?.let(getEvent)
+            ?.also(_itemEvent::tryEmit)
+    }
 
     override fun onBindViewHolder(holder: ScheduleUiStateViewHolder, position: Int) {
         holder.onBind(getItem(position))
@@ -79,5 +81,13 @@ class DefaultScheduleUiStateAdapter(
         }
 
         selectionEnabledFlow.emit(isEnable)
+    }
+
+    sealed class ItemEvent private constructor() {
+        data class OnCompleteClicked(val uiState: ScheduleUiState) : ItemEvent()
+        data class OnDeleteClicked(val uiState: ScheduleUiState) : ItemEvent()
+        data class OnLinkClicked(val uiState: ScheduleUiState) : ItemEvent()
+        data class OnSelectionClicked(val uiState: ScheduleUiState) : ItemEvent()
+        data class OnDragHandleClicked(val viewHolder: ViewHolder) : ItemEvent()
     }
 }
