@@ -163,7 +163,6 @@ dependencies {
     implementation(Dependencies.ANDROID_MATERIAL)
     implementation(Dependencies.ANDROID_CONSTRAINTLAYOUT)
     implementation(Dependencies.ANDROID_RECYCLERVIEW)
-    implementation(Dependencies.ANDROID_RECYCLERVIEW_SELECTION)
     implementation(Dependencies.ANDROID_LIFECYCLE_VIEWMODEL_KTX)
     implementation(Dependencies.ANDROID_LIFECYCLE_RUNTIME_KTX)
     implementation(Dependencies.ANDROID_FRAGMENT)
@@ -174,6 +173,7 @@ dependencies {
     kapt(Dependencies.ANDROID_ROOM_COMPILER)
     implementation(Dependencies.ANDROID_STARTUP_RUNTIME)
     implementation(Dependencies.ANDROID_DATASTORE_PREFERENCES)
+    implementation(Dependencies.AFOLLESTED_DRAG_SELECTION_RECYCLERVIEW)
 
     implementation(Dependencies.GOOGLE_HILT_ANDROID)
     kapt(Dependencies.GOOGLE_HILT_ANDROID_COMPILER)
