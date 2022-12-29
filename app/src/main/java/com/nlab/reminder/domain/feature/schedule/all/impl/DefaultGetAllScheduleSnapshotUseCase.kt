@@ -16,6 +16,7 @@
 
 package com.nlab.reminder.domain.feature.schedule.all.impl
 
+import com.nlab.reminder.core.kotlin.coroutine.flow.flatMapLatest
 import com.nlab.reminder.core.kotlin.coroutine.flow.map
 import com.nlab.reminder.domain.common.schedule.*
 import com.nlab.reminder.domain.common.schedule.visibleconfig.CompletedScheduleShownRepository
@@ -24,7 +25,6 @@ import com.nlab.reminder.domain.common.util.link.LinkMetadataTable
 import com.nlab.reminder.domain.common.util.link.LinkMetadataTableRepository
 import com.nlab.reminder.domain.feature.schedule.all.AllScheduleSnapshot
 import com.nlab.reminder.domain.feature.schedule.all.GetAllScheduleSnapshotUseCase
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 
 /**
@@ -41,7 +41,6 @@ class DefaultGetAllScheduleSnapshotUseCase(
     private val findNotCompleteSchedules: Flow<List<Schedule>> =
         scheduleRepository.get(GetRequest.ByComplete(isComplete = false))
 
-    @ExperimentalCoroutinesApi
     override fun invoke(): Flow<AllScheduleSnapshot> =
         completedScheduleShownRepository.get().flatMapLatest(this::getSnapshot)
 
