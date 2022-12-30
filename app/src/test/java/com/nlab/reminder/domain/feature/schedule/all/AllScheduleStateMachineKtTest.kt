@@ -338,46 +338,34 @@ class AllScheduleStateMachineKtTest {
     }
 
     @Test
-    fun `nothing work when StateMachine hasn't uiState and OnScheduleSelectionClicked event sent`() = runTest {
-        val testSchedule: Schedule = genSchedule(scheduleId = 1)
-        testOnScheduleSelectionClicked(
+    fun `nothing work when StateMachine hasn't uiState and OnScheduleSelected event sent`() = runTest {
+        val schedule: Schedule = genSchedule(scheduleId = 1)
+        val select: Boolean = genBoolean()
+        testOnScheduleSelected(
             initState = genScheduleUiState(genSchedule(scheduleId = 0)),
-            event = AllScheduleEvent.OnScheduleSelectionClicked(testSchedule.id),
+            event = AllScheduleEvent.OnScheduleSelected(schedule.id, select),
             verify = { selectionRepository ->
-                verify(selectionRepository, never()).setSelected(testSchedule.id, genBoolean())
+                verify(selectionRepository, never()).setSelected(schedule.id, select)
             }
         )
     }
 
     @Test
-    fun `selectionRepository select true when select was false OnScheduleSelectionClicked event sent`() = runTest {
-        val expectedSelect = true
-        val uiState: ScheduleUiState = genScheduleUiState(isSelected = expectedSelect.not())
-        testOnScheduleSelectionClicked(
+    fun `selectionRepository selected when OnScheduleSelectionClicked event sent`() = runTest {
+        val expectedSelect = genBoolean()
+        val uiState: ScheduleUiState = genScheduleUiState()
+        testOnScheduleSelected(
             initState = uiState,
-            event = AllScheduleEvent.OnScheduleSelectionClicked(uiState.id),
+            event = AllScheduleEvent.OnScheduleSelected(uiState.id, expectedSelect),
             verify = { selectionRepository ->
                 verify(selectionRepository, once()).setSelected(uiState.id, expectedSelect)
             }
         )
     }
 
-    @Test
-    fun `selectionRepository select false when select was true OnScheduleSelectionClicked event sent`() = runTest {
-        val expectedSelect = false
-        val uiState: ScheduleUiState = genScheduleUiState(isSelected = expectedSelect.not())
-        testOnScheduleSelectionClicked(
-            initState = uiState,
-            event = AllScheduleEvent.OnScheduleSelectionClicked(uiState.id),
-            verify = { selectionRepository ->
-                verify(selectionRepository, once()).setSelected(uiState.id, expectedSelect)
-            }
-        )
-    }
-
-    private suspend inline fun testOnScheduleSelectionClicked(
+    private suspend inline fun testOnScheduleSelected(
         initState: ScheduleUiState,
-        event: AllScheduleEvent.OnScheduleSelectionClicked,
+        event: AllScheduleEvent.OnScheduleSelected,
         verify: (SelectionRepository) -> Unit
     ) {
         val selectionRepository: SelectionRepository = mock()

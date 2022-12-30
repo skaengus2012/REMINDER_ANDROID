@@ -23,3 +23,6 @@ import androidx.recyclerview.widget.RecyclerView
  */
 val RecyclerView.ViewHolder.bindingAdapterOptionalPosition: Int?
     get() = bindingAdapterPosition.takeUnless { it == RecyclerView.NO_POSITION }
+
+val RecyclerView.ViewHolder.absoluteAdapterOptionalPosition: Int?
+    get() = absoluteAdapterPosition.takeUnless { it == RecyclerView.NO_POSITION }

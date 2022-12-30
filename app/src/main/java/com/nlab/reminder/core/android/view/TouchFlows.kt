@@ -25,7 +25,7 @@ import kotlinx.coroutines.flow.callbackFlow
 /**
  * @author thalys
  */
-fun View.touchs(): Flow<MotionEvent> = callbackFlow {
+fun View.touches(): Flow<MotionEvent> = callbackFlow {
     setOnTouchListener { v, event ->
         trySend(event)
         v.performClick()

@@ -33,6 +33,7 @@ class AllScheduleViewModelsKtTest {
         val schedule: Schedule = genSchedule()
         val scheduleUiStates: List<ScheduleUiState> = genScheduleUiStates()
         val isComplete: Boolean = genBoolean()
+        val isSelect: Boolean = genBoolean()
         val viewModel = AllScheduleViewModel(
             stateContainerFactory = mock {
                 whenever(mock.create(any(), any())) doReturn stateContainer
@@ -81,7 +82,7 @@ class AllScheduleViewModelsKtTest {
 
         verifyStateSendExtension(
             stateContainer,
-            AllScheduleEvent.OnScheduleSelectionClicked(schedule.id)
-        ) { viewModel.onScheduleSelectionClicked(schedule.id) }
+            AllScheduleEvent.OnScheduleSelected(schedule.id, isSelect)
+        ) { viewModel.onScheduleSelected(schedule.id, isSelect) }
     }
 }

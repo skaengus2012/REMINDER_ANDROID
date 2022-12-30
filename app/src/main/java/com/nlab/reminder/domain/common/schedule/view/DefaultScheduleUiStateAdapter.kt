@@ -48,7 +48,9 @@ class DefaultScheduleUiStateAdapter :
             onCompleteClicked = { position -> sendItemEventWithUiState(position, ItemEvent::OnCompleteClicked) },
             onDeleteClicked = { position -> sendItemEventWithUiState(position, ItemEvent::OnDeleteClicked) },
             onLinkClicked = { position -> sendItemEventWithUiState(position, ItemEvent::OnLinkClicked) },
-            onSelectClicked = { position -> sendItemEventWithUiState(position, ItemEvent::OnSelectionClicked) },
+            onSelectTouched = { absolutePosition, curSelected ->
+                _itemEvent.tryEmit(ItemEvent.OnSelectTouched(absolutePosition, curSelected))
+            },
             onDragHandleClicked = { viewHolder -> _itemEvent.tryEmit(ItemEvent.OnDragHandleClicked(viewHolder)) }
         )
 
@@ -87,7 +89,7 @@ class DefaultScheduleUiStateAdapter :
         data class OnCompleteClicked(val uiState: ScheduleUiState) : ItemEvent()
         data class OnDeleteClicked(val uiState: ScheduleUiState) : ItemEvent()
         data class OnLinkClicked(val uiState: ScheduleUiState) : ItemEvent()
-        data class OnSelectionClicked(val uiState: ScheduleUiState) : ItemEvent()
+        data class OnSelectTouched(val absolutePosition: Int, val curSelected: Boolean) : ItemEvent()
         data class OnDragHandleClicked(val viewHolder: ViewHolder) : ItemEvent()
     }
 }

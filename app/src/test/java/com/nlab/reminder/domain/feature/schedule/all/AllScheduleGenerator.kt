@@ -46,7 +46,8 @@ fun genAllScheduleEvents(): Set<AllScheduleEvent> = setOf(
     AllScheduleEvent.OnModifyScheduleCompleteClicked(genSchedule().id, genBoolean()),
     AllScheduleEvent.OnDragScheduleEnded(genScheduleUiStates()),
     AllScheduleEvent.OnDeleteScheduleClicked(genSchedule().id),
-    AllScheduleEvent.OnScheduleLinkClicked(genSchedule().id)
+    AllScheduleEvent.OnScheduleLinkClicked(genSchedule().id),
+    AllScheduleEvent.OnScheduleSelected(genSchedule().id, genBoolean())
 )
 
 fun genAllScheduleLoadedState(

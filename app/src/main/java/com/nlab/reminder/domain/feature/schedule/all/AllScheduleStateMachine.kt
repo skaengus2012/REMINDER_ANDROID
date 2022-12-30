@@ -130,11 +130,11 @@ fun AllScheduleStateMachine(
                 }
             }
 
-            event<AllScheduleEvent.OnScheduleSelectionClicked> { (event, before) ->
+            event<AllScheduleEvent.OnScheduleSelected> { (event, before) ->
                 val uiState: ScheduleUiState? =
-                    before.scheduleUiStates.find { it.id == event.scheduleId }
+                    before.scheduleUiStates.find { uiState -> uiState.id == event.scheduleId }
                 if (uiState != null) {
-                    selectionRepository.setSelected(uiState.id, uiState.isSelected.not())
+                    selectionRepository.setSelected(uiState.id, isSelect = event.isSelected)
                 }
             }
 

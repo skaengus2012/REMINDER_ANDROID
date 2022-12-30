@@ -48,6 +48,6 @@ fun AllScheduleViewModel.onDeleteScheduleClicked(scheduleId: ScheduleId) =
 fun AllScheduleViewModel.onScheduleLinkClicked(scheduleId: ScheduleId) =
     send(AllScheduleEvent.OnScheduleLinkClicked(scheduleId))
 
-fun AllScheduleViewModel.onScheduleSelectionClicked(scheduleId: ScheduleId) {
-    send(AllScheduleEvent.OnScheduleSelectionClicked(scheduleId))
+fun AllScheduleViewModel.onScheduleSelected(scheduleId: ScheduleId, isSelect: Boolean) {
+    send(AllScheduleEvent.OnScheduleSelected(scheduleId, isSelect))
 }
