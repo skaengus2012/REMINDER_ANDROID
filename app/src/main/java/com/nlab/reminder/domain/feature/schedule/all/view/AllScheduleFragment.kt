@@ -101,7 +101,7 @@ class AllScheduleFragment : Fragment() {
             .filterIsInstance<ItemEvent.OnCompleteClicked>()
             .map { it.uiState }
             .onEach { uiState ->
-                viewModel.onModifyScheduleCompleteClicked(
+                viewModel.onScheduleCompleteClicked(
                     scheduleId = uiState.id,
                     isComplete = uiState.isCompleteMarked.not()
                 )

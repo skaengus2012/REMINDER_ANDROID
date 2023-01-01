@@ -138,7 +138,7 @@ class AllScheduleStateMachineKtTest {
             genAllScheduleStateMachine(modifyScheduleComplete = updateCompleteUseCase)
                 .asContainer(genStateContainerScope(), genAllScheduleLoadedState())
         stateContainer
-            .send(AllScheduleEvent.OnModifyScheduleCompleteClicked(schedule.id, isComplete))
+            .send(AllScheduleEvent.OnScheduleCompleteClicked(schedule.id, isComplete))
             .join()
         verify(updateCompleteUseCase, once())(schedule.id, isComplete)
     }

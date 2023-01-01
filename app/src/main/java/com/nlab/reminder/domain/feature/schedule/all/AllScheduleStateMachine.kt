@@ -77,7 +77,7 @@ fun AllScheduleStateMachine(
         }
 
         state<AllScheduleState.Loaded> {
-            event<AllScheduleEvent.OnModifyScheduleCompleteClicked> { (event) ->
+            event<AllScheduleEvent.OnScheduleCompleteClicked> { (event) ->
                 modifyScheduleComplete(event.scheduleId, event.isComplete)
             }
 
