@@ -47,6 +47,9 @@ class LocalScheduleRepository(
                 requests = request.values.map { request -> request.scheduleId.value to request.isComplete }
             )
         }
+        is UpdateRequest.BulkCompletes -> catching {
+            scheduleDao.updateCompletes(scheduleIds = request.scheduleIds.map { it.value }, request.isComplete)
+        }
         is UpdateRequest.VisiblePriorities -> catching {
             scheduleDao.updateVisiblePriorities(
                 requests = request.values.map { request -> request.scheduleId.value to request.visiblePriority }

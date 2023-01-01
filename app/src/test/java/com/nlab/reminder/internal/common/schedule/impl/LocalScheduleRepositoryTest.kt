@@ -98,6 +98,18 @@ class LocalScheduleRepositoryTest {
     }
 
     @Test
+    fun `result for updateComplete was success by BulkCompletes`() = runTest {
+        val isComplete: Boolean = genBoolean()
+        val (repositoryParam, daoParam) = genRepositoryParamAndDaoParamsForUpdate(
+            genRandomUpdateValue = { isComplete },
+            genRequest = { scheduleId, _ -> scheduleId }
+        )
+        testUpdateTemplate(UpdateRequest.BulkCompletes(repositoryParam, isComplete)) { scheduleDao ->
+            verify(scheduleDao, once()).updateCompletes(daoParam.map { it.first }, isComplete)
+        }
+    }
+
+    @Test
     fun `result for updateVisiblePriority was success`() = runTest {
         val (repositoryParam, daoParam) = genRepositoryParamAndDaoParamsForUpdate(
             genRandomUpdateValue = { genLong() },

@@ -30,6 +30,8 @@ sealed class UpdateRequest private constructor() {
     @Generated
     data class Completes(val values: List<ModifyCompleteRequest>) : UpdateRequest()
     @Generated
+    data class BulkCompletes(val scheduleIds: List<ScheduleId>, val isComplete: Boolean) : UpdateRequest()
+    @Generated
     data class VisiblePriorities(val values: List<ModifyVisiblePriorityRequest>) : UpdateRequest()
 }
 

@@ -61,10 +61,10 @@ abstract class ScheduleDao {
         """
         UPDATE schedule 
         SET is_complete = :isComplete, visible_priority = :visiblePriority 
-        WHERE schedule_id = :scheduleId
+        WHERE schedule_id IN (:scheduleIds)
         """
     )
-    abstract suspend fun updateComplete(scheduleId: Long, isComplete: Boolean, visiblePriority: Long)
+    abstract suspend fun updateCompletes(scheduleIds: List<Long>, isComplete: Boolean, visiblePriority: Long)
 
     @Transaction
     open suspend fun updateCompletes(requests: List<Pair<Long, Boolean>>) {
@@ -90,12 +90,17 @@ abstract class ScheduleDao {
         )
     }
 
+    @Transaction
+    open suspend fun updateCompletes(scheduleIds: List<Long>, isComplete: Boolean) {
+        updateCompletesWithIds(scheduleIds, isComplete)
+    }
+
     private suspend fun updateCompletesWithIds(scheduleIds: List<Long>, isComplete: Boolean) {
         if (scheduleIds.isEmpty()) return
 
         val maxVisiblePriority: Long = getMaxVisiblePriority(isComplete) ?: -1
         scheduleIds.forEachIndexed { index, scheduleId ->
-            updateComplete(scheduleId, isComplete, visiblePriority = maxVisiblePriority + index + 1)
+            updateCompletes(listOf(scheduleId), isComplete, visiblePriority = maxVisiblePriority + index + 1)
         }
     }
 
