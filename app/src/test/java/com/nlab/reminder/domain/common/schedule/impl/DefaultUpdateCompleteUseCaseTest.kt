@@ -20,14 +20,12 @@ import com.nlab.reminder.core.kotlin.coroutine.Delay
 import com.nlab.reminder.domain.common.util.transaction.TransactionId
 import com.nlab.reminder.domain.common.util.link.transaction.genTransactionIdGenerator
 import com.nlab.reminder.core.kotlin.util.Result
+import com.nlab.reminder.core.kotlin.util.isSuccess
 import com.nlab.reminder.domain.common.schedule.*
-import com.nlab.reminder.test.genBoolean
-import com.nlab.reminder.test.genBothify
-import com.nlab.reminder.test.genLong
-import com.nlab.reminder.test.once
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import com.nlab.reminder.test.*
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.*
@@ -38,7 +36,7 @@ import org.mockito.kotlin.*
  * @author Doohyun
  */
 @OptIn(ExperimentalCoroutinesApi::class)
-class DefaultModifyScheduleCompleteUseCaseTest {
+class DefaultUpdateCompleteUseCaseTest {
     @Test
     fun `completeMark inserted`() = runTest {
         val fixedTxId = genBothify()
@@ -47,12 +45,11 @@ class DefaultModifyScheduleCompleteUseCaseTest {
         val completeMarkRepository: CompleteMarkRepository = mock {
             whenever(mock.get()) doReturn MutableStateFlow(emptyMap())
         }
-        val updateCompleteUseCase = DefaultModifyScheduleCompleteUseCase(
+        val updateCompleteUseCase = DefaultUpdateCompleteUseCase(
             transactionIdGenerator = genTransactionIdGenerator(expected = fixedTxId),
             scheduleRepository = mock(),
             completeMarkRepository = completeMarkRepository,
-            delayUntilTransactionPeriod = mock(),
-            dispatcher = Dispatchers.Default
+            delayUntilTransactionPeriod = mock()
         )
 
         updateCompleteUseCase(scheduleId, isComplete)
@@ -85,12 +82,11 @@ class DefaultModifyScheduleCompleteUseCaseTest {
             )
         }
         val scheduleRepository: ScheduleRepository = mock()
-        val updateCompleteUseCase = DefaultModifyScheduleCompleteUseCase(
+        val updateCompleteUseCase = DefaultUpdateCompleteUseCase(
             transactionIdGenerator = genTransactionIdGenerator(),
             scheduleRepository = scheduleRepository,
             completeMarkRepository = completeMarkRepository,
-            delayUntilTransactionPeriod = mock(),
-            dispatcher = Dispatchers.Default
+            delayUntilTransactionPeriod = mock()
         )
 
         updateCompleteUseCase(ScheduleId(genLong()), genBoolean())
@@ -119,12 +115,11 @@ class DefaultModifyScheduleCompleteUseCaseTest {
                 mock.update(UpdateRequest.Completes(listOf(ModifyCompleteRequest(scheduleId, isComplete))))
             ) doReturn scheduleCompleteResult
         }
-        val updateCompleteUseCase = DefaultModifyScheduleCompleteUseCase(
+        val updateCompleteUseCase = DefaultUpdateCompleteUseCase(
             transactionIdGenerator = genTransactionIdGenerator(),
             scheduleRepository = scheduleRepository,
             completeMarkRepository = completeMarkRepository,
-            delayUntilTransactionPeriod = mock(),
-            dispatcher = Dispatchers.Default
+            delayUntilTransactionPeriod = mock()
         )
 
         return updateCompleteUseCase(ScheduleId(genLong()), genBoolean())
@@ -166,12 +161,11 @@ class DefaultModifyScheduleCompleteUseCaseTest {
         val delayUntilTransactionPeriod: Delay = mock()
         val beforeDelayedOrder = inOrder(completeMarkRepository, delayUntilTransactionPeriod)
         val afterDelayedOrder = inOrder(delayUntilTransactionPeriod, completeMarkRepository)
-        val updateCompleteUseCase = DefaultModifyScheduleCompleteUseCase(
+        val updateCompleteUseCase = DefaultUpdateCompleteUseCase(
             transactionIdGenerator = genTransactionIdGenerator(txId),
             scheduleRepository = mock(),
             completeMarkRepository = completeMarkRepository,
-            delayUntilTransactionPeriod = delayUntilTransactionPeriod,
-            dispatcher = Dispatchers.Unconfined
+            delayUntilTransactionPeriod = delayUntilTransactionPeriod
         )
 
         updateCompleteUseCase(scheduleId, isComplete)
@@ -188,5 +182,44 @@ class DefaultModifyScheduleCompleteUseCaseTest {
         beforeDelayedOrder.verify(delayUntilTransactionPeriod, once())()
         afterDelayedOrder.verify(delayUntilTransactionPeriod, once())()
         afterDelayedOrder.verify(completeMarkRepository, once()).get()
+    }
+
+    @Test
+    fun `skipped commit when requestCount still have it`() = runTest {
+        val completeMarkRepository: CompleteMarkRepository = mock()
+        val scheduleRepository: ScheduleRepository = mock()
+        val firstInfinityDelay = object : Delay {
+            private val dispatcher = genFlowExecutionDispatcher(testScheduler)
+            private var count: Int = 0
+            override suspend fun invoke() {
+                withContext(dispatcher) {
+                    val delayTime = if (count > 0) 0 else Long.MAX_VALUE
+                    ++count
+                    delay(delayTime)
+                }
+            }
+        }
+        val schedule: Schedule = genSchedule()
+        val complete: Boolean = genBoolean()
+        val updateCompleteUseCase = DefaultUpdateCompleteUseCase(
+            transactionIdGenerator = genTransactionIdGenerator(),
+            scheduleRepository = scheduleRepository,
+            completeMarkRepository = completeMarkRepository,
+            delayUntilTransactionPeriod = firstInfinityDelay
+        )
+        val delayTime = 1_000L
+        val job = launch {
+            updateCompleteUseCase(schedule.id, complete)
+        }
+        delay(delayTime)
+        advanceTimeBy(delayTime)
+
+        val result = updateCompleteUseCase(genSchedule().id, complete)
+
+        verify(completeMarkRepository, never()).updateToApplied(any())
+        verify(scheduleRepository, never()).update(any())
+        assert(result.isSuccess)
+
+        job.cancelAndJoin()
     }
 }

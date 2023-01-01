@@ -133,14 +133,14 @@ class AllScheduleStateMachineKtTest {
     fun `modify schedule complete when stateMachine received update schedule complete`() = runTest {
         val schedule: Schedule = genSchedule()
         val isComplete: Boolean = genBoolean()
-        val modifyScheduleCompleteUseCase: ModifyScheduleCompleteUseCase = mock()
+        val updateCompleteUseCase: UpdateCompleteUseCase = mock()
         val stateContainer =
-            genAllScheduleStateMachine(modifyScheduleComplete = modifyScheduleCompleteUseCase)
+            genAllScheduleStateMachine(modifyScheduleComplete = updateCompleteUseCase)
                 .asContainer(genStateContainerScope(), genAllScheduleLoadedState())
         stateContainer
             .send(AllScheduleEvent.OnModifyScheduleCompleteClicked(schedule.id, isComplete))
             .join()
-        verify(modifyScheduleCompleteUseCase, once())(schedule.id, isComplete)
+        verify(updateCompleteUseCase, once())(schedule.id, isComplete)
     }
 
     @Test

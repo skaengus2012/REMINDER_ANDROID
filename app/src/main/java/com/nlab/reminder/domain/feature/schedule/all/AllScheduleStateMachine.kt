@@ -33,7 +33,7 @@ import com.nlab.reminder.domain.common.schedule.visibleconfig.*
 fun AllScheduleStateMachine(
     sideEffectHandle: SideEffectHandle<AllScheduleSideEffect>,
     getAllScheduleSnapshot: GetAllScheduleSnapshotUseCase,
-    modifyScheduleComplete: ModifyScheduleCompleteUseCase,
+    modifyScheduleComplete: UpdateCompleteUseCase,
     completedScheduleShownRepository: CompletedScheduleShownRepository,
     scheduleRepository: ScheduleRepository,
     selectionModeRepository: SelectionModeRepository,

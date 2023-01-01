@@ -42,7 +42,7 @@ class AllScheduleViewModelModule {
     fun provideStateMachineProvider(
         scheduleRepository: ScheduleRepository,
         scheduleUiStateFlowFactory: ScheduleUiStateFlowFactory,
-        modifyScheduleCompleteUseCase: ModifyScheduleCompleteUseCase,
+        updateCompleteUseCase: UpdateCompleteUseCase,
         selectionModeRepository: SelectionModeRepository,
         selectionRepository: SelectionRepository,
         linkMetadataTableRepository: LinkMetadataTableRepository,
@@ -60,7 +60,7 @@ class AllScheduleViewModelModule {
                     completedScheduleShownRepository,
                     scheduleUiStateFlowFactory
                 ),
-                modifyScheduleCompleteUseCase,
+                updateCompleteUseCase,
                 completedScheduleShownRepository,
                 scheduleRepository,
                 selectionModeRepository,

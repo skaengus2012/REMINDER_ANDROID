@@ -72,7 +72,7 @@ fun genAllScheduleSideEffects(): Set<AllScheduleSideEffect> = setOf(
 fun genAllScheduleStateMachine(
     sideEffectHandle: SideEffectHandle<AllScheduleSideEffect> = mock(),
     getAllScheduleSnapshot: GetAllScheduleSnapshotUseCase = mock { whenever(mock()) doReturn emptyFlow() },
-    modifyScheduleComplete: ModifyScheduleCompleteUseCase = mock(),
+    modifyScheduleComplete: UpdateCompleteUseCase = mock(),
     completedScheduleShownRepository: CompletedScheduleShownRepository = mock(),
     scheduleRepository: ScheduleRepository = mock(),
     selectionModeRepository: SelectionModeRepository = mock(),

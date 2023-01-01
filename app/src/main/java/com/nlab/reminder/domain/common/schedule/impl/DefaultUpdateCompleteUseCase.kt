@@ -20,28 +20,33 @@ import com.nlab.reminder.core.kotlin.coroutine.Delay
 import com.nlab.reminder.core.kotlin.util.Result
 import com.nlab.reminder.domain.common.util.transaction.TransactionIdGenerator
 import com.nlab.reminder.domain.common.schedule.*
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.updateAndGet
+import kotlin.math.max
 
 /**
  * @author Doohyun
  */
-class DefaultModifyScheduleCompleteUseCase(
+class DefaultUpdateCompleteUseCase(
     private val transactionIdGenerator: TransactionIdGenerator,
     private val scheduleRepository: ScheduleRepository,
     private val completeMarkRepository: CompleteMarkRepository,
     private val delayUntilTransactionPeriod: Delay,
-    private val dispatcher: CoroutineDispatcher
-) : ModifyScheduleCompleteUseCase {
-    override suspend fun invoke(scheduleId: ScheduleId, isComplete: Boolean): Result<Unit> = withContext(dispatcher) {
+) : UpdateCompleteUseCase {
+    private val requestCount = MutableStateFlow(0)
+
+    // Because of jacoco, I used coroutineScope.
+    override suspend fun invoke(scheduleId: ScheduleId, isComplete: Boolean): Result<Unit> = coroutineScope {
         completeMarkRepository.insert(completeMarkTableOf(scheduleId, isComplete))
+        requestCount.update { count -> count + 1 }
         delayUntilTransactionPeriod()
 
-        completeMarkRepository.get()
-            .value
-            .filterNot { it.value.isApplied }
-            .also { snapshot -> completeMarkRepository.updateToApplied(snapshot) }
-            .let { snapshot -> commitCompleteMarkTableToSchedule(snapshot) }
+        val hasPendingRequest: Boolean =
+            requestCount.updateAndGet { count -> max(count - 1, 0) } > 0
+        if (hasPendingRequest) Result.Success(Unit)
+        else commitCompleteMarksToSchedule()
     }
 
     private fun completeMarkTableOf(scheduleId: ScheduleId, isComplete: Boolean): CompleteMarkTable =
@@ -53,9 +58,15 @@ class DefaultModifyScheduleCompleteUseCase(
             )
         )
 
-    private suspend fun commitCompleteMarkTableToSchedule(table: CompleteMarkTable): Result<Unit> =
-        if (table.isEmpty()) Result.Success(Unit)
-        else scheduleRepository.update(
-            UpdateRequest.Completes(table.map { ModifyCompleteRequest(it.key, it.value.isComplete) })
-        )
+    private suspend fun commitCompleteMarksToSchedule(): Result<Unit> =
+        completeMarkRepository.get()
+            .value
+            .filterNot { it.value.isApplied }
+            .also { table -> completeMarkRepository.updateToApplied(table) }
+            .let { table ->
+                if (table.isEmpty()) Result.Success(Unit)
+                else scheduleRepository.update(
+                    UpdateRequest.Completes(table.map { ModifyCompleteRequest(it.key, it.value.isComplete) })
+                )
+            }
 }
