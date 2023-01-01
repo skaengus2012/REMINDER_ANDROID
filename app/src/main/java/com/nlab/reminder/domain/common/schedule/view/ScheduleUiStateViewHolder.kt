@@ -43,17 +43,14 @@ import com.nlab.reminder.core.android.view.touches
 import com.nlab.reminder.databinding.ViewItemScheduleBinding
 import com.nlab.reminder.domain.common.schedule.ScheduleId
 import com.nlab.reminder.domain.common.schedule.ScheduleUiState
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.*
 
 /**
  * @author thalys
  */
 class ScheduleUiStateViewHolder(
     private val binding: ViewItemScheduleBinding,
-    selectionEnabledFlow: StateFlow<Boolean>,
+    selectionEnabled: Flow<Boolean>,
     onCompleteClicked: (Int) -> Unit,
     onDeleteClicked: (Int) -> Unit,
     onLinkClicked: (Int) -> Unit,
@@ -113,7 +110,7 @@ class ScheduleUiStateViewHolder(
                 }
                 .launchIn(lifecycleOwner.lifecycleScope)
 
-            selectionEnabledFlow
+            selectionEnabled
                 .flowWithLifecycle(lifecycleOwner.lifecycle)
                 .onEach { isSelectionMode -> buttonSelection.isEnabled = isSelectionMode }
                 .onEach { isSelectionMode -> buttonComplete.isEnabled = isSelectionMode.not() }
@@ -190,7 +187,7 @@ class ScheduleUiStateViewHolder(
     companion object {
         fun of(
             parent: ViewGroup,
-            selectionEnabledFlow: StateFlow<Boolean>,
+            selectionEnabled: Flow<Boolean>,
             onCompleteClicked: (position: Int) -> Unit,
             onDeleteClicked: (position: Int) -> Unit,
             onLinkClicked: (position: Int) -> Unit,
@@ -198,7 +195,7 @@ class ScheduleUiStateViewHolder(
             onDragHandleClicked: (RecyclerView.ViewHolder) -> Unit
         ): ScheduleUiStateViewHolder = ScheduleUiStateViewHolder(
             ViewItemScheduleBinding.inflate(LayoutInflater.from(parent.context), parent, false),
-            selectionEnabledFlow,
+            selectionEnabled,
             onCompleteClicked,
             onDeleteClicked,
             onLinkClicked,

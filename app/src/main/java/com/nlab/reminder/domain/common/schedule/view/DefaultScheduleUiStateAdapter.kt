@@ -32,7 +32,7 @@ class DefaultScheduleUiStateAdapter :
     ListAdapter<ScheduleUiState, ScheduleUiStateViewHolder>(ScheduleUiStateDiffCallback()),
     DraggableAdapter<ScheduleUiState> {
     private val _itemEvent = MutableSharedFlow<ItemEvent>(extraBufferCapacity = 1)
-    private val selectionEnabledFlow = MutableStateFlow(false)
+    private val selectionEnabled = MutableStateFlow(false)
     private val draggableAdapterDelegate = ListItemDraggableAdapterDelegate(
         getSnapshot = this::getCurrentList,
         getItem = this::getItem,
@@ -44,7 +44,13 @@ class DefaultScheduleUiStateAdapter :
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ScheduleUiStateViewHolder =
         ScheduleUiStateViewHolder.of(
             parent,
-            selectionEnabledFlow.asStateFlow(),
+            selectionEnabled = selectionEnabled.map { value ->
+                if (value.not()) {
+                    // Include a delay period because selection animation conflicts occur.
+                    delay(100L)
+                }
+                value
+            },
             onCompleteClicked = { position -> sendItemEventWithUiState(position, ItemEvent::OnCompleteClicked) },
             onDeleteClicked = { position -> sendItemEventWithUiState(position, ItemEvent::OnDeleteClicked) },
             onLinkClicked = { position -> sendItemEventWithUiState(position, ItemEvent::OnLinkClicked) },
@@ -77,12 +83,7 @@ class DefaultScheduleUiStateAdapter :
     }
 
     suspend fun setSelectionEnabled(isEnable: Boolean) {
-        if (isEnable.not()) {
-            // Include a delay period because selection animation conflicts occur.
-            delay(100L)
-        }
-
-        selectionEnabledFlow.emit(isEnable)
+        selectionEnabled.emit(isEnable)
     }
 
     sealed class ItemEvent private constructor() {
