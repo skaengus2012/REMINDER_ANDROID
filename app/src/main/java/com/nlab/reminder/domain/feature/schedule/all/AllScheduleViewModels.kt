@@ -34,10 +34,8 @@ fun AllScheduleViewModel.onDeleteCompletedScheduleClicked() =
 fun AllScheduleViewModel.onSelectedScheduleDeleteClicked() =
     send(AllScheduleEvent.OnSelectedScheduleDeleteClicked)
 
-fun AllScheduleViewModel.onScheduleCompleteClicked(
-    scheduleId: ScheduleId,
-    isComplete: Boolean
-) = send(AllScheduleEvent.OnScheduleCompleteClicked(scheduleId, isComplete))
+fun AllScheduleViewModel.onScheduleCompleteClicked(scheduleId: ScheduleId, isComplete: Boolean) =
+    send(AllScheduleEvent.OnScheduleCompleteClicked(scheduleId, isComplete))
 
 fun AllScheduleViewModel.onDragScheduleEnded(draggedSnapshot: List<ScheduleUiState>) =
     send(AllScheduleEvent.OnDragScheduleEnded(draggedSnapshot))
@@ -48,6 +46,8 @@ fun AllScheduleViewModel.onDeleteScheduleClicked(scheduleId: ScheduleId) =
 fun AllScheduleViewModel.onScheduleLinkClicked(scheduleId: ScheduleId) =
     send(AllScheduleEvent.OnScheduleLinkClicked(scheduleId))
 
-fun AllScheduleViewModel.onScheduleSelected(scheduleId: ScheduleId, isSelect: Boolean) {
+fun AllScheduleViewModel.onScheduleSelected(scheduleId: ScheduleId, isSelect: Boolean) =
     send(AllScheduleEvent.OnScheduleSelected(scheduleId, isSelect))
-}
+
+fun AllScheduleViewModel.onSelectedScheduleCompleteClicked(isComplete: Boolean) =
+    send(AllScheduleEvent.OnSelectedScheduleCompleteClicked(isComplete))
