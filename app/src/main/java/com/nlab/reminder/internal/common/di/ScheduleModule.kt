@@ -62,6 +62,6 @@ class ScheduleModule {
         transactionIdGenerator,
         scheduleRepository,
         completeMarkRepository,
-        delayUntilTransactionPeriod = Delay(timeMillis = 1_000)
+        delayUntilTransactionPeriod = Delay(timeMillis = 500)
     )
 }
