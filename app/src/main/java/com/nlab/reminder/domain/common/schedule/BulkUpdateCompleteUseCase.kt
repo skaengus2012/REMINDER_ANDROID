@@ -21,6 +21,6 @@ import com.nlab.reminder.core.kotlin.util.Result
 /**
  * @author thalys
  */
-interface UpdateBulkCompleteUseCase {
-    suspend operator fun invoke(schedules: List<Schedule>, isComplete: Boolean): Result<Unit>
+interface BulkUpdateCompleteUseCase {
+    suspend operator fun invoke(schedules: Set<Schedule>, isComplete: Boolean): Result<Unit>
 }

@@ -16,10 +16,7 @@
 
 package com.nlab.reminder.domain.common.schedule.impl
 
-import com.nlab.reminder.domain.common.schedule.Schedule
-import com.nlab.reminder.domain.common.schedule.ScheduleRepository
-import com.nlab.reminder.domain.common.schedule.UpdateRequest
-import com.nlab.reminder.domain.common.schedule.genSchedule
+import com.nlab.reminder.domain.common.schedule.*
 import com.nlab.reminder.test.genBoolean
 import com.nlab.reminder.test.once
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -32,40 +29,39 @@ import org.mockito.kotlin.verify
  * @author thalys
  */
 @ExperimentalCoroutinesApi
-class DefaultUpdateBulkCompleteUseCaseTest {
+class DefaultBulkUpdateCompleteUseCaseTest {
     @Test
     fun `update schedules with distinct`() = runTest {
-        val scheduleRepository: ScheduleRepository = mock()
-        val bulkCompleteUseCase = DefaultUpdateBulkCompleteUseCase(scheduleRepository)
         val schedule: Schedule = genSchedule()
-        val schedules: List<Schedule> = List(10) { schedule }
-        val isComplete: Boolean = genBoolean()
-
-        bulkCompleteUseCase(schedules, isComplete)
-        verify(scheduleRepository, once()).update(
-            UpdateRequest.BulkCompletes(
-                listOf(schedule.id),
-                isComplete
-            )
+        testInvokeTemplate(
+            inputSchedules = List(10) { schedule }.toSet(),
+            expectedScheduleIds = listOf(schedule.id)
         )
     }
 
     @Test
     fun `update schedules with sorted visiblePriority`() = runTest {
-        val scheduleRepository: ScheduleRepository = mock()
-        val bulkCompleteUseCase = DefaultUpdateBulkCompleteUseCase(scheduleRepository)
         val size = 10L
         val schedules: List<Schedule> = List(size.toInt()) { index ->
             genSchedule(scheduleId = index.toLong(), visiblePriority = size - index)
         }
+        testInvokeTemplate(
+            inputSchedules =
+            List(size.toInt()) { index -> genSchedule(scheduleId = index.toLong(), visiblePriority = size - index) }
+                .toSet(),
+            expectedScheduleIds = schedules.map { it.id }.reversed(),
+        )
+    }
+
+    private suspend fun testInvokeTemplate(
+        inputSchedules: Set<Schedule>,
+        expectedScheduleIds: List<ScheduleId>
+    ) {
+        val scheduleRepository: ScheduleRepository = mock()
+        val bulkCompleteUseCase = DefaultBulkUpdateCompleteUseCase(scheduleRepository)
         val isComplete: Boolean = genBoolean()
 
-        bulkCompleteUseCase(schedules, isComplete)
-        verify(scheduleRepository, once()).update(
-            UpdateRequest.BulkCompletes(
-                schedules.map { it.id }.reversed(),
-                isComplete
-            )
-        )
+        bulkCompleteUseCase(inputSchedules, isComplete)
+        verify(scheduleRepository, once()).update(UpdateRequest.BulkCompletes(expectedScheduleIds, isComplete))
     }
 }

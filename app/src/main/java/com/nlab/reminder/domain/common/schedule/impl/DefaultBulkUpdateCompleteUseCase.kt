@@ -19,16 +19,16 @@ package com.nlab.reminder.domain.common.schedule.impl
 import com.nlab.reminder.core.kotlin.util.Result
 import com.nlab.reminder.domain.common.schedule.Schedule
 import com.nlab.reminder.domain.common.schedule.ScheduleRepository
-import com.nlab.reminder.domain.common.schedule.UpdateBulkCompleteUseCase
+import com.nlab.reminder.domain.common.schedule.BulkUpdateCompleteUseCase
 import com.nlab.reminder.domain.common.schedule.UpdateRequest
 
 /**
  * @author thalys
  */
-class DefaultUpdateBulkCompleteUseCase(
+class DefaultBulkUpdateCompleteUseCase(
     private val scheduleRepository: ScheduleRepository,
-) : UpdateBulkCompleteUseCase {
-    override suspend fun invoke(schedules: List<Schedule>, isComplete: Boolean): Result<Unit> =
+) : BulkUpdateCompleteUseCase {
+    override suspend fun invoke(schedules: Set<Schedule>, isComplete: Boolean): Result<Unit> =
         scheduleRepository.update(
             UpdateRequest.BulkCompletes(
                 scheduleIds = schedules
