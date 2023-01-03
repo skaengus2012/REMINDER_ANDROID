@@ -164,6 +164,16 @@ class AllScheduleFragment : Fragment() {
             .onEach { viewModel.onSelectedScheduleDeleteClicked() }
             .launchIn(viewLifecycleScope)
 
+        binding.buttonSelectedItemComplete
+            .throttleClicks()
+            .onEach { viewModel.onSelectedScheduleCompleteClicked(isComplete = true) }
+            .launchIn(viewLifecycleScope)
+
+        binding.buttonSelectedItemIncomplete
+            .throttleClicks()
+            .onEach { viewModel.onSelectedScheduleCompleteClicked(isComplete = false) }
+            .launchIn(viewLifecycleScope)
+
         viewModel.stateFlow
             .filterIsInstance<AllScheduleState.Loaded>()
             .map { it.isCompletedScheduleShown }

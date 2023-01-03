@@ -32,6 +32,15 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
+        android:id="@+id/button_selected_item_complete"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/default_toolbar_height"
+        android:layout_marginStart="15dp"
+        android:text="@string/schedule_selected_item_complete"
+        app:layout_constraintStart_toEndOf="@id/button_completed_schedule_shown_toggle"
+        app:layout_constraintTop_toTopOf="@id/button_completed_schedule_shown_toggle" />
+
+    <Button
         android:id="@+id/button_delete_all_if_completed"
         android:layout_width="wrap_content"
         android:layout_height="@dimen/default_toolbar_height"
@@ -40,6 +49,15 @@
         app:layout_constraintBottom_toTopOf="@id/button_selection_mode_on_off"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/button_completed_schedule_shown_toggle" />
+
+    <Button
+        android:id="@+id/button_selected_item_incomplete"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/default_toolbar_height"
+        android:layout_marginStart="15dp"
+        android:text="@string/schedule_selected_item_incomplete"
+        app:layout_constraintStart_toEndOf="@id/button_delete_all_if_completed"
+        app:layout_constraintTop_toTopOf="@id/button_delete_all_if_completed" />
 
     <Button
         android:id="@+id/button_selection_mode_on_off"

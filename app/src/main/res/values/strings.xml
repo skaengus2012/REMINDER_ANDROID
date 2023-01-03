@@ -41,6 +41,8 @@
     <string name="schedule_erase_all_if_completed">지우기</string>
     <string name="schedule_selection_mode_on">스케줄 선택</string>
     <string name="schedule_selection_mode_off">스케줄 선택해제</string>
+    <string name="schedule_selected_item_complete">완료됨으로 표시</string>
+    <string name="schedule_selected_item_incomplete">완료되지 않음으로 표시</string>
 
     <!-- home -->
     <string name="home_category_header">나의 할일</string>

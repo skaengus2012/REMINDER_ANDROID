@@ -34,6 +34,8 @@
     <string name="schedule_erase_all_if_completed">Erase</string> <!-- TODO xlt 확인 필요. -->
     <string name="schedule_selection_mode_on">Select schedules</string>
     <string name="schedule_selection_mode_off">Unselect schedules</string>
+    <string name="schedule_selected_item_complete">Mark as complete</string>
+    <string name="schedule_selected_item_incomplete">Mark as incomplete</string>
 
     <!-- home -->
     <string name="home_category_header">My Todo</string>
