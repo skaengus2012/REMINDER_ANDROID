@@ -24,6 +24,7 @@ import com.nlab.reminder.core.kotlin.util.onFailure
 import com.nlab.reminder.core.state.StateMachine
 import com.nlab.reminder.domain.common.schedule.*
 import com.nlab.reminder.domain.common.schedule.SelectionModeRepository
+import com.nlab.reminder.domain.common.schedule.util.asSelectedSchedules
 import com.nlab.reminder.domain.common.schedule.visibleconfig.*
 
 /**
@@ -33,7 +34,8 @@ import com.nlab.reminder.domain.common.schedule.visibleconfig.*
 fun AllScheduleStateMachine(
     sideEffectHandle: SideEffectHandle<AllScheduleSideEffect>,
     getAllScheduleSnapshot: GetAllScheduleSnapshotUseCase,
-    modifyScheduleComplete: UpdateCompleteUseCase,
+    updateComplete: UpdateCompleteUseCase,
+    bulkUpdateComplete: BulkUpdateCompleteUseCase,
     completedScheduleShownRepository: CompletedScheduleShownRepository,
     scheduleRepository: ScheduleRepository,
     selectionModeRepository: SelectionModeRepository,
@@ -78,7 +80,7 @@ fun AllScheduleStateMachine(
 
         state<AllScheduleState.Loaded> {
             event<AllScheduleEvent.OnScheduleCompleteClicked> { (event) ->
-                modifyScheduleComplete(event.scheduleId, event.isComplete)
+                updateComplete(event.scheduleId, event.isComplete)
             }
 
             event<AllScheduleEvent.OnToggleCompletedScheduleShownClicked> { (_, state) ->
@@ -144,7 +146,16 @@ fun AllScheduleStateMachine(
                 if (selectedUiStateIds.isNotEmpty()) {
                     scheduleRepository.delete(DeleteRequest.ByIds(selectedUiStateIds))
                 }
+            }
 
+            event<AllScheduleEvent.OnSelectedScheduleCompleteClicked> { (event, state) ->
+                bulkUpdateComplete(
+                    schedules = state.scheduleUiStates.asSelectedSchedules(),
+                    isComplete = event.isComplete
+                )
+            }
+
+            filteredEvent(predicate = { event -> event is SelectionDisable }) {
                 selectionModeRepository.setEnabled(false)
             }
         }

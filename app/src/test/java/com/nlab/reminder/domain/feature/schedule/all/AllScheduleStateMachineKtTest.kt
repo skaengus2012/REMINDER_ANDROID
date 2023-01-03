@@ -20,6 +20,7 @@ import com.nlab.reminder.core.effect.SideEffectHandle
 import com.nlab.reminder.core.state.asContainer
 import com.nlab.reminder.core.kotlin.util.Result
 import com.nlab.reminder.domain.common.schedule.*
+import com.nlab.reminder.domain.common.schedule.util.asSelectedSchedules
 import com.nlab.reminder.domain.common.schedule.visibleconfig.*
 import com.nlab.reminder.test.*
 import kotlinx.coroutines.*
@@ -135,7 +136,7 @@ class AllScheduleStateMachineKtTest {
         val isComplete: Boolean = genBoolean()
         val updateCompleteUseCase: UpdateCompleteUseCase = mock()
         val stateContainer =
-            genAllScheduleStateMachine(modifyScheduleComplete = updateCompleteUseCase)
+            genAllScheduleStateMachine(updateComplete = updateCompleteUseCase)
                 .asContainer(genStateContainerScope(), genAllScheduleLoadedState())
         stateContainer
             .send(AllScheduleEvent.OnScheduleCompleteClicked(schedule.id, isComplete))
@@ -422,12 +423,41 @@ class AllScheduleStateMachineKtTest {
     }
 
     @Test
-    fun `selectionMode was disable when OnSelectedScheduleDeleteClicked clicked`() = runTest {
-        val selectionModeRepository: SelectionModeRepository = mock()
+    fun `bulkUpdateComplete invoked when OnSelectedScheduleCompleteClicked sent`() = runTest {
+        val bulkUpdateCompleteUseCase: BulkUpdateCompleteUseCase = mock()
+        val isComplete: Boolean = genBoolean()
+        val uiStates: List<ScheduleUiState> = genScheduleUiStates()
+            .withIndex()
+            .map { (index, uiState) -> uiState.copy(isSelected = index % 2 == 0) }
 
+        genAllScheduleStateMachine(bulkUpdateComplete = bulkUpdateCompleteUseCase)
+            .asContainer(
+                genStateContainerScope(),
+                genAllScheduleLoadedState(snapshot = genAllScheduleSnapshot(uiStates = uiStates))
+            )
+            .send(AllScheduleEvent.OnSelectedScheduleCompleteClicked(isComplete))
+            .join()
+        verify(bulkUpdateCompleteUseCase, once()).invoke(
+            uiStates.asSelectedSchedules(),
+            isComplete
+        )
+    }
+
+    @Test
+    fun `selectionMode was disable when OnSelectedScheduleCompleteClicked sent`() = runTest {
+        testSelectionDisableTemplate(AllScheduleEvent.OnSelectedScheduleCompleteClicked(genBoolean()))
+    }
+
+    @Test
+    fun `selectionMode was disable when OnSelectedScheduleDelete sent`() = runTest {
+        testSelectionDisableTemplate(AllScheduleEvent.OnSelectedScheduleDeleteClicked)
+    }
+
+    private suspend fun <E> testSelectionDisableTemplate(event: E) where E : AllScheduleEvent, E : SelectionDisable {
+        val selectionModeRepository: SelectionModeRepository = mock()
         genAllScheduleStateMachine(selectionModeRepository = selectionModeRepository)
             .asContainer(genStateContainerScope(), genAllScheduleLoadedState())
-            .send(AllScheduleEvent.OnSelectedScheduleDeleteClicked)
+            .send(event)
             .join()
         verify(selectionModeRepository, once()).setEnabled(false)
     }

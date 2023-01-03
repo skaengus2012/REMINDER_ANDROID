@@ -54,7 +54,7 @@ class ScheduleModule {
     )
 
     @Provides
-    fun provideUpdateScheduleCompleteUseCase(
+    fun provideUpdateCompleteUseCase(
         transactionIdGenerator: TransactionIdGenerator,
         scheduleRepository: ScheduleRepository,
         completeMarkRepository: CompleteMarkRepository
@@ -64,4 +64,8 @@ class ScheduleModule {
         completeMarkRepository,
         delayUntilTransactionPeriod = Delay(timeMillis = 500)
     )
+
+    @Provides
+    fun provideBulkUpdateCompleteUseCase(scheduleRepository: ScheduleRepository): BulkUpdateCompleteUseCase =
+        DefaultBulkUpdateCompleteUseCase(scheduleRepository)
 }

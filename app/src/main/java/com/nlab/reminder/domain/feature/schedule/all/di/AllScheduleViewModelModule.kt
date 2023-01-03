@@ -43,6 +43,7 @@ class AllScheduleViewModelModule {
         scheduleRepository: ScheduleRepository,
         scheduleUiStateFlowFactory: ScheduleUiStateFlowFactory,
         updateCompleteUseCase: UpdateCompleteUseCase,
+        bulkUpdateCompleteUseCase: BulkUpdateCompleteUseCase,
         selectionModeRepository: SelectionModeRepository,
         selectionRepository: SelectionRepository,
         linkMetadataTableRepository: LinkMetadataTableRepository,
@@ -61,6 +62,7 @@ class AllScheduleViewModelModule {
                     scheduleUiStateFlowFactory
                 ),
                 updateCompleteUseCase,
+                bulkUpdateCompleteUseCase,
                 completedScheduleShownRepository,
                 scheduleRepository,
                 selectionModeRepository,

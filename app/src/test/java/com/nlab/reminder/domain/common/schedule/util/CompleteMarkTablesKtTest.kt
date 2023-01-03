@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 The N's lab Open Source Project
+ * Copyright (C) 2023 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.common.schedule.impl
+package com.nlab.reminder.domain.common.schedule.util
 
 import com.nlab.reminder.domain.common.schedule.*
 import com.nlab.reminder.test.genBoolean

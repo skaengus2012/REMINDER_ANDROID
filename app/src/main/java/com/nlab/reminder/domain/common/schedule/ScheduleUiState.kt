@@ -25,7 +25,7 @@ import com.nlab.reminder.domain.common.tag.Tag
  */
 @Generated
 data class ScheduleUiState(
-    private val schedule: Schedule,
+    val schedule: Schedule,
     val linkMetadata: LinkMetadata,
     val isCompleteMarked: Boolean,
     val isSelected: Boolean
