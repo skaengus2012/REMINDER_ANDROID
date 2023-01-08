@@ -40,12 +40,12 @@ import org.mockito.kotlin.*
  * @author thalys
  */
 @ExperimentalCoroutinesApi
-class ScopedLinkMetadataTableRepositoryTest {
+class DefaultLinkMetadataTableRepositoryTest {
     @Test
     fun `ignore blank link requests`() = runTest {
         val linkMetadataRepository: LinkMetadataRepository = mock()
         val linkMetadataTableRepository =
-            ScopedLinkMetadataTableRepository(linkMetadataRepository, CoroutineScope(Dispatchers.Unconfined))
+            DefaultLinkMetadataTableRepository(linkMetadataRepository, CoroutineScope(Dispatchers.Unconfined))
 
         linkMetadataTableRepository.setLinks(listOf(" "))
         verify(linkMetadataRepository, never()).get(any())
@@ -59,7 +59,7 @@ class ScopedLinkMetadataTableRepositoryTest {
             whenever(mock.get(any())) doReturn Result.Success(linkMetadata)
         }
         val linkMetadataTableRepository =
-            ScopedLinkMetadataTableRepository(linkMetadataRepository, CoroutineScope(Dispatchers.Unconfined))
+            DefaultLinkMetadataTableRepository(linkMetadataRepository, CoroutineScope(Dispatchers.Unconfined))
         linkMetadataTableRepository.setLinks(listOf(link))
         linkMetadataTableRepository.setLinks(listOf(link))
 
@@ -71,7 +71,7 @@ class ScopedLinkMetadataTableRepositoryTest {
         val link: String = genBothify()
         val linkMetadataRepository: LinkMetadataRepository = mock()
         val linkMetadataTableRepository =
-            ScopedLinkMetadataTableRepository(linkMetadataRepository, CoroutineScope(Dispatchers.Unconfined))
+            DefaultLinkMetadataTableRepository(linkMetadataRepository, CoroutineScope(Dispatchers.Unconfined))
 
         linkMetadataTableRepository.setLinks(List(10) { link })
         verify(linkMetadataRepository, once()).get(any())
@@ -90,7 +90,7 @@ class ScopedLinkMetadataTableRepositoryTest {
                 return  Result.Success(genLinkMetadata())
             }
         }
-        val linkMetadataTableRepository = ScopedLinkMetadataTableRepository(
+        val linkMetadataTableRepository = DefaultLinkMetadataTableRepository(
             fakeLinkMetadataRepository,
             CoroutineScope(genFlowExecutionDispatcher(testScheduler))
         )
@@ -110,7 +110,7 @@ class ScopedLinkMetadataTableRepositoryTest {
             whenever(mock.get(link)) doReturn Result.Success(linkMetadata)
         }
         val linkMetadataTableRepository =
-            ScopedLinkMetadataTableRepository(linkMetadataRepository, CoroutineScope(Dispatchers.Default))
+            DefaultLinkMetadataTableRepository(linkMetadataRepository, CoroutineScope(Dispatchers.Default))
         val notifiedLinkTable = async {
             linkMetadataTableRepository.getStream()
                 .filter { it.isNotEmpty() }

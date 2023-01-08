@@ -32,12 +32,12 @@ import org.junit.Test
  * @author thalys
  */
 @OptIn(ExperimentalCoroutinesApi::class)
-class ScopedSelectionRepositoryTest {
+class DefaultSelectionRepositoryTest {
     @Test
     fun `notify selectionTable when inputted`() = runTest {
         val schedule: Schedule = genSchedule()
         val isSelect: Boolean = genBoolean()
-        val repository = ScopedSelectionRepository()
+        val repository = DefaultSelectionRepository()
         val notEmptySelectionTable = async {
             repository.selectionTableStream()
                 .filter { it.isNotEmpty() }
@@ -55,7 +55,7 @@ class ScopedSelectionRepositoryTest {
             genScheduleUiStates(isSelected = true).associate { it.id to it.isSelected }
         val unSelectedTable: SelectionTable =
             genScheduleUiStates(isSelected = false).associate { it.id to it.isSelected }
-        val repository = ScopedSelectionRepository(initTable = selectedTable + unSelectedTable)
+        val repository = DefaultSelectionRepository(initTable = selectedTable + unSelectedTable)
         repository.clearSelected()
 
         assertThat(repository.selectionTableStream().value, equalTo(emptyMap()))

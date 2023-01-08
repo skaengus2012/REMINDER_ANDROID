@@ -30,7 +30,7 @@ import kotlinx.coroutines.flow.update
 /**
  * @author thalys
  */
-class ScopedLinkMetadataTableRepository(
+class DefaultLinkMetadataTableRepository(
     private val linkMetadataRepository: LinkMetadataRepository,
     private val coroutineScope: CoroutineScope
 ) : LinkMetadataTableRepository {

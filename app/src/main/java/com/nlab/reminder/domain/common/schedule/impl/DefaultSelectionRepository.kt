@@ -27,7 +27,7 @@ import kotlinx.coroutines.flow.update
 /**
  * @author thalys
  */
-class ScopedSelectionRepository(initTable: SelectionTable = SelectionTable()) : SelectionRepository {
+class DefaultSelectionRepository(initTable: SelectionTable = SelectionTable()) : SelectionRepository {
     private val selectedStateFlow = MutableStateFlow(initTable)
 
     override fun selectionTableStream(): StateFlow<SelectionTable> = selectedStateFlow.asStateFlow()

@@ -38,11 +38,11 @@ class ScheduleModule {
 
     @ViewModelScoped
     @Provides
-    fun provideSelectionRepository(): SelectionRepository = ScopedSelectionRepository()
+    fun provideSelectionRepository(): SelectionRepository = DefaultSelectionRepository()
 
     @ViewModelScoped
     @Provides
-    fun provideSelectionModeRepository(): SelectionModeRepository = ScopedSelectionModeRepository()
+    fun provideSelectionModeRepository(): SelectionModeRepository = DefaultSelectionModeRepository()
 
     @Provides
     fun provideScheduleUiStateFlowFactory(

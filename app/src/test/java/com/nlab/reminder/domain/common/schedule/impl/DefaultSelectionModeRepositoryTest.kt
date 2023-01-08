@@ -32,17 +32,17 @@ import org.junit.Test
  * @author thalys
  */
 @ExperimentalCoroutinesApi
-class ScopedSelectionModeRepositoryTest {
+class DefaultSelectionModeRepositoryTest {
     @Test
     fun `set default initValue false when not set on constructor`() {
-        val selectionModeRepository = ScopedSelectionModeRepository()
+        val selectionModeRepository = DefaultSelectionModeRepository()
         assertThat(selectionModeRepository.enabledStream().value, equalTo(false))
     }
 
     @Test
     fun `set initValue with constructor parameter`() {
         val initValue: Boolean = genBoolean()
-        val selectionModeRepository = ScopedSelectionModeRepository(initValue)
+        val selectionModeRepository = DefaultSelectionModeRepository(initValue)
 
         assertThat(selectionModeRepository.enabledStream().value, equalTo(initValue))
     }
@@ -51,7 +51,7 @@ class ScopedSelectionModeRepositoryTest {
     fun `notify new selection mode when repository received setEnabled event`() = runTest {
         val initValue: Boolean = genBoolean()
         val input: Boolean = initValue.not()
-        val selectionModeRepository = ScopedSelectionModeRepository(initValue)
+        val selectionModeRepository = DefaultSelectionModeRepository(initValue)
         val newValueDeferred = async {
             selectionModeRepository
                 .enabledStream()

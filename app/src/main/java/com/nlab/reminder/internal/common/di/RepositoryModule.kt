@@ -24,7 +24,7 @@ import com.nlab.reminder.domain.common.util.link.impl.CachedLinkMetadataReposito
 import com.nlab.reminder.domain.common.schedule.ScheduleRepository
 import com.nlab.reminder.domain.common.tag.TagRepository
 import com.nlab.reminder.domain.common.util.link.LinkMetadataTableRepository
-import com.nlab.reminder.domain.common.util.link.impl.ScopedLinkMetadataTableRepository
+import com.nlab.reminder.domain.common.util.link.impl.DefaultLinkMetadataTableRepository
 import com.nlab.reminder.internal.common.android.database.ScheduleDao
 import com.nlab.reminder.internal.common.android.database.ScheduleTagListDao
 import com.nlab.reminder.internal.common.android.database.TagDao
@@ -62,7 +62,7 @@ class RepositoryModule {
     @Singleton
     @Provides
     fun provideLinkMetadataTableRepository(@Singleton coroutineScope: CoroutineScope): LinkMetadataTableRepository =
-        ScopedLinkMetadataTableRepository(
+        DefaultLinkMetadataTableRepository(
             linkMetadataRepository = object : LinkMetadataRepository {
                 private val internalRepository: LinkMetadataRepository = CachedLinkMetadataRepository(
                     JsoupLinkMetadataRepository()
