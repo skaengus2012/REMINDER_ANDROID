@@ -17,10 +17,7 @@
 package com.nlab.reminder.internal.common.di
 
 import android.app.Application
-import com.nlab.reminder.internal.common.android.database.ReminderDatabase
-import com.nlab.reminder.internal.common.android.database.ScheduleDao
-import com.nlab.reminder.internal.common.android.database.ScheduleTagListDao
-import com.nlab.reminder.internal.common.android.database.TagDao
+import com.nlab.reminder.internal.common.android.database.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -39,15 +36,19 @@ class ReminderDatabaseModule {
 
     @Singleton
     @Provides
-    fun provideScheduleDao(reminderDatabase: ReminderDatabase): ScheduleDao = reminderDatabase.scheduleDao()
+    fun provideLinkMetadataDao(reminderDatabase: ReminderDatabase): LinkMetadataDao = reminderDatabase.linkMetadataDao()
 
     @Singleton
     @Provides
-    fun provideTagDao(reminderDatabase: ReminderDatabase): TagDao = reminderDatabase.tagDao()
+    fun provideScheduleDao(reminderDatabase: ReminderDatabase): ScheduleDao = reminderDatabase.scheduleDao()
 
     @Singleton
     @Provides
     fun provideScheduleTagListDao(
         reminderDatabase: ReminderDatabase
     ): ScheduleTagListDao = reminderDatabase.scheduleTagListDao()
+
+    @Singleton
+    @Provides
+    fun provideTagDao(reminderDatabase: ReminderDatabase): TagDao = reminderDatabase.tagDao()
 }

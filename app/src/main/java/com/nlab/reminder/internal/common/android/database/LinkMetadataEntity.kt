@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 The N's lab Open Source Project
+ * Copyright (C) 2023 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,18 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.common.util.link
+package com.nlab.reminder.internal.common.android.database
 
-import kotlinx.coroutines.flow.Flow
+import androidx.room.ColumnInfo
+import androidx.room.Entity
 
 /**
  * @author thalys
  */
-interface LinkMetadataTableRepository {
-    fun getStream(): Flow<LinkMetadataTable>
-    suspend fun setLinks(links: List<String>)
-}
+@Entity(tableName = "link_metadata", primaryKeys = ["link"])
+data class LinkMetadataEntity(
+    @ColumnInfo(name = "link") val link: String,
+    @ColumnInfo(name = "title") val title: String?,
+    @ColumnInfo(name = "imageUrl") val imageUrl: String?,
+    @ColumnInfo(name = "timestamp") val timestamp: Long
+)
