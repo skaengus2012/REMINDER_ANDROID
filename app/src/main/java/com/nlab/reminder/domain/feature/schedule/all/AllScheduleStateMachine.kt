@@ -26,6 +26,7 @@ import com.nlab.reminder.domain.common.schedule.*
 import com.nlab.reminder.domain.common.schedule.SelectionModeRepository
 import com.nlab.reminder.domain.common.schedule.asSelectedSchedules
 import com.nlab.reminder.domain.common.schedule.visibleconfig.*
+import kotlinx.coroutines.flow.filter
 
 /**
  * @author Doohyun
@@ -70,11 +71,8 @@ fun AllScheduleStateMachine(
 
             state<AllScheduleState.Init> {
                 selectionModeRepository.enabledStream()
-                    .collect { isEnabled ->
-                        if (isEnabled.not()) {
-                            selectionRepository.clearSelected()
-                        }
-                    }
+                    .filter { it.not() }
+                    .collectWhileSubscribed { selectionRepository.clearSelected() }
             }
         }
 
