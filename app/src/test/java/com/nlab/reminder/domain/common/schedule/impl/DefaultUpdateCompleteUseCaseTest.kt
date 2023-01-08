@@ -17,11 +17,11 @@
 package com.nlab.reminder.domain.common.schedule.impl
 
 import com.nlab.reminder.core.kotlin.coroutine.Delay
+import com.nlab.reminder.core.kotlin.util.isSuccess
 import com.nlab.reminder.domain.common.util.transaction.TransactionId
 import com.nlab.reminder.domain.common.util.link.transaction.genTransactionIdGenerator
-import com.nlab.reminder.core.kotlin.util.Result
-import com.nlab.reminder.core.kotlin.util.isSuccess
 import com.nlab.reminder.domain.common.schedule.*
+import com.nlab.reminder.domain.common.util.link.transaction.genTransactionId
 import com.nlab.reminder.test.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -37,6 +37,34 @@ import org.mockito.kotlin.*
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class DefaultUpdateCompleteUseCaseTest {
+    @Test
+    fun `commit complete`() = runTest {
+        val insertedSet = ScheduleId(0) to true
+        val inputSet = ScheduleId(1) to false
+        val scheduleRepository: ScheduleRepository = mock()
+        val completeMarkRepository: CompleteMarkRepository = mock {
+            whenever(mock.get()) doReturn MutableStateFlow(
+                CompleteMarkTable(insertedSet.first to genCompleteMark(insertedSet.second))
+            )
+        }
+        val updateCompleteUseCase = DefaultUpdateCompleteUseCase(
+            transactionIdGenerator = mock(),
+            scheduleRepository = scheduleRepository,
+            completeMarkRepository = completeMarkRepository,
+            delayUntilTransactionPeriod = mock()
+        )
+
+        updateCompleteUseCase(inputSet.first, inputSet.second)
+
+        verify(scheduleRepository, once()).update(
+            UpdateRequest.Completes(
+                listOf(
+                    ModifyCompleteRequest(insertedSet.first, insertedSet.second),
+                )
+            )
+        )
+    }
+
     @Test
     fun `completeMark inserted`() = runTest {
         val fixedTxId = genBothify()
@@ -56,96 +84,7 @@ class DefaultUpdateCompleteUseCaseTest {
 
         verify(completeMarkRepository, once()).insert(
             mapOf(
-                scheduleId to CompleteMark(isComplete, isApplied = false, TransactionId(fixedTxId))
-            )
-        )
-    }
-
-    @Test
-    fun `commit complete state if not applied`() = runTest {
-        val testScheduleId = ScheduleId(0)
-        val testComplete: Boolean = genBoolean()
-        val completeMarkRepository: CompleteMarkRepository = mock {
-            whenever(mock.get()) doReturn MutableStateFlow(
-                mapOf(
-                    testScheduleId to CompleteMark(
-                        isComplete = testComplete,
-                        isApplied = false,
-                        transactionId = TransactionId(genBothify())
-                    ),
-                    ScheduleId(1) to CompleteMark(
-                        isComplete = genBoolean(),
-                        isApplied = true,
-                        transactionId = TransactionId(genBothify())
-                    )
-                )
-            )
-        }
-        val scheduleRepository: ScheduleRepository = mock()
-        val updateCompleteUseCase = DefaultUpdateCompleteUseCase(
-            transactionIdGenerator = genTransactionIdGenerator(),
-            scheduleRepository = scheduleRepository,
-            completeMarkRepository = completeMarkRepository,
-            delayUntilTransactionPeriod = mock()
-        )
-
-        updateCompleteUseCase(ScheduleId(genLong()), genBoolean())
-
-        verify(scheduleRepository, once()).update(
-            UpdateRequest.Completes(listOf(ModifyCompleteRequest(testScheduleId, testComplete)))
-        )
-    }
-
-    private suspend fun mapScheduleCompleteResultToTotalResult(scheduleCompleteResult: Result<Unit>): Result<Unit> {
-        val scheduleId = ScheduleId(genLong())
-        val isComplete = genBoolean()
-        val completeMarkRepository: CompleteMarkRepository = mock {
-            whenever(mock.get()) doReturn MutableStateFlow(
-                mapOf(
-                    scheduleId to CompleteMark(
-                        isComplete,
-                        isApplied = false,
-                        transactionId = TransactionId(genBothify())
-                    )
-                )
-            )
-        }
-        val scheduleRepository: ScheduleRepository = mock {
-            whenever(
-                mock.update(UpdateRequest.Completes(listOf(ModifyCompleteRequest(scheduleId, isComplete))))
-            ) doReturn scheduleCompleteResult
-        }
-        val updateCompleteUseCase = DefaultUpdateCompleteUseCase(
-            transactionIdGenerator = genTransactionIdGenerator(),
-            scheduleRepository = scheduleRepository,
-            completeMarkRepository = completeMarkRepository,
-            delayUntilTransactionPeriod = mock()
-        )
-
-        return updateCompleteUseCase(ScheduleId(genLong()), genBoolean())
-    }
-
-    @Test
-    fun `update result for commit complete to schedule was success`() = runTest {
-        assertThat(
-            Result.Success(Unit),
-            equalTo(
-                mapScheduleCompleteResultToTotalResult(
-                    Result.Success(Unit)
-                )
-            )
-        )
-    }
-
-    @Test
-    fun `update result for commit complete to schedule was failed`() = runTest {
-        val throwable = Throwable()
-        assertThat(
-            Result.Failure(throwable),
-            equalTo(
-                mapScheduleCompleteResultToTotalResult(
-                    Result.Failure(throwable)
-                )
+                scheduleId to genCompleteMark(isComplete, TransactionId(fixedTxId))
             )
         )
     }
@@ -156,7 +95,7 @@ class DefaultUpdateCompleteUseCaseTest {
         val isComplete = genBoolean()
         val txId = genBothify()
         val completeMarkRepository: CompleteMarkRepository = mock {
-            whenever(mock.get()) doReturn MutableStateFlow(emptyMap())
+            whenever(mock.get()) doReturn MutableStateFlow(CompleteMarkTable())
         }
         val delayUntilTransactionPeriod: Delay = mock()
         val beforeDelayedOrder = inOrder(completeMarkRepository, delayUntilTransactionPeriod)
@@ -171,12 +110,8 @@ class DefaultUpdateCompleteUseCaseTest {
         updateCompleteUseCase(scheduleId, isComplete)
 
         beforeDelayedOrder.verify(completeMarkRepository, once()).insert(
-            mapOf(
-                scheduleId to CompleteMark(
-                    isComplete,
-                    isApplied = false,
-                    transactionId = TransactionId(txId)
-                )
+            CompleteMarkTable(
+                scheduleId to CompleteMark(isComplete, transactionId = genTransactionId(txId))
             )
         )
         beforeDelayedOrder.verify(delayUntilTransactionPeriod, once())()
@@ -186,7 +121,6 @@ class DefaultUpdateCompleteUseCaseTest {
 
     @Test
     fun `skipped commit when requestCount still have it`() = runTest {
-        val completeMarkRepository: CompleteMarkRepository = mock()
         val scheduleRepository: ScheduleRepository = mock()
         val firstInfinityDelay = object : Delay {
             private val dispatcher = genFlowExecutionDispatcher(testScheduler)
@@ -195,28 +129,25 @@ class DefaultUpdateCompleteUseCaseTest {
                 withContext(dispatcher) {
                     val delayTime = if (count > 0) 0 else Long.MAX_VALUE
                     ++count
+                    println(delayTime)
                     delay(delayTime)
                 }
             }
         }
-        val schedule: Schedule = genSchedule()
-        val complete: Boolean = genBoolean()
         val updateCompleteUseCase = DefaultUpdateCompleteUseCase(
             transactionIdGenerator = genTransactionIdGenerator(),
             scheduleRepository = scheduleRepository,
-            completeMarkRepository = completeMarkRepository,
+            completeMarkRepository = mock(),
             delayUntilTransactionPeriod = firstInfinityDelay
         )
         val delayTime = 1_000L
         val job = launch {
-            updateCompleteUseCase(schedule.id, complete)
+            updateCompleteUseCase(genSchedule().id, genBoolean())
         }
         delay(delayTime)
         advanceTimeBy(delayTime)
 
-        val result = updateCompleteUseCase(genSchedule().id, complete)
-
-        verify(completeMarkRepository, never()).updateToApplied(any())
+        val result = updateCompleteUseCase(genSchedule().id, genBoolean())
         verify(scheduleRepository, never()).update(any())
         assert(result.isSuccess)
 

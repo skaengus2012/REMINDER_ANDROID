@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.common.schedule.util
-
-import com.nlab.reminder.domain.common.schedule.CompleteMarkTable
-import com.nlab.reminder.domain.common.schedule.Schedule
+package com.nlab.reminder.domain.common.schedule
 
 /**
  * @author thalys
- */
-fun CompleteMarkTable.isCompleteMarked(schedule: Schedule): Boolean {
-    return this[schedule.id]?.isComplete ?: schedule.isComplete
-}
+*/
+fun CompleteMarkTable(vararg pairs: Pair<ScheduleId, CompleteMark>): CompleteMarkTable =
+    mapOf(*pairs)
+
+fun CompleteMarkTable.isCompleteMarked(schedule: Schedule): Boolean =
+    get(schedule.id)?.isComplete ?: schedule.isComplete

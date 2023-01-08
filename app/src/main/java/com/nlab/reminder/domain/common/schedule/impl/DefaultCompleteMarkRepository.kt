@@ -25,21 +25,14 @@ import kotlinx.coroutines.flow.*
  *
  * @author Doohyun
  */
-class ScopedCompleteMarkRepository : CompleteMarkRepository {
-    private val chunkRequests: MutableStateFlow<CompleteMarkTable> = MutableStateFlow(emptyMap())
+class DefaultCompleteMarkRepository : CompleteMarkRepository {
+    private val chunkRequests: MutableStateFlow<CompleteMarkTable> = MutableStateFlow(CompleteMarkTable())
 
     override fun get(): StateFlow<CompleteMarkTable> = chunkRequests.asStateFlow()
 
-    override suspend fun insert(completeMarks: CompleteMarkTable) {
+    override suspend fun insert(completeMarks: CompleteMarkTable) =
         chunkRequests.update { old -> old + completeMarks }
-    }
 
-    override suspend fun updateToApplied(completeMarks: CompleteMarkTable) {
-        chunkRequests.update { old ->
-            old.mapValues { (key, value) ->
-                if (completeMarks[key] == value) value.copy(isApplied = true)
-                else value
-            }
-        }
-    }
+    override suspend fun clear() =
+        chunkRequests.update { CompleteMarkTable() }
 }

@@ -68,6 +68,5 @@ fun genScheduleUiStates(
 
 fun genCompleteMark(
     isComplete: Boolean = genBoolean(),
-    isApplied: Boolean = genBoolean(),
     transactionId: TransactionId = TransactionId(genBothify())
-): CompleteMark = CompleteMark(isComplete, isApplied, transactionId)
+): CompleteMark = CompleteMark(isComplete, transactionId)

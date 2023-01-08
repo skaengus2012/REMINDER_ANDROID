@@ -34,7 +34,7 @@ import dagger.hilt.android.scopes.ViewModelScoped
 class ScheduleModule {
     @ViewModelScoped
     @Provides
-    fun provideCompleteMarkRepository(): CompleteMarkRepository = ScopedCompleteMarkRepository()
+    fun provideCompleteMarkRepository(): CompleteMarkRepository = DefaultCompleteMarkRepository()
 
     @ViewModelScoped
     @Provides
@@ -62,7 +62,7 @@ class ScheduleModule {
         transactionIdGenerator,
         scheduleRepository,
         completeMarkRepository,
-        delayUntilTransactionPeriod = Delay(timeMillis = 500)
+        delayUntilTransactionPeriod = Delay(timeMillis = 500),
     )
 
     @Provides

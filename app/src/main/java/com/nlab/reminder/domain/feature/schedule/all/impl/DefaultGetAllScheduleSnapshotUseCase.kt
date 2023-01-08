@@ -34,6 +34,7 @@ class DefaultGetAllScheduleSnapshotUseCase(
     scheduleRepository: ScheduleRepository,
     private val linkMetadataTableRepository: LinkMetadataTableRepository,
     private val completedScheduleShownRepository: CompletedScheduleShownRepository,
+    private val completeMarkRepository: CompleteMarkRepository,
     private val scheduleUiStateFlowFactory: ScheduleUiStateFlowFactory,
 ) : GetAllScheduleSnapshotUseCase {
     private val findAllSchedules: Flow<List<Schedule>> =
@@ -59,6 +60,7 @@ class DefaultGetAllScheduleSnapshotUseCase(
     private fun getScheduleUiStateStream(isCompletedScheduleShown: Boolean): Flow<List<ScheduleUiState>> =
         combine(
             getScheduleStream(isCompletedScheduleShown)
+                .onEach { completeMarkRepository.clear() }
                 .let(scheduleUiStateFlowFactory::with)
                 .onEach { uiStates -> linkMetadataTableRepository.setLinks(uiStates.map { it.link }) },
             linkMetadataTableRepository.getStream(),

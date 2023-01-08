@@ -47,6 +47,7 @@ class AllScheduleViewModelModule {
         selectionModeRepository: SelectionModeRepository,
         selectionRepository: SelectionRepository,
         linkMetadataTableRepository: LinkMetadataTableRepository,
+        completeMarkRepository: CompleteMarkRepository,
         @AllScheduleScope completedScheduleShownRepository: CompletedScheduleShownRepository
     ): AllScheduleStateContainerFactory = object : AllScheduleStateContainerFactory {
         override fun create(
@@ -59,6 +60,7 @@ class AllScheduleViewModelModule {
                     scheduleRepository,
                     linkMetadataTableRepository,
                     completedScheduleShownRepository,
+                    completeMarkRepository,
                     scheduleUiStateFlowFactory
                 ),
                 updateCompleteUseCase,

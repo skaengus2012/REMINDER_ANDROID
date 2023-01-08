@@ -24,5 +24,5 @@ import kotlinx.coroutines.flow.StateFlow
 interface CompleteMarkRepository {
     fun get(): StateFlow<CompleteMarkTable>
     suspend fun insert(completeMarks: CompleteMarkTable)
-    suspend fun updateToApplied(completeMarks: CompleteMarkTable)
+    suspend fun clear()
 }

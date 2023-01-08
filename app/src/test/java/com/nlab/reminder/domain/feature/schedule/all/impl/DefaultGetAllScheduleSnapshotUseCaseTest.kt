@@ -16,6 +16,7 @@
 
 package com.nlab.reminder.domain.feature.schedule.all.impl
 
+import com.nlab.reminder.core.kotlin.coroutine.flow.map
 import com.nlab.reminder.domain.common.schedule.*
 import com.nlab.reminder.domain.common.schedule.visibleconfig.CompletedScheduleShownRepository
 import com.nlab.reminder.domain.common.util.link.LinkMetadata
@@ -94,7 +95,7 @@ class DefaultGetAllScheduleSnapshotUseCaseTest {
         val getAllScheduleSnapshotUseCase = genDefaultGetAllScheduleSnapshotUseCase(
             linkMetadataTableRepository = linkMetadataTableRepository,
             scheduleUiStateFlowFactory = object : ScheduleUiStateFlowFactory {
-                override fun with(schedules: Flow<List<Schedule>>): Flow<List<ScheduleUiState>> =
+                override fun with(schedulesStream: Flow<List<Schedule>>): Flow<List<ScheduleUiState>> =
                     flowOf(expectedUiStates)
             },
         )
@@ -115,7 +116,7 @@ class DefaultGetAllScheduleSnapshotUseCaseTest {
                 whenever(mock.getStream()) doReturn MutableStateFlow(mapOf(link to expectedLinkMetadata))
             },
             scheduleUiStateFlowFactory = object : ScheduleUiStateFlowFactory {
-                override fun with(schedules: Flow<List<Schedule>>): Flow<List<ScheduleUiState>> = flowOf(
+                override fun with(schedulesStream: Flow<List<Schedule>>): Flow<List<ScheduleUiState>> = flowOf(
                     listOf(scheduleUiState)
                 )
             },
@@ -140,13 +141,30 @@ class DefaultGetAllScheduleSnapshotUseCaseTest {
         completedScheduleShownRepository: CompletedScheduleShownRepository = mock {
             whenever(mock.get()) doReturn flowOf(genBoolean())
         },
-        scheduleUiStateFlowFactory: ScheduleUiStateFlowFactory = mock {
-            whenever(mock.with(any())) doReturn flowOf(emptyList())
+        completeMarkRepository: CompleteMarkRepository = mock(),
+        scheduleUiStateFlowFactory: ScheduleUiStateFlowFactory = object : ScheduleUiStateFlowFactory {
+            override fun with(schedulesStream: Flow<List<Schedule>>): Flow<List<ScheduleUiState>> =
+                schedulesStream.map { schedules -> schedules.map { genScheduleUiState(schedule = it) } }
         }
     ): DefaultGetAllScheduleSnapshotUseCase = DefaultGetAllScheduleSnapshotUseCase(
         scheduleRepository,
         linkMetadataTableRepository,
         completedScheduleShownRepository,
+        completeMarkRepository,
         scheduleUiStateFlowFactory
     )
+
+    @Test
+    fun `clear complete mark when schedules sent`() = runTest {
+        val completeMarkRepository: CompleteMarkRepository = mock()
+        val getAllScheduleSnapshotUseCase = genDefaultGetAllScheduleSnapshotUseCase(
+            completeMarkRepository = completeMarkRepository
+        )
+
+        // join
+        getAllScheduleSnapshotUseCase()
+            .take(1)
+            .first()
+        verify(completeMarkRepository, once()).clear()
+    }
 }

@@ -27,5 +27,7 @@ import org.mockito.kotlin.whenever
  * @author Doohyun
  */
 fun genTransactionIdGenerator(expected: String = genBothify()): TransactionIdGenerator = mock {
-    whenever(mock.generate()) doReturn TransactionId(expected)
+    whenever(mock.generate()) doReturn genTransactionId(expected)
 }
+
+fun genTransactionId(expected: String = genBothify()): TransactionId = TransactionId(expected)

@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.common.schedule.util
+package com.nlab.reminder.domain.common.schedule
 
-import com.nlab.reminder.domain.common.schedule.*
 import com.nlab.reminder.test.genBoolean
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat

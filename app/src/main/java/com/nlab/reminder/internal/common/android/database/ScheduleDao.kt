@@ -17,6 +17,7 @@
 package com.nlab.reminder.internal.common.android.database
 
 import androidx.room.*
+import com.nlab.reminder.domain.common.schedule.Schedule
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -92,7 +93,12 @@ abstract class ScheduleDao {
 
     @Transaction
     open suspend fun updateCompletes(scheduleIds: List<Long>, isComplete: Boolean) {
-        updateCompletesWithIds(scheduleIds, isComplete)
+        updateCompletesWithIds(
+            scheduleIds = findByScheduleIds(scheduleIds)
+                .filter { it.isComplete != isComplete }
+                .map { it.scheduleId },
+            isComplete
+        )
     }
 
     private suspend fun updateCompletesWithIds(scheduleIds: List<Long>, isComplete: Boolean) {
