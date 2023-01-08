@@ -18,11 +18,12 @@ package com.nlab.reminder.domain.common.schedule.impl
 
 import com.nlab.reminder.core.kotlin.coroutine.Delay
 import com.nlab.reminder.core.kotlin.util.Result
-import com.nlab.reminder.core.util.transaction.TransactionIdGenerator
+import com.nlab.reminder.domain.common.util.transaction.TransactionIdGenerator
 import com.nlab.reminder.domain.common.schedule.*
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.updateAndGet
+import kotlin.math.max
 
 /**
  * @author Doohyun
@@ -32,37 +33,27 @@ class DefaultUpdateCompleteUseCase(
     private val scheduleRepository: ScheduleRepository,
     private val completeMarkRepository: CompleteMarkRepository,
     private val delayUntilTransactionPeriod: Delay,
-    private val dispatcher: CoroutineDispatcher
 ) : UpdateCompleteUseCase {
-    override suspend fun invoke(scheduleId: ScheduleId, isComplete: Boolean): Result<Unit> = withContext(dispatcher) {
-        completeMarkRepository.insert(completeMarkGroupOf(scheduleId, isComplete))
-        delayUntilTransactionPeriod()
+    private val requestCount = MutableStateFlow(0)
 
-        getNotAppliedCompleteMarkSnapshot()
-            .also { snapshot -> completeMarkRepository.updateToApplied(snapshot) }
-            .let { snapshot -> commitCompleteMarkSnapshotToSchedule(snapshot) }
-    }
-
-    private fun completeMarkGroupOf(scheduleId: ScheduleId, isComplete: Boolean): Map<ScheduleId, CompleteMark> =
-        mapOf(
-            scheduleId to CompleteMark(
-                isComplete,
-                isApplied = false,
-                transactionId = transactionIdGenerator.generate()
+    override suspend fun invoke(scheduleId: ScheduleId, isComplete: Boolean): Result<Unit> {
+        completeMarkRepository.insert(
+            CompleteMarkTable(
+                scheduleId to CompleteMark(isComplete, transactionIdGenerator.generate())
             )
         )
+        requestCount.update { count -> count + 1 }
+        delayUntilTransactionPeriod()
 
-    private suspend fun getNotAppliedCompleteMarkSnapshot(): Map<ScheduleId, CompleteMark> =
-        completeMarkRepository.get()
-            .firstOrNull()
-            ?.filterNot { it.value.isApplied }
-            ?: emptyMap()
-
-    private suspend fun commitCompleteMarkSnapshotToSchedule(snapshot: Map<ScheduleId, CompleteMark>): Result<Unit> =
-        if (snapshot.isEmpty()) Result.Success(Unit)
-        else scheduleRepository.updateComplete(
-            requests = snapshot
-                .map { ScheduleCompleteRequest(it.key, it.value.isComplete) }
-                .toSet()
-        )
+        val hasPendingRequest: Boolean =
+            requestCount.updateAndGet { count -> max(count - 1, 0) } > 0
+        return if (hasPendingRequest) Result.Success(Unit)
+        else {
+            val table: CompleteMarkTable = completeMarkRepository.get().value
+            if (table.isEmpty()) Result.Success(Unit)
+            else scheduleRepository.update(
+                UpdateRequest.Completes(table.map { ModifyCompleteRequest(it.key, it.value.isComplete) })
+            )
+        }
+    }
 }

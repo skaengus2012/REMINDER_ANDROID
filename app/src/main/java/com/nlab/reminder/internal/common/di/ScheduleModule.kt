@@ -17,7 +17,7 @@
 package com.nlab.reminder.internal.common.di
 
 import com.nlab.reminder.core.kotlin.coroutine.util.Delay
-import com.nlab.reminder.core.util.transaction.TransactionIdGenerator
+import com.nlab.reminder.domain.common.util.transaction.TransactionIdGenerator
 import com.nlab.reminder.domain.common.schedule.*
 import com.nlab.reminder.domain.common.schedule.impl.*
 import dagger.Module
@@ -25,7 +25,6 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.android.scopes.ViewModelScoped
-import kotlinx.coroutines.Dispatchers
 
 /**
  * @author Doohyun
@@ -35,15 +34,27 @@ import kotlinx.coroutines.Dispatchers
 class ScheduleModule {
     @ViewModelScoped
     @Provides
-    fun provideCompleteMarkRepository(): CompleteMarkRepository = ScopedCompleteMarkRepository()
+    fun provideCompleteMarkRepository(): CompleteMarkRepository = DefaultCompleteMarkRepository()
+
+    @ViewModelScoped
+    @Provides
+    fun provideSelectionRepository(): SelectionRepository = DefaultSelectionRepository()
+
+    @ViewModelScoped
+    @Provides
+    fun provideSelectionModeRepository(): SelectionModeRepository = DefaultSelectionModeRepository()
 
     @Provides
     fun provideScheduleUiStateFlowFactory(
-        completeMarkRepository: CompleteMarkRepository
-    ): ScheduleUiStatePagingFlowFactory = DefaultScheduleUiStatePagingFlowFactory(completeMarkRepository)
+        completeMarkRepository: CompleteMarkRepository,
+        selectionRepository: SelectionRepository,
+    ): ScheduleUiStateFlowFactory = DefaultScheduleUiStateFlowFactory(
+        completeMarkRepository,
+        selectionRepository
+    )
 
     @Provides
-    fun provideUpdateScheduleCompleteUseCase(
+    fun provideUpdateCompleteUseCase(
         transactionIdGenerator: TransactionIdGenerator,
         scheduleRepository: ScheduleRepository,
         completeMarkRepository: CompleteMarkRepository
@@ -51,7 +62,10 @@ class ScheduleModule {
         transactionIdGenerator,
         scheduleRepository,
         completeMarkRepository,
-        delayUntilTransactionPeriod = Delay(timeMillis = 1_000),
-        dispatcher = Dispatchers.Default
+        delayUntilTransactionPeriod = Delay(timeMillis = 500),
     )
+
+    @Provides
+    fun provideBulkUpdateCompleteUseCase(scheduleRepository: ScheduleRepository): BulkUpdateCompleteUseCase =
+        DefaultBulkUpdateCompleteUseCase(scheduleRepository)
 }

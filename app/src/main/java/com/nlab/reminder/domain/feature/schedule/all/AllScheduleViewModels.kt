@@ -17,10 +17,37 @@
 package com.nlab.reminder.domain.feature.schedule.all
 
 import com.nlab.reminder.domain.common.schedule.ScheduleId
+import com.nlab.reminder.domain.common.schedule.ScheduleUiState
 
 /**
  * @author Doohyun
  */
-fun AllScheduleViewModel.onScheduleCompleteUpdateClicked(scheduleId: ScheduleId, isComplete: Boolean) {
-    send(AllScheduleEvent.OnScheduleCompleteUpdateClicked(scheduleId, isComplete))
-}
+fun AllScheduleViewModel.onToggleCompletedScheduleShownClicked() =
+    send(AllScheduleEvent.OnToggleCompletedScheduleShownClicked)
+
+fun AllScheduleViewModel.onToggleSelectionModeEnableClicked() =
+    send(AllScheduleEvent.OnToggleSelectionModeEnableClicked)
+
+fun AllScheduleViewModel.onDeleteCompletedScheduleClicked() =
+    send(AllScheduleEvent.OnDeleteCompletedScheduleClicked)
+
+fun AllScheduleViewModel.onSelectedScheduleDeleteClicked() =
+    send(AllScheduleEvent.OnSelectedScheduleDeleteClicked)
+
+fun AllScheduleViewModel.onScheduleCompleteClicked(scheduleId: ScheduleId, isComplete: Boolean) =
+    send(AllScheduleEvent.OnScheduleCompleteClicked(scheduleId, isComplete))
+
+fun AllScheduleViewModel.onDragScheduleEnded(draggedSnapshot: List<ScheduleUiState>) =
+    send(AllScheduleEvent.OnDragScheduleEnded(draggedSnapshot))
+
+fun AllScheduleViewModel.onDeleteScheduleClicked(scheduleId: ScheduleId) =
+    send(AllScheduleEvent.OnDeleteScheduleClicked(scheduleId))
+
+fun AllScheduleViewModel.onScheduleLinkClicked(scheduleId: ScheduleId) =
+    send(AllScheduleEvent.OnScheduleLinkClicked(scheduleId))
+
+fun AllScheduleViewModel.onScheduleSelected(scheduleId: ScheduleId, isSelect: Boolean) =
+    send(AllScheduleEvent.OnScheduleSelected(scheduleId, isSelect))
+
+fun AllScheduleViewModel.onSelectedScheduleCompleteClicked(isComplete: Boolean) =
+    send(AllScheduleEvent.OnSelectedScheduleCompleteClicked(isComplete))

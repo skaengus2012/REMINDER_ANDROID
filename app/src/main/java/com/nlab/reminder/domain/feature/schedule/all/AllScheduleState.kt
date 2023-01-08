@@ -18,6 +18,7 @@ package com.nlab.reminder.domain.feature.schedule.all
 
 import com.nlab.reminder.core.state.State
 import com.nlab.reminder.core.util.test.annotation.Generated
+import com.nlab.reminder.domain.common.schedule.ScheduleUiState
 
 /**
  * @author Doohyun
@@ -27,5 +28,9 @@ sealed class AllScheduleState private constructor() : State {
     object Loading : AllScheduleState()
 
     @Generated
-    data class Loaded(val snapshot: AllScheduleSnapshot) : AllScheduleState()
+    data class Loaded(
+        val scheduleUiStates: List<ScheduleUiState>,
+        val isCompletedScheduleShown: Boolean,
+        val isSelectionMode: Boolean
+    ) : AllScheduleState()
 }

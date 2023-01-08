@@ -23,4 +23,6 @@ import androidx.recyclerview.widget.RecyclerView
  * @author Doohyun
  */
 @Suppress("FunctionName")
-fun ScheduleItemAnimator(): RecyclerView.ItemAnimator = DefaultItemAnimator().apply { changeDuration = 0 }
+fun ScheduleItemAnimator(): RecyclerView.ItemAnimator = DefaultItemAnimator().apply {
+    changeDuration = 0
+}

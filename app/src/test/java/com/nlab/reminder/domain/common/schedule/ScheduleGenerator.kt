@@ -16,9 +16,8 @@
 
 package com.nlab.reminder.domain.common.schedule
 
-import androidx.paging.PagingData
-import androidx.paging.map
-import com.nlab.reminder.core.util.transaction.TransactionId
+import com.nlab.reminder.domain.common.util.link.LinkMetadata
+import com.nlab.reminder.domain.common.util.transaction.TransactionId
 import com.nlab.reminder.domain.common.tag.Tag
 import com.nlab.reminder.domain.common.tag.genTags
 import com.nlab.reminder.test.genBoolean
@@ -33,39 +32,41 @@ fun genSchedule(
     scheduleId: Long = genLong(),
     title: String = genBothify(),
     note: String = genBothify(),
-    url: String = genBothify(),
+    link: String? = genBothify(),
     tags: List<Tag> = genTags(),
-    visiblePriority: Int = genInt(),
+    visiblePriority: Long = genLong(),
     isComplete: Boolean = genBoolean()
-): Schedule = Schedule(scheduleId, title, note, url, tags, visiblePriority, isComplete)
+): Schedule = Schedule(scheduleId, title, note, link, tags, visiblePriority, isComplete)
 
 fun genSchedules(
-    isComplete: Boolean = genBoolean()
+    isComplete: Boolean = genBoolean(),
+    link: String? = null
 ): List<Schedule> = List(genInt("1#")) { index ->
-    genSchedule(scheduleId = index.toLong(), isComplete = isComplete)
+    genSchedule(scheduleId = index.toLong(), isComplete = isComplete, link = link)
 }
 
 fun genScheduleUiState(
     schedule: Schedule = genSchedule(),
-    isCompleteMarked: Boolean? = null
-): ScheduleUiState = ScheduleUiState(schedule, isCompleteMarked = isCompleteMarked ?: schedule.isComplete)
+    linkMetadata: LinkMetadata = LinkMetadata.Empty,
+    isCompleteMarked: Boolean = genBoolean(),
+    isSelected: Boolean = genBoolean()
+): ScheduleUiState = ScheduleUiState(
+    schedule,
+    linkMetadata,
+    isCompleteMarked,
+    isSelected
+)
 
 fun genScheduleUiStates(
     schedules: List<Schedule> = genSchedules(),
-    isCompleteMarked: Boolean? = null
+    linkMetadata: LinkMetadata = LinkMetadata.Empty,
+    isCompleteMarked: Boolean = genBoolean(),
+    isSelected: Boolean = false
 ): List<ScheduleUiState> = schedules.map { schedule ->
-    ScheduleUiState(schedule, isCompleteMarked = isCompleteMarked ?: schedule.isComplete)
-}
-
-fun genPagingScheduleUiStates(
-    schedules: PagingData<Schedule>,
-    isCompleteMarked: Boolean? = null
-): PagingData<ScheduleUiState> = schedules.map { schedule ->
-    ScheduleUiState(schedule, isCompleteMarked = isCompleteMarked ?: schedule.isComplete)
+    genScheduleUiState(schedule, linkMetadata, isCompleteMarked, isSelected)
 }
 
 fun genCompleteMark(
     isComplete: Boolean = genBoolean(),
-    isApplied: Boolean = genBoolean(),
     transactionId: TransactionId = TransactionId(genBothify())
-): CompleteMark = CompleteMark(isComplete, isApplied, transactionId)
+): CompleteMark = CompleteMark(isComplete, transactionId)

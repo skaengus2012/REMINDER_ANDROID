@@ -21,6 +21,7 @@ import androidx.startup.Initializer
 import com.nlab.reminder.core.state.StateMachinePlugin
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
+import timber.log.Timber
 
 /**
  * @author thalys
@@ -29,6 +30,7 @@ import kotlinx.coroutines.flow.SharingStarted
 class StateMachinePluginInitializer : Initializer<Unit> {
     override fun create(context: Context) {
         StateMachinePlugin.defaultDispatcher = Dispatchers.Default
+        StateMachinePlugin.defaultExceptionHandler = { e -> Timber.tag("stateMachine.err").e(e) }
         StateMachinePlugin.defaultSharingStarted = SharingStarted.WhileSubscribed(5_000)
     }
 

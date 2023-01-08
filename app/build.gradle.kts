@@ -1,4 +1,7 @@
 import org.gradle.configurationcache.extensions.capitalized
+import com.android.build.api.dsl.VariantDimension
+import java.io.FileInputStream
+import java.util.Properties
 
 /*
  * Copyright (C) 2022 The N"s lab Open Source Project
@@ -44,6 +47,11 @@ android {
         versionName = AndroidConfig.VERSION_NAME
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        setBuildConfigFromFile(
+            defaultConfig,
+            makePropertiesFromFiles(fileName = "${projectDir.path}${File.separator}config-default.properties")
+        )
 
         kapt {
             arguments {
@@ -102,6 +110,7 @@ android {
                 "**/kotlin/**",
                 "**/view/**",
                 "**/test/**",
+                "**/infra/**",
                 "**/di/**",
                 "**/*Args*.*",          /* filtering Navigation Component generated classes */
                 "**/*Directions*.*"     /* filtering Navigation Component generated classes */
@@ -161,14 +170,21 @@ dependencies {
     implementation(Dependencies.ANDROID_NAVIGATION_UI)
     implementation(Dependencies.ANDROID_ROOM_RUNTIME)
     implementation(Dependencies.ANDROID_ROOM_KTX)
-    implementation(Dependencies.ANDROID_ROOM_PAGING)
     kapt(Dependencies.ANDROID_ROOM_COMPILER)
     implementation(Dependencies.ANDROID_STARTUP_RUNTIME)
-    implementation(Dependencies.ANDROID_PAGING_RUNTIME)
+    implementation(Dependencies.ANDROID_DATASTORE_PREFERENCES)
+    implementation(Dependencies.AFOLLESTED_DRAG_SELECTION_RECYCLERVIEW)
 
     implementation(Dependencies.GOOGLE_HILT_ANDROID)
     kapt(Dependencies.GOOGLE_HILT_ANDROID_COMPILER)
     implementation(Dependencies.GOGGLE_FLEXBOX)
+
+    implementation(Dependencies.GLIDE)
+    kapt(Dependencies.GLIDE_COMPILER)
+
+    implementation(Dependencies.TIMBER)
+
+    implementation(Dependencies.JSOUP)
 
     debugImplementation(Dependencies.FACEBOOK_FLIPPER)
     debugImplementation(Dependencies.FACEBOOK_FLIPPER_LEAKCANARY)
@@ -187,4 +203,16 @@ dependencies {
     androidTestImplementation(Dependencies.TEST_ANDROID_JUNIT_ESPRESSO)
     androidTestImplementation(Dependencies.TEST_ANDROID_TEST_RUNNER)
     androidTestImplementation(Dependencies.TEST_ANDROID_TEST_RULES)
+}
+
+fun makePropertiesFromFiles(fileName: String): Map<Any, Any> =
+    runCatching { Properties().apply { load(FileInputStream(File(fileName))) } }
+        .getOrNull()
+        ?.toMap()
+        ?: emptyMap()
+
+fun setBuildConfigFromFile(config: VariantDimension, properties: Map<Any, Any>) {
+    properties.forEach { (key, value) ->
+        config.buildConfigField(type = "String", key.toString(), "\"${value}\"")
+    }
 }

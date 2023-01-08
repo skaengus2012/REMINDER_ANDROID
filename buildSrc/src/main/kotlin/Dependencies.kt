@@ -32,13 +32,19 @@ object Dependencies {
     const val ANDROID_ROOM_RUNTIME = "androidx.room:room-runtime:${DependenciesVersions.ANDROID_ROOM}"
     const val ANDROID_ROOM_KTX = "androidx.room:room-ktx:${DependenciesVersions.ANDROID_ROOM}"
     const val ANDROID_ROOM_COMPILER = "androidx.room:room-compiler:${DependenciesVersions.ANDROID_ROOM}"
-    const val ANDROID_ROOM_PAGING = "androidx.room:room-paging:${DependenciesVersions.ANDROID_ROOM}"
     const val ANDROID_STARTUP_RUNTIME = "androidx.startup:startup-runtime:${DependenciesVersions.ANDROID_STARTUP}"
-    const val ANDROID_PAGING_RUNTIME = "androidx.paging:paging-runtime:${DependenciesVersions.ANDROID_PAGING}"
+    const val ANDROID_DATASTORE_PREFERENCES = "androidx.datastore:datastore-preferences:${DependenciesVersions.ANDROID_DATASTORE_PREFERENCES}"
 
     const val GOOGLE_HILT_ANDROID = "com.google.dagger:hilt-android:${DependenciesVersions.GOOGLE_HILT}"
     const val GOOGLE_HILT_ANDROID_COMPILER = "com.google.dagger:hilt-android-compiler:${DependenciesVersions.GOOGLE_HILT}"
     const val GOGGLE_FLEXBOX = "com.google.android.flexbox:flexbox:${DependenciesVersions.GOOGLE_FLEXBOX}"
+
+    const val GLIDE = "com.github.bumptech.glide:glide:${DependenciesVersions.GLIDE}"
+    const val GLIDE_COMPILER = "com.github.bumptech.glide:compiler:${DependenciesVersions.GLIDE}"
+
+    const val TIMBER = "com.jakewharton.timber:timber:${DependenciesVersions.TIMBER}"
+    const val JSOUP = "org.jsoup:jsoup:${DependenciesVersions.JSOUP}"
+    const val AFOLLESTED_DRAG_SELECTION_RECYCLERVIEW = "com.afollestad:drag-select-recyclerview:${DependenciesVersions.AFOLLESTED_DRAG_SELECTION_RECYCLERVIEW}"
 
     const val FACEBOOK_FLIPPER = "com.facebook.flipper:flipper:${DependenciesVersions.FACEBOOK_FLIPPER}"
     const val FACEBOOK_FLIPPER_LEAKCANARY = "com.facebook.flipper:flipper-leakcanary2-plugin:${DependenciesVersions.FACEBOOK_FLIPPER}"

@@ -18,10 +18,17 @@
 	<!-- common -->
 	<attr name="bg_color_1" format="color"/>
 	<attr name="bg_color_card_1" format="color" />
+	<attr name="bg_color_card_2" format="color" />
 	<attr name="bg_color_tag" format="color" />
 	<attr name="bg_color_ripple_1" format="color" />
+	<attr name="bg_color_line_1" format="color" />
+	<attr name="bg_color_stroke_1" format="color" />
 	<attr name="font_color_1" format="color" />
 	<attr name="font_color_2" format="color" />
 	<attr name="font_color_tag" format="color" />
 	<attr name="progress_color_1" format="color" />
+
+	<!-- schedule -->
+	<attr name="bg_schedule_placeholder" format="color" />
+	<attr name="tint_schedule_placeholder" format="color"/>
 </resources>

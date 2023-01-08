@@ -27,23 +27,10 @@ data class Schedule(
     private val scheduleId: Long,
     val title: String,
     val note: String?,
-    val url: String?,
+    val link: String?,
     val tags: List<Tag>,
-    val visiblePriority: Int,
+    val visiblePriority: Long,
     val isComplete: Boolean
 ) {
-    fun id(): ScheduleId = ScheduleId(scheduleId)
-
-    companion object {
-        @Generated
-        fun empty(): Schedule = Schedule(
-            scheduleId = Long.MIN_VALUE,
-            title = "",
-            note = null,
-            url = null,
-            tags = emptyList(),
-            visiblePriority = Int.MIN_VALUE,
-            isComplete = false
-        )
-    }
+    val id: ScheduleId = ScheduleId(scheduleId)
 }

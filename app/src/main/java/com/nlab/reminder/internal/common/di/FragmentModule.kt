@@ -17,10 +17,10 @@
 package com.nlab.reminder.internal.common.di
 
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import com.nlab.reminder.core.android.navigation.NavigationController
-import com.nlab.reminder.core.android.navigation.util.NavigationController
 import com.nlab.reminder.core.android.navigation.util.NavigationTable
 import com.nlab.reminder.core.android.navigation.util.Navigator
 import dagger.Module
@@ -39,8 +39,12 @@ class FragmentModule {
     @Provides
     fun provideNavigationController(
         fragment: Fragment,
-        table: NavigationTable<NavController>
+        navControllerHandleTable: NavigationTable<NavController>,
+        activityHandleTable: NavigationTable<FragmentActivity>
     ): NavigationController = NavigationController(
-        Navigator(table, getHandler = { fragment.findNavController() })
+        listOf(
+            Navigator(navControllerHandleTable, getHandler = { fragment.findNavController() }),
+            Navigator(activityHandleTable, getHandler = { fragment.requireActivity() })
+        )
     )
 }

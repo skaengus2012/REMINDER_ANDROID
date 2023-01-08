@@ -16,16 +16,10 @@
 
 package com.nlab.reminder.internal.common.schedule.impl
 
-import androidx.paging.AsyncPagingDataDiffer
-import androidx.paging.PagingConfig
-import androidx.paging.PagingSource
-import androidx.paging.PagingState
-import com.nlab.reminder.core.kotlin.util.isFailure
 import com.nlab.reminder.core.kotlin.util.isSuccess
 import com.nlab.reminder.domain.common.schedule.*
 import com.nlab.reminder.domain.common.tag.genTags
 import com.nlab.reminder.internal.common.android.database.*
-import com.nlab.reminder.internal.common.database.genScheduleEntityWithTagEntitiesList
 import com.nlab.reminder.internal.common.database.toScheduleEntityWithTagEntities
 import com.nlab.reminder.test.*
 import kotlinx.coroutines.*
@@ -33,8 +27,6 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.test.*
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.*
-import org.junit.After
-import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.*
 
@@ -43,32 +35,26 @@ import org.mockito.kotlin.*
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class LocalScheduleRepositoryTest {
-    @Before
-    fun setUp() = runTest {
-        Dispatchers.setMain(genFlowExecutionDispatcher(testScheduler))
-    }
-
-    @After
-    fun tearDown() {
-        Dispatchers.resetMain()
-    }
-
     @Test
     fun `notify 2 times schedules when ScheduleDao sent 2 times data`() = runTest {
         val isComplete: Boolean = genBoolean()
 
         notifySchedulesWhenScheduleDaoSent2TimesData(
-            ScheduleItemRequest.Find,
-            setupMock = { scheduleDao, mockFlow -> whenever(scheduleDao.find()) doReturn mockFlow }
+            GetRequest.All,
+            setupMock = { scheduleDao, mockFlow ->
+                whenever(scheduleDao.findAsStream()) doReturn mockFlow
+            }
         )
         notifySchedulesWhenScheduleDaoSent2TimesData(
-            ScheduleItemRequest.FindByComplete(isComplete),
-            setupMock = { scheduleDao, mockFlow -> whenever(scheduleDao.findByComplete(isComplete)) doReturn mockFlow }
+            GetRequest.ByComplete(isComplete),
+            setupMock = { scheduleDao, mockFlow ->
+                whenever(scheduleDao.findByCompleteAsStream(isComplete)) doReturn mockFlow
+            }
         )
     }
 
     private fun notifySchedulesWhenScheduleDaoSent2TimesData(
-        scheduleItemRequest: ScheduleItemRequest,
+        scheduleItemRequest: GetRequest,
         setupMock: (ScheduleDao, Flow<List<ScheduleEntityWithTagEntities>>) -> Unit
     ) = runTest {
         val executeDispatcher = genFlowExecutionDispatcher(testScheduler)
@@ -101,79 +87,88 @@ class LocalScheduleRepositoryTest {
     }
 
     @Test
-    fun `notify schedules when ScheduleDao sent pagingSource`() = runTest {
+    fun `result for updateComplete was success`() = runTest {
+        val (repositoryParam, daoParam) = genRepositoryParamAndDaoParamsForUpdate(
+            genRandomUpdateValue = { genBoolean() },
+            genRequest = { scheduleId, isComplete -> ModifyCompleteRequest(scheduleId, isComplete) }
+        )
+        testUpdateTemplate(UpdateRequest.Completes(repositoryParam)) { scheduleDao ->
+            verify(scheduleDao, once()).updateCompletes(daoParam)
+        }
+    }
+
+    @Test
+    fun `result for updateComplete was success by BulkCompletes`() = runTest {
         val isComplete: Boolean = genBoolean()
-
-        notifyScheduleWhenScheduleDaoSentPagingSource(
-            ScheduleItemRequest.Find,
-            setupMock = { scheduleDao, pagingSource ->
-                whenever(scheduleDao.findAsPagingSource()) doReturn pagingSource
-            }
+        val (repositoryParam, daoParam) = genRepositoryParamAndDaoParamsForUpdate(
+            genRandomUpdateValue = { isComplete },
+            genRequest = { scheduleId, _ -> scheduleId }
         )
-
-        notifyScheduleWhenScheduleDaoSentPagingSource(
-            ScheduleItemRequest.FindByComplete(isComplete),
-            setupMock = { scheduleDao, pagingSource ->
-                whenever(scheduleDao.findAsPagingSourceByComplete(isComplete)) doReturn pagingSource
-            }
-        )
-    }
-
-    private fun notifyScheduleWhenScheduleDaoSentPagingSource(
-        ScheduleItemRequest: ScheduleItemRequest,
-        setupMock: (ScheduleDao, PagingSource<Int, ScheduleEntityWithTagEntities>) -> Unit
-    ) = runTest {
-        val expectedEntities = genScheduleEntityWithTagEntitiesList()
-        val scheduleDao: ScheduleDao = mock {
-            setupMock(
-                mock,
-                object : PagingSource<Int, ScheduleEntityWithTagEntities>() {
-                    override fun getRefreshKey(state: PagingState<Int, ScheduleEntityWithTagEntities>): Int? = null
-                    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, ScheduleEntityWithTagEntities> =
-                        LoadResult.Page(data = expectedEntities, prevKey = null, nextKey = null)
-                }
-            )
+        testUpdateTemplate(UpdateRequest.BulkCompletes(repositoryParam, isComplete)) { scheduleDao ->
+            verify(scheduleDao, once()).updateCompletes(daoParam.map { it.first }, isComplete)
         }
-        val differ = AsyncPagingDataDiffer(
-            diffCallback = IdentityItemCallback<Schedule>(),
-            updateCallback = NoopListCallback(),
-            workerDispatcher = Dispatchers.Main
-        )
-
-        LocalScheduleRepository(scheduleDao)
-            .getAsPagingData(ScheduleItemRequest, PagingConfig(pageSize = genInt()))
-            .onEach { data -> differ.submitData(data) }
-            .launchIn(genFlowObserveCoroutineScope())
-
-        advanceUntilIdle()
-        assertThat(differ.snapshot().items, equalTo(expectedEntities.toSchedules()))
     }
 
     @Test
-    fun `update result for updateComplete was success`() = runTest {
+    fun `result for updateVisiblePriority was success`() = runTest {
+        val (repositoryParam, daoParam) = genRepositoryParamAndDaoParamsForUpdate(
+            genRandomUpdateValue = { genLong() },
+            genRequest = { scheduleId, visiblePriority -> ModifyVisiblePriorityRequest(scheduleId, visiblePriority) }
+        )
+        testUpdateTemplate(UpdateRequest.VisiblePriorities(repositoryParam)) { scheduleDao ->
+            verify(scheduleDao, once()).updateVisiblePriorities(daoParam)
+        }
+    }
+
+    private fun <T, U> genRepositoryParamAndDaoParamsForUpdate(
+        genRandomUpdateValue: () -> T,
+        genRequest: (ScheduleId, T) -> U
+    ): Pair<List<U>, List<Pair<Long, T>>> {
         val schedules: List<Schedule> = genSchedules()
-        val completes: List<Boolean> = List(schedules.size) { genBoolean() }
-        val repositoryParam: Set<ScheduleCompleteRequest> =
-            schedules
-                .mapIndexed { index, schedule -> ScheduleCompleteRequest(schedule.id(), completes[index]) }
-                .toSet()
-        val daoParam = buildMap {
-            schedules.forEachIndexed { index, schedule -> this[schedule.id().value] = completes[index] }
-        }
+        val updateValues: List<T> = List(schedules.size) { genRandomUpdateValue() }
+        val repositoryParam: List<U> =
+            schedules.mapIndexed { index, schedule -> genRequest(schedule.id, updateValues[index]) }
+        val daoParam: List<Pair<Long, T>> =
+            schedules.mapIndexed { index, schedule -> schedule.id.value to updateValues[index] }
 
+        return repositoryParam to daoParam
+    }
+
+    private suspend fun testUpdateTemplate(request: UpdateRequest, verifyDao: suspend (ScheduleDao) -> Unit) {
         val scheduleDao: ScheduleDao = mock()
-        val updateResult = LocalScheduleRepository(scheduleDao).updateComplete(repositoryParam)
-
-        verify(scheduleDao, once()).updateComplete(daoParam)
-        assertThat(updateResult.isSuccess, equalTo(true))
+        val result = LocalScheduleRepository(scheduleDao).update(request)
+        verifyDao(scheduleDao)
+        assertThat(result.isSuccess, equalTo(true))
     }
 
     @Test
-    fun `update result for updateComplete was failed`() = runTest {
-        val scheduleDao: ScheduleDao = mock {
-            whenever(mock.updateComplete(any())) doThrow RuntimeException()
+    fun `result for delete by specific scheduleId was success`() = runTest {
+        val schedule: Schedule = genSchedule()
+        testDeleteTemplate(DeleteRequest.ById(schedule.id)) { scheduleDao ->
+            scheduleDao.deleteByScheduleIds(listOf(schedule.id.value))
         }
-        val updateResult = LocalScheduleRepository(scheduleDao).updateComplete(emptySet())
-        assertThat(updateResult.isFailure, equalTo(true))
+    }
+
+    @Test
+    fun `result for delete by specific scheduleIds was success`() = runTest {
+        val schedules: List<Schedule> = genSchedules()
+        testDeleteTemplate(DeleteRequest.ByIds(schedules.map { it.id })) { scheduleDao ->
+            scheduleDao.deleteByScheduleIds(schedules.map { it.id.value })
+        }
+    }
+
+    @Test
+    fun `result for delete by completed was success`() = runTest {
+        val isComplete: Boolean = genBoolean()
+        testDeleteTemplate(DeleteRequest.ByComplete(isComplete)) { scheduleDao ->
+            scheduleDao.deleteByComplete(isComplete)
+        }
+    }
+
+    private suspend fun testDeleteTemplate(request: DeleteRequest, verifyDao: suspend (ScheduleDao) -> Unit) {
+        val scheduleDao: ScheduleDao = mock()
+        val result = LocalScheduleRepository(scheduleDao).delete(request)
+        verifyDao(scheduleDao)
+        assertThat(result.isSuccess, equalTo(true))
     }
 }

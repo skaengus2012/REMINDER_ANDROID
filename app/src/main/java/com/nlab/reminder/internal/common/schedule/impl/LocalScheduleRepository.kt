@@ -16,7 +16,6 @@
 
 package com.nlab.reminder.internal.common.schedule.impl
 
-import androidx.paging.*
 import com.nlab.reminder.core.kotlin.coroutine.flow.map
 import com.nlab.reminder.core.kotlin.util.Result
 import com.nlab.reminder.core.kotlin.util.catching
@@ -32,29 +31,36 @@ import kotlinx.coroutines.flow.*
 class LocalScheduleRepository(
     private val scheduleDao: ScheduleDao,
 ) : ScheduleRepository {
-    override fun get(request: ScheduleItemRequest): Flow<List<Schedule>> {
+    override fun get(request: GetRequest): Flow<List<Schedule>> {
         val resultFlow: Flow<List<ScheduleEntityWithTagEntities>> = when (request) {
-            is ScheduleItemRequest.Find -> scheduleDao.find()
-            is ScheduleItemRequest.FindByComplete -> scheduleDao.findByComplete(request.isComplete)
+            is GetRequest.All -> scheduleDao.findAsStream()
+            is GetRequest.ByComplete -> scheduleDao.findByCompleteAsStream(request.isComplete)
         }
 
-        return resultFlow.map { entities -> entities.map(ScheduleEntityWithTagEntities::toSchedule)  }
+        return resultFlow.map { entities -> entities.map(ScheduleEntityWithTagEntities::toSchedule) }
     }
 
-    override fun getAsPagingData(request: ScheduleItemRequest, pagingConfig: PagingConfig): Flow<PagingData<Schedule>> {
-        val pager = Pager(pagingConfig, pagingSourceFactory = {
-            when (request) {
-                is ScheduleItemRequest.Find -> scheduleDao.findAsPagingSource()
-                is ScheduleItemRequest.FindByComplete -> scheduleDao.findAsPagingSourceByComplete(request.isComplete)
-            }
-        })
-
-        return pager.flow.map { pagingData -> pagingData.map(ScheduleEntityWithTagEntities::toSchedule) }
+    override suspend fun update(request: UpdateRequest): Result<Unit> = when (request) {
+        // When outside the catch block, jacoco does not recognize. 😭
+        is UpdateRequest.Completes -> catching {
+            scheduleDao.updateCompletes(
+                requests = request.values.map { request -> request.scheduleId.value to request.isComplete }
+            )
+        }
+        is UpdateRequest.BulkCompletes -> catching {
+            scheduleDao.updateCompletes(scheduleIds = request.scheduleIds.map { it.value }, request.isComplete)
+        }
+        is UpdateRequest.VisiblePriorities -> catching {
+            scheduleDao.updateVisiblePriorities(
+                requests = request.values.map { request -> request.scheduleId.value to request.visiblePriority }
+            )
+        }
     }
 
-    override suspend fun updateComplete(requests: Set<ScheduleCompleteRequest>): Result<Unit> = catching {
-        scheduleDao.updateComplete(
-            requests.fold(emptyMap()) { acc, (scheduleId, isComplete) -> acc + (scheduleId.value to isComplete) }
-        )
+    override suspend fun delete(request: DeleteRequest): Result<Unit> = when (request) {
+        // When outside the catch block, jacoco does not recognize. 😭
+        is DeleteRequest.ById -> catching { scheduleDao.deleteByScheduleIds(listOf(request.scheduleId.value)) }
+        is DeleteRequest.ByIds -> catching { scheduleDao.deleteByScheduleIds(request.scheduleIds.map { it.value }) }
+        is DeleteRequest.ByComplete -> catching { scheduleDao.deleteByComplete(request.isComplete) }
     }
 }

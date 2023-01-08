@@ -17,11 +17,10 @@
 package com.nlab.reminder.domain.common.schedule
 
 import com.nlab.reminder.core.util.test.annotation.Generated
-import com.nlab.reminder.core.util.transaction.TransactionId
+import com.nlab.reminder.domain.common.util.transaction.TransactionId
 
+/**
+ * @author Doohyun
+ */
 @Generated
-data class CompleteMark(
-    val isComplete: Boolean,
-    val isApplied: Boolean,
-    val transactionId: TransactionId
-)
+data class CompleteMark(val isComplete: Boolean, val transactionId: TransactionId)

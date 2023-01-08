@@ -16,11 +16,14 @@
 
 package com.nlab.reminder.domain.feature.schedule.all.di
 
-import androidx.paging.PagingConfig
+import com.nlab.reminder.core.effect.SideEffectHandle
 import com.nlab.reminder.core.state.StateContainer
 import com.nlab.reminder.core.state.asContainer
 import com.nlab.reminder.domain.common.schedule.*
+import com.nlab.reminder.domain.common.schedule.visibleconfig.CompletedScheduleShownRepository
 import com.nlab.reminder.domain.common.schedule.impl.*
+import com.nlab.reminder.domain.common.schedule.SelectionModeRepository
+import com.nlab.reminder.domain.common.util.link.LinkMetadataTableRepository
 import com.nlab.reminder.domain.feature.schedule.all.*
 import com.nlab.reminder.domain.feature.schedule.all.impl.*
 import dagger.Module
@@ -38,23 +41,36 @@ class AllScheduleViewModelModule {
     @Provides
     fun provideStateMachineProvider(
         scheduleRepository: ScheduleRepository,
-        scheduleUiStatePagingFlowFactory: ScheduleUiStatePagingFlowFactory,
+        scheduleUiStateFlowFactory: ScheduleUiStateFlowFactory,
         updateCompleteUseCase: UpdateCompleteUseCase,
-        @AllScheduleScope doneScheduleShownRepository: DoneScheduleShownRepository
-    ): AllScheduleStateContainerFactory =
-        object : AllScheduleStateContainerFactory {
-            override fun create(scope: CoroutineScope): StateContainer<AllScheduleEvent, AllScheduleState> {
-                val stateMachine = AllScheduleStateMachine(
-                    getAllScheduleSnapshot = DefaultGetAllScheduleSnapshotUseCase(
-                        scope,
-                        PagingConfig(pageSize = 20),
-                        scheduleRepository,
-                        doneScheduleShownRepository,
-                        scheduleUiStatePagingFlowFactory
-                    ),
-                    updateScheduleComplete = updateCompleteUseCase
-                )
-                return stateMachine.asContainer(scope, AllScheduleState.Init, fetchEvent = AllScheduleEvent.Fetch)
-            }
+        bulkUpdateCompleteUseCase: BulkUpdateCompleteUseCase,
+        selectionModeRepository: SelectionModeRepository,
+        selectionRepository: SelectionRepository,
+        linkMetadataTableRepository: LinkMetadataTableRepository,
+        completeMarkRepository: CompleteMarkRepository,
+        @AllScheduleScope completedScheduleShownRepository: CompletedScheduleShownRepository
+    ): AllScheduleStateContainerFactory = object : AllScheduleStateContainerFactory {
+        override fun create(
+            scope: CoroutineScope,
+            sideEffectHandle: SideEffectHandle<AllScheduleSideEffect>
+        ): StateContainer<AllScheduleEvent, AllScheduleState> {
+            val stateMachine = AllScheduleStateMachine(
+                sideEffectHandle,
+                DefaultGetAllScheduleSnapshotUseCase(
+                    scheduleRepository,
+                    linkMetadataTableRepository,
+                    completedScheduleShownRepository,
+                    completeMarkRepository,
+                    scheduleUiStateFlowFactory
+                ),
+                updateCompleteUseCase,
+                bulkUpdateCompleteUseCase,
+                completedScheduleShownRepository,
+                scheduleRepository,
+                selectionModeRepository,
+                selectionRepository
+            )
+            return stateMachine.asContainer(scope, AllScheduleState.Init, fetchEvent = AllScheduleEvent.Fetch)
         }
+    }
 }

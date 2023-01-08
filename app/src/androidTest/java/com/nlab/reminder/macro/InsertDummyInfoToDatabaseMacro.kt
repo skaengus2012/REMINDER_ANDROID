@@ -50,8 +50,8 @@ class InsertDummyInfoToDatabaseMacro {
             ScheduleEntity(
                 title = "Programming STUDY!",
                 description = "Good to know about [${faker.programmingLanguage().name()}] with ${faker.name().fullName()}",
-                url = "https://github.com/skaengus2012/REMINDER_ANDROID",
-                visiblePriority = faker.number().numberBetween(0, 300),
+                link = "https://github.com/skaengus2012/REMINDER_ANDROID",
+                visiblePriority = 0,
                 isComplete = false
             )
         }
@@ -60,7 +60,7 @@ class InsertDummyInfoToDatabaseMacro {
             ScheduleEntity(
                 title = "Travel ✈️",
                 description = "Go to [${faker.nation().capitalCity()}] with ${faker.name().fullName()}",
-                visiblePriority = faker.number().numberBetween(0, 300),
+                visiblePriority = 0,
                 isComplete = false
             )
         }
@@ -70,7 +70,7 @@ class InsertDummyInfoToDatabaseMacro {
             ScheduleEntity(
                 title = "Book club",
                 description = "About [${book.title()} of ${book.author()}]",
-                visiblePriority = faker.number().numberBetween(0, 300),
+                visiblePriority = 0,
                 isComplete = false
             )
         }
@@ -108,15 +108,22 @@ class InsertDummyInfoToDatabaseMacro {
     }
 
     private suspend fun resetScheduleEntities() {
-        scheduleDao.findByComplete(isComplete = true).first().forEach { scheduleDao.delete(it.scheduleEntity) }
-        scheduleDao.findByComplete(isComplete = false).first().forEach { scheduleDao.delete(it.scheduleEntity) }
+        scheduleDao.findByCompleteAsStream(isComplete = true).first().forEach { scheduleDao.delete(it.scheduleEntity) }
+        scheduleDao.findByCompleteAsStream(isComplete = false).first().forEach { scheduleDao.delete(it.scheduleEntity) }
 
-        inputScheduleEntities.shuffled().forEach { scheduleDao.insert(it)  }
+        inputScheduleEntities.shuffled().forEachIndexed { index, scheduleEntity ->
+            scheduleDao.insert(
+                scheduleEntity.copy(
+                    visiblePriority = index.toLong(),
+                    title = "#$index ${scheduleEntity.title}"
+                )
+            )
+        }
     }
 
     private suspend fun resetScheduleTagList() {
         val tagEntities = tagDao.find().first()
-        scheduleDao.findByComplete(isComplete = false)
+        scheduleDao.findByCompleteAsStream(isComplete = false)
             .first()
             .map { it.scheduleEntity }
             .map { scheduleEntity ->

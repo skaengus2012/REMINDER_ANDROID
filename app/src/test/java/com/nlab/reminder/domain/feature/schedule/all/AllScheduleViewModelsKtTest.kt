@@ -18,8 +18,7 @@ package com.nlab.reminder.domain.feature.schedule.all
 
 import com.nlab.reminder.core.state.StateContainer
 import com.nlab.reminder.core.state.verifyStateSendExtension
-import com.nlab.reminder.domain.common.schedule.Schedule
-import com.nlab.reminder.domain.common.schedule.genSchedule
+import com.nlab.reminder.domain.common.schedule.*
 import com.nlab.reminder.test.genBoolean
 import org.junit.Test
 import org.mockito.kotlin.*
@@ -32,16 +31,63 @@ class AllScheduleViewModelsKtTest {
     fun testExtensions() {
         val stateContainer: StateContainer<AllScheduleEvent, AllScheduleState> = mock()
         val schedule: Schedule = genSchedule()
+        val scheduleUiStates: List<ScheduleUiState> = genScheduleUiStates()
         val isComplete: Boolean = genBoolean()
+        val isSelect: Boolean = genBoolean()
         val viewModel = AllScheduleViewModel(
-            stateControllerFactory = mock {
-                whenever(mock.create(any())) doReturn stateContainer
+            stateContainerFactory = mock {
+                whenever(mock.create(any(), any())) doReturn stateContainer
             }
         )
 
         verifyStateSendExtension(
             stateContainer,
-            AllScheduleEvent.OnScheduleCompleteUpdateClicked(schedule.id(), isComplete)
-        ) { viewModel.onScheduleCompleteUpdateClicked(schedule.id(), isComplete) }
+            AllScheduleEvent.OnToggleCompletedScheduleShownClicked
+        ) { viewModel.onToggleCompletedScheduleShownClicked() }
+
+        verifyStateSendExtension(
+            stateContainer,
+            AllScheduleEvent.OnToggleSelectionModeEnableClicked
+        ) { viewModel.onToggleSelectionModeEnableClicked() }
+
+        verifyStateSendExtension(
+            stateContainer,
+            AllScheduleEvent.OnToggleCompletedScheduleShownClicked
+        ) { viewModel.onDeleteCompletedScheduleClicked() }
+
+        verifyStateSendExtension(
+            stateContainer,
+            AllScheduleEvent.OnSelectedScheduleDeleteClicked
+        ) { viewModel.onSelectedScheduleDeleteClicked() }
+
+        verifyStateSendExtension(
+            stateContainer,
+            AllScheduleEvent.OnScheduleCompleteClicked(schedule.id, isComplete)
+        ) { viewModel.onScheduleCompleteClicked(schedule.id, isComplete) }
+
+        verifyStateSendExtension(
+            stateContainer,
+            AllScheduleEvent.OnDragScheduleEnded(scheduleUiStates)
+        ) { viewModel.onDragScheduleEnded(scheduleUiStates) }
+
+        verifyStateSendExtension(
+            stateContainer,
+            AllScheduleEvent.OnDeleteScheduleClicked(schedule.id)
+        ) { viewModel.onDeleteScheduleClicked(schedule.id) }
+
+        verifyStateSendExtension(
+            stateContainer,
+            AllScheduleEvent.OnScheduleLinkClicked(schedule.id)
+        ) { viewModel.onScheduleLinkClicked(schedule.id) }
+
+        verifyStateSendExtension(
+            stateContainer,
+            AllScheduleEvent.OnScheduleSelected(schedule.id, isSelect)
+        ) { viewModel.onScheduleSelected(schedule.id, isSelect) }
+
+        verifyStateSendExtension(
+            stateContainer,
+            AllScheduleEvent.OnSelectedScheduleCompleteClicked(isComplete)
+        ) { viewModel.onSelectedScheduleCompleteClicked(isComplete) }
     }
 }

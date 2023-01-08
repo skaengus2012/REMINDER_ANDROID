@@ -18,15 +18,26 @@ package com.nlab.reminder.domain.feature.schedule.all
 
 import com.nlab.reminder.core.state.Event
 import com.nlab.reminder.domain.common.schedule.ScheduleId
+import com.nlab.reminder.domain.common.schedule.ScheduleUiState
+import com.nlab.reminder.domain.common.schedule.SelectionDisable
 
 /**
  * @author Doohyun
  */
 sealed class AllScheduleEvent private constructor() : Event {
     object Fetch : AllScheduleEvent()
-    data class AllScheduleReportLoaded(val allSchedulesReport: AllScheduleSnapshot) : AllScheduleEvent()
-    data class OnScheduleCompleteUpdateClicked(
-        val scheduleId: ScheduleId,
-        val isComplete: Boolean
+    object OnToggleCompletedScheduleShownClicked : AllScheduleEvent()
+    object OnToggleSelectionModeEnableClicked : AllScheduleEvent()
+    object OnDeleteCompletedScheduleClicked : AllScheduleEvent()
+    object OnSelectedScheduleDeleteClicked : AllScheduleEvent(), SelectionDisable
+    data class StateLoaded(
+        val scheduleSnapshot: AllScheduleSnapshot,
+        val isSelectionEnabled: Boolean
     ) : AllScheduleEvent()
+    data class OnScheduleCompleteClicked(val scheduleId: ScheduleId, val isComplete: Boolean) : AllScheduleEvent()
+    data class OnDragScheduleEnded(val draggedSnapshot: List<ScheduleUiState>) : AllScheduleEvent()
+    data class OnDeleteScheduleClicked(val scheduleId: ScheduleId) : AllScheduleEvent()
+    data class OnScheduleLinkClicked(val scheduleId: ScheduleId) : AllScheduleEvent()
+    data class OnScheduleSelected(val scheduleId: ScheduleId, val isSelected: Boolean) : AllScheduleEvent()
+    data class OnSelectedScheduleCompleteClicked(val isComplete: Boolean) : AllScheduleEvent(), SelectionDisable
 }

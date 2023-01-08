@@ -16,7 +16,9 @@
 
 package com.nlab.reminder.domain.common.schedule
 
+import com.nlab.reminder.domain.common.util.link.LinkMetadata
 import com.nlab.reminder.core.util.test.annotation.Generated
+import com.nlab.reminder.domain.common.tag.Tag
 
 /**
  * @author Doohyun
@@ -24,5 +26,16 @@ import com.nlab.reminder.core.util.test.annotation.Generated
 @Generated
 data class ScheduleUiState(
     val schedule: Schedule,
-    val isCompleteMarked: Boolean
-)
+    val linkMetadata: LinkMetadata,
+    val isCompleteMarked: Boolean,
+    val isSelected: Boolean
+) {
+    val id: ScheduleId get() = schedule.id
+    val title: String get() = schedule.title
+    val note: String get() = schedule.note ?: ""
+    val link: String get() = schedule.link ?: ""
+    val tags: List<Tag> get() = schedule.tags
+    val visiblePriority: Long get() = schedule.visiblePriority
+    val isComplete: Boolean get() = schedule.isComplete
+    val isLinkCardVisible: Boolean get() = link.isBlank().not()
+}

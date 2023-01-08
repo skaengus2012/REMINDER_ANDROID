@@ -16,6 +16,7 @@
 
 package com.nlab.reminder.domain.feature.schedule.all
 
+import com.nlab.reminder.core.effect.SideEffectHandle
 import com.nlab.reminder.core.state.StateContainer
 import kotlinx.coroutines.CoroutineScope
 
@@ -23,5 +24,8 @@ import kotlinx.coroutines.CoroutineScope
  * @author Doohyun
  */
 interface AllScheduleStateContainerFactory {
-    fun create(scope: CoroutineScope): StateContainer<AllScheduleEvent, AllScheduleState>
+    fun create(
+        scope: CoroutineScope,
+        sideEffectHandle: SideEffectHandle<AllScheduleSideEffect>
+    ): StateContainer<AllScheduleEvent, AllScheduleState>
 }

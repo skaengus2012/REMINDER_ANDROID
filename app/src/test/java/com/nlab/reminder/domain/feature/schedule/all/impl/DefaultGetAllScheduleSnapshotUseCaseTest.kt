@@ -16,12 +16,13 @@
 
 package com.nlab.reminder.domain.feature.schedule.all.impl
 
-import androidx.paging.AsyncPagingDataDiffer
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
+import com.nlab.reminder.core.kotlin.coroutine.flow.map
 import com.nlab.reminder.domain.common.schedule.*
+import com.nlab.reminder.domain.common.schedule.visibleconfig.CompletedScheduleShownRepository
+import com.nlab.reminder.domain.common.util.link.LinkMetadata
+import com.nlab.reminder.domain.common.util.link.LinkMetadataTableRepository
+import com.nlab.reminder.domain.common.util.link.genLinkMetadata
 import com.nlab.reminder.domain.feature.schedule.all.AllScheduleSnapshot
-import com.nlab.reminder.domain.feature.schedule.all.GetAllScheduleSnapshotUseCase
 import com.nlab.reminder.domain.feature.schedule.all.genAllScheduleSnapshot
 import com.nlab.reminder.test.*
 import kotlinx.coroutines.*
@@ -29,42 +30,20 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.test.*
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
-import org.junit.After
-import org.junit.Before
 import org.junit.Test
-import org.mockito.kotlin.doReturn
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
+import org.mockito.kotlin.*
 
 /**
  * @author thalys
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class DefaultGetAllScheduleSnapshotUseCaseTest {
-    @Before
-    fun setUp() = runTest {
-        Dispatchers.setMain(genFlowExecutionDispatcher(testScheduler))
-    }
-
-    @After
-    fun tearDown() {
-        Dispatchers.resetMain()
-    }
-
     @Test
     fun `find all schedules when doneScheduleShown was true`() = runTest {
         testFindTemplate(
             isDoneScheduleShown = true,
-            setupMock = { scheduleRepository, pagingConfig, expectSchedules ->
-                whenever(
-                    scheduleRepository
-                        .getAsPagingData(ScheduleItemRequest.Find, pagingConfig)
-                ) doReturn flowOf(PagingData.from(expectSchedules))
-
-                whenever(
-                    scheduleRepository
-                        .getAsPagingData(ScheduleItemRequest.FindByComplete(isComplete = false), pagingConfig)
-                ) doReturn emptyFlow()
+            setupMock = { scheduleRepository, expectSchedules ->
+                whenever(scheduleRepository.get(GetRequest.All)) doReturn flowOf(expectSchedules)
             }
         )
     }
@@ -73,61 +52,119 @@ class DefaultGetAllScheduleSnapshotUseCaseTest {
     fun `find not complete schedules when doneScheduleShown was false`() = runTest {
         testFindTemplate(
             isDoneScheduleShown = false,
-            setupMock = { scheduleRepository, pagingConfig, expectSchedules ->
+            setupMock = { scheduleRepository, expectSchedules ->
                 whenever(
-                    scheduleRepository
-                        .getAsPagingData(ScheduleItemRequest.Find, pagingConfig)
-                ) doReturn emptyFlow()
-
-                whenever(
-                    scheduleRepository
-                        .getAsPagingData(ScheduleItemRequest.FindByComplete(isComplete = false), pagingConfig)
-                ) doReturn flowOf(PagingData.from(expectSchedules))
+                    scheduleRepository.get(GetRequest.ByComplete(isComplete = false))
+                ) doReturn flowOf(expectSchedules)
             }
         )
     }
 
-    private suspend fun TestScope.testFindTemplate(
+    private suspend fun testFindTemplate(
         isDoneScheduleShown: Boolean,
-        setupMock: (ScheduleRepository, PagingConfig, schedules: List<Schedule>) -> Unit,
+        setupMock: (ScheduleRepository, schedules: List<Schedule>) -> Unit,
     ) {
-        val expectSchedules: List<Schedule> = genSchedules()
-        val pagingConfig = PagingConfig(pageSize = expectSchedules.size)
-        val fakeCompleteMark: Boolean = genBoolean()
-        val fakeScheduleUiStatePagingFlowFactory = object : ScheduleUiStatePagingFlowFactory {
-            override fun with(schedules: Flow<PagingData<Schedule>>): Flow<PagingData<ScheduleUiState>> =
-                schedules.map { genPagingScheduleUiStates(it, fakeCompleteMark) }
-        }
-        val scheduleRepository: ScheduleRepository = mock { setupMock(mock, pagingConfig, expectSchedules) }
-        val getAllScheduleSnapshotUseCase: GetAllScheduleSnapshotUseCase = DefaultGetAllScheduleSnapshotUseCase(
-            coroutineScope = CoroutineScope(genFlowExecutionDispatcher(testScheduler)),
-            pagingConfig = pagingConfig,
-            scheduleRepository = scheduleRepository,
-            doneScheduleShownRepository = mock { whenever(mock.get()) doReturn flowOf(isDoneScheduleShown) },
-            scheduleUiStatePagingFlowFactory = fakeScheduleUiStatePagingFlowFactory
+        val expectedSchedules: List<Schedule> = genSchedules()
+        val expectedUiStates: List<ScheduleUiState> = genScheduleUiStates(expectedSchedules)
+        val getAllScheduleSnapshotUseCase = genDefaultGetAllScheduleSnapshotUseCase(
+            scheduleRepository = mock { setupMock(mock, expectedSchedules) },
+            completedScheduleShownRepository = mock { whenever(mock.get()) doReturn flowOf(isDoneScheduleShown) },
+            scheduleUiStateFlowFactory = object : ScheduleUiStateFlowFactory {
+                override fun with(schedules: Flow<List<Schedule>>): Flow<List<ScheduleUiState>> =
+                    schedules.filter { it == expectedSchedules }.map { expectedUiStates }
+            },
         )
         val snapshot: AllScheduleSnapshot =
             getAllScheduleSnapshotUseCase().take(1).first()
-        val differ = AsyncPagingDataDiffer(
-            diffCallback = IdentityItemCallback<ScheduleUiState>(),
-            updateCallback = NoopListCallback(),
-            workerDispatcher = Dispatchers.Main
-        )
-        differ.submitData(snapshot.pagingScheduled)
-
-        advanceUntilIdle()
         assertThat(
-            snapshot.copy(pagingScheduled = PagingData.empty()),
-            equalTo(
+            snapshot, equalTo(
                 genAllScheduleSnapshot(
-                    pagingScheduled = PagingData.empty(),
-                    isDoneScheduleShown = isDoneScheduleShown
+                    uiStates = expectedUiStates,
+                    isCompletedScheduleShown = isDoneScheduleShown
                 )
             )
         )
-        assertThat(
-            differ.snapshot().items,
-            equalTo(genScheduleUiStates(expectSchedules, fakeCompleteMark))
+    }
+
+    @Test
+    fun `setLinks when scheduleUiState received`() = runTest {
+        val expectedUiStates: List<ScheduleUiState> = genScheduleUiStates(genSchedules(link = genBothify()))
+        val linkMetadataTableRepository: LinkMetadataTableRepository = mock {
+            whenever(mock.getStream()) doReturn MutableStateFlow(emptyMap())
+        }
+        val getAllScheduleSnapshotUseCase = genDefaultGetAllScheduleSnapshotUseCase(
+            linkMetadataTableRepository = linkMetadataTableRepository,
+            scheduleUiStateFlowFactory = object : ScheduleUiStateFlowFactory {
+                override fun with(schedulesStream: Flow<List<Schedule>>): Flow<List<ScheduleUiState>> =
+                    flowOf(expectedUiStates)
+            },
         )
+
+        getAllScheduleSnapshotUseCase()
+            .take(1)
+            .first()
+        verify(linkMetadataTableRepository, once()).setLinks(expectedUiStates.map { it.link })
+    }
+
+    @Test
+    fun `combine with linkMetadataTable when notified new links`() = runTest {
+        val link: String = genBothify()
+        val scheduleUiState: ScheduleUiState = genScheduleUiState(genSchedule(link = link))
+        val expectedLinkMetadata: LinkMetadata = genLinkMetadata()
+        val getAllScheduleSnapshotUseCase = genDefaultGetAllScheduleSnapshotUseCase(
+            linkMetadataTableRepository = mock {
+                whenever(mock.getStream()) doReturn MutableStateFlow(mapOf(link to expectedLinkMetadata))
+            },
+            scheduleUiStateFlowFactory = object : ScheduleUiStateFlowFactory {
+                override fun with(schedulesStream: Flow<List<Schedule>>): Flow<List<ScheduleUiState>> = flowOf(
+                    listOf(scheduleUiState)
+                )
+            },
+        )
+
+        val uiState: ScheduleUiState =
+            getAllScheduleSnapshotUseCase()
+                .mapNotNull { it.scheduleUiStates.firstOrNull() }
+                .filter { uiState -> uiState.linkMetadata != LinkMetadata.Empty }
+                .take(1)
+                .first()
+        assertThat(uiState.linkMetadata, equalTo(expectedLinkMetadata))
+    }
+
+    private fun genDefaultGetAllScheduleSnapshotUseCase(
+        scheduleRepository: ScheduleRepository = mock {
+            whenever(mock.get(any())) doReturn flowOf(emptyList())
+        },
+        linkMetadataTableRepository: LinkMetadataTableRepository = mock {
+            whenever(mock.getStream()) doReturn MutableStateFlow(emptyMap())
+        },
+        completedScheduleShownRepository: CompletedScheduleShownRepository = mock {
+            whenever(mock.get()) doReturn flowOf(genBoolean())
+        },
+        completeMarkRepository: CompleteMarkRepository = mock(),
+        scheduleUiStateFlowFactory: ScheduleUiStateFlowFactory = object : ScheduleUiStateFlowFactory {
+            override fun with(schedulesStream: Flow<List<Schedule>>): Flow<List<ScheduleUiState>> =
+                schedulesStream.map { schedules -> schedules.map { genScheduleUiState(schedule = it) } }
+        }
+    ): DefaultGetAllScheduleSnapshotUseCase = DefaultGetAllScheduleSnapshotUseCase(
+        scheduleRepository,
+        linkMetadataTableRepository,
+        completedScheduleShownRepository,
+        completeMarkRepository,
+        scheduleUiStateFlowFactory
+    )
+
+    @Test
+    fun `clear complete mark when schedules sent`() = runTest {
+        val completeMarkRepository: CompleteMarkRepository = mock()
+        val getAllScheduleSnapshotUseCase = genDefaultGetAllScheduleSnapshotUseCase(
+            completeMarkRepository = completeMarkRepository
+        )
+
+        // join
+        getAllScheduleSnapshotUseCase()
+            .take(1)
+            .first()
+        verify(completeMarkRepository, once()).clear()
     }
 }

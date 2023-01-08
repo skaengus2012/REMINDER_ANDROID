@@ -17,12 +17,16 @@
 package com.nlab.reminder.domain.common.schedule.impl
 
 import com.nlab.reminder.domain.common.schedule.*
+import com.nlab.reminder.test.genBoolean
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 /**
  * @author Doohyun
@@ -31,16 +35,59 @@ import org.junit.Test
 class DefaultScheduleUiStateFlowFactoryTest {
     @Test
     fun `schedule combined with complete mark`() = runTest {
-        val testFixture = CompleteMarkCombineTestFixture()
-        val scheduleUiStateFlowFactory =
-            DefaultScheduleUiStateFlowFactory(testFixture.completeMarkRepository)
+        val expectCompleteMarked: Boolean = genBoolean()
+        val schedule: Schedule = genSchedule(isComplete = expectCompleteMarked.not())
+        val completeMarkRepository: CompleteMarkRepository = mock {
+            whenever(mock.get()) doReturn MutableStateFlow(
+                mapOf(schedule.id to genCompleteMark(isComplete = expectCompleteMarked))
+            )
+        }
+        testTemplate(schedule, completeMarkRepository = completeMarkRepository) { scheduleUiState ->
+            scheduleUiState.copy(
+                isCompleteMarked = expectCompleteMarked,
+                isSelected = false
+            )
+        }
+    }
 
+    @Test
+    fun `schedule combined with selectionTables`() = runTest {
+        val expectSelected: Boolean = genBoolean()
+        val schedule: Schedule = genSchedule()
+        val selectionRepository: SelectionRepository = mock {
+            whenever(mock.selectionTableStream()) doReturn MutableStateFlow(
+                mapOf(schedule.id to expectSelected)
+            )
+        }
+        testTemplate(schedule, selectionRepository = selectionRepository) { scheduleUiState ->
+            scheduleUiState.copy(
+                isCompleteMarked = schedule.isComplete,
+                isSelected = expectSelected
+            )
+        }
+    }
+
+    private suspend fun testTemplate(
+        schedule: Schedule = genSchedule(),
+        completeMarkRepository: CompleteMarkRepository = mock {
+            whenever(mock.get()) doReturn MutableStateFlow(emptyMap())
+        },
+        selectionRepository: SelectionRepository = mock {
+            whenever(mock.selectionTableStream()) doReturn MutableStateFlow(emptyMap())
+        },
+        decorateExpectedScheduleUiState: (ScheduleUiState) -> ScheduleUiState = { it }
+    ) {
+        val scheduleUiStateFlowFactory = DefaultScheduleUiStateFlowFactory(
+            completeMarkRepository,
+            selectionRepository
+        )
         val acc: List<ScheduleUiState> =
             scheduleUiStateFlowFactory
-                .with(flowOf(listOf(testFixture.schedule)))
+                .with(flowOf(listOf(schedule)))
                 .take(1)
                 .first()
-
-        assertThat(acc, equalTo(testFixture.expectedScheduleUiStates))
+        assertThat(
+            acc, equalTo(listOf(genScheduleUiState(schedule)).map(decorateExpectedScheduleUiState))
+        )
     }
 }

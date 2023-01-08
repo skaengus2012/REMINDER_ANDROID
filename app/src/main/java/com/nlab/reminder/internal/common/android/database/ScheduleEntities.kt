@@ -26,17 +26,17 @@ fun ScheduleEntity.toSchedule(tags: List<Tag> = emptyList()): Schedule = Schedul
     scheduleId = scheduleId,
     title = title,
     note = description,
-    url = url,
+    link = link,
     tags = tags,
     visiblePriority = visiblePriority,
     isComplete = isComplete
 )
 
 fun Schedule.toEntity(): ScheduleEntity = ScheduleEntity(
-    scheduleId = id().value,
+    scheduleId = id.value,
     title = title,
     description = note,
-    url = url,
+    link = link,
     visiblePriority = visiblePriority,
     isComplete = isComplete
 )

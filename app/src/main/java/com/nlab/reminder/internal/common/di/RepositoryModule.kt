@@ -16,18 +16,29 @@
 
 package com.nlab.reminder.internal.common.di
 
+import com.nlab.reminder.core.kotlin.util.Result
+import com.nlab.reminder.core.kotlin.util.onFailure
+import com.nlab.reminder.domain.common.util.link.LinkMetadata
+import com.nlab.reminder.domain.common.util.link.LinkMetadataRepository
+import com.nlab.reminder.domain.common.util.link.impl.CachedLinkMetadataRepository
 import com.nlab.reminder.domain.common.schedule.ScheduleRepository
 import com.nlab.reminder.domain.common.tag.TagRepository
+import com.nlab.reminder.domain.common.util.link.LinkMetadataTableRepository
+import com.nlab.reminder.domain.common.util.link.impl.DefaultLinkMetadataTableRepository
 import com.nlab.reminder.internal.common.android.database.ScheduleDao
 import com.nlab.reminder.internal.common.android.database.ScheduleTagListDao
 import com.nlab.reminder.internal.common.android.database.TagDao
 import com.nlab.reminder.internal.common.schedule.impl.LocalScheduleRepository
 import com.nlab.reminder.internal.common.tag.impl.LocalTagRepository
+import com.nlab.reminder.domain.common.util.link.infra.JsoupLinkMetadataRepository
 import dagger.Module
 import dagger.Provides
 import dagger.Reusable
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineScope
+import timber.log.Timber
+import javax.inject.Singleton
 
 /**
  * @author Doohyun
@@ -47,4 +58,19 @@ class RepositoryModule {
         tagDao: TagDao,
         scheduleTagListDao: ScheduleTagListDao
     ): TagRepository = LocalTagRepository(tagDao, scheduleTagListDao)
+
+    @Singleton
+    @Provides
+    fun provideLinkMetadataTableRepository(@Singleton coroutineScope: CoroutineScope): LinkMetadataTableRepository =
+        DefaultLinkMetadataTableRepository(
+            linkMetadataRepository = object : LinkMetadataRepository {
+                private val internalRepository: LinkMetadataRepository = CachedLinkMetadataRepository(
+                    JsoupLinkMetadataRepository()
+                )
+
+                override suspend fun get(link: String): Result<LinkMetadata> =
+                    internalRepository.get(link).onFailure { e -> Timber.w(e, "LinkThumbnail load failed.") }
+            },
+            coroutineScope
+        )
 }

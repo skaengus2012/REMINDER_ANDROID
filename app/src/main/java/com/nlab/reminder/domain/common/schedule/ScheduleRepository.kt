@@ -16,8 +16,6 @@
 
 package com.nlab.reminder.domain.common.schedule
 
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
 import com.nlab.reminder.core.kotlin.util.Result
 import kotlinx.coroutines.flow.Flow
 
@@ -25,7 +23,7 @@ import kotlinx.coroutines.flow.Flow
  * @author Doohyun
  */
 interface ScheduleRepository {
-    fun get(request: ScheduleItemRequest): Flow<List<Schedule>>
-    fun getAsPagingData(request: ScheduleItemRequest, pagingConfig: PagingConfig): Flow<PagingData<Schedule>>
-    suspend fun updateComplete(requests: Set<ScheduleCompleteRequest>): Result<Unit>
+    fun get(request: GetRequest): Flow<List<Schedule>>
+    suspend fun update(request: UpdateRequest): Result<Unit>
+    suspend fun delete(request: DeleteRequest): Result<Unit>
 }

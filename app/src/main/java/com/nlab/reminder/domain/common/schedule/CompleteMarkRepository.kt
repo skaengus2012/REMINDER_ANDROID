@@ -16,13 +16,13 @@
 
 package com.nlab.reminder.domain.common.schedule
 
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 
 /**
  * @author Doohyun
  */
 interface CompleteMarkRepository {
-    fun get(): Flow<Map<ScheduleId, CompleteMark>>
-    suspend fun insert(completeMarks: Map<ScheduleId, CompleteMark>)
-    suspend fun updateToApplied(completeMarks: Map<ScheduleId, CompleteMark>)
+    fun get(): StateFlow<CompleteMarkTable>
+    suspend fun insert(completeMarks: CompleteMarkTable)
+    suspend fun clear()
 }

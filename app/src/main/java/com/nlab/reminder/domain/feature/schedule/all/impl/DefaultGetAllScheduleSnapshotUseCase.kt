@@ -16,48 +16,65 @@
 
 package com.nlab.reminder.domain.feature.schedule.all.impl
 
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
-import androidx.paging.cachedIn
+import com.nlab.reminder.core.kotlin.coroutine.flow.flatMapLatest
 import com.nlab.reminder.core.kotlin.coroutine.flow.map
 import com.nlab.reminder.domain.common.schedule.*
+import com.nlab.reminder.domain.common.schedule.visibleconfig.CompletedScheduleShownRepository
+import com.nlab.reminder.domain.common.util.link.LinkMetadata
+import com.nlab.reminder.domain.common.util.link.LinkMetadataTable
+import com.nlab.reminder.domain.common.util.link.LinkMetadataTableRepository
 import com.nlab.reminder.domain.feature.schedule.all.AllScheduleSnapshot
 import com.nlab.reminder.domain.feature.schedule.all.GetAllScheduleSnapshotUseCase
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 
 /**
  * @author thalys
  */
 class DefaultGetAllScheduleSnapshotUseCase(
-    coroutineScope: CoroutineScope,
-    pagingConfig: PagingConfig,
     scheduleRepository: ScheduleRepository,
-    private val doneScheduleShownRepository: DoneScheduleShownRepository,
-    private val scheduleUiStatePagingFlowFactory: ScheduleUiStatePagingFlowFactory,
+    private val linkMetadataTableRepository: LinkMetadataTableRepository,
+    private val completedScheduleShownRepository: CompletedScheduleShownRepository,
+    private val completeMarkRepository: CompleteMarkRepository,
+    private val scheduleUiStateFlowFactory: ScheduleUiStateFlowFactory,
 ) : GetAllScheduleSnapshotUseCase {
-    private val findAllSchedules: Flow<PagingData<Schedule>> =
-        scheduleRepository
-            .getAsPagingData(ScheduleItemRequest.Find, pagingConfig)
-            .cachedIn(coroutineScope)
-    private val findNotCompleteSchedules: Flow<PagingData<Schedule>> =
-        scheduleRepository
-            .getAsPagingData(ScheduleItemRequest.FindByComplete(isComplete = false), pagingConfig)
-            .cachedIn(coroutineScope)
+    private val findAllSchedules: Flow<List<Schedule>> =
+        scheduleRepository.get(GetRequest.All)
+    private val findNotCompleteSchedules: Flow<List<Schedule>> =
+        scheduleRepository.get(GetRequest.ByComplete(isComplete = false))
 
-    @ExperimentalCoroutinesApi
     override fun invoke(): Flow<AllScheduleSnapshot> =
-        doneScheduleShownRepository.get()
-            .flatMapLatest(this::getSnapshot)
-            .buffer(0)
+        completedScheduleShownRepository.get().flatMapLatest(this::getSnapshot)
 
-    private fun getSnapshot(isDoneScheduleShown: Boolean): Flow<AllScheduleSnapshot> =
-        getSchedules(isDoneScheduleShown)
-            .let(scheduleUiStatePagingFlowFactory::with)
-            .map { scheduleUiStates -> AllScheduleSnapshot(scheduleUiStates, isDoneScheduleShown) }
+    private fun getSnapshot(isCompletedScheduleShown: Boolean): Flow<AllScheduleSnapshot> =
+        getScheduleUiStateStream(isCompletedScheduleShown).map { scheduleUiStates ->
+            AllScheduleSnapshot(
+                scheduleUiStates,
+                isCompletedScheduleShown
+            )
+        }
 
-    private fun getSchedules(isDoneScheduleShown: Boolean): Flow<PagingData<Schedule>> =
-        if (isDoneScheduleShown) findAllSchedules
+    private fun getScheduleStream(isCompletedScheduleShown: Boolean): Flow<List<Schedule>> =
+        if (isCompletedScheduleShown) findAllSchedules
         else findNotCompleteSchedules
+
+    private fun getScheduleUiStateStream(isCompletedScheduleShown: Boolean): Flow<List<ScheduleUiState>> =
+        combine(
+            getScheduleStream(isCompletedScheduleShown)
+                .onEach { completeMarkRepository.clear() }
+                .let(scheduleUiStateFlowFactory::with)
+                .onEach { uiStates -> linkMetadataTableRepository.setLinks(uiStates.map { it.link }) },
+            linkMetadataTableRepository.getStream(),
+            ::combineScheduleUiStateAndLinkMetadataTable
+        )
+
+    companion object {
+        private fun combineScheduleUiStateAndLinkMetadataTable(
+            scheduleUiStates: List<ScheduleUiState>,
+            linkMetadataTable: LinkMetadataTable
+        ): List<ScheduleUiState> = scheduleUiStates.map { uiState ->
+            val foundLinkMetadata: LinkMetadata? = linkMetadataTable[uiState.link]
+            if (foundLinkMetadata != null) uiState.copy(linkMetadata = foundLinkMetadata)
+            else uiState
+        }
+    }
 }

@@ -16,26 +16,38 @@
 
 package com.nlab.reminder.domain.common.schedule.impl
 
+import com.nlab.reminder.core.util.test.annotation.Generated
 import com.nlab.reminder.domain.common.schedule.*
+import com.nlab.reminder.domain.common.schedule.isSelected
+import com.nlab.reminder.domain.common.util.link.LinkMetadata
 import kotlinx.coroutines.flow.*
 
 /**
  * @author Doohyun
  */
 class DefaultScheduleUiStateFlowFactory(
-    private val completeMarkRepository: CompleteMarkRepository
+    private val completeMarkRepository: CompleteMarkRepository,
+    private val selectionRepository: SelectionRepository
 ) : ScheduleUiStateFlowFactory {
-    override fun with(schedules: Flow<List<Schedule>>): Flow<List<ScheduleUiState>> =
+    override fun with(schedulesStream: Flow<List<Schedule>>): Flow<List<ScheduleUiState>> =
         combine(
-            schedules,
-            completeMarkRepository.get().distinctUntilChanged(),
-            transform = ::transformToScheduleUiStates
+            schedulesStream,
+            completeMarkRepository.get(),
+            selectionRepository.selectionTableStream(),
+            transform = this::transformToScheduleUiStates
         )
 
-    companion object {
-        private fun transformToScheduleUiStates(
-            schedules: List<Schedule>,
-            completeMarkSnapshot: Map<ScheduleId, CompleteMark>
-        ): List<ScheduleUiState> = schedules.map { schedule -> ScheduleUiState(schedule, completeMarkSnapshot) }
+    @Generated
+    private fun transformToScheduleUiStates(
+        schedules: List<Schedule>,
+        completeMarkTable: CompleteMarkTable,
+        selectionTable: SelectionTable,
+    ): List<ScheduleUiState> = schedules.map { schedule ->
+        ScheduleUiState(
+            schedule,
+            linkMetadata = LinkMetadata.Empty,
+            isCompleteMarked = completeMarkTable.isCompleteMarked(schedule),
+            isSelected = selectionTable.isSelected(schedule)
+        )
     }
 }

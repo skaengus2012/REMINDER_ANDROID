@@ -52,7 +52,7 @@ class HomeViewModelTest {
     }
 
     @Test
-    fun `stateController send event when viewModel sent`() {
+    fun `stateContainer send event when viewModel sent`() {
         val sampleEvent = genHomeEventSample()
         val stateContainer: StateContainer<HomeEvent, HomeState> = mock()
         val viewModel = HomeViewModel(
@@ -66,7 +66,7 @@ class HomeViewModelTest {
     }
 
     @Test
-    fun `notify state when stateController flow published`() {
+    fun `notify state when stateContainer flow published`() {
         val sampleState = genHomeStateSample()
         val stateContainer: StateContainer<HomeEvent, HomeState> = mock {
             whenever(mock.stateFlow) doReturn MutableStateFlow(sampleState)
@@ -94,7 +94,7 @@ class HomeViewModelTest {
                             }
                         }
                     }
-                    return fakeStateComponent.asContainer(scope, HomeState.Init)
+                    return fakeStateComponent.asContainer(scope, genHomeStateSample())
                 }
             }
         )

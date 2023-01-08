@@ -16,8 +16,8 @@
 
 package com.nlab.reminder.internal.common.android.database
 
-import androidx.paging.PagingSource
 import androidx.room.*
+import com.nlab.reminder.domain.common.schedule.Schedule
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -30,28 +30,92 @@ abstract class ScheduleDao {
 
     @Transaction
     @Query("SELECT * FROM schedule ORDER BY is_complete, visible_priority")
-    abstract fun find(): Flow<List<ScheduleEntityWithTagEntities>>
-
-    @Transaction
-    @Query("SELECT * FROM schedule ORDER BY is_complete, visible_priority")
-    abstract fun findAsPagingSource(): PagingSource<Int, ScheduleEntityWithTagEntities>
+    abstract fun findAsStream(): Flow<List<ScheduleEntityWithTagEntities>>
 
     @Transaction
     @Query("SELECT * FROM schedule WHERE is_complete = :isComplete ORDER BY is_complete, visible_priority")
-    abstract fun findByComplete(isComplete: Boolean): Flow<List<ScheduleEntityWithTagEntities>>
+    abstract fun findByCompleteAsStream(isComplete: Boolean): Flow<List<ScheduleEntityWithTagEntities>>
+
+    @Query("SELECT * FROM schedule WHERE schedule_id IN (:scheduleIds)")
+    abstract suspend fun findByScheduleIds(scheduleIds: List<Long>): List<ScheduleEntity>
+
+    @Query(
+        """
+        SELECT visible_priority 
+        FROM schedule 
+        WHERE is_complete = :isComplete
+        ORDER BY visible_priority 
+        DESC LIMIT 1
+        """
+    )
+    abstract fun getMaxVisiblePriority(isComplete: Boolean): Long?
+
+    @Query("UPDATE schedule SET visible_priority = :visiblePriority WHERE schedule_id = :scheduleId")
+    abstract suspend fun updateVisiblePriority(scheduleId: Long, visiblePriority: Long)
 
     @Transaction
-    @Query("SELECT * FROM schedule WHERE is_complete = :isComplete ORDER BY is_complete, visible_priority")
-    abstract fun findAsPagingSourceByComplete(isComplete: Boolean): PagingSource<Int, ScheduleEntityWithTagEntities>
+    open suspend fun updateVisiblePriorities(requests: List<Pair<Long, Long>>) {
+        requests.forEach { (scheduleId, visiblePriority) -> updateVisiblePriority(scheduleId, visiblePriority) }
+    }
 
-    @Query("UPDATE schedule SET is_complete = :isComplete WHERE schedule_id = :scheduleId")
-    abstract suspend fun updateComplete(scheduleId: Long, isComplete: Boolean)
+    @Query(
+        """
+        UPDATE schedule 
+        SET is_complete = :isComplete, visible_priority = :visiblePriority 
+        WHERE schedule_id IN (:scheduleIds)
+        """
+    )
+    abstract suspend fun updateCompletes(scheduleIds: List<Long>, isComplete: Boolean, visiblePriority: Long)
 
     @Transaction
-    open suspend fun updateComplete(requests: Map<Long, Boolean>) {
-        requests.forEach { (scheduleId, isComplete) -> updateComplete(scheduleId, isComplete) }
+    open suspend fun updateCompletes(requests: List<Pair<Long, Boolean>>) {
+        val curIdToComplete: Map<Long, Boolean> =
+            findByScheduleIds(scheduleIds = requests.map { (first) -> first }).associateBy(
+                keySelector = { it.scheduleId },
+                valueTransform = { it.isComplete }
+            )
+        val diffCompleteRequests: List<Pair<Long, Boolean>> =
+            requests
+                .filter { (scheduleId) -> curIdToComplete.containsKey(scheduleId) }
+                .filter { (scheduleId, isComplete) -> curIdToComplete[scheduleId] != isComplete }
+        updateCompletesInternal(diffCompleteRequests, isComplete = true)
+        updateCompletesInternal(diffCompleteRequests, isComplete = false)
+    }
+
+    private suspend fun updateCompletesInternal(requests: List<Pair<Long, Boolean>>, isComplete: Boolean) {
+        updateCompletesWithIds(
+            scheduleIds = requests
+                .filter { (_, mappingComplete) -> mappingComplete == isComplete }
+                .map { (scheduleId) -> scheduleId },
+            isComplete = isComplete
+        )
+    }
+
+    @Transaction
+    open suspend fun updateCompletes(scheduleIds: List<Long>, isComplete: Boolean) {
+        updateCompletesWithIds(
+            scheduleIds = findByScheduleIds(scheduleIds)
+                .filter { it.isComplete != isComplete }
+                .map { it.scheduleId },
+            isComplete
+        )
+    }
+
+    private suspend fun updateCompletesWithIds(scheduleIds: List<Long>, isComplete: Boolean) {
+        if (scheduleIds.isEmpty()) return
+
+        val maxVisiblePriority: Long = getMaxVisiblePriority(isComplete) ?: -1
+        scheduleIds.forEachIndexed { index, scheduleId ->
+            updateCompletes(listOf(scheduleId), isComplete, visiblePriority = maxVisiblePriority + index + 1)
+        }
     }
 
     @Delete
     abstract suspend fun delete(schedule: ScheduleEntity)
+
+    @Query("DELETE FROM schedule WHERE schedule_id IN (:scheduleId)")
+    abstract suspend fun deleteByScheduleIds(scheduleId: List<Long>)
+
+    @Query("DELETE FROM schedule WHERE is_complete = :isComplete")
+    abstract suspend fun deleteByComplete(isComplete: Boolean)
 }

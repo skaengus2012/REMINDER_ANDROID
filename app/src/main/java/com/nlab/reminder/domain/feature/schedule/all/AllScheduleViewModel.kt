@@ -18,8 +18,10 @@ package com.nlab.reminder.domain.feature.schedule.all
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.nlab.reminder.core.effect.SideEffectContainer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
@@ -28,10 +30,12 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class AllScheduleViewModel @Inject constructor(
-    stateControllerFactory: AllScheduleStateContainerFactory
+    stateContainerFactory: AllScheduleStateContainerFactory
 ) : ViewModel() {
-    private val stateContainer = stateControllerFactory.create(viewModelScope)
+    private val sideEffectContainer = SideEffectContainer<AllScheduleSideEffect>()
+    private val stateContainer = stateContainerFactory.create(viewModelScope, sideEffectContainer)
 
+    val allScheduleSideEffectFlow: Flow<AllScheduleSideEffect> = sideEffectContainer.sideEffectFlow
     val stateFlow: StateFlow<AllScheduleState> = stateContainer.stateFlow
     fun send(event: AllScheduleEvent): Job = stateContainer.send(event)
 }

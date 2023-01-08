@@ -18,17 +18,13 @@ package com.nlab.reminder.core.android.recyclerview
 
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.CompletableDeferred
 
 /**
- * @author Doohyun
+ * @author thalys
  */
-@OptIn(ExperimentalCoroutinesApi::class)
-suspend fun <T : Any, VH : RecyclerView.ViewHolder> ListAdapter<T, VH>.suspendSubmitList(newItems: List<T>) {
-    suspendCancellableCoroutine { continuation ->
-        submitList(newItems) {
-            continuation.resume(Unit, null)
-        }
-    }
+suspend fun <T, VH : RecyclerView.ViewHolder> ListAdapter<T, VH>.suspendSubmitList(list: List<T>?) {
+    val deferred = CompletableDeferred<Unit>()
+    submitList(list) { deferred.complete(Unit) }
+    deferred.await()
 }
