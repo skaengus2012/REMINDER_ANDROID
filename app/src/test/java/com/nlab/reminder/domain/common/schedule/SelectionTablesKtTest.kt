@@ -29,14 +29,14 @@ class SelectionTablesKtTest {
     fun `get selected when selectedTable hit`() {
         val expectSchedule: Schedule = genSchedule()
         val expectSelected: Boolean = genBoolean()
-        val selectionTable: SelectionTable = mapOf(expectSchedule.id to expectSelected)
+        val selectionTable: SelectionTable = SelectionTable(expectSchedule.id to expectSelected)
 
         assertThat(selectionTable.isSelected(expectSchedule), equalTo(expectSelected))
     }
 
     @Test
     fun `get false when selectTable hit failed`() {
-        val selectionTable: SelectionTable = emptyMap()
+        val selectionTable: SelectionTable = SelectionTable()
         assertThat(selectionTable.isSelected(genSchedule()), equalTo(false))
     }
 }

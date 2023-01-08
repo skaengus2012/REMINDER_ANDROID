@@ -108,7 +108,7 @@ class AllScheduleStateMachineKtTest {
         val initSelectionMode = false
         val clearSelectedJob = CompletableDeferred<Unit>()
         val fakeSelectionRepository: SelectionRepository = object : SelectionRepository {
-            override fun selectionTableStream(): StateFlow<SelectionTable> = MutableStateFlow(emptyMap())
+            override fun selectionTableStream(): StateFlow<SelectionTable> = MutableStateFlow(SelectionTable())
             override suspend fun setSelected(scheduleId: ScheduleId, isSelect: Boolean) = Unit
             override suspend fun clearSelected() {
                 clearSelectedJob.complete(Unit)

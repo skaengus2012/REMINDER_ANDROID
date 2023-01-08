@@ -19,6 +19,9 @@ package com.nlab.reminder.domain.common.schedule
 /**
  * @author thalys
  */
+fun SelectionTable(vararg pairs: Pair<ScheduleId, Boolean>): SelectionTable =
+    mapOf(*pairs)
+
 fun SelectionTable.isSelected(schedule: Schedule): Boolean {
     return this[schedule.id] ?: false
 }
