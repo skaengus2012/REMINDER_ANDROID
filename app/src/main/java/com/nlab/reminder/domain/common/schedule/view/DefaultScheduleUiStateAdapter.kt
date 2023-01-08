@@ -17,19 +17,23 @@
 package com.nlab.reminder.domain.common.schedule.view
 
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.nlab.reminder.core.android.recyclerview.DragSnapshot
 import com.nlab.reminder.core.android.recyclerview.DraggableAdapter
 import com.nlab.reminder.domain.common.schedule.ScheduleUiState
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.withContext
 
 /**
  * @author thalys
  */
-class DefaultScheduleUiStateAdapter :
-    ListAdapter<ScheduleUiState, ScheduleUiStateViewHolder>(ScheduleUiStateDiffCallback()),
+class DefaultScheduleUiStateAdapter(
+    diffCallback: DiffUtil.ItemCallback<ScheduleUiState>
+) : ListAdapter<ScheduleUiState, ScheduleUiStateViewHolder>(diffCallback),
     DraggableAdapter<ScheduleUiState> {
     private val _itemEvent = MutableSharedFlow<ItemEvent>(extraBufferCapacity = 1)
     private val selectionEnabled = MutableStateFlow(false)
@@ -44,13 +48,7 @@ class DefaultScheduleUiStateAdapter :
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ScheduleUiStateViewHolder =
         ScheduleUiStateViewHolder.of(
             parent,
-            selectionEnabled = selectionEnabled.map { value ->
-                if (value.not()) {
-                    // Include a delay period because selection animation conflicts occur.
-                    delay(100L)
-                }
-                value
-            },
+            selectionEnabled = selectionEnabled.asStateFlow(),
             onCompleteClicked = { position -> sendItemEventWithUiState(position, ItemEvent::OnCompleteClicked) },
             onDeleteClicked = { position -> sendItemEventWithUiState(position, ItemEvent::OnDeleteClicked) },
             onLinkClicked = { position -> sendItemEventWithUiState(position, ItemEvent::OnLinkClicked) },
@@ -82,7 +80,11 @@ class DefaultScheduleUiStateAdapter :
         draggableAdapterDelegate.adjustRecentSwapPositions()
     }
 
-    suspend fun setSelectionEnabled(isEnable: Boolean) {
+    suspend fun setSelectionEnabled(isEnable: Boolean) = withContext(Dispatchers.Main) {
+        if (isEnable.not()) {
+            // Include a delay period because selection animation conflicts occur.
+            delay(100L)
+        }
         selectionEnabled.emit(isEnable)
     }
 

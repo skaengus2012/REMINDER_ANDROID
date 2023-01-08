@@ -24,7 +24,9 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
+import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.*
 import com.nlab.reminder.R
 import com.nlab.reminder.core.android.fragment.viewLifecycle
@@ -41,6 +43,7 @@ import com.nlab.reminder.core.kotlin.coroutine.flow.withBefore
 import com.nlab.reminder.databinding.FragmentAllScheduleBinding
 import com.nlab.reminder.domain.common.android.navigation.openLinkSafety
 import com.nlab.reminder.domain.common.android.view.loadingFlow
+import com.nlab.reminder.domain.common.android.view.recyclerview.SimpleLayoutAdapter
 import com.nlab.reminder.domain.common.schedule.view.*
 import com.nlab.reminder.domain.common.schedule.view.DefaultScheduleUiStateAdapter.*
 import com.nlab.reminder.domain.feature.schedule.all.*
@@ -74,11 +77,13 @@ class AllScheduleFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val scheduleAdapter = DefaultScheduleUiStateAdapter()
+        val diffCallback = ScheduleUiStateDiffCallback()
+        val scheduleAdapter = DefaultScheduleUiStateAdapter(diffCallback)
         val itemTouchCallback = ScheduleItemTouchCallback(
             context = requireContext(),
             onItemMoved = scheduleAdapter::onMove,
             onItemMoveEnded = {
+                diffCallback.setDragMode(true)
                 val snapshot = scheduleAdapter.calculateDraggedSnapshot()
                 if (snapshot is DragSnapshot.Success) {
                     viewModel.onDragScheduleEnded(snapshot.items)
@@ -91,9 +96,14 @@ class AllScheduleFragment : Fragment() {
             onSelectChanged = viewModel::onScheduleSelected
         )
 
+        val logoAdapter = SimpleLayoutAdapter(R.layout.view_item_home_logo)
+        val logoAdapter2 = SimpleLayoutAdapter(R.layout.view_item_home_logo)
+
         binding.recyclerviewContent
             .apply { itemAnimator = ScheduleItemAnimator() }
-            .apply { adapter = scheduleAdapter }
+            .apply {
+                adapter = scheduleAdapter
+            }
             .apply { itemTouchHelper.attachToRecyclerView(this) }
             .apply { addOnItemTouchListener(dragSelectionHelper.itemTouchListener) }
 
@@ -239,6 +249,7 @@ class AllScheduleFragment : Fragment() {
             .onEach { items ->
                 scheduleAdapter.suspendSubmitList(items)
                 scheduleAdapter.adjustRecentSwapPositions()
+                diffCallback.setDragMode(false)
             }
             .launchIn(viewLifecycleScope)
 
