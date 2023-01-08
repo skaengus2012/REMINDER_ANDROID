@@ -70,8 +70,8 @@ class DefaultGetAllScheduleSnapshotUseCaseTest {
             scheduleRepository = mock { setupMock(mock, expectedSchedules) },
             completedScheduleShownRepository = mock { whenever(mock.get()) doReturn flowOf(isDoneScheduleShown) },
             scheduleUiStateFlowFactory = object : ScheduleUiStateFlowFactory {
-                override fun with(schedules: Flow<List<Schedule>>): Flow<List<ScheduleUiState>> =
-                    schedules.filter { it == expectedSchedules }.map { expectedUiStates }
+                override fun with(schedulesStream: Flow<List<Schedule>>): Flow<List<ScheduleUiState>> =
+                    schedulesStream.filter { it == expectedSchedules }.map { expectedUiStates }
             },
         )
         val snapshot: AllScheduleSnapshot =
