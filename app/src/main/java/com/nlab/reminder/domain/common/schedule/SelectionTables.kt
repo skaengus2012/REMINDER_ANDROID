@@ -14,10 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.common.schedule.util
-
-import com.nlab.reminder.domain.common.schedule.Schedule
-import com.nlab.reminder.domain.common.schedule.SelectionTable
+package com.nlab.reminder.domain.common.schedule
 
 /**
  * @author thalys

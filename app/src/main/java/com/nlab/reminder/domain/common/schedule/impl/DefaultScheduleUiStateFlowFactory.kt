@@ -18,7 +18,7 @@ package com.nlab.reminder.domain.common.schedule.impl
 
 import com.nlab.reminder.core.util.test.annotation.Generated
 import com.nlab.reminder.domain.common.schedule.*
-import com.nlab.reminder.domain.common.schedule.util.isSelected
+import com.nlab.reminder.domain.common.schedule.isSelected
 import com.nlab.reminder.domain.common.util.link.LinkMetadata
 import kotlinx.coroutines.flow.*
 
