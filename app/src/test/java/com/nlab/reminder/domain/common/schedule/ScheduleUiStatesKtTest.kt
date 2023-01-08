@@ -14,13 +14,25 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.common.schedule.util
+package com.nlab.reminder.domain.common.schedule
 
-import com.nlab.reminder.domain.common.schedule.Schedule
-import com.nlab.reminder.domain.common.schedule.ScheduleUiState
+import org.hamcrest.CoreMatchers.equalTo
+import org.hamcrest.MatcherAssert.assertThat
+import org.junit.Test
 
 /**
  * @author thalys
  */
-fun Collection<ScheduleUiState>.asSelectedSchedules(): Set<Schedule> =
-    filter { it.isSelected }.map { it.schedule }.toSet()
+class ScheduleUiStatesKtTest {
+    @Test
+    fun `filtered selected schedules`() {
+        val selectedSchedules: List<ScheduleUiState> = genScheduleUiStates(isSelected = true)
+        val unselectedSchedules: List<ScheduleUiState> = genScheduleUiStates(isSelected = false)
+
+        assertThat(
+            (selectedSchedules + unselectedSchedules)
+                .asSelectedSchedules(),
+            equalTo(selectedSchedules.map { it.schedule }.toSet())
+        )
+    }
+}

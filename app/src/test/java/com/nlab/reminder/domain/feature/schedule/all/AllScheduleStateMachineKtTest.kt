@@ -20,7 +20,7 @@ import com.nlab.reminder.core.effect.SideEffectHandle
 import com.nlab.reminder.core.state.asContainer
 import com.nlab.reminder.core.kotlin.util.Result
 import com.nlab.reminder.domain.common.schedule.*
-import com.nlab.reminder.domain.common.schedule.util.asSelectedSchedules
+import com.nlab.reminder.domain.common.schedule.asSelectedSchedules
 import com.nlab.reminder.domain.common.schedule.visibleconfig.*
 import com.nlab.reminder.test.*
 import kotlinx.coroutines.*
