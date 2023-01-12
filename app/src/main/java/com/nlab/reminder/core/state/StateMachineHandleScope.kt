@@ -15,10 +15,9 @@
  */
 package com.nlab.reminder.core.state
 
-import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.coroutineScope
+import com.nlab.reminder.core.kotlin.coroutine.flow.map
+import com.nlab.reminder.core.util.test.annotation.Generated
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 
 /**
  * @author thalys
@@ -28,14 +27,11 @@ class StateMachineHandleScope<E : Event> internal constructor(
     private val subscriptionCount: StateFlow<Int>,
     private val eventProcessor: EventProcessor<E>
 ) : EventProcessor<E> by eventProcessor {
+    @Generated
     suspend fun <T> Flow<T>.collectWhileSubscribed(flowCollector: FlowCollector<T>) {
-        coroutineScope {
-            launch(start = CoroutineStart.UNDISPATCHED) {
-                subscriptionCount
-                    .map { it > 0 }
-                    .distinctUntilChanged()
-                    .collectLatest { isActive -> if (isActive) collect(flowCollector) }
-            }
-        }
+        subscriptionCount
+            .map { it > 0 }
+            .distinctUntilChanged()
+            .collectLatest { isActive -> if (isActive) collect(flowCollector) }
     }
 }
