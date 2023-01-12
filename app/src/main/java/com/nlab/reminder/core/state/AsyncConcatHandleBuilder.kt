@@ -31,7 +31,11 @@ class AsyncConcatHandleBuilder<E : P, P : Event, S : State> : HandleBuilder<E, P
     }
 
     override fun build(): suspend StateMachineHandleScope<P>.(UpdateSource<E, S>) -> Unit = { updateSource ->
+        handleInternal(scope = this, updateSource)
+    }
+
+    private suspend fun handleInternal(scope: StateMachineHandleScope<P>, updateSource: UpdateSource<E, S>) {
         val coroutineScope = CoroutineScope(currentCoroutineContext())
-        handles.forEach { handle -> coroutineScope.launch { handle(updateSource) } }
+        handles.forEach { handle -> coroutineScope.launch { scope.handle(updateSource) } }
     }
 }
