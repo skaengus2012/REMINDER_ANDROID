@@ -21,9 +21,9 @@ import org.gradle.api.JavaVersion
  */
 object DependenciesVersions {
     val JAVA_VERSION = JavaVersion.VERSION_11
-    const val AGP = "7.3.1"
+    const val AGP = "7.4.0"
     const val JACOCO = "0.8.8"
-    const val KOTLIN = "1.7.21"
+    const val KOTLIN = "1.8.0"
     const val KOTLIN_COROUTINE = "1.6.4"
 
     const val ANDROID_APPCOMPAT = "1.5.1"
