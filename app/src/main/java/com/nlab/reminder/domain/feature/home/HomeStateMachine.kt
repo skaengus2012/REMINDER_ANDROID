@@ -19,7 +19,7 @@ package com.nlab.reminder.domain.feature.home
 import com.nlab.reminder.core.effect.SideEffectHandle
 import com.nlab.reminder.core.kotlin.util.*
 import com.nlab.reminder.core.state.StateMachine
-import com.nlab.reminder.core.state.StateMachineHandleScope
+import com.nlab.reminder.core.state.util.generateHandleScopeFunction
 import com.nlab.reminder.domain.common.tag.TagRepository
 import kotlinx.coroutines.flow.*
 
@@ -51,7 +51,7 @@ fun HomeStateMachine(
     }
 
     handle {
-        suspend fun StateMachineHandleScope<in HomeEvent>.collectSnapshot() {
+        val collectSnapshot = generateHandleScopeFunction {
             val collectResult = catching {
                 getHomeSnapshot()
                     .map(HomeEvent::OnSnapshotLoaded)
