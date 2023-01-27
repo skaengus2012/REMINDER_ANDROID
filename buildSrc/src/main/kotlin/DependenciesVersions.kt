@@ -26,15 +26,15 @@ object DependenciesVersions {
     const val KOTLIN = "1.8.0"
     const val KOTLIN_COROUTINE = "1.6.4"
 
-    const val ANDROID_APPCOMPAT = "1.5.1"
+    const val ANDROID_APPCOMPAT = "1.6.0"
     const val ANDROID_CORE = "1.9.0"
-    const val ANDROID_MATERIAL = "1.6.1"
+    const val ANDROID_MATERIAL = "1.8.0"
     const val ANDROID_CONSTRAINTLAYOUT = "2.1.4"
     const val ANDROID_RECYCLERVIEW = "1.2.1"
     const val ANDROID_LIFECYCLE = "2.5.1"
-    const val ANDROID_FRAGMENT = "1.5.4"
+    const val ANDROID_FRAGMENT = "1.5.5"
     const val ANDROID_NAVIGATION = "2.5.3"
-    const val ANDROID_ROOM = "2.4.3"
+    const val ANDROID_ROOM = "2.5.0"
     const val ANDROID_STARTUP = "1.1.1"
     const val ANDROID_DATASTORE_PREFERENCES = "1.0.0"
 
@@ -50,7 +50,7 @@ object DependenciesVersions {
     const val FACEBOOK_FLIPPER = "0.177.0"
     const val FACEBOOK_SOLOADER = "0.10.5"
 
-    const val SQUARE_LEAKCANARY = "2.9.1"
+    const val SQUARE_LEAKCANARY = "2.10"
 
     const val TEST_JUNIT = "4.13.2"
     const val TEST_COROUTINES = "1.6.4"
