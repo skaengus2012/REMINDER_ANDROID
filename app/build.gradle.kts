@@ -142,6 +142,8 @@ android {
     }
 
     packagingOptions {
+        // guide in kotlin coroutine
+        // https://github.com/Kotlin/kotlinx.coroutines#avoiding-including-the-debug-infrastructure-in-the-resulting-apk
         resources.excludes.add("DebugProbesKt.bin")
     }
 
