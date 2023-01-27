@@ -34,11 +34,13 @@ jacoco {
 }
 
 android {
+    namespace = "com.nlab.reminder"
+
     compileSdk = AndroidConfig.COMPILE_SDK_VERSION
     buildToolsVersion = AndroidConfig.BUILD_TOOLS_VERSION
 
     defaultConfig {
-        applicationId = "com.nlab.reminder"
+        applicationId = namespace
         multiDexEnabled = true
         minSdk = AndroidConfig.MIN_SDK_VERSION
         targetSdk = AndroidConfig.TARGET_SDK_VERSION
