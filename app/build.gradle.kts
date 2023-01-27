@@ -218,6 +218,12 @@ dependencies {
     androidTestImplementation(Dependencies.TEST_ANDROID_TEST_RULES)
 }
 
+kapt {
+    // guide in dagger hilt
+    // https://developer.android.com/training/dependency-injection/hilt-android?hl=ko#setup
+    correctErrorTypes = true
+}
+
 fun makePropertiesFromFiles(fileName: String): Map<Any, Any> =
     runCatching { Properties().apply { load(FileInputStream(File(fileName))) } }
         .getOrNull()
