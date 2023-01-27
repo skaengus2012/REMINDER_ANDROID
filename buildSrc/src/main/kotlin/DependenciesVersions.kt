@@ -47,8 +47,8 @@ object DependenciesVersions {
     const val JSOUP = "1.13.1"
     const val AFOLLESTED_DRAG_SELECTION_RECYCLERVIEW = "2.4.0"
 
-    const val FACEBOOK_FLIPPER = "0.173.0"
-    const val FACEBOOK_SOLOADER = "0.10.4"
+    const val FACEBOOK_FLIPPER = "0.177.0"
+    const val FACEBOOK_SOLOADER = "0.10.5"
 
     const val SQUARE_LEAKCANARY = "2.9.1"
 
