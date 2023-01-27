@@ -141,15 +141,24 @@ android {
         targetCompatibility = DependenciesVersions.JAVA_VERSION
     }
 
-    packagingOptions {
-        // guide in kotlin coroutine
-        // https://github.com/Kotlin/kotlinx.coroutines#avoiding-including-the-debug-infrastructure-in-the-resulting-apk
-        resources.excludes.add("DebugProbesKt.bin")
+    java {
+        // fix warning [https://github.com/skaengus2012/REMINDER_ANDROID/issues/82#issuecomment-1406942682]
+        // see https://kotlinlang.org/docs/gradle-configure-project.html#check-for-jvm-target-compatibility-of-related-compile-tasks
+        toolchain {
+            languageVersion.set(JavaLanguageVersion.of(DependenciesVersions.JAVA_VERSION.toString()))
+        }
     }
 
     kotlinOptions {
         jvmTarget = DependenciesVersions.JAVA_VERSION.toString()
+        // Exclude opt-in API warnings
         freeCompilerArgs = listOf("-opt-in=kotlin.RequiresOptIn")
+    }
+
+    packagingOptions {
+        // guide in kotlin coroutine
+        // https://github.com/Kotlin/kotlinx.coroutines#avoiding-including-the-debug-infrastructure-in-the-resulting-apk
+        resources.excludes.add("DebugProbesKt.bin")
     }
 
     buildFeatures {
