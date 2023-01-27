@@ -34,11 +34,13 @@ jacoco {
 }
 
 android {
+    namespace = "com.nlab.reminder"
+
     compileSdk = AndroidConfig.COMPILE_SDK_VERSION
     buildToolsVersion = AndroidConfig.BUILD_TOOLS_VERSION
 
     defaultConfig {
-        applicationId = "com.nlab.reminder"
+        applicationId = namespace
         multiDexEnabled = true
         minSdk = AndroidConfig.MIN_SDK_VERSION
         targetSdk = AndroidConfig.TARGET_SDK_VERSION
@@ -139,13 +141,24 @@ android {
         targetCompatibility = DependenciesVersions.JAVA_VERSION
     }
 
-    packagingOptions {
-        resources.excludes.add("DebugProbesKt.bin")
+    java {
+        // fix warning [https://github.com/skaengus2012/REMINDER_ANDROID/issues/82#issuecomment-1406942682]
+        // see https://kotlinlang.org/docs/gradle-configure-project.html#check-for-jvm-target-compatibility-of-related-compile-tasks
+        toolchain {
+            languageVersion.set(JavaLanguageVersion.of(DependenciesVersions.JAVA_VERSION.toString()))
+        }
     }
 
     kotlinOptions {
         jvmTarget = DependenciesVersions.JAVA_VERSION.toString()
+        // Exclude opt-in API warnings
         freeCompilerArgs = listOf("-opt-in=kotlin.RequiresOptIn")
+    }
+
+    packagingOptions {
+        // guide in kotlin coroutine
+        // https://github.com/Kotlin/kotlinx.coroutines#avoiding-including-the-debug-infrastructure-in-the-resulting-apk
+        resources.excludes.add("DebugProbesKt.bin")
     }
 
     buildFeatures {
@@ -203,6 +216,12 @@ dependencies {
     androidTestImplementation(Dependencies.TEST_ANDROID_JUNIT_ESPRESSO)
     androidTestImplementation(Dependencies.TEST_ANDROID_TEST_RUNNER)
     androidTestImplementation(Dependencies.TEST_ANDROID_TEST_RULES)
+}
+
+kapt {
+    // guide in dagger hilt
+    // https://developer.android.com/training/dependency-injection/hilt-android?hl=ko#setup
+    correctErrorTypes = true
 }
 
 fun makePropertiesFromFiles(fileName: String): Map<Any, Any> =

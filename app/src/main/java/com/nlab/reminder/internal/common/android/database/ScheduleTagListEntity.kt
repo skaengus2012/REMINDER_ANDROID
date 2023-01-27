@@ -19,7 +19,6 @@ package com.nlab.reminder.internal.common.android.database
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
-import androidx.room.ForeignKey.CASCADE
 
 /**
  * @author Doohyun
@@ -32,13 +31,13 @@ import androidx.room.ForeignKey.CASCADE
             entity = ScheduleEntity::class,
             parentColumns = ["schedule_id"],
             childColumns = ["schedule_id"],
-            onDelete = CASCADE
+            onDelete = ForeignKey.CASCADE
         ),
         ForeignKey(
             entity = TagEntity::class,
             parentColumns = ["tag_id"],
             childColumns = ["tag_id"],
-            onDelete = CASCADE
+            onDelete = ForeignKey.CASCADE
         )
     ]
 )
