@@ -115,8 +115,9 @@ android {
                 "**/test/**",
                 "**/infra/**",
                 "**/di/**",
-                "**/*Args*.*",          /* filtering Navigation Component generated classes */
-                "**/*Directions*.*"     /* filtering Navigation Component generated classes */
+                "**/*_PublicEventsKt.class",    /* filtering PublicEvent generated classes */
+                "**/*Args*.*",                  /* filtering Navigation Component generated classes */
+                "**/*Directions*.*"             /* filtering Navigation Component generated classes */
             )
 
             classDirectories.setFrom(files(
