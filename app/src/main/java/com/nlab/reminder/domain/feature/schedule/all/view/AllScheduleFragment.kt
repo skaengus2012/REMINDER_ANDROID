@@ -24,9 +24,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
-import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.*
 import com.nlab.reminder.R
 import com.nlab.reminder.core.android.fragment.viewLifecycle
@@ -95,9 +93,6 @@ class AllScheduleFragment : Fragment() {
             binding.recyclerviewContent,
             onSelectChanged = viewModel::onScheduleSelected
         )
-
-        val logoAdapter = SimpleLayoutAdapter(R.layout.view_item_home_logo)
-        val logoAdapter2 = SimpleLayoutAdapter(R.layout.view_item_home_logo)
 
         binding.recyclerviewContent
             .apply { itemAnimator = ScheduleItemAnimator() }

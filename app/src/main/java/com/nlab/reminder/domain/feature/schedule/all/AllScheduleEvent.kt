@@ -20,24 +20,54 @@ import com.nlab.reminder.core.state.Event
 import com.nlab.reminder.domain.common.schedule.ScheduleId
 import com.nlab.reminder.domain.common.schedule.ScheduleUiState
 import com.nlab.reminder.domain.common.schedule.SelectionDisable
+import com.nlab.state.core.lifecycle.PublicEvent
 
 /**
  * @author Doohyun
  */
 sealed class AllScheduleEvent private constructor() : Event {
     object Fetch : AllScheduleEvent()
-    object OnToggleCompletedScheduleShownClicked : AllScheduleEvent()
-    object OnToggleSelectionModeEnableClicked : AllScheduleEvent()
-    object OnDeleteCompletedScheduleClicked : AllScheduleEvent()
-    object OnSelectedScheduleDeleteClicked : AllScheduleEvent(), SelectionDisable
+
     data class StateLoaded(
         val scheduleSnapshot: AllScheduleSnapshot,
         val isSelectionEnabled: Boolean
     ) : AllScheduleEvent()
-    data class OnScheduleCompleteClicked(val scheduleId: ScheduleId, val isComplete: Boolean) : AllScheduleEvent()
+
+    @PublicEvent(AllScheduleViewModel::class)
+    object OnToggleCompletedScheduleShownClicked : AllScheduleEvent()
+
+    @PublicEvent(AllScheduleViewModel::class)
+    object OnToggleSelectionModeEnableClicked : AllScheduleEvent()
+
+    @PublicEvent(AllScheduleViewModel::class)
+    object OnDeleteCompletedScheduleClicked : AllScheduleEvent()
+
+    @PublicEvent(AllScheduleViewModel::class)
+    object OnSelectedScheduleDeleteClicked : AllScheduleEvent(), SelectionDisable
+
+    @PublicEvent(AllScheduleViewModel::class)
+    data class OnScheduleCompleteClicked(
+        val scheduleId: ScheduleId,
+        val isComplete: Boolean
+    ) : AllScheduleEvent()
+
+    @PublicEvent(AllScheduleViewModel::class)
     data class OnDragScheduleEnded(val draggedSnapshot: List<ScheduleUiState>) : AllScheduleEvent()
+
+    @PublicEvent(AllScheduleViewModel::class)
     data class OnDeleteScheduleClicked(val scheduleId: ScheduleId) : AllScheduleEvent()
+
+    @PublicEvent(AllScheduleViewModel::class)
     data class OnScheduleLinkClicked(val scheduleId: ScheduleId) : AllScheduleEvent()
-    data class OnScheduleSelected(val scheduleId: ScheduleId, val isSelected: Boolean) : AllScheduleEvent()
-    data class OnSelectedScheduleCompleteClicked(val isComplete: Boolean) : AllScheduleEvent(), SelectionDisable
+
+    @PublicEvent(AllScheduleViewModel::class)
+    data class OnScheduleSelected(
+        val scheduleId: ScheduleId,
+        val isSelected: Boolean
+    ) : AllScheduleEvent()
+
+    @PublicEvent(AllScheduleViewModel::class)
+    data class OnSelectedScheduleCompleteClicked(
+        val isComplete: Boolean
+    ) : AllScheduleEvent(), SelectionDisable
 }
