@@ -1,5 +1,6 @@
 import org.gradle.configurationcache.extensions.capitalized
 import com.android.build.api.dsl.VariantDimension
+import com.android.tools.build.jetifier.core.pom.DependencyVersions
 import java.io.FileInputStream
 import java.util.Properties
 
@@ -167,6 +168,9 @@ android {
 }
 
 dependencies {
+    implementation(project(Dependencies.NLAB_STATE_CORE))
+    kapt(project(Dependencies.NLAB_STATE_CORE_COMPILER))
+
     implementation(Dependencies.KOTLIN)
     implementation(Dependencies.KOTLIN_COROUTINE)
     implementation(Dependencies.KOTLIN_COROUTINE_ANDROID)

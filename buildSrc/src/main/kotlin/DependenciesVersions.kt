@@ -51,6 +51,7 @@ object DependenciesVersions {
     const val FACEBOOK_SOLOADER = "0.10.5"
 
     const val SQUARE_LEAKCANARY = "2.10"
+    const val SQUARE_KOTLINPOT = "1.12.0"
 
     const val TEST_JUNIT = "4.13.2"
     const val TEST_COROUTINES = "1.6.4"

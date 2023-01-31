@@ -14,19 +14,27 @@
  * limitations under the License.
  */
 
-plugins {
-    id("kotlin")
+package com.nlab.state.compiler
+
+import com.squareup.kotlinpoet.ClassName
+import com.squareup.kotlinpoet.TypeName
+import kotlinx.metadata.KmClassifier
+import kotlinx.metadata.KmType
+
+/**
+ * @author thalys
+ */
+fun KmType.toClassName(): String {
+    return (classifier as KmClassifier.Class).name
 }
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
-}
-
-dependencies {
-    implementation(project(Dependencies.NLAB_STATE_CORE))
-
-    implementation(Dependencies.KOTLIN)
-    implementation(Dependencies.SQUARE_KOTLINPOT)
-    implementation(Dependencies.SQUARE_KOTLINPOT_METADATA)
+fun KmType.toTypeName(): TypeName {
+    val classTokens: List<String> =
+        (classifier as KmClassifier.Class)
+            .name
+            .split("/")
+    return ClassName(
+        classTokens.subList(0, classTokens.size - 1).joinToString("."),
+        classTokens.last()
+    )
 }
