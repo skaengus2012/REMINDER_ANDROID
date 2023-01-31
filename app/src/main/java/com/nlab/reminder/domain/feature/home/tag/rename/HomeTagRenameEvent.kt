@@ -18,11 +18,22 @@ package com.nlab.reminder.domain.feature.home.tag.rename
 
 import com.nlab.reminder.core.state.Event
 import com.nlab.reminder.core.util.test.annotation.Generated
+import com.nlab.state.core.lifecycle.PublicEvent
 
 sealed class HomeTagRenameEvent private constructor() : Event {
-    @Generated data class OnRenameTextInput(val text: String) : HomeTagRenameEvent()
+    @Generated
+    @PublicEvent(HomeTagRenameViewModel::class)
+    data class OnRenameTextInput(val text: String) : HomeTagRenameEvent()
+
+    @PublicEvent(HomeTagRenameViewModel::class)
     object OnRenameTextClearClicked : HomeTagRenameEvent()
+
+    @PublicEvent(HomeTagRenameViewModel::class)
     object OnKeyboardShownWhenViewCreated : HomeTagRenameEvent()
+
+    @PublicEvent(HomeTagRenameViewModel::class)
     object OnCancelClicked : HomeTagRenameEvent()
+
+    @PublicEvent(HomeTagRenameViewModel::class)
     object OnConfirmClicked : HomeTagRenameEvent()
 }

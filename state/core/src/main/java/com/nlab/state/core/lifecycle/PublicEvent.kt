@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 The N's lab Open Source Project
+ * Copyright (C) 2023 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-rootProject.name="REMINDER_ANDROID"
-include(":app")
-include(":state:core")
-include(":state:compiler")
+
+package com.nlab.state.core.lifecycle
+
+import kotlin.reflect.KClass
+
+/**
+ * @author thalys
+ */
+@Retention(AnnotationRetention.SOURCE)
+@Target(AnnotationTarget.CLASS)
+annotation class PublicEvent(
+    @Suppress("unused") val receiverType: KClass<out Any>
+)

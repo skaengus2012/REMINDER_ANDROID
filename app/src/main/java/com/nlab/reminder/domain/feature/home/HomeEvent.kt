@@ -18,24 +18,60 @@ package com.nlab.reminder.domain.feature.home
 import com.nlab.reminder.core.state.Event
 import com.nlab.reminder.core.util.test.annotation.Generated
 import com.nlab.reminder.domain.common.tag.Tag
+import com.nlab.state.core.lifecycle.PublicEvent
 
 /**
  * @author Doohyun
  */
 sealed class HomeEvent private constructor() : Event {
     object Fetch : HomeEvent()
+
+    @Generated
+    data class OnSnapshotLoaded(val snapshot: HomeSnapshot) : HomeEvent()
+
+    @PublicEvent(HomeViewModel::class)
     object OnTodayCategoryClicked : HomeEvent()
+
+    @PublicEvent(HomeViewModel::class)
     object OnTimetableCategoryClicked : HomeEvent()
+
+    @PublicEvent(HomeViewModel::class)
     object OnAllCategoryClicked : HomeEvent()
+
+    @PublicEvent(HomeViewModel::class)
     object OnRetryClicked : HomeEvent()
+
+    @PublicEvent(HomeViewModel::class)
     object OnNewScheduleClicked : HomeEvent()   // TODO impl using handling
+
+    @PublicEvent(HomeViewModel::class)
     object OnPushConfigClicked : HomeEvent()    // TODO impl using handling
-    @Generated data class OnSnapshotLoaded(val snapshot: HomeSnapshot) : HomeEvent()
-    @Generated data class OnSnapshotLoadFailed(val throwable: Throwable) : HomeEvent()
-    @Generated data class OnTagClicked(val tag: Tag) : HomeEvent()
-    @Generated data class OnTagLongClicked(val tag: Tag) : HomeEvent()
-    @Generated data class OnTagRenameRequestClicked(val tag: Tag) : HomeEvent()
-    @Generated data class OnTagRenameConfirmClicked(val originalTag: Tag, val renameText: String) : HomeEvent()
-    @Generated data class OnTagDeleteRequestClicked(val tag: Tag) : HomeEvent()
-    @Generated data class OnTagDeleteConfirmClicked(val tag: Tag) : HomeEvent()
+
+    @Generated
+    @PublicEvent(HomeViewModel::class)
+    data class OnSnapshotLoadFailed(val throwable: Throwable) : HomeEvent()
+
+    @Generated
+    @PublicEvent(HomeViewModel::class)
+    data class OnTagClicked(val tag: Tag) : HomeEvent()
+
+    @Generated
+    @PublicEvent(HomeViewModel::class)
+    data class OnTagLongClicked(val tag: Tag) : HomeEvent()
+
+    @Generated
+    @PublicEvent(HomeViewModel::class)
+    data class OnTagRenameRequestClicked(val tag: Tag) : HomeEvent()
+
+    @Generated
+    @PublicEvent(HomeViewModel::class)
+    data class OnTagRenameConfirmClicked(val originalTag: Tag, val renameText: String) : HomeEvent()
+
+    @Generated
+    @PublicEvent(HomeViewModel::class)
+    data class OnTagDeleteRequestClicked(val tag: Tag) : HomeEvent()
+
+    @Generated
+    @PublicEvent(HomeViewModel::class)
+    data class OnTagDeleteConfirmClicked(val tag: Tag) : HomeEvent()
 }
