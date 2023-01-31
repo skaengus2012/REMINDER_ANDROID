@@ -14,6 +14,15 @@
  * limitations under the License.
  */
 
-plugins {
-    id("kotlin")
-}
+package com.nlab.state.core.lifecycle
+
+import kotlin.reflect.KClass
+
+/**
+ * @author thalys
+ */
+@Retention(AnnotationRetention.SOURCE)
+@Target(AnnotationTarget.CLASS)
+annotation class PublicEvent(
+    @Suppress("unused") val receiverType: KClass<out Any>
+)
