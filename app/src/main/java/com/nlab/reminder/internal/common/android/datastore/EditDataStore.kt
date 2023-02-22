@@ -22,13 +22,13 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import com.nlab.reminder.core.kotlin.util.Result
 import com.nlab.reminder.core.kotlin.util.catching
-import com.nlab.reminder.core.util.test.annotation.Generated
+import com.nlab.reminder.core.util.test.annotation.ExcludeFromGeneratedTestReport
 
 /**
  * @author thalys
  */
 // jacoco cannot recognize catching with edit
-@Generated
+@ExcludeFromGeneratedTestReport
 class EditDataStore(
     private val dataStore: DataStore<Preferences>,
 ) {

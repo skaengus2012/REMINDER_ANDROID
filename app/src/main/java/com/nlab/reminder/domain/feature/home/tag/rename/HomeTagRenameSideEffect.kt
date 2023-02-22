@@ -17,12 +17,12 @@
 package com.nlab.reminder.domain.feature.home.tag.rename
 
 import com.nlab.reminder.core.effect.SideEffect
-import com.nlab.reminder.core.util.test.annotation.Generated
+import com.nlab.reminder.core.util.test.annotation.ExcludeFromGeneratedTestReport
 
 /**
  * @author Doohyun
  */
 sealed class HomeTagRenameSideEffect : SideEffect {
-    @Generated data class Complete(val rename: String) : HomeTagRenameSideEffect()
+    @ExcludeFromGeneratedTestReport data class Complete(val rename: String) : HomeTagRenameSideEffect()
     object Cancel : HomeTagRenameSideEffect()
 }

@@ -16,12 +16,12 @@
 
 package com.nlab.reminder.domain.common.util.link
 
-import com.nlab.reminder.core.util.test.annotation.Generated
+import com.nlab.reminder.core.util.test.annotation.ExcludeFromGeneratedTestReport
 
 /**
  * @author thalys
  */
-@Generated
+@ExcludeFromGeneratedTestReport
 data class LinkMetadata(val title: String, val imageUrl: String) {
     val isTitleVisible: Boolean get() = title.isBlank().not()
     val isImageVisible: Boolean get() = imageUrl.isBlank().not()

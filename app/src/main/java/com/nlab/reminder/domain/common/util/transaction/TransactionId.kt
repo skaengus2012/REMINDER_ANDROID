@@ -16,11 +16,11 @@
 
 package com.nlab.reminder.domain.common.util.transaction
 
-import com.nlab.reminder.core.util.test.annotation.Generated
+import com.nlab.reminder.core.util.test.annotation.ExcludeFromGeneratedTestReport
 
 /**
  * @author Doohyun
  */
-@Generated
+@ExcludeFromGeneratedTestReport
 @JvmInline
 value class TransactionId(val value: String)

@@ -16,13 +16,13 @@
 package com.nlab.reminder.domain.feature.schedule.all
 
 import com.nlab.reminder.core.effect.SideEffect
-import com.nlab.reminder.core.util.test.annotation.Generated
+import com.nlab.reminder.core.util.test.annotation.ExcludeFromGeneratedTestReport
 
 /**
  * @author thalys
  */
 sealed class AllScheduleSideEffect : SideEffect {
     object ShowErrorPopup : AllScheduleSideEffect()
-    @Generated
+    @ExcludeFromGeneratedTestReport
     data class NavigateScheduleLink(val link: String) : AllScheduleSideEffect()
 }

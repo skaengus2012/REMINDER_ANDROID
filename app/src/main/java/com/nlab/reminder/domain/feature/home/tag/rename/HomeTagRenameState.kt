@@ -17,9 +17,9 @@
 package com.nlab.reminder.domain.feature.home.tag.rename
 
 import com.nlab.reminder.core.state.State
-import com.nlab.reminder.core.util.test.annotation.Generated
+import com.nlab.reminder.core.util.test.annotation.ExcludeFromGeneratedTestReport
 
-@Generated
+@ExcludeFromGeneratedTestReport
 data class HomeTagRenameState(
     val currentText: String,
     val isKeyboardShowWhenViewCreated: Boolean

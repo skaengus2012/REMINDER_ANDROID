@@ -16,7 +16,7 @@
 package com.nlab.reminder.core.state
 
 import com.nlab.reminder.core.kotlin.coroutine.flow.map
-import com.nlab.reminder.core.util.test.annotation.Generated
+import com.nlab.reminder.core.util.test.annotation.ExcludeFromGeneratedTestReport
 import kotlinx.coroutines.flow.*
 
 /**
@@ -27,7 +27,7 @@ class StateMachineHandleScope<E : Event> internal constructor(
     private val subscriptionCount: StateFlow<Int>,
     private val eventProcessor: EventProcessor<E>
 ) : EventProcessor<E> by eventProcessor {
-    @Generated
+    @ExcludeFromGeneratedTestReport
     suspend fun <T> Flow<T>.collectWhileSubscribed(flowCollector: FlowCollector<T>) {
         subscriptionCount
             .map { it > 0 }

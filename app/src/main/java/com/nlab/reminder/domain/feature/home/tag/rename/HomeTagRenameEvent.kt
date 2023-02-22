@@ -17,11 +17,11 @@
 package com.nlab.reminder.domain.feature.home.tag.rename
 
 import com.nlab.reminder.core.state.Event
-import com.nlab.reminder.core.util.test.annotation.Generated
+import com.nlab.reminder.core.util.test.annotation.ExcludeFromGeneratedTestReport
 import com.nlab.state.core.lifecycle.PublicEvent
 
 sealed class HomeTagRenameEvent private constructor() : Event {
-    @Generated
+    @ExcludeFromGeneratedTestReport
     @PublicEvent(HomeTagRenameViewModel::class)
     data class OnRenameTextInput(val text: String) : HomeTagRenameEvent()
 
