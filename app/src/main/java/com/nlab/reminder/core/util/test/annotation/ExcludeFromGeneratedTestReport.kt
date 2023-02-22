@@ -26,4 +26,4 @@ package com.nlab.reminder.core.util.test.annotation
  */
 @Retention(AnnotationRetention.BINARY)
 @Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION, AnnotationTarget.CONSTRUCTOR)
-annotation class Generated
+annotation class ExcludeFromGeneratedTestReport

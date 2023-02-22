@@ -16,14 +16,14 @@
 
 package com.nlab.reminder.core.state
 
-import com.nlab.reminder.core.util.test.annotation.Generated
+import com.nlab.reminder.core.util.test.annotation.ExcludeFromGeneratedTestReport
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.SharingStarted
 
 /**
  * @author thalys
  */
-@Generated
+@ExcludeFromGeneratedTestReport
 data class StateMachineConfig(
     val sharingStarted: SharingStarted = StateMachinePlugin.defaultSharingStarted,
     val dispatcher: CoroutineDispatcher? = StateMachinePlugin.defaultDispatcher,

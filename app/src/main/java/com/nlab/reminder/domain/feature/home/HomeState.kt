@@ -17,7 +17,7 @@
 package com.nlab.reminder.domain.feature.home
 
 import com.nlab.reminder.core.state.State
-import com.nlab.reminder.core.util.test.annotation.Generated
+import com.nlab.reminder.core.util.test.annotation.ExcludeFromGeneratedTestReport
 
 /**
  * @author Doohyun
@@ -25,12 +25,12 @@ import com.nlab.reminder.core.util.test.annotation.Generated
 sealed class HomeState private constructor() : State {
     object Init : HomeState()
 
-    @Generated
+    @ExcludeFromGeneratedTestReport
     data class Error(val throwable: Throwable) : HomeState()
 
-    @Generated
+    @ExcludeFromGeneratedTestReport
     data class Loading(val before: HomeState) : HomeState()
 
-    @Generated
+    @ExcludeFromGeneratedTestReport
     data class Loaded(val snapshot: HomeSnapshot) : HomeState()
 }

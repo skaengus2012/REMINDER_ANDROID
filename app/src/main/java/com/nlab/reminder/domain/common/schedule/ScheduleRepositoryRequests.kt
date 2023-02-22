@@ -15,36 +15,36 @@
  */
 package com.nlab.reminder.domain.common.schedule
 
-import com.nlab.reminder.core.util.test.annotation.Generated
+import com.nlab.reminder.core.util.test.annotation.ExcludeFromGeneratedTestReport
 
 /**
  * @author thalys
  */
 sealed class GetRequest private constructor() {
     object All : GetRequest()
-    @Generated
+    @ExcludeFromGeneratedTestReport
     data class ByComplete(val isComplete: Boolean) : GetRequest()
 }
 
 sealed class UpdateRequest private constructor() {
-    @Generated
+    @ExcludeFromGeneratedTestReport
     data class Completes(val values: List<ModifyCompleteRequest>) : UpdateRequest()
-    @Generated
+    @ExcludeFromGeneratedTestReport
     data class BulkCompletes(val scheduleIds: List<ScheduleId>, val isComplete: Boolean) : UpdateRequest()
-    @Generated
+    @ExcludeFromGeneratedTestReport
     data class VisiblePriorities(val values: List<ModifyVisiblePriorityRequest>) : UpdateRequest()
 }
 
 sealed class DeleteRequest private constructor() {
-    @Generated
+    @ExcludeFromGeneratedTestReport
     data class ById(val scheduleId: ScheduleId) : DeleteRequest()
-    @Generated
+    @ExcludeFromGeneratedTestReport
     data class ByIds(val scheduleIds: List<ScheduleId>) : DeleteRequest()
-    @Generated
+    @ExcludeFromGeneratedTestReport
     data class ByComplete(val isComplete: Boolean) : DeleteRequest()
 }
 
-@Generated
+@ExcludeFromGeneratedTestReport
 data class ModifyCompleteRequest(val scheduleId: ScheduleId, val isComplete: Boolean)
-@Generated
+@ExcludeFromGeneratedTestReport
 data class ModifyVisiblePriorityRequest(val scheduleId: ScheduleId, val visiblePriority: Long)

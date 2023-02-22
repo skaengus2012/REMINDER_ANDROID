@@ -16,12 +16,12 @@
 
 package com.nlab.reminder.domain.feature.home
 
-import com.nlab.reminder.core.util.test.annotation.Generated
+import com.nlab.reminder.core.util.test.annotation.ExcludeFromGeneratedTestReport
 
 /**
  * @author thalys
  */
-@Generated
+@ExcludeFromGeneratedTestReport
 data class NotificationUiState(
     val todayCount: String,
     val timetableCount: String,

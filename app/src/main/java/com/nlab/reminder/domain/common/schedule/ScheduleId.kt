@@ -16,12 +16,12 @@
 
 package com.nlab.reminder.domain.common.schedule
 
-import com.nlab.reminder.core.util.test.annotation.Generated
+import com.nlab.reminder.core.util.test.annotation.ExcludeFromGeneratedTestReport
 
 /**
  * @author Doohyun
  */
-@Generated
+@ExcludeFromGeneratedTestReport
 @JvmInline
 value class ScheduleId(val value: Long) {
     init {

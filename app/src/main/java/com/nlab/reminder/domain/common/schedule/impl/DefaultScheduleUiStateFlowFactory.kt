@@ -16,7 +16,7 @@
 
 package com.nlab.reminder.domain.common.schedule.impl
 
-import com.nlab.reminder.core.util.test.annotation.Generated
+import com.nlab.reminder.core.util.test.annotation.ExcludeFromGeneratedTestReport
 import com.nlab.reminder.domain.common.schedule.*
 import com.nlab.reminder.domain.common.schedule.isSelected
 import com.nlab.reminder.domain.common.util.link.LinkMetadata
@@ -37,7 +37,7 @@ class DefaultScheduleUiStateFlowFactory(
             transform = this::transformToScheduleUiStates
         )
 
-    @Generated
+    @ExcludeFromGeneratedTestReport
     private fun transformToScheduleUiStates(
         schedules: List<Schedule>,
         completeMarkTable: CompleteMarkTable,

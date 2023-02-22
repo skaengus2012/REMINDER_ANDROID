@@ -17,7 +17,7 @@
 package com.nlab.reminder.domain.feature.schedule.all
 
 import com.nlab.reminder.core.state.State
-import com.nlab.reminder.core.util.test.annotation.Generated
+import com.nlab.reminder.core.util.test.annotation.ExcludeFromGeneratedTestReport
 import com.nlab.reminder.domain.common.schedule.ScheduleUiState
 
 /**
@@ -27,7 +27,7 @@ sealed class AllScheduleState private constructor() : State {
     object Init : AllScheduleState()
     object Loading : AllScheduleState()
 
-    @Generated
+    @ExcludeFromGeneratedTestReport
     data class Loaded(
         val scheduleUiStates: List<ScheduleUiState>,
         val isCompletedScheduleShown: Boolean,

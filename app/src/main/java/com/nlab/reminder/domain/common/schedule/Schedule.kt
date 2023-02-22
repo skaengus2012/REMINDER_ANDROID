@@ -16,13 +16,13 @@
 
 package com.nlab.reminder.domain.common.schedule
 
-import com.nlab.reminder.core.util.test.annotation.Generated
+import com.nlab.reminder.core.util.test.annotation.ExcludeFromGeneratedTestReport
 import com.nlab.reminder.domain.common.tag.Tag
 
 /**
  * @author Doohyun
  */
-@Generated
+@ExcludeFromGeneratedTestReport
 data class Schedule(
     private val scheduleId: Long,
     val title: String,

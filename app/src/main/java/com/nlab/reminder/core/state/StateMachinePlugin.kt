@@ -16,14 +16,14 @@
 
 package com.nlab.reminder.core.state
 
-import com.nlab.reminder.core.util.test.annotation.Generated
+import com.nlab.reminder.core.util.test.annotation.ExcludeFromGeneratedTestReport
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.SharingStarted
 
 /**
  * @author Doohyun
  */
-@Generated
+@ExcludeFromGeneratedTestReport
 object StateMachinePlugin {
     var defaultSharingStarted: SharingStarted = SharingStarted.Eagerly
     var defaultDispatcher: CoroutineDispatcher? = null

@@ -16,13 +16,13 @@
 
 package com.nlab.reminder.domain.feature.home
 
-import com.nlab.reminder.core.util.test.annotation.Generated
+import com.nlab.reminder.core.util.test.annotation.ExcludeFromGeneratedTestReport
 import com.nlab.reminder.domain.common.tag.Tag
 
 /**
  * @author Doohyun
  */
-@Generated
+@ExcludeFromGeneratedTestReport
 data class HomeSnapshot(
     val notification: NotificationUiState,
     val tags: List<Tag>

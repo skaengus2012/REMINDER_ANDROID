@@ -16,7 +16,7 @@
 package com.nlab.reminder.domain.feature.home
 
 import com.nlab.reminder.core.state.Event
-import com.nlab.reminder.core.util.test.annotation.Generated
+import com.nlab.reminder.core.util.test.annotation.ExcludeFromGeneratedTestReport
 import com.nlab.reminder.domain.common.tag.Tag
 import com.nlab.state.core.lifecycle.PublicEvent
 
@@ -26,7 +26,7 @@ import com.nlab.state.core.lifecycle.PublicEvent
 sealed class HomeEvent private constructor() : Event {
     object Fetch : HomeEvent()
 
-    @Generated
+    @ExcludeFromGeneratedTestReport
     data class OnSnapshotLoaded(val snapshot: HomeSnapshot) : HomeEvent()
 
     @PublicEvent(HomeViewModel::class)
@@ -47,31 +47,31 @@ sealed class HomeEvent private constructor() : Event {
     @PublicEvent(HomeViewModel::class)
     object OnPushConfigClicked : HomeEvent()    // TODO impl using handling
 
-    @Generated
+    @ExcludeFromGeneratedTestReport
     @PublicEvent(HomeViewModel::class)
     data class OnSnapshotLoadFailed(val throwable: Throwable) : HomeEvent()
 
-    @Generated
+    @ExcludeFromGeneratedTestReport
     @PublicEvent(HomeViewModel::class)
     data class OnTagClicked(val tag: Tag) : HomeEvent()
 
-    @Generated
+    @ExcludeFromGeneratedTestReport
     @PublicEvent(HomeViewModel::class)
     data class OnTagLongClicked(val tag: Tag) : HomeEvent()
 
-    @Generated
+    @ExcludeFromGeneratedTestReport
     @PublicEvent(HomeViewModel::class)
     data class OnTagRenameRequestClicked(val tag: Tag) : HomeEvent()
 
-    @Generated
+    @ExcludeFromGeneratedTestReport
     @PublicEvent(HomeViewModel::class)
     data class OnTagRenameConfirmClicked(val originalTag: Tag, val renameText: String) : HomeEvent()
 
-    @Generated
+    @ExcludeFromGeneratedTestReport
     @PublicEvent(HomeViewModel::class)
     data class OnTagDeleteRequestClicked(val tag: Tag) : HomeEvent()
 
-    @Generated
+    @ExcludeFromGeneratedTestReport
     @PublicEvent(HomeViewModel::class)
     data class OnTagDeleteConfirmClicked(val tag: Tag) : HomeEvent()
 }

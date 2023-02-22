@@ -18,7 +18,6 @@ package com.nlab.reminder.domain.feature.home.view
 import android.os.Parcelable
 import com.nlab.reminder.core.android.navigation.Navigation
 import com.nlab.reminder.core.android.navigation.NavigationController
-import com.nlab.reminder.core.util.test.annotation.Generated
 import com.nlab.reminder.domain.common.tag.Tag
 import kotlinx.parcelize.Parcelize
 

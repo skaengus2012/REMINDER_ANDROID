@@ -16,7 +16,7 @@
 package com.nlab.reminder.domain.feature.home
 
 import com.nlab.reminder.core.effect.SideEffect
-import com.nlab.reminder.core.util.test.annotation.Generated
+import com.nlab.reminder.core.util.test.annotation.ExcludeFromGeneratedTestReport
 import com.nlab.reminder.domain.common.tag.Tag
 
 /**
@@ -27,8 +27,8 @@ sealed class HomeSideEffect : SideEffect {
     object NavigateTimetable : HomeSideEffect()
     object NavigateAllSchedule : HomeSideEffect()
     object ShowErrorPopup : HomeSideEffect()
-    @Generated data class NavigateTag(val tag: Tag) : HomeSideEffect()
-    @Generated data class ShowTagConfigPopup(val tag: Tag) : HomeSideEffect()
-    @Generated data class ShowTagRenamePopup(val tag: Tag, val usageCount: Long) : HomeSideEffect()
-    @Generated data class ShowTagDeletePopup(val tag: Tag, val usageCount: Long) : HomeSideEffect()
+    @ExcludeFromGeneratedTestReport data class NavigateTag(val tag: Tag) : HomeSideEffect()
+    @ExcludeFromGeneratedTestReport data class ShowTagConfigPopup(val tag: Tag) : HomeSideEffect()
+    @ExcludeFromGeneratedTestReport data class ShowTagRenamePopup(val tag: Tag, val usageCount: Long) : HomeSideEffect()
+    @ExcludeFromGeneratedTestReport data class ShowTagDeletePopup(val tag: Tag, val usageCount: Long) : HomeSideEffect()
 }

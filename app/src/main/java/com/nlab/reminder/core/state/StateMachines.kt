@@ -16,7 +16,7 @@
 
 package com.nlab.reminder.core.state
 
-import com.nlab.reminder.core.util.test.annotation.Generated
+import com.nlab.reminder.core.util.test.annotation.ExcludeFromGeneratedTestReport
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.plus
@@ -24,7 +24,7 @@ import kotlinx.coroutines.plus
 /**
  * @author thalys
  */
-@Generated
+@ExcludeFromGeneratedTestReport
 @Suppress("FunctionName")
 inline fun <E : Event, S : State> StateMachine(
     block: StateMachine<E, S>.() -> Unit
