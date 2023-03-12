@@ -17,7 +17,7 @@
 package com.nlab.reminder.core.state2.store
 
 import com.nlab.reminder.core.state2.TestAction
-import com.nlab.reminder.test.once
+import com.nlab.reminder.core.state2.middleware.handle.SuspendActionDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
@@ -28,16 +28,19 @@ import org.mockito.kotlin.verify
  * @author thalys
  */
 @ExperimentalCoroutinesApi
-class DefaultActionDispatcherTest {
+class StoreActionDispatcherTest {
     @Test
-    fun `When an action is passed to dispatch of Dispatcher, it should invoke the provided dispatcher`() = runTest {
+    fun `StoreActionDispatcher should be dispatched with mock dispatcher`() = runTest {
         val input = TestAction.genAction()
-        val mockDispatcher: (TestAction) -> Unit = mock()
-        val dispatcher = DefaultActionDispatcher(coroutineScope = this, mockDispatcher)
+        val mockActionDispatcher: SuspendActionDispatcher<TestAction> = mock()
+        val actionDispatcher = StoreActionDispatcher(
+            coroutineScope = this,
+            suspendActionDispatcher = mockActionDispatcher
+        )
 
-        dispatcher
+        actionDispatcher
             .dispatch(input)
             .join()
-        verify(mockDispatcher, once())(input)
+        verify(mockActionDispatcher).dispatch(input)
     }
 }
