@@ -14,13 +14,19 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.state2
+package com.nlab.reminder.core.state2.store
 
-import kotlinx.coroutines.Job
+import com.nlab.reminder.core.state2.Action
+import com.nlab.reminder.core.state2.ActionDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 /**
  * @author thalys
  */
-interface ActionDispatcher<A : Action> {
-    fun dispatch(action: A): Job
+internal class DefaultActionDispatcher<A : Action>(
+    private val coroutineScope: CoroutineScope,
+    private val block: suspend (A) -> Unit
+) : ActionDispatcher<A> {
+    override fun dispatch(action: A) = coroutineScope.launch { block(action) }
 }
