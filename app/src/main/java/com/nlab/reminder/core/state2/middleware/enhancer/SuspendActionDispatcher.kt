@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.state2.middleware.handle
+package com.nlab.reminder.core.state2.middleware.enhancer
 
 import com.nlab.reminder.core.state2.Action
 

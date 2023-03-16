@@ -14,19 +14,11 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.state2.middleware.handle
+package com.nlab.reminder.core.state2.middleware.enhancer
 
-import com.nlab.reminder.core.state2.Action
-import com.nlab.reminder.core.state2.State
-import com.nlab.reminder.core.state2.UpdateSource
+import com.nlab.reminder.core.state2.*
 
 /**
  * @author thalys
  */
-internal class DefaultUpdateSourceHandle<A : Action, S : State>(
-    private val block: suspend SuspendActionDispatcher<A>.(UpdateSource<A, S>) -> Unit
-) : UpdateSourceHandle<A, S> {
-    override suspend fun invoke(actionDispatcher: SuspendActionDispatcher<A>, source: UpdateSource<A, S>) {
-        actionDispatcher.block(source)
-    }
-}
+interface Enhancer<A : Action, S : State> : suspend SuspendActionDispatcher<A>.(UpdateSource<A, S>) -> Unit

@@ -14,20 +14,22 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.state2.store
+package com.nlab.reminder.core.state2.util
 
 import com.nlab.reminder.core.state2.*
-import com.nlab.reminder.core.state2.middleware.enhancer.SuspendActionDispatcher
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
+import com.nlab.reminder.core.state2.middleware.enhancer.*
 
 /**
  * @author thalys
  */
-class StoreActionDispatcher<A : Action>(
-    private val coroutineScope: CoroutineScope,
-    private val suspendActionDispatcher: SuspendActionDispatcher<A>,
-) : ActionDispatcher<A> {
-    override fun dispatch(action: A): Job = coroutineScope.launch { suspendActionDispatcher.dispatch(action) }
-}
+fun <A : Action, S : State> buildEnhancer(
+    block: suspend SuspendActionDispatcher<A>.(UpdateSource<A, S>) -> Unit
+): Enhancer<A, S> = DefaultEnhancer(block)
+
+operator fun <A : Action, S : State> Enhancer<A, S>.plus(enhancer: Enhancer<A, S>): Enhancer<A, S> =
+    buildEnhancer(
+        block = CompositeEnhanceBuilder<A, A, S>()
+            .apply { add(this@plus) }
+            .apply { add(enhancer) }
+            .build()
+    )

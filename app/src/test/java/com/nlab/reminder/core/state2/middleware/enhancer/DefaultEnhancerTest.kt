@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.state2.store
+package com.nlab.reminder.core.state2.middleware.enhancer
 
 import com.nlab.reminder.core.state2.TestAction
-import com.nlab.reminder.core.state2.middleware.enhancer.SuspendActionDispatcher
+import com.nlab.reminder.core.state2.TestState
+import com.nlab.reminder.core.state2.UpdateSource
+import com.nlab.testkit.once
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
@@ -28,19 +30,15 @@ import org.mockito.kotlin.verify
  * @author thalys
  */
 @ExperimentalCoroutinesApi
-class StoreActionDispatcherTest {
+class DefaultEnhancerTest {
     @Test
-    fun `StoreActionDispatcher should be dispatched with mock dispatcher`() = runTest {
-        val input = TestAction.genAction()
-        val mockActionDispatcher: SuspendActionDispatcher<TestAction> = mock()
-        val actionDispatcher = StoreActionDispatcher(
-            coroutineScope = this,
-            suspendActionDispatcher = mockActionDispatcher
-        )
+    fun `Dispatched actionDispatcher when updateSourceHandle invoked`() = runTest {
+        val inputSource = UpdateSource(TestAction.genAction(), TestState.genState())
+        val actionDispatcher: SuspendActionDispatcher<TestAction> = mock()
+        val handle = DefaultEnhancer<TestAction, TestState> { source -> dispatch(source.action) }
+        handle.invoke(actionDispatcher, inputSource)
 
-        actionDispatcher
-            .dispatch(input)
-            .join()
-        verify(mockActionDispatcher).dispatch(input)
+        verify(actionDispatcher, once()).dispatch(inputSource.action)
     }
+
 }

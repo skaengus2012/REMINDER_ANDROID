@@ -19,7 +19,7 @@ package com.nlab.reminder.core.state2.store
 import com.nlab.reminder.core.state2.TestAction
 import com.nlab.reminder.core.state2.TestState
 import com.nlab.reminder.core.state2.UpdateSource
-import com.nlab.reminder.core.state2.middleware.handle.UpdateSourceHandle
+import com.nlab.reminder.core.state2.middleware.enhancer.Enhancer
 import com.nlab.reminder.core.state2.util.buildReducer
 import com.nlab.testkit.once
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -44,7 +44,7 @@ class StoreSuspendActionDispatcherTest {
         val actionDispatcher = StoreSuspendActionDispatcher<TestAction, TestState>(
             stateHolder,
             reduce = buildReducer { expectedState },
-            handleUpdateSource = mock()
+            enhance = mock()
         )
 
         actionDispatcher.dispatch(TestAction.genAction())
@@ -56,14 +56,14 @@ class StoreSuspendActionDispatcherTest {
         val input: TestAction = TestAction.genAction()
         val initState = TestState.State1
         val changedState = TestState.State2
-        val updateSourceHandle: UpdateSourceHandle<TestAction, TestState> = mock()
+        val enhancer: Enhancer<TestAction, TestState> = mock()
         val actionDispatcher = StoreSuspendActionDispatcher(
             state = MutableStateFlow(initState),
             reduce = buildReducer { changedState },
-            handleUpdateSource = updateSourceHandle
+            enhance = enhancer
         )
 
         actionDispatcher.dispatch(input)
-        verify(updateSourceHandle, once()).invoke(actionDispatcher, UpdateSource(input, initState))
+        verify(enhancer, once()).invoke(actionDispatcher, UpdateSource(input, initState))
     }
 }

@@ -14,13 +14,17 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.state2.middleware.handle
+package com.nlab.reminder.core.state2.middleware.enhancer.dsl
 
-import com.nlab.reminder.core.state2.*
+import com.nlab.reminder.core.state2.Action
+import com.nlab.reminder.core.state2.dsl.BuilderDsl
+import com.nlab.reminder.core.state2.middleware.enhancer.SuspendActionDispatcher
 
 /**
  * @author thalys
  */
-interface UpdateSourceHandle<A : Action, S : State> {
-    suspend operator fun invoke(actionDispatcher: SuspendActionDispatcher<A>, source: UpdateSource<A, S>)
-}
+@JvmInline
+@BuilderDsl
+value class EnhanceEndScope<A : Action> internal constructor(
+    private val suspendActionDispatcher: SuspendActionDispatcher<A>
+) : SuspendActionDispatcher<A> by suspendActionDispatcher
