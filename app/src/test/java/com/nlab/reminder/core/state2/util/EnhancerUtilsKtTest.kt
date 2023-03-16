@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.state2.middleware.handle
+package com.nlab.reminder.core.state2.util
 
 import com.nlab.reminder.core.state2.TestAction
 import com.nlab.reminder.core.state2.TestState
 import com.nlab.reminder.core.state2.UpdateSource
+import com.nlab.testkit.once
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
@@ -29,15 +30,27 @@ import org.mockito.kotlin.verify
  * @author thalys
  */
 @ExperimentalCoroutinesApi
-class DefaultUpdateSourceHandleTest {
+class EnhancerUtilsKtTest {
     @Test
-    fun test() = runTest {
-        val inputSource = UpdateSource(TestAction.genAction(), TestState.genState())
-        val actionDispatcher: SuspendActionDispatcher<TestAction> = mock()
-        val handle = DefaultUpdateSourceHandle<TestAction, TestState> { source -> dispatch(source.action) }
-        handle.invoke(actionDispatcher, inputSource)
+    fun testBuildEnhancer() = runTest {
+        val work: () -> Unit = mock()
+        val enhancer = buildEnhancer<TestAction, TestState> { work() }
 
-        verify(actionDispatcher).dispatch(inputSource.action)
+        enhancer.invoke(mock(), UpdateSource(TestAction.genAction(), TestState.genState()))
+        verify(work, once())()
     }
 
+    @Test
+    fun testEnhancerComposition() = runTest {
+        val firstWork: () -> Unit = mock()
+        val lastWork: () -> Unit = mock()
+
+        val firstEnhancer = buildEnhancer<TestAction, TestState> { firstWork() }
+        val lastEnhancer = buildEnhancer<TestAction, TestState> { lastWork() }
+        val compositionEnhancer = firstEnhancer + lastEnhancer
+
+        compositionEnhancer.invoke(mock(), UpdateSource(TestAction.genAction(), TestState.genState()))
+        verify(firstWork, once())()
+        verify(lastWork, once())()
+    }
 }

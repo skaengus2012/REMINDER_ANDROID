@@ -14,26 +14,19 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.state2.store
+package com.nlab.reminder.core.state2.middleware.enhancer
 
 import com.nlab.reminder.core.state2.Action
-import com.nlab.reminder.core.state2.Reducer
 import com.nlab.reminder.core.state2.State
 import com.nlab.reminder.core.state2.UpdateSource
-import com.nlab.reminder.core.state2.middleware.enhancer.SuspendActionDispatcher
-import com.nlab.reminder.core.state2.middleware.enhancer.Enhancer
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.getAndUpdate
 
 /**
  * @author thalys
  */
-class StoreSuspendActionDispatcher<A : Action, S : State>(
-    private val state: MutableStateFlow<S>,
-    private val reduce: Reducer<A, S>,
-    private val enhance: Enhancer<A, S>
-) : SuspendActionDispatcher<A> {
-    override suspend fun dispatch(action: A) {
-        enhance(this, UpdateSource(action, before = state.getAndUpdate { cur -> reduce(UpdateSource(action, cur)) }))
+internal class DefaultEnhancer<A : Action, S : State>(
+    private val block: suspend SuspendActionDispatcher<A>.(UpdateSource<A, S>) -> Unit
+) : Enhancer<A, S> {
+    override suspend fun invoke(actionDispatcher: SuspendActionDispatcher<A>, source: UpdateSource<A, S>) {
+        actionDispatcher.block(source)
     }
 }
