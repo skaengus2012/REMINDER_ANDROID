@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.state2.middleware.stream.dsl
+package com.nlab.reminder.core.state2.middleware.epic.dsl
 
 import com.nlab.reminder.core.state2.TestAction
-import com.nlab.reminder.core.state2.middleware.stream.*
+import com.nlab.reminder.core.state2.middleware.epic.*
 import kotlinx.coroutines.flow.Flow
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
@@ -27,16 +27,16 @@ import org.mockito.kotlin.mock
 /**
  * @author thalys
  */
-class DslActionStreamTest {
+class DslEpicTest {
     @Test
     fun test() {
         val flow: Flow<TestAction> = mock()
-        val middleware = DslActionStream(
+        val middleware = DslEpic(
             buildDSL = {
                 whileStateUsed { flow }
             }
         )
-        val source: ActionStreamSource<TestAction> = middleware().first()
+        val source: EpicSource<TestAction> = middleware().first()
 
         assertThat(source.source, equalTo(flow))
         assertThat(source.subscriptionStrategy, equalTo(SubscriptionStrategy.WhileStateUsed))
