@@ -14,15 +14,25 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.state2.middleware.stream
+package com.nlab.reminder.core.state2.middleware.epic.dsl
 
-import com.nlab.reminder.core.state2.Action
+import com.nlab.reminder.core.state2.*
+import com.nlab.reminder.core.state2.dsl.*
+import com.nlab.reminder.core.state2.middleware.epic.EpicSource
+import com.nlab.reminder.core.state2.middleware.epic.SubscriptionStrategy
 import kotlinx.coroutines.flow.Flow
 
 /**
  * @author thalys
  */
-class ActionStreamSource<out A : Action> internal constructor(
-    internal val source: Flow<A>,
-    internal val subscriptionStrategy: SubscriptionStrategy
-)
+@BuilderDsl
+class DslEpicBuilder<A : Action> internal constructor() {
+    private val actionStreams = mutableListOf<EpicSource<A>>()
+
+    internal fun build(): List<EpicSource<A>> = actionStreams
+
+    @OperationDsl
+    fun whileStateUsed(block: () -> Flow<A>) {
+        actionStreams.add(EpicSource(block(), SubscriptionStrategy.WhileStateUsed))
+    }
+}

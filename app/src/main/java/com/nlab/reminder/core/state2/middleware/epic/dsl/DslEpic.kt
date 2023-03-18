@@ -14,13 +14,21 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.state2.middleware.stream
+package com.nlab.reminder.core.state2.middleware.epic.dsl
 
 import com.nlab.reminder.core.state2.*
+import com.nlab.reminder.core.state2.middleware.epic.Epic
+import com.nlab.reminder.core.state2.middleware.epic.EpicSource
 
 /**
  * @author thalys
  */
-interface ActionStream<out A : Action> {
-    operator fun invoke(): List<ActionStreamSource<A>>
+class DslEpic<A : Action>(
+    buildDSL: DslEpicBuilder<A>.() -> Unit
+) : Epic<A> {
+    private val builder = DslEpicBuilder<A>().apply(buildDSL)
+
+    override fun invoke(): List<EpicSource<A>> {
+        return builder.build()
+    }
 }

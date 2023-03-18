@@ -14,11 +14,15 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.state2.middleware.stream
+package com.nlab.reminder.core.state2.middleware.epic
+
+import com.nlab.reminder.core.state2.Action
+import kotlinx.coroutines.flow.Flow
 
 /**
  * @author thalys
  */
-sealed class SubscriptionStrategy {
-    object WhileStateUsed : SubscriptionStrategy()
-}
+class EpicSource<out A : Action> internal constructor(
+    internal val source: Flow<A>,
+    internal val subscriptionStrategy: SubscriptionStrategy
+)
