@@ -17,3 +17,4 @@ rootProject.name="REMINDER_ANDROID"
 include(":app")
 include(":state:core")
 include(":state:compiler")
+include(":testkit")

@@ -66,4 +66,5 @@ object Dependencies {
 
     const val NLAB_STATE_CORE = ":state:core"
     const val NLAB_STATE_CORE_COMPILER = ":state:compiler"
+    const val NLAB_TEST_KIT = ":testkit"
 }

@@ -21,7 +21,7 @@ import com.nlab.reminder.core.state.StateContainer
 import com.nlab.reminder.core.state.StateMachine
 import com.nlab.reminder.core.state.asContainer
 import com.nlab.reminder.test.genFlowObserveCoroutineScope
-import com.nlab.reminder.test.once
+import com.nlab.testkit.once
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi

@@ -16,9 +16,7 @@
 
 package com.nlab.reminder.domain.common.tag
 
-import com.nlab.reminder.test.genBothify
-import com.nlab.reminder.test.genInt
-import com.nlab.reminder.test.genLong
+import com.nlab.testkit.*
 
 /**
  * @author Doohyun

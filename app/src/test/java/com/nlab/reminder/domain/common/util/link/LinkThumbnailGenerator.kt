@@ -16,7 +16,7 @@
 
 package com.nlab.reminder.domain.common.util.link
 
-import com.nlab.reminder.test.genBothify
+import com.nlab.testkit.genBothify
 
 /**
  * @author thalys

@@ -19,7 +19,7 @@ package com.nlab.reminder.core.state.util
 import com.nlab.reminder.core.state.EventProcessor
 import com.nlab.reminder.core.state.StateMachineHandleScope
 import com.nlab.reminder.core.state.TestEvent
-import com.nlab.reminder.test.once
+import com.nlab.testkit.once
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Test

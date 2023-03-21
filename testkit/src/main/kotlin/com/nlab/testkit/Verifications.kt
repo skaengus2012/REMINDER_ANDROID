@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 The N's lab Open Source Project
+ * Copyright (C) 2023 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,13 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.test
+package com.nlab.testkit
 
-import androidx.recyclerview.widget.ListUpdateCallback
+import org.mockito.kotlin.times
+import org.mockito.verification.VerificationMode
 
 /**
  * @author Doohyun
  */
-class NoopListCallback : ListUpdateCallback {
-    override fun onChanged(position: Int, count: Int, payload: Any?) {}
-    override fun onMoved(fromPosition: Int, toPosition: Int) {}
-    override fun onInserted(position: Int, count: Int) {}
-    override fun onRemoved(position: Int, count: Int) {}
-}
+
+fun once(): VerificationMode = times(1)

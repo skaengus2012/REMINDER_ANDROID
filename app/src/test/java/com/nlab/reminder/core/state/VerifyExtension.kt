@@ -16,7 +16,7 @@
 
 package com.nlab.reminder.core.state
 
-import com.nlab.reminder.test.once
+import com.nlab.testkit.once
 import org.mockito.kotlin.verify
 
 /**

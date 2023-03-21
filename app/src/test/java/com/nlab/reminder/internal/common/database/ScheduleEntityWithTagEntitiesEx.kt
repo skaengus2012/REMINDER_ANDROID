@@ -22,7 +22,7 @@ import com.nlab.reminder.domain.common.tag.Tag
 import com.nlab.reminder.domain.common.tag.genTags
 import com.nlab.reminder.internal.common.android.database.ScheduleEntityWithTagEntities
 import com.nlab.reminder.internal.common.android.database.toEntity
-import com.nlab.reminder.test.genInt
+import com.nlab.testkit.genInt
 
 /**
  * @author Doohyun

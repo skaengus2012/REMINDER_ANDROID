@@ -19,11 +19,11 @@ package com.nlab.reminder.internal.common.util.link.impl
 import com.nlab.reminder.domain.common.util.link.*
 import com.nlab.reminder.internal.common.android.database.LinkMetadataDao
 import com.nlab.reminder.internal.common.android.database.toEntity
-import com.nlab.reminder.test.genBothify
-import com.nlab.reminder.test.genLong
-import com.nlab.reminder.test.once
+import com.nlab.testkit.once
 import com.nlab.reminder.core.kotlin.util.Result
-import com.nlab.reminder.test.genNumerify
+import com.nlab.testkit.genBothify
+import com.nlab.testkit.genLong
+import com.nlab.testkit.genNumerify
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi

@@ -17,7 +17,7 @@
 package com.nlab.reminder.domain.common.schedule.impl
 
 import com.nlab.reminder.domain.common.schedule.*
-import com.nlab.reminder.test.genInt
+import com.nlab.testkit.genInt
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest

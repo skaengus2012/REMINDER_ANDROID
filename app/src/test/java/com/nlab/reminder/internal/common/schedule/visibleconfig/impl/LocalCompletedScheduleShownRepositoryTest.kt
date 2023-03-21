@@ -20,9 +20,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
-import com.nlab.reminder.test.genBoolean
-import com.nlab.reminder.test.genBothify
-import com.nlab.reminder.test.once
+import com.nlab.testkit.once
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
@@ -36,7 +34,8 @@ import org.mockito.kotlin.*
 import com.nlab.reminder.core.kotlin.util.Result
 import com.nlab.reminder.core.kotlin.util.isFailure
 import com.nlab.reminder.core.kotlin.util.isSuccess
-import com.nlab.reminder.internal.common.schedule.visibleconfig.impl.LocalCompletedScheduleShownRepository
+import com.nlab.testkit.genBoolean
+import com.nlab.testkit.genBothify
 
 /**
  * @author thalys

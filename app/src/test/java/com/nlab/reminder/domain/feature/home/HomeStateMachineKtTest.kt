@@ -22,7 +22,11 @@ import com.nlab.reminder.core.state.asContainer
 import com.nlab.reminder.domain.common.tag.Tag
 import com.nlab.reminder.domain.common.tag.TagRepository
 import com.nlab.reminder.domain.common.tag.genTag
-import com.nlab.reminder.test.*
+import com.nlab.reminder.test.genStateContainerScope
+import com.nlab.testkit.genBothify
+import com.nlab.testkit.genLong
+import com.nlab.testkit.instanceOf
+import com.nlab.testkit.once
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.test.runTest

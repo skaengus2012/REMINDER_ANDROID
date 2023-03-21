@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.test
+package com.nlab.testkit
 
 import com.github.javafaker.Faker
 
@@ -24,9 +24,45 @@ import com.github.javafaker.Faker
 
 private val f = Faker()
 
+/**
+ * Create a string using the length of [numericString].
+ * @param numericString String that contains only'#' character.
+ * @return random number string.
+ */
 fun genNumerify(numericString: String = "###"): String = f.numerify(numericString)
+
+/**
+ * Create a string using the length of [letterString].
+ * @param letterString String that contains only'?' character.
+ * @param isUpper If true, the result string is upper case.
+ * @return random alphabet string.
+ */
 fun genLetterify(letterString: String = "???", isUpper: Boolean = false): String = f.letterify(letterString, isUpper)
+
+/**
+ * Create a string using the length of [string].
+ * @param string String that contains only '#' or '?' character. '#' is number, '?' is alphabet.
+ * @param isUpper If true, the result string is upper case.
+ * @return random string.
+ */
 fun genBothify(string: String = "???###", isUpper: Boolean = false): String = f.bothify(string, isUpper)
+
+/**
+ * Create a number using the length of [numericString].
+ * @param numericString String that contains only '#' character.
+ * @return random long type number.
+ */
 fun genLong(numericString: String = "#######"): Long = genNumerify(numericString).toLong()
+
+/**
+ * Create a number using the length of [numericString].
+ * @param numericString String that contains only '#' character.
+ * @return random int type number.
+ */
 fun genInt(numericString: String = "####"): Int = genNumerify(numericString).toInt()
+
+/**
+ * Create a boolean value.
+ * @return random boolean value.
+ */
 fun genBoolean(): Boolean = genInt("#") % 2 == 0

@@ -18,7 +18,7 @@ package com.nlab.reminder.domain.common.util.link.transaction
 
 import com.nlab.reminder.domain.common.util.transaction.TransactionId
 import com.nlab.reminder.domain.common.util.transaction.TransactionIdGenerator
-import com.nlab.reminder.test.genBothify
+import com.nlab.testkit.genBothify
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
