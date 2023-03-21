@@ -16,7 +16,7 @@
 
 package com.nlab.reminder.domain.common.schedule.impl
 
-import com.nlab.reminder.test.genBoolean
+import com.nlab.testkit.genBoolean
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.drop

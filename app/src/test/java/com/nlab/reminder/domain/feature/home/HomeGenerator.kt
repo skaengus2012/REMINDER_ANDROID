@@ -21,8 +21,8 @@ import com.nlab.reminder.domain.common.tag.Tag
 import com.nlab.reminder.domain.common.tag.TagRepository
 import com.nlab.reminder.domain.common.tag.genTag
 import com.nlab.reminder.domain.common.tag.genTags
-import com.nlab.reminder.test.genBothify
-import com.nlab.reminder.test.genLong
+import com.nlab.testkit.genBothify
+import com.nlab.testkit.genLong
 import kotlinx.coroutines.flow.emptyFlow
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock

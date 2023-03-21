@@ -210,6 +210,7 @@ dependencies {
 
     debugImplementation(Dependencies.SQUARE_LEAKCANARY)
 
+    testImplementation(project(Dependencies.NLAB_TEST_KIT))
     testImplementation(Dependencies.TEST_JUNIT)
     testImplementation(Dependencies.TEST_COROUTINES)
     testImplementation(Dependencies.TEST_MOCKITO)

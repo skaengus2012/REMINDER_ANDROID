@@ -16,7 +16,7 @@
 
 package com.nlab.reminder.core.state
 
-import com.nlab.reminder.test.genInt
+import com.nlab.testkit.genInt
 
 /**
  * @author Doohyun

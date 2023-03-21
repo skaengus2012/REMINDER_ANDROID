@@ -20,10 +20,7 @@ import com.nlab.reminder.domain.common.util.link.LinkMetadata
 import com.nlab.reminder.domain.common.util.transaction.TransactionId
 import com.nlab.reminder.domain.common.tag.Tag
 import com.nlab.reminder.domain.common.tag.genTags
-import com.nlab.reminder.test.genBoolean
-import com.nlab.reminder.test.genBothify
-import com.nlab.reminder.test.genInt
-import com.nlab.reminder.test.genLong
+import com.nlab.testkit.*
 
 /**
  * @author Doohyun

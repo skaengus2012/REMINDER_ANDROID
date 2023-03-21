@@ -17,8 +17,8 @@
 package com.nlab.reminder.domain.feature.home.tag.rename
 
 import com.nlab.reminder.core.effect.SideEffectHandle
-import com.nlab.reminder.test.genBoolean
-import com.nlab.reminder.test.genBothify
+import com.nlab.testkit.genBoolean
+import com.nlab.testkit.genBothify
 import org.mockito.kotlin.mock
 
 /**

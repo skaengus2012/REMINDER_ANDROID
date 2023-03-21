@@ -17,7 +17,7 @@
 package com.nlab.reminder.core.state
 
 import com.nlab.reminder.test.genStateContainerScope
-import com.nlab.reminder.test.once
+import com.nlab.testkit.once
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.hamcrest.CoreMatchers.equalTo

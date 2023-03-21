@@ -16,8 +16,8 @@
 
 package com.nlab.reminder.core.effect
 
-import com.nlab.reminder.test.genBoolean
-import com.nlab.reminder.test.once
+import com.nlab.testkit.genBoolean
+import com.nlab.testkit.once
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.fold

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 The N's lab Open Source Project
+ * Copyright (C) 2023 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.test
+plugins {
+    id("kotlin")
+}
 
-import org.hamcrest.CoreMatchers
-import org.hamcrest.Matcher
-import kotlin.reflect.KClass
-
-/**
- * @author Doohyun
- */
-fun <T> instanceOf(clazz: KClass<*>): Matcher<T> = CoreMatchers.instanceOf(clazz.java)
+dependencies {
+    implementation(Dependencies.TEST_JUNIT)
+    implementation(Dependencies.TEST_JAVAFAKER)
+    implementation(Dependencies.TEST_MOCKITO)
+    implementation(Dependencies.TEST_MOCKITO_KOTLIN)
+}

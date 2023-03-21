@@ -17,8 +17,8 @@
 package com.nlab.reminder.core.state
 
 import com.nlab.reminder.test.genStateContainerScope
-import com.nlab.reminder.test.instanceOf
-import com.nlab.reminder.test.once
+import com.nlab.testkit.instanceOf
+import com.nlab.testkit.once
 import kotlinx.coroutines.*
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.MatcherAssert.assertThat

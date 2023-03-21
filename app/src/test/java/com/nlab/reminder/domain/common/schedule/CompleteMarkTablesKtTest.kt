@@ -16,7 +16,7 @@
 
 package com.nlab.reminder.domain.common.schedule
 
-import com.nlab.reminder.test.genBoolean
+import com.nlab.testkit.genBoolean
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test

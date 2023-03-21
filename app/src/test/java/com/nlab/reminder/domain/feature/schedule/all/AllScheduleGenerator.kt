@@ -20,7 +20,7 @@ import com.nlab.reminder.core.effect.SideEffectHandle
 import com.nlab.reminder.domain.common.schedule.*
 import com.nlab.reminder.domain.common.schedule.SelectionModeRepository
 import com.nlab.reminder.domain.common.schedule.visibleconfig.CompletedScheduleShownRepository
-import com.nlab.reminder.test.genBoolean
+import com.nlab.testkit.genBoolean
 import kotlinx.coroutines.flow.emptyFlow
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock

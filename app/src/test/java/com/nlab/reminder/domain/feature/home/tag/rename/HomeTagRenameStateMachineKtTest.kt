@@ -18,10 +18,10 @@ package com.nlab.reminder.domain.feature.home.tag.rename
 
 import com.nlab.reminder.core.effect.SideEffectHandle
 import com.nlab.reminder.core.state.asContainer
-import com.nlab.reminder.test.genBothify
-import com.nlab.reminder.test.genLetterify
 import com.nlab.reminder.test.genStateContainerScope
-import com.nlab.reminder.test.once
+import com.nlab.testkit.genBothify
+import com.nlab.testkit.genLetterify
+import com.nlab.testkit.once
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.equalTo

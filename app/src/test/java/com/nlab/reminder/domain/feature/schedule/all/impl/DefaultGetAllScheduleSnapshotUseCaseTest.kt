@@ -24,7 +24,9 @@ import com.nlab.reminder.domain.common.util.link.LinkMetadataTableRepository
 import com.nlab.reminder.domain.common.util.link.genLinkMetadata
 import com.nlab.reminder.domain.feature.schedule.all.AllScheduleSnapshot
 import com.nlab.reminder.domain.feature.schedule.all.genAllScheduleSnapshot
-import com.nlab.reminder.test.*
+import com.nlab.testkit.genBoolean
+import com.nlab.testkit.genBothify
+import com.nlab.testkit.once
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.test.*

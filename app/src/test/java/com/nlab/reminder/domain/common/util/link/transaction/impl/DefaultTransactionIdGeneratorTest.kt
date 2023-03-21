@@ -19,7 +19,7 @@ package com.nlab.reminder.domain.common.util.link.transaction.impl
 import com.nlab.reminder.domain.common.util.transaction.TransactionId
 import com.nlab.reminder.domain.common.util.transaction.TransactionIdGenerator
 import com.nlab.reminder.domain.common.util.transaction.impl.DefaultTransactionIdGenerator
-import com.nlab.reminder.test.genBothify
+import com.nlab.testkit.genBothify
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.*
 import org.junit.Test
