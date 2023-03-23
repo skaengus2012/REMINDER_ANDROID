@@ -17,14 +17,22 @@
 package com.nlab.reminder.core.state2.middleware.enhancer.dsl
 
 import com.nlab.reminder.core.state2.Action
-import com.nlab.reminder.core.state2.dsl.BuilderDsl
+import com.nlab.reminder.core.state2.State
+import com.nlab.reminder.core.state2.UpdateSource
+import com.nlab.reminder.core.state2.middleware.enhancer.Enhancer
 import com.nlab.reminder.core.state2.middleware.enhancer.SuspendActionDispatcher
 
 /**
  * @author thalys
  */
-@JvmInline
-@BuilderDsl
-value class EnhanceEndScope<A : Action> internal constructor(
-    private val actionDispatcher: SuspendActionDispatcher<A>
-) : SuspendActionDispatcher<A> by actionDispatcher
+internal class DslEnhancer<A : Action, S : State>(
+    defineDSL: DslEnhanceBuilder<A, S>.() -> Unit
+) : Enhancer<A, S> {
+    private val block: suspend (SuspendActionDispatcher<A>).(UpdateSource<A, S>) -> Unit =
+        DslEnhanceBuilder<A, S>()
+            .apply(defineDSL)
+            .build()
+    override suspend fun invoke(actionDispatcher: SuspendActionDispatcher<A>, updateSource: UpdateSource<A, S>) {
+        block(actionDispatcher, updateSource)
+    }
+}
