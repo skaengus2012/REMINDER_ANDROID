@@ -41,6 +41,19 @@ class EnhancerUtilsKtTest {
     }
 
     @Test
+    fun testBuildDslEnhancer() = runTest {
+        val work: () -> Unit = mock()
+        val enhancer = buildDslEnhancer<TestAction, TestState> {
+            anyState {
+                anyAction { work() }
+            }
+        }
+
+        enhancer.invoke(mock(), UpdateSource(TestAction.genAction(), TestState.genState()))
+        verify(work, once())()
+    }
+
+    @Test
     fun testEnhancerComposition() = runTest {
         val firstWork: () -> Unit = mock()
         val lastWork: () -> Unit = mock()
