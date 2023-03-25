@@ -18,7 +18,7 @@ package com.nlab.reminder.core.state2.store
 
 import com.nlab.reminder.core.state2.TestAction
 import com.nlab.reminder.core.state2.TestState
-import com.nlab.reminder.core.state2.middleware.enhancer.SuspendActionDispatcher
+import com.nlab.reminder.core.state2.middleware.enhancer.ActionDispatcher
 import com.nlab.testkit.once
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -35,7 +35,7 @@ class DefaultStoreTest {
     @Test
     fun `Store should be dispatched with mock dispatcher`() = runTest {
         val input = TestAction.genAction()
-        val mockActionDispatcher: SuspendActionDispatcher<TestAction> = mock()
+        val mockActionDispatcher: ActionDispatcher<TestAction> = mock()
         val store = DefaultStore<TestAction, TestState>(
             coroutineScope = this,
             mockActionDispatcher,

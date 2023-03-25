@@ -24,9 +24,9 @@ import com.nlab.reminder.core.state2.UpdateSource
  * @author thalys
  */
 internal class DefaultEnhancer<A : Action, S : State>(
-    private val block: suspend SuspendActionDispatcher<A>.(UpdateSource<A, S>) -> Unit
+    private val block: suspend ActionDispatcher<A>.(UpdateSource<A, S>) -> Unit
 ) : Enhancer<A, S> {
-    override suspend fun invoke(actionDispatcher: SuspendActionDispatcher<A>, source: UpdateSource<A, S>) {
+    override suspend fun invoke(actionDispatcher: ActionDispatcher<A>, source: UpdateSource<A, S>) {
         actionDispatcher.block(source)
     }
 }

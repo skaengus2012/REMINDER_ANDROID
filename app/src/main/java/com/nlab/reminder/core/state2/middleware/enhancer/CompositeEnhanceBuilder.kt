@@ -26,18 +26,18 @@ import kotlinx.coroutines.launch
  */
 
 internal class CompositeEnhanceBuilder<A : Action, T : A, S : State> {
-    private val enhances = mutableListOf<suspend SuspendActionDispatcher<A>.(UpdateSource<T, S>) -> Unit>()
+    private val enhances = mutableListOf<suspend ActionDispatcher<A>.(UpdateSource<T, S>) -> Unit>()
 
-    fun add(block: suspend SuspendActionDispatcher<A>.(UpdateSource<T, S>) -> Unit) {
+    fun add(block: suspend ActionDispatcher<A>.(UpdateSource<T, S>) -> Unit) {
         enhances += block
     }
 
-    fun build(): suspend SuspendActionDispatcher<A>.(UpdateSource<T, S>) -> Unit = { updateSource ->
+    fun build(): suspend ActionDispatcher<A>.(UpdateSource<T, S>) -> Unit = { updateSource ->
         coroutineScope(enhanceAsync(actionDispatcher = this, updateSource))
     }
 
     private fun enhanceAsync(
-        actionDispatcher: SuspendActionDispatcher<A>,
+        actionDispatcher: ActionDispatcher<A>,
         updateSource: UpdateSource<T, S>
     ): (CoroutineScope) -> Unit = { scope ->
         enhances.forEach { scope.launch { it(actionDispatcher, updateSource) } }

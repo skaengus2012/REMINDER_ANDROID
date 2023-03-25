@@ -25,7 +25,7 @@ import com.nlab.reminder.core.state2.middleware.enhancer.dsl.DslEnhancer
  * @author thalys
  */
 fun <A : Action, S : State> buildEnhancer(
-    block: suspend SuspendActionDispatcher<A>.(UpdateSource<A, S>) -> Unit
+    block: suspend ActionDispatcher<A>.(UpdateSource<A, S>) -> Unit
 ): Enhancer<A, S> = DefaultEnhancer(block)
 
 fun <A : Action, S : State> buildDslEnhancer(

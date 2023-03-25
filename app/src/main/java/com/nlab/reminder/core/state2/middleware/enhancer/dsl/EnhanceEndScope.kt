@@ -18,7 +18,7 @@ package com.nlab.reminder.core.state2.middleware.enhancer.dsl
 
 import com.nlab.reminder.core.state2.Action
 import com.nlab.reminder.core.state2.dsl.BuilderDsl
-import com.nlab.reminder.core.state2.middleware.enhancer.SuspendActionDispatcher
+import com.nlab.reminder.core.state2.middleware.enhancer.ActionDispatcher
 
 /**
  * @author thalys
@@ -26,5 +26,5 @@ import com.nlab.reminder.core.state2.middleware.enhancer.SuspendActionDispatcher
 @JvmInline
 @BuilderDsl
 value class EnhanceEndScope<A : Action> internal constructor(
-    private val actionDispatcher: SuspendActionDispatcher<A>
-) : SuspendActionDispatcher<A> by actionDispatcher
+    private val actionDispatcher: ActionDispatcher<A>
+) : ActionDispatcher<A> by actionDispatcher

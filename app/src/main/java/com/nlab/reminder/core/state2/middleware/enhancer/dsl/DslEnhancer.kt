@@ -20,7 +20,7 @@ import com.nlab.reminder.core.state2.Action
 import com.nlab.reminder.core.state2.State
 import com.nlab.reminder.core.state2.UpdateSource
 import com.nlab.reminder.core.state2.middleware.enhancer.Enhancer
-import com.nlab.reminder.core.state2.middleware.enhancer.SuspendActionDispatcher
+import com.nlab.reminder.core.state2.middleware.enhancer.ActionDispatcher
 
 /**
  * @author thalys
@@ -28,11 +28,11 @@ import com.nlab.reminder.core.state2.middleware.enhancer.SuspendActionDispatcher
 internal class DslEnhancer<A : Action, S : State>(
     defineDSL: DslEnhanceBuilder<A, S>.() -> Unit
 ) : Enhancer<A, S> {
-    private val block: suspend (SuspendActionDispatcher<A>).(UpdateSource<A, S>) -> Unit =
+    private val block: suspend (ActionDispatcher<A>).(UpdateSource<A, S>) -> Unit =
         DslEnhanceBuilder<A, S>()
             .apply(defineDSL)
             .build()
-    override suspend fun invoke(actionDispatcher: SuspendActionDispatcher<A>, updateSource: UpdateSource<A, S>) {
+    override suspend fun invoke(actionDispatcher: ActionDispatcher<A>, updateSource: UpdateSource<A, S>) {
         block(actionDispatcher, updateSource)
     }
 }

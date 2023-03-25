@@ -21,4 +21,4 @@ import com.nlab.reminder.core.state2.*
 /**
  * @author thalys
  */
-interface Enhancer<A : Action, S : State> : suspend SuspendActionDispatcher<A>.(UpdateSource<A, S>) -> Unit
+interface Enhancer<A : Action, S : State> : suspend ActionDispatcher<A>.(UpdateSource<A, S>) -> Unit
