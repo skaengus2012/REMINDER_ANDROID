@@ -22,7 +22,7 @@ import com.nlab.reminder.core.state2.UpdateSource
 import com.nlab.reminder.core.state2.dsl.BuilderDsl
 import com.nlab.reminder.core.state2.dsl.OperationDsl
 import com.nlab.reminder.core.state2.middleware.enhancer.CompositeEnhanceBuilder
-import com.nlab.reminder.core.state2.middleware.enhancer.SuspendActionDispatcher
+import com.nlab.reminder.core.state2.middleware.enhancer.ActionDispatcher
 import kotlin.reflect.KClass
 import kotlin.reflect.cast
 
@@ -33,7 +33,7 @@ import kotlin.reflect.cast
 class DslEnhanceBuilder<A : Action, S : State> internal constructor() {
     private val compositeEnhanceBuilder = CompositeEnhanceBuilder<A, A, S>()
 
-    internal fun build(): suspend SuspendActionDispatcher<A>.(UpdateSource<A, S>) -> Unit {
+    internal fun build(): suspend ActionDispatcher<A>.(UpdateSource<A, S>) -> Unit {
         return compositeEnhanceBuilder.build()
     }
 

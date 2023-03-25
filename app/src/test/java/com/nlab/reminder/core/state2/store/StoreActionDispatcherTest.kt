@@ -35,13 +35,13 @@ import org.mockito.kotlin.verify
  * @author thalys
  */
 @ExperimentalCoroutinesApi
-class StoreSuspendActionDispatcherTest {
+class StoreActionDispatcherTest {
     @Test
     fun `ActionDispatcher should update state to expectedState after dispatching TestAction`() = runTest {
         val initState = TestState.State1
         val expectedState = TestState.State2
         val stateHolder = MutableStateFlow<TestState>(initState)
-        val actionDispatcher = StoreSuspendActionDispatcher<TestAction, TestState>(
+        val actionDispatcher = StoreActionDispatcher<TestAction, TestState>(
             stateHolder,
             reduce = buildReducer { expectedState },
             enhance = mock()
@@ -57,7 +57,7 @@ class StoreSuspendActionDispatcherTest {
         val initState = TestState.State1
         val changedState = TestState.State2
         val enhancer: Enhancer<TestAction, TestState> = mock()
-        val actionDispatcher = StoreSuspendActionDispatcher(
+        val actionDispatcher = StoreActionDispatcher(
             state = MutableStateFlow(initState),
             reduce = buildReducer { changedState },
             enhance = enhancer

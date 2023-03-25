@@ -20,7 +20,7 @@ import com.nlab.reminder.core.state2.Action
 import com.nlab.reminder.core.state2.Reducer
 import com.nlab.reminder.core.state2.State
 import com.nlab.reminder.core.state2.UpdateSource
-import com.nlab.reminder.core.state2.middleware.enhancer.SuspendActionDispatcher
+import com.nlab.reminder.core.state2.middleware.enhancer.ActionDispatcher
 import com.nlab.reminder.core.state2.middleware.enhancer.Enhancer
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.getAndUpdate
@@ -28,11 +28,11 @@ import kotlinx.coroutines.flow.getAndUpdate
 /**
  * @author thalys
  */
-class StoreSuspendActionDispatcher<A : Action, S : State>(
+class StoreActionDispatcher<A : Action, S : State>(
     private val state: MutableStateFlow<S>,
     private val reduce: Reducer<A, S>,
     private val enhance: Enhancer<A, S>
-) : SuspendActionDispatcher<A> {
+) : ActionDispatcher<A> {
     override suspend fun dispatch(action: A) {
         enhance(this, UpdateSource(action, before = state.getAndUpdate { cur -> reduce(UpdateSource(action, cur)) }))
     }

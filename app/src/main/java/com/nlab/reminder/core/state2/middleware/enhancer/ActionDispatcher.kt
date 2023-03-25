@@ -21,6 +21,6 @@ import com.nlab.reminder.core.state2.Action
 /**
  * @author thalys
  */
-interface SuspendActionDispatcher<A : Action> {
+interface ActionDispatcher<A : Action> {
     suspend fun dispatch(action: A)
 }

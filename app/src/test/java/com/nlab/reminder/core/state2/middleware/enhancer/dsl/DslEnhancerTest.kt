@@ -19,7 +19,7 @@ package com.nlab.reminder.core.state2.middleware.enhancer.dsl
 import com.nlab.reminder.core.state2.TestAction
 import com.nlab.reminder.core.state2.TestState
 import com.nlab.reminder.core.state2.UpdateSource
-import com.nlab.reminder.core.state2.middleware.enhancer.SuspendActionDispatcher
+import com.nlab.reminder.core.state2.middleware.enhancer.ActionDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
@@ -34,7 +34,7 @@ class DslEnhancerTest {
     @Test
     fun testDefineDSL() = runTest {
         val dispatchAction = TestAction.genAction()
-        val mockActionDispatcher: SuspendActionDispatcher<TestAction> = mock()
+        val mockActionDispatcher: ActionDispatcher<TestAction> = mock()
         val enhancer = DslEnhancer<TestAction, TestState>(
             defineDSL = {
                 action<TestAction.Action1> {

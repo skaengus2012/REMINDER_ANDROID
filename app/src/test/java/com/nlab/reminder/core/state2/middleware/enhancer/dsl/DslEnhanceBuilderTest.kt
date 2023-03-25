@@ -19,7 +19,7 @@ package com.nlab.reminder.core.state2.middleware.enhancer.dsl
 import com.nlab.reminder.core.state2.TestAction
 import com.nlab.reminder.core.state2.TestState
 import com.nlab.reminder.core.state2.UpdateSource
-import com.nlab.reminder.core.state2.middleware.enhancer.SuspendActionDispatcher
+import com.nlab.reminder.core.state2.middleware.enhancer.ActionDispatcher
 import com.nlab.testkit.once
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -42,7 +42,7 @@ class DslEnhanceBuilderTest {
         verifyMode: VerificationMode,
         buildDSL: (DslEnhanceBuilder<TestAction, TestState>).() -> Unit
     ) {
-        val mockDispatcher: SuspendActionDispatcher<TestAction> = mock()
+        val mockDispatcher: ActionDispatcher<TestAction> = mock()
         val enhancer = DslEnhanceBuilder<TestAction, TestState>()
             .apply(buildDSL)
             .build()

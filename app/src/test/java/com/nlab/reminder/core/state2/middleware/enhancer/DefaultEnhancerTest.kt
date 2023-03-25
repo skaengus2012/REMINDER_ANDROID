@@ -34,7 +34,7 @@ class DefaultEnhancerTest {
     @Test
     fun `Dispatched actionDispatcher when updateSourceHandle invoked`() = runTest {
         val inputSource = UpdateSource(TestAction.genAction(), TestState.genState())
-        val actionDispatcher: SuspendActionDispatcher<TestAction> = mock()
+        val actionDispatcher: ActionDispatcher<TestAction> = mock()
         val handle = DefaultEnhancer<TestAction, TestState> { source -> dispatch(source.action) }
         handle.invoke(actionDispatcher, inputSource)
 
