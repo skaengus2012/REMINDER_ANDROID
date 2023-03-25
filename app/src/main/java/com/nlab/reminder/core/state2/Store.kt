@@ -16,11 +16,13 @@
 
 package com.nlab.reminder.core.state2
 
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.StateFlow
 
 /**
  * @author thalys
  */
-interface Store<A : Action, S : State> : ActionDispatcher<A> {
-    val state: StateFlow<S>
+abstract class Store<A : Action, S : State> internal constructor() {
+    abstract val state: StateFlow<S>
+    abstract fun dispatch(action: A): Job
 }

@@ -17,13 +17,19 @@
 package com.nlab.reminder.core.state2.store
 
 import com.nlab.reminder.core.state2.*
+import com.nlab.reminder.core.state2.middleware.enhancer.SuspendActionDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 
 /**
  * @author thalys
  */
-class DefaultStore<A : Action, S : State>(
-    actionDispatcher: ActionDispatcher<A>,
+internal class DefaultStore<A : Action, S : State>(
+    private val coroutineScope: CoroutineScope,
+    private val suspendActionDispatcher: SuspendActionDispatcher<A>,
     override val state: StateFlow<S>,
-) : Store<A, S>,
-    ActionDispatcher<A> by actionDispatcher
+) : Store<A, S>() {
+    override fun dispatch(action: A): Job = coroutineScope.launch { suspendActionDispatcher.dispatch(action) }
+}

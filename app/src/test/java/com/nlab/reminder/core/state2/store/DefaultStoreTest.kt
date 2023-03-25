@@ -16,12 +16,13 @@
 
 package com.nlab.reminder.core.state2.store
 
-import com.nlab.reminder.core.state2.ActionDispatcher
 import com.nlab.reminder.core.state2.TestAction
 import com.nlab.reminder.core.state2.TestState
+import com.nlab.reminder.core.state2.middleware.enhancer.SuspendActionDispatcher
 import com.nlab.testkit.once
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import org.mockito.kotlin.*
 
@@ -29,21 +30,26 @@ import org.mockito.kotlin.*
 /**
  * @author thalys
  */
+@ExperimentalCoroutinesApi
 class DefaultStoreTest {
     @Test
-    fun `ActionDispatcher dispatch called correctly`() {
-        val actionDispatcher: ActionDispatcher<TestAction> = mock {
-            whenever(mock.dispatch(any())) doReturn Job()
-        }
+    fun `Store should be dispatched with mock dispatcher`() = runTest {
+        val input = TestAction.genAction()
+        val mockActionDispatcher: SuspendActionDispatcher<TestAction> = mock()
+        val store = DefaultStore<TestAction, TestState>(
+            coroutineScope = this,
+            mockActionDispatcher,
+            mock()
+        )
 
-        DefaultStore<TestAction, TestState>(actionDispatcher, mock()).dispatch(TestAction.genAction())
-        verify(actionDispatcher, once()).dispatch(any())
+        store.dispatch(input).join()
+        verify(mockActionDispatcher, once()).dispatch(input)
     }
 
     @Test
     fun `State is initialized correctly`() {
         val expected = MutableStateFlow(TestState.genState())
-        val actual = DefaultStore<TestAction, TestState>(mock(), expected).state
+        val actual = DefaultStore<TestAction, TestState>(mock(), mock(), expected).state
 
         assert(expected === actual)
     }
