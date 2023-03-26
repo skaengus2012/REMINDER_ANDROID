@@ -17,12 +17,10 @@
 package com.nlab.reminder.core.state2.middleware.epic
 
 import com.nlab.reminder.core.state2.Action
-import kotlinx.coroutines.flow.Flow
 
 /**
  * @author thalys
  */
-class EpicSource<out A : Action> internal constructor(
-    internal val stream: Flow<A>,
-    internal val subscriptionStrategy: SubscriptionStrategy
-)
+internal class DefaultEpic<A : Action>(private val epicSources: List<EpicSource<A>>) : Epic<A> {
+    override fun invoke(): List<EpicSource<A>> = epicSources
+}
