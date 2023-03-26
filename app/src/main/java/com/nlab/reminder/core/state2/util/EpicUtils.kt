@@ -14,15 +14,17 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.state2.middleware.epic
+package com.nlab.reminder.core.state2.util
 
 import com.nlab.reminder.core.state2.Action
-import kotlinx.coroutines.flow.Flow
+import com.nlab.reminder.core.state2.middleware.epic.DefaultEpic
+import com.nlab.reminder.core.state2.middleware.epic.Epic
+import com.nlab.reminder.core.state2.middleware.epic.EpicSource
+import com.nlab.reminder.core.state2.middleware.epic.dsl.DslEpic
+import com.nlab.reminder.core.state2.middleware.epic.dsl.DslEpicBuilder
 
 /**
  * @author thalys
  */
-class EpicSource<out A : Action> internal constructor(
-    internal val stream: Flow<A>,
-    internal val subscriptionStrategy: SubscriptionStrategy
-)
+fun <A : Action> buildEpic(vararg epicSources: EpicSource<A>): Epic<A> = DefaultEpic(epicSources.toList())
+fun <A : Action> buildDslEpic(block: DslEpicBuilder<A>.() -> Unit): Epic<A> = DslEpic(block)

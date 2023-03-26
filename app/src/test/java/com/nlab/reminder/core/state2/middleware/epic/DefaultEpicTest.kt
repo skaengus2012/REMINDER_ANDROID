@@ -14,31 +14,29 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.state2.middleware.epic.dsl
+package com.nlab.reminder.core.state2.middleware.epic
 
 import com.nlab.reminder.core.state2.TestAction
-import com.nlab.reminder.core.state2.middleware.epic.*
-import kotlinx.coroutines.flow.Flow
+import com.nlab.testkit.genInt
+import kotlinx.coroutines.flow.flowOf
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
-import org.mockito.kotlin.mock
 
 /**
  * @author thalys
  */
-class DslEpicTest {
+class DefaultEpicTest {
     @Test
-    fun test() {
-        val flow: Flow<TestAction> = mock()
-        val middleware = DslEpic(
-            buildDSL = {
-                whileStateUsed { flow }
-            }
-        )
-        val source: EpicSource<TestAction> = middleware().first()
-
-        assertThat(source.stream, equalTo(flow))
-        assertThat(source.subscriptionStrategy, equalTo(SubscriptionStrategy.WhileStateUsed))
+    fun testInvoke() {
+        val expectedSources: List<EpicSource<TestAction>> = List(genInt("#0")) {
+            EpicSource(
+                flowOf(TestAction.genAction()),
+                SubscriptionStrategy.WhileStateUsed
+            )
+        }
+        val epic = DefaultEpic(expectedSources)
+        val actualSources = epic()
+        assertThat(actualSources, equalTo(expectedSources))
     }
 }
