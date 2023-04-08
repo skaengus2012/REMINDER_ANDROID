@@ -14,11 +14,23 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.state2.middleware.epic
+package com.nlab.reminder.core.state2.store
+
+import com.nlab.reminder.core.state2.Action
+import com.nlab.reminder.core.state2.State
+import com.nlab.reminder.core.state2.middleware.enhancer.ActionDispatcher
+import com.nlab.reminder.core.state2.middleware.epic.EpicSource
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.MutableStateFlow
 
 /**
  * @author thalys
  */
-sealed class SubscriptionStrategy private constructor() {
-    object WhileStateUsed : SubscriptionStrategy()
+internal interface EpicSourceLoader {
+    fun <A : Action, S : State> load(
+        coroutineScope: CoroutineScope,
+        epicSources: List<EpicSource<A>>,
+        actionDispatcher: ActionDispatcher<A>,
+        stateFlow: MutableStateFlow<S>,
+    )
 }
