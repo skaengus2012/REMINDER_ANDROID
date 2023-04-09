@@ -75,6 +75,9 @@ mockito-inline = { module = "org.mockito:mockito-inline", version.ref = "mockito
 mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockitoKotlin" }
 javafaker = { module = "com.github.javafaker:javafaker", version.ref = "javafaker" }
 
+# Dependencies of the included build-logic
+kotlin-gradle-plugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
+android-gradle-plugin = { group = "com.android.tools.build", name = "gradle", version.ref = "androidGradlePlugin" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }

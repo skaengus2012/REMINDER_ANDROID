@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 The N's lab Open Source Project
+ * Copyright (C) 2023 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,23 @@ plugins {
     `kotlin-dsl`
 }
 
-kotlinDslPluginOptions {
-    jvmTarget.set(provider { java.targetCompatibility.toString() })
+group = "com.nlab.reminder.buildlogic"
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
 }
 
-repositories {
-    mavenCentral()
+dependencies {
+    compileOnly(libs.kotlin.gradle.plugin)
+    compileOnly(libs.android.gradle.plugin)
+}
+
+gradlePlugin {
+    plugins {
+        register("androidApplication") {
+            id = "nlab.android.application"
+            implementationClass = "AndroidApplicationConventionPlugin"
+        }
+    }
 }

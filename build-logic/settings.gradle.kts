@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 The N's lab Open Source Project
+ * Copyright (C) 2023 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,15 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-/**
- * @author Doohyun
- */
-object AndroidConfig {
-    const val COMPILE_SDK_VERSION = 33
-    const val BUILD_TOOLS_VERSION = "30.0.3"
-    const val MIN_SDK_VERSION = 23
-    const val TARGET_SDK_VERSION = 33
-    const val VERSION_CODE = 1
-    const val VERSION_NAME = "1.0.0"
+dependencyResolutionManagement {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    versionCatalogs {
+        create("libs") {
+            from(files("../gradle/libs.versions.toml"))
+        }
+    }
 }
+
+rootProject.name = "build-logic"
+include(":convention")

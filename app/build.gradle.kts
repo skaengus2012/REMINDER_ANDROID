@@ -23,12 +23,11 @@ import java.util.Properties
 // https://developer.android.com/studio/build/migrate-to-catalogs?hl=ko#migrate-plugins
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-    alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.google.hilt)
-    alias(libs.plugins.android.application)
-    alias(libs.plugins.android.navigation.safearges)
-    kotlin("kapt")
+    id("nlab.android.application")
     id("kotlin-parcelize")
+    kotlin("kapt")
+    alias(libs.plugins.google.hilt)
+    alias(libs.plugins.android.navigation.safearges)
     jacoco
 }
 
@@ -39,17 +38,10 @@ jacoco {
 android {
     namespace = "com.nlab.reminder"
 
-    compileSdk = AndroidConfig.COMPILE_SDK_VERSION
-    buildToolsVersion = AndroidConfig.BUILD_TOOLS_VERSION
-
     defaultConfig {
         applicationId = namespace
-        multiDexEnabled = true
-        minSdk = AndroidConfig.MIN_SDK_VERSION
-        targetSdk = AndroidConfig.TARGET_SDK_VERSION
-
-        versionCode = AndroidConfig.VERSION_CODE
-        versionName = AndroidConfig.VERSION_NAME
+        versionCode = 1
+        versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -138,31 +130,6 @@ android {
             java.srcDirs("src/release/java")
             res.srcDirs("src/release/res")
         }
-    }
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
-
-    java {
-        // fix warning [https://github.com/skaengus2012/REMINDER_ANDROID/issues/82#issuecomment-1406942682]
-        // see https://kotlinlang.org/docs/gradle-configure-project.html#check-for-jvm-target-compatibility-of-related-compile-tasks
-        toolchain {
-            languageVersion.set(JavaLanguageVersion.of(JavaVersion.VERSION_11.toString()))
-        }
-    }
-
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11.toString()
-        // Exclude opt-in API warnings
-        freeCompilerArgs = listOf("-opt-in=kotlin.RequiresOptIn")
-    }
-
-    packagingOptions {
-        // guide in kotlin coroutine
-        // https://github.com/Kotlin/kotlinx.coroutines#avoiding-including-the-debug-infrastructure-in-the-resulting-apk
-        resources.excludes.add("DebugProbesKt.bin")
     }
 
     buildFeatures {
