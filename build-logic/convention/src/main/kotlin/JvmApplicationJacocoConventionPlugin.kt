@@ -1,3 +1,7 @@
+import com.nlab.reminder.convention.configureJacocoToolVersion
+import org.gradle.api.Plugin
+import org.gradle.api.Project
+
 /*
  * Copyright (C) 2023 The N's lab Open Source Project
  *
@@ -14,12 +18,14 @@
  * limitations under the License.
  */
 
-// Annotations must be added before Gradle 8.1.
-// https://developer.android.com/studio/build/migrate-to-catalogs?hl=ko#migrate-plugins
-@Suppress("DSL_SCOPE_VIOLATION")
-plugins {
-    id("nlab.jvm.application.jacoco")
-    alias(libs.plugins.kotlin.jvm)
+class JvmApplicationJacocoConventionPlugin : Plugin<Project> {
+    override fun apply(target: Project) {
+        with(target) {
+            with(pluginManager) {
+                apply("org.gradle.jacoco")
+                apply("org.jetbrains.kotlin.jvm")
+            }
+            configureJacocoToolVersion()
+        }
+    }
 }
-
-dependencies {  }

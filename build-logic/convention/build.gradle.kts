@@ -36,5 +36,13 @@ gradlePlugin {
             id = "nlab.android.application"
             implementationClass = "AndroidApplicationConventionPlugin"
         }
+        register("androidApplicationJacoco") {
+            id = "nlab.android.application.jacoco"
+            implementationClass = "AndroidApplicationJacocoConventionPlugin"
+        }
+        register("jvmApplicationJacoco") {
+            id = "nlab.jvm.application.jacoco"
+            implementationClass = "JvmApplicationJacocoConventionPlugin"
+        }
     }
 }

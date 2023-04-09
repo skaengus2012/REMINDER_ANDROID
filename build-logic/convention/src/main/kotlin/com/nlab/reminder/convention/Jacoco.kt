@@ -14,12 +14,20 @@
  * limitations under the License.
  */
 
-// Annotations must be added before Gradle 8.1.
-// https://developer.android.com/studio/build/migrate-to-catalogs?hl=ko#migrate-plugins
-@Suppress("DSL_SCOPE_VIOLATION")
-plugins {
-    id("nlab.jvm.application.jacoco")
-    alias(libs.plugins.kotlin.jvm)
-}
+package com.nlab.reminder.convention
 
-dependencies {  }
+import org.gradle.api.Project
+import org.gradle.api.artifacts.VersionCatalogsExtension
+import org.gradle.kotlin.dsl.configure
+import org.gradle.kotlin.dsl.getByType
+import org.gradle.testing.jacoco.plugins.JacocoPluginExtension
+
+/**
+ * @author Doohyun
+ */
+internal fun Project.configureJacocoToolVersion() {
+    val libs = extensions.getByType<VersionCatalogsExtension>().named("libs")
+    configure<JacocoPluginExtension> {
+        toolVersion = libs.findVersion("jacoco").get().toString()
+    }
+}
