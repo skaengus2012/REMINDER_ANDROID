@@ -14,19 +14,16 @@
  * limitations under the License.
  */
 
+// Annotations must be added before Gradle 8.1.
+// https://developer.android.com/studio/build/migrate-to-catalogs?hl=ko#migrate-plugins
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-    id("kotlin")
-}
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
+    alias(libs.plugins.kotlin.jvm)
 }
 
 dependencies {
-    implementation(project(Dependencies.NLAB_STATE_CORE))
+    implementation(project(":state:core"))
 
-    implementation(Dependencies.KOTLIN)
-    implementation(Dependencies.SQUARE_KOTLINPOT)
-    implementation(Dependencies.SQUARE_KOTLINPOT_METADATA)
+    implementation(libs.squeare.kotlinpoet)
+    implementation(libs.squeare.kotlinpoet.metadata)
 }

@@ -14,13 +14,16 @@
  * limitations under the License.
  */
 
+// Annotations must be added before Gradle 8.1.
+// https://developer.android.com/studio/build/migrate-to-catalogs?hl=ko#migrate-plugins
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-    id("kotlin")
+    alias(libs.plugins.kotlin.jvm)
 }
 
 dependencies {
-    implementation(Dependencies.TEST_JUNIT)
-    implementation(Dependencies.TEST_JAVAFAKER)
-    implementation(Dependencies.TEST_MOCKITO)
-    implementation(Dependencies.TEST_MOCKITO_KOTLIN)
+    implementation(libs.junit)
+    implementation(libs.javafaker)
+    implementation(libs.mockito.inline)
+    implementation(libs.mockito.kotlin)
 }

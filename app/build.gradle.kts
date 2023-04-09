@@ -1,9 +1,3 @@
-import org.gradle.configurationcache.extensions.capitalized
-import com.android.build.api.dsl.VariantDimension
-import com.android.tools.build.jetifier.core.pom.DependencyVersions
-import java.io.FileInputStream
-import java.util.Properties
-
 /*
  * Copyright (C) 2022 The N"s lab Open Source Project
  *
@@ -20,18 +14,26 @@ import java.util.Properties
  * limitations under the License.
  */
 
+import org.gradle.configurationcache.extensions.capitalized
+import com.android.build.api.dsl.VariantDimension
+import java.io.FileInputStream
+import java.util.Properties
+
+// Annotations must be added before Gradle 8.1.
+// https://developer.android.com/studio/build/migrate-to-catalogs?hl=ko#migrate-plugins
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-    kotlin("android")
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.google.hilt)
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.android.navigation.safearges)
     kotlin("kapt")
-    id("com.android.application")
-    id("androidx.navigation.safeargs.kotlin")
-    id("dagger.hilt.android.plugin")
     id("kotlin-parcelize")
     jacoco
 }
 
 jacoco {
-    toolVersion = DependenciesVersions.JACOCO
+    toolVersion = libs.versions.jacoco.get()
 }
 
 android {
@@ -139,20 +141,20 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = DependenciesVersions.JAVA_VERSION
-        targetCompatibility = DependenciesVersions.JAVA_VERSION
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
 
     java {
         // fix warning [https://github.com/skaengus2012/REMINDER_ANDROID/issues/82#issuecomment-1406942682]
         // see https://kotlinlang.org/docs/gradle-configure-project.html#check-for-jvm-target-compatibility-of-related-compile-tasks
         toolchain {
-            languageVersion.set(JavaLanguageVersion.of(DependenciesVersions.JAVA_VERSION.toString()))
+            languageVersion.set(JavaLanguageVersion.of(JavaVersion.VERSION_11.toString()))
         }
     }
 
     kotlinOptions {
-        jvmTarget = DependenciesVersions.JAVA_VERSION.toString()
+        jvmTarget = JavaVersion.VERSION_11.toString()
         // Exclude opt-in API warnings
         freeCompilerArgs = listOf("-opt-in=kotlin.RequiresOptIn")
     }
@@ -169,59 +171,58 @@ android {
 }
 
 dependencies {
-    implementation(project(Dependencies.NLAB_STATE_CORE))
-    kapt(project(Dependencies.NLAB_STATE_CORE_COMPILER))
+    implementation(project(":state:core"))
+    kapt(project(":state:compiler"))
 
-    implementation(Dependencies.KOTLIN)
-    implementation(Dependencies.KOTLIN_COROUTINE)
-    implementation(Dependencies.KOTLIN_COROUTINE_ANDROID)
+    implementation(libs.kotlin.coroutines.android)
 
-    implementation(Dependencies.ANDROID_KTX)
-    implementation(Dependencies.ANDROID_APPCOMPAT)
-    implementation(Dependencies.ANDROID_MATERIAL)
-    implementation(Dependencies.ANDROID_CONSTRAINTLAYOUT)
-    implementation(Dependencies.ANDROID_RECYCLERVIEW)
-    implementation(Dependencies.ANDROID_LIFECYCLE_VIEWMODEL_KTX)
-    implementation(Dependencies.ANDROID_LIFECYCLE_RUNTIME_KTX)
-    implementation(Dependencies.ANDROID_FRAGMENT)
-    implementation(Dependencies.ANDROID_NAVIGATION_FRAGMENT)
-    implementation(Dependencies.ANDROID_NAVIGATION_UI)
-    implementation(Dependencies.ANDROID_ROOM_RUNTIME)
-    implementation(Dependencies.ANDROID_ROOM_KTX)
-    kapt(Dependencies.ANDROID_ROOM_COMPILER)
-    implementation(Dependencies.ANDROID_STARTUP_RUNTIME)
-    implementation(Dependencies.ANDROID_DATASTORE_PREFERENCES)
-    implementation(Dependencies.AFOLLESTED_DRAG_SELECTION_RECYCLERVIEW)
+    implementation(libs.android.core.ktx)
+    implementation(libs.android.appcompat)
+    implementation(libs.android.constaintlayout)
+    implementation(libs.android.recyclerview)
+    implementation(libs.android.lifecycle.viewmodel.ktx)
+    implementation(libs.android.lifecycle.runtime.ktx)
+    implementation(libs.android.fragment.ktx)
+    implementation(libs.android.navigation.fragment.ktx)
+    implementation(libs.android.navigation.ui.ktx)
+    implementation(libs.android.room.runtime)
+    implementation(libs.android.room.ktx)
+    kapt(libs.android.room.compiler)
+    implementation(libs.android.startup.runtime)
+    implementation(libs.android.datastore.preferences)
 
-    implementation(Dependencies.GOOGLE_HILT_ANDROID)
-    kapt(Dependencies.GOOGLE_HILT_ANDROID_COMPILER)
-    implementation(Dependencies.GOGGLE_FLEXBOX)
+    implementation(libs.google.android.material)
+    implementation(libs.google.flexbox)
+    implementation(libs.google.hilt.android)
+    kapt(libs.google.hilt.android.compiler)
 
-    implementation(Dependencies.GLIDE)
-    kapt(Dependencies.GLIDE_COMPILER)
+    implementation(libs.timber)
 
-    implementation(Dependencies.TIMBER)
+    implementation(libs.glide)
+    kapt(libs.glide.compiler)
 
-    implementation(Dependencies.JSOUP)
+    implementation(libs.jsoup)
 
-    debugImplementation(Dependencies.FACEBOOK_FLIPPER)
-    debugImplementation(Dependencies.FACEBOOK_FLIPPER_LEAKCANARY)
-    debugImplementation(Dependencies.FACEBOOK_SOLOADER)
+    implementation(libs.afollested.dragselectRecyclerView)
 
-    debugImplementation(Dependencies.SQUARE_LEAKCANARY)
+    debugImplementation(libs.facebook.flipper)
+    debugImplementation(libs.facebook.flipper.leakcanary)
+    debugImplementation(libs.facebook.soloader)
 
-    testImplementation(project(Dependencies.NLAB_TEST_KIT))
-    testImplementation(Dependencies.TEST_JUNIT)
-    testImplementation(Dependencies.TEST_COROUTINES)
-    testImplementation(Dependencies.TEST_MOCKITO)
-    testImplementation(Dependencies.TEST_MOCKITO_KOTLIN)
-    testImplementation(Dependencies.TEST_JAVAFAKER)
-    androidTestImplementation(Dependencies.TEST_COROUTINES)
-    androidTestImplementation(Dependencies.TEST_JAVAFAKER)
-    androidTestImplementation(Dependencies.TEST_ANDROID_JUNIT_EXT)
-    androidTestImplementation(Dependencies.TEST_ANDROID_JUNIT_ESPRESSO)
-    androidTestImplementation(Dependencies.TEST_ANDROID_TEST_RUNNER)
-    androidTestImplementation(Dependencies.TEST_ANDROID_TEST_RULES)
+    debugImplementation(libs.squeare.leakcanary)
+
+    testImplementation(project(":testkit"))
+    testImplementation(libs.junit)
+    testImplementation(libs.kotlin.coroutines.test)
+    testImplementation(libs.mockito.inline)
+    testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.javafaker)
+    androidTestImplementation(libs.kotlin.coroutines.test)
+    androidTestImplementation(libs.javafaker)
+    androidTestImplementation(libs.android.test.junit)
+    androidTestImplementation(libs.android.test.espresso.core)
+    androidTestImplementation(libs.android.test.runner)
+    androidTestImplementation(libs.android.test.rules)
 }
 
 kapt {
