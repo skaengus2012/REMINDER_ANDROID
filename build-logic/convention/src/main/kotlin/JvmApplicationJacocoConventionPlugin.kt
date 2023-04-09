@@ -1,6 +1,10 @@
 import com.nlab.reminder.convention.configureJacocoToolVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.tasks.testing.Test
+import org.gradle.kotlin.dsl.invoke
+import org.gradle.kotlin.dsl.named
+import org.gradle.testing.jacoco.tasks.JacocoReport
 
 /*
  * Copyright (C) 2023 The N's lab Open Source Project
@@ -26,6 +30,20 @@ class JvmApplicationJacocoConventionPlugin : Plugin<Project> {
                 apply("org.jetbrains.kotlin.jvm")
             }
             configureJacocoToolVersion()
+
+            val test = tasks.named<Test>("test")
+            val jacocoTestReport = tasks.named<JacocoReport>("jacocoTestReport")
+
+            test { finalizedBy(jacocoTestReport) }
+
+            jacocoTestReport {
+                dependsOn(test)
+                reports {
+                    html.required.set(true)
+                    xml.required.set(true)
+                    csv.required.set(false)
+                }
+            }
         }
     }
 }

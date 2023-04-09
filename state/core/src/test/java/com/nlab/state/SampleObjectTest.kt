@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-// Annotations must be added before Gradle 8.1.
-// https://developer.android.com/studio/build/migrate-to-catalogs?hl=ko#migrate-plugins
-@Suppress("DSL_SCOPE_VIOLATION")
-plugins {
-    id("nlab.jvm.application.jacoco")
-    alias(libs.plugins.kotlin.jvm)
-}
+package com.nlab.state
 
-dependencies {
-    implementation(libs.junit)
+import org.junit.Test
+
+class SampleObjectTest {
+    @Test
+    fun hello() {
+        assert(true)
+    }
 }
