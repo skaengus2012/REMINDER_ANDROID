@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-// FIXME Annotations must be added before Gradle 8.1.
-// FIXME https://developer.android.com/studio/build/migrate-to-catalogs?hl=ko#migrate-plugins
-@Suppress("DSL_SCOPE_VIOLATION")
-plugins {
-    id("nlab.jvm.application.jacoco")
-    alias(libs.plugins.kotlin.jvm)
-}
+package com.nlab.reminder.convention
 
-dependencies {
-    implementation(libs.junit)
+import org.gradle.api.Project
+import org.gradle.api.plugins.ExtensionAware
+import org.gradle.api.plugins.JavaPluginExtension
+
+internal fun Project.java(block: JavaPluginExtension.() -> Unit) {
+    (this as ExtensionAware).extensions.configure("java", block)
 }

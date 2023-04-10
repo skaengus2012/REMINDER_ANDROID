@@ -40,6 +40,10 @@ gradlePlugin {
             id = "nlab.android.application.jacoco"
             implementationClass = "AndroidApplicationJacocoConventionPlugin"
         }
+        register("coverageAggregation") {
+            id = "nlab.coverage.aggregation"
+            implementationClass = "CoverageAggregationPlugin"
+        }
         register("jvmApplicationJacoco") {
             id = "nlab.jvm.application.jacoco"
             implementationClass = "JvmApplicationJacocoConventionPlugin"

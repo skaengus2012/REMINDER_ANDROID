@@ -19,8 +19,8 @@ import com.android.build.api.dsl.VariantDimension
 import java.io.FileInputStream
 import java.util.Properties
 
-// Annotations must be added before Gradle 8.1.
-// https://developer.android.com/studio/build/migrate-to-catalogs?hl=ko#migrate-plugins
+// FIXME Annotations must be added before Gradle 8.1.
+// FIXME https://developer.android.com/studio/build/migrate-to-catalogs?hl=ko#migrate-plugins
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     id("nlab.android.application")
@@ -56,13 +56,13 @@ android {
     }
 
     buildTypes {
-        getByName("debug") {
+        debug {
             isDebuggable = true
             isMinifyEnabled = false
             applicationIdSuffix = ".debug"
         }
 
-        getByName("release") {
+        release {
             isDebuggable = false
             isMinifyEnabled = true
             signingConfig = signingConfigs.getByName("debug") // TODO make release key..

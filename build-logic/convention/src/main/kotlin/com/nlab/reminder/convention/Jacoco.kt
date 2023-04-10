@@ -16,9 +16,13 @@
 
 package com.nlab.reminder.convention
 
+import com.android.build.api.dsl.BuildType
+import com.android.build.api.dsl.ProductFlavor
 import org.gradle.api.Project
 import org.gradle.api.artifacts.VersionCatalogsExtension
+import org.gradle.api.provider.Property
 import org.gradle.kotlin.dsl.configure
+import org.gradle.kotlin.dsl.getByName
 import org.gradle.kotlin.dsl.getByType
 import org.gradle.testing.jacoco.plugins.JacocoPluginExtension
 
@@ -31,3 +35,9 @@ internal fun Project.configureJacocoToolVersion() {
         toolVersion = libs.findVersion("jacoco").get().toString()
     }
 }
+
+val BuildType.aggregateTestCoverage: Property<Boolean>
+    get() = extensions.getByName<Property<Boolean>>(::aggregateTestCoverage.name)
+
+val ProductFlavor.aggregateTestCoverage: Property<Boolean>
+    get() = extensions.getByName<Property<Boolean>>(::aggregateTestCoverage.name)

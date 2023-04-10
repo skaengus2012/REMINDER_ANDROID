@@ -1,11 +1,3 @@
-import com.nlab.reminder.convention.configureJacocoToolVersion
-import org.gradle.api.Plugin
-import org.gradle.api.Project
-import org.gradle.api.tasks.testing.Test
-import org.gradle.kotlin.dsl.invoke
-import org.gradle.kotlin.dsl.named
-import org.gradle.testing.jacoco.tasks.JacocoReport
-
 /*
  * Copyright (C) 2023 The N's lab Open Source Project
  *
@@ -21,7 +13,18 @@ import org.gradle.testing.jacoco.tasks.JacocoReport
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import com.nlab.reminder.convention.configureJacocoToolVersion
+import org.gradle.api.Plugin
+import org.gradle.api.Project
+import org.gradle.api.plugins.JavaPlugin
+import org.gradle.api.tasks.testing.Test
+import org.gradle.kotlin.dsl.invoke
+import org.gradle.kotlin.dsl.named
+import org.gradle.testing.jacoco.tasks.JacocoReport
 
+/**
+ * @author Doohyun
+ */
 class JvmApplicationJacocoConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
@@ -31,7 +34,7 @@ class JvmApplicationJacocoConventionPlugin : Plugin<Project> {
             }
             configureJacocoToolVersion()
 
-            val test = tasks.named<Test>("test")
+            val test = tasks.named<Test>(JavaPlugin.TEST_TASK_NAME)
             val jacocoTestReport = tasks.named<JacocoReport>("jacocoTestReport")
 
             test { finalizedBy(jacocoTestReport) }

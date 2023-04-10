@@ -20,8 +20,8 @@ buildscript {
     }
 }
 
-// Annotations must be added before Gradle 8.1.
-// https://developer.android.com/studio/build/migrate-to-catalogs?hl=ko#migrate-plugins
+// FIXME Annotations must be added before Gradle 8.1.
+// FIXME https://developer.android.com/studio/build/migrate-to-catalogs?hl=ko#migrate-plugins
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     alias(libs.plugins.kotlin.jvm) apply false
@@ -29,8 +29,10 @@ plugins {
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.android.navigation.safearges) apply false
     alias(libs.plugins.google.hilt) apply false
+    id("nlab.coverage.aggregation")
 }
 
-tasks.register("clean", Delete::class){
-    delete(rootProject.buildDir)
+// FIXME It's required some blocks below plugin blocks.
+// FIXME https://github.com/gradle/gradle/issues/20131
+dependencies {
 }
