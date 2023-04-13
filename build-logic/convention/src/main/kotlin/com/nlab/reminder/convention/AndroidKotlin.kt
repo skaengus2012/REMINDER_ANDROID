@@ -25,16 +25,10 @@ import org.gradle.kotlin.dsl.provideDelegate
 /**
  * @author Doohyun
  */
-internal fun Project.configureKotlinAndroid(
+internal fun Project.configureAndroidKotlin(
     commonExtension: CommonExtension<*, *, *, *>,
 ) {
     commonExtension.apply {
-        compileSdk = 33
-
-        defaultConfig {
-            minSdk = 23
-        }
-
         compileOptions {
             sourceCompatibility = JavaVersion.VERSION_11
             targetCompatibility = JavaVersion.VERSION_11
