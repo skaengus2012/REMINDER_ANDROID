@@ -14,25 +14,22 @@
  * limitations under the License.
  */
 
-import com.android.build.api.variant.ApplicationAndroidComponentsExtension
+import com.android.build.api.variant.LibraryAndroidComponentsExtension
 import com.nlab.reminder.convention.configureAndroidJacoco
 import com.nlab.reminder.convention.configureJacocoToolVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.getByType
 
-/**
- * @author Doohyun
- */
-class AndroidApplicationJacocoConventionPlugin : Plugin<Project> {
+class AndroidLibraryJacocoConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             with(pluginManager) {
                 apply("org.gradle.jacoco")
-                apply("com.android.application")
+                apply("com.android.library")
             }
             configureJacocoToolVersion()
-            configureAndroidJacoco(extensions.getByType<ApplicationAndroidComponentsExtension>())
+            configureAndroidJacoco(extensions.getByType<LibraryAndroidComponentsExtension>())
         }
     }
 }
