@@ -54,15 +54,19 @@ class CoverageAggregationPlugin : Plugin<Project> {
             apply("test-report-aggregation")
         }
 
-        val aggregatedVariantAttribute: Attribute<Boolean> =
+        val androidAggregatedVariantAttribute: Attribute<Boolean> =
             Attribute.of("com.android.variants.aggregated", Boolean::class.javaObjectType)
         val jacocoAggregation = configurations.getByName("jacocoAggregation")
         val testReportAggregation = configurations.getByName("testReportAggregation")
 
         allprojects {
             plugins.withId("jacoco") {
-                val childDependency = (dependencies.create(project) as ModuleDependency).attributes {
-                    attribute(aggregatedVariantAttribute, true)
+                val childDependency = (dependencies.create(project) as ModuleDependency)
+                val hasAndroidPlugins: Boolean = plugins.findPlugin("com.android.base") != null
+                if (hasAndroidPlugins) {
+                    childDependency.attributes {
+                        attribute(androidAggregatedVariantAttribute, true)
+                    }
                 }
 
                 jacocoAggregation.dependencies.add(childDependency)
@@ -152,7 +156,7 @@ class CoverageAggregationPlugin : Plugin<Project> {
                     isCanBeResolved = false
                     isVisible = false
                     attributes {
-                        attribute(aggregatedVariantAttribute, true)
+                        attribute(androidAggregatedVariantAttribute, true)
                         attribute(Category.CATEGORY_ATTRIBUTE, objects.named(Category.LIBRARY))
                         attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage.JAVA_RUNTIME))
                         attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, objects.named(LibraryElements.CLASSES))
