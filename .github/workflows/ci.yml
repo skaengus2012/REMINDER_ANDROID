@@ -1,4 +1,4 @@
-name: Test CI
+name: Build check
 
 on:
   push:
@@ -8,6 +8,7 @@ on:
 
 jobs:
   test:
+    name: Build check
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -82,4 +83,3 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_CI_URL }}
         if: always()
-
