@@ -19,6 +19,7 @@ package com.nlab.reminder.convention
 import com.android.build.api.variant.AndroidComponentsExtension
 import com.android.build.api.variant.Variant
 import org.gradle.api.Project
+import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.ConfigurableFileTree
 import org.gradle.api.tasks.testing.Test
 import org.gradle.configurationcache.extensions.capitalized
@@ -44,7 +45,7 @@ internal fun Project.configureAndroidJacoco(extension: AndroidComponentsExtensio
             }
 
             classDirectories.setFrom(getJacocoTestClassDirectories(variant))
-            sourceDirectories.setFrom(files("$projectDir/src/main/java", "$projectDir/src/main/kotlin"))
+            sourceDirectories.setFrom(getJacocoTestSourcesDirectories(variant))
             executionData.setFrom(file("$buildDir/jacoco/$unitTestTaskName.exec"))
         }
 
@@ -61,6 +62,14 @@ internal fun Project.configureAndroidJacoco(extension: AndroidComponentsExtensio
         }
     }
 }
+
+internal fun Project.getJacocoTestSourcesDirectories(variant: Variant): ConfigurableFileCollection =
+    files(
+        "$projectDir/src/main/java",
+        "$projectDir/src/main/kotlin",
+        "$projectDir/src/${variant.name}/java",
+        "$projectDir/src/${variant.name}/kotlin"
+    )
 
 internal fun Project.getJacocoTestClassDirectories(variant: Variant): ConfigurableFileTree =
     fileTree("$buildDir/tmp/kotlin-classes/${variant.name}") {
