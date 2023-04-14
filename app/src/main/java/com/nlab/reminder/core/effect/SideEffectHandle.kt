@@ -19,7 +19,7 @@ package com.nlab.reminder.core.effect
 /**
  * @author Doohyun
  */
-// FIXME cannot make mock after AGP 8.0 & Kotlin 1.8.20
+// FIXME sealed class cannot used for mocking after AGP 8.0
 interface SideEffectHandle<T : SideEffect> {
     suspend fun post(sideEffect: T)
 }

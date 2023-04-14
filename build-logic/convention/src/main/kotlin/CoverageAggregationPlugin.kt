@@ -39,8 +39,12 @@ import java.io.File
 /**
  * Jacoco aggregation plugin.
  *
+ * jacoco-report-aggregation was not support AGP yet.
+ * So, custom script will be used until AGP support.
+ *
  * @author Doohyun
  * @see [reference](https://medium.com/@gmazzo65/generating-android-jvm-aggregated-coverage-reports-53e912b2e63c)
+ * @see [agp_guide](https://docs.gradle.org/current/userguide/jacoco_report_aggregation_plugin.html)
  */
 class CoverageAggregationPlugin : Plugin<Project> {
     override fun apply(target: Project): Unit = with(target) {
