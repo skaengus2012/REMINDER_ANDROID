@@ -17,11 +17,10 @@
 import com.android.build.api.variant.AndroidComponentsExtension
 import com.android.build.api.variant.Variant
 import com.android.build.gradle.*
-import com.android.build.gradle.api.BaseVariant
 import com.nlab.reminder.convention.aggregateTestCoverage
 import com.nlab.reminder.convention.getJacocoTestClassDirectories
+import com.nlab.reminder.convention.getJacocoTestSourcesDirectories
 import com.nlab.reminder.convention.unitTestTaskName
-import org.gradle.api.DomainObjectSet
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.ModuleDependency
@@ -134,13 +133,8 @@ class CoverageAggregationPlugin : Plugin<Project> {
                         )
                     }
                     jacocoVariants.all variant@{
-                        val variant = android.variants.single { it.name == this@variant.name }
                         val sources = objects.setProperty(File::class)
-
-                        sources.addAll(variant.sourceSets.asSequence()
-                            .flatMap { it.javaDirectories + it.kotlinDirectories }
-                            .asIterable())
-
+                        sources.addAll(getJacocoTestSourcesDirectories(this@variant))
                         outgoing.artifacts(sources) {
                             type = ArtifactTypeDefinition.DIRECTORY_TYPE
                         }
@@ -166,13 +160,6 @@ class CoverageAggregationPlugin : Plugin<Project> {
                         attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, objects.named(LibraryElements.CLASSES))
                     }
                     jacocoVariants.all variant@{
-                        val variant = android.variants.single { it.name == this@variant.name }
-                        val sources = objects.setProperty(File::class)
-
-                        sources.addAll(variant.sourceSets.asSequence()
-                            .flatMap { it.javaDirectories + it.kotlinDirectories }
-                            .asIterable())
-
                         outgoing.artifact(allVariantsClassesForCoverageReport) {
                             type = ArtifactTypeDefinition.JVM_CLASS_DIRECTORY
                         }
@@ -193,11 +180,3 @@ class CoverageAggregationPlugin : Plugin<Project> {
         }
     }
 }
-
-val BaseExtension.variants: DomainObjectSet<out BaseVariant>
-    get() = when (this) {
-        is AppExtension -> applicationVariants
-        is LibraryExtension -> libraryVariants
-        is TestExtension -> applicationVariants
-        else -> error("unsupported module type: $this")
-    }
