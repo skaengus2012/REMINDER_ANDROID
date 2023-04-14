@@ -54,13 +54,11 @@ class CoverageAggregationPlugin : Plugin<Project> {
         with(pluginManager) {
             apply("base")
             apply("jacoco-report-aggregation")
-            apply("test-report-aggregation")
         }
 
         val androidAggregatedVariantAttribute: Attribute<Boolean> =
             Attribute.of("com.android.variants.aggregated", Boolean::class.javaObjectType)
         val jacocoAggregation = configurations.getByName("jacocoAggregation")
-        val testReportAggregation = configurations.getByName("testReportAggregation")
 
         allprojects {
             plugins.withId("jacoco") {
@@ -73,7 +71,6 @@ class CoverageAggregationPlugin : Plugin<Project> {
                 }
 
                 jacocoAggregation.dependencies.add(childDependency)
-                testReportAggregation.dependencies.add(childDependency)
             }
 
             plugins.withId("com.android.base") {
