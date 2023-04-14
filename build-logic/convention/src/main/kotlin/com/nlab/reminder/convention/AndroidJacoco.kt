@@ -17,7 +17,9 @@
 package com.nlab.reminder.convention
 
 import com.android.build.api.variant.AndroidComponentsExtension
+import com.android.build.api.variant.Variant
 import org.gradle.api.Project
+import org.gradle.api.file.ConfigurableFileTree
 import org.gradle.api.tasks.testing.Test
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.register
@@ -42,14 +44,7 @@ internal fun Project.configureAndroidJacoco(extension: AndroidComponentsExtensio
                 html.required.set(true)
             }
 
-            classDirectories.setFrom(
-                fileTree("$buildDir/tmp/kotlin-classes/${variant.name}") {
-                    exclude(
-                        emptyList()
-                    )
-                }
-            )
-
+            classDirectories.setFrom(getJacocoTestClassDirectories(variant))
             sourceDirectories.setFrom(files("$projectDir/src/main/java", "$projectDir/src/main/kotlin"))
             executionData.setFrom(file("$buildDir/jacoco/$testTaskName.exec"))
         }
@@ -67,3 +62,22 @@ internal fun Project.configureAndroidJacoco(extension: AndroidComponentsExtensio
         }
     }
 }
+
+internal fun Project.getJacocoTestClassDirectories(variant: Variant): ConfigurableFileTree =
+    fileTree("$buildDir/tmp/kotlin-classes/${variant.name}") {
+        exclude(setOf(
+            "**/R.class",
+            "**/R$*.class",
+            "**/BuildConfig.*",
+            "**/Manifest*.*",
+            "**/android/**",
+            "**/kotlin/**",
+            "**/view/**",
+            "**/test/**",
+            "**/infra/**",
+            "**/di/**",
+            "**/*_PublicEventsKt.class",    /* filtering PublicEvent generated classes */
+            "**/*Args*.*",                  /* filtering Navigation Component generated classes */
+            "**/*Directions*.*"             /* filtering Navigation Component generated classes */
+        ))
+    }

@@ -19,6 +19,7 @@ import com.android.build.api.variant.Variant
 import com.android.build.gradle.*
 import com.android.build.gradle.api.BaseVariant
 import com.nlab.reminder.convention.aggregateTestCoverage
+import com.nlab.reminder.convention.getJacocoTestClassDirectories
 import org.gradle.api.DomainObjectSet
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -34,6 +35,7 @@ import org.gradle.kotlin.dsl.*
 import org.gradle.testing.jacoco.plugins.JacocoCoverageReport
 import org.gradle.testing.jacoco.plugins.JacocoTaskExtension
 import java.io.File
+import java.util.Locale
 
 /**
  * Jacoco aggregation plugin.
@@ -141,8 +143,9 @@ class CoverageAggregationPlugin : Plugin<Project> {
 
                 val allVariantsClassesForCoverageReport by tasks.registering(Sync::class) {
                     jacocoVariants.all variant@{
-                        // TODO implement.
-                    //    from(this@variant.artifacts.getAll(MultipleArtifact.ALL_CLASSES_DIRS))
+                        val testTaskName = "test${this@variant.name.capitalize(Locale.getDefault())}UnitTest"
+                        dependsOn(testTaskName)
+                        from(getJacocoTestClassDirectories(this@variant))
                     }
                     into(provider { temporaryDir })
                     duplicatesStrategy = DuplicatesStrategy.WARN // in case of duplicated classes

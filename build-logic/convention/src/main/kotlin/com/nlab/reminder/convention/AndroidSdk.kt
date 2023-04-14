@@ -18,6 +18,9 @@ package com.nlab.reminder.convention
 
 import com.android.build.api.dsl.CommonExtension
 
+/**
+ * @author Doohyun
+ */
 internal inline fun configureAndroidSdk(extension: CommonExtension<*, *, *, *>, targetSdk: (version: Int) -> Unit) {
     targetSdk(33)
     extension.apply {
