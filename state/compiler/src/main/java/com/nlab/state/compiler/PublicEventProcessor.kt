@@ -34,7 +34,7 @@ import javax.tools.Diagnostic
  * @author thalys
  */
 @SupportedAnnotationTypes("com.nlab.state.core.lifecycle.PublicEvent")
-@SupportedSourceVersion(SourceVersion.RELEASE_11)
+@SupportedSourceVersion(SourceVersion.RELEASE_17)
 @SupportedOptions(PublicEventProcessor.KAPT_KOTLIN_GENERATED_OPTION_NAME)
 @OptIn(KotlinPoetMetadataPreview::class)
 class PublicEventProcessor : AbstractProcessor() {
@@ -89,7 +89,7 @@ class PublicEventProcessor : AbstractProcessor() {
     private fun parseDestinationClazzString(element: Element): String {
         val typeElement = element as TypeElement
         return typeElement.annotationMirrors
-            .first()
+            .first()  // Annotation information was introduced in version 1.8.20 and appears last.
             .elementValues.entries
             .first()
             .value

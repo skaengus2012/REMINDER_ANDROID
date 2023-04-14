@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import com.android.build.api.dsl.ApplicationExtension
+import com.android.build.gradle.LibraryExtension
 import com.nlab.reminder.convention.configureAndroidKotlin
 import com.nlab.reminder.convention.configureAndroidSdk
 import org.gradle.api.Plugin
@@ -24,21 +24,17 @@ import org.gradle.kotlin.dsl.configure
 /**
  * @author Doohyun
  */
-class AndroidApplicationConventionPlugin : Plugin<Project> {
+class AndroidLibraryConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             with(pluginManager) {
-                apply("com.android.application")
+                apply("com.android.library")
                 apply("org.jetbrains.kotlin.android")
             }
 
-            extensions.configure<ApplicationExtension> {
+            extensions.configure<LibraryExtension> {
                 configureAndroidKotlin(this)
-                configureAndroidSdk(this) { version ->
-                    defaultConfig {
-                        targetSdk = version
-                    }
-                }
+                configureAndroidSdk(this) { version -> defaultConfig.targetSdk = version }
             }
         }
     }

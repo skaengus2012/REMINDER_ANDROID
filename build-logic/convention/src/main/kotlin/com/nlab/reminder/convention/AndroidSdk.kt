@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 The N's lab Open Source Project
+ * Copyright (C) 2023 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,20 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.state
+package com.nlab.reminder.convention
 
-import kotlinx.coroutines.Job
+import com.android.build.api.dsl.CommonExtension
 
 /**
  * @author Doohyun
  */
-// FIXME sealed class cannot used for mocking after AGP 8.0
-interface EventProcessor<E : Event> {
-    fun send(event: E): Job
+internal inline fun configureAndroidSdk(extension: CommonExtension<*, *, *, *>, targetSdk: (version: Int) -> Unit) {
+    targetSdk(33)
+    extension.apply {
+        compileSdk = 33
+
+        defaultConfig {
+            minSdk = 23
+        }
+    }
 }

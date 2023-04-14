@@ -19,6 +19,7 @@ package com.nlab.reminder.core.effect
 /**
  * @author Doohyun
  */
-sealed interface SideEffectHandle<T : SideEffect> {
+// FIXME sealed class cannot used for mocking after AGP 8.0
+interface SideEffectHandle<T : SideEffect> {
     suspend fun post(sideEffect: T)
 }

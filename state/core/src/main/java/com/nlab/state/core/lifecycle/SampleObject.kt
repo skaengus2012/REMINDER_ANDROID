@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 The N's lab Open Source Project
+ * Copyright (C) 2023 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,8 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.state
+package com.nlab.state.core.lifecycle
 
-import kotlinx.coroutines.Job
-
-/**
- * @author Doohyun
- */
-// FIXME sealed class cannot used for mocking after AGP 8.0
-interface EventProcessor<E : Event> {
-    fun send(event: E): Job
+class SampleObject {
+    fun sum(a: Int, b: Int): Int = a + b
 }

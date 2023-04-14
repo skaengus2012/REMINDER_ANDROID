@@ -14,25 +14,16 @@
  * limitations under the License.
  */
 
-import org.gradle.configurationcache.extensions.capitalized
-import com.android.build.api.dsl.VariantDimension
-import java.io.FileInputStream
-import java.util.Properties
-
-// Annotations must be added before Gradle 8.1.
-// https://developer.android.com/studio/build/migrate-to-catalogs?hl=ko#migrate-plugins
+// FIXME Annotations must be added before Gradle 8.1.
+// FIXME https://developer.android.com/studio/build/migrate-to-catalogs?hl=ko#migrate-plugins
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     id("nlab.android.application")
+    id("nlab.android.application.jacoco")
     id("kotlin-parcelize")
     kotlin("kapt")
     alias(libs.plugins.google.hilt)
     alias(libs.plugins.android.navigation.safearges)
-    jacoco
-}
-
-jacoco {
-    toolVersion = libs.versions.jacoco.get()
 }
 
 android {
@@ -45,11 +36,6 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        setBuildConfigFromFile(
-            defaultConfig,
-            makePropertiesFromFiles(fileName = "${projectDir.path}${File.separator}config-default.properties")
-        )
-
         kapt {
             arguments {
                 arg("dagger.fastInit", "enabled")
@@ -60,13 +46,13 @@ android {
     }
 
     buildTypes {
-        getByName("debug") {
+        debug {
             isDebuggable = true
             isMinifyEnabled = false
             applicationIdSuffix = ".debug"
         }
 
-        getByName("release") {
+        release {
             isDebuggable = false
             isMinifyEnabled = true
             signingConfig = signingConfigs.getByName("debug") // TODO make release key..
@@ -77,51 +63,6 @@ android {
         if (buildType.isMinifyEnabled) {
             buildType.proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"))
             buildType.proguardFile("proguard-rules.pro")
-        }
-
-        // TODO with Flavor.
-        val buildName = buildType.name
-        val buildNameCapitalized = buildName.capitalized()
-        val taskName = "coverageReport${buildNameCapitalized}"
-        val dependOnName = "test${buildNameCapitalized}UnitTest"
-        tasks.register<JacocoReport>(taskName) {
-            dependsOn(dependOnName)
-
-            group = "reporting"
-            description = "Generate Jacoco coverage reports"
-
-            reports {
-                html.required.set(true)
-                // codecov depends on xml format report
-                if (buildType.name == "release") {
-                    xml.required.set(true)
-                }
-            }
-
-            val classFilters = setOf(
-                "**/R.class",
-                "**/R$*.class",
-                "**/BuildConfig.*",
-                "**/Manifest*.*",
-                "**/android/**",
-                "**/kotlin/**",
-                "**/view/**",
-                "**/test/**",
-                "**/infra/**",
-                "**/di/**",
-                "**/*_PublicEventsKt.class",    /* filtering PublicEvent generated classes */
-                "**/*Args*.*",                  /* filtering Navigation Component generated classes */
-                "**/*Directions*.*"             /* filtering Navigation Component generated classes */
-            )
-
-            classDirectories.setFrom(files(
-                fileTree("${buildDir}/intermediates/javac/${buildName}/compile${buildNameCapitalized}JavaWithJavac/classes") {
-                    setExcludes(classFilters)
-                },
-                fileTree("${buildDir}/tmp/kotlin-classes/${buildName}") { setExcludes(classFilters) }
-            ))
-            sourceDirectories.setFrom(file("${projectDir}/src/main/java"))
-            executionData.setFrom(files("${buildDir}/jacoco/${dependOnName}.exec"))
         }
     }
 
@@ -196,16 +137,4 @@ kapt {
     // guide in dagger hilt
     // https://developer.android.com/training/dependency-injection/hilt-android?hl=ko#setup
     correctErrorTypes = true
-}
-
-fun makePropertiesFromFiles(fileName: String): Map<Any, Any> =
-    runCatching { Properties().apply { load(FileInputStream(File(fileName))) } }
-        .getOrNull()
-        ?.toMap()
-        ?: emptyMap()
-
-fun setBuildConfigFromFile(config: VariantDimension, properties: Map<Any, Any>) {
-    properties.forEach { (key, value) ->
-        config.buildConfigField(type = "String", key.toString(), "\"${value}\"")
-    }
 }

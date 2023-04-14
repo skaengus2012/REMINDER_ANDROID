@@ -19,40 +19,29 @@ package com.nlab.reminder.convention
 import com.android.build.api.dsl.CommonExtension
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
-import org.gradle.api.plugins.ExtensionAware
-import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.jvm.toolchain.JavaLanguageVersion
 import org.gradle.kotlin.dsl.provideDelegate
-import org.jetbrains.kotlin.gradle.dsl.KotlinJvmOptions
 
 /**
  * @author Doohyun
  */
-internal fun Project.configureKotlinAndroid(
-    commonExtension: CommonExtension<*, *, *, *>,
-) {
-    commonExtension.apply {
-        compileSdk = 33
-
-        defaultConfig {
-            minSdk = 23
-        }
-
+internal fun Project.configureAndroidKotlin(extension: CommonExtension<*, *, *, *>) {
+    extension.apply {
         compileOptions {
-            sourceCompatibility = JavaVersion.VERSION_11
-            targetCompatibility = JavaVersion.VERSION_11
+            sourceCompatibility = JavaVersion.VERSION_17
+            targetCompatibility = JavaVersion.VERSION_17
         }
 
         java {
             // fix warning [https://github.com/skaengus2012/REMINDER_ANDROID/issues/82#issuecomment-1406942682]
             // see https://kotlinlang.org/docs/gradle-configure-project.html#check-for-jvm-target-compatibility-of-related-compile-tasks
             toolchain {
-                languageVersion.set(JavaLanguageVersion.of(JavaVersion.VERSION_11.toString()))
+                languageVersion.set(JavaLanguageVersion.of(JavaVersion.VERSION_17.toString()))
             }
         }
 
         kotlinOptions {
-            jvmTarget = JavaVersion.VERSION_11.toString()
+            jvmTarget = JavaVersion.VERSION_17.toString()
 
             // Treat all Kotlin warnings as errors (disabled by default)
             // Override by setting warningsAsErrors=true in your ~/.gradle/gradle.properties
@@ -69,18 +58,10 @@ internal fun Project.configureKotlinAndroid(
             )
         }
 
-        packagingOptions {
+        packaging {
             // guide in kotlin coroutine
             // https://github.com/Kotlin/kotlinx.coroutines#avoiding-including-the-debug-infrastructure-in-the-resulting-apk
             resources.excludes.add("DebugProbesKt.bin")
         }
     }
-}
-
-private fun Project.java(block: JavaPluginExtension.() -> Unit) {
-    (this as ExtensionAware).extensions.configure("java", block)
-}
-
-private fun CommonExtension<*, *, *, *>.kotlinOptions(block: KotlinJvmOptions.() -> Unit) {
-    (this as ExtensionAware).extensions.configure("kotlinOptions", block)
 }

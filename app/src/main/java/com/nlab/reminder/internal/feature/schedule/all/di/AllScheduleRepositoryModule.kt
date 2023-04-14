@@ -19,7 +19,6 @@ package com.nlab.reminder.internal.feature.schedule.all.di
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
-import com.nlab.reminder.BuildConfig
 import com.nlab.reminder.domain.common.schedule.visibleconfig.CompletedScheduleShownRepository
 import com.nlab.reminder.domain.feature.schedule.all.AllScheduleScope
 import com.nlab.reminder.internal.common.schedule.visibleconfig.impl.LocalCompletedScheduleShownRepository
@@ -42,6 +41,6 @@ class AllScheduleRepositoryModule {
         dataStore: DataStore<Preferences>
     ): CompletedScheduleShownRepository = LocalCompletedScheduleShownRepository(
         dataStore,
-        booleanPreferencesKey(BuildConfig.PREFERENCE_KEY_ALL_SCHEDULE_COMPLETE_SHOWN)
+        booleanPreferencesKey(TODO("Implement using config-default.properties"))
     )
 }

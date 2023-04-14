@@ -21,8 +21,8 @@ plugins {
 group = "com.nlab.reminder.buildlogic"
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }
 
 dependencies {
@@ -35,6 +35,26 @@ gradlePlugin {
         register("androidApplication") {
             id = "nlab.android.application"
             implementationClass = "AndroidApplicationConventionPlugin"
+        }
+        register("androidApplicationJacoco") {
+            id = "nlab.android.application.jacoco"
+            implementationClass = "AndroidApplicationJacocoConventionPlugin"
+        }
+        register("androidLibrary") {
+            id = "nlab.android.library"
+            implementationClass = "AndroidLibraryConventionPlugin"
+        }
+        register("androidLibraryJacoco") {
+            id = "nlab.android.library.jacoco"
+            implementationClass = "AndroidLibraryJacocoConventionPlugin"
+        }
+        register("coverageAggregation") {
+            id = "nlab.coverage.aggregation"
+            implementationClass = "CoverageAggregationPlugin"
+        }
+        register("jvmApplicationJacoco") {
+            id = "nlab.jvm.application.jacoco"
+            implementationClass = "JvmApplicationJacocoConventionPlugin"
         }
     }
 }

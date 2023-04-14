@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 The N's lab Open Source Project
+ * Copyright (C) 2023 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,20 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.state
+package com.example.mylibrary
 
-import kotlinx.coroutines.Job
+import org.junit.Test
+
+import org.junit.Assert.*
 
 /**
- * @author Doohyun
+ * Example local unit test, which will execute on the development machine (host).
+ *
+ * See [testing documentation](http://d.android.com/tools/testing).
  */
-// FIXME sealed class cannot used for mocking after AGP 8.0
-interface EventProcessor<E : Event> {
-    fun send(event: E): Job
+class ExampleUnitTest {
+    @Test
+    fun addition_isCorrect() {
+        assertEquals(4, 2 + 2)
+    }
 }
