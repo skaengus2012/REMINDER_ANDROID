@@ -21,12 +21,12 @@ import com.android.build.api.variant.Variant
 import org.gradle.api.Project
 import org.gradle.api.file.ConfigurableFileTree
 import org.gradle.api.tasks.testing.Test
+import org.gradle.configurationcache.extensions.capitalized
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.withType
 import org.gradle.testing.jacoco.plugins.JacocoTaskExtension
 import org.gradle.testing.jacoco.tasks.JacocoReport
-import java.util.*
 
 /**
  * @author Doohyun
@@ -35,10 +35,9 @@ internal fun Project.configureAndroidJacoco(extension: AndroidComponentsExtensio
     val jacocoTestReport = tasks.create("jacocoTestReport")
 
     extension.onVariants { variant ->
-        val testTaskName = "test${variant.name.capitalize(Locale.getDefault())}UnitTest"
-        val reportTask = tasks.register("jacoco${testTaskName.capitalize(Locale.getDefault())}Report", JacocoReport::class) {
-            dependsOn(testTaskName)
-
+        val unitTestTaskName: String = variant.unitTestTaskName() ?: return@onVariants
+        val reportTask = tasks.register("jacoco${unitTestTaskName.capitalized()}Report", JacocoReport::class) {
+            dependsOn(unitTestTaskName)
             reports {
                 xml.required.set(true)
                 html.required.set(true)
@@ -46,7 +45,7 @@ internal fun Project.configureAndroidJacoco(extension: AndroidComponentsExtensio
 
             classDirectories.setFrom(getJacocoTestClassDirectories(variant))
             sourceDirectories.setFrom(files("$projectDir/src/main/java", "$projectDir/src/main/kotlin"))
-            executionData.setFrom(file("$buildDir/jacoco/$testTaskName.exec"))
+            executionData.setFrom(file("$buildDir/jacoco/$unitTestTaskName.exec"))
         }
 
         jacocoTestReport.dependsOn(reportTask)

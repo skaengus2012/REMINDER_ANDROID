@@ -20,6 +20,7 @@ import com.android.build.gradle.*
 import com.android.build.gradle.api.BaseVariant
 import com.nlab.reminder.convention.aggregateTestCoverage
 import com.nlab.reminder.convention.getJacocoTestClassDirectories
+import com.nlab.reminder.convention.unitTestTaskName
 import org.gradle.api.DomainObjectSet
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -30,12 +31,10 @@ import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.reporting.ReportingExtension
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Sync
-import org.gradle.configurationcache.extensions.capitalized
 import org.gradle.kotlin.dsl.*
 import org.gradle.testing.jacoco.plugins.JacocoCoverageReport
 import org.gradle.testing.jacoco.plugins.JacocoTaskExtension
 import java.io.File
-import java.util.Locale
 
 /**
  * Jacoco aggregation plugin.
@@ -104,11 +103,10 @@ class CoverageAggregationPlugin : Plugin<Project> {
                         )
                     }
                     jacocoVariants.all variant@{
-                        val unitTest = this@variant.unitTest ?: return@variant
-                        val execData = tasks
-                            .named("test${unitTest.name.capitalized()}")
-                            .map { it.the<JacocoTaskExtension>().destinationFile!! }
-
+                        val execData = this@variant.unitTestTaskName()
+                            ?.let { unitTestName -> tasks.named(unitTestName) }
+                            ?.map { it.the<JacocoTaskExtension>().destinationFile!! }
+                            ?: return@variant
                         outgoing.artifact(execData) {
                             type = ArtifactTypeDefinition.BINARY_DATA_TYPE
                         }
@@ -143,8 +141,7 @@ class CoverageAggregationPlugin : Plugin<Project> {
 
                 val allVariantsClassesForCoverageReport by tasks.registering(Sync::class) {
                     jacocoVariants.all variant@{
-                        val testTaskName = "test${this@variant.name.capitalize(Locale.getDefault())}UnitTest"
-                        dependsOn(testTaskName)
+                        dependsOn(this@variant.unitTestTaskName())
                         from(getJacocoTestClassDirectories(this@variant))
                     }
                     into(provider { temporaryDir })
