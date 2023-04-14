@@ -19,6 +19,7 @@ package com.nlab.reminder.core.effect
 /**
  * @author Doohyun
  */
-sealed interface SideEffectHandle<T : SideEffect> {
+// FIXME cannot make mock after AGP 8.0 & Kotlin 1.8.20
+interface SideEffectHandle<T : SideEffect> {
     suspend fun post(sideEffect: T)
 }

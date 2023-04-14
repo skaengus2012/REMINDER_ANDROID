@@ -41,11 +41,6 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        setBuildConfigFromFile(
-            defaultConfig,
-            makePropertiesFromFiles(fileName = "${projectDir.path}${File.separator}config-default.properties")
-        )
-
         kapt {
             arguments {
                 arg("dagger.fastInit", "enabled")
@@ -192,16 +187,4 @@ kapt {
     // guide in dagger hilt
     // https://developer.android.com/training/dependency-injection/hilt-android?hl=ko#setup
     correctErrorTypes = true
-}
-
-fun makePropertiesFromFiles(fileName: String): Map<Any, Any> =
-    runCatching { Properties().apply { load(FileInputStream(File(fileName))) } }
-        .getOrNull()
-        ?.toMap()
-        ?: emptyMap()
-
-fun setBuildConfigFromFile(config: VariantDimension, properties: Map<Any, Any>) {
-    properties.forEach { (key, value) ->
-        config.buildConfigField(type = "String", key.toString(), "\"${value}\"")
-    }
 }

@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.StateFlow
 /**
  * @author Doohyun
  */
-sealed interface StateContainer<E : Event, S : State> : EventProcessor<E> {
+// FIXME cannot make mock after AGP 8.0 & Kotlin 1.8.20
+interface StateContainer<E : Event, S : State> : EventProcessor<E> {
     val stateFlow: StateFlow<S>
 }

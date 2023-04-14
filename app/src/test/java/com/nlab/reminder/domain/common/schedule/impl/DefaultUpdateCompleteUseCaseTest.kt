@@ -52,7 +52,7 @@ class DefaultUpdateCompleteUseCaseTest {
             )
         }
         val updateCompleteUseCase = DefaultUpdateCompleteUseCase(
-            transactionIdGenerator = mock(),
+            transactionIdGenerator = genTransactionIdGenerator(),
             scheduleRepository = scheduleRepository,
             completeMarkRepository = completeMarkRepository,
             delayUntilTransactionPeriod = mock()

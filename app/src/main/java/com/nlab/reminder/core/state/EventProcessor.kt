@@ -21,6 +21,7 @@ import kotlinx.coroutines.Job
 /**
  * @author Doohyun
  */
-sealed interface EventProcessor<E : Event> {
+// FIXME cannot make mock after AGP 8.0 & Kotlin 1.8.20
+interface EventProcessor<E : Event> {
     fun send(event: E): Job
 }

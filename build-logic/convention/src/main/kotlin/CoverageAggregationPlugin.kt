@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import com.android.build.api.artifact.MultipleArtifact
+
 import com.android.build.api.variant.AndroidComponentsExtension
 import com.android.build.api.variant.Variant
 import com.android.build.gradle.*
@@ -141,7 +141,8 @@ class CoverageAggregationPlugin : Plugin<Project> {
 
                 val allVariantsClassesForCoverageReport by tasks.registering(Sync::class) {
                     jacocoVariants.all variant@{
-                        from(this@variant.artifacts.getAll(MultipleArtifact.ALL_CLASSES_DIRS))
+                        // TODO implement.
+                    //    from(this@variant.artifacts.getAll(MultipleArtifact.ALL_CLASSES_DIRS))
                     }
                     into(provider { temporaryDir })
                     duplicatesStrategy = DuplicatesStrategy.WARN // in case of duplicated classes

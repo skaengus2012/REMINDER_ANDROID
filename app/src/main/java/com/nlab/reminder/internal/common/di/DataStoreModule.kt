@@ -21,7 +21,6 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
-import com.nlab.reminder.BuildConfig
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -39,6 +38,6 @@ class DataStoreModule {
     }
 
     companion object {
-        private val Context.dataStore by preferencesDataStore(name = BuildConfig.PREFERENCE_KEY_NAME)
+        private val Context.dataStore by preferencesDataStore(name = TODO("Implement using config-default.properties"))
     }
 }
