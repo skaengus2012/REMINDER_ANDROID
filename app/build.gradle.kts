@@ -14,11 +14,6 @@
  * limitations under the License.
  */
 
-import org.gradle.configurationcache.extensions.capitalized
-import com.android.build.api.dsl.VariantDimension
-import java.io.FileInputStream
-import java.util.Properties
-
 // FIXME Annotations must be added before Gradle 8.1.
 // FIXME https://developer.android.com/studio/build/migrate-to-catalogs?hl=ko#migrate-plugins
 @Suppress("DSL_SCOPE_VIOLATION")
@@ -68,51 +63,6 @@ android {
         if (buildType.isMinifyEnabled) {
             buildType.proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"))
             buildType.proguardFile("proguard-rules.pro")
-        }
-
-        // TODO with Flavor.
-        val buildName = buildType.name
-        val buildNameCapitalized = buildName.capitalized()
-        val taskName = "coverageReport${buildNameCapitalized}"
-        val dependOnName = "test${buildNameCapitalized}UnitTest"
-        tasks.register<JacocoReport>(taskName) {
-            dependsOn(dependOnName)
-
-            group = "reporting"
-            description = "Generate Jacoco coverage reports"
-
-            reports {
-                html.required.set(true)
-                // codecov depends on xml format report
-                if (buildType.name == "release") {
-                    xml.required.set(true)
-                }
-            }
-
-            val classFilters = setOf(
-                "**/R.class",
-                "**/R$*.class",
-                "**/BuildConfig.*",
-                "**/Manifest*.*",
-                "**/android/**",
-                "**/kotlin/**",
-                "**/view/**",
-                "**/test/**",
-                "**/infra/**",
-                "**/di/**",
-                "**/*_PublicEventsKt.class",    /* filtering PublicEvent generated classes */
-                "**/*Args*.*",                  /* filtering Navigation Component generated classes */
-                "**/*Directions*.*"             /* filtering Navigation Component generated classes */
-            )
-
-            classDirectories.setFrom(files(
-                fileTree("${buildDir}/intermediates/javac/${buildName}/compile${buildNameCapitalized}JavaWithJavac/classes") {
-                    setExcludes(classFilters)
-                },
-                fileTree("${buildDir}/tmp/kotlin-classes/${buildName}") { setExcludes(classFilters) }
-            ))
-            sourceDirectories.setFrom(file("${projectDir}/src/main/java"))
-            executionData.setFrom(files("${buildDir}/jacoco/${dependOnName}.exec"))
         }
     }
 
