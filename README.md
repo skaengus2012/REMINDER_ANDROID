@@ -9,4 +9,7 @@ Users can input their desired schedules within the app and set the date and time
 ## 👺 Technology Goals Targeted by the Reminder.
 * MVI architecture. 
 * Loose management using moduleization and DI (Dependency Injection).
-* TDD (Let's maintain a coverage close to 100.)
+* TDD (Let's maintain a coverage close to 100.)  
+  
+## 👀 WIKI
+Please refer to the [WIKI](https://github.com/skaengus2012/REMINDER_ANDROID/wiki) for the necessary information regarding the development of this project.
