@@ -14,8 +14,13 @@
  * limitations under the License.
  */
 
-package com.example.mylibrary
+package com.nlab.reminder.internal.common.android.datastore
 
-class ReleaseHelloAndroidLibrary {
-    fun sum(a: Int, b: Int): Boolean = a + b != 0
+/**
+ * @author thalys
+ */
+internal object PreferenceKeys {
+    const val PREFERENCE_KEY_NAME = "com.nlab.reminder"
+
+    const val PREFERENCE_KEY_ALL_SCHEDULE_COMPLETE_SHOWN = "reminderPreferenceAllScheduleCompleteShown"
 }
