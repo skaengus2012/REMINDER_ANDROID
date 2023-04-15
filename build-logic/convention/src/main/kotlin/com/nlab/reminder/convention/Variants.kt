@@ -23,3 +23,4 @@ import org.gradle.configurationcache.extensions.capitalized
  * @author Doohyun
  */
 internal fun Variant.unitTestTaskName(): String? = unitTest?.let { "test${it.name.capitalized()}" }
+internal fun Variant.unitTestCapitalized(): String? = unitTest?.name?.capitalized()

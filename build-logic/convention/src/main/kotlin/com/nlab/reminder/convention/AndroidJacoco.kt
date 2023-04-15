@@ -22,7 +22,6 @@ import org.gradle.api.Project
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.ConfigurableFileTree
 import org.gradle.api.tasks.testing.Test
-import org.gradle.configurationcache.extensions.capitalized
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.withType
@@ -36,8 +35,9 @@ internal fun Project.configureAndroidJacoco(extension: AndroidComponentsExtensio
     val jacocoTestReport = tasks.create("jacocoTestReport")
 
     extension.onVariants { variant ->
+        val unitTestCapitalized = variant.unitTestCapitalized() ?: return@onVariants
         val unitTestTaskName: String = variant.unitTestTaskName() ?: return@onVariants
-        val reportTask = tasks.register("jacoco${unitTestTaskName.capitalized()}Report", JacocoReport::class) {
+        val reportTask = tasks.register("jacoco${unitTestCapitalized}Report", JacocoReport::class) {
             dependsOn(unitTestTaskName)
             reports {
                 xml.required.set(true)
