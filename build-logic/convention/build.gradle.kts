@@ -28,7 +28,6 @@ java {
 dependencies {
     compileOnly(libs.kotlin.gradle.plugin)
     compileOnly(libs.android.gradle.plugin)
-    compileOnly("org.jetbrains.kotlin:kotlin-reflect:1.8.10")
 }
 
 gradlePlugin {

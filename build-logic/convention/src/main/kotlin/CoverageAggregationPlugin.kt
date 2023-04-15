@@ -26,6 +26,7 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.ModuleDependency
 import org.gradle.api.artifacts.type.ArtifactTypeDefinition
 import org.gradle.api.attributes.*
+import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.reporting.ReportingExtension
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Sync
@@ -142,6 +143,7 @@ class CoverageAggregationPlugin : Plugin<Project> {
                         from(getJacocoTestClassDirectories(this@variant))
                     }
                     into(provider { temporaryDir })
+                    duplicatesStrategy = DuplicatesStrategy.INCLUDE // in case of duplicated classes
                 }
                 configurations.create("codeCoverageElements") {
                     isCanBeConsumed = true
