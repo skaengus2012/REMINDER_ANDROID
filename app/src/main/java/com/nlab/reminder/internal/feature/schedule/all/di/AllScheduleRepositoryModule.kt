@@ -21,6 +21,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import com.nlab.reminder.domain.common.schedule.visibleconfig.CompletedScheduleShownRepository
 import com.nlab.reminder.domain.feature.schedule.all.AllScheduleScope
+import com.nlab.reminder.internal.common.android.datastore.PreferenceKeys
 import com.nlab.reminder.internal.common.schedule.visibleconfig.impl.LocalCompletedScheduleShownRepository
 import dagger.Module
 import dagger.Provides
@@ -41,6 +42,6 @@ class AllScheduleRepositoryModule {
         dataStore: DataStore<Preferences>
     ): CompletedScheduleShownRepository = LocalCompletedScheduleShownRepository(
         dataStore,
-        booleanPreferencesKey(TODO("Implement using config-default.properties"))
+        booleanPreferencesKey(PreferenceKeys.PREFERENCE_KEY_ALL_SCHEDULE_COMPLETE_SHOWN)
     )
 }
