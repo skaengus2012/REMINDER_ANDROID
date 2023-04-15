@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import com.android.build.api.variant.AndroidComponentsExtension
 import com.android.build.api.variant.Variant
 import com.android.build.gradle.*
 import com.nlab.reminder.convention.aggregateTestCoverage
+import com.nlab.reminder.convention.androidComponentsExtension
 import com.nlab.reminder.convention.getJacocoTestClassDirectories
 import com.nlab.reminder.convention.getJacocoTestSourcesDirectories
 import com.nlab.reminder.convention.unitTestTaskName
@@ -74,18 +74,17 @@ class CoverageAggregationPlugin : Plugin<Project> {
             }
 
             plugins.withId("com.android.base") {
-                val android = the<TestedExtension>()
-                val androidComponents =
-                    extensions.getByName<AndroidComponentsExtension<*, *, *>>("androidComponents")
-                android.buildTypes.configureEach {
-                    extensions.add(typeOf<Property<Boolean>>(), ::aggregateTestCoverage.name, objects.property())
-                }
-                android.productFlavors.configureEach {
-                    extensions.add(typeOf<Property<Boolean>>(), ::aggregateTestCoverage.name, objects.property())
+                with(the<TestedExtension>()) android@{
+                    this@android.buildTypes.configureEach {
+                        extensions.add(typeOf<Property<Boolean>>(), ::aggregateTestCoverage.name, objects.property())
+                    }
+                    this@android.productFlavors.configureEach {
+                        extensions.add(typeOf<Property<Boolean>>(), ::aggregateTestCoverage.name, objects.property())
+                    }
                 }
 
                 val jacocoVariants = objects.namedDomainObjectSet(Variant::class)
-                androidComponents.onVariants { variant ->
+                androidComponentsExtension().onVariants { variant ->
                     afterEvaluate {
                         val hasJacocoTask = tasks.any { task -> task.name.contains("jacoco") }
                         if (hasJacocoTask) {
@@ -144,7 +143,7 @@ class CoverageAggregationPlugin : Plugin<Project> {
                         from(getJacocoTestClassDirectories(this@variant))
                     }
                     into(provider { temporaryDir })
-                    duplicatesStrategy = DuplicatesStrategy.WARN // in case of duplicated classes
+                    duplicatesStrategy = DuplicatesStrategy.INCLUDE // in case of duplicated classes
                 }
                 configurations.create("codeCoverageElements") {
                     isCanBeConsumed = true
@@ -156,7 +155,7 @@ class CoverageAggregationPlugin : Plugin<Project> {
                         attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage.JAVA_RUNTIME))
                         attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, objects.named(LibraryElements.CLASSES))
                     }
-                    jacocoVariants.all variant@{
+                    jacocoVariants.all {
                         outgoing.artifact(allVariantsClassesForCoverageReport) {
                             type = ArtifactTypeDefinition.JVM_CLASS_DIRECTORY
                         }

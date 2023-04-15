@@ -16,6 +16,6 @@
 
 package com.example.mylibrary
 
-class HelloAndroidLibrary {
+class DebugHelloAndroidLibrary {
     fun sum(a: Int, b: Int): Boolean = a + b == 0
 }
