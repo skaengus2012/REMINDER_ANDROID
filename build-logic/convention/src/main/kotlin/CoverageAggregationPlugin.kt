@@ -156,7 +156,7 @@ class CoverageAggregationPlugin : Plugin<Project> {
                         attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage.JAVA_RUNTIME))
                         attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, objects.named(LibraryElements.CLASSES))
                     }
-                    jacocoVariants.all variant@{
+                    jacocoVariants.all {
                         outgoing.artifact(allVariantsClassesForCoverageReport) {
                             type = ArtifactTypeDefinition.JVM_CLASS_DIRECTORY
                         }
