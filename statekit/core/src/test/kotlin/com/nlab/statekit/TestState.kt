@@ -14,21 +14,23 @@
  * limitations under the License.
  */
 
-// FIXME Annotations must be added before Gradle 8.1.
-// FIXME https://developer.android.com/studio/build/migrate-to-catalogs?hl=ko#migrate-plugins
-@Suppress("DSL_SCOPE_VIOLATION")
-plugins {
-    id("nlab.jvm.application.jacoco")
-    alias(libs.plugins.kotlin.jvm)
-}
+package com.nlab.statekit
 
-dependencies {
-    implementation(libs.kotlin.coroutines.core)
+import com.nlab.testkit.genInt
 
-    testImplementation(project(":testkit"))
-    testImplementation(libs.junit)
-    testImplementation(libs.kotlin.coroutines.test)
-    testImplementation(libs.mockito.inline)
-    testImplementation(libs.mockito.kotlin)
-    testImplementation(libs.javafaker)
+/**
+ * @author thalys
+ */
+internal sealed class TestState private constructor() : State {
+    object State1 : TestState()
+    object State2 : TestState()
+    object State3 : TestState()
+
+    companion object {
+        fun genState(): TestState = when (genInt() % 3) {
+            0 -> State1
+            1 -> State2
+            else -> State3
+        }
+    }
 }

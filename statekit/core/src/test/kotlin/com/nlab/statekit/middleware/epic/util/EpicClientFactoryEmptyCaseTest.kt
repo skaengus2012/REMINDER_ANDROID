@@ -14,21 +14,20 @@
  * limitations under the License.
  */
 
-// FIXME Annotations must be added before Gradle 8.1.
-// FIXME https://developer.android.com/studio/build/migrate-to-catalogs?hl=ko#migrate-plugins
-@Suppress("DSL_SCOPE_VIOLATION")
-plugins {
-    id("nlab.jvm.application.jacoco")
-    alias(libs.plugins.kotlin.jvm)
-}
+package com.nlab.statekit.middleware.epic.util
 
-dependencies {
-    implementation(libs.kotlin.coroutines.core)
+import com.nlab.testkit.instanceOf
+import org.hamcrest.MatcherAssert.assertThat
+import org.junit.Test
+import org.mockito.kotlin.mock
 
-    testImplementation(project(":testkit"))
-    testImplementation(libs.junit)
-    testImplementation(libs.kotlin.coroutines.test)
-    testImplementation(libs.mockito.inline)
-    testImplementation(libs.mockito.kotlin)
-    testImplementation(libs.javafaker)
+/**
+ * @author thalys
+ */
+internal class EpicClientFactoryEmptyCaseTest {
+    @Test
+    fun testEmptyWhileStateUsed() {
+        val epicClient = EpicClientFactory.getWhileStateUsed(mock())
+        assertThat(epicClient, instanceOf(EmptyEpicClient::class))
+    }
 }
