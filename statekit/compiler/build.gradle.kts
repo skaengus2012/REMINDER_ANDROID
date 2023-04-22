@@ -18,10 +18,12 @@
 // FIXME https://developer.android.com/studio/build/migrate-to-catalogs?hl=ko#migrate-plugins
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-    id("nlab.jvm.application.jacoco")
     alias(libs.plugins.kotlin.jvm)
 }
 
 dependencies {
-    implementation(libs.junit)
+    implementation(project(":statekit:core"))
+
+    implementation(libs.squeare.kotlinpoet)
+    implementation(libs.squeare.kotlinpoet.metadata)
 }

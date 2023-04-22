@@ -32,6 +32,6 @@ dependencyResolutionManagement {
 
 rootProject.name="REMINDER_ANDROID"
 include(":app")
-include(":state:core")
-include(":state:compiler")
+include(":statekit:core")
+include(":statekit:compiler")
 include(":testkit")
