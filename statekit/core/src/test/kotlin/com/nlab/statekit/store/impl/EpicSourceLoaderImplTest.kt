@@ -89,7 +89,7 @@ internal class EpicSourceLoaderImplTest {
         checkedEpicClientFactoryInvoked(
             coroutineScope = this,
             expectedCount = 1,
-            epicSources = List(genInt("#0")) {
+            epicSources = List(genInt("#0").takeIf { it > 0 } ?: 1) {
                 EpicSource(flowOf(TestAction.genAction()), SubscriptionStrategy.WhileStateUsed)
             },
             setupEpicClientFactory = { factory -> EpicClientFactory.setWhileStateUsedEpicClientFactory(factory) }

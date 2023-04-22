@@ -18,7 +18,7 @@ import com.android.build.api.variant.Variant
 import com.android.build.gradle.*
 import com.nlab.reminder.convention.aggregateTestCoverage
 import com.nlab.reminder.convention.androidComponentsExtension
-import com.nlab.reminder.convention.getJacocoTestClassDirectories
+import com.nlab.reminder.convention.getAndroidJacocoTestClassDirectories
 import com.nlab.reminder.convention.getJacocoTestSourcesDirectories
 import com.nlab.reminder.convention.unitTestTaskName
 import org.gradle.api.Plugin
@@ -46,15 +46,14 @@ import java.io.File
  * @see [agp_guide](https://docs.gradle.org/current/userguide/jacoco_report_aggregation_plugin.html)
  */
 class CoverageAggregationPlugin : Plugin<Project> {
+
     override fun apply(target: Project): Unit = with(target) {
         check(this == rootProject) {
             "The aggregation coverage plugin should be applied to the root project only."
         }
 
-        with(pluginManager) {
-            apply("base")
-            apply("jacoco-report-aggregation")
-        }
+        apply(plugin = "base")
+        apply(plugin = "jacoco-report-aggregation")
 
         val androidAggregatedVariantAttribute: Attribute<Boolean> =
             Attribute.of("com.android.variants.aggregated", Boolean::class.javaObjectType)
@@ -62,15 +61,14 @@ class CoverageAggregationPlugin : Plugin<Project> {
 
         allprojects {
             plugins.withId("jacoco") {
-                val childDependency = (dependencies.create(project) as ModuleDependency)
-                val hasAndroidPlugins: Boolean = plugins.findPlugin("com.android.base") != null
-                if (hasAndroidPlugins) {
-                    childDependency.attributes {
-                        attribute(androidAggregatedVariantAttribute, true)
+                with(dependencies.create(project) as ModuleDependency) childDependency@{
+                    plugins.withId("com.android.base") {
+                        this@childDependency.attributes {
+                            attribute(androidAggregatedVariantAttribute, true)
+                        }
                     }
+                    jacocoAggregation.dependencies.add(this@childDependency)
                 }
-
-                jacocoAggregation.dependencies.add(childDependency)
             }
 
             plugins.withId("com.android.base") {
@@ -140,7 +138,7 @@ class CoverageAggregationPlugin : Plugin<Project> {
                 val allVariantsClassesForCoverageReport by tasks.registering(Sync::class) {
                     jacocoVariants.all variant@{
                         dependsOn(this@variant.unitTestTaskName())
-                        from(getJacocoTestClassDirectories(this@variant))
+                        from(getAndroidJacocoTestClassDirectories(this@variant))
                     }
                     into(provider { temporaryDir })
                     duplicatesStrategy = DuplicatesStrategy.INCLUDE // in case of duplicated classes
@@ -167,11 +165,6 @@ class CoverageAggregationPlugin : Plugin<Project> {
         with(the<ReportingExtension>().reports) {
             create("jacocoTestReport", JacocoCoverageReport::class.java) {
                 testType.set(TestSuiteType.UNIT_TEST)
-
-                // control the report generation
-                // reportTask.get().reports {
-                //    html.required.set(false)
-                // }
             }
         }
     }
