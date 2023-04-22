@@ -14,4 +14,4 @@
 # limitations under the License.
 #
 
-com.nlab.state.compiler.PublicEventProcessor
+com.nlab.statekit.compiler.PublicEventProcessor

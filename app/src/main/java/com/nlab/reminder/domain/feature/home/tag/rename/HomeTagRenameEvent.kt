@@ -18,7 +18,7 @@ package com.nlab.reminder.domain.feature.home.tag.rename
 
 import com.nlab.reminder.core.state.Event
 import com.nlab.reminder.core.util.test.annotation.ExcludeFromGeneratedTestReport
-import com.nlab.state.core.lifecycle.PublicEvent
+import com.nlab.statekit.core.lifecycle.PublicEvent
 
 sealed class HomeTagRenameEvent private constructor() : Event {
     @ExcludeFromGeneratedTestReport

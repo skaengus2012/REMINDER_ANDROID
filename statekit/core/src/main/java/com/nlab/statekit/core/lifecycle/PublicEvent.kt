@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.state.core.lifecycle
+package com.nlab.statekit.core.lifecycle
 
 import kotlin.reflect.KClass
 

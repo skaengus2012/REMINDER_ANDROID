@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.nlab.state.compiler
+package com.nlab.statekit.compiler
 
-import com.nlab.state.core.lifecycle.PublicEvent
+import com.nlab.statekit.core.lifecycle.PublicEvent
 import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.metadata.KotlinPoetMetadataPreview
 import com.squareup.kotlinpoet.metadata.isObject
@@ -33,11 +33,11 @@ import javax.tools.Diagnostic
 /**
  * @author thalys
  */
-@SupportedAnnotationTypes("com.nlab.state.core.lifecycle.PublicEvent")
+@SupportedAnnotationTypes("com.nlab.statekit.core.lifecycle.PublicEvent")
 @SupportedSourceVersion(SourceVersion.RELEASE_17)
 @SupportedOptions(PublicEventProcessor.KAPT_KOTLIN_GENERATED_OPTION_NAME)
 @OptIn(KotlinPoetMetadataPreview::class)
-class PublicEventProcessor : AbstractProcessor() {
+internal class PublicEventProcessor : AbstractProcessor() {
     private val functionEntries: MutableMap<Destination, List<FunSpec.Builder>> = hashMapOf()
 
     override fun process(
