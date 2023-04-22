@@ -18,7 +18,7 @@ package com.nlab.reminder.domain.feature.home
 import com.nlab.reminder.core.state.Event
 import com.nlab.reminder.core.util.test.annotation.ExcludeFromGeneratedTestReport
 import com.nlab.reminder.domain.common.tag.Tag
-import com.nlab.state.core.lifecycle.PublicEvent
+import com.nlab.statekit.core.lifecycle.PublicEvent
 
 /**
  * @author Doohyun

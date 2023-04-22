@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.state.compiler
+package com.nlab.statekit.compiler
 
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.TypeName
@@ -24,11 +24,11 @@ import kotlinx.metadata.KmType
 /**
  * @author thalys
  */
-fun KmType.toClassName(): String {
+internal fun KmType.toClassName(): String {
     return (classifier as KmClassifier.Class).name
 }
 
-fun KmType.toTypeName(): TypeName {
+internal fun KmType.toTypeName(): TypeName {
     val classTokens: List<String> =
         (classifier as KmClassifier.Class)
             .name

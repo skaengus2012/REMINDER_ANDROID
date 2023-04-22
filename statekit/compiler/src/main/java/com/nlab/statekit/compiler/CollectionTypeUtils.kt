@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.state.compiler
+package com.nlab.statekit.compiler
 
 import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
@@ -23,7 +23,7 @@ import kotlinx.metadata.KmType
 /**
  * @author thalys
  */
-object CollectionTypeUtils {
+internal object CollectionTypeUtils {
     private const val iterableTypeName = "kotlin/collections/Iterable"
     private const val collectionTypeName = "kotlin/collections/Collection"
     private const val listTypeName = "kotlin/collections/List"
