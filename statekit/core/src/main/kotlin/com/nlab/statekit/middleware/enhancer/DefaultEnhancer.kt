@@ -14,21 +14,19 @@
  * limitations under the License.
  */
 
-// FIXME Annotations must be added before Gradle 8.1.
-// FIXME https://developer.android.com/studio/build/migrate-to-catalogs?hl=ko#migrate-plugins
-@Suppress("DSL_SCOPE_VIOLATION")
-plugins {
-    id("nlab.jvm.application.jacoco")
-    alias(libs.plugins.kotlin.jvm)
-}
+package com.nlab.statekit.middleware.enhancer
 
-dependencies {
-    implementation(libs.kotlin.coroutines.core)
+import com.nlab.statekit.Action
+import com.nlab.statekit.State
+import com.nlab.statekit.UpdateSource
 
-    testImplementation(project(":testkit"))
-    testImplementation(libs.junit)
-    testImplementation(libs.kotlin.coroutines.test)
-    testImplementation(libs.mockito.inline)
-    testImplementation(libs.mockito.kotlin)
-    testImplementation(libs.javafaker)
+/**
+ * @author thalys
+ */
+internal class DefaultEnhancer<A : Action, S : State>(
+    private val block: suspend ActionDispatcher<A>.(UpdateSource<A, S>) -> Unit
+) : Enhancer<A, S> {
+    override suspend fun invoke(actionDispatcher: ActionDispatcher<A>, source: UpdateSource<A, S>) {
+        actionDispatcher.block(source)
+    }
 }

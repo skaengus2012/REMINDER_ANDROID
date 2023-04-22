@@ -14,21 +14,17 @@
  * limitations under the License.
  */
 
-// FIXME Annotations must be added before Gradle 8.1.
-// FIXME https://developer.android.com/studio/build/migrate-to-catalogs?hl=ko#migrate-plugins
-@Suppress("DSL_SCOPE_VIOLATION")
-plugins {
-    id("nlab.jvm.application.jacoco")
-    alias(libs.plugins.kotlin.jvm)
-}
+package com.nlab.statekit.util
 
-dependencies {
-    implementation(libs.kotlin.coroutines.core)
+import com.nlab.statekit.Action
+import com.nlab.statekit.middleware.epic.DefaultEpic
+import com.nlab.statekit.middleware.epic.Epic
+import com.nlab.statekit.middleware.epic.EpicSource
+import com.nlab.statekit.middleware.epic.dsl.DslEpic
+import com.nlab.statekit.middleware.epic.dsl.DslEpicBuilder
 
-    testImplementation(project(":testkit"))
-    testImplementation(libs.junit)
-    testImplementation(libs.kotlin.coroutines.test)
-    testImplementation(libs.mockito.inline)
-    testImplementation(libs.mockito.kotlin)
-    testImplementation(libs.javafaker)
-}
+/**
+ * @author thalys
+ */
+fun <A : Action> buildEpic(vararg epicSources: EpicSource<A>): Epic<A> = DefaultEpic(epicSources.toList())
+fun <A : Action> buildDslEpic(block: DslEpicBuilder<A>.() -> Unit): Epic<A> = DslEpic(block)
