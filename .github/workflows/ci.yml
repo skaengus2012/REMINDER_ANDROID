@@ -30,7 +30,6 @@ jobs:
           flags: unittests
           fail_ci_if_error: true
           directory: /home/runner/work/REMINDER_ANDROID/REMINDER_ANDROID/
-          files: ./build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml
 
       - name: action-slack
         uses: 8398a7/action-slack@v3.12.0
