@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 import com.nlab.reminder.convention.configureJacocoToolVersion
+import com.nlab.reminder.convention.jacocoExcludePatterns
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPlugin
@@ -46,6 +47,9 @@ class JvmApplicationJacocoConventionPlugin : Plugin<Project> {
                     xml.required.set(true)
                     csv.required.set(false)
                 }
+                classDirectories.setFrom(files(classDirectories.map { dir ->
+                    fileTree(dir) { exclude(jacocoExcludePatterns) }
+                }))
             }
         }
     }
