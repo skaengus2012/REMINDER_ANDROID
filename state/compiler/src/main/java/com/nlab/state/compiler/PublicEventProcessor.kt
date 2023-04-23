@@ -89,7 +89,7 @@ class PublicEventProcessor : AbstractProcessor() {
     private fun parseDestinationClazzString(element: Element): String {
         val typeElement = element as TypeElement
         return typeElement.annotationMirrors
-            .last()  // Annotation information was introduced in version 1.8.20 and appears last.
+            .first()  // Annotation information was introduced in version 1.8.20 and appears last.
             .elementValues.entries
             .first()
             .value
