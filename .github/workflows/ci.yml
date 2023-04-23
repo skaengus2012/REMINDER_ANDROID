@@ -24,7 +24,7 @@ jobs:
         run: ./gradlew jacocoTestReport
 
       - name: Upload jacocoTestReport to Codecov
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           flags: unittests
