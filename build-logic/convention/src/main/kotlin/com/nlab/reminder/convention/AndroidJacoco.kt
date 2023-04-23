@@ -44,8 +44,8 @@ internal fun Project.configureAndroidJacoco(extension: AndroidComponentsExtensio
                 html.required.set(true)
             }
 
-            classDirectories.setFrom(getJacocoTestClassDirectories(variant))
-            sourceDirectories.setFrom(getJacocoTestSourcesDirectories(variant))
+            sourceDirectories.setFrom(androidJacocoSourcesDirectories(variant))
+            classDirectories.setFrom(androidJacocoClassDirectories(variant))
             executionData.setFrom(file("$buildDir/jacoco/$unitTestTaskName.exec"))
         }
 
@@ -63,7 +63,7 @@ internal fun Project.configureAndroidJacoco(extension: AndroidComponentsExtensio
     }
 }
 
-internal fun Project.getJacocoTestSourcesDirectories(variant: Variant): ConfigurableFileCollection =
+private fun Project.androidJacocoSourcesDirectories(variant: Variant): ConfigurableFileCollection =
     files(
         "$projectDir/src/main/java",
         "$projectDir/src/main/kotlin",
@@ -71,21 +71,21 @@ internal fun Project.getJacocoTestSourcesDirectories(variant: Variant): Configur
         "$projectDir/src/${variant.name}/kotlin"
     )
 
-internal fun Project.getJacocoTestClassDirectories(variant: Variant): ConfigurableFileTree =
+private fun Project.androidJacocoClassDirectories(variant: Variant): ConfigurableFileTree =
     fileTree("$buildDir/tmp/kotlin-classes/${variant.name}") {
-        exclude(setOf(
-            "**/R.class",
-            "**/R$*.class",
-            "**/BuildConfig.*",
-            "**/Manifest*.*",
-            "**/android/**",
-            "**/kotlin/**",
-            "**/view/**",
-            "**/test/**",
-            "**/infra/**",
-            "**/di/**",
-            "**/*_PublicEventsKt.class",    /* filtering PublicEvent generated classes */
-            "**/*Args*.*",                  /* filtering Navigation Component generated classes */
-            "**/*Directions*.*"             /* filtering Navigation Component generated classes */
-        ))
+        exclude(
+            jacocoExcludePatterns + setOf(
+                "**/R.class",
+                "**/R$*.class",
+                "**/BuildConfig.*",
+                "**/Manifest*.*",
+                "**/android/**",
+                "**/view/**",
+                "**/test/**",
+                "**/di/**",
+                "**/*_PublicEventsKt.class",    /* filtering PublicEvent generated classes */
+                "**/*Args*.*",                  /* filtering Navigation Component generated classes */
+                "**/*Directions*.*"             /* filtering Navigation Component generated classes */
+            )
+        )
     }

@@ -16,11 +16,9 @@
 
 package com.nlab.reminder.convention
 
-import com.android.build.api.variant.AndroidComponentsExtension
 import org.gradle.api.Project
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.plugins.JavaPluginExtension
-import org.gradle.kotlin.dsl.getByName
 
 /**
  * @author Doohyun
@@ -28,6 +26,3 @@ import org.gradle.kotlin.dsl.getByName
 internal fun Project.java(block: JavaPluginExtension.() -> Unit) {
     (this as ExtensionAware).extensions.configure("java", block)
 }
-
-internal fun Project.androidComponentsExtension(): AndroidComponentsExtension<*, *, *> =
-    extensions.getByName<AndroidComponentsExtension<*, *, *>>("androidComponents")

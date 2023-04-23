@@ -48,10 +48,6 @@ gradlePlugin {
             id = "nlab.android.library.jacoco"
             implementationClass = "AndroidLibraryJacocoConventionPlugin"
         }
-        register("coverageAggregation") {
-            id = "nlab.coverage.aggregation"
-            implementationClass = "CoverageAggregationPlugin"
-        }
         register("jvmApplicationJacoco") {
             id = "nlab.jvm.application.jacoco"
             implementationClass = "JvmApplicationJacocoConventionPlugin"

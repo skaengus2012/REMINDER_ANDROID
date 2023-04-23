@@ -29,7 +29,6 @@ plugins {
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.android.navigation.safearges) apply false
     alias(libs.plugins.google.hilt) apply false
-    id("nlab.coverage.aggregation")
 }
 
 // FIXME It's required some blocks below plugin blocks.
