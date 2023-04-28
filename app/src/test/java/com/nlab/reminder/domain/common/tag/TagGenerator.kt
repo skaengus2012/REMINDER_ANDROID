@@ -23,6 +23,5 @@ import com.nlab.testkit.*
  */
 
 fun genTag(tagId: Long = genLong(), name: String = genBothify()) = Tag(tagId, name)
-fun genTags(numericString: String = "##"): List<Tag> =
-    List(genInt(numericString)) { index -> genTag(index.toLong()) }
-        .distinctBy { it.name }
+fun genTags(count: Int = genIntGreaterThanZero()): List<Tag> =
+    List(count) { index -> genTag(index.toLong()) }.distinctBy { it.name }

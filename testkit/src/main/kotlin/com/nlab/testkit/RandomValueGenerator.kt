@@ -48,21 +48,43 @@ fun genLetterify(letterString: String = "???", isUpper: Boolean = false): String
 fun genBothify(string: String = "???###", isUpper: Boolean = false): String = f.bothify(string, isUpper)
 
 /**
- * Create a number using the length of [numericString].
- * @param numericString String that contains only '#' character.
+ * Create a long using the [min]..[max]
+ *
+ * @param min Minimum value for randomValue.
+ * @param max Maximum value for randomValue.
  * @return random long type number.
  */
-fun genLong(numericString: String = "#######"): Long = genNumerify(numericString).toLong()
+fun genLong(min: Long = 0, max: Long = 9999999): Long = f.number().numberBetween(min, max)
 
 /**
- * Create a number using the length of [numericString].
- * @param numericString String that contains only '#' character.
+ * Create a number using the [min]..[max]
+ *
+ * @param min Minimum value for randomValue.
+ * @param max Maximum value for randomValue.
+ * @return random double type number.
+ */
+fun genLongGreaterThanZero(max: Int = 9999): Int = genInt(min = 1, max)
+
+/**
+ * Create a Int using the [min]..[max]
+ *
+ * @param min Minimum value for randomValue.
+ * @param max Maximum value for randomValue.
  * @return random int type number.
  */
-fun genInt(numericString: String = "####"): Int = genNumerify(numericString).toInt()
+fun genInt(min: Int = 0, max: Int = 9999): Int = f.number().numberBetween(min, max)
+
+/**
+ * Create a number using the [min]..[max]
+ *
+ * @param min Minimum value for randomValue.
+ * @param max Maximum value for randomValue.
+ * @return random double type number.
+ */
+fun genIntGreaterThanZero(max: Int = 9999): Int = genInt(min = 1, max)
 
 /**
  * Create a boolean value.
  * @return random boolean value.
  */
-fun genBoolean(): Boolean = genInt("#") % 2 == 0
+fun genBoolean(): Boolean = genInt(0, 1) % 2 == 0
