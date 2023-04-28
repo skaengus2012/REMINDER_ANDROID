@@ -38,7 +38,7 @@ fun genSchedule(
 fun genSchedules(
     isComplete: Boolean = genBoolean(),
     link: String? = null
-): List<Schedule> = List(genInt("1#")) { index ->
+): List<Schedule> = List(genInt(min = 10, max = 99)) { index ->
     genSchedule(scheduleId = index.toLong(), isComplete = isComplete, link = link)
 }
 
