@@ -14,20 +14,15 @@
  * limitations under the License.
  */
 
-package com.nlab.statekit.middleware.epic.util
+package com.nlab.statekit.store
 
-import com.nlab.testkit.instanceOf
-import org.hamcrest.MatcherAssert.assertThat
-import org.junit.Test
-import org.mockito.kotlin.mock
+import com.nlab.statekit.middleware.epic.EpicClient
+import com.nlab.statekit.middleware.epic.SubscriptionStrategy
 
 /**
  * @author thalys
  */
-internal class EpicClientFactoryEmptyCaseTest {
-    @Test
-    fun testEmptyWhileStateUsed() {
-        val epicClient = EpicClientFactory.getWhileStateUsed(mock())
-        assertThat(epicClient, instanceOf(EmptyEpicClient::class))
-    }
+abstract class EpicClientFactory {
+    internal fun create(subscriptionStrategy: SubscriptionStrategy): EpicClient = onCreate(subscriptionStrategy)
+    protected abstract fun onCreate(subscriptionStrategy: SubscriptionStrategy): EpicClient
 }

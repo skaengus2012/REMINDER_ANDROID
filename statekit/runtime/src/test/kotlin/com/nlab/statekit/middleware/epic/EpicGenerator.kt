@@ -14,22 +14,9 @@
  * limitations under the License.
  */
 
-package com.nlab.statekit.middleware.epic.util
-
-import com.nlab.statekit.middleware.epic.EpicClient
-import kotlinx.coroutines.flow.MutableStateFlow
+package com.nlab.statekit.middleware.epic
 
 /**
  * @author thalys
  */
-object EpicClientFactory {
-    private var createWhileStateUsedEpicClient: (MutableStateFlow<*>) -> EpicClient = { EmptyEpicClient() }
-
-    fun setWhileStateUsedEpicClientFactory(factory: (MutableStateFlow<*>) -> EpicClient) {
-        createWhileStateUsedEpicClient = factory
-    }
-
-    internal fun getWhileStateUsed(stateFlow: MutableStateFlow<*>): EpicClient {
-        return createWhileStateUsedEpicClient(stateFlow)
-    }
-}
+internal fun genSubscriptionStrategy(): SubscriptionStrategy = SubscriptionStrategy.WhileStateUsed

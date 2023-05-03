@@ -17,7 +17,7 @@
 package com.nlab.statekit.middleware.epic
 
 import com.nlab.statekit.TestAction
-import com.nlab.statekit.middleware.epic.util.EmptyEpicClient
+import com.nlab.statekit.middleware.epic.impl.EmptyEpicClient
 import org.junit.Test
 import org.mockito.kotlin.mock
 

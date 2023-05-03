@@ -28,7 +28,7 @@ import kotlinx.coroutines.flow.getAndUpdate
 /**
  * @author thalys
  */
-class StoreActionDispatcher<A : Action, S : State>(
+internal class StoreActionDispatcher<A : Action, S : State>(
     private val state: MutableStateFlow<S>,
     private val reduce: Reducer<A, S>,
     private val enhance: Enhancer<A, S>

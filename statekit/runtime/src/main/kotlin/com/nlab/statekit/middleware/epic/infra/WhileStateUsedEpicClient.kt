@@ -19,9 +19,8 @@ package com.nlab.statekit.middleware.epic.infra
 import com.nlab.statekit.Action
 import com.nlab.statekit.middleware.enhancer.ActionDispatcher
 import com.nlab.statekit.middleware.epic.EpicClient
-import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 
 /**
  * @author thalys
@@ -31,8 +30,8 @@ internal class WhileStateUsedEpicClient(private val stateFlow: MutableStateFlow<
         coroutineScope: CoroutineScope,
         epicStream: Flow<A>,
         actionDispatcher: ActionDispatcher<A>
-    ) {
-        coroutineScope.launch {
+    ): Job {
+        return coroutineScope.launch(start = CoroutineStart.UNDISPATCHED) {
             stateFlow.subscriptionCount
                 .map { it > 0 }
                 .distinctUntilChanged()

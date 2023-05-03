@@ -19,6 +19,7 @@ package com.nlab.statekit.middleware.epic
 import com.nlab.statekit.Action
 import com.nlab.statekit.middleware.enhancer.ActionDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -29,5 +30,5 @@ interface EpicClient {
         coroutineScope: CoroutineScope,
         epicStream: Flow<A>,
         actionDispatcher: ActionDispatcher<A>
-    )
+    ): Job
 }

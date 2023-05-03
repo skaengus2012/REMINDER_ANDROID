@@ -23,6 +23,6 @@ import kotlinx.coroutines.flow.Flow
  * @author thalys
  */
 class EpicSource<out A : Action> internal constructor(
-    internal val stream: Flow<A>,
-    internal val subscriptionStrategy: SubscriptionStrategy
+    val stream: Flow<A>,
+    val subscriptionStrategy: SubscriptionStrategy
 )

@@ -14,23 +14,25 @@
  * limitations under the License.
  */
 
-package com.nlab.statekit.store
+package com.nlab.statekit.middleware.epic.impl
 
 import com.nlab.statekit.Action
-import com.nlab.statekit.State
 import com.nlab.statekit.middleware.enhancer.ActionDispatcher
-import com.nlab.statekit.middleware.epic.EpicSource
+import com.nlab.statekit.middleware.epic.EpicClient
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 
 /**
+ * Just stub.
+ *
  * @author thalys
  */
-internal interface EpicSourceLoader {
-    fun <A : Action, S : State> load(
+class EmptyEpicClient : EpicClient {
+    override fun <A : Action> fetch(
         coroutineScope: CoroutineScope,
-        epicSources: List<EpicSource<A>>,
-        actionDispatcher: ActionDispatcher<A>,
-        stateFlow: MutableStateFlow<S>,
-    )
+        epicStream: Flow<A>,
+        actionDispatcher: ActionDispatcher<A>
+    ): Job = Job()
 }

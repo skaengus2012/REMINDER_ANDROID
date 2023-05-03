@@ -34,15 +34,6 @@ import org.mockito.kotlin.*
  */
 @ExperimentalCoroutinesApi
 internal class DefaultStoreFactoryTest {
-    private fun createStoreFromDefaultStoreFactory(
-        coroutineScope: CoroutineScope,
-        initState: TestState = TestState.genState(),
-        reducer: Reducer<TestAction, TestState> = mock(),
-        enhancer: Enhancer<TestAction, TestState> = mock(),
-        epicSourceLoader: EpicSourceLoader = mock(),
-        epic: Epic<TestAction> = mock()
-    ): Store<TestAction, TestState> =
-        DefaultStoreFactory(epicSourceLoader).createStore(coroutineScope, initState, reducer, enhancer, epic)
 
     @Test
     fun `Store was created with initValue`() = runTest {
@@ -107,30 +98,42 @@ internal class DefaultStoreFactoryTest {
 
     @Test
     fun `Epic was fetched, when DefaultStore created`() = runTest {
-        var isInvoked = false
-        val inputEpicSources = List(genIntGreaterThanZero()) {
-            EpicSource(
-                emptyFlow<TestAction>(),
-                SubscriptionStrategy.WhileStateUsed
-            )
-        }
-        val epicSourceLoader: EpicSourceLoader = object : EpicSourceLoader {
-            override fun <A : Action, S : State> load(
+        val actionStream = emptyFlow<TestAction>()
+        val subscriptionStrategy = genSubscriptionStrategy()
+        val epicSourceSize: Int = genIntGreaterThanZero()
+        val epicClient = object : EpicClient {
+            var invokedCount: Int = 0
+            override fun <A : Action> fetch(
                 coroutineScope: CoroutineScope,
-                epicSources: List<EpicSource<A>>,
-                actionDispatcher: ActionDispatcher<A>,
-                stateFlow: MutableStateFlow<S>
-            ) {
-                if (epicSources == inputEpicSources) {
-                    isInvoked = true
-                }
+                epicStream: Flow<A>,
+                actionDispatcher: ActionDispatcher<A>
+            ): Job {
+                ++invokedCount
+                return Job()
             }
         }
+
         createStoreFromDefaultStoreFactory(
             coroutineScope = this,
-            epicSourceLoader = epicSourceLoader,
-            epic = buildEpic(*inputEpicSources.toTypedArray())
+            epic = buildEpic(*Array(epicSourceSize) { EpicSource(actionStream, subscriptionStrategy) }),
+            epicClientFactory = object : EpicClientFactory() {
+                override fun onCreate(subscriptionStrategy: SubscriptionStrategy): EpicClient {
+                    return epicClient
+                }
+            }
         )
-        assert(isInvoked)
+        assertThat(epicClient.invokedCount, equalTo(epicSourceSize))
     }
+
+    private fun createStoreFromDefaultStoreFactory(
+        coroutineScope: CoroutineScope,
+        initState: TestState = TestState.genState(),
+        reducer: Reducer<TestAction, TestState> = mock(),
+        enhancer: Enhancer<TestAction, TestState> = mock(),
+        epic: Epic<TestAction> = mock(),
+        epicClientFactory: EpicClientFactory = mock()
+    ): Store<TestAction, TestState> =
+        DefaultStoreFactory().createStore(
+            coroutineScope, MutableStateFlow(initState), reducer, enhancer, epic, epicClientFactory
+        )
 }

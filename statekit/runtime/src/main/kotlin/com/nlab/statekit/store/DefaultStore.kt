@@ -29,9 +29,10 @@ import kotlinx.coroutines.launch
  * @author thalys
  */
 internal class DefaultStore<A : Action, S : State>(
+    override val state: StateFlow<S>,
     private val coroutineScope: CoroutineScope,
     private val actionDispatcher: ActionDispatcher<A>,
-    override val state: StateFlow<S>,
+    @Suppress("unused") private val initJobs: List<Job>  // for strong reference
 ) : Store<A, S>() {
     override fun dispatch(action: A): Job = coroutineScope.launch { actionDispatcher.dispatch(action) }
 }

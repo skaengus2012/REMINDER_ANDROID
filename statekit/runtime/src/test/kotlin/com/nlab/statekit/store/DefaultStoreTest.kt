@@ -36,9 +36,10 @@ internal class DefaultStoreTest {
         val input = TestAction.genAction()
         val mockActionDispatcher: ActionDispatcher<TestAction> = mock()
         val store = DefaultStore<TestAction, TestState>(
+            state = mock(),
             coroutineScope = this,
-            mockActionDispatcher,
-            mock()
+            actionDispatcher = mockActionDispatcher,
+            initJobs = emptyList()
         )
 
         store.dispatch(input).join()
@@ -48,7 +49,7 @@ internal class DefaultStoreTest {
     @Test
     fun `State is initialized correctly`() {
         val expected = MutableStateFlow(TestState.genState())
-        val actual = DefaultStore<TestAction, TestState>(mock(), mock(), expected).state
+        val actual = DefaultStore<TestAction, TestState>(expected, mock(), mock(), initJobs = emptyList()).state
 
         assert(expected === actual)
     }

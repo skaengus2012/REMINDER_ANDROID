@@ -28,20 +28,25 @@ import kotlinx.coroutines.flow.MutableStateFlow
 /**
  * @author thalys
  */
-internal class DefaultStoreFactory(
-    private val epicSourceLoader: EpicSourceLoader
-) {
+internal class DefaultStoreFactory {
     fun <A : Action, S : State> createStore(
         coroutineScope: CoroutineScope,
-        initState: S,
+        baseState: MutableStateFlow<S>,
         reducer: Reducer<A, S>,
         enhancer: Enhancer<A, S>,
         epic: Epic<A>,
+        epicClientFactory: EpicClientFactory
     ): Store<A, S> {
-        val stateFlow = MutableStateFlow(initState)
-        val actionDispatcher = StoreActionDispatcher(stateFlow, reducer, enhancer)
-        epicSourceLoader.load(coroutineScope, epicSources = epic(), actionDispatcher, stateFlow)
-
-        return DefaultStore(coroutineScope, actionDispatcher, stateFlow)
+        val actionDispatcher = StoreActionDispatcher(baseState, reducer, enhancer)
+        return DefaultStore(
+            baseState,
+            coroutineScope,
+            actionDispatcher,
+            initJobs = epic().map { epicSource ->
+                epicClientFactory
+                    .create(epicSource.subscriptionStrategy)
+                    .fetch(coroutineScope, epicSource.stream, actionDispatcher)
+            }
+        )
     }
 }
