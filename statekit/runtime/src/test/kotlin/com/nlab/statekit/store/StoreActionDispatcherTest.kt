@@ -17,7 +17,7 @@
 package com.nlab.statekit.store
 
 import com.nlab.statekit.*
-import com.nlab.statekit.middleware.enhancer.Enhancer
+import com.nlab.statekit.middleware.interceptor.Interceptor
 import com.nlab.statekit.util.buildReducer
 import com.nlab.testkit.once
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -42,7 +42,7 @@ internal class StoreActionDispatcherTest {
         val actionDispatcher = StoreActionDispatcher<TestAction, TestState>(
             stateHolder,
             reduce = buildReducer { expectedState },
-            enhance = mock()
+            intercept = mock()
         )
 
         actionDispatcher.dispatch(TestAction.genAction())
@@ -54,14 +54,14 @@ internal class StoreActionDispatcherTest {
         val input: TestAction = TestAction.genAction()
         val initState = TestState.State1
         val changedState = TestState.State2
-        val enhancer: Enhancer<TestAction, TestState> = mock()
+        val interceptor: Interceptor<TestAction, TestState> = mock()
         val actionDispatcher = StoreActionDispatcher(
             state = MutableStateFlow(initState),
             reduce = buildReducer { changedState },
-            enhance = enhancer
+            intercept = interceptor
         )
 
         actionDispatcher.dispatch(input)
-        verify(enhancer, once()).invoke(actionDispatcher, UpdateSource(input, initState))
+        verify(interceptor, once()).invoke(actionDispatcher, UpdateSource(input, initState))
     }
 }

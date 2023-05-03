@@ -20,7 +20,7 @@ import com.nlab.statekit.Action
 import com.nlab.statekit.Reducer
 import com.nlab.statekit.State
 import com.nlab.statekit.Store
-import com.nlab.statekit.middleware.enhancer.Enhancer
+import com.nlab.statekit.middleware.interceptor.Interceptor
 import com.nlab.statekit.middleware.epic.Epic
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -33,11 +33,11 @@ internal class DefaultStoreFactory {
         coroutineScope: CoroutineScope,
         baseState: MutableStateFlow<S>,
         reducer: Reducer<A, S>,
-        enhancer: Enhancer<A, S>,
+        interceptor: Interceptor<A, S>,
         epic: Epic<A>,
         epicClientFactory: EpicClientFactory
     ): Store<A, S> {
-        val actionDispatcher = StoreActionDispatcher(baseState, reducer, enhancer)
+        val actionDispatcher = StoreActionDispatcher(baseState, reducer, interceptor)
         return DefaultStore(
             baseState,
             coroutineScope,

@@ -14,22 +14,22 @@
  * limitations under the License.
  */
 
-package com.nlab.statekit.middleware.enhancer.dsl
+package com.nlab.statekit.middleware.interceptor.dsl
 
 import com.nlab.statekit.Action
 import com.nlab.statekit.State
 import com.nlab.statekit.UpdateSource
-import com.nlab.statekit.middleware.enhancer.Enhancer
-import com.nlab.statekit.middleware.enhancer.ActionDispatcher
+import com.nlab.statekit.middleware.interceptor.Interceptor
+import com.nlab.statekit.middleware.interceptor.ActionDispatcher
 
 /**
  * @author thalys
  */
-internal class DslEnhancer<A : Action, S : State>(
-    defineDSL: DslEnhanceBuilder<A, S>.() -> Unit
-) : Enhancer<A, S> {
+internal class DslInterceptor<A : Action, S : State>(
+    defineDSL: DslInterceptBuilder<A, S>.() -> Unit
+) : Interceptor<A, S> {
     private val block: suspend (ActionDispatcher<A>).(UpdateSource<A, S>) -> Unit =
-        DslEnhanceBuilder<A, S>()
+        DslInterceptBuilder<A, S>()
             .apply(defineDSL)
             .build()
     override suspend fun invoke(actionDispatcher: ActionDispatcher<A>, updateSource: UpdateSource<A, S>) {

@@ -29,39 +29,39 @@ import org.mockito.kotlin.verify
  * @author thalys
  */
 @ExperimentalCoroutinesApi
-internal class EnhancerUtilsKtTest {
+internal class InterceptorUtilsKtTest {
     @Test
-    fun testBuildEnhancer() = runTest {
+    fun testBuildInterceptor() = runTest {
         val work: () -> Unit = mock()
-        val enhancer = buildEnhancer<TestAction, TestState> { work() }
+        val interceptor = buildInterceptor<TestAction, TestState> { work() }
 
-        enhancer.invoke(mock(), UpdateSource(TestAction.genAction(), TestState.genState()))
+        interceptor.invoke(mock(), UpdateSource(TestAction.genAction(), TestState.genState()))
         verify(work, once())()
     }
 
     @Test
-    fun testBuildDslEnhancer() = runTest {
+    fun testBuildDslInterceptor() = runTest {
         val work: () -> Unit = mock()
-        val enhancer = buildDslEnhancer<TestAction, TestState> {
+        val interceptor = buildDslInterceptor<TestAction, TestState> {
             anyState {
                 anyAction { work() }
             }
         }
 
-        enhancer.invoke(mock(), UpdateSource(TestAction.genAction(), TestState.genState()))
+        interceptor.invoke(mock(), UpdateSource(TestAction.genAction(), TestState.genState()))
         verify(work, once())()
     }
 
     @Test
-    fun testEnhancerComposition() = runTest {
+    fun testInterceptorComposition() = runTest {
         val firstWork: () -> Unit = mock()
         val lastWork: () -> Unit = mock()
 
-        val firstEnhancer = buildEnhancer<TestAction, TestState> { firstWork() }
-        val lastEnhancer = buildEnhancer<TestAction, TestState> { lastWork() }
-        val compositionEnhancer = firstEnhancer + lastEnhancer
+        val firstInterceptor = buildInterceptor<TestAction, TestState> { firstWork() }
+        val lastInterceptor = buildInterceptor<TestAction, TestState> { lastWork() }
+        val compositeInterceptor = firstInterceptor + lastInterceptor
 
-        compositionEnhancer.invoke(mock(), UpdateSource(TestAction.genAction(), TestState.genState()))
+        compositeInterceptor.invoke(mock(), UpdateSource(TestAction.genAction(), TestState.genState()))
         verify(firstWork, once())()
         verify(lastWork, once())()
     }

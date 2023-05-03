@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.nlab.statekit.middleware.enhancer
+package com.nlab.statekit.middleware.interceptor
 
 import com.nlab.statekit.*
-import com.nlab.statekit.middleware.enhancer.dsl.EnhanceEndScope
+import com.nlab.statekit.middleware.interceptor.dsl.InterceptEndScope
 import com.nlab.testkit.once
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
@@ -31,22 +31,22 @@ import org.mockito.kotlin.verify
  * @author thalys
  */
 @ExperimentalCoroutinesApi
-internal class CompositeEnhanceBuilderTest {
+internal class CompositeInterceptBuilderTest {
     @Test
-    fun `Enhanced with async, when two types strategies registered`() = runTest {
-        val enhanceBuilder = CompositeEnhanceBuilder<TestAction, TestAction, TestState>()
+    fun `Intercepted with async, when two types strategies registered`() = runTest {
+        val interceptBuilder = CompositeInterceptBuilder<TestAction, TestAction, TestState>()
         val firstStrategy: () -> Unit = mock()
         val lastStrategy: () -> Unit = mock()
-        enhanceBuilder.add {
+        interceptBuilder.add {
             delay(1_000)
             firstStrategy()
         }
-        enhanceBuilder.add {
+        interceptBuilder.add {
             delay(1_000)
             lastStrategy()
         }
-        val enhancer = enhanceBuilder.build()
-        enhancer(EnhanceEndScope(mock()), UpdateSource(TestAction.genAction(), TestState.genState()))
+        val interceptor = interceptBuilder.build()
+        interceptor(InterceptEndScope(mock()), UpdateSource(TestAction.genAction(), TestState.genState()))
         advanceTimeBy(1_100)
         verify(firstStrategy, once())()
         verify(lastStrategy, once())()

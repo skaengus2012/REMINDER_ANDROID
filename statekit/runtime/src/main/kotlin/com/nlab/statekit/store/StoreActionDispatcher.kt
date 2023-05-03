@@ -20,8 +20,8 @@ import com.nlab.statekit.Action
 import com.nlab.statekit.Reducer
 import com.nlab.statekit.State
 import com.nlab.statekit.UpdateSource
-import com.nlab.statekit.middleware.enhancer.ActionDispatcher
-import com.nlab.statekit.middleware.enhancer.Enhancer
+import com.nlab.statekit.middleware.interceptor.ActionDispatcher
+import com.nlab.statekit.middleware.interceptor.Interceptor
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.getAndUpdate
 
@@ -31,9 +31,9 @@ import kotlinx.coroutines.flow.getAndUpdate
 internal class StoreActionDispatcher<A : Action, S : State>(
     private val state: MutableStateFlow<S>,
     private val reduce: Reducer<A, S>,
-    private val enhance: Enhancer<A, S>
+    private val intercept: Interceptor<A, S>
 ) : ActionDispatcher<A> {
     override suspend fun dispatch(action: A) {
-        enhance(this, UpdateSource(action, before = state.getAndUpdate { cur -> reduce(UpdateSource(action, cur)) }))
+        intercept(this, UpdateSource(action, before = state.getAndUpdate { cur -> reduce(UpdateSource(action, cur)) }))
     }
 }

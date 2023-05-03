@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.nlab.statekit.middleware.enhancer.dsl
+package com.nlab.statekit.middleware.interceptor.dsl
 
 import com.nlab.statekit.*
-import com.nlab.statekit.middleware.enhancer.ActionDispatcher
+import com.nlab.statekit.middleware.interceptor.ActionDispatcher
 import com.nlab.testkit.once
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -31,20 +31,20 @@ import org.mockito.verification.VerificationMode
  * @author thalys
  */
 @ExperimentalCoroutinesApi
-internal class DslEnhanceBuilderTest {
+internal class DslInterceptBuilderTest {
 
     private suspend fun checkWithActionDispatch(
         inputAction: TestAction = TestAction.genAction(),
         initState: TestState = TestState.genState(),
         dispatchAction: TestAction,
         verifyMode: VerificationMode,
-        buildDSL: (DslEnhanceBuilder<TestAction, TestState>).() -> Unit
+        buildDSL: (DslInterceptBuilder<TestAction, TestState>).() -> Unit
     ) {
         val mockDispatcher: ActionDispatcher<TestAction> = mock()
-        val enhancer = DslEnhanceBuilder<TestAction, TestState>()
+        val interceptor = DslInterceptBuilder<TestAction, TestState>()
             .apply(buildDSL)
             .build()
-        enhancer(mockDispatcher, UpdateSource(inputAction, initState))
+        interceptor(mockDispatcher, UpdateSource(inputAction, initState))
         verify(mockDispatcher, verifyMode).dispatch(dispatchAction)
     }
 

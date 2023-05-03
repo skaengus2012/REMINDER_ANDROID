@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package com.nlab.statekit.middleware.enhancer.dsl
+package com.nlab.statekit.middleware.interceptor.dsl
 
 import com.nlab.statekit.Action
 import com.nlab.statekit.dsl.BuilderDsl
-import com.nlab.statekit.middleware.enhancer.ActionDispatcher
+import com.nlab.statekit.middleware.interceptor.ActionDispatcher
 
 /**
  * @author thalys
  */
 @JvmInline
 @BuilderDsl
-value class EnhanceEndScope<A : Action> internal constructor(
+value class InterceptEndScope<A : Action> internal constructor(
     private val actionDispatcher: ActionDispatcher<A>
 ) : ActionDispatcher<A> by actionDispatcher

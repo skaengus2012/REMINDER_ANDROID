@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package com.nlab.statekit.middleware.enhancer.dsl
+package com.nlab.statekit.middleware.interceptor.dsl
 
 import com.nlab.statekit.Action
 import com.nlab.statekit.State
 import com.nlab.statekit.UpdateSource
 import com.nlab.statekit.dsl.BuilderDsl
 import com.nlab.statekit.dsl.OperationDsl
-import com.nlab.statekit.middleware.enhancer.CompositeEnhanceBuilder
-import com.nlab.statekit.middleware.enhancer.ActionDispatcher
+import com.nlab.statekit.middleware.interceptor.CompositeInterceptBuilder
+import com.nlab.statekit.middleware.interceptor.ActionDispatcher
 import kotlin.reflect.KClass
 import kotlin.reflect.cast
 
@@ -30,69 +30,69 @@ import kotlin.reflect.cast
  * @author thalys
  */
 @BuilderDsl
-class StateHostEnhanceBuilder<A : Action, T : A, S : State> internal constructor() {
-    private val compositeEnhanceBuilder = CompositeEnhanceBuilder<A, T, S>()
+class StateHostInterceptBuilder<A : Action, T : A, S : State> internal constructor() {
+    private val compositeInterceptBuilder = CompositeInterceptBuilder<A, T, S>()
 
     internal fun build(): suspend ActionDispatcher<A>.(UpdateSource<T, S>) -> Unit {
-        return compositeEnhanceBuilder.build()
+        return compositeInterceptBuilder.build()
     }
 
     @OperationDsl
-    fun anyState(block: suspend EnhanceEndScope<A>.(UpdateSource<T, S>) -> Unit) {
-        compositeEnhanceBuilder.add { block(EnhanceEndScope(actionDispatcher = this), it) }
+    fun anyState(block: suspend InterceptEndScope<A>.(UpdateSource<T, S>) -> Unit) {
+        compositeInterceptBuilder.add { block(InterceptEndScope(actionDispatcher = this), it) }
     }
 
     @OperationDsl
     fun filteredState(
         predicate: (S) -> Boolean,
-        block: suspend EnhanceEndScope<A>.(UpdateSource<T, S>) -> Unit
+        block: suspend InterceptEndScope<A>.(UpdateSource<T, S>) -> Unit
     ) {
         /**
          * Jacoco was unable to recognize inline,
-         * so **[StateHostEnhanceBuilder.anyState]** could not be used
+         * so **[StateHostInterceptBuilder.anyState]** could not be used
          */
-        compositeEnhanceBuilder.add { if (predicate(it.before)) block(EnhanceEndScope(actionDispatcher = this), it) }
+        compositeInterceptBuilder.add { if (predicate(it.before)) block(InterceptEndScope(actionDispatcher = this), it) }
     }
 
     @OperationDsl
     fun <U : S> state(
         clazz: KClass<U>,
-        block: suspend EnhanceEndScope<A>.(UpdateSource<T, U>) -> Unit
+        block: suspend InterceptEndScope<A>.(UpdateSource<T, U>) -> Unit
     ) {
         /**
          * Jacoco was unable to recognize inline,
-         * so **[StateHostEnhanceBuilder.filteredState]** could not be used
+         * so **[StateHostInterceptBuilder.filteredState]** could not be used
          */
-        compositeEnhanceBuilder.add { (action, before) ->
+        compositeInterceptBuilder.add { (action, before) ->
             if (clazz.isInstance(before)) {
-                block(EnhanceEndScope(actionDispatcher = this), UpdateSource(action, clazz.cast(before)))
+                block(InterceptEndScope(actionDispatcher = this), UpdateSource(action, clazz.cast(before)))
             }
         }
     }
 
     @OperationDsl
-    inline fun <reified U : S> state(noinline block: suspend EnhanceEndScope<A>.(UpdateSource<T, U>) -> Unit) {
+    inline fun <reified U : S> state(noinline block: suspend InterceptEndScope<A>.(UpdateSource<T, U>) -> Unit) {
         state(U::class, block)
     }
 
     @OperationDsl
     fun <U : S> stateNot(
         clazz: KClass<U>,
-        block: suspend EnhanceEndScope<A>.(UpdateSource<T, S>) -> Unit
+        block: suspend InterceptEndScope<A>.(UpdateSource<T, S>) -> Unit
     ) {
         /**
          * Jacoco was unable to recognize inline,
-         * so **[StateHostEnhanceBuilder.filteredState]** could not be used
+         * so **[StateHostInterceptBuilder.filteredState]** could not be used
          */
-        compositeEnhanceBuilder.add { updateSource ->
+        compositeInterceptBuilder.add { updateSource ->
             if (clazz.isInstance(updateSource.before).not()) {
-                block(EnhanceEndScope(actionDispatcher = this), updateSource)
+                block(InterceptEndScope(actionDispatcher = this), updateSource)
             }
         }
     }
 
     @OperationDsl
-    inline fun <reified U : S> stateNot(noinline block: suspend EnhanceEndScope<A>.(UpdateSource<T, S>) -> Unit) {
+    inline fun <reified U : S> stateNot(noinline block: suspend InterceptEndScope<A>.(UpdateSource<T, S>) -> Unit) {
         stateNot(U::class, block)
     }
 }

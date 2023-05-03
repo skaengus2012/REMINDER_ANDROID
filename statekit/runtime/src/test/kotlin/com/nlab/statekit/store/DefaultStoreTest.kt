@@ -17,7 +17,7 @@
 package com.nlab.statekit.store
 
 import com.nlab.statekit.*
-import com.nlab.statekit.middleware.enhancer.ActionDispatcher
+import com.nlab.statekit.middleware.interceptor.ActionDispatcher
 import com.nlab.testkit.once
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow

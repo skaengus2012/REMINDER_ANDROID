@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.nlab.statekit.middleware.enhancer.dsl
+package com.nlab.statekit.middleware.interceptor.dsl
 
 import com.nlab.statekit.*
-import com.nlab.statekit.middleware.enhancer.ActionDispatcher
+import com.nlab.statekit.middleware.interceptor.ActionDispatcher
 import com.nlab.testkit.once
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -31,24 +31,24 @@ import org.mockito.verification.VerificationMode
  * @author thalys
  */
 @ExperimentalCoroutinesApi
-internal class ActionHostEnhanceBuilderTest {
+internal class ActionHostInterceptBuilderTest {
 
     private suspend fun checkWithActionDispatch(
         inputAction: TestAction = TestAction.genAction(),
         dispatchAction: TestAction,
         verifyMode: VerificationMode,
-        buildDSL: (ActionHostEnhanceBuilder<TestAction, TestState>).() -> Unit
+        buildDSL: (ActionHostInterceptBuilder<TestAction, TestState>).() -> Unit
     ) {
         val mockDispatcher: ActionDispatcher<TestAction> = mock()
-        val enhancer = ActionHostEnhanceBuilder<TestAction, TestState>()
+        val interceptor = ActionHostInterceptBuilder<TestAction, TestState>()
             .apply(buildDSL)
             .build()
-        enhancer(mockDispatcher, UpdateSource(inputAction, TestState.genState()))
+        interceptor(mockDispatcher, UpdateSource(inputAction, TestState.genState()))
         verify(mockDispatcher, verifyMode).dispatch(dispatchAction)
     }
 
     @Test
-    fun `When enhancer inputted the action, Action dispatched`() = runTest {
+    fun `When interceptor inputted the action, Action dispatched`() = runTest {
         val dispatchAction = TestAction.genAction()
         checkWithActionDispatch(
             dispatchAction = dispatchAction,

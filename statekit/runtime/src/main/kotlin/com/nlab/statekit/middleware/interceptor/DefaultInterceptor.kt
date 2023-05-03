@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.statekit.middleware.enhancer
+package com.nlab.statekit.middleware.interceptor
 
 import com.nlab.statekit.Action
 import com.nlab.statekit.State
@@ -23,4 +23,10 @@ import com.nlab.statekit.UpdateSource
 /**
  * @author thalys
  */
-interface Enhancer<A : Action, S : State> : suspend ActionDispatcher<A>.(UpdateSource<A, S>) -> Unit
+internal class DefaultInterceptor<A : Action, S : State>(
+    private val block: suspend ActionDispatcher<A>.(UpdateSource<A, S>) -> Unit
+) : Interceptor<A, S> {
+    override suspend fun invoke(actionDispatcher: ActionDispatcher<A>, source: UpdateSource<A, S>) {
+        actionDispatcher.block(source)
+    }
+}

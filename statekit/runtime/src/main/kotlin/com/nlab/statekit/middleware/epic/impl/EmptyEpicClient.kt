@@ -17,12 +17,11 @@
 package com.nlab.statekit.middleware.epic.impl
 
 import com.nlab.statekit.Action
-import com.nlab.statekit.middleware.enhancer.ActionDispatcher
+import com.nlab.statekit.middleware.interceptor.ActionDispatcher
 import com.nlab.statekit.middleware.epic.EpicClient
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.launch
 
 /**
  * Just stub.

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.statekit.middleware.enhancer
+package com.nlab.statekit.middleware.interceptor
 
 import com.nlab.statekit.Action
 import com.nlab.statekit.State
@@ -27,21 +27,21 @@ import kotlinx.coroutines.launch
  * @author thalys
  */
 
-internal class CompositeEnhanceBuilder<A : Action, T : A, S : State> {
-    private val enhances = mutableListOf<suspend ActionDispatcher<A>.(UpdateSource<T, S>) -> Unit>()
+internal class CompositeInterceptBuilder<A : Action, T : A, S : State> {
+    private val interceptors = mutableListOf<suspend ActionDispatcher<A>.(UpdateSource<T, S>) -> Unit>()
 
     fun add(block: suspend ActionDispatcher<A>.(UpdateSource<T, S>) -> Unit) {
-        enhances += block
+        interceptors += block
     }
 
     fun build(): suspend ActionDispatcher<A>.(UpdateSource<T, S>) -> Unit = { updateSource ->
-        coroutineScope(enhanceAsync(actionDispatcher = this, updateSource))
+        coroutineScope(interceptAsync(actionDispatcher = this, updateSource))
     }
 
-    private fun enhanceAsync(
+    private fun interceptAsync(
         actionDispatcher: ActionDispatcher<A>,
         updateSource: UpdateSource<T, S>
     ): (CoroutineScope) -> Unit = { scope ->
-        enhances.forEach { scope.launch { it(actionDispatcher, updateSource) } }
+        interceptors.forEach { scope.launch { it(actionDispatcher, updateSource) } }
     }
 }

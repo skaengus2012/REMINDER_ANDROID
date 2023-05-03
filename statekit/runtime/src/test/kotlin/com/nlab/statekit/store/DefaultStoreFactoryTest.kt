@@ -16,7 +16,7 @@
 
 package com.nlab.statekit.store
 
-import com.nlab.statekit.middleware.enhancer.*
+import com.nlab.statekit.middleware.interceptor.*
 import com.nlab.statekit.middleware.epic.*
 import com.nlab.statekit.util.*
 import com.nlab.statekit.*
@@ -68,22 +68,22 @@ internal class DefaultStoreFactoryTest {
     }
 
     @Test
-    fun `Enhancer modified state of store`() = runTest {
+    fun `Interceptor modified state of store`() = runTest {
         val initState: TestState = TestState.State1
         val expectedState: TestState = TestState.State2
         val input: TestAction = TestAction.Action1
-        val actionInEnhancer: TestAction = TestAction.Action2
+        val actionInInterceptor: TestAction = TestAction.Action2
         val store = createStoreFromDefaultStoreFactory(
             coroutineScope = this,
             initState = initState,
             reducer = buildDslReducer {
-                filteredAction(predicate = { it == actionInEnhancer }) {
+                filteredAction(predicate = { it == actionInInterceptor }) {
                     anyState { expectedState }
                 }
             },
-            enhancer = buildDslEnhancer {
+            interceptor = buildDslInterceptor {
                 filteredState(predicate = { it == initState }) {
-                    filteredAction(predicate = { it == input }) { dispatch(actionInEnhancer) }
+                    filteredAction(predicate = { it == input }) { dispatch(actionInInterceptor) }
                 }
             }
         )
@@ -129,11 +129,11 @@ internal class DefaultStoreFactoryTest {
         coroutineScope: CoroutineScope,
         initState: TestState = TestState.genState(),
         reducer: Reducer<TestAction, TestState> = mock(),
-        enhancer: Enhancer<TestAction, TestState> = mock(),
+        interceptor: Interceptor<TestAction, TestState> = mock(),
         epic: Epic<TestAction> = mock(),
         epicClientFactory: EpicClientFactory = mock()
     ): Store<TestAction, TestState> =
         DefaultStoreFactory().createStore(
-            coroutineScope, MutableStateFlow(initState), reducer, enhancer, epic, epicClientFactory
+            coroutineScope, MutableStateFlow(initState), reducer, interceptor, epic, epicClientFactory
         )
 }

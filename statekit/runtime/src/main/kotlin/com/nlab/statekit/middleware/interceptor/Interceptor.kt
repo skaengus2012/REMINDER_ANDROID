@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.nlab.statekit.middleware.enhancer
+package com.nlab.statekit.middleware.interceptor
 
 import com.nlab.statekit.Action
+import com.nlab.statekit.State
+import com.nlab.statekit.UpdateSource
 
 /**
  * @author thalys
  */
-interface ActionDispatcher<A : Action> {
-    suspend fun dispatch(action: A)
-}
+interface Interceptor<A : Action, S : State> : suspend ActionDispatcher<A>.(UpdateSource<A, S>) -> Unit

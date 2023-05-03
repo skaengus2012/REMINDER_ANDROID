@@ -16,7 +16,7 @@
 
 package com.nlab.statekit.store
 
-import com.nlab.statekit.middleware.enhancer.ActionDispatcher
+import com.nlab.statekit.middleware.interceptor.ActionDispatcher
 import com.nlab.statekit.Action
 import com.nlab.statekit.State
 import com.nlab.statekit.Store
