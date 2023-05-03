@@ -14,25 +14,24 @@
  * limitations under the License.
  */
 
-package com.nlab.statekit
+package com.nlab.statekit.store
 
-import com.nlab.testkit.genBothify
-import com.nlab.testkit.genInt
+import com.nlab.statekit.Action
+import com.nlab.statekit.middleware.epic.EpicClient
+import com.nlab.statekit.middleware.interceptor.ActionDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.Flow
 
-/**
- * @author thalys
- */
-internal sealed class TestState private constructor() : State {
-    object State1 : TestState()
-    object State2 : TestState()
-    object State3 : TestState()
-    data class State4(val value: String = genBothify()) : TestState()
-
-    companion object {
-        fun genState(): TestState = when (genInt() % 3) {
-            0 -> State1
-            1 -> State2
-            else -> State3
-        }
+internal class FetchCountableEpicClient : EpicClient {
+    var invokedCount: Int = 0
+        private set
+    override fun <A : Action> fetch(
+        coroutineScope: CoroutineScope,
+        epicStream: Flow<A>,
+        actionDispatcher: ActionDispatcher<A>
+    ): Job {
+        ++invokedCount
+        return Job()
     }
 }

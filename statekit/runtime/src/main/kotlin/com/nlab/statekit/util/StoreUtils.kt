@@ -15,25 +15,51 @@
  */
 package com.nlab.statekit.util
 
-/**
- * @author thalys
- */
+import com.nlab.statekit.Action
+import com.nlab.statekit.Reducer
+import com.nlab.statekit.State
+import com.nlab.statekit.Store
+import com.nlab.statekit.middleware.epic.Epic
+import com.nlab.statekit.middleware.interceptor.Interceptor
+import com.nlab.statekit.store.DefaultStoreFactory
+import com.nlab.statekit.store.EpicClientFactory
+import com.nlab.statekit.store.impl.DefaultEpicClientFactory
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.MutableStateFlow
 
 /**
+ * @author Doohyun
+ */
+private val storeFactory = DefaultStoreFactory()
+
+fun <A : Action, S : State> createStore(
+    coroutineScope: CoroutineScope,
+    initState: S,
+    reducer: Reducer<A, S> = buildDslReducer {},
+    interceptor: Interceptor<A, S> = buildDslInterceptor {},
+    epic: Epic<A> = buildEpic(),
+    epicClientFactory: EpicClientFactory? = null
+): Store<A, S> = createStore(
+    coroutineScope,
+    MutableStateFlow(initState),
+    reducer,
+    interceptor,
+    epic,
+    epicClientFactory
+)
+
 fun <A : Action, S : State> createStore(
     coroutineScope: CoroutineScope,
     baseState: MutableStateFlow<S>,
     reducer: Reducer<A, S> = buildDslReducer {},
-    enhancer: Enhancer<A, S> = buildEnhancer {},
+    interceptor: Interceptor<A, S> = buildDslInterceptor {},
     epic: Epic<A> = buildEpic(),
     epicClientFactory: EpicClientFactory? = null
-): Store<A, S> {
-    return factory.createStore(
-        coroutineScope,
-        baseState,
-        reducer,
-        enhancer,
-        epic,
-        epicClientFactory
-    )
-}*/
+): Store<A, S> = storeFactory.createStore(
+    coroutineScope,
+    baseState,
+    reducer,
+    interceptor,
+    epic,
+    epicClientFactory = epicClientFactory ?: DefaultEpicClientFactory(baseState)
+)

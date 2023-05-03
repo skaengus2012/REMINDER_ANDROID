@@ -101,17 +101,7 @@ internal class DefaultStoreFactoryTest {
         val actionStream = emptyFlow<TestAction>()
         val subscriptionStrategy = genSubscriptionStrategy()
         val epicSourceSize: Int = genIntGreaterThanZero()
-        val epicClient = object : EpicClient {
-            var invokedCount: Int = 0
-            override fun <A : Action> fetch(
-                coroutineScope: CoroutineScope,
-                epicStream: Flow<A>,
-                actionDispatcher: ActionDispatcher<A>
-            ): Job {
-                ++invokedCount
-                return Job()
-            }
-        }
+        val epicClient = FetchCountableEpicClient()
 
         createStoreFromDefaultStoreFactory(
             coroutineScope = this,
