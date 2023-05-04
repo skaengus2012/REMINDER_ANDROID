@@ -24,6 +24,7 @@ import com.nlab.statekit.middleware.interceptor.Interceptor
 import com.nlab.statekit.middleware.epic.Epic
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 /**
  * @author thalys
@@ -39,7 +40,7 @@ internal class DefaultStoreFactory {
     ): Store<A, S> {
         val actionDispatcher = StoreActionDispatcher(baseState, reducer, interceptor)
         return DefaultStore(
-            baseState,
+            baseState.asStateFlow(),
             coroutineScope,
             actionDispatcher,
             initJobs = epic().map { epicSource ->

@@ -17,10 +17,11 @@
 package com.nlab.statekit.lifecycle
 
 import com.nlab.statekit.Action
+import kotlinx.coroutines.Job
 
 /**
  * @author Doohyun
  */
 interface StateHolder<A : Action> {
-    fun dispatch(action: A)
+    fun dispatch(action: A): Job
 }

@@ -16,7 +16,7 @@
 
 package com.nlab.statekit.compiler
 
-import com.nlab.statekit.core.lifecycle.PublicEvent
+import com.nlab.statekit.lifecycle.UiAction
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
@@ -48,7 +48,7 @@ class UiActionProcessor : AbstractProcessor() {
         annotations: MutableSet<out TypeElement>,
         roundEnv: RoundEnvironment
     ): Boolean {
-        val elements = roundEnv.getElementsAnnotatedWith(PublicEvent::class.java)
+        val elements = roundEnv.getElementsAnnotatedWith(UiAction::class.java)
         val hasInvalidElement: Boolean = elements.any { it.kind != ElementKind.CLASS }
         if (hasInvalidElement) {
             processingEnv.messager.printMessage(
