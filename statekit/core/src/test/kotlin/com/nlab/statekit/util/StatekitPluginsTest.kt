@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 The N's lab Open Source Project
+ * Copyright (C) 2023 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,26 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-pluginManagement {
-    repositories {
-        includeBuild("build-logic")
-        gradlePluginPortal()
-        google()
-        mavenCentral()
+
+package com.nlab.statekit.util
+
+import kotlinx.coroutines.CoroutineExceptionHandler
+import org.junit.Before
+import org.junit.Test
+import org.mockito.kotlin.mock
+
+/**
+ * @author Doohyun
+ */
+internal class StatekitPluginsTest {
+    private val onError: (Throwable) -> Unit = mock()
+
+    @Before
+    fun setup() {
     }
 }
-
-dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-    repositories {
-        google()
-        mavenCentral()
-    }
-}
-
-rootProject.name="REMINDER_ANDROID"
-include(":app")
-include(":statekit:compiler")
-include(":statekit:core")
-include(":statekit:runtime")
-include(":testkit")

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 The N's lab Open Source Project
+ * Copyright (C) 2023 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,26 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-pluginManagement {
-    repositories {
-        includeBuild("build-logic")
-        gradlePluginPortal()
-        google()
-        mavenCentral()
+
+package com.nlab.statekit.middleware.epic
+
+import com.nlab.statekit.TestAction
+import com.nlab.statekit.middleware.epic.impl.EmptyEpicClient
+import org.junit.Test
+import org.mockito.kotlin.mock
+
+/**
+ * @author thalys
+ */
+internal class EmptyEpicClientTest {
+    @Test
+    fun testEmpty() {
+        val epicSourceClient = EmptyEpicClient()
+        epicSourceClient.fetch<TestAction>(
+            coroutineScope = mock(),
+            epicStream = mock(),
+            actionDispatcher = mock()
+        )
     }
 }
-
-dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-    repositories {
-        google()
-        mavenCentral()
-    }
-}
-
-rootProject.name="REMINDER_ANDROID"
-include(":app")
-include(":statekit:compiler")
-include(":statekit:core")
-include(":statekit:runtime")
-include(":testkit")

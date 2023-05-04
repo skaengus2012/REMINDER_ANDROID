@@ -20,7 +20,7 @@ import com.nlab.reminder.core.state.Event
 import com.nlab.reminder.domain.common.schedule.ScheduleId
 import com.nlab.reminder.domain.common.schedule.ScheduleUiState
 import com.nlab.reminder.domain.common.schedule.SelectionDisable
-import com.nlab.state.core.lifecycle.PublicEvent
+import com.nlab.statekit.core.lifecycle.PublicEvent
 
 /**
  * @author Doohyun
