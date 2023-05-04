@@ -17,26 +17,12 @@
 package com.nlab.reminder.internal.common.database
 
 import com.nlab.reminder.domain.common.schedule.Schedule
-import com.nlab.reminder.domain.common.schedule.genSchedule
-import com.nlab.reminder.domain.common.tag.Tag
-import com.nlab.reminder.domain.common.tag.genTags
 import com.nlab.reminder.internal.common.android.database.ScheduleEntityWithTagEntities
 import com.nlab.reminder.internal.common.android.database.toEntity
-import com.nlab.testkit.genInt
 
 /**
  * @author Doohyun
  */
-fun genScheduleEntityWithTagEntities(
-    schedule: Schedule = genSchedule(),
-    tags: List<Tag> = genTags()
-): ScheduleEntityWithTagEntities = ScheduleEntityWithTagEntities(
-    schedule.toEntity(),
-    tags.toEntities()
-)
-fun genScheduleEntityWithTagEntitiesList(numericString: String = "##"): List<ScheduleEntityWithTagEntities> =
-    List(genInt(numericString)) { genScheduleEntityWithTagEntities() }
-
 fun Schedule.toScheduleEntityWithTagEntities(): ScheduleEntityWithTagEntities = ScheduleEntityWithTagEntities(
     scheduleEntity = toEntity(),
     tagEntities = tags.toEntities()
