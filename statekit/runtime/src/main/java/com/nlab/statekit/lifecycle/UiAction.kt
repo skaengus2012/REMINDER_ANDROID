@@ -14,20 +14,15 @@
  * limitations under the License.
  */
 
-// FIXME Annotations must be added before Gradle 8.1.
-// FIXME https://developer.android.com/studio/build/migrate-to-catalogs?hl=ko#migrate-plugins
-@Suppress("DSL_SCOPE_VIOLATION")
-plugins {
-    id("nlab.jvm.application.jacoco")
-    alias(libs.plugins.kotlin.jvm)
-}
+package com.nlab.statekit.lifecycle
 
-dependencies {
-    implementation(libs.kotlin.coroutines.core)
+import kotlin.reflect.KClass
 
-    testImplementation(project(":testkit"))
-    testImplementation(libs.junit)
-    testImplementation(libs.kotlin.coroutines.test)
-    testImplementation(libs.mockito.inline)
-    testImplementation(libs.mockito.kotlin)
-}
+/**
+ * @author Doohyun
+ */
+@Retention(AnnotationRetention.SOURCE)
+@Target(AnnotationTarget.CLASS)
+annotation class UiAction(
+    @Suppress("unused") val stateHolderType: KClass<out StateHolder<*>>
+)

@@ -17,28 +17,31 @@
 package com.nlab.statekit.compiler
 
 import com.nlab.statekit.core.lifecycle.PublicEvent
-import com.squareup.kotlinpoet.*
+import com.squareup.kotlinpoet.ClassName
+import com.squareup.kotlinpoet.FileSpec
+import com.squareup.kotlinpoet.FunSpec
+import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.metadata.KotlinPoetMetadataPreview
 import com.squareup.kotlinpoet.metadata.isObject
 import com.squareup.kotlinpoet.metadata.toKmClass
 import kotlinx.metadata.KmType
 import kotlinx.metadata.KmValueParameter
-import javax.annotation.processing.*
+import javax.annotation.processing.AbstractProcessor
+import javax.annotation.processing.RoundEnvironment
+import javax.annotation.processing.SupportedAnnotationTypes
+import javax.annotation.processing.SupportedOptions
+import javax.annotation.processing.SupportedSourceVersion
 import javax.lang.model.SourceVersion
 import javax.lang.model.element.Element
 import javax.lang.model.element.ElementKind
 import javax.lang.model.element.TypeElement
 import javax.tools.Diagnostic
 
-/**
- * @author thalys
- */
-@Deprecated("This class will be removed in the future.")
-@SupportedAnnotationTypes("com.nlab.statekit.core.lifecycle.PublicEvent")
+@SupportedAnnotationTypes("com.nlab.statekit.lifecycle.UiAction")
 @SupportedSourceVersion(SourceVersion.RELEASE_17)
-@SupportedOptions(PublicEventProcessor.KAPT_KOTLIN_GENERATED_OPTION_NAME)
+@SupportedOptions(UiActionProcessor.KAPT_KOTLIN_GENERATED_OPTION_NAME)
 @OptIn(KotlinPoetMetadataPreview::class)
-internal class PublicEventProcessor : AbstractProcessor() {
+class UiActionProcessor : AbstractProcessor() {
     private val functionEntries: MutableMap<Destination, List<FunSpec.Builder>> = hashMapOf()
 
     override fun process(
@@ -117,7 +120,7 @@ internal class PublicEventProcessor : AbstractProcessor() {
             packageInfo = packageTokens.joinToString("."),
             clazzName = tokens.joinToString("."),
             filePath = "/${packageTokens.joinToString("/")}",
-            fileName = "${tokens[firstClassTokenIndex]}_PublicEvents"
+            fileName = "${tokens[firstClassTokenIndex]}_UiActions"
         )
     }
 
@@ -146,7 +149,7 @@ internal class PublicEventProcessor : AbstractProcessor() {
                 val str = name.toString()
                 "${str[0].lowercaseChar()}${str.substring(1, str.length)}"
             })
-            .addStatement("return send($statementBuilder)")
+            .addStatement("return dispatch($statementBuilder)")
             .returns(jobType)
 
         constructors.first().valueParameters.map { parameter ->
@@ -252,7 +255,7 @@ internal class PublicEventProcessor : AbstractProcessor() {
 
         processingEnv.messager.printMessage(
             Diagnostic.Kind.NOTE,
-            "generating public events. [${kaptKotlinGeneratedDir}${destination.filePath}/${destination.fileName}.kt]"
+            "generate UiAction. [${kaptKotlinGeneratedDir}${destination.filePath}/${destination.fileName}.kt]"
         )
     }
 

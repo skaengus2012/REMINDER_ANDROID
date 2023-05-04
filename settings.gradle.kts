@@ -34,4 +34,5 @@ rootProject.name="REMINDER_ANDROID"
 include(":app")
 include(":statekit:compiler")
 include(":statekit:core")
+include(":statekit:runtime")
 include(":testkit")

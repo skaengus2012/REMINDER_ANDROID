@@ -79,7 +79,7 @@ android {
 }
 
 dependencies {
-    implementation(project(":statekit:core"))
+    implementation(project(":statekit:runtime"))
     kapt(project(":statekit:compiler"))
 
     implementation(libs.kotlin.coroutines.android)
