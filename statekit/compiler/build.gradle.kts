@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 The N's lab Open Source Project
+ * Copyright (C) 2023 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,26 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-pluginManagement {
-    repositories {
-        includeBuild("build-logic")
-        gradlePluginPortal()
-        google()
-        mavenCentral()
-    }
+
+// FIXME Annotations must be added before Gradle 8.1.
+// FIXME https://developer.android.com/studio/build/migrate-to-catalogs?hl=ko#migrate-plugins
+@Suppress("DSL_SCOPE_VIOLATION")
+plugins {
+    alias(libs.plugins.kotlin.jvm)
 }
 
-dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-    repositories {
-        google()
-        mavenCentral()
-    }
-}
+dependencies {
+    implementation(project(":statekit:runtime"))
 
-rootProject.name="REMINDER_ANDROID"
-include(":app")
-include(":statekit:compiler")
-include(":statekit:core")
-include(":statekit:runtime")
-include(":testkit")
+    implementation(libs.squeare.kotlinpoet)
+    implementation(libs.squeare.kotlinpoet.metadata)
+}
