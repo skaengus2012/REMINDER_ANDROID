@@ -14,16 +14,20 @@
  * limitations under the License.
  */
 
-// FIXME Annotations must be added before Gradle 8.1.
-// FIXME https://developer.android.com/studio/build/migrate-to-catalogs?hl=ko#migrate-plugins
-@Suppress("DSL_SCOPE_VIOLATION")
-plugins {
-    alias(libs.plugins.kotlin.jvm)
-}
+package com.nlab.statekit.util
 
-dependencies {
-    implementation(project(":statekit:core"))
+import kotlinx.coroutines.CoroutineExceptionHandler
+import org.junit.Before
+import org.junit.Test
+import org.mockito.kotlin.mock
 
-    implementation(libs.squeare.kotlinpoet)
-    implementation(libs.squeare.kotlinpoet.metadata)
+/**
+ * @author Doohyun
+ */
+internal class StatekitPluginsTest {
+    private val onError: (Throwable) -> Unit = mock()
+
+    @Before
+    fun setup() {
+    }
 }
