@@ -16,14 +16,10 @@
 
 package com.nlab.reminder.core.state2
 
-import androidx.lifecycle.viewModelScope
 import com.nlab.reminder.test.genFlowExecutionDispatcher
 import com.nlab.reminder.test.genFlowObserveCoroutineScope
-import com.nlab.statekit.Action
-import com.nlab.statekit.State
-import com.nlab.statekit.Store
-import com.nlab.statekit.util.buildDslEpic
-import com.nlab.statekit.util.createStore
+import com.nlab.statekit.*
+import com.nlab.statekit.util.*
 import com.nlab.testkit.once
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -82,11 +78,12 @@ internal class StoreViewModelTest {
     fun `ViewModel's uiState closed after 5 second's, when last subscriber unsubscribed`() = runTest {
         val flow = MutableStateFlow(TestAction())
         val viewModel = object : StoreViewModel<TestAction, TestState>() {
-            override fun onCreateStore(): Store<TestAction, TestState> {
-                return createStore(viewModelScope, TestState(), epic = buildDslEpic {
+            override fun onCreateStore(): Store<TestAction, TestState> = createStore(
+                initState = TestState(),
+                epic = buildDslEpic {
                     whileStateUsed { flow }
-                })
-            }
+                }
+            )
         }
         val awaitUntilSubscriptionCreated = async {
             flow.subscriptionCount

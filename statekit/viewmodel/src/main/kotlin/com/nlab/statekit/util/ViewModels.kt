@@ -13,34 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.nlab.statekit.util
 
-import com.nlab.statekit.Action
-import com.nlab.statekit.Reducer
-import com.nlab.statekit.State
-import com.nlab.statekit.Store
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import com.nlab.statekit.*
 import com.nlab.statekit.middleware.epic.Epic
 import com.nlab.statekit.middleware.interceptor.Interceptor
-import com.nlab.statekit.store.DefaultStoreFactory
 import com.nlab.statekit.store.EpicClientFactory
-import com.nlab.statekit.store.impl.DefaultEpicClientFactory
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.MutableStateFlow
+import com.nlab.statekit.util.createStore as createStoreOrigin
 
 /**
  * @author Doohyun
  */
-private val storeFactory = DefaultStoreFactory()
-
-fun <A : Action, S : State> createStore(
-    coroutineScope: CoroutineScope,
+fun <A : Action, S : State> ViewModel.createStore(
     initState: S,
     reducer: Reducer<A, S> = buildDslReducer {},
     interceptor: Interceptor<A, S> = buildDslInterceptor {},
     epic: Epic<A> = buildEpic(),
-    epicClientFactory: EpicClientFactory? = null
-): Store<A, S> = createStore(
-    coroutineScope,
+    epicClientFactory: EpicClientFactory? = null,
+): Store<A, S> = createStoreOrigin(
+    coroutineScope = viewModelScope,
     MutableStateFlow(initState),
     reducer,
     interceptor,
@@ -48,18 +43,17 @@ fun <A : Action, S : State> createStore(
     epicClientFactory
 )
 
-fun <A : Action, S : State> createStore(
-    coroutineScope: CoroutineScope,
+fun <A : Action, S : State> ViewModel.createStore(
     baseState: MutableStateFlow<S>,
     reducer: Reducer<A, S> = buildDslReducer {},
     interceptor: Interceptor<A, S> = buildDslInterceptor {},
     epic: Epic<A> = buildEpic(),
-    epicClientFactory: EpicClientFactory? = null
-): Store<A, S> = storeFactory.createStore(
-    coroutineScope.toStoreMaterialScope(),
+    epicClientFactory: EpicClientFactory? = null,
+): Store<A, S> = createStoreOrigin(
+    coroutineScope = viewModelScope,
     baseState,
     reducer,
     interceptor,
     epic,
-    epicClientFactory = epicClientFactory ?: DefaultEpicClientFactory(baseState)
+    epicClientFactory
 )

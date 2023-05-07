@@ -16,18 +16,9 @@
 
 package com.nlab.statekit.util
 
-import kotlinx.coroutines.CoroutineExceptionHandler
-import org.junit.Before
-import org.junit.Test
-import org.mockito.kotlin.mock
-
 /**
  * @author Doohyun
  */
-internal class StatekitPluginsTest {
-    private val onError: (Throwable) -> Unit = mock()
-
-    @Before
-    fun setup() {
-    }
+sealed interface StorekitPlugin {
+    companion object
 }
