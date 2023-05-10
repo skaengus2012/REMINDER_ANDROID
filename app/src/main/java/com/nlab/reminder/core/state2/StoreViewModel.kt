@@ -32,8 +32,11 @@ abstract class StoreViewModel<A : Action, S : State> : ViewModel(), StateHolder<
     private val store: Store<A, S> by lazy(LazyThreadSafetyMode.NONE) { onCreateStore() }
 
     val uiState: StateFlow<S> by lazy(LazyThreadSafetyMode.NONE) {
-        store.state
-            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(100), store.state.value)
+        with(store.state) {
+            // Set the timeout to 5000 as per the following reference
+            // https://medium.com/androiddevelopers/things-to-know-about-flows-sharein-and-statein-operators-20e6ccb2bc74
+            stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), value)
+        }
     }
 
     protected abstract fun onCreateStore(): Store<A, S>

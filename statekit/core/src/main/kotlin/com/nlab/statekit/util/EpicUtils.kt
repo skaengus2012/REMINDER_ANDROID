@@ -28,3 +28,5 @@ import com.nlab.statekit.middleware.epic.dsl.DslEpicBuilder
  */
 fun <A : Action> buildEpic(vararg epicSources: EpicSource<A>): Epic<A> = DefaultEpic(epicSources.toList())
 fun <A : Action> buildDslEpic(block: DslEpicBuilder<A>.() -> Unit): Epic<A> = DslEpic(block)
+@Suppress("FunctionName")
+fun <A : Action> EmptyEpic(): Epic<A> = buildEpic()

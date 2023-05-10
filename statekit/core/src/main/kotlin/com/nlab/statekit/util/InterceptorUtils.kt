@@ -38,3 +38,8 @@ operator fun <A : Action, S : State> Interceptor<A, S>.plus(interceptor: Interce
             .apply { add(interceptor) }
             .build()
     )
+
+@Suppress("FunctionName")
+fun <A : Action, S : State> EmptyInterceptor(): Interceptor<A, S> {
+    return buildDslInterceptor {}
+}
