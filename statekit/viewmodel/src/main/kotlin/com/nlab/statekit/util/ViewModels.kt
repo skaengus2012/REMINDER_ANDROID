@@ -30,9 +30,9 @@ import com.nlab.statekit.util.createStore as createStoreOrigin
  */
 fun <A : Action, S : State> ViewModel.createStore(
     initState: S,
-    reducer: Reducer<A, S> = buildDslReducer {},
-    interceptor: Interceptor<A, S> = buildDslInterceptor {},
-    epic: Epic<A> = buildEpic(),
+    reducer: Reducer<A, S> = EmptyReducer(),
+    interceptor: Interceptor<A, S> = EmptyInterceptor(),
+    epic: Epic<A> = EmptyEpic(),
     epicClientFactory: EpicClientFactory? = null,
 ): Store<A, S> = createStoreOrigin(
     coroutineScope = viewModelScope,
@@ -45,9 +45,9 @@ fun <A : Action, S : State> ViewModel.createStore(
 
 fun <A : Action, S : State> ViewModel.createStore(
     baseState: MutableStateFlow<S>,
-    reducer: Reducer<A, S> = buildDslReducer {},
-    interceptor: Interceptor<A, S> = buildDslInterceptor {},
-    epic: Epic<A> = buildEpic(),
+    reducer: Reducer<A, S> = EmptyReducer(),
+    interceptor: Interceptor<A, S> = EmptyInterceptor(),
+    epic: Epic<A> = EmptyEpic(),
     epicClientFactory: EpicClientFactory? = null,
 ): Store<A, S> = createStoreOrigin(
     coroutineScope = viewModelScope,

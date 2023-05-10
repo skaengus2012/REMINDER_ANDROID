@@ -35,9 +35,9 @@ private val storeFactory = DefaultStoreFactory()
 fun <A : Action, S : State> createStore(
     coroutineScope: CoroutineScope,
     initState: S,
-    reducer: Reducer<A, S> = buildDslReducer {},
-    interceptor: Interceptor<A, S> = buildDslInterceptor {},
-    epic: Epic<A> = buildEpic(),
+    reducer: Reducer<A, S> = EmptyReducer(),
+    interceptor: Interceptor<A, S> = EmptyInterceptor(),
+    epic: Epic<A> = EmptyEpic(),
     epicClientFactory: EpicClientFactory? = null
 ): Store<A, S> = createStore(
     coroutineScope,
@@ -51,9 +51,9 @@ fun <A : Action, S : State> createStore(
 fun <A : Action, S : State> createStore(
     coroutineScope: CoroutineScope,
     baseState: MutableStateFlow<S>,
-    reducer: Reducer<A, S> = buildDslReducer {},
-    interceptor: Interceptor<A, S> = buildDslInterceptor {},
-    epic: Epic<A> = buildEpic(),
+    reducer: Reducer<A, S> = EmptyReducer(),
+    interceptor: Interceptor<A, S> = EmptyInterceptor(),
+    epic: Epic<A> = EmptyEpic(),
     epicClientFactory: EpicClientFactory? = null
 ): Store<A, S> = storeFactory.createStore(
     coroutineScope.toStoreMaterialScope(),

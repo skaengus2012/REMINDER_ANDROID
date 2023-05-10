@@ -43,3 +43,8 @@ operator fun <A : Action, S : State> Reducer<A, S>.plus(reducer: Reducer<A, S>):
             .apply { add(reducer) }
             .build()
     )
+
+@Suppress("FunctionName")
+fun <A : Action, S : State> EmptyReducer(): Reducer<A, S> {
+    return buildDslReducer {}
+}
