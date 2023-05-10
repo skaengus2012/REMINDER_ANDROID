@@ -21,9 +21,9 @@ plugins {
     id("nlab.android.application")
     id("nlab.android.application.jacoco")
     id("kotlin-parcelize")
-    kotlin("kapt")
     alias(libs.plugins.google.hilt)
     alias(libs.plugins.android.navigation.safearges)
+    kotlin("kapt")
 }
 
 android {
