@@ -33,7 +33,7 @@ class DefaultCompleteMarkRepositoryTest {
     @Test
     fun `insert executed on io thread`() = runTest {
         val repository = DefaultCompleteMarkRepository()
-        val count = genInt()
+        val count = genInt(min = 5, max = 10)
         (0 until count)
             .map { ScheduleId(it.toLong()) }
             .map { scheduleId ->
