@@ -1,5 +1,5 @@
 [versions]
-kotlin = "1.8.21"
+kotlin = "1.8.20"
 kotlinCoroutine = "1.7.0"
 androidGradlePlugin = "8.0.0"
 androidCoreKtx = "1.9.0"
@@ -15,6 +15,8 @@ androidDataStore = "1.0.0"
 androidTestJunit = "1.1.5"
 androidTestEspresso = "3.5.0"
 androidTestRules = "1.4.0"
+androidComposeCompiler = "1.4.5"
+androidComposeBom = "2023.01.00"
 googleAndroidMaterial = "1.8.0"
 googleHilt = "2.45"
 googleFlexbox = "3.0.0"
@@ -55,6 +57,10 @@ android-test-junit = { module = "androidx.test.ext:junit", version.ref = "androi
 android-test-espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "androidTestEspresso" }
 android-test-runner = { module = "androidx.test:runner", version.ref = "androidTestRules"}
 android-test-rules = { module = "androidx.test:rules", version.ref = "androidTestRules"}
+android-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "androidComposeBom" }
+android-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
+android-compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
+android-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
 google-android-material =  { module = "com.google.android.material:material", version.ref = "googleAndroidMaterial" }
 google-hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "googleHilt" }
 google-hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "googleHilt" }

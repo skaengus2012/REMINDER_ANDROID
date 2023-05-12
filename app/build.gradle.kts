@@ -75,6 +75,11 @@ android {
 
     buildFeatures {
         viewBinding = true
+        compose = true
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = libs.versions.androidComposeCompiler.get()
     }
 }
 
@@ -99,6 +104,10 @@ dependencies {
     kapt(libs.android.room.compiler)
     implementation(libs.android.startup.runtime)
     implementation(libs.android.datastore.preferences)
+    implementation(platform(libs.android.compose.bom))
+    implementation(libs.android.compose.material3)
+    implementation(libs.android.compose.ui.tooling.preview)
+    debugImplementation(libs.android.compose.ui.tooling)
 
     implementation(libs.google.android.material)
     implementation(libs.google.flexbox)

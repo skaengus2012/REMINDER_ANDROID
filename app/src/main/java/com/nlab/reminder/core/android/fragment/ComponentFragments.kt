@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 The N's lab Open Source Project
+ * Copyright (C) 2023 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,13 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.feature.main.view
+package com.nlab.reminder.core.android.fragment
 
-import androidx.appcompat.app.AppCompatActivity
-import android.os.Bundle
-import com.nlab.reminder.R
-import dagger.hilt.android.AndroidEntryPoint
+import androidx.compose.runtime.Composable
 
 /**
  * @author Doohyun
  */
-@AndroidEntryPoint
-class MainActivity : AppCompatActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-    }
+fun ComponentFragment.setContent(content: @Composable () -> Unit) {
+    composeView.setContent(content)
 }
