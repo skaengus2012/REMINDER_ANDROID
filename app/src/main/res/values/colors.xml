@@ -19,6 +19,7 @@
 
     <color name="white">#FFFFFF</color>
 
+    <color name="gray_1">#F2F2F6</color>
     <color name="gray_50">#FAFAFA</color>
     <color name="gray_400">#BDBDBD</color>
     <color name="gray_500">#9E9E9E</color>
@@ -50,7 +51,7 @@
     <color name="bg_delete_clamp">@color/red_600</color>
 
     <!-- light theme color -->
-    <color name="bg_1_light">#F2F2F6</color>
+    <color name="bg_1_light">@color/gray_1</color>
     <color name="bg_card_1_light">@color/white</color>
     <color name="bg_card_2_light">@color/gray_50</color>
     <color name="bg_tag_light">#EEEEEF</color>
