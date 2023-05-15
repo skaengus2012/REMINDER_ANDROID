@@ -21,24 +21,79 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.graphics.Color
+import javax.annotation.concurrent.Immutable
 
 /**
+ * Theme color set used in Reminder.
  * @author Doohyun
  */
-val DarkDefaultColorScheme = darkColorScheme(
-    surface = Black,
+@Immutable
+data class ReminderColorScheme(
+    val bg1: Color,
+    val bgCard1: Color,
+    val bgRipple1: Color,
+    val font1: Color,
+    val font2: Color
 )
+
+val LocalReminderColorScheme = staticCompositionLocalOf {
+    ReminderColorScheme(
+        bg1 = Color.Unspecified,
+        bgCard1 = Color.Unspecified,
+        bgRipple1 = Color.Unspecified,
+        font1 = Color.Unspecified,
+        font2 = Color.Unspecified
+    )
+}
+
 val LightDefaultColorScheme = lightColorScheme(
-    surface = GrayLight
+    surface = Gray1
 )
+val LightReminderColorScheme = ReminderColorScheme(
+    bg1 = Bg1Light,
+    bgCard1 = BgCard1Light,
+    bgRipple1 = BgRipple1Light,
+    font1 = Font1Light,
+    font2 = Font2Light
+)
+
+val DarkDefaultColorScheme = darkColorScheme(
+    surface = Color.Black,
+)
+val DarkReminderColorScheme = ReminderColorScheme(
+    bg1 = Bg1Dark,
+    bgCard1 = BgCard1Dark,
+    bgRipple1 = BgRipple1Dark,
+    font1 = Font1Dark,
+    font2 = Font2Dark
+)
+
+/**
+ * Extended Theme for Reminder.
+ * @see <a href="https://developer.android.com/jetpack/compose/designsystems/custom?hl=ko">Reference</a>
+ * @author Doohyun
+ */
+object ReminderTheme {
+    val colors: ReminderColorScheme @Composable get() = LocalReminderColorScheme.current
+}
 
 @Composable
 fun ReminderTheme(
     isDarkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
-    MaterialTheme(
-        colorScheme = if (isDarkTheme) DarkDefaultColorScheme else LightDefaultColorScheme,
-        content = content
-    )
+    val defaultColorScheme = if (isDarkTheme) DarkDefaultColorScheme else LightDefaultColorScheme
+    val reminderColorScheme = if (isDarkTheme) DarkReminderColorScheme else LightReminderColorScheme
+
+    CompositionLocalProvider(
+        LocalReminderColorScheme provides reminderColorScheme
+    ) {
+        MaterialTheme(
+            colorScheme = defaultColorScheme,
+            content = content
+        )
+    }
 }

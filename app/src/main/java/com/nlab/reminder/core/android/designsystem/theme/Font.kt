@@ -16,22 +16,12 @@
 
 package com.nlab.reminder.core.android.designsystem.theme
 
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import com.nlab.reminder.R
 
 /**
  * @author Doohyun
  */
-// /app/src/main/res/values/colors.xml
-internal val Gray1 = Color(0xFFF2F2F6)
 
-internal val Bg1Light = Gray1
-internal val BgCard1Light = Color.White
-internal val BgRipple1Light = Color(0xFFDBDBDB)
-internal val Font1Light = Color(0xFF393939)
-internal val Font2Light = Color(0xFF8A8A8D)
-
-internal val Bg1Dark = Color.Black
-internal val BgCard1Dark = Color(0xFF1C1C1C)
-internal val BgRipple1Dark = Color(0xFF49494C)
-internal val Font1Dark = Color.White
-internal val Font2Dark = Color(0xFFB7B7B7)
+val FontDangamAsac = FontFamily(Font(R.font.dangam_asac))
