@@ -17,15 +17,20 @@
 package com.nlab.reminder.domain.feature.home.view
 
 import android.content.res.Configuration.*
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -37,7 +42,6 @@ import com.nlab.reminder.core.android.designsystem.theme.ReminderTheme
 /**
  * @author Doohyun
  */
-
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier
@@ -45,21 +49,42 @@ fun HomeScreen(
     var count by remember { mutableStateOf(0L) }
     LazyColumn(modifier) {
         item {
+            Spacer(modifier = Modifier.height(37.dp))
+
+            Logo(modifier = Modifier.padding(horizontal = 20.dp))
+
+            Spacer(modifier = Modifier.height(42.5.dp))
+
             CategoryCardSection(
-                modifier = Modifier.padding(horizontal = 19.dp),
+                modifier = Modifier.padding(horizontal = 20.dp),
                 todayCount = count,
+                timetableCount = 0,
+                allCount = 0,
                 onTodayCategoryClicked = { count++ }
             )
+
+            Spacer(modifier = Modifier.height(59.dp))
         }
     }
 }
 
 @Composable
-internal fun HomeTitle(
+private fun Logo(modifier: Modifier = Modifier) {
+    Image(
+        modifier = modifier
+            .width(126.dp)
+            .height(25.dp),
+        painter = painterResource(id = R.drawable.ic_logo),
+        contentDescription = null,
+        colorFilter = ColorFilter.tint(ReminderTheme.colors.font1),
+    )
+}
+
+@Composable
+private fun HomeTitle(
     text: String,
     modifier: Modifier = Modifier
 ) {
-    println("HomeTitle")
     Text(
         text = text,
         color = ReminderTheme.colors.font1,
@@ -71,13 +96,13 @@ internal fun HomeTitle(
 
 @Composable
 private fun CategoryCardSection(
-    todayCount: Long = 0,
-    timetableCount: Long = 0,
-    allCount: Long = 0,
+    todayCount: Long,
+    timetableCount: Long,
+    allCount: Long,
+    modifier: Modifier = Modifier,
     onTodayCategoryClicked: () -> Unit = {},
     onTimetableCategoryClicked: () -> Unit = {},
-    onAllCategoryClicked: () -> Unit = {},
-    modifier: Modifier = Modifier
+    onAllCategoryClicked: () -> Unit = {}
 ) {
     Column(
         modifier = modifier.fillMaxWidth()
@@ -93,7 +118,7 @@ private fun CategoryCardSection(
                 onClick = onTodayCategoryClicked
             )
 
-            Spacer(modifier = Modifier.fillMaxWidth(0.0388f))
+            Spacer(modifier = Modifier.width(14.dp))
 
             TimetableCategoryCard(
                 modifier = Modifier.weight(1f),
@@ -101,7 +126,7 @@ private fun CategoryCardSection(
                 onClick = onTimetableCategoryClicked
             )
 
-            Spacer(modifier = Modifier.fillMaxWidth(0.0388f))
+            Spacer(modifier = Modifier.width(14.dp))
 
             AllCategoryCard(
                 modifier = Modifier.weight(1f),
@@ -113,12 +138,29 @@ private fun CategoryCardSection(
 }
 
 @Preview(
-    name = "LightCategoryCardSectionPreviewPreview",
+    name = "LightLogoPreview",
     showBackground = true,
     uiMode = UI_MODE_NIGHT_NO
 )
 @Preview(
-    name = "DarkCategoryCardSectionPreviewPreview",
+    name = "DarkLogoPreview",
+    showBackground = true,
+    uiMode = UI_MODE_NIGHT_YES
+)
+@Composable
+private fun LogoPreview() {
+    ReminderTheme {
+        Logo()
+    }
+}
+
+@Preview(
+    name = "LightCategoryCardSectionPreview",
+    showBackground = true,
+    uiMode = UI_MODE_NIGHT_NO
+)
+@Preview(
+    name = "DarkCategoryCardSectionPreview",
     showBackground = true,
     uiMode = UI_MODE_NIGHT_YES
 )
@@ -126,7 +168,9 @@ private fun CategoryCardSection(
 private fun CategoryCardSectionPreview() {
     ReminderTheme {
         CategoryCardSection(
-            todayCount = 1
+            todayCount = 10,
+            timetableCount = 20,
+            allCount = 30,
         )
     }
 }
