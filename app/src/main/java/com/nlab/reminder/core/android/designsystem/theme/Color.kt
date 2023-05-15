@@ -27,11 +27,15 @@ internal val Gray1 = Color(0xFFF2F2F6)
 internal val Bg1Light = Gray1
 internal val BgCard1Light = Color.White
 internal val BgRipple1Light = Color(0xFFDBDBDB)
+internal val BgTagLight = Color(0xFFEEEEEE)
 internal val Font1Light = Color(0xFF393939)
 internal val Font2Light = Color(0xFF8A8A8D)
+internal val FontTagLight = Color(0xFF838387)
 
 internal val Bg1Dark = Color.Black
 internal val BgCard1Dark = Color(0xFF1C1C1C)
 internal val BgRipple1Dark = Color(0xFF49494C)
+internal val BgTagDark = Color(0xFF2F2F2F)
 internal val Font1Dark = Color.White
 internal val Font2Dark = Color(0xFFB7B7B7)
+internal val FontTagDark = Color(0xFF838387)
