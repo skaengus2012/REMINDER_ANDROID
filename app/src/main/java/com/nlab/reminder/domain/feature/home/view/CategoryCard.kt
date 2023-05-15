@@ -20,6 +20,8 @@ import android.content.res.Configuration.UI_MODE_NIGHT_NO
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,23 +33,19 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ripple.LocalRippleTheme
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Surface
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nlab.reminder.R
-import com.nlab.reminder.core.android.compose.material.ripple.DomainRippleTheme
 import com.nlab.reminder.core.android.designsystem.theme.FontDangamAsac
 import com.nlab.reminder.core.android.designsystem.theme.ReminderTheme
 
@@ -63,7 +61,6 @@ internal fun TodayCategoryCard(
     CategoryCard(
         name = stringResource(id = R.string.home_category_today),
         remainCount = remainCount,
-        modifier = modifier,
         icon = {
             Image(
                 painter = painterResource(id = R.drawable.ic_home_category_today),
@@ -73,6 +70,7 @@ internal fun TodayCategoryCard(
                     .aspectRatio(1f)
             )
         },
+        modifier = modifier,
         onClick = onClick
     )
 }
@@ -86,7 +84,6 @@ internal fun TimetableCategoryCard(
     CategoryCard(
         name = stringResource(id = R.string.home_category_timetable),
         remainCount = remainCount,
-        modifier = modifier,
         icon = {
             Image(
                 painter = painterResource(id = R.drawable.ic_home_category_timetable),
@@ -96,6 +93,7 @@ internal fun TimetableCategoryCard(
                     .aspectRatio(18.6f / 19.28f)
             )
         },
+        modifier = modifier,
         onClick = onClick
     )
 }
@@ -109,7 +107,6 @@ internal fun AllCategoryCard(
     CategoryCard(
         name = stringResource(id = R.string.home_category_timetable),
         remainCount = remainCount,
-        modifier = modifier,
         icon = {
             Image(
                 painter = painterResource(id = R.drawable.ic_home_category_all),
@@ -119,23 +116,22 @@ internal fun AllCategoryCard(
                     .aspectRatio(18.22f / 15.93f)
             )
         },
+        modifier = modifier,
         onClick = onClick
     )
 }
-
 
 @Composable
 private fun CategoryCard(
     name: String,
     remainCount: Long,
-    modifier: Modifier = Modifier,
-    contentDescription: String = name,
     icon: @Composable () -> Unit,
+    modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
+    onClickLabel: String = name,
 ) {
     Box(modifier = modifier) {
-        CategoryCardBackground(contentDescription, onClick)
-
+        CategoryCardBackground(onClick, onClickLabel)
         Column(
             modifier = Modifier.matchParentSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -151,26 +147,25 @@ private fun CategoryCard(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun CategoryCardBackground(
-    contentDescription: String,
     onClick: () -> Unit = {},
+    onClickLabel: String? = null
 ) {
-    CompositionLocalProvider(
-        LocalRippleTheme provides DomainRippleTheme(color = ReminderTheme.colors.bgRipple1)
-    ) {
-        Surface(
-            onClick = onClick,
-            modifier = Modifier
-                .aspectRatio(1 / 1.625f)
-                .fillMaxWidth()
-                .semantics { this.contentDescription = contentDescription },
-            shape = RoundedCornerShape(8.dp),
-            color = ReminderTheme.colors.bgCard1,
-            content = {}
-        )
-    }
+    val interactiveSource = remember { MutableInteractionSource() }
+    Spacer(
+        modifier = Modifier
+            .aspectRatio(1 / 1.625f)
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(8.dp))
+            .clickable(
+                interactionSource = interactiveSource,
+                indication = rememberRipple(color = ReminderTheme.colors.bgRipple1),
+                onClick = onClick,
+                onClickLabel = onClickLabel
+            )
+            .background(ReminderTheme.colors.bgCard1)
+    )
 }
 
 @Composable
