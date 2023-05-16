@@ -141,7 +141,7 @@ private fun CategoryCard(
             CategoryIcon(icon)
             Spacer(modifier = Modifier.fillMaxHeight(0.048f))
             CategoryTitleText(name)
-            Spacer(modifier = Modifier.fillMaxHeight(0.1538f))
+            Spacer(modifier = Modifier.fillMaxHeight(0.17f))
             CategoryCountText(remainCount)
         }
     }
@@ -194,7 +194,7 @@ private fun CategoryTitleText(text: String) {
 private fun CategoryCountText(count: Long) {
     Text(
         text = count.toString(),
-        fontSize = 23.sp,
+        fontSize = 21.5.sp,
         color = ReminderTheme.colors.font1,
         fontFamily = FontDangamAsac
     )
