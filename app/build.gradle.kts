@@ -89,6 +89,7 @@ dependencies {
     kapt(project(":statekit:compiler"))
 
     implementation(libs.kotlin.coroutines.android)
+    implementation(libs.kotlin.collections.immutable)
 
     implementation(libs.android.core.ktx)
     implementation(libs.android.appcompat)
@@ -108,6 +109,7 @@ dependencies {
     implementation(libs.android.compose.material3)
     implementation(libs.android.compose.ui.tooling.preview)
     debugImplementation(libs.android.compose.ui.tooling)
+    implementation(libs.android.compose.foundation)
 
     implementation(libs.google.android.material)
     implementation(libs.google.flexbox)
