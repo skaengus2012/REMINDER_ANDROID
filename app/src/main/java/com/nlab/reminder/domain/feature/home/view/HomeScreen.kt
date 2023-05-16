@@ -51,16 +51,14 @@ fun HomeScreen(
     var count: Long by remember { mutableStateOf(0L) }
     var tags: ImmutableList<Tag> by remember { mutableStateOf(persistentListOf()) }
 
-    LazyColumn(modifier) {
+    LazyColumn(
+        modifier = modifier.padding(horizontal = 20.dp)
+    ) {
         item {
             Spacer(modifier = Modifier.height(37.dp))
-
-            Logo(modifier = Modifier.padding(horizontal = 20.dp))
-
+            Logo()
             Spacer(modifier = Modifier.height(42.5.dp))
-
             CategoryCardSection(
-                modifier = Modifier.padding(horizontal = 20.dp),
                 todayCount = count,
                 timetableCount = 0,
                 allCount = 0,
@@ -70,23 +68,21 @@ fun HomeScreen(
                     tags = tags.toPersistentList() + Tag(tagId = id, name = "Tag${id}")
                 },
             )
-
             Spacer(modifier = Modifier.height(59.dp))
-
             TagCardSection(
-                modifier = Modifier.padding(horizontal = 20.dp),
                 tags = tags,
                 onTagClicked = { tag -> println("onClick Tag ${tag.tagId}") },
                 onTagLongClicked = { tag -> println("onLongClick Tag ${tag.tagId}") }
             )
+            Spacer(modifier = Modifier.height(86.dp))
         }
     }
 }
 
 @Composable
-private fun Logo(modifier: Modifier = Modifier) {
+private fun Logo() {
     Image(
-        modifier = modifier
+        modifier = Modifier
             .width(126.dp)
             .height(25.dp),
         painter = painterResource(id = R.drawable.ic_logo),
@@ -114,12 +110,11 @@ private fun CategoryCardSection(
     todayCount: Long,
     timetableCount: Long,
     allCount: Long,
-    modifier: Modifier = Modifier,
     onTodayCategoryClicked: () -> Unit = {},
     onTimetableCategoryClicked: () -> Unit = {},
     onAllCategoryClicked: () -> Unit = {}
 ) {
-    Column(modifier = modifier.fillMaxWidth()) {
+    Column(modifier = Modifier.fillMaxWidth()) {
         HomeTitle(
             text = LocalContext.current.getString(R.string.home_category_header),
             modifier = Modifier.padding(bottom = 14.dp)
@@ -153,12 +148,11 @@ private fun CategoryCardSection(
 @Composable
 private fun TagCardSection(
     tags: ImmutableList<Tag>,
-    modifier: Modifier = Modifier,
     onTagClicked: (Tag) -> Unit = {},
     onTagLongClicked: (Tag) -> Unit = {}
 ) {
     Column(
-        modifier = modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth()
     ) {
         HomeTitle(
             text = LocalContext.current.getString(R.string.home_tag_header),
