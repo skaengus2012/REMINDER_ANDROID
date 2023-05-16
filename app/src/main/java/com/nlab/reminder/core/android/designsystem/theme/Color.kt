@@ -26,7 +26,7 @@ internal val Gray1 = Color(0xFFF2F2F6)
 
 internal val Bg1Light = Gray1
 internal val BgCard1Light = Color.White
-internal val BgRipple1Light = Color(0xFFDBDBDB)
+internal val BgRipple1Light = Color(0xFFEBEBEB)
 internal val BgTagLight = Color(0xFFEEEEEE)
 internal val Font1Light = Color(0xFF393939)
 internal val Font2Light = Color(0xFF8A8A8D)
