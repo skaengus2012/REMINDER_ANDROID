@@ -27,12 +27,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.key
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -66,7 +65,7 @@ internal fun TagCard(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = stringResource(id = R.string.common_tag_empty),
+                    text = LocalContext.current.getString(R.string.common_tag_empty),
                     fontSize = 14.sp,
                     color = ReminderTheme.colors.font2,
                 )
@@ -83,8 +82,8 @@ internal fun TagCard(
                         TagText(
                             text = tag.name,
                             modifier = Modifier.padding(vertical = 6.5.dp),
-                            onClick = { onTagClicked(tag) },
-                            onLongClick = { onTagLongClicked(tag) }
+                            onClick = remember { { onTagClicked(tag) } },
+                            onLongClick = remember { { onTagLongClicked(tag) } }
                         )
                     }
                 }

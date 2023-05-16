@@ -40,8 +40,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -59,7 +59,7 @@ internal fun TodayCategoryCard(
     onClick: () -> Unit = {},
 ) {
     CategoryCard(
-        name = stringResource(id = R.string.home_category_today),
+        name = LocalContext.current.getString(R.string.home_category_today),
         remainCount = remainCount,
         icon = {
             Image(
@@ -82,7 +82,7 @@ internal fun TimetableCategoryCard(
     onClick: () -> Unit = {},
 ) {
     CategoryCard(
-        name = stringResource(id = R.string.home_category_timetable),
+        name = LocalContext.current.getString(R.string.home_category_timetable),
         remainCount = remainCount,
         icon = {
             Image(
@@ -105,7 +105,7 @@ internal fun AllCategoryCard(
     onClick: () -> Unit = {},
 ) {
     CategoryCard(
-        name = stringResource(id = R.string.home_category_timetable),
+        name = LocalContext.current.getString(R.string.home_category_timetable),
         remainCount = remainCount,
         icon = {
             Image(
