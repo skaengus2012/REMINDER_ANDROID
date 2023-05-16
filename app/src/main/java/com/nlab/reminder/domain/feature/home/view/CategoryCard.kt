@@ -160,7 +160,7 @@ private fun CategoryCardBackground(
             .clip(RoundedCornerShape(8.dp))
             .clickable(
                 interactionSource = interactiveSource,
-                indication = rememberRipple(color = ReminderTheme.colors.bgRipple1),
+                indication = rememberRipple(color = ReminderTheme.colors.bgCard1Ripple),
                 onClick = onClick,
                 onClickLabel = onClickLabel
             )

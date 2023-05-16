@@ -34,8 +34,9 @@ import javax.annotation.concurrent.Immutable
 data class ReminderColorScheme(
     val bg1: Color,
     val bgCard1: Color,
-    val bgRipple1: Color,
+    val bgCard1Ripple: Color,
     val bgTag: Color,
+    val bgTagRipple: Color,
     val font1: Color,
     val font2: Color,
     val fontTag: Color
@@ -45,8 +46,9 @@ val LocalReminderColorScheme = staticCompositionLocalOf {
     ReminderColorScheme(
         bg1 = Color.Unspecified,
         bgCard1 = Color.Unspecified,
-        bgRipple1 = Color.Unspecified,
+        bgCard1Ripple = Color.Unspecified,
         bgTag = Color.Unspecified,
+        bgTagRipple = Color.Unspecified,
         font1 = Color.Unspecified,
         font2 = Color.Unspecified,
         fontTag = Color.Unspecified
@@ -59,8 +61,9 @@ val LightDefaultColorScheme = lightColorScheme(
 val LightReminderColorScheme = ReminderColorScheme(
     bg1 = Bg1Light,
     bgCard1 = BgCard1Light,
-    bgRipple1 = BgRipple1Light,
+    bgCard1Ripple = BgCard1RippleLight,
     bgTag = BgTagLight,
+    bgTagRipple = BgTagRippleLight,
     font1 = Font1Light,
     font2 = Font2Light,
     fontTag = FontTagLight
@@ -72,8 +75,9 @@ val DarkDefaultColorScheme = darkColorScheme(
 val DarkReminderColorScheme = ReminderColorScheme(
     bg1 = Bg1Dark,
     bgCard1 = BgCard1Dark,
-    bgRipple1 = BgRipple1Dark,
+    bgCard1Ripple = BgCard1RippleDark,
     bgTag = BgTagDark,
+    bgTagRipple = BgTagRippleDark,
     font1 = Font1Dark,
     font2 = Font2Dark,
     fontTag = FontTagDark

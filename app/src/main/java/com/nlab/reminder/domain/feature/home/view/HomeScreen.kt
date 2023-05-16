@@ -38,6 +38,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nlab.reminder.R
 import com.nlab.reminder.core.android.designsystem.theme.ReminderTheme
+import com.nlab.reminder.domain.common.tag.Tag
+import kotlinx.collections.immutable.*
 
 /**
  * @author Doohyun
@@ -46,7 +48,9 @@ import com.nlab.reminder.core.android.designsystem.theme.ReminderTheme
 fun HomeScreen(
     modifier: Modifier = Modifier
 ) {
-    var count by remember { mutableStateOf(0L) }
+    var count: Long by remember { mutableStateOf(0L) }
+    var tags: ImmutableList<Tag> by remember { mutableStateOf(persistentListOf()) }
+
     LazyColumn(modifier) {
         item {
             Spacer(modifier = Modifier.height(37.dp))
@@ -60,10 +64,21 @@ fun HomeScreen(
                 todayCount = count,
                 timetableCount = 0,
                 allCount = 0,
-                onTodayCategoryClicked = { count++ }
+                onTodayCategoryClicked = { count++ },
+                onTimetableCategoryClicked = {
+                    val id = tags.size.toLong()
+                    tags = tags.toPersistentList() + Tag(tagId = id, name = "Tag${id}")
+                },
             )
 
             Spacer(modifier = Modifier.height(59.dp))
+
+            TagCardSection(
+                modifier = Modifier.padding(horizontal = 20.dp),
+                tags = tags,
+                onTagClicked = { tag -> println("onClick Tag ${tag.tagId}") },
+                onTagLongClicked = { tag -> println("onLongClick Tag ${tag.tagId}") }
+            )
         }
     }
 }
@@ -135,6 +150,29 @@ private fun CategoryCardSection(
     }
 }
 
+@Composable
+private fun TagCardSection(
+    tags: ImmutableList<Tag>,
+    modifier: Modifier = Modifier,
+    onTagClicked: (Tag) -> Unit = {},
+    onTagLongClicked: (Tag) -> Unit = {}
+) {
+    Column(
+        modifier = modifier.fillMaxWidth()
+    ) {
+        HomeTitle(
+            text = LocalContext.current.getString(R.string.home_tag_header),
+            modifier = Modifier.padding(bottom = 14.dp)
+        )
+        TagCard(
+            tags = tags,
+            onTagClicked = onTagClicked,
+            onTagLongClicked = onTagLongClicked,
+            modifier = Modifier.padding(bottom = 14.dp)
+        )
+    }
+}
+
 @Preview(
     name = "LightLogoPreview",
     showBackground = true,
@@ -169,6 +207,29 @@ private fun CategoryCardSectionPreview() {
             todayCount = 10,
             timetableCount = 20,
             allCount = 30,
+        )
+    }
+}
+
+@Preview(
+    name = "LightTagCardSectionPreview",
+    showBackground = true,
+    uiMode = UI_MODE_NIGHT_NO
+)
+@Preview(
+    name = "DarkTagCardSectionPreview",
+    showBackground = true,
+    uiMode = UI_MODE_NIGHT_YES
+)
+@Composable
+private fun TagCardSectionPreview() {
+    ReminderTheme {
+        TagCardSection(
+            tags = persistentListOf(
+                Tag(tagId = 1, "My Tag"),
+                Tag(tagId = 2, "Your Tag"),
+                Tag(tagId = 3, "Our Tag")
+            )
         )
     }
 }

@@ -83,7 +83,7 @@ private fun BoxScope.TagTextBackground(
             .background(ReminderTheme.colors.bgTag)
             .combinedClickable(
                 interactiveSource,
-                indication = rememberRipple(color = ReminderTheme.colors.bgRipple1),
+                indication = rememberRipple(color = ReminderTheme.colors.bgTagRipple),
                 onClick = onClick,
                 onClickLabel = onClickLabel,
                 onLongClick = onLongClick,
