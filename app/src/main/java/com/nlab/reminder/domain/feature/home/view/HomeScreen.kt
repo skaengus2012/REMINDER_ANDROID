@@ -18,16 +18,21 @@ package com.nlab.reminder.domain.feature.home.view
 
 import android.content.res.Configuration.*
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
@@ -41,6 +46,7 @@ import com.nlab.reminder.core.android.designsystem.theme.ReminderTheme
 import com.nlab.reminder.domain.common.tag.Tag
 import kotlinx.collections.immutable.*
 
+
 /**
  * @author Doohyun
  */
@@ -51,10 +57,16 @@ fun HomeScreen(
     var count: Long by remember { mutableStateOf(0L) }
     var tags: ImmutableList<Tag> by remember { mutableStateOf(persistentListOf()) }
 
-    LazyColumn(
-        modifier = modifier.padding(horizontal = 20.dp)
-    ) {
-        item {
+    val contentBottomPadding = 76.dp
+    val bottomContainerHeight = 56.dp
+    val scrollState = rememberScrollState()
+    Box {
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .verticalScroll(scrollState)
+                .padding(horizontal = 20.dp)
+        ) {
             Spacer(modifier = Modifier.height(37.dp))
             Logo()
             Spacer(modifier = Modifier.height(42.5.dp))
@@ -70,11 +82,25 @@ fun HomeScreen(
             )
             Spacer(modifier = Modifier.height(59.dp))
             TagCardSection(
+                modifier = Modifier.padding(bottom = 10.dp),
                 tags = tags,
                 onTagClicked = { tag -> println("onClick Tag ${tag.tagId}") },
                 onTagLongClicked = { tag -> println("onLongClick Tag ${tag.tagId}") }
             )
-            Spacer(modifier = Modifier.height(86.dp))
+            Spacer(modifier = Modifier.height(contentBottomPadding))
+        }
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+                .align(Alignment.BottomCenter)
+        ) {
+            BottomContainer(
+                containerHeight = bottomContainerHeight,
+                contentBottomPadding = contentBottomPadding,
+                contentScrollState = scrollState,
+            )
         }
     }
 }
@@ -148,11 +174,12 @@ private fun CategoryCardSection(
 @Composable
 private fun TagCardSection(
     tags: ImmutableList<Tag>,
+    modifier: Modifier = Modifier,
     onTagClicked: (Tag) -> Unit = {},
     onTagLongClicked: (Tag) -> Unit = {}
 ) {
     Column(
-        modifier = Modifier.fillMaxWidth()
+        modifier = modifier.fillMaxWidth()
     ) {
         HomeTitle(
             text = LocalContext.current.getString(R.string.home_tag_header),
@@ -161,8 +188,7 @@ private fun TagCardSection(
         TagCard(
             tags = tags,
             onTagClicked = onTagClicked,
-            onTagLongClicked = onTagLongClicked,
-            modifier = Modifier.padding(bottom = 14.dp)
+            onTagLongClicked = onTagLongClicked
         )
     }
 }

@@ -48,12 +48,11 @@ import kotlinx.collections.immutable.persistentListOf
 @Composable
 internal fun TagCard(
     tags: ImmutableList<Tag>,
-    modifier: Modifier = Modifier,
     onTagClicked: (Tag) -> Unit = {},
     onTagLongClicked: (Tag) -> Unit = {}
 ) {
     Box(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxWidth()
             .defaultMinSize(minHeight = 160.dp)
             .clip(RoundedCornerShape(8.dp))
