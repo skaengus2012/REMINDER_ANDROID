@@ -13,19 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-buildscript {
-    repositories {
-        google()
-        mavenCentral()
-    }
-}
 
 // FIXME Annotations must be added before Gradle 8.1.
 // FIXME https://developer.android.com/studio/build/migrate-to-catalogs?hl=ko#migrate-plugins
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     alias(libs.plugins.kotlin.jvm) apply false
-    alias(libs.plugins.kotlin.android) apply false
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.android.navigation.safearges) apply false
     alias(libs.plugins.google.hilt) apply false

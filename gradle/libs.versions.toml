@@ -87,7 +87,6 @@ android-gradle-plugin = { group = "com.android.tools.build", name = "gradle", ve
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
 android-navigation-safearges = { id = "androidx.navigation.safeargs.kotlin", version.ref = "androidNavigation" }
 google-hilt = { id = "com.google.dagger.hilt.android", version.ref = "googleHilt" }
