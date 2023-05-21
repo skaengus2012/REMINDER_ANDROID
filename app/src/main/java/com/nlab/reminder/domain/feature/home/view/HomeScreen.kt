@@ -54,7 +54,7 @@ fun HomeScreen(
     modifier: Modifier = Modifier
 ) {
     var count: Long by remember { mutableStateOf(0L) }
-    var tags: ImmutableList<Tag> by remember { mutableStateOf(persistentListOf()) }
+    var tags: PersistentList<Tag> by remember { mutableStateOf(persistentListOf()) }
     var isPushOn: Boolean by remember { mutableStateOf(false) }
 
     val contentBottomPadding = 76.dp
@@ -77,8 +77,12 @@ fun HomeScreen(
                 onTodayCategoryClicked = { count++ },
                 onTimetableCategoryClicked = {
                     val id = tags.size.toLong()
-                    tags = tags.toPersistentList() + Tag(tagId = id, name = "Tag${id}")
+                    tags += Tag(tagId = id, name = "Tag${id}")
                 },
+                onAllCategoryClicked = {
+                    tags.firstOrNull()
+                        ?.let { first -> tags -= first }
+                }
             )
             Spacer(modifier = Modifier.height(59.dp))
             TagCardSection(

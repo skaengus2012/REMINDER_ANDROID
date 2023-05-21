@@ -81,8 +81,8 @@ internal fun TagCard(
                         TagText(
                             text = tag.name,
                             modifier = Modifier.padding(vertical = 6.5.dp),
-                            onClick = remember { { onTagClicked(tag) } },
-                            onLongClick = remember { { onTagLongClicked(tag) } }
+                            onClick = { onTagClicked(tag) },
+                            onLongClick = { onTagLongClicked(tag) }
                         )
                     }
                 }

@@ -38,6 +38,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nlab.reminder.R
+import com.nlab.reminder.domain.common.android.designsystem.component.throttle
 import com.nlab.reminder.domain.common.android.designsystem.theme.ReminderTheme
 
 /**
@@ -54,7 +55,7 @@ fun TagText(
 ) {
     Box(modifier) {
         TagTextBackground(
-            onClick = onClick,
+            onClick = onClick.throttle(),
             onClickLabel = onClickLabel,
             onLongClick = onLongClick,
             onLongClickLabel = onLongClickLabel
