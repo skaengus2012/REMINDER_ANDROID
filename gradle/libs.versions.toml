@@ -1,6 +1,6 @@
 [versions]
 kotlin = "1.8.20"
-kotlinCoroutine = "1.7.0"
+kotlinCoroutine = "1.7.1"
 androidGradlePlugin = "8.0.0"
 androidCoreKtx = "1.9.0"
 androidAppCompat = "1.6.1"
