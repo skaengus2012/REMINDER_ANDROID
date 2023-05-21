@@ -27,7 +27,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
@@ -56,6 +55,7 @@ fun HomeScreen(
 ) {
     var count: Long by remember { mutableStateOf(0L) }
     var tags: ImmutableList<Tag> by remember { mutableStateOf(persistentListOf()) }
+    var isPushOn: Boolean by remember { mutableStateOf(false) }
 
     val contentBottomPadding = 76.dp
     val bottomContainerHeight = 56.dp
@@ -93,13 +93,27 @@ fun HomeScreen(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .wrapContentHeight()
+                .height(bottomContainerHeight)
                 .align(Alignment.BottomCenter)
         ) {
             BottomContainer(
                 containerHeight = bottomContainerHeight,
                 contentBottomPadding = contentBottomPadding,
                 contentScrollState = scrollState,
+            )
+
+            NewPlanButton(
+                modifier = Modifier
+                    .align(Alignment.CenterStart)
+                    .padding(start = 10.dp)
+            )
+
+            TimePushSwitchButton(
+                isPushOn = isPushOn,
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .padding(end = 10.dp),
+                onClick = { isPushOn = isPushOn.not() }
             )
         }
     }

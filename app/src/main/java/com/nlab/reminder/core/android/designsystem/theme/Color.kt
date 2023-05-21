@@ -45,3 +45,5 @@ internal val BgTagRippleDark = BgCard1RippleDark
 internal val Font1Dark = Color.White
 internal val Font2Dark = Color(0xFFB7B7B7)
 internal val FontTagDark = Color(0xFF838387)
+
+internal val PointColor1 = Color(0xFF1CCF98)

@@ -56,7 +56,7 @@
         android:drawableStart="@drawable/ic_home_new_schedule"
         android:minHeight="0dp"
         android:paddingHorizontal="20dp"
-        android:text="@string/home_new_schedule_label"
+        android:text="@string/new_schedule_label"
         android:textAllCaps="false"
         android:textColor="@color/point_color_1"
         android:textSize="17sp"
