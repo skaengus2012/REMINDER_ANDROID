@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.android.designsystem.theme
+package com.nlab.reminder.domain.common.android.designsystem.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
@@ -33,9 +33,12 @@ import javax.annotation.concurrent.Immutable
 @Immutable
 data class ReminderColorScheme(
     val bg1: Color,
+    val bg2: Color,
     val bgCard1: Color,
     val bgCard1Ripple: Color,
     val bgLine1: Color,
+    val bgLine2: Color,
+    val bgDialogSurface: Color,
     val bgTag: Color,
     val bgTagRipple: Color,
     val font1: Color,
@@ -47,9 +50,12 @@ data class ReminderColorScheme(
 val LocalReminderColorScheme = staticCompositionLocalOf {
     ReminderColorScheme(
         bg1 = Color.Unspecified,
+        bg2 = Color.Unspecified,
         bgCard1 = Color.Unspecified,
         bgCard1Ripple = Color.Unspecified,
         bgLine1 = Color.Unspecified,
+        bgLine2 = Color.Unspecified,
+        bgDialogSurface = Color.Unspecified,
         bgTag = Color.Unspecified,
         bgTagRipple = Color.Unspecified,
         font1 = Color.Unspecified,
@@ -64,9 +70,12 @@ val LightDefaultColorScheme = lightColorScheme(
 )
 val LightReminderColorScheme = ReminderColorScheme(
     bg1 = Bg1Light,
+    bg2 = Bg2Light,
     bgCard1 = BgCard1Light,
     bgCard1Ripple = BgCard1RippleLight,
     bgLine1 = BgLine1Light,
+    bgLine2 = BgLine2,
+    bgDialogSurface = BgDialogSurfaceLight,
     bgTag = BgTagLight,
     bgTagRipple = BgTagRippleLight,
     font1 = Font1Light,
@@ -80,9 +89,12 @@ val DarkDefaultColorScheme = darkColorScheme(
 )
 val DarkReminderColorScheme = ReminderColorScheme(
     bg1 = Bg1Dark,
+    bg2 = Bg2Dark,
     bgCard1 = BgCard1Dark,
     bgCard1Ripple = BgCard1RippleDark,
     bgLine1 = BgLine1Dark,
+    bgLine2 = BgLine2,
+    bgDialogSurface = BgDialogSurfaceDark,
     bgTag = BgTagDark,
     bgTagRipple = BgTagRippleDark,
     font1 = Font1Dark,

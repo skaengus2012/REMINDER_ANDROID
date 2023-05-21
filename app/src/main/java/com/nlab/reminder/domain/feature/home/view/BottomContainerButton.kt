@@ -18,10 +18,6 @@ package com.nlab.reminder.domain.feature.home.view
 
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.InteractionSource
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -30,8 +26,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.*
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
@@ -41,7 +35,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nlab.reminder.R
-import com.nlab.reminder.core.android.designsystem.theme.ReminderTheme
+import com.nlab.reminder.domain.common.android.designsystem.component.PointColorPressButton
+import com.nlab.reminder.domain.common.android.designsystem.theme.ReminderTheme
 
 /**
  * @author thalys
@@ -51,9 +46,12 @@ internal fun NewPlanButton(
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {}
 ) {
-    BottomContainerButton(modifier, onClick) { interactionSource ->
-        val isPressed by interactionSource.collectIsPressedAsState()
-        val contentColor = ReminderTheme.colors.pointColor1.copy(alpha = if (isPressed) 0.5f else 1f)
+    PointColorPressButton(
+        modifier = modifier
+            .padding(horizontal = 10.dp)
+            .fillMaxHeight(),
+        onClick = onClick
+    ) { contentColor ->
         Image(
             modifier = Modifier
                 .width(35.73.dp)
@@ -77,9 +75,12 @@ internal fun TimePushSwitchButton(
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {}
 ) {
-    BottomContainerButton(modifier, onClick) { interactionSource ->
-        val isPressed by interactionSource.collectIsPressedAsState()
-        val contentColor = ReminderTheme.colors.pointColor1.copy(alpha = if (isPressed) 0.5f else 1f)
+    PointColorPressButton(
+        modifier = modifier
+            .padding(horizontal = 10.dp)
+            .fillMaxHeight(),
+        onClick = onClick
+    ) { contentColor ->
         Image(
             modifier = Modifier
                 .width(19.35.dp)
@@ -98,26 +99,6 @@ internal fun TimePushSwitchButton(
             color = contentColor
         )
     }
-}
-
-@Composable
-private fun BottomContainerButton(
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit = {},
-    content: @Composable (InteractionSource) -> Unit
-) {
-    val interactionSource = remember { MutableInteractionSource() }
-    Row(
-        modifier = modifier
-            .clickable(
-                interactionSource = interactionSource,
-                indication = null,
-                onClick = onClick
-            )
-            .padding(horizontal = 10.dp)
-            .fillMaxHeight(),
-        verticalAlignment = Alignment.CenterVertically
-    ) { content(interactionSource) }
 }
 
 @Preview(
