@@ -37,6 +37,18 @@
     <string name="schedule_selected_item_complete">Mark as complete</string>
     <string name="schedule_selected_item_incomplete">Mark as incomplete</string>
 
+    <!-- tag -->
+    <string name="tag_rename">Rename Tag</string>
+    <string name="tag_rename_clear">Clear Editing Text</string>
+    <plurals name="tag_rename_dialog_description">
+        <item quantity="one">#%1$s will be updated in %2$d reminder.</item>
+        <item quantity="other">#%1$s will be updated in %2$d reminders.</item>
+    </plurals>
+    <plurals name="tag_delete">
+        <item quantity="one">Delete Tag</item>
+        <item quantity="other">Delete %1$d Tags</item>
+    </plurals>
+
     <!-- home -->
     <string name="home_category_header">My Todo</string>
     <string name="home_category_today">Today</string>

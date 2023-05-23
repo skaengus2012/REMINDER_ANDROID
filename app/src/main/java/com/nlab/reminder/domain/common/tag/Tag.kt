@@ -18,7 +18,7 @@ package com.nlab.reminder.domain.common.tag
 
 import android.os.Parcelable
 import androidx.annotation.Keep
-import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
 import com.nlab.reminder.core.util.test.annotation.ExcludeFromGeneratedTestReport
 import kotlinx.parcelize.Parcelize
 
@@ -27,6 +27,6 @@ import kotlinx.parcelize.Parcelize
  */
 @Keep   // for navigation graph.
 @Parcelize
-@Immutable // TODO remove Parcels.
+@Stable
 @ExcludeFromGeneratedTestReport
 data class Tag(val tagId: Long, val name: String) : Parcelable

@@ -44,6 +44,16 @@
     <string name="schedule_selected_item_complete">완료됨으로 표시</string>
     <string name="schedule_selected_item_incomplete">완료되지 않음으로 표시</string>
 
+    <!-- tag -->
+    <string name="tag_rename">태그 이름 변경</string>
+    <string name="tag_rename_clear">편집 중인 텍스트 초기화</string>
+    <plurals name="tag_rename_dialog_description">
+        <item quantity="other">#%1$s이(가) %2$d개의 알림에서 업데이트됩니다.</item>
+    </plurals>
+    <plurals name="tag_delete">
+        <item quantity="other">%1$d개의 태그 삭제</item>
+    </plurals>
+
     <!-- home -->
     <string name="home_category_header">나의 할일</string>
     <string name="home_category_today">오늘</string>

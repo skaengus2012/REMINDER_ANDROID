@@ -43,7 +43,9 @@ import androidx.compose.ui.unit.sp
 import com.nlab.reminder.R
 import com.nlab.reminder.domain.common.android.designsystem.theme.ReminderTheme
 import com.nlab.reminder.domain.common.tag.Tag
+import com.nlab.reminder.domain.common.tag.view.TagRenameDialog
 import kotlinx.collections.immutable.*
+import timber.log.Timber
 
 
 /**
@@ -56,6 +58,7 @@ fun HomeScreen(
     var count: Long by remember { mutableStateOf(0L) }
     var tags: PersistentList<Tag> by remember { mutableStateOf(persistentListOf()) }
     var isPushOn: Boolean by remember { mutableStateOf(false) }
+    var renameTag: Tag? by remember { mutableStateOf(null) }
 
     val contentBottomPadding = 76.dp
     val bottomContainerHeight = 56.dp
@@ -88,7 +91,9 @@ fun HomeScreen(
             TagCardSection(
                 modifier = Modifier.padding(bottom = 10.dp),
                 tags = tags,
-                onTagClicked = { tag -> println("onClick Tag ${tag.tagId}") },
+                onTagClicked = { tag ->
+                    renameTag = tag
+                },
                 onTagLongClicked = { tag -> println("onLongClick Tag ${tag.tagId}") }
             )
             Spacer(modifier = Modifier.height(contentBottomPadding))
@@ -120,6 +125,21 @@ fun HomeScreen(
                 onClick = { isPushOn = isPushOn.not() }
             )
         }
+    }
+
+    renameTag?.let { tag ->
+        TagRenameDialog(
+            initText = "Modify..",
+            tagName = tag.name,
+            usageCount = 5,
+            onTextChanged = { text -> Timber.d("Rename Tag $text") },
+            onCancel = { renameTag = null },
+            onConfirm = {
+                Timber.d("Rename Tag[${tag.name}]")
+                renameTag = null
+            },
+            shouldKeyboardShown = true
+        )
     }
 }
 
