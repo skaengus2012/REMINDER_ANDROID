@@ -25,7 +25,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -43,7 +45,6 @@ import androidx.compose.ui.unit.sp
 import com.nlab.reminder.R
 import com.nlab.reminder.domain.common.android.designsystem.theme.ReminderTheme
 import com.nlab.reminder.domain.common.tag.Tag
-import com.nlab.reminder.domain.common.tag.view.TagRenameDialog
 import kotlinx.collections.immutable.*
 import timber.log.Timber
 
@@ -63,10 +64,14 @@ fun HomeScreen(
     val contentBottomPadding = 76.dp
     val bottomContainerHeight = 56.dp
     val scrollState = rememberScrollState()
-    Box {
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .statusBarsPadding()
+            .navigationBarsPadding()
+    ) {
         Column(
-            modifier = modifier
-                .fillMaxSize()
+            modifier = Modifier
                 .verticalScroll(scrollState)
                 .padding(horizontal = 20.dp)
         ) {
@@ -94,7 +99,7 @@ fun HomeScreen(
                 onTagClicked = { tag ->
                     renameTag = tag
                 },
-                onTagLongClicked = { tag -> println("onLongClick Tag ${tag.tagId}") }
+                onTagLongClicked = { tag -> Timber.d("onLongClick Tag ${tag.tagId}") }
             )
             Spacer(modifier = Modifier.height(contentBottomPadding))
         }
