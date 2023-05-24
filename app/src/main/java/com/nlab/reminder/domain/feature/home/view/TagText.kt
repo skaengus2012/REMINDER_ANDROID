@@ -55,7 +55,7 @@ fun TagText(
 ) {
     Box(modifier) {
         TagTextBackground(
-            onClick = onClick.throttle(),
+            onClick = onClick,
             onClickLabel = onClickLabel,
             onLongClick = onLongClick,
             onLongClickLabel = onLongClickLabel
@@ -88,7 +88,7 @@ private fun BoxScope.TagTextBackground(
             .combinedClickable(
                 interactiveSource,
                 indication = rememberRipple(color = ReminderTheme.colors.bgTagRipple),
-                onClick = onClick,
+                onClick = onClick.throttle(),
                 onClickLabel = onClickLabel,
                 onLongClick = onLongClick,
                 onLongClickLabel = onLongClickLabel

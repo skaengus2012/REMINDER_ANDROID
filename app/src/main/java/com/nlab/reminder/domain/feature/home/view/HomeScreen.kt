@@ -128,6 +128,12 @@ fun HomeScreen(
     }
 
     renameTag?.let { tag ->
+        HomeTagConfigDialog(
+            tagName = tag.name,
+            usageCount = 1,
+            onDismiss = { renameTag = null }
+        )
+        /**
         TagRenameDialog(
             initText = "Modify..",
             tagName = tag.name,
@@ -139,7 +145,7 @@ fun HomeScreen(
                 renameTag = null
             },
             shouldKeyboardShown = true
-        )
+        )*/
     }
 }
 

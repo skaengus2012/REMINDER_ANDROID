@@ -22,7 +22,6 @@
     <string name="category_all" translatable="false">All</string>
 
     <!-- common -->
-    <string name="format_tag" formatted="true" translatable="false">#%1$s</string>
     <string name="cancel">취소</string>
     <string name="ok">확인</string>
     <string name="common_tag_empty">스케줄에 지정된 태그가 없습니다.</string>
@@ -45,6 +44,7 @@
     <string name="schedule_selected_item_incomplete">완료되지 않음으로 표시</string>
 
     <!-- tag -->
+    <string name="format_tag" formatted="true" translatable="false">#%1$s</string>
     <string name="tag_rename">태그 이름 변경</string>
     <string name="tag_rename_clear">편집 중인 텍스트 초기화</string>
     <plurals name="tag_rename_dialog_description">
