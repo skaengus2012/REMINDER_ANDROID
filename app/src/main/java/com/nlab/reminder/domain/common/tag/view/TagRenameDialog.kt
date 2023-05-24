@@ -63,7 +63,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nlab.reminder.R
-import com.nlab.reminder.domain.common.android.designsystem.component.PointColorPressButton
+import com.nlab.reminder.domain.common.android.designsystem.component.ColorPressButton
 import com.nlab.reminder.domain.common.android.designsystem.component.ReminderThemeDialog
 import com.nlab.reminder.domain.common.android.designsystem.theme.ReminderTheme
 import kotlinx.coroutines.delay
@@ -133,7 +133,8 @@ fun TagRenameDialog(
                     .height(40.dp)
 
             ) {
-                PointColorPressButton(
+                ColorPressButton(
+                    contentColor = ReminderTheme.colors.pointColor1,
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight(),
@@ -155,7 +156,8 @@ fun TagRenameDialog(
                         .background(ReminderTheme.colors.bgLine2)
                 )
 
-                PointColorPressButton(
+                ColorPressButton(
+                    contentColor = ReminderTheme.colors.pointColor1,
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight(),

@@ -23,7 +23,7 @@ import com.nlab.reminder.core.kotlin.coroutine.flow.throttleFirst
 import kotlinx.coroutines.flow.MutableSharedFlow
 
 /**
- * @author
+ * @author Doohyun
  */
 @Composable
 fun (() -> Unit).throttle(

@@ -35,7 +35,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nlab.reminder.R
-import com.nlab.reminder.domain.common.android.designsystem.component.PointColorPressButton
+import com.nlab.reminder.domain.common.android.designsystem.component.ColorPressButton
 import com.nlab.reminder.domain.common.android.designsystem.component.throttle
 import com.nlab.reminder.domain.common.android.designsystem.theme.ReminderTheme
 
@@ -47,7 +47,8 @@ internal fun NewPlanButton(
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {}
 ) {
-    PointColorPressButton(
+    ColorPressButton(
+        contentColor = ReminderTheme.colors.pointColor1,
         modifier = modifier
             .padding(horizontal = 10.dp)
             .fillMaxHeight(),
@@ -76,11 +77,12 @@ internal fun TimePushSwitchButton(
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {}
 ) {
-    PointColorPressButton(
+    ColorPressButton(
+        contentColor = ReminderTheme.colors.pointColor1,
         modifier = modifier
             .padding(horizontal = 10.dp)
             .fillMaxHeight(),
-        onClick = onClick.throttle()
+        onClick = onClick
     ) { contentColor ->
         Image(
             modifier = Modifier

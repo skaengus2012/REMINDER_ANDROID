@@ -22,6 +22,7 @@ import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -41,27 +42,29 @@ import com.nlab.reminder.domain.common.android.designsystem.theme.ReminderTheme
  * @author Doohyun
  */
 @Composable
-fun PointColorPressButton(
+fun ColorPressButton(
+    contentColor: Color,
     modifier: Modifier = Modifier,
+    pressedContentColor: Color = contentColor.copy(alpha = 0.5f),
     onClick: () -> Unit = {},
-    content: @Composable (contentColor: Color) -> Unit
+    content: @Composable RowScope.(contentColor: Color) -> Unit
 ) {
-    InternalPointColorPressButton(
+    InternalColorPressButton(
         modifier = modifier,
         onClick = onClick,
     ) { interactionSource ->
         val isPressed by interactionSource.collectIsPressedAsState()
         content(
-            contentColor = ReminderTheme.colors.pointColor1.copy(alpha = if (isPressed) 0.5f else 1f)
+            contentColor = if (isPressed) pressedContentColor else contentColor
         )
     }
 }
 
 @Composable
-private fun InternalPointColorPressButton(
+private fun InternalColorPressButton(
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
-    content: @Composable (InteractionSource) -> Unit
+    content: @Composable RowScope.(InteractionSource) -> Unit
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     Row(
@@ -81,9 +84,10 @@ private fun InternalPointColorPressButton(
     uiMode = UI_MODE_NIGHT_NO
 )
 @Composable
-fun PointerColorPressButtonPreview() {
+fun ColorPressButtonPreview() {
     ReminderTheme {
-        PointColorPressButton(
+        ColorPressButton(
+            contentColor = ReminderTheme.colors.pointColor1,
             modifier = Modifier.padding(10.dp)
         ) { contentColor ->
             Text(
