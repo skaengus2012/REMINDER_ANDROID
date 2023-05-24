@@ -53,5 +53,6 @@ internal val Font1Dark = Color.White
 internal val Font2Dark = Color(0xFFB7B7B7)
 internal val FontTagDark = Color(0xFF838387)
 
+internal val BgDim = Color.Black.copy(alpha = 0.5f)
 internal val BgLine2 = Gray2
 internal val PointColor1 = Color(0xFF1CCF98)

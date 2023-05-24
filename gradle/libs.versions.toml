@@ -61,6 +61,7 @@ android-test-espresso-core = { module = "androidx.test.espresso:espresso-core", 
 android-test-runner = { module = "androidx.test:runner", version.ref = "androidTestRules"}
 android-test-rules = { module = "androidx.test:rules", version.ref = "androidTestRules"}
 android-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "androidComposeBom" }
+android-compose-material = { group = "androidx.compose.material", name = "material" }   # For using ModalBottomSheetLayout
 android-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
 android-compose-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "androidComposeFoundation" }
 android-compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }

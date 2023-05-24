@@ -106,6 +106,7 @@ dependencies {
     implementation(libs.android.startup.runtime)
     implementation(libs.android.datastore.preferences)
     implementation(platform(libs.android.compose.bom))
+    implementation(libs.android.compose.material)
     implementation(libs.android.compose.material3)
     implementation(libs.android.compose.ui.tooling.preview)
     debugImplementation(libs.android.compose.ui.tooling)
