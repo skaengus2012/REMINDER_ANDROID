@@ -46,7 +46,8 @@ data class ReminderColorScheme(
     val font1: Color,
     val font2: Color,
     val fontTag: Color,
-    val pointColor1: Color
+    val pointColor1: Color,
+    val red: Color
 )
 
 val LocalReminderColorScheme = staticCompositionLocalOf {
@@ -65,7 +66,8 @@ val LocalReminderColorScheme = staticCompositionLocalOf {
         font1 = Color.Unspecified,
         font2 = Color.Unspecified,
         fontTag = Color.Unspecified,
-        pointColor1 = Color.Unspecified
+        pointColor1 = Color.Unspecified,
+        red = Color.Unspecified,
     )
 }
 
@@ -87,7 +89,8 @@ val LightReminderColorScheme = ReminderColorScheme(
     font1 = Font1Light,
     font2 = Font2Light,
     fontTag = FontTagLight,
-    pointColor1 = PointColor1
+    pointColor1 = PointColor1,
+    red = Red400
 )
 
 val DarkDefaultColorScheme = darkColorScheme(
@@ -108,7 +111,8 @@ val DarkReminderColorScheme = ReminderColorScheme(
     font1 = Font1Dark,
     font2 = Font2Dark,
     fontTag = FontTagDark,
-    pointColor1 = PointColor1
+    pointColor1 = PointColor1,
+    red = Red400
 )
 
 /**
@@ -133,6 +137,7 @@ fun ReminderTheme(
     ) {
         MaterialTheme(
             colorScheme = defaultColorScheme,
+            typography = ReminderTypography,
             content = content
         )
     }

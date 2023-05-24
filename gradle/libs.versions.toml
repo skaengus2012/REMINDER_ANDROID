@@ -17,8 +17,7 @@ androidTestJunit = "1.1.5"
 androidTestEspresso = "3.5.0"
 androidTestRules = "1.4.0"
 androidComposeCompiler = "1.4.5"
-androidComposeBom = "2023.01.00"
-androidComposeFoundation = "1.4.0-beta02"
+androidComposeBom = "2023.05.01"
 googleAndroidMaterial = "1.8.0"
 googleHilt = "2.46.1"
 googleFlexbox = "3.0.0"
@@ -43,6 +42,7 @@ kotlin-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines
 kotlin-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlinCollectionsImmutable" }
 kotlin-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinCoroutine" }
 android-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidCoreKtx" }
+android-activity-compose = { group = "androidx.activity", name = "activity-compose" }
 android-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "androidAppCompat" }
 android-constaintlayout =  { module = "androidx.constraintlayout:constraintlayout", version.ref = "androidConstaintLayout" }
 android-recyclerview = { module = "androidx.recyclerview:recyclerview", version.ref = "androidRecyclerView" }
@@ -63,7 +63,7 @@ android-test-rules = { module = "androidx.test:rules", version.ref = "androidTes
 android-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "androidComposeBom" }
 android-compose-material = { group = "androidx.compose.material", name = "material" }   # For using ModalBottomSheetLayout
 android-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
-android-compose-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "androidComposeFoundation" }
+android-compose-foundation = { group = "androidx.compose.foundation", name = "foundation" }
 android-compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 android-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
 google-android-material =  { module = "com.google.android.material:material", version.ref = "googleAndroidMaterial" }

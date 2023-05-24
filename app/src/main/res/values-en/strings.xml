@@ -48,6 +48,10 @@
         <item quantity="one">Delete Tag</item>
         <item quantity="other">Delete %1$d Tags</item>
     </plurals>
+    <plurals name="tag_delete_dialog_description">
+        <item quantity="one">%1$s is being used in %2$d notification.</item>
+        <item quantity="other">%1$s is being used in %2$d notifications.</item>
+    </plurals>
 
     <!-- home -->
     <string name="home_category_header">My Todo</string>

@@ -24,8 +24,11 @@ import androidx.compose.ui.graphics.Color
 // /app/src/main/res/values/colors.xml
 internal val Gray1 = Color(0xFFF2F2F6)
 internal val Gray2 = Color(0xFF838387)
+
+// https://m2.material.io/design/color/the-color-system.html#tools-for-picking-colors
 internal val Gray400 = Color(0xFFBDBDBD)
 internal val Gray800 = Color(0xFF424242)
+internal val Red400 = Color(0xFFFF1744)
 
 internal val Bg1Light = Gray1
 internal val Bg2Light = Color.White

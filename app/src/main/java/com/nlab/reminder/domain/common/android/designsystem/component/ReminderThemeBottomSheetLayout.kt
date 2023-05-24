@@ -24,6 +24,7 @@ import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.nlab.reminder.domain.common.android.designsystem.theme.ReminderTheme
 
@@ -36,12 +37,14 @@ import com.nlab.reminder.domain.common.android.designsystem.theme.ReminderTheme
 @Composable
 fun ReminderThemeBottomSheetLayout(
     sheetContent: @Composable ColumnScope.() -> Unit,
+    modifier: Modifier = Modifier,
     sheetState: ModalBottomSheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden),
     content: @Composable () -> Unit,
 ) {
     ModalBottomSheetLayout(
         sheetState = sheetState,
-        sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
+        modifier = modifier,
+        sheetShape = RoundedCornerShape(topStart = 15.dp, topEnd = 15.dp),
         scrimColor = ReminderTheme.colors.bgDim,
         sheetContent = sheetContent,
         content = content

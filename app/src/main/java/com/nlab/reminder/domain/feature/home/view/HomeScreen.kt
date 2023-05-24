@@ -17,6 +17,7 @@
 package com.nlab.reminder.domain.feature.home.view
 
 import android.content.res.Configuration.*
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,6 +32,9 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.ModalBottomSheetValue
+import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -43,102 +47,158 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nlab.reminder.R
+import com.nlab.reminder.domain.common.android.designsystem.component.ReminderThemeBottomSheetLayout
+import com.nlab.reminder.domain.common.android.designsystem.component.showWith
 import com.nlab.reminder.domain.common.android.designsystem.theme.ReminderTheme
 import com.nlab.reminder.domain.common.tag.Tag
+import com.nlab.reminder.domain.common.tag.view.TagDeleteBottomSheetContent
+import com.nlab.reminder.domain.common.tag.view.TagRenameDialog
 import kotlinx.collections.immutable.*
+import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.util.UUID
 
 
 /**
  * @author Doohyun
  */
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun HomeScreen(
-    modifier: Modifier = Modifier
-) {
+fun HomeScreen(modifier: Modifier = Modifier) {
     var count: Long by remember { mutableStateOf(0L) }
     var tags: PersistentList<Tag> by remember { mutableStateOf(persistentListOf()) }
     var isPushOn: Boolean by remember { mutableStateOf(false) }
+    var configTag: Tag? by remember { mutableStateOf(null) }
     var renameTag: Tag? by remember { mutableStateOf(null) }
+    var deleteTag: DeleteTagEvent? by remember { mutableStateOf(null) }
 
-    val contentBottomPadding = 76.dp
-    val bottomContainerHeight = 56.dp
-    val scrollState = rememberScrollState()
-    Box(
-        modifier = modifier
-            .fillMaxSize()
-            .statusBarsPadding()
-            .navigationBarsPadding()
-    ) {
-        Column(
-            modifier = Modifier
-                .verticalScroll(scrollState)
-                .padding(horizontal = 20.dp)
-        ) {
-            Spacer(modifier = Modifier.height(37.dp))
-            Logo()
-            Spacer(modifier = Modifier.height(42.5.dp))
-            CategoryCardSection(
-                todayCount = count,
-                timetableCount = 0,
-                allCount = 0,
-                onTodayCategoryClicked = { count++ },
-                onTimetableCategoryClicked = {
-                    val id = tags.size.toLong()
-                    tags += Tag(tagId = id, name = "Tag${id}")
-                },
-                onAllCategoryClicked = {
-                    tags.firstOrNull()
-                        ?.let { first -> tags -= first }
-                }
-            )
-            Spacer(modifier = Modifier.height(59.dp))
-            TagCardSection(
-                modifier = Modifier.padding(bottom = 10.dp),
-                tags = tags,
-                onTagClicked = { tag ->
-                    renameTag = tag
-                },
-                onTagLongClicked = { tag -> Timber.d("onLongClick Tag ${tag.tagId}") }
-            )
-            Spacer(modifier = Modifier.height(contentBottomPadding))
+    val coroutineScope = rememberCoroutineScope()
+    val sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
+
+    ReminderThemeBottomSheetLayout(
+        sheetState = sheetState,
+        sheetContent = {
+            if (deleteTag != null) {
+                TagDeleteBottomSheetContent(
+                    tagName = "Hello",
+                    usageCount = 1,
+                    modifier = Modifier.navigationBarsPadding(),
+                    onConfirmClicked = {
+                        coroutineScope.launch {
+                            Timber.d("Tag Delete ok.")
+                            sheetState.hide()
+                        }
+                    },
+                    onCancelClicked = {
+                        coroutineScope.launch {
+                            Timber.d("Tag Delete cancel.")
+                            sheetState.hide()
+                        }
+                    }
+                )
+            }
         }
-
+    ) {
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(bottomContainerHeight)
-                .align(Alignment.BottomCenter)
+            modifier = modifier
+                .statusBarsPadding()
+                .navigationBarsPadding()
+                .fillMaxSize()
         ) {
-            BottomContainer(
-                containerHeight = bottomContainerHeight,
-                contentBottomPadding = contentBottomPadding,
-                contentScrollState = scrollState,
-            )
-
-            NewPlanButton(
+            val contentBottomPadding = 76.dp
+            val bottomContainerHeight = 56.dp
+            val scrollState = rememberScrollState()
+            Column(
                 modifier = Modifier
-                    .align(Alignment.CenterStart)
-                    .padding(start = 10.dp)
-            )
+                    .verticalScroll(scrollState)
+                    .padding(horizontal = 20.dp)
+            ) {
+                Spacer(modifier = Modifier.height(37.dp))
+                Logo()
+                Spacer(modifier = Modifier.height(42.5.dp))
+                CategoryCardSection(
+                    todayCount = count,
+                    timetableCount = 0,
+                    allCount = 0,
+                    onTodayCategoryClicked = { count++ },
+                    onTimetableCategoryClicked = {
+                        val id = tags.size.toLong()
+                        tags += Tag(tagId = id, name = "Tag${id}")
+                    },
+                    onAllCategoryClicked = {
+                        tags.firstOrNull()
+                            ?.let { first -> tags -= first }
+                    }
+                )
+                Spacer(modifier = Modifier.height(59.dp))
+                TagCardSection(
+                    modifier = Modifier.padding(bottom = 10.dp),
+                    tags = tags,
+                    onTagClicked = { tag ->
+                        renameTag = tag
+                    },
+                    onTagLongClicked = { tag -> Timber.d("onLongClick Tag ${tag.tagId}") }
+                )
+                Spacer(modifier = Modifier.height(contentBottomPadding))
+            }
 
-            TimePushSwitchButton(
-                isPushOn = isPushOn,
+            Box(
                 modifier = Modifier
-                    .align(Alignment.CenterEnd)
-                    .padding(end = 10.dp),
-                onClick = { isPushOn = isPushOn.not() }
-            )
+                    .fillMaxWidth()
+                    .height(bottomContainerHeight)
+                    .align(Alignment.BottomCenter)
+            ) {
+                BottomContainer(
+                    containerHeight = bottomContainerHeight,
+                    contentBottomPadding = contentBottomPadding,
+                    contentScrollState = scrollState,
+                )
+
+                NewPlanButton(
+                    modifier = Modifier
+                        .align(Alignment.CenterStart)
+                        .padding(start = 10.dp),
+                    onClick = {
+                        configTag = Tag(tagId = 1, name = "Config시도중..")
+                    }
+                )
+
+                TimePushSwitchButton(
+                    isPushOn = isPushOn,
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd)
+                        .padding(end = 10.dp),
+                    onClick = {
+                        isPushOn = isPushOn.not()
+                        deleteTag = DeleteTagEvent(Tag(tagId = 1, name = "삭제시도중.."))
+                    },
+                )
+            }
         }
     }
 
-    renameTag?.let { tag ->
+    BackHandler(enabled = sheetState.isVisible) {
+        coroutineScope.launch {
+            sheetState.hide()
+        }
+    }
+
+    if (deleteTag != null) {
+        sheetState.showWith(
+            deleteTag,
+            onDismiss = { deleteTag = null }
+        )
+    }
+
+    configTag?.let { tag ->
         HomeTagConfigDialog(
             tagName = tag.name,
             usageCount = 1,
-            onDismiss = { renameTag = null }
+            onDismiss = { configTag = null }
         )
-        /**
+    }
+
+    renameTag?.let { tag ->
         TagRenameDialog(
             initText = "Modify..",
             tagName = tag.name,
@@ -150,7 +210,7 @@ fun HomeScreen(
                 renameTag = null
             },
             shouldKeyboardShown = true
-        )*/
+        )
     }
 }
 
@@ -302,3 +362,9 @@ private fun TagCardSectionPreview() {
         )
     }
 }
+
+// TODO check when make stateMachine.
+private data class DeleteTagEvent(
+    val tag: Tag,
+    val id: String = UUID.randomUUID().toString()
+)

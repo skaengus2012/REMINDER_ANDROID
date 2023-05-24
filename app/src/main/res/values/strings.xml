@@ -53,6 +53,9 @@
     <plurals name="tag_delete">
         <item quantity="other">%1$d개의 태그 삭제</item>
     </plurals>
+    <plurals name="tag_delete_dialog_description">
+        <item quantity="other">#%1$s이(가) %2$d개의 알림에서 사용되고 있습니다.</item>
+    </plurals>
 
     <!-- home -->
     <string name="home_category_header">나의 할일</string>
