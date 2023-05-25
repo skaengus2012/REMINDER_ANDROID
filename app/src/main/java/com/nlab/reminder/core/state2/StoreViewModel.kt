@@ -28,7 +28,7 @@ import kotlinx.coroutines.flow.stateIn
 /**
  * @author Doohyun
  */
-abstract class StoreViewModel<A : Action, S : State> : ViewModel(), StateHolder<A> {
+abstract class StoreViewModel<A : Action, S : State> : ViewModel(), UiActionDispatchable<A> {
     private val store: Store<A, S> by lazy(LazyThreadSafetyMode.NONE) { onCreateStore() }
 
     val uiState: StateFlow<S> by lazy(LazyThreadSafetyMode.NONE) {

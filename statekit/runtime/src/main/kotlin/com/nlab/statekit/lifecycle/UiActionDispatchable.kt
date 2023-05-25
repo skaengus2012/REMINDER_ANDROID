@@ -16,13 +16,9 @@
 
 package com.nlab.statekit.lifecycle
 
-import kotlin.reflect.KClass
+import com.nlab.statekit.Action
+import kotlinx.coroutines.Job
 
-/**
- * @author Doohyun
- */
-@Retention(AnnotationRetention.SOURCE)
-@Target(AnnotationTarget.CLASS)
-annotation class UiAction(
-    val receiverTypes: Array<KClass<out UiActionDispatchable<*>>>
-)
+interface UiActionDispatchable<T : Action> {
+    fun dispatch(action: T): Job
+}
