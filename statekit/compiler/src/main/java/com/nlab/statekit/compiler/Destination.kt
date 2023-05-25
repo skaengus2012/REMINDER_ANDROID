@@ -14,14 +14,16 @@
  * limitations under the License.
  */
 
-package com.nlab.statekit.lifecycle
-
-import com.nlab.statekit.Action
-import kotlinx.coroutines.Job
+package com.nlab.statekit.compiler
 
 /**
  * @author Doohyun
  */
-interface StateHolder<A : Action> {
-    fun dispatch(action: A): Job
+internal data class Destination(
+    val packageMetadata: List<String>,
+    val clazzMetadata: List<String>
+) {
+    val packageInfo: String = packageMetadata.joinToString(".")
+    val filePath: String = packageMetadata.joinToString("/")
+    val fileName: String = "${clazzMetadata.last()}_GeneratedUiActions"
 }

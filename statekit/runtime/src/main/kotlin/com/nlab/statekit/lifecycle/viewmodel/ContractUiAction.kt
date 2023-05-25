@@ -14,15 +14,20 @@
  * limitations under the License.
  */
 
-package com.nlab.statekit.lifecycle
-
-import kotlin.reflect.KClass
+package com.nlab.statekit.lifecycle.viewmodel
 
 /**
+ * Generate UiAction dispatch method without receiver type.
+ * The first simple names of annotated class should suffixed with "Action".
+ * **SampleUiAction.OnClick**, **SampleUiAction.DialogAction.OnClick**
+ *
+ * For example, if you have a action like this: **SimpleAction.OnClick**
+ * Annotation Processor will be generate method like this:
+ *
+ * fun SampleViewModel.onClick() {
+ * }
  * @author Doohyun
  */
 @Retention(AnnotationRetention.SOURCE)
 @Target(AnnotationTarget.CLASS)
-annotation class UiAction(
-    val receiverTypes: Array<KClass<out UiActionDispatchable<*>>>
-)
+annotation class ContractUiAction
