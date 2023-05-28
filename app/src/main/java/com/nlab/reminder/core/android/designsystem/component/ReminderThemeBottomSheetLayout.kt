@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.common.android.designsystem.component
+package com.nlab.reminder.core.android.designsystem.component
 
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -26,7 +26,7 @@ import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.nlab.reminder.domain.common.android.designsystem.theme.ReminderTheme
+import com.nlab.reminder.core.android.designsystem.theme.ReminderTheme
 
 /**
  * This used Material2 ModalBottomSheetLayout.

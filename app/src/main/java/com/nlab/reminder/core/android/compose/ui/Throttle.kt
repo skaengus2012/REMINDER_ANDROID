@@ -14,31 +14,27 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.common.android.designsystem.component
+package com.nlab.reminder.core.android.compose.ui
 
-import androidx.compose.material.ModalBottomSheetState
-import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.snapshotFlow
-import kotlinx.coroutines.flow.dropWhile
-import kotlinx.coroutines.launch
+import androidx.compose.runtime.*
+import com.nlab.reminder.core.kotlin.coroutine.flow.throttleFirst
+import kotlinx.coroutines.flow.MutableSharedFlow
 
 /**
  * @author Doohyun
  */
 @Composable
-fun ModalBottomSheetState.showWith(vararg key: Any?, onDismiss: () -> Unit) {
-    LaunchedEffect(*key) {
-        launch {
-            snapshotFlow { currentValue }
-                .dropWhile { it == ModalBottomSheetValue.Hidden }
-                .collect { value ->
-                    if (value == ModalBottomSheetValue.Hidden) {
-                        onDismiss()
-                    }
-                }
-        }
-        show()
+fun (() -> Unit).throttle(
+    windowDuration: Long = 100
+): () -> Unit {
+    val clickEvent = remember { MutableSharedFlow<Unit>(extraBufferCapacity = 1) }
+    LaunchedEffect(this, windowDuration) {
+        clickEvent
+            .throttleFirst(windowDuration)
+            .collect { invoke() }
     }
+
+    return { clickEvent.tryEmit(Unit) }
 }

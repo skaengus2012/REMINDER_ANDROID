@@ -38,8 +38,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nlab.reminder.R
-import com.nlab.reminder.domain.common.android.designsystem.component.throttle
-import com.nlab.reminder.domain.common.android.designsystem.theme.ReminderTheme
+import com.nlab.reminder.core.android.compose.ui.throttle
+import com.nlab.reminder.core.android.designsystem.theme.ReminderTheme
 
 /**
  * @author Doohyun

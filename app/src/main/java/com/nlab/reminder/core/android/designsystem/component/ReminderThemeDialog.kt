@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.common.android.designsystem.component
+package com.nlab.reminder.core.android.designsystem.component
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Box
@@ -28,7 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import com.nlab.reminder.domain.common.android.designsystem.theme.ReminderTheme
+import com.nlab.reminder.core.android.designsystem.theme.ReminderTheme
 
 /**
  * @author Doohyun

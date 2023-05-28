@@ -47,9 +47,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nlab.reminder.R
-import com.nlab.reminder.domain.common.android.designsystem.component.ReminderThemeBottomSheetLayout
-import com.nlab.reminder.domain.common.android.designsystem.component.showWith
-import com.nlab.reminder.domain.common.android.designsystem.theme.ReminderTheme
+import com.nlab.reminder.core.android.designsystem.component.BottomSheetShowEffect
+import com.nlab.reminder.core.android.designsystem.component.ReminderThemeBottomSheetLayout
+import com.nlab.reminder.core.android.designsystem.theme.ReminderTheme
 import com.nlab.reminder.domain.common.tag.Tag
 import com.nlab.reminder.domain.common.tag.view.TagDeleteBottomSheetContent
 import com.nlab.reminder.domain.common.tag.view.TagRenameDialog
@@ -184,9 +184,10 @@ fun HomeScreen(modifier: Modifier = Modifier) {
     }
 
     if (deleteTag != null) {
-        sheetState.showWith(
+        BottomSheetShowEffect(
+            sheetState = sheetState,
             deleteTag,
-            onDismiss = { deleteTag = null }
+            onDismiss = {deleteTag = null}
         )
     }
 
