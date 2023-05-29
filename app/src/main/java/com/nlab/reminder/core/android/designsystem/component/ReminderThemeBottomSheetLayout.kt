@@ -24,9 +24,13 @@ import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.nlab.reminder.core.android.designsystem.theme.ReminderTheme
+import kotlinx.coroutines.flow.dropWhile
+import kotlinx.coroutines.flow.filter
 
 /**
  * This used Material2 ModalBottomSheetLayout.
@@ -39,8 +43,16 @@ fun ReminderThemeBottomSheetLayout(
     sheetContent: @Composable ColumnScope.() -> Unit,
     modifier: Modifier = Modifier,
     sheetState: ModalBottomSheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden),
-    content: @Composable () -> Unit,
+    onHide: () -> Unit = {},
+    content: @Composable () -> Unit
 ) {
+    LaunchedEffect(sheetState) {
+        snapshotFlow { sheetState.currentValue }
+            .dropWhile { it == ModalBottomSheetValue.Hidden }
+            .filter { value -> value == ModalBottomSheetValue.Hidden }
+            .collect { onHide() }
+    }
+
     ModalBottomSheetLayout(
         sheetState = sheetState,
         modifier = modifier,

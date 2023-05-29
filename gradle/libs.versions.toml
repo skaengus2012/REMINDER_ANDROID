@@ -5,6 +5,7 @@ androidGradlePlugin = "8.0.2"
 kotlinCollectionsImmutable = "0.3.5"
 androidCoreKtx = "1.9.0"
 androidAppCompat = "1.6.1"
+androidComposeMaterial = "1.5.0-beta01"
 androidConstaintLayout = "2.1.4"
 androidRecyclerView = "1.2.1"
 androidLifecycle = "2.5.1"
@@ -61,7 +62,7 @@ android-test-espresso-core = { module = "androidx.test.espresso:espresso-core", 
 android-test-runner = { module = "androidx.test:runner", version.ref = "androidTestRules"}
 android-test-rules = { module = "androidx.test:rules", version.ref = "androidTestRules"}
 android-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "androidComposeBom" }
-android-compose-material = { group = "androidx.compose.material", name = "material" }   # For using ModalBottomSheetLayout
+android-compose-material = { group = "androidx.compose.material", name = "material", version.ref = "androidComposeMaterial" }   # For using ModalBottomSheetLayout
 android-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
 android-compose-foundation = { group = "androidx.compose.foundation", name = "foundation" }
 android-compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }

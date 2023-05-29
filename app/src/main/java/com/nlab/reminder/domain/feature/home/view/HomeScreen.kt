@@ -47,7 +47,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nlab.reminder.R
-import com.nlab.reminder.core.android.designsystem.component.BottomSheetShowEffect
 import com.nlab.reminder.core.android.designsystem.component.ReminderThemeBottomSheetLayout
 import com.nlab.reminder.core.android.designsystem.theme.ReminderTheme
 import com.nlab.reminder.domain.common.tag.Tag
@@ -65,7 +64,7 @@ import java.util.UUID
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun HomeScreen(modifier: Modifier = Modifier) {
-    var count: Long by remember { mutableStateOf(0L) }
+    var count: Long by remember { mutableLongStateOf(0L) }
     var tags: PersistentList<Tag> by remember { mutableStateOf(persistentListOf()) }
     var isPushOn: Boolean by remember { mutableStateOf(false) }
     var configTag: Tag? by remember { mutableStateOf(null) }
@@ -96,6 +95,11 @@ fun HomeScreen(modifier: Modifier = Modifier) {
                         }
                     }
                 )
+            }
+        },
+        onHide = {
+            if (deleteTag != null) {
+                deleteTag = null
             }
         }
     ) {
@@ -184,11 +188,9 @@ fun HomeScreen(modifier: Modifier = Modifier) {
     }
 
     if (deleteTag != null) {
-        BottomSheetShowEffect(
-            sheetState = sheetState,
-            deleteTag,
-            onDismiss = {deleteTag = null}
-        )
+        LaunchedEffect(deleteTag) {
+            sheetState.show()
+        }
     }
 
     configTag?.let { tag ->
