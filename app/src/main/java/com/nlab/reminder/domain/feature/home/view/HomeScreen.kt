@@ -48,6 +48,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nlab.reminder.R
 import com.nlab.reminder.core.android.designsystem.component.ReminderThemeBottomSheetLayout
+import com.nlab.reminder.core.android.designsystem.component.ThemeLoadingIndicator
 import com.nlab.reminder.core.android.designsystem.theme.ReminderTheme
 import com.nlab.reminder.domain.common.tag.Tag
 import com.nlab.reminder.domain.common.tag.view.TagDeleteBottomSheetContent
@@ -176,6 +177,13 @@ fun HomeScreen(modifier: Modifier = Modifier) {
                         isPushOn = isPushOn.not()
                         deleteTag = DeleteTagEvent(Tag(tagId = 1, name = "삭제시도중.."))
                     },
+                )
+            }
+
+            if (count > 0) {
+                ThemeLoadingIndicator(
+                    modifier = Modifier.align(Alignment.Center),
+                    displayDelayTime = 2_000
                 )
             }
         }
