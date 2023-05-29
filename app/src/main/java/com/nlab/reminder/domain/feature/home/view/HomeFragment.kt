@@ -17,190 +17,22 @@
 package com.nlab.reminder.domain.feature.home.view
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.flowWithLifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.ConcatAdapter
-import com.nlab.reminder.R
-import com.nlab.reminder.core.android.fragment.viewLifecycle
-import com.nlab.reminder.core.android.fragment.viewLifecycleScope
-import com.nlab.reminder.core.android.view.throttleClicks
-import com.nlab.reminder.databinding.FragmentHomeBinding
-import com.nlab.reminder.domain.common.android.fragment.resultReceives
-import com.nlab.reminder.domain.common.android.navigation.navigateToAllScheduleEnd
-import com.nlab.reminder.domain.common.android.view.loadingFlow
-import com.nlab.reminder.domain.common.android.view.recyclerview.SimpleLayoutAdapter
-import com.nlab.reminder.domain.feature.home.*
+
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.*
+import com.nlab.reminder.core.android.designsystem.theme.ReminderTheme
+import com.nlab.reminder.core.android.fragment.ComponentFragment
+import com.nlab.reminder.core.android.fragment.setContent
 
 /**
  * @author Doohyun
  */
 @AndroidEntryPoint
-class HomeFragment : Fragment() {
-    private val viewModel: HomeViewModel by viewModels()
-
-    private var _binding: FragmentHomeBinding? = null
-    private val binding: FragmentHomeBinding get() = checkNotNull(_binding)
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        resultReceives<HomeTagConfigResult>(REQUEST_KEY_HOME_TO_HOME_TAG_CONFIG)
-            .onEach { result ->
-                when {
-                    result.isRenameRequested -> viewModel.onTagRenameRequestClicked(result.tag)
-                    result.isDeleteRequested -> viewModel.onTagDeleteRequestClicked(result.tag)
-                }
+class HomeFragment : ComponentFragment() {
+    override fun onViewCreated(savedInstanceState: Bundle?) {
+        setContent {
+            ReminderTheme {
+                HomeScreen()
             }
-            .launchIn(lifecycleScope)
-
-        resultReceives<HomeTagRenameResult>(REQUEST_KEY_HOME_TO_HOME_TAG_RENAME)
-            .filter { it.isConfirmed }
-            .onEach { result -> viewModel.onTagRenameConfirmClicked(result.tag, result.rename) }
-            .launchIn(lifecycleScope)
-
-        resultReceives<HomeTagDeleteResult>(REQUEST_KEY_HOME_TO_HOME_TAG_DELETE)
-            .filter { it.isConfirmed }
-            .map { it.tag }
-            .onEach { tag -> viewModel.onTagDeleteConfirmClicked(tag) }
-            .launchIn(lifecycleScope)
-    }
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return FragmentHomeBinding.inflate(inflater, container, false)
-            .also { _binding = it }
-            .root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        val logoAdapter = SimpleLayoutAdapter(R.layout.view_item_home_logo)
-        val categoryAdapter = HomeCategoryAdapter(
-            onTodayNavClicked = viewModel::onTodayCategoryClicked,
-            onTimetableNavClicked = viewModel::onTimetableCategoryClicked,
-            onAllNavClicked = viewModel::onAllCategoryClicked
-        )
-        val tagCardAdapter = HomeTagCardAdapter(
-            onTagClicked = viewModel::onTagClicked,
-            onTagLongClicked = viewModel::onTagLongClicked
-        )
-
-        val renderWhenLoaded = renderWhenLoadedFunc(categoryAdapter, tagCardAdapter)
-
-        binding.recyclerviewContent
-            .apply { itemAnimator = null }
-            .apply { adapter = ConcatAdapter(logoAdapter, categoryAdapter, tagCardAdapter) }
-
-        binding.buttonNewSchedule
-            .throttleClicks()
-            .onEach { viewModel.onNewScheduleClicked() }
-            .launchIn(viewLifecycleScope)
-
-        binding.buttonPush
-            .throttleClicks()
-            .onEach { viewModel.onPushConfigClicked() }
-            .launchIn(viewLifecycleScope)
-
-        viewModel.homeSideEffectFlow
-            .flowWithLifecycle(viewLifecycle)
-            .onEach(this::handleSideEffect)
-            .launchIn(viewLifecycleScope)
-
-        viewModel.stateFlow
-            .filterIsInstance<HomeState.Init>()
-            .flowWithLifecycle(viewLifecycle)
-            .onEach { renderWhenInit() }
-            .launchIn(viewLifecycleScope)
-
-        viewModel.stateFlow
-            .loadingFlow<HomeState.Loading>()
-            .flowWithLifecycle(viewLifecycle)
-            .onEach { renderWhenLoading() }
-            .launchIn(viewLifecycleScope)
-
-        viewModel.stateFlow
-            .filterIsInstance<HomeState.Loaded>()
-            .flowWithLifecycle(viewLifecycle)
-            .onEach { state -> renderWhenLoaded(state.snapshot) }
-            .launchIn(viewLifecycleScope)
-
-        viewModel.stateFlow
-            .filterIsInstance<HomeState.Error>()
-            .flowWithLifecycle(viewLifecycle)
-            .onEach { 
-                // TODO render error case
-            }
-            .launchIn(viewLifecycleScope)
-    }
-
-    private fun handleSideEffect(sideEffect: HomeSideEffect) = when (sideEffect) {
-        is HomeSideEffect.NavigateToday -> {
-
         }
-        is HomeSideEffect.NavigateTimetable -> {
-
-        }
-        is HomeSideEffect.NavigateAllSchedule -> {
-            findNavController().navigateToAllScheduleEnd()
-        }
-        is HomeSideEffect.NavigateTag -> {
-
-        }
-        is HomeSideEffect.ShowTagConfigPopup -> {
-            findNavController().navigateToTagConfig(
-                REQUEST_KEY_HOME_TO_HOME_TAG_CONFIG, sideEffect.tag
-            )
-        }
-        is HomeSideEffect.ShowTagRenamePopup -> {
-            findNavController().navigateToTagRename(
-                REQUEST_KEY_HOME_TO_HOME_TAG_RENAME, sideEffect.tag, sideEffect.usageCount
-            )
-        }
-        is HomeSideEffect.ShowTagDeletePopup -> {
-            findNavController().navigateToTagDelete(
-                REQUEST_KEY_HOME_TO_HOME_TAG_DELETE, sideEffect.tag, sideEffect.usageCount
-            )
-        }
-        is HomeSideEffect.ShowErrorPopup -> {
-
-        }
-    }
-
-    private fun renderWhenInit() {
-        binding.progress.visibility = View.GONE
-        binding.groupContent.visibility = View.GONE
-    }
-
-    private fun renderWhenLoading() {
-        binding.progress.visibility = View.VISIBLE
-    }
-
-    private fun renderWhenLoadedFunc(
-        categoryAdapter: HomeCategoryAdapter,
-        tagCardAdapter: HomeTagCardAdapter,
-    ) = { snapshot: HomeSnapshot ->
-        binding.progress.visibility = View.GONE
-        binding.groupContent.visibility = View.VISIBLE
-
-        categoryAdapter.submitList(listOf(snapshot.notification))
-        tagCardAdapter.submitList(listOf(snapshot.tags))
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
-
-    companion object {
-        private const val REQUEST_KEY_HOME_TO_HOME_TAG_CONFIG = "requestKeyHomeToHomeTagConfig"
-        private const val REQUEST_KEY_HOME_TO_HOME_TAG_RENAME = "requestKeyHomeToHomeTagRename"
-        private const val REQUEST_KEY_HOME_TO_HOME_TAG_DELETE = "requestKeyHomeToHomeTagDelete"
     }
 }
