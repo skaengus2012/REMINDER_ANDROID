@@ -34,7 +34,7 @@ import com.nlab.reminder.core.android.designsystem.theme.ReminderTheme
  * @author Doohyun
  */
 @Composable
-fun ReminderThemeDialog(
+fun ThemeDialog(
     onDismissRequest: () -> Unit = {},
     content: @Composable () -> Unit
 ) {
@@ -49,19 +49,19 @@ fun ReminderThemeDialog(
 }
 
 @Preview(
-    name = "LightReminderThemeDialogPreview",
+    name = "LightThemeDialogPreview",
     showBackground = true,
     uiMode = Configuration.UI_MODE_NIGHT_NO
 )
 @Preview(
-    name = "DarkReminderThemeDialogPreview",
+    name = "DarkThemeDialogPreview",
     showBackground = true,
     uiMode = Configuration.UI_MODE_NIGHT_YES
 )
 @Composable
-private fun ReminderThemeDialogPreview() {
+private fun ThemeDialogPreview() {
     ReminderTheme {
-        ReminderThemeDialog {
+        ThemeDialog {
             Box(modifier = Modifier.padding(10.dp)) {
                 Text(
                     text = "Hello, Dialogs",

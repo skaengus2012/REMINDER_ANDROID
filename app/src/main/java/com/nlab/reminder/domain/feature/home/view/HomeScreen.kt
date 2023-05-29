@@ -47,7 +47,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nlab.reminder.R
-import com.nlab.reminder.core.android.designsystem.component.ReminderThemeBottomSheetLayout
+import com.nlab.reminder.core.android.designsystem.component.ThemeBottomSheetLayout
 import com.nlab.reminder.core.android.designsystem.component.ThemeLoadingIndicator
 import com.nlab.reminder.core.android.designsystem.theme.ReminderTheme
 import com.nlab.reminder.domain.common.tag.Tag
@@ -75,7 +75,7 @@ fun HomeScreen(modifier: Modifier = Modifier) {
     val coroutineScope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
 
-    ReminderThemeBottomSheetLayout(
+    ThemeBottomSheetLayout(
         sheetState = sheetState,
         sheetContent = {
             if (deleteTag != null) {

@@ -43,7 +43,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.nlab.reminder.R
-import com.nlab.reminder.core.android.designsystem.component.ReminderThemeDialog
+import com.nlab.reminder.core.android.designsystem.component.ThemeDialog
 import com.nlab.reminder.core.android.compose.ui.throttle
 import com.nlab.reminder.core.android.designsystem.theme.ReminderTheme
 
@@ -58,7 +58,7 @@ internal fun HomeTagConfigDialog(
     onRenameRequestClicked: () -> Unit = {},
     onDeleteRequestClicked: () -> Unit = {}
 ) {
-    ReminderThemeDialog(onDismiss) {
+    ThemeDialog(onDismiss) {
         Column(
             modifier = Modifier
                 .width(250.dp)

@@ -64,7 +64,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nlab.reminder.R
 import com.nlab.reminder.core.android.designsystem.component.ColorPressButton
-import com.nlab.reminder.core.android.designsystem.component.ReminderThemeDialog
+import com.nlab.reminder.core.android.designsystem.component.ThemeDialog
 import com.nlab.reminder.core.android.designsystem.theme.ReminderTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.debounce
@@ -82,7 +82,7 @@ fun TagRenameDialog(
     onCancel: () -> Unit = {},
     onConfirm: () -> Unit = {}
 ) {
-    ReminderThemeDialog(onDismissRequest = onCancel) {
+    ThemeDialog(onDismissRequest = onCancel) {
         Column(
             modifier = Modifier
                 .width(250.dp)

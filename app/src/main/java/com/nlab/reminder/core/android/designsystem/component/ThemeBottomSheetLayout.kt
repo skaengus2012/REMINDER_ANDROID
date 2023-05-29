@@ -39,7 +39,7 @@ import kotlinx.coroutines.flow.filter
  */
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun ReminderThemeBottomSheetLayout(
+fun ThemeBottomSheetLayout(
     sheetContent: @Composable ColumnScope.() -> Unit,
     modifier: Modifier = Modifier,
     sheetState: ModalBottomSheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden),
