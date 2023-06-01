@@ -17,7 +17,7 @@
 package com.nlab.reminder.domain.feature.home.view
 
 import androidx.recyclerview.widget.DiffUtil
-import com.nlab.reminder.domain.common.tag.Tag
+import com.nlab.reminder.domain.common.data.model.Tag
 
 /**
  * @author thalys

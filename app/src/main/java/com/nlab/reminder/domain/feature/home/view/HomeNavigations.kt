@@ -16,8 +16,7 @@
 package com.nlab.reminder.domain.feature.home.view
 
 import android.os.Parcelable
-import androidx.navigation.NavController
-import com.nlab.reminder.domain.common.tag.Tag
+import com.nlab.reminder.domain.common.data.model.Tag
 import kotlinx.parcelize.Parcelize
 
 /**
@@ -42,29 +41,3 @@ data class HomeTagDeleteResult(
     val tag: Tag,
     val isConfirmed: Boolean
 ) : Parcelable
-
-internal fun NavController.navigateToTagConfig(requestKey: String, tag: Tag) {
-    HomeFragmentDirections
-        .actionHomeFragmentToHomeConfigDialogFragment(requestKey, tag)
-        .run(this::navigate)
-}
-
-internal fun NavController.navigateToTagDelete(requestKey: String, tag: Tag, usageCount: Long) {
-    HomeFragmentDirections
-        .actionHomeFragmentToHomeTagRenameDialogFragment(
-            requestKey,
-            tag,
-            usageCount
-        )
-        .run(this::navigate)
-}
-
-internal fun NavController.navigateToTagRename(requestKey: String, tag: Tag, usageCount: Long) {
-    HomeFragmentDirections
-        .actionHomeFragmentToHomeTagDeleteDialogFragment(
-            requestKey,
-            tag,
-            usageCount
-        )
-        .run(this::navigate)
-}

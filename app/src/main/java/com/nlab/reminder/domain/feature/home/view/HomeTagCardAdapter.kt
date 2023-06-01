@@ -28,7 +28,7 @@ import com.nlab.reminder.core.android.view.throttleClicks
 import com.nlab.reminder.core.android.view.throttleLongClicks
 import com.nlab.reminder.databinding.ViewItemHomeTagCardBinding
 import com.nlab.reminder.databinding.ViewTagBinding
-import com.nlab.reminder.domain.common.tag.Tag
+import com.nlab.reminder.domain.common.data.model.Tag
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 

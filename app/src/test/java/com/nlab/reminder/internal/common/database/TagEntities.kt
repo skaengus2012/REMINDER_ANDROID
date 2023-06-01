@@ -16,7 +16,7 @@
 
 package com.nlab.reminder.internal.common.database
 
-import com.nlab.reminder.domain.common.tag.Tag
+import com.nlab.reminder.domain.common.data.model.Tag
 import com.nlab.reminder.internal.common.android.database.TagEntity
 import com.nlab.reminder.internal.common.android.database.toEntity
 

@@ -19,9 +19,9 @@ package com.nlab.reminder.domain.feature.home
 import com.nlab.reminder.core.kotlin.util.Result
 import com.nlab.reminder.core.effect.SideEffectHandle
 import com.nlab.reminder.core.state.asContainer
-import com.nlab.reminder.domain.common.tag.Tag
-import com.nlab.reminder.domain.common.tag.TagRepository
-import com.nlab.reminder.domain.common.tag.genTag
+import com.nlab.reminder.domain.common.data.model.Tag
+import com.nlab.reminder.domain.common.data.repository.TagRepository
+import com.nlab.reminder.domain.common.data.model.genTag
 import com.nlab.reminder.test.genStateContainerScope
 import com.nlab.testkit.genBothify
 import com.nlab.testkit.genLong

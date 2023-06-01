@@ -17,7 +17,7 @@
 package com.nlab.reminder.domain.common.android.lifecycle
 
 import androidx.lifecycle.SavedStateHandle
-import com.nlab.reminder.domain.common.tag.Tag
+import com.nlab.reminder.domain.common.data.model.Tag
 
 /**
  * @see <a href="./nav_main.xml">argument defined</a>

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 The N's lab Open Source Project
+ * Copyright (C) 2023 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,19 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.common.tag
+package com.nlab.reminder.domain.common.data.model
 
-import com.nlab.testkit.*
+import android.os.Parcelable
+import androidx.annotation.Keep
+import androidx.compose.runtime.Stable
+import com.nlab.reminder.core.util.test.annotation.ExcludeFromGeneratedTestReport
+import kotlinx.parcelize.Parcelize
 
 /**
  * @author Doohyun
  */
-
-fun genTag(tagId: Long = genLong(), name: String = genBothify()) = Tag(tagId, name)
-fun genTags(count: Int = genIntGreaterThanZero()): List<Tag> =
-    List(count) { index -> genTag(index.toLong()) }.distinctBy { it.name }
+@Keep   // for navigation graph.
+@Parcelize
+@Stable
+@ExcludeFromGeneratedTestReport
+data class Tag(val tagId: Long, val name: String) : Parcelable

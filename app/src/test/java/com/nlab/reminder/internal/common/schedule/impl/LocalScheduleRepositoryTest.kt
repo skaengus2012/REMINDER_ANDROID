@@ -18,7 +18,7 @@ package com.nlab.reminder.internal.common.schedule.impl
 
 import com.nlab.reminder.core.kotlin.util.isSuccess
 import com.nlab.reminder.domain.common.schedule.*
-import com.nlab.reminder.domain.common.tag.genTags
+import com.nlab.reminder.domain.common.data.model.genTags
 import com.nlab.reminder.internal.common.android.database.*
 import com.nlab.reminder.internal.common.database.toScheduleEntityWithTagEntities
 import com.nlab.reminder.test.*

@@ -50,7 +50,7 @@ import com.nlab.reminder.R
 import com.nlab.reminder.core.android.designsystem.component.ThemeBottomSheetLayout
 import com.nlab.reminder.core.android.designsystem.component.ThemeLoadingIndicator
 import com.nlab.reminder.core.android.designsystem.theme.ReminderTheme
-import com.nlab.reminder.domain.common.tag.Tag
+import com.nlab.reminder.domain.common.data.model.Tag
 import com.nlab.reminder.domain.common.tag.view.TagDeleteBottomSheetContent
 import com.nlab.reminder.domain.common.tag.view.TagRenameDialog
 import kotlinx.collections.immutable.*

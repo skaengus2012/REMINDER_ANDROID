@@ -17,7 +17,7 @@
 package com.nlab.reminder.internal.common.android.database
 
 import com.nlab.reminder.domain.common.schedule.Schedule
-import com.nlab.reminder.domain.common.tag.Tag
+import com.nlab.reminder.domain.common.data.model.Tag
 
 /**
  * @author Doohyun

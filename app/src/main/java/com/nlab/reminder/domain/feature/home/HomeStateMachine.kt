@@ -20,7 +20,7 @@ import com.nlab.reminder.core.effect.SideEffectHandle
 import com.nlab.reminder.core.kotlin.util.*
 import com.nlab.reminder.core.state.StateMachine
 import com.nlab.reminder.core.state.util.generateHandleScopeFunction
-import com.nlab.reminder.domain.common.tag.TagRepository
+import com.nlab.reminder.domain.common.data.repository.TagRepository
 import kotlinx.coroutines.flow.*
 
 /**

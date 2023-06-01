@@ -18,7 +18,7 @@ package com.nlab.reminder.domain.feature.home.di
 
 import com.nlab.reminder.core.kotlin.coroutine.flow.map
 import com.nlab.reminder.core.util.test.annotation.ExcludeFromGeneratedTestReport
-import com.nlab.reminder.domain.common.tag.TagRepository
+import com.nlab.reminder.domain.common.data.repository.TagRepository
 import com.nlab.reminder.domain.feature.home.*
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers

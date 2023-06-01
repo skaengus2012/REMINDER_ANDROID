@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 The N's lab Open Source Project
+ * Copyright (C) 2023 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,14 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.common.tag
+package com.nlab.reminder.domain.common.data.model
 
-import kotlinx.coroutines.flow.Flow
-import com.nlab.reminder.core.kotlin.util.Result
+import com.nlab.testkit.*
 
 /**
  * @author Doohyun
  */
-interface TagRepository {
-    fun get(): Flow<List<Tag>>
-    suspend fun getUsageCount(tag: Tag): Result<Long>
-    suspend fun updateName(tag: Tag, name: String): Result<Unit>
-    suspend fun delete(tag: Tag): Result<Unit>
-}
+
+fun genTag(tagId: Long = genLong(), name: String = genBothify()) = Tag(tagId, name)
+fun genTags(count: Int = genIntGreaterThanZero()): List<Tag> =
+    List(count) { index -> genTag(index.toLong()) }.distinctBy { it.name }

@@ -16,7 +16,7 @@
 
 package com.nlab.reminder.domain.feature.home.di
 
-import com.nlab.reminder.domain.common.tag.TagRepository
+import com.nlab.reminder.domain.common.data.repository.TagRepository
 import com.nlab.reminder.domain.feature.home.*
 import dagger.Module
 import dagger.Provides

@@ -16,8 +16,7 @@
 
 package com.nlab.reminder.domain.feature.home
 
-import com.nlab.reminder.domain.common.tag.Tag
-import com.nlab.reminder.domain.common.tag.genTags
+import com.nlab.reminder.domain.common.data.model.*
 import com.nlab.testkit.genBoolean
 import com.nlab.testkit.genInt
 import kotlinx.collections.immutable.toPersistentList

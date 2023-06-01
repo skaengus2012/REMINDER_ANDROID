@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 The N's lab Open Source Project
+ * Copyright (C) 2023 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.internal.common.tag.impl
+package com.nlab.reminder.internal.common.data.repository
 
 import com.nlab.reminder.core.kotlin.util.Result
-import com.nlab.reminder.domain.common.tag.Tag
-import com.nlab.reminder.domain.common.tag.TagRepository
-import com.nlab.reminder.domain.common.tag.genTag
-import com.nlab.reminder.domain.common.tag.genTags
+import com.nlab.reminder.domain.common.data.model.Tag
+import com.nlab.reminder.domain.common.data.repository.TagRepository
+import com.nlab.reminder.domain.common.data.model.genTag
+import com.nlab.reminder.domain.common.data.model.genTags
 import com.nlab.reminder.internal.common.android.database.ScheduleTagListDao
 import com.nlab.reminder.internal.common.android.database.TagDao
 import com.nlab.reminder.internal.common.android.database.TagEntity
@@ -46,7 +46,7 @@ import org.mockito.kotlin.*
  * @author Doohyun
  */
 @OptIn(ExperimentalCoroutinesApi::class)
-class LocalTagRepositoryTest {
+internal class LocalTagRepositoryTest {
     private fun genTagRepository(
         tagDao: TagDao = mock(),
         scheduleTagListDao: ScheduleTagListDao = mock()

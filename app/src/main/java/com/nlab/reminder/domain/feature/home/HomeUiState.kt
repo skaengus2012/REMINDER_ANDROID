@@ -17,7 +17,7 @@
 package com.nlab.reminder.domain.feature.home
 
 import com.nlab.reminder.core.util.test.annotation.ExcludeFromGeneratedTestReport
-import com.nlab.reminder.domain.common.tag.Tag
+import com.nlab.reminder.domain.common.data.model.Tag
 import com.nlab.statekit.State
 import kotlinx.collections.immutable.ImmutableList
 

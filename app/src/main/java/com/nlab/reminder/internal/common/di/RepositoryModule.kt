@@ -21,16 +21,15 @@ import com.nlab.reminder.core.kotlin.util.onFailure
 import com.nlab.reminder.domain.common.util.link.LinkMetadata
 import com.nlab.reminder.domain.common.util.link.LinkMetadataRepository
 import com.nlab.reminder.domain.common.schedule.ScheduleRepository
-import com.nlab.reminder.domain.common.tag.TagRepository
+import com.nlab.reminder.domain.common.data.repository.TagRepository
 import com.nlab.reminder.domain.common.util.link.LinkMetadataTableRepository
 import com.nlab.reminder.internal.common.android.database.ScheduleDao
-import com.nlab.reminder.internal.common.android.database.ScheduleTagListDao
-import com.nlab.reminder.internal.common.android.database.TagDao
 import com.nlab.reminder.internal.common.schedule.impl.LocalScheduleRepository
-import com.nlab.reminder.internal.common.tag.impl.LocalTagRepository
+import com.nlab.reminder.internal.common.data.repository.LocalTagRepository
 import com.nlab.reminder.domain.common.util.link.infra.JsoupLinkMetadataRepository
 import com.nlab.reminder.internal.common.android.database.LinkMetadataDao
 import com.nlab.reminder.internal.common.util.link.impl.LocalCachedLinkMetadataTableRepository
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.Reusable
@@ -46,33 +45,32 @@ import javax.inject.Singleton
  */
 @Module
 @InstallIn(SingletonComponent::class)
-class RepositoryModule {
+internal abstract class RepositoryModule {
     @Reusable
-    @Provides
-    fun provideScheduleRepository(
-        scheduleDao: ScheduleDao
-    ): ScheduleRepository = LocalScheduleRepository(scheduleDao)
+    @Binds
+    abstract fun bindTagRepository(tagRepository: LocalTagRepository): TagRepository
 
-    @Reusable
-    @Provides
-    fun provideTagRepository(
-        tagDao: TagDao,
-        scheduleTagListDao: ScheduleTagListDao
-    ): TagRepository = LocalTagRepository(tagDao, scheduleTagListDao)
+    companion object {
+        @Reusable
+        @Provides
+        fun provideScheduleRepository(
+            scheduleDao: ScheduleDao
+        ): ScheduleRepository = LocalScheduleRepository(scheduleDao)
 
-    @Singleton
-    @Provides
-    fun provideLinkMetadataTableRepository(
-        linkMetadataDao: LinkMetadataDao,
-        @Singleton coroutineScope: CoroutineScope
-    ): LinkMetadataTableRepository = LocalCachedLinkMetadataTableRepository(
-        linkMetadataRepository = object : LinkMetadataRepository {
-            private val internalRepository = JsoupLinkMetadataRepository()
-            override suspend fun get(link: String): Result<LinkMetadata> =
-                internalRepository.get(link).onFailure { e -> Timber.w(e, "LinkThumbnail load failed.") }
-        },
-        linkMetadataDao,
-        coroutineScope,
-        getTimestamp = { Calendar.getInstance().timeInMillis }
-    )
+        @Singleton
+        @Provides
+        fun provideLinkMetadataTableRepository(
+            linkMetadataDao: LinkMetadataDao,
+            @Singleton coroutineScope: CoroutineScope
+        ): LinkMetadataTableRepository = LocalCachedLinkMetadataTableRepository(
+            linkMetadataRepository = object : LinkMetadataRepository {
+                private val internalRepository = JsoupLinkMetadataRepository()
+                override suspend fun get(link: String): Result<LinkMetadata> =
+                    internalRepository.get(link).onFailure { e -> Timber.w(e, "LinkThumbnail load failed.") }
+            },
+            linkMetadataDao,
+            coroutineScope,
+            getTimestamp = { Calendar.getInstance().timeInMillis }
+        )
+    }
 }
