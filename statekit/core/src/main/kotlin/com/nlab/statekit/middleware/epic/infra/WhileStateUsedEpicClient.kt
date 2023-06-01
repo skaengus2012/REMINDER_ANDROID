@@ -39,10 +39,7 @@ internal class WhileStateUsedEpicClient(private val stateFlow: MutableStateFlow<
                 // jacoco cannot recognize collectLatest.
                 .collectLatest { isActive ->
                     if (isActive) {
-                        println("구독 중.")
                         epicStream.collect(actionDispatcher::dispatch)
-                    } else {
-                        println("구독 종료.")
                     }
                 }
         }

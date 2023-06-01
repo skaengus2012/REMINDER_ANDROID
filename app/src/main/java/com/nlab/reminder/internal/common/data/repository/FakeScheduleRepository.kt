@@ -26,15 +26,15 @@ import javax.inject.Inject
  */
 @Deprecated(message = "FakeScheduleRepository was used")
 internal class FakeScheduleRepository @Inject constructor() : ScheduleRepository {
-    override fun getTodaySchedulesCount(): Flow<Long> = flow {
-        emit((0..100L).random())
+    override fun getTodaySchedulesCount(): Flow<Int> = flow {
+        emit((0..100).random())
     }
 
-    override fun getTimetableSchedulesCount(): Flow<Long> = flow {
-        emit((0..100L).random())
+    override fun getTimetableSchedulesCount(): Flow<Int> = flow {
+        emit((0..100).random())
     }
 
-    override fun getAllSchedulesCount(): Flow<Long> = flow {
-        emit((0..100L).random())
+    override fun getAllSchedulesCount(): Flow<Int> = flow {
+        emit((0..100).random())
     }
 }

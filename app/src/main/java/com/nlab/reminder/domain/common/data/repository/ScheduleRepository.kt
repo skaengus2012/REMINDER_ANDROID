@@ -22,7 +22,7 @@ import kotlinx.coroutines.flow.Flow
  * @author thalys
  */
 interface ScheduleRepository {
-    fun getTodaySchedulesCount(): Flow<Long>
-    fun getTimetableSchedulesCount(): Flow<Long>
-    fun getAllSchedulesCount(): Flow<Long>
+    fun getTodaySchedulesCount(): Flow<Int>
+    fun getTimetableSchedulesCount(): Flow<Int>
+    fun getAllSchedulesCount(): Flow<Int>
 }

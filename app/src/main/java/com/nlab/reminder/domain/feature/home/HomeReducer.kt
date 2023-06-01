@@ -42,20 +42,20 @@ internal class HomeReducer @Inject constructor() : Reducer<HomeAction, HomeUiSta
         action<HomeAction.SummaryLoaded> {
             state<HomeUiState.Loading> { (action) ->
                 HomeUiState.Success(
-                    todayScheduleCount = action.todayScheduleCount,
+                    todayScheduleCount = action.todaySchedulesCount,
                     todayScheduleShown = false,
-                    timetableScheduleCount = action.timetableScheduleCount,
+                    timetableScheduleCount = action.timetableSchedulesCount,
                     timetableScheduleShown = false,
-                    allScheduleCount = action.allScheduleCount,
+                    allScheduleCount = action.allSchedulesCount,
                     allScheduleShown = false,
                     tags = action.tags.toImmutableList()
                 )
             }
             state<HomeUiState.Success> { (action, before) ->
                 before.copy(
-                    todayScheduleCount = action.todayScheduleCount,
-                    timetableScheduleCount = action.timetableScheduleCount,
-                    allScheduleCount = action.allScheduleCount,
+                    todayScheduleCount = action.todaySchedulesCount,
+                    timetableScheduleCount = action.timetableSchedulesCount,
+                    allScheduleCount = action.allSchedulesCount,
                     tags = action.tags.toImmutableList()
                 )
             }

@@ -24,9 +24,9 @@ import com.nlab.statekit.Action
  */
 sealed interface HomeAction : Action {
     data class SummaryLoaded(
-        val todayScheduleCount: Int,
-        val timetableScheduleCount: Int,
-        val allScheduleCount: Int,
+        val todaySchedulesCount: Int,
+        val timetableSchedulesCount: Int,
+        val allSchedulesCount: Int,
         val tags: List<Tag>
     ) : HomeAction
 

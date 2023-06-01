@@ -118,9 +118,9 @@ private suspend fun TestScope.testPageShown(
 }
 
 private fun HomeUiState.Success.toSummaryLoaded(): HomeAction.SummaryLoaded = HomeAction.SummaryLoaded(
-    todayScheduleCount = todayScheduleCount,
-    timetableScheduleCount = timetableScheduleCount,
-    allScheduleCount = allScheduleCount,
+    todaySchedulesCount = todayScheduleCount,
+    timetableSchedulesCount = timetableScheduleCount,
+    allSchedulesCount = allScheduleCount,
     tags = tags
 )
 
