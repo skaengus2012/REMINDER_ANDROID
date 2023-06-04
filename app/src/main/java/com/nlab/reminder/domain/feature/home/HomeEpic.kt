@@ -25,7 +25,7 @@ import javax.inject.Inject
 /**
  * @author thalys
  */
-internal class HomeEpic @Inject constructor(
+class HomeEpic @Inject constructor(
     tagRepository: TagRepository,
     scheduleRepository: ScheduleRepository
 ) : Epic<HomeAction> by buildDslEpic(buildDSL = {

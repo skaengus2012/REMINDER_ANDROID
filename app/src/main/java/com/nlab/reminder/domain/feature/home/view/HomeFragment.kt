@@ -31,7 +31,7 @@ class HomeFragment : ComponentFragment() {
     override fun onViewCreated(savedInstanceState: Bundle?) {
         setContent {
             ReminderTheme {
-                HomeScreen()
+                HomeRoot()
             }
         }
     }

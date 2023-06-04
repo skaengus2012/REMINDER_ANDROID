@@ -17,6 +17,7 @@
 package com.nlab.reminder.internal.common.data.repository
 
 import com.nlab.reminder.domain.common.data.repository.ScheduleRepository
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
@@ -26,15 +27,16 @@ import javax.inject.Inject
  */
 @Deprecated(message = "FakeScheduleRepository was used")
 internal class FakeScheduleRepository @Inject constructor() : ScheduleRepository {
-    override fun getTodaySchedulesCount(): Flow<Int> = flow {
-        emit((0..100).random())
+    override fun getTodaySchedulesCount(): Flow<Long> = flow {
+        delay((1_500L..3000L).random())
+        emit((0L..100).random())
     }
 
-    override fun getTimetableSchedulesCount(): Flow<Int> = flow {
-        emit((0..100).random())
+    override fun getTimetableSchedulesCount(): Flow<Long> = flow {
+        emit((0L..100).random())
     }
 
-    override fun getAllSchedulesCount(): Flow<Int> = flow {
-        emit((0..100).random())
+    override fun getAllSchedulesCount(): Flow<Long> = flow {
+        emit((0L..100).random())
     }
 }

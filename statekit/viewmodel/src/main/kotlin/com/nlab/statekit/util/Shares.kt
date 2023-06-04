@@ -14,15 +14,18 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.common.data.repository
+package com.nlab.statekit.util
 
-import kotlinx.coroutines.flow.Flow
+import com.nlab.statekit.State
+import com.nlab.statekit.Store
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
 
 /**
- * @author thalys
+ * @author Doohyun
  */
-interface ScheduleRepository {
-    fun getTodaySchedulesCount(): Flow<Long>
-    fun getTimetableSchedulesCount(): Flow<Long>
-    fun getAllSchedulesCount(): Flow<Long>
+fun <S : State> Store<*, S>.stateIn(coroutineScope: CoroutineScope, started: SharingStarted): StateFlow<S> {
+    return state.stateIn(coroutineScope, started, state.value)
 }

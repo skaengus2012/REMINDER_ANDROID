@@ -29,49 +29,49 @@ sealed class HomeEvent private constructor() : Event {
     @ExcludeFromGeneratedTestReport
     data class OnSnapshotLoaded(val snapshot: HomeSnapshot) : HomeEvent()
 
-    @PublicEvent(HomeViewModel::class)
+   
     object OnTodayCategoryClicked : HomeEvent()
 
-    @PublicEvent(HomeViewModel::class)
+   
     object OnTimetableCategoryClicked : HomeEvent()
 
-    @PublicEvent(HomeViewModel::class)
+   
     object OnAllCategoryClicked : HomeEvent()
 
-    @PublicEvent(HomeViewModel::class)
+   
     object OnRetryClicked : HomeEvent()
 
-    @PublicEvent(HomeViewModel::class)
+   
     object OnNewScheduleClicked : HomeEvent()   // TODO impl using handling
 
-    @PublicEvent(HomeViewModel::class)
+   
     object OnPushConfigClicked : HomeEvent()    // TODO impl using handling
 
     @ExcludeFromGeneratedTestReport
-    @PublicEvent(HomeViewModel::class)
+   
     data class OnSnapshotLoadFailed(val throwable: Throwable) : HomeEvent()
 
     @ExcludeFromGeneratedTestReport
-    @PublicEvent(HomeViewModel::class)
+   
     data class OnTagClicked(val tag: Tag) : HomeEvent()
 
     @ExcludeFromGeneratedTestReport
-    @PublicEvent(HomeViewModel::class)
+   
     data class OnTagLongClicked(val tag: Tag) : HomeEvent()
 
     @ExcludeFromGeneratedTestReport
-    @PublicEvent(HomeViewModel::class)
+   
     data class OnTagRenameRequestClicked(val tag: Tag) : HomeEvent()
 
     @ExcludeFromGeneratedTestReport
-    @PublicEvent(HomeViewModel::class)
+   
     data class OnTagRenameConfirmClicked(val originalTag: Tag, val renameText: String) : HomeEvent()
 
     @ExcludeFromGeneratedTestReport
-    @PublicEvent(HomeViewModel::class)
+   
     data class OnTagDeleteRequestClicked(val tag: Tag) : HomeEvent()
 
     @ExcludeFromGeneratedTestReport
-    @PublicEvent(HomeViewModel::class)
+   
     data class OnTagDeleteConfirmClicked(val tag: Tag) : HomeEvent()
 }

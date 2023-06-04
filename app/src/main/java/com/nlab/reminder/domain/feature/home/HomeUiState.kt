@@ -29,22 +29,22 @@ sealed interface HomeUiState : State {
 
     @ExcludeFromGeneratedTestReport
     data class Success(
-        val todayScheduleCount: Int,
-        val todayScheduleShown: Boolean,
-        val timetableScheduleCount: Int,
-        val timetableScheduleShown: Boolean,
-        val allScheduleCount: Int,
-        val allScheduleShown: Boolean,
-        val tags: ImmutableList<Tag>
+        val todayScheduleCount: Long,
+        val timetableScheduleCount: Long,
+        val allScheduleCount: Long,
+        val tags: ImmutableList<Tag>,
+        val todayScheduleShown: Boolean = false,
+        val timetableScheduleShown: Boolean = false,
+        val allScheduleShown: Boolean = false,
     ) : HomeUiState
 }
 
 internal fun HomeUiState.Success.withPageShown(
-    todayScheduleShow: Boolean = false,
-    timetableScheduleShow: Boolean = false,
-    allScheduleShow: Boolean = false,
+    todayScheduleShown: Boolean = false,
+    timetableScheduleShown: Boolean = false,
+    allScheduleShown: Boolean = false,
 ) = copy(
-    todayScheduleShown = todayScheduleShow,
-    timetableScheduleShown = timetableScheduleShow,
-    allScheduleShown = allScheduleShow,
+    todayScheduleShown = todayScheduleShown,
+    timetableScheduleShown = timetableScheduleShown,
+    allScheduleShown = allScheduleShown,
 )

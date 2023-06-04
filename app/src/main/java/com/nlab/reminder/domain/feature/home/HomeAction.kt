@@ -18,20 +18,28 @@ package com.nlab.reminder.domain.feature.home
 
 import com.nlab.reminder.domain.common.data.model.Tag
 import com.nlab.statekit.Action
+import com.nlab.statekit.lifecycle.viewmodel.ContractUiAction
 
 /**
  * @author Doohyun
  */
 sealed interface HomeAction : Action {
     data class SummaryLoaded(
-        val todaySchedulesCount: Int,
-        val timetableSchedulesCount: Int,
-        val allSchedulesCount: Int,
+        val todaySchedulesCount: Long,
+        val timetableSchedulesCount: Long,
+        val allSchedulesCount: Long,
         val tags: List<Tag>
     ) : HomeAction
 
+    @ContractUiAction
     object PageShown : HomeAction
+
+    @ContractUiAction
     object OnTodayCategoryClicked : HomeAction
+
+    @ContractUiAction
     object OnTimetableCategoryClicked : HomeAction
+
+    @ContractUiAction
     object OnAllCategoryClicked : HomeAction
 }

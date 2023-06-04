@@ -16,24 +16,19 @@
 
 package com.nlab.reminder.domain.feature.home.view
 
-import android.content.res.Configuration
 import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.material3.Surface
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.nlab.reminder.core.android.designsystem.theme.ReminderTheme
@@ -43,83 +38,72 @@ import com.nlab.reminder.core.android.designsystem.theme.ReminderTheme
  */
 @Composable
 internal fun BottomContainer(
-    containerHeight: Dp,
-    contentBottomPadding: Dp,
+    contentPaddingBottom: Dp,
     contentScrollState: ScrollState,
+    modifier: Modifier = Modifier,
+    content: @Composable BoxScope.() -> Unit
 ) {
-    AnimatedBottomContainer(
-        containerHeightToPx = with(LocalDensity.current) { containerHeight.toPx() },
-        contentBottomPaddingToPx = with(LocalDensity.current) { contentBottomPadding.toPx() },
-        scrollState = contentScrollState,
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(containerHeight)
+    var computedHeightToPx by remember { mutableStateOf(0f) }
+    Box(
+        modifier = modifier
+            .onGloballyPositioned { coordinates ->
+                computedHeightToPx = coordinates.size.height.toFloat()
+            }
+    ) {
+        if (computedHeightToPx != 0f) {
+            AnimatedBottomContainerBackground(
+                containerHeightToPx = computedHeightToPx,
+                contentPaddingBottomToPx = with(LocalDensity.current) { contentPaddingBottom.toPx() },
+                contentScrollState = contentScrollState
+            )
+        }
+        content()
+    }
+}
+
+@Composable
+private fun AnimatedBottomContainerBackground(
+    containerHeightToPx: Float,
+    contentPaddingBottomToPx: Float,
+    contentScrollState: ScrollState
+) {
+    BottomContainerBackground(
+        alphaState = remember(containerHeightToPx, contentPaddingBottomToPx, contentScrollState) {
+            val maxBottomContainerAnimPx = contentPaddingBottomToPx - containerHeightToPx
+            derivedStateOf {
+                if (contentScrollState.maxValue == Int.MAX_VALUE) 0f
+                else {
+                    val remainScrollToPx = contentScrollState.maxValue - contentScrollState.value
+                    val visibleClipToPaddingHeight =
+                        maxOf(contentPaddingBottomToPx - remainScrollToPx, 0f)
+                    val bottomContainerAnimPx = maxOf(visibleClipToPaddingHeight - containerHeightToPx, 0f)
+                    1f - bottomContainerAnimPx / maxBottomContainerAnimPx
+                }
+            }
+        }
     )
 }
 
+/**
+ * @param alphaState alphaState is 0f ~ 1f
+ */
 @Composable
-private fun AnimatedBottomContainer(
-    containerHeightToPx: Float,
-    contentBottomPaddingToPx: Float,
-    scrollState: ScrollState,
-    modifier: Modifier = Modifier
-) {
-    // offset is 0f ~ 1f
-    val offset by remember(scrollState) {
-        val maxBottomContainerAnimPx = contentBottomPaddingToPx - containerHeightToPx
-        derivedStateOf {
-            if (scrollState.maxValue == Int.MAX_VALUE) 0f
-            else {
-                val remainScrollToPx = scrollState.maxValue - scrollState.value
-                val visibleClipToPaddingHeight =
-                    maxOf(contentBottomPaddingToPx - remainScrollToPx, 0f)
-                val bottomContainerAnimPx = maxOf(visibleClipToPaddingHeight - containerHeightToPx, 0f)
-                1f - bottomContainerAnimPx / maxBottomContainerAnimPx
-            }
-        }
-    }
-    BottomContainerSpace(modifier = modifier.alpha(offset))
-}
-
-@Composable
-private fun BottomContainerSpace(
-    modifier: Modifier = Modifier
-) {
-    Box(modifier = modifier) {
+private fun BottomContainerBackground(alphaState: State<Float>) {
+    val containerColor = ReminderTheme.colors.bgCard1
+    val lineColor = ReminderTheme.colors.bgLine1
+    Box(modifier = Modifier.fillMaxSize()) {
+        // TODO find alpha with animation on parent modifier.
         Spacer(
             modifier = Modifier
-                .matchParentSize()
-                .background(ReminderTheme.colors.bgCard1.copy(alpha = 0.925f))
+                .fillMaxSize()
+                .drawBehind { drawRect(color = containerColor.copy(alpha = 0.925f * alphaState.value)) }
         )
         Spacer(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(0.5.dp)
                 .align(Alignment.TopCenter)
-                .background(ReminderTheme.colors.bgLine1)
+                .drawBehind { drawRect(color = lineColor.copy(alpha = alphaState.value)) }
         )
-    }
-}
-
-@Preview(
-    name = "LightBottomContainerSpaceContainerPreview",
-    showBackground = true,
-    uiMode = Configuration.UI_MODE_NIGHT_NO
-)
-@Preview(
-    name = "DarkBottomContainerSpaceContainerPreview",
-    showBackground = true,
-    uiMode = Configuration.UI_MODE_NIGHT_YES
-)
-@Composable
-private fun BottomContainerSpaceContainerPreview() {
-    ReminderTheme {
-        Surface(color = Color.Red) {
-            BottomContainerSpace(
-                modifier = Modifier
-                    .height(50.dp)
-                    .alpha(0.6f)
-            )
-        }
     }
 }

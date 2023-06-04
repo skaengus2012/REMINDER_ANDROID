@@ -39,9 +39,11 @@ fun DelayedVisibleContent(
         content()
     }
 
-    LaunchedEffect(key) {
-        delay(delayTimeMillis)
-        visibleState.visible()
+    if (visibleState.value.not()) {
+        LaunchedEffect(key) {
+            delay(delayTimeMillis)
+            visibleState.visible()
+        }
     }
 }
 
@@ -62,6 +64,6 @@ class DelayedVisibleState internal constructor(initial: Boolean) {
 }
 
 @Composable
-fun rememberDelayedVisibleState(): DelayedVisibleState {
-    return rememberSaveable(saver = DelayedVisibleState.Saver) { DelayedVisibleState(initial = false) }
+fun rememberDelayedVisibleState(visible: Boolean = false): DelayedVisibleState {
+    return rememberSaveable(saver = DelayedVisibleState.Saver) { DelayedVisibleState(initial = visible) }
 }

@@ -40,8 +40,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -54,20 +54,55 @@ import com.nlab.reminder.core.android.designsystem.theme.ReminderTheme
  * @author Doohyun
  */
 @Composable
-internal fun TodayCategoryCard(
+internal fun CategoryCardsRow(
+    todayCount: Long,
+    timetableCount: Long,
+    allCount: Long,
+    modifier: Modifier = Modifier,
+    onTodayCategoryClicked: () -> Unit = {},
+    onTimetableCategoryClicked: () -> Unit = {},
+    onAllCategoryClicked: () -> Unit = {}
+) {
+    Row(modifier = modifier.fillMaxWidth()) {
+        TodayCategoryCard(
+            modifier = Modifier.weight(1f),
+            remainCount = todayCount,
+            onClick = onTodayCategoryClicked
+        )
+
+        Spacer(modifier = Modifier.width(14.dp))
+
+        TimetableCategoryCard(
+            modifier = Modifier.weight(1f),
+            remainCount = timetableCount,
+            onClick = onTimetableCategoryClicked
+        )
+
+        Spacer(modifier = Modifier.width(14.dp))
+
+        AllCategoryCard(
+            modifier = Modifier.weight(1f),
+            remainCount = allCount,
+            onClick = onAllCategoryClicked
+        )
+    }
+}
+
+@Composable
+private fun TodayCategoryCard(
     remainCount: Long,
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
 ) {
-    CategoryCard(
-        name = LocalContext.current.getString(R.string.home_category_today),
+    BasicCategoryCard(
+        name = stringResource(R.string.home_category_today),
         remainCount = remainCount,
         icon = {
             Image(
                 painter = painterResource(id = R.drawable.ic_home_category_today),
                 contentDescription = null,
                 modifier = Modifier
-                    .fillMaxWidth(0.4479f)
+                    .fillMaxWidth(0.4883f)
                     .aspectRatio(1f)
             )
         },
@@ -77,20 +112,20 @@ internal fun TodayCategoryCard(
 }
 
 @Composable
-internal fun TimetableCategoryCard(
+private fun TimetableCategoryCard(
     remainCount: Long,
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
 ) {
-    CategoryCard(
-        name = LocalContext.current.getString(R.string.home_category_timetable),
+    BasicCategoryCard(
+        name = stringResource(R.string.home_category_timetable),
         remainCount = remainCount,
         icon = {
             Image(
                 painter = painterResource(id = R.drawable.ic_home_category_timetable),
                 contentDescription = null,
                 modifier = Modifier
-                    .fillMaxWidth(0.4243f)
+                    .fillMaxWidth(0.4325f)
                     .aspectRatio(18.6f / 19.28f)
             )
         },
@@ -100,20 +135,20 @@ internal fun TimetableCategoryCard(
 }
 
 @Composable
-internal fun AllCategoryCard(
+private fun AllCategoryCard(
     remainCount: Long,
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
 ) {
-    CategoryCard(
-        name = LocalContext.current.getString(R.string.home_category_timetable),
+    BasicCategoryCard(
+        name = stringResource(R.string.home_category_timetable),
         remainCount = remainCount,
         icon = {
             Image(
                 painter = painterResource(id = R.drawable.ic_home_category_all),
                 contentDescription = null,
                 modifier = Modifier
-                    .fillMaxWidth(0.4237f)
+                    .fillMaxWidth(0.4232f)
                     .aspectRatio(18.22f / 15.93f)
             )
         },
@@ -123,7 +158,7 @@ internal fun AllCategoryCard(
 }
 
 @Composable
-private fun CategoryCard(
+private fun BasicCategoryCard(
     name: String,
     remainCount: Long,
     icon: @Composable () -> Unit,
@@ -202,37 +237,22 @@ private fun CategoryCountText(count: Long) {
 }
 
 @Preview(
-    name = "DarkCategoryCardsPreview",
-    uiMode = UI_MODE_NIGHT_YES,
+    name = "LightCategoryCardsRowPreview",
     showBackground = true,
+    uiMode = UI_MODE_NIGHT_NO
 )
 @Preview(
-    name = "LightCategoryCardsPreview",
-    uiMode = UI_MODE_NIGHT_NO,
+    name = "DarkCategoryCardsRowPreview",
     showBackground = true,
+    uiMode = UI_MODE_NIGHT_YES
 )
 @Composable
-private fun CategoryCardsPreview() {
+private fun CategoryCardSectionPreview() {
     ReminderTheme {
-        Row {
-            TodayCategoryCard(
-                remainCount = 10,
-                modifier = Modifier.width(100.dp)
-            )
-
-            Spacer(modifier = Modifier.width(16.dp))
-
-            TimetableCategoryCard(
-                remainCount = 5,
-                modifier = Modifier.width(100.dp)
-            )
-
-            Spacer(modifier = Modifier.width(16.dp))
-
-            AllCategoryCard(
-                remainCount = 28,
-                modifier = Modifier.width(100.dp)
-            )
-        }
+        CategoryCardsRow(
+            todayCount = 10,
+            timetableCount = 20,
+            allCount = 30,
+        )
     }
 }

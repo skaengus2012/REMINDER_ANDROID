@@ -5,7 +5,6 @@ androidGradlePlugin = "8.0.2"
 kotlinCollectionsImmutable = "0.3.5"
 androidCoreKtx = "1.9.0"
 androidAppCompat = "1.6.1"
-androidComposeMaterial = "1.5.0-beta01"
 androidConstaintLayout = "2.1.4"
 androidRecyclerView = "1.2.1"
 androidLifecycle = "2.5.1"
@@ -19,6 +18,7 @@ androidTestEspresso = "3.5.0"
 androidTestRules = "1.4.0"
 androidComposeCompiler = "1.4.5"
 androidComposeBom = "2023.05.01"
+androidHiltNavigationCompose = "1.0.0"
 googleAndroidMaterial = "1.8.0"
 googleHilt = "2.46.1"
 googleFlexbox = "3.0.0"
@@ -45,13 +45,16 @@ kotlin-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-te
 android-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidCoreKtx" }
 android-activity-compose = { group = "androidx.activity", name = "activity-compose" }
 android-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "androidAppCompat" }
-android-constaintlayout =  { module = "androidx.constraintlayout:constraintlayout", version.ref = "androidConstaintLayout" }
+android-constaintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "androidConstaintLayout" }
 android-recyclerview = { module = "androidx.recyclerview:recyclerview", version.ref = "androidRecyclerView" }
 android-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "androidLifecycle" }
 android-lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "androidLifecycle" }
+android-lifecycle-runtimeCompose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "androidLifecycle" }
 android-fragment-ktx = { module = "androidx.fragment:fragment-ktx", version.ref = "androidFragment" }
 android-navigation-fragment-ktx = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "androidNavigation" }
 android-navigation-ui-ktx = { module = "androidx.navigation:navigation-ui-ktx", version.ref = "androidNavigation" }
+android-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "androidNavigation" }
+android-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "androidHiltNavigationCompose" }
 android-room-runtime = { module = "androidx.room:room-runtime", version.ref = "androidRoom" }
 android-room-ktx = { module = "androidx.room:room-ktx", version.ref = "androidRoom" }
 android-room-compiler = { module = "androidx.room:room-compiler", version.ref = "androidRoom" }
@@ -59,15 +62,15 @@ android-startup-runtime = { module = "androidx.startup:startup-runtime", version
 android-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "androidDataStore" }
 android-test-junit = { module = "androidx.test.ext:junit", version.ref = "androidTestJunit" }
 android-test-espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "androidTestEspresso" }
-android-test-runner = { module = "androidx.test:runner", version.ref = "androidTestRules"}
-android-test-rules = { module = "androidx.test:rules", version.ref = "androidTestRules"}
+android-test-runner = { module = "androidx.test:runner", version.ref = "androidTestRules" }
+android-test-rules = { module = "androidx.test:rules", version.ref = "androidTestRules" }
 android-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "androidComposeBom" }
-android-compose-material = { group = "androidx.compose.material", name = "material", version.ref = "androidComposeMaterial" }   # For using ModalBottomSheetLayout
+android-compose-material = { group = "androidx.compose.material", name = "material" }   # For using ModalBottomSheetLayout
 android-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
 android-compose-foundation = { group = "androidx.compose.foundation", name = "foundation" }
 android-compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 android-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
-google-android-material =  { module = "com.google.android.material:material", version.ref = "googleAndroidMaterial" }
+google-android-material = { module = "com.google.android.material:material", version.ref = "googleAndroidMaterial" }
 google-hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "googleHilt" }
 google-hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "googleHilt" }
 google-flexbox = { module = "com.google.android.flexbox:flexbox", version.ref = "googleFlexbox" }

@@ -55,6 +55,7 @@ android {
         release {
             isDebuggable = false
             isMinifyEnabled = true
+            isShrinkResources = true
             signingConfig = signingConfigs.getByName("debug") // TODO make release key..
         }
     }
@@ -97,8 +98,11 @@ dependencies {
     implementation(libs.android.recyclerview)
     implementation(libs.android.lifecycle.viewmodel.ktx)
     implementation(libs.android.lifecycle.runtime.ktx)
+    implementation(libs.android.lifecycle.runtimeCompose)
     implementation(libs.android.fragment.ktx)
     implementation(libs.android.navigation.fragment.ktx)
+    implementation(libs.android.navigation.compose)
+    implementation(libs.android.hilt.navigation.compose)
     implementation(libs.android.navigation.ui.ktx)
     implementation(libs.android.room.runtime)
     implementation(libs.android.room.ktx)

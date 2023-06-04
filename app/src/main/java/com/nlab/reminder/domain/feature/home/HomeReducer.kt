@@ -24,18 +24,18 @@ import javax.inject.Inject
 /**
  * @author Doohyun
  */
-internal class HomeReducer @Inject constructor() : Reducer<HomeAction, HomeUiState> by buildDslReducer(
+class HomeReducer @Inject constructor() : Reducer<HomeAction, HomeUiState> by buildDslReducer(
     defineDSL = {
         state<HomeUiState.Success> {
             action<HomeAction.PageShown> { (_, before) -> before.withPageShown() }
             action<HomeAction.OnTodayCategoryClicked> { (_, before) ->
-                before.withPageShown(todayScheduleShow = true)
+                before.withPageShown(todayScheduleShown = true)
             }
             action<HomeAction.OnTimetableCategoryClicked> { (_, before) ->
-                before.withPageShown(timetableScheduleShow = true)
+                before.withPageShown(timetableScheduleShown = true)
             }
             action<HomeAction.OnAllCategoryClicked> { (_, before) ->
-                before.withPageShown(allScheduleShow = true)
+                before.withPageShown(allScheduleShown = true)
             }
         }
 
@@ -43,11 +43,8 @@ internal class HomeReducer @Inject constructor() : Reducer<HomeAction, HomeUiSta
             state<HomeUiState.Loading> { (action) ->
                 HomeUiState.Success(
                     todayScheduleCount = action.todaySchedulesCount,
-                    todayScheduleShown = false,
                     timetableScheduleCount = action.timetableSchedulesCount,
-                    timetableScheduleShown = false,
                     allScheduleCount = action.allSchedulesCount,
-                    allScheduleShown = false,
                     tags = action.tags.toImmutableList()
                 )
             }

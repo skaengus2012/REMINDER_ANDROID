@@ -17,17 +17,16 @@
 package com.nlab.reminder.domain.feature.home.view
 
 import android.content.res.Configuration
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.*
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -54,13 +53,13 @@ internal fun NewPlanButton(
             .fillMaxHeight(),
         onClick = onClick.throttle()
     ) { contentColor ->
-        Image(
+        Icon(
             modifier = Modifier
                 .width(35.73.dp)
                 .height(20.69.dp),
             painter = painterResource(id = R.drawable.ic_new_plan),
             contentDescription = null,
-            colorFilter = ColorFilter.tint(contentColor),
+            tint = contentColor
         )
         Text(
             text = LocalContext.current.getString(R.string.new_schedule_label),
@@ -84,13 +83,13 @@ internal fun TimePushSwitchButton(
             .fillMaxHeight(),
         onClick = onClick
     ) { contentColor ->
-        Image(
+        Icon(
             modifier = Modifier
                 .width(19.35.dp)
                 .height(18.9.dp),
             painter = painterResource(id = R.drawable.ic_time_push),
             contentDescription = null,
-            colorFilter = ColorFilter.tint(contentColor),
+            tint = contentColor,
         )
         Spacer(modifier = Modifier.width(5.87.dp))
         Text(

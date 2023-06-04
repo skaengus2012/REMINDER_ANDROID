@@ -19,17 +19,18 @@ package com.nlab.reminder.domain.feature.home
 import com.nlab.reminder.domain.common.data.model.*
 import com.nlab.testkit.genBoolean
 import com.nlab.testkit.genInt
+import com.nlab.testkit.genLong
 import kotlinx.collections.immutable.toPersistentList
 
 /**
  * @author Doohyun
  */
 internal fun genHomeUiStateSuccess(
-    todayScheduleCount: Int = genInt(),
+    todayScheduleCount: Long = genLong(),
     todayScheduleShown: Boolean = genBoolean(),
-    timetableScheduleCount: Int = genInt(),
+    timetableScheduleCount: Long = genLong(),
     timetableScheduleShown: Boolean = genBoolean(),
-    allScheduleCount: Int = genInt(),
+    allScheduleCount: Long = genLong(),
     allScheduleShown: Boolean = genBoolean(),
     tags: List<Tag> = genTags()
 ): HomeUiState.Success = HomeUiState.Success(

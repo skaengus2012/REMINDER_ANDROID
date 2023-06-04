@@ -46,13 +46,14 @@ import kotlinx.collections.immutable.persistentListOf
  */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-internal fun TagCard(
+internal fun TagTextsBox(
     tags: ImmutableList<Tag>,
+    modifier: Modifier = Modifier,
     onTagClicked: (Tag) -> Unit = {},
     onTagLongClicked: (Tag) -> Unit = {}
 ) {
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .defaultMinSize(minHeight = 160.dp)
             .clip(RoundedCornerShape(8.dp))
@@ -92,19 +93,19 @@ internal fun TagCard(
 }
 
 @Preview(
-    name = "DarkTagCardPreview",
+    name = "DarkTagTextsBoxPreview",
     uiMode = Configuration.UI_MODE_NIGHT_YES,
     showBackground = true,
 )
 @Preview(
-    name = "LightTagCardPreview",
+    name = "LightTagTextsBoxPreview",
     uiMode = Configuration.UI_MODE_NIGHT_NO,
     showBackground = true,
 )
 @Composable
-private fun TagCardPreview() {
+private fun TagTextsBoxPreview() {
     ReminderTheme {
-        TagCard(
+        TagTextsBox(
             persistentListOf(
                 Tag(tagId = 1, name = "MyTag"),
                 Tag(tagId = 2, name = "YourTag"),
@@ -115,18 +116,18 @@ private fun TagCardPreview() {
 }
 
 @Preview(
-    name = "DarkTagCardEmptyPreview",
+    name = "DarkTagTextsBoxEmptyPreview",
     uiMode = Configuration.UI_MODE_NIGHT_YES,
     showBackground = true,
 )
 @Preview(
-    name = "LightTagCardEmptyPreview",
+    name = "LightTagTextsBoxEmptyPreview",
     uiMode = Configuration.UI_MODE_NIGHT_NO,
     showBackground = true,
 )
 @Composable
-private fun TagCardEmptyPreview() {
+private fun TagTextsBoxEmptyPreview() {
     ReminderTheme {
-        TagCard(persistentListOf())
+        TagTextsBox(persistentListOf())
     }
 }

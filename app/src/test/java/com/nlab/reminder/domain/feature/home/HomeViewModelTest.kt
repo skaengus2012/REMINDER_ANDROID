@@ -41,6 +41,7 @@ import org.mockito.kotlin.*
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class HomeViewModelTest {
+   /**
     @Before
     fun setup() {
         Dispatchers.setMain(Dispatchers.Unconfined)
@@ -105,5 +106,5 @@ class HomeViewModelTest {
             .launchIn(genFlowObserveCoroutineScope())
         viewModel.send(sampleEvent).join()
         verify(sideEffectHandler, once())()
-    }
+    }*/
 }

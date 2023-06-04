@@ -23,23 +23,14 @@ import androidx.compose.runtime.Composable
  */
 @Composable
 fun LoadedContent(
-    delayTimeMillis: Long = 100,
-    visibleState: DelayedVisibleState = rememberDelayedVisibleState(),
-    content: @Composable () -> Unit
-) {
-    DelayedVisibleContent(
-        delayTimeMillis = delayTimeMillis,
-        visibleState = visibleState,
-        key = Unit,
-        content = content
-    )
-}
-
-@Composable
-fun LoadedContent(
     isDelay: Boolean,
     visibleState: DelayedVisibleState = rememberDelayedVisibleState(),
     content: @Composable () -> Unit
 ) {
-    LoadedContent(delayTimeMillis = if (isDelay) 100 else 0, visibleState = visibleState, content = content)
+    DelayedVisibleContent(
+        delayTimeMillis = if (isDelay) 100 else 0,
+        visibleState = visibleState,
+        key = Unit,
+        content = content
+    )
 }
