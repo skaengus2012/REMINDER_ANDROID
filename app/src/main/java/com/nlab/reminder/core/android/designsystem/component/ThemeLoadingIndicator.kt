@@ -23,9 +23,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.nlab.reminder.core.android.compose.runtime.DelayedVisibleContent
+import com.nlab.reminder.core.android.compose.runtime.DelayedVisibleState
+import com.nlab.reminder.core.android.compose.runtime.rememberDelayedVisibleState
 import com.nlab.reminder.core.android.designsystem.theme.ReminderTheme
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 /**
  * @author Doohyun
@@ -35,26 +36,18 @@ fun ThemeLoadingIndicator(
     modifier: Modifier = Modifier,
     color: Color = ReminderTheme.colors.pointColor1,
     strokeWidth: Dp = 3.5.dp,
-    displayDelayTime: Long = 500
+    delayTime: Long = 500,
+    visibleState: DelayedVisibleState = rememberDelayedVisibleState()
 ) {
-    val coroutineScope = rememberCoroutineScope()
-    var isIndicatorVisibleState by remember { mutableStateOf(false) }
-    if (isIndicatorVisibleState) {
+    DelayedVisibleContent(
+        delayTimeMillis = delayTime,
+        visibleState = visibleState,
+        key = Unit,
+    ) {
         CircularProgressIndicator(
             modifier = modifier.size(36.dp),
             color = color,
             strokeWidth = strokeWidth
         )
-    }
-
-    DisposableEffect(true) {
-        val job = coroutineScope.launch {
-            delay(displayDelayTime)
-            isIndicatorVisibleState = true
-        }
-
-        onDispose {
-            job.cancel()
-        }
     }
 }
