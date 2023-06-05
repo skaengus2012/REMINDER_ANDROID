@@ -31,7 +31,7 @@ jsoup = "1.16.1"
 afollestedDragselectRecyclerView = "2.4.0"
 junit = "4.13.2"
 mockitoInline = "5.2.0"
-mockitoKotlin = "4.1.0"
+mockitoKotlin = "5.0.0"
 javafaker = "1.0.2"
 
 
