@@ -33,7 +33,7 @@ internal fun genHomeUiStateSuccess(
     todayScheduleShown: Boolean = genBoolean(),
     timetableScheduleShown: Boolean = genBoolean(),
     allScheduleShown: Boolean = genBoolean(),
-    tagConfigTarget: Tag? = null,
+    tagConfigTarget: TagConfig? = null,
     tagRenameTarget: TagRenameConfig? = null,
     tagDeleteTarget: TagDeleteConfig? = null,
     userMessages: List<UserMessage> = emptyList()

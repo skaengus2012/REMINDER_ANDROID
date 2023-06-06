@@ -51,10 +51,14 @@ internal class HomeReducer @Inject constructor() : DomainReducer by buildDslRedu
         action<HomeAction.OnAllCategoryClicked> { (_, before) ->
             before.withPageShown(showAllSchedule = true)
         }
-        action<HomeAction.OnTagLongClicked> { (action, before) ->
+        action<HomeAction.TagConfigMetadataLoaded> { (action, before) ->
             before.updateIfTagExists(
                 target = action.tag,
-                getUiState = { before.withPageShown(tagConfigTarget = action.tag) }
+                getUiState = {
+                    before.withPageShown(
+                        tagConfigTarget = TagConfig(action.tag, action.usageCount)
+                    )
+                }
             )
         }
         action<HomeAction.TagRenameMetadataLoaded> { (action, before) ->
@@ -110,7 +114,7 @@ private fun HomeUiState.Success.withPageShown(
     showTodaySchedule: Boolean = false,
     showTimetableSchedule: Boolean = false,
     showAllSchedule: Boolean = false,
-    tagConfigTarget: Tag? = null,
+    tagConfigTarget: TagConfig? = null,
     tagRenameTarget: TagRenameConfig? = null,
     tagDeleteTarget: TagDeleteConfig? = null
 ): HomeUiState.Success =

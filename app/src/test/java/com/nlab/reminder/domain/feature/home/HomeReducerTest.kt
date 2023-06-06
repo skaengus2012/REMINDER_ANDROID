@@ -110,17 +110,22 @@ internal class HomeReducerTest {
     @Test
     fun `Tag config target set, when tag long clicked`() = runTest {
         val tag = genTag()
+        val usageCount = genLong(min = 1, max = 50)
         val initState = genHomeUiStateSuccess(tags = listOf(tag))
         testReduce(
-            action = HomeAction.OnTagLongClicked(tag),
+            action = HomeAction.TagConfigMetadataLoaded(tag, usageCount),
             initState = initState,
-            expectedState = initState.withShownCleared().copy(tagConfigTarget = tag)
+            expectedState = initState
+                .withShownCleared()
+                .copy(tagConfigTarget = TagConfig(tag, usageCount))
         )
     }
 
     @Test
     fun `Show user message, when no tag used for LongClick`() = runTest {
-        testUserMessageShownByTagNotExist { tag -> HomeAction.OnTagLongClicked(tag) }
+        testUserMessageShownByTagNotExist { tag ->
+            HomeAction.TagConfigMetadataLoaded(tag, genLong())
+        }
     }
 
     @Test
@@ -129,7 +134,7 @@ internal class HomeReducerTest {
         val usageCount = genLong(min = 0, max = 100)
         val initState = genHomeUiStateSuccess(
             tags = listOf(tag),
-            tagConfigTarget = tag
+            tagConfigTarget = TagConfig(tag, usageCount)
         )
         testReduce(
             action = HomeAction.TagRenameMetadataLoaded(tag, usageCount),
@@ -178,7 +183,7 @@ internal class HomeReducerTest {
         val usageCount = genLong(min = 0, max = 100)
         val initState = genHomeUiStateSuccess(
             tags = listOf(tag),
-            tagConfigTarget = tag
+            tagConfigTarget = TagConfig(tag, genLong())
         )
         testReduce(
             action = HomeAction.TagDeleteMetadataLoaded(tag, usageCount),
@@ -230,7 +235,7 @@ private suspend fun TestScope.testUserMessageShownByTagNotExist(
     val initState = genHomeUiStateSuccess(
         tags = emptyList(),
         userMessages = emptyList(),
-        tagConfigTarget = tag,
+        tagConfigTarget = TagConfig(tag, genLong()),
         tagRenameTarget = TagRenameConfig(tag, genLong(), genBothify())
     )
     testReduce(

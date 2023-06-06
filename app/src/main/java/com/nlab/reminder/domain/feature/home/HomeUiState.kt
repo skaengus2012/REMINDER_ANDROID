@@ -37,7 +37,7 @@ internal sealed interface HomeUiState : State {
         val todayScheduleShown: Boolean = false,
         val timetableScheduleShown: Boolean = false,
         val allScheduleShown: Boolean = false,
-        val tagConfigTarget: Tag? = null,
+        val tagConfigTarget: TagConfig? = null,
         val tagRenameTarget: TagRenameConfig? = null,
         val tagDeleteTarget: TagDeleteConfig? = null,
         val userMessages: PersistentList<UserMessage> = persistentListOf()

@@ -57,6 +57,10 @@ import com.nlab.reminder.core.android.designsystem.theme.ReminderTheme
 import com.nlab.reminder.domain.common.data.model.Tag
 import com.nlab.reminder.domain.feature.home.HomeUiState
 import com.nlab.reminder.domain.feature.home.HomeViewModel
+import com.nlab.reminder.domain.feature.home.onAllCategoryClicked
+import com.nlab.reminder.domain.feature.home.onTagLongClicked
+import com.nlab.reminder.domain.feature.home.onTimetableCategoryClicked
+import com.nlab.reminder.domain.feature.home.onTodayCategoryClicked
 import kotlinx.collections.immutable.*
 import timber.log.Timber
 
@@ -70,7 +74,15 @@ internal fun HomeRoot(
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    HomeScreen(uiState, modifier)
+    Timber.d("change home $uiState")
+    HomeScreen(
+        uiState = uiState,
+        modifier = modifier,
+        onTodayCategoryClicked = viewModel::onTodayCategoryClicked,
+        onTimetableCategoryClicked = viewModel::onTimetableCategoryClicked,
+        onAllCategoryClicked = viewModel::onAllCategoryClicked,
+        onTagLongClicked = viewModel::onTagLongClicked
+    )
 }
 
 
@@ -78,10 +90,12 @@ internal fun HomeRoot(
 @Composable
 internal fun HomeScreen(
     uiState: HomeUiState,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onTodayCategoryClicked: () -> Unit = {},
+    onTimetableCategoryClicked: () -> Unit = {},
+    onAllCategoryClicked: () -> Unit = {},
+    onTagLongClicked: (Tag) -> Unit = {}
 ) {
-    var tags: PersistentList<Tag> by remember { mutableStateOf(persistentListOf()) }
-
     val sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
     ThemeBottomSheetLayout(
         sheetState = sheetState,
@@ -107,15 +121,14 @@ internal fun HomeScreen(
                     )
                 }
 
-                is HomeUiState.Success -> {
-                    LoadedContent(isDelay = loadingVisibleState.value) {
-                        HomeContent(
-                            uiState = uiState,
-                            onTodayCategoryClicked = {
-                                tags += Tag(tags.size.toLong(), "Hello ${tags.size}",)
-                            }
-                        )
-                    }
+                is HomeUiState.Success -> LoadedContent(isDelay = loadingVisibleState.value) {
+                    HomeContent(
+                        uiState = uiState,
+                        onTodayCategoryClicked = onTodayCategoryClicked,
+                        onTimetableCategoryClicked = onTimetableCategoryClicked,
+                        onAllCategoryClicked = onAllCategoryClicked,
+                        onTagLongClicked = onTagLongClicked
+                    )
                 }
             }
         }
@@ -125,7 +138,10 @@ internal fun HomeScreen(
 @Composable
 private fun BoxScope.HomeContent(
     uiState: HomeUiState.Success,
-    onTodayCategoryClicked: () -> Unit = {}
+    onTodayCategoryClicked: () -> Unit = {},
+    onTimetableCategoryClicked: () -> Unit = {},
+    onAllCategoryClicked: () -> Unit = {},
+    onTagLongClicked: (Tag) -> Unit = {}
 ) {
     val homeContentPaddingBottom = 76.dp
     val homeContentScrollState = rememberScrollState()
@@ -140,7 +156,10 @@ private fun BoxScope.HomeContent(
             .verticalScroll(homeContentScrollState)
             .padding(horizontal = 20.dp)
             .padding(bottom = homeContentPaddingBottom),
-        onTodayCategoryClicked = onTodayCategoryClicked
+        onTodayCategoryClicked = onTodayCategoryClicked,
+        onTimetableCategoryClicked = onTimetableCategoryClicked,
+        onAllCategoryClicked = onAllCategoryClicked,
+        onTagLongClicked = onTagLongClicked
     )
 
     BottomContent(
@@ -161,6 +180,9 @@ private fun HomeItems(
     tags: ImmutableList<Tag>,
     modifier: Modifier = Modifier,
     onTodayCategoryClicked: () -> Unit = {},
+    onTimetableCategoryClicked: () -> Unit = {},
+    onAllCategoryClicked: () -> Unit = {},
+    onTagLongClicked: (Tag) -> Unit = {}
 ) {
     Column(modifier = modifier) {
         Logo(modifier = Modifier.padding(top = 37.dp))
@@ -168,14 +190,14 @@ private fun HomeItems(
             textRes = R.string.home_category_header,
             modifier = Modifier.padding(top = 42.5.dp)
         )
-          CategoryCardsRow(
+        CategoryCardsRow(
             modifier = Modifier.padding(top = 14.dp),
             todayCount = todayScheduleCount,
             timetableCount = timetableScheduleCount,
             allCount = allScheduleCount,
             onTodayCategoryClicked = onTodayCategoryClicked,
-            onTimetableCategoryClicked = {},
-            onAllCategoryClicked = {}
+            onTimetableCategoryClicked = onTimetableCategoryClicked,
+            onAllCategoryClicked = onAllCategoryClicked
         )
         HomeTitle(
             textRes = R.string.home_tag_header,
@@ -187,7 +209,7 @@ private fun HomeItems(
                 .fillMaxWidth(),
             tags = tags,
             onTagClicked = {},
-            onTagLongClicked = { tag -> Timber.d("onLongClick Tag ${tag.tagId}") }
+            onTagLongClicked = onTagLongClicked
         )
     }
 }
