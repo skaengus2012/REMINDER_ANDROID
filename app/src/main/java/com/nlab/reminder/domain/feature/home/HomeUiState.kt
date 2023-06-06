@@ -16,10 +16,11 @@
 
 package com.nlab.reminder.domain.feature.home
 
+import com.nlab.reminder.core.state.UserMessage
 import com.nlab.reminder.core.util.test.annotation.ExcludeFromGeneratedTestReport
 import com.nlab.reminder.domain.common.data.model.Tag
 import com.nlab.statekit.State
-import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.*
 
 /**
  * @author Doohyun
@@ -36,15 +37,9 @@ internal sealed interface HomeUiState : State {
         val todayScheduleShown: Boolean = false,
         val timetableScheduleShown: Boolean = false,
         val allScheduleShown: Boolean = false,
+        val tagConfigTarget: Tag? = null,
+        val tagRenameTarget: TagRenameConfig? = null,
+        val tagDeleteTarget: TagDeleteConfig? = null,
+        val userMessages: PersistentList<UserMessage> = persistentListOf()
     ) : HomeUiState
 }
-
-internal fun HomeUiState.Success.withPageShown(
-    todayScheduleShown: Boolean = false,
-    timetableScheduleShown: Boolean = false,
-    allScheduleShown: Boolean = false,
-) = copy(
-    todayScheduleShown = todayScheduleShown,
-    timetableScheduleShown = timetableScheduleShown,
-    allScheduleShown = allScheduleShown,
-)

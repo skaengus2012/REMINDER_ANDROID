@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.internal.common.data.repository
+package com.nlab.reminder.internal.common.di.fake
 
 import com.nlab.reminder.domain.common.data.repository.ScheduleRepository
 import kotlinx.coroutines.delay

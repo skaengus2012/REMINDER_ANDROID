@@ -16,9 +16,16 @@
 
 package com.nlab.reminder.domain.feature.home
 
+import com.nlab.reminder.R
+import com.nlab.reminder.core.state.UserMessage
+import com.nlab.reminder.domain.common.data.model.Tag
+import com.nlab.reminder.domain.common.data.model.genTag
 import com.nlab.reminder.test.unconfinedCoroutineScope
 import com.nlab.statekit.util.createStore
-import kotlinx.collections.immutable.persistentListOf
+import com.nlab.testkit.genBothify
+import com.nlab.testkit.genInt
+import com.nlab.testkit.genLong
+import kotlinx.collections.immutable.*
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.equalTo
@@ -31,63 +38,162 @@ import org.junit.Test
 internal class HomeReducerTest {
     @Test
     fun `Page was cleared, when page shown`() = runTest {
-        testPageShown(
+        val initState = genHomeUiStateSuccessWithPageShownTrues()
+        testReduce(
             action = HomeAction.PageShown,
-            initState = genHomeUiStateSuccessWithPageShownTrues(),
-            expectedState = { shownClearedState -> shownClearedState }
+            initState = initState,
+            expectedState = initState.withShownCleared()
+        )
+    }
+
+    @Test
+    fun testUserMessageShown() = runTest {
+        val shownMessage = UserMessage(genInt())
+        val expectedState = genHomeUiStateSuccess(userMessages = emptyList())
+        testReduce(
+            action = HomeAction.UserMessageShown(shownMessage),
+            initState = expectedState.copy(userMessages = persistentListOf(shownMessage)),
+            expectedState = expectedState
         )
     }
 
     @Test
     fun `Today's schedule was shown, when today category clicked`() = runTest {
-        testPageShown(
+        val initState = genHomeUiStateSuccess(todayScheduleShown = false)
+        testReduce(
             action = HomeAction.OnTodayCategoryClicked,
-            initState = genHomeUiStateSuccess(todayScheduleShown = false),
-            expectedState = { shownClearedState -> shownClearedState.copy(todayScheduleShown = true) }
+            initState = initState,
+            expectedState = initState.withShownCleared().copy(todayScheduleShown = true)
         )
     }
 
     @Test
     fun `Timetable's schedule was shown, when timetable category clicked`() = runTest {
-        testPageShown(
+        val initState = genHomeUiStateSuccess(timetableScheduleShown = false)
+        testReduce(
             action = HomeAction.OnTimetableCategoryClicked,
-            initState = genHomeUiStateSuccess(timetableScheduleShown = false),
-            expectedState = { shownClearedState -> shownClearedState.copy(timetableScheduleShown = true) }
+            initState = initState,
+            expectedState = initState.withShownCleared().copy(timetableScheduleShown = true)
         )
     }
 
     @Test
     fun `All's schedule was shown, when all category clicked`() = runTest {
-        testPageShown(
+        val initState = genHomeUiStateSuccess(allScheduleShown = false)
+        testReduce(
             action = HomeAction.OnAllCategoryClicked,
-            initState = genHomeUiStateSuccess(allScheduleShown = false),
-            expectedState = { shownClearedState -> shownClearedState.copy(allScheduleShown = true) }
+            initState = initState,
+            expectedState = initState.withShownCleared().copy(allScheduleShown = true)
         )
     }
 
     @Test
     fun `Fetched, when summary loaded`() = runTest {
         val expectedState = genHomeUiStateSuccess()
-        val store = createStore(unconfinedCoroutineScope(), HomeUiState.Loading, HomeReducer())
-        store.dispatch(expectedState.toSummaryLoaded()).join()
-
-        assertThat(
-            store.state.value,
-            equalTo(expectedState.withShownCleared())
+        testReduce(
+            action = expectedState.toSummaryLoaded(),
+            initState = HomeUiState.Loading,
+            expectedState = expectedState.withShownCleared()
         )
     }
 
     @Test
     fun `State was changed, when summary loaded`() = runTest {
         val expectedState = genHomeUiStateSuccess()
-        val store = createStore(
-            unconfinedCoroutineScope(),
-            expectedState.withSummaryCleared(),
-            HomeReducer()
+        testReduce(
+            action = expectedState.toSummaryLoaded(),
+            initState = expectedState.withSummaryCleared(),
+            expectedState = expectedState
         )
-        store.dispatch(expectedState.toSummaryLoaded()).join()
+    }
 
-        assertThat(store.state.value, equalTo(expectedState))
+    @Test
+    fun `Tag config target set, when tag long clicked`() = runTest {
+        val tag = genTag()
+        val initState = genHomeUiStateSuccess(tags = listOf(tag))
+        testReduce(
+            action = HomeAction.OnTagLongClicked(tag),
+            initState = initState,
+            expectedState = initState.withShownCleared().copy(tagConfigTarget = tag)
+        )
+    }
+
+    @Test
+    fun `Show user message, when no tag used for LongClick`() = runTest {
+        testUserMessageShownByTagNotExist { tag -> HomeAction.OnTagLongClicked(tag) }
+    }
+
+    @Test
+    fun `Tag rename target set, when metadata for rename tag loaded`() = runTest {
+        val tag = genTag()
+        val usageCount = genLong(min = 0, max = 100)
+        val initState = genHomeUiStateSuccess(
+            tags = listOf(tag),
+            tagConfigTarget = tag
+        )
+        testReduce(
+            action = HomeAction.TagRenameMetadataLoaded(tag, usageCount),
+            initState = initState,
+            expectedState = initState.withShownCleared().copy(
+                tagRenameTarget = TagRenameConfig(tag, usageCount, renameText = "")
+            )
+        )
+    }
+
+    @Test
+    fun `Show user message, when no tag used for loaded rename metadata`() = runTest {
+        testUserMessageShownByTagNotExist { tag ->
+            HomeAction.TagRenameMetadataLoaded(tag, genLong())
+        }
+    }
+
+    @Test
+    fun `Tag rename inputted`() = runTest {
+        val tag = genTag()
+        val input = genBothify("rename-????")
+        val curTagRenameConfig = TagRenameConfig(tag, genLong(), renameText = "")
+        val initState = genHomeUiStateSuccess(tagRenameTarget = curTagRenameConfig)
+        testReduce(
+            action = HomeAction.OnTagRenameInputted(input),
+            initState = initState,
+            expectedState = initState.copy(
+                tagRenameTarget = curTagRenameConfig.copy(renameText = input)
+            )
+        )
+    }
+
+    @Test
+    fun `Tag rename input ignored, when tag rename config not existed`() = runTest {
+        val expectedState = genHomeUiStateSuccess(tagRenameTarget = null)
+        testReduce(
+            action = HomeAction.OnTagRenameInputted(genBothify("rename-????")),
+            initState = expectedState,
+            expectedState = expectedState
+        )
+    }
+
+    @Test
+    fun `Tag delete target set, when metadata for delete tag loaded`() = runTest {
+        val tag = genTag()
+        val usageCount = genLong(min = 0, max = 100)
+        val initState = genHomeUiStateSuccess(
+            tags = listOf(tag),
+            tagConfigTarget = tag
+        )
+        testReduce(
+            action = HomeAction.TagDeleteMetadataLoaded(tag, usageCount),
+            initState = initState,
+            expectedState = initState.withShownCleared().copy(
+                tagDeleteTarget = TagDeleteConfig(tag, usageCount)
+            )
+        )
+    }
+
+    @Test
+    fun `Show user message, when no tag used for loaded delete metadata`() = runTest {
+        testUserMessageShownByTagNotExist { tag ->
+            HomeAction.TagDeleteMetadataLoaded(tag, genLong())
+        }
     }
 }
 
@@ -100,24 +206,45 @@ private fun genHomeUiStateSuccessWithPageShownTrues(): HomeUiState.Success = gen
 private fun HomeUiState.Success.withShownCleared(): HomeUiState.Success = copy(
     todayScheduleShown = false,
     timetableScheduleShown = false,
-    allScheduleShown = false
+    allScheduleShown = false,
+    tagConfigTarget = null,
+    tagRenameTarget = null,
+    tagDeleteTarget = null
 )
 
-private suspend fun TestScope.testPageShown(
+private suspend fun TestScope.testReduce(
     action: HomeAction,
-    initState: HomeUiState.Success,
-    expectedState: (shownClearedState: HomeUiState.Success) -> HomeUiState.Success
+    initState: HomeUiState,
+    expectedState: HomeUiState
 ) {
     val store = createStore(unconfinedCoroutineScope(), initState, HomeReducer())
     store.dispatch(action).join()
 
-    assertThat(
-        store.state.value,
-        equalTo(expectedState(initState.withShownCleared()))
+    assertThat(store.state.value, equalTo(expectedState))
+}
+
+private suspend fun TestScope.testUserMessageShownByTagNotExist(
+    getAction: suspend (Tag) -> HomeAction
+) {
+    val tag = genTag()
+    val initState = genHomeUiStateSuccess(
+        tags = emptyList(),
+        userMessages = emptyList(),
+        tagConfigTarget = tag,
+        tagRenameTarget = TagRenameConfig(tag, genLong(), genBothify())
+    )
+    testReduce(
+        action = getAction(tag),
+        initState = initState,
+        expectedState = initState.copy(
+            userMessages = persistentListOf(UserMessage(R.string.tag_not_exist)),
+            tagConfigTarget = null,
+            tagRenameTarget = null,
+        )
     )
 }
 
-private fun HomeUiState.Success.toSummaryLoaded(): HomeAction.SummaryLoaded = HomeAction.SummaryLoaded(
+private fun HomeUiState.Success.toSummaryLoaded() = HomeAction.SummaryLoaded(
     todaySchedulesCount = todayScheduleCount,
     timetableSchedulesCount = timetableScheduleCount,
     allSchedulesCount = allScheduleCount,

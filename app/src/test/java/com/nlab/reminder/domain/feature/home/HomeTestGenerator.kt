@@ -16,9 +16,9 @@
 
 package com.nlab.reminder.domain.feature.home
 
+import com.nlab.reminder.core.state.UserMessage
 import com.nlab.reminder.domain.common.data.model.*
 import com.nlab.testkit.genBoolean
-import com.nlab.testkit.genInt
 import com.nlab.testkit.genLong
 import kotlinx.collections.immutable.toPersistentList
 
@@ -27,18 +27,26 @@ import kotlinx.collections.immutable.toPersistentList
  */
 internal fun genHomeUiStateSuccess(
     todayScheduleCount: Long = genLong(),
-    todayScheduleShown: Boolean = genBoolean(),
     timetableScheduleCount: Long = genLong(),
-    timetableScheduleShown: Boolean = genBoolean(),
     allScheduleCount: Long = genLong(),
+    tags: List<Tag> = genTags(),
+    todayScheduleShown: Boolean = genBoolean(),
+    timetableScheduleShown: Boolean = genBoolean(),
     allScheduleShown: Boolean = genBoolean(),
-    tags: List<Tag> = genTags()
+    tagConfigTarget: Tag? = null,
+    tagRenameTarget: TagRenameConfig? = null,
+    tagDeleteTarget: TagDeleteConfig? = null,
+    userMessages: List<UserMessage> = emptyList()
 ): HomeUiState.Success = HomeUiState.Success(
     todayScheduleCount = todayScheduleCount,
-    todayScheduleShown = todayScheduleShown,
     timetableScheduleCount = timetableScheduleCount,
-    timetableScheduleShown = timetableScheduleShown,
     allScheduleCount = allScheduleCount,
+    tags = tags.toPersistentList(),
+    todayScheduleShown = todayScheduleShown,
+    timetableScheduleShown = timetableScheduleShown,
     allScheduleShown = allScheduleShown,
-    tags = tags.toPersistentList()
+    tagConfigTarget = tagConfigTarget,
+    tagRenameTarget = tagRenameTarget,
+    tagDeleteTarget = tagDeleteTarget,
+    userMessages = userMessages.toPersistentList()
 )

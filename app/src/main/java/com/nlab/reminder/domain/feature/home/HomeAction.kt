@@ -16,6 +16,7 @@
 
 package com.nlab.reminder.domain.feature.home
 
+import com.nlab.reminder.core.state.UserMessage
 import com.nlab.reminder.domain.common.data.model.Tag
 import com.nlab.statekit.Action
 import com.nlab.statekit.lifecycle.viewmodel.ContractUiAction
@@ -28,11 +29,14 @@ internal sealed interface HomeAction : Action {
         val todaySchedulesCount: Long,
         val timetableSchedulesCount: Long,
         val allSchedulesCount: Long,
-        val tags: List<Tag>
+        val tags: List<Tag>,
     ) : HomeAction
 
     @ContractUiAction
     object PageShown : HomeAction
+
+    @ContractUiAction
+    data class UserMessageShown(val shownMessage: UserMessage) : HomeAction
 
     @ContractUiAction
     object OnTodayCategoryClicked : HomeAction
@@ -42,4 +46,14 @@ internal sealed interface HomeAction : Action {
 
     @ContractUiAction
     object OnAllCategoryClicked : HomeAction
+
+    @ContractUiAction
+    data class OnTagLongClicked(val tag: Tag) : HomeAction
+
+    data class TagRenameMetadataLoaded(val tag: Tag, val usageCount: Long) : HomeAction
+
+    @ContractUiAction
+    data class OnTagRenameInputted(val text: String) : HomeAction
+
+    data class TagDeleteMetadataLoaded(val tag: Tag, val usageCount: Long) : HomeAction
 }

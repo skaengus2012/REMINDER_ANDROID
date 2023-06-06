@@ -52,6 +52,7 @@
         <item quantity="one">%1$s is being used in %2$d notification.</item>
         <item quantity="other">%1$s is being used in %2$d notifications.</item>
     </plurals>
+    <string name="tag_not_exist">The tag does not exist.</string>
 
     <!-- home -->
     <string name="home_category_header">My Todo</string>

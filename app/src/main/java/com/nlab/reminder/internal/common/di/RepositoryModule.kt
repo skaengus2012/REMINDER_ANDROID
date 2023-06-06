@@ -28,7 +28,7 @@ import com.nlab.reminder.internal.common.schedule.impl.LocalScheduleRepository
 import com.nlab.reminder.internal.common.data.repository.LocalTagRepository
 import com.nlab.reminder.domain.common.util.link.infra.JsoupLinkMetadataRepository
 import com.nlab.reminder.internal.common.android.database.LinkMetadataDao
-import com.nlab.reminder.internal.common.data.repository.FakeScheduleRepository
+import com.nlab.reminder.internal.common.di.fake.FakeScheduleRepository
 import com.nlab.reminder.internal.common.util.link.impl.LocalCachedLinkMetadataTableRepository
 import dagger.Binds
 import dagger.Module
