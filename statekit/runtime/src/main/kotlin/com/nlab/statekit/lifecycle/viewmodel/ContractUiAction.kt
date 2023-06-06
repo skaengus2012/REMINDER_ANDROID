@@ -30,4 +30,4 @@ package com.nlab.statekit.lifecycle.viewmodel
  */
 @Retention(AnnotationRetention.SOURCE)
 @Target(AnnotationTarget.CLASS)
-annotation class ContractUiAction
+annotation class ContractUiAction(val isPublic: Boolean = false)

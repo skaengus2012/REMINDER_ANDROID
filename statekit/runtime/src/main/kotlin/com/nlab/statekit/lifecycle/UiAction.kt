@@ -24,5 +24,6 @@ import kotlin.reflect.KClass
 @Retention(AnnotationRetention.SOURCE)
 @Target(AnnotationTarget.CLASS)
 annotation class UiAction(
-    val receiverTypes: Array<KClass<out UiActionDispatchable<*>>>
+    val receiverTypes: Array<KClass<out UiActionDispatchable<*>>>,
+    val isPublic: Boolean = false,
 )
