@@ -23,6 +23,7 @@ import com.nlab.reminder.test.unconfinedCoroutineScope
 import com.nlab.statekit.util.buildDslInterceptor
 import com.nlab.statekit.util.createStore
 import com.nlab.testkit.genInt
+import com.nlab.testkit.genLong
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -43,9 +44,9 @@ import org.mockito.kotlin.whenever
 internal class HomeEpicTest {
     @Test
     fun `Repository used while subscribed`() = runTest {
-        val todaySchedulesCount = MutableStateFlow(0)
-        val timetableSchedulesCount = MutableStateFlow(0)
-        val allSchedulesCount = MutableStateFlow(0)
+        val todaySchedulesCount = MutableStateFlow(0L)
+        val timetableSchedulesCount = MutableStateFlow(0L)
+        val allSchedulesCount = MutableStateFlow(0L)
         val tags = MutableStateFlow<List<Tag>>(emptyList())
         val store = createStore(
             unconfinedCoroutineScope(),
@@ -71,9 +72,9 @@ internal class HomeEpicTest {
 
     @Test
     fun `Summary Loaded, when dependencies data changed`() = runTest {
-        val todaySchedulesCount = genInt()
-        val timetableSchedulesCount = genInt()
-        val allSchedulesCount = genInt()
+        val todaySchedulesCount = genLong()
+        val timetableSchedulesCount = genLong()
+        val allSchedulesCount = genLong()
         val tags = genTags(count = genInt(min = 1, max = 3))
 
         val awaitSummaryLoadedReceived = CompletableDeferred<HomeAction.SummaryLoaded>()

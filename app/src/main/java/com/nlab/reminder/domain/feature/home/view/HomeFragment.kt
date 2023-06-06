@@ -27,7 +27,7 @@ import com.nlab.reminder.core.android.fragment.setContent
  * @author Doohyun
  */
 @AndroidEntryPoint
-class HomeFragment : ComponentFragment() {
+internal class HomeFragment : ComponentFragment() {
     override fun onViewCreated(savedInstanceState: Bundle?) {
         setContent {
             ReminderTheme {

@@ -23,7 +23,7 @@ import com.nlab.statekit.lifecycle.viewmodel.ContractUiAction
 /**
  * @author Doohyun
  */
-sealed interface HomeAction : Action {
+internal sealed interface HomeAction : Action {
     data class SummaryLoaded(
         val todaySchedulesCount: Long,
         val timetableSchedulesCount: Long,

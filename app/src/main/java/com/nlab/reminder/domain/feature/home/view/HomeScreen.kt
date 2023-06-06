@@ -65,7 +65,7 @@ import timber.log.Timber
  * @author Doohyun
  */
 @Composable
-fun HomeRoot(
+internal fun HomeRoot(
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
@@ -76,7 +76,7 @@ fun HomeRoot(
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun HomeScreen(
+internal fun HomeScreen(
     uiState: HomeUiState,
     modifier: Modifier = Modifier
 ) {

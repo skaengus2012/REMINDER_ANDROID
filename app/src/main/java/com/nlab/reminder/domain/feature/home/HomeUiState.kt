@@ -24,7 +24,7 @@ import kotlinx.collections.immutable.ImmutableList
 /**
  * @author Doohyun
  */
-sealed interface HomeUiState : State {
+internal sealed interface HomeUiState : State {
     object Loading : HomeUiState
 
     @ExcludeFromGeneratedTestReport

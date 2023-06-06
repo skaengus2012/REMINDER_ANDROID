@@ -33,7 +33,7 @@ import javax.inject.Inject
  */
 @ExcludeFromGeneratedTestReport
 @HiltViewModel
-class HomeViewModel @Inject constructor(
+internal class HomeViewModel @Inject constructor(
     reducer: HomeReducer,
     epic: HomeEpic
 ) : ViewModel(),
