@@ -17,6 +17,7 @@
 package com.nlab.reminder.domain.feature.home
 
 import com.nlab.reminder.core.kotlin.util.Result
+import com.nlab.reminder.domain.common.data.model.TagUsageCount
 import com.nlab.reminder.domain.common.data.model.genTag
 import com.nlab.reminder.domain.common.data.repository.TagRepository
 import com.nlab.reminder.test.unconfinedCoroutineScope
@@ -45,7 +46,7 @@ internal class HomeInterceptorTest {
     @Test
     fun `Sending TagConfigMetadata, when tag was long clicked`() = runTest {
         val target = genTag()
-        val usageCount: Long = genLong(min = 10, max = 100)
+        val usageCount = TagUsageCount(genLong(min = 10, max = 100))
         val tagRepository: TagRepository = mock {
             whenever(mock.getUsageCount(target)) doReturn Result.Success(usageCount)
         }
@@ -61,7 +62,7 @@ internal class HomeInterceptorTest {
         )
         store.dispatch(HomeAction.OnTagLongClicked(tag = target)).join()
         verify(loadedTagConfigMetadata, once()).invoke(
-            HomeAction.TagConfigMetadataLoaded(target, usageCount)
+            HomeAction.TagConfigMetadataLoaded(target, usageCount.value)
         )
     }
 

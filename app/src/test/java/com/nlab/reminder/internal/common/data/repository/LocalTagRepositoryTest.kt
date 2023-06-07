@@ -18,6 +18,7 @@ package com.nlab.reminder.internal.common.data.repository
 
 import com.nlab.reminder.core.kotlin.util.Result
 import com.nlab.reminder.domain.common.data.model.Tag
+import com.nlab.reminder.domain.common.data.model.TagUsageCount
 import com.nlab.reminder.domain.common.data.repository.TagRepository
 import com.nlab.reminder.domain.common.data.model.genTag
 import com.nlab.reminder.domain.common.data.model.genTags
@@ -93,7 +94,7 @@ internal class LocalTagRepositoryTest {
         }
         val result = genTagRepository(scheduleTagListDao = scheduleTagListDao).getUsageCount(input)
 
-        assertThat(result, equalTo(Result.Success(usageCount)))
+        assertThat(result, equalTo(Result.Success(TagUsageCount(usageCount))))
     }
 
     @Test

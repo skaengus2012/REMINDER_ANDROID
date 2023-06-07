@@ -83,7 +83,7 @@ fun HomeStateMachine(
             event<HomeEvent.OnTagRenameRequestClicked> { (event) ->
                 sideEffectHandle.post(
                     sideEffect = tagRepository.getUsageCount(event.tag)
-                        .map { usageCount -> HomeSideEffect.ShowTagRenamePopup(event.tag, usageCount) }
+                        .map { usageCount -> HomeSideEffect.ShowTagRenamePopup(event.tag, usageCount.value) }
                         .getOrNull()
                         ?: HomeSideEffect.ShowErrorPopup
                 )
@@ -91,7 +91,7 @@ fun HomeStateMachine(
             event<HomeEvent.OnTagDeleteRequestClicked> { (event) ->
                 sideEffectHandle.post(
                     sideEffect = tagRepository.getUsageCount(event.tag)
-                        .map { usageCount -> HomeSideEffect.ShowTagDeletePopup(event.tag, usageCount) }
+                        .map { usageCount -> HomeSideEffect.ShowTagDeletePopup(event.tag, usageCount.value) }
                         .getOrNull()
                         ?: HomeSideEffect.ShowErrorPopup
                 )

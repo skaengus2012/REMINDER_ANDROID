@@ -14,19 +14,13 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.common.data.repository
+package com.nlab.reminder.domain.common.data.model
 
-import kotlinx.coroutines.flow.Flow
-import com.nlab.reminder.core.kotlin.util.Result
-import com.nlab.reminder.domain.common.data.model.Tag
-import com.nlab.reminder.domain.common.data.model.TagUsageCount
+import com.nlab.reminder.core.util.test.annotation.ExcludeFromGeneratedTestReport
 
 /**
  * @author Doohyun
  */
-interface TagRepository {
-    fun get(): Flow<List<Tag>>
-    suspend fun getUsageCount(tag: Tag): Result<TagUsageCount>
-    suspend fun updateName(tag: Tag, name: String): Result<Unit>
-    suspend fun delete(tag: Tag): Result<Unit>
-}
+@ExcludeFromGeneratedTestReport
+@JvmInline
+value class TagUsageCount(val value: Long)

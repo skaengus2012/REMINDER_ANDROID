@@ -20,6 +20,7 @@ import com.nlab.reminder.core.kotlin.coroutine.flow.map
 import com.nlab.reminder.core.kotlin.util.Result
 import com.nlab.reminder.core.kotlin.util.catching
 import com.nlab.reminder.domain.common.data.model.Tag
+import com.nlab.reminder.domain.common.data.model.TagUsageCount
 import com.nlab.reminder.domain.common.data.repository.TagRepository
 import com.nlab.reminder.internal.common.android.database.*
 import kotlinx.coroutines.flow.Flow
@@ -34,8 +35,8 @@ internal class LocalTagRepository @Inject constructor(
 ) : TagRepository {
     override fun get(): Flow<List<Tag>> = tagDao.find().map { it.toTags() }
 
-    override suspend fun getUsageCount(tag: Tag): Result<Long> = catching {
-        scheduleTagListDao.findTagUsageCount(tagId = tag.tagId)
+    override suspend fun getUsageCount(tag: Tag): Result<TagUsageCount> = catching {
+        TagUsageCount(scheduleTagListDao.findTagUsageCount(tagId = tag.tagId))
     }
 
     override suspend fun updateName(tag: Tag, name: String): Result<Unit> = catching {
