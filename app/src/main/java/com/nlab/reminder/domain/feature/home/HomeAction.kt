@@ -58,4 +58,6 @@ internal sealed interface HomeAction : Action {
     data class OnTagRenameInputted(val text: String) : HomeAction
 
     data class TagDeleteMetadataLoaded(val tag: Tag, val usageCount: Long) : HomeAction
+
+    data class ErrorOccurred(val throwable: Throwable) : HomeAction
 }
