@@ -34,7 +34,7 @@ internal class HomeInterceptor @Inject constructor(
         action<HomeAction.OnTagLongClicked> { (action) ->
             tagRepository.getUsageCount(action.tag)
                 .onSuccess { usageCount ->
-                    dispatch(HomeAction.TagConfigMetadataLoaded(action.tag, usageCount.value))
+                    dispatch(HomeAction.TagConfigMetadataLoaded(action.tag, usageCount))
                 }
                 .onFailure { e -> dispatch(HomeAction.ErrorOccurred(e)) }
                 .getOrThrow()

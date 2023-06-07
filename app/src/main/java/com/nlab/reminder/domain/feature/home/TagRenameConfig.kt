@@ -17,12 +17,13 @@
 package com.nlab.reminder.domain.feature.home
 
 import com.nlab.reminder.domain.common.data.model.Tag
+import com.nlab.reminder.domain.common.data.model.TagUsageCount
 
 /**
  * @author Doohyun
  */
 data class TagRenameConfig(
     val tag: Tag,
-    val usageCount: Long,
+    val usageCount: TagUsageCount,
     val renameText: String
 )

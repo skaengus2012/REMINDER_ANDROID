@@ -14,16 +14,21 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.common.data.model
+package com.nlab.reminder.domain.common.tag.view
 
-import com.nlab.testkit.*
+import androidx.compose.runtime.Composable
+import com.nlab.reminder.domain.common.data.model.TagUsageCount
 
 /**
  * @author Doohyun
  */
+private const val MAX_PRESENTABLE_USAGE_COUNT = 1_000
 
-fun genTag(tagId: Long = genLong(), name: String = genBothify()) = Tag(tagId, name)
-fun genTags(count: Int = genIntGreaterThanZero()): List<Tag> =
-    List(count) { index -> genTag(index.toLong()) }.distinctBy { it.name }
-
-fun genTagUsageCount(count: Long = genLongGreaterThanZero()) = TagUsageCount(count)
+@Composable
+fun TagUsageCount.mapToString(
+    transform: @Composable (Int) -> String,
+    transformWhenOverflow: @Composable (Int) -> String
+): String {
+    return if (value <= MAX_PRESENTABLE_USAGE_COUNT) transform(value.toInt())
+    else transformWhenOverflow(MAX_PRESENTABLE_USAGE_COUNT)
+}

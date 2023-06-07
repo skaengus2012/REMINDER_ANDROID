@@ -19,6 +19,7 @@ package com.nlab.reminder.domain.feature.home
 import com.nlab.reminder.core.state.UserMessage
 import com.nlab.reminder.core.util.test.annotation.ExcludeFromGeneratedTestReport
 import com.nlab.reminder.domain.common.data.model.Tag
+import com.nlab.reminder.domain.common.data.model.TagUsageCount
 import com.nlab.statekit.Action
 import com.nlab.statekit.lifecycle.viewmodel.ContractUiAction
 
@@ -54,12 +55,12 @@ internal sealed interface HomeAction : Action {
     @ContractUiAction
     data class OnTagLongClicked(val tag: Tag) : HomeAction
 
-    data class TagConfigMetadataLoaded(val tag: Tag, val usageCount: Long) : HomeAction
+    data class TagConfigMetadataLoaded(val tag: Tag, val usageCount: TagUsageCount) : HomeAction
 
-    data class TagRenameMetadataLoaded(val tag: Tag, val usageCount: Long) : HomeAction
+    data class TagRenameMetadataLoaded(val tag: Tag, val usageCount: TagUsageCount) : HomeAction
 
     @ContractUiAction
     data class OnTagRenameInputted(val text: String) : HomeAction
 
-    data class TagDeleteMetadataLoaded(val tag: Tag, val usageCount: Long) : HomeAction
+    data class TagDeleteMetadataLoaded(val tag: Tag, val usageCount: TagUsageCount) : HomeAction
 }

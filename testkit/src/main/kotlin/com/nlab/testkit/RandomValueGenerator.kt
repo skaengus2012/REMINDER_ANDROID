@@ -63,7 +63,7 @@ fun genLong(min: Long = 0, max: Long = 9999999): Long = f.number().numberBetween
  * @param max Maximum value for randomValue.
  * @return random double type number.
  */
-fun genLongGreaterThanZero(max: Int = 9999): Int = genInt(min = 1, max)
+fun genLongGreaterThanZero(max: Int = 9999): Long = genInt(min = 1, max).toLong()
 
 /**
  * Create a Int using the [min]..[max]

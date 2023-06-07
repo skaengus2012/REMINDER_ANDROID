@@ -62,7 +62,7 @@ internal class HomeInterceptorTest {
         )
         store.dispatch(HomeAction.OnTagLongClicked(tag = target)).join()
         verify(loadedTagConfigMetadata, once()).invoke(
-            HomeAction.TagConfigMetadataLoaded(target, usageCount.value)
+            HomeAction.TagConfigMetadataLoaded(target, usageCount)
         )
     }
 

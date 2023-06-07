@@ -20,11 +20,11 @@ import com.nlab.reminder.R
 import com.nlab.reminder.core.state.UserMessage
 import com.nlab.reminder.domain.common.data.model.Tag
 import com.nlab.reminder.domain.common.data.model.genTag
+import com.nlab.reminder.domain.common.data.model.genTagUsageCount
 import com.nlab.reminder.test.unconfinedCoroutineScope
 import com.nlab.statekit.util.createStore
 import com.nlab.testkit.genBothify
 import com.nlab.testkit.genInt
-import com.nlab.testkit.genLong
 import kotlinx.collections.immutable.*
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
@@ -119,9 +119,9 @@ internal class HomeReducerTest {
     }
 
     @Test
-    fun `Tag config target set, when tag long clicked`() = runTest {
+    fun `Tag config target set, when tag metadata loaded`() = runTest {
         val tag = genTag()
-        val usageCount = genLong(min = 1, max = 50)
+        val usageCount = genTagUsageCount()
         val initState = genHomeUiStateSuccess(tags = listOf(tag))
         testReduce(
             action = HomeAction.TagConfigMetadataLoaded(tag, usageCount),
@@ -135,14 +135,14 @@ internal class HomeReducerTest {
     @Test
     fun `Show user message, when no tag used for LongClick`() = runTest {
         testUserMessageShownByTagNotExist { tag ->
-            HomeAction.TagConfigMetadataLoaded(tag, genLong())
+            HomeAction.TagConfigMetadataLoaded(tag, genTagUsageCount())
         }
     }
 
     @Test
     fun `Tag rename target set, when metadata for rename tag loaded`() = runTest {
         val tag = genTag()
-        val usageCount = genLong(min = 0, max = 100)
+        val usageCount = genTagUsageCount()
         val initState = genHomeUiStateSuccess(
             tags = listOf(tag),
             tagConfigTarget = TagConfig(tag, usageCount)
@@ -159,7 +159,7 @@ internal class HomeReducerTest {
     @Test
     fun `Show user message, when no tag used for loaded rename metadata`() = runTest {
         testUserMessageShownByTagNotExist { tag ->
-            HomeAction.TagRenameMetadataLoaded(tag, genLong())
+            HomeAction.TagRenameMetadataLoaded(tag, genTagUsageCount())
         }
     }
 
@@ -167,7 +167,7 @@ internal class HomeReducerTest {
     fun `Tag rename inputted`() = runTest {
         val tag = genTag()
         val input = genBothify("rename-????")
-        val curTagRenameConfig = TagRenameConfig(tag, genLong(), renameText = "")
+        val curTagRenameConfig = TagRenameConfig(tag, genTagUsageCount(), renameText = "")
         val initState = genHomeUiStateSuccess(tagRenameTarget = curTagRenameConfig)
         testReduce(
             action = HomeAction.OnTagRenameInputted(input),
@@ -191,10 +191,10 @@ internal class HomeReducerTest {
     @Test
     fun `Tag delete target set, when metadata for delete tag loaded`() = runTest {
         val tag = genTag()
-        val usageCount = genLong(min = 0, max = 100)
+        val usageCount = genTagUsageCount()
         val initState = genHomeUiStateSuccess(
             tags = listOf(tag),
-            tagConfigTarget = TagConfig(tag, genLong())
+            tagConfigTarget = TagConfig(tag, usageCount)
         )
         testReduce(
             action = HomeAction.TagDeleteMetadataLoaded(tag, usageCount),
@@ -208,7 +208,7 @@ internal class HomeReducerTest {
     @Test
     fun `Show user message, when no tag used for loaded delete metadata`() = runTest {
         testUserMessageShownByTagNotExist { tag ->
-            HomeAction.TagDeleteMetadataLoaded(tag, genLong())
+            HomeAction.TagDeleteMetadataLoaded(tag, genTagUsageCount())
         }
     }
 }
@@ -246,8 +246,8 @@ private suspend fun TestScope.testUserMessageShownByTagNotExist(
     val initState = genHomeUiStateSuccess(
         tags = emptyList(),
         userMessages = emptyList(),
-        tagConfigTarget = TagConfig(tag, genLong()),
-        tagRenameTarget = TagRenameConfig(tag, genLong(), genBothify())
+        tagConfigTarget = TagConfig(tag, genTagUsageCount()),
+        tagRenameTarget = TagRenameConfig(tag, genTagUsageCount(), genBothify())
     )
     testReduce(
         action = getAction(tag),
