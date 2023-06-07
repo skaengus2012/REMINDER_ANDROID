@@ -42,6 +42,9 @@ internal class HomeReducer @Inject constructor() : DomainReducer by buildDslRedu
                     .userMessageShown(action.shownMessage)
             )
         }
+        action<HomeAction.ErrorOccurred> { (_, before) ->
+            before.copy(userMessages = before.userMessages + UserMessage(R.string.unknown_error))
+        }
         action<HomeAction.OnTodayCategoryClicked> { (_, before) ->
             before.withPageShown(showTodaySchedule = true)
         }

@@ -58,6 +58,17 @@ internal class HomeReducerTest {
     }
 
     @Test
+    fun testErrorOccurred() = runTest {
+        val errorMessage = UserMessage(R.string.unknown_error)
+        val initState = genHomeUiStateSuccess(userMessages = emptyList())
+        testReduce(
+            action = HomeAction.ErrorOccurred(Throwable()),
+            initState = initState,
+            expectedState = initState.copy(userMessages = persistentListOf(errorMessage))
+        )
+    }
+
+    @Test
     fun `Today's schedule was shown, when today category clicked`() = runTest {
         val initState = genHomeUiStateSuccess(todayScheduleShown = false)
         testReduce(

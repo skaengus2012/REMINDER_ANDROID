@@ -17,6 +17,7 @@
 package com.nlab.reminder.domain.feature.home
 
 import com.nlab.reminder.core.state.UserMessage
+import com.nlab.reminder.core.util.test.annotation.ExcludeFromGeneratedTestReport
 import com.nlab.reminder.domain.common.data.model.Tag
 import com.nlab.statekit.Action
 import com.nlab.statekit.lifecycle.viewmodel.ContractUiAction
@@ -38,6 +39,9 @@ internal sealed interface HomeAction : Action {
     @ContractUiAction
     data class UserMessageShown(val shownMessage: UserMessage) : HomeAction
 
+    @ExcludeFromGeneratedTestReport
+    data class ErrorOccurred(val throwable: Throwable) : HomeAction
+
     @ContractUiAction
     object OnTodayCategoryClicked : HomeAction
 
@@ -58,6 +62,4 @@ internal sealed interface HomeAction : Action {
     data class OnTagRenameInputted(val text: String) : HomeAction
 
     data class TagDeleteMetadataLoaded(val tag: Tag, val usageCount: Long) : HomeAction
-
-    data class ErrorOccurred(val throwable: Throwable) : HomeAction
 }

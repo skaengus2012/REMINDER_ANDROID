@@ -23,6 +23,7 @@
     <string name="open_link_default_error">This link is not executable.</string>
     <string name="delete">Delete</string>
     <string name="handle_drag">Start drag</string>
+    <string name="unknown_error">An unknown error has occurred.</string>
 
     <!-- schedule -->
     <string name="schedule_complete_checkbox_contentDescription" formatted="true">Complete %1$s</string>
