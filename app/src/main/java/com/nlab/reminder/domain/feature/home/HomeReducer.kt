@@ -64,32 +64,39 @@ internal class HomeReducer @Inject constructor() : DomainReducer by buildDslRedu
                 }
             )
         }
-        action<HomeAction.TagRenameMetadataLoaded> { (action, before) ->
-            before.updateIfTagExists(
-                target = action.tag,
-                getUiState = {
-                    before.withPageShown(
-                        tagRenameTarget = TagRenameConfig(
-                            action.tag,
-                            action.usageCount,
-                            renameText = ""
-                        )
-                    )
-                }
-            )
-        }
         action<HomeAction.OnTagRenameInputted> { (action, before) ->
             before.copy(tagRenameTarget = before.tagRenameTarget?.copy(renameText = action.text))
         }
-        action<HomeAction.TagDeleteMetadataLoaded> { (action, before) ->
-            before.updateIfTagExists(
-                target = action.tag,
-                getUiState = {
-                    before.withPageShown(
-                        tagDeleteTarget = TagDeleteConfig(action.tag, action.usageCount)
+    }
+
+    filteredState(
+        predicate = { state ->
+            state is HomeUiState.Success && state.tagConfigTarget != null
+        }
+    ) {
+        action<HomeAction.OnTagRenameRequestClicked> { (_, before) ->
+            val (uiState, tagConfig) = before.asTagConfigMetadata()
+            uiState.updateIfTagExists(target = tagConfig.tag, getUiState = {
+                uiState.withPageShown(
+                    tagRenameTarget = TagRenameConfig(
+                        tagConfig.tag,
+                        tagConfig.usageCount,
+                        renameText = ""
                     )
-                }
-            )
+                )
+            })
+        }
+
+        action<HomeAction.OnTagDeleteRequestClicked> { (_, before) ->
+            val (uiState, tagConfig) = before.asTagConfigMetadata()
+            uiState.updateIfTagExists(target = tagConfig.tag, getUiState = {
+                uiState.withPageShown(
+                    tagDeleteTarget = TagDeleteConfig(
+                        tagConfig.tag,
+                        tagConfig.usageCount
+                    )
+                )
+            })
         }
     }
 
@@ -142,3 +149,7 @@ private inline fun HomeUiState.Success.updateIfTagExists(
         tagRenameTarget = null,
         userMessages = userMessages + UserMessage(R.string.tag_not_exist)
     )
+
+private fun HomeUiState.asTagConfigMetadata(): Pair<HomeUiState.Success, TagConfig> {
+    return (this as HomeUiState.Success).let { it to it.tagConfigTarget!! }
+}

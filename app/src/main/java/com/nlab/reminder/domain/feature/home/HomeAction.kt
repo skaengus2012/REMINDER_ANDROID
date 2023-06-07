@@ -57,10 +57,12 @@ internal sealed interface HomeAction : Action {
 
     data class TagConfigMetadataLoaded(val tag: Tag, val usageCount: TagUsageCount) : HomeAction
 
-    data class TagRenameMetadataLoaded(val tag: Tag, val usageCount: TagUsageCount) : HomeAction
+    @ContractUiAction
+    object OnTagRenameRequestClicked : HomeAction
 
     @ContractUiAction
     data class OnTagRenameInputted(val text: String) : HomeAction
 
-    data class TagDeleteMetadataLoaded(val tag: Tag, val usageCount: TagUsageCount) : HomeAction
+    @ContractUiAction
+    object OnTagDeleteRequestClicked : HomeAction
 }

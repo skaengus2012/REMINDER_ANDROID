@@ -148,7 +148,7 @@ internal class HomeReducerTest {
             tagConfigTarget = TagConfig(tag, usageCount)
         )
         testReduce(
-            action = HomeAction.TagRenameMetadataLoaded(tag, usageCount),
+            action = HomeAction.OnTagRenameRequestClicked,
             initState = initState,
             expectedState = initState.withShownCleared().copy(
                 tagRenameTarget = TagRenameConfig(tag, usageCount, renameText = "")
@@ -158,9 +158,12 @@ internal class HomeReducerTest {
 
     @Test
     fun `Show user message, when no tag used for loaded rename metadata`() = runTest {
-        testUserMessageShownByTagNotExist { tag ->
-            HomeAction.TagRenameMetadataLoaded(tag, genTagUsageCount())
-        }
+        testUserMessageShownByTagNotExist { HomeAction.OnTagRenameRequestClicked }
+    }
+
+    @Test
+    fun `Nothing action, when no tag config list for loaded rename metadata`() = runTest {
+        testNothingHappenedWhenTagConfigWasNullCase { HomeAction.OnTagRenameRequestClicked }
     }
 
     @Test
@@ -197,7 +200,7 @@ internal class HomeReducerTest {
             tagConfigTarget = TagConfig(tag, usageCount)
         )
         testReduce(
-            action = HomeAction.TagDeleteMetadataLoaded(tag, usageCount),
+            action = HomeAction.OnTagDeleteRequestClicked,
             initState = initState,
             expectedState = initState.withShownCleared().copy(
                 tagDeleteTarget = TagDeleteConfig(tag, usageCount)
@@ -207,9 +210,12 @@ internal class HomeReducerTest {
 
     @Test
     fun `Show user message, when no tag used for loaded delete metadata`() = runTest {
-        testUserMessageShownByTagNotExist { tag ->
-            HomeAction.TagDeleteMetadataLoaded(tag, genTagUsageCount())
-        }
+        testUserMessageShownByTagNotExist { HomeAction.OnTagDeleteRequestClicked }
+    }
+
+    @Test
+    fun `Nothing action, when no tag config list for loaded delete metadata`() = runTest {
+        testNothingHappenedWhenTagConfigWasNullCase { HomeAction.OnTagDeleteRequestClicked }
     }
 }
 
@@ -257,6 +263,28 @@ private suspend fun TestScope.testUserMessageShownByTagNotExist(
             tagConfigTarget = null,
             tagRenameTarget = null,
         )
+    )
+}
+
+private suspend fun TestScope.testNothingHappenedWhenTagConfigWasNullCase(
+    getAction: () -> HomeAction
+) {
+    // case1 loading
+    testReduce(
+        action = getAction(),
+        initState = HomeUiState.Loading,
+        expectedState = HomeUiState.Loading
+    )
+
+    // case2 tagConfigTarget is null
+    val initState = genHomeUiStateSuccess(
+        tags = listOf(genTag()),
+        tagConfigTarget = null
+    )
+    testReduce(
+        action = getAction(),
+        initState = initState,
+        expectedState = initState
     )
 }
 
