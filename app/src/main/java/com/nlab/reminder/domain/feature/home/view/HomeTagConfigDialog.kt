@@ -37,6 +37,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -46,6 +48,8 @@ import com.nlab.reminder.R
 import com.nlab.reminder.core.android.designsystem.component.ThemeDialog
 import com.nlab.reminder.core.android.compose.ui.throttle
 import com.nlab.reminder.core.android.designsystem.theme.ReminderTheme
+import com.nlab.reminder.domain.common.data.model.TagUsageCount
+import com.nlab.reminder.domain.common.tag.view.mapToString
 
 /**
  * @author Doohyun
@@ -53,7 +57,7 @@ import com.nlab.reminder.core.android.designsystem.theme.ReminderTheme
 @Composable
 internal fun HomeTagConfigDialog(
     tagName: String,
-    usageCount: Int,
+    usageCount: TagUsageCount,
     onDismiss: () -> Unit = {},
     onRenameRequestClicked: () -> Unit = {},
     onDeleteRequestClicked: () -> Unit = {}
@@ -66,14 +70,18 @@ internal fun HomeTagConfigDialog(
                 .wrapContentHeight()
         ) {
             Text(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp),
                 text = LocalContext.current.getString(R.string.format_tag, tagName),
                 style = MaterialTheme.typography.titleSmall,
                 color = ReminderTheme.colors.font1,
                 textAlign = TextAlign.Center
             )
             Divider(
-                modifier = Modifier.fillMaxWidth().padding(top = 17.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 17.dp),
                 thickness = 0.5.dp,
                 color = ReminderTheme.colors.bgLine1,
             )
@@ -87,8 +95,15 @@ internal fun HomeTagConfigDialog(
                     .padding(top = 10.dp)
             )
             HomeTagConfigButton(
-                text = LocalContext.current.resources.getQuantityString(R.plurals.tag_delete, usageCount, usageCount),
-                onClick =  onDeleteRequestClicked,
+                text = usageCount.mapToString(
+                    transform = { count ->
+                        pluralStringResource(R.plurals.tag_delete, count, count)
+                    },
+                    transformWhenOverflow = { count ->
+                        stringResource(R.string.tag_delete_overflow, count)
+                    }
+                ),
+                onClick = onDeleteRequestClicked,
                 fontColor = ReminderTheme.colors.red,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -159,7 +174,7 @@ private fun HomeTagConfigDialogPreview() {
     ReminderTheme {
         HomeTagConfigDialog(
             tagName = "Hello HomeTag Config DialogPreview",
-            usageCount = 1
+            usageCount = TagUsageCount(1)
         )
     }
 }

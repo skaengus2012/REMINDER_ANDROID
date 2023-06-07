@@ -26,8 +26,8 @@ private const val MAX_PRESENTABLE_USAGE_COUNT = 1_000
 
 @Composable
 fun TagUsageCount.mapToString(
-    transform: @Composable (Int) -> String,
-    transformWhenOverflow: @Composable (Int) -> String
+    transform: @Composable (count: Int) -> String,
+    transformWhenOverflow: @Composable (count: Int) -> String
 ): String {
     return if (value <= MAX_PRESENTABLE_USAGE_COUNT) transform(value.toInt())
     else transformWhenOverflow(MAX_PRESENTABLE_USAGE_COUNT)

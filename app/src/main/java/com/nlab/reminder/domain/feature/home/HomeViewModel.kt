@@ -35,12 +35,14 @@ import javax.inject.Inject
 @HiltViewModel
 internal class HomeViewModel @Inject constructor(
     reducer: HomeReducer,
+    interceptor: HomeInterceptor,
     epic: HomeEpic
 ) : ViewModel(),
     UiActionDispatchable<HomeAction> {
     private val store = createStore(
         initState = HomeUiState.Loading,
         reducer = reducer,
+        interceptor = interceptor,
         epic = epic
     )
 

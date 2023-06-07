@@ -49,10 +49,12 @@
         <item quantity="one">Delete Tag</item>
         <item quantity="other">Delete %1$d Tags</item>
     </plurals>
+    <string name="tag_delete_overflow">Delete %1$d(+) Tags</string>
     <plurals name="tag_delete_dialog_description">
         <item quantity="one">%1$s is being used in %2$d notification.</item>
         <item quantity="other">%1$s is being used in %2$d notifications.</item>
     </plurals>
+    <string name="tag_delete_dialog_description_overflow">%1$s is being used in %2$d(+) notifications.</string>
     <string name="tag_not_exist">The tag does not exist.</string>
 
     <!-- home -->

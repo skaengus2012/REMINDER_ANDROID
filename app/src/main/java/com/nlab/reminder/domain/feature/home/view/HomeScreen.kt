@@ -55,12 +55,14 @@ import com.nlab.reminder.core.android.designsystem.component.ThemeBottomSheetLay
 import com.nlab.reminder.core.android.designsystem.component.ThemeLoadingIndicator
 import com.nlab.reminder.core.android.designsystem.theme.ReminderTheme
 import com.nlab.reminder.domain.common.data.model.Tag
+import com.nlab.reminder.domain.common.tag.view.mapToString
 import com.nlab.reminder.domain.feature.home.HomeUiState
 import com.nlab.reminder.domain.feature.home.HomeViewModel
 import com.nlab.reminder.domain.feature.home.onAllCategoryClicked
 import com.nlab.reminder.domain.feature.home.onTagLongClicked
 import com.nlab.reminder.domain.feature.home.onTimetableCategoryClicked
 import com.nlab.reminder.domain.feature.home.onTodayCategoryClicked
+import com.nlab.reminder.domain.feature.home.pageShown
 import kotlinx.collections.immutable.*
 import timber.log.Timber
 
@@ -81,7 +83,8 @@ internal fun HomeRoot(
         onTodayCategoryClicked = viewModel::onTodayCategoryClicked,
         onTimetableCategoryClicked = viewModel::onTimetableCategoryClicked,
         onAllCategoryClicked = viewModel::onAllCategoryClicked,
-        onTagLongClicked = viewModel::onTagLongClicked
+        onTagLongClicked = viewModel::onTagLongClicked,
+        onPageShown = viewModel::pageShown
     )
 }
 
@@ -94,7 +97,8 @@ internal fun HomeScreen(
     onTodayCategoryClicked: () -> Unit = {},
     onTimetableCategoryClicked: () -> Unit = {},
     onAllCategoryClicked: () -> Unit = {},
-    onTagLongClicked: (Tag) -> Unit = {}
+    onTagLongClicked: (Tag) -> Unit = {},
+    onPageShown: () -> Unit = {}
 ) {
     val sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
     ThemeBottomSheetLayout(
@@ -127,7 +131,8 @@ internal fun HomeScreen(
                         onTodayCategoryClicked = onTodayCategoryClicked,
                         onTimetableCategoryClicked = onTimetableCategoryClicked,
                         onAllCategoryClicked = onAllCategoryClicked,
-                        onTagLongClicked = onTagLongClicked
+                        onTagLongClicked = onTagLongClicked,
+                        onPageShown = onPageShown
                     )
                 }
             }
@@ -141,7 +146,8 @@ private fun BoxScope.HomeContent(
     onTodayCategoryClicked: () -> Unit = {},
     onTimetableCategoryClicked: () -> Unit = {},
     onAllCategoryClicked: () -> Unit = {},
-    onTagLongClicked: (Tag) -> Unit = {}
+    onTagLongClicked: (Tag) -> Unit = {},
+    onPageShown: () -> Unit = {},
 ) {
     val homeContentPaddingBottom = 76.dp
     val homeContentScrollState = rememberScrollState()
@@ -170,6 +176,14 @@ private fun BoxScope.HomeContent(
         homeContentPaddingBottom = homeContentPaddingBottom,
         homeContentScrollState = homeContentScrollState
     )
+
+    uiState.tagConfigTarget?.let { tagConfig ->
+        HomeTagConfigDialog(
+            tagName = tagConfig.tag.name,
+            usageCount = tagConfig.usageCount,
+            onDismiss = onPageShown
+        )
+    }
 }
 
 @Composable

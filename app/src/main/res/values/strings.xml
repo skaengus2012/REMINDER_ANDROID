@@ -54,9 +54,11 @@
     <plurals name="tag_delete">
         <item quantity="other">%1$d개의 태그 삭제</item>
     </plurals>
+    <string name="tag_delete_overflow">>%1$d(+)개의 태그 삭제</string>
     <plurals name="tag_delete_dialog_description">
         <item quantity="other">#%1$s이(가) %2$d개의 알림에서 사용되고 있습니다.</item>
     </plurals>
+    <string name="tag_delete_dialog_description_overflow">#%1$s이(가) %2$d(+)개의 알림에서 사용되고 있습니다.</string>
     <string name="tag_not_exist">태그가 존재하지 않습니다.</string>
 
     <!-- home -->
