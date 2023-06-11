@@ -16,6 +16,8 @@
 
 package com.nlab.reminder.domain.feature.home
 
+import com.nlab.reminder.core.kotlin.util.catching
+import com.nlab.reminder.core.kotlin.util.flatMap
 import com.nlab.reminder.core.kotlin.util.getOrThrow
 import com.nlab.reminder.core.kotlin.util.onFailure
 import com.nlab.reminder.core.kotlin.util.onSuccess
@@ -37,6 +39,11 @@ internal class HomeInterceptor @Inject constructor(
                     dispatch(HomeAction.TagConfigMetadataLoaded(action.tag, usageCount))
                 }
                 .onFailure { e -> dispatch(HomeAction.ErrorOccurred(e)) }
+                .getOrThrow()
+        }
+        action<HomeAction.OnTagRenameConfirmClicked> { (_, before) ->
+            catching { checkNotNull(before.tagRenameTarget) { "TagRenameTarget must not be null" } }
+                .flatMap { renameConfig -> tagRepository.updateName(renameConfig.tag, renameConfig.renameText) }
                 .getOrThrow()
         }
     }

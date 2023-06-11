@@ -52,6 +52,11 @@ inline fun <T, U> Result<T>.map(transform: (T) -> U): Result<U> = when (this) {
     is Result.Failure -> Result.Failure(throwable)
 }
 
+inline fun <T, U> Result<T>.flatMap(transform: (T) -> Result<U>): Result<U> = when (this) {
+    is Result.Success -> transform(value)
+    is Result.Failure -> Result.Failure(throwable)
+}
+
 inline fun <T> Result<T>.onFailure(action: (Throwable) -> Unit): Result<T> {
     if (this is Result.Failure) {
         action(throwable)

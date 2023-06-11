@@ -64,6 +64,9 @@ internal sealed interface HomeAction : Action {
     object OnTagRenameInputKeyboardShown : HomeAction
 
     @ContractUiAction
+    object OnTagRenameConfirmClicked : HomeAction
+
+    @ContractUiAction
     data class OnTagRenameInputted(val text: String) : HomeAction
 
     @ContractUiAction

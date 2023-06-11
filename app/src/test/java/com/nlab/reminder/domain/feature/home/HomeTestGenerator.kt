@@ -19,6 +19,7 @@ package com.nlab.reminder.domain.feature.home
 import com.nlab.reminder.core.state.UserMessage
 import com.nlab.reminder.domain.common.data.model.*
 import com.nlab.testkit.genBoolean
+import com.nlab.testkit.genBothify
 import com.nlab.testkit.genLong
 import kotlinx.collections.immutable.toPersistentList
 
@@ -50,3 +51,10 @@ internal fun genHomeUiStateSuccess(
     tagDeleteTarget = tagDeleteTarget,
     userMessages = userMessages.toPersistentList()
 )
+
+internal fun genTagRenameConfig(
+    tag: Tag = genTag(),
+    usageCount: TagUsageCount = genTagUsageCount(),
+    renameText: String = genBothify(),
+    shouldKeyboardShown: Boolean = genBoolean()
+): TagRenameConfig = TagRenameConfig(tag, usageCount, renameText, shouldKeyboardShown)

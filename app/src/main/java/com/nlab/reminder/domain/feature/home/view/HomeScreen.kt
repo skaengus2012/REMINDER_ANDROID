@@ -61,6 +61,7 @@ import com.nlab.reminder.domain.feature.home.HomeViewModel
 import com.nlab.reminder.domain.feature.home.onAllCategoryClicked
 import com.nlab.reminder.domain.feature.home.onTagDeleteRequestClicked
 import com.nlab.reminder.domain.feature.home.onTagLongClicked
+import com.nlab.reminder.domain.feature.home.onTagRenameConfirmClicked
 import com.nlab.reminder.domain.feature.home.onTagRenameInputKeyboardShown
 import com.nlab.reminder.domain.feature.home.onTagRenameInputted
 import com.nlab.reminder.domain.feature.home.onTagRenameRequestClicked
@@ -88,6 +89,7 @@ internal fun HomeRoot(
         onTagDeleteRequestClicked = viewModel::onTagDeleteRequestClicked,
         onTagRenameKeyboardShown = viewModel::onTagRenameInputKeyboardShown,
         onTagRenameTextChanged = viewModel::onTagRenameInputted,
+        onTagRenameConfirmClicked = viewModel::onTagRenameConfirmClicked,
         onPageShown = viewModel::pageShown
     )
 }
@@ -105,6 +107,7 @@ internal fun HomeScreen(
     onTagDeleteRequestClicked: () -> Unit,
     onTagRenameKeyboardShown: () -> Unit,
     onTagRenameTextChanged: (String) -> Unit,
+    onTagRenameConfirmClicked: () -> Unit,
     onPageShown: () -> Unit,
 ) {
     val curState = uiState.value
@@ -156,7 +159,8 @@ internal fun HomeScreen(
                             usageCount = tagRenameConfig.usageCount,
                             shouldKeyboardShown = tagRenameConfig.shouldKeyboardShown,
                             onCancel = onPageShown,
-                            onTextChanged = onTagRenameTextChanged
+                            onTextChanged = onTagRenameTextChanged,
+                            onConfirm = onTagRenameConfirmClicked
                         )
                         if (tagRenameConfig.shouldKeyboardShown) {
                             LaunchedEffect(Unit) { onTagRenameKeyboardShown() }

@@ -34,7 +34,14 @@ private typealias DomainReducer = Reducer<HomeAction, HomeUiState>
  */
 internal class HomeReducer @Inject constructor() : DomainReducer by buildDslReducer(defineDSL = {
     state<HomeUiState.Success> {
-        action<HomeAction.PageShown> { (_, before) -> before.withPageShown() }
+        filteredAction(predicate = { action ->
+            when (action) {
+                is HomeAction.PageShown,
+                is HomeAction.OnTagRenameConfirmClicked -> true
+
+                else -> false
+            }
+        }) { (_, before) -> before.withPageShown() }
         action<HomeAction.UserMessageShown> { (action, before) ->
             before.copy(
                 userMessages = before
@@ -72,11 +79,7 @@ internal class HomeReducer @Inject constructor() : DomainReducer by buildDslRedu
         }
     }
 
-    filteredState(
-        predicate = { state ->
-            state is HomeUiState.Success && state.tagConfigTarget != null
-        }
-    ) {
+    filteredState(predicate = { state -> state is HomeUiState.Success && state.tagConfigTarget != null }) {
         action<HomeAction.OnTagRenameRequestClicked> { (_, before) ->
             val (uiState, tagConfig) = before.asTagConfigMetadata()
             uiState.updateIfTagExists(target = tagConfig.tag, getUiState = {

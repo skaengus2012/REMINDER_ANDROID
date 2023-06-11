@@ -23,7 +23,6 @@ import com.nlab.reminder.domain.common.data.model.genTag
 import com.nlab.reminder.domain.common.data.model.genTagUsageCount
 import com.nlab.reminder.test.unconfinedCoroutineScope
 import com.nlab.statekit.util.createStore
-import com.nlab.testkit.genBoolean
 import com.nlab.testkit.genBothify
 import com.nlab.testkit.genInt
 import kotlinx.collections.immutable.*
@@ -38,13 +37,20 @@ import org.junit.Test
  */
 internal class HomeReducerTest {
     @Test
-    fun `Page was cleared, when page shown`() = runTest {
-        val initState = genHomeUiStateSuccessWithPageShownTrues()
-        testReduce(
-            action = HomeAction.PageShown,
-            initState = initState,
-            expectedState = initState.withShownCleared()
+    fun testPageCleared() = runTest {
+        val actionConditions = setOf(
+            HomeAction.PageShown,
+            HomeAction.OnTagRenameConfirmClicked
         )
+
+        val initState = genHomeUiStateSuccessWithPageShownTrues()
+        actionConditions.forEach { action ->
+            testReduce(
+                action = action,
+                initState = initState,
+                expectedState = initState.withShownCleared()
+            )
+        }
     }
 
     @Test
@@ -152,9 +158,9 @@ internal class HomeReducerTest {
             action = HomeAction.OnTagRenameRequestClicked,
             initState = initState,
             expectedState = initState.withShownCleared().copy(
-                tagRenameTarget = TagRenameConfig(
-                    tag,
-                    usageCount,
+                tagRenameTarget = genTagRenameConfig(
+                    tag = tag,
+                    usageCount = usageCount,
                     renameText = tag.name,
                     shouldKeyboardShown = true
                 )
@@ -174,12 +180,7 @@ internal class HomeReducerTest {
 
     @Test
     fun `Tag rename input keyboard shown`() = runTest {
-        val curTagRenameConfig = TagRenameConfig(
-            genTag(),
-            genTagUsageCount(),
-            renameText = genBothify(),
-            shouldKeyboardShown = true
-        )
+        val curTagRenameConfig = genTagRenameConfig(shouldKeyboardShown = true)
         val initState = genHomeUiStateSuccess(tagRenameTarget = curTagRenameConfig)
         testReduce(
             action = HomeAction.OnTagRenameInputKeyboardShown,
@@ -203,18 +204,13 @@ internal class HomeReducerTest {
     @Test
     fun `Tag rename inputted`() = runTest {
         val input = genBothify("rename-????")
-        val curTagRenameConfig = TagRenameConfig(
-            genTag(),
-            genTagUsageCount(),
-            renameText = "",
-            shouldKeyboardShown = genBoolean()
-        )
-        val initState = genHomeUiStateSuccess(tagRenameTarget = curTagRenameConfig)
+        val initTagRenameConfig = genTagRenameConfig(renameText = "",)
+        val initState = genHomeUiStateSuccess(tagRenameTarget = initTagRenameConfig)
         testReduce(
             action = HomeAction.OnTagRenameInputted(input),
             initState = initState,
             expectedState = initState.copy(
-                tagRenameTarget = curTagRenameConfig.copy(renameText = input)
+                tagRenameTarget = initTagRenameConfig.copy(renameText = input)
             )
         )
     }
@@ -259,21 +255,14 @@ internal class HomeReducerTest {
     @Test
     fun `Rename text changed, when tag rename inputted`() = runTest {
         val input = genBothify("rename-????")
-        val tagRenameConfig = TagRenameConfig(
-            tag = genTag(),
-            usageCount = genTagUsageCount(),
-            renameText = "",
-            shouldKeyboardShown = true
-        )
-        val initState = genHomeUiStateSuccess(
-            tagRenameTarget = tagRenameConfig
-        )
+        val initTagRenameConfig = genTagRenameConfig(renameText = "")
+        val initState = genHomeUiStateSuccess(tagRenameTarget = initTagRenameConfig)
 
         testReduce(
             action = HomeAction.OnTagRenameInputted(input),
             initState = initState,
             expectedState = initState.copy(
-                tagRenameTarget = tagRenameConfig.copy(renameText = input)
+                tagRenameTarget = initTagRenameConfig.copy(renameText = input)
             )
         )
     }
@@ -313,7 +302,7 @@ private suspend fun TestScope.testUserMessageShownByTagNotExist(
         tags = emptyList(),
         userMessages = emptyList(),
         tagConfigTarget = TagConfig(tag, genTagUsageCount()),
-        tagRenameTarget = TagRenameConfig(tag, genTagUsageCount(), genBothify(), genBoolean())
+        tagRenameTarget = genTagRenameConfig(tag = tag)
     )
     testReduce(
         action = getAction(tag),

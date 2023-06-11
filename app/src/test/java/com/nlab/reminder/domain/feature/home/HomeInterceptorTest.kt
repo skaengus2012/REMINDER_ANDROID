@@ -17,22 +17,19 @@
 package com.nlab.reminder.domain.feature.home
 
 import com.nlab.reminder.core.kotlin.util.Result
-import com.nlab.reminder.domain.common.data.model.TagUsageCount
 import com.nlab.reminder.domain.common.data.model.genTag
+import com.nlab.reminder.domain.common.data.model.genTagUsageCount
 import com.nlab.reminder.domain.common.data.repository.TagRepository
 import com.nlab.reminder.test.unconfinedCoroutineScope
+import com.nlab.statekit.middleware.interceptor.Interceptor
 import com.nlab.statekit.util.buildInterceptor
 import com.nlab.statekit.util.createStore
 import com.nlab.statekit.util.*
+import com.nlab.testkit.ExpectedRuntimeException
 import com.nlab.testkit.genBothify
-import com.nlab.testkit.genLong
 import com.nlab.testkit.once
-import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.plus
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
-import org.hamcrest.CoreMatchers.equalTo
-import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
@@ -46,54 +43,90 @@ internal class HomeInterceptorTest {
     @Test
     fun `Sending TagConfigMetadata, when tag was long clicked`() = runTest {
         val target = genTag()
-        val usageCount = TagUsageCount(genLong(min = 10, max = 100))
+        val usageCount = genTagUsageCount()
         val tagRepository: TagRepository = mock {
             whenever(mock.getUsageCount(target)) doReturn Result.Success(usageCount)
         }
         val loadedTagConfigMetadata: (HomeAction.TagConfigMetadataLoaded) -> Unit = mock()
-        val store = createStore(
-            unconfinedCoroutineScope(),
-            initState = genHomeUiStateSuccess(),
-            interceptor = genHomeInterceptor(tagRepository = tagRepository) + buildInterceptor {
-                loadedTagConfigMetadata(
-                    it.action as? HomeAction.TagConfigMetadataLoaded ?: return@buildInterceptor
-                )
-            }
+        dispatchWithInterceptor(
+            action = HomeAction.OnTagLongClicked(tag = target),
+            interceptor = genHomeInterceptor(tagRepository),
+            additionalInterceptors = listOf(
+                buildInterceptor {
+                    loadedTagConfigMetadata(
+                        it.action as? HomeAction.TagConfigMetadataLoaded ?: return@buildInterceptor
+                    )
+                }
+            )
         )
-        store.dispatch(HomeAction.OnTagLongClicked(tag = target)).join()
-        verify(loadedTagConfigMetadata, once()).invoke(
-            HomeAction.TagConfigMetadataLoaded(target, usageCount)
-        )
+        verify(loadedTagConfigMetadata, once()).invoke(HomeAction.TagConfigMetadataLoaded(target, usageCount))
     }
 
-    @Test
+    @Test(expected = ExpectedRuntimeException::class)
     fun `Sending error message, when tag was long clicked`() = runTest {
         val target = genTag()
-        val error = RuntimeException(genBothify("error occurred: ????"))
+        val error = ExpectedRuntimeException()
         val tagRepository: TagRepository = mock {
             whenever(mock.getUsageCount(target)) doReturn Result.Failure(error)
         }
-        val exceptionDeferred = CompletableDeferred<Throwable>()
-        val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
-            exceptionDeferred.complete(throwable)
-        }
         val errorOccurred: (HomeAction.ErrorOccurred) -> Unit = mock()
-        val store = createStore(
-            coroutineScope = unconfinedCoroutineScope() + exceptionHandler,
-            initState = genHomeUiStateSuccess(),
-            interceptor = genHomeInterceptor(tagRepository = tagRepository) + buildInterceptor {
-                errorOccurred(
-                    it.action as? HomeAction.ErrorOccurred ?: return@buildInterceptor
-                )
-            }
+        dispatchWithInterceptor(
+            action = HomeAction.OnTagLongClicked(tag = target),
+            interceptor = genHomeInterceptor(tagRepository),
+            additionalInterceptors = listOf(
+                buildInterceptor {
+                    errorOccurred(
+                        it.action as? HomeAction.ErrorOccurred ?: return@buildInterceptor
+                    )
+                }
+            )
         )
-        store.dispatch(HomeAction.OnTagLongClicked(tag = target)).join()
         verify(errorOccurred, once()).invoke(HomeAction.ErrorOccurred(error))
-        assertThat(
-            exceptionDeferred.await().message,
-            equalTo(error.message)
+    }
+
+    @Test
+    fun `update tag name, when tag rename confirmed`() = runTest {
+        val tag = genTag()
+        val updateName = genBothify("update name: ????")
+        val tagRepository: TagRepository = mock {
+            whenever(mock.updateName(tag, updateName)) doReturn Result.Success(Unit)
+        }
+        dispatchWithInterceptor(
+            initState = genHomeUiStateSuccess(
+                tagRenameTarget = genTagRenameConfig(
+                    tag = tag,
+                    renameText = updateName
+                )
+            ),
+            action = HomeAction.OnTagRenameConfirmClicked,
+            interceptor = genHomeInterceptor(tagRepository = tagRepository),
+        )
+        verify(tagRepository, once()).updateName(tag, updateName)
+    }
+
+    @Test(expected = IllegalStateException::class)
+    fun `Failed rename tag, when renameTagConfig was not set`() = runTest {
+        dispatchWithInterceptor(
+            initState = genHomeUiStateSuccess(tagRenameTarget = null),
+            action = HomeAction.OnTagRenameConfirmClicked,
         )
     }
+}
+
+private suspend fun TestScope.dispatchWithInterceptor(
+    action: HomeAction,
+    initState: HomeUiState = genHomeUiStateSuccess(),
+    interceptor: HomeInterceptor = genHomeInterceptor(),
+    additionalInterceptors: List<Interceptor<HomeAction, HomeUiState>> = emptyList()
+) {
+    var concatInterceptors: Interceptor<HomeAction, HomeUiState> = interceptor
+    additionalInterceptors.forEach { concatInterceptors += it }
+    val store = createStore(
+        unconfinedCoroutineScope(),
+        initState = initState,
+        interceptor = concatInterceptors
+    )
+    store.dispatch(action).join()
 }
 
 private fun genHomeInterceptor(
