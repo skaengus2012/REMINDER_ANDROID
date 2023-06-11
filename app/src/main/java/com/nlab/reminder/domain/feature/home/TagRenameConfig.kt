@@ -25,5 +25,6 @@ import com.nlab.reminder.domain.common.data.model.TagUsageCount
 data class TagRenameConfig(
     val tag: Tag,
     val usageCount: TagUsageCount,
-    val renameText: String
+    val renameText: String,
+    val shouldKeyboardShown: Boolean
 )

@@ -54,6 +54,8 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
@@ -66,6 +68,7 @@ import com.nlab.reminder.R
 import com.nlab.reminder.core.android.designsystem.component.ColorPressButton
 import com.nlab.reminder.core.android.designsystem.component.ThemeDialog
 import com.nlab.reminder.core.android.designsystem.theme.ReminderTheme
+import com.nlab.reminder.domain.common.data.model.TagUsageCount
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.debounce
 
@@ -76,7 +79,7 @@ import kotlinx.coroutines.flow.debounce
 fun TagRenameDialog(
     initText: String,
     tagName: String,
-    usageCount: Int,
+    usageCount: TagUsageCount,
     shouldKeyboardShown: Boolean = false,
     onTextChanged: (String) -> Unit = {},
     onCancel: () -> Unit = {},
@@ -102,11 +105,22 @@ fun TagRenameDialog(
 
                 Text(
                     modifier = Modifier.padding(start = 20.dp, top = 2.5.dp, end = 20.dp, bottom = 15.dp),
-                    text = LocalContext.current.resources.getQuantityString(
-                        R.plurals.tag_rename_dialog_description,
-                        usageCount,
-                        tagName,
-                        usageCount
+                    text = usageCount.mapToString(
+                        transform = { count ->
+                            pluralStringResource(
+                                R.plurals.tag_rename_dialog_description,
+                                count,
+                                tagName,
+                                count
+                            )
+                        },
+                        transformWhenOverflow = { count ->
+                            stringResource(
+                                R.string.tag_rename_dialog_description_overflow,
+                                tagName,
+                                count
+                            )
+                        }
                     ),
                     fontSize = 12.sp,
                     color = ReminderTheme.colors.font1,
@@ -198,7 +212,11 @@ private fun TagRenameTextBox(
     Row(
         modifier = modifier
             .clip(RoundedCornerShape(5.dp))
-            .border(width = 0.5.dp, color = ReminderTheme.colors.bgLine1, shape = RoundedCornerShape(5.dp))
+            .border(
+                width = 0.5.dp,
+                color = ReminderTheme.colors.bgLine1,
+                shape = RoundedCornerShape(5.dp)
+            )
             .background(ReminderTheme.colors.bg2), verticalAlignment = Alignment.CenterVertically
     ) {
         var localTextFieldValue by remember {
@@ -245,7 +263,10 @@ private fun TagRenameTextBox(
                     enabled = isClearBtnVisible,
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null,
-                    onClick = { localTextFieldValue = localTextFieldValue.copy("", selection = TextRange.Zero) },
+                    onClick = {
+                        localTextFieldValue =
+                            localTextFieldValue.copy("", selection = TextRange.Zero)
+                    },
                     role = Role.Button
                 )
                 .alpha(if (isClearBtnVisible) 1f else 0f),
@@ -278,7 +299,7 @@ private fun TagRenameDialogPreview() {
         TagRenameDialog(
             initText = "Modify Tag Name...",
             tagName = "Hello, TagRenameDialog check long text",
-            usageCount = 2
+            usageCount = TagUsageCount(2)
         )
     }
 }

@@ -45,6 +45,7 @@
         <item quantity="one">#%1$s will be updated in %2$d reminder.</item>
         <item quantity="other">#%1$s will be updated in %2$d reminders.</item>
     </plurals>
+    <string name="tag_rename_dialog_description_overflow">#%1$s will be updated in %2$d(+) reminders.</string>
     <plurals name="tag_delete">
         <item quantity="one">Delete Tag</item>
         <item quantity="other">Delete %1$d Tags</item>

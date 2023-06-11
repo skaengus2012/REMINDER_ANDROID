@@ -51,6 +51,7 @@
     <plurals name="tag_rename_dialog_description">
         <item quantity="other">#%1$s이(가) %2$d개의 알림에서 업데이트됩니다.</item>
     </plurals>
+    <string name="tag_rename_dialog_description_overflow">#%1$s이(가) %2$d(+)개의 알림에서 업데이트됩니다.</string>
     <plurals name="tag_delete">
         <item quantity="other">%1$d개의 태그 삭제</item>
     </plurals>

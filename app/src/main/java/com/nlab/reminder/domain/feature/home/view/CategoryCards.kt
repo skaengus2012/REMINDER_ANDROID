@@ -42,6 +42,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -188,17 +189,17 @@ private fun CategoryCardBackground(
     onClick: () -> Unit = {},
     onClickLabel: String? = null
 ) {
-    val interactiveSource = remember { MutableInteractionSource() }
     Spacer(
         modifier = Modifier
             .aspectRatio(1 / 1.625f)
             .fillMaxWidth()
             .clip(RoundedCornerShape(8.dp))
             .clickable(
-                interactionSource = interactiveSource,
+                interactionSource = remember { MutableInteractionSource() },
                 indication = rememberRipple(color = ReminderTheme.colors.bgCard1Ripple),
                 onClick = onClick.throttle(),
-                onClickLabel = onClickLabel
+                onClickLabel = onClickLabel,
+                role = Role.Tab
             )
             .background(ReminderTheme.colors.bgCard1)
     )

@@ -55,17 +55,19 @@ import com.nlab.reminder.core.android.designsystem.component.ThemeBottomSheetLay
 import com.nlab.reminder.core.android.designsystem.component.ThemeLoadingIndicator
 import com.nlab.reminder.core.android.designsystem.theme.ReminderTheme
 import com.nlab.reminder.domain.common.data.model.Tag
-import com.nlab.reminder.domain.common.tag.view.mapToString
+import com.nlab.reminder.domain.common.tag.view.TagRenameDialog
 import com.nlab.reminder.domain.feature.home.HomeUiState
 import com.nlab.reminder.domain.feature.home.HomeViewModel
 import com.nlab.reminder.domain.feature.home.onAllCategoryClicked
+import com.nlab.reminder.domain.feature.home.onTagDeleteRequestClicked
 import com.nlab.reminder.domain.feature.home.onTagLongClicked
+import com.nlab.reminder.domain.feature.home.onTagRenameInputKeyboardShown
+import com.nlab.reminder.domain.feature.home.onTagRenameInputted
+import com.nlab.reminder.domain.feature.home.onTagRenameRequestClicked
 import com.nlab.reminder.domain.feature.home.onTimetableCategoryClicked
 import com.nlab.reminder.domain.feature.home.onTodayCategoryClicked
 import com.nlab.reminder.domain.feature.home.pageShown
 import kotlinx.collections.immutable.*
-import timber.log.Timber
-
 
 /**
  * @author Doohyun
@@ -75,40 +77,43 @@ internal fun HomeRoot(
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    Timber.d("change home $uiState")
     HomeScreen(
-        uiState = uiState,
+        uiState = viewModel.uiState.collectAsStateWithLifecycle(),
         modifier = modifier,
         onTodayCategoryClicked = viewModel::onTodayCategoryClicked,
         onTimetableCategoryClicked = viewModel::onTimetableCategoryClicked,
         onAllCategoryClicked = viewModel::onAllCategoryClicked,
         onTagLongClicked = viewModel::onTagLongClicked,
+        onTagRenameRequestClicked = viewModel::onTagRenameRequestClicked,
+        onTagDeleteRequestClicked = viewModel::onTagDeleteRequestClicked,
+        onTagRenameKeyboardShown = viewModel::onTagRenameInputKeyboardShown,
+        onTagRenameTextChanged = viewModel::onTagRenameInputted,
         onPageShown = viewModel::pageShown
     )
 }
 
-
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 internal fun HomeScreen(
-    uiState: HomeUiState,
+    uiState: State<HomeUiState>,
     modifier: Modifier = Modifier,
-    onTodayCategoryClicked: () -> Unit = {},
-    onTimetableCategoryClicked: () -> Unit = {},
-    onAllCategoryClicked: () -> Unit = {},
-    onTagLongClicked: (Tag) -> Unit = {},
-    onPageShown: () -> Unit = {}
+    onTodayCategoryClicked: () -> Unit,
+    onTimetableCategoryClicked: () -> Unit,
+    onAllCategoryClicked: () -> Unit,
+    onTagLongClicked: (Tag) -> Unit,
+    onTagRenameRequestClicked: () -> Unit,
+    onTagDeleteRequestClicked: () -> Unit,
+    onTagRenameKeyboardShown: () -> Unit,
+    onTagRenameTextChanged: (String) -> Unit,
+    onPageShown: () -> Unit,
 ) {
+    val curState = uiState.value
     val sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
     ThemeBottomSheetLayout(
         sheetState = sheetState,
         sheetContent = {
 
         },
-        onHide = {
-
-        }
     ) {
         Box(
             modifier = modifier
@@ -117,7 +122,7 @@ internal fun HomeScreen(
                 .navigationBarsPadding()
         ) {
             val loadingVisibleState = rememberDelayedVisibleState()
-            when (uiState) {
+            when (curState) {
                 is HomeUiState.Loading -> {
                     ThemeLoadingIndicator(
                         modifier = Modifier.align(Alignment.Center),
@@ -127,13 +132,36 @@ internal fun HomeScreen(
 
                 is HomeUiState.Success -> LoadedContent(isDelay = loadingVisibleState.value) {
                     HomeContent(
-                        uiState = uiState,
+                        uiState = curState,
                         onTodayCategoryClicked = onTodayCategoryClicked,
                         onTimetableCategoryClicked = onTimetableCategoryClicked,
                         onAllCategoryClicked = onAllCategoryClicked,
-                        onTagLongClicked = onTagLongClicked,
-                        onPageShown = onPageShown
+                        onTagLongClicked = onTagLongClicked
                     )
+
+                    curState.tagConfigTarget?.let { tagConfig ->
+                        HomeTagConfigDialog(
+                            tagName = tagConfig.tag.name,
+                            usageCount = tagConfig.usageCount,
+                            onDismiss = onPageShown,
+                            onRenameRequestClicked = onTagRenameRequestClicked,
+                            onDeleteRequestClicked = onTagDeleteRequestClicked
+                        )
+                    }
+
+                    curState.tagRenameTarget?.let { tagRenameConfig ->
+                        TagRenameDialog(
+                            initText = tagRenameConfig.renameText,
+                            tagName = tagRenameConfig.tag.name,
+                            usageCount = tagRenameConfig.usageCount,
+                            shouldKeyboardShown = tagRenameConfig.shouldKeyboardShown,
+                            onCancel = onPageShown,
+                            onTextChanged = onTagRenameTextChanged
+                        )
+                        if (tagRenameConfig.shouldKeyboardShown) {
+                            LaunchedEffect(Unit) { onTagRenameKeyboardShown() }
+                        }
+                    }
                 }
             }
         }
@@ -147,7 +175,6 @@ private fun BoxScope.HomeContent(
     onTimetableCategoryClicked: () -> Unit = {},
     onAllCategoryClicked: () -> Unit = {},
     onTagLongClicked: (Tag) -> Unit = {},
-    onPageShown: () -> Unit = {},
 ) {
     val homeContentPaddingBottom = 76.dp
     val homeContentScrollState = rememberScrollState()
@@ -176,14 +203,6 @@ private fun BoxScope.HomeContent(
         homeContentPaddingBottom = homeContentPaddingBottom,
         homeContentScrollState = homeContentScrollState
     )
-
-    uiState.tagConfigTarget?.let { tagConfig ->
-        HomeTagConfigDialog(
-            tagName = tagConfig.tag.name,
-            usageCount = tagConfig.usageCount,
-            onDismiss = onPageShown
-        )
-    }
 }
 
 @Composable
@@ -196,7 +215,7 @@ private fun HomeItems(
     onTodayCategoryClicked: () -> Unit = {},
     onTimetableCategoryClicked: () -> Unit = {},
     onAllCategoryClicked: () -> Unit = {},
-    onTagLongClicked: (Tag) -> Unit = {}
+    onTagLongClicked: (Tag) -> Unit = {},
 ) {
     Column(modifier = modifier) {
         Logo(modifier = Modifier.padding(top = 37.dp))

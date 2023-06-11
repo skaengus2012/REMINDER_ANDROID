@@ -64,6 +64,9 @@ internal class HomeReducer @Inject constructor() : DomainReducer by buildDslRedu
                 }
             )
         }
+        action<HomeAction.OnTagRenameInputKeyboardShown> { (_, before) ->
+            before.copy(tagRenameTarget = before.tagRenameTarget?.copy(shouldKeyboardShown = false))
+        }
         action<HomeAction.OnTagRenameInputted> { (action, before) ->
             before.copy(tagRenameTarget = before.tagRenameTarget?.copy(renameText = action.text))
         }
@@ -81,7 +84,8 @@ internal class HomeReducer @Inject constructor() : DomainReducer by buildDslRedu
                     tagRenameTarget = TagRenameConfig(
                         tagConfig.tag,
                         tagConfig.usageCount,
-                        renameText = ""
+                        renameText = tagConfig.tag.name,
+                        shouldKeyboardShown = true
                     )
                 )
             })

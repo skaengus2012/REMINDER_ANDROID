@@ -23,6 +23,7 @@ import com.nlab.reminder.domain.common.data.model.genTag
 import com.nlab.reminder.domain.common.data.model.genTagUsageCount
 import com.nlab.reminder.test.unconfinedCoroutineScope
 import com.nlab.statekit.util.createStore
+import com.nlab.testkit.genBoolean
 import com.nlab.testkit.genBothify
 import com.nlab.testkit.genInt
 import kotlinx.collections.immutable.*
@@ -151,7 +152,12 @@ internal class HomeReducerTest {
             action = HomeAction.OnTagRenameRequestClicked,
             initState = initState,
             expectedState = initState.withShownCleared().copy(
-                tagRenameTarget = TagRenameConfig(tag, usageCount, renameText = "")
+                tagRenameTarget = TagRenameConfig(
+                    tag,
+                    usageCount,
+                    renameText = tag.name,
+                    shouldKeyboardShown = true
+                )
             )
         )
     }
@@ -167,10 +173,42 @@ internal class HomeReducerTest {
     }
 
     @Test
+    fun `Tag rename input keyboard shown`() = runTest {
+        val curTagRenameConfig = TagRenameConfig(
+            genTag(),
+            genTagUsageCount(),
+            renameText = genBothify(),
+            shouldKeyboardShown = true
+        )
+        val initState = genHomeUiStateSuccess(tagRenameTarget = curTagRenameConfig)
+        testReduce(
+            action = HomeAction.OnTagRenameInputKeyboardShown,
+            initState = initState,
+            expectedState = initState.copy(
+                tagRenameTarget = curTagRenameConfig.copy(shouldKeyboardShown = false)
+            )
+        )
+    }
+
+    @Test
+    fun `Tag rename keyboard shown event ignored, when tag rename config not existed`() = runTest {
+        val expectedState = genHomeUiStateSuccess(tagRenameTarget = null)
+        testReduce(
+            action = HomeAction.OnTagRenameInputKeyboardShown,
+            initState = expectedState,
+            expectedState = expectedState
+        )
+    }
+
+    @Test
     fun `Tag rename inputted`() = runTest {
-        val tag = genTag()
         val input = genBothify("rename-????")
-        val curTagRenameConfig = TagRenameConfig(tag, genTagUsageCount(), renameText = "")
+        val curTagRenameConfig = TagRenameConfig(
+            genTag(),
+            genTagUsageCount(),
+            renameText = "",
+            shouldKeyboardShown = genBoolean()
+        )
         val initState = genHomeUiStateSuccess(tagRenameTarget = curTagRenameConfig)
         testReduce(
             action = HomeAction.OnTagRenameInputted(input),
@@ -217,6 +255,28 @@ internal class HomeReducerTest {
     fun `Nothing action, when no tag config list for loaded delete metadata`() = runTest {
         testNothingHappenedWhenTagConfigWasNullCase { HomeAction.OnTagDeleteRequestClicked }
     }
+
+    @Test
+    fun `Rename text changed, when tag rename inputted`() = runTest {
+        val input = genBothify("rename-????")
+        val tagRenameConfig = TagRenameConfig(
+            tag = genTag(),
+            usageCount = genTagUsageCount(),
+            renameText = "",
+            shouldKeyboardShown = true
+        )
+        val initState = genHomeUiStateSuccess(
+            tagRenameTarget = tagRenameConfig
+        )
+
+        testReduce(
+            action = HomeAction.OnTagRenameInputted(input),
+            initState = initState,
+            expectedState = initState.copy(
+                tagRenameTarget = tagRenameConfig.copy(renameText = input)
+            )
+        )
+    }
 }
 
 private fun genHomeUiStateSuccessWithPageShownTrues(): HomeUiState.Success = genHomeUiStateSuccess(
@@ -253,7 +313,7 @@ private suspend fun TestScope.testUserMessageShownByTagNotExist(
         tags = emptyList(),
         userMessages = emptyList(),
         tagConfigTarget = TagConfig(tag, genTagUsageCount()),
-        tagRenameTarget = TagRenameConfig(tag, genTagUsageCount(), genBothify())
+        tagRenameTarget = TagRenameConfig(tag, genTagUsageCount(), genBothify(), genBoolean())
     )
     testReduce(
         action = getAction(tag),
