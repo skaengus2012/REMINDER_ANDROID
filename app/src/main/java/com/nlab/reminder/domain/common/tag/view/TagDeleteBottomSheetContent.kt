@@ -34,6 +34,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -41,6 +43,7 @@ import androidx.compose.ui.unit.sp
 import com.nlab.reminder.R
 import com.nlab.reminder.core.android.compose.ui.throttle
 import com.nlab.reminder.core.android.designsystem.theme.ReminderTheme
+import com.nlab.reminder.domain.common.data.model.TagUsageCount
 
 /**
  * @author Doohyun
@@ -48,59 +51,67 @@ import com.nlab.reminder.core.android.designsystem.theme.ReminderTheme
 @Composable
 fun TagDeleteBottomSheetContent(
     tagName: String,
-    usageCount: Int,
+    usageCount: TagUsageCount,
     modifier: Modifier = Modifier,
     onConfirmClicked: () -> Unit = {},
     onCancelClicked: () -> Unit = {},
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .wrapContentHeight()
-    ) {
-        Text(
-            modifier = Modifier
+    Surface(color = ReminderTheme.colors.bgDialogSurface) {
+        Column(
+            modifier = modifier
                 .fillMaxWidth()
-                .padding(top = 17.dp),
-            text = LocalContext.current
-                .resources
-                .getQuantityString(R.plurals.tag_delete, usageCount, usageCount),
-            style = MaterialTheme.typography.titleSmall,
-            color = ReminderTheme.colors.font1,
-            textAlign = TextAlign.Center
-        )
+                .wrapContentHeight()
+        ) {
+            Text(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 17.dp),
+                text = usageCount.mapToString(
+                    transform = { pluralStringResource(id = R.plurals.tag_delete, count = it, it) },
+                    transformWhenOverflow = { stringResource(id = R.string.tag_delete_overflow, it) }
+                ),
+                style = MaterialTheme.typography.titleSmall,
+                color = ReminderTheme.colors.font1,
+                textAlign = TextAlign.Center
+            )
 
-        Text(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 30.dp)
-                .padding(top = 3.5.dp, bottom = 17.dp),
-            style = MaterialTheme.typography.bodySmall,
-            text = LocalContext.current
-                .resources
-                .getQuantityString(R.plurals.tag_delete_dialog_description, usageCount, tagName, usageCount),
-            color = ReminderTheme.colors.font1,
-            textAlign = TextAlign.Center
-        )
+            Text(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 30.dp)
+                    .padding(top = 3.5.dp, bottom = 17.dp),
+                style = MaterialTheme.typography.bodySmall,
+                text = usageCount.mapToString(
+                    transform = {
+                        pluralStringResource(id = R.plurals.tag_delete_dialog_description, count = it, tagName, it)
+                    },
+                    transformWhenOverflow = {
+                        stringResource(id = R.string.tag_delete_dialog_description_overflow, tagName, it)
+                    }
+                ),
+                color = ReminderTheme.colors.font1,
+                textAlign = TextAlign.Center
+            )
 
-        Divider(
-            modifier = Modifier.fillMaxWidth(),
-            thickness = 0.5.dp,
-            color = ReminderTheme.colors.bgLine1,
-        )
+            Divider(
+                modifier = Modifier.fillMaxWidth(),
+                thickness = 0.5.dp,
+                color = ReminderTheme.colors.bgLine1,
+            )
 
-        InternalButton(
-            text = LocalContext.current.getString(R.string.delete),
-            fontColor = ReminderTheme.colors.red,
-            onClick = onConfirmClicked
-        )
+            InternalButton(
+                text = LocalContext.current.getString(R.string.delete),
+                fontColor = ReminderTheme.colors.red,
+                onClick = onConfirmClicked
+            )
 
-        InternalButton(
-            text = LocalContext.current.getString(R.string.cancel),
-            fontColor = ReminderTheme.colors.font2,
-            onClick = onCancelClicked,
-            modifier = Modifier.padding(bottom = 10.dp)
-        )
+            InternalButton(
+                text = LocalContext.current.getString(R.string.cancel),
+                fontColor = ReminderTheme.colors.font2,
+                onClick = onCancelClicked,
+                modifier = Modifier.padding(bottom = 10.dp)
+            )
+        }
     }
 }
 
@@ -146,11 +157,9 @@ private fun InternalButton(
 @Composable
 private fun TagDeleteBottomSheetContentPreview() {
     ReminderTheme {
-        Surface(color = ReminderTheme.colors.bgDialogSurface) {
-            TagDeleteBottomSheetContent(
-                tagName = "Hello TagDeleteBottomSheetContentPreview",
-                usageCount = 1
-            )
-        }
+        TagDeleteBottomSheetContent(
+            tagName = "Hello TagDeleteBottomSheetContentPreview",
+            usageCount = TagUsageCount(1)
+        )
     }
 }

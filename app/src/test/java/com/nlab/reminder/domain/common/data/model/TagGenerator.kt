@@ -23,7 +23,7 @@ import com.nlab.testkit.*
  */
 
 fun genTag(tagId: Long = genLong(), name: String = genBothify()) = Tag(tagId, name)
-fun genTags(count: Int = genIntGreaterThanZero()): List<Tag> =
+fun genTags(count: Int = genInt(min = 5, max = 10)): List<Tag> =
     List(count) { index -> genTag(index.toLong()) }.distinctBy { it.name }
 
 fun genTagUsageCount(count: Long = genLongGreaterThanZero()) = TagUsageCount(count)

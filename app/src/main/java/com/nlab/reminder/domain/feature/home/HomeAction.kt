@@ -35,7 +35,7 @@ internal sealed interface HomeAction : Action {
     ) : HomeAction
 
     @ContractUiAction
-    object PageShown : HomeAction
+    object WorkflowComplete : HomeAction
 
     @ContractUiAction
     data class UserMessageShown(val shownMessage: UserMessage) : HomeAction
@@ -71,4 +71,7 @@ internal sealed interface HomeAction : Action {
 
     @ContractUiAction
     object OnTagDeleteRequestClicked : HomeAction
+
+    @ContractUiAction
+    object OnTagDeleteConfirmClicked : HomeAction
 }

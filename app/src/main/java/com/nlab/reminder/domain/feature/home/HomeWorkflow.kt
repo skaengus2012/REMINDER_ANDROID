@@ -21,10 +21,30 @@ import com.nlab.reminder.domain.common.data.model.Tag
 import com.nlab.reminder.domain.common.data.model.TagUsageCount
 
 /**
- * @author Doohyun
+ * @author thalys
  */
-@ExcludeFromGeneratedTestReport
-internal data class TagDeleteConfig(
-    val tag: Tag,
-    val usageCount: TagUsageCount
-)
+internal sealed interface HomeWorkflow {
+    object TodaySchedule : HomeWorkflow
+    object TimetableSchedule : HomeWorkflow
+    object AllSchedule : HomeWorkflow
+
+    @ExcludeFromGeneratedTestReport
+    data class TagConfig(
+        val tag: Tag,
+        val usageCount: TagUsageCount
+    ) : HomeWorkflow
+
+    @ExcludeFromGeneratedTestReport
+    data class TagRename(
+        val tag: Tag,
+        val usageCount: TagUsageCount,
+        val renameText: String,
+        val shouldKeyboardShown: Boolean
+    ) : HomeWorkflow
+
+    @ExcludeFromGeneratedTestReport
+    data class TagDelete(
+        val tag: Tag,
+        val usageCount: TagUsageCount
+    ) : HomeWorkflow
+}

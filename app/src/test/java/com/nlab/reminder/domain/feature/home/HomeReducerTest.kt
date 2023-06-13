@@ -18,7 +18,6 @@ package com.nlab.reminder.domain.feature.home
 
 import com.nlab.reminder.R
 import com.nlab.reminder.core.state.UserMessage
-import com.nlab.reminder.domain.common.data.model.Tag
 import com.nlab.reminder.domain.common.data.model.genTag
 import com.nlab.reminder.domain.common.data.model.genTagUsageCount
 import com.nlab.reminder.test.unconfinedCoroutineScope
@@ -37,18 +36,14 @@ import org.junit.Test
  */
 internal class HomeReducerTest {
     @Test
-    fun testPageCleared() = runTest {
-        val actionConditions = setOf(
-            HomeAction.PageShown,
-            HomeAction.OnTagRenameConfirmClicked
-        )
-
-        val initState = genHomeUiStateSuccessWithPageShownTrues()
+    fun testScreenShown() = runTest {
+        val actionConditions = setOf(HomeAction.WorkflowComplete)
+        val initState = genHomeUiStateSuccess(workflow = genHomeWorkflow())
         actionConditions.forEach { action ->
             testReduce(
                 action = action,
                 initState = initState,
-                expectedState = initState.withShownCleared()
+                expectedState = initState.copy(workflow = null)
             )
         }
     }
@@ -56,7 +51,9 @@ internal class HomeReducerTest {
     @Test
     fun testUserMessageShown() = runTest {
         val shownMessage = UserMessage(genInt())
-        val expectedState = genHomeUiStateSuccess(userMessages = emptyList())
+        val expectedState = genHomeUiStateSuccess(
+            userMessages = emptyList()
+        )
         testReduce(
             action = HomeAction.UserMessageShown(shownMessage),
             initState = expectedState.copy(userMessages = persistentListOf(shownMessage)),
@@ -76,32 +73,42 @@ internal class HomeReducerTest {
     }
 
     @Test
-    fun `Today's schedule was shown, when today category clicked`() = runTest {
-        val initState = genHomeUiStateSuccess(todayScheduleShown = false)
+    fun `Workflow not changed, when workflow exists`() = runTest {
+        val initState = genHomeUiStateSuccess(workflow = genHomeWorkflow())
         testReduce(
             action = HomeAction.OnTodayCategoryClicked,
             initState = initState,
-            expectedState = initState.withShownCleared().copy(todayScheduleShown = true)
+            expectedState = initState
+        )
+    }
+
+    @Test
+    fun `Today's schedule was shown, when today category clicked`() = runTest {
+        val initState = genHomeUiStateSuccess(workflow = null)
+        testReduce(
+            action = HomeAction.OnTodayCategoryClicked,
+            initState = initState,
+            expectedState = initState.copy(workflow = HomeWorkflow.TodaySchedule)
         )
     }
 
     @Test
     fun `Timetable's schedule was shown, when timetable category clicked`() = runTest {
-        val initState = genHomeUiStateSuccess(timetableScheduleShown = false)
+        val initState = genHomeUiStateSuccess(workflow = null)
         testReduce(
             action = HomeAction.OnTimetableCategoryClicked,
             initState = initState,
-            expectedState = initState.withShownCleared().copy(timetableScheduleShown = true)
+            expectedState = initState.copy(workflow = HomeWorkflow.TimetableSchedule)
         )
     }
 
     @Test
     fun `All's schedule was shown, when all category clicked`() = runTest {
-        val initState = genHomeUiStateSuccess(allScheduleShown = false)
+        val initState = genHomeUiStateSuccess(workflow = null)
         testReduce(
             action = HomeAction.OnAllCategoryClicked,
             initState = initState,
-            expectedState = initState.withShownCleared().copy(allScheduleShown = true)
+            expectedState = initState.copy(workflow = HomeWorkflow.AllSchedule)
         )
     }
 
@@ -111,7 +118,7 @@ internal class HomeReducerTest {
         testReduce(
             action = expectedState.toSummaryLoaded(),
             initState = HomeUiState.Loading,
-            expectedState = expectedState.withShownCleared()
+            expectedState = expectedState.copy(workflow = null)
         )
     }
 
@@ -126,39 +133,47 @@ internal class HomeReducerTest {
     }
 
     @Test
-    fun `Tag config target set, when tag metadata loaded`() = runTest {
+    fun `Tag config workflow set, when tag metadata loaded`() = runTest {
         val tag = genTag()
         val usageCount = genTagUsageCount()
-        val initState = genHomeUiStateSuccess(tags = listOf(tag))
+        val initState = genHomeUiStateSuccess(tags = listOf(tag), workflow = null)
         testReduce(
             action = HomeAction.TagConfigMetadataLoaded(tag, usageCount),
             initState = initState,
-            expectedState = initState
-                .withShownCleared()
-                .copy(tagConfigTarget = TagConfig(tag, usageCount))
+            expectedState = initState.copy(workflow = HomeWorkflow.TagConfig(tag, usageCount))
         )
     }
 
     @Test
-    fun `Show user message, when no tag used for LongClick`() = runTest {
-        testUserMessageShownByTagNotExist { tag ->
-            HomeAction.TagConfigMetadataLoaded(tag, genTagUsageCount())
-        }
+    fun `Show not exists tag message, when no tag used for TagConfig`() = runTest {
+        val tag = genTag()
+        val initState = genHomeUiStateSuccess(
+            tags = emptyList(),
+            userMessages = emptyList(),
+            workflow = null
+        )
+        testReduce(
+            action = HomeAction.TagConfigMetadataLoaded(tag, genTagUsageCount()),
+            initState = initState,
+            expectedState = initState.copy(
+                userMessages = persistentListOf(UserMessage(R.string.tag_not_exist))
+            )
+        )
     }
 
     @Test
-    fun `Tag rename target set, when metadata for rename tag loaded`() = runTest {
+    fun `Tag rename workflow set, when tag rename request clicked`() = runTest {
         val tag = genTag()
         val usageCount = genTagUsageCount()
         val initState = genHomeUiStateSuccess(
-            tags = listOf(tag),
-            tagConfigTarget = TagConfig(tag, usageCount)
+            tags = emptyList(),
+            workflow = HomeWorkflow.TagConfig(tag, usageCount)
         )
         testReduce(
             action = HomeAction.OnTagRenameRequestClicked,
             initState = initState,
-            expectedState = initState.withShownCleared().copy(
-                tagRenameTarget = genTagRenameConfig(
+            expectedState = initState.copy(
+                workflow = HomeWorkflow.TagRename(
                     tag = tag,
                     usageCount = usageCount,
                     renameText = tag.name,
@@ -169,119 +184,98 @@ internal class HomeReducerTest {
     }
 
     @Test
-    fun `Show user message, when no tag used for loaded rename metadata`() = runTest {
-        testUserMessageShownByTagNotExist { HomeAction.OnTagRenameRequestClicked }
+    fun `Nothing happened, when tag rename request clicked, but tagConfig workflow not set`() = runTest {
+        val initState = genHomeUiStateSuccess(
+            workflow = genHomeWorkflow(ignoreCases = setOf(HomeWorkflow.TagConfig::class))
+        )
+        testReduce(
+            action = HomeAction.OnTagRenameRequestClicked,
+            initState = initState,
+            expectedState = initState
+        )
     }
 
     @Test
-    fun `Nothing action, when no tag config list for loaded rename metadata`() = runTest {
-        testNothingHappenedWhenTagConfigWasNullCase { HomeAction.OnTagRenameRequestClicked }
-    }
-
-    @Test
-    fun `Tag rename input keyboard shown`() = runTest {
-        val curTagRenameConfig = genTagRenameConfig(shouldKeyboardShown = true)
-        val initState = genHomeUiStateSuccess(tagRenameTarget = curTagRenameConfig)
+    fun `Keyboard shown by Tag rename input box`() = runTest {
+        val tagRename = genHomeTagRenameWorkflow(shouldKeyboardShown = true)
+        val initState = genHomeUiStateSuccess(workflow = tagRename)
         testReduce(
             action = HomeAction.OnTagRenameInputKeyboardShown,
             initState = initState,
             expectedState = initState.copy(
-                tagRenameTarget = curTagRenameConfig.copy(shouldKeyboardShown = false)
+                workflow = tagRename.copy(shouldKeyboardShown = false)
             )
         )
     }
 
     @Test
-    fun `Tag rename keyboard shown event ignored, when tag rename config not existed`() = runTest {
-        val expectedState = genHomeUiStateSuccess(tagRenameTarget = null)
+    fun `Nothing happened, when keyboard shown, but tagRename workflow not set`() = runTest {
+        val initState = genHomeUiStateSuccess(
+            workflow = genHomeWorkflow(ignoreCases = setOf(HomeWorkflow.TagRename::class))
+        )
         testReduce(
             action = HomeAction.OnTagRenameInputKeyboardShown,
-            initState = expectedState,
-            expectedState = expectedState
+            initState = initState,
+            expectedState = initState
         )
     }
 
     @Test
     fun `Tag rename inputted`() = runTest {
         val input = genBothify("rename-????")
-        val initTagRenameConfig = genTagRenameConfig(renameText = "",)
-        val initState = genHomeUiStateSuccess(tagRenameTarget = initTagRenameConfig)
+        val tagRename = genHomeTagRenameWorkflow(renameText = "")
+        val initState = genHomeUiStateSuccess(workflow = tagRename)
         testReduce(
             action = HomeAction.OnTagRenameInputted(input),
             initState = initState,
-            expectedState = initState.copy(
-                tagRenameTarget = initTagRenameConfig.copy(renameText = input)
-            )
+            expectedState = initState.copy(workflow = tagRename.copy(renameText = input))
         )
     }
 
     @Test
-    fun `Tag rename input ignored, when tag rename config not existed`() = runTest {
-        val expectedState = genHomeUiStateSuccess(tagRenameTarget = null)
+    fun `Nothing happened, when tag rename text inputted, but tagRename workflow not set`() = runTest {
+        val initState = genHomeUiStateSuccess(
+            workflow = genHomeWorkflow(ignoreCases = setOf(HomeWorkflow.TagRename::class))
+        )
         testReduce(
-            action = HomeAction.OnTagRenameInputted(genBothify("rename-????")),
-            initState = expectedState,
-            expectedState = expectedState
+            action = HomeAction.OnTagRenameInputKeyboardShown,
+            initState = initState,
+            expectedState = initState
         )
     }
 
     @Test
-    fun `Tag delete target set, when metadata for delete tag loaded`() = runTest {
+    fun `Tag delete workflow set, when Tag delete request was Clicked`() = runTest {
         val tag = genTag()
         val usageCount = genTagUsageCount()
         val initState = genHomeUiStateSuccess(
-            tags = listOf(tag),
-            tagConfigTarget = TagConfig(tag, usageCount)
+            tags = emptyList(),
+            workflow = HomeWorkflow.TagConfig(tag, usageCount)
         )
         testReduce(
             action = HomeAction.OnTagDeleteRequestClicked,
             initState = initState,
-            expectedState = initState.withShownCleared().copy(
-                tagDeleteTarget = TagDeleteConfig(tag, usageCount)
+            expectedState = initState.copy(
+                workflow = HomeWorkflow.TagDelete(
+                    tag = tag,
+                    usageCount = usageCount
+                )
             )
         )
     }
 
     @Test
-    fun `Show user message, when no tag used for loaded delete metadata`() = runTest {
-        testUserMessageShownByTagNotExist { HomeAction.OnTagDeleteRequestClicked }
-    }
-
-    @Test
-    fun `Nothing action, when no tag config list for loaded delete metadata`() = runTest {
-        testNothingHappenedWhenTagConfigWasNullCase { HomeAction.OnTagDeleteRequestClicked }
-    }
-
-    @Test
-    fun `Rename text changed, when tag rename inputted`() = runTest {
-        val input = genBothify("rename-????")
-        val initTagRenameConfig = genTagRenameConfig(renameText = "")
-        val initState = genHomeUiStateSuccess(tagRenameTarget = initTagRenameConfig)
-
+    fun `Nothing happened, when tag delete request clicked, but tagConfig workflow not set`() = runTest {
+        val initState = genHomeUiStateSuccess(
+            workflow = genHomeWorkflow(ignoreCases = setOf(HomeWorkflow.TagConfig::class))
+        )
         testReduce(
-            action = HomeAction.OnTagRenameInputted(input),
+            action = HomeAction.OnTagDeleteRequestClicked,
             initState = initState,
-            expectedState = initState.copy(
-                tagRenameTarget = initTagRenameConfig.copy(renameText = input)
-            )
+            expectedState = initState
         )
     }
 }
-
-private fun genHomeUiStateSuccessWithPageShownTrues(): HomeUiState.Success = genHomeUiStateSuccess(
-    todayScheduleShown = true,
-    timetableScheduleShown = true,
-    allScheduleShown = true
-)
-
-private fun HomeUiState.Success.withShownCleared(): HomeUiState.Success = copy(
-    todayScheduleShown = false,
-    timetableScheduleShown = false,
-    allScheduleShown = false,
-    tagConfigTarget = null,
-    tagRenameTarget = null,
-    tagDeleteTarget = null
-)
 
 private suspend fun TestScope.testReduce(
     action: HomeAction,
@@ -292,49 +286,6 @@ private suspend fun TestScope.testReduce(
     store.dispatch(action).join()
 
     assertThat(store.state.value, equalTo(expectedState))
-}
-
-private suspend fun TestScope.testUserMessageShownByTagNotExist(
-    getAction: suspend (Tag) -> HomeAction
-) {
-    val tag = genTag()
-    val initState = genHomeUiStateSuccess(
-        tags = emptyList(),
-        userMessages = emptyList(),
-        tagConfigTarget = TagConfig(tag, genTagUsageCount()),
-        tagRenameTarget = genTagRenameConfig(tag = tag)
-    )
-    testReduce(
-        action = getAction(tag),
-        initState = initState,
-        expectedState = initState.copy(
-            userMessages = persistentListOf(UserMessage(R.string.tag_not_exist)),
-            tagConfigTarget = null,
-            tagRenameTarget = null,
-        )
-    )
-}
-
-private suspend fun TestScope.testNothingHappenedWhenTagConfigWasNullCase(
-    getAction: () -> HomeAction
-) {
-    // case1 loading
-    testReduce(
-        action = getAction(),
-        initState = HomeUiState.Loading,
-        expectedState = HomeUiState.Loading
-    )
-
-    // case2 tagConfigTarget is null
-    val initState = genHomeUiStateSuccess(
-        tags = listOf(genTag()),
-        tagConfigTarget = null
-    )
-    testReduce(
-        action = getAction(),
-        initState = initState,
-        expectedState = initState
-    )
 }
 
 private fun HomeUiState.Success.toSummaryLoaded() = HomeAction.SummaryLoaded(

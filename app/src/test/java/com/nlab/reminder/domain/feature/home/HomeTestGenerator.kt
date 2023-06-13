@@ -22,6 +22,7 @@ import com.nlab.testkit.genBoolean
 import com.nlab.testkit.genBothify
 import com.nlab.testkit.genLong
 import kotlinx.collections.immutable.toPersistentList
+import kotlin.reflect.KClass
 
 /**
  * @author Doohyun
@@ -31,30 +32,45 @@ internal fun genHomeUiStateSuccess(
     timetableScheduleCount: Long = genLong(),
     allScheduleCount: Long = genLong(),
     tags: List<Tag> = genTags(),
-    todayScheduleShown: Boolean = genBoolean(),
-    timetableScheduleShown: Boolean = genBoolean(),
-    allScheduleShown: Boolean = genBoolean(),
-    tagConfigTarget: TagConfig? = null,
-    tagRenameTarget: TagRenameConfig? = null,
-    tagDeleteTarget: TagDeleteConfig? = null,
+    workflow: HomeWorkflow? = genHomeWorkflow(),
     userMessages: List<UserMessage> = emptyList()
 ): HomeUiState.Success = HomeUiState.Success(
     todayScheduleCount = todayScheduleCount,
     timetableScheduleCount = timetableScheduleCount,
     allScheduleCount = allScheduleCount,
     tags = tags.toPersistentList(),
-    todayScheduleShown = todayScheduleShown,
-    timetableScheduleShown = timetableScheduleShown,
-    allScheduleShown = allScheduleShown,
-    tagConfigTarget = tagConfigTarget,
-    tagRenameTarget = tagRenameTarget,
-    tagDeleteTarget = tagDeleteTarget,
+    workflow = workflow,
     userMessages = userMessages.toPersistentList()
 )
 
-internal fun genTagRenameConfig(
+internal fun genHomeTagConfigWorkflow(
+    tag: Tag = genTag(),
+    usageCount: TagUsageCount = genTagUsageCount(),
+) = HomeWorkflow.TagConfig(tag, usageCount)
+
+internal fun genHomeTagRenameWorkflow(
     tag: Tag = genTag(),
     usageCount: TagUsageCount = genTagUsageCount(),
     renameText: String = genBothify(),
     shouldKeyboardShown: Boolean = genBoolean()
-): TagRenameConfig = TagRenameConfig(tag, usageCount, renameText, shouldKeyboardShown)
+) = HomeWorkflow.TagRename(tag, usageCount, renameText, shouldKeyboardShown)
+
+
+internal fun genHomeTagDeleteConfig(
+    tag: Tag = genTag(),
+    usageCount: TagUsageCount = genTagUsageCount(),
+) = HomeWorkflow.TagDelete(tag, usageCount)
+
+private fun genHomeWorkflows(): List<HomeWorkflow> = listOf(
+    HomeWorkflow.TodaySchedule,
+    HomeWorkflow.TimetableSchedule,
+    HomeWorkflow.AllSchedule,
+    genHomeTagConfigWorkflow(),
+    genHomeTagRenameWorkflow(),
+    genHomeTagDeleteConfig()
+)
+
+internal fun genHomeWorkflow(ignoreCases: Set<KClass<out HomeWorkflow>> = emptySet()): HomeWorkflow =
+    genHomeWorkflows()
+        .filterNot { it::class in ignoreCases }
+        .random()

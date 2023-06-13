@@ -42,8 +42,13 @@ internal class HomeInterceptor @Inject constructor(
                 .getOrThrow()
         }
         action<HomeAction.OnTagRenameConfirmClicked> { (_, before) ->
-            catching { checkNotNull(before.tagRenameTarget) { "TagRenameTarget must not be null" } }
-                .flatMap { renameConfig -> tagRepository.updateName(renameConfig.tag, renameConfig.renameText) }
+            catching { checkNotNull(before.workflow as? HomeWorkflow.TagRename) { "TagRename workflow was not set" } }
+                .flatMap { tagRename -> tagRepository.updateName(tagRename.tag, tagRename.renameText) }
+                .getOrThrow()
+        }
+        action<HomeAction.OnTagDeleteConfirmClicked> { (_, before) ->
+            catching { checkNotNull(before.workflow as? HomeWorkflow.TagDelete) { "TagDelete workflow was not set" } }
+                .flatMap { tagDelete -> tagRepository.delete(tagDelete.tag) }
                 .getOrThrow()
         }
     }

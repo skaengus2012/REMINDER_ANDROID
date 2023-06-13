@@ -26,6 +26,8 @@ import com.nlab.statekit.Reducer
 import com.nlab.statekit.util.buildDslReducer
 import kotlinx.collections.immutable.*
 import javax.inject.Inject
+import kotlin.reflect.KClass
+import kotlin.reflect.cast
 
 private typealias DomainReducer = Reducer<HomeAction, HomeUiState>
 
@@ -34,14 +36,7 @@ private typealias DomainReducer = Reducer<HomeAction, HomeUiState>
  */
 internal class HomeReducer @Inject constructor() : DomainReducer by buildDslReducer(defineDSL = {
     state<HomeUiState.Success> {
-        filteredAction(predicate = { action ->
-            when (action) {
-                is HomeAction.PageShown,
-                is HomeAction.OnTagRenameConfirmClicked -> true
-
-                else -> false
-            }
-        }) { (_, before) -> before.withPageShown() }
+        action<HomeAction.WorkflowComplete> { (_, before) -> before.copy(workflow = null) }
         action<HomeAction.UserMessageShown> { (action, before) ->
             before.copy(
                 userMessages = before
@@ -53,57 +48,47 @@ internal class HomeReducer @Inject constructor() : DomainReducer by buildDslRedu
             before.copy(userMessages = before.userMessages + UserMessage(R.string.unknown_error))
         }
         action<HomeAction.OnTodayCategoryClicked> { (_, before) ->
-            before.withPageShown(showTodaySchedule = true)
+            before.mapIfWorkflowEmpty { it.copy(workflow = HomeWorkflow.TodaySchedule) }
         }
         action<HomeAction.OnTimetableCategoryClicked> { (_, before) ->
-            before.withPageShown(showTimetableSchedule = true)
+            before.mapIfWorkflowEmpty { it.copy(workflow = HomeWorkflow.TimetableSchedule) }
         }
         action<HomeAction.OnAllCategoryClicked> { (_, before) ->
-            before.withPageShown(showAllSchedule = true)
+            before.mapIfWorkflowEmpty { it.copy(workflow = HomeWorkflow.AllSchedule) }
         }
         action<HomeAction.TagConfigMetadataLoaded> { (action, before) ->
-            before.updateIfTagExists(
-                target = action.tag,
-                getUiState = {
-                    before.withPageShown(
-                        tagConfigTarget = TagConfig(action.tag, action.usageCount)
-                    )
+            before.mapIfWorkflowEmpty { cur ->
+                cur.mapIfTagExists(action.tag) {
+                    it.copy(workflow = HomeWorkflow.TagConfig(action.tag, action.usageCount))
                 }
-            )
+            }
         }
-        action<HomeAction.OnTagRenameInputKeyboardShown> { (_, before) ->
-            before.copy(tagRenameTarget = before.tagRenameTarget?.copy(shouldKeyboardShown = false))
-        }
-        action<HomeAction.OnTagRenameInputted> { (action, before) ->
-            before.copy(tagRenameTarget = before.tagRenameTarget?.copy(renameText = action.text))
-        }
-    }
-
-    filteredState(predicate = { state -> state is HomeUiState.Success && state.tagConfigTarget != null }) {
         action<HomeAction.OnTagRenameRequestClicked> { (_, before) ->
-            val (uiState, tagConfig) = before.asTagConfigMetadata()
-            uiState.updateIfTagExists(target = tagConfig.tag, getUiState = {
-                uiState.withPageShown(
-                    tagRenameTarget = TagRenameConfig(
-                        tagConfig.tag,
-                        tagConfig.usageCount,
-                        renameText = tagConfig.tag.name,
+            before.mapIfWorkflowMatches<HomeWorkflow.TagConfig> { old, workflow ->
+                old.copy(
+                    workflow = HomeWorkflow.TagRename(
+                        workflow.tag,
+                        workflow.usageCount,
+                        renameText = workflow.tag.name,
                         shouldKeyboardShown = true
                     )
                 )
-            })
+            }
         }
-
+        action<HomeAction.OnTagRenameInputKeyboardShown> { (_, before) ->
+            before.mapIfWorkflowMatches<HomeWorkflow.TagRename> { cur, workflow ->
+                cur.copy(workflow = workflow.copy(shouldKeyboardShown = false))
+            }
+        }
+        action<HomeAction.OnTagRenameInputted> { (action, before) ->
+            before.mapIfWorkflowMatches<HomeWorkflow.TagRename> { cur, tagRenameWorkflow ->
+                cur.copy(workflow = tagRenameWorkflow.copy(renameText = action.text))
+            }
+        }
         action<HomeAction.OnTagDeleteRequestClicked> { (_, before) ->
-            val (uiState, tagConfig) = before.asTagConfigMetadata()
-            uiState.updateIfTagExists(target = tagConfig.tag, getUiState = {
-                uiState.withPageShown(
-                    tagDeleteTarget = TagDeleteConfig(
-                        tagConfig.tag,
-                        tagConfig.usageCount
-                    )
-                )
-            })
+            before.mapIfWorkflowMatches<HomeWorkflow.TagConfig> { old, workflow ->
+                old.copy(workflow = HomeWorkflow.TagDelete(workflow.tag, workflow.usageCount))
+            }
         }
     }
 
@@ -113,7 +98,9 @@ internal class HomeReducer @Inject constructor() : DomainReducer by buildDslRedu
                 todayScheduleCount = action.todaySchedulesCount,
                 timetableScheduleCount = action.timetableSchedulesCount,
                 allScheduleCount = action.allSchedulesCount,
-                tags = action.tags.toImmutableList()
+                tags = action.tags.toImmutableList(),
+                workflow = null,
+                userMessages = persistentListOf()
             )
         }
         state<HomeUiState.Success> { (action, before) ->
@@ -127,36 +114,26 @@ internal class HomeReducer @Inject constructor() : DomainReducer by buildDslRedu
     }
 })
 
-private fun HomeUiState.Success.withPageShown(
-    showTodaySchedule: Boolean = false,
-    showTimetableSchedule: Boolean = false,
-    showAllSchedule: Boolean = false,
-    tagConfigTarget: TagConfig? = null,
-    tagRenameTarget: TagRenameConfig? = null,
-    tagDeleteTarget: TagDeleteConfig? = null
-): HomeUiState.Success =
-    copy(
-        todayScheduleShown = showTodaySchedule,
-        timetableScheduleShown = showTimetableSchedule,
-        allScheduleShown = showAllSchedule,
-        tagConfigTarget = tagConfigTarget,
-        tagRenameTarget = tagRenameTarget,
-        tagDeleteTarget = tagDeleteTarget
-    )
+@TestComplete
+@ExcludeFromGeneratedTestReport
+private inline fun HomeUiState.Success.mapIfWorkflowEmpty(
+    transform: (HomeUiState.Success) -> HomeUiState
+): HomeUiState = if (workflow == null) transform(this) else this
 
 @TestComplete
 @ExcludeFromGeneratedTestReport
-private inline fun HomeUiState.Success.updateIfTagExists(
+private inline fun HomeUiState.Success.mapIfTagExists(
     target: Tag,
-    getUiState: () -> HomeUiState.Success
-): HomeUiState.Success =
-    if (target in tags) getUiState()
-    else copy(
-        tagConfigTarget = null,
-        tagRenameTarget = null,
-        userMessages = userMessages + UserMessage(R.string.tag_not_exist)
-    )
+    transform: (HomeUiState.Success) -> HomeUiState
+): HomeUiState =
+    if (target in tags) transform(this)
+    else copy(userMessages = userMessages + UserMessage(R.string.tag_not_exist))
 
-private fun HomeUiState.asTagConfigMetadata(): Pair<HomeUiState.Success, TagConfig> {
-    return (this as HomeUiState.Success).let { it to it.tagConfigTarget!! }
+@TestComplete
+@ExcludeFromGeneratedTestReport
+private inline fun <reified T : HomeWorkflow> HomeUiState.Success.mapIfWorkflowMatches(
+    transform: (old: HomeUiState.Success, workflow: T) -> HomeUiState
+): HomeUiState {
+    val clazz = T::class
+    return if (clazz.isInstance(workflow)) transform(this, clazz.cast(workflow)) else this
 }

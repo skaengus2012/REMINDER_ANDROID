@@ -93,7 +93,7 @@ internal class HomeInterceptorTest {
         }
         dispatchWithInterceptor(
             initState = genHomeUiStateSuccess(
-                tagRenameTarget = genTagRenameConfig(
+                workflow = genHomeTagRenameWorkflow(
                     tag = tag,
                     renameText = updateName
                 )
@@ -107,8 +107,34 @@ internal class HomeInterceptorTest {
     @Test(expected = IllegalStateException::class)
     fun `Failed rename tag, when renameTagConfig was not set`() = runTest {
         dispatchWithInterceptor(
-            initState = genHomeUiStateSuccess(tagRenameTarget = null),
+            initState = genHomeUiStateSuccess(
+                workflow = genHomeWorkflow(ignoreCases = setOf(HomeWorkflow.TagRename::class))
+            ),
             action = HomeAction.OnTagRenameConfirmClicked,
+        )
+    }
+
+    @Test
+    fun `Delete tag, when tag delete confirmed`() = runTest {
+        val tagDelete = genHomeTagDeleteConfig()
+        val tagRepository: TagRepository = mock {
+            whenever(mock.delete(tagDelete.tag)) doReturn Result.Success(Unit)
+        }
+        dispatchWithInterceptor(
+            initState = genHomeUiStateSuccess(workflow = tagDelete),
+            action = HomeAction.OnTagDeleteConfirmClicked,
+            interceptor = genHomeInterceptor(tagRepository = tagRepository),
+        )
+        verify(tagRepository, once()).delete(tagDelete.tag)
+    }
+
+    @Test(expected = IllegalStateException::class)
+    fun `Failed delete tag, when deleteTagConfig was not set`() = runTest {
+        dispatchWithInterceptor(
+            initState = genHomeUiStateSuccess(
+                workflow = genHomeWorkflow(ignoreCases = setOf(HomeWorkflow.TagDelete::class))
+            ),
+            action = HomeAction.OnTagDeleteConfirmClicked,
         )
     }
 }

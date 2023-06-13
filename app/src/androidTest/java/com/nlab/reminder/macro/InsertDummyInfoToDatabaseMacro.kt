@@ -23,7 +23,7 @@ import com.github.javafaker.Faker
 import com.nlab.reminder.internal.common.android.database.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -38,13 +38,19 @@ import java.util.*
 class InsertDummyInfoToDatabaseMacro {
     private val faker: Faker = Faker(Locale("ko"))
     private val inputTagEntities: List<TagEntity> = listOf(
-        TagEntity(name = "돈내는거"),
+        TagEntity(name = "집안일"),
         TagEntity(name = "약속"),
         TagEntity(name = "건강"),
         TagEntity(name = "공과금 내는 날~!!"),
         TagEntity(name = "장보러 가는 날"),
-        TagEntity(name = "핸드폰")
-    )
+        TagEntity(name = "결혼준비"),
+        TagEntity(name = "경제"),
+        TagEntity(name = "핸드폰"),
+        TagEntity(name = "개발"),
+        TagEntity(name = "스터디"),
+        TagEntity(name = "데이트 장소 알아보기"),
+        TagEntity(name = "뭔가 엄청엄청엄청 긴 태그~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"),
+    ) + List(20) { TagEntity(name = "테스트용 태그 #$it") }
     private val inputScheduleEntities: List<ScheduleEntity> = buildList {
         this += List(300) {
             ScheduleEntity(
@@ -96,7 +102,7 @@ class InsertDummyInfoToDatabaseMacro {
     }
 
     @Test
-    fun input() = runTest {
+    fun input() = runBlocking {
         resetTagEntities()
         resetScheduleEntities()
         resetScheduleTagList()

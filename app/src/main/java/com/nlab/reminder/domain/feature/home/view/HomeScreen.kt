@@ -20,7 +20,6 @@ import android.content.res.Configuration.*
 import androidx.annotation.StringRes
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -55,20 +54,12 @@ import com.nlab.reminder.core.android.designsystem.component.ThemeBottomSheetLay
 import com.nlab.reminder.core.android.designsystem.component.ThemeLoadingIndicator
 import com.nlab.reminder.core.android.designsystem.theme.ReminderTheme
 import com.nlab.reminder.domain.common.data.model.Tag
+import com.nlab.reminder.domain.common.tag.view.TagDeleteBottomSheetContent
 import com.nlab.reminder.domain.common.tag.view.TagRenameDialog
-import com.nlab.reminder.domain.feature.home.HomeUiState
-import com.nlab.reminder.domain.feature.home.HomeViewModel
-import com.nlab.reminder.domain.feature.home.onAllCategoryClicked
-import com.nlab.reminder.domain.feature.home.onTagDeleteRequestClicked
-import com.nlab.reminder.domain.feature.home.onTagLongClicked
-import com.nlab.reminder.domain.feature.home.onTagRenameConfirmClicked
-import com.nlab.reminder.domain.feature.home.onTagRenameInputKeyboardShown
-import com.nlab.reminder.domain.feature.home.onTagRenameInputted
-import com.nlab.reminder.domain.feature.home.onTagRenameRequestClicked
-import com.nlab.reminder.domain.feature.home.onTimetableCategoryClicked
-import com.nlab.reminder.domain.feature.home.onTodayCategoryClicked
-import com.nlab.reminder.domain.feature.home.pageShown
+import com.nlab.reminder.domain.feature.home.*
 import kotlinx.collections.immutable.*
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 /**
  * @author Doohyun
@@ -86,17 +77,18 @@ internal fun HomeRoot(
         onAllCategoryClicked = viewModel::onAllCategoryClicked,
         onTagLongClicked = viewModel::onTagLongClicked,
         onTagRenameRequestClicked = viewModel::onTagRenameRequestClicked,
-        onTagDeleteRequestClicked = viewModel::onTagDeleteRequestClicked,
         onTagRenameKeyboardShown = viewModel::onTagRenameInputKeyboardShown,
         onTagRenameTextChanged = viewModel::onTagRenameInputted,
         onTagRenameConfirmClicked = viewModel::onTagRenameConfirmClicked,
-        onPageShown = viewModel::pageShown
+        onTagDeleteRequestClicked = viewModel::onTagDeleteRequestClicked,
+        onTagDeleteConfirmClicked = viewModel::onTagDeleteConfirmClicked,
+        onPageShown = viewModel::workflowComplete
     )
 }
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-internal fun HomeScreen(
+private fun HomeScreen(
     uiState: State<HomeUiState>,
     modifier: Modifier = Modifier,
     onTodayCategoryClicked: () -> Unit,
@@ -104,77 +96,110 @@ internal fun HomeScreen(
     onAllCategoryClicked: () -> Unit,
     onTagLongClicked: (Tag) -> Unit,
     onTagRenameRequestClicked: () -> Unit,
-    onTagDeleteRequestClicked: () -> Unit,
     onTagRenameKeyboardShown: () -> Unit,
     onTagRenameTextChanged: (String) -> Unit,
     onTagRenameConfirmClicked: () -> Unit,
+    onTagDeleteRequestClicked: () -> Unit,
+    onTagDeleteConfirmClicked: () -> Unit,
     onPageShown: () -> Unit,
 ) {
-    val curState = uiState.value
-    val sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
-    ThemeBottomSheetLayout(
-        sheetState = sheetState,
-        sheetContent = {
+    val windowModifier = modifier
+        .fillMaxSize()
+        .statusBarsPadding()
+        .navigationBarsPadding()
+    val loadingVisibleState = rememberDelayedVisibleState()
 
-        },
-    ) {
-        Box(
-            modifier = modifier
-                .fillMaxSize()
-                .statusBarsPadding()
-                .navigationBarsPadding()
-        ) {
-            val loadingVisibleState = rememberDelayedVisibleState()
-            when (curState) {
-                is HomeUiState.Loading -> {
-                    ThemeLoadingIndicator(
-                        modifier = Modifier.align(Alignment.Center),
-                        visibleState = loadingVisibleState
+    when (val curUi = uiState.value) {
+        is HomeUiState.Loading -> Box(modifier = windowModifier) {
+            ThemeLoadingIndicator(
+                modifier = Modifier.align(Alignment.Center),
+                visibleState = loadingVisibleState
+            )
+        }
+
+        is HomeUiState.Success -> LoadedContent(isDelay = loadingVisibleState.value) {
+            val sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
+            val coroutineScope = rememberCoroutineScope()
+            ThemeBottomSheetLayout(
+                sheetState = sheetState,
+                sheetContent = {
+                    if (curUi.workflow is HomeWorkflow.TagDelete) {
+                        TagDeleteBottomSheetContent(
+                            tagName = curUi.workflow.tag.name,
+                            usageCount = curUi.workflow.usageCount,
+                            modifier = Modifier.navigationBarsPadding(),
+                            onCancelClicked = { coroutineScope.launch { sheetState.hide() } },
+                            onConfirmClicked = {
+                                onTagDeleteConfirmClicked()
+                                coroutineScope.launch { sheetState.hide() }
+                            }
+                        )
+                    }
+                },
+                onHide = onPageShown
+            ) {
+                HomeContent(
+                    uiState = curUi,
+                    modifier = windowModifier,
+                    onTodayCategoryClicked = onTodayCategoryClicked,
+                    onTimetableCategoryClicked = onTimetableCategoryClicked,
+                    onAllCategoryClicked = onAllCategoryClicked,
+                    onTagLongClicked = onTagLongClicked
+                )
+            }
+
+            when (val workflow = curUi.workflow) {
+                is HomeWorkflow.TodaySchedule,
+                is HomeWorkflow.TimetableSchedule,
+                is HomeWorkflow.AllSchedule -> {
+                    LaunchedEffect(workflow) { onPageShown() }
+                }
+
+                is HomeWorkflow.TagConfig -> {
+                    HomeTagConfigDialog(
+                        tagName = workflow.tag.name,
+                        usageCount = workflow.usageCount,
+                        onDismiss = onPageShown,
+                        onRenameRequestClicked = onTagRenameRequestClicked,
+                        onDeleteRequestClicked = onTagDeleteRequestClicked
                     )
                 }
 
-                is HomeUiState.Success -> LoadedContent(isDelay = loadingVisibleState.value) {
-                    HomeContent(
-                        uiState = curState,
-                        onTodayCategoryClicked = onTodayCategoryClicked,
-                        onTimetableCategoryClicked = onTimetableCategoryClicked,
-                        onAllCategoryClicked = onAllCategoryClicked,
-                        onTagLongClicked = onTagLongClicked
-                    )
-
-                    curState.tagConfigTarget?.let { tagConfig ->
-                        HomeTagConfigDialog(
-                            tagName = tagConfig.tag.name,
-                            usageCount = tagConfig.usageCount,
-                            onDismiss = onPageShown,
-                            onRenameRequestClicked = onTagRenameRequestClicked,
-                            onDeleteRequestClicked = onTagDeleteRequestClicked
-                        )
-                    }
-
-                    curState.tagRenameTarget?.let { tagRenameConfig ->
-                        TagRenameDialog(
-                            initText = tagRenameConfig.renameText,
-                            tagName = tagRenameConfig.tag.name,
-                            usageCount = tagRenameConfig.usageCount,
-                            shouldKeyboardShown = tagRenameConfig.shouldKeyboardShown,
-                            onCancel = onPageShown,
-                            onTextChanged = onTagRenameTextChanged,
-                            onConfirm = onTagRenameConfirmClicked
-                        )
-                        if (tagRenameConfig.shouldKeyboardShown) {
-                            LaunchedEffect(Unit) { onTagRenameKeyboardShown() }
+                is HomeWorkflow.TagRename -> {
+                    TagRenameDialog(
+                        initText = workflow.renameText,
+                        tagName = workflow.tag.name,
+                        usageCount = workflow.usageCount,
+                        shouldKeyboardShown = workflow.shouldKeyboardShown,
+                        onCancel = onPageShown,
+                        onTextChanged = onTagRenameTextChanged,
+                        onConfirm = {
+                            onTagRenameConfirmClicked()
+                            onPageShown()
                         }
+                    )
+                    if (workflow.shouldKeyboardShown) {
+                        LaunchedEffect(Unit) { onTagRenameKeyboardShown() }
                     }
                 }
+
+                is HomeWorkflow.TagDelete -> {
+                    LaunchedEffect(workflow) {
+                        delay(200) // for animation showing, with HomeTagConfigDialog..
+                        sheetState.show()
+                    }
+                }
+
+                null -> {}
             }
         }
     }
 }
 
 @Composable
-private fun BoxScope.HomeContent(
+private fun HomeContent(
     uiState: HomeUiState.Success,
+    modifier: Modifier = Modifier,
     onTodayCategoryClicked: () -> Unit = {},
     onTimetableCategoryClicked: () -> Unit = {},
     onAllCategoryClicked: () -> Unit = {},
@@ -182,31 +207,32 @@ private fun BoxScope.HomeContent(
 ) {
     val homeContentPaddingBottom = 76.dp
     val homeContentScrollState = rememberScrollState()
+    Box(modifier = modifier) {
+        HomeItems(
+            todayScheduleCount = uiState.todayScheduleCount,
+            timetableScheduleCount = uiState.timetableScheduleCount,
+            allScheduleCount = uiState.allScheduleCount,
+            tags = uiState.tags,
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(homeContentScrollState)
+                .padding(horizontal = 20.dp)
+                .padding(bottom = homeContentPaddingBottom),
+            onTodayCategoryClicked = onTodayCategoryClicked,
+            onTimetableCategoryClicked = onTimetableCategoryClicked,
+            onAllCategoryClicked = onAllCategoryClicked,
+            onTagLongClicked = onTagLongClicked
+        )
 
-    HomeItems(
-        todayScheduleCount = uiState.todayScheduleCount,
-        timetableScheduleCount = uiState.timetableScheduleCount,
-        allScheduleCount = uiState.allScheduleCount,
-        tags = uiState.tags,
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(homeContentScrollState)
-            .padding(horizontal = 20.dp)
-            .padding(bottom = homeContentPaddingBottom),
-        onTodayCategoryClicked = onTodayCategoryClicked,
-        onTimetableCategoryClicked = onTimetableCategoryClicked,
-        onAllCategoryClicked = onAllCategoryClicked,
-        onTagLongClicked = onTagLongClicked
-    )
-
-    BottomContent(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(56.dp)
-            .align(Alignment.BottomCenter),
-        homeContentPaddingBottom = homeContentPaddingBottom,
-        homeContentScrollState = homeContentScrollState
-    )
+        BottomContent(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp)
+                .align(Alignment.BottomCenter),
+            homeContentPaddingBottom = homeContentPaddingBottom,
+            homeContentScrollState = homeContentScrollState
+        )
+    }
 }
 
 @Composable
@@ -324,17 +350,17 @@ private fun BottomContent(
 @Composable
 private fun HomeContentPreview() {
     ReminderTheme {
-        Box(modifier = Modifier.fillMaxSize()) {
-            HomeContent(
-                uiState = HomeUiState.Success(
-                    todayScheduleCount = 10,
-                    timetableScheduleCount = 20,
-                    allScheduleCount = 30,
-                    tags = (0L..100)
-                        .map { index -> Tag(tagId = index, name = "TagName $index") }
-                        .toPersistentList()
-                )
-            )
-        }
+        HomeContent(
+            uiState = HomeUiState.Success(
+                todayScheduleCount = 10,
+                timetableScheduleCount = 20,
+                allScheduleCount = 30,
+                tags = (0L..100)
+                    .map { index -> Tag(tagId = index, name = "TagName $index") }
+                    .toImmutableList(),
+                userMessages = persistentListOf()
+            ),
+            modifier = Modifier.fillMaxSize()
+        )
     }
 }
