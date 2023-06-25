@@ -16,18 +16,13 @@
 package com.nlab.reminder.domain.feature.home.view
 
 import android.os.Parcelable
-import com.nlab.reminder.core.android.navigation.Navigation
-import com.nlab.reminder.core.android.navigation.NavigationController
+import androidx.navigation.NavController
 import com.nlab.reminder.domain.common.tag.Tag
 import kotlinx.parcelize.Parcelize
 
 /**
  * @author Doohyun
  */
-data class HomeTagConfigNavigation(val requestKey: String, val tag: Tag) : Navigation
-data class HomeTagDeleteNavigation(val requestKey: String, val tag: Tag, val usageCount: Long) : Navigation
-data class HomeTagRenameNavigation(val requestKey: String, val tag: Tag, val usageCount: Long) : Navigation
-
 @Parcelize
 data class HomeTagConfigResult(
     val tag: Tag,
@@ -48,11 +43,28 @@ data class HomeTagDeleteResult(
     val isConfirmed: Boolean
 ) : Parcelable
 
-fun NavigationController.navigateToTagConfig(requestKey: String, tag: Tag) =
-    navigateTo(HomeTagConfigNavigation(requestKey, tag))
+internal fun NavController.navigateToTagConfig(requestKey: String, tag: Tag) {
+    HomeFragmentDirections
+        .actionHomeFragmentToHomeConfigDialogFragment(requestKey, tag)
+        .run(this::navigate)
+}
 
-fun NavigationController.navigateToTagDelete(requestKey: String, tag: Tag, usageCount: Long) =
-    navigateTo(HomeTagDeleteNavigation(requestKey, tag, usageCount))
+internal fun NavController.navigateToTagDelete(requestKey: String, tag: Tag, usageCount: Long) {
+    HomeFragmentDirections
+        .actionHomeFragmentToHomeTagRenameDialogFragment(
+            requestKey,
+            tag,
+            usageCount
+        )
+        .run(this::navigate)
+}
 
-fun NavigationController.navigateToTagRename(requestKey: String, tag: Tag, usageCount: Long) =
-    navigateTo(HomeTagRenameNavigation(requestKey, tag, usageCount))
+internal fun NavController.navigateToTagRename(requestKey: String, tag: Tag, usageCount: Long) {
+    HomeFragmentDirections
+        .actionHomeFragmentToHomeTagDeleteDialogFragment(
+            requestKey,
+            tag,
+            usageCount
+        )
+        .run(this::navigate)
+}
