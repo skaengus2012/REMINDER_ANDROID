@@ -1,5 +1,5 @@
 [versions]
-kotlin = "1.8.20"
+kotlin = "1.8.21"
 kotlinCoroutine = "1.7.1"
 androidGradlePlugin = "8.0.2"
 kotlinCollectionsImmutable = "0.3.5"
@@ -16,8 +16,8 @@ androidDataStore = "1.0.0"
 androidTestJunit = "1.1.5"
 androidTestEspresso = "3.5.0"
 androidTestRules = "1.4.0"
-androidComposeCompiler = "1.4.5"
-androidComposeBom = "2023.05.01"
+androidComposeCompiler = "1.4.7"
+androidComposeBom = "2023.06.01"
 androidHiltNavigationCompose = "1.0.0"
 googleAndroidMaterial = "1.8.0"
 googleHilt = "2.46.1"
@@ -53,7 +53,6 @@ android-lifecycle-runtimeCompose = { group = "androidx.lifecycle", name = "lifec
 android-fragment-ktx = { module = "androidx.fragment:fragment-ktx", version.ref = "androidFragment" }
 android-navigation-fragment-ktx = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "androidNavigation" }
 android-navigation-ui-ktx = { module = "androidx.navigation:navigation-ui-ktx", version.ref = "androidNavigation" }
-android-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "androidNavigation" }
 android-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "androidHiltNavigationCompose" }
 android-room-runtime = { module = "androidx.room:room-runtime", version.ref = "androidRoom" }
 android-room-ktx = { module = "androidx.room:room-ktx", version.ref = "androidRoom" }

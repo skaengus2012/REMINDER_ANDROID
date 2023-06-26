@@ -101,7 +101,6 @@ dependencies {
     implementation(libs.android.lifecycle.runtimeCompose)
     implementation(libs.android.fragment.ktx)
     implementation(libs.android.navigation.fragment.ktx)
-    implementation(libs.android.navigation.compose)
     implementation(libs.android.hilt.navigation.compose)
     implementation(libs.android.navigation.ui.ktx)
     implementation(libs.android.room.runtime)
