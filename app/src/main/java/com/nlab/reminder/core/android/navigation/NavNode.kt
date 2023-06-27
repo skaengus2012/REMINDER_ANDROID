@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 The N's lab Open Source Project
+ * Copyright (C) 2023 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,8 @@
 package com.nlab.reminder.core.android.navigation
 
 /**
- * @author thalys
+ * @author Doohyun
  */
-class NavigationController(private val navigators: List<Navigator>) {
-    fun navigateTo(navigation: Navigation) {
-        navigators.any { it.navigate(navigation) }
-    }
+abstract class NavNode<T> internal constructor() {
+    internal abstract fun visit(navHandle: T, screen: Screen)
 }

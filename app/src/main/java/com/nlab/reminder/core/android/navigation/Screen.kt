@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 The N's lab Open Source Project
+ * Copyright (C) 2023 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.android.navigation.util
+package com.nlab.reminder.core.android.navigation
 
 /**
- * @author Doohyun
+ * @author thalys
  */
-@NavigationTableBuildMarker
-object NavigationTableBuildScope
+interface Screen
