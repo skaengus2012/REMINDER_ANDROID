@@ -66,12 +66,11 @@ import kotlinx.coroutines.launch
  */
 @Composable
 internal fun HomeRoot(
-    modifier: Modifier = Modifier,
+    navigateToAllScheduleEnd: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     HomeScreen(
         uiState = viewModel.uiState.collectAsStateWithLifecycle(),
-        modifier = modifier,
         onTodayCategoryClicked = viewModel::onTodayCategoryClicked,
         onTimetableCategoryClicked = viewModel::onTimetableCategoryClicked,
         onAllCategoryClicked = viewModel::onAllCategoryClicked,
@@ -82,7 +81,8 @@ internal fun HomeRoot(
         onTagRenameConfirmClicked = viewModel::onTagRenameConfirmClicked,
         onTagDeleteRequestClicked = viewModel::onTagDeleteRequestClicked,
         onTagDeleteConfirmClicked = viewModel::onTagDeleteConfirmClicked,
-        onPageShown = viewModel::workflowComplete
+        onPageShown = viewModel::workflowComplete,
+        navigateToAllScheduleEnd = navigateToAllScheduleEnd
     )
 }
 
@@ -90,7 +90,6 @@ internal fun HomeRoot(
 @Composable
 private fun HomeScreen(
     uiState: State<HomeUiState>,
-    modifier: Modifier = Modifier,
     onTodayCategoryClicked: () -> Unit,
     onTimetableCategoryClicked: () -> Unit,
     onAllCategoryClicked: () -> Unit,
@@ -102,8 +101,9 @@ private fun HomeScreen(
     onTagDeleteRequestClicked: () -> Unit,
     onTagDeleteConfirmClicked: () -> Unit,
     onPageShown: () -> Unit,
+    navigateToAllScheduleEnd: () -> Unit
 ) {
-    val windowModifier = modifier
+    val windowModifier = Modifier
         .fillMaxSize()
         .statusBarsPadding()
         .navigationBarsPadding()
@@ -150,9 +150,15 @@ private fun HomeScreen(
 
             when (val workflow = curUi.workflow) {
                 is HomeWorkflow.TodaySchedule,
-                is HomeWorkflow.TimetableSchedule,
-                is HomeWorkflow.AllSchedule -> {
+                is HomeWorkflow.TimetableSchedule -> {
                     LaunchedEffect(workflow) { onPageShown() }
+                }
+
+                is HomeWorkflow.AllSchedule -> {
+                    LaunchedEffect(workflow) {
+                        onPageShown()
+                        navigateToAllScheduleEnd()
+                    }
                 }
 
                 is HomeWorkflow.TagConfig -> {
