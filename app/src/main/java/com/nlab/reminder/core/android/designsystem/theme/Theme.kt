@@ -17,6 +17,10 @@
 package com.nlab.reminder.core.android.designsystem.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material.ripple.LocalRippleTheme
+import androidx.compose.material.ripple.RippleAlpha
+import androidx.compose.material.ripple.RippleTheme
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
@@ -50,7 +54,7 @@ data class ReminderColorScheme(
     val red: Color
 )
 
-val LocalReminderColorScheme = staticCompositionLocalOf {
+private val LocalReminderColorScheme = staticCompositionLocalOf {
     ReminderColorScheme(
         bg1 = Color.Unspecified,
         bg2 = Color.Unspecified,
@@ -71,10 +75,10 @@ val LocalReminderColorScheme = staticCompositionLocalOf {
     )
 }
 
-val LightDefaultColorScheme = lightColorScheme(
+private val LightDefaultColorScheme = lightColorScheme(
     surface = Gray1
 )
-val LightReminderColorScheme = ReminderColorScheme(
+private val LightReminderColorScheme = ReminderColorScheme(
     bg1 = Bg1Light,
     bg2 = Bg2Light,
     bgRipple1 = BgRipple1Light,
@@ -93,10 +97,10 @@ val LightReminderColorScheme = ReminderColorScheme(
     red = Red400
 )
 
-val DarkDefaultColorScheme = darkColorScheme(
+private val DarkDefaultColorScheme = darkColorScheme(
     surface = Color.Black,
 )
-val DarkReminderColorScheme = ReminderColorScheme(
+private val DarkReminderColorScheme = ReminderColorScheme(
     bg1 = Bg1Dark,
     bg2 = Bg2Dark,
     bgRipple1 = BgRipple1Dark,
@@ -115,6 +119,20 @@ val DarkReminderColorScheme = ReminderColorScheme(
     red = Red400
 )
 
+@Immutable
+private object DefaultRippleTheme : RippleTheme {
+    @Composable
+    override fun defaultColor() = LocalContentColor.current
+
+    @Composable
+    override fun rippleAlpha() = RippleAlpha(
+        pressedAlpha = 0.5f,
+        focusedAlpha = 0.5f,
+        draggedAlpha = 0.5f,
+        hoveredAlpha = 0.5f,
+    )
+}
+
 /**
  * Extended Theme for Reminder.
  * @see <a href="https://developer.android.com/jetpack/compose/designsystems/custom?hl=ko">Reference</a>
@@ -131,13 +149,13 @@ fun ReminderTheme(
 ) {
     val defaultColorScheme = if (isDarkTheme) DarkDefaultColorScheme else LightDefaultColorScheme
     val reminderColorScheme = if (isDarkTheme) DarkReminderColorScheme else LightReminderColorScheme
-
-    CompositionLocalProvider(
-        LocalReminderColorScheme provides reminderColorScheme
+    MaterialTheme(
+        colorScheme = defaultColorScheme,
+        typography = ReminderTypography,
     ) {
-        MaterialTheme(
-            colorScheme = defaultColorScheme,
-            typography = ReminderTypography,
+        CompositionLocalProvider(
+            LocalReminderColorScheme provides reminderColorScheme,
+            LocalRippleTheme provides DefaultRippleTheme,
             content = content
         )
     }
