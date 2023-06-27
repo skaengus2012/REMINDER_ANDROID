@@ -24,11 +24,11 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ConcatAdapter
 import com.nlab.reminder.R
 import com.nlab.reminder.core.android.fragment.viewLifecycle
 import com.nlab.reminder.core.android.fragment.viewLifecycleScope
-import com.nlab.reminder.core.android.navigation.NavigationController
 import com.nlab.reminder.core.android.view.throttleClicks
 import com.nlab.reminder.databinding.FragmentHomeBinding
 import com.nlab.reminder.domain.common.android.fragment.resultReceives
@@ -38,7 +38,6 @@ import com.nlab.reminder.domain.common.android.view.recyclerview.SimpleLayoutAda
 import com.nlab.reminder.domain.feature.home.*
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.*
-import javax.inject.Inject
 
 /**
  * @author Doohyun
@@ -49,10 +48,6 @@ class HomeFragment : Fragment() {
 
     private var _binding: FragmentHomeBinding? = null
     private val binding: FragmentHomeBinding get() = checkNotNull(_binding)
-
-    @HomeScope
-    @Inject
-    lateinit var navigationController: NavigationController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -153,23 +148,23 @@ class HomeFragment : Fragment() {
 
         }
         is HomeSideEffect.NavigateAllSchedule -> {
-            navigationController.navigateToAllScheduleEnd()
+            findNavController().navigateToAllScheduleEnd()
         }
         is HomeSideEffect.NavigateTag -> {
 
         }
         is HomeSideEffect.ShowTagConfigPopup -> {
-            navigationController.navigateToTagConfig(
+            findNavController().navigateToTagConfig(
                 REQUEST_KEY_HOME_TO_HOME_TAG_CONFIG, sideEffect.tag
             )
         }
         is HomeSideEffect.ShowTagRenamePopup -> {
-            navigationController.navigateToTagRename(
+            findNavController().navigateToTagRename(
                 REQUEST_KEY_HOME_TO_HOME_TAG_RENAME, sideEffect.tag, sideEffect.usageCount
             )
         }
         is HomeSideEffect.ShowTagDeletePopup -> {
-            navigationController.navigateToTagDelete(
+            findNavController().navigateToTagDelete(
                 REQUEST_KEY_HOME_TO_HOME_TAG_DELETE, sideEffect.tag, sideEffect.usageCount
             )
         }
