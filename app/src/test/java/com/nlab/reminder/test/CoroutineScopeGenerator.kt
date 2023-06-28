@@ -21,6 +21,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestCoroutineScheduler
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 
 /**
  * @author Doohyun
@@ -30,3 +32,6 @@ fun genFlowExecutionDispatcher(testScheduler: TestCoroutineScheduler) = Standard
 fun genFlowObserveDispatcher() = Dispatchers.Unconfined
 fun genFlowObserveCoroutineScope() = CoroutineScope(genFlowObserveDispatcher())
 fun genStateContainerScope() = CoroutineScope(Dispatchers.Unconfined)
+
+fun TestScope.unconfinedTestDispatcher() = UnconfinedTestDispatcher(testScheduler)
+fun TestScope.unconfinedCoroutineScope() = CoroutineScope(unconfinedTestDispatcher())

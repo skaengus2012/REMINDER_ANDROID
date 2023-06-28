@@ -18,24 +18,36 @@ package com.nlab.reminder.domain.feature.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nlab.reminder.core.effect.SideEffectContainer
+import com.nlab.reminder.core.util.test.annotation.ExcludeFromGeneratedTestReport
+import com.nlab.statekit.lifecycle.UiActionDispatchable
+import com.nlab.statekit.util.createStore
+import com.nlab.statekit.util.stateIn
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
 /**
  * @author Doohyun
  */
+@ExcludeFromGeneratedTestReport
 @HiltViewModel
-class HomeViewModel @Inject constructor(
-    stateContainerFactory: HomeStateContainerFactory
-) : ViewModel() {
-    private val sideEffectContainer = SideEffectContainer<HomeSideEffect>()
-    private val stateContainer = stateContainerFactory.create(viewModelScope, sideEffectContainer)
+internal class HomeViewModel @Inject constructor(
+    reducer: HomeReducer,
+    interceptor: HomeInterceptor,
+    epic: HomeEpic
+) : ViewModel(),
+    UiActionDispatchable<HomeAction> {
+    private val store = createStore(
+        initState = HomeUiState.Loading,
+        reducer = reducer,
+        interceptor = interceptor,
+        epic = epic
+    )
 
-    val homeSideEffectFlow: Flow<HomeSideEffect> = sideEffectContainer.sideEffectFlow
-    val stateFlow: StateFlow<HomeState> = stateContainer.stateFlow
-    fun send(event: HomeEvent): Job = stateContainer.send(event)
+    val uiState: StateFlow<HomeUiState> =
+        store.stateIn(viewModelScope, SharingStarted.WhileSubscribed(stopTimeoutMillis = 5_000))
+
+    override fun dispatch(action: HomeAction): Job = store.dispatch(action)
 }

@@ -20,10 +20,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nlab.statekit.*
 import com.nlab.statekit.lifecycle.*
+import com.nlab.statekit.util.stateIn
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.stateIn
 
 /**
  * @author Doohyun
@@ -32,11 +32,9 @@ abstract class StoreViewModel<A : Action, S : State> : ViewModel(), UiActionDisp
     private val store: Store<A, S> by lazy(LazyThreadSafetyMode.NONE) { onCreateStore() }
 
     val uiState: StateFlow<S> by lazy(LazyThreadSafetyMode.NONE) {
-        with(store.state) {
-            // Set the timeout to 5000 as per the following reference
-            // https://medium.com/androiddevelopers/things-to-know-about-flows-sharein-and-statein-operators-20e6ccb2bc74
-            stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), value)
-        }
+        // Set the timeout to 5000 as per the following reference
+        // https://medium.com/androiddevelopers/things-to-know-about-flows-sharein-and-statein-operators-20e6ccb2bc74
+        store.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000))
     }
 
     protected abstract fun onCreateStore(): Store<A, S>

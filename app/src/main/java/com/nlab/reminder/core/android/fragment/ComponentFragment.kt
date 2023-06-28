@@ -22,39 +22,25 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.compose.ui.platform.*
 import androidx.fragment.app.Fragment
-import com.nlab.reminder.databinding.FragmentComponentBinding
 
 /**
  * Fragment for Compose Composition
  * @author Doohyun
  */
 abstract class ComponentFragment : Fragment() {
-    private var _binding: FragmentComponentBinding? = null
-    val composeView: ComposeView get() = checkNotNull(_binding).composeView
+    private var _composeView: ComposeView? = null
+    val composeView: ComposeView get() = checkNotNull(_composeView)
 
     final override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View = FragmentComponentBinding.inflate(inflater, container, false)
-        .apply {
-            with(composeView) {
-                setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-                composeView.setContent {
-
-                }
-            }
-        }
-        .also { _binding = it }
-        .root
+    ): View = ComposeView(requireContext())
+        .apply { setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed) }
+        .also { _composeView = it }
 
     final override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         onViewCreated(savedInstanceState)
-    }
-
-    final override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
     }
 
     protected abstract fun onViewCreated(savedInstanceState: Bundle?)
