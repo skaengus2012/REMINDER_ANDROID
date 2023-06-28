@@ -17,6 +17,7 @@
 package com.nlab.reminder.domain.feature.home.view
 
 import android.content.res.Configuration.*
+import androidx.activity.compose.BackHandler
 import androidx.annotation.StringRes
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Box
@@ -118,8 +119,11 @@ private fun HomeScreen(
         }
 
         is HomeUiState.Success -> LoadedContent(isDelay = loadingVisibleState.value) {
-            val sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
             val coroutineScope = rememberCoroutineScope()
+            val sheetState = rememberModalBottomSheetState(
+                initialValue = ModalBottomSheetValue.Hidden,
+                skipHalfExpanded = true
+            )
             ThemeBottomSheetLayout(
                 sheetState = sheetState,
                 sheetContent = {
@@ -197,6 +201,10 @@ private fun HomeScreen(
                 }
 
                 null -> {}
+            }
+
+            BackHandler(enabled = sheetState.isVisible) {
+                coroutineScope.launch { sheetState.hide() }
             }
         }
     }
