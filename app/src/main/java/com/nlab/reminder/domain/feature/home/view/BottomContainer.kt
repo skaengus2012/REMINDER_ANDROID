@@ -92,7 +92,6 @@ private fun BottomContainerBackground(alphaState: State<Float>) {
     val containerColor = ReminderTheme.colors.bgCard1
     val lineColor = ReminderTheme.colors.bgLine1
     Box(modifier = Modifier.fillMaxSize()) {
-        // TODO find alpha with animation on parent modifier.
         Spacer(
             modifier = Modifier
                 .fillMaxSize()
