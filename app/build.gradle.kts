@@ -55,6 +55,7 @@ android {
         release {
             isDebuggable = false
             isMinifyEnabled = true
+            isShrinkResources = true
             signingConfig = signingConfigs.getByName("debug") // TODO make release key..
         }
     }
@@ -89,6 +90,7 @@ dependencies {
     kapt(project(":statekit:compiler"))
 
     implementation(libs.kotlin.coroutines.android)
+    implementation(libs.kotlin.collections.immutable)
 
     implementation(libs.android.core.ktx)
     implementation(libs.android.appcompat)
@@ -96,8 +98,10 @@ dependencies {
     implementation(libs.android.recyclerview)
     implementation(libs.android.lifecycle.viewmodel.ktx)
     implementation(libs.android.lifecycle.runtime.ktx)
+    implementation(libs.android.lifecycle.runtimeCompose)
     implementation(libs.android.fragment.ktx)
     implementation(libs.android.navigation.fragment.ktx)
+    implementation(libs.android.hilt.navigation.compose)
     implementation(libs.android.navigation.ui.ktx)
     implementation(libs.android.room.runtime)
     implementation(libs.android.room.ktx)
@@ -105,9 +109,12 @@ dependencies {
     implementation(libs.android.startup.runtime)
     implementation(libs.android.datastore.preferences)
     implementation(platform(libs.android.compose.bom))
+    implementation(libs.android.activity.compose)
+    implementation(libs.android.compose.material)
     implementation(libs.android.compose.material3)
     implementation(libs.android.compose.ui.tooling.preview)
     debugImplementation(libs.android.compose.ui.tooling)
+    implementation(libs.android.compose.foundation)
 
     implementation(libs.google.android.material)
     implementation(libs.google.flexbox)

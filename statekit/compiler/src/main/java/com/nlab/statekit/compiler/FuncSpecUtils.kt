@@ -16,8 +16,11 @@
 
 package com.nlab.statekit.compiler
 
+import com.nlab.statekit.lifecycle.UiAction
+import com.nlab.statekit.lifecycle.viewmodel.ContractUiAction
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FunSpec
+import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.metadata.KotlinPoetMetadataPreview
 import com.squareup.kotlinpoet.metadata.isObject
@@ -66,7 +69,8 @@ internal fun generateFuncSpecBuilder(element: Element): Result<FunSpec.Builder> 
         )
     }
 
-    funcSpecBuilder
+    if (element.isPublicFunction()) funcSpecBuilder
+    else funcSpecBuilder.addModifiers(KModifier.INTERNAL)
 }
 
 private fun convertTypeName(valueParameter: KmValueParameter): TypeName {
@@ -146,4 +150,11 @@ private tailrec fun registerTypeName(
             relationCursor = 0,
         )
     }
+}
+
+private fun Element.isPublicFunction(): Boolean {
+    return getAnnotation(UiAction::class.java)
+        ?.isPublic
+        ?: getAnnotation(ContractUiAction::class.java)?.isPublic
+        ?: throw IllegalArgumentException("Cannot recognize any actions annotation")
 }

@@ -18,6 +18,7 @@ package com.nlab.reminder.domain.feature.main.view
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.core.view.WindowCompat
 import com.nlab.reminder.R
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -28,6 +29,9 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Insets for Jetpack Compose
+        // https://google.github.io/accompanist/insets/
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         setContentView(R.layout.activity_main)
     }
 }

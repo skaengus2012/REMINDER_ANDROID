@@ -23,6 +23,7 @@
     <string name="open_link_default_error">This link is not executable.</string>
     <string name="delete">Delete</string>
     <string name="handle_drag">Start drag</string>
+    <string name="unknown_error">An unknown error has occurred.</string>
 
     <!-- schedule -->
     <string name="schedule_complete_checkbox_contentDescription" formatted="true">Complete %1$s</string>
@@ -37,13 +38,33 @@
     <string name="schedule_selected_item_complete">Mark as complete</string>
     <string name="schedule_selected_item_incomplete">Mark as incomplete</string>
 
+    <!-- tag -->
+    <string name="tag_rename">Rename Tag</string>
+    <string name="tag_rename_clear">Clear Editing Text</string>
+    <plurals name="tag_rename_dialog_description">
+        <item quantity="one">#%1$s will be updated in %2$d reminder.</item>
+        <item quantity="other">#%1$s will be updated in %2$d reminders.</item>
+    </plurals>
+    <string name="tag_rename_dialog_description_overflow">#%1$s will be updated in %2$d(+) reminders.</string>
+    <plurals name="tag_delete">
+        <item quantity="one">Delete Tag</item>
+        <item quantity="other">Delete %1$d Tags</item>
+    </plurals>
+    <string name="tag_delete_overflow">Delete %1$d(+) Tags</string>
+    <plurals name="tag_delete_dialog_description">
+        <item quantity="one">%1$s is being used in %2$d notification.</item>
+        <item quantity="other">%1$s is being used in %2$d notifications.</item>
+    </plurals>
+    <string name="tag_delete_dialog_description_overflow">%1$s is being used in %2$d(+) notifications.</string>
+    <string name="tag_not_exist">The tag does not exist.</string>
+
     <!-- home -->
     <string name="home_category_header">My Todo</string>
     <string name="home_category_today">Today</string>
     <string name="home_category_timetable">Scheduled</string>
     <string name="home_category_all">All</string>
     <string name="home_tag_header">My Tags</string>
-    <string name="home_push_on_label">Push on</string>
-    <string name="home_push_off_label">Push off</string>
-    <string name="home_new_schedule_label">New Timeeat</string>
+    <string name="home_push_on_label">Time-Push on</string>
+    <string name="home_push_off_label">Time-Push off</string>
+    <string name="new_schedule_label">New Plan</string>
 </resources>
