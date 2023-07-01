@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.feature.home.view
+package com.nlab.reminder.domain.feature.home.ui
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Row

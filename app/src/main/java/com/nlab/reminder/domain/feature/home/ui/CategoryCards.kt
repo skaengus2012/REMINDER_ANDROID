@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.feature.home.view
+package com.nlab.reminder.domain.feature.home.ui
 
 import android.content.res.Configuration.UI_MODE_NIGHT_NO
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
@@ -125,6 +125,9 @@ private fun TimetableCategoryCard(
         name = stringResource(R.string.home_category_timetable),
         remainCount = remainCount,
         icon = {
+            // case1: If you use webp, the image quality is not good when in landscape mode.
+            // case2: When using svg, the square is not drawn properly. (No problem when using view system)
+            // case3: Resolve when using image vector
             Image(
                 imageVector = ReminderIcons.IcHomeCategoryTimetable,
                 contentDescription = null,

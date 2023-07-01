@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.feature.home.view
+package com.nlab.reminder.domain.feature.home.ui
 
 import android.content.res.Configuration.*
 import androidx.activity.compose.BackHandler
@@ -55,8 +55,8 @@ import com.nlab.reminder.core.android.designsystem.component.ThemeBottomSheetLay
 import com.nlab.reminder.core.android.designsystem.component.ThemeLoadingIndicator
 import com.nlab.reminder.core.android.designsystem.theme.ReminderTheme
 import com.nlab.reminder.domain.common.data.model.Tag
-import com.nlab.reminder.domain.common.tag.view.TagDeleteBottomSheetContent
-import com.nlab.reminder.domain.common.tag.view.TagRenameDialog
+import com.nlab.reminder.domain.common.tag.ui.TagDeleteBottomSheetContent
+import com.nlab.reminder.domain.common.tag.ui.TagRenameDialog
 import com.nlab.reminder.domain.feature.home.*
 import kotlinx.collections.immutable.*
 import kotlinx.coroutines.delay
@@ -323,6 +323,12 @@ private fun BottomContent(
     homeContentScrollState: ScrollState,
     modifier: Modifier = Modifier,
 ) {
+    /**
+                isPushOn = isPushOn.not()
+                deleteTag = DeleteTagEvent(Tag(tagId = 1, name = "삭제시도중.."))*/
+    /**
+                isPushOn = isPushOn.not()
+                deleteTag = DeleteTagEvent(Tag(tagId = 1, name = "삭제시도중.."))*/
     BottomContainer(
         contentPaddingBottom = homeContentPaddingBottom,
         contentScrollState = homeContentScrollState,
@@ -337,6 +343,15 @@ private fun BottomContent(
             }
         )
 
+        /**
+                isPushOn = isPushOn.not()
+                deleteTag = DeleteTagEvent(Tag(tagId = 1, name = "삭제시도중.."))*/
+        /**
+                isPushOn = isPushOn.not()
+                deleteTag = DeleteTagEvent(Tag(tagId = 1, name = "삭제시도중.."))*/
+        /**
+                isPushOn = isPushOn.not()
+                deleteTag = DeleteTagEvent(Tag(tagId = 1, name = "삭제시도중.."))*/
         TimePushSwitchButton(
             isPushOn = true,
             modifier = Modifier

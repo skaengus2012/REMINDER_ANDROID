@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.common.tag.view
+package com.nlab.reminder.domain.common.tag.ui
 
 import androidx.compose.runtime.Composable
 import com.nlab.reminder.domain.common.data.model.TagUsageCount

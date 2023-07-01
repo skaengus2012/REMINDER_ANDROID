@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.feature.home.view
+package com.nlab.reminder.domain.feature.home.ui
 
 import android.content.res.Configuration
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -49,7 +49,7 @@ import com.nlab.reminder.core.android.designsystem.component.ThemeDialog
 import com.nlab.reminder.core.android.compose.ui.throttle
 import com.nlab.reminder.core.android.designsystem.theme.ReminderTheme
 import com.nlab.reminder.domain.common.data.model.TagUsageCount
-import com.nlab.reminder.domain.common.tag.view.mapToString
+import com.nlab.reminder.domain.common.tag.ui.mapToString
 
 /**
  * @author Doohyun
