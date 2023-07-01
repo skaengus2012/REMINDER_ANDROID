@@ -40,7 +40,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
@@ -48,8 +47,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nlab.reminder.R
 import com.nlab.reminder.core.android.compose.ui.throttle
+import com.nlab.reminder.core.android.designsystem.component.ReminderIcons
 import com.nlab.reminder.core.android.designsystem.theme.FontDangamAsac
 import com.nlab.reminder.core.android.designsystem.theme.ReminderTheme
+import com.nlab.reminder.domain.feature.home.icons.IcHomeCategoryAll
+import com.nlab.reminder.domain.feature.home.icons.IcHomeCategoryTimetable
+import com.nlab.reminder.domain.feature.home.icons.IcHomeCategoryToday
 
 /**
  * @author Doohyun
@@ -100,7 +103,7 @@ private fun TodayCategoryCard(
         remainCount = remainCount,
         icon = {
             Image(
-                painter = painterResource(id = R.drawable.ic_home_category_today),
+                imageVector = ReminderIcons.IcHomeCategoryToday,
                 contentDescription = null,
                 modifier = Modifier
                     .fillMaxWidth(0.4883f)
@@ -123,11 +126,11 @@ private fun TimetableCategoryCard(
         remainCount = remainCount,
         icon = {
             Image(
-                painter = painterResource(id = R.drawable.ic_home_category_timetable),
+                imageVector = ReminderIcons.IcHomeCategoryTimetable,
                 contentDescription = null,
                 modifier = Modifier
-                    .fillMaxWidth(0.4325f)
-                    .aspectRatio(18.6f / 19.28f)
+                    .fillMaxWidth(0.4f)
+                    .aspectRatio(1f)
             )
         },
         modifier = modifier,
@@ -146,7 +149,7 @@ private fun AllCategoryCard(
         remainCount = remainCount,
         icon = {
             Image(
-                painter = painterResource(id = R.drawable.ic_home_category_all),
+                imageVector = ReminderIcons.IcHomeCategoryAll,
                 contentDescription = null,
                 modifier = Modifier
                     .fillMaxWidth(0.4232f)
