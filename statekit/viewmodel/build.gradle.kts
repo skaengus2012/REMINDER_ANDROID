@@ -29,5 +29,5 @@ android {
 dependencies {
     implementation(project(":statekit:runtime"))
     implementation(libs.kotlin.coroutines.android)
-    implementation(libs.android.lifecycle.viewmodel.ktx)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
 }
