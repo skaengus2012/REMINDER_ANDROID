@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.common.tag.view
+package com.nlab.reminder.domain.common.tag.ui
 
 import android.content.res.Configuration
 import androidx.compose.foundation.clickable

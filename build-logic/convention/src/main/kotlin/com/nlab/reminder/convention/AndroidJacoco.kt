@@ -81,8 +81,10 @@ private fun Project.androidJacocoClassDirectories(variant: Variant): Configurabl
                 "**/Manifest*.*",
                 "**/android/**",
                 "**/view/**",
+                "**/ui/**",
                 "**/test/**",
                 "**/di/**",
+                "**/icons/**",
                 "**/*_PublicEventsKt.class",        /* filtering PublicEvent generated classes */
                 "**/*_GeneratedUiActionsKt.class",  /* filtering UiAction generated classes */
                 "**/*Args*.*",                      /* filtering Navigation Component generated classes */

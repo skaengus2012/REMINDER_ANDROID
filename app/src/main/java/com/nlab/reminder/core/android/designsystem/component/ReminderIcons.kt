@@ -14,21 +14,9 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.common.tag.view
-
-import androidx.compose.runtime.Composable
-import com.nlab.reminder.domain.common.data.model.TagUsageCount
+package com.nlab.reminder.core.android.designsystem.component
 
 /**
- * @author Doohyun
+ * @author thalys
  */
-private const val MAX_PRESENTABLE_USAGE_COUNT = 1_000
-
-@Composable
-fun TagUsageCount.mapToString(
-    transform: @Composable (count: Int) -> String,
-    transformWhenOverflow: @Composable (count: Int) -> String
-): String {
-    return if (value <= MAX_PRESENTABLE_USAGE_COUNT) transform(value.toInt())
-    else transformWhenOverflow(MAX_PRESENTABLE_USAGE_COUNT)
-}
+object ReminderIcons

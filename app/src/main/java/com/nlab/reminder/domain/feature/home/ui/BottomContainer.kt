@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.feature.home.view
+package com.nlab.reminder.domain.feature.home.ui
 
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Box
