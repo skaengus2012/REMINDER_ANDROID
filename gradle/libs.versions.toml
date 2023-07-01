@@ -1,100 +1,96 @@
 [versions]
-kotlin = "1.8.21"
-kotlinCoroutine = "1.7.1"
+afollestedDragselectRecyclerView = "2.4.0"
 androidGradlePlugin = "8.0.2"
-kotlinCollectionsImmutable = "0.3.5"
-androidCoreKtx = "1.9.0"
-androidAppCompat = "1.6.1"
-androidConstaintLayout = "2.1.4"
-androidRecyclerView = "1.2.1"
-androidLifecycle = "2.5.1"
-androidFragment = "1.5.5"
-androidNavigation = "2.5.3"
-androidRoom = "2.5.0"
-androidStartUp = "1.1.0"
-androidDataStore = "1.0.0"
-androidTestJunit = "1.1.5"
-androidTestEspresso = "3.5.0"
-androidTestRules = "1.4.0"
-androidComposeCompiler = "1.4.7"
-androidComposeBom = "2023.06.01"
-androidHiltNavigationCompose = "1.0.0"
-googleAndroidMaterial = "1.8.0"
-googleHilt = "2.46.1"
-googleFlexbox = "3.0.0"
+androidxAppCompat = "1.6.1"
+androidxComposeBom = "2023.06.01"
+androidxComposeCompiler = "1.4.7"
+androidxConstaintLayout = "2.1.4"
+androidxCoreKtx = "1.9.0"
+androidxDataStore = "1.0.0"
+androidxFragment = "1.5.5"
+androidxHiltNavigationCompose = "1.0.0"
+androidxLifecycle = "2.5.1"
+androidxNavigation = "2.5.3"
+androidxRecyclerView = "1.2.1"
+androidxRoom = "2.5.0"
+androidxStartUp = "1.1.0"
+androidxTestEspresso = "3.5.0"
+androidxTestJunit = "1.1.5"
+androidxTestRules = "1.4.0"
 facebookFlipper = "0.201.0"
 facebookSoloader = "0.10.5"
-squareLeakcanary = "2.11"
-squareKotlinpoet = "1.12.0"
-jacoco = "0.8.9"
-timber = "5.0.1"
+googleAndroidMaterial = "1.8.0"
+googleHilt = "2.46.1"
 glide = "4.15.1"
+jacoco = "0.8.9"
+javafaker = "1.0.2"
 jsoup = "1.16.1"
-afollestedDragselectRecyclerView = "2.4.0"
 junit = "4.13.2"
+kotlin = "1.8.21"
+kotlinCollectionsImmutable = "0.3.5"
+kotlinCoroutine = "1.7.1"
 mockitoInline = "5.2.0"
 mockitoKotlin = "5.0.0"
-javafaker = "1.0.2"
+squareLeakcanary = "2.11"
+squareKotlinpoet = "1.12.0"
+timber = "5.0.1"
 
 
 [libraries]
-kotlin-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinCoroutine" }
-kotlin-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinCoroutine" }
-kotlin-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlinCollectionsImmutable" }
-kotlin-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinCoroutine" }
-android-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidCoreKtx" }
-android-activity-compose = { group = "androidx.activity", name = "activity-compose" }
-android-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "androidAppCompat" }
-android-constaintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "androidConstaintLayout" }
-android-recyclerview = { module = "androidx.recyclerview:recyclerview", version.ref = "androidRecyclerView" }
-android-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "androidLifecycle" }
-android-lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "androidLifecycle" }
-android-lifecycle-runtimeCompose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "androidLifecycle" }
-android-fragment-ktx = { module = "androidx.fragment:fragment-ktx", version.ref = "androidFragment" }
-android-navigation-fragment-ktx = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "androidNavigation" }
-android-navigation-ui-ktx = { module = "androidx.navigation:navigation-ui-ktx", version.ref = "androidNavigation" }
-android-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "androidHiltNavigationCompose" }
-android-room-runtime = { module = "androidx.room:room-runtime", version.ref = "androidRoom" }
-android-room-ktx = { module = "androidx.room:room-ktx", version.ref = "androidRoom" }
-android-room-compiler = { module = "androidx.room:room-compiler", version.ref = "androidRoom" }
-android-startup-runtime = { module = "androidx.startup:startup-runtime", version.ref = "androidStartUp" }
-android-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "androidDataStore" }
-android-test-junit = { module = "androidx.test.ext:junit", version.ref = "androidTestJunit" }
-android-test-espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "androidTestEspresso" }
-android-test-runner = { module = "androidx.test:runner", version.ref = "androidTestRules" }
-android-test-rules = { module = "androidx.test:rules", version.ref = "androidTestRules" }
-android-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "androidComposeBom" }
-android-compose-material = { group = "androidx.compose.material", name = "material" }   # For using ModalBottomSheetLayout
-android-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
-android-compose-foundation = { group = "androidx.compose.foundation", name = "foundation" }
-android-compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
-android-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
-google-android-material = { module = "com.google.android.material:material", version.ref = "googleAndroidMaterial" }
-google-hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "googleHilt" }
-google-hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "googleHilt" }
-google-flexbox = { module = "com.google.android.flexbox:flexbox", version.ref = "googleFlexbox" }
+afollested-dragselectRecyclerView = { module = "com.afollestad:drag-select-recyclerview", version.ref = "afollestedDragselectRecyclerView" }
+android-gradle-plugin = { group = "com.android.tools.build", name = "gradle", version.ref = "androidGradlePlugin" }
+androidx-activity-compose = { group = "androidx.activity", name = "activity-compose" }
+androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "androidxAppCompat" }
+androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "androidxComposeBom" }
+androidx-compose-foundation = { group = "androidx.compose.foundation", name = "foundation" }
+androidx-compose-material = { group = "androidx.compose.material", name = "material" }   # For using ModalBottomSheetLayout
+androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
+androidx-compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
+androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
+androidx-constaintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "androidxConstaintLayout" }
+androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidxCoreKtx" }
+androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "androidxDataStore" }
+androidx-fragment-ktx = { module = "androidx.fragment:fragment-ktx", version.ref = "androidxFragment" }
+androidx-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "androidxHiltNavigationCompose" }
+androidx-lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "androidxLifecycle" }
+androidx-lifecycle-runtimeCompose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "androidxLifecycle" }
+androidx-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "androidxLifecycle" }
+androidx-navigation-fragment-ktx = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "androidxNavigation" }
+androidx-navigation-ui-ktx = { module = "androidx.navigation:navigation-ui-ktx", version.ref = "androidxNavigation" }
+androidx-recyclerview = { module = "androidx.recyclerview:recyclerview", version.ref = "androidxRecyclerView" }
+androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "androidxRoom" }
+androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "androidxRoom" }
+androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "androidxRoom" }
+androidx-startup-runtime = { module = "androidx.startup:startup-runtime", version.ref = "androidxStartUp" }
+androidx-test-espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "androidxTestEspresso" }
+androidx-test-junit = { module = "androidx.test.ext:junit", version.ref = "androidxTestJunit" }
+androidx-test-rules = { module = "androidx.test:rules", version.ref = "androidxTestRules" }
+androidx-test-runner = { module = "androidx.test:runner", version.ref = "androidxTestRules" }
 facebook-flipper = { module = "com.facebook.flipper:flipper", version.ref = "facebookFlipper" }
 facebook-flipper-leakcanary = { module = "com.facebook.flipper:flipper-leakcanary2-plugin", version.ref = "facebookFlipper" }
 facebook-soloader = { module = "com.facebook.soloader:soloader", version.ref = "facebookSoloader" }
+google-android-material = { module = "com.google.android.material:material", version.ref = "googleAndroidMaterial" }
+google-hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "googleHilt" }
+google-hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "googleHilt" }
+glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
+glide-compiler = { module = "com.github.bumptech.glide:compiler", version.ref = "glide" }
+javafaker = { module = "com.github.javafaker:javafaker", version.ref = "javafaker" }
+jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
+junit = { module = "junit:junit", version.ref = "junit" }
+kotlin-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlinCollectionsImmutable" }
+kotlin-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinCoroutine" }
+kotlin-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinCoroutine" }
+kotlin-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinCoroutine" }
+kotlin-gradle-plugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" } # Dependencies of the included build-logic
+mockito-inline = { module = "org.mockito:mockito-inline", version.ref = "mockitoInline" }
+mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockitoKotlin" }
 squeare-leakcanary = { module = "com.squareup.leakcanary:leakcanary-android", version.ref = "squareLeakcanary" }
 squeare-kotlinpoet = { module = "com.squareup:kotlinpoet", version.ref = "squareKotlinpoet" }
 squeare-kotlinpoet-metadata = { module = "com.squareup:kotlinpoet-metadata", version.ref = "squareKotlinpoet" }
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
-glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
-glide-compiler = { module = "com.github.bumptech.glide:compiler", version.ref = "glide" }
-jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
-afollested-dragselectRecyclerView = { module = "com.afollestad:drag-select-recyclerview", version.ref = "afollestedDragselectRecyclerView" }
-junit = { module = "junit:junit", version.ref = "junit" }
-mockito-inline = { module = "org.mockito:mockito-inline", version.ref = "mockitoInline" }
-mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockitoKotlin" }
-javafaker = { module = "com.github.javafaker:javafaker", version.ref = "javafaker" }
-
-# Dependencies of the included build-logic
-kotlin-gradle-plugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
-android-gradle-plugin = { group = "com.android.tools.build", name = "gradle", version.ref = "androidGradlePlugin" }
 
 [plugins]
-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
-android-navigation-safearges = { id = "androidx.navigation.safeargs.kotlin", version.ref = "androidNavigation" }
+androidx-navigation-safearges = { id = "androidx.navigation.safeargs.kotlin", version.ref = "androidxNavigation" }
 google-hilt = { id = "com.google.dagger.hilt.android", version.ref = "googleHilt" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }

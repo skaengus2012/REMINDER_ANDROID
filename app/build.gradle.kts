@@ -23,7 +23,7 @@ plugins {
     id("kotlin-parcelize")
     kotlin("kapt")
     alias(libs.plugins.google.hilt)
-    alias(libs.plugins.android.navigation.safearges)
+    alias(libs.plugins.androidx.navigation.safearges)
 }
 
 android {
@@ -80,7 +80,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = libs.versions.androidComposeCompiler.get()
+        kotlinCompilerExtensionVersion = libs.versions.androidxComposeCompiler.get()
     }
 }
 
@@ -92,32 +92,31 @@ dependencies {
     implementation(libs.kotlin.coroutines.android)
     implementation(libs.kotlin.collections.immutable)
 
-    implementation(libs.android.core.ktx)
-    implementation(libs.android.appcompat)
-    implementation(libs.android.constaintlayout)
-    implementation(libs.android.recyclerview)
-    implementation(libs.android.lifecycle.viewmodel.ktx)
-    implementation(libs.android.lifecycle.runtime.ktx)
-    implementation(libs.android.lifecycle.runtimeCompose)
-    implementation(libs.android.fragment.ktx)
-    implementation(libs.android.navigation.fragment.ktx)
-    implementation(libs.android.hilt.navigation.compose)
-    implementation(libs.android.navigation.ui.ktx)
-    implementation(libs.android.room.runtime)
-    implementation(libs.android.room.ktx)
-    kapt(libs.android.room.compiler)
-    implementation(libs.android.startup.runtime)
-    implementation(libs.android.datastore.preferences)
-    implementation(platform(libs.android.compose.bom))
-    implementation(libs.android.activity.compose)
-    implementation(libs.android.compose.material)
-    implementation(libs.android.compose.material3)
-    implementation(libs.android.compose.ui.tooling.preview)
-    debugImplementation(libs.android.compose.ui.tooling)
-    implementation(libs.android.compose.foundation)
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.constaintlayout)
+    implementation(libs.androidx.recyclerview)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.lifecycle.runtimeCompose)
+    implementation(libs.androidx.fragment.ktx)
+    implementation(libs.androidx.navigation.fragment.ktx)
+    implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.androidx.navigation.ui.ktx)
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    kapt(libs.androidx.room.compiler)
+    implementation(libs.androidx.startup.runtime)
+    implementation(libs.androidx.datastore.preferences)
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.compose.material)
+    implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.ui.tooling.preview)
+    debugImplementation(libs.androidx.compose.ui.tooling)
+    implementation(libs.androidx.compose.foundation)
 
     implementation(libs.google.android.material)
-    implementation(libs.google.flexbox)
     implementation(libs.google.hilt.android)
     kapt(libs.google.hilt.android.compiler)
 
@@ -144,10 +143,10 @@ dependencies {
     testImplementation(libs.javafaker)
     androidTestImplementation(libs.kotlin.coroutines.test)
     androidTestImplementation(libs.javafaker)
-    androidTestImplementation(libs.android.test.junit)
-    androidTestImplementation(libs.android.test.espresso.core)
-    androidTestImplementation(libs.android.test.runner)
-    androidTestImplementation(libs.android.test.rules)
+    androidTestImplementation(libs.androidx.test.junit)
+    androidTestImplementation(libs.androidx.test.espresso.core)
+    androidTestImplementation(libs.androidx.test.runner)
+    androidTestImplementation(libs.androidx.test.rules)
 }
 
 kapt {
