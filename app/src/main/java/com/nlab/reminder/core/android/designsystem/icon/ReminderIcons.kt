@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.android.designsystem.component
+package com.nlab.reminder.core.android.designsystem.icon
 
 /**
  * @author thalys
