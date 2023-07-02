@@ -189,7 +189,7 @@ private fun HomeScreen(
                         }
                     )
                     if (workflow.shouldKeyboardShown) {
-                        LaunchedEffect(Unit) { onTagRenameKeyboardShown() }
+                        SideEffect { onTagRenameKeyboardShown() }
                     }
                 }
 
