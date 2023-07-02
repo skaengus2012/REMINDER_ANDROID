@@ -323,12 +323,6 @@ private fun BottomContent(
     homeContentScrollState: ScrollState,
     modifier: Modifier = Modifier,
 ) {
-    /**
-                isPushOn = isPushOn.not()
-                deleteTag = DeleteTagEvent(Tag(tagId = 1, name = "삭제시도중.."))*/
-    /**
-                isPushOn = isPushOn.not()
-                deleteTag = DeleteTagEvent(Tag(tagId = 1, name = "삭제시도중.."))*/
     BottomContainer(
         contentPaddingBottom = homeContentPaddingBottom,
         contentScrollState = homeContentScrollState,
@@ -343,15 +337,6 @@ private fun BottomContent(
             }
         )
 
-        /**
-                isPushOn = isPushOn.not()
-                deleteTag = DeleteTagEvent(Tag(tagId = 1, name = "삭제시도중.."))*/
-        /**
-                isPushOn = isPushOn.not()
-                deleteTag = DeleteTagEvent(Tag(tagId = 1, name = "삭제시도중.."))*/
-        /**
-                isPushOn = isPushOn.not()
-                deleteTag = DeleteTagEvent(Tag(tagId = 1, name = "삭제시도중.."))*/
         TimePushSwitchButton(
             isPushOn = true,
             modifier = Modifier
