@@ -34,7 +34,7 @@ internal sealed interface HomeUiState : State {
         val timetableScheduleCount: Long,
         val allScheduleCount: Long,
         val tags: ImmutableList<Tag>,
-        val workflow: HomeWorkflow? = null,
+        val workflow: HomeWorkflow,
         val userMessages: PersistentList<UserMessage>
     ) : HomeUiState
 }

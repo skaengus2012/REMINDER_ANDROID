@@ -24,6 +24,7 @@ import com.nlab.reminder.domain.common.data.model.TagUsageCount
  * @author thalys
  */
 internal sealed interface HomeWorkflow {
+    object Empty : HomeWorkflow
     object TodaySchedule : HomeWorkflow
     object TimetableSchedule : HomeWorkflow
     object AllSchedule : HomeWorkflow

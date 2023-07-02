@@ -35,7 +35,7 @@ private typealias DomainReducer = Reducer<HomeAction, HomeUiState>
  */
 internal class HomeReducer @Inject constructor() : DomainReducer by buildDslReducer(defineDSL = {
     state<HomeUiState.Success> {
-        action<HomeAction.CompleteWorkflow> { (_, before) -> before.copy(workflow = null) }
+        action<HomeAction.CompleteWorkflow> { (_, before) -> before.copy(workflow = HomeWorkflow.Empty) }
         action<HomeAction.UserMessageShown> { (action, before) ->
             before.copy(
                 userMessages = before
@@ -98,7 +98,7 @@ internal class HomeReducer @Inject constructor() : DomainReducer by buildDslRedu
                 timetableScheduleCount = action.timetableSchedulesCount,
                 allScheduleCount = action.allSchedulesCount,
                 tags = action.tags.toImmutableList(),
-                workflow = null,
+                workflow = HomeWorkflow.Empty,
                 userMessages = persistentListOf()
             )
         }
@@ -117,7 +117,7 @@ internal class HomeReducer @Inject constructor() : DomainReducer by buildDslRedu
 @ExcludeFromGeneratedTestReport
 private inline fun HomeUiState.Success.mapIfWorkflowEmpty(
     transform: (HomeUiState.Success) -> HomeUiState
-): HomeUiState = if (workflow == null) transform(this) else this
+): HomeUiState = if (workflow is HomeWorkflow.Empty) transform(this) else this
 
 @TestComplete
 @ExcludeFromGeneratedTestReport

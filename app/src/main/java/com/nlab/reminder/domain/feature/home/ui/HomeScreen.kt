@@ -152,19 +152,12 @@ private fun HomeScreen(
                 )
             }
 
+            BackHandler(enabled = sheetState.isVisible) {
+                coroutineScope.launch { sheetState.hide() }
+            }
+
             when (val workflow = curUi.workflow) {
-                is HomeWorkflow.TodaySchedule,
-                is HomeWorkflow.TimetableSchedule -> {
-                    LaunchedEffect(workflow) { completeWorkflow() }
-                }
-
-                is HomeWorkflow.AllSchedule -> {
-                    LaunchedEffect(workflow) {
-                        completeWorkflow()
-                        navigateToAllScheduleEnd()
-                    }
-                }
-
+                is HomeWorkflow.Empty -> {}
                 is HomeWorkflow.TagConfig -> {
                     HomeTagConfigDialog(
                         tagName = workflow.tag.name,
@@ -200,11 +193,12 @@ private fun HomeScreen(
                     }
                 }
 
-                null -> {}
-            }
-
-            BackHandler(enabled = sheetState.isVisible) {
-                coroutineScope.launch { sheetState.hide() }
+                else -> {
+                    LaunchedEffect(workflow) {
+                        completeWorkflow()
+                        if (workflow is HomeWorkflow.AllSchedule) navigateToAllScheduleEnd()
+                    }
+                }
             }
         }
     }
@@ -372,6 +366,7 @@ private fun HomeContentPreview() {
                 tags = (0L..100)
                     .map { index -> Tag(tagId = index, name = "TagName $index") }
                     .toImmutableList(),
+                workflow = HomeWorkflow.Empty,
                 userMessages = persistentListOf()
             ),
             modifier = Modifier.fillMaxSize()
