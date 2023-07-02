@@ -36,16 +36,13 @@ import org.junit.Test
  */
 internal class HomeReducerTest {
     @Test
-    fun testScreenShown() = runTest {
-        val actionConditions = setOf(HomeAction.WorkflowComplete)
+    fun testCompleteWorkflow() = runTest {
         val initState = genHomeUiStateSuccess(workflow = genHomeWorkflow())
-        actionConditions.forEach { action ->
-            testReduce(
-                action = action,
-                initState = initState,
-                expectedState = initState.copy(workflow = null)
-            )
-        }
+        testReduce(
+            action = HomeAction.CompleteWorkflow,
+            initState = initState,
+            expectedState = initState.copy(workflow = null)
+        )
     }
 
     @Test

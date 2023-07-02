@@ -82,7 +82,7 @@ internal fun HomeRoot(
         onTagRenameConfirmClicked = viewModel::onTagRenameConfirmClicked,
         onTagDeleteRequestClicked = viewModel::onTagDeleteRequestClicked,
         onTagDeleteConfirmClicked = viewModel::onTagDeleteConfirmClicked,
-        onPageShown = viewModel::workflowComplete,
+        completeWorkflow = viewModel::completeWorkflow,
         navigateToAllScheduleEnd = navigateToAllScheduleEnd
     )
 }
@@ -101,7 +101,7 @@ private fun HomeScreen(
     onTagRenameConfirmClicked: () -> Unit,
     onTagDeleteRequestClicked: () -> Unit,
     onTagDeleteConfirmClicked: () -> Unit,
-    onPageShown: () -> Unit,
+    completeWorkflow: () -> Unit,
     navigateToAllScheduleEnd: () -> Unit
 ) {
     val windowModifier = Modifier
@@ -140,7 +140,7 @@ private fun HomeScreen(
                         )
                     }
                 },
-                onHide = onPageShown
+                onHide = completeWorkflow
             ) {
                 HomeContent(
                     uiState = curUi,
@@ -155,12 +155,12 @@ private fun HomeScreen(
             when (val workflow = curUi.workflow) {
                 is HomeWorkflow.TodaySchedule,
                 is HomeWorkflow.TimetableSchedule -> {
-                    LaunchedEffect(workflow) { onPageShown() }
+                    LaunchedEffect(workflow) { completeWorkflow() }
                 }
 
                 is HomeWorkflow.AllSchedule -> {
                     LaunchedEffect(workflow) {
-                        onPageShown()
+                        completeWorkflow()
                         navigateToAllScheduleEnd()
                     }
                 }
@@ -169,7 +169,7 @@ private fun HomeScreen(
                     HomeTagConfigDialog(
                         tagName = workflow.tag.name,
                         usageCount = workflow.usageCount,
-                        onDismiss = onPageShown,
+                        onDismiss = completeWorkflow,
                         onRenameRequestClicked = onTagRenameRequestClicked,
                         onDeleteRequestClicked = onTagDeleteRequestClicked
                     )
@@ -181,11 +181,11 @@ private fun HomeScreen(
                         tagName = workflow.tag.name,
                         usageCount = workflow.usageCount,
                         shouldKeyboardShown = workflow.shouldKeyboardShown,
-                        onCancel = onPageShown,
+                        onCancel = completeWorkflow,
                         onTextChanged = onTagRenameTextChanged,
                         onConfirm = {
                             onTagRenameConfirmClicked()
-                            onPageShown()
+                            completeWorkflow()
                         }
                     )
                     if (workflow.shouldKeyboardShown) {

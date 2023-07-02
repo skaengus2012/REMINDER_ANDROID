@@ -35,7 +35,7 @@ internal sealed interface HomeAction : Action {
     ) : HomeAction
 
     @ContractUiAction
-    object WorkflowComplete : HomeAction
+    object CompleteWorkflow : HomeAction
 
     @ContractUiAction
     data class UserMessageShown(val shownMessage: UserMessage) : HomeAction
