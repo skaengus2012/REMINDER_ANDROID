@@ -32,7 +32,7 @@ internal fun genHomeUiStateSuccess(
     timetableScheduleCount: Long = genLong(),
     allScheduleCount: Long = genLong(),
     tags: List<Tag> = genTags(),
-    workflow: HomeWorkflow? = genHomeWorkflow(),
+    workflow: HomeWorkflow = genHomeWorkflowExcludeEmpty(),
     userMessages: List<UserMessage> = emptyList()
 ): HomeUiState.Success = HomeUiState.Success(
     todayScheduleCount = todayScheduleCount,
@@ -61,7 +61,7 @@ internal fun genHomeTagDeleteConfig(
     usageCount: TagUsageCount = genTagUsageCount(),
 ) = HomeWorkflow.TagDelete(tag, usageCount)
 
-private fun genHomeWorkflows(): List<HomeWorkflow> = listOf(
+private fun genHomeWorkflowsExcludeEmpty(): List<HomeWorkflow> = listOf(
     HomeWorkflow.TodaySchedule,
     HomeWorkflow.TimetableSchedule,
     HomeWorkflow.AllSchedule,
@@ -70,7 +70,7 @@ private fun genHomeWorkflows(): List<HomeWorkflow> = listOf(
     genHomeTagDeleteConfig()
 )
 
-internal fun genHomeWorkflow(ignoreCases: Set<KClass<out HomeWorkflow>> = emptySet()): HomeWorkflow =
-    genHomeWorkflows()
+internal fun genHomeWorkflowExcludeEmpty(ignoreCases: Set<KClass<out HomeWorkflow>> = emptySet()): HomeWorkflow =
+    genHomeWorkflowsExcludeEmpty()
         .filterNot { it::class in ignoreCases }
         .random()

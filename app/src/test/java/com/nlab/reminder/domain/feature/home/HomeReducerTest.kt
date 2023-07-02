@@ -36,16 +36,13 @@ import org.junit.Test
  */
 internal class HomeReducerTest {
     @Test
-    fun testScreenShown() = runTest {
-        val actionConditions = setOf(HomeAction.WorkflowComplete)
-        val initState = genHomeUiStateSuccess(workflow = genHomeWorkflow())
-        actionConditions.forEach { action ->
-            testReduce(
-                action = action,
-                initState = initState,
-                expectedState = initState.copy(workflow = null)
-            )
-        }
+    fun testCompleteWorkflow() = runTest {
+        val initState = genHomeUiStateSuccess(workflow = genHomeWorkflowExcludeEmpty())
+        testReduce(
+            action = HomeAction.CompleteWorkflow,
+            initState = initState,
+            expectedState = initState.copy(workflow = HomeWorkflow.Empty)
+        )
     }
 
     @Test
@@ -74,7 +71,7 @@ internal class HomeReducerTest {
 
     @Test
     fun `Workflow not changed, when workflow exists`() = runTest {
-        val initState = genHomeUiStateSuccess(workflow = genHomeWorkflow())
+        val initState = genHomeUiStateSuccess(workflow = genHomeWorkflowExcludeEmpty())
         testReduce(
             action = HomeAction.OnTodayCategoryClicked,
             initState = initState,
@@ -84,7 +81,7 @@ internal class HomeReducerTest {
 
     @Test
     fun `Today's schedule was shown, when today category clicked`() = runTest {
-        val initState = genHomeUiStateSuccess(workflow = null)
+        val initState = genHomeUiStateSuccess(workflow = HomeWorkflow.Empty)
         testReduce(
             action = HomeAction.OnTodayCategoryClicked,
             initState = initState,
@@ -94,7 +91,7 @@ internal class HomeReducerTest {
 
     @Test
     fun `Timetable's schedule was shown, when timetable category clicked`() = runTest {
-        val initState = genHomeUiStateSuccess(workflow = null)
+        val initState = genHomeUiStateSuccess(workflow = HomeWorkflow.Empty)
         testReduce(
             action = HomeAction.OnTimetableCategoryClicked,
             initState = initState,
@@ -104,7 +101,7 @@ internal class HomeReducerTest {
 
     @Test
     fun `All's schedule was shown, when all category clicked`() = runTest {
-        val initState = genHomeUiStateSuccess(workflow = null)
+        val initState = genHomeUiStateSuccess(workflow = HomeWorkflow.Empty)
         testReduce(
             action = HomeAction.OnAllCategoryClicked,
             initState = initState,
@@ -118,7 +115,7 @@ internal class HomeReducerTest {
         testReduce(
             action = expectedState.toSummaryLoaded(),
             initState = HomeUiState.Loading,
-            expectedState = expectedState.copy(workflow = null)
+            expectedState = expectedState.copy(workflow = HomeWorkflow.Empty)
         )
     }
 
@@ -136,7 +133,7 @@ internal class HomeReducerTest {
     fun `Tag config workflow set, when tag metadata loaded`() = runTest {
         val tag = genTag()
         val usageCount = genTagUsageCount()
-        val initState = genHomeUiStateSuccess(tags = listOf(tag), workflow = null)
+        val initState = genHomeUiStateSuccess(tags = listOf(tag), workflow = HomeWorkflow.Empty)
         testReduce(
             action = HomeAction.TagConfigMetadataLoaded(tag, usageCount),
             initState = initState,
@@ -150,7 +147,7 @@ internal class HomeReducerTest {
         val initState = genHomeUiStateSuccess(
             tags = emptyList(),
             userMessages = emptyList(),
-            workflow = null
+            workflow = HomeWorkflow.Empty
         )
         testReduce(
             action = HomeAction.TagConfigMetadataLoaded(tag, genTagUsageCount()),
@@ -186,7 +183,7 @@ internal class HomeReducerTest {
     @Test
     fun `Nothing happened, when tag rename request clicked, but tagConfig workflow not set`() = runTest {
         val initState = genHomeUiStateSuccess(
-            workflow = genHomeWorkflow(ignoreCases = setOf(HomeWorkflow.TagConfig::class))
+            workflow = genHomeWorkflowExcludeEmpty(ignoreCases = setOf(HomeWorkflow.TagConfig::class))
         )
         testReduce(
             action = HomeAction.OnTagRenameRequestClicked,
@@ -211,7 +208,7 @@ internal class HomeReducerTest {
     @Test
     fun `Nothing happened, when keyboard shown, but tagRename workflow not set`() = runTest {
         val initState = genHomeUiStateSuccess(
-            workflow = genHomeWorkflow(ignoreCases = setOf(HomeWorkflow.TagRename::class))
+            workflow = genHomeWorkflowExcludeEmpty(ignoreCases = setOf(HomeWorkflow.TagRename::class))
         )
         testReduce(
             action = HomeAction.OnTagRenameInputKeyboardShown,
@@ -235,7 +232,7 @@ internal class HomeReducerTest {
     @Test
     fun `Nothing happened, when tag rename text inputted, but tagRename workflow not set`() = runTest {
         val initState = genHomeUiStateSuccess(
-            workflow = genHomeWorkflow(ignoreCases = setOf(HomeWorkflow.TagRename::class))
+            workflow = genHomeWorkflowExcludeEmpty(ignoreCases = setOf(HomeWorkflow.TagRename::class))
         )
         testReduce(
             action = HomeAction.OnTagRenameInputKeyboardShown,
@@ -267,7 +264,7 @@ internal class HomeReducerTest {
     @Test
     fun `Nothing happened, when tag delete request clicked, but tagConfig workflow not set`() = runTest {
         val initState = genHomeUiStateSuccess(
-            workflow = genHomeWorkflow(ignoreCases = setOf(HomeWorkflow.TagConfig::class))
+            workflow = genHomeWorkflowExcludeEmpty(ignoreCases = setOf(HomeWorkflow.TagConfig::class))
         )
         testReduce(
             action = HomeAction.OnTagDeleteRequestClicked,

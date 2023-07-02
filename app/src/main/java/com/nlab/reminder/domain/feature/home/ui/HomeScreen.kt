@@ -39,6 +39,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -50,10 +51,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nlab.reminder.R
 import com.nlab.reminder.core.android.compose.runtime.LoadedContent
+import com.nlab.reminder.core.android.compose.runtime.UserMessageEffect
 import com.nlab.reminder.core.android.compose.runtime.rememberDelayedVisibleState
 import com.nlab.reminder.core.android.designsystem.component.ThemeBottomSheetLayout
 import com.nlab.reminder.core.android.designsystem.component.ThemeLoadingIndicator
 import com.nlab.reminder.core.android.designsystem.theme.ReminderTheme
+import com.nlab.reminder.core.state.UserMessage
+import com.nlab.reminder.domain.common.android.widget.showToast
 import com.nlab.reminder.domain.common.data.model.Tag
 import com.nlab.reminder.domain.common.tag.ui.TagDeleteBottomSheetContent
 import com.nlab.reminder.domain.common.tag.ui.TagRenameDialog
@@ -82,7 +86,8 @@ internal fun HomeRoot(
         onTagRenameConfirmClicked = viewModel::onTagRenameConfirmClicked,
         onTagDeleteRequestClicked = viewModel::onTagDeleteRequestClicked,
         onTagDeleteConfirmClicked = viewModel::onTagDeleteConfirmClicked,
-        onPageShown = viewModel::workflowComplete,
+        completeWorkflow = viewModel::completeWorkflow,
+        userMessageShown = viewModel::userMessageShown,
         navigateToAllScheduleEnd = navigateToAllScheduleEnd
     )
 }
@@ -101,7 +106,8 @@ private fun HomeScreen(
     onTagRenameConfirmClicked: () -> Unit,
     onTagDeleteRequestClicked: () -> Unit,
     onTagDeleteConfirmClicked: () -> Unit,
-    onPageShown: () -> Unit,
+    completeWorkflow: () -> Unit,
+    userMessageShown: (UserMessage) -> Unit,
     navigateToAllScheduleEnd: () -> Unit
 ) {
     val windowModifier = Modifier
@@ -119,6 +125,7 @@ private fun HomeScreen(
         }
 
         is HomeUiState.Success -> LoadedContent(isDelay = loadingVisibleState.value) {
+            val context = LocalContext.current
             val coroutineScope = rememberCoroutineScope()
             val sheetState = rememberModalBottomSheetState(
                 initialValue = ModalBottomSheetValue.Hidden,
@@ -140,7 +147,7 @@ private fun HomeScreen(
                         )
                     }
                 },
-                onHide = onPageShown
+                onHide = completeWorkflow
             ) {
                 HomeContent(
                     uiState = curUi,
@@ -152,24 +159,21 @@ private fun HomeScreen(
                 )
             }
 
+            BackHandler(enabled = sheetState.isVisible) {
+                coroutineScope.launch { sheetState.hide() }
+            }
+
+            UserMessageEffect(messages = curUi.userMessages, onMessageReleased = userMessageShown) {
+                context.showToast(displayMessage)
+            }
+
             when (val workflow = curUi.workflow) {
-                is HomeWorkflow.TodaySchedule,
-                is HomeWorkflow.TimetableSchedule -> {
-                    LaunchedEffect(workflow) { onPageShown() }
-                }
-
-                is HomeWorkflow.AllSchedule -> {
-                    LaunchedEffect(workflow) {
-                        onPageShown()
-                        navigateToAllScheduleEnd()
-                    }
-                }
-
+                is HomeWorkflow.Empty -> {}
                 is HomeWorkflow.TagConfig -> {
                     HomeTagConfigDialog(
                         tagName = workflow.tag.name,
                         usageCount = workflow.usageCount,
-                        onDismiss = onPageShown,
+                        onDismiss = completeWorkflow,
                         onRenameRequestClicked = onTagRenameRequestClicked,
                         onDeleteRequestClicked = onTagDeleteRequestClicked
                     )
@@ -181,15 +185,15 @@ private fun HomeScreen(
                         tagName = workflow.tag.name,
                         usageCount = workflow.usageCount,
                         shouldKeyboardShown = workflow.shouldKeyboardShown,
-                        onCancel = onPageShown,
+                        onCancel = completeWorkflow,
                         onTextChanged = onTagRenameTextChanged,
                         onConfirm = {
                             onTagRenameConfirmClicked()
-                            onPageShown()
+                            completeWorkflow()
                         }
                     )
                     if (workflow.shouldKeyboardShown) {
-                        LaunchedEffect(Unit) { onTagRenameKeyboardShown() }
+                        SideEffect { onTagRenameKeyboardShown() }
                     }
                 }
 
@@ -200,11 +204,12 @@ private fun HomeScreen(
                     }
                 }
 
-                null -> {}
-            }
-
-            BackHandler(enabled = sheetState.isVisible) {
-                coroutineScope.launch { sheetState.hide() }
+                else -> {
+                    LaunchedEffect(workflow) {
+                        completeWorkflow()
+                        if (workflow is HomeWorkflow.AllSchedule) navigateToAllScheduleEnd()
+                    }
+                }
             }
         }
     }
@@ -323,12 +328,6 @@ private fun BottomContent(
     homeContentScrollState: ScrollState,
     modifier: Modifier = Modifier,
 ) {
-    /**
-                isPushOn = isPushOn.not()
-                deleteTag = DeleteTagEvent(Tag(tagId = 1, name = "삭제시도중.."))*/
-    /**
-                isPushOn = isPushOn.not()
-                deleteTag = DeleteTagEvent(Tag(tagId = 1, name = "삭제시도중.."))*/
     BottomContainer(
         contentPaddingBottom = homeContentPaddingBottom,
         contentScrollState = homeContentScrollState,
@@ -343,15 +342,6 @@ private fun BottomContent(
             }
         )
 
-        /**
-                isPushOn = isPushOn.not()
-                deleteTag = DeleteTagEvent(Tag(tagId = 1, name = "삭제시도중.."))*/
-        /**
-                isPushOn = isPushOn.not()
-                deleteTag = DeleteTagEvent(Tag(tagId = 1, name = "삭제시도중.."))*/
-        /**
-                isPushOn = isPushOn.not()
-                deleteTag = DeleteTagEvent(Tag(tagId = 1, name = "삭제시도중.."))*/
         TimePushSwitchButton(
             isPushOn = true,
             modifier = Modifier
@@ -387,6 +377,7 @@ private fun HomeContentPreview() {
                 tags = (0L..100)
                     .map { index -> Tag(tagId = index, name = "TagName $index") }
                     .toImmutableList(),
+                workflow = HomeWorkflow.Empty,
                 userMessages = persistentListOf()
             ),
             modifier = Modifier.fillMaxSize()

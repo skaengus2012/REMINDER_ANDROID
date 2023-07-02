@@ -108,7 +108,7 @@ internal class HomeInterceptorTest {
     fun `Failed rename tag, when renameTagConfig was not set`() = runTest {
         dispatchWithInterceptor(
             initState = genHomeUiStateSuccess(
-                workflow = genHomeWorkflow(ignoreCases = setOf(HomeWorkflow.TagRename::class))
+                workflow = genHomeWorkflowExcludeEmpty(ignoreCases = setOf(HomeWorkflow.TagRename::class))
             ),
             action = HomeAction.OnTagRenameConfirmClicked,
         )
@@ -132,7 +132,7 @@ internal class HomeInterceptorTest {
     fun `Failed delete tag, when deleteTagConfig was not set`() = runTest {
         dispatchWithInterceptor(
             initState = genHomeUiStateSuccess(
-                workflow = genHomeWorkflow(ignoreCases = setOf(HomeWorkflow.TagDelete::class))
+                workflow = genHomeWorkflowExcludeEmpty(ignoreCases = setOf(HomeWorkflow.TagDelete::class))
             ),
             action = HomeAction.OnTagDeleteConfirmClicked,
         )
