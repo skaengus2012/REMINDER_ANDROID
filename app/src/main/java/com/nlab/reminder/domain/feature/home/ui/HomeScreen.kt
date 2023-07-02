@@ -39,6 +39,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -50,10 +51,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nlab.reminder.R
 import com.nlab.reminder.core.android.compose.runtime.LoadedContent
+import com.nlab.reminder.core.android.compose.runtime.UserMessageEffect
 import com.nlab.reminder.core.android.compose.runtime.rememberDelayedVisibleState
 import com.nlab.reminder.core.android.designsystem.component.ThemeBottomSheetLayout
 import com.nlab.reminder.core.android.designsystem.component.ThemeLoadingIndicator
 import com.nlab.reminder.core.android.designsystem.theme.ReminderTheme
+import com.nlab.reminder.core.state.UserMessage
+import com.nlab.reminder.domain.common.android.widget.showToast
 import com.nlab.reminder.domain.common.data.model.Tag
 import com.nlab.reminder.domain.common.tag.ui.TagDeleteBottomSheetContent
 import com.nlab.reminder.domain.common.tag.ui.TagRenameDialog
@@ -83,6 +87,7 @@ internal fun HomeRoot(
         onTagDeleteRequestClicked = viewModel::onTagDeleteRequestClicked,
         onTagDeleteConfirmClicked = viewModel::onTagDeleteConfirmClicked,
         completeWorkflow = viewModel::completeWorkflow,
+        userMessageShown = viewModel::userMessageShown,
         navigateToAllScheduleEnd = navigateToAllScheduleEnd
     )
 }
@@ -102,6 +107,7 @@ private fun HomeScreen(
     onTagDeleteRequestClicked: () -> Unit,
     onTagDeleteConfirmClicked: () -> Unit,
     completeWorkflow: () -> Unit,
+    userMessageShown: (UserMessage) -> Unit,
     navigateToAllScheduleEnd: () -> Unit
 ) {
     val windowModifier = Modifier
@@ -119,6 +125,7 @@ private fun HomeScreen(
         }
 
         is HomeUiState.Success -> LoadedContent(isDelay = loadingVisibleState.value) {
+            val context = LocalContext.current
             val coroutineScope = rememberCoroutineScope()
             val sheetState = rememberModalBottomSheetState(
                 initialValue = ModalBottomSheetValue.Hidden,
@@ -154,6 +161,10 @@ private fun HomeScreen(
 
             BackHandler(enabled = sheetState.isVisible) {
                 coroutineScope.launch { sheetState.hide() }
+            }
+
+            UserMessageEffect(messages = curUi.userMessages, onMessageReleased = userMessageShown) {
+                context.showToast(displayMessage)
             }
 
             when (val workflow = curUi.workflow) {

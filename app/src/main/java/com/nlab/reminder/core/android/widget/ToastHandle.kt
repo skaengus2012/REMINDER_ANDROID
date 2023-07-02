@@ -28,8 +28,12 @@ import androidx.annotation.StringRes
 class ToastHandle(private val context: Context) {
     private var curToast: Toast? = null
 
-    fun showToast(@StringRes stringResource: Int) {
-        showToast { Toast.makeText(context, stringResource, Toast.LENGTH_SHORT) }
+    fun showToast(@StringRes resId: Int) {
+        showToast { Toast.makeText(context, resId, Toast.LENGTH_SHORT) }
+    }
+
+    fun showToast(text: String) {
+        showToast { Toast.makeText(context, text, Toast.LENGTH_SHORT) }
     }
 
     private inline fun showToast(crossinline getToast: () -> Toast) {

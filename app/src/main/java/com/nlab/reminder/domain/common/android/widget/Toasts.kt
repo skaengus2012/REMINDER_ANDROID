@@ -11,3 +11,9 @@ fun Context.showToast(@StringRes stringResource: Int) {
         .toastHandle()
         .showToast(stringResource)
 }
+
+fun Context.showToast(text: String) {
+    widgetEntryPoint()
+        .toastHandle()
+        .showToast(text)
+}
