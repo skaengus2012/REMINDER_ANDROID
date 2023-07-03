@@ -13,24 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nlab.reminder.core.state
 
-import androidx.annotation.StringRes
-import com.nlab.reminder.core.util.test.annotation.ExcludeFromGeneratedTestReport
-import kotlinx.collections.immutable.*
+package com.nlab.reminder.core.state
 
 /**
  * @author Doohyun
  */
-@Stable
-sealed interface UserMessage {
-    @ExcludeFromGeneratedTestReport
-    @JvmInline
-    value class ResIdValue(@StringRes val value: Int) : UserMessage
-}
-
-fun UserMessage(@StringRes value: Int): UserMessage = UserMessage.ResIdValue(value)
-
-fun PersistentList<UserMessage>.userMessageShown(
-    shownMessage: UserMessage
-): PersistentList<UserMessage> = this - shownMessage
+typealias Stable = androidx.compose.runtime.Stable

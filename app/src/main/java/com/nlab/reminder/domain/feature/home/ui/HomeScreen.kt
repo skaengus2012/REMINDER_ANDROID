@@ -51,7 +51,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nlab.reminder.R
 import com.nlab.reminder.core.android.compose.runtime.LoadedContent
-import com.nlab.reminder.core.android.compose.runtime.UserMessageEffect
+import com.nlab.reminder.core.android.compose.runtime.UserMessageHandler
 import com.nlab.reminder.core.android.compose.runtime.rememberDelayedVisibleState
 import com.nlab.reminder.core.android.designsystem.component.ThemeBottomSheetLayout
 import com.nlab.reminder.core.android.designsystem.component.ThemeLoadingIndicator
@@ -163,7 +163,7 @@ private fun HomeScreen(
                 coroutineScope.launch { sheetState.hide() }
             }
 
-            UserMessageEffect(messages = curUi.userMessages, onMessageReleased = userMessageShown) {
+            UserMessageHandler(messages = curUi.userMessages, onMessageReleased = userMessageShown) {
                 context.showToast(displayMessage)
             }
 

@@ -16,6 +16,7 @@
 
 package com.nlab.reminder.domain.feature.home
 
+import com.nlab.reminder.core.state.Stable
 import com.nlab.reminder.core.state.UserMessage
 import com.nlab.reminder.core.util.test.annotation.ExcludeFromGeneratedTestReport
 import com.nlab.reminder.domain.common.data.model.Tag
@@ -25,6 +26,7 @@ import kotlinx.collections.immutable.*
 /**
  * @author Doohyun
  */
+@Stable
 internal sealed interface HomeUiState : State {
     object Loading : HomeUiState
 
