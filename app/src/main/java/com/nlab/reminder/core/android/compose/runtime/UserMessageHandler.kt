@@ -25,21 +25,19 @@ import com.nlab.reminder.core.state.UserMessage
  * @author Doohyun
  */
 @Composable
-fun UserMessageEffect(
+inline fun UserMessageHandler(
     messages: List<UserMessage>,
-    onMessageReleased: (UserMessage) -> Unit,
-    block: suspend UserMessageEffectScope.() -> Unit
+    crossinline onMessageReleased: (UserMessage) -> Unit,
+    crossinline block: suspend UserMessageEffectScope.() -> Unit
 ) {
-    val context = LocalContext.current
-    messages.firstOrNull()?.let { userMessage ->
-        LaunchedEffect(userMessage) {
-            val scope = UserMessageEffectScope(
-                displayMessage = when (userMessage) {
-                    is UserMessage.ResIdValue -> context.getString(userMessage.value)
-                }
-            )
-            block(scope)
-            onMessageReleased(userMessage)
+    messages.firstOrNull()?.let { message ->
+        val context = LocalContext.current
+        LaunchedEffect(message) {
+            val displayMessage = when (message) {
+                is UserMessage.ResIdValue -> context.getString(message.value)
+            }
+            block(UserMessageEffectScope(displayMessage))
+            onMessageReleased(message)
         }
     }
 }
