@@ -33,4 +33,9 @@
         <item name="bg_schedule_placeholder">@color/bg_schedule_placeholder_dark</item>
         <item name="tint_schedule_placeholder">@color/tint_schedule_placeholder_dark</item>
     </style>
+
+    <style name="AppSplashScreen" parent="AppSplashScreenBase">
+        <item name="windowSplashScreenBackground">@android:color/black</item>
+    </style>
+
 </resources>
