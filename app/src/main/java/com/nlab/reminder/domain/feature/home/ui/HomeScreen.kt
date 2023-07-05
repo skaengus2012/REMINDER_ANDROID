@@ -267,7 +267,7 @@ private fun HomeItems(
     onTagLongClicked: (Tag) -> Unit = {},
 ) {
     Column(modifier = modifier) {
-        Logo(modifier = Modifier.padding(top = 37.dp))
+        Logo(modifier = Modifier.padding(top = 32.dp))
         HomeTitle(
             textRes = R.string.home_category_header,
             modifier = Modifier.padding(top = 42.5.dp)
@@ -300,8 +300,8 @@ private fun HomeItems(
 private fun Logo(modifier: Modifier = Modifier) {
     Icon(
         modifier = modifier
-            .width(126.dp)
-            .height(25.dp),
+            .width(120.dp)
+            .height(30.dp),
         painter = painterResource(id = R.drawable.ic_logo),
         contentDescription = null,
         tint = ReminderTheme.colors.font1
