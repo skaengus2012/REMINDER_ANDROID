@@ -14,18 +14,17 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.internal.common.android.database
+package com.nlab.reminder.domain.common.data.repository.infra
 
-import androidx.room.ColumnInfo
-import androidx.room.Entity
+import com.nlab.reminder.domain.common.data.repository.TimestampRepository
+import java.util.Calendar
+import javax.inject.Inject
 
 /**
  * @author thalys
  */
-@Entity(tableName = "link_metadata", primaryKeys = ["link"])
-data class LinkMetadataEntity(
-    @ColumnInfo(name = "link") val link: String,
-    @ColumnInfo(name = "title") val title: String,
-    @ColumnInfo(name = "imageUrl") val imageUrl: String,
-    @ColumnInfo(name = "timestamp") val timestamp: Long
-)
+class DefaultTimestampRepository @Inject constructor() : TimestampRepository {
+    override fun get(): Long {
+        return Calendar.getInstance().timeInMillis
+    }
+}

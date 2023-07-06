@@ -32,6 +32,7 @@ import kotlinx.coroutines.launch
 /**
  * @author thalys
  */
+@Deprecated("삭제 예정")
 class LocalCachedLinkMetadataTableRepository(
     private val linkMetadataRepository: LinkMetadataRepository,
     private val linkMetadataDao: LinkMetadataDao,

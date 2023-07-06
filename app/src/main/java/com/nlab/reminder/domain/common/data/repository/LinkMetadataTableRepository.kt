@@ -14,18 +14,17 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.internal.common.android.database
+package com.nlab.reminder.domain.common.data.repository
 
-import androidx.room.ColumnInfo
-import androidx.room.Entity
+import com.nlab.reminder.domain.common.data.model.Link
+import com.nlab.reminder.domain.common.data.model.LinkMetadataTable
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.Flow
 
 /**
  * @author thalys
  */
-@Entity(tableName = "link_metadata", primaryKeys = ["link"])
-data class LinkMetadataEntity(
-    @ColumnInfo(name = "link") val link: String,
-    @ColumnInfo(name = "title") val title: String,
-    @ColumnInfo(name = "imageUrl") val imageUrl: String,
-    @ColumnInfo(name = "timestamp") val timestamp: Long
-)
+interface LinkMetadataTableRepository {
+    fun fetch(links: List<Link>)
+    fun get(): Flow<LinkMetadataTable>
+}

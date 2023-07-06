@@ -14,18 +14,12 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.internal.common.android.database
+package com.nlab.reminder.domain.common.data.model
 
-import androidx.room.ColumnInfo
-import androidx.room.Entity
+import com.nlab.reminder.core.util.test.annotation.ExcludeFromGeneratedTestReport
 
 /**
  * @author thalys
  */
-@Entity(tableName = "link_metadata", primaryKeys = ["link"])
-data class LinkMetadataEntity(
-    @ColumnInfo(name = "link") val link: String,
-    @ColumnInfo(name = "title") val title: String,
-    @ColumnInfo(name = "imageUrl") val imageUrl: String,
-    @ColumnInfo(name = "timestamp") val timestamp: Long
-)
+@ExcludeFromGeneratedTestReport
+data class LinkMetadata(val title: String, val imageUrl: String)

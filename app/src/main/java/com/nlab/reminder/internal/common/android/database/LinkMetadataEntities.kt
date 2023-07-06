@@ -16,15 +16,15 @@
 
 package com.nlab.reminder.internal.common.android.database
 
-import com.nlab.reminder.domain.common.util.link.LinkMetadata
+import com.nlab.reminder.domain.common.util.link.LinkMetadata as LegacyLinkMetadata
 
 /**
  * @author thalys
  */
-fun LinkMetadataEntity.toLinkMetadata(): LinkMetadata =
-    LinkMetadata(title = title ?: "", imageUrl = imageUrl ?: "")
+fun LinkMetadataEntity.toLinkMetadata(): LegacyLinkMetadata =
+    LegacyLinkMetadata(title = title ?: "", imageUrl = imageUrl ?: "")
 
-fun LinkMetadata.toEntity(link: String, timestamp: Long): LinkMetadataEntity =
+fun LegacyLinkMetadata.toEntity(link: String, timestamp: Long): LinkMetadataEntity =
     LinkMetadataEntity(
         link,
         title,

@@ -48,20 +48,15 @@ import org.mockito.kotlin.*
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 internal class LocalTagRepositoryTest {
-    private fun genTagRepository(
-        tagDao: TagDao = mock(),
-        scheduleTagListDao: ScheduleTagListDao = mock()
-    ): TagRepository = LocalTagRepository(tagDao, scheduleTagListDao)
-
     @Test
-    fun `tagDao found when get`() {
+    fun `Get tags from dao`() {
         val tagDao: TagDao = mock()
         genTagRepository(tagDao = tagDao).get()
         verify(tagDao, once()).find()
     }
 
     @Test
-    fun `notify tag list when dao updated`() = runTest {
+    fun `Notify tag list when dao updated`() = runTest {
         val executeDispatcher = genFlowExecutionDispatcher(testScheduler)
         val actualTags = mutableListOf<List<Tag>>()
         val firstTags: List<Tag> = listOf(genTag())
@@ -86,7 +81,7 @@ internal class LocalTagRepositoryTest {
     }
 
     @Test
-    fun `repository get usage count from scheduleTagListDao`() = runTest {
+    fun `Repository get usage count from scheduleTagListDao`() = runTest {
         val usageCount: Long = genLong()
         val input: Tag = genTag()
         val scheduleTagListDao: ScheduleTagListDao = mock {
@@ -98,7 +93,7 @@ internal class LocalTagRepositoryTest {
     }
 
     @Test
-    fun `repository return error when scheduleTagListDao occurred error while find by usage count`() = runTest {
+    fun `Repository return error when scheduleTagListDao occurred error while find by usage count`() = runTest {
         val exception = RuntimeException()
         val input: Tag = genTag()
         val scheduleTagListDao: ScheduleTagListDao = mock { whenever(mock.findTagUsageCount(any())) doThrow exception }
@@ -108,7 +103,7 @@ internal class LocalTagRepositoryTest {
     }
 
     @Test
-    fun `tagDao updated when repository update name requested`() = runTest {
+    fun `TagDao updated when repository update name requested`() = runTest {
         val name: String = genBothify()
         val input: Tag = genTag()
         val tagDao: TagDao = mock()
@@ -118,7 +113,7 @@ internal class LocalTagRepositoryTest {
     }
 
     @Test
-    fun `tagDao return error when repository update name requested`() = runTest {
+    fun `TagDao return error when repository update name requested`() = runTest {
         val exception = RuntimeException()
         val tagDao: TagDao = mock { whenever(mock.update(any())) doThrow exception }
         val result = genTagRepository(tagDao = tagDao).updateName(genTag(), genBothify())
@@ -127,7 +122,7 @@ internal class LocalTagRepositoryTest {
     }
 
     @Test
-    fun `tagDao delete tag when repository deleting requested`() = runTest {
+    fun `TagDao delete tag when repository deleting requested`() = runTest {
         val input: Tag = genTag()
         val tagDao: TagDao = mock()
 
@@ -136,7 +131,7 @@ internal class LocalTagRepositoryTest {
     }
 
     @Test
-    fun `tagDao return error when repository deleting requested`() = runTest {
+    fun `TagDao return error when repository deleting requested`() = runTest {
         val exception = RuntimeException()
         val input: Tag = genTag()
         val tagDao: TagDao = mock { whenever(mock.delete(any())) doThrow exception }
@@ -145,3 +140,8 @@ internal class LocalTagRepositoryTest {
         assertThat(result, equalTo(Result.Failure(exception)))
     }
 }
+
+private fun genTagRepository(
+    tagDao: TagDao = mock(),
+    scheduleTagListDao: ScheduleTagListDao = mock()
+): TagRepository = LocalTagRepository(tagDao, scheduleTagListDao)

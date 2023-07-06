@@ -48,6 +48,12 @@ fun genLetterify(letterString: String = "???", isUpper: Boolean = false): String
 fun genBothify(string: String = "???###", isUpper: Boolean = false): String = f.bothify(string, isUpper)
 
 /**
+ * Create a blank string.
+ * @param count The number of blank characters.
+ */
+fun genBlank(count: Int = genInt(min = 2, max = 10)): String = List(count) { ' ' }.joinToString("")
+
+/**
  * Create a long using the [min]..[max]
  *
  * @param min Minimum value for randomValue.

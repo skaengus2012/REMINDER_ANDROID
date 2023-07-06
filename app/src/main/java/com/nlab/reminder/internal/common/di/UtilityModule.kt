@@ -25,6 +25,7 @@ import dagger.Provides
 import dagger.Reusable
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import java.util.*
@@ -49,5 +50,7 @@ class UtilityModule {
 
     @Singleton
     @Provides
-    fun provideGlobalCoroutineScope(): CoroutineScope = CoroutineScope(SupervisorJob())
+    fun provideGlobalCoroutineScope(): CoroutineScope = CoroutineScope(
+        context = SupervisorJob() + CoroutineName("ReminderGlobalScope")
+    )
 }

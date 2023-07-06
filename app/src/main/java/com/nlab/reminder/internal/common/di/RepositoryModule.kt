@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 The N's lab Open Source Project
+ * Copyright (C) 2023 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,33 +16,20 @@
 
 package com.nlab.reminder.internal.common.di
 
-import com.nlab.reminder.core.kotlin.util.Result
-import com.nlab.reminder.core.kotlin.util.onFailure
-import com.nlab.reminder.domain.common.util.link.LinkMetadata
-import com.nlab.reminder.domain.common.util.link.LinkMetadataRepository
-import com.nlab.reminder.domain.common.schedule.ScheduleRepository as LegacyScheduleRepository
+import com.nlab.reminder.core.kotlin.util.*
+import com.nlab.reminder.domain.common.data.model.*
 import com.nlab.reminder.domain.common.data.repository.*
-import com.nlab.reminder.domain.common.util.link.LinkMetadataTableRepository
-import com.nlab.reminder.internal.common.android.database.ScheduleDao
-import com.nlab.reminder.internal.common.schedule.impl.LocalScheduleRepository
-import com.nlab.reminder.internal.common.data.repository.LocalTagRepository
-import com.nlab.reminder.domain.common.util.link.infra.JsoupLinkMetadataRepository
-import com.nlab.reminder.internal.common.android.database.LinkMetadataDao
+import com.nlab.reminder.domain.common.data.repository.infra.*
+import com.nlab.reminder.internal.common.data.repository.*
 import com.nlab.reminder.internal.common.di.fake.FakeScheduleRepository
-import com.nlab.reminder.internal.common.util.link.impl.LocalCachedLinkMetadataTableRepository
-import dagger.Binds
-import dagger.Module
-import dagger.Provides
-import dagger.Reusable
+import dagger.*
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import timber.log.Timber
-import java.util.Calendar
-import javax.inject.Singleton
 
 /**
- * @author Doohyun
+ * @author thalys
  */
 @Module
 @InstallIn(SingletonComponent::class)
@@ -55,27 +42,20 @@ internal abstract class RepositoryModule {
     @Binds
     abstract fun bindTagRepository(tagRepository: LocalTagRepository): TagRepository
 
+    @Reusable
+    @Binds
+    abstract fun bindTimestampRepository(timestampRepository: DefaultTimestampRepository): TimestampRepository
+
     companion object {
         @Reusable
         @Provides
-        fun provideScheduleRepository(
-            scheduleDao: ScheduleDao
-        ): LegacyScheduleRepository = LocalScheduleRepository(scheduleDao)
-
-        @Singleton
-        @Provides
-        fun provideLinkMetadataTableRepository(
-            linkMetadataDao: LinkMetadataDao,
-            @Singleton coroutineScope: CoroutineScope
-        ): LinkMetadataTableRepository = LocalCachedLinkMetadataTableRepository(
-            linkMetadataRepository = object : LinkMetadataRepository {
-                private val internalRepository = JsoupLinkMetadataRepository()
-                override suspend fun get(link: String): Result<LinkMetadata> =
-                    internalRepository.get(link).onFailure { e -> Timber.w(e, "LinkThumbnail load failed.") }
-            },
-            linkMetadataDao,
-            coroutineScope,
-            getTimestamp = { Calendar.getInstance().timeInMillis }
-        )
+        fun provideScheduleRepository(): LinkMetadataRepository = object : LinkMetadataRepository {
+            private val internalRepository = JsoupLinkMetadataRepository(dispatcher = Dispatchers.IO)
+            override suspend fun get(link: Link): Result<LinkMetadata> {
+                return internalRepository.get(link).onFailure {
+                    Timber.w(it, "LinkMetadata load failed.")
+                }
+            }
+        }
     }
 }

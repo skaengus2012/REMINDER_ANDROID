@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.internal.common.android.database
+package com.nlab.reminder.internal.common.data.model
 
-import androidx.room.ColumnInfo
-import androidx.room.Entity
+import com.nlab.reminder.domain.common.data.model.Link
+import com.nlab.reminder.domain.common.data.model.LinkMetadata
+import com.nlab.reminder.internal.common.android.database.LinkMetadataEntity
 
 /**
  * @author thalys
  */
-@Entity(tableName = "link_metadata", primaryKeys = ["link"])
-data class LinkMetadataEntity(
-    @ColumnInfo(name = "link") val link: String,
-    @ColumnInfo(name = "title") val title: String,
-    @ColumnInfo(name = "imageUrl") val imageUrl: String,
-    @ColumnInfo(name = "timestamp") val timestamp: Long
+internal fun LinkMetadata.toEntity(link: Link, timestamp: Long): LinkMetadataEntity = LinkMetadataEntity(
+    link = link.value,
+    title = title,
+    imageUrl = imageUrl,
+    timestamp = timestamp
 )

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 The N's lab Open Source Project
+ * Copyright (C) 2023 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,16 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nlab.reminder.domain.common.util.link.infra
+
+package com.nlab.reminder.domain.common.data.repository.infra
 
 import com.nlab.reminder.core.kotlin.util.Result
 import com.nlab.reminder.core.kotlin.util.catching
-import com.nlab.reminder.domain.common.data.repository.infra.OG_IMAGE
-import com.nlab.reminder.domain.common.data.repository.infra.OG_TITLE
-import com.nlab.reminder.domain.common.data.repository.infra.toContent
-import com.nlab.reminder.domain.common.data.repository.infra.toProperty
-import com.nlab.reminder.domain.common.util.link.LinkMetadata
-import com.nlab.reminder.domain.common.util.link.LinkMetadataRepository
+import com.nlab.reminder.domain.common.data.model.Link
+import com.nlab.reminder.domain.common.data.model.LinkMetadata
+import com.nlab.reminder.domain.common.data.repository.LinkMetadataRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -34,10 +32,10 @@ import org.jsoup.Jsoup
 class JsoupLinkMetadataRepository(
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : LinkMetadataRepository {
-    override suspend fun get(link: String): Result<LinkMetadata> = withContext(dispatcher) {
+    override suspend fun get(link: Link): Result<LinkMetadata> = withContext(dispatcher) {
         catching {
             val tagNameToValues: Map<String, String> = buildMap {
-                Jsoup.connect(link)
+                Jsoup.connect(link.value)
                     .get()
                     .select("meta[property^=og:]")
                     .asSequence()
@@ -46,8 +44,8 @@ class JsoupLinkMetadataRepository(
             }
 
             LinkMetadata(
-                title = tagNameToValues.get(OG_TITLE) ?: "",
-                imageUrl = tagNameToValues.get(OG_IMAGE) ?: ""
+                title = tagNameToValues[OG_TITLE] ?: "",
+                imageUrl = tagNameToValues[OG_IMAGE] ?: ""
             )
         }
     }
