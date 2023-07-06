@@ -24,4 +24,4 @@ import com.nlab.reminder.R
  * @author Doohyun
  */
 
-val FontDangamAsac = FontFamily(Font(R.font.dangam_asac))
+val FontSbAggroM = FontFamily(Font(R.font.sb_aggro_m))
