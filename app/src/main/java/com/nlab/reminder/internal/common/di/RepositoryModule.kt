@@ -21,7 +21,6 @@ import com.nlab.reminder.domain.common.data.model.*
 import com.nlab.reminder.domain.common.data.repository.*
 import com.nlab.reminder.domain.common.data.repository.infra.*
 import com.nlab.reminder.internal.common.data.repository.*
-import com.nlab.reminder.internal.common.di.fake.FakeScheduleRepository
 import dagger.*
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
@@ -36,7 +35,7 @@ import timber.log.Timber
 internal abstract class RepositoryModule {
     @Reusable
     @Binds
-    abstract fun bindScheduleRepository(scheduleRepository: FakeScheduleRepository): ScheduleRepository
+    abstract fun bindScheduleRepository(scheduleRepository: LocalScheduleRepository): ScheduleRepository
 
     @Reusable
     @Binds
