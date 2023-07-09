@@ -15,7 +15,7 @@
   -->
 
 <resources>
-    <string name="app_name" translatable="false">Time Eat</string>
+    <string name="app_name" translatable="false">Planeat</string>
 
     <string name="category_today" translatable="false">Today</string>
     <string name="category_timetable" translatable="false">Timetable</string>

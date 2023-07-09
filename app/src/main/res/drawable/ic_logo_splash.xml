@@ -1,0 +1,29 @@
+<!--
+  ~ Copyright (C) 2023 The N's lab Open Source Project
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~        http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="288"
+    android:viewportHeight="288">
+  <path
+      android:pathData="M179.42,129.26V152.4H185.13V146.43H188.39C191.38,146.43 193.78,145.6 195.45,144.08C197.11,142.57 198,140.4 198,137.82C198,135.25 197.11,133.1 195.44,131.59C193.78,130.09 191.38,129.26 188.39,129.26H179.42ZM188.39,146.08H184.78V152.06H179.77V152.06H184.78V146.08H188.39C194.23,146.08 197.65,142.83 197.65,137.82C197.65,133.24 194.74,130.11 189.69,129.66C194.74,130.11 197.65,133.24 197.65,137.82C197.65,142.83 194.23,146.08 188.39,146.08ZM188.17,141.3H185.13V134.39H188.17C189.52,134.39 190.54,134.7 191.23,135.26C191.9,135.82 192.29,136.66 192.29,137.82C192.29,138.99 191.9,139.84 191.23,140.4C190.54,140.98 189.51,141.3 188.17,141.3ZM188.89,134.07C188.66,134.05 188.42,134.04 188.17,134.04H184.78V141.65H184.78V134.04H188.17C188.42,134.04 188.66,134.05 188.89,134.07Z"
+      android:fillColor="#1CCF98"
+      android:fillType="evenOdd"/>
+  <path
+      android:pathData="M180.65,162.52C173.38,154.1 157.18,146.65 144.81,142.77C156.5,137.42 171.07,128.39 177.16,119.44C169.53,108.43 156.91,101.25 142.64,101.25C119.36,101.25 100.49,120.39 100.49,144C100.49,167.61 119.36,186.75 142.64,186.75C159.37,186.75 173.83,176.87 180.65,162.52ZM138.79,131.75C136.67,131.75 135.08,130.39 135.08,128.28C135.08,126.16 136.67,124.8 138.79,124.8C140.91,124.8 142.5,126.16 142.5,128.28C142.5,130.39 140.91,131.75 138.79,131.75Z"
+      android:fillColor="#1CCF98"/>
+</vector>

@@ -14,7 +14,7 @@
   ~ limitations under the License.
   -->
 
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <style name="AppTheme" parent="BaseAppTheme">
         <item name="android:windowLightStatusBar">true</item>
@@ -35,6 +35,16 @@
         <!-- schedule -->
         <item name="bg_schedule_placeholder">@color/bg_schedule_placeholder_light</item>
         <item name="tint_schedule_placeholder">@color/tint_schedule_placeholder_light</item>
+    </style>
+
+    <style name="AppSplashScreenBase" parent="Theme.SplashScreen">
+        <item name="android:windowSplashScreenBrandingImage" tools:targetApi="s">@drawable/ic_brand_splash</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_logo_splash</item>
+        <item name="postSplashScreenTheme">@style/AppTheme</item>
+    </style>
+
+    <style name="AppSplashScreen" parent="AppSplashScreenBase">
+        <item name="windowSplashScreenBackground">@color/bg_1_light</item>
     </style>
 
 </resources>
