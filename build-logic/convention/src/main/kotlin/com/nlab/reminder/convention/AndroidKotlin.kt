@@ -19,29 +19,36 @@ package com.nlab.reminder.convention
 import com.android.build.api.dsl.CommonExtension
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
-import org.gradle.jvm.toolchain.JavaLanguageVersion
+import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.provideDelegate
+import org.gradle.kotlin.dsl.withType
+import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 /**
  * @author Doohyun
  */
-internal fun Project.configureAndroidKotlin(extension: CommonExtension<*, *, *, *>) {
-    extension.apply {
+internal fun Project.configureAndroidKotlin(commonExtension: CommonExtension<*, *, *, *>) {
+    val javaVersion = JavaVersion.VERSION_17
+    val javaVersionToNumber = 17
+
+    commonExtension.apply {
         compileOptions {
-            sourceCompatibility = JavaVersion.VERSION_17
-            targetCompatibility = JavaVersion.VERSION_17
+            sourceCompatibility = javaVersion
+            targetCompatibility = javaVersion
         }
 
-        java {
-            // fix warning [https://github.com/skaengus2012/REMINDER_ANDROID/issues/82#issuecomment-1406942682]
-            // see https://kotlinlang.org/docs/gradle-configure-project.html#check-for-jvm-target-compatibility-of-related-compile-tasks
-            toolchain {
-                languageVersion.set(JavaLanguageVersion.of(JavaVersion.VERSION_17.toString()))
-            }
+        packaging {
+            // guide in kotlin coroutine
+            // https://github.com/Kotlin/kotlinx.coroutines#avoiding-including-the-debug-infrastructure-in-the-resulting-apk
+            resources.excludes.add("DebugProbesKt.bin")
         }
+    }
 
+    tasks.withType<KotlinCompile>().configureEach {
         kotlinOptions {
-            jvmTarget = JavaVersion.VERSION_17.toString()
+            // Enable JVM IR backend for Kotlin
+            jvmTarget = javaVersion.toString()
 
             // Treat all Kotlin warnings as errors (disabled by default)
             // Override by setting warningsAsErrors=true in your ~/.gradle/gradle.properties
@@ -59,11 +66,9 @@ internal fun Project.configureAndroidKotlin(extension: CommonExtension<*, *, *, 
                 "-opt-in=androidx.compose.material3.ExperimentalMaterial3Api",
             )
         }
+    }
 
-        packaging {
-            // guide in kotlin coroutine
-            // https://github.com/Kotlin/kotlinx.coroutines#avoiding-including-the-debug-infrastructure-in-the-resulting-apk
-            resources.excludes.add("DebugProbesKt.bin")
-        }
+    extensions.configure<KotlinAndroidProjectExtension> {
+        jvmToolchain(javaVersionToNumber)
     }
 }
