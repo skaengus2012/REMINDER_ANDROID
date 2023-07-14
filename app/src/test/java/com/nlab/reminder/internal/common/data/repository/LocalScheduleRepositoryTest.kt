@@ -22,7 +22,6 @@ import com.nlab.reminder.domain.common.data.repository.ScheduleGetStreamRequest
 import com.nlab.reminder.domain.common.data.repository.ScheduleRepository
 import com.nlab.reminder.internal.common.android.database.ScheduleDao
 import com.nlab.reminder.internal.common.android.database.ScheduleEntityWithTagEntities
-import com.nlab.reminder.internal.common.android.database.toEntity
 import com.nlab.reminder.internal.common.data.model.toEntity
 import com.nlab.testkit.genBoolean
 import kotlinx.coroutines.flow.first

@@ -20,7 +20,6 @@ import com.nlab.reminder.domain.common.data.model.Schedule
 import com.nlab.reminder.domain.common.data.model.ScheduleId
 import com.nlab.reminder.internal.common.android.database.ScheduleEntity
 import com.nlab.reminder.internal.common.android.database.ScheduleEntityWithTagEntities
-import com.nlab.reminder.internal.common.android.database.toTag
 import kotlinx.collections.immutable.toImmutableList
 
 /**
@@ -42,7 +41,7 @@ internal fun ScheduleEntityWithTagEntities.toModel(): Schedule = Schedule(
     link = scheduleEntity.link,
     visiblePriority = scheduleEntity.visiblePriority,
     isComplete = scheduleEntity.isComplete,
-    tags = tagEntities.map { it.toTag() }.toImmutableList()
+    tags = tagEntities.map { it.toModel() }.toImmutableList()
 )
 
 internal fun List<ScheduleEntityWithTagEntities>.toModels(): List<Schedule> = map(

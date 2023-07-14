@@ -18,15 +18,14 @@ package com.nlab.reminder.internal.common.util.link.impl
 
 import com.nlab.reminder.domain.common.util.link.*
 import com.nlab.reminder.internal.common.android.database.LinkMetadataDao
-import com.nlab.reminder.internal.common.android.database.toEntity
 import com.nlab.testkit.once
 import com.nlab.reminder.core.kotlin.util.Result
+import com.nlab.reminder.internal.common.android.database.toEntity
 import com.nlab.testkit.genBothify
 import com.nlab.testkit.genLong
 import com.nlab.testkit.genNumerify
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.take
@@ -39,7 +38,6 @@ import org.mockito.kotlin.*
 /**
  * @author thalys
  */
-@OptIn(ExperimentalCoroutinesApi::class)
 class LocalCachedLinkMetadataTableRepositoryTest {
     @Test
     fun `getStream from linkMetadataDao`() = runTest {

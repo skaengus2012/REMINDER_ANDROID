@@ -25,7 +25,7 @@ import com.nlab.reminder.domain.common.data.model.genTags
 import com.nlab.reminder.internal.common.android.database.ScheduleTagListDao
 import com.nlab.reminder.internal.common.android.database.TagDao
 import com.nlab.reminder.internal.common.android.database.TagEntity
-import com.nlab.reminder.internal.common.android.database.toEntity
+import com.nlab.reminder.internal.common.data.model.toEntity
 import com.nlab.reminder.internal.common.database.toEntities
 import com.nlab.reminder.test.*
 import com.nlab.testkit.genBothify

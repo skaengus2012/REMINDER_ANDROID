@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 The N's lab Open Source Project
+ * Copyright (C) 2023 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.internal.common.android.database
+package com.nlab.reminder.internal.common.data.model
 
 import com.nlab.reminder.domain.common.data.model.Tag
+import com.nlab.reminder.internal.common.android.database.TagEntity
 
 /**
  * @author Doohyun
  */
-fun TagEntity.toTag(): Tag = Tag(tagId, name)
-fun List<TagEntity>.toTags(): List<Tag> = map { it.toTag() }
+internal fun TagEntity.toModel(): Tag = Tag(tagId, name)
+internal fun List<TagEntity>.toModels(): List<Tag> = map(TagEntity::toModel)
 
-fun Tag.toEntity(name: String = this.name): TagEntity = TagEntity(tagId, name)
+internal fun Tag.toEntity(name: String = this.name): TagEntity = TagEntity(tagId, name)
