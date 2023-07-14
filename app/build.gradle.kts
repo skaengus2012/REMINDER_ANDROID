@@ -137,6 +137,7 @@ dependencies {
     debugImplementation(libs.squeare.leakcanary)
 
     testImplementation(project(":testkit"))
+    testImplementation(project(":statekit:test"))
     testImplementation(libs.junit)
     testImplementation(libs.kotlin.coroutines.test)
     testImplementation(libs.mockito.inline)
