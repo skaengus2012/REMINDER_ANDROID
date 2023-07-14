@@ -14,13 +14,27 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.common.data.model
+package com.nlab.reminder.internal.common.data.repository.fake
 
 import com.nlab.reminder.core.util.test.annotation.ExcludeFromGeneratedTestReport
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 
 /**
- * @author Doohyun
+ * TODO : Remove this class and Jacoco fake whitelist.
+ * @author thalys
  */
-@JvmInline
 @ExcludeFromGeneratedTestReport
-value class LinkMetadataTable(val value: Map<Link, LinkMetadata>)
+@Deprecated("Fake method used")
+internal object FakeScheduleRepositoryDelegate {
+    fun getTodaySchedulesCount(): Flow<Long> = flow {
+        delay((1_500L..3000L).random())
+        emit((0L..100).random())
+    }
+
+    fun getTimetableSchedulesCount(): Flow<Long> = flowOf((0L..100).random())
+
+    fun getAllSchedulesCount(): Flow<Long> = flowOf((0L..100).random())
+}

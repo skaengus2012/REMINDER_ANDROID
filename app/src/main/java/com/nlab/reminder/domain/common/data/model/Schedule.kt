@@ -14,22 +14,17 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.common.data.repository
-
-import com.nlab.reminder.domain.common.data.model.Schedule
-import kotlinx.coroutines.flow.Flow
+package com.nlab.reminder.domain.common.data.model
 
 /**
- * @author thalys
+ * @author Doohyun
  */
-interface ScheduleRepository {
-    fun getTodaySchedulesCount(): Flow<Long>
-    fun getTimetableSchedulesCount(): Flow<Long>
-    fun getAllSchedulesCount(): Flow<Long>
-    fun getAsStream(request: ScheduleGetStreamRequest): Flow<List<Schedule>>
-}
-
-sealed class ScheduleGetStreamRequest private constructor() {
-    object All : ScheduleGetStreamRequest()
-    data class ByComplete(val isComplete: Boolean) : ScheduleGetStreamRequest()
-}
+data class Schedule(
+    val scheduleId: ScheduleId,
+    val title: String,
+    val note: String?,
+    val link: String?,
+    val tags: List<Tag>,
+    val visiblePriority: Long,
+    val isComplete: Boolean
+)
