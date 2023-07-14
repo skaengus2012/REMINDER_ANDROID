@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.feature.main.view
+package com.nlab.reminder.domain.feature.main.ui
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
