@@ -14,17 +14,14 @@
  * limitations under the License.
  */
 
-// Annotations must be added before Gradle 8.1.
-// https://developer.android.com/studio/build/migrate-to-catalogs?hl=ko#migrate-plugins
-@Suppress("DSL_SCOPE_VIOLATION")
-plugins {
-    id("nlab.jvm.library")
-}
+package com.nlab.testkit
 
-dependencies {
-    implementation(libs.junit)
-    implementation(libs.javafaker)
-    implementation(libs.mockito.inline)
-    implementation(libs.mockito.kotlin)
-    implementation(libs.kotlin.coroutines.test)
-}
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+
+/**
+ * @author Doohyun
+ */
+fun TestScope.unconfinedTestDispatcher() = UnconfinedTestDispatcher(testScheduler)
+fun TestScope.unconfinedCoroutineScope() = CoroutineScope(unconfinedTestDispatcher())

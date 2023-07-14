@@ -19,11 +19,11 @@ package com.nlab.reminder.domain.feature.home
 import com.nlab.reminder.core.statekit.checkWhileStateUsed
 import com.nlab.reminder.domain.common.data.model.Tag
 import com.nlab.reminder.domain.common.data.model.genTags
-import com.nlab.reminder.test.unconfinedCoroutineScope
 import com.nlab.statekit.util.buildDslInterceptor
 import com.nlab.statekit.util.createStore
 import com.nlab.testkit.genInt
 import com.nlab.testkit.genLong
+import com.nlab.testkit.unconfinedCoroutineScope
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.MutableStateFlow

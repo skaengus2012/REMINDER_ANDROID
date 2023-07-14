@@ -20,10 +20,10 @@ import com.nlab.reminder.R
 import com.nlab.reminder.core.state.UserMessage
 import com.nlab.reminder.domain.common.data.model.genTag
 import com.nlab.reminder.domain.common.data.model.genTagUsageCount
-import com.nlab.reminder.test.unconfinedCoroutineScope
 import com.nlab.statekit.util.createStore
 import com.nlab.testkit.genBothify
 import com.nlab.testkit.genInt
+import com.nlab.testkit.unconfinedCoroutineScope
 import kotlinx.collections.immutable.*
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest

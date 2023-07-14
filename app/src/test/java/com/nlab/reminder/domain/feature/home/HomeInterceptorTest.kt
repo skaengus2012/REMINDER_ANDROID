@@ -20,7 +20,6 @@ import com.nlab.reminder.core.kotlin.util.Result
 import com.nlab.reminder.domain.common.data.model.genTag
 import com.nlab.reminder.domain.common.data.model.genTagUsageCount
 import com.nlab.reminder.domain.common.data.repository.TagRepository
-import com.nlab.reminder.test.unconfinedCoroutineScope
 import com.nlab.statekit.middleware.interceptor.Interceptor
 import com.nlab.statekit.util.buildInterceptor
 import com.nlab.statekit.util.createStore
@@ -28,6 +27,7 @@ import com.nlab.statekit.util.*
 import com.nlab.testkit.ExpectedRuntimeException
 import com.nlab.testkit.genBothify
 import com.nlab.testkit.once
+import com.nlab.testkit.unconfinedCoroutineScope
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
