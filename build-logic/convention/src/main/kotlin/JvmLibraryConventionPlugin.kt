@@ -1,3 +1,7 @@
+import com.nlab.reminder.convention.configureJvmKotlin
+import org.gradle.api.Plugin
+import org.gradle.api.Project
+
 /*
  * Copyright (C) 2023 The N's lab Open Source Project
  *
@@ -14,20 +18,15 @@
  * limitations under the License.
  */
 
-// FIXME Annotations must be added before Gradle 8.1.
-// FIXME https://developer.android.com/studio/build/migrate-to-catalogs?hl=ko#migrate-plugins
-@Suppress("DSL_SCOPE_VIOLATION")
-plugins {
-    id("nlab.jvm.library")
-    id("nlab.jvm.library.jacoco")
-}
-
-dependencies {
-    implementation(libs.kotlin.coroutines.core)
-
-    testImplementation(project(":testkit"))
-    testImplementation(libs.junit)
-    testImplementation(libs.kotlin.coroutines.test)
-    testImplementation(libs.mockito.inline)
-    testImplementation(libs.mockito.kotlin)
+/**
+ * @author Doohyun
+ */
+@Suppress("unused")
+internal class JvmLibraryConventionPlugin : Plugin<Project> {
+    override fun apply(target: Project) = with(target) {
+        with(pluginManager) {
+            apply("org.jetbrains.kotlin.jvm")
+        }
+        configureJvmKotlin()
+    }
 }

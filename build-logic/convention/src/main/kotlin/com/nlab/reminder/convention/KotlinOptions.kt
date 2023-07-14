@@ -72,3 +72,16 @@ internal fun Project.configureAndroidKotlin(commonExtension: CommonExtension<*, 
         jvmToolchain(javaVersionToNumber)
     }
 }
+
+internal fun Project.configureJvmKotlin() {
+    tasks.withType<KotlinCompile>().configureEach {
+        kotlinOptions {
+            // Exclude opt-in API warnings
+            freeCompilerArgs = listOf(
+                "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
+                "-opt-in=kotlinx.coroutines.FlowPreview",
+                "-opt-in=kotlin.Experimental"
+            )
+        }
+    }
+}

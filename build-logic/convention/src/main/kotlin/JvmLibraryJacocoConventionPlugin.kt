@@ -26,7 +26,8 @@ import org.gradle.testing.jacoco.tasks.JacocoReport
 /**
  * @author Doohyun
  */
-class JvmApplicationJacocoConventionPlugin : Plugin<Project> {
+@Suppress("unused")
+internal class JvmLibraryJacocoConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             with(pluginManager) {
