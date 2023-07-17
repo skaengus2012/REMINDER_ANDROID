@@ -38,11 +38,12 @@ class ReduceTester<A : Action, S : State> internal constructor(
     fun dispatchAction(action: A) = ReduceTester(reducer, action, initState, transformInitToExpectedState)
     fun initState(state: S) = ReduceTester(reducer, dispatchAction, state, transformInitToExpectedState)
 
-    fun expectedState(transformInitToExpectedState: (S) -> S): ReduceTester<A, S> =
+    fun expectedStateFromInit(transformInitToExpectedState: (S) -> S): ReduceTester<A, S> =
         ReduceTester(reducer, dispatchAction, initState, transformInitToExpectedState)
 
-    fun expectedState(state: S): ReduceTester<A, S> =
-        ReduceTester(reducer, dispatchAction, initState, transformInitToExpectedState = { state })
+    inline fun <reified T : S> expectedStateFromInitTypeOf(
+        crossinline transformInitToExpectedState: (T) -> S
+    ): ReduceTester<A, S> = expectedStateFromInit { transformInitToExpectedState(it as T) }
 
     suspend fun verify(testScope: TestScope) {
         checkNotNull(dispatchAction) { "DispatchAction must not be null" }
@@ -57,3 +58,9 @@ class ReduceTester<A : Action, S : State> internal constructor(
 
 fun <A : Action, S : State> Reducer<A, S>.tester(): ReduceTester<A, S> =
     ReduceTester(reducer = this, dispatchAction = null, initState = null, transformInitToExpectedState = null)
+
+fun <A : Action, S : State> ReduceTester<A, S>.expectedState(state: S): ReduceTester<A, S> =
+    expectedStateFromInit { state }
+
+fun <A : Action, S : State> ReduceTester<A, S>.expectedStateToInit(): ReduceTester<A, S> =
+    expectedStateFromInit { it }
