@@ -48,9 +48,13 @@ gradlePlugin {
             id = "nlab.android.library.jacoco"
             implementationClass = "AndroidLibraryJacocoConventionPlugin"
         }
-        register("jvmApplicationJacoco") {
-            id = "nlab.jvm.application.jacoco"
-            implementationClass = "JvmApplicationJacocoConventionPlugin"
+        register("jvmLibrary") {
+            id = "nlab.jvm.library"
+            implementationClass = "JvmLibraryConventionPlugin"
+        }
+        register("jvmLibraryJacoco") {
+            id = "nlab.jvm.library.jacoco"
+            implementationClass = "JvmLibraryJacocoConventionPlugin"
         }
     }
 }

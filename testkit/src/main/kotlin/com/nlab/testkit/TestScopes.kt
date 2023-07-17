@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-plugins {
-    id("nlab.jvm.library")
-}
+package com.nlab.testkit
 
-dependencies {
-    implementation(libs.junit)
-    implementation(libs.javafaker)
-    implementation(libs.mockito.inline)
-    implementation(libs.mockito.kotlin)
-    implementation(libs.kotlin.coroutines.test)
-}
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+
+/**
+ * @author Doohyun
+ */
+fun TestScope.unconfinedTestDispatcher() = UnconfinedTestDispatcher(testScheduler)
+fun TestScope.unconfinedCoroutineScope() = CoroutineScope(unconfinedTestDispatcher())

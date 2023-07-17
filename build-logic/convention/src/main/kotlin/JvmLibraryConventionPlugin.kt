@@ -1,3 +1,7 @@
+import com.nlab.reminder.convention.configureJvmKotlin
+import org.gradle.api.Plugin
+import org.gradle.api.Project
+
 /*
  * Copyright (C) 2023 The N's lab Open Source Project
  *
@@ -14,14 +18,15 @@
  * limitations under the License.
  */
 
-plugins {
-    id("nlab.jvm.library")
-}
-
-dependencies {
-    implementation(libs.junit)
-    implementation(libs.javafaker)
-    implementation(libs.mockito.inline)
-    implementation(libs.mockito.kotlin)
-    implementation(libs.kotlin.coroutines.test)
+/**
+ * @author Doohyun
+ */
+@Suppress("unused")
+internal class JvmLibraryConventionPlugin : Plugin<Project> {
+    override fun apply(target: Project) = with(target) {
+        with(pluginManager) {
+            apply("org.jetbrains.kotlin.jvm")
+        }
+        configureJvmKotlin()
+    }
 }
