@@ -20,9 +20,7 @@ import com.nlab.statekit.Action
 import com.nlab.statekit.Reducer
 import com.nlab.statekit.State
 import com.nlab.statekit.util.createStore
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.test.TestScope
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 
@@ -45,12 +43,12 @@ class ReduceTester<A : Action, S : State> internal constructor(
         crossinline transformInitToExpectedState: (T) -> S
     ): ReduceTester<A, S> = expectedStateFromInit { transformInitToExpectedState(it as T) }
 
-    suspend fun verify(testScope: TestScope) {
+    fun verify() = runTest {
         checkNotNull(dispatchAction) { "DispatchAction must not be null" }
         checkNotNull(initState) { "InitState must not be null" }
 
         val expectedState = checkNotNull(transformInitToExpectedState?.invoke(initState))
-        val store = createStore(CoroutineScope(UnconfinedTestDispatcher(testScope.testScheduler)), initState, reducer)
+        val store = createStore(testStoreCoroutineScope(), initState, reducer)
         store.dispatch(dispatchAction).join()
         assertThat(store.state.value, equalTo(expectedState))
     }
