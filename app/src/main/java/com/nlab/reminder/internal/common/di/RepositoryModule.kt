@@ -16,10 +16,14 @@
 
 package com.nlab.reminder.internal.common.di
 
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import com.nlab.reminder.core.kotlin.util.*
 import com.nlab.reminder.domain.common.data.model.*
 import com.nlab.reminder.domain.common.data.repository.*
 import com.nlab.reminder.domain.common.data.repository.infra.*
+import com.nlab.reminder.internal.common.android.datastore.PreferenceKeys
 import com.nlab.reminder.internal.common.data.repository.*
 import dagger.*
 import dagger.hilt.InstallIn
@@ -56,5 +60,15 @@ internal abstract class RepositoryModule {
                 }
             }
         }
+
+        @CompletedScheduleShownAllData
+        @Reusable
+        @Provides
+        fun provideCompletedScheduleShownAllScopeRepository(
+            dataStore: DataStore<Preferences>
+        ): CompletedScheduleShownRepository = LocalCompletedScheduleShownRepository(
+            dataStore,
+            booleanPreferencesKey(PreferenceKeys.PREFERENCE_KEY_ALL_SCHEDULE_COMPLETE_SHOWN)
+        )
     }
 }
