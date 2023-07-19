@@ -18,6 +18,7 @@ package com.nlab.reminder.internal.common.di
 
 import android.app.Application
 import com.nlab.reminder.core.android.widget.ToastHandle
+import com.nlab.reminder.domain.common.kotlin.coroutine.inject.GlobalScope
 import com.nlab.reminder.domain.common.util.transaction.TransactionIdGenerator
 import com.nlab.reminder.domain.common.util.transaction.impl.DefaultTransactionIdGenerator
 import dagger.Module
@@ -48,6 +49,7 @@ class UtilityModule {
     @Provides
     fun provideToastHandle(application: Application): ToastHandle = ToastHandle(application)
 
+    @GlobalScope
     @Singleton
     @Provides
     fun provideGlobalCoroutineScope(): CoroutineScope = CoroutineScope(

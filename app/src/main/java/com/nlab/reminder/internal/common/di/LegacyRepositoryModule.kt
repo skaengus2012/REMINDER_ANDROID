@@ -18,6 +18,7 @@ package com.nlab.reminder.internal.common.di
 
 import com.nlab.reminder.core.kotlin.util.Result
 import com.nlab.reminder.core.kotlin.util.onFailure
+import com.nlab.reminder.domain.common.kotlin.coroutine.inject.GlobalScope
 import com.nlab.reminder.domain.common.util.link.LinkMetadata
 import com.nlab.reminder.domain.common.util.link.LinkMetadataRepository
 import com.nlab.reminder.domain.common.schedule.ScheduleRepository as LegacyScheduleRepository
@@ -55,7 +56,7 @@ internal abstract class LegacyRepositoryModule {
         @Provides
         fun provideLinkMetadataTableRepository(
             linkMetadataDao: LinkMetadataDao,
-            @Singleton coroutineScope: CoroutineScope
+            @GlobalScope coroutineScope: CoroutineScope
         ): LinkMetadataTableRepository = LocalCachedLinkMetadataTableRepository(
             linkMetadataRepository = object : LinkMetadataRepository {
                 private val internalRepository = JsoupLinkMetadataRepository()

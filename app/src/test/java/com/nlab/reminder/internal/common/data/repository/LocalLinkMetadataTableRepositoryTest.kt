@@ -147,10 +147,10 @@ internal class LocalLinkMetadataTableRepositoryTest {
 private fun TestScope.genLinkMetadataTableRepository(
     linkMetadataDao: LinkMetadataDao = mock(),
     linkMetadataRepository: LinkMetadataRepository = mock(),
-    coroutineScope: CoroutineScope = unconfinedCoroutineScope(),
     timestampRepository: TimestampRepository = mock {
         whenever(mock.get()) doReturn genLong()
-    }
+    },
+    coroutineScope: CoroutineScope = unconfinedCoroutineScope()
 ): LinkMetadataTableRepository = LocalLinkMetadataTableRepository(
-    linkMetadataDao, linkMetadataRepository, coroutineScope, timestampRepository
+    linkMetadataDao, linkMetadataRepository, timestampRepository, coroutineScope
 )

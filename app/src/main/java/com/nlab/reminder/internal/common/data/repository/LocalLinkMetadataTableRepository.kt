@@ -25,6 +25,7 @@ import com.nlab.reminder.domain.common.data.model.LinkMetadataTable
 import com.nlab.reminder.domain.common.data.repository.LinkMetadataRepository
 import com.nlab.reminder.domain.common.data.repository.LinkMetadataTableRepository
 import com.nlab.reminder.domain.common.data.repository.TimestampRepository
+import com.nlab.reminder.domain.common.kotlin.coroutine.inject.GlobalScope
 import com.nlab.reminder.internal.common.android.database.LinkMetadataDao
 import com.nlab.reminder.internal.common.data.model.toEntity
 import kotlinx.coroutines.CoroutineScope
@@ -38,8 +39,8 @@ import javax.inject.Inject
 internal class LocalLinkMetadataTableRepository @Inject constructor(
     private val linkMetadataDao: LinkMetadataDao,
     private val linkMetadataRepository: LinkMetadataRepository,
-    private val coroutineScope: CoroutineScope,
-    private val timestampRepository: TimestampRepository
+    private val timestampRepository: TimestampRepository,
+    @GlobalScope private val coroutineScope: CoroutineScope,
 ) : LinkMetadataTableRepository {
     override fun fetch(links: List<Link>) {
         links.filter(Link::isValid).forEach { link ->
