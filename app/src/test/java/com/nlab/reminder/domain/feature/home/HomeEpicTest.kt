@@ -16,10 +16,7 @@
 
 package com.nlab.reminder.domain.feature.home
 
-import com.nlab.reminder.domain.common.data.model.genTags
 import com.nlab.statekit.middleware.epic.scenario
-import com.nlab.testkit.genInt
-import com.nlab.testkit.genLong
 import kotlinx.coroutines.flow.flowOf
 import org.junit.Test
 import org.mockito.kotlin.doReturn
@@ -32,25 +29,22 @@ import org.mockito.kotlin.whenever
 internal class HomeEpicTest {
     @Test
     fun `Loaded summary from repository`() {
-        val todaySchedulesCount = genLong()
-        val timetableSchedulesCount = genLong()
-        val allSchedulesCount = genLong()
-        val tags = genTags(count = genInt(min = 1, max = 3))
+        val uiState = genHomeUiStateSuccess()
 
         HomeEpic(
-            tagRepository = mock { whenever(mock.get()) doReturn flowOf(tags) },
+            tagRepository = mock { whenever(mock.get()) doReturn flowOf(uiState.tags) },
             scheduleRepository = mock {
-                whenever(mock.getTodaySchedulesCount()) doReturn flowOf(todaySchedulesCount)
-                whenever(mock.getTimetableSchedulesCount()) doReturn flowOf(timetableSchedulesCount)
-                whenever(mock.getAllSchedulesCount()) doReturn flowOf(allSchedulesCount)
+                whenever(mock.getTodaySchedulesCount()) doReturn flowOf(uiState.todayScheduleCount)
+                whenever(mock.getTimetableSchedulesCount()) doReturn flowOf(uiState.timetableScheduleCount)
+                whenever(mock.getAllSchedulesCount()) doReturn flowOf(uiState.allScheduleCount)
             })
             .scenario()
             .action(
                 HomeAction.SummaryLoaded(
-                    todaySchedulesCount = todaySchedulesCount,
-                    timetableSchedulesCount = timetableSchedulesCount,
-                    allSchedulesCount = allSchedulesCount,
-                    tags = tags
+                    todaySchedulesCount = uiState.todayScheduleCount,
+                    timetableSchedulesCount = uiState.timetableScheduleCount,
+                    allSchedulesCount = uiState.allScheduleCount,
+                    tags = uiState.tags
                 )
             )
             .verify()
