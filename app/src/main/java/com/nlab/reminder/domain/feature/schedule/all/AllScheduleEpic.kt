@@ -22,9 +22,13 @@ import com.nlab.reminder.domain.common.data.repository.CompletedScheduleShownAll
 import com.nlab.reminder.domain.common.data.repository.CompletedScheduleShownRepository
 import com.nlab.reminder.domain.common.data.repository.ScheduleGetStreamRequest
 import com.nlab.reminder.domain.common.data.repository.ScheduleRepository
+import com.nlab.reminder.domain.common.kotlin.coroutine.inject.DefaultDispatcher
 import com.nlab.statekit.middleware.epic.Epic
 import com.nlab.statekit.util.buildDslEpic
+import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOn
 import javax.inject.Inject
 
 /**
@@ -32,12 +36,14 @@ import javax.inject.Inject
  */
 internal class AllScheduleEpic @Inject constructor(
     private val scheduleRepository: ScheduleRepository,
-    @CompletedScheduleShownAllData private val completedScheduleShownRepository: CompletedScheduleShownRepository
+    @CompletedScheduleShownAllData private val completedScheduleShownRepository: CompletedScheduleShownRepository,
+    @DefaultDispatcher private val dispatcher: CoroutineDispatcher
 ) : Epic<AllScheduleAction> by buildDslEpic(buildDSL = {
     whileStateUsed {
         completedScheduleShownRepository
             .getAsStream()
             .flatMapLatest(scheduleRepository::getLoadedActionAsStream)
+            .flowOn(dispatcher)
     }
 })
 

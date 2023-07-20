@@ -18,6 +18,7 @@ package com.nlab.reminder.internal.common.di
 
 import android.app.Application
 import com.nlab.reminder.core.android.widget.ToastHandle
+import com.nlab.reminder.domain.common.kotlin.coroutine.inject.DefaultDispatcher
 import com.nlab.reminder.domain.common.kotlin.coroutine.inject.GlobalScope
 import com.nlab.reminder.domain.common.util.transaction.TransactionIdGenerator
 import com.nlab.reminder.domain.common.util.transaction.impl.DefaultTransactionIdGenerator
@@ -26,8 +27,10 @@ import dagger.Provides
 import dagger.Reusable
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import java.util.*
 import javax.inject.Singleton
@@ -55,4 +58,8 @@ class UtilityModule {
     fun provideGlobalCoroutineScope(): CoroutineScope = CoroutineScope(
         context = SupervisorJob() + CoroutineName("ReminderGlobalScope")
     )
+
+    @DefaultDispatcher
+    @Provides
+    fun provideDefaultDispatcher(): CoroutineDispatcher = Dispatchers.Default
 }
