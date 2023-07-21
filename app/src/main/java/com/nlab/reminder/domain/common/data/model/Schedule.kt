@@ -16,6 +16,8 @@
 
 package com.nlab.reminder.domain.common.data.model
 
+import kotlinx.collections.immutable.ImmutableList
+
 /**
  * @author Doohyun
  */
@@ -24,7 +26,7 @@ data class Schedule(
     val title: String,
     val note: String?,
     val link: String?,
-    val tags: List<Tag>,
+    val tags: ImmutableList<Tag>,
     val visiblePriority: Long,
     val isComplete: Boolean
 )

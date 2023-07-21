@@ -16,8 +16,8 @@
 
 package com.nlab.reminder.domain.feature.schedule.all
 
-import com.nlab.statekit.test.expectedState
-import com.nlab.statekit.test.tester
+import com.nlab.statekit.expectedState
+import com.nlab.statekit.scenario
 import com.nlab.testkit.genBoolean
 import kotlinx.collections.immutable.persistentListOf
 import org.junit.Test
@@ -32,9 +32,9 @@ internal class AllScheduleReducerTest {
             isSelectionMode = false
         )
 
-        AllScheduleReducer().tester()
-            .dispatchAction(expectedState.toLoadedAction())
+        AllScheduleReducer().scenario()
             .initState(AllScheduleUiState.Idle)
+            .action(expectedState.toLoadedAction())
             .expectedState(expectedState)
             .verify()
     }
@@ -43,14 +43,14 @@ internal class AllScheduleReducerTest {
     fun `Load schedule, when after loaded`() {
         val expectedState = genAllScheduleUiStateLoaded()
 
-        AllScheduleReducer().tester()
-            .dispatchAction(expectedState.toLoadedAction())
+        AllScheduleReducer().scenario()
             .initState(
                 expectedState.copy(
                     schedules = persistentListOf(),
                     isCompletedScheduleShown = expectedState.isCompletedScheduleShown.not()
                 )
             )
+            .action(expectedState.toLoadedAction())
             .expectedState(expectedState)
             .verify()
     }
@@ -59,9 +59,9 @@ internal class AllScheduleReducerTest {
     fun `Update selection mode, when selectionMode enabled clicked`() {
         val expectedSelectionMode: Boolean = genBoolean()
 
-        AllScheduleReducer().tester()
-            .dispatchAction(AllScheduleAction.OnSelectionModeUpdateClicked(expectedSelectionMode))
+        AllScheduleReducer().scenario()
             .initState(genAllScheduleUiStateLoaded(isSelectionMode = expectedSelectionMode.not()))
+            .action(AllScheduleAction.OnSelectionModeUpdateClicked(expectedSelectionMode))
             .expectedStateFromInitTypeOf<AllScheduleUiState.Loaded> { it.copy(isSelectionMode = expectedSelectionMode) }
             .verify()
     }

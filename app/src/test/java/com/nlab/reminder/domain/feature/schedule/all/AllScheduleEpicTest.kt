@@ -21,6 +21,8 @@ import com.nlab.reminder.domain.common.data.repository.*
 import com.nlab.statekit.middleware.epic.scenario
 import com.nlab.testkit.genInt
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flowOf
 import org.junit.Test
 import org.mockito.kotlin.doReturn
@@ -41,7 +43,7 @@ internal class AllScheduleEpicTest {
         genAllScheduleEpic(
             scheduleRepository = mock {
                 whenever(mock.getAsStream(ScheduleGetStreamRequest.ByComplete(isComplete = false)))
-                    .doReturn(flowOf(schedules))
+                    .doReturn(flowOf(schedules.toImmutableList()))
             },
             completedScheduleShownRepository = mock {
                 whenever(mock.getAsStream()) doReturn flowOf(isCompletedSchedulesShown)
@@ -58,7 +60,7 @@ internal class AllScheduleEpicTest {
 
         genAllScheduleEpic(
             scheduleRepository = mock {
-                whenever(mock.getAsStream(ScheduleGetStreamRequest.All)) doReturn flowOf(schedules)
+                whenever(mock.getAsStream(ScheduleGetStreamRequest.All)) doReturn flowOf(schedules.toImmutableList())
             },
             completedScheduleShownRepository = mock {
                 whenever(mock.getAsStream()) doReturn flowOf(isCompletedSchedulesShown)
@@ -71,5 +73,6 @@ internal class AllScheduleEpicTest {
 
 private fun genAllScheduleEpic(
     scheduleRepository: ScheduleRepository = mock(),
-    completedScheduleShownRepository: CompletedScheduleShownRepository = mock()
-): AllScheduleEpic = AllScheduleEpic(scheduleRepository, completedScheduleShownRepository)
+    completedScheduleShownRepository: CompletedScheduleShownRepository = mock(),
+    dispatcher: CoroutineDispatcher = Dispatchers.Unconfined
+): AllScheduleEpic = AllScheduleEpic(scheduleRepository, completedScheduleShownRepository, dispatcher)

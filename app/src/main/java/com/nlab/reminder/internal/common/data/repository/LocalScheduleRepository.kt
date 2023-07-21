@@ -16,14 +16,16 @@
 
 package com.nlab.reminder.internal.common.data.repository
 
+import com.nlab.reminder.core.kotlin.collection.immutable.mapToPersistentList
 import com.nlab.reminder.core.kotlin.coroutine.flow.map
 import com.nlab.reminder.core.util.test.annotation.ExcludeFromGeneratedTestReport
 import com.nlab.reminder.domain.common.data.model.Schedule
 import com.nlab.reminder.domain.common.data.repository.ScheduleGetStreamRequest
 import com.nlab.reminder.domain.common.data.repository.ScheduleRepository
 import com.nlab.reminder.internal.common.android.database.ScheduleDao
-import com.nlab.reminder.internal.common.data.model.toModels
+import com.nlab.reminder.internal.common.data.model.toModel
 import com.nlab.reminder.internal.common.data.repository.fake.FakeScheduleRepositoryDelegate
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -45,12 +47,14 @@ internal class LocalScheduleRepository @Inject constructor(
     override fun getAllSchedulesCount(): Flow<Long> =
         FakeScheduleRepositoryDelegate.getAllSchedulesCount()
 
-    override fun getAsStream(request: ScheduleGetStreamRequest): Flow<List<Schedule>> {
+    override fun getAsStream(request: ScheduleGetStreamRequest): Flow<ImmutableList<Schedule>> {
         val entitiesFlow = when (request) {
             is ScheduleGetStreamRequest.All -> scheduleDao.findAsStream()
             is ScheduleGetStreamRequest.ByComplete -> scheduleDao.findByCompleteAsStream(request.isComplete)
         }
 
-        return entitiesFlow.map { it.toModels() }
+        return entitiesFlow.map { entities ->
+            entities.mapToPersistentList { it.toModel() }
+        }
     }
 }

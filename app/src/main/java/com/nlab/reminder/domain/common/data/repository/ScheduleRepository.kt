@@ -17,6 +17,7 @@
 package com.nlab.reminder.domain.common.data.repository
 
 import com.nlab.reminder.domain.common.data.model.Schedule
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -26,7 +27,7 @@ interface ScheduleRepository {
     fun getTodaySchedulesCount(): Flow<Long>
     fun getTimetableSchedulesCount(): Flow<Long>
     fun getAllSchedulesCount(): Flow<Long>
-    fun getAsStream(request: ScheduleGetStreamRequest): Flow<List<Schedule>>
+    fun getAsStream(request: ScheduleGetStreamRequest): Flow<ImmutableList<Schedule>>
 }
 
 sealed class ScheduleGetStreamRequest private constructor() {

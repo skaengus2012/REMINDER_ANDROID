@@ -18,13 +18,14 @@ package com.nlab.reminder.domain.feature.schedule.all
 
 import com.nlab.reminder.domain.common.data.model.Schedule
 import com.nlab.statekit.Action
+import kotlinx.collections.immutable.ImmutableList
 
 /**
  * @author Doohyun
  */
 internal sealed interface AllScheduleAction : Action {
     data class ScheduleLoaded(
-        val schedules: List<Schedule>,
+        val schedules: ImmutableList<Schedule>,
         val isCompletedScheduleShown: Boolean
     ) : AllScheduleAction
 
