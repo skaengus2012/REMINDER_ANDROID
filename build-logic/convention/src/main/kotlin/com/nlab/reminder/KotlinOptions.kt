@@ -28,10 +28,10 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 /**
  * @author Doohyun
  */
-internal fun Project.configureAndroidKotlin(commonExtension: CommonExtension<*, *, *, *>) {
-    val javaVersion = JavaVersion.VERSION_17
-    val javaVersionToNumber = 17
+private val javaVersion: JavaVersion get() = JavaVersion.VERSION_17
+private val javaVersionToNumber: Int get() = 17
 
+internal fun Project.configureAndroidKotlin(commonExtension: CommonExtension<*, *, *, *>) {
     commonExtension.apply {
         compileOptions {
             sourceCompatibility = javaVersion
@@ -74,8 +74,16 @@ internal fun Project.configureAndroidKotlin(commonExtension: CommonExtension<*, 
 }
 
 internal fun Project.configureJvmKotlin() {
+    java {
+        sourceCompatibility = javaVersion
+        targetCompatibility = javaVersion
+    }
+
     tasks.withType<KotlinCompile>().configureEach {
         kotlinOptions {
+            // Enable JVM IR backend for Kotlin
+            jvmTarget = javaVersion.toString()
+
             // Exclude opt-in API warnings
             freeCompilerArgs = listOf(
                 "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
