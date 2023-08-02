@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import com.nlab.reminder.convention.configureJacocoToolVersion
-import com.nlab.reminder.convention.jacocoExcludePatterns
+import com.nlab.reminder.configureJacocoToolVersion
+import com.nlab.reminder.jacocoExcludePatterns
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPlugin

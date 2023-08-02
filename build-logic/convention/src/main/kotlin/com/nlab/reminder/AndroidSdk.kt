@@ -14,13 +14,20 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.convention
+package com.nlab.reminder
 
-import com.android.build.api.variant.Variant
-import org.gradle.configurationcache.extensions.capitalized
+import com.android.build.api.dsl.CommonExtension
 
 /**
  * @author Doohyun
  */
-internal fun Variant.unitTestTaskName(): String? = unitTest?.let { "test${it.name.capitalized()}" }
-internal fun Variant.unitTestCapitalized(): String? = unitTest?.name?.capitalized()
+internal inline fun configureAndroidSdk(extension: CommonExtension<*, *, *, *>, targetSdk: (version: Int) -> Unit) {
+    targetSdk(33)
+    extension.apply {
+        compileSdk = 33
+
+        defaultConfig {
+            minSdk = 23
+        }
+    }
+}

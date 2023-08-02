@@ -15,8 +15,8 @@
  */
 
 import com.android.build.api.dsl.ApplicationExtension
-import com.nlab.reminder.convention.configureAndroidKotlin
-import com.nlab.reminder.convention.configureAndroidSdk
+import com.nlab.reminder.configureAndroidKotlin
+import com.nlab.reminder.configureAndroidSdk
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure

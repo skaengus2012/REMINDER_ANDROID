@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.convention
+package com.nlab.reminder
 
 import com.android.build.api.variant.AndroidComponentsExtension
 import com.android.build.api.variant.Variant

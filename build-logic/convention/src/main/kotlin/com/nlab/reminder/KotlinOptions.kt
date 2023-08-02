@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.convention
+package com.nlab.reminder
 
 import com.android.build.api.dsl.CommonExtension
 import org.gradle.api.JavaVersion

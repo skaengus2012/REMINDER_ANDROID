@@ -1,4 +1,4 @@
-import com.nlab.reminder.convention.configureJvmKotlin
+import com.nlab.reminder.configureJvmKotlin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
