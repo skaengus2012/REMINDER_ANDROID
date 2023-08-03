@@ -14,16 +14,20 @@
  * limitations under the License.
  */
 
-// FIXME Annotations must be added before Gradle 8.1.
-// FIXME https://developer.android.com/studio/build/migrate-to-catalogs?hl=ko#migrate-plugins
-@Suppress("DSL_SCOPE_VIOLATION")
-plugins {
-    id("nlab.jvm.library")
-}
+package com.nlab.reminder
 
-dependencies {
-    implementation(project(":statekit:runtime"))
+import com.android.build.api.dsl.CommonExtension
 
-    implementation(libs.squeare.kotlinpoet)
-    implementation(libs.squeare.kotlinpoet.metadata)
+/**
+ * @author Doohyun
+ */
+internal inline fun configureAndroidSdk(extension: CommonExtension<*, *, *, *>, targetSdk: (version: Int) -> Unit) {
+    targetSdk(33)
+    extension.apply {
+        compileSdk = 33
+
+        defaultConfig {
+            minSdk = 23
+        }
+    }
 }

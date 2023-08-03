@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.convention
+package com.nlab.reminder
 
-import com.android.build.api.variant.Variant
-import org.gradle.configurationcache.extensions.capitalized
+import org.gradle.api.Project
+import org.gradle.api.plugins.ExtensionAware
+import org.gradle.api.plugins.JavaPluginExtension
 
 /**
- * @author Doohyun
+ * @author thalys
  */
-internal fun Variant.unitTestTaskName(): String? = unitTest?.let { "test${it.name.capitalized()}" }
-internal fun Variant.unitTestCapitalized(): String? = unitTest?.name?.capitalized()
+internal fun Project.java(block: JavaPluginExtension.() -> Unit) {
+    (this as ExtensionAware).extensions.configure("java", block)
+}

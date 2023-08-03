@@ -14,20 +14,26 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.convention
+package com.nlab.reminder
 
-import com.android.build.api.dsl.CommonExtension
+import org.gradle.api.Project
+import org.gradle.api.artifacts.VersionCatalogsExtension
+import org.gradle.kotlin.dsl.configure
+import org.gradle.kotlin.dsl.getByType
+import org.gradle.testing.jacoco.plugins.JacocoPluginExtension
 
 /**
  * @author Doohyun
  */
-internal inline fun configureAndroidSdk(extension: CommonExtension<*, *, *, *>, targetSdk: (version: Int) -> Unit) {
-    targetSdk(33)
-    extension.apply {
-        compileSdk = 33
-
-        defaultConfig {
-            minSdk = 23
-        }
+internal fun Project.configureJacocoToolVersion() {
+    val libs = extensions.getByType<VersionCatalogsExtension>().named("libs")
+    configure<JacocoPluginExtension> {
+        toolVersion = libs.findVersion("jacoco").get().toString()
     }
 }
+
+internal val jacocoExcludePatterns: Set<String>
+    get() = setOf(
+        "**/kotlin/**",
+        "**/infra/**",
+    )

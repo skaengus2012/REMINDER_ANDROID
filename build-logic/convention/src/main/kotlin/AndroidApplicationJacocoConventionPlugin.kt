@@ -15,8 +15,8 @@
  */
 
 import com.android.build.api.variant.ApplicationAndroidComponentsExtension
-import com.nlab.reminder.convention.configureAndroidJacoco
-import com.nlab.reminder.convention.configureJacocoToolVersion
+import com.nlab.reminder.configureAndroidJacoco
+import com.nlab.reminder.configureJacocoToolVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.getByType
