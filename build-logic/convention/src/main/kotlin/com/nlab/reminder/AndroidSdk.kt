@@ -21,9 +21,12 @@ import com.android.build.api.dsl.CommonExtension
 /**
  * @author Doohyun
  */
-internal inline fun configureAndroidSdk(extension: CommonExtension<*, *, *, *>, targetSdk: (version: Int) -> Unit) {
+internal inline fun configureAndroidSdk(
+    commonExtension: CommonExtension<*, *, *, *, *>,
+    targetSdk: (version: Int) -> Unit
+) {
     targetSdk(33)
-    extension.apply {
+    commonExtension.apply {
         compileSdk = 33
 
         defaultConfig {
