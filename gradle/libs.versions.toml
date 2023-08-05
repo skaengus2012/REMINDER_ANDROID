@@ -1,6 +1,6 @@
 [versions]
 afollestedDragselectRecyclerView = "2.4.0"
-androidGradlePlugin = "8.0.2"
+androidGradlePlugin = "8.1.0"
 androidxAppCompat = "1.6.1"
 androidxComposeBom = "2023.06.01"
 androidxComposeCompiler = "1.4.7"
