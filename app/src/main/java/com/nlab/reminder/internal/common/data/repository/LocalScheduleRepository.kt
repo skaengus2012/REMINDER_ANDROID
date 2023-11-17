@@ -16,16 +16,17 @@
 
 package com.nlab.reminder.internal.common.data.repository
 
-import com.nlab.reminder.core.kotlin.collection.immutable.mapToPersistentList
 import com.nlab.reminder.core.kotlin.coroutine.flow.map
 import com.nlab.reminder.core.util.test.annotation.ExcludeFromGeneratedTestReport
 import com.nlab.reminder.domain.common.data.model.Schedule
 import com.nlab.reminder.domain.common.data.repository.ScheduleGetStreamRequest
 import com.nlab.reminder.domain.common.data.repository.ScheduleRepository
 import com.nlab.reminder.internal.common.android.database.ScheduleDao
+import com.nlab.reminder.internal.common.android.database.ScheduleEntityWithTagEntities
 import com.nlab.reminder.internal.common.data.model.toModel
 import com.nlab.reminder.internal.common.data.repository.fake.FakeScheduleRepositoryDelegate
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -54,7 +55,9 @@ internal class LocalScheduleRepository @Inject constructor(
         }
 
         return entitiesFlow.map { entities ->
-            entities.mapToPersistentList { it.toModel() }
+            entities
+                .map(ScheduleEntityWithTagEntities::toModel)
+                .toImmutableList()
         }
     }
 }
