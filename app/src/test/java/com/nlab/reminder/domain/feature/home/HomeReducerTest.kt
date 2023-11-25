@@ -21,9 +21,9 @@ import com.nlab.reminder.core.state.UserMessage
 import com.nlab.reminder.domain.common.data.model.genTag
 import com.nlab.reminder.domain.common.data.model.genTagUsageCount
 import com.nlab.reminder.domain.common.data.model.genTags
-import com.nlab.statekit.test.expectedState
-import com.nlab.statekit.test.expectedStateToInit
-import com.nlab.statekit.test.tester
+import com.nlab.statekit.expectedState
+import com.nlab.statekit.expectedStateToInit
+import com.nlab.statekit.scenario
 import com.nlab.testkit.genBothify
 import com.nlab.testkit.genInt
 import com.nlab.testkit.genLong
@@ -36,9 +36,9 @@ import org.junit.Test
 internal class HomeReducerTest {
     @Test
     fun testCompleteWorkflow() {
-        HomeReducer().tester()
-            .dispatchAction(HomeAction.CompleteWorkflow)
+        HomeReducer().scenario()
             .initState(genHomeUiStateSuccess(workflow = genHomeWorkflowExcludeEmpty()))
+            .action(HomeAction.CompleteWorkflow)
             .expectedStateFromInitTypeOf<HomeUiState.Success> { it.copy(workflow = HomeWorkflow.Empty) }
             .verify()
     }
@@ -48,18 +48,18 @@ internal class HomeReducerTest {
         val shownMessage = UserMessage(genInt())
         val expectedState = genHomeUiStateSuccess(userMessages = emptyList())
 
-        HomeReducer().tester()
-            .dispatchAction(HomeAction.UserMessageShown(shownMessage))
+        HomeReducer().scenario()
             .initState(expectedState.copy(userMessages = persistentListOf(shownMessage)))
+            .action(HomeAction.UserMessageShown(shownMessage))
             .expectedState(expectedState)
             .verify()
     }
 
     @Test
     fun testErrorOccurred() {
-        HomeReducer().tester()
-            .dispatchAction(HomeAction.ErrorOccurred(Throwable()))
+        HomeReducer().scenario()
             .initState(genHomeUiStateSuccess(userMessages = emptyList()))
+            .action(HomeAction.ErrorOccurred(Throwable()))
             .expectedStateFromInitTypeOf<HomeUiState.Success> { initState ->
                 initState.copy(userMessages = persistentListOf(UserMessage(R.string.unknown_error)))
             }
@@ -68,36 +68,36 @@ internal class HomeReducerTest {
 
     @Test
     fun `Workflow not changed, when workflow exists`() {
-        HomeReducer().tester()
-            .dispatchAction(HomeAction.OnTodayCategoryClicked)
+        HomeReducer().scenario()
             .initState(genHomeUiStateSuccess(workflow = genHomeWorkflowExcludeEmpty()))
+            .action(HomeAction.OnTodayCategoryClicked)
             .expectedStateToInit()
             .verify()
     }
 
     @Test
     fun `Today's schedule was shown, when today category clicked`() {
-        HomeReducer().tester()
-            .dispatchAction(HomeAction.OnTodayCategoryClicked)
+        HomeReducer().scenario()
             .initState(genHomeUiStateSuccess(workflow = HomeWorkflow.Empty))
+            .action(HomeAction.OnTodayCategoryClicked)
             .expectedStateFromInitTypeOf<HomeUiState.Success> { it.copy(workflow = HomeWorkflow.TodaySchedule) }
             .verify()
     }
 
     @Test
     fun `Timetable's schedule was shown, when timetable category clicked`() {
-        HomeReducer().tester()
-            .dispatchAction(HomeAction.OnTimetableCategoryClicked)
+        HomeReducer().scenario()
             .initState(genHomeUiStateSuccess(workflow = HomeWorkflow.Empty))
+            .action(HomeAction.OnTimetableCategoryClicked)
             .expectedStateFromInitTypeOf<HomeUiState.Success> { it.copy(workflow = HomeWorkflow.TimetableSchedule) }
             .verify()
     }
 
     @Test
     fun `All's schedule was shown, when all category clicked`() {
-        HomeReducer().tester()
-            .dispatchAction(HomeAction.OnAllCategoryClicked)
+        HomeReducer().scenario()
             .initState(genHomeUiStateSuccess(workflow = HomeWorkflow.Empty))
+            .action(HomeAction.OnAllCategoryClicked)
             .expectedStateFromInitTypeOf<HomeUiState.Success> { it.copy(workflow = HomeWorkflow.AllSchedule) }
             .verify()
     }
@@ -112,9 +112,9 @@ internal class HomeReducerTest {
             workflow = HomeWorkflow.Empty
         )
 
-        HomeReducer().tester()
-            .dispatchAction(expectedState.toSummaryLoadedAction())
+        HomeReducer().scenario()
             .initState(HomeUiState.Loading)
+            .action(expectedState.toSummaryLoadedAction())
             .expectedState(expectedState)
             .verify()
     }
@@ -128,8 +128,7 @@ internal class HomeReducerTest {
             tags = genTags(count = genInt(min = 10))
         )
 
-        HomeReducer().tester()
-            .dispatchAction(expectedState.toSummaryLoadedAction())
+        HomeReducer().scenario()
             .initState(
                 expectedState.copy(
                     todayScheduleCount = 0,
@@ -138,6 +137,7 @@ internal class HomeReducerTest {
                     tags = persistentListOf()
                 )
             )
+            .action(expectedState.toSummaryLoadedAction())
             .expectedState(expectedState)
             .verify()
     }
@@ -147,9 +147,9 @@ internal class HomeReducerTest {
         val tag = genTag()
         val usageCount = genTagUsageCount()
 
-        HomeReducer().tester()
-            .dispatchAction(HomeAction.TagConfigMetadataLoaded(tag, usageCount))
+        HomeReducer().scenario()
             .initState(genHomeUiStateSuccess(tags = listOf(tag), workflow = HomeWorkflow.Empty))
+            .action(HomeAction.TagConfigMetadataLoaded(tag, usageCount))
             .expectedStateFromInitTypeOf<HomeUiState.Success> { initState ->
                 initState.copy(workflow = HomeWorkflow.TagConfig(tag, usageCount))
             }
@@ -158,8 +158,7 @@ internal class HomeReducerTest {
 
     @Test
     fun `Show not exists tag message, when no tag used for TagConfig`() {
-        HomeReducer().tester()
-            .dispatchAction(HomeAction.TagConfigMetadataLoaded(genTag(), genTagUsageCount()))
+        HomeReducer().scenario()
             .initState(
                 genHomeUiStateSuccess(
                     tags = emptyList(),
@@ -167,6 +166,7 @@ internal class HomeReducerTest {
                     workflow = HomeWorkflow.Empty
                 )
             )
+            .action(HomeAction.TagConfigMetadataLoaded(genTag(), genTagUsageCount()))
             .expectedStateFromInitTypeOf<HomeUiState.Success> { initState ->
                 initState.copy(userMessages = persistentListOf(UserMessage(R.string.tag_not_exist)))
             }
@@ -178,14 +178,14 @@ internal class HomeReducerTest {
         val tag = genTag()
         val usageCount = genTagUsageCount()
 
-        HomeReducer().tester()
-            .dispatchAction(HomeAction.OnTagRenameRequestClicked)
+        HomeReducer().scenario()
             .initState(
                 genHomeUiStateSuccess(
                     tags = emptyList(),
                     workflow = HomeWorkflow.TagConfig(tag, usageCount)
                 )
             )
+            .action(HomeAction.OnTagRenameRequestClicked)
             .expectedStateFromInitTypeOf<HomeUiState.Success> { initState ->
                 initState.copy(
                     workflow = HomeWorkflow.TagRename(
@@ -201,13 +201,13 @@ internal class HomeReducerTest {
 
     @Test
     fun `Nothing happened, when tag rename request clicked, but tagConfig workflow not set`() {
-        HomeReducer().tester()
-            .dispatchAction(HomeAction.OnTagRenameRequestClicked)
+        HomeReducer().scenario()
             .initState(
                 genHomeUiStateSuccess(
                     workflow = genHomeWorkflowExcludeEmpty(ignoreCases = setOf(HomeWorkflow.TagConfig::class))
                 )
             )
+            .action(HomeAction.OnTagRenameRequestClicked)
             .expectedStateToInit()
             .verify()
     }
@@ -216,9 +216,9 @@ internal class HomeReducerTest {
     fun `Keyboard shown by Tag rename input box`() {
         val tagRenameWorkflow = genHomeTagRenameWorkflow(shouldKeyboardShown = true)
 
-        HomeReducer().tester()
-            .dispatchAction(HomeAction.OnTagRenameInputKeyboardShown)
+        HomeReducer().scenario()
             .initState(genHomeUiStateSuccess(workflow = tagRenameWorkflow))
+            .action(HomeAction.OnTagRenameInputKeyboardShown)
             .expectedStateFromInitTypeOf<HomeUiState.Success> { initState ->
                 initState.copy(workflow = tagRenameWorkflow.copy(shouldKeyboardShown = false))
             }
@@ -227,13 +227,13 @@ internal class HomeReducerTest {
 
     @Test
     fun `Nothing happened, when keyboard shown, but tagRename workflow not set`() {
-        HomeReducer().tester()
-            .dispatchAction(HomeAction.OnTagRenameInputKeyboardShown)
+        HomeReducer().scenario()
             .initState(
                 genHomeUiStateSuccess(
                     workflow = genHomeWorkflowExcludeEmpty(ignoreCases = setOf(HomeWorkflow.TagRename::class))
                 )
             )
+            .action(HomeAction.OnTagRenameInputKeyboardShown)
             .expectedStateToInit()
             .verify()
     }
@@ -243,9 +243,9 @@ internal class HomeReducerTest {
         val input = genBothify("rename-????")
         val tagRename = genHomeTagRenameWorkflow(renameText = "")
 
-        HomeReducer().tester()
-            .dispatchAction(HomeAction.OnTagRenameInputted(input))
+        HomeReducer().scenario()
             .initState(genHomeUiStateSuccess(workflow = tagRename))
+            .action(HomeAction.OnTagRenameInputted(input))
             .expectedStateFromInitTypeOf<HomeUiState.Success> { initState ->
                 initState.copy(workflow = tagRename.copy(renameText = input))
             }
@@ -254,13 +254,13 @@ internal class HomeReducerTest {
 
     @Test
     fun `Nothing happened, when tag rename text inputted, but tagRename workflow not set`() {
-        HomeReducer().tester()
-            .dispatchAction(HomeAction.OnTagRenameInputKeyboardShown)
+        HomeReducer().scenario()
             .initState(
                 genHomeUiStateSuccess(
                     workflow = genHomeWorkflowExcludeEmpty(ignoreCases = setOf(HomeWorkflow.TagRename::class))
                 )
             )
+            .action(HomeAction.OnTagRenameInputKeyboardShown)
             .expectedStateToInit()
             .verify()
     }
@@ -270,14 +270,14 @@ internal class HomeReducerTest {
         val tag = genTag()
         val usageCount = genTagUsageCount()
 
-        HomeReducer().tester()
-            .dispatchAction(HomeAction.OnTagDeleteRequestClicked)
+        HomeReducer().scenario()
             .initState(
                 genHomeUiStateSuccess(
                     tags = emptyList(),
                     workflow = HomeWorkflow.TagConfig(tag, usageCount)
                 )
             )
+            .action(HomeAction.OnTagDeleteRequestClicked)
             .expectedStateFromInitTypeOf<HomeUiState.Success> { initState ->
                 initState.copy(workflow = HomeWorkflow.TagDelete(tag = tag, usageCount = usageCount))
             }
@@ -286,11 +286,11 @@ internal class HomeReducerTest {
 
     @Test
     fun `Nothing happened, when tag delete request clicked, but tagConfig workflow not set`() {
-        HomeReducer().tester()
-            .dispatchAction(HomeAction.OnTagDeleteRequestClicked)
+        HomeReducer().scenario()
             .initState(genHomeUiStateSuccess(
                 workflow = genHomeWorkflowExcludeEmpty(ignoreCases = setOf(HomeWorkflow.TagConfig::class))
             ))
+            .action(HomeAction.OnTagDeleteRequestClicked)
             .expectedStateToInit()
             .verify()
     }

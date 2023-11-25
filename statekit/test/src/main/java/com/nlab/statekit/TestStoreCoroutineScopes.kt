@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.statekit.test
+package com.nlab.statekit
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.test.TestScope
@@ -23,5 +23,5 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 /**
  * @author Doohyun
  */
-fun TestScope.testStoreDispatcher() = UnconfinedTestDispatcher(testScheduler)
-fun TestScope.testStoreCoroutineScope() = CoroutineScope(testStoreDispatcher())
+internal fun TestScope.testStoreDispatcher() = UnconfinedTestDispatcher(testScheduler)
+internal fun TestScope.testStoreCoroutineScope() = CoroutineScope(testStoreDispatcher())
