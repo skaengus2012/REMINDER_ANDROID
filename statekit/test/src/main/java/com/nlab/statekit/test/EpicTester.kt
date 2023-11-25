@@ -19,6 +19,7 @@ package com.nlab.statekit.test
 import com.nlab.statekit.Action
 import com.nlab.statekit.State
 import com.nlab.statekit.middleware.epic.Epic
+import com.nlab.statekit.testStoreCoroutineScope
 import com.nlab.statekit.util.buildDslInterceptor
 import com.nlab.statekit.util.createStore
 import kotlinx.coroutines.CompletableDeferred

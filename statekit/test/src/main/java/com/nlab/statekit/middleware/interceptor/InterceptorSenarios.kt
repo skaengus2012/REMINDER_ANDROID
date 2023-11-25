@@ -17,7 +17,7 @@
 package com.nlab.statekit.middleware.interceptor
 
 import com.nlab.statekit.*
-import com.nlab.statekit.test.testStoreCoroutineScope
+import com.nlab.statekit.testStoreCoroutineScope
 import com.nlab.statekit.util.*
 import kotlinx.coroutines.test.*
 
