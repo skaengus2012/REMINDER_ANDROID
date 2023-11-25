@@ -17,7 +17,7 @@
 package com.nlab.reminder.domain.feature.home
 
 import com.nlab.reminder.domain.common.data.model.genTags
-import com.nlab.statekit.test.tester
+import com.nlab.statekit.middleware.epic.scenario
 import com.nlab.testkit.genInt
 import com.nlab.testkit.genLong
 import kotlinx.coroutines.flow.flowOf
@@ -44,8 +44,8 @@ internal class HomeEpicTest {
                 whenever(mock.getTimetableSchedulesCount()) doReturn flowOf(timetableSchedulesCount)
                 whenever(mock.getAllSchedulesCount()) doReturn flowOf(allSchedulesCount)
             })
-            .tester()
-            .expectedAction(
+            .scenario()
+            .action(
                 HomeAction.SummaryLoaded(
                     todaySchedulesCount = todaySchedulesCount,
                     timetableSchedulesCount = timetableSchedulesCount,

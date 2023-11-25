@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.nlab.statekit.test
+package com.nlab.statekit.middleware.epic
 
 import com.nlab.statekit.Action
 import com.nlab.statekit.State
-import com.nlab.statekit.middleware.epic.Epic
+import com.nlab.statekit.testStoreCoroutineScope
 import com.nlab.statekit.util.buildDslInterceptor
 import com.nlab.statekit.util.createStore
 import kotlinx.coroutines.CompletableDeferred
@@ -30,18 +30,21 @@ import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 
 /**
- * @author Doohyun
+ * @author thalys
  */
-class EpicTester<A : Action> internal constructor(
-    private val epic: Epic<A>,
-    private val expectedAction: A?,
+class EpicScenarioActionSetup<A : Action> internal constructor(
+    private val epic: Epic<A>
 ) {
-    fun expectedAction(expectedAction: A): EpicTester<A> =
-        EpicTester(epic, expectedAction)
+    fun action(action: A): EpicScenario<A> = EpicScenario(epic, action)
+}
 
+fun <A : Action> Epic<A>.scenario(): EpicScenarioActionSetup<A> = EpicScenarioActionSetup(epic = this)
+
+class EpicScenario<A : Action> internal constructor(
+    private val epic: Epic<A>,
+    private val action: A,
+) {
     fun verify() = runTest {
-        checkNotNull(expectedAction) { "ExpectedAction must not be null" }
-
         val awaitSummaryLoadedReceived = CompletableDeferred<Action>()
         val store = createStore(
             testStoreCoroutineScope(),
@@ -55,12 +58,9 @@ class EpicTester<A : Action> internal constructor(
         )
         val collectJob = launch { store.state.collect() }
 
-        assertThat(awaitSummaryLoadedReceived.await(), equalTo(expectedAction))
+        assertThat(awaitSummaryLoadedReceived.await(), equalTo(action))
         collectJob.cancelAndJoin()
     }
 }
 
 private class EpicTestState : State
-
-fun <A : Action> Epic<A>.tester(): EpicTester<A> =
-    EpicTester(epic = this, expectedAction = null)

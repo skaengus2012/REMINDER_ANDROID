@@ -20,15 +20,9 @@ import com.nlab.reminder.core.kotlin.util.Result
 import com.nlab.reminder.domain.common.data.model.genTag
 import com.nlab.reminder.domain.common.data.model.genTagUsageCount
 import com.nlab.reminder.domain.common.data.repository.TagRepository
-import com.nlab.statekit.middleware.interceptor.Interceptor
-import com.nlab.statekit.util.buildInterceptor
-import com.nlab.statekit.util.createStore
-import com.nlab.statekit.util.*
-import com.nlab.testkit.ExpectedRuntimeException
+import com.nlab.statekit.middleware.interceptor.scenario
 import com.nlab.testkit.genBothify
 import com.nlab.testkit.once
-import com.nlab.testkit.unconfinedCoroutineScope
-import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import org.mockito.kotlin.doReturn
@@ -44,43 +38,35 @@ internal class HomeInterceptorTest {
     fun `Sending TagConfigMetadata, when tag was long clicked`() = runTest {
         val target = genTag()
         val usageCount = genTagUsageCount()
-        val tagRepository: TagRepository = mock {
+        val tagRepository = mock<TagRepository> {
             whenever(mock.getUsageCount(target)) doReturn Result.Success(usageCount)
         }
         val loadedTagConfigMetadata: (HomeAction.TagConfigMetadataLoaded) -> Unit = mock()
-        dispatchWithInterceptor(
-            action = HomeAction.OnTagLongClicked(tag = target),
-            interceptor = genHomeInterceptor(tagRepository),
-            additionalInterceptors = listOf(
-                buildInterceptor {
-                    loadedTagConfigMetadata(
-                        it.action as? HomeAction.TagConfigMetadataLoaded ?: return@buildInterceptor
-                    )
-                }
-            )
-        )
+
+        genHomeInterceptor(tagRepository = tagRepository)
+            .scenario()
+            .initState(genHomeUiStateSuccess())
+            .action(HomeAction.OnTagLongClicked(tag = target))
+            .hookIf<HomeAction.TagConfigMetadataLoaded> { loadedTagConfigMetadata(it) }
+            .dispatchIn(testScope = this)
         verify(loadedTagConfigMetadata, once()).invoke(HomeAction.TagConfigMetadataLoaded(target, usageCount))
     }
 
-    @Test(expected = ExpectedRuntimeException::class)
+    @Test(expected = IllegalStateException::class)
     fun `Sending error message, when tag was long clicked`() = runTest {
         val target = genTag()
-        val error = ExpectedRuntimeException()
-        val tagRepository: TagRepository = mock {
+        val error = IllegalStateException()
+        val tagRepository = mock<TagRepository> {
             whenever(mock.getUsageCount(target)) doReturn Result.Failure(error)
         }
         val errorOccurred: (HomeAction.ErrorOccurred) -> Unit = mock()
-        dispatchWithInterceptor(
-            action = HomeAction.OnTagLongClicked(tag = target),
-            interceptor = genHomeInterceptor(tagRepository),
-            additionalInterceptors = listOf(
-                buildInterceptor {
-                    errorOccurred(
-                        it.action as? HomeAction.ErrorOccurred ?: return@buildInterceptor
-                    )
-                }
-            )
-        )
+
+        genHomeInterceptor(tagRepository = tagRepository)
+            .scenario()
+            .initState(genHomeUiStateSuccess())
+            .action(HomeAction.OnTagLongClicked(tag = target))
+            .hookIf<HomeAction.ErrorOccurred> { errorOccurred(it) }
+            .dispatchIn(testScope = this)
         verify(errorOccurred, once()).invoke(HomeAction.ErrorOccurred(error))
     }
 
@@ -91,27 +77,26 @@ internal class HomeInterceptorTest {
         val tagRepository: TagRepository = mock {
             whenever(mock.updateName(tag, updateName)) doReturn Result.Success(Unit)
         }
-        dispatchWithInterceptor(
-            initState = genHomeUiStateSuccess(
-                workflow = genHomeTagRenameWorkflow(
-                    tag = tag,
-                    renameText = updateName
-                )
-            ),
-            action = HomeAction.OnTagRenameConfirmClicked,
-            interceptor = genHomeInterceptor(tagRepository = tagRepository),
-        )
+
+        genHomeInterceptor(tagRepository = tagRepository)
+            .scenario()
+            .initState(genHomeUiStateSuccess(workflow = genHomeTagRenameWorkflow(tag = tag, renameText = updateName)))
+            .action(HomeAction.OnTagRenameConfirmClicked)
+            .dispatchIn(testScope = this)
         verify(tagRepository, once()).updateName(tag, updateName)
     }
 
     @Test(expected = IllegalStateException::class)
     fun `Failed rename tag, when renameTagConfig was not set`() = runTest {
-        dispatchWithInterceptor(
-            initState = genHomeUiStateSuccess(
-                workflow = genHomeWorkflowExcludeEmpty(ignoreCases = setOf(HomeWorkflow.TagRename::class))
-            ),
-            action = HomeAction.OnTagRenameConfirmClicked,
-        )
+        genHomeInterceptor()
+            .scenario()
+            .initState(
+                genHomeUiStateSuccess(
+                    workflow = genHomeWorkflowExcludeEmpty(ignoreCases = setOf(HomeWorkflow.TagRename::class))
+                )
+            )
+            .action(HomeAction.OnTagRenameConfirmClicked)
+            .dispatchIn(testScope = this)
     }
 
     @Test
@@ -120,43 +105,29 @@ internal class HomeInterceptorTest {
         val tagRepository: TagRepository = mock {
             whenever(mock.delete(tagDelete.tag)) doReturn Result.Success(Unit)
         }
-        dispatchWithInterceptor(
-            initState = genHomeUiStateSuccess(workflow = tagDelete),
-            action = HomeAction.OnTagDeleteConfirmClicked,
-            interceptor = genHomeInterceptor(tagRepository = tagRepository),
-        )
+
+        genHomeInterceptor(tagRepository = tagRepository)
+            .scenario()
+            .initState(genHomeUiStateSuccess(workflow = tagDelete))
+            .action(HomeAction.OnTagDeleteConfirmClicked)
+            .dispatchIn(testScope = this)
         verify(tagRepository, once()).delete(tagDelete.tag)
     }
 
     @Test(expected = IllegalStateException::class)
     fun `Failed delete tag, when deleteTagConfig was not set`() = runTest {
-        dispatchWithInterceptor(
-            initState = genHomeUiStateSuccess(
-                workflow = genHomeWorkflowExcludeEmpty(ignoreCases = setOf(HomeWorkflow.TagDelete::class))
-            ),
-            action = HomeAction.OnTagDeleteConfirmClicked,
-        )
+        genHomeInterceptor()
+            .scenario()
+            .initState(
+                genHomeUiStateSuccess(
+                    workflow = genHomeWorkflowExcludeEmpty(ignoreCases = setOf(HomeWorkflow.TagDelete::class))
+                )
+            )
+            .action(HomeAction.OnTagDeleteConfirmClicked)
+            .dispatchIn(testScope = this)
     }
 }
 
-private suspend fun TestScope.dispatchWithInterceptor(
-    action: HomeAction,
-    initState: HomeUiState = genHomeUiStateSuccess(),
-    interceptor: HomeInterceptor = genHomeInterceptor(),
-    additionalInterceptors: List<Interceptor<HomeAction, HomeUiState>> = emptyList()
-) {
-    var concatInterceptors: Interceptor<HomeAction, HomeUiState> = interceptor
-    additionalInterceptors.forEach { concatInterceptors += it }
-    val store = createStore(
-        unconfinedCoroutineScope(),
-        initState = initState,
-        interceptor = concatInterceptors
-    )
-    store.dispatch(action).join()
-}
-
-private fun genHomeInterceptor(
-    tagRepository: TagRepository = mock()
-) = HomeInterceptor(
+private fun genHomeInterceptor(tagRepository: TagRepository = mock()) = HomeInterceptor(
     tagRepository = tagRepository
 )

@@ -30,7 +30,7 @@ import javax.inject.Inject
  * @author Doohyun
  */
 internal class HomeInterceptor @Inject constructor(
-    private val tagRepository: TagRepository
+    tagRepository: TagRepository
 ) : Interceptor<HomeAction, HomeUiState> by buildDslInterceptor(defineDSL = {
     state<HomeUiState.Success> {
         action<HomeAction.OnTagLongClicked> { (action) ->
