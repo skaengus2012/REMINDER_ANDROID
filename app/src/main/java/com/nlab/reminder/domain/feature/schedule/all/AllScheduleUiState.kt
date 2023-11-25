@@ -26,7 +26,7 @@ import kotlinx.collections.immutable.ImmutableList
  */
 @Stable
 internal sealed interface AllScheduleUiState : State {
-    object Idle : AllScheduleUiState
+    object Empty : AllScheduleUiState
     data class Loaded(
         val schedules: ImmutableList<Schedule>,
         val isCompletedScheduleShown: Boolean,

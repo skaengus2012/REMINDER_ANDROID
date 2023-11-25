@@ -27,13 +27,13 @@ import org.junit.Test
  */
 internal class AllScheduleReducerTest {
     @Test
-    fun `Load schedules, when idle`() {
+    fun `Load schedules, when empty`() {
         val expectedState = genAllScheduleUiStateLoaded(
             isSelectionMode = false
         )
 
         AllScheduleReducer().scenario()
-            .initState(AllScheduleUiState.Idle)
+            .initState(AllScheduleUiState.Empty)
             .action(expectedState.toLoadedAction())
             .expectedState(expectedState)
             .verify()
@@ -65,6 +65,7 @@ internal class AllScheduleReducerTest {
             .expectedStateFromInitTypeOf<AllScheduleUiState.Loaded> { it.copy(isSelectionMode = expectedSelectionMode) }
             .verify()
     }
+
 }
 
 private fun AllScheduleUiState.Loaded.toLoadedAction(): AllScheduleAction.ScheduleLoaded =

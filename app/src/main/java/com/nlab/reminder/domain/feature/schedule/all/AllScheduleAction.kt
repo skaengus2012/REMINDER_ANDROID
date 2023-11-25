@@ -30,4 +30,5 @@ internal sealed interface AllScheduleAction : Action {
     ) : AllScheduleAction
 
     data class OnSelectionModeUpdateClicked(val isSelectionMode: Boolean) : AllScheduleAction
+    data class OnCompletedScheduleVisibilityUpdateClicked(val isVisible: Boolean) : AllScheduleAction
 }

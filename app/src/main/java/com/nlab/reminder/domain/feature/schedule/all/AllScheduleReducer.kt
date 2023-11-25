@@ -27,7 +27,7 @@ private typealias DomainReducer = Reducer<AllScheduleAction, AllScheduleUiState>
  */
 internal class AllScheduleReducer @Inject constructor() : DomainReducer by buildDslReducer(defineDSL = {
     action<AllScheduleAction.ScheduleLoaded> {
-        state<AllScheduleUiState.Idle> { (action) ->
+        state<AllScheduleUiState.Empty> { (action) ->
             AllScheduleUiState.Loaded(
                 schedules = action.schedules,
                 isCompletedScheduleShown = action.isCompletedScheduleShown,
