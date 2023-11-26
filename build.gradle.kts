@@ -14,17 +14,9 @@
  * limitations under the License.
  */
 
-// FIXME Annotations must be added before Gradle 8.1.
-// FIXME https://developer.android.com/studio/build/migrate-to-catalogs?hl=ko#migrate-plugins
-@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     alias(libs.plugins.kotlin.jvm) apply false
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.androidx.navigation.safearges) apply false
     alias(libs.plugins.google.hilt) apply false
-}
-
-// FIXME It's required some blocks below plugin blocks.
-// FIXME https://github.com/gradle/gradle/issues/20131
-dependencies {
 }

@@ -14,9 +14,6 @@
  * limitations under the License.
  */
 
-// FIXME Annotations must be added before Gradle 8.1.
-// FIXME https://developer.android.com/studio/build/migrate-to-catalogs?hl=ko#migrate-plugins
-@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     alias(libs.plugins.nlab.android.application)
     alias(libs.plugins.nlab.android.application.jacoco)
