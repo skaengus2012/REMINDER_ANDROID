@@ -1,6 +1,7 @@
-import com.nlab.reminder.configureJvmKotlin
-import org.gradle.api.Plugin
-import org.gradle.api.Project
+import com.android.build.api.variant.ApplicationAndroidComponentsExtension
+import com.nlab.reminder.configureJacocoAndroid
+import com.nlab.reminder.configureJacocoToolVersion
+import org.gradle.kotlin.dsl.getByType
 
 /*
  * Copyright (C) 2023 The N's lab Open Source Project
@@ -18,15 +19,10 @@ import org.gradle.api.Project
  * limitations under the License.
  */
 
-/**
- * @author Doohyun
- */
-@Suppress("unused")
-internal class JvmLibraryConventionPlugin : Plugin<Project> {
-    override fun apply(target: Project) = with(target) {
-        with(pluginManager) {
-            apply("org.jetbrains.kotlin.jvm")
-        }
-        configureJvmKotlin()
-    }
+with(pluginManager) {
+    apply("org.gradle.jacoco")
+    apply("com.android.application")
 }
+
+configureJacocoToolVersion()
+configureJacocoAndroid(extensions.getByType<ApplicationAndroidComponentsExtension>())

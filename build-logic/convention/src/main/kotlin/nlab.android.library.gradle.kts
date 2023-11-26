@@ -1,3 +1,8 @@
+import com.android.build.gradle.LibraryExtension
+import com.nlab.reminder.configureAndroidSdk
+import com.nlab.reminder.configureKotlinAndroid
+import org.gradle.kotlin.dsl.configure
+
 /*
  * Copyright (C) 2023 The N's lab Open Source Project
  *
@@ -13,21 +18,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package com.nlab.reminder
-
-import org.gradle.api.Project
-import org.gradle.api.artifacts.VersionCatalogsExtension
-import org.gradle.api.plugins.ExtensionAware
-import org.gradle.api.plugins.JavaPluginExtension
-import org.gradle.kotlin.dsl.getByType
-
-/**
- * @author thalys
- */
-internal fun Project.java(block: JavaPluginExtension.() -> Unit) {
-    (this as ExtensionAware).extensions.configure("java", block)
+with(pluginManager) {
+    apply("com.android.library")
+    apply("org.jetbrains.kotlin.android")
 }
 
-internal val Project.libs get() =
-    extensions.getByType<VersionCatalogsExtension>().named("libs")
+extensions.configure<LibraryExtension> {
+    configureAndroidSdk(this)
+    configureKotlinAndroid(this)
+}

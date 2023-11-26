@@ -1,3 +1,8 @@
+import com.android.build.api.variant.LibraryAndroidComponentsExtension
+import com.nlab.reminder.configureJacocoAndroid
+import com.nlab.reminder.configureJacocoToolVersion
+import org.gradle.kotlin.dsl.getByType
+
 /*
  * Copyright (C) 2023 The N's lab Open Source Project
  *
@@ -13,21 +18,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package com.nlab.reminder
-
-import org.gradle.api.Project
-import org.gradle.api.artifacts.VersionCatalogsExtension
-import org.gradle.api.plugins.ExtensionAware
-import org.gradle.api.plugins.JavaPluginExtension
-import org.gradle.kotlin.dsl.getByType
-
-/**
- * @author thalys
- */
-internal fun Project.java(block: JavaPluginExtension.() -> Unit) {
-    (this as ExtensionAware).extensions.configure("java", block)
+with(pluginManager) {
+    apply("org.gradle.jacoco")
+    apply("com.android.library")
 }
 
-internal val Project.libs get() =
-    extensions.getByType<VersionCatalogsExtension>().named("libs")
+configureJacocoToolVersion()
+configureJacocoAndroid(extensions.getByType<LibraryAndroidComponentsExtension>())

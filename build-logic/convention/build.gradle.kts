@@ -36,32 +36,3 @@ dependencies {
     compileOnly(libs.kotlin.gradle.plugin)
     compileOnly(libs.android.gradle.plugin)
 }
-
-gradlePlugin {
-    plugins {
-        register("androidApplication") {
-            id = "nlab.android.application"
-            implementationClass = "AndroidApplicationConventionPlugin"
-        }
-        register("androidApplicationJacoco") {
-            id = "nlab.android.application.jacoco"
-            implementationClass = "AndroidApplicationJacocoConventionPlugin"
-        }
-        register("androidLibrary") {
-            id = "nlab.android.library"
-            implementationClass = "AndroidLibraryConventionPlugin"
-        }
-        register("androidLibraryJacoco") {
-            id = "nlab.android.library.jacoco"
-            implementationClass = "AndroidLibraryJacocoConventionPlugin"
-        }
-        register("jvmLibrary") {
-            id = "nlab.jvm.library"
-            implementationClass = "JvmLibraryConventionPlugin"
-        }
-        register("jvmLibraryJacoco") {
-            id = "nlab.jvm.library.jacoco"
-            implementationClass = "JvmLibraryJacocoConventionPlugin"
-        }
-    }
-}

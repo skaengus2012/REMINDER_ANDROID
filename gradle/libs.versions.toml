@@ -1,4 +1,11 @@
 [versions]
+
+# build Environmental
+compileSdk = "33"
+targetSdk = "33"
+minSdk = "23"
+
+# library version
 afollestedDragselectRecyclerView = "2.4.0"
 androidGradlePlugin = "8.1.0"
 androidxAppCompat = "1.6.1"

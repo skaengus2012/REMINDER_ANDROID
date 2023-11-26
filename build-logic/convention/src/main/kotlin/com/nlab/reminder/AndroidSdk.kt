@@ -17,20 +17,12 @@
 package com.nlab.reminder
 
 import com.android.build.api.dsl.CommonExtension
+import org.gradle.api.Project
 
 /**
  * @author Doohyun
  */
-internal inline fun configureAndroidSdk(
-    commonExtension: CommonExtension<*, *, *, *, *>,
-    targetSdk: (version: Int) -> Unit
-) {
-    targetSdk(33)
-    commonExtension.apply {
-        compileSdk = 33
-
-        defaultConfig {
-            minSdk = 23
-        }
-    }
+internal fun Project.configureAndroidSdk(commonExtension: CommonExtension<*, *, *, *, *>) = with(commonExtension) {
+    compileSdk = libs.findVersion("compileSdk").get().toString().toInt()
+    defaultConfig.minSdk = libs.findVersion("minSdk").get().toString().toInt()
 }
