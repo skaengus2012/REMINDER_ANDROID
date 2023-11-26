@@ -18,7 +18,7 @@
 // FIXME https://developer.android.com/studio/build/migrate-to-catalogs?hl=ko#migrate-plugins
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-    id("nlab.jvm.library")
+    alias(libs.plugins.nlab.jvm.library)
 }
 
 dependencies {
