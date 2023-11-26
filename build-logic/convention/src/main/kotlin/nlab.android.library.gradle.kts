@@ -1,3 +1,8 @@
+import com.android.build.gradle.LibraryExtension
+import com.nlab.reminder.configureAndroidSdk
+import com.nlab.reminder.configureKotlinAndroid
+import org.gradle.kotlin.dsl.configure
+
 /*
  * Copyright (C) 2023 The N's lab Open Source Project
  *
@@ -13,15 +18,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-plugins {
-    alias(libs.plugins.nlab.jvm.library)
+with(pluginManager) {
+    apply("com.android.library")
+    apply("org.jetbrains.kotlin.android")
 }
 
-dependencies {
-    implementation(project(":statekit:core"))
-    implementation(libs.junit)
-    implementation(libs.mockito.inline)
-    implementation(libs.mockito.kotlin)
-    implementation(libs.kotlin.coroutines.test)
+extensions.configure<LibraryExtension> {
+    configureAndroidSdk(this)
+    configureKotlinAndroid(this)
 }

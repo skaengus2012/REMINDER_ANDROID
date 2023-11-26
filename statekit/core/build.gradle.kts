@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 plugins {
-    id("nlab.jvm.library")
-    id("nlab.jvm.library.jacoco")
+    alias(libs.plugins.nlab.jvm.library)
+    alias(libs.plugins.nlab.jvm.library.jacoco)
 }
 
 dependencies {

@@ -31,7 +31,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 private val javaVersion: JavaVersion get() = JavaVersion.VERSION_17
 private val javaVersionToNumber: Int get() = 17
 
-internal fun Project.configureAndroidKotlin(commonExtension: CommonExtension<*, *, *, *, *>) {
+internal fun Project.configureKotlinAndroid(commonExtension: CommonExtension<*, *, *, *, *>) {
     commonExtension.apply {
         compileOptions {
             sourceCompatibility = javaVersion
@@ -73,7 +73,7 @@ internal fun Project.configureAndroidKotlin(commonExtension: CommonExtension<*, 
     }
 }
 
-internal fun Project.configureJvmKotlin() {
+internal fun Project.configureKotlinJvm() {
     java {
         sourceCompatibility = javaVersion
         targetCompatibility = javaVersion

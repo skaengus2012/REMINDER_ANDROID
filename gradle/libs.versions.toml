@@ -1,6 +1,13 @@
 [versions]
+
+# build Environmental
+compileSdk = "33"
+targetSdk = "33"
+minSdk = "23"
+
+# library version
 afollestedDragselectRecyclerView = "2.4.0"
-androidGradlePlugin = "8.1.0"
+androidGradlePlugin = "8.1.4"
 androidxAppCompat = "1.6.1"
 androidxComposeBom = "2023.06.01"
 androidxComposeCompiler = "1.4.7"
@@ -96,3 +103,11 @@ android-application = { id = "com.android.application", version.ref = "androidGr
 androidx-navigation-safearges = { id = "androidx.navigation.safeargs.kotlin", version.ref = "androidxNavigation" }
 google-hilt = { id = "com.google.dagger.hilt.android", version.ref = "googleHilt" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+
+# reminder's custom plugin
+nlab-android-application = { id = "nlab.android.application", version = "unspecified" }
+nlab-android-application-jacoco = { id = "nlab.android.application.jacoco", version = "unspecified" }
+nlab-android-library = { id = "nlab.android.library", version = "unspecified" }
+nlab-android-library-jacoco = { id = "nlab.android.library.jacoco", version = "unspecified" }
+nlab-jvm-library = { id = "nlab.jvm.library", version = "unspecified" }
+nlab-jvm-library-jacoco = { id = "nlab.jvm.library.jacoco", version = "unspecified" }

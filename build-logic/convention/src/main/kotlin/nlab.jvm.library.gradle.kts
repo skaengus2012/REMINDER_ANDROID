@@ -1,3 +1,5 @@
+import com.nlab.reminder.configureKotlinJvm
+
 /*
  * Copyright (C) 2023 The N's lab Open Source Project
  *
@@ -14,14 +16,8 @@
  * limitations under the License.
  */
 
-plugins {
-    alias(libs.plugins.nlab.jvm.library)
+with(pluginManager) {
+    apply("org.jetbrains.kotlin.jvm")
 }
 
-dependencies {
-    implementation(project(":statekit:core"))
-    implementation(libs.junit)
-    implementation(libs.mockito.inline)
-    implementation(libs.mockito.kotlin)
-    implementation(libs.kotlin.coroutines.test)
-}
+configureKotlinJvm()

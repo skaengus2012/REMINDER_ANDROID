@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 plugins {
-    id("nlab.android.library")
+    alias(libs.plugins.nlab.android.library)
 }
 
 android {

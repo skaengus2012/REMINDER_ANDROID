@@ -1,3 +1,8 @@
+import com.android.build.api.variant.LibraryAndroidComponentsExtension
+import com.nlab.reminder.configureJacocoAndroid
+import com.nlab.reminder.configureJacocoToolVersion
+import org.gradle.kotlin.dsl.getByType
+
 /*
  * Copyright (C) 2023 The N's lab Open Source Project
  *
@@ -13,15 +18,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-plugins {
-    alias(libs.plugins.nlab.jvm.library)
+with(pluginManager) {
+    apply("org.gradle.jacoco")
+    apply("com.android.library")
 }
 
-dependencies {
-    implementation(project(":statekit:core"))
-    implementation(libs.junit)
-    implementation(libs.mockito.inline)
-    implementation(libs.mockito.kotlin)
-    implementation(libs.kotlin.coroutines.test)
-}
+configureJacocoToolVersion()
+configureJacocoAndroid(extensions.getByType<LibraryAndroidComponentsExtension>())

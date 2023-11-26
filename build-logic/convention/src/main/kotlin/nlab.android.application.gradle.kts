@@ -1,3 +1,9 @@
+import com.android.build.api.dsl.ApplicationExtension
+import com.nlab.reminder.configureKotlinAndroid
+import com.nlab.reminder.configureAndroidSdk
+import com.nlab.reminder.libs
+import org.gradle.kotlin.dsl.configure
+
 /*
  * Copyright (C) 2023 The N's lab Open Source Project
  *
@@ -14,14 +20,15 @@
  * limitations under the License.
  */
 
-plugins {
-    alias(libs.plugins.nlab.jvm.library)
+with(pluginManager) {
+    apply("com.android.application")
+    apply("org.jetbrains.kotlin.android")
 }
 
-dependencies {
-    implementation(project(":statekit:core"))
-    implementation(libs.junit)
-    implementation(libs.mockito.inline)
-    implementation(libs.mockito.kotlin)
-    implementation(libs.kotlin.coroutines.test)
+extensions.configure<ApplicationExtension> {
+    defaultConfig {
+        targetSdk = libs.findVersion("targetSdk").get().toString().toInt()
+    }
+    configureAndroidSdk(this)
+    configureKotlinAndroid(this)
 }

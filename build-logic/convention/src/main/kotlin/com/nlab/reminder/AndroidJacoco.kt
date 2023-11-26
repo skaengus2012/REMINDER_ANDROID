@@ -32,7 +32,7 @@ import org.gradle.testing.jacoco.tasks.JacocoReport
 /**
  * @author Doohyun
  */
-internal fun Project.configureAndroidJacoco(extension: AndroidComponentsExtension<*, *, *>) {
+internal fun Project.configureJacocoAndroid(extension: AndroidComponentsExtension<*, *, *>) {
     val jacocoTestReport = tasks.create("jacocoTestReport")
 
     extension.onVariants { variant ->
