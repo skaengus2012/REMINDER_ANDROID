@@ -18,6 +18,7 @@ package com.nlab.reminder.internal.common.data.repository
 
 import com.nlab.reminder.domain.common.data.model.Schedule
 import com.nlab.reminder.domain.common.data.model.genSchedules
+import com.nlab.reminder.domain.common.data.repository.ScheduleDeleteRequest
 import com.nlab.reminder.domain.common.data.repository.ScheduleGetStreamRequest
 import com.nlab.reminder.domain.common.data.repository.ScheduleRepository
 import com.nlab.reminder.internal.common.android.database.ScheduleDao
@@ -33,6 +34,7 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 /**
@@ -63,6 +65,17 @@ internal class LocalScheduleRepositoryTest {
             request = ScheduleGetStreamRequest.ByComplete(isComplete),
             expectedResult = schedules
         )
+    }
+
+    @Test
+    fun `When Repository called deleteByComplete, Then dao called delete`() = runTest {
+        val isComplete = genBoolean()
+        val scheduleDao = mock<ScheduleDao>()
+        val scheduleRepository = genScheduleRepository(
+            scheduleDao = scheduleDao
+        )
+        scheduleRepository.delete(ScheduleDeleteRequest.ByComplete(isComplete))
+        verify(scheduleDao).deleteByComplete(isComplete)
     }
 }
 
