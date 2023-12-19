@@ -17,7 +17,10 @@
 package com.nlab.reminder.domain.feature.schedule.all
 
 import com.nlab.reminder.core.kotlin.util.getOrThrow
+import com.nlab.reminder.domain.common.data.repository.CompletedScheduleShownAllData
 import com.nlab.reminder.domain.common.data.repository.CompletedScheduleShownRepository
+import com.nlab.reminder.domain.common.data.repository.ScheduleDeleteRequest
+import com.nlab.reminder.domain.common.data.repository.ScheduleRepository
 import com.nlab.statekit.middleware.interceptor.Interceptor
 import com.nlab.statekit.util.buildDslInterceptor
 import javax.inject.Inject
@@ -26,12 +29,17 @@ import javax.inject.Inject
  * @author thalys
  */
 internal class AllScheduleInterceptor @Inject constructor(
-    completedScheduleShownRepository: CompletedScheduleShownRepository
+    scheduleRepository: ScheduleRepository,
+    @CompletedScheduleShownAllData completedScheduleShownRepository: CompletedScheduleShownRepository
 ) : Interceptor<AllScheduleAction, AllScheduleUiState> by buildDslInterceptor(defineDSL = {
     state<AllScheduleUiState.Loaded> {
         action<AllScheduleAction.OnCompletedScheduleVisibilityUpdateClicked> { (action) ->
             completedScheduleShownRepository
                 .setShown(isShown = action.isVisible)
+                .getOrThrow()
+        }
+        action<AllScheduleAction.OnCompletedScheduleDeleteClicked> {
+            scheduleRepository.delete(ScheduleDeleteRequest.ByComplete(true))
                 .getOrThrow()
         }
     }
