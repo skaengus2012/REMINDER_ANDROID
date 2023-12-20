@@ -41,5 +41,5 @@ sealed class ScheduleGetStreamRequest private constructor() {
 sealed class ScheduleDeleteRequest private constructor() {
     data class ByComplete(val isComplete: Boolean) : ScheduleDeleteRequest()
     data class ById(val scheduleId: ScheduleId) : ScheduleDeleteRequest()
-    data class ByIds(val scheduleIds: List<ScheduleId>) : ScheduleDeleteRequest()
+    data class ByIds(val scheduleIds: Collection<ScheduleId>) : ScheduleDeleteRequest()
 }

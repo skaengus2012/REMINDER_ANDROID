@@ -23,6 +23,7 @@ import com.nlab.reminder.domain.common.data.repository.ScheduleDeleteRequest
 import com.nlab.reminder.domain.common.data.repository.ScheduleRepository
 import com.nlab.statekit.middleware.interceptor.scenario
 import com.nlab.testkit.genBoolean
+import com.nlab.testkit.genInt
 import com.nlab.testkit.once
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
@@ -77,6 +78,20 @@ internal class AllScheduleInterceptorTest {
             .action(AllScheduleAction.OnScheduleDeleteClicked(scheduleId))
             .dispatchIn(testScope = this)
         verify(scheduleRepository, once()).delete(ScheduleDeleteRequest.ById(scheduleId))
+    }
+
+    @Test
+    fun `Given State Loaded, When OnSelectedSchedulesDeleteClicked, Then Repository called delete`() = runTest {
+        val scheduleIds = List(genInt(min = 1, max = 5)) { genScheduleId() }
+        val scheduleRepository: ScheduleRepository = mock {
+            whenever(mock.delete(ScheduleDeleteRequest.ByIds(scheduleIds))) doReturn Result.Success(Unit)
+        }
+
+        genInterceptor(scheduleRepository = scheduleRepository)
+            .scenario()
+            .initState(genAllScheduleUiStateLoaded())
+            .action(AllScheduleAction.OnSelectedSchedulesDeleteClicked(scheduleIds))
+            .dispatchIn(testScope = this)
     }
 }
 

@@ -38,12 +38,18 @@ internal class AllScheduleInterceptor @Inject constructor(
                 .setShown(isShown = action.isVisible)
                 .getOrThrow()
         }
-        action<AllScheduleAction.OnCompletedScheduleDeleteClicked> {
-            scheduleRepository.delete(ScheduleDeleteRequest.ByComplete(isComplete = true))
+
+        // delete
+        action<AllScheduleAction.OnScheduleDeleteClicked> { (action) ->
+            scheduleRepository.delete(ScheduleDeleteRequest.ById(action.id))
                 .getOrThrow()
         }
-        action<AllScheduleAction.OnScheduleDeleteClicked> { (action) ->
-            scheduleRepository.delete(ScheduleDeleteRequest.ById(action.scheduleId))
+        action<AllScheduleAction.OnSelectedSchedulesDeleteClicked> { (action) ->
+            scheduleRepository.delete(ScheduleDeleteRequest.ByIds(action.ids))
+                .getOrThrow()
+        }
+        action<AllScheduleAction.OnCompletedScheduleDeleteClicked> {
+            scheduleRepository.delete(ScheduleDeleteRequest.ByComplete(isComplete = true))
                 .getOrThrow()
         }
     }
