@@ -17,6 +17,7 @@
 package com.nlab.reminder.internal.common.data.repository
 
 import com.nlab.reminder.domain.common.data.model.Schedule
+import com.nlab.reminder.domain.common.data.model.genScheduleId
 import com.nlab.reminder.domain.common.data.model.genSchedules
 import com.nlab.reminder.domain.common.data.repository.ScheduleDeleteRequest
 import com.nlab.reminder.domain.common.data.repository.ScheduleGetStreamRequest
@@ -25,6 +26,9 @@ import com.nlab.reminder.internal.common.android.database.ScheduleDao
 import com.nlab.reminder.internal.common.android.database.ScheduleEntityWithTagEntities
 import com.nlab.reminder.internal.common.data.model.toEntity
 import com.nlab.testkit.genBoolean
+import com.nlab.testkit.genInt
+import com.nlab.testkit.genLong
+import com.nlab.testkit.once
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.take
@@ -51,6 +55,7 @@ internal class LocalScheduleRepositoryTest {
             )
         }
         val isComplete = genBoolean()
+
         testGet(
             scheduleDao = mock {
                 whenever(mock.findAsStream()) doReturn flowOf(scheduleEntities)
@@ -68,14 +73,22 @@ internal class LocalScheduleRepositoryTest {
     }
 
     @Test
-    fun `When Repository called deleteByComplete, Then dao called delete`() = runTest {
-        val isComplete = genBoolean()
-        val scheduleDao = mock<ScheduleDao>()
-        val scheduleRepository = genScheduleRepository(
-            scheduleDao = scheduleDao
+    fun `When repository called delete actions, Then dao also called delete`() = runTest {
+        val randomBoolean = genBoolean()
+        val randomLongs = List(genInt(min = 1, max = 5)) { genLong() }
+
+        testDelete(
+            request = ScheduleDeleteRequest.ByComplete(randomBoolean),
+            doVerify = { deleteByComplete(isComplete = randomBoolean) }
         )
-        scheduleRepository.delete(ScheduleDeleteRequest.ByComplete(isComplete))
-        verify(scheduleDao).deleteByComplete(isComplete)
+        testDelete(
+            request = ScheduleDeleteRequest.ById(genScheduleId(value = randomLongs.first())),
+            doVerify = { deleteByScheduleIds(listOf(randomLongs.first())) }
+        )
+        testDelete(
+            request = ScheduleDeleteRequest.ByIds(randomLongs.map(::genScheduleId)),
+            doVerify = { deleteByScheduleIds(randomLongs) }
+        )
     }
 }
 
@@ -94,4 +107,14 @@ private suspend fun testGet(
         .first()
 
     assertThat(actualSchedules, equalTo(expectedResult))
+}
+
+private suspend inline fun <T : ScheduleDeleteRequest> testDelete(
+    request: T,
+    doVerify: (ScheduleDao).(T) -> Unit
+) {
+    val scheduleDao = mock<ScheduleDao>()
+    val scheduleRepository = genScheduleRepository(scheduleDao = scheduleDao)
+    scheduleRepository.delete(request)
+    verify(scheduleDao, once()).doVerify(request)
 }

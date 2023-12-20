@@ -18,6 +18,7 @@ package com.nlab.reminder.domain.common.data.repository
 
 import com.nlab.reminder.core.kotlin.util.Result
 import com.nlab.reminder.domain.common.data.model.Schedule
+import com.nlab.reminder.domain.common.data.model.ScheduleId
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.flow.Flow
 
@@ -39,4 +40,6 @@ sealed class ScheduleGetStreamRequest private constructor() {
 
 sealed class ScheduleDeleteRequest private constructor() {
     data class ByComplete(val isComplete: Boolean) : ScheduleDeleteRequest()
+    data class ById(val scheduleId: ScheduleId) : ScheduleDeleteRequest()
+    data class ByIds(val scheduleIds: List<ScheduleId>) : ScheduleDeleteRequest()
 }

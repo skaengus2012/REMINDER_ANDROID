@@ -64,8 +64,18 @@ internal class LocalScheduleRepository @Inject constructor(
         }
     }
 
-    override suspend fun delete(request: ScheduleDeleteRequest): Result<Unit> = when(request) {
+    override suspend fun delete(request: ScheduleDeleteRequest): Result<Unit> = when (request) {
         // When outside the catch block, jacoco does not recognize. 😭
-        is ScheduleDeleteRequest.ByComplete -> catching { scheduleDao.deleteByComplete(request.isComplete) }
+        is ScheduleDeleteRequest.ByComplete -> catching {
+            scheduleDao.deleteByComplete(request.isComplete)
+        }
+
+        is ScheduleDeleteRequest.ById -> catching {
+            scheduleDao.deleteByScheduleIds(listOf(request.scheduleId.value))
+        }
+
+        is ScheduleDeleteRequest.ByIds -> catching {
+            scheduleDao.deleteByScheduleIds(request.scheduleIds.map { it.value })
+        }
     }
 }
