@@ -39,7 +39,11 @@ internal class AllScheduleInterceptor @Inject constructor(
                 .getOrThrow()
         }
         action<AllScheduleAction.OnCompletedScheduleDeleteClicked> {
-            scheduleRepository.delete(ScheduleDeleteRequest.ByComplete(true))
+            scheduleRepository.delete(ScheduleDeleteRequest.ByComplete(isComplete = true))
+                .getOrThrow()
+        }
+        action<AllScheduleAction.OnScheduleDeleteClicked> { (action) ->
+            scheduleRepository.delete(ScheduleDeleteRequest.ById(action.scheduleId))
                 .getOrThrow()
         }
     }

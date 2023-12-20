@@ -17,6 +17,7 @@
 package com.nlab.reminder.domain.feature.schedule.all
 
 import com.nlab.reminder.core.kotlin.util.Result
+import com.nlab.reminder.domain.common.data.model.genScheduleId
 import com.nlab.reminder.domain.common.data.repository.CompletedScheduleShownRepository
 import com.nlab.reminder.domain.common.data.repository.ScheduleDeleteRequest
 import com.nlab.reminder.domain.common.data.repository.ScheduleRepository
@@ -61,6 +62,21 @@ internal class AllScheduleInterceptorTest {
             .action(AllScheduleAction.OnCompletedScheduleDeleteClicked)
             .dispatchIn(testScope = this)
         verify(scheduleRepository, once()).delete(ScheduleDeleteRequest.ByComplete(true))
+    }
+
+    @Test
+    fun `Given State Loaded, When OnScheduleDeleteClicked, Then Repository called delete`() = runTest {
+        val scheduleId = genScheduleId()
+        val scheduleRepository: ScheduleRepository = mock {
+            whenever(mock.delete(ScheduleDeleteRequest.ById(scheduleId))) doReturn Result.Success(Unit)
+        }
+
+        genInterceptor(scheduleRepository = scheduleRepository)
+            .scenario()
+            .initState(genAllScheduleUiStateLoaded())
+            .action(AllScheduleAction.OnScheduleDeleteClicked(scheduleId))
+            .dispatchIn(testScope = this)
+        verify(scheduleRepository, once()).delete(ScheduleDeleteRequest.ById(scheduleId))
     }
 }
 

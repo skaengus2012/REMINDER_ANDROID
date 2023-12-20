@@ -17,6 +17,7 @@
 package com.nlab.reminder.domain.feature.schedule.all
 
 import com.nlab.reminder.domain.common.data.model.Schedule
+import com.nlab.reminder.domain.common.data.model.ScheduleId
 import com.nlab.statekit.Action
 import kotlinx.collections.immutable.ImmutableList
 
@@ -32,4 +33,5 @@ internal sealed interface AllScheduleAction : Action {
     data class OnSelectionModeUpdateClicked(val isSelectionMode: Boolean) : AllScheduleAction
     data class OnCompletedScheduleVisibilityUpdateClicked(val isVisible: Boolean) : AllScheduleAction
     object OnCompletedScheduleDeleteClicked : AllScheduleAction
+    data class OnScheduleDeleteClicked(val scheduleId: ScheduleId) : AllScheduleAction
 }
