@@ -16,7 +16,7 @@
 package com.nlab.reminder.domain.feature.schedule.all
 
 import com.nlab.reminder.core.effect.SideEffect
-import com.nlab.reminder.core.util.test.annotation.ExcludeFromGeneratedTestReport
+import com.nlab.reminder.core.annotation.ExcludeFromGeneratedTestReport
 
 /**
  * @author thalys

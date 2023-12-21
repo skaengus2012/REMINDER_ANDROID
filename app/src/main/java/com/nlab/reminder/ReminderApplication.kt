@@ -17,7 +17,7 @@
 package com.nlab.reminder
 
 import android.app.Application
-import com.nlab.reminder.core.util.test.annotation.ExcludeFromGeneratedTestReport
+import com.nlab.reminder.core.annotation.ExcludeFromGeneratedTestReport
 import dagger.hilt.android.HiltAndroidApp
 
 /**

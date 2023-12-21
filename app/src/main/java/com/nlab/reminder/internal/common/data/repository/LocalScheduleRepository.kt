@@ -19,7 +19,7 @@ package com.nlab.reminder.internal.common.data.repository
 import com.nlab.reminder.core.kotlin.coroutine.flow.map
 import com.nlab.reminder.core.kotlin.util.Result
 import com.nlab.reminder.core.kotlin.util.catching
-import com.nlab.reminder.core.util.test.annotation.ExcludeFromGeneratedTestReport
+import com.nlab.reminder.core.annotation.ExcludeFromGeneratedTestReport
 import com.nlab.reminder.domain.common.data.model.Schedule
 import com.nlab.reminder.domain.common.data.repository.ScheduleDeleteRequest
 import com.nlab.reminder.domain.common.data.repository.ScheduleGetStreamRequest

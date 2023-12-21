@@ -17,7 +17,7 @@
 package com.nlab.reminder.domain.feature.home
 
 import com.nlab.reminder.core.state.UserMessage
-import com.nlab.reminder.core.util.test.annotation.ExcludeFromGeneratedTestReport
+import com.nlab.reminder.core.annotation.ExcludeFromGeneratedTestReport
 import com.nlab.reminder.domain.common.data.model.Tag
 import com.nlab.reminder.domain.common.data.model.TagUsageCount
 import com.nlab.statekit.Action

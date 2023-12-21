@@ -16,13 +16,15 @@
 
 package com.nlab.reminder.core.data.model
 
-import com.nlab.reminder.core.annotation.InlineTestCompleted
+import com.nlab.reminder.core.annotation.ExcludeFromGeneratedTestReport
+import com.nlab.reminder.core.annotation.TestCompleted
 
 /**
- * See UnitTest [com.nlab.reminder.core.data.model.TransactionIdTest].
+ * See UnitTest [com.nlab.reminder.core.data.model.TransactionIdTest]
  * @author Doohyun
  */
-@InlineTestCompleted
+@ExcludeFromGeneratedTestReport
+@TestCompleted
 @JvmInline
 value class TransactionId(val value: String) {
     init {

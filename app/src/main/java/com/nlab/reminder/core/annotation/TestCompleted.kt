@@ -16,8 +16,6 @@
 
 package com.nlab.reminder.core.annotation
 
-import com.nlab.reminder.core.util.test.annotation.ExcludeFromGeneratedTestReport
-
 /**
  * If a test has been completed but is excluded from coverage, use this annotation.
  *
@@ -26,4 +24,9 @@ import com.nlab.reminder.core.util.test.annotation.ExcludeFromGeneratedTestRepor
  *  it may not be recognized in the coverage instruction,
  *  so it is excluded from the coverage report.
  */
-typealias InlineTestCompleted = ExcludeFromGeneratedTestReport
+@Retention(AnnotationRetention.SOURCE)
+@Target(
+    AnnotationTarget.CLASS,
+    AnnotationTarget.FUNCTION
+)
+annotation class TestCompleted
