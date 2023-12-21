@@ -17,10 +17,10 @@
 package com.nlab.reminder.domain.feature.schedule.all
 
 import com.nlab.reminder.core.kotlin.util.Result
-import com.nlab.reminder.domain.common.data.model.genScheduleId
-import com.nlab.reminder.domain.common.data.repository.CompletedScheduleShownRepository
-import com.nlab.reminder.domain.common.data.repository.ScheduleDeleteRequest
-import com.nlab.reminder.domain.common.data.repository.ScheduleRepository
+import com.nlab.reminder.core.data.model.genScheduleId
+import com.nlab.reminder.core.data.repository.CompletedScheduleShownRepository
+import com.nlab.reminder.core.data.repository.ScheduleDeleteRequest
+import com.nlab.reminder.core.data.repository.ScheduleRepository
 import com.nlab.statekit.middleware.interceptor.scenario
 import com.nlab.testkit.genBoolean
 import com.nlab.testkit.genInt

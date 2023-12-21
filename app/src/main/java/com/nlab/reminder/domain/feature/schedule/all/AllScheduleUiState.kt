@@ -17,7 +17,7 @@
 package com.nlab.reminder.domain.feature.schedule.all
 
 import com.nlab.reminder.core.state.Stable
-import com.nlab.reminder.domain.common.data.model.Schedule
+import com.nlab.reminder.core.data.model.Schedule
 import com.nlab.statekit.State
 import kotlinx.collections.immutable.ImmutableList
 

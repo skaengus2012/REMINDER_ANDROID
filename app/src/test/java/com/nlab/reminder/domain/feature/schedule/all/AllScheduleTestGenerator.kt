@@ -16,8 +16,8 @@
 
 package com.nlab.reminder.domain.feature.schedule.all
 
-import com.nlab.reminder.domain.common.data.model.Schedule
-import com.nlab.reminder.domain.common.data.model.genSchedules
+import com.nlab.reminder.core.data.model.Schedule
+import com.nlab.reminder.core.data.model.genSchedules
 import com.nlab.testkit.genBoolean
 import kotlinx.collections.immutable.toImmutableList
 

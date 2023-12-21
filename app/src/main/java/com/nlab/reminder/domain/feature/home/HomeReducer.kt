@@ -20,7 +20,7 @@ import com.nlab.reminder.R
 import com.nlab.reminder.core.annotation.*
 import com.nlab.reminder.core.state.UserMessage
 import com.nlab.reminder.core.state.userMessageShown
-import com.nlab.reminder.domain.common.data.model.Tag
+import com.nlab.reminder.core.data.model.Tag
 import com.nlab.statekit.Reducer
 import com.nlab.statekit.util.buildDslReducer
 import kotlinx.collections.immutable.*

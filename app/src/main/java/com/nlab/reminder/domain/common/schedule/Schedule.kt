@@ -17,7 +17,7 @@
 package com.nlab.reminder.domain.common.schedule
 
 import com.nlab.reminder.core.annotation.ExcludeFromGeneratedTestReport
-import com.nlab.reminder.domain.common.data.model.Tag
+import com.nlab.reminder.core.data.model.Tag
 
 /**
  * @author Doohyun

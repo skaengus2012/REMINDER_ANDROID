@@ -16,8 +16,12 @@
 
 package com.nlab.reminder.domain.feature.schedule.all
 
-import com.nlab.reminder.domain.common.data.model.*
-import com.nlab.reminder.domain.common.data.repository.*
+import com.nlab.reminder.core.data.model.ScheduleId
+import com.nlab.reminder.core.data.model.genSchedule
+import com.nlab.reminder.core.data.model.genSchedules
+import com.nlab.reminder.core.data.repository.CompletedScheduleShownRepository
+import com.nlab.reminder.core.data.repository.ScheduleGetStreamRequest
+import com.nlab.reminder.core.data.repository.ScheduleRepository
 import com.nlab.statekit.middleware.epic.scenario
 import com.nlab.testkit.genInt
 import kotlinx.collections.immutable.toImmutableList

@@ -17,7 +17,7 @@
 package com.nlab.reminder.internal.common.android.database
 
 import com.nlab.reminder.domain.common.schedule.Schedule
-import com.nlab.reminder.internal.common.data.model.toModels
+import com.nlab.reminder.internal.data.model.toModels
 
 /**
  * @author Doohyun

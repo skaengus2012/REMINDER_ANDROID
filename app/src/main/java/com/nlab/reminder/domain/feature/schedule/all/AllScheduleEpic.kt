@@ -18,10 +18,10 @@ package com.nlab.reminder.domain.feature.schedule.all
 
 import com.nlab.reminder.core.kotlin.coroutine.flow.flatMapLatest
 import com.nlab.reminder.core.kotlin.coroutine.flow.map
-import com.nlab.reminder.domain.common.data.repository.CompletedScheduleShownAllData
-import com.nlab.reminder.domain.common.data.repository.CompletedScheduleShownRepository
-import com.nlab.reminder.domain.common.data.repository.ScheduleGetStreamRequest
-import com.nlab.reminder.domain.common.data.repository.ScheduleRepository
+import com.nlab.reminder.core.data.repository.CompletedScheduleShownAllData
+import com.nlab.reminder.core.data.repository.CompletedScheduleShownRepository
+import com.nlab.reminder.core.data.repository.ScheduleGetStreamRequest
+import com.nlab.reminder.core.data.repository.ScheduleRepository
 import com.nlab.reminder.domain.common.kotlin.coroutine.inject.DefaultDispatcher
 import com.nlab.statekit.middleware.epic.Epic
 import com.nlab.statekit.util.buildDslEpic
