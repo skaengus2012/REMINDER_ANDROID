@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 The N's lab Open Source Project
+ * Copyright (C) 2023 The N's lab Open Source Project
  *  
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package com.nlab.reminder.domain.common.util.link.transaction
 
-import com.nlab.reminder.domain.common.util.transaction.TransactionId
+import com.nlab.reminder.core.data.model.genTransactionId
 import com.nlab.reminder.domain.common.util.transaction.TransactionIdGenerator
 import com.nlab.testkit.genBothify
 import org.mockito.kotlin.doReturn
@@ -30,4 +30,3 @@ fun genTransactionIdGenerator(expected: String = genBothify()): TransactionIdGen
     whenever(mock.generate()) doReturn genTransactionId(expected)
 }
 
-fun genTransactionId(expected: String = genBothify()): TransactionId = TransactionId(expected)

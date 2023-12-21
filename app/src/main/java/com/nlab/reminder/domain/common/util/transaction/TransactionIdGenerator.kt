@@ -16,9 +16,12 @@
 
 package com.nlab.reminder.domain.common.util.transaction
 
+import com.nlab.reminder.core.data.model.TransactionId
+
 /**
  * @author Doohyun
  */
+@Deprecated("Please use TransactionIdRepository")
 interface TransactionIdGenerator {
     fun generate(): TransactionId
 }

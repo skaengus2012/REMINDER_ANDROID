@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 The N's lab Open Source Project
+ * Copyright (C) 2023 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.common.util.transaction.impl
+package com.nlab.reminder.core.annotation
 
-import com.nlab.reminder.core.data.model.TransactionId
-import com.nlab.reminder.domain.common.util.transaction.TransactionIdGenerator
+import com.nlab.reminder.core.util.test.annotation.ExcludeFromGeneratedTestReport
 
 /**
- * @author Doohyun
+ * If a test has been completed but is excluded from coverage, use this annotation.
+ *
+ *  Example:
+ *  When creating an inline function,
+ *  it may not be recognized in the coverage instruction,
+ *  so it is excluded from the coverage report.
  */
-class DefaultTransactionIdGenerator(
-    private val randomPrefix: () -> String,
-    private val timestamp: () -> Long,
-) : TransactionIdGenerator {
-    override fun generate(): TransactionId = TransactionId("${randomPrefix()}_${timestamp()}")
-}
+typealias InlineTestCompleted = ExcludeFromGeneratedTestReport

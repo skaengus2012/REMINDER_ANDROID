@@ -18,10 +18,10 @@ package com.nlab.reminder.domain.common.schedule.impl
 
 import com.nlab.reminder.core.kotlin.coroutine.Delay
 import com.nlab.reminder.core.kotlin.util.isSuccess
-import com.nlab.reminder.domain.common.util.transaction.TransactionId
+import com.nlab.reminder.core.data.model.TransactionId
 import com.nlab.reminder.domain.common.util.link.transaction.genTransactionIdGenerator
 import com.nlab.reminder.domain.common.schedule.*
-import com.nlab.reminder.domain.common.util.link.transaction.genTransactionId
+import com.nlab.reminder.core.data.model.genTransactionId
 import com.nlab.reminder.test.*
 import com.nlab.testkit.genBoolean
 import com.nlab.testkit.genBothify
@@ -31,8 +31,6 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
-import org.hamcrest.CoreMatchers.*
-import org.hamcrest.MatcherAssert.*
 import org.junit.Test
 import org.mockito.kotlin.*
 

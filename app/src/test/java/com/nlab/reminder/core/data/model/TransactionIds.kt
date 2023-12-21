@@ -14,19 +14,11 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.util.test.annotation
+package com.nlab.reminder.core.data.model
+
+import com.nlab.testkit.genBothify
 
 /**
- * If a test has been completed but is excluded from coverage, use this annotation.
- *
- *  Example:
- *  When creating an inline function,
- *  it may not be recognized in the coverage instruction,
- *  so it is excluded from the coverage report.
+ * @author Doohyun
  */
-@Retention(AnnotationRetention.SOURCE)
-@Target(
-    AnnotationTarget.CLASS,
-    AnnotationTarget.FUNCTION
-)
-annotation class TestComplete
+fun genTransactionId(expected: String = genBothify()): TransactionId = TransactionId(expected)

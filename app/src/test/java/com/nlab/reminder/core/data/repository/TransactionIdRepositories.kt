@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 The N's lab Open Source Project
+ * Copyright (C) 2023 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.common.util.transaction.impl
+package com.nlab.reminder.core.data.repository
 
-import com.nlab.reminder.core.data.model.TransactionId
-import com.nlab.reminder.domain.common.util.transaction.TransactionIdGenerator
+import com.nlab.reminder.core.data.model.genTransactionId
+import com.nlab.testkit.genBothify
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 /**
  * @author Doohyun
  */
-class DefaultTransactionIdGenerator(
-    private val randomPrefix: () -> String,
-    private val timestamp: () -> Long,
-) : TransactionIdGenerator {
-    override fun generate(): TransactionId = TransactionId("${randomPrefix()}_${timestamp()}")
+suspend fun genTransactionIdRepository(expected: String = genBothify()): TransactionIdRepository = mock {
+    whenever(mock.generate()) doReturn genTransactionId(expected)
 }
