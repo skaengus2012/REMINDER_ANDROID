@@ -14,20 +14,16 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.data.repository
+package com.nlab.reminder.core.util.tx
 
-import com.nlab.reminder.core.data.model.TransactionId
+import com.nlab.reminder.core.annotation.ExcludeFromGeneratedTestReport
+import java.util.Calendar
+import java.util.UUID
 
 /**
- * @author Doohyun
+ * @author thalys
  */
-interface TransactionIdRepository {
-    suspend fun generate(): TransactionId
-}
-
-class DefaultTransactionIdRepository(
-    private val randomPrefix: () -> String,
-    private val timestamp: () -> Long,
-) : TransactionIdRepository {
-    override suspend fun generate(): TransactionId = TransactionId(value = "${randomPrefix()}_${timestamp()}")
+@ExcludeFromGeneratedTestReport
+object TxIdGenerator {
+    fun generate(): String = "${UUID.randomUUID()}_${Calendar.getInstance().timeInMillis}"
 }
