@@ -21,6 +21,7 @@ import com.nlab.reminder.core.data.model.Schedule
 import com.nlab.reminder.core.data.repository.ScheduleDeleteRequest
 import com.nlab.reminder.core.data.repository.ScheduleGetStreamRequest
 import com.nlab.reminder.core.data.repository.ScheduleRepository
+import com.nlab.reminder.core.data.repository.ScheduleUpdateRequest
 import com.nlab.reminder.core.kotlin.coroutine.flow.map
 import com.nlab.reminder.core.kotlin.util.Result
 import com.nlab.reminder.core.kotlin.util.catching
@@ -61,6 +62,13 @@ internal class LocalScheduleRepository @Inject constructor(
             entities
                 .map(ScheduleEntityWithTagEntities::toModel)
                 .toImmutableList()
+        }
+    }
+
+    override suspend fun update(request: ScheduleUpdateRequest): Result<Unit> = when (request) {
+        // When outside the catch block, jacoco does not recognize. 😭
+        is ScheduleUpdateRequest.Completes -> catching {
+            scheduleDao.updateCompletes(request.scheduleToCompletes.mapKeys { (key) -> key.value })
         }
     }
 

@@ -30,12 +30,17 @@ interface ScheduleRepository {
     fun getTimetableSchedulesCount(): Flow<Long>
     fun getAllSchedulesCount(): Flow<Long>
     fun getAsStream(request: ScheduleGetStreamRequest): Flow<ImmutableList<Schedule>>
+    suspend fun update(request: ScheduleUpdateRequest): Result<Unit>
     suspend fun delete(request: ScheduleDeleteRequest): Result<Unit>
 }
 
 sealed class ScheduleGetStreamRequest private constructor() {
     object All : ScheduleGetStreamRequest()
     data class ByComplete(val isComplete: Boolean) : ScheduleGetStreamRequest()
+}
+
+sealed class ScheduleUpdateRequest private constructor() {
+    data class Completes(val scheduleToCompletes: Map<ScheduleId, Boolean>) : ScheduleUpdateRequest()
 }
 
 sealed class ScheduleDeleteRequest private constructor() {

@@ -96,7 +96,7 @@ class LocalScheduleRepositoryTest {
             genRequest = { scheduleId, isComplete -> ModifyCompleteRequest(scheduleId, isComplete) }
         )
         testUpdateTemplate(UpdateRequest.Completes(repositoryParam)) { scheduleDao ->
-            verify(scheduleDao, once()).updateCompletes(daoParam)
+            verify(scheduleDao, once()).updateCompletesLegacy(daoParam)
         }
     }
 
@@ -108,7 +108,7 @@ class LocalScheduleRepositoryTest {
             genRequest = { scheduleId, _ -> scheduleId }
         )
         testUpdateTemplate(UpdateRequest.BulkCompletes(repositoryParam, isComplete)) { scheduleDao ->
-            verify(scheduleDao, once()).updateCompletes(daoParam.map { it.first }, isComplete)
+            verify(scheduleDao, once()).updateCompletesLegacy(daoParam.map { it.first }, isComplete)
         }
     }
 

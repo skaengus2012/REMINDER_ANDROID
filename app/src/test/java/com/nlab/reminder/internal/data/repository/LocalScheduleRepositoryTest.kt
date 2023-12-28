@@ -22,6 +22,7 @@ import com.nlab.reminder.core.data.model.genSchedules
 import com.nlab.reminder.core.data.repository.ScheduleDeleteRequest
 import com.nlab.reminder.core.data.repository.ScheduleGetStreamRequest
 import com.nlab.reminder.core.data.repository.ScheduleRepository
+import com.nlab.reminder.core.data.repository.ScheduleUpdateRequest
 import com.nlab.reminder.internal.common.android.database.ScheduleDao
 import com.nlab.reminder.internal.common.android.database.ScheduleEntityWithTagEntities
 import com.nlab.reminder.internal.data.model.toEntity
@@ -34,7 +35,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers
-import org.hamcrest.MatcherAssert
+import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
@@ -90,6 +91,18 @@ internal class LocalScheduleRepositoryTest {
             doVerify = { deleteByScheduleIds(randomLongs) }
         )
     }
+
+    @Test
+    fun `When repository called update actions, Then dao also call update`() = runTest {
+        val daoInput = List(genInt(min = 1, max = 10)) { it }
+            .associateBy(keySelector = { it.toLong() }, valueTransform = { genBoolean() })
+        val input = daoInput.mapKeys { genScheduleId(it.key) }
+        val scheduleDao: ScheduleDao = mock()
+        val scheduleRepository = genScheduleRepository(scheduleDao)
+
+        scheduleRepository.update(ScheduleUpdateRequest.Completes(input))
+        verify(scheduleDao, once()).updateCompletes(daoInput)
+    }
 }
 
 private fun genScheduleRepository(
@@ -106,7 +119,7 @@ private suspend fun testGet(
         .take(1)
         .first()
 
-    MatcherAssert.assertThat(actualSchedules, CoreMatchers.equalTo(expectedResult))
+    assertThat(actualSchedules, CoreMatchers.equalTo(expectedResult))
 }
 
 private suspend inline fun <T : ScheduleDeleteRequest> testDelete(
