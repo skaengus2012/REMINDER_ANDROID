@@ -16,15 +16,18 @@
 
 package com.nlab.reminder.core.data.repository
 
-import com.nlab.reminder.core.data.model.ScheduleCompleteMarkTable
 import com.nlab.reminder.core.data.model.ScheduleId
+import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.coroutines.flow.StateFlow
 
 /**
  * @author thalys
  */
 interface ScheduleCompleteMarkRepository {
-    fun get(): StateFlow<ScheduleCompleteMarkTable>
-    suspend fun insert(scheduleId: ScheduleId, isComplete: Boolean)
+    fun get(): StateFlow<ImmutableMap<ScheduleId, Boolean>>
+    suspend fun add(scheduleId: ScheduleId, isComplete: Boolean)
     suspend fun clear()
 }
+
+fun ScheduleCompleteMarkRepository.getSnapshot(): ImmutableMap<ScheduleId, Boolean> =
+    get().value

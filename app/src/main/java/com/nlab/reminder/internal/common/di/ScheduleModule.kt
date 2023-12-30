@@ -16,7 +16,7 @@
 
 package com.nlab.reminder.internal.common.di
 
-import com.nlab.reminder.core.kotlin.coroutine.util.Delay
+import com.nlab.reminder.core.kotlin.coroutine.Delay
 import com.nlab.reminder.domain.common.util.transaction.TransactionIdGenerator
 import com.nlab.reminder.domain.common.schedule.*
 import com.nlab.reminder.domain.common.schedule.impl.*

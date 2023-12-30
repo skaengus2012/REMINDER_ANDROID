@@ -14,15 +14,27 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.data.model
+package com.nlab.reminder.core.data.repository
 
+import com.nlab.reminder.core.data.model.ScheduleId
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.persistentMapOf
+import kotlinx.collections.immutable.toPersistentMap
+import kotlinx.coroutines.flow.*
 
 /**
  * @author thalys
  */
-data class ScheduleCompleteMarkTable(val value: ImmutableMap<ScheduleId, ScheduleCompleteMark>)
+class InMemoryScheduleCompleteMarkRepository : ScheduleCompleteMarkRepository {
+    private val chunkRequests = MutableStateFlow(persistentMapOf<ScheduleId, Boolean>())
 
-fun ScheduleCompleteMarkTable(vararg pairs: Pair<ScheduleId, ScheduleCompleteMark>): ScheduleCompleteMarkTable =
-    ScheduleCompleteMarkTable(value = persistentMapOf(*pairs))
+    override fun get(): StateFlow<ImmutableMap<ScheduleId, Boolean>> = chunkRequests.asStateFlow()
+
+    override suspend fun add(scheduleId: ScheduleId, isComplete: Boolean) {
+        chunkRequests.update { old -> old.toPersistentMap().put(scheduleId, isComplete) }
+    }
+
+    override suspend fun clear() {
+        chunkRequests.update { persistentMapOf() }
+    }
+}
