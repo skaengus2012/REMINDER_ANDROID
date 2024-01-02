@@ -45,7 +45,7 @@ import timber.log.Timber
  */
 @Module
 @InstallIn(SingletonComponent::class)
-internal abstract class RepositoryModule {
+internal abstract class ApplicationRepositoryModule {
     @Reusable
     @Binds
     abstract fun bindScheduleRepository(scheduleRepository: LocalScheduleRepository): ScheduleRepository

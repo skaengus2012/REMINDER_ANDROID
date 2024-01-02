@@ -21,11 +21,12 @@ import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.collections.immutable.toPersistentMap
 import kotlinx.coroutines.flow.*
+import javax.inject.Inject
 
 /**
  * @author thalys
  */
-class InMemoryScheduleCompleteMarkRepository : ScheduleCompleteMarkRepository {
+class InMemoryScheduleCompleteMarkRepository @Inject constructor() : ScheduleCompleteMarkRepository {
     private val chunkRequests = MutableStateFlow(persistentMapOf<ScheduleId, Boolean>())
 
     override fun get(): StateFlow<ImmutableMap<ScheduleId, Boolean>> = chunkRequests.asStateFlow()

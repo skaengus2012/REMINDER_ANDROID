@@ -33,8 +33,21 @@ internal sealed interface AllScheduleAction : Action {
     data class OnSelectionModeUpdateClicked(val isSelectionMode: Boolean) : AllScheduleAction
     data class OnCompletedScheduleVisibilityUpdateClicked(val isVisible: Boolean) : AllScheduleAction
 
+    // update completion
+    data class OnScheduleCompleteClicked(
+        override val id: ScheduleId,
+        val isComplete: Boolean
+    ) : AllScheduleAction, ScheduleIdAction
+
     // delete
-    data class OnScheduleDeleteClicked(val id: ScheduleId) : AllScheduleAction
+    data class OnScheduleDeleteClicked(
+        override val id: ScheduleId
+    ) : AllScheduleAction, ScheduleIdAction
     data class OnSelectedSchedulesDeleteClicked(val ids: Collection<ScheduleId>) : AllScheduleAction
     object OnCompletedScheduleDeleteClicked : AllScheduleAction
+}
+
+// TODO : need move refactoring..
+interface ScheduleIdAction {
+    val id: ScheduleId
 }

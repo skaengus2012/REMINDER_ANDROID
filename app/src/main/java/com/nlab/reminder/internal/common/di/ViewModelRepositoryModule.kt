@@ -14,21 +14,23 @@
  * limitations under the License.
  */
 
-package com.nlab.statekit.middleware.interceptor.dsl
+package com.nlab.reminder.internal.common.di
 
-import com.nlab.statekit.Action
-import com.nlab.statekit.UpdateSource
-import com.nlab.statekit.dsl.BuilderDsl
-import com.nlab.statekit.middleware.interceptor.ActionDispatcher
+import com.nlab.reminder.core.data.repository.InMemoryScheduleCompleteMarkRepository
+import com.nlab.reminder.core.data.repository.ScheduleCompleteMarkRepository
+import dagger.Binds
+import dagger.Module
+import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ViewModelComponent
 
 /**
  * @author thalys
  */
-@JvmInline
-@BuilderDsl
-value class InterceptEndScope<A : Action> internal constructor(
-    private val actionDispatcher: ActionDispatcher<A>
-) : ActionDispatcher<A> by actionDispatcher
-
-typealias InterceptorEndType2<A, S> = suspend InterceptEndScope<A>.(UpdateSource<A, S>) -> Unit
-typealias InterceptorEndType3<A, S, T> = suspend InterceptEndScope<A>.(UpdateSource<T, S>) -> Unit
+@Module
+@InstallIn(ViewModelComponent::class)
+internal abstract class ViewModelRepositoryModule {
+    @Binds
+    abstract fun bindScheduleCompleteMarkRepositry(
+        repository: InMemoryScheduleCompleteMarkRepository
+    ): ScheduleCompleteMarkRepository
+}

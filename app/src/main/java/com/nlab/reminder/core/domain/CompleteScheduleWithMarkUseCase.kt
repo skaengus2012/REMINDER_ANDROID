@@ -27,7 +27,7 @@ import com.nlab.reminder.core.kotlin.util.Result
 /**
  * @author thalys
  */
-class UpdateScheduleCompletionWithMarkUseCase(
+class CompleteScheduleWithMarkUseCase(
     private val scheduleRepository: ScheduleRepository,
     private val completeMarkRepository: ScheduleCompleteMarkRepository,
     private val aggregateDelay: Delay,

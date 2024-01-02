@@ -26,7 +26,7 @@ import org.mockito.kotlin.whenever
 /**
  * @author thalys
  */
-class UpdateScheduleCompletionWithMarkUseCaseTest {
+class CompleteScheduleWithMarkUseCaseTest {
 
     @Test
     fun `When invoked, Then completeMark add`() = runTest {
@@ -102,7 +102,7 @@ private fun genUpdateScheduleCompletionUseCase(
     scheduleRepository: ScheduleRepository = mock(),
     completeMarkRepository: ScheduleCompleteMarkRepository = mock(),
     aggregateDelay: Delay = mock()
-): UpdateScheduleCompletionWithMarkUseCase = UpdateScheduleCompletionWithMarkUseCase(
+): CompleteScheduleWithMarkUseCase = CompleteScheduleWithMarkUseCase(
     scheduleRepository = scheduleRepository,
     completeMarkRepository = completeMarkRepository,
     aggregateDelay = aggregateDelay
