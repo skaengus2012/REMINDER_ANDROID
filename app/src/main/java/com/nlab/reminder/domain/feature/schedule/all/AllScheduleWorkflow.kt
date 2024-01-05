@@ -16,9 +16,11 @@
 
 package com.nlab.reminder.domain.feature.schedule.all
 
+import com.nlab.reminder.core.data.model.Link
+
 /**
  * @author thalys
  */
 internal sealed interface AllScheduleWorkflow {
-    data class Link(val value: String) : AllScheduleWorkflow
+    data class LinkPage(val link: Link) : AllScheduleWorkflow
 }

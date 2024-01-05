@@ -16,6 +16,8 @@
 
 package com.nlab.reminder.domain.feature.schedule.all
 
+import com.nlab.reminder.core.data.model.isEmpty
+import com.nlab.reminder.core.data.model.orEmpty
 import com.nlab.reminder.core.kotlin.collection.find
 import com.nlab.statekit.Reducer
 import com.nlab.statekit.util.buildDslReducer
@@ -53,8 +55,8 @@ internal class AllScheduleReducer @Inject constructor() : DomainReducer by build
                 .find { it.scheduleId == action.id }
                 ?.link
                 .orEmpty()
-            if (link.isBlank()) before
-            else before.copy(workflows = before.workflows.toPersistentList() + AllScheduleWorkflow.Link(link))
+            if (link.isEmpty()) before
+            else before.copy(workflows = before.workflows.toPersistentList() + AllScheduleWorkflow.LinkPage(link))
         }
         action<AllScheduleAction.CompleteWorkflow> { (action, before) ->
             before.copy(workflows = before.workflows.toPersistentList() - action.workflow)

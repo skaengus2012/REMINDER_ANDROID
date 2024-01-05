@@ -23,4 +23,11 @@ import com.nlab.reminder.core.annotation.ExcludeFromGeneratedTestReport
  */
 @JvmInline
 @ExcludeFromGeneratedTestReport
-value class Link(val value: String)
+value class Link(val value: String) {
+    companion object {
+        val EMPTY = Link("")
+    }
+}
+
+fun Link.isEmpty(): Boolean = value.isBlank()
+fun Link?.orEmpty(): Link = this ?: Link.EMPTY

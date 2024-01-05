@@ -16,6 +16,8 @@
 
 package com.nlab.reminder.domain.feature.schedule.all
 
+import com.nlab.reminder.core.data.model.Link
+import com.nlab.reminder.core.data.model.genLink
 import com.nlab.reminder.core.data.model.genSchedule
 import com.nlab.reminder.core.data.model.genScheduleId
 import com.nlab.statekit.expectedState
@@ -34,7 +36,8 @@ internal class AllScheduleReducerTest {
     @Test
     fun `Load schedules, when empty`() {
         val expectedState = genAllScheduleUiStateLoaded(
-            isSelectionMode = false
+            isSelectionMode = false,
+            workflows = persistentListOf()
         )
 
         AllScheduleReducer().scenario()
@@ -73,23 +76,21 @@ internal class AllScheduleReducerTest {
 
     @Test
     fun `Given schedule, When OnScheduleLinkClicked, Then link workflow added`() {
-        val link = genBothify("https:???.??.??")
+        val link = genLink()
         val schedule = genSchedule(link = link)
 
         AllScheduleReducer().scenario()
             .initState(genAllScheduleUiStateLoaded(schedules = persistentListOf(schedule)))
             .action(AllScheduleAction.OnScheduleLinkClicked(schedule.scheduleId))
             .expectedStateFromInitTypeOf<AllScheduleUiState.Loaded> { initState ->
-                initState.copy(workflows = persistentListOf(AllScheduleWorkflow.Link(link)))
+                initState.copy(workflows = persistentListOf(AllScheduleWorkflow.LinkPage(link)))
             }
             .verify()
     }
 
     @Test
     fun `Given schedule with empty link, When OnScheduleLinkClicked, Then state not changed`() {
-        val schedule = genSchedule(link = buildString {
-            repeat(genInt(min = 0, max = 10)) { append(" ") }
-        })
+        val schedule = genSchedule(link = Link.EMPTY)
         AllScheduleReducer().scenario()
             .initState(genAllScheduleUiStateLoaded(schedules = persistentListOf(schedule)))
             .action(AllScheduleAction.OnScheduleLinkClicked(schedule.scheduleId))

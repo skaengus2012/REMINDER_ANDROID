@@ -25,7 +25,7 @@ data class Schedule(
     val scheduleId: ScheduleId,
     val title: String,
     val note: String,
-    val link: String,
+    val link: Link,
     val tags: ImmutableList<Tag>,
     val visiblePriority: Long,
     val isComplete: Boolean

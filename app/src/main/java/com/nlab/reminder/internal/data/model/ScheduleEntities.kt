@@ -16,6 +16,7 @@
 
 package com.nlab.reminder.internal.data.model
 
+import com.nlab.reminder.core.data.model.Link
 import com.nlab.reminder.core.data.model.Schedule
 import com.nlab.reminder.core.data.model.ScheduleId
 import com.nlab.reminder.internal.common.android.database.ScheduleEntity
@@ -30,7 +31,7 @@ internal fun Schedule.toEntity(): ScheduleEntity = ScheduleEntity(
     scheduleId = scheduleId.value,
     title = title,
     description = note,
-    link = link,
+    link = link.value,
     visiblePriority = visiblePriority,
     isComplete = isComplete
 )
@@ -39,7 +40,7 @@ internal fun ScheduleEntityWithTagEntities.toModel(): Schedule = Schedule(
     scheduleId = ScheduleId(scheduleEntity.scheduleId),
     title = scheduleEntity.title,
     note = scheduleEntity.description.orEmpty(),
-    link = scheduleEntity.link.orEmpty(),
+    link = Link(scheduleEntity.link.orEmpty()),
     visiblePriority = scheduleEntity.visiblePriority,
     isComplete = scheduleEntity.isComplete,
     tags = tagEntities.map(TagEntity::toModel).toImmutableList()

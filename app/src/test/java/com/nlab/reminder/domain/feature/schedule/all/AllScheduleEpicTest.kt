@@ -58,7 +58,7 @@ internal class AllScheduleEpicTest {
     }
 
     @Test
-    fun `Completed Schedule loaded from repository2`() {
+    fun `Completed Schedule loaded from repository`() {
         val isCompletedSchedulesShown = true
         val schedules = genSchedules()
 

@@ -21,15 +21,19 @@ import com.nlab.reminder.core.data.repository.ScheduleRepository
 import com.nlab.reminder.core.data.repository.ScheduleUpdateRequest
 import com.nlab.reminder.core.kotlin.collection.associateWith
 import com.nlab.reminder.core.kotlin.util.Result
+import com.nlab.reminder.domain.common.kotlin.coroutine.inject.DefaultDispatcher
+import dagger.Reusable
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 /**
  * @author thalys
  */
-class CompleteScheduleWithIdsUseCase(
+@Reusable
+class CompleteScheduleWithIdsUseCase @Inject constructor(
     private val scheduleRepository: ScheduleRepository,
-    private val dispatcher: CoroutineDispatcher
+    @DefaultDispatcher private val dispatcher: CoroutineDispatcher
 ) {
     suspend operator fun invoke(ids: Collection<ScheduleId>, isComplete: Boolean): Result<Unit> =
         if (ids.isEmpty()) Result.Success(Unit)

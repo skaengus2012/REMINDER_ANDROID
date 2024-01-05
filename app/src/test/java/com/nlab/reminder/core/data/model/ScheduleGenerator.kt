@@ -32,7 +32,7 @@ fun genSchedule(
     scheduleId: ScheduleId = genScheduleId(),
     title: String = genBothify(),
     note: String = genBothify(),
-    link: String = genBothify(),
+    link: Link = genLink(),
     tags: ImmutableList<Tag> = genTags().toImmutableList(),
     visiblePriority: Long = genLong(min = 1),
     isComplete: Boolean = genBoolean()

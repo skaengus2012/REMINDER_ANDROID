@@ -16,10 +16,11 @@
 
 package com.nlab.reminder.domain.feature.schedule.all
 
+import com.nlab.reminder.core.data.model.Link
 import com.nlab.reminder.core.data.model.Schedule
+import com.nlab.reminder.core.data.model.genLink
 import com.nlab.reminder.core.data.model.genSchedules
 import com.nlab.testkit.genBoolean
-import com.nlab.testkit.genBothify
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
@@ -40,8 +41,8 @@ internal fun genAllScheduleUiStateLoaded(
 )
 
 internal fun genAllScheduleWorkflowLink(
-    link: String = genBothify("https://?????.???")
-): AllScheduleWorkflow.Link = AllScheduleWorkflow.Link(link)
+    link: Link = genLink()
+): AllScheduleWorkflow.LinkPage = AllScheduleWorkflow.LinkPage(link)
 
 internal fun genAllScheduleWorkflowsExcludeEmpty(): List<AllScheduleWorkflow> = listOf(
     genAllScheduleWorkflowLink()
