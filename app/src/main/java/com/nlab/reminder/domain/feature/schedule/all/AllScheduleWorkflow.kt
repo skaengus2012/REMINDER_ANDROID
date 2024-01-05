@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 The N's lab Open Source Project
+ * Copyright (C) 2024 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,11 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.data.model
-
-import kotlinx.collections.immutable.ImmutableList
+package com.nlab.reminder.domain.feature.schedule.all
 
 /**
- * @author Doohyun
+ * @author thalys
  */
-data class Schedule(
-    val scheduleId: ScheduleId,
-    val title: String,
-    val note: String,
-    val link: String,
-    val tags: ImmutableList<Tag>,
-    val visiblePriority: Long,
-    val isComplete: Boolean
-)
+internal sealed interface AllScheduleWorkflow {
+    data class Link(val value: String) : AllScheduleWorkflow
+}

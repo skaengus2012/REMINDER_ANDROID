@@ -30,6 +30,7 @@ internal sealed interface AllScheduleUiState : State {
     data class Loaded(
         val schedules: ImmutableList<Schedule>,
         val isCompletedScheduleShown: Boolean,
-        val isSelectionMode: Boolean
+        val isSelectionMode: Boolean,
+        val workflows: ImmutableList<AllScheduleWorkflow>
     ) : AllScheduleUiState
 }

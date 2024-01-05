@@ -20,6 +20,7 @@ import kotlin.collections.minOf as kotlinMinOf
 import kotlin.collections.maxOf as kotlinMaxOf
 import kotlin.collections.filter as kotlinFilter
 import kotlin.collections.associateWith as kotlinAssociateWith
+import kotlin.collections.find as kotlinFind
 
 /**
  * @author thalys
@@ -38,4 +39,8 @@ fun <T> Iterable<T>.filter(predicate: (T) -> Boolean): List<T> {
 
 fun <K, V> Iterable<K>.associateWith(valueSelector: (K) -> V): Map<K, V> {
     return kotlinAssociateWith(valueSelector)
+}
+
+fun <T> Iterable<T>.find(predicate: (T) -> Boolean): T? {
+    return kotlinFind(predicate)
 }

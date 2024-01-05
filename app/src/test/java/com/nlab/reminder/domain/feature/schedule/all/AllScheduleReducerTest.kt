@@ -16,9 +16,14 @@
 
 package com.nlab.reminder.domain.feature.schedule.all
 
+import com.nlab.reminder.core.data.model.genSchedule
+import com.nlab.reminder.core.data.model.genScheduleId
 import com.nlab.statekit.expectedState
+import com.nlab.statekit.expectedStateToInit
 import com.nlab.statekit.scenario
 import com.nlab.testkit.genBoolean
+import com.nlab.testkit.genBothify
+import com.nlab.testkit.genInt
 import kotlinx.collections.immutable.persistentListOf
 import org.junit.Test
 
@@ -66,6 +71,53 @@ internal class AllScheduleReducerTest {
             .verify()
     }
 
+    @Test
+    fun `Given schedule, When OnScheduleLinkClicked, Then link workflow added`() {
+        val link = genBothify("https:???.??.??")
+        val schedule = genSchedule(link = link)
+
+        AllScheduleReducer().scenario()
+            .initState(genAllScheduleUiStateLoaded(schedules = persistentListOf(schedule)))
+            .action(AllScheduleAction.OnScheduleLinkClicked(schedule.scheduleId))
+            .expectedStateFromInitTypeOf<AllScheduleUiState.Loaded> { initState ->
+                initState.copy(workflows = persistentListOf(AllScheduleWorkflow.Link(link)))
+            }
+            .verify()
+    }
+
+    @Test
+    fun `Given schedule with empty link, When OnScheduleLinkClicked, Then state not changed`() {
+        val schedule = genSchedule(link = buildString {
+            repeat(genInt(min = 0, max = 10)) { append(" ") }
+        })
+        AllScheduleReducer().scenario()
+            .initState(genAllScheduleUiStateLoaded(schedules = persistentListOf(schedule)))
+            .action(AllScheduleAction.OnScheduleLinkClicked(schedule.scheduleId))
+            .expectedStateToInit()
+            .verify()
+    }
+
+    @Test
+    fun `Given empty schedule, When OnScheduleLinkClicked, Then state not changed`() {
+        AllScheduleReducer().scenario()
+            .initState(genAllScheduleUiStateLoaded(schedules = persistentListOf()))
+            .action(AllScheduleAction.OnScheduleLinkClicked(genScheduleId()))
+            .expectedStateToInit()
+            .verify()
+    }
+
+    @Test
+    fun `Given same workflow in container, When complete workflow, Then state removed first once`() {
+        val workflow = genAllScheduleWorkflowsExcludeEmpty().first()
+
+        AllScheduleReducer().scenario()
+            .initState(genAllScheduleUiStateLoaded(workflows = persistentListOf(workflow, workflow)))
+            .action(AllScheduleAction.CompleteWorkflow(workflow))
+            .expectedStateFromInitTypeOf<AllScheduleUiState.Loaded> { initState ->
+                initState.copy(workflows = persistentListOf(workflow))
+            }
+            .verify()
+    }
 }
 
 private fun AllScheduleUiState.Loaded.toLoadedAction(): AllScheduleAction.ScheduleLoaded =

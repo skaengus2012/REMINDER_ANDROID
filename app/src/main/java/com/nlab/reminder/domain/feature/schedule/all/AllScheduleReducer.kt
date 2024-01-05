@@ -16,8 +16,10 @@
 
 package com.nlab.reminder.domain.feature.schedule.all
 
+import com.nlab.reminder.core.kotlin.collection.find
 import com.nlab.statekit.Reducer
 import com.nlab.statekit.util.buildDslReducer
+import kotlinx.collections.immutable.*
 import javax.inject.Inject
 
 private typealias DomainReducer = Reducer<AllScheduleAction, AllScheduleUiState>
@@ -31,7 +33,8 @@ internal class AllScheduleReducer @Inject constructor() : DomainReducer by build
             AllScheduleUiState.Loaded(
                 schedules = action.schedules,
                 isCompletedScheduleShown = action.isCompletedScheduleShown,
-                isSelectionMode = false
+                isSelectionMode = false,
+                workflows = persistentListOf()
             )
         }
         state<AllScheduleUiState.Loaded> { (action, before) ->
@@ -44,6 +47,17 @@ internal class AllScheduleReducer @Inject constructor() : DomainReducer by build
     state<AllScheduleUiState.Loaded> {
         action<AllScheduleAction.OnSelectionModeUpdateClicked> { (action, before) ->
             before.copy(isSelectionMode = action.isSelectionMode)
+        }
+        action<AllScheduleAction.OnScheduleLinkClicked> { (action, before) ->
+            val link = before.schedules
+                .find { it.scheduleId == action.id }
+                ?.link
+                .orEmpty()
+            if (link.isBlank()) before
+            else before.copy(workflows = before.workflows.toPersistentList() + AllScheduleWorkflow.Link(link))
+        }
+        action<AllScheduleAction.CompleteWorkflow> { (action, before) ->
+            before.copy(workflows = before.workflows.toPersistentList() - action.workflow)
         }
     }
 })

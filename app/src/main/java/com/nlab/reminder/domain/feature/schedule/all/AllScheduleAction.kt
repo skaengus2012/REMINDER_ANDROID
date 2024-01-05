@@ -32,6 +32,8 @@ internal sealed interface AllScheduleAction : Action {
 
     data class OnSelectionModeUpdateClicked(val isSelectionMode: Boolean) : AllScheduleAction
     data class OnCompletedScheduleVisibilityUpdateClicked(val isVisible: Boolean) : AllScheduleAction
+    data class OnScheduleLinkClicked(val id: ScheduleId) : AllScheduleAction
+    data class CompleteWorkflow(val workflow: AllScheduleWorkflow) : AllScheduleAction
 
     // update completion
     data class OnScheduleCompleteClicked(

@@ -31,8 +31,8 @@ fun genScheduleId(value: Long = genLong(min = 1)): ScheduleId = ScheduleId(value
 fun genSchedule(
     scheduleId: ScheduleId = genScheduleId(),
     title: String = genBothify(),
-    note: String? = genBothify(),
-    link: String? = genBothify(),
+    note: String = genBothify(),
+    link: String = genBothify(),
     tags: ImmutableList<Tag> = genTags().toImmutableList(),
     visiblePriority: Long = genLong(min = 1),
     isComplete: Boolean = genBoolean()

@@ -19,6 +19,9 @@ package com.nlab.reminder.domain.feature.schedule.all
 import com.nlab.reminder.core.data.model.Schedule
 import com.nlab.reminder.core.data.model.genSchedules
 import com.nlab.testkit.genBoolean
+import com.nlab.testkit.genBothify
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 
 /**
@@ -27,9 +30,19 @@ import kotlinx.collections.immutable.toImmutableList
 internal fun genAllScheduleUiStateLoaded(
     schedules: List<Schedule> = genSchedules(),
     isCompletedScheduleShown: Boolean = genBoolean(),
-    isSelectionMode: Boolean = genBoolean()
+    isSelectionMode: Boolean = genBoolean(),
+    workflows: ImmutableList<AllScheduleWorkflow> = persistentListOf()
 ): AllScheduleUiState.Loaded = AllScheduleUiState.Loaded(
     schedules = schedules.toImmutableList(),
     isCompletedScheduleShown = isCompletedScheduleShown,
-    isSelectionMode = isSelectionMode
+    isSelectionMode = isSelectionMode,
+    workflows = workflows
+)
+
+internal fun genAllScheduleWorkflowLink(
+    link: String = genBothify("https://?????.???")
+): AllScheduleWorkflow.Link = AllScheduleWorkflow.Link(link)
+
+internal fun genAllScheduleWorkflowsExcludeEmpty(): List<AllScheduleWorkflow> = listOf(
+    genAllScheduleWorkflowLink()
 )
