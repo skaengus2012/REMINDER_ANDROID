@@ -19,9 +19,11 @@ package com.nlab.reminder.domain.feature.schedule.all
 import com.nlab.reminder.core.data.model.genSchedule
 import com.nlab.reminder.core.kotlin.util.Result
 import com.nlab.reminder.core.data.model.genScheduleId
+import com.nlab.reminder.core.data.model.genSchedules
 import com.nlab.reminder.core.data.repository.CompletedScheduleShownRepository
 import com.nlab.reminder.core.data.repository.ScheduleDeleteRequest
 import com.nlab.reminder.core.data.repository.ScheduleRepository
+import com.nlab.reminder.core.domain.CompleteScheduleWithIdsUseCase
 import com.nlab.reminder.core.domain.CompleteScheduleWithMarkUseCase
 import com.nlab.statekit.middleware.interceptor.scenario
 import com.nlab.testkit.genBoolean
@@ -100,7 +102,7 @@ internal class AllScheduleInterceptorTest {
     }
 
     @Test
-    fun `Given State Loaded, When OnScheduleCompleteClicked, Then CompleteScheduleWithMarkUseCase occurred`() = runTest {
+    fun `Given State Loaded, When OnScheduleCompleteClicked, Then CompleteScheduleWithMarkUseCase invoked`() = runTest {
         val schedule = genSchedule()
         val isComplete = genBoolean()
         val useCase: CompleteScheduleWithMarkUseCase = mock {
@@ -113,14 +115,32 @@ internal class AllScheduleInterceptorTest {
             .dispatchIn(testScope = this)
         verify(useCase, once()).invoke(schedule.scheduleId, isComplete)
     }
+
+    @Test
+    fun `Given State Loaded, When OnSelectedSchedulesCompleteClicked, Then CompleteScheduleWithIdsUseCase invoked`() = runTest {
+        val schedules = genSchedules()
+        val scheduleIds = schedules.map { it.scheduleId }
+        val isComplete = genBoolean()
+        val useCase: CompleteScheduleWithIdsUseCase = mock {
+            whenever(mock(scheduleIds, isComplete)) doReturn Result.Success(Unit)
+        }
+        genInterceptor(completeScheduleWithIds = useCase)
+            .scenario()
+            .initState(genAllScheduleUiStateLoaded(schedules = schedules))
+            .action(AllScheduleAction.OnSelectedSchedulesCompleteClicked(scheduleIds, isComplete))
+            .dispatchIn(testScope = this)
+        verify(useCase, once()).invoke(scheduleIds, isComplete)
+    }
 }
 
 private fun genInterceptor(
     scheduleRepository: ScheduleRepository = mock(),
     completedScheduleShownRepository: CompletedScheduleShownRepository = mock(),
-    completeScheduleWithMark: CompleteScheduleWithMarkUseCase = mock()
+    completeScheduleWithMark: CompleteScheduleWithMarkUseCase = mock(),
+    completeScheduleWithIds: CompleteScheduleWithIdsUseCase = mock()
 ): AllScheduleInterceptor = AllScheduleInterceptor(
     scheduleRepository = scheduleRepository,
     completedScheduleShownRepository = completedScheduleShownRepository,
-    completeScheduleWithMark = completeScheduleWithMark
+    completeScheduleWithMark = completeScheduleWithMark,
+    completeScheduleWithIds = completeScheduleWithIds
 )

@@ -68,7 +68,7 @@ internal class LocalScheduleRepository @Inject constructor(
     override suspend fun update(request: ScheduleUpdateRequest): Result<Unit> = when (request) {
         // When outside the catch block, jacoco does not recognize. 😭
         is ScheduleUpdateRequest.Completes -> catching {
-            scheduleDao.updateCompletes(request.scheduleToCompletes.mapKeys { (key) -> key.value })
+            scheduleDao.updateCompletes(request.idToCompleteTable.mapKeys { (key) -> key.value })
         }
     }
 

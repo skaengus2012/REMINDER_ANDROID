@@ -12,6 +12,8 @@ import com.nlab.testkit.once
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.collections.immutable.toPersistentMap
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
@@ -101,11 +103,13 @@ class CompleteScheduleWithMarkUseCaseTest {
 private fun genUpdateScheduleCompletionUseCase(
     scheduleRepository: ScheduleRepository = mock(),
     completeMarkRepository: ScheduleCompleteMarkRepository = mock(),
-    aggregateDelay: Delay = mock()
+    aggregateDelay: Delay = mock(),
+    dispatcher: CoroutineDispatcher = Dispatchers.Unconfined
 ): CompleteScheduleWithMarkUseCase = CompleteScheduleWithMarkUseCase(
     scheduleRepository = scheduleRepository,
     completeMarkRepository = completeMarkRepository,
-    aggregateDelay = aggregateDelay
+    aggregateDelay = aggregateDelay,
+    dispatcher = dispatcher
 )
 
 private fun genCompleteMarkRepositoryMockWithEmptyTable(): ScheduleCompleteMarkRepository = mock {

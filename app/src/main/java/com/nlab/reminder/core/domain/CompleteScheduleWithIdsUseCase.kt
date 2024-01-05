@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 The N's lab Open Source Project
+ * Copyright (C) 2024 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,9 @@
 package com.nlab.reminder.core.domain
 
 import com.nlab.reminder.core.data.model.ScheduleId
-import com.nlab.reminder.core.data.repository.ScheduleCompleteMarkRepository
 import com.nlab.reminder.core.data.repository.ScheduleRepository
 import com.nlab.reminder.core.data.repository.ScheduleUpdateRequest
-import com.nlab.reminder.core.data.repository.getSnapshot
-import com.nlab.reminder.core.kotlin.coroutine.Delay
+import com.nlab.reminder.core.kotlin.collection.associateWith
 import com.nlab.reminder.core.kotlin.util.Result
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
@@ -29,18 +27,15 @@ import kotlinx.coroutines.withContext
 /**
  * @author thalys
  */
-class CompleteScheduleWithMarkUseCase(
+class CompleteScheduleWithIdsUseCase(
     private val scheduleRepository: ScheduleRepository,
-    private val completeMarkRepository: ScheduleCompleteMarkRepository,
-    private val aggregateDelay: Delay,
     private val dispatcher: CoroutineDispatcher
 ) {
-    suspend operator fun invoke(id: ScheduleId, isComplete: Boolean): Result<Unit> = withContext(dispatcher) {
-        completeMarkRepository.add(id, isComplete)
-        aggregateDelay()
-        val completeMarkTable = completeMarkRepository.getSnapshot()
-
-        if (completeMarkTable.isEmpty()) Result.Success(Unit)
-        else scheduleRepository.update(ScheduleUpdateRequest.Completes(completeMarkTable))
-    }
+    suspend operator fun invoke(ids: Collection<ScheduleId>, isComplete: Boolean): Result<Unit> =
+        if (ids.isEmpty()) Result.Success(Unit)
+        else withContext(dispatcher) {
+            scheduleRepository.update(
+                ScheduleUpdateRequest.Completes(idToCompleteTable = ids.associateWith { isComplete })
+            )
+        }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 The N's lab Open Source Project
+ * Copyright (C) 2024 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,32 +16,26 @@
 
 package com.nlab.reminder.internal.common.di
 
-import com.nlab.reminder.core.data.repository.ScheduleCompleteMarkRepository
 import com.nlab.reminder.core.data.repository.ScheduleRepository
-import com.nlab.reminder.core.domain.CompleteScheduleWithMarkUseCase
-import com.nlab.reminder.core.kotlin.coroutine.Delay
+import com.nlab.reminder.core.domain.CompleteScheduleWithIdsUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.Reusable
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ViewModelComponent
+import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.Dispatchers
 
 /**
  * @author thalys
  */
 @Module
-@InstallIn(ViewModelComponent::class)
-internal abstract class UseCaseModule {
-    companion object {
-        @Reusable
-        @Provides
-        fun provideCompleteScheduleWithMarkUseCase(
-            scheduleRepository: ScheduleRepository,
-            scheduleCompleteMarkRepository: ScheduleCompleteMarkRepository
-        ) = CompleteScheduleWithMarkUseCase(
+@InstallIn(SingletonComponent::class)
+internal class AppScopeUseCaseModule {
+    @Reusable
+    @Provides
+    fun provideCompleteScheduleWithIdsUseCase(scheduleRepository: ScheduleRepository) =
+        CompleteScheduleWithIdsUseCase(
             scheduleRepository,
-            scheduleCompleteMarkRepository,
-            aggregateDelay = Delay(timeMillis = 500)
+            dispatcher = Dispatchers.Default
         )
-    }
 }

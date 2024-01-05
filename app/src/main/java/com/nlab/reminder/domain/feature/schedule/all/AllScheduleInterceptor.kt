@@ -21,6 +21,7 @@ import com.nlab.reminder.core.data.repository.CompletedScheduleShownAllData
 import com.nlab.reminder.core.data.repository.CompletedScheduleShownRepository
 import com.nlab.reminder.core.data.repository.ScheduleDeleteRequest
 import com.nlab.reminder.core.data.repository.ScheduleRepository
+import com.nlab.reminder.core.domain.CompleteScheduleWithIdsUseCase
 import com.nlab.reminder.core.domain.CompleteScheduleWithMarkUseCase
 import com.nlab.statekit.middleware.interceptor.Interceptor
 import com.nlab.statekit.util.buildDslInterceptor
@@ -32,7 +33,8 @@ import javax.inject.Inject
 internal class AllScheduleInterceptor @Inject constructor(
     scheduleRepository: ScheduleRepository,
     @CompletedScheduleShownAllData completedScheduleShownRepository: CompletedScheduleShownRepository,
-    completeScheduleWithMark: CompleteScheduleWithMarkUseCase
+    completeScheduleWithMark: CompleteScheduleWithMarkUseCase,
+    completeScheduleWithIds: CompleteScheduleWithIdsUseCase
 ) : Interceptor<AllScheduleAction, AllScheduleUiState> by buildDslInterceptor(defineDSL = {
     state<AllScheduleUiState.Loaded> {
         action<AllScheduleAction.OnCompletedScheduleVisibilityUpdateClicked> { (action) ->
@@ -44,6 +46,9 @@ internal class AllScheduleInterceptor @Inject constructor(
         // https://github.com/skaengus2012/REMINDER_ANDROID/issues/236
         action<AllScheduleAction.OnScheduleCompleteClicked> { (action) ->
             completeScheduleWithMark(action.id, action.isComplete)
+        }
+        action<AllScheduleAction.OnSelectedSchedulesCompleteClicked> { (action) ->
+            completeScheduleWithIds(action.ids, action.isComplete)
         }
         action<AllScheduleAction.OnScheduleDeleteClicked> { (action) ->
             scheduleRepository.delete(ScheduleDeleteRequest.ById(action.id))
