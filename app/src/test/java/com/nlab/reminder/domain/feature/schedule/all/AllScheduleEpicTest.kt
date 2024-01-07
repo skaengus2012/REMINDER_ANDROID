@@ -19,16 +19,21 @@ package com.nlab.reminder.domain.feature.schedule.all
 import com.nlab.reminder.core.data.model.ScheduleId
 import com.nlab.reminder.core.data.model.genLinkMetadataTable
 import com.nlab.reminder.core.data.model.genSchedule
+import com.nlab.reminder.core.data.model.genScheduleId
 import com.nlab.reminder.core.data.model.genSchedules
 import com.nlab.reminder.core.data.repository.CompletedScheduleShownRepository
 import com.nlab.reminder.core.data.repository.LinkMetadataTableRepository
+import com.nlab.reminder.core.data.repository.ScheduleCompleteMarkRepository
 import com.nlab.reminder.core.data.repository.ScheduleGetStreamRequest
 import com.nlab.reminder.core.data.repository.ScheduleRepository
 import com.nlab.statekit.middleware.epic.scenario
+import com.nlab.testkit.genBoolean
 import com.nlab.testkit.genInt
+import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import org.junit.Test
@@ -85,7 +90,19 @@ internal class AllScheduleEpicTest {
                 whenever(mock.get()) doReturn flowOf(linkMetadataTable)
             })
             .scenario()
-            .action(AllScheduleAction.LinkMetadataTableLoaded(linkMetadataTable))
+            .action(AllScheduleAction.LinkMetadataLoaded(linkMetadataTable))
+            .verify()
+    }
+
+    @Test
+    fun `CompleteMark loaded from repository`() {
+        val completeMark = persistentMapOf(genScheduleId() to genBoolean(),)
+        genAllScheduleEpic(
+            completeMarkRepository = mock {
+                whenever(mock.get()) doReturn MutableStateFlow(completeMark)
+            })
+            .scenario()
+            .action(AllScheduleAction.CompleteMarkLoaded(completeMark))
             .verify()
     }
 }
@@ -93,6 +110,9 @@ internal class AllScheduleEpicTest {
 private fun genAllScheduleEpic(
     scheduleRepository: ScheduleRepository = mock {
         whenever(mock.getAsStream(ScheduleGetStreamRequest.All)) doReturn emptyFlow()
+    },
+    completeMarkRepository: ScheduleCompleteMarkRepository = mock {
+        whenever(mock.get()) doReturn MutableStateFlow(persistentMapOf())
     },
     linkMetadataTableRepository: LinkMetadataTableRepository = mock {
         whenever(mock.get()) doReturn emptyFlow()
@@ -103,6 +123,7 @@ private fun genAllScheduleEpic(
     dispatcher: CoroutineDispatcher = Dispatchers.Unconfined
 ): AllScheduleEpic = AllScheduleEpic(
     scheduleRepository,
+    completeMarkRepository,
     linkMetadataTableRepository,
     completedScheduleShownRepository,
     dispatcher

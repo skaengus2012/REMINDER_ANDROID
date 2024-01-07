@@ -21,6 +21,7 @@ import com.nlab.reminder.core.kotlin.coroutine.flow.map
 import com.nlab.reminder.core.data.repository.CompletedScheduleShownAllData
 import com.nlab.reminder.core.data.repository.CompletedScheduleShownRepository
 import com.nlab.reminder.core.data.repository.LinkMetadataTableRepository
+import com.nlab.reminder.core.data.repository.ScheduleCompleteMarkRepository
 import com.nlab.reminder.core.data.repository.ScheduleGetStreamRequest
 import com.nlab.reminder.core.data.repository.ScheduleRepository
 import com.nlab.reminder.domain.common.kotlin.coroutine.inject.DefaultDispatcher
@@ -36,6 +37,7 @@ import javax.inject.Inject
  */
 internal class AllScheduleEpic @Inject constructor(
     scheduleRepository: ScheduleRepository,
+    completeMarkRepository: ScheduleCompleteMarkRepository,
     linkMetadataTableRepository: LinkMetadataTableRepository,
     @CompletedScheduleShownAllData completedScheduleShownRepository: CompletedScheduleShownRepository,
     @DefaultDispatcher dispatcher: CoroutineDispatcher
@@ -49,7 +51,12 @@ internal class AllScheduleEpic @Inject constructor(
     whileStateUsed {
         linkMetadataTableRepository
             .get()
-            .map(AllScheduleAction::LinkMetadataTableLoaded)
+            .map(AllScheduleAction::LinkMetadataLoaded)
+    }
+    whileStateUsed {
+        completeMarkRepository
+            .get()
+            .map(AllScheduleAction::CompleteMarkLoaded)
     }
 })
 
