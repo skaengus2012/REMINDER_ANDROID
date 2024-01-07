@@ -19,10 +19,12 @@ package com.nlab.reminder.domain.feature.schedule.all
 import com.nlab.reminder.core.kotlin.util.getOrThrow
 import com.nlab.reminder.core.data.repository.CompletedScheduleShownAllData
 import com.nlab.reminder.core.data.repository.CompletedScheduleShownRepository
+import com.nlab.reminder.core.data.repository.LinkMetadataTableRepository
 import com.nlab.reminder.core.data.repository.ScheduleDeleteRequest
 import com.nlab.reminder.core.data.repository.ScheduleRepository
 import com.nlab.reminder.core.domain.CompleteScheduleWithIdsUseCase
 import com.nlab.reminder.core.domain.CompleteScheduleWithMarkUseCase
+import com.nlab.reminder.core.domain.FetchLinkMetadataUseCase
 import com.nlab.statekit.middleware.interceptor.Interceptor
 import com.nlab.statekit.util.buildDslInterceptor
 import javax.inject.Inject
@@ -34,7 +36,8 @@ internal class AllScheduleInterceptor @Inject constructor(
     scheduleRepository: ScheduleRepository,
     @CompletedScheduleShownAllData completedScheduleShownRepository: CompletedScheduleShownRepository,
     completeScheduleWithMark: CompleteScheduleWithMarkUseCase,
-    completeScheduleWithIds: CompleteScheduleWithIdsUseCase
+    completeScheduleWithIds: CompleteScheduleWithIdsUseCase,
+    fetchLinkMetadata: FetchLinkMetadataUseCase,
 ) : Interceptor<AllScheduleAction, AllScheduleUiState> by buildDslInterceptor(defineDSL = {
     state<AllScheduleUiState.Loaded> {
         action<AllScheduleAction.OnCompletedScheduleVisibilityUpdateClicked> { (action) ->
@@ -61,6 +64,11 @@ internal class AllScheduleInterceptor @Inject constructor(
         action<AllScheduleAction.OnCompletedScheduleDeleteClicked> {
             scheduleRepository.delete(ScheduleDeleteRequest.ByComplete(isComplete = true))
                 .getOrThrow()
+        }
+    }
+    anyState {
+        action<AllScheduleAction.ScheduleLoaded> { (action) ->
+            fetchLinkMetadata(action.schedules)
         }
     }
 })

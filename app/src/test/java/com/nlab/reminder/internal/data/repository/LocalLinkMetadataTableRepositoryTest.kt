@@ -40,7 +40,7 @@ import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers
-import org.hamcrest.MatcherAssert
+import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
@@ -69,7 +69,7 @@ internal class LocalLinkMetadataTableRepositoryTest {
             }
         )
 
-        linkMetadataTableRepository.fetch(listOf(link))
+        linkMetadataTableRepository.fetch(setOf(link))
         verify(linkMetadataDao, once()).insertAndClearOldData(linkMetadata.toEntity(link, timestamp))
     }
 
@@ -87,7 +87,7 @@ internal class LocalLinkMetadataTableRepositoryTest {
             }
         )
 
-        linkMetadataTableRepository.fetch(links + emptyLink)
+        linkMetadataTableRepository.fetch((links + emptyLink).toSet())
         verify(linkMetadataDao, times(links.size)).insertAndClearOldData(any())
     }
 
@@ -104,7 +104,7 @@ internal class LocalLinkMetadataTableRepositoryTest {
             }
         )
 
-        linkMetadataTableRepository.fetch(listOf(successTargetLink, failedTargetLink))
+        linkMetadataTableRepository.fetch(setOf(successTargetLink, failedTargetLink))
         verify(linkMetadataDao, once()).insertAndClearOldData(any())
     }
 
@@ -123,7 +123,7 @@ internal class LocalLinkMetadataTableRepositoryTest {
             }
         )
 
-        linkMetadataTableRepository.fetch(links)
+        linkMetadataTableRepository.fetch(links.toSet())
         verify(linkMetadataDao, times(2)).insertAndClearOldData(any())
     }
 
@@ -140,7 +140,7 @@ internal class LocalLinkMetadataTableRepositoryTest {
         val linkMetadataTable = linkMetadataTableRepository.get()
             .take(1)
             .first()
-        MatcherAssert.assertThat(
+        assertThat(
             linkMetadataTable,
             CoreMatchers.equalTo(LinkMetadataTable(mapOf(link to linkMetadata)))
         )

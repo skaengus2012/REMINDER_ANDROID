@@ -25,12 +25,15 @@ import com.nlab.reminder.core.data.repository.ScheduleDeleteRequest
 import com.nlab.reminder.core.data.repository.ScheduleRepository
 import com.nlab.reminder.core.domain.CompleteScheduleWithIdsUseCase
 import com.nlab.reminder.core.domain.CompleteScheduleWithMarkUseCase
+import com.nlab.reminder.core.domain.FetchLinkMetadataUseCase
 import com.nlab.statekit.middleware.interceptor.scenario
 import com.nlab.testkit.genBoolean
 import com.nlab.testkit.genInt
 import com.nlab.testkit.once
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
@@ -131,16 +134,29 @@ internal class AllScheduleInterceptorTest {
             .dispatchIn(testScope = this)
         verify(useCase, once()).invoke(scheduleIds, isComplete)
     }
+
+    @Test
+    fun `Given any state, When ScheduleLoaded, Then fetchLinkMetadata invoked`() = runTest {
+        val useCase: FetchLinkMetadataUseCase = mock()
+        genInterceptor(fetchLinkMetadata = useCase)
+            .scenario()
+            .initState(genAllScheduleUiState())
+            .action(AllScheduleAction.ScheduleLoaded(genSchedules().toImmutableList(), genBoolean()))
+            .dispatchIn(testScope = this)
+        verify(useCase, once()).invoke(any())
+    }
 }
 
 private fun genInterceptor(
     scheduleRepository: ScheduleRepository = mock(),
     completedScheduleShownRepository: CompletedScheduleShownRepository = mock(),
     completeScheduleWithMark: CompleteScheduleWithMarkUseCase = mock(),
-    completeScheduleWithIds: CompleteScheduleWithIdsUseCase = mock()
+    completeScheduleWithIds: CompleteScheduleWithIdsUseCase = mock(),
+    fetchLinkMetadata: FetchLinkMetadataUseCase = mock(),
 ): AllScheduleInterceptor = AllScheduleInterceptor(
     scheduleRepository = scheduleRepository,
     completedScheduleShownRepository = completedScheduleShownRepository,
     completeScheduleWithMark = completeScheduleWithMark,
-    completeScheduleWithIds = completeScheduleWithIds
+    completeScheduleWithIds = completeScheduleWithIds,
+    fetchLinkMetadata = fetchLinkMetadata
 )

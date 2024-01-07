@@ -28,6 +28,11 @@ import kotlinx.collections.immutable.toImmutableList
 /**
  * @author Doohyun
  */
+internal fun genAllScheduleUiState(): AllScheduleUiState = when(genBoolean()) {
+    true -> AllScheduleUiState.Empty
+    false -> genAllScheduleUiStateLoaded()
+}
+
 internal fun genAllScheduleUiStateLoaded(
     schedules: List<Schedule> = genSchedules(),
     isCompletedScheduleShown: Boolean = genBoolean(),

@@ -30,4 +30,5 @@ value class Link(val value: String) {
 }
 
 fun Link.isEmpty(): Boolean = value.isBlank()
+fun Link.isNotEmpty(): Boolean = isEmpty().not()
 fun Link?.orEmpty(): Link = this ?: Link.EMPTY

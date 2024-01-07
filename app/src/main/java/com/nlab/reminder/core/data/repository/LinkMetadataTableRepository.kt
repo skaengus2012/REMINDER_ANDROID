@@ -24,6 +24,6 @@ import kotlinx.coroutines.flow.Flow
  * @author thalys
  */
 interface LinkMetadataTableRepository {
-    fun fetch(links: List<Link>)
+    suspend fun fetch(links: Set<Link>)
     fun get(): Flow<LinkMetadataTable>
 }
