@@ -17,6 +17,7 @@
 package com.nlab.reminder.core.data.model
 
 import com.nlab.testkit.genBothify
+import com.nlab.testkit.genInt
 
 /**
  * @author thalys
@@ -25,3 +26,7 @@ fun genLinkMetadata(
     title: String = genBothify("Title_${genBothify()}"),
     imageUrl: String = genBothify("ImageUrl_${genBothify()}")
 ): LinkMetadata = LinkMetadata(title, imageUrl)
+
+fun genLinkMetadataTable(
+    size: Int = genInt(min = 5)
+): LinkMetadataTable = LinkMetadataTable(List(size) { genLink() }.associateWith { genLinkMetadata() })

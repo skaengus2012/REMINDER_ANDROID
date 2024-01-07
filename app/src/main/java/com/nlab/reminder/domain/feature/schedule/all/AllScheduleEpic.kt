@@ -20,6 +20,7 @@ import com.nlab.reminder.core.kotlin.coroutine.flow.flatMapLatest
 import com.nlab.reminder.core.kotlin.coroutine.flow.map
 import com.nlab.reminder.core.data.repository.CompletedScheduleShownAllData
 import com.nlab.reminder.core.data.repository.CompletedScheduleShownRepository
+import com.nlab.reminder.core.data.repository.LinkMetadataTableRepository
 import com.nlab.reminder.core.data.repository.ScheduleGetStreamRequest
 import com.nlab.reminder.core.data.repository.ScheduleRepository
 import com.nlab.reminder.domain.common.kotlin.coroutine.inject.DefaultDispatcher
@@ -34,15 +35,21 @@ import javax.inject.Inject
  * @author thalys
  */
 internal class AllScheduleEpic @Inject constructor(
-    private val scheduleRepository: ScheduleRepository,
-    @CompletedScheduleShownAllData private val completedScheduleShownRepository: CompletedScheduleShownRepository,
-    @DefaultDispatcher private val dispatcher: CoroutineDispatcher
+    scheduleRepository: ScheduleRepository,
+    linkMetadataTableRepository: LinkMetadataTableRepository,
+    @CompletedScheduleShownAllData completedScheduleShownRepository: CompletedScheduleShownRepository,
+    @DefaultDispatcher dispatcher: CoroutineDispatcher
 ) : Epic<AllScheduleAction> by buildDslEpic(buildDSL = {
     whileStateUsed {
         completedScheduleShownRepository
             .getAsStream()
             .flatMapLatest(scheduleRepository::getLoadedActionAsStream)
             .flowOn(dispatcher)
+    }
+    whileStateUsed {
+        linkMetadataTableRepository
+            .get()
+            .map(AllScheduleAction::LinkMetadataTableLoaded)
     }
 })
 

@@ -16,6 +16,7 @@
 
 package com.nlab.reminder.domain.feature.schedule.all
 
+import com.nlab.reminder.core.data.model.LinkMetadataTable
 import com.nlab.reminder.core.data.model.Schedule
 import com.nlab.reminder.core.data.model.ScheduleId
 import com.nlab.statekit.Action
@@ -29,6 +30,8 @@ internal sealed interface AllScheduleAction : Action {
         val schedules: ImmutableList<Schedule>,
         val isCompletedScheduleShown: Boolean
     ) : AllScheduleAction
+
+    data class LinkMetadataTableLoaded(val linkTables: LinkMetadataTable) : AllScheduleAction
 
     data class OnSelectionModeUpdateClicked(val isSelectionMode: Boolean) : AllScheduleAction
     data class OnCompletedScheduleVisibilityUpdateClicked(val isVisible: Boolean) : AllScheduleAction
