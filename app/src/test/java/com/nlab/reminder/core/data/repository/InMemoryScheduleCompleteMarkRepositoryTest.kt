@@ -3,7 +3,6 @@ package com.nlab.reminder.core.data.repository
 import com.nlab.reminder.core.data.model.genScheduleId
 import com.nlab.testkit.genBoolean
 import com.nlab.testkit.genInt
-import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
@@ -38,7 +37,7 @@ internal class InMemoryScheduleCompleteMarkRepositoryTest {
         scheduleCompleteMarkRepository.add(scheduleId, newCompleteMark)
         assertThat(
             scheduleCompleteMarkRepository.getSnapshot(),
-            equalTo(persistentMapOf(scheduleId to newCompleteMark))
+            equalTo(mapOf(scheduleId to newCompleteMark))
         )
     }
 
@@ -51,7 +50,7 @@ internal class InMemoryScheduleCompleteMarkRepositoryTest {
         scheduleCompleteMarkRepository.clear()
         assertThat(
             scheduleCompleteMarkRepository.getSnapshot(),
-            equalTo(persistentMapOf())
+            equalTo(mapOf())
         )
     }
 }

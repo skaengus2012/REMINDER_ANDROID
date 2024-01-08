@@ -26,11 +26,12 @@ import com.nlab.reminder.core.data.repository.ScheduleRepository
 import com.nlab.reminder.core.domain.CompleteScheduleWithIdsUseCase
 import com.nlab.reminder.core.domain.CompleteScheduleWithMarkUseCase
 import com.nlab.reminder.core.domain.FetchLinkMetadataUseCase
+import com.nlab.reminder.core.schedule.genScheduleItems
+import com.nlab.reminder.core.schedule.toItems
 import com.nlab.statekit.middleware.interceptor.scenario
 import com.nlab.testkit.genBoolean
 import com.nlab.testkit.genInt
 import com.nlab.testkit.once
-import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -113,7 +114,7 @@ internal class AllScheduleInterceptorTest {
         }
         genInterceptor(completeScheduleWithMark = useCase)
             .scenario()
-            .initState(genAllScheduleUiStateLoaded(schedules = listOf(schedule)))
+            .initState(genAllScheduleUiStateLoaded(scheduleItems = genScheduleItems(schedule)))
             .action(AllScheduleAction.OnScheduleCompleteClicked(schedule.scheduleId, isComplete))
             .dispatchIn(testScope = this)
         verify(useCase, once()).invoke(schedule.scheduleId, isComplete)
@@ -129,7 +130,7 @@ internal class AllScheduleInterceptorTest {
         }
         genInterceptor(completeScheduleWithIds = useCase)
             .scenario()
-            .initState(genAllScheduleUiStateLoaded(schedules = schedules))
+            .initState(genAllScheduleUiStateLoaded(scheduleItems = schedules.toItems()))
             .action(AllScheduleAction.OnSelectedSchedulesCompleteClicked(scheduleIds, isComplete))
             .dispatchIn(testScope = this)
         verify(useCase, once()).invoke(scheduleIds, isComplete)
@@ -141,7 +142,7 @@ internal class AllScheduleInterceptorTest {
         genInterceptor(fetchLinkMetadata = useCase)
             .scenario()
             .initState(genAllScheduleUiState())
-            .action(AllScheduleAction.ScheduleLoaded(genSchedules().toImmutableList(), genBoolean()))
+            .action(AllScheduleAction.ScheduleLoaded(genSchedules(), genBoolean()))
             .dispatchIn(testScope = this)
         verify(useCase, once()).invoke(any())
     }

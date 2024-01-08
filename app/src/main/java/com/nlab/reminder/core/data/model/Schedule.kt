@@ -16,11 +16,13 @@
 
 package com.nlab.reminder.core.data.model
 
+import com.nlab.reminder.core.annotation.Immutable
 import kotlinx.collections.immutable.ImmutableList
 
 /**
  * @author Doohyun
  */
+@Immutable
 data class Schedule(
     val scheduleId: ScheduleId,
     val title: String,

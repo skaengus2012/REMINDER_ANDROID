@@ -16,21 +16,18 @@
 
 package com.nlab.reminder.core.schedule
 
-import com.nlab.reminder.core.data.model.genSchedule
-import org.hamcrest.CoreMatchers.equalTo
-import org.hamcrest.MatcherAssert.assertThat
-import org.junit.Test
+import com.nlab.reminder.core.data.model.Link
+import com.nlab.reminder.core.data.model.Schedule
+import com.nlab.reminder.core.data.model.ScheduleId
+import com.nlab.reminder.core.data.model.orEmpty
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 
 /**
  * @author thalys
  */
-internal class ScheduleUiStateTest {
-    @Test
-    fun testConstructorWithDefaultValues() {
-        val schedule = genSchedule()
-        val uiState = ScheduleUiState(schedule = schedule)
-        assertThat(uiState.schedule, equalTo(schedule))
-        assertThat(uiState.isCompleteMarked, equalTo(false))
-        assertThat(uiState.linkMetadata, equalTo(null))
-    }
-}
+fun List<Schedule>.toItems(): ImmutableList<ScheduleItem> =
+    map(::ScheduleItem).toImmutableList()
+
+fun List<ScheduleItem>.findLink(scheduleId: ScheduleId): Link =
+    find { it.schedule.scheduleId == scheduleId }?.schedule?.link.orEmpty()

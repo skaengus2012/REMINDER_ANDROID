@@ -29,8 +29,6 @@ import com.nlab.reminder.internal.common.android.database.ScheduleDao
 import com.nlab.reminder.internal.common.android.database.ScheduleEntityWithTagEntities
 import com.nlab.reminder.internal.data.repository.fake.FakeScheduleRepositoryDelegate
 import com.nlab.reminder.internal.data.model.toModel
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -52,16 +50,14 @@ internal class LocalScheduleRepository @Inject constructor(
     override fun getAllSchedulesCount(): Flow<Long> =
         FakeScheduleRepositoryDelegate.getAllSchedulesCount()
 
-    override fun getAsStream(request: ScheduleGetStreamRequest): Flow<ImmutableList<Schedule>> {
+    override fun getAsStream(request: ScheduleGetStreamRequest): Flow<List<Schedule>> {
         val entitiesFlow = when (request) {
             is ScheduleGetStreamRequest.All -> scheduleDao.findAsStream()
             is ScheduleGetStreamRequest.ByComplete -> scheduleDao.findByCompleteAsStream(request.isComplete)
         }
 
         return entitiesFlow.map { entities ->
-            entities
-                .map(ScheduleEntityWithTagEntities::toModel)
-                .toImmutableList()
+            entities.map(ScheduleEntityWithTagEntities::toModel)
         }
     }
 

@@ -17,8 +17,8 @@
 package com.nlab.reminder.domain.feature.schedule.all
 
 import com.nlab.reminder.core.data.model.isEmpty
-import com.nlab.reminder.core.data.model.orEmpty
-import com.nlab.reminder.core.kotlin.collection.find
+import com.nlab.reminder.core.schedule.findLink
+import com.nlab.reminder.core.schedule.toItems
 import com.nlab.statekit.Reducer
 import com.nlab.statekit.util.buildDslReducer
 import kotlinx.collections.immutable.*
@@ -33,7 +33,7 @@ internal class AllScheduleReducer @Inject constructor() : DomainReducer by build
     action<AllScheduleAction.ScheduleLoaded> {
         state<AllScheduleUiState.Empty> { (action) ->
             AllScheduleUiState.Loaded(
-                schedules = action.schedules,
+                scheduleItems = action.schedules.toItems(),
                 isCompletedScheduleShown = action.isCompletedScheduleShown,
                 isSelectionMode = false,
                 workflows = persistentListOf()
@@ -41,7 +41,7 @@ internal class AllScheduleReducer @Inject constructor() : DomainReducer by build
         }
         state<AllScheduleUiState.Loaded> { (action, before) ->
             before.copy(
-                schedules = action.schedules,
+                scheduleItems = action.schedules.toItems(),
                 isCompletedScheduleShown = action.isCompletedScheduleShown
             )
         }
@@ -51,10 +51,7 @@ internal class AllScheduleReducer @Inject constructor() : DomainReducer by build
             before.copy(isSelectionMode = action.isSelectionMode)
         }
         action<AllScheduleAction.OnScheduleLinkClicked> { (action, before) ->
-            val link = before.schedules
-                .find { it.scheduleId == action.id }
-                ?.link
-                .orEmpty()
+            val link = before.scheduleItems.findLink(scheduleId = action.id)
             if (link.isEmpty()) before
             else before.copy(workflows = before.workflows.toPersistentList() + AllScheduleWorkflow.LinkPage(link))
         }

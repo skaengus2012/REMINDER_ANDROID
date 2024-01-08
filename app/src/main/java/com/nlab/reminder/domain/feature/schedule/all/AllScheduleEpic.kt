@@ -18,7 +18,7 @@ package com.nlab.reminder.domain.feature.schedule.all
 
 import com.nlab.reminder.core.kotlin.coroutine.flow.flatMapLatest
 import com.nlab.reminder.core.kotlin.coroutine.flow.map
-import com.nlab.reminder.core.data.repository.CompletedScheduleShownAllData
+import com.nlab.reminder.core.data.repository.AllScheduleData
 import com.nlab.reminder.core.data.repository.CompletedScheduleShownRepository
 import com.nlab.reminder.core.data.repository.LinkMetadataTableRepository
 import com.nlab.reminder.core.data.repository.ScheduleCompleteMarkRepository
@@ -39,7 +39,7 @@ internal class AllScheduleEpic @Inject constructor(
     scheduleRepository: ScheduleRepository,
     completeMarkRepository: ScheduleCompleteMarkRepository,
     linkMetadataTableRepository: LinkMetadataTableRepository,
-    @CompletedScheduleShownAllData completedScheduleShownRepository: CompletedScheduleShownRepository,
+    @AllScheduleData completedScheduleShownRepository: CompletedScheduleShownRepository,
     @DefaultDispatcher dispatcher: CoroutineDispatcher
 ) : Epic<AllScheduleAction> by buildDslEpic(buildDSL = {
     whileStateUsed {

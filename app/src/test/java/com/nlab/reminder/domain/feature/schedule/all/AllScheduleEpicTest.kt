@@ -96,7 +96,7 @@ internal class AllScheduleEpicTest {
 
     @Test
     fun `CompleteMark loaded from repository`() {
-        val completeMark = persistentMapOf(genScheduleId() to genBoolean(),)
+        val completeMark = persistentMapOf(genScheduleId() to genBoolean())
         genAllScheduleEpic(
             completeMarkRepository = mock {
                 whenever(mock.get()) doReturn MutableStateFlow(completeMark)

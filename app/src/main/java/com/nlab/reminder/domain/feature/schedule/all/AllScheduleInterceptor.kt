@@ -17,9 +17,8 @@
 package com.nlab.reminder.domain.feature.schedule.all
 
 import com.nlab.reminder.core.kotlin.util.getOrThrow
-import com.nlab.reminder.core.data.repository.CompletedScheduleShownAllData
+import com.nlab.reminder.core.data.repository.AllScheduleData
 import com.nlab.reminder.core.data.repository.CompletedScheduleShownRepository
-import com.nlab.reminder.core.data.repository.LinkMetadataTableRepository
 import com.nlab.reminder.core.data.repository.ScheduleDeleteRequest
 import com.nlab.reminder.core.data.repository.ScheduleRepository
 import com.nlab.reminder.core.domain.CompleteScheduleWithIdsUseCase
@@ -34,7 +33,7 @@ import javax.inject.Inject
  */
 internal class AllScheduleInterceptor @Inject constructor(
     scheduleRepository: ScheduleRepository,
-    @CompletedScheduleShownAllData completedScheduleShownRepository: CompletedScheduleShownRepository,
+    @AllScheduleData completedScheduleShownRepository: CompletedScheduleShownRepository,
     completeScheduleWithMark: CompleteScheduleWithMarkUseCase,
     completeScheduleWithIds: CompleteScheduleWithIdsUseCase,
     fetchLinkMetadata: FetchLinkMetadataUseCase,

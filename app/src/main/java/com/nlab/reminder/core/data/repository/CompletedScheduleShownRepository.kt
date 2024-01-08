@@ -18,7 +18,6 @@ package com.nlab.reminder.core.data.repository
 
 import com.nlab.reminder.core.kotlin.util.Result
 import kotlinx.coroutines.flow.Flow
-import javax.inject.Qualifier
 
 /**
  * @author thalys
@@ -27,7 +26,3 @@ interface CompletedScheduleShownRepository {
     fun getAsStream(): Flow<Boolean>
     suspend fun setShown(isShown: Boolean): Result<Unit>
 }
-
-@Qualifier
-@Retention(AnnotationRetention.BINARY)
-annotation class CompletedScheduleShownAllData

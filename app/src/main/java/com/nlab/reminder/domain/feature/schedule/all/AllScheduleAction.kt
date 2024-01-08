@@ -20,20 +20,18 @@ import com.nlab.reminder.core.data.model.LinkMetadataTable
 import com.nlab.reminder.core.data.model.Schedule
 import com.nlab.reminder.core.data.model.ScheduleId
 import com.nlab.statekit.Action
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.ImmutableMap
 
 /**
  * @author Doohyun
  */
 internal sealed interface AllScheduleAction : Action {
     data class ScheduleLoaded(
-        val schedules: ImmutableList<Schedule>,
+        val schedules: List<Schedule>,
         val isCompletedScheduleShown: Boolean
     ) : AllScheduleAction
 
     data class LinkMetadataLoaded(val linkTables: LinkMetadataTable) : AllScheduleAction
-    data class CompleteMarkLoaded(val table: ImmutableMap<ScheduleId, Boolean>) : AllScheduleAction
+    data class CompleteMarkLoaded(val table: Map<ScheduleId, Boolean>) : AllScheduleAction
 
     data class OnSelectionModeUpdateClicked(val isSelectionMode: Boolean) : AllScheduleAction
     data class OnCompletedScheduleVisibilityUpdateClicked(val isVisible: Boolean) : AllScheduleAction

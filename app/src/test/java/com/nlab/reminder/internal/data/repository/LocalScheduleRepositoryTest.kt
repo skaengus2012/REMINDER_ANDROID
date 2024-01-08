@@ -34,7 +34,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.test.runTest
-import org.hamcrest.CoreMatchers
+import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
 import org.mockito.kotlin.doReturn
@@ -119,7 +119,7 @@ private suspend fun testGet(
         .take(1)
         .first()
 
-    assertThat(actualSchedules, CoreMatchers.equalTo(expectedResult))
+    assertThat(actualSchedules, equalTo(expectedResult))
 }
 
 private suspend inline fun <T : ScheduleDeleteRequest> testDelete(

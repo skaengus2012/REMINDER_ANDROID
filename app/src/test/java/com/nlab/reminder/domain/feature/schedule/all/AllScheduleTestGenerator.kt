@@ -17,13 +17,12 @@
 package com.nlab.reminder.domain.feature.schedule.all
 
 import com.nlab.reminder.core.data.model.Link
-import com.nlab.reminder.core.data.model.Schedule
 import com.nlab.reminder.core.data.model.genLink
-import com.nlab.reminder.core.data.model.genSchedules
+import com.nlab.reminder.core.schedule.ScheduleItem
+import com.nlab.reminder.core.schedule.genScheduleItems
 import com.nlab.testkit.genBoolean
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.toImmutableList
 
 /**
  * @author Doohyun
@@ -34,12 +33,12 @@ internal fun genAllScheduleUiState(): AllScheduleUiState = when(genBoolean()) {
 }
 
 internal fun genAllScheduleUiStateLoaded(
-    schedules: List<Schedule> = genSchedules(),
+    scheduleItems: ImmutableList<ScheduleItem> = genScheduleItems(),
     isCompletedScheduleShown: Boolean = genBoolean(),
     isSelectionMode: Boolean = genBoolean(),
     workflows: ImmutableList<AllScheduleWorkflow> = persistentListOf()
 ): AllScheduleUiState.Loaded = AllScheduleUiState.Loaded(
-    schedules = schedules.toImmutableList(),
+    scheduleItems = scheduleItems,
     isCompletedScheduleShown = isCompletedScheduleShown,
     isSelectionMode = isSelectionMode,
     workflows = workflows

@@ -14,18 +14,13 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.schedule
+package com.nlab.reminder.core.data.repository
 
-import androidx.compose.runtime.Immutable
-import com.nlab.reminder.core.data.model.LinkMetadata
-import com.nlab.reminder.core.data.model.Schedule
+import javax.inject.Qualifier
 
 /**
- * @author thalys
+ * @author Doohyun
  */
-@Immutable
-data class ScheduleUiState(
-    val schedule: Schedule,
-    val isCompleteMarked: Boolean = false,
-    val linkMetadata: LinkMetadata? = null,
-)
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class AllScheduleData
