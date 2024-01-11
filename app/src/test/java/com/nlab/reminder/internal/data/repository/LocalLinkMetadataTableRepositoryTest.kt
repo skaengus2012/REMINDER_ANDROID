@@ -137,7 +137,7 @@ internal class LocalLinkMetadataTableRepositoryTest {
             }
         )
 
-        val linkMetadataTable = linkMetadataTableRepository.get()
+        val linkMetadataTable = linkMetadataTableRepository.getStream()
             .take(1)
             .first()
         assertThat(

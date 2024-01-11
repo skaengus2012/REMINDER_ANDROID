@@ -62,7 +62,7 @@ internal class LocalLinkMetadataTableRepository @Inject constructor(
         }
     }
 
-    override fun get(): Flow<LinkMetadataTable> =
+    override fun getStream(): Flow<LinkMetadataTable> =
         linkMetadataDao.findAsStream().map { entities ->
             LinkMetadataTable(entities.associateBy(
                 keySelector = { Link(it.link) },

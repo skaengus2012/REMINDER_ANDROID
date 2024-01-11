@@ -58,7 +58,7 @@ internal class LocalTagRepositoryTest {
     @Test
     fun `Get tags from dao`() {
         val tagDao: TagDao = mock()
-        genTagRepository(tagDao = tagDao).get()
+        genTagRepository(tagDao = tagDao).getStream()
         verify(tagDao, once()).find()
     }
 
@@ -79,7 +79,7 @@ internal class LocalTagRepositoryTest {
         }
 
         genTagRepository(tagDao = tagDao)
-            .get()
+            .getStream()
             .onEach(actualTags::add)
             .launchIn(genFlowObserveCoroutineScope())
 

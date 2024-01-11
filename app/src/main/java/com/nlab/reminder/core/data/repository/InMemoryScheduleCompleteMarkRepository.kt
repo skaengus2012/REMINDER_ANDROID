@@ -26,7 +26,7 @@ import javax.inject.Inject
 class InMemoryScheduleCompleteMarkRepository @Inject constructor() : ScheduleCompleteMarkRepository {
     private val chunkRequests = MutableStateFlow(emptyMap<ScheduleId, Boolean>())
 
-    override fun get(): StateFlow<Map<ScheduleId, Boolean>> = chunkRequests.asStateFlow()
+    override fun getStream(): StateFlow<Map<ScheduleId, Boolean>> = chunkRequests.asStateFlow()
 
     override fun add(scheduleId: ScheduleId, isComplete: Boolean) {
         chunkRequests.update { old -> old + (scheduleId to isComplete) }

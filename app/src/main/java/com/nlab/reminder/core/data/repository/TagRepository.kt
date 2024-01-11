@@ -25,7 +25,7 @@ import com.nlab.reminder.core.data.model.TagUsageCount
  * @author Doohyun
  */
 interface TagRepository {
-    fun get(): Flow<List<Tag>>
+    fun getStream(): Flow<List<Tag>>
     suspend fun getUsageCount(tag: Tag): Result<TagUsageCount>
     suspend fun updateName(tag: Tag, name: String): Result<Unit>
     suspend fun delete(tag: Tag): Result<Unit>

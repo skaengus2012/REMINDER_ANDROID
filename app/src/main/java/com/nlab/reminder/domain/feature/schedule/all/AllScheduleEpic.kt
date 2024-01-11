@@ -50,12 +50,12 @@ internal class AllScheduleEpic @Inject constructor(
     }
     whileStateUsed {
         linkMetadataTableRepository
-            .get()
+            .getStream()
             .map(AllScheduleAction::LinkMetadataLoaded)
     }
     whileStateUsed {
         completeMarkRepository
-            .get()
+            .getStream()
             .map(AllScheduleAction::CompleteMarkLoaded)
     }
 })

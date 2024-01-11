@@ -52,7 +52,7 @@ internal class GetScheduleItemUseCaseTest {
                 whenever(mock.getStream()) doReturn flowOf(listOf(schedule))
             },
             completeMarkRepository = mock {
-                whenever(mock.get()) doReturn MutableStateFlow(
+                whenever(mock.getStream()) doReturn MutableStateFlow(
                     persistentHashMapOf(
                         schedule.scheduleId to schedule.isComplete.not()
                     )
@@ -79,7 +79,7 @@ internal class GetScheduleItemUseCaseTest {
                 whenever(mock.getStream()) doReturn flowOf(listOf(schedule))
             },
             linkMetadataTableRepository = mock {
-                whenever(mock.get()) doReturn flowOf(LinkMetadataTable(mapOf(link to linkMetadata)))
+                whenever(mock.getStream()) doReturn flowOf(LinkMetadataTable(mapOf(link to linkMetadata)))
             }
         )
         assertThat(
@@ -114,9 +114,9 @@ internal class GetScheduleItemUseCaseTest {
 private fun genGetScheduleItemUseCase(
     schedulesStreamRepository: SchedulesStreamRepository,
     completeMarkRepository: ScheduleCompleteMarkRepository = mock {
-        whenever(mock.get()) doReturn MutableStateFlow(persistentHashMapOf())
+        whenever(mock.getStream()) doReturn MutableStateFlow(persistentHashMapOf())
     },
     linkMetadataTableRepository: LinkMetadataTableRepository = mock {
-        whenever(mock.get()) doReturn MutableStateFlow(LinkMetadataTable(emptyMap())) // TODO stateFlow 로 바꾸자..
+        whenever(mock.getStream()) doReturn MutableStateFlow(LinkMetadataTable(emptyMap())) // TODO stateFlow 로 바꾸자..
     }
 ) = GetScheduleItemUseCase(schedulesStreamRepository, completeMarkRepository, linkMetadataTableRepository)

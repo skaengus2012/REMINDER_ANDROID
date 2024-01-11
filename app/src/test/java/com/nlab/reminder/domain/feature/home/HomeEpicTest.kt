@@ -32,7 +32,7 @@ internal class HomeEpicTest {
         val uiState = genHomeUiStateSuccess()
 
         HomeEpic(
-            tagRepository = mock { whenever(mock.get()) doReturn flowOf(uiState.tags) },
+            tagRepository = mock { whenever(mock.getStream()) doReturn flowOf(uiState.tags) },
             scheduleRepository = mock {
                 whenever(mock.getTodaySchedulesCount()) doReturn flowOf(uiState.todayScheduleCount)
                 whenever(mock.getTimetableSchedulesCount()) doReturn flowOf(uiState.timetableScheduleCount)

@@ -51,7 +51,7 @@ class CompleteScheduleWithMarkUseCaseTest {
                 .toPersistentMap()
         val scheduleRepository: ScheduleRepository = mock()
         val completeMarkRepository: ScheduleCompleteMarkRepository = mock {
-            whenever(mock.get()) doReturn MutableStateFlow(
+            whenever(mock.getStream()) doReturn MutableStateFlow(
                 expectedCompleteTable
             )
         }
@@ -79,7 +79,7 @@ class CompleteScheduleWithMarkUseCaseTest {
     @Test
     fun `AggregateDelay called between adding completeMark and updating scheduleRepository`() = runTest {
         val completeMarkRepository: ScheduleCompleteMarkRepository = mock {
-            whenever(mock.get()) doReturn MutableStateFlow(persistentMapOf(genScheduleId() to genBoolean()))
+            whenever(mock.getStream()) doReturn MutableStateFlow(persistentMapOf(genScheduleId() to genBoolean()))
         }
         val aggregateDelay: Delay = mock()
         val scheduleRepository: ScheduleRepository = mock()
@@ -113,5 +113,5 @@ private fun genUpdateScheduleCompletionUseCase(
 )
 
 private fun genCompleteMarkRepositoryMockWithEmptyTable(): ScheduleCompleteMarkRepository = mock {
-    whenever(mock.get()) doReturn MutableStateFlow(persistentMapOf())
+    whenever(mock.getStream()) doReturn MutableStateFlow(persistentMapOf())
 }

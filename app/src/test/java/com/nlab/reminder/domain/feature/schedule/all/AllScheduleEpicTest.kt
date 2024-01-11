@@ -87,7 +87,7 @@ internal class AllScheduleEpicTest {
         val linkMetadataTable = genLinkMetadataTable()
         genAllScheduleEpic(
             linkMetadataTableRepository = mock {
-                whenever(mock.get()) doReturn flowOf(linkMetadataTable)
+                whenever(mock.getStream()) doReturn flowOf(linkMetadataTable)
             })
             .scenario()
             .action(AllScheduleAction.LinkMetadataLoaded(linkMetadataTable))
@@ -99,7 +99,7 @@ internal class AllScheduleEpicTest {
         val completeMark = persistentMapOf(genScheduleId() to genBoolean())
         genAllScheduleEpic(
             completeMarkRepository = mock {
-                whenever(mock.get()) doReturn MutableStateFlow(completeMark)
+                whenever(mock.getStream()) doReturn MutableStateFlow(completeMark)
             })
             .scenario()
             .action(AllScheduleAction.CompleteMarkLoaded(completeMark))
@@ -112,10 +112,10 @@ private fun genAllScheduleEpic(
         whenever(mock.getAsStream(ScheduleGetStreamRequest.All)) doReturn emptyFlow()
     },
     completeMarkRepository: ScheduleCompleteMarkRepository = mock {
-        whenever(mock.get()) doReturn MutableStateFlow(persistentMapOf())
+        whenever(mock.getStream()) doReturn MutableStateFlow(persistentMapOf())
     },
     linkMetadataTableRepository: LinkMetadataTableRepository = mock {
-        whenever(mock.get()) doReturn emptyFlow()
+        whenever(mock.getStream()) doReturn emptyFlow()
     },
     completedScheduleShownRepository: CompletedScheduleShownRepository = mock {
         whenever(mock.getAsStream()) doReturn emptyFlow()

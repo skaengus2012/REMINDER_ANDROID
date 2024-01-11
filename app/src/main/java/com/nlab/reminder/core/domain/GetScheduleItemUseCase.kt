@@ -38,8 +38,8 @@ class GetScheduleItemUseCase(
 ) {
     operator fun invoke(): Flow<List<ScheduleItem>> = combine(
         schedulesStreamRepository.getStream(),
-        completeMarkRepository.get(),
-        linkMetadataTableRepository.get(),
+        completeMarkRepository.getStream(),
+        linkMetadataTableRepository.getStream(),
         transform = ::createScheduleItems
     )
 }

@@ -36,7 +36,7 @@ internal class LocalTagRepository @Inject constructor(
     private val tagDao: TagDao,
     private val scheduleTagListDao: ScheduleTagListDao
 ) : TagRepository {
-    override fun get(): Flow<List<Tag>> = tagDao.find().map { it.toModels() }
+    override fun getStream(): Flow<List<Tag>> = tagDao.find().map { it.toModels() }
 
     override suspend fun getUsageCount(tag: Tag): Result<TagUsageCount> = catching {
         TagUsageCount(scheduleTagListDao.findTagUsageCount(tagId = tag.tagId))

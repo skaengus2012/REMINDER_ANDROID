@@ -35,7 +35,7 @@ internal class HomeEpic @Inject constructor(
             scheduleRepository.getTodaySchedulesCount(),
             scheduleRepository.getTimetableSchedulesCount(),
             scheduleRepository.getAllSchedulesCount(),
-            tagRepository.get(),
+            tagRepository.getStream(),
         ) { todaySchedulesCount, timetableSchedulesCount, allSchedulesCount, tags ->
             HomeAction.SummaryLoaded(
                 todaySchedulesCount = todaySchedulesCount,
