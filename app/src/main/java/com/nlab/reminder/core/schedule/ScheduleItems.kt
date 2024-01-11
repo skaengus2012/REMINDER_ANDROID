@@ -26,8 +26,6 @@ import kotlinx.collections.immutable.toImmutableList
 /**
  * @author thalys
  */
-fun List<Schedule>.toItems(): ImmutableList<ScheduleItem> =
-    map(::ScheduleItem).toImmutableList()
 
 fun List<ScheduleItem>.findLink(scheduleId: ScheduleId): Link =
     find { it.schedule.scheduleId == scheduleId }?.schedule?.link.orEmpty()

@@ -17,10 +17,10 @@
 package com.nlab.reminder.core.domain
 
 import com.nlab.reminder.core.data.model.Link
-import com.nlab.reminder.core.data.model.Schedule
 import com.nlab.reminder.core.data.model.isNotEmpty
 import com.nlab.reminder.core.data.repository.LinkMetadataTableRepository
 import com.nlab.reminder.core.kotlin.collection.filter
+import com.nlab.reminder.core.schedule.ScheduleItem
 import com.nlab.reminder.domain.common.kotlin.coroutine.inject.DefaultDispatcher
 import dagger.Reusable
 import kotlinx.coroutines.CoroutineDispatcher
@@ -36,9 +36,9 @@ class FetchLinkMetadataUseCase @Inject constructor(
     @DefaultDispatcher private val dispatcher: CoroutineDispatcher
 ) {
     // Return the Unit, so Jacoco didn't have a problem with Context.
-    suspend operator fun invoke(schedules: List<Schedule>): Unit = withContext(dispatcher) {
+    suspend operator fun invoke(schedules: List<ScheduleItem>): Unit = withContext(dispatcher) {
         val links: Set<Link> =
-            schedules.map(Schedule::link)
+            schedules.map(ScheduleItem::link)
                 .filter(Link::isNotEmpty)
                 .toSet()
         if (links.isNotEmpty()) {

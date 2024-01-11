@@ -22,12 +22,10 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import com.nlab.reminder.core.data.model.Link
 import com.nlab.reminder.core.data.model.LinkMetadata
 import com.nlab.reminder.core.data.repository.AllScheduleData
-import com.nlab.reminder.core.data.repository.AllSchedulesStreamRepository
 import com.nlab.reminder.core.data.repository.CompletedScheduleShownRepository
 import com.nlab.reminder.core.data.repository.LinkMetadataRepository
 import com.nlab.reminder.core.data.repository.LinkMetadataTableRepository
 import com.nlab.reminder.core.data.repository.ScheduleRepository
-import com.nlab.reminder.core.data.repository.SchedulesStreamRepository
 import com.nlab.reminder.core.data.repository.TagRepository
 import com.nlab.reminder.core.data.repository.TimestampRepository
 import com.nlab.reminder.core.data.repository.infra.DefaultTimestampRepository
@@ -66,12 +64,8 @@ internal abstract class AppScopeRepositoryModule {
     @Singleton
     @Binds
     abstract fun bindLinkMetadataTableRepository(
-        repository: LocalLinkMetadataTableRepository): LinkMetadataTableRepository
-
-    @AllScheduleData
-    @Reusable
-    @Binds
-    abstract fun bindAllSchedulesStreamRepository(repository: AllSchedulesStreamRepository): SchedulesStreamRepository
+        repository: LocalLinkMetadataTableRepository
+    ): LinkMetadataTableRepository
 
     companion object {
         @Reusable

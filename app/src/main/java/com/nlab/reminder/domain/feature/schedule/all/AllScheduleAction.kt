@@ -17,16 +17,16 @@
 package com.nlab.reminder.domain.feature.schedule.all
 
 import com.nlab.reminder.core.data.model.LinkMetadataTable
-import com.nlab.reminder.core.data.model.Schedule
 import com.nlab.reminder.core.data.model.ScheduleId
+import com.nlab.reminder.core.schedule.ScheduleItem
 import com.nlab.statekit.Action
 
 /**
  * @author Doohyun
  */
 internal sealed interface AllScheduleAction : Action {
-    data class ScheduleLoaded(
-        val schedules: List<Schedule>,
+    data class ScheduleItemsLoaded(
+        val scheduleItems: List<ScheduleItem>,
         val isCompletedScheduleShown: Boolean
     ) : AllScheduleAction
 

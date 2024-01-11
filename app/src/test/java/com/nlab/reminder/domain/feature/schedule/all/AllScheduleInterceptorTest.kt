@@ -27,7 +27,7 @@ import com.nlab.reminder.core.domain.CompleteScheduleWithIdsUseCase
 import com.nlab.reminder.core.domain.CompleteScheduleWithMarkUseCase
 import com.nlab.reminder.core.domain.FetchLinkMetadataUseCase
 import com.nlab.reminder.core.schedule.genScheduleItems
-import com.nlab.reminder.core.schedule.toItems
+import com.nlab.reminder.core.schedule.mapToScheduleItemsAsImmutableList
 import com.nlab.statekit.middleware.interceptor.scenario
 import com.nlab.testkit.genBoolean
 import com.nlab.testkit.genInt
@@ -107,14 +107,14 @@ internal class AllScheduleInterceptorTest {
 
     @Test
     fun `Given State Loaded, When OnScheduleCompleteClicked, Then CompleteScheduleWithMarkUseCase invoked`() = runTest {
-        val schedule = genSchedule()
         val isComplete = genBoolean()
+        val schedule = genSchedule(isComplete = isComplete.not())
         val useCase: CompleteScheduleWithMarkUseCase = mock {
             whenever(mock(schedule.scheduleId, isComplete)) doReturn Result.Success(Unit)
         }
         genInterceptor(completeScheduleWithMark = useCase)
             .scenario()
-            .initState(genAllScheduleUiStateLoaded(scheduleItems = genScheduleItems(schedule)))
+            .initState(genAllScheduleUiStateLoaded(scheduleItems = schedule.mapToScheduleItemsAsImmutableList()))
             .action(AllScheduleAction.OnScheduleCompleteClicked(schedule.scheduleId, isComplete))
             .dispatchIn(testScope = this)
         verify(useCase, once()).invoke(schedule.scheduleId, isComplete)
@@ -130,7 +130,7 @@ internal class AllScheduleInterceptorTest {
         }
         genInterceptor(completeScheduleWithIds = useCase)
             .scenario()
-            .initState(genAllScheduleUiStateLoaded(scheduleItems = schedules.toItems()))
+            .initState(genAllScheduleUiStateLoaded(scheduleItems = schedules.mapToScheduleItemsAsImmutableList()))
             .action(AllScheduleAction.OnSelectedSchedulesCompleteClicked(scheduleIds, isComplete))
             .dispatchIn(testScope = this)
         verify(useCase, once()).invoke(scheduleIds, isComplete)
@@ -142,7 +142,7 @@ internal class AllScheduleInterceptorTest {
         genInterceptor(fetchLinkMetadata = useCase)
             .scenario()
             .initState(genAllScheduleUiState())
-            .action(AllScheduleAction.ScheduleLoaded(genSchedules(), genBoolean()))
+            .action(AllScheduleAction.ScheduleItemsLoaded(genScheduleItems(), genBoolean()))
             .dispatchIn(testScope = this)
         verify(useCase, once()).invoke(any())
     }

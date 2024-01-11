@@ -16,56 +16,42 @@
 
 package com.nlab.reminder.domain.feature.schedule.all
 
-import com.nlab.reminder.core.kotlin.coroutine.flow.flatMapLatest
+import com.nlab.reminder.core.data.model.Schedule
 import com.nlab.reminder.core.kotlin.coroutine.flow.map
 import com.nlab.reminder.core.data.repository.AllScheduleData
 import com.nlab.reminder.core.data.repository.CompletedScheduleShownRepository
-import com.nlab.reminder.core.data.repository.LinkMetadataTableRepository
-import com.nlab.reminder.core.data.repository.ScheduleCompleteMarkRepository
 import com.nlab.reminder.core.data.repository.ScheduleGetStreamRequest
 import com.nlab.reminder.core.data.repository.ScheduleRepository
-import com.nlab.reminder.domain.common.kotlin.coroutine.inject.DefaultDispatcher
+import com.nlab.reminder.core.domain.MapToScheduleItemsUseCase
+import com.nlab.reminder.core.kotlin.coroutine.flow.flatMapLatest
 import com.nlab.statekit.middleware.epic.Epic
 import com.nlab.statekit.util.buildDslEpic
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOn
 import javax.inject.Inject
 
 /**
  * @author thalys
  */
 internal class AllScheduleEpic @Inject constructor(
-    scheduleRepository: ScheduleRepository,
-    completeMarkRepository: ScheduleCompleteMarkRepository,
-    linkMetadataTableRepository: LinkMetadataTableRepository,
     @AllScheduleData completedScheduleShownRepository: CompletedScheduleShownRepository,
-    @DefaultDispatcher dispatcher: CoroutineDispatcher
+    scheduleRepository: ScheduleRepository,
+    mapToScheduleItems: MapToScheduleItemsUseCase
 ) : Epic<AllScheduleAction> by buildDslEpic(buildDSL = {
     whileStateUsed {
-        completedScheduleShownRepository
-            .getAsStream()
-            .flatMapLatest(scheduleRepository::getLoadedActionAsStream)
-            .flowOn(dispatcher)
-    }
-    whileStateUsed {
-        linkMetadataTableRepository
-            .getStream()
-            .map(AllScheduleAction::LinkMetadataLoaded)
-    }
-    whileStateUsed {
-        completeMarkRepository
-            .getStream()
-            .map(AllScheduleAction::CompleteMarkLoaded)
+        completedScheduleShownRepository.getAsStream().flatMapLatest { isCompletedScheduleShown ->
+            scheduleRepository.getAllSchedulesStream(isCompletedScheduleShown)
+                .let(mapToScheduleItems::invoke)
+                .map { items -> AllScheduleAction.ScheduleItemsLoaded(items, isCompletedScheduleShown) }
+        }
     }
 })
 
-private fun ScheduleRepository.getLoadedActionAsStream(
+private fun ScheduleRepository.getAllSchedulesStream(
     isCompletedScheduleShown: Boolean
-): Flow<AllScheduleAction.ScheduleLoaded> =
+): Flow<List<Schedule>> =
     getAsStream(
         when (isCompletedScheduleShown) {
             true -> ScheduleGetStreamRequest.All
             else -> ScheduleGetStreamRequest.ByComplete(isComplete = false)
         }
-    ).map { schedules -> AllScheduleAction.ScheduleLoaded(schedules, isCompletedScheduleShown) }
+    )

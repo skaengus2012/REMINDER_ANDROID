@@ -8,9 +8,9 @@ import com.nlab.reminder.core.data.model.genSchedule
 import com.nlab.reminder.core.data.model.genSchedules
 import com.nlab.reminder.core.data.repository.LinkMetadataTableRepository
 import com.nlab.reminder.core.data.repository.ScheduleCompleteMarkRepository
-import com.nlab.reminder.core.data.repository.SchedulesStreamRepository
 import com.nlab.testkit.genBoolean
 import kotlinx.collections.immutable.persistentHashMapOf
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
@@ -26,17 +26,13 @@ import org.mockito.kotlin.whenever
 /**
  * @author Doohyun
  */
-internal class GetScheduleItemUseCaseTest {
+internal class MapToScheduleItemsUseCaseTest {
     @Test
     fun `Given schedules, Then return scheduleItem including schedules`() = runTest {
         val schedules = genSchedules()
-        val useCase = genGetScheduleItemUseCase(
-            schedulesStreamRepository = mock {
-                whenever(mock.getStream()) doReturn flowOf(schedules)
-            }
-        )
+        val useCase = genMapToScheduleItemsUseCase()
         assertThat(
-            useCase.invoke()
+            useCase.invoke(flowOf(schedules))
                 .take(1)
                 .first()
                 .map { it.schedule },
@@ -47,10 +43,7 @@ internal class GetScheduleItemUseCaseTest {
     @Test
     fun `Given complete marked, Then scheduleItem has marked`() = runTest {
         val schedule = genSchedule(isComplete = genBoolean())
-        val useCase = genGetScheduleItemUseCase(
-            schedulesStreamRepository = mock {
-                whenever(mock.getStream()) doReturn flowOf(listOf(schedule))
-            },
+        val useCase = genMapToScheduleItemsUseCase(
             completeMarkRepository = mock {
                 whenever(mock.getStream()) doReturn MutableStateFlow(
                     persistentHashMapOf(
@@ -60,7 +53,7 @@ internal class GetScheduleItemUseCaseTest {
             }
         )
         assertThat(
-            useCase.invoke()
+            useCase.invoke(flowOf(listOf(schedule)))
                 .take(1)
                 .first()
                 .first()
@@ -74,16 +67,13 @@ internal class GetScheduleItemUseCaseTest {
         val link = genLink()
         val linkMetadata = genLinkMetadata()
         val schedule = genSchedule(link = link)
-        val useCase = genGetScheduleItemUseCase(
-            schedulesStreamRepository = mock {
-                whenever(mock.getStream()) doReturn flowOf(listOf(schedule))
-            },
+        val useCase = genMapToScheduleItemsUseCase(
             linkMetadataTableRepository = mock {
                 whenever(mock.getStream()) doReturn flowOf(LinkMetadataTable(mapOf(link to linkMetadata)))
             }
         )
         assertThat(
-            useCase.invoke()
+            useCase.invoke(flowOf(listOf(schedule)))
                 .take(1)
                 .first()
                 .first()
@@ -95,13 +85,9 @@ internal class GetScheduleItemUseCaseTest {
     @Test
     fun `Given schedule link was empty, Then scheduleItem linkMetadata was null`() = runTest {
         val schedule = genSchedule(link = Link.EMPTY)
-        val useCase = genGetScheduleItemUseCase(
-            schedulesStreamRepository = mock {
-                whenever(mock.getStream()) doReturn flowOf(listOf(schedule))
-            }
-        )
+        val useCase = genMapToScheduleItemsUseCase()
         assertThat(
-            useCase.invoke()
+            useCase.invoke(flowOf(listOf(schedule)))
                 .take(1)
                 .first()
                 .first()
@@ -111,12 +97,15 @@ internal class GetScheduleItemUseCaseTest {
     }
 }
 
-private fun genGetScheduleItemUseCase(
-    schedulesStreamRepository: SchedulesStreamRepository,
+private fun genMapToScheduleItemsUseCase(
     completeMarkRepository: ScheduleCompleteMarkRepository = mock {
         whenever(mock.getStream()) doReturn MutableStateFlow(persistentHashMapOf())
     },
     linkMetadataTableRepository: LinkMetadataTableRepository = mock {
         whenever(mock.getStream()) doReturn MutableStateFlow(LinkMetadataTable(emptyMap())) // TODO stateFlow 로 바꾸자..
     }
-) = GetScheduleItemUseCase(schedulesStreamRepository, completeMarkRepository, linkMetadataTableRepository)
+) = MapToScheduleItemsUseCase(
+    completeMarkRepository,
+    linkMetadataTableRepository,
+    dispatcher = Dispatchers.Unconfined
+)

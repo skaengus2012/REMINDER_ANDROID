@@ -23,6 +23,7 @@ import com.nlab.reminder.core.schedule.genScheduleItems
 import com.nlab.testkit.genBoolean
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 
 /**
  * @author Doohyun
@@ -33,7 +34,7 @@ internal fun genAllScheduleUiState(): AllScheduleUiState = when(genBoolean()) {
 }
 
 internal fun genAllScheduleUiStateLoaded(
-    scheduleItems: ImmutableList<ScheduleItem> = genScheduleItems(),
+    scheduleItems: ImmutableList<ScheduleItem> = genScheduleItems().toImmutableList(),
     isCompletedScheduleShown: Boolean = genBoolean(),
     isSelectionMode: Boolean = genBoolean(),
     workflows: ImmutableList<AllScheduleWorkflow> = persistentListOf()

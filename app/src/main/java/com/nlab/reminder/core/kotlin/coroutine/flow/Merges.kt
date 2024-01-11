@@ -16,13 +16,16 @@
 
 package com.nlab.reminder.core.kotlin.coroutine.flow
 
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest as kotlinFlatMapLatest
 
 /**
  * @author thalys
  */
-@OptIn(ExperimentalCoroutinesApi::class)
-fun <T, R> Flow<T>.flatMapLatest(transform: suspend (value: T) -> Flow<R>): Flow<R> =
+
+/**
+ * The flatMapLatest function does not support suspend.
+ * If the transform function does not use suspend, there may be cases that Jacoco does not recognize
+ */
+fun <T, R> Flow<T>.flatMapLatest(transform: (value: T) -> Flow<R>): Flow<R> =
     kotlinFlatMapLatest(transform)

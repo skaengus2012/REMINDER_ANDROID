@@ -66,8 +66,8 @@ internal class AllScheduleInterceptor @Inject constructor(
         }
     }
     anyState {
-        action<AllScheduleAction.ScheduleLoaded> { (action) ->
-            fetchLinkMetadata(action.schedules)
+        action<AllScheduleAction.ScheduleItemsLoaded> { (action) ->
+            fetchLinkMetadata(action.scheduleItems)
         }
     }
 })

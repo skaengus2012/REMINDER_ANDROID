@@ -18,7 +18,6 @@ package com.nlab.reminder.domain.feature.schedule.all
 
 import com.nlab.reminder.core.data.model.isEmpty
 import com.nlab.reminder.core.schedule.findLink
-import com.nlab.reminder.core.schedule.toItems
 import com.nlab.statekit.Reducer
 import com.nlab.statekit.util.buildDslReducer
 import kotlinx.collections.immutable.*
@@ -30,10 +29,10 @@ private typealias DomainReducer = Reducer<AllScheduleAction, AllScheduleUiState>
  * @author Doohyun
  */
 internal class AllScheduleReducer @Inject constructor() : DomainReducer by buildDslReducer(defineDSL = {
-    action<AllScheduleAction.ScheduleLoaded> {
+    action<AllScheduleAction.ScheduleItemsLoaded> {
         state<AllScheduleUiState.Empty> { (action) ->
             AllScheduleUiState.Loaded(
-                scheduleItems = action.schedules.toItems(),
+                scheduleItems = action.scheduleItems.toImmutableList(),
                 isCompletedScheduleShown = action.isCompletedScheduleShown,
                 isSelectionMode = false,
                 workflows = persistentListOf()
@@ -41,7 +40,7 @@ internal class AllScheduleReducer @Inject constructor() : DomainReducer by build
         }
         state<AllScheduleUiState.Loaded> { (action, before) ->
             before.copy(
-                scheduleItems = action.schedules.toItems(),
+                scheduleItems = action.scheduleItems.toImmutableList(),
                 isCompletedScheduleShown = action.isCompletedScheduleShown
             )
         }

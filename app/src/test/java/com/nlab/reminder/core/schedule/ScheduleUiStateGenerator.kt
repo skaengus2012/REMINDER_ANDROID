@@ -18,6 +18,7 @@ package com.nlab.reminder.core.schedule
 
 import com.nlab.reminder.core.data.model.LinkMetadata
 import com.nlab.reminder.core.data.model.Schedule
+import com.nlab.reminder.core.data.model.genLinkMetadata
 import com.nlab.reminder.core.data.model.genSchedule
 import com.nlab.testkit.genBoolean
 import com.nlab.testkit.genInt
@@ -31,11 +32,19 @@ import kotlinx.collections.immutable.toImmutableList
 fun genScheduleItem(
     schedule: Schedule = genSchedule(),
     isCompleteMarked: Boolean = genBoolean(),
-    linkMetadata: LinkMetadata? = null
+    linkMetadata: LinkMetadata? = genLinkMetadata()
 ) = ScheduleItem(schedule, isCompleteMarked, linkMetadata)
 
-fun genScheduleItems(schedule: Schedule): ImmutableList<ScheduleItem> =
-    persistentListOf(genScheduleItem(schedule))
+fun genScheduleItems(size: Int = genInt(min = 2, max = 10)): List<ScheduleItem> =
+    List(size) { genScheduleItem() }
 
-fun genScheduleItems(size: Int = genInt(min = 2, max = 10)): ImmutableList<ScheduleItem> =
-    List(size) { genScheduleItem() }.toImmutableList()
+fun Schedule.mapToScheduleItemsAsImmutableList(
+    isCompleteMarked: Boolean = genBoolean(),
+    linkMetadata: LinkMetadata? = genLinkMetadata()
+): ImmutableList<ScheduleItem> =
+    persistentListOf(genScheduleItem(schedule = this, isCompleteMarked, linkMetadata))
+
+fun List<Schedule>.mapToScheduleItemsAsImmutableList(
+    isCompleteMarked: Boolean = genBoolean(),
+    linkMetadata: LinkMetadata? = genLinkMetadata()
+): ImmutableList<ScheduleItem> = map { genScheduleItem(it, isCompleteMarked, linkMetadata) }.toImmutableList()

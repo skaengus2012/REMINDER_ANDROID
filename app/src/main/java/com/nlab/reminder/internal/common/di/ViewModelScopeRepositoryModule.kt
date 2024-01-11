@@ -22,6 +22,7 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
+import dagger.hilt.android.scopes.ViewModelScoped
 
 /**
  * @author thalys
@@ -29,8 +30,9 @@ import dagger.hilt.android.components.ViewModelComponent
 @Module
 @InstallIn(ViewModelComponent::class)
 internal abstract class ViewModelScopeRepositoryModule {
+    @ViewModelScoped
     @Binds
-    abstract fun bindScheduleCompleteMarkRepositry(
+    abstract fun bindScheduleCompleteMarkRepository(
         repository: InMemoryScheduleCompleteMarkRepository
     ): ScheduleCompleteMarkRepository
 }

@@ -23,25 +23,32 @@ import com.nlab.reminder.core.data.model.ScheduleId
 import com.nlab.reminder.core.data.model.isEmpty
 import com.nlab.reminder.core.data.repository.LinkMetadataTableRepository
 import com.nlab.reminder.core.data.repository.ScheduleCompleteMarkRepository
-import com.nlab.reminder.core.data.repository.SchedulesStreamRepository
 import com.nlab.reminder.core.schedule.ScheduleItem
+import com.nlab.reminder.domain.common.kotlin.coroutine.inject.DefaultDispatcher
+import dagger.hilt.android.scopes.ViewModelScoped
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOn
+import javax.inject.Inject
 
 /**
  * @author Doohyun
  */
-class GetScheduleItemUseCase(
-    private val schedulesStreamRepository: SchedulesStreamRepository,
+@ViewModelScoped
+class MapToScheduleItemsUseCase @Inject constructor(
     private val completeMarkRepository: ScheduleCompleteMarkRepository,
     private val linkMetadataTableRepository: LinkMetadataTableRepository,
+    @DefaultDispatcher private val dispatcher: CoroutineDispatcher
 ) {
-    operator fun invoke(): Flow<List<ScheduleItem>> = combine(
-        schedulesStreamRepository.getStream(),
+    operator fun invoke(
+        schedulesStream: Flow<List<Schedule>>
+    ): Flow<List<ScheduleItem>> = combine(
+        schedulesStream,
         completeMarkRepository.getStream(),
         linkMetadataTableRepository.getStream(),
         transform = ::createScheduleItems
-    )
+    ).flowOn(dispatcher)
 }
 
 private fun createScheduleItems(

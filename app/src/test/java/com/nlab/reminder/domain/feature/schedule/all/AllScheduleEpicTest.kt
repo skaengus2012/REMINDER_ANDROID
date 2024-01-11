@@ -17,24 +17,12 @@
 package com.nlab.reminder.domain.feature.schedule.all
 
 import com.nlab.reminder.core.data.model.ScheduleId
-import com.nlab.reminder.core.data.model.genLinkMetadataTable
 import com.nlab.reminder.core.data.model.genSchedule
-import com.nlab.reminder.core.data.model.genScheduleId
 import com.nlab.reminder.core.data.model.genSchedules
-import com.nlab.reminder.core.data.repository.CompletedScheduleShownRepository
-import com.nlab.reminder.core.data.repository.LinkMetadataTableRepository
-import com.nlab.reminder.core.data.repository.ScheduleCompleteMarkRepository
 import com.nlab.reminder.core.data.repository.ScheduleGetStreamRequest
-import com.nlab.reminder.core.data.repository.ScheduleRepository
+import com.nlab.reminder.core.schedule.genScheduleItem
 import com.nlab.statekit.middleware.epic.scenario
-import com.nlab.testkit.genBoolean
 import com.nlab.testkit.genInt
-import kotlinx.collections.immutable.persistentMapOf
-import kotlinx.collections.immutable.toImmutableList
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import org.junit.Test
 import org.mockito.kotlin.doReturn
@@ -51,17 +39,22 @@ internal class AllScheduleEpicTest {
         val schedules = List(genInt(min = 5, max = 10)) { index ->
             genSchedule(scheduleId = ScheduleId(index.toLong()), isComplete = false)
         }
+        val scheduleItems = schedules.map { genScheduleItem(it) }
+        val schedulesFlow = flowOf(schedules)
 
-        genAllScheduleEpic(
-            scheduleRepository = mock {
-                whenever(mock.getAsStream(ScheduleGetStreamRequest.ByComplete(isComplete = false)))
-                    .doReturn(flowOf(schedules.toImmutableList()))
-            },
+        AllScheduleEpic(
             completedScheduleShownRepository = mock {
                 whenever(mock.getAsStream()) doReturn flowOf(isCompletedSchedulesShown)
+            },
+            scheduleRepository = mock {
+                whenever(mock.getAsStream(ScheduleGetStreamRequest.ByComplete(isComplete = false)))
+                    .doReturn(schedulesFlow)
+            },
+            mapToScheduleItems = mock {
+                whenever(mock.invoke(schedulesFlow)) doReturn flowOf(scheduleItems)
             })
             .scenario()
-            .action(AllScheduleAction.ScheduleLoaded(schedules.toImmutableList(), isCompletedSchedulesShown))
+            .action(AllScheduleAction.ScheduleItemsLoaded(scheduleItems, isCompletedSchedulesShown))
             .verify()
     }
 
@@ -69,62 +62,21 @@ internal class AllScheduleEpicTest {
     fun `Completed Schedule loaded from repository`() {
         val isCompletedSchedulesShown = true
         val schedules = genSchedules()
+        val scheduleItems = schedules.map { genScheduleItem(it) }
+        val schedulesFlow = flowOf(schedules)
 
-        genAllScheduleEpic(
-            scheduleRepository = mock {
-                whenever(mock.getAsStream(ScheduleGetStreamRequest.All)) doReturn flowOf(schedules.toImmutableList())
-            },
+        AllScheduleEpic(
             completedScheduleShownRepository = mock {
                 whenever(mock.getAsStream()) doReturn flowOf(isCompletedSchedulesShown)
+            },
+            scheduleRepository = mock {
+                whenever(mock.getAsStream(ScheduleGetStreamRequest.All)) doReturn schedulesFlow
+            },
+            mapToScheduleItems = mock {
+                whenever(mock.invoke(schedulesFlow)) doReturn flowOf(scheduleItems)
             })
             .scenario()
-            .action(AllScheduleAction.ScheduleLoaded(schedules.toImmutableList(), isCompletedSchedulesShown))
-            .verify()
-    }
-
-    @Test
-    fun `LinkMetadataTable loaded from repository`() {
-        val linkMetadataTable = genLinkMetadataTable()
-        genAllScheduleEpic(
-            linkMetadataTableRepository = mock {
-                whenever(mock.getStream()) doReturn flowOf(linkMetadataTable)
-            })
-            .scenario()
-            .action(AllScheduleAction.LinkMetadataLoaded(linkMetadataTable))
-            .verify()
-    }
-
-    @Test
-    fun `CompleteMark loaded from repository`() {
-        val completeMark = persistentMapOf(genScheduleId() to genBoolean())
-        genAllScheduleEpic(
-            completeMarkRepository = mock {
-                whenever(mock.getStream()) doReturn MutableStateFlow(completeMark)
-            })
-            .scenario()
-            .action(AllScheduleAction.CompleteMarkLoaded(completeMark))
+            .action(AllScheduleAction.ScheduleItemsLoaded(scheduleItems, isCompletedSchedulesShown))
             .verify()
     }
 }
-
-private fun genAllScheduleEpic(
-    scheduleRepository: ScheduleRepository = mock {
-        whenever(mock.getAsStream(ScheduleGetStreamRequest.All)) doReturn emptyFlow()
-    },
-    completeMarkRepository: ScheduleCompleteMarkRepository = mock {
-        whenever(mock.getStream()) doReturn MutableStateFlow(persistentMapOf())
-    },
-    linkMetadataTableRepository: LinkMetadataTableRepository = mock {
-        whenever(mock.getStream()) doReturn emptyFlow()
-    },
-    completedScheduleShownRepository: CompletedScheduleShownRepository = mock {
-        whenever(mock.getAsStream()) doReturn emptyFlow()
-    },
-    dispatcher: CoroutineDispatcher = Dispatchers.Unconfined
-): AllScheduleEpic = AllScheduleEpic(
-    scheduleRepository,
-    completeMarkRepository,
-    linkMetadataTableRepository,
-    completedScheduleShownRepository,
-    dispatcher
-)

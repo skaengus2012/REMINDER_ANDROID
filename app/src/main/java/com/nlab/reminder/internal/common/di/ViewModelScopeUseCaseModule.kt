@@ -20,12 +20,13 @@ import com.nlab.reminder.core.data.repository.ScheduleCompleteMarkRepository
 import com.nlab.reminder.core.data.repository.ScheduleRepository
 import com.nlab.reminder.core.domain.CompleteScheduleWithMarkUseCase
 import com.nlab.reminder.core.kotlin.coroutine.Delay
+import com.nlab.reminder.domain.common.kotlin.coroutine.inject.DefaultDispatcher
 import dagger.Module
 import dagger.Provides
-import dagger.Reusable
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
-import kotlinx.coroutines.Dispatchers
+import dagger.hilt.android.scopes.ViewModelScoped
+import kotlinx.coroutines.CoroutineDispatcher
 
 /**
  * @author thalys
@@ -33,15 +34,16 @@ import kotlinx.coroutines.Dispatchers
 @Module
 @InstallIn(ViewModelComponent::class)
 internal class ViewModelScopeUseCaseModule {
-    @Reusable
+    @ViewModelScoped
     @Provides
     fun provideCompleteScheduleWithMarkUseCase(
         scheduleRepository: ScheduleRepository,
-        scheduleCompleteMarkRepository: ScheduleCompleteMarkRepository
+        scheduleCompleteMarkRepository: ScheduleCompleteMarkRepository,
+        @DefaultDispatcher dispatcher: CoroutineDispatcher
     ) = CompleteScheduleWithMarkUseCase(
         scheduleRepository,
         scheduleCompleteMarkRepository,
         aggregateDelay = Delay(timeMillis = 500),
-        dispatcher = Dispatchers.Default
+        dispatcher
     )
 }

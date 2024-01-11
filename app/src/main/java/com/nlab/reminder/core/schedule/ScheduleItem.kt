@@ -16,6 +16,7 @@
 
 package com.nlab.reminder.core.schedule
 
+import com.nlab.reminder.core.data.model.Link
 import com.nlab.reminder.core.data.model.LinkMetadata
 import com.nlab.reminder.core.data.model.Schedule
 
@@ -26,4 +27,6 @@ data class ScheduleItem(
     val schedule: Schedule,
     val isCompleteMarked: Boolean = false,
     val linkMetadata: LinkMetadata? = null,
-)
+) {
+    val link: Link get() = schedule.link
+}
