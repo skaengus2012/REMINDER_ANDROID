@@ -40,7 +40,7 @@ kotlinCoroutine = "1.7.3"
 mockitoInline = "5.2.0"
 mockitoKotlin = "5.2.1"
 squareLeakcanary = "2.12"
-squareKotlinpoet = "1.12.0"
+squareKotlinpoet = "1.15.3"
 timber = "5.0.1"
 
 
