@@ -24,7 +24,7 @@ import kotlinx.collections.immutable.ImmutableList
  */
 @Immutable
 data class Schedule(
-    val scheduleId: ScheduleId,
+    val id: ScheduleId,
     val title: String,
     val note: String,
     val link: Link,

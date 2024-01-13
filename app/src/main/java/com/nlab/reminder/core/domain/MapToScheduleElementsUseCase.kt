@@ -23,7 +23,7 @@ import com.nlab.reminder.core.data.model.ScheduleId
 import com.nlab.reminder.core.data.model.isEmpty
 import com.nlab.reminder.core.data.repository.LinkMetadataTableRepository
 import com.nlab.reminder.core.data.repository.ScheduleCompleteMarkRepository
-import com.nlab.reminder.core.schedule.ScheduleItem
+import com.nlab.reminder.core.schedule.model.ScheduleElement
 import com.nlab.reminder.domain.common.kotlin.coroutine.inject.DefaultDispatcher
 import dagger.hilt.android.scopes.ViewModelScoped
 import kotlinx.coroutines.CoroutineDispatcher
@@ -36,14 +36,14 @@ import javax.inject.Inject
  * @author Doohyun
  */
 @ViewModelScoped
-class MapToScheduleItemsUseCase @Inject constructor(
+class MapToScheduleElementsUseCase @Inject constructor(
     private val completeMarkRepository: ScheduleCompleteMarkRepository,
     private val linkMetadataTableRepository: LinkMetadataTableRepository,
     @DefaultDispatcher private val dispatcher: CoroutineDispatcher
 ) {
     operator fun invoke(
         schedulesStream: Flow<List<Schedule>>
-    ): Flow<List<ScheduleItem>> = combine(
+    ): Flow<List<ScheduleElement>> = combine(
         schedulesStream,
         completeMarkRepository.getStream(),
         linkMetadataTableRepository.getStream(),
@@ -55,10 +55,10 @@ private fun createScheduleItems(
     schedules: List<Schedule>,
     completeMarkTable: Map<ScheduleId, Boolean>,
     linkMetadataTable: LinkMetadataTable
-): List<ScheduleItem> = schedules.map { schedule ->
-    ScheduleItem(
+): List<ScheduleElement> = schedules.map { schedule ->
+    ScheduleElement(
         schedule,
-        isCompleteMarked = completeMarkTable[schedule.scheduleId] ?: schedule.isComplete,
+        isCompleteMarked = completeMarkTable[schedule.id] ?: schedule.isComplete,
         linkMetadata = schedule.link
             .takeUnless(Link::isEmpty)
             ?.let { linkMetadataTable.value[it] }

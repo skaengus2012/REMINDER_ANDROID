@@ -4,7 +4,7 @@ import com.nlab.reminder.core.data.model.Link
 import com.nlab.reminder.core.data.model.genLink
 import com.nlab.reminder.core.data.model.genSchedule
 import com.nlab.reminder.core.data.repository.LinkMetadataTableRepository
-import com.nlab.reminder.core.schedule.genScheduleItem
+import com.nlab.reminder.core.schedule.model.genScheduleElement
 import com.nlab.testkit.genInt
 import com.nlab.testkit.once
 import kotlinx.coroutines.Dispatchers
@@ -31,7 +31,7 @@ internal class FetchLinkMetadataUseCaseTest {
 
     @Test
     fun `Given empty link schedules, When invoked, Then repository never fetch`() = runTest {
-        val scheduleItems = List(genInt(min = 1, max = 10)) { genScheduleItem(genSchedule(link = Link.EMPTY)) }
+        val scheduleItems = List(genInt(min = 1, max = 10)) { genScheduleElement(genSchedule(link = Link.EMPTY)) }
         val repository: LinkMetadataTableRepository = mock()
         val useCase = genFetchLinkMetadataUseCase(repository)
 
@@ -42,7 +42,7 @@ internal class FetchLinkMetadataUseCaseTest {
     @Test
     fun `Given same link schedules, When invoked, Then repository fetched with distinct`() = runTest {
         val link = genLink()
-        val scheduleItems = List(genInt(min = 2, max = 10)) { genScheduleItem(genSchedule(link = Link(link.value))) }
+        val scheduleItems = List(genInt(min = 2, max = 10)) { genScheduleElement(genSchedule(link = Link(link.value))) }
         val repository: LinkMetadataTableRepository = mock()
         val useCase = genFetchLinkMetadataUseCase(repository)
 

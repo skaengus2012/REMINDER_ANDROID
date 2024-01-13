@@ -28,7 +28,7 @@ import kotlinx.collections.immutable.toImmutableList
  * @author thalys
  */
 internal fun Schedule.toEntity(): ScheduleEntity = ScheduleEntity(
-    scheduleId = scheduleId.value,
+    scheduleId = id.value,
     title = title,
     description = note,
     link = link.value,
@@ -37,7 +37,7 @@ internal fun Schedule.toEntity(): ScheduleEntity = ScheduleEntity(
 )
 
 internal fun ScheduleEntityWithTagEntities.toModel(): Schedule = Schedule(
-    scheduleId = ScheduleId(scheduleEntity.scheduleId),
+    id = ScheduleId(scheduleEntity.scheduleId),
     title = scheduleEntity.title,
     note = scheduleEntity.description.orEmpty(),
     link = Link(scheduleEntity.link.orEmpty()),

@@ -24,6 +24,7 @@ import com.nlab.reminder.core.data.repository.ScheduleRepository
 import com.nlab.reminder.core.domain.CompleteScheduleWithIdsUseCase
 import com.nlab.reminder.core.domain.CompleteScheduleWithMarkUseCase
 import com.nlab.reminder.core.domain.FetchLinkMetadataUseCase
+import com.nlab.reminder.core.schedule.model.findId
 import com.nlab.statekit.middleware.interceptor.Interceptor
 import com.nlab.statekit.util.buildDslInterceptor
 import javax.inject.Inject
@@ -31,7 +32,7 @@ import javax.inject.Inject
 /**
  * @author thalys
  */
-internal class AllScheduleInterceptor @Inject constructor(
+class AllScheduleInterceptor @Inject constructor(
     scheduleRepository: ScheduleRepository,
     @AllScheduleData completedScheduleShownRepository: CompletedScheduleShownRepository,
     completeScheduleWithMark: CompleteScheduleWithMarkUseCase,
@@ -39,15 +40,18 @@ internal class AllScheduleInterceptor @Inject constructor(
     fetchLinkMetadata: FetchLinkMetadataUseCase,
 ) : Interceptor<AllScheduleAction, AllScheduleUiState> by buildDslInterceptor(defineDSL = {
     state<AllScheduleUiState.Loaded> {
-        action<AllScheduleAction.OnCompletedScheduleVisibilityUpdateClicked> { (action) ->
+        action<AllScheduleAction.OnCompletedScheduleVisibilityToggleClicked> { (_, before) ->
             completedScheduleShownRepository
-                .setShown(isShown = action.isVisible)
+                .setShown(isShown = before.isCompletedScheduleShown.not())
                 .getOrThrow()
         }
         // TODO ScheduleId 에 대한 필터를 AOP 형태로 분리
         // https://github.com/skaengus2012/REMINDER_ANDROID/issues/236
-        action<AllScheduleAction.OnScheduleCompleteClicked> { (action) ->
-            completeScheduleWithMark(action.id, action.isComplete)
+        action<AllScheduleAction.OnScheduleCompleteClicked> { (action, before) ->
+            completeScheduleWithMark(
+                id = before.scheduleElements.findId(action.position) ?: return@action,
+                isComplete = action.isComplete
+            )
         }
         action<AllScheduleAction.OnSelectedSchedulesCompleteClicked> { (action) ->
             completeScheduleWithIds(action.ids, action.isComplete)
@@ -66,8 +70,8 @@ internal class AllScheduleInterceptor @Inject constructor(
         }
     }
     anyState {
-        action<AllScheduleAction.ScheduleItemsLoaded> { (action) ->
-            fetchLinkMetadata(action.scheduleItems)
+        action<AllScheduleAction.ScheduleElementsLoaded> { (action) ->
+            fetchLinkMetadata(action.scheduleElements)
         }
     }
 })

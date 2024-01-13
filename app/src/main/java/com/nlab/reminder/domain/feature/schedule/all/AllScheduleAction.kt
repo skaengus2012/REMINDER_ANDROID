@@ -16,44 +16,52 @@
 
 package com.nlab.reminder.domain.feature.schedule.all
 
-import com.nlab.reminder.core.data.model.LinkMetadataTable
 import com.nlab.reminder.core.data.model.ScheduleId
-import com.nlab.reminder.core.schedule.ScheduleItem
+import com.nlab.reminder.core.schedule.model.ScheduleElement
 import com.nlab.statekit.Action
+import com.nlab.statekit.lifecycle.viewmodel.ContractUiAction
 
 /**
  * @author Doohyun
  */
-internal sealed interface AllScheduleAction : Action {
-    data class ScheduleItemsLoaded(
-        val scheduleItems: List<ScheduleItem>,
+sealed interface AllScheduleAction : Action {
+    data class ScheduleElementsLoaded(
+        val scheduleElements: List<ScheduleElement>,
         val isCompletedScheduleShown: Boolean
     ) : AllScheduleAction
 
-    data class LinkMetadataLoaded(val linkTables: LinkMetadataTable) : AllScheduleAction
-    data class CompleteMarkLoaded(val table: Map<ScheduleId, Boolean>) : AllScheduleAction
-
+    @ContractUiAction
     data class OnSelectionModeUpdateClicked(val isSelectionMode: Boolean) : AllScheduleAction
-    data class OnCompletedScheduleVisibilityUpdateClicked(val isVisible: Boolean) : AllScheduleAction
+
+    @ContractUiAction
+    object OnCompletedScheduleVisibilityToggleClicked : AllScheduleAction
+
+    @ContractUiAction
     data class OnScheduleLinkClicked(val id: ScheduleId) : AllScheduleAction
+
+    @ContractUiAction
     data class CompleteWorkflow(val workflow: AllScheduleWorkflow) : AllScheduleAction
 
-    // update completion
-    data class OnScheduleCompleteClicked(
-        val id: ScheduleId,
-        val isComplete: Boolean
-    ) : AllScheduleAction
 
+    // update completion
+    @ContractUiAction
+    data class OnScheduleCompleteClicked(val position: Int, val isComplete: Boolean) : AllScheduleAction
+
+    @ContractUiAction
     data class OnSelectedSchedulesCompleteClicked(
         val ids: Collection<ScheduleId>,
         val isComplete: Boolean
     ) : AllScheduleAction
 
     // delete
+    @ContractUiAction
     data class OnScheduleDeleteClicked(
         val id: ScheduleId
     ) : AllScheduleAction
 
+    @ContractUiAction
     data class OnSelectedSchedulesDeleteClicked(val ids: Collection<ScheduleId>) : AllScheduleAction
+
+    @ContractUiAction
     object OnCompletedScheduleDeleteClicked : AllScheduleAction
 }

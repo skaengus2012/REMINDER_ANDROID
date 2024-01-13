@@ -22,11 +22,13 @@ import com.nlab.testkit.genInt
 import com.nlab.testkit.genLong
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
+import org.mockito.kotlin.any
 
 /**
  * @author thalys
  */
 fun genScheduleId(value: Long = genLong(min = 1)): ScheduleId = ScheduleId(value)
+fun anyScheduleId(): ScheduleId = ScheduleId(0L)
 
 fun genSchedule(
     scheduleId: ScheduleId = genScheduleId(),

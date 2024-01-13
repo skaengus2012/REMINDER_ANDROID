@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 The N's lab Open Source Project
+ * Copyright (C) 2024 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,9 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.common.android.view
-
-import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.filterIsInstance
+package com.nlab.reminder.core.schedule.model
 
 /**
- * @author thalys
+ * @author Doohyun
  */
-@OptIn(FlowPreview::class)
-inline fun <reified R> Flow<*>.loadingFlow(delayTimeInMillis: Long = 500): Flow<R> {
-    return debounce(delayTimeInMillis).filterIsInstance()
-}
+sealed interface ScheduleItem

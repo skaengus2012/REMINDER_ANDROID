@@ -20,8 +20,8 @@ import com.nlab.reminder.core.data.model.Link
 import com.nlab.reminder.core.data.model.genLink
 import com.nlab.reminder.core.data.model.genSchedule
 import com.nlab.reminder.core.data.model.genScheduleId
-import com.nlab.reminder.core.schedule.genScheduleItems
-import com.nlab.reminder.core.schedule.mapToScheduleItemsAsImmutableList
+import com.nlab.reminder.core.schedule.model.genScheduleElements
+import com.nlab.reminder.core.schedule.model.mapToScheduleElementsAsImmutableList
 import com.nlab.statekit.expectedState
 import com.nlab.statekit.expectedStateToInit
 import com.nlab.statekit.scenario
@@ -37,7 +37,7 @@ internal class AllScheduleReducerTest {
     @Test
     fun `Load schedules, when empty`() {
         val expectedState = genAllScheduleUiStateLoaded(
-            scheduleItems = genScheduleItems().toImmutableList(),
+            scheduleElements = genScheduleElements().toImmutableList(),
             isSelectionMode = false,
             workflows = persistentListOf()
         )
@@ -55,7 +55,7 @@ internal class AllScheduleReducerTest {
         AllScheduleReducer().scenario()
             .initState(
                 expectedState.copy(
-                    scheduleItems = persistentListOf(),
+                    scheduleElements = persistentListOf(),
                     isCompletedScheduleShown = expectedState.isCompletedScheduleShown.not()
                 )
             )
@@ -81,8 +81,8 @@ internal class AllScheduleReducerTest {
         val schedule = genSchedule(link = link)
 
         AllScheduleReducer().scenario()
-            .initState(genAllScheduleUiStateLoaded(scheduleItems = schedule.mapToScheduleItemsAsImmutableList()))
-            .action(AllScheduleAction.OnScheduleLinkClicked(schedule.scheduleId))
+            .initState(genAllScheduleUiStateLoaded(scheduleElements = schedule.mapToScheduleElementsAsImmutableList()))
+            .action(AllScheduleAction.OnScheduleLinkClicked(schedule.id))
             .expectedStateFromInitTypeOf<AllScheduleUiState.Loaded> { initState ->
                 initState.copy(workflows = persistentListOf(AllScheduleWorkflow.LinkPage(link)))
             }
@@ -93,8 +93,8 @@ internal class AllScheduleReducerTest {
     fun `Given schedule with empty link, When OnScheduleLinkClicked, Then state not changed`() {
         val schedule = genSchedule(link = Link.EMPTY)
         AllScheduleReducer().scenario()
-            .initState(genAllScheduleUiStateLoaded(scheduleItems = schedule.mapToScheduleItemsAsImmutableList()))
-            .action(AllScheduleAction.OnScheduleLinkClicked(schedule.scheduleId))
+            .initState(genAllScheduleUiStateLoaded(scheduleElements = schedule.mapToScheduleElementsAsImmutableList()))
+            .action(AllScheduleAction.OnScheduleLinkClicked(schedule.id))
             .expectedStateToInit()
             .verify()
     }
@@ -102,7 +102,7 @@ internal class AllScheduleReducerTest {
     @Test
     fun `Given empty schedule, When OnScheduleLinkClicked, Then state not changed`() {
         AllScheduleReducer().scenario()
-            .initState(genAllScheduleUiStateLoaded(scheduleItems = persistentListOf()))
+            .initState(genAllScheduleUiStateLoaded(scheduleElements = persistentListOf()))
             .action(AllScheduleAction.OnScheduleLinkClicked(genScheduleId()))
             .expectedStateToInit()
             .verify()
@@ -122,8 +122,8 @@ internal class AllScheduleReducerTest {
     }
 }
 
-private fun AllScheduleUiState.Loaded.toLoadedAction(): AllScheduleAction.ScheduleItemsLoaded =
-    AllScheduleAction.ScheduleItemsLoaded(
-        scheduleItems = scheduleItems,
+private fun AllScheduleUiState.Loaded.toLoadedAction(): AllScheduleAction.ScheduleElementsLoaded =
+    AllScheduleAction.ScheduleElementsLoaded(
+        scheduleElements = scheduleElements,
         isCompletedScheduleShown = isCompletedScheduleShown
     )

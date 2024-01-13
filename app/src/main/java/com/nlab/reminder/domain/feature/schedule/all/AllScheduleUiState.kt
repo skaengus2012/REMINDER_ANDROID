@@ -17,7 +17,7 @@
 package com.nlab.reminder.domain.feature.schedule.all
 
 import com.nlab.reminder.core.annotation.Stable
-import com.nlab.reminder.core.schedule.ScheduleItem
+import com.nlab.reminder.core.schedule.model.ScheduleElement
 import com.nlab.statekit.State
 import kotlinx.collections.immutable.ImmutableList
 
@@ -25,10 +25,10 @@ import kotlinx.collections.immutable.ImmutableList
  * @author Doohyun
  */
 @Stable
-internal sealed interface AllScheduleUiState : State {
+sealed interface AllScheduleUiState : State {
     object Empty : AllScheduleUiState
     data class Loaded(
-        val scheduleItems: ImmutableList<ScheduleItem>,
+        val scheduleElements: ImmutableList<ScheduleElement>,
         val isCompletedScheduleShown: Boolean,
         val isSelectionMode: Boolean,
         val workflows: ImmutableList<AllScheduleWorkflow>

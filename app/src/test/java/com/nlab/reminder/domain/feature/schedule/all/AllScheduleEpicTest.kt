@@ -20,7 +20,7 @@ import com.nlab.reminder.core.data.model.ScheduleId
 import com.nlab.reminder.core.data.model.genSchedule
 import com.nlab.reminder.core.data.model.genSchedules
 import com.nlab.reminder.core.data.repository.ScheduleGetStreamRequest
-import com.nlab.reminder.core.schedule.genScheduleItem
+import com.nlab.reminder.core.schedule.model.genScheduleElement
 import com.nlab.statekit.middleware.epic.scenario
 import com.nlab.testkit.genInt
 import kotlinx.coroutines.flow.flowOf
@@ -39,7 +39,7 @@ internal class AllScheduleEpicTest {
         val schedules = List(genInt(min = 5, max = 10)) { index ->
             genSchedule(scheduleId = ScheduleId(index.toLong()), isComplete = false)
         }
-        val scheduleItems = schedules.map { genScheduleItem(it) }
+        val scheduleItems = schedules.map { genScheduleElement(it) }
         val schedulesFlow = flowOf(schedules)
 
         AllScheduleEpic(
@@ -50,11 +50,11 @@ internal class AllScheduleEpicTest {
                 whenever(mock.getAsStream(ScheduleGetStreamRequest.ByComplete(isComplete = false)))
                     .doReturn(schedulesFlow)
             },
-            mapToScheduleItems = mock {
+            mapToScheduleElements = mock {
                 whenever(mock.invoke(schedulesFlow)) doReturn flowOf(scheduleItems)
             })
             .scenario()
-            .action(AllScheduleAction.ScheduleItemsLoaded(scheduleItems, isCompletedSchedulesShown))
+            .action(AllScheduleAction.ScheduleElementsLoaded(scheduleItems, isCompletedSchedulesShown))
             .verify()
     }
 
@@ -62,7 +62,7 @@ internal class AllScheduleEpicTest {
     fun `Completed Schedule loaded from repository`() {
         val isCompletedSchedulesShown = true
         val schedules = genSchedules()
-        val scheduleItems = schedules.map { genScheduleItem(it) }
+        val scheduleItems = schedules.map { genScheduleElement(it) }
         val schedulesFlow = flowOf(schedules)
 
         AllScheduleEpic(
@@ -72,11 +72,11 @@ internal class AllScheduleEpicTest {
             scheduleRepository = mock {
                 whenever(mock.getAsStream(ScheduleGetStreamRequest.All)) doReturn schedulesFlow
             },
-            mapToScheduleItems = mock {
+            mapToScheduleElements = mock {
                 whenever(mock.invoke(schedulesFlow)) doReturn flowOf(scheduleItems)
             })
             .scenario()
-            .action(AllScheduleAction.ScheduleItemsLoaded(scheduleItems, isCompletedSchedulesShown))
+            .action(AllScheduleAction.ScheduleElementsLoaded(scheduleItems, isCompletedSchedulesShown))
             .verify()
     }
 }

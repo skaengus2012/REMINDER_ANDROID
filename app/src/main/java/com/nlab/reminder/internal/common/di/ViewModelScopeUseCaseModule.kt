@@ -43,7 +43,7 @@ internal class ViewModelScopeUseCaseModule {
     ) = CompleteScheduleWithMarkUseCase(
         scheduleRepository,
         scheduleCompleteMarkRepository,
-        aggregateDelay = Delay(timeMillis = 500),
+        aggregateDelay = Delay(timeMillis = 1000),
         dispatcher
     )
 }

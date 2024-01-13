@@ -1,0 +1,75 @@
+/*
+ * Copyright (C) 2024 The N's lab Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.nlab.reminder.core.schedule.view
+
+import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
+import com.nlab.reminder.core.android.recyclerview.DragSnapshot
+import com.nlab.reminder.core.android.recyclerview.DraggableAdapter
+import com.nlab.reminder.core.schedule.model.ScheduleItem
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+
+/**
+ * @author Doohyun
+ */
+class ScheduleItemAdapter(
+    diffCallback: DiffUtil.ItemCallback<ScheduleItem> = ScheduleItemDiffCallback()
+) : ListAdapter<ScheduleItem, ScheduleItemViewHolder>(diffCallback),
+    DraggableAdapter<ScheduleItem> {
+    private val _itemEvent = MutableSharedFlow<ItemEvent>(
+        extraBufferCapacity = 10, onBufferOverflow = BufferOverflow.DROP_OLDEST
+    )
+    private val viewTypeAdapterDelegate = ScheduleItemViewTypeDelegate(
+        getItem = ::getItem,
+        onCompleteClicked = { position, isComplete ->
+            _itemEvent.tryEmit(ItemEvent.OnCompleteClicked(position, isComplete))
+        }
+    )
+    private val draggableAdapterDelegate = ListItemDraggableAdapterDelegate(
+        getSnapshot = this::getCurrentList,
+        getItem = this::getItem,
+        notifyItemMoved = this::notifyItemMoved
+    )
+
+    val itemEvent: Flow<ItemEvent> = _itemEvent.asSharedFlow()
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ScheduleItemViewHolder =
+        viewTypeAdapterDelegate.onCreateViewHolder(parent, viewType)
+
+    override fun onBindViewHolder(holder: ScheduleItemViewHolder, position: Int) =
+        viewTypeAdapterDelegate.onBindViewHolder(holder, position)
+
+    override fun getItemViewType(position: Int): Int =
+        viewTypeAdapterDelegate.getItemViewType(position)
+
+    override fun calculateDraggedSnapshot(): DragSnapshot<ScheduleItem> =
+        draggableAdapterDelegate.calculateDraggedSnapshot()
+
+    override fun adjustRecentSwapPositions() =
+        draggableAdapterDelegate.adjustRecentSwapPositions()
+
+    override fun onMove(fromPosition: Int, toPosition: Int): Boolean =
+        draggableAdapterDelegate.onMove(fromPosition, toPosition)
+
+    sealed class ItemEvent private constructor() {
+        data class OnCompleteClicked(val position: Int, val isComplete: Boolean) : ItemEvent()
+    }
+}

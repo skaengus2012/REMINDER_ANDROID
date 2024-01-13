@@ -32,4 +32,4 @@ value class Link private constructor(val value: String) {
 
 fun Link.isEmpty(): Boolean = value.isBlank()
 fun Link.isNotEmpty(): Boolean = isEmpty().not()
-fun Link?.orEmpty(): Link = this ?: Link("")
+fun Link?.orEmpty(): Link = this ?: Link.EMPTY

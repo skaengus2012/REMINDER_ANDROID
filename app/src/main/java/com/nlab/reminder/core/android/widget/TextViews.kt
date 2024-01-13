@@ -14,23 +14,20 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.schedule
+package com.nlab.reminder.core.android.widget
 
-import com.nlab.reminder.core.data.model.genSchedule
-import org.hamcrest.CoreMatchers.equalTo
-import org.hamcrest.MatcherAssert.assertThat
-import org.junit.Test
+import android.widget.TextView
 
 /**
- * @author thalys
+ * @author Doohyun
  */
-internal class ScheduleItemTest {
-    @Test
-    fun testConstructorWithDefaultValues() {
-        val schedule = genSchedule()
-        val uiState = ScheduleItem(schedule = schedule)
-        assertThat(uiState.schedule, equalTo(schedule))
-        assertThat(uiState.isCompleteMarked, equalTo(false))
-        assertThat(uiState.linkMetadata, equalTo(null))
-    }
+
+fun TextView.bindText(text: CharSequence?): Boolean {
+    val oldText: CharSequence? = this.text
+    if (text === oldText) return false
+    if (text == null && oldText!!.isEmpty()) return false
+    if (text is String && oldText is String && text == oldText) return false
+
+    setText(text)
+    return true
 }

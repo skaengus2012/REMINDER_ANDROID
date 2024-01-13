@@ -16,6 +16,7 @@
 
 package com.nlab.reminder.domain.feature.schedule.all
 
+import com.nlab.reminder.core.data.model.anyScheduleId
 import com.nlab.reminder.core.data.model.genSchedule
 import com.nlab.reminder.core.kotlin.util.Result
 import com.nlab.reminder.core.data.model.genScheduleId
@@ -26,17 +27,20 @@ import com.nlab.reminder.core.data.repository.ScheduleRepository
 import com.nlab.reminder.core.domain.CompleteScheduleWithIdsUseCase
 import com.nlab.reminder.core.domain.CompleteScheduleWithMarkUseCase
 import com.nlab.reminder.core.domain.FetchLinkMetadataUseCase
-import com.nlab.reminder.core.schedule.genScheduleItems
-import com.nlab.reminder.core.schedule.mapToScheduleItemsAsImmutableList
+import com.nlab.reminder.core.schedule.model.genScheduleElements
+import com.nlab.reminder.core.schedule.model.mapToScheduleElementsAsImmutableList
 import com.nlab.statekit.middleware.interceptor.scenario
 import com.nlab.testkit.genBoolean
 import com.nlab.testkit.genInt
 import com.nlab.testkit.once
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -45,18 +49,24 @@ import org.mockito.kotlin.whenever
  */
 internal class AllScheduleInterceptorTest {
     @Test
-    fun `Given State Loaded, When OnCompletedScheduleVisibilityUpdateClicked, Then Repository called setShown`() = runTest {
-        val isVisible = genBoolean()
+    fun `Given State Loaded, When OnCompletedScheduleVisibilityToggleClicked, Then Repository called setShown with negative isCompletedScheduleShown`() = runTest {
+        testOnCompletedScheduleVisibilityToggleClicked(currentCompletedScheduleShown = true)
+        testOnCompletedScheduleVisibilityToggleClicked(currentCompletedScheduleShown = false)
+    }
+
+    private suspend fun TestScope.testOnCompletedScheduleVisibilityToggleClicked(
+        currentCompletedScheduleShown: Boolean
+    ) {
         val completedScheduleShownRepository: CompletedScheduleShownRepository = mock {
-            whenever(mock.setShown(isVisible)) doReturn Result.Success(Unit)
+            whenever(mock.setShown(currentCompletedScheduleShown.not())) doReturn Result.Success(Unit)
         }
 
         genInterceptor(completedScheduleShownRepository = completedScheduleShownRepository)
             .scenario()
-            .initState(genAllScheduleUiStateLoaded())
-            .action(AllScheduleAction.OnCompletedScheduleVisibilityUpdateClicked(isVisible))
+            .initState(genAllScheduleUiStateLoaded(isCompletedScheduleShown = currentCompletedScheduleShown))
+            .action(AllScheduleAction.OnCompletedScheduleVisibilityToggleClicked)
             .dispatchIn(testScope = this)
-        verify(completedScheduleShownRepository, once()).setShown(isShown = isVisible)
+        verify(completedScheduleShownRepository, once()).setShown(isShown = currentCompletedScheduleShown.not())
     }
 
     @Test
@@ -110,27 +120,39 @@ internal class AllScheduleInterceptorTest {
         val isComplete = genBoolean()
         val schedule = genSchedule(isComplete = isComplete.not())
         val useCase: CompleteScheduleWithMarkUseCase = mock {
-            whenever(mock(schedule.scheduleId, isComplete)) doReturn Result.Success(Unit)
+            whenever(mock(schedule.id, isComplete)) doReturn Result.Success(Unit)
         }
         genInterceptor(completeScheduleWithMark = useCase)
             .scenario()
-            .initState(genAllScheduleUiStateLoaded(scheduleItems = schedule.mapToScheduleItemsAsImmutableList()))
-            .action(AllScheduleAction.OnScheduleCompleteClicked(schedule.scheduleId, isComplete))
+            .initState(genAllScheduleUiStateLoaded(scheduleElements = schedule.mapToScheduleElementsAsImmutableList()))
+            .action(AllScheduleAction.OnScheduleCompleteClicked(position = 0, isComplete))
             .dispatchIn(testScope = this)
-        verify(useCase, once()).invoke(schedule.scheduleId, isComplete)
+        verify(useCase, once()).invoke(schedule.id, isComplete)
+    }
+
+    @Test
+    fun `Given State Loaded, When OnScheduleCompleteClicked with wrong position, Then CompleteScheduleWithMarkUseCase never invoked`() = runTest {
+        val isComplete = genBoolean()
+        val useCase: CompleteScheduleWithMarkUseCase = mock()
+        genInterceptor(completeScheduleWithMark = useCase)
+            .scenario()
+            .initState(genAllScheduleUiStateLoaded(scheduleElements = persistentListOf()))
+            .action(AllScheduleAction.OnScheduleCompleteClicked(position = 0, isComplete))
+            .dispatchIn(testScope = this)
+        verify(useCase, never()).invoke(anyScheduleId(), isComplete)
     }
 
     @Test
     fun `Given State Loaded, When OnSelectedSchedulesCompleteClicked, Then CompleteScheduleWithIdsUseCase invoked`() = runTest {
         val schedules = genSchedules()
-        val scheduleIds = schedules.map { it.scheduleId }
+        val scheduleIds = schedules.map { it.id }
         val isComplete = genBoolean()
         val useCase: CompleteScheduleWithIdsUseCase = mock {
             whenever(mock(scheduleIds, isComplete)) doReturn Result.Success(Unit)
         }
         genInterceptor(completeScheduleWithIds = useCase)
             .scenario()
-            .initState(genAllScheduleUiStateLoaded(scheduleItems = schedules.mapToScheduleItemsAsImmutableList()))
+            .initState(genAllScheduleUiStateLoaded(scheduleElements = schedules.mapToScheduleElementsAsImmutableList()))
             .action(AllScheduleAction.OnSelectedSchedulesCompleteClicked(scheduleIds, isComplete))
             .dispatchIn(testScope = this)
         verify(useCase, once()).invoke(scheduleIds, isComplete)
@@ -142,7 +164,7 @@ internal class AllScheduleInterceptorTest {
         genInterceptor(fetchLinkMetadata = useCase)
             .scenario()
             .initState(genAllScheduleUiState())
-            .action(AllScheduleAction.ScheduleItemsLoaded(genScheduleItems(), genBoolean()))
+            .action(AllScheduleAction.ScheduleElementsLoaded(genScheduleElements(), genBoolean()))
             .dispatchIn(testScope = this)
         verify(useCase, once()).invoke(any())
     }

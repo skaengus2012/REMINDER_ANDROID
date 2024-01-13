@@ -22,7 +22,7 @@ import com.nlab.reminder.core.data.repository.AllScheduleData
 import com.nlab.reminder.core.data.repository.CompletedScheduleShownRepository
 import com.nlab.reminder.core.data.repository.ScheduleGetStreamRequest
 import com.nlab.reminder.core.data.repository.ScheduleRepository
-import com.nlab.reminder.core.domain.MapToScheduleItemsUseCase
+import com.nlab.reminder.core.domain.MapToScheduleElementsUseCase
 import com.nlab.reminder.core.kotlin.coroutine.flow.flatMapLatest
 import com.nlab.statekit.middleware.epic.Epic
 import com.nlab.statekit.util.buildDslEpic
@@ -32,16 +32,16 @@ import javax.inject.Inject
 /**
  * @author thalys
  */
-internal class AllScheduleEpic @Inject constructor(
+class AllScheduleEpic @Inject constructor(
     @AllScheduleData completedScheduleShownRepository: CompletedScheduleShownRepository,
     scheduleRepository: ScheduleRepository,
-    mapToScheduleItems: MapToScheduleItemsUseCase
+    mapToScheduleElements: MapToScheduleElementsUseCase
 ) : Epic<AllScheduleAction> by buildDslEpic(buildDSL = {
     whileStateUsed {
         completedScheduleShownRepository.getAsStream().flatMapLatest { isCompletedScheduleShown ->
             scheduleRepository.getAllSchedulesStream(isCompletedScheduleShown)
-                .let(mapToScheduleItems::invoke)
-                .map { items -> AllScheduleAction.ScheduleItemsLoaded(items, isCompletedScheduleShown) }
+                .let(mapToScheduleElements::invoke)
+                .map { items -> AllScheduleAction.ScheduleElementsLoaded(items, isCompletedScheduleShown) }
         }
     }
 })

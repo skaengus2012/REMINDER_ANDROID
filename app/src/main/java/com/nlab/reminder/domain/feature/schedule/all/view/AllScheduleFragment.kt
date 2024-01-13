@@ -22,28 +22,24 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
+import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.RecyclerView.*
 import com.nlab.reminder.R
 import com.nlab.reminder.core.android.fragment.viewLifecycle
 import com.nlab.reminder.core.android.fragment.viewLifecycleScope
-import com.nlab.reminder.core.android.lifecycle.event
-import com.nlab.reminder.core.android.lifecycle.filterLifecycleEvent
-import com.nlab.reminder.core.android.recyclerview.DragSnapshot
-import com.nlab.reminder.core.android.recyclerview.scrollState
+import com.nlab.reminder.core.android.recyclerview.SingleItemAdapter
 import com.nlab.reminder.core.android.recyclerview.suspendSubmitList
 import com.nlab.reminder.core.android.view.throttleClicks
 import com.nlab.reminder.core.android.view.touches
-import com.nlab.reminder.core.kotlin.coroutine.flow.withBefore
+import com.nlab.reminder.core.schedule.view.ScheduleItemAdapter
+import com.nlab.reminder.core.schedule.view.ScheduleItemTouchCallback
 import com.nlab.reminder.databinding.FragmentAllScheduleBinding
-import com.nlab.reminder.domain.common.android.navigation.navigateOpenLink
 import com.nlab.reminder.domain.common.android.view.loadingFlow
-import com.nlab.reminder.domain.common.schedule.view.*
-import com.nlab.reminder.domain.common.schedule.view.DefaultScheduleUiStateAdapter.*
+import com.nlab.reminder.domain.common.schedule.view.ScheduleItemAnimator
 import com.nlab.reminder.domain.feature.schedule.all.*
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 
 /**
@@ -68,7 +64,73 @@ class AllScheduleFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val scheduleItemAdapter = ScheduleItemAdapter()
+        val itemTouchCallback = ScheduleItemTouchCallback(
+            context = requireContext(),
+            onItemMoved = scheduleItemAdapter::onMove,
+            onItemMoveEnded = {
+              //  diffCallback.setDragMode(true)
+                val snapshot = scheduleItemAdapter.calculateDraggedSnapshot()
+            }
+        )
+        itemTouchCallback.isLongPressDragEnabled = true
 
+        scheduleItemAdapter.itemEvent
+            .filterIsInstance<ScheduleItemAdapter.ItemEvent.OnCompleteClicked>()
+            .onEach { (position, isComplete) -> viewModel.onScheduleCompleteClicked(position, isComplete) }
+            .launchIn(viewLifecycleScope)
+
+        binding.recyclerviewContent.apply {
+            itemAnimator = ScheduleItemAnimator()
+            adapter = ConcatAdapter(
+                SingleItemAdapter(R.layout.view_item_empty),
+                scheduleItemAdapter
+            )
+            ItemTouchHelper(itemTouchCallback).attachToRecyclerView(/* recyclerView=*/ this)
+        }
+
+        binding.recyclerviewContent.touches()
+            .map { it.x }
+            .distinctUntilChanged()
+            .onEach { itemTouchCallback.setContainerX(it) }
+            .launchIn(viewLifecycleScope)
+
+        binding.buttonCompletedScheduleShownToggle
+            .throttleClicks()
+            .onEach { viewModel.onCompletedScheduleVisibilityToggleClicked() }
+            .launchIn(viewLifecycleScope)
+
+        viewModel.loadedUiState
+            .map { it.scheduleElements }
+            .distinctUntilChanged()
+            .flowOn(Dispatchers.Default)
+            .flowWithLifecycle(viewLifecycle)
+            .onEach { scheduleElements ->
+                scheduleItemAdapter.suspendSubmitList(scheduleElements)
+            }
+            .launchIn(viewLifecycleScope)
+
+        viewModel.loadedUiState
+            .map { uiState ->
+                if (uiState.isCompletedScheduleShown) R.string.schedule_completed_hidden
+                else R.string.schedule_completed_shown
+            }
+            .distinctUntilChanged()
+            .flowWithLifecycle(viewLifecycle)
+            .onEach(binding.buttonCompletedScheduleShownToggle::setText)
+            .launchIn(viewLifecycleScope)
+
+        merge(
+            viewModel.loadedUiState,
+            viewModel.uiState.loadingFlow<AllScheduleUiState.Empty>()
+        )
+            .flowWithLifecycle(viewLifecycle)
+            .take(count = 1)
+            .onEach { startPostponedEnterTransition() }
+            .launchIn(viewLifecycleScope)
+
+
+/**
         val diffCallback = ScheduleUiStateDiffCallback()
         val scheduleAdapter = DefaultScheduleUiStateAdapter(diffCallback)
         val itemTouchCallback = ScheduleItemTouchCallback(
@@ -95,17 +157,6 @@ class AllScheduleFragment : Fragment() {
             }
             .apply { itemTouchHelper.attachToRecyclerView(this) }
             .apply { addOnItemTouchListener(dragSelectionHelper.itemTouchListener) }
-
-        scheduleAdapter.itemEvent
-            .filterIsInstance<ItemEvent.OnCompleteClicked>()
-            .map { it.uiState }
-            .onEach { uiState ->
-                viewModel.onScheduleCompleteClicked(
-                    scheduleId = uiState.id,
-                    isComplete = uiState.isCompleteMarked.not()
-                )
-            }
-            .launchIn(viewLifecycleScope)
 
         scheduleAdapter.itemEvent
             .filterIsInstance<ItemEvent.OnDeleteClicked>()
@@ -141,11 +192,6 @@ class AllScheduleFragment : Fragment() {
         viewLifecycle.event()
             .filterLifecycleEvent(Lifecycle.Event.ON_DESTROY)
             .onEach { itemTouchCallback.clearResource() }
-            .launchIn(viewLifecycleScope)
-
-        binding.buttonCompletedScheduleShownToggle
-            .throttleClicks()
-            .onEach { viewModel.onToggleCompletedScheduleShownClicked() }
             .launchIn(viewLifecycleScope)
 
         binding.buttonSelectionModeOnOff
@@ -244,9 +290,10 @@ class AllScheduleFragment : Fragment() {
 
         viewModel.allScheduleSideEffectFlow
             .onEach(this::handleSideEffect)
-            .launchIn(viewLifecycleScope)
+            .launchIn(viewLifecycleScope)*/
     }
 
+    /**
     private fun handleSideEffect(sideEffect: AllScheduleSideEffect) = when (sideEffect) {
         is AllScheduleSideEffect.ShowErrorPopup -> {
             // TODO implement error popup
@@ -254,10 +301,12 @@ class AllScheduleFragment : Fragment() {
         is AllScheduleSideEffect.NavigateScheduleLink -> {
             requireActivity().navigateOpenLink(sideEffect.link)
         }
-    }
+    }*/
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
 }
+
+private val AllScheduleViewModel.loadedUiState: Flow<AllScheduleUiState.Loaded> get() = uiState.filterIsInstance()

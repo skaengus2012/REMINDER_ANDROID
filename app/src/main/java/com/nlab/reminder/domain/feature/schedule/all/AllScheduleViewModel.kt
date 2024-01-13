@@ -18,10 +18,12 @@ package com.nlab.reminder.domain.feature.schedule.all
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nlab.reminder.core.effect.SideEffectContainer
+import com.nlab.statekit.lifecycle.UiActionDispatchable
+import com.nlab.statekit.util.createStore
+import com.nlab.statekit.util.stateIn
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
@@ -29,13 +31,16 @@ import javax.inject.Inject
  * @author Doohyun
  */
 @HiltViewModel
-class AllScheduleViewModel @Inject constructor(
-    stateContainerFactory: AllScheduleStateContainerFactory
-) : ViewModel() {
-    private val sideEffectContainer = SideEffectContainer<AllScheduleSideEffect>()
-    private val stateContainer = stateContainerFactory.create(viewModelScope, sideEffectContainer)
+internal class AllScheduleViewModel @Inject constructor(
+    reducer: AllScheduleReducer,
+    interceptor: AllScheduleInterceptor,
+    epic: AllScheduleEpic,
+) : ViewModel(),
+    UiActionDispatchable<AllScheduleAction> {
+    private val store = createStore(initState = AllScheduleUiState.Empty, reducer, interceptor, epic)
 
-    val allScheduleSideEffectFlow: Flow<AllScheduleSideEffect> = sideEffectContainer.sideEffectFlow
-    val stateFlow: StateFlow<AllScheduleState> = stateContainer.stateFlow
-    fun send(event: AllScheduleEvent): Job = stateContainer.send(event)
+    val uiState: StateFlow<AllScheduleUiState> =
+        store.stateIn(viewModelScope, SharingStarted.WhileSubscribed(stopTimeoutMillis = 5_000))
+
+    override fun dispatch(action: AllScheduleAction): Job = store.dispatch(action)
 }

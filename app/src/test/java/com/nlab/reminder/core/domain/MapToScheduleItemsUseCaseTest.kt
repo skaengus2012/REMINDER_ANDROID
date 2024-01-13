@@ -9,7 +9,6 @@ import com.nlab.reminder.core.data.model.genSchedules
 import com.nlab.reminder.core.data.repository.LinkMetadataTableRepository
 import com.nlab.reminder.core.data.repository.ScheduleCompleteMarkRepository
 import com.nlab.testkit.genBoolean
-import kotlinx.collections.immutable.persistentHashMapOf
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
@@ -45,11 +44,7 @@ internal class MapToScheduleItemsUseCaseTest {
         val schedule = genSchedule(isComplete = genBoolean())
         val useCase = genMapToScheduleItemsUseCase(
             completeMarkRepository = mock {
-                whenever(mock.getStream()) doReturn MutableStateFlow(
-                    persistentHashMapOf(
-                        schedule.scheduleId to schedule.isComplete.not()
-                    )
-                )
+                whenever(mock.getStream()) doReturn MutableStateFlow(mapOf(schedule.id to schedule.isComplete.not()))
             }
         )
         assertThat(
@@ -99,12 +94,12 @@ internal class MapToScheduleItemsUseCaseTest {
 
 private fun genMapToScheduleItemsUseCase(
     completeMarkRepository: ScheduleCompleteMarkRepository = mock {
-        whenever(mock.getStream()) doReturn MutableStateFlow(persistentHashMapOf())
+        whenever(mock.getStream()) doReturn MutableStateFlow(mapOf())
     },
     linkMetadataTableRepository: LinkMetadataTableRepository = mock {
         whenever(mock.getStream()) doReturn MutableStateFlow(LinkMetadataTable(emptyMap())) // TODO stateFlow 로 바꾸자..
     }
-) = MapToScheduleItemsUseCase(
+) = MapToScheduleElementsUseCase(
     completeMarkRepository,
     linkMetadataTableRepository,
     dispatcher = Dispatchers.Unconfined

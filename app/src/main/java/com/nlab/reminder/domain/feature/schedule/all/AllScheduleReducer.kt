@@ -17,7 +17,7 @@
 package com.nlab.reminder.domain.feature.schedule.all
 
 import com.nlab.reminder.core.data.model.isEmpty
-import com.nlab.reminder.core.schedule.findLink
+import com.nlab.reminder.core.schedule.model.findLink
 import com.nlab.statekit.Reducer
 import com.nlab.statekit.util.buildDslReducer
 import kotlinx.collections.immutable.*
@@ -28,11 +28,11 @@ private typealias DomainReducer = Reducer<AllScheduleAction, AllScheduleUiState>
 /**
  * @author Doohyun
  */
-internal class AllScheduleReducer @Inject constructor() : DomainReducer by buildDslReducer(defineDSL = {
-    action<AllScheduleAction.ScheduleItemsLoaded> {
+class AllScheduleReducer @Inject constructor() : DomainReducer by buildDslReducer(defineDSL = {
+    action<AllScheduleAction.ScheduleElementsLoaded> {
         state<AllScheduleUiState.Empty> { (action) ->
             AllScheduleUiState.Loaded(
-                scheduleItems = action.scheduleItems.toImmutableList(),
+                scheduleElements = action.scheduleElements.toImmutableList(),
                 isCompletedScheduleShown = action.isCompletedScheduleShown,
                 isSelectionMode = false,
                 workflows = persistentListOf()
@@ -40,7 +40,7 @@ internal class AllScheduleReducer @Inject constructor() : DomainReducer by build
         }
         state<AllScheduleUiState.Loaded> { (action, before) ->
             before.copy(
-                scheduleItems = action.scheduleItems.toImmutableList(),
+                scheduleElements = action.scheduleElements.toImmutableList(),
                 isCompletedScheduleShown = action.isCompletedScheduleShown
             )
         }
@@ -50,7 +50,8 @@ internal class AllScheduleReducer @Inject constructor() : DomainReducer by build
             before.copy(isSelectionMode = action.isSelectionMode)
         }
         action<AllScheduleAction.OnScheduleLinkClicked> { (action, before) ->
-            val link = before.scheduleItems.findLink(scheduleId = action.id)
+            val link = before.scheduleElements.findLink(id = action.id)
+
             if (link.isEmpty()) before
             else before.copy(workflows = before.workflows.toPersistentList() + AllScheduleWorkflow.LinkPage(link))
         }

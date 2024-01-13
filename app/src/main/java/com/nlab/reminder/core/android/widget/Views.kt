@@ -14,18 +14,15 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.schedule
+package com.nlab.reminder.core.android.widget
 
-import com.nlab.reminder.core.data.model.Link
-import com.nlab.reminder.core.data.model.Schedule
-import com.nlab.reminder.core.data.model.ScheduleId
-import com.nlab.reminder.core.data.model.orEmpty
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.toImmutableList
+import android.view.View
 
 /**
  * @author thalys
  */
-
-fun List<ScheduleItem>.findLink(scheduleId: ScheduleId): Link =
-    find { it.schedule.scheduleId == scheduleId }?.schedule?.link.orEmpty()
+fun View.bindSelected(selected: Boolean): Boolean {
+    if (this.isSelected == selected) return false
+    this.isSelected = selected
+    return true
+}
