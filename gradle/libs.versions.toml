@@ -39,7 +39,7 @@ kotlinCollectionsImmutable = "0.3.7"
 kotlinCoroutine = "1.7.3"
 mockitoInline = "5.2.0"
 mockitoKotlin = "5.2.1"
-squareLeakcanary = "2.12"
+squareLeakcanary = "2.13"
 squareKotlinpoet = "1.12.0"
 timber = "5.0.1"
 
