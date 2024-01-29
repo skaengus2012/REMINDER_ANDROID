@@ -66,6 +66,10 @@ internal class LocalScheduleRepository @Inject constructor(
         is ScheduleUpdateRequest.Completes -> catching {
             scheduleDao.updateCompletes(request.idToCompleteTable.mapKeys { (key) -> key.value })
         }
+
+        is ScheduleUpdateRequest.VisiblePriority -> catching {
+            scheduleDao.updateVisiblePriorities(request.idToVisiblePriorityTable.mapKeys { (key) -> key.value })
+        }
     }
 
     override suspend fun delete(request: ScheduleDeleteRequest): Result<Unit> = when (request) {

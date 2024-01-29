@@ -40,6 +40,7 @@ sealed class ScheduleGetStreamRequest private constructor() {
 
 sealed class ScheduleUpdateRequest private constructor() {
     data class Completes(val idToCompleteTable: Map<ScheduleId, Boolean>) : ScheduleUpdateRequest()
+    data class VisiblePriority(val idToVisiblePriorityTable: Map<ScheduleId, Long>) : ScheduleUpdateRequest()
 }
 
 sealed class ScheduleDeleteRequest private constructor() {

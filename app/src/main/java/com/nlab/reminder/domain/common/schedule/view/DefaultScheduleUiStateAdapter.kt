@@ -68,8 +68,8 @@ class DefaultScheduleUiStateAdapter(
         holder.onBind(getItem(position))
     }
 
-    override fun onMove(fromPosition: Int, toPosition: Int): Boolean {
-        return draggableAdapterDelegate.onMove(fromPosition, toPosition)
+    override fun onItemMoved(fromPosition: Int, toPosition: Int): Boolean {
+        return draggableAdapterDelegate.onItemMoved(fromPosition, toPosition)
     }
 
     override fun calculateDraggedSnapshot(): DragSnapshot<ScheduleUiState> {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 The N's lab Open Source Project
+ * Copyright (C) 2024 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.android.recyclerview
+package com.nlab.reminder.core.schedule.view
+
+import com.nlab.reminder.core.schedule.model.ScheduleElement
 
 /**
  * @author thalys
  */
-interface ItemMoveListener {
-    fun onItemMoved(fromPosition: Int, toPosition: Int): Boolean
-    fun onItemMoveEnded() {} // todo remove default
+class DefaultScheduleElementItemMovePolicy : ScheduleElementItemMovePolicy() {
+    override fun isMovable(from: ScheduleElement, to: ScheduleElement): Boolean = true
 }

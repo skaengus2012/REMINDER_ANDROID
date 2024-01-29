@@ -55,20 +55,11 @@ abstract class ScheduleDao {
     @Query("UPDATE schedule SET visible_priority = :visiblePriority WHERE schedule_id = :scheduleId")
     abstract suspend fun updateVisiblePriority(scheduleId: Long, visiblePriority: Long)
 
-    @Query(
-        """
-        UPDATE schedule 
-        SET is_complete = :isComplete, visible_priority = :visiblePriority 
-        WHERE schedule_id = :scheduleId
-        """
-    )
-    abstract suspend fun updateComplete(scheduleId: Long, isComplete: Boolean, visiblePriority: Long)
-
     @Transaction
-    open suspend fun updateCompletes(scheduleIdToCompleteRequest: Map<Long, Boolean>) {
+    open suspend fun updateCompletes(idToCompleteTable: Map<Long, Boolean>) {
         val completeToEntities: Map<Boolean, List<ScheduleEntity>> =
-            findByScheduleIds(scheduleIds = scheduleIdToCompleteRequest.keys)
-                .filter { entity -> entity.isComplete != scheduleIdToCompleteRequest.getValue(entity.scheduleId) }
+            findByScheduleIds(scheduleIds = idToCompleteTable.keys)
+                .filter { entity -> entity.isComplete != idToCompleteTable.getValue(entity.scheduleId) }
                 .groupBy { it.isComplete }
         updateCompletesInternal(completeToEntities[true], targetComplete = false)
         updateCompletesInternal(completeToEntities[false], targetComplete = true)
@@ -89,12 +80,21 @@ abstract class ScheduleDao {
         }
     }
 
-    // deprecate zone.
-
     @Transaction
-    open suspend fun updateVisiblePriorities(requests: List<Pair<Long, Long>>) {
-        requests.forEach { (scheduleId, visiblePriority) -> updateVisiblePriority(scheduleId, visiblePriority) }
+    open suspend fun updateVisiblePriorities(idToVisiblePriorityTable: Map<Long, Long>) {
+        idToVisiblePriorityTable
+            .forEach { (scheduleId, visiblePriority) -> updateVisiblePriority(scheduleId, visiblePriority) }
     }
+
+    // deprecate zone.
+    @Query(
+        """
+        UPDATE schedule 
+        SET is_complete = :isComplete, visible_priority = :visiblePriority 
+        WHERE schedule_id = :scheduleId
+        """
+    )
+    abstract suspend fun updateComplete(scheduleId: Long, isComplete: Boolean, visiblePriority: Long)
 
     private suspend fun updateCompletesWithIds(scheduleIds: List<Long>, isComplete: Boolean) {
         if (scheduleIds.isEmpty()) return

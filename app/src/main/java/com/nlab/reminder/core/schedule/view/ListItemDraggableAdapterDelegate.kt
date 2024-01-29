@@ -32,6 +32,8 @@ fun ListItemDraggableAdapterDelegate(
     notifyItemMoved: (fromPosition: Int, toPosition: Int) -> Unit
 ): DraggableAdapter<ScheduleItem> {
     val dragPositionHolder = DragPositionHolder()
+    return TODO()
+    /**
     return DraggableAdapterDelegate(
         dragPositionHolder,
         notifyItemMoved,
@@ -40,5 +42,5 @@ fun ListItemDraggableAdapterDelegate(
             notifyItemMoved(fromPosition, toPosition)
         }),
         ListItemDragSnapshotCalculator(dragPositionHolder, getSnapshot)
-    )
+    )*/
 }

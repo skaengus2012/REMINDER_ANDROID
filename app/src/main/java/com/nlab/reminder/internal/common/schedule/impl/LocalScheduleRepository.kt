@@ -52,7 +52,7 @@ class LocalScheduleRepository(
         }
         is UpdateRequest.VisiblePriorities -> catching {
             scheduleDao.updateVisiblePriorities(
-                requests = request.values.map { request -> request.scheduleId.value to request.visiblePriority }
+                request.values.associate { request -> request.scheduleId.value to request.visiblePriority }
             )
         }
     }

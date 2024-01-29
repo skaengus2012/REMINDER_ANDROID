@@ -19,8 +19,7 @@ package com.nlab.reminder.core.schedule.view
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import com.nlab.reminder.core.android.recyclerview.DragSnapshot
-import com.nlab.reminder.core.android.recyclerview.DraggableAdapter
+import com.nlab.reminder.core.schedule.model.ScheduleElement
 import com.nlab.reminder.core.schedule.model.ScheduleItem
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
@@ -31,9 +30,10 @@ import kotlinx.coroutines.flow.asSharedFlow
  * @author Doohyun
  */
 class ScheduleItemAdapter(
-    diffCallback: DiffUtil.ItemCallback<ScheduleItem> = ScheduleItemDiffCallback()
+    diffCallback: DiffUtil.ItemCallback<ScheduleItem> = ScheduleItemDiffCallback(),
+    private val scheduleElementItemMovePolicy: ScheduleElementItemMovePolicy = DefaultScheduleElementItemMovePolicy()
 ) : ListAdapter<ScheduleItem, ScheduleItemViewHolder>(diffCallback),
-    DraggableAdapter<ScheduleItem> {
+    ScheduleItemTouchCallback.ItemMoveListener {
     private val _itemEvent = MutableSharedFlow<ItemEvent>(
         extraBufferCapacity = 10, onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
@@ -43,11 +43,7 @@ class ScheduleItemAdapter(
             _itemEvent.tryEmit(ItemEvent.OnCompleteClicked(position, isComplete))
         }
     )
-    private val draggableAdapterDelegate = ListItemDraggableAdapterDelegate(
-        getSnapshot = this::getCurrentList,
-        getItem = this::getItem,
-        notifyItemMoved = this::notifyItemMoved
-    )
+    private val dragPositionHolder = DragPositionHolder()
 
     val itemEvent: Flow<ItemEvent> = _itemEvent.asSharedFlow()
 
@@ -60,16 +56,38 @@ class ScheduleItemAdapter(
     override fun getItemViewType(position: Int): Int =
         viewTypeAdapterDelegate.getItemViewType(position)
 
+    override fun onItemMoved(fromPosition: Int, toPosition: Int): Boolean {
+        val fromItem = getItem(fromPosition) as? ScheduleElement ?: return false
+        val toItem = getItem(toPosition) as? ScheduleElement ?: return false
+        val isMovable = scheduleElementItemMovePolicy.isMovableInternal(fromItem, toItem)
+        if (isMovable) {
+            dragPositionHolder.setPosition(fromPosition, toPosition)
+            notifyItemMoved(fromPosition, toPosition)
+        }
+        return isMovable
+    }
+
+    override fun onItemMoveEnded() {
+        val (from, to) = dragPositionHolder.snapshot() ?: return
+        _itemEvent.tryEmit(ItemEvent.OnItemMoveEnded(from, to))
+    }
+
+    /**
     override fun calculateDraggedSnapshot(): DragSnapshot<ScheduleItem> =
         draggableAdapterDelegate.calculateDraggedSnapshot()
 
     override fun adjustRecentSwapPositions() =
         draggableAdapterDelegate.adjustRecentSwapPositions()
 
-    override fun onMove(fromPosition: Int, toPosition: Int): Boolean =
-        draggableAdapterDelegate.onMove(fromPosition, toPosition)
+    override fun onItemMove(fromPosition: Int, toPosition: Int): Boolean =
+        draggableAdapterDelegate.onItemMove(fromPosition, toPosition)
+
+    override fun onItemMoveEnded() {
+
+    }*/
 
     sealed class ItemEvent private constructor() {
         data class OnCompleteClicked(val position: Int, val isComplete: Boolean) : ItemEvent()
+        data class OnItemMoveEnded(val fromPosition: Int, val toPosition: Int) : ItemEvent() // todo 구현
     }
 }

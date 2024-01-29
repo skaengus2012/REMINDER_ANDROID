@@ -67,17 +67,18 @@ class AllScheduleFragment : Fragment() {
         val scheduleItemAdapter = ScheduleItemAdapter()
         val itemTouchCallback = ScheduleItemTouchCallback(
             context = requireContext(),
-            onItemMoved = scheduleItemAdapter::onMove,
-            onItemMoveEnded = {
-              //  diffCallback.setDragMode(true)
-                val snapshot = scheduleItemAdapter.calculateDraggedSnapshot()
-            }
+            itemMoveListener = scheduleItemAdapter
         )
         itemTouchCallback.isLongPressDragEnabled = true
 
         scheduleItemAdapter.itemEvent
             .filterIsInstance<ScheduleItemAdapter.ItemEvent.OnCompleteClicked>()
             .onEach { (position, isComplete) -> viewModel.onScheduleCompleteClicked(position, isComplete) }
+            .launchIn(viewLifecycleScope)
+
+        scheduleItemAdapter.itemEvent
+            .filterIsInstance<ScheduleItemAdapter.ItemEvent.OnItemMoveEnded>()
+            .onEach {  }
             .launchIn(viewLifecycleScope)
 
         binding.recyclerviewContent.apply {

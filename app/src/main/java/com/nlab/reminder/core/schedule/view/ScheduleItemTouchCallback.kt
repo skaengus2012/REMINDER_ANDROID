@@ -45,8 +45,7 @@ import kotlin.math.min
 class ScheduleItemTouchCallback(
     private val clampWidth: Float,
     private val draggedWhenLinkImageVisibleHeight: Float,
-    private val onItemMoved: (fromPosition: Int, toPosition: Int) -> Boolean,
-    private val onItemMoveEnded: () -> Unit
+    private val itemMoveListener: ItemMoveListener
 ) : ItemTouchHelper.SimpleCallback(
     /* dragDirs=*/ ItemTouchHelper.UP or ItemTouchHelper.DOWN,
     /* swipeDirs=*/ ItemTouchHelper.START or ItemTouchHelper.END
@@ -65,7 +64,7 @@ class ScheduleItemTouchCallback(
     override fun isLongPressDragEnabled(): Boolean = isLongPressDragEnabled
 
     override fun onMove(recyclerView: RecyclerView, viewHolder: ViewHolder, target: ViewHolder): Boolean {
-        return onItemMoved(viewHolder.bindingAdapterPosition, target.bindingAdapterPosition)
+        return itemMoveListener.onItemMoved(viewHolder.bindingAdapterPosition, target.bindingAdapterPosition)
     }
 
     // nothing.
@@ -145,7 +144,7 @@ class ScheduleItemTouchCallback(
         curDX = 0f
         prevPosition = viewHolder.bindingAdapterPosition
         getDefaultUIUtil().clearView(binding.swipeView)
-        onItemMoveEnded()
+        itemMoveListener.onItemMoveEnded()
     }
 
     override fun onSelectedChanged(
@@ -274,15 +273,18 @@ class ScheduleItemTouchCallback(
                 setTag(R.id.tag_schedule_item_touch_callback_scale_clear_anim, value)
             }
     }
+
+    interface ItemMoveListener {
+        fun onItemMoved(fromPosition: Int, toPosition: Int): Boolean
+        fun onItemMoveEnded()
+    }
 }
 
 fun ScheduleItemTouchCallback(
     context: Context,
-    onItemMoved: (fromPosition: Int, toPosition: Int) -> Boolean,
-    onItemMoveEnded: () -> Unit
+    itemMoveListener: ScheduleItemTouchCallback.ItemMoveListener
 ): ScheduleItemTouchCallback = ScheduleItemTouchCallback(
     clampWidth = context.getDimension(R.dimen.schedule_clamp_width),
     draggedWhenLinkImageVisibleHeight = context.getDimension(R.dimen.schedule_dragged_when_link_thumbnail_height),
-    onItemMoved = onItemMoved,
-    onItemMoveEnded = onItemMoveEnded
+    itemMoveListener = itemMoveListener
 )

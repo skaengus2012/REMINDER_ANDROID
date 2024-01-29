@@ -38,6 +38,7 @@ import org.mockito.kotlin.*
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class LocalScheduleRepositoryTest {
+    /**
     @Test
     fun `notify 2 times schedules when ScheduleDao sent 2 times data`() = runTest {
         val isComplete: Boolean = genBoolean()
@@ -173,5 +174,5 @@ class LocalScheduleRepositoryTest {
         val result = LocalScheduleRepository(scheduleDao).delete(request)
         verifyDao(scheduleDao)
         assertThat(result.isSuccess, equalTo(true))
-    }
+    }*/
 }

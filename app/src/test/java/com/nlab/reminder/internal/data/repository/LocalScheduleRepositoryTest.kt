@@ -94,14 +94,19 @@ internal class LocalScheduleRepositoryTest {
 
     @Test
     fun `When repository called update actions, Then dao also call update`() = runTest {
-        val daoInput = List(genInt(min = 1, max = 10)) { it }
+        val daoIdToBoolean = List(genInt(min = 1, max = 10)) { it }
             .associateBy(keySelector = { it.toLong() }, valueTransform = { genBoolean() })
-        val input = daoInput.mapKeys { genScheduleId(it.key) }
-        val scheduleDao: ScheduleDao = mock()
-        val scheduleRepository = genScheduleRepository(scheduleDao)
+        val daoIdToLong = List(genInt(min = 1, max = 10)) { it }
+            .associateBy(keySelector = { it.toLong() }, valueTransform = { genLong() })
 
-        scheduleRepository.update(ScheduleUpdateRequest.Completes(input))
-        verify(scheduleDao, once()).updateCompletes(daoInput)
+        testUpdate(
+            request = ScheduleUpdateRequest.Completes(daoIdToBoolean.mapKeys { genScheduleId(it.key) }),
+            doVerify = { updateCompletes(daoIdToBoolean) }
+        )
+        testUpdate(
+            request = ScheduleUpdateRequest.VisiblePriority(daoIdToLong.mapKeys { genScheduleId(it.key) }),
+            doVerify = { updateVisiblePriorities(daoIdToLong) }
+        )
     }
 }
 
@@ -129,5 +134,15 @@ private suspend inline fun <T : ScheduleDeleteRequest> testDelete(
     val scheduleDao = mock<ScheduleDao>()
     val scheduleRepository = genScheduleRepository(scheduleDao = scheduleDao)
     scheduleRepository.delete(request)
+    verify(scheduleDao, once()).doVerify(request)
+}
+
+private suspend inline fun <T : ScheduleUpdateRequest> testUpdate(
+    request: T,
+    doVerify: (ScheduleDao).(T) -> Unit
+) {
+    val scheduleDao = mock<ScheduleDao>()
+    val scheduleRepository = genScheduleRepository(scheduleDao = scheduleDao)
+    scheduleRepository.update(request)
     verify(scheduleDao, once()).doVerify(request)
 }
