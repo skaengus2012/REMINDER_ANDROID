@@ -78,6 +78,11 @@ class AllScheduleFragment : Fragment() {
 
         scheduleItemAdapter.itemEvent
             .filterIsInstance<ScheduleItemAdapter.ItemEvent.OnItemMoveEnded>()
+            .onEach { (fromPosition, toPosition) -> viewModel.onScheduleItemMoved(fromPosition, toPosition) }
+            .launchIn(viewLifecycleScope)
+
+        scheduleItemAdapter.itemEvent
+            .filterIsInstance<ScheduleItemAdapter.ItemEvent.OnItemMoveEnded>()
             .onEach {  }
             .launchIn(viewLifecycleScope)
 

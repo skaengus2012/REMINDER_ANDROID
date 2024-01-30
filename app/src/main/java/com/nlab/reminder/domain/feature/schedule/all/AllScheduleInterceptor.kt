@@ -68,6 +68,10 @@ class AllScheduleInterceptor @Inject constructor(
             scheduleRepository.delete(ScheduleDeleteRequest.ByComplete(isComplete = true))
                 .getOrThrow()
         }
+
+        action<AllScheduleAction.OnScheduleItemMoved> { (action, before) ->
+            println("HHHH ${action.fromPosition} ${action.toPosition}")
+        }
     }
     anyState {
         action<AllScheduleAction.ScheduleElementsLoaded> { (action) ->

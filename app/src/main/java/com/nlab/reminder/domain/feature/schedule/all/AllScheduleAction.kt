@@ -64,4 +64,7 @@ sealed interface AllScheduleAction : Action {
 
     @ContractUiAction
     object OnCompletedScheduleDeleteClicked : AllScheduleAction
+
+    @ContractUiAction
+    data class OnScheduleItemMoved(val fromPosition: Int, val toPosition: Int) : AllScheduleAction
 }
