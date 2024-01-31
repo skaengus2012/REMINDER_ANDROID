@@ -57,8 +57,8 @@ class ScheduleItemTouchCallback(
     private var isLongPressDragEnabled: Boolean = false
     private var curDX: Float = 0f
     private var curContainerX: Float = 0f
-    private var curPosition: Int? = null
-    private var prevPosition: Int? = null
+    private var curSelectedPosition: Int? = null
+    private var prevSelectedPosition: Int? = null
 
     override fun isItemViewSwipeEnabled(): Boolean = isItemViewSwipeEnabled
     override fun isLongPressDragEnabled(): Boolean = isLongPressDragEnabled
@@ -142,7 +142,7 @@ class ScheduleItemTouchCallback(
         viewHolder: ViewHolder
     ) = withSupportType(viewHolder) {
         curDX = 0f
-        prevPosition = viewHolder.bindingAdapterPosition
+        prevSelectedPosition = viewHolder.absoluteAdapterPosition
         getDefaultUIUtil().clearView(binding.swipeView)
         itemMoveListener.onItemMoveEnded()
     }
@@ -152,7 +152,7 @@ class ScheduleItemTouchCallback(
         actionState: Int
     ) = withSupportType(viewHolder) {
         if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
-            curPosition = bindingAdapterPosition
+            curSelectedPosition = absoluteAdapterPosition
         }
         getDefaultUIUtil().onSelected(/* view=*/ binding.swipeView)
     }
@@ -197,17 +197,17 @@ class ScheduleItemTouchCallback(
     }
 
     private fun removePreviousSwipeClamp(recyclerView: RecyclerView) {
-        if (curPosition == prevPosition) return
+        if (curSelectedPosition == prevSelectedPosition) return
 
-        removeSwipeClampInternal(recyclerView, prevPosition)
-        prevPosition = null
+        removeSwipeClampInternal(recyclerView, prevSelectedPosition)
+        prevSelectedPosition = null
     }
 
     fun removeSwipeClamp(recyclerView: RecyclerView) {
-        removeSwipeClampInternal(recyclerView, prevPosition)
-        removeSwipeClampInternal(recyclerView, curPosition)
-        prevPosition = null
-        curPosition = null
+        removeSwipeClampInternal(recyclerView, prevSelectedPosition)
+        removeSwipeClampInternal(recyclerView, curSelectedPosition)
+        prevSelectedPosition = null
+        curSelectedPosition = null
     }
 
     fun clearResource() {
@@ -215,8 +215,8 @@ class ScheduleItemTouchCallback(
         disposeSwipeClearedAnimations.clear()
         disposeScaleAnimation?.cancel()
         disposeScaleAnimation = null
-        prevPosition = null
-        curPosition = null
+        prevSelectedPosition = null
+        curSelectedPosition = null
         curContainerX = 0f
         curDX = 0f
     }

@@ -25,13 +25,17 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_DRAGGING
+import androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_IDLE
 import com.nlab.reminder.R
 import com.nlab.reminder.core.android.fragment.viewLifecycle
 import com.nlab.reminder.core.android.fragment.viewLifecycleScope
 import com.nlab.reminder.core.android.recyclerview.SingleItemAdapter
+import com.nlab.reminder.core.android.recyclerview.scrollState
 import com.nlab.reminder.core.android.recyclerview.suspendSubmitList
 import com.nlab.reminder.core.android.view.throttleClicks
 import com.nlab.reminder.core.android.view.touches
+import com.nlab.reminder.core.kotlin.coroutine.flow.withBefore
 import com.nlab.reminder.core.schedule.view.ScheduleItemAdapter
 import com.nlab.reminder.core.schedule.view.ScheduleItemTouchCallback
 import com.nlab.reminder.databinding.FragmentAllScheduleBinding
@@ -71,6 +75,7 @@ class AllScheduleFragment : Fragment() {
             itemMoveListener = scheduleItemAdapter
         )
         itemTouchCallback.isLongPressDragEnabled = true
+        itemTouchCallback.isItemViewSwipeEnabled = true
 
         scheduleItemAdapter.itemEvent
             .filterIsInstance<ScheduleItemAdapter.ItemEvent.OnCompleteClicked>()
@@ -87,15 +92,10 @@ class AllScheduleFragment : Fragment() {
             .onEach { viewModel.onScheduleLinkClicked(it.position) }
             .launchIn(viewLifecycleScope)
 
-        scheduleItemAdapter.itemEvent
-            .filterIsInstance<ScheduleItemAdapter.ItemEvent.OnItemMoveEnded>()
-            .onEach {  }
-            .launchIn(viewLifecycleScope)
-
         binding.recyclerviewContent.apply {
             itemAnimator = ScheduleItemAnimator()
             adapter = ConcatAdapter(
-                SingleItemAdapter(R.layout.view_item_empty),
+                SingleItemAdapter(R.layout.view_item_empty), // Removing the header causes scrolling problems when completing the first item.
                 scheduleItemAdapter
             )
             ItemTouchHelper(itemTouchCallback).attachToRecyclerView(/* recyclerView=*/ this)
@@ -105,6 +105,20 @@ class AllScheduleFragment : Fragment() {
             .map { it.x }
             .distinctUntilChanged()
             .onEach { itemTouchCallback.setContainerX(it) }
+            .launchIn(viewLifecycleScope)
+
+        merge(
+            binding.recyclerviewContent
+                .scrollState()
+                .distinctUntilChanged()
+                .withBefore(SCROLL_STATE_IDLE)
+                .filter { (prev, cur) -> prev == SCROLL_STATE_IDLE && cur == SCROLL_STATE_DRAGGING },
+            viewModel.loadedUiState
+                .distinctUntilChanged()
+                .flowOn(Dispatchers.Default)
+                .flowWithLifecycle(viewLifecycle)
+        )
+            .onEach { itemTouchCallback.removeSwipeClamp(binding.recyclerviewContent) }
             .launchIn(viewLifecycleScope)
 
         binding.buttonCompletedScheduleShownToggle
