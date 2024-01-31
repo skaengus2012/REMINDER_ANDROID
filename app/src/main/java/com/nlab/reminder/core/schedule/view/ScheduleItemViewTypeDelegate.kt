@@ -28,14 +28,16 @@ import com.nlab.reminder.databinding.ViewItemScheduleElementBinding
  */
 internal class ScheduleItemViewTypeDelegate(
     private val getItem: (position: Int) -> ScheduleItem,
-    private val onCompleteClicked: (position: Int, isComplete: Boolean) -> Unit
+    private val onCompleteClicked: (position: Int, isComplete: Boolean) -> Unit,
+    private val onLinkClicked: (position: Int) -> Unit
 ) {
     fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ScheduleItemViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
         return when (viewType) {
             R.layout.view_item_schedule_element -> ScheduleElementViewHolder(
-                ViewItemScheduleElementBinding.inflate(layoutInflater, parent, false),
-                onCompleteClicked
+                binding = ViewItemScheduleElementBinding.inflate(layoutInflater, parent, /* attachToParent=*/ false),
+                onCompleteClicked = onCompleteClicked,
+                onLinkClicked = onLinkClicked
             )
 
             else -> throw IllegalArgumentException("unsupported viewType inputted!!")

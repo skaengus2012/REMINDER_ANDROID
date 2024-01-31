@@ -41,6 +41,9 @@ class ScheduleItemAdapter(
         getItem = ::getItem,
         onCompleteClicked = { position, isComplete ->
             _itemEvent.tryEmit(ItemEvent.OnCompleteClicked(position, isComplete))
+        },
+        onLinkClicked = { position ->
+            _itemEvent.tryEmit(ItemEvent.OnLinkClicked(position))
         }
     )
     private val dragPositionHolder = DragPositionHolder()
@@ -107,6 +110,7 @@ class ScheduleItemAdapter(
 
     sealed class ItemEvent private constructor() {
         data class OnCompleteClicked(val position: Int, val isComplete: Boolean) : ItemEvent()
+        data class OnLinkClicked(val position: Int) : ItemEvent()
         data class OnItemMoveEnded(val fromPosition: Int, val toPosition: Int) : ItemEvent()
     }
 }

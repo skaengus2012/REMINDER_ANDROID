@@ -26,6 +26,7 @@ import com.nlab.statekit.expectedState
 import com.nlab.statekit.expectedStateToInit
 import com.nlab.statekit.scenario
 import com.nlab.testkit.genBoolean
+import com.nlab.testkit.genInt
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import org.junit.Test
@@ -79,10 +80,11 @@ internal class AllScheduleReducerTest {
     fun `Given schedule, When OnScheduleLinkClicked, Then link workflow added`() {
         val link = genLink()
         val schedule = genSchedule(link = link)
+        val clickedPosition = 0
 
         AllScheduleReducer().scenario()
             .initState(genAllScheduleUiStateLoaded(scheduleElements = schedule.mapToScheduleElementsAsImmutableList()))
-            .action(AllScheduleAction.OnScheduleLinkClicked(schedule.id))
+            .action(AllScheduleAction.OnScheduleLinkClicked(clickedPosition))
             .expectedStateFromInitTypeOf<AllScheduleUiState.Loaded> { initState ->
                 initState.copy(workflows = persistentListOf(AllScheduleWorkflow.LinkPage(link)))
             }
@@ -92,9 +94,10 @@ internal class AllScheduleReducerTest {
     @Test
     fun `Given schedule with empty link, When OnScheduleLinkClicked, Then state not changed`() {
         val schedule = genSchedule(link = Link.EMPTY)
+        val clickedPosition = 0
         AllScheduleReducer().scenario()
             .initState(genAllScheduleUiStateLoaded(scheduleElements = schedule.mapToScheduleElementsAsImmutableList()))
-            .action(AllScheduleAction.OnScheduleLinkClicked(schedule.id))
+            .action(AllScheduleAction.OnScheduleLinkClicked(clickedPosition))
             .expectedStateToInit()
             .verify()
     }
@@ -103,7 +106,7 @@ internal class AllScheduleReducerTest {
     fun `Given empty schedule, When OnScheduleLinkClicked, Then state not changed`() {
         AllScheduleReducer().scenario()
             .initState(genAllScheduleUiStateLoaded(scheduleElements = persistentListOf()))
-            .action(AllScheduleAction.OnScheduleLinkClicked(genScheduleId()))
+            .action(AllScheduleAction.OnScheduleLinkClicked(genInt()))
             .expectedStateToInit()
             .verify()
     }

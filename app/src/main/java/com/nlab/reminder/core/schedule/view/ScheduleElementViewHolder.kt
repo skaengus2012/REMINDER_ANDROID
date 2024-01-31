@@ -33,7 +33,9 @@ import com.nlab.reminder.core.android.widget.bindText
 import com.nlab.reminder.core.data.model.isEmpty
 import com.nlab.reminder.core.schedule.model.ScheduleElement
 import com.nlab.reminder.databinding.ViewItemScheduleElementBinding
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
 
 /**
@@ -41,7 +43,8 @@ import kotlinx.coroutines.flow.onEach
  */
 internal class ScheduleElementViewHolder(
     internal val binding: ViewItemScheduleElementBinding,
-    onCompleteClicked: (position: Int, isComplete: Boolean) -> Unit
+    onCompleteClicked: (position: Int, isComplete: Boolean) -> Unit,
+    onLinkClicked: (position: Int) -> Unit
 ) : ScheduleItemViewHolder(binding.root) {
     private val linkThumbnailPlaceHolderDrawable: Drawable? = with(itemView) {
         AppCompatResources.getDrawable(context, R.drawable.ic_schedule_link_error)
@@ -52,13 +55,25 @@ internal class ScheduleElementViewHolder(
         binding.initWithLifecycleOwner { lifecycleOwner ->
             buttonComplete
                 .throttleClicks()
-                .onEach { view ->
-                    val position = bindingAdapterOptionalPosition ?: return@onEach
-                    onCompleteClicked(position, view.isSelected.not())
-                }
+                .withItemPosition()
+                .onEach { (view, position) -> onCompleteClicked(position, view.isSelected.not()) }
+                .launchIn(lifecycleOwner.lifecycleScope)
+
+            imageviewBgLinkThumbnail
+                .throttleClicks()
+                .mapToItemPosition()
+                .onEach { position -> onLinkClicked(position) }
                 .launchIn(lifecycleOwner.lifecycleScope)
         }
     }
+
+    private fun Flow<View>.withItemPosition(): Flow<Pair<View, Int>> = mapNotNull { v ->
+        val position = bindingAdapterOptionalPosition
+        if (position == null) null
+        else v to position
+    }
+
+    private fun Flow<*>.mapToItemPosition(): Flow<Int> = mapNotNull { bindingAdapterOptionalPosition }
 
     fun onBind(scheduleElement: ScheduleElement) {
         val isTitleChanged: Boolean

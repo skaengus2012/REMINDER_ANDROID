@@ -35,6 +35,7 @@ import com.nlab.reminder.core.android.view.touches
 import com.nlab.reminder.core.schedule.view.ScheduleItemAdapter
 import com.nlab.reminder.core.schedule.view.ScheduleItemTouchCallback
 import com.nlab.reminder.databinding.FragmentAllScheduleBinding
+import com.nlab.reminder.domain.common.android.navigation.navigateOpenLink
 import com.nlab.reminder.domain.common.android.view.loadingFlow
 import com.nlab.reminder.domain.common.schedule.view.ScheduleItemAnimator
 import com.nlab.reminder.domain.feature.schedule.all.*
@@ -82,6 +83,11 @@ class AllScheduleFragment : Fragment() {
             .launchIn(viewLifecycleScope)
 
         scheduleItemAdapter.itemEvent
+            .filterIsInstance<ScheduleItemAdapter.ItemEvent.OnLinkClicked>()
+            .onEach { viewModel.onScheduleLinkClicked(it.position) }
+            .launchIn(viewLifecycleScope)
+
+        scheduleItemAdapter.itemEvent
             .filterIsInstance<ScheduleItemAdapter.ItemEvent.OnItemMoveEnded>()
             .onEach {  }
             .launchIn(viewLifecycleScope)
@@ -111,8 +117,20 @@ class AllScheduleFragment : Fragment() {
             .distinctUntilChanged()
             .flowOn(Dispatchers.Default)
             .flowWithLifecycle(viewLifecycle)
-            .onEach { scheduleElements ->
-                scheduleItemAdapter.suspendSubmitList(scheduleElements)
+            .onEach { scheduleElements -> scheduleItemAdapter.suspendSubmitList(scheduleElements) }
+            .launchIn(viewLifecycleScope)
+
+        viewModel.loadedUiState
+            .mapNotNull { it.workflows.firstOrNull() }
+            .distinctUntilChanged()
+            .flowWithLifecycle(viewLifecycle)
+            .onEach { workflow ->
+                when (workflow) {
+                    is AllScheduleWorkflow.LinkPage -> {
+                        requireActivity().navigateOpenLink(workflow.link.value)
+                        viewModel.completeWorkflow(workflow)
+                    }
+                }
             }
             .launchIn(viewLifecycleScope)
 

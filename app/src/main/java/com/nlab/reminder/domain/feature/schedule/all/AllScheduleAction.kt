@@ -37,7 +37,7 @@ sealed interface AllScheduleAction : Action {
     object OnCompletedScheduleVisibilityToggleClicked : AllScheduleAction
 
     @ContractUiAction
-    data class OnScheduleLinkClicked(val id: ScheduleId) : AllScheduleAction
+    data class OnScheduleLinkClicked(val position: Int) : AllScheduleAction
 
     @ContractUiAction
     data class CompleteWorkflow(val workflow: AllScheduleWorkflow) : AllScheduleAction

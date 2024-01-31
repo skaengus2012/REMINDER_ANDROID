@@ -17,7 +17,7 @@
 package com.nlab.reminder.domain.feature.schedule.all
 
 import com.nlab.reminder.core.data.model.isEmpty
-import com.nlab.reminder.core.schedule.model.findLink
+import com.nlab.reminder.core.data.model.orEmpty
 import com.nlab.statekit.Reducer
 import com.nlab.statekit.util.buildDslReducer
 import kotlinx.collections.immutable.*
@@ -50,8 +50,7 @@ class AllScheduleReducer @Inject constructor() : DomainReducer by buildDslReduce
             before.copy(isSelectionMode = action.isSelectionMode)
         }
         action<AllScheduleAction.OnScheduleLinkClicked> { (action, before) ->
-            val link = before.scheduleElements.findLink(id = action.id)
-
+            val link = before.scheduleElements.getOrNull(action.position)?.link.orEmpty()
             if (link.isEmpty()) before
             else before.copy(workflows = before.workflows.toPersistentList() + AllScheduleWorkflow.LinkPage(link))
         }

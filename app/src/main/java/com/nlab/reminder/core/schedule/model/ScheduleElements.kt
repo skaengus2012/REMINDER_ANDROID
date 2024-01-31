@@ -16,14 +16,9 @@
 
 package com.nlab.reminder.core.schedule.model
 
-import com.nlab.reminder.core.data.model.Link
 import com.nlab.reminder.core.data.model.ScheduleId
-import com.nlab.reminder.core.data.model.orEmpty
 
 /**
  * @author thalys
  */
 fun List<ScheduleElement>.findId(position: Int): ScheduleId? = getOrNull(position)?.id
-
-fun List<ScheduleElement>.findLink(id: ScheduleId): Link =
-    find { it.id == id }?.schedule?.link.orEmpty()
