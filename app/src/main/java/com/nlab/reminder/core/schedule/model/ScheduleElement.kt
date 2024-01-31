@@ -34,4 +34,5 @@ data class ScheduleElement(
     val note: String get() = schedule.note
     val link: Link get() = schedule.link
     val isComplete: Boolean get() = schedule.isComplete
+    val visiblePriority: Long get() = schedule.visiblePriority
 }

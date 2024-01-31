@@ -72,6 +72,25 @@ class ScheduleItemAdapter(
         _itemEvent.tryEmit(ItemEvent.OnItemMoveEnded(from, to))
     }
 
+    private fun adjustRecentSwapPositions() {
+        val (from, to) = dragPositionHolder.snapshot() ?: return
+        dragPositionHolder.clearPosition()
+        notifyItemMoved(to, from)
+    }
+
+    override fun submitList(list: MutableList<ScheduleItem>?) {
+        submitList(list, null)
+    }
+
+    override fun submitList(list: MutableList<ScheduleItem>?, commitCallback: Runnable?) {
+        super.submitList(list) {
+            commitCallback?.run()
+            // When dragging the first item, there is a problem that the scroll moves.
+            // No problem after adding this logic
+            adjustRecentSwapPositions()
+        }
+    }
+
     /**
     override fun calculateDraggedSnapshot(): DragSnapshot<ScheduleItem> =
         draggableAdapterDelegate.calculateDraggedSnapshot()
@@ -88,6 +107,6 @@ class ScheduleItemAdapter(
 
     sealed class ItemEvent private constructor() {
         data class OnCompleteClicked(val position: Int, val isComplete: Boolean) : ItemEvent()
-        data class OnItemMoveEnded(val fromPosition: Int, val toPosition: Int) : ItemEvent() // todo 구현
+        data class OnItemMoveEnded(val fromPosition: Int, val toPosition: Int) : ItemEvent()
     }
 }

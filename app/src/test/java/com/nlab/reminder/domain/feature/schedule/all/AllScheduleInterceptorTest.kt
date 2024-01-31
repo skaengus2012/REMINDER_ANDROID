@@ -24,6 +24,8 @@ import com.nlab.reminder.core.data.model.genSchedules
 import com.nlab.reminder.core.data.repository.CompletedScheduleShownRepository
 import com.nlab.reminder.core.data.repository.ScheduleDeleteRequest
 import com.nlab.reminder.core.data.repository.ScheduleRepository
+import com.nlab.reminder.core.data.repository.ScheduleUpdateRequest
+import com.nlab.reminder.core.domain.CalculateItemSwapResultUseCase
 import com.nlab.reminder.core.domain.CompleteScheduleWithIdsUseCase
 import com.nlab.reminder.core.domain.CompleteScheduleWithMarkUseCase
 import com.nlab.reminder.core.domain.FetchLinkMetadataUseCase
@@ -159,6 +161,52 @@ internal class AllScheduleInterceptorTest {
     }
 
     @Test
+    fun `Given state Loaded, When OnScheduleItemMoved and swap result was empty, scheduleRepository never called`() = runTest {
+        val schedules = genSchedules()
+        val items = schedules.mapToScheduleElementsAsImmutableList()
+        val from = genInt(min = 0, max = items.size - 1)
+        val to = genInt(min = 0, max = items.size - 1)
+        val useCase: CalculateItemSwapResultUseCase = mock {
+            whenever(mock(items, from, to)) doReturn emptyList()
+        }
+        val scheduleRepository: ScheduleRepository = mock()
+        genInterceptor(scheduleRepository = scheduleRepository, calculateItemSwapResult = useCase)
+            .scenario()
+            .initState(genAllScheduleUiStateLoaded(scheduleElements = items))
+            .action(AllScheduleAction.OnScheduleItemMoved(from, to))
+            .dispatchIn(testScope = this)
+        verify(scheduleRepository, never()).update(any())
+    }
+
+    @Test
+    fun `Given state Loaded, When OnScheduleItemMoved, scheduleRepository call updated`() = runTest {
+        val schedules = List(10) { index ->
+            val indexToLong = index.toLong()
+            genSchedule(scheduleId = genScheduleId(indexToLong), visiblePriority = indexToLong)
+        }
+        val from = 2
+        val to = 4
+        val items = schedules.mapToScheduleElementsAsImmutableList()
+        val fakeSwapResult = items.subList(from, to)
+        val useCase: CalculateItemSwapResultUseCase = mock {
+            whenever(mock(items, 2, 4)) doReturn fakeSwapResult
+        }
+        val scheduleRepository: ScheduleRepository = mock {
+            whenever(mock.update(any())) doReturn Result.Success(Unit)
+        }
+        genInterceptor(scheduleRepository = scheduleRepository, calculateItemSwapResult = useCase)
+            .scenario()
+            .initState(genAllScheduleUiStateLoaded(scheduleElements = items))
+            .action(AllScheduleAction.OnScheduleItemMoved(from, to))
+            .dispatchIn(testScope = this)
+        verify(scheduleRepository, once()).update(
+            request = fakeSwapResult
+                .associateBy({ it.id }, { it.visiblePriority })
+                .let(ScheduleUpdateRequest::VisiblePriority)
+        )
+    }
+
+    @Test
     fun `Given any state, When ScheduleLoaded, Then fetchLinkMetadata invoked`() = runTest {
         val useCase: FetchLinkMetadataUseCase = mock()
         genInterceptor(fetchLinkMetadata = useCase)
@@ -176,10 +224,12 @@ private fun genInterceptor(
     completeScheduleWithMark: CompleteScheduleWithMarkUseCase = mock(),
     completeScheduleWithIds: CompleteScheduleWithIdsUseCase = mock(),
     fetchLinkMetadata: FetchLinkMetadataUseCase = mock(),
+    calculateItemSwapResult: CalculateItemSwapResultUseCase = mock()
 ): AllScheduleInterceptor = AllScheduleInterceptor(
     scheduleRepository = scheduleRepository,
     completedScheduleShownRepository = completedScheduleShownRepository,
     completeScheduleWithMark = completeScheduleWithMark,
     completeScheduleWithIds = completeScheduleWithIds,
-    fetchLinkMetadata = fetchLinkMetadata
+    fetchLinkMetadata = fetchLinkMetadata,
+    calculateItemSwapResult = calculateItemSwapResult
 )

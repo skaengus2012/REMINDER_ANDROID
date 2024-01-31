@@ -16,11 +16,14 @@
 
 package com.nlab.reminder.domain.feature.schedule.all
 
+import com.nlab.reminder.core.kotlin.collection.minOf
 import com.nlab.reminder.core.kotlin.util.getOrThrow
 import com.nlab.reminder.core.data.repository.AllScheduleData
 import com.nlab.reminder.core.data.repository.CompletedScheduleShownRepository
 import com.nlab.reminder.core.data.repository.ScheduleDeleteRequest
 import com.nlab.reminder.core.data.repository.ScheduleRepository
+import com.nlab.reminder.core.data.repository.ScheduleUpdateRequest
+import com.nlab.reminder.core.domain.CalculateItemSwapResultUseCase
 import com.nlab.reminder.core.domain.CompleteScheduleWithIdsUseCase
 import com.nlab.reminder.core.domain.CompleteScheduleWithMarkUseCase
 import com.nlab.reminder.core.domain.FetchLinkMetadataUseCase
@@ -38,6 +41,7 @@ class AllScheduleInterceptor @Inject constructor(
     completeScheduleWithMark: CompleteScheduleWithMarkUseCase,
     completeScheduleWithIds: CompleteScheduleWithIdsUseCase,
     fetchLinkMetadata: FetchLinkMetadataUseCase,
+    calculateItemSwapResult: CalculateItemSwapResultUseCase
 ) : Interceptor<AllScheduleAction, AllScheduleUiState> by buildDslInterceptor(defineDSL = {
     state<AllScheduleUiState.Loaded> {
         action<AllScheduleAction.OnCompletedScheduleVisibilityToggleClicked> { (_, before) ->
@@ -70,7 +74,21 @@ class AllScheduleInterceptor @Inject constructor(
         }
 
         action<AllScheduleAction.OnScheduleItemMoved> { (action, before) ->
-            println("HHHH ${action.fromPosition} ${action.toPosition}")
+            val swapResult = calculateItemSwapResult(
+                items = before.scheduleElements,
+                fromPosition = action.fromPosition,
+                toPosition = action.toPosition
+            )
+            if (swapResult.isEmpty()) return@action
+
+            val minVisiblePriority = swapResult.minOf { it.visiblePriority }
+            scheduleRepository
+                .update(ScheduleUpdateRequest.VisiblePriority(buildMap {
+                    swapResult.forEachIndexed { index, scheduleElement ->
+                        this[scheduleElement.id] = minVisiblePriority + index
+                    }
+                }))
+                .getOrThrow()
         }
     }
     anyState {

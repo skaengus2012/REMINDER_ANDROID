@@ -16,11 +16,13 @@
 
 package com.nlab.reminder.core.domain
 
+import dagger.Reusable
 import javax.inject.Inject
 
 /**
  * @author Doohyun
  */
+@Reusable
 class CalculateItemSwapResultUseCase @Inject constructor() {
     /**
      * Returns only the part of the swap of items from [fromPosition] and [toPosition] in [items].
