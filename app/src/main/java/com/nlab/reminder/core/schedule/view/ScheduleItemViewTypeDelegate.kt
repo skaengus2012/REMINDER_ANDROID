@@ -22,12 +22,14 @@ import com.nlab.reminder.R
 import com.nlab.reminder.core.schedule.model.ScheduleElement
 import com.nlab.reminder.core.schedule.model.ScheduleItem
 import com.nlab.reminder.databinding.ViewItemScheduleElementBinding
+import kotlinx.coroutines.flow.Flow
 
 /**
  * @author Doohyun
  */
 internal class ScheduleItemViewTypeDelegate(
     private val getItem: (position: Int) -> ScheduleItem,
+    private val selectionEnabled: Flow<Boolean>,
     private val onCompleteClicked: (position: Int, isComplete: Boolean) -> Unit,
     private val onDeleteClicked: (position: Int) -> Unit,
     private val onLinkClicked: (position: Int) -> Unit
@@ -37,6 +39,7 @@ internal class ScheduleItemViewTypeDelegate(
         return when (viewType) {
             R.layout.view_item_schedule_element -> ScheduleElementViewHolder(
                 binding = ViewItemScheduleElementBinding.inflate(layoutInflater, parent, /* attachToParent=*/ false),
+                selectionEnabled = selectionEnabled,
                 onCompleteClicked = onCompleteClicked,
                 onDeleteClicked = onDeleteClicked,
                 onLinkClicked = onLinkClicked

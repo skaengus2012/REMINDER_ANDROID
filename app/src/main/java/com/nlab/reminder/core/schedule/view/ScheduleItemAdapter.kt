@@ -24,7 +24,9 @@ import com.nlab.reminder.core.schedule.model.ScheduleItem
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 /**
  * @author Doohyun
@@ -37,8 +39,10 @@ class ScheduleItemAdapter(
     private val _itemEvent = MutableSharedFlow<ItemEvent>(
         extraBufferCapacity = 10, onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
+    private val selectionEnabled = MutableStateFlow(false)
     private val viewTypeAdapterDelegate = ScheduleItemViewTypeDelegate(
         getItem = ::getItem,
+        selectionEnabled = selectionEnabled.asStateFlow(),
         onCompleteClicked = { position, isComplete ->
             _itemEvent.tryEmit(ItemEvent.OnCompleteClicked(position, isComplete))
         },
@@ -91,6 +95,10 @@ class ScheduleItemAdapter(
             // No problem after adding this logic
             adjustRecentSwapPositions()
         }
+    }
+
+    fun selectionEnabled(enabled: Boolean) {
+        selectionEnabled.value = enabled
     }
 
     /**

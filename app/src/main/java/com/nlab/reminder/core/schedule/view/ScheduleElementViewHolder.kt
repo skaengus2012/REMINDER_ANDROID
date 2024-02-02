@@ -21,12 +21,17 @@ import android.graphics.drawable.Drawable
 import android.view.View
 import android.widget.ImageView
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.graphics.drawable.DrawableCompat
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.transition.AutoTransition
+import androidx.transition.TransitionManager
 import com.bumptech.glide.Glide
 import com.nlab.reminder.R
 import com.nlab.reminder.core.android.content.getThemeColor
 import com.nlab.reminder.core.android.recyclerview.bindingAdapterOptionalPosition
+import com.nlab.reminder.core.android.transition.transitionListenerOf
 import com.nlab.reminder.core.android.view.initWithLifecycleOwner
 import com.nlab.reminder.core.android.view.throttleClicks
 import com.nlab.reminder.core.android.widget.bindSelected
@@ -44,6 +49,7 @@ import kotlinx.coroutines.flow.onEach
  */
 internal class ScheduleElementViewHolder(
     internal val binding: ViewItemScheduleElementBinding,
+    selectionEnabled: Flow<Boolean>,
     onCompleteClicked: (position: Int, isComplete: Boolean) -> Unit,
     onDeleteClicked: (position: Int) -> Unit,
     onLinkClicked: (position: Int) -> Unit
@@ -53,6 +59,11 @@ internal class ScheduleElementViewHolder(
             ?.let(DrawableCompat::wrap)
             ?.apply { DrawableCompat.setTint(mutate(), context.getThemeColor(R.attr.tint_schedule_placeholder)) }
     }
+    private val layoutContentNormalSet: ConstraintSet =
+        ConstraintSet().apply { clone(binding.layoutContent) }
+    private val layoutContentSelectionSet: ConstraintSet =
+        ConstraintSet().apply { load(itemView.context, R.layout.view_item_schedule_element_content_selected) }
+
     init {
         binding.initWithLifecycleOwner { lifecycleOwner ->
             buttonComplete
@@ -71,6 +82,28 @@ internal class ScheduleElementViewHolder(
                 .throttleClicks()
                 .mapToItemPosition()
                 .onEach { position -> onLinkClicked(position) }
+                .launchIn(lifecycleOwner.lifecycleScope)
+
+            selectionEnabled
+                .flowWithLifecycle(lifecycleOwner.lifecycle)
+                .onEach { isSelectionMode -> buttonSelection.isEnabled = isSelectionMode }
+                .onEach { isSelectionMode -> buttonComplete.isEnabled = isSelectionMode.not() }
+                .onEach { isSelectionMode ->
+                    TransitionManager.beginDelayedTransition(
+                        layoutContent,
+                        AutoTransition().apply {
+                            duration = 300
+                            addListener(transitionListenerOf(
+                                onStart = { layoutDelete.visibility = View.INVISIBLE },
+                                onEnd = { layoutDelete.visibility = View.VISIBLE },
+                                onCancel = { layoutDelete.visibility = View.VISIBLE }
+                            ))
+                        }
+                    )
+                    val applyConstraintSet: ConstraintSet =
+                        if (isSelectionMode) layoutContentSelectionSet else layoutContentNormalSet
+                    applyConstraintSet.applyTo(layoutContent)
+                }
                 .launchIn(lifecycleOwner.lifecycleScope)
         }
     }

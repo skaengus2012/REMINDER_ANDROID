@@ -185,6 +185,7 @@ class AllScheduleFragment : Fragment() {
                     else R.string.schedule_selection_mode_on
                 )
             }
+            .onEach { isSelectionMode -> scheduleItemAdapter.selectionEnabled(isSelectionMode) }
             .map { it.not() }
             .onEach { isNotSelectionMode ->
                 itemTouchCallback.isItemViewSwipeEnabled = isNotSelectionMode

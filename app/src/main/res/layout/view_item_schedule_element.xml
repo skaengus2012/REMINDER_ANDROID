@@ -71,6 +71,13 @@
             app:layout_constraintGuide_begin="@dimen/schedule_checkbox_touchable_size" />
 
         <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline_textStartCompleteSelection"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            app:layout_constraintGuide_begin="@dimen/schedule_checkbox_touchable_size_2x" />
+
+        <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline_textEnd"
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -91,6 +98,33 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="ContentDescription"
             tools:src="@drawable/checkbox_schedule_checked" />
+
+        <ImageButton
+            android:id="@+id/button_selection"
+            android:layout_width="@dimen/schedule_checkbox_touchable_size"
+            android:layout_height="@dimen/schedule_checkbox_touchable_size"
+            android:alpha="0.5"
+            android:background="@android:color/transparent"
+            android:padding="16dp"
+            android:scaleType="fitXY"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/button_complete"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/checkbox_schedule_selection"
+            tools:ignore="ContentDescription" />
+
+        <View
+            android:id="@+id/view_button_complete_hidden"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="?android:windowBackground"
+            android:clickable="false"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@id/guideline_textStartCompleteSelection"
+            app:layout_constraintStart_toStartOf="@id/guideline_textStart"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/layout_data_holder"
