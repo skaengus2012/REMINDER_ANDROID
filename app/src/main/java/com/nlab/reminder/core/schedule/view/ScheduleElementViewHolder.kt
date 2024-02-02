@@ -19,6 +19,7 @@ package com.nlab.reminder.core.schedule.view
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.view.View
+import android.widget.ImageView
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.lifecycle.lifecycleScope
@@ -106,14 +107,7 @@ internal class ScheduleElementViewHolder(
         binding.imageviewBgLinkThumbnail.apply {
             val linkMetadataImage = scheduleElement.linkMetadata?.imageUrl
             visibility = if (linkMetadataImage.isNullOrBlank()) View.GONE else View.VISIBLE
-            Glide.with(context)
-                .load(linkMetadataImage)
-                .override(1000, 400)
-                .dontTransform()
-                .optionalCenterCrop()
-                .placeholder(linkThumbnailPlaceHolderDrawable)
-                .error(linkThumbnailPlaceHolderDrawable)
-                .into(this)
+            bindLinkMetadataImage(linkMetadataImage, linkThumbnailPlaceHolderDrawable)
         }
     }
 }
@@ -124,3 +118,18 @@ private fun ScheduleElement.completeButtonDescription(context: Context): String 
         else R.string.schedule_complete_checkbox_contentDescription,
         title
     )
+
+private fun ImageView.bindLinkMetadataImage(newImage: String?, placeHolder: Drawable?) {
+    val oldImage: String? = tag as? String
+    if (oldImage == newImage) return
+    tag = newImage
+
+    Glide.with(context)
+        .load(newImage)
+        .override(1000, 400)
+        .dontTransform()
+        .optionalCenterCrop()
+        .placeholder(placeHolder)
+        .error(placeHolder)
+        .into(/* view= */this)
+}
