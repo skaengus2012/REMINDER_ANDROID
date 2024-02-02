@@ -87,18 +87,30 @@ internal class AllScheduleInterceptorTest {
 
     @Test
     fun `Given State Loaded, When OnScheduleDeleteClicked, Then Repository called delete`() = runTest {
-        val scheduleId = genScheduleId()
-        val repositoryDeleteRequest = ScheduleDeleteRequest.ById(scheduleId)
+        val schedule = genSchedule()
+        val repositoryDeleteRequest = ScheduleDeleteRequest.ById(schedule.id)
         val scheduleRepository: ScheduleRepository = mock {
             whenever(mock.delete(repositoryDeleteRequest)) doReturn Result.Success(Unit)
         }
-
         genInterceptor(scheduleRepository = scheduleRepository)
             .scenario()
-            .initState(genAllScheduleUiStateLoaded())
-            .action(AllScheduleAction.OnScheduleDeleteClicked(scheduleId))
+            .initState(genAllScheduleUiStateLoaded(scheduleElements = schedule.mapToScheduleElementsAsImmutableList()))
+            .action(AllScheduleAction.OnScheduleDeleteClicked(position = 0))
             .dispatchIn(testScope = this)
         verify(scheduleRepository, once()).delete(repositoryDeleteRequest)
+    }
+
+    @Test
+    fun `Given State Loaded with empty schedules, When OnScheduleDeleteClicked, Then Repository never called`() = runTest {
+        val scheduleRepository: ScheduleRepository = mock {
+            whenever(mock.delete(any())) doReturn Result.Success(Unit)
+        }
+        genInterceptor(scheduleRepository = scheduleRepository)
+            .scenario()
+            .initState(genAllScheduleUiStateLoaded(scheduleElements = persistentListOf()))
+            .action(AllScheduleAction.OnScheduleDeleteClicked(position = 0))
+            .dispatchIn(testScope = this)
+        verify(scheduleRepository, never()).delete(any())
     }
 
     @Test

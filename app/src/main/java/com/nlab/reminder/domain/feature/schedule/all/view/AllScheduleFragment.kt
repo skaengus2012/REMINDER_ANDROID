@@ -22,6 +22,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -30,6 +31,8 @@ import androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_IDLE
 import com.nlab.reminder.R
 import com.nlab.reminder.core.android.fragment.viewLifecycle
 import com.nlab.reminder.core.android.fragment.viewLifecycleScope
+import com.nlab.reminder.core.android.lifecycle.event
+import com.nlab.reminder.core.android.lifecycle.filterLifecycleEvent
 import com.nlab.reminder.core.android.recyclerview.SingleItemAdapter
 import com.nlab.reminder.core.android.recyclerview.scrollState
 import com.nlab.reminder.core.android.recyclerview.suspendSubmitList
@@ -75,6 +78,11 @@ class AllScheduleFragment : Fragment() {
             itemMoveListener = scheduleItemAdapter
         )
 
+        viewLifecycle.event()
+            .filterLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+            .onEach { itemTouchCallback.clearResource() }
+            .launchIn(viewLifecycleScope)
+
         scheduleItemAdapter.itemEvent
             .filterIsInstance<ScheduleItemAdapter.ItemEvent.OnCompleteClicked>()
             .onEach { (position, isComplete) -> viewModel.onScheduleCompleteClicked(position, isComplete) }
@@ -88,6 +96,12 @@ class AllScheduleFragment : Fragment() {
         scheduleItemAdapter.itemEvent
             .filterIsInstance<ScheduleItemAdapter.ItemEvent.OnLinkClicked>()
             .onEach { viewModel.onScheduleLinkClicked(it.position) }
+            .launchIn(viewLifecycleScope)
+
+        scheduleItemAdapter.itemEvent
+            .filterIsInstance<ScheduleItemAdapter.ItemEvent.OnDeleteClicked>()
+            .onEach { itemTouchCallback.removeSwipeClamp(binding.recyclerviewContent) }
+            .onEach { viewModel.onScheduleDeleteClicked(it.position) }
             .launchIn(viewLifecycleScope)
 
         binding.recyclerviewContent.apply {

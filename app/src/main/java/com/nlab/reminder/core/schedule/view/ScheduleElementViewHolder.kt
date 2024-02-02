@@ -44,6 +44,7 @@ import kotlinx.coroutines.flow.onEach
 internal class ScheduleElementViewHolder(
     internal val binding: ViewItemScheduleElementBinding,
     onCompleteClicked: (position: Int, isComplete: Boolean) -> Unit,
+    onDeleteClicked: (position: Int) -> Unit,
     onLinkClicked: (position: Int) -> Unit
 ) : ScheduleItemViewHolder(binding.root) {
     private val linkThumbnailPlaceHolderDrawable: Drawable? = with(itemView) {
@@ -57,6 +58,12 @@ internal class ScheduleElementViewHolder(
                 .throttleClicks()
                 .withItemPosition()
                 .onEach { (view, position) -> onCompleteClicked(position, view.isSelected.not()) }
+                .launchIn(lifecycleOwner.lifecycleScope)
+
+            layoutDelete
+                .throttleClicks()
+                .mapToItemPosition()
+                .onEach { position -> onDeleteClicked(position) }
                 .launchIn(lifecycleOwner.lifecycleScope)
 
             imageviewBgLinkThumbnail

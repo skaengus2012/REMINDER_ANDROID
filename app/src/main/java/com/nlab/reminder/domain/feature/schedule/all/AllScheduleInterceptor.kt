@@ -16,6 +16,7 @@
 
 package com.nlab.reminder.domain.feature.schedule.all
 
+import com.nlab.reminder.core.data.model.ScheduleId
 import com.nlab.reminder.core.kotlin.collection.minOf
 import com.nlab.reminder.core.kotlin.util.getOrThrow
 import com.nlab.reminder.core.data.repository.AllScheduleData
@@ -60,8 +61,10 @@ class AllScheduleInterceptor @Inject constructor(
         action<AllScheduleAction.OnSelectedSchedulesCompleteClicked> { (action) ->
             completeScheduleWithIds(action.ids, action.isComplete)
         }
-        action<AllScheduleAction.OnScheduleDeleteClicked> { (action) ->
-            scheduleRepository.delete(ScheduleDeleteRequest.ById(action.id))
+        action<AllScheduleAction.OnScheduleDeleteClicked> { (action, before) ->
+            val scheduleId: ScheduleId = before.scheduleElements.getOrNull(action.position)?.id ?: return@action
+            scheduleRepository
+                .delete(ScheduleDeleteRequest.ById(scheduleId))
                 .getOrThrow()
         }
         action<AllScheduleAction.OnSelectedSchedulesDeleteClicked> { (action) ->

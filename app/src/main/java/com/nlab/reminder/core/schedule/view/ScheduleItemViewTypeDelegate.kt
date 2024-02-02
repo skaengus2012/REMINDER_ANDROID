@@ -29,6 +29,7 @@ import com.nlab.reminder.databinding.ViewItemScheduleElementBinding
 internal class ScheduleItemViewTypeDelegate(
     private val getItem: (position: Int) -> ScheduleItem,
     private val onCompleteClicked: (position: Int, isComplete: Boolean) -> Unit,
+    private val onDeleteClicked: (position: Int) -> Unit,
     private val onLinkClicked: (position: Int) -> Unit
 ) {
     fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ScheduleItemViewHolder {
@@ -37,6 +38,7 @@ internal class ScheduleItemViewTypeDelegate(
             R.layout.view_item_schedule_element -> ScheduleElementViewHolder(
                 binding = ViewItemScheduleElementBinding.inflate(layoutInflater, parent, /* attachToParent=*/ false),
                 onCompleteClicked = onCompleteClicked,
+                onDeleteClicked = onDeleteClicked,
                 onLinkClicked = onLinkClicked
             )
 
