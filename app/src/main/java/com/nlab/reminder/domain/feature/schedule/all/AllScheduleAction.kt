@@ -31,7 +31,7 @@ sealed interface AllScheduleAction : Action {
     ) : AllScheduleAction
 
     @ContractUiAction
-    data class OnSelectionModeUpdateClicked(val isSelectionMode: Boolean) : AllScheduleAction
+    object OnSelectionModeToggleClicked : AllScheduleAction
 
     @ContractUiAction
     object OnCompletedScheduleVisibilityToggleClicked : AllScheduleAction

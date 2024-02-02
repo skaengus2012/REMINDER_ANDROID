@@ -66,12 +66,12 @@ internal class AllScheduleReducerTest {
     }
 
     @Test
-    fun `Update selection mode, when selectionMode enabled clicked`() {
+    fun `Update selection mode, when selectionMode toggle clicked`() {
         val expectedSelectionMode: Boolean = genBoolean()
 
         AllScheduleReducer().scenario()
             .initState(genAllScheduleUiStateLoaded(isSelectionMode = expectedSelectionMode.not()))
-            .action(AllScheduleAction.OnSelectionModeUpdateClicked(expectedSelectionMode))
+            .action(AllScheduleAction.OnSelectionModeToggleClicked)
             .expectedStateFromInitTypeOf<AllScheduleUiState.Loaded> { it.copy(isSelectionMode = expectedSelectionMode) }
             .verify()
     }

@@ -74,8 +74,6 @@ class AllScheduleFragment : Fragment() {
             context = requireContext(),
             itemMoveListener = scheduleItemAdapter
         )
-        itemTouchCallback.isLongPressDragEnabled = true
-        itemTouchCallback.isItemViewSwipeEnabled = true
 
         scheduleItemAdapter.itemEvent
             .filterIsInstance<ScheduleItemAdapter.ItemEvent.OnCompleteClicked>()
@@ -126,6 +124,11 @@ class AllScheduleFragment : Fragment() {
             .onEach { viewModel.onCompletedScheduleVisibilityToggleClicked() }
             .launchIn(viewLifecycleScope)
 
+        binding.buttonSelectionModeOnOff
+            .throttleClicks()
+            .onEach { viewModel.onSelectionModeToggleClicked() }
+            .launchIn(viewLifecycleScope)
+
         viewModel.loadedUiState
             .map { it.scheduleElements }
             .distinctUntilChanged()
@@ -156,6 +159,23 @@ class AllScheduleFragment : Fragment() {
             .distinctUntilChanged()
             .flowWithLifecycle(viewLifecycle)
             .onEach(binding.buttonCompletedScheduleShownToggle::setText)
+            .launchIn(viewLifecycleScope)
+
+        viewModel.loadedUiState
+            .map { it.isSelectionMode }
+            .distinctUntilChanged()
+            .flowWithLifecycle(viewLifecycle)
+            .onEach { isSelectionMode ->
+                binding.buttonSelectionModeOnOff.setText(
+                    if (isSelectionMode) R.string.schedule_selection_mode_off
+                    else R.string.schedule_selection_mode_on
+                )
+            }
+            .map { it.not() }
+            .onEach { isNotSelectionMode ->
+                itemTouchCallback.isItemViewSwipeEnabled = isNotSelectionMode
+                itemTouchCallback.isLongPressDragEnabled = isNotSelectionMode
+            }
             .launchIn(viewLifecycleScope)
 
         merge(

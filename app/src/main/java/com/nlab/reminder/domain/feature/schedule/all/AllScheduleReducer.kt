@@ -46,8 +46,8 @@ class AllScheduleReducer @Inject constructor() : DomainReducer by buildDslReduce
         }
     }
     state<AllScheduleUiState.Loaded> {
-        action<AllScheduleAction.OnSelectionModeUpdateClicked> { (action, before) ->
-            before.copy(isSelectionMode = action.isSelectionMode)
+        action<AllScheduleAction.OnSelectionModeToggleClicked> { (_, before) ->
+            before.copy(isSelectionMode = before.isSelectionMode.not())
         }
         action<AllScheduleAction.OnScheduleLinkClicked> { (action, before) ->
             val link = before.scheduleElements.getOrNull(action.position)?.link.orEmpty()
