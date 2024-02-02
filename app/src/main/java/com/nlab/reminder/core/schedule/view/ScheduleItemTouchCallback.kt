@@ -70,7 +70,7 @@ class ScheduleItemTouchCallback(
     // nothing.
     override fun onSwiped(viewHolder: ViewHolder, direction: Int) = Unit
 
-    override fun getSwipeEscapeVelocity(defaultValue: Float): Float = defaultValue * 10
+    override fun getSwipeEscapeVelocity(defaultValue: Float): Float = defaultValue * 20
 
     override fun getSwipeThreshold(viewHolder: ViewHolder): Float {
         viewHolder.isClamped = curDX <= -clampWidth
