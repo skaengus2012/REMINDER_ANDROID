@@ -27,10 +27,10 @@ import javax.inject.Inject
 /**
  * @author thalys
  */
-class ScheduleSelectionRepository @Inject constructor() {
+class ScheduleSelectedIdRepository @Inject constructor() {
     private val selectedIds = MutableStateFlow(persistentHashSetOf<ScheduleId>())
 
-    fun getSelectedIdsStream(): StateFlow<Set<ScheduleId>> = selectedIds.asStateFlow()
+    fun getStream(): StateFlow<Set<ScheduleId>> = selectedIds.asStateFlow()
 
     fun selected(id: ScheduleId) {
         selectedIds.update { it.add(id) }

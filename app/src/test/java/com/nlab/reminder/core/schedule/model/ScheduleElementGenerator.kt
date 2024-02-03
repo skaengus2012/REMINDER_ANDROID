@@ -32,19 +32,23 @@ import kotlinx.collections.immutable.toImmutableList
 fun genScheduleElement(
     schedule: Schedule = genSchedule(),
     isCompleteMarked: Boolean = genBoolean(),
-    linkMetadata: LinkMetadata? = genLinkMetadata()
-) = ScheduleElement(schedule, isCompleteMarked, linkMetadata)
+    linkMetadata: LinkMetadata? = genLinkMetadata(),
+    isSelected: Boolean = genBoolean()
+) = ScheduleElement(schedule, isCompleteMarked, linkMetadata, isSelected)
 
 fun genScheduleElements(size: Int = genInt(min = 2, max = 10)): List<ScheduleElement> =
     List(size) { genScheduleElement() }
 
 fun Schedule.mapToScheduleElementsAsImmutableList(
     isCompleteMarked: Boolean = genBoolean(),
-    linkMetadata: LinkMetadata? = genLinkMetadata()
+    linkMetadata: LinkMetadata? = genLinkMetadata(),
+    isSelected: Boolean = genBoolean()
 ): ImmutableList<ScheduleElement> =
-    persistentListOf(genScheduleElement(schedule = this, isCompleteMarked, linkMetadata))
+    persistentListOf(genScheduleElement(schedule = this, isCompleteMarked, linkMetadata, isSelected))
 
 fun List<Schedule>.mapToScheduleElementsAsImmutableList(
     isCompleteMarked: Boolean = genBoolean(),
-    linkMetadata: LinkMetadata? = genLinkMetadata()
-): ImmutableList<ScheduleElement> = map { genScheduleElement(it, isCompleteMarked, linkMetadata) }.toImmutableList()
+    linkMetadata: LinkMetadata? = genLinkMetadata(),
+    isSelected: Boolean = genBoolean()
+): ImmutableList<ScheduleElement> =
+    map { genScheduleElement(it, isCompleteMarked, linkMetadata, isSelected) }.toImmutableList()

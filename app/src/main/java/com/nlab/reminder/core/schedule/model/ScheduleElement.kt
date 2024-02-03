@@ -28,6 +28,7 @@ data class ScheduleElement(
     val schedule: Schedule,
     val isCompleteMarked: Boolean,
     val linkMetadata: LinkMetadata?,
+    val isSelected: Boolean
 ) : ScheduleItem {
     val id: ScheduleId get() = schedule.id
     val title: String get() = schedule.title

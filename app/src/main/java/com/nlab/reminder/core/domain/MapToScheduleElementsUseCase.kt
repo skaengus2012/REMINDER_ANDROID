@@ -23,6 +23,7 @@ import com.nlab.reminder.core.data.model.ScheduleId
 import com.nlab.reminder.core.data.model.isEmpty
 import com.nlab.reminder.core.data.repository.LinkMetadataTableRepository
 import com.nlab.reminder.core.data.repository.ScheduleCompleteMarkRepository
+import com.nlab.reminder.core.data.repository.ScheduleSelectedIdRepository
 import com.nlab.reminder.core.schedule.model.ScheduleElement
 import com.nlab.reminder.domain.common.kotlin.coroutine.inject.DefaultDispatcher
 import dagger.hilt.android.scopes.ViewModelScoped
@@ -39,6 +40,7 @@ import javax.inject.Inject
 class MapToScheduleElementsUseCase @Inject constructor(
     private val completeMarkRepository: ScheduleCompleteMarkRepository,
     private val linkMetadataTableRepository: LinkMetadataTableRepository,
+    private val selectionRepository: ScheduleSelectedIdRepository,
     @DefaultDispatcher private val dispatcher: CoroutineDispatcher
 ) {
     operator fun invoke(
@@ -47,6 +49,7 @@ class MapToScheduleElementsUseCase @Inject constructor(
         schedulesStream,
         completeMarkRepository.getStream(),
         linkMetadataTableRepository.getStream(),
+        selectionRepository.getStream(),
         transform = ::createScheduleItems
     ).flowOn(dispatcher)
 }
@@ -54,13 +57,15 @@ class MapToScheduleElementsUseCase @Inject constructor(
 private fun createScheduleItems(
     schedules: List<Schedule>,
     completeMarkTable: Map<ScheduleId, Boolean>,
-    linkMetadataTable: LinkMetadataTable
+    linkMetadataTable: LinkMetadataTable,
+    selectedIds: Set<ScheduleId>,
 ): List<ScheduleElement> = schedules.map { schedule ->
     ScheduleElement(
         schedule,
         isCompleteMarked = completeMarkTable[schedule.id] ?: schedule.isComplete,
         linkMetadata = schedule.link
             .takeUnless(Link::isEmpty)
-            ?.let { linkMetadataTable.value[it] }
+            ?.let { linkMetadataTable.value[it] },
+        isSelected = schedule.id in selectedIds
     )
 }

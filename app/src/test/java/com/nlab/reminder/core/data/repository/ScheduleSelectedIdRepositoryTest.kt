@@ -25,15 +25,15 @@ import org.junit.Test
 /**
  * @author thalys
  */
-internal class ScheduleSelectionRepositoryTest {
+internal class ScheduleSelectedIdRepositoryTest {
     @Test
     fun `When selected, Then return added id`() {
-        val repository = ScheduleSelectionRepository()
+        val repository = ScheduleSelectedIdRepository()
         val id = genScheduleId()
         repository.selected(id)
 
         assertThat(
-            repository.getSelectedIdsStream().value,
+            repository.getStream().value,
             equalTo(setOf(id))
         )
     }
@@ -41,14 +41,14 @@ internal class ScheduleSelectionRepositoryTest {
     @Test
     fun `When unselected, Then return deleted id`() {
         val ids = List(genInt(min = 2, max = 10)) { genScheduleId(it.toLong()) }
-        val repository = ScheduleSelectionRepository().apply {
+        val repository = ScheduleSelectedIdRepository().apply {
             ids.forEach { selected(it) }
         }
         val deleteTarget = ids.first()
 
         repository.unselected(deleteTarget)
         assertThat(
-            repository.getSelectedIdsStream().value,
+            repository.getStream().value,
             equalTo(ids.subList(1, ids.size).toSet())
         )
     }
@@ -56,13 +56,13 @@ internal class ScheduleSelectionRepositoryTest {
     @Test
     fun `When cleared, Then return empty`() {
         val ids = List(genInt(min = 2, max = 10)) { genScheduleId(it.toLong()) }
-        val repository = ScheduleSelectionRepository().apply {
+        val repository = ScheduleSelectedIdRepository().apply {
             ids.forEach { selected(it) }
         }
 
         repository.clear()
         assertThat(
-            repository.getSelectedIdsStream().value,
+            repository.getStream().value,
             equalTo(emptySet())
         )
     }

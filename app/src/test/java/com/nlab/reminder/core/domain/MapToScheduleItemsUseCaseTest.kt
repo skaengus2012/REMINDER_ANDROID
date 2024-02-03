@@ -2,13 +2,18 @@ package com.nlab.reminder.core.domain
 
 import com.nlab.reminder.core.data.model.Link
 import com.nlab.reminder.core.data.model.LinkMetadataTable
+import com.nlab.reminder.core.data.model.Schedule
 import com.nlab.reminder.core.data.model.genLink
 import com.nlab.reminder.core.data.model.genLinkMetadata
 import com.nlab.reminder.core.data.model.genSchedule
+import com.nlab.reminder.core.data.model.genScheduleId
 import com.nlab.reminder.core.data.model.genSchedules
 import com.nlab.reminder.core.data.repository.LinkMetadataTableRepository
 import com.nlab.reminder.core.data.repository.ScheduleCompleteMarkRepository
+import com.nlab.reminder.core.data.repository.ScheduleSelectedIdRepository
+import com.nlab.reminder.core.schedule.model.ScheduleElement
 import com.nlab.testkit.genBoolean
+import com.nlab.testkit.genInt
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
@@ -31,10 +36,7 @@ internal class MapToScheduleItemsUseCaseTest {
         val schedules = genSchedules()
         val useCase = genMapToScheduleItemsUseCase()
         assertThat(
-            useCase.invoke(flowOf(schedules))
-                .take(1)
-                .first()
-                .map { it.schedule },
+            useCase.expectedSnapshot(schedules).map { it.schedule },
             equalTo(schedules)
         )
     }
@@ -48,9 +50,7 @@ internal class MapToScheduleItemsUseCaseTest {
             }
         )
         assertThat(
-            useCase.invoke(flowOf(listOf(schedule)))
-                .take(1)
-                .first()
+            useCase.expectedSnapshot(listOf(schedule))
                 .first()
                 .isCompleteMarked,
             equalTo(schedule.isComplete.not())
@@ -68,9 +68,7 @@ internal class MapToScheduleItemsUseCaseTest {
             }
         )
         assertThat(
-            useCase.invoke(flowOf(listOf(schedule)))
-                .take(1)
-                .first()
+            useCase.expectedSnapshot(listOf(schedule))
                 .first()
                 .linkMetadata,
             equalTo(linkMetadata)
@@ -82,25 +80,61 @@ internal class MapToScheduleItemsUseCaseTest {
         val schedule = genSchedule(link = Link.EMPTY)
         val useCase = genMapToScheduleItemsUseCase()
         assertThat(
-            useCase.invoke(flowOf(listOf(schedule)))
-                .take(1)
-                .first()
+            useCase.expectedSnapshot(listOf(schedule))
                 .first()
                 .linkMetadata,
             equalTo(null)
         )
     }
+
+    @Test
+    fun `Given selected id set, Then schedule included id set is selected`() = runTest {
+        val schedules = List(genInt(min = 2, max = 10)) {
+            genSchedule(scheduleId = genScheduleId(it.toLong()))
+        }
+        val selectedSchedule = schedules.last()
+        val useCase = genMapToScheduleItemsUseCase(
+            selectedIdRepository = mock {
+                whenever(mock.getStream()) doReturn MutableStateFlow(setOf(selectedSchedule.id))
+            }
+        )
+        assert(useCase.expectedSnapshot(schedules).find { it.id == selectedSchedule.id }!!.isSelected,)
+    }
+
+    @Test
+    fun `Given selected id set, Then schedule not included id set is unselected`() = runTest {
+        val schedules = List(genInt(min = 2, max = 10)) {
+            genSchedule(scheduleId = genScheduleId(it.toLong()))
+        }
+        val selectedSchedule = schedules.last()
+        val useCase = genMapToScheduleItemsUseCase(
+            selectedIdRepository = mock {
+                whenever(mock.getStream()) doReturn MutableStateFlow(setOf(selectedSchedule.id))
+            }
+        )
+        assert(useCase.expectedSnapshot(schedules).find { it.id != selectedSchedule.id }!!.isSelected.not())
+    }
 }
 
 private fun genMapToScheduleItemsUseCase(
     completeMarkRepository: ScheduleCompleteMarkRepository = mock {
-        whenever(mock.getStream()) doReturn MutableStateFlow(mapOf())
+        whenever(mock.getStream()) doReturn MutableStateFlow(emptyMap())
     },
     linkMetadataTableRepository: LinkMetadataTableRepository = mock {
         whenever(mock.getStream()) doReturn MutableStateFlow(LinkMetadataTable(emptyMap())) // TODO stateFlow 로 바꾸자..
+    },
+    selectedIdRepository: ScheduleSelectedIdRepository = mock {
+        whenever(mock.getStream()) doReturn MutableStateFlow(emptySet())
     }
 ) = MapToScheduleElementsUseCase(
     completeMarkRepository,
     linkMetadataTableRepository,
+    selectedIdRepository,
     dispatcher = Dispatchers.Unconfined
 )
+
+private suspend fun MapToScheduleElementsUseCase.expectedSnapshot(
+    schedules: List<Schedule>
+): List<ScheduleElement> = invoke(flowOf(schedules))
+    .take(1)
+    .first()
