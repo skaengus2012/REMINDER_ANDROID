@@ -30,19 +30,15 @@ import kotlinx.coroutines.flow.Flow
 internal class ScheduleItemViewTypeDelegate(
     private val getItem: (position: Int) -> ScheduleItem,
     private val selectionEnabled: Flow<Boolean>,
-    private val onCompleteClicked: (position: Int, isComplete: Boolean) -> Unit,
-    private val onDeleteClicked: (position: Int) -> Unit,
-    private val onLinkClicked: (position: Int) -> Unit
+    private val eventListener: ScheduleElementItemEventListener
 ) {
     fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ScheduleItemViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
         return when (viewType) {
             R.layout.view_item_schedule_element -> ScheduleElementViewHolder(
-                binding = ViewItemScheduleElementBinding.inflate(layoutInflater, parent, /* attachToParent=*/ false),
-                selectionEnabled = selectionEnabled,
-                onCompleteClicked = onCompleteClicked,
-                onDeleteClicked = onDeleteClicked,
-                onLinkClicked = onLinkClicked
+                ViewItemScheduleElementBinding.inflate(layoutInflater, parent, /* attachToParent=*/ false),
+                selectionEnabled,
+                eventListener
             )
 
             else -> throw IllegalArgumentException("unsupported viewType inputted!!")

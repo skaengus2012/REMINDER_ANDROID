@@ -43,11 +43,23 @@ class ScheduleItemAdapter(
     private val viewTypeAdapterDelegate = ScheduleItemViewTypeDelegate(
         getItem = ::getItem,
         selectionEnabled = selectionEnabled.asStateFlow(),
-        onCompleteClicked = { position, isComplete ->
-            _itemEvent.tryEmit(ItemEvent.OnCompleteClicked(position, isComplete))
-        },
-        onDeleteClicked = { position -> _itemEvent.tryEmit(ItemEvent.OnDeleteClicked(position)) },
-        onLinkClicked = { position -> _itemEvent.tryEmit(ItemEvent.OnLinkClicked(position)) }
+        eventListener = object : ScheduleElementItemEventListener {
+            override fun onCompleteClicked(position: Int, isComplete: Boolean) {
+                _itemEvent.tryEmit(ItemEvent.OnCompleteClicked(position, isComplete))
+            }
+
+            override fun onSelectTouched(absolutePosition: Int, isSelected: Boolean) {
+                _itemEvent.tryEmit(ItemEvent.OnSelectTouched(absolutePosition, isSelected))
+            }
+
+            override fun onDeleteClicked(position: Int) {
+                _itemEvent.tryEmit(ItemEvent.OnDeleteClicked(position))
+            }
+
+            override fun onLinkClicked(position: Int) {
+                _itemEvent.tryEmit(ItemEvent.OnLinkClicked(position))
+            }
+        }
     )
     private val dragPositionHolder = DragPositionHolder()
 
@@ -120,5 +132,6 @@ class ScheduleItemAdapter(
         data class OnLinkClicked(val position: Int) : ItemEvent()
         data class OnItemMoveEnded(val fromPosition: Int, val toPosition: Int) : ItemEvent()
         data class OnDeleteClicked(val position: Int) : ItemEvent()
+        data class OnSelectTouched(val absolutePosition: Int, val selected: Boolean) : ItemEvent()
     }
 }

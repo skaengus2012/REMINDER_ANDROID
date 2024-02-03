@@ -18,6 +18,7 @@ package com.nlab.reminder.core.schedule.view
 
 import android.content.Context
 import android.graphics.drawable.Drawable
+import android.view.MotionEvent
 import android.view.View
 import android.widget.ImageView
 import androidx.appcompat.content.res.AppCompatResources
@@ -30,16 +31,19 @@ import androidx.transition.TransitionManager
 import com.bumptech.glide.Glide
 import com.nlab.reminder.R
 import com.nlab.reminder.core.android.content.getThemeColor
+import com.nlab.reminder.core.android.recyclerview.absoluteAdapterOptionalPosition
 import com.nlab.reminder.core.android.recyclerview.bindingAdapterOptionalPosition
 import com.nlab.reminder.core.android.transition.transitionListenerOf
 import com.nlab.reminder.core.android.view.initWithLifecycleOwner
 import com.nlab.reminder.core.android.view.throttleClicks
+import com.nlab.reminder.core.android.view.touches
 import com.nlab.reminder.core.android.widget.bindSelected
 import com.nlab.reminder.core.android.widget.bindText
 import com.nlab.reminder.core.data.model.isEmpty
 import com.nlab.reminder.core.schedule.model.ScheduleElement
 import com.nlab.reminder.databinding.ViewItemScheduleElementBinding
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
@@ -50,9 +54,7 @@ import kotlinx.coroutines.flow.onEach
 internal class ScheduleElementViewHolder(
     internal val binding: ViewItemScheduleElementBinding,
     selectionEnabled: Flow<Boolean>,
-    onCompleteClicked: (position: Int, isComplete: Boolean) -> Unit,
-    onDeleteClicked: (position: Int) -> Unit,
-    onLinkClicked: (position: Int) -> Unit
+    eventListener: ScheduleElementItemEventListener
 ) : ScheduleItemViewHolder(binding.root) {
     private val linkThumbnailPlaceHolderDrawable: Drawable? = with(itemView) {
         AppCompatResources.getDrawable(context, R.drawable.ic_schedule_link_error)
@@ -69,19 +71,32 @@ internal class ScheduleElementViewHolder(
             buttonComplete
                 .throttleClicks()
                 .withItemPosition()
-                .onEach { (view, position) -> onCompleteClicked(position, view.isSelected.not()) }
+                .onEach { (view, position) ->
+                    eventListener.onCompleteClicked(position, view.isSelected.not())
+                }
                 .launchIn(lifecycleOwner.lifecycleScope)
 
             layoutDelete
                 .throttleClicks()
                 .mapToItemPosition()
-                .onEach { position -> onDeleteClicked(position) }
+                .onEach(eventListener::onDeleteClicked)
                 .launchIn(lifecycleOwner.lifecycleScope)
 
-            imageviewBgLinkThumbnail
+            cardLink
                 .throttleClicks()
                 .mapToItemPosition()
-                .onEach { position -> onLinkClicked(position) }
+                .onEach(eventListener::onLinkClicked)
+                .launchIn(lifecycleOwner.lifecycleScope)
+
+            buttonSelection
+                .touches()
+                .filter { event -> event.action == MotionEvent.ACTION_DOWN }
+                .onEach {
+                    eventListener.onSelectTouched(
+                        absolutePosition = absoluteAdapterOptionalPosition ?: return@onEach,
+                        isSelected = buttonSelection.isSelected.not()
+                    )
+                }
                 .launchIn(lifecycleOwner.lifecycleScope)
 
             selectionEnabled

@@ -40,6 +40,7 @@ import com.nlab.reminder.core.android.view.throttleClicks
 import com.nlab.reminder.core.android.view.touches
 import com.nlab.reminder.core.kotlin.coroutine.flow.withBefore
 import com.nlab.reminder.core.schedule.view.ScheduleItemAdapter
+import com.nlab.reminder.core.schedule.view.ScheduleItemDragSelectionHelper
 import com.nlab.reminder.core.schedule.view.ScheduleItemTouchCallback
 import com.nlab.reminder.databinding.FragmentAllScheduleBinding
 import com.nlab.reminder.domain.common.android.navigation.navigateOpenLink
@@ -77,11 +78,12 @@ class AllScheduleFragment : Fragment() {
             context = requireContext(),
             itemMoveListener = scheduleItemAdapter
         )
-
-        viewLifecycle.event()
-            .filterLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-            .onEach { itemTouchCallback.clearResource() }
-            .launchIn(viewLifecycleScope)
+        val dragSelectionHelper = ScheduleItemDragSelectionHelper(
+            recyclerView = binding.recyclerviewContent,
+            onSelectChanged = { position, isSelected ->
+                // TODO implements
+            }
+        )
 
         scheduleItemAdapter.itemEvent
             .filterIsInstance<ScheduleItemAdapter.ItemEvent.OnCompleteClicked>()
@@ -104,6 +106,18 @@ class AllScheduleFragment : Fragment() {
             .onEach { viewModel.onScheduleDeleteClicked(it.position) }
             .launchIn(viewLifecycleScope)
 
+        scheduleItemAdapter.itemEvent
+            .filterIsInstance<ScheduleItemAdapter.ItemEvent.OnSelectTouched>()
+            .onEach { (absolutePosition, isSelected) ->
+                dragSelectionHelper.enableDragSelection(absolutePosition, isSelected)
+            }
+            .launchIn(viewLifecycleScope)
+
+        viewLifecycle.event()
+            .filterLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+            .onEach { itemTouchCallback.clearResource() }
+            .launchIn(viewLifecycleScope)
+
         binding.recyclerviewContent.apply {
             itemAnimator = ScheduleItemAnimator()
             adapter = ConcatAdapter(
@@ -111,6 +125,7 @@ class AllScheduleFragment : Fragment() {
                 scheduleItemAdapter
             )
             ItemTouchHelper(itemTouchCallback).attachToRecyclerView(/* recyclerView=*/ this)
+            addOnItemTouchListener(dragSelectionHelper.itemTouchListener)
         }
 
         binding.recyclerviewContent.touches()
@@ -191,6 +206,7 @@ class AllScheduleFragment : Fragment() {
                 itemTouchCallback.isItemViewSwipeEnabled = isNotSelectionMode
                 itemTouchCallback.isLongPressDragEnabled = isNotSelectionMode
             }
+            .onEach { dragSelectionHelper.disableDragSelection() }
             .launchIn(viewLifecycleScope)
 
         merge(
