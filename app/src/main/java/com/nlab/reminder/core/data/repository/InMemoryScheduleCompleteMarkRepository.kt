@@ -17,16 +17,22 @@
 package com.nlab.reminder.core.data.repository
 
 import com.nlab.reminder.core.data.model.ScheduleId
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.*
+import javax.inject.Inject
 
 /**
  * @author thalys
  */
-interface ScheduleCompleteMarkRepository {
-    fun getStream(): StateFlow<Map<ScheduleId, Boolean>>
-    fun add(scheduleId: ScheduleId, isComplete: Boolean)
-    fun clear()
-}
+class InMemoryScheduleCompleteMarkRepository @Inject constructor() : ScheduleCompleteMarkRepository {
+    private val chunkRequests = MutableStateFlow(emptyMap<ScheduleId, Boolean>())
 
-fun ScheduleCompleteMarkRepository.getSnapshot(): Map<ScheduleId, Boolean> =
-    getStream().value
+    override fun getStream(): StateFlow<Map<ScheduleId, Boolean>> = chunkRequests.asStateFlow()
+
+    override fun add(scheduleId: ScheduleId, isComplete: Boolean) {
+        chunkRequests.update { old -> old + (scheduleId to isComplete) }
+    }
+
+    override fun clear() {
+        chunkRequests.update { emptyMap() }
+    }
+}
