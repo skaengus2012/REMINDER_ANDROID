@@ -19,6 +19,7 @@ package com.nlab.reminder.core.schedule.view
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.nlab.reminder.core.schedule.model.ScheduleElement
 import com.nlab.reminder.core.schedule.model.ScheduleItem
 import kotlinx.coroutines.channels.BufferOverflow
@@ -58,6 +59,10 @@ class ScheduleItemAdapter(
 
             override fun onLinkClicked(position: Int) {
                 _itemEvent.tryEmit(ItemEvent.OnLinkClicked(position))
+            }
+
+            override fun onDragHandleClicked(viewHolder: ViewHolder) {
+                _itemEvent.tryEmit(ItemEvent.OnDragHandleClicked(viewHolder))
             }
         }
     )
@@ -133,5 +138,6 @@ class ScheduleItemAdapter(
         data class OnItemMoveEnded(val fromPosition: Int, val toPosition: Int) : ItemEvent()
         data class OnDeleteClicked(val position: Int) : ItemEvent()
         data class OnSelectTouched(val absolutePosition: Int, val selected: Boolean) : ItemEvent()
+        data class OnDragHandleClicked(val viewHolder: ViewHolder) : ItemEvent()
     }
 }

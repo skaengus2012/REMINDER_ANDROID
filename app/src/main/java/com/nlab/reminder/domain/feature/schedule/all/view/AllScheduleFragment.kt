@@ -78,6 +78,7 @@ class AllScheduleFragment : Fragment() {
             context = requireContext(),
             itemMoveListener = scheduleItemAdapter
         )
+        val itemTouchHelper = ItemTouchHelper(itemTouchCallback)
         val dragSelectionHelper = ScheduleItemDragSelectionHelper(
             recyclerView = binding.recyclerviewContent,
             onSelectChanged = viewModel::onScheduleSelected
@@ -111,6 +112,12 @@ class AllScheduleFragment : Fragment() {
             }
             .launchIn(viewLifecycleScope)
 
+        scheduleItemAdapter.itemEvent
+            .filterIsInstance<ScheduleItemAdapter.ItemEvent.OnDragHandleClicked>()
+            .map { it.viewHolder }
+            .onEach { itemTouchHelper.startDrag(it) }
+            .launchIn(viewLifecycleScope)
+
         viewLifecycle.event()
             .filterLifecycleEvent(Lifecycle.Event.ON_DESTROY)
             .onEach { itemTouchCallback.clearResource() }
@@ -122,7 +129,7 @@ class AllScheduleFragment : Fragment() {
                 SingleItemAdapter(R.layout.view_item_empty), // Removing the header causes scrolling problems when completing the first item.
                 scheduleItemAdapter
             )
-            ItemTouchHelper(itemTouchCallback).attachToRecyclerView(/* recyclerView=*/ this)
+            itemTouchHelper.attachToRecyclerView(/* recyclerView=*/ this)
             addOnItemTouchListener(dragSelectionHelper.itemTouchListener)
         }
 

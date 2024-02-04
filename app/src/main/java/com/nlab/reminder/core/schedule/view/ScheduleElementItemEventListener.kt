@@ -16,6 +16,8 @@
 
 package com.nlab.reminder.core.schedule.view
 
+import androidx.recyclerview.widget.RecyclerView
+
 /**
  * @author thalys
  */
@@ -24,4 +26,5 @@ internal interface ScheduleElementItemEventListener {
     fun onSelectTouched(absolutePosition: Int, isSelected: Boolean)
     fun onDeleteClicked(position: Int)
     fun onLinkClicked(position: Int)
+    fun onDragHandleClicked(viewHolder: RecyclerView.ViewHolder)
 }

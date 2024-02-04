@@ -88,6 +88,12 @@ internal class ScheduleElementViewHolder(
                 .onEach(eventListener::onLinkClicked)
                 .launchIn(lifecycleOwner.lifecycleScope)
 
+            buttonDragHandle
+                .touches()
+                .filter { event -> event.action == MotionEvent.ACTION_DOWN }
+                .onEach { eventListener.onDragHandleClicked(viewHolder = this@ScheduleElementViewHolder) }
+                .launchIn(lifecycleOwner.lifecycleScope)
+
             buttonSelection
                 .touches()
                 .filter { event -> event.action == MotionEvent.ACTION_DOWN }
