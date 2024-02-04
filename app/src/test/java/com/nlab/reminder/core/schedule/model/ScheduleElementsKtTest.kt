@@ -1,5 +1,7 @@
 package com.nlab.reminder.core.schedule.model
 
+import com.nlab.reminder.core.data.model.genSchedule
+import com.nlab.reminder.core.data.model.genScheduleId
 import com.nlab.testkit.genInt
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
@@ -23,5 +25,21 @@ internal class ScheduleElementsKtTest {
         val scheduleElements = genScheduleElements(position - 2)
 
         assertThat(scheduleElements.findId(position), equalTo(null))
+    }
+
+    @Test
+    fun `Given selected including items, When getSelectedIds, Then return ids`() {
+        val size = genInt(min = 5, max = 10)
+        val selectedItems = List(size) { index ->
+            genScheduleElement(
+                schedule = genSchedule(scheduleId = genScheduleId(index.toLong())),
+                isSelected = index % 2 == 0
+            )
+        }
+
+        assertThat(
+            selectedItems.getSelectedIds(),
+            equalTo(buildList { for (i in 0 until size step 2) add(genScheduleId(i.toLong())) })
+        )
     }
 }

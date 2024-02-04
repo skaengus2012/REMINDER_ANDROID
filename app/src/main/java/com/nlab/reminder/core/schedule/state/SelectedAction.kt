@@ -14,13 +14,9 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.schedule.model
-
-import com.nlab.reminder.core.data.model.ScheduleId
+package com.nlab.reminder.core.schedule.state
 
 /**
  * @author thalys
  */
-fun List<ScheduleElement>.findId(position: Int): ScheduleId? = getOrNull(position)?.id
-
-fun List<ScheduleElement>.getSelectedIds(): List<ScheduleId> = filter { it.isSelected }.map { it.id }
+interface SelectedAction

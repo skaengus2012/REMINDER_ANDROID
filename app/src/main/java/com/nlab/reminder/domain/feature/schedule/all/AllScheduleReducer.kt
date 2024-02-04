@@ -18,6 +18,7 @@ package com.nlab.reminder.domain.feature.schedule.all
 
 import com.nlab.reminder.core.data.model.isEmpty
 import com.nlab.reminder.core.data.model.orEmpty
+import com.nlab.reminder.core.schedule.state.SelectedAction
 import com.nlab.statekit.Reducer
 import com.nlab.statekit.util.buildDslReducer
 import kotlinx.collections.immutable.*
@@ -46,6 +47,9 @@ class AllScheduleReducer @Inject constructor() : DomainReducer by buildDslReduce
         }
     }
     state<AllScheduleUiState.Loaded> {
+        filteredAction(predicate = { it is SelectedAction }) { (_, before) ->
+            before.copy(isSelectionMode = false)
+        }
         action<AllScheduleAction.OnSelectionModeToggleClicked> { (_, before) ->
             before.copy(isSelectionMode = before.isSelectionMode.not())
         }

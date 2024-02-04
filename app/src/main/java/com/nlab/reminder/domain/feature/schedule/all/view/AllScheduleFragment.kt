@@ -163,6 +163,16 @@ class AllScheduleFragment : Fragment() {
             .onEach { viewModel.onSelectionModeToggleClicked() }
             .launchIn(viewLifecycleScope)
 
+        binding.buttonSelectedItemComplete
+            .throttleClicks()
+            .onEach { viewModel.onSelectedSchedulesCompleteClicked(isComplete = true) }
+            .launchIn(viewLifecycleScope)
+
+        binding.buttonSelectedItemIncomplete
+            .throttleClicks()
+            .onEach { viewModel.onSelectedSchedulesCompleteClicked(isComplete = false) }
+            .launchIn(viewLifecycleScope)
+
         viewModel.loadedUiState
             .map { it.scheduleElements }
             .distinctUntilChanged()

@@ -18,6 +18,7 @@ package com.nlab.reminder.domain.feature.schedule.all
 
 import com.nlab.reminder.core.data.model.ScheduleId
 import com.nlab.reminder.core.schedule.model.ScheduleElement
+import com.nlab.reminder.core.schedule.state.SelectedAction
 import com.nlab.statekit.Action
 import com.nlab.statekit.lifecycle.viewmodel.ContractUiAction
 
@@ -51,10 +52,7 @@ sealed interface AllScheduleAction : Action {
     data class OnScheduleCompleteClicked(val position: Int, val isComplete: Boolean) : AllScheduleAction
 
     @ContractUiAction
-    data class OnSelectedSchedulesCompleteClicked(
-        val ids: Collection<ScheduleId>,
-        val isComplete: Boolean
-    ) : AllScheduleAction
+    data class OnSelectedSchedulesCompleteClicked(val isComplete: Boolean) : AllScheduleAction, SelectedAction
 
     // delete
     @ContractUiAction

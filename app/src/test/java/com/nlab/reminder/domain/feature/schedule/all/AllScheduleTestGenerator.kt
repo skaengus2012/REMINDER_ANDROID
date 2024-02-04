@@ -20,6 +20,7 @@ import com.nlab.reminder.core.data.model.Link
 import com.nlab.reminder.core.data.model.genLink
 import com.nlab.reminder.core.schedule.model.ScheduleElement
 import com.nlab.reminder.core.schedule.model.genScheduleElements
+import com.nlab.reminder.core.schedule.state.SelectedAction
 import com.nlab.testkit.genBoolean
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -28,7 +29,7 @@ import kotlinx.collections.immutable.toImmutableList
 /**
  * @author Doohyun
  */
-internal fun genAllScheduleUiState(): AllScheduleUiState = when(genBoolean()) {
+internal fun genAllScheduleUiState(): AllScheduleUiState = when (genBoolean()) {
     true -> AllScheduleUiState.Empty
     false -> genAllScheduleUiStateLoaded()
 }
@@ -52,3 +53,10 @@ internal fun genAllScheduleWorkflowLink(
 internal fun genAllScheduleWorkflowsExcludeEmpty(): List<AllScheduleWorkflow> = listOf(
     genAllScheduleWorkflowLink()
 )
+
+internal fun genAllScheduleSelectedAction(): AllScheduleAction =
+    listOf(
+        AllScheduleAction.OnSelectedSchedulesCompleteClicked(isComplete = genBoolean())
+    )
+        .shuffled()
+        .first()

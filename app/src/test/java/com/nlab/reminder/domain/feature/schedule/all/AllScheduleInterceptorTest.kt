@@ -167,8 +167,10 @@ internal class AllScheduleInterceptorTest {
         }
         genInterceptor(completeScheduleWithIds = useCase)
             .scenario()
-            .initState(genAllScheduleUiStateLoaded(scheduleElements = schedules.mapToScheduleElementsAsImmutableList()))
-            .action(AllScheduleAction.OnSelectedSchedulesCompleteClicked(scheduleIds, isComplete))
+            .initState(genAllScheduleUiStateLoaded(
+                scheduleElements = schedules.mapToScheduleElementsAsImmutableList(isSelected = true))
+            )
+            .action(AllScheduleAction.OnSelectedSchedulesCompleteClicked(isComplete))
             .dispatchIn(testScope = this)
         verify(useCase, once()).invoke(scheduleIds, isComplete)
     }
