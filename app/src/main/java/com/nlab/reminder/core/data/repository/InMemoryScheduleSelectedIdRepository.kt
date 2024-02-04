@@ -17,13 +17,25 @@
 package com.nlab.reminder.core.data.repository
 
 import com.nlab.reminder.core.data.model.ScheduleId
+import kotlinx.collections.immutable.persistentHashSetOf
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import javax.inject.Inject
 
 /**
  * @author thalys
  */
-interface ScheduleSelectedIdRepository {
-    fun getStream(): StateFlow<Set<ScheduleId>>
-    suspend fun update(id: ScheduleId, isSelected: Boolean)
-    suspend fun clear()
+class InMemoryScheduleSelectedIdRepository @Inject constructor() : ScheduleSelectedIdRepository {
+    private val selectedIds = MutableStateFlow(persistentHashSetOf<ScheduleId>())
+
+    override fun getStream(): StateFlow<Set<ScheduleId>> = selectedIds.asStateFlow()
+    override suspend fun update(id: ScheduleId, isSelected: Boolean) {
+        selectedIds.update { old -> if (isSelected) old.add(id) else old.remove(id) }
+    }
+
+    override suspend fun clear() {
+        selectedIds.update { it.clear() }
+    }
 }

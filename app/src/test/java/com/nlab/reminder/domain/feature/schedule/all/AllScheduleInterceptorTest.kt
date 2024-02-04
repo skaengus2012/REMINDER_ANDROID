@@ -24,6 +24,7 @@ import com.nlab.reminder.core.data.model.genSchedules
 import com.nlab.reminder.core.data.repository.CompletedScheduleShownRepository
 import com.nlab.reminder.core.data.repository.ScheduleDeleteRequest
 import com.nlab.reminder.core.data.repository.ScheduleRepository
+import com.nlab.reminder.core.data.repository.InMemoryScheduleSelectedIdRepository
 import com.nlab.reminder.core.data.repository.ScheduleUpdateRequest
 import com.nlab.reminder.core.domain.CalculateItemSwapResultUseCase
 import com.nlab.reminder.core.domain.CompleteScheduleWithIdsUseCase
@@ -219,6 +220,32 @@ internal class AllScheduleInterceptorTest {
     }
 
     @Test
+    fun `Given state loaded, When OnScheduleSelected, Then repository called`() = runTest {
+        val schedule = genSchedule()
+        val scheduleElements = schedule.mapToScheduleElementsAsImmutableList()
+        val selectedIdRepository: InMemoryScheduleSelectedIdRepository = mock()
+        val isSelected = genBoolean()
+
+        genInterceptor(selectedIdRepository = selectedIdRepository)
+            .scenario()
+            .initState(genAllScheduleUiStateLoaded(scheduleElements = scheduleElements))
+            .action(AllScheduleAction.OnScheduleSelected(position = 0, isSelected = isSelected))
+            .dispatchIn(testScope = this)
+        verify(selectedIdRepository, once()).update(schedule.id, isSelected)
+    }
+
+    @Test
+    fun `Given State Loaded with empty schedules, When OnScheduleSelected, Then repository never called`() = runTest {
+        val selectedIdRepository: InMemoryScheduleSelectedIdRepository = mock()
+        genInterceptor(selectedIdRepository = selectedIdRepository)
+            .scenario()
+            .initState(genAllScheduleUiStateLoaded(scheduleElements = persistentListOf()))
+            .action(AllScheduleAction.OnScheduleSelected(position = 0, isSelected = genBoolean()))
+            .dispatchIn(testScope = this)
+        verify(selectedIdRepository, never()).update(anyScheduleId(), genBoolean())
+    }
+
+    @Test
     fun `Given any state, When ScheduleLoaded, Then fetchLinkMetadata invoked`() = runTest {
         val useCase: FetchLinkMetadataUseCase = mock()
         genInterceptor(fetchLinkMetadata = useCase)
@@ -233,6 +260,7 @@ internal class AllScheduleInterceptorTest {
 private fun genInterceptor(
     scheduleRepository: ScheduleRepository = mock(),
     completedScheduleShownRepository: CompletedScheduleShownRepository = mock(),
+    selectedIdRepository: InMemoryScheduleSelectedIdRepository = mock(),
     completeScheduleWithMark: CompleteScheduleWithMarkUseCase = mock(),
     completeScheduleWithIds: CompleteScheduleWithIdsUseCase = mock(),
     fetchLinkMetadata: FetchLinkMetadataUseCase = mock(),
@@ -240,6 +268,7 @@ private fun genInterceptor(
 ): AllScheduleInterceptor = AllScheduleInterceptor(
     scheduleRepository = scheduleRepository,
     completedScheduleShownRepository = completedScheduleShownRepository,
+    selectedIdRepository = selectedIdRepository,
     completeScheduleWithMark = completeScheduleWithMark,
     completeScheduleWithIds = completeScheduleWithIds,
     fetchLinkMetadata = fetchLinkMetadata,

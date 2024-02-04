@@ -17,7 +17,9 @@
 package com.nlab.reminder.internal.common.di
 
 import com.nlab.reminder.core.data.repository.InMemoryScheduleCompleteMarkRepository
+import com.nlab.reminder.core.data.repository.InMemoryScheduleSelectedIdRepository
 import com.nlab.reminder.core.data.repository.ScheduleCompleteMarkRepository
+import com.nlab.reminder.core.data.repository.ScheduleSelectedIdRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -35,4 +37,10 @@ internal abstract class ViewModelScopeRepositoryModule {
     abstract fun bindScheduleCompleteMarkRepository(
         repository: InMemoryScheduleCompleteMarkRepository
     ): ScheduleCompleteMarkRepository
+
+    @ViewModelScoped
+    @Binds
+    abstract fun bindScheduleSelectedIdRepository(
+        repository: InMemoryScheduleSelectedIdRepository
+    ): ScheduleSelectedIdRepository
 }

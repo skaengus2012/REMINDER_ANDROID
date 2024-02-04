@@ -19,15 +19,8 @@ package com.nlab.reminder.domain.feature.schedule.all
 import com.nlab.reminder.core.data.model.ScheduleId
 import com.nlab.reminder.core.kotlin.collection.minOf
 import com.nlab.reminder.core.kotlin.util.getOrThrow
-import com.nlab.reminder.core.data.repository.AllScheduleData
-import com.nlab.reminder.core.data.repository.CompletedScheduleShownRepository
-import com.nlab.reminder.core.data.repository.ScheduleDeleteRequest
-import com.nlab.reminder.core.data.repository.ScheduleRepository
-import com.nlab.reminder.core.data.repository.ScheduleUpdateRequest
-import com.nlab.reminder.core.domain.CalculateItemSwapResultUseCase
-import com.nlab.reminder.core.domain.CompleteScheduleWithIdsUseCase
-import com.nlab.reminder.core.domain.CompleteScheduleWithMarkUseCase
-import com.nlab.reminder.core.domain.FetchLinkMetadataUseCase
+import com.nlab.reminder.core.data.repository.*
+import com.nlab.reminder.core.domain.*
 import com.nlab.reminder.core.schedule.model.findId
 import com.nlab.statekit.middleware.interceptor.Interceptor
 import com.nlab.statekit.util.buildDslInterceptor
@@ -39,6 +32,7 @@ import javax.inject.Inject
 class AllScheduleInterceptor @Inject constructor(
     scheduleRepository: ScheduleRepository,
     @AllScheduleData completedScheduleShownRepository: CompletedScheduleShownRepository,
+    selectedIdRepository: ScheduleSelectedIdRepository,
     completeScheduleWithMark: CompleteScheduleWithMarkUseCase,
     completeScheduleWithIds: CompleteScheduleWithIdsUseCase,
     fetchLinkMetadata: FetchLinkMetadataUseCase,
@@ -92,6 +86,11 @@ class AllScheduleInterceptor @Inject constructor(
                     }
                 }))
                 .getOrThrow()
+        }
+
+        action<AllScheduleAction.OnScheduleSelected> { (action, before) ->
+            val targetId = before.scheduleElements.getOrNull(action.position)?.id ?: return@action
+            selectedIdRepository.update(targetId, action.isSelected)
         }
     }
     anyState {

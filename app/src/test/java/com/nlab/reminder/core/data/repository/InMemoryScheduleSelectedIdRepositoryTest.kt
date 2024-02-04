@@ -18,6 +18,7 @@ package com.nlab.reminder.core.data.repository
 
 import com.nlab.reminder.core.data.model.genScheduleId
 import com.nlab.testkit.genInt
+import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
@@ -25,12 +26,12 @@ import org.junit.Test
 /**
  * @author thalys
  */
-internal class ScheduleSelectedIdRepositoryTest {
+internal class InMemoryScheduleSelectedIdRepositoryTest {
     @Test
-    fun `When selected, Then return added id`() {
-        val repository = ScheduleSelectedIdRepository()
+    fun `When selected, Then return added id`() = runTest {
+        val repository = InMemoryScheduleSelectedIdRepository()
         val id = genScheduleId()
-        repository.selected(id)
+        repository.update(id, isSelected = true)
 
         assertThat(
             repository.getStream().value,
@@ -39,14 +40,14 @@ internal class ScheduleSelectedIdRepositoryTest {
     }
 
     @Test
-    fun `When unselected, Then return deleted id`() {
+    fun `When unselected, Then return deleted id`() = runTest {
         val ids = List(genInt(min = 2, max = 10)) { genScheduleId(it.toLong()) }
-        val repository = ScheduleSelectedIdRepository().apply {
-            ids.forEach { selected(it) }
+        val repository = InMemoryScheduleSelectedIdRepository().apply {
+            ids.forEach { update(it, isSelected = true) }
         }
         val deleteTarget = ids.first()
 
-        repository.unselected(deleteTarget)
+        repository.update(deleteTarget, isSelected = false)
         assertThat(
             repository.getStream().value,
             equalTo(ids.subList(1, ids.size).toSet())
@@ -54,10 +55,10 @@ internal class ScheduleSelectedIdRepositoryTest {
     }
 
     @Test
-    fun `When cleared, Then return empty`() {
+    fun `When cleared, Then return empty`() = runTest {
         val ids = List(genInt(min = 2, max = 10)) { genScheduleId(it.toLong()) }
-        val repository = ScheduleSelectedIdRepository().apply {
-            ids.forEach { selected(it) }
+        val repository = InMemoryScheduleSelectedIdRepository().apply {
+            ids.forEach { update(it, isSelected = true) }
         }
 
         repository.clear()
@@ -66,5 +67,4 @@ internal class ScheduleSelectedIdRepositoryTest {
             equalTo(emptySet())
         )
     }
-
 }

@@ -144,6 +144,17 @@ internal class ScheduleElementViewHolder(
                 contentDescription = scheduleElement.completeButtonDescription(context)
             }
         }
+        binding.buttonSelection.apply {
+            val isChanged = bindSelected(scheduleElement.isSelected)
+            if (isChanged) {
+                contentDescription = context.getString(
+                    if (scheduleElement.isSelected) R.string.schedule_selection_checkbox_undo_contentDescription
+                    else R.string.schedule_selection_checkbox_contentDescription,
+                    scheduleElement.title
+                )
+            }
+        }
+
         // link binding
         binding.cardLink.visibility = if (scheduleElement.link.isEmpty()) View.GONE else View.VISIBLE
         binding.textviewLink.bindText(scheduleElement.link.value)

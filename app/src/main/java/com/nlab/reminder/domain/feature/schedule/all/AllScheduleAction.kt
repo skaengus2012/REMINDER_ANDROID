@@ -42,6 +42,9 @@ sealed interface AllScheduleAction : Action {
     @ContractUiAction
     data class CompleteWorkflow(val workflow: AllScheduleWorkflow) : AllScheduleAction
 
+    @ContractUiAction
+    data class OnScheduleSelected(val position: Int, val isSelected: Boolean) : AllScheduleAction
+
 
     // update completion
     @ContractUiAction

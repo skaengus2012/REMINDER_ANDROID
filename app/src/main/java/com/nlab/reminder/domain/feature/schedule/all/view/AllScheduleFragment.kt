@@ -80,9 +80,7 @@ class AllScheduleFragment : Fragment() {
         )
         val dragSelectionHelper = ScheduleItemDragSelectionHelper(
             recyclerView = binding.recyclerviewContent,
-            onSelectChanged = { position, isSelected ->
-                // TODO implements
-            }
+            onSelectChanged = viewModel::onScheduleSelected
         )
 
         scheduleItemAdapter.itemEvent
