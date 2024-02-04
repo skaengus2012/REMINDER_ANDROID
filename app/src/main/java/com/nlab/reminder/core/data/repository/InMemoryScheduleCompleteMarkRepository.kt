@@ -31,8 +31,4 @@ class InMemoryScheduleCompleteMarkRepository @Inject constructor() : ScheduleCom
     override fun add(scheduleId: ScheduleId, isComplete: Boolean) {
         chunkRequests.update { old -> old + (scheduleId to isComplete) }
     }
-
-    override fun clear() {
-        chunkRequests.update { emptyMap() }
-    }
 }

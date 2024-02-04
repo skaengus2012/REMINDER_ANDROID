@@ -25,7 +25,6 @@ import kotlinx.coroutines.flow.StateFlow
 interface ScheduleCompleteMarkRepository {
     fun getStream(): StateFlow<Map<ScheduleId, Boolean>>
     fun add(scheduleId: ScheduleId, isComplete: Boolean)
-    fun clear()
 }
 
 fun ScheduleCompleteMarkRepository.getSnapshot(): Map<ScheduleId, Boolean> =

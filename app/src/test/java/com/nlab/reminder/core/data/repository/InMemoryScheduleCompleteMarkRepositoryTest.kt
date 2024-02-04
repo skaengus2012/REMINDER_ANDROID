@@ -2,7 +2,6 @@ package com.nlab.reminder.core.data.repository
 
 import com.nlab.reminder.core.data.model.genScheduleId
 import com.nlab.testkit.genBoolean
-import com.nlab.testkit.genInt
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
@@ -38,19 +37,6 @@ internal class InMemoryScheduleCompleteMarkRepositoryTest {
         assertThat(
             scheduleCompleteMarkRepository.getSnapshot(),
             equalTo(mapOf(scheduleId to newCompleteMark))
-        )
-    }
-
-    @Test
-    fun `When cleared, Then updated to empty table`() = runTest {
-        val scheduleCompleteMarkRepository = InMemoryScheduleCompleteMarkRepository().apply {
-            (0..genInt(min = 1, max = 10)).forEach { add(genScheduleId(it.toLong()), genBoolean()) }
-        }
-
-        scheduleCompleteMarkRepository.clear()
-        assertThat(
-            scheduleCompleteMarkRepository.getSnapshot(),
-            equalTo(mapOf())
         )
     }
 }
