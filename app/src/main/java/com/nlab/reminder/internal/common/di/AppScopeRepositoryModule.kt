@@ -24,7 +24,6 @@ import com.nlab.reminder.core.data.model.LinkMetadata
 import com.nlab.reminder.core.data.repository.AllScheduleData
 import com.nlab.reminder.core.data.repository.CompletedScheduleShownRepository
 import com.nlab.reminder.core.data.repository.LinkMetadataRepository
-import com.nlab.reminder.core.data.repository.LinkMetadataTableRepository
 import com.nlab.reminder.core.data.repository.ScheduleRepository
 import com.nlab.reminder.core.data.repository.TagRepository
 import com.nlab.reminder.core.data.repository.TimestampRepository
@@ -33,7 +32,6 @@ import com.nlab.reminder.core.data.repository.infra.JsoupLinkMetadataRepository
 import com.nlab.reminder.core.kotlin.util.*
 import com.nlab.reminder.internal.common.android.datastore.PreferenceKeys
 import com.nlab.reminder.internal.data.repository.LocalCompletedScheduleShownRepository
-import com.nlab.reminder.internal.data.repository.LocalLinkMetadataTableRepository
 import com.nlab.reminder.internal.data.repository.LocalScheduleRepository
 import com.nlab.reminder.internal.data.repository.LocalTagRepository
 import dagger.*
@@ -60,12 +58,6 @@ internal abstract class AppScopeRepositoryModule {
     @Reusable
     @Binds
     abstract fun bindTimestampRepository(repository: DefaultTimestampRepository): TimestampRepository
-
-    @Singleton
-    @Binds
-    abstract fun bindLinkMetadataTableRepository(
-        repository: LocalLinkMetadataTableRepository
-    ): LinkMetadataTableRepository
 
     companion object {
         @Reusable

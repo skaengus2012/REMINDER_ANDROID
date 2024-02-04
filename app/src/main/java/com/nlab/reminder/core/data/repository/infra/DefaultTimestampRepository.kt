@@ -16,8 +16,8 @@
 
 package com.nlab.reminder.core.data.repository.infra
 
+import android.os.SystemClock
 import com.nlab.reminder.core.data.repository.TimestampRepository
-import java.util.Calendar
 import javax.inject.Inject
 
 /**
@@ -25,6 +25,6 @@ import javax.inject.Inject
  */
 class DefaultTimestampRepository @Inject constructor() : TimestampRepository {
     override fun get(): Long {
-        return Calendar.getInstance().timeInMillis
+        return SystemClock.elapsedRealtime()
     }
 }

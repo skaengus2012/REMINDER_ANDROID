@@ -16,15 +16,21 @@
 
 package com.nlab.reminder.internal.common.di
 
+import com.nlab.reminder.core.data.repository.CachedLinkMetadataTableRepository
 import com.nlab.reminder.core.data.repository.InMemoryScheduleCompleteMarkRepository
 import com.nlab.reminder.core.data.repository.InMemoryScheduleSelectedIdRepository
+import com.nlab.reminder.core.data.repository.LinkMetadataTableRepository
 import com.nlab.reminder.core.data.repository.ScheduleCompleteMarkRepository
 import com.nlab.reminder.core.data.repository.ScheduleSelectedIdRepository
+import com.nlab.reminder.domain.common.kotlin.coroutine.inject.DefaultDispatcher
+import com.nlab.reminder.internal.data.repository.LocalLinkMetadataTableRepository
 import dagger.Binds
 import dagger.Module
+import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.android.scopes.ViewModelScoped
+import kotlinx.coroutines.CoroutineDispatcher
 
 /**
  * @author thalys
@@ -43,4 +49,13 @@ internal abstract class ViewModelScopeRepositoryModule {
     abstract fun bindScheduleSelectedIdRepository(
         repository: InMemoryScheduleSelectedIdRepository
     ): ScheduleSelectedIdRepository
+
+    companion object {
+        @ViewModelScoped
+        @Provides
+        fun provideCachedLinkMetadataTableRepository(
+            repository: LocalLinkMetadataTableRepository,
+            @DefaultDispatcher dispatcher: CoroutineDispatcher
+        ): LinkMetadataTableRepository = CachedLinkMetadataTableRepository(repository, dispatcher)
+    }
 }

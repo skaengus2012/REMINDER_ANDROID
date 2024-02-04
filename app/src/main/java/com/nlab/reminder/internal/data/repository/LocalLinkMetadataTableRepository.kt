@@ -33,13 +33,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
- * TODO 캐시층이 있어야 한다.
- * 로컬 최대갯수를 넘어갈 경우 버그가 있을 것 같다.
- * https://github.com/skaengus2012/REMINDER_ANDROID/issues/237
  * @author thalys
  */
+@Singleton
 internal class LocalLinkMetadataTableRepository @Inject constructor(
     private val linkMetadataDao: LinkMetadataDao,
     private val linkMetadataRepository: LinkMetadataRepository,
