@@ -180,10 +180,12 @@ class AllScheduleFragment : Fragment() {
             .flowWithLifecycle(viewLifecycle)
             .onEach { action ->
                 if (action.isSelectedActionInvoked) {
-                    // Set a term not to allow the selection change animation
-                    // and list update to be performed at the same time.
                     viewModel.appliedSelectedActionWithSchedules()
-                    delay(timeMillis = 200)
+                    /**
+                     * Set a term not to allow the selection change animation
+                     * and list update to be performed at the same time.
+                     */
+                    delay(timeMillis = 250)
                 }
                 scheduleItemAdapter.suspendSubmitList(action.scheduleElements)
             }

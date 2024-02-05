@@ -23,16 +23,32 @@ import com.nlab.reminder.core.schedule.model.ScheduleItem
 /**
  * @author Doohyun
  */
-class ScheduleItemDiffCallback : DiffUtil.ItemCallback<ScheduleItem>() {
-    override fun areItemsTheSame(oldItem: ScheduleItem, newItem: ScheduleItem): Boolean {
-        if (oldItem::class != newItem::class) return false
-        return when (oldItem) {
+internal class ScheduleItemDiffCallback : DiffUtil.ItemCallback<ScheduleItem>() {
+    private var isDragCompare: Boolean = false
+
+    override fun areItemsTheSame(oldItem: ScheduleItem, newItem: ScheduleItem): Boolean =
+        if (oldItem::class != newItem::class) false
+        else when (oldItem) {
             // add another ScheduleItem type
-            is ScheduleElement -> oldItem.id == (newItem as ScheduleElement).id
+            is ScheduleElement -> {
+                newItem as ScheduleElement
+                if (isDragCompare) {
+                    // When updating by Drag, fade animation is prevented from occurring unnecessarily.
+                    oldItem.id == newItem.id
+                }
+                else oldItem.schedule == newItem.schedule
+            }
         }
-    }
 
     override fun areContentsTheSame(oldItem: ScheduleItem, newItem: ScheduleItem): Boolean {
         return oldItem == newItem
+    }
+
+    fun onUserDragEnded() {
+        isDragCompare = true
+    }
+
+    fun onItemUpdated() {
+        isDragCompare = false
     }
 }

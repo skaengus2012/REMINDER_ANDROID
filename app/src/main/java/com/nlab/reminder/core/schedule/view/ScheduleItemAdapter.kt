@@ -17,7 +17,6 @@
 package com.nlab.reminder.core.schedule.view
 
 import android.view.ViewGroup
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.nlab.reminder.core.schedule.model.ScheduleElement
@@ -32,13 +31,14 @@ import kotlinx.coroutines.flow.asStateFlow
 /**
  * @author Doohyun
  */
-class ScheduleItemAdapter(
-    diffCallback: DiffUtil.ItemCallback<ScheduleItem> = ScheduleItemDiffCallback(),
+class ScheduleItemAdapter internal constructor(
+    private val diffCallback: ScheduleItemDiffCallback,
     private val scheduleElementItemMovePolicy: ScheduleElementItemMovePolicy = DefaultScheduleElementItemMovePolicy()
 ) : ListAdapter<ScheduleItem, ScheduleItemViewHolder>(diffCallback),
     ScheduleItemTouchCallback.ItemMoveListener {
     private val _itemEvent = MutableSharedFlow<ItemEvent>(
-        extraBufferCapacity = 10, onBufferOverflow = BufferOverflow.DROP_OLDEST
+        extraBufferCapacity = 10,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
     private val selectionEnabled = MutableStateFlow(false)
     private val viewTypeAdapterDelegate = ScheduleItemViewTypeDelegate(
@@ -93,6 +93,7 @@ class ScheduleItemAdapter(
     override fun onItemMoveEnded() {
         val (from, to) = dragPositionHolder.snapshot() ?: return
         _itemEvent.tryEmit(ItemEvent.OnItemMoveEnded(from, to))
+        diffCallback.onUserDragEnded()
     }
 
     private fun adjustRecentSwapPositions() {
@@ -111,6 +112,7 @@ class ScheduleItemAdapter(
             // When dragging the first item, there is a problem that the scroll moves.
             // No problem after adding this logic
             adjustRecentSwapPositions()
+            diffCallback.onItemUpdated()
         }
     }
 
@@ -141,3 +143,7 @@ class ScheduleItemAdapter(
         data class OnDragHandleClicked(val viewHolder: ViewHolder) : ItemEvent()
     }
 }
+
+fun ScheduleItemAdapter(
+    scheduleElementItemMovePolicy: ScheduleElementItemMovePolicy = DefaultScheduleElementItemMovePolicy()
+): ScheduleItemAdapter = ScheduleItemAdapter(ScheduleItemDiffCallback(), scheduleElementItemMovePolicy)

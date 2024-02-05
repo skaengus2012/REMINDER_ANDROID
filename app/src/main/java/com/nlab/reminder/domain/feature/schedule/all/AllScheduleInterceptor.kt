@@ -25,7 +25,6 @@ import com.nlab.reminder.core.schedule.model.findId
 import com.nlab.reminder.core.schedule.model.getSelectedIds
 import com.nlab.statekit.middleware.interceptor.Interceptor
 import com.nlab.statekit.util.buildDslInterceptor
-import kotlinx.coroutines.delay
 import javax.inject.Inject
 
 /**
@@ -55,10 +54,12 @@ class AllScheduleInterceptor @Inject constructor(
             )
         }
         action<AllScheduleAction.OnSelectedSchedulesCompleteClicked> { (action, before) ->
-            completeScheduleWithIds(
+            val result = completeScheduleWithIds(
                 before.scheduleElements.getSelectedIds(),
                 action.isComplete
             )
+            selectedIdRepository.clear()
+            result.getOrThrow()
         }
         action<AllScheduleAction.OnScheduleDeleteClicked> { (action, before) ->
             val scheduleId: ScheduleId = before.scheduleElements.getOrNull(action.position)?.id ?: return@action
