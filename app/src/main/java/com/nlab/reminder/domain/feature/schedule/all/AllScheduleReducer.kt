@@ -36,6 +36,7 @@ class AllScheduleReducer @Inject constructor() : DomainReducer by buildDslReduce
                 scheduleElements = action.scheduleElements.toImmutableList(),
                 isCompletedScheduleShown = action.isCompletedScheduleShown,
                 isSelectionMode = false,
+                isSelectedActionInvoked = false,
                 workflows = persistentListOf()
             )
         }
@@ -48,7 +49,10 @@ class AllScheduleReducer @Inject constructor() : DomainReducer by buildDslReduce
     }
     state<AllScheduleUiState.Loaded> {
         filteredAction(predicate = { it is SelectedAction }) { (_, before) ->
-            before.copy(isSelectionMode = false)
+            before.copy(isSelectionMode = false, isSelectedActionInvoked = true)
+        }
+        action<AllScheduleAction.AppliedSelectedActionWithSchedules> { (_, before) ->
+            before.copy(isSelectedActionInvoked = false)
         }
         action<AllScheduleAction.OnSelectionModeToggleClicked> { (_, before) ->
             before.copy(isSelectionMode = before.isSelectionMode.not())

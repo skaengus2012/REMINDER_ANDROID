@@ -27,6 +27,7 @@ import com.nlab.statekit.scenario
 import com.nlab.testkit.genInt
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.test.runTest
 import org.junit.Test
 
 /**
@@ -38,6 +39,7 @@ internal class AllScheduleReducerTest {
         val expectedState = genAllScheduleUiStateLoaded(
             scheduleElements = genScheduleElements().toImmutableList(),
             isSelectionMode = false,
+            isSelectedActionInvoked = false,
             workflows = persistentListOf()
         )
 
@@ -80,9 +82,18 @@ internal class AllScheduleReducerTest {
     @Test
     fun `When selectedAction invoked, Then selection mode changed to false`() {
         AllScheduleReducer().scenario()
-            .initState(genAllScheduleUiStateLoaded(isSelectionMode = true))
+            .initState(genAllScheduleUiStateLoaded(isSelectionMode = true, isSelectedActionInvoked = false))
             .action(genAllScheduleSelectedAction())
-            .expectedStateFromInitTypeOf<AllScheduleUiState.Loaded> { it.copy(isSelectionMode = false) }
+            .expectedStateFromInitTypeOf<AllScheduleUiState.Loaded> { it.copy(isSelectionMode = false, isSelectedActionInvoked = true) }
+            .verify()
+    }
+
+    @Test
+    fun `When appliedSelectedActionWithSchedules, Then isSelectedActionInvoked changed to false`() = runTest {
+        AllScheduleReducer().scenario()
+            .initState(genAllScheduleUiStateLoaded(isSelectedActionInvoked = true))
+            .action(AllScheduleAction.AppliedSelectedActionWithSchedules)
+            .expectedStateFromInitTypeOf<AllScheduleUiState.Loaded> { it.copy(isSelectedActionInvoked = false) }
             .verify()
     }
 

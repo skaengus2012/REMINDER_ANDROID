@@ -31,6 +31,7 @@ sealed interface AllScheduleUiState : State {
         val scheduleElements: ImmutableList<ScheduleElement>,
         val isCompletedScheduleShown: Boolean,
         val isSelectionMode: Boolean,
+        val isSelectedActionInvoked: Boolean,
         val workflows: ImmutableList<AllScheduleWorkflow>
     ) : AllScheduleUiState
 }

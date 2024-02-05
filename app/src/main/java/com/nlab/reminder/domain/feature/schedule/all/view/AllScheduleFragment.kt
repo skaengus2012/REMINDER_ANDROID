@@ -49,6 +49,7 @@ import com.nlab.reminder.domain.common.schedule.view.ScheduleItemAnimator
 import com.nlab.reminder.domain.feature.schedule.all.*
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 
 /**
@@ -174,11 +175,18 @@ class AllScheduleFragment : Fragment() {
             .launchIn(viewLifecycleScope)
 
         viewModel.loadedUiState
-            .map { it.scheduleElements }
-            .distinctUntilChanged()
+            .distinctUntilChangedBy { it.scheduleElements }
             .flowOn(Dispatchers.Default)
             .flowWithLifecycle(viewLifecycle)
-            .onEach { scheduleElements -> scheduleItemAdapter.suspendSubmitList(scheduleElements) }
+            .onEach { action ->
+                if (action.isSelectedActionInvoked) {
+                    // Set a term not to allow the selection change animation
+                    // and list update to be performed at the same time.
+                    viewModel.appliedSelectedActionWithSchedules()
+                    delay(timeMillis = 200)
+                }
+                scheduleItemAdapter.suspendSubmitList(action.scheduleElements)
+            }
             .launchIn(viewLifecycleScope)
 
         viewModel.loadedUiState

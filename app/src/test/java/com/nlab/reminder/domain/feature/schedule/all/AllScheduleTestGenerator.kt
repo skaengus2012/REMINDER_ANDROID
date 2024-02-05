@@ -38,11 +38,13 @@ internal fun genAllScheduleUiStateLoaded(
     scheduleElements: ImmutableList<ScheduleElement> = genScheduleElements().toImmutableList(),
     isCompletedScheduleShown: Boolean = genBoolean(),
     isSelectionMode: Boolean = genBoolean(),
+    isSelectedActionInvoked: Boolean = false,
     workflows: ImmutableList<AllScheduleWorkflow> = persistentListOf()
 ): AllScheduleUiState.Loaded = AllScheduleUiState.Loaded(
     scheduleElements = scheduleElements,
     isCompletedScheduleShown = isCompletedScheduleShown,
     isSelectionMode = isSelectionMode,
+    isSelectedActionInvoked = isSelectedActionInvoked,
     workflows = workflows
 )
 
