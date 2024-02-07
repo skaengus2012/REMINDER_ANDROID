@@ -55,8 +55,8 @@ class AllScheduleInterceptor @Inject constructor(
         }
         action<AllScheduleAction.OnSelectedSchedulesCompleteClicked> { (action, before) ->
             val result = completeScheduleWithIds(
-                before.scheduleElements.getSelectedIds(),
-                action.isComplete
+                ids = before.scheduleElements.getSelectedIds(),
+                isComplete = action.isComplete
             )
             selectedIdRepository.clear()
             result.getOrThrow()
