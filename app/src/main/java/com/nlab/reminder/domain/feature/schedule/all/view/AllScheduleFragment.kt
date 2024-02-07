@@ -185,7 +185,7 @@ class AllScheduleFragment : Fragment() {
                      * Set a term not to allow the selection change animation
                      * and list update to be performed at the same time.
                      */
-                    delay(timeMillis = 250)
+                    delay(timeMillis = 300)
                 }
                 scheduleItemAdapter.suspendSubmitList(action.scheduleElements)
             }

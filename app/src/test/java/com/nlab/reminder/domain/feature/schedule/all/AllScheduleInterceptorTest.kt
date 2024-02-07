@@ -48,11 +48,28 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import org.mockito.verification.VerificationMode
 
 /**
  * @author thalys
  */
 internal class AllScheduleInterceptorTest {
+    @Test
+    fun `Given state Loaded with selectionMode, When OnSelectionModeToggleClicked, Then selectedIdRepo reacted`() = runTest {
+        suspend fun testTemplated(isSelectionMode: Boolean, mode: VerificationMode) {
+            val selectedIdRepository: ScheduleSelectedIdRepository = mock()
+            genInterceptor(selectedIdRepository = selectedIdRepository)
+                .scenario()
+                .initState(genAllScheduleUiStateLoaded(isSelectionMode = isSelectionMode))
+                .action(AllScheduleAction.OnSelectionModeToggleClicked)
+                .dispatchIn(testScope = this)
+            verify(selectedIdRepository, mode).clear()
+        }
+
+        testTemplated(isSelectionMode = true, mode = once())
+        testTemplated(isSelectionMode = false, mode = never())
+    }
+
     @Test
     fun `Given State Loaded, When OnCompletedScheduleVisibilityToggleClicked, Then Repository called setShown with negative isCompletedScheduleShown`() = runTest {
         testOnCompletedScheduleVisibilityToggleClicked(currentCompletedScheduleShown = true)

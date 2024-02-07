@@ -51,11 +51,15 @@ class AllScheduleReducer @Inject constructor() : DomainReducer by buildDslReduce
         filteredAction(predicate = { it is SelectedAction }) { (_, before) ->
             before.copy(isSelectionMode = false, isSelectedActionInvoked = true)
         }
+        action<AllScheduleAction.OnSelectionModeToggleClicked> { (_, before) ->
+            val nextSelectionMode = before.isSelectionMode.not()
+            before.copy(
+                isSelectionMode = nextSelectionMode,
+                isSelectedActionInvoked = nextSelectionMode.not()
+            )
+        }
         action<AllScheduleAction.AppliedSelectedActionWithSchedules> { (_, before) ->
             before.copy(isSelectedActionInvoked = false)
-        }
-        action<AllScheduleAction.OnSelectionModeToggleClicked> { (_, before) ->
-            before.copy(isSelectionMode = before.isSelectionMode.not())
         }
         action<AllScheduleAction.OnScheduleLinkClicked> { (action, before) ->
             val link = before.scheduleElements.getOrNull(action.position)?.link.orEmpty()

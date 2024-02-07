@@ -35,8 +35,13 @@ internal class ScheduleItemDiffCallback : DiffUtil.ItemCallback<ScheduleItem>() 
                 if (isDragCompare) {
                     // When updating by Drag, fade animation is prevented from occurring unnecessarily.
                     oldItem.id == newItem.id
+                } else {
+                    // When performing the bulk select function, it prevents the scroll from going to the end.
+                    //
+                    // Ex) If you can see the completed schedule on the Full Schedule screen,
+                    // the scroll will be moved to the end when you perform a full completion.
+                    oldItem.schedule == newItem.schedule
                 }
-                else oldItem.schedule == newItem.schedule
             }
         }
 

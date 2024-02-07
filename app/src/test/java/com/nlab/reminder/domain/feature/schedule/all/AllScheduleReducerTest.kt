@@ -69,9 +69,19 @@ internal class AllScheduleReducerTest {
     fun `Update selection mode, when selectionMode toggle clicked`() {
         fun testTemplate(expectedSelectionMode: Boolean) {
             AllScheduleReducer().scenario()
-                .initState(genAllScheduleUiStateLoaded(isSelectionMode = expectedSelectionMode.not()))
+                .initState(
+                    genAllScheduleUiStateLoaded(
+                        isSelectionMode = expectedSelectionMode.not(),
+                        isSelectedActionInvoked = expectedSelectionMode
+                    )
+                )
                 .action(AllScheduleAction.OnSelectionModeToggleClicked)
-                .expectedStateFromInitTypeOf<AllScheduleUiState.Loaded> { it.copy(isSelectionMode = expectedSelectionMode) }
+                .expectedStateFromInitTypeOf<AllScheduleUiState.Loaded> { initState ->
+                    initState.copy(
+                        isSelectionMode = expectedSelectionMode,
+                        isSelectedActionInvoked = expectedSelectionMode.not()
+                    )
+                }
                 .verify()
         }
 

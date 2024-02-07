@@ -40,6 +40,11 @@ class AllScheduleInterceptor @Inject constructor(
     calculateItemSwapResult: CalculateItemSwapResultUseCase
 ) : Interceptor<AllScheduleAction, AllScheduleUiState> by buildDslInterceptor(defineDSL = {
     state<AllScheduleUiState.Loaded> {
+        action<AllScheduleAction.OnSelectionModeToggleClicked> { (_, before) ->
+            if (before.isSelectionMode) {
+                selectedIdRepository.clear()
+            }
+        }
         action<AllScheduleAction.OnCompletedScheduleVisibilityToggleClicked> { (_, before) ->
             completedScheduleShownRepository
                 .setShown(isShown = before.isCompletedScheduleShown.not())
@@ -51,7 +56,7 @@ class AllScheduleInterceptor @Inject constructor(
             completeScheduleWithMark(
                 id = before.scheduleElements.findId(action.position) ?: return@action,
                 isComplete = action.isComplete
-            )
+            ).getOrThrow()
         }
         action<AllScheduleAction.OnSelectedSchedulesCompleteClicked> { (action, before) ->
             val result = completeScheduleWithIds(
