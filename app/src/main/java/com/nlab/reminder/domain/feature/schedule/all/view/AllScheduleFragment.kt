@@ -174,6 +174,11 @@ class AllScheduleFragment : Fragment() {
             .onEach { viewModel.onSelectedSchedulesCompleteClicked(isComplete = false) }
             .launchIn(viewLifecycleScope)
 
+        binding.buttonSelectedItemDeleted
+            .throttleClicks()
+            .onEach { viewModel.onSelectedSchedulesDeleteClicked() }
+            .launchIn(viewLifecycleScope)
+
         viewModel.loadedUiState
             .distinctUntilChangedBy { it.scheduleElements }
             .flowOn(Dispatchers.Default)

@@ -59,7 +59,7 @@ sealed interface AllScheduleAction : Action {
     data class OnScheduleDeleteClicked(val position: Int) : AllScheduleAction
 
     @ContractUiAction
-    data class OnSelectedSchedulesDeleteClicked(val ids: Collection<ScheduleId>) : AllScheduleAction
+    object OnSelectedSchedulesDeleteClicked : AllScheduleAction, SelectedAction
 
     @ContractUiAction
     object OnCompletedScheduleDeleteClicked : AllScheduleAction

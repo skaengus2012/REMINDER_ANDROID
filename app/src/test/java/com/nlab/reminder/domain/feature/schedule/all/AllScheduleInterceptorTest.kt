@@ -134,19 +134,25 @@ internal class AllScheduleInterceptorTest {
     }
 
     @Test
-    fun `Given State Loaded, When OnSelectedSchedulesDeleteClicked, Then Repository called delete`() = runTest {
-        val scheduleIds = List(genInt(min = 1, max = 5)) { genScheduleId() }
-        val repositoryDeleteRequest = ScheduleDeleteRequest.ByIds(scheduleIds)
+    fun `Given State Loaded, When OnSelectedSchedulesDeleteClicked, Then Repository called delete with clear selected ids`() = runTest {
+        val schedules = genSchedules()
+        val repositoryDeleteRequest = ScheduleDeleteRequest.ByIds(schedules.map { it.id })
         val scheduleRepository: ScheduleRepository = mock {
             whenever(mock.delete(repositoryDeleteRequest)) doReturn Result.Success(Unit)
         }
+        val selectedIdRepository: ScheduleSelectedIdRepository = mock()
 
-        genInterceptor(scheduleRepository = scheduleRepository)
+        genInterceptor(scheduleRepository = scheduleRepository, selectedIdRepository = selectedIdRepository)
             .scenario()
-            .initState(genAllScheduleUiStateLoaded())
-            .action(AllScheduleAction.OnSelectedSchedulesDeleteClicked(scheduleIds))
+            .initState(genAllScheduleUiStateLoaded(
+                scheduleElements = schedules.mapToScheduleElementsAsImmutableList(isSelected = true))
+            )
+            .action(AllScheduleAction.OnSelectedSchedulesDeleteClicked)
             .dispatchIn(testScope = this)
-        verify(scheduleRepository, once()).delete(repositoryDeleteRequest)
+        inOrder(scheduleRepository, selectedIdRepository) {
+            verify(scheduleRepository, once()).delete(repositoryDeleteRequest)
+            verify(selectedIdRepository, once()).clear()
+        }
     }
 
     @Test

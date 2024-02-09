@@ -72,9 +72,11 @@ class AllScheduleInterceptor @Inject constructor(
                 .delete(ScheduleDeleteRequest.ById(scheduleId))
                 .getOrThrow()
         }
-        action<AllScheduleAction.OnSelectedSchedulesDeleteClicked> { (action) ->
-            scheduleRepository.delete(ScheduleDeleteRequest.ByIds(action.ids))
-                .getOrThrow()
+        action<AllScheduleAction.OnSelectedSchedulesDeleteClicked> { (_, before) ->
+            val result = scheduleRepository
+                .delete(ScheduleDeleteRequest.ByIds(before.scheduleElements.getSelectedIds()))
+            selectedIdRepository.clear()
+            result.getOrThrow()
         }
         action<AllScheduleAction.OnCompletedScheduleDeleteClicked> {
             scheduleRepository.delete(ScheduleDeleteRequest.ByComplete(isComplete = true))
