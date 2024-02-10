@@ -120,7 +120,7 @@ class UiActionProcessor : AbstractProcessor() {
 
         processingEnv.messager.printMessage(
             Diagnostic.Kind.NOTE,
-            "generating UiAction -> [${kaptKotlinGeneratedDir}${destination.filePath}/${destination.fileName}.kt]"
+            "generating UiAction -> [${kaptKotlinGeneratedDir}/${destination.filePath}/${destination.fileName}.kt]"
         )
     }
 
