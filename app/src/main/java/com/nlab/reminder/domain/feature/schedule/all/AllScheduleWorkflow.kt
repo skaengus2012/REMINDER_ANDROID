@@ -16,11 +16,13 @@
 
 package com.nlab.reminder.domain.feature.schedule.all
 
+import com.nlab.reminder.core.annotation.ExcludeFromGeneratedTestReport
 import com.nlab.reminder.core.data.model.Link
 
 /**
  * @author thalys
  */
 sealed interface AllScheduleWorkflow {
+    @ExcludeFromGeneratedTestReport
     data class LinkPage(val link: Link) : AllScheduleWorkflow
 }

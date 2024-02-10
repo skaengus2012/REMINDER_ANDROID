@@ -18,6 +18,7 @@ package com.nlab.reminder.domain.feature.schedule.all
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.nlab.reminder.core.annotation.ExcludeFromGeneratedTestReport
 import com.nlab.statekit.lifecycle.UiActionDispatchable
 import com.nlab.statekit.util.createStore
 import com.nlab.statekit.util.stateIn
@@ -30,6 +31,7 @@ import javax.inject.Inject
 /**
  * @author Doohyun
  */
+@ExcludeFromGeneratedTestReport
 @HiltViewModel
 internal class AllScheduleViewModel @Inject constructor(
     reducer: AllScheduleReducer,

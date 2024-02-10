@@ -16,6 +16,7 @@
 
 package com.nlab.reminder.domain.feature.schedule.all
 
+import com.nlab.reminder.core.annotation.ExcludeFromGeneratedTestReport
 import com.nlab.reminder.core.annotation.Stable
 import com.nlab.reminder.core.schedule.model.ScheduleElement
 import com.nlab.statekit.State
@@ -27,6 +28,8 @@ import kotlinx.collections.immutable.ImmutableList
 @Stable
 sealed interface AllScheduleUiState : State {
     object Empty : AllScheduleUiState
+
+    @ExcludeFromGeneratedTestReport
     data class Loaded(
         val scheduleElements: ImmutableList<ScheduleElement>,
         val isCompletedScheduleShown: Boolean,
