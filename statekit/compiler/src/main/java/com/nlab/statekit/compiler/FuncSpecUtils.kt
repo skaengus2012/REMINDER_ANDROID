@@ -23,10 +23,11 @@ import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.metadata.KotlinPoetMetadataPreview
-import com.squareup.kotlinpoet.metadata.isObject
 import com.squareup.kotlinpoet.metadata.toKmClass
+import kotlinx.metadata.ClassKind
 import kotlinx.metadata.KmType
 import kotlinx.metadata.KmValueParameter
+import kotlinx.metadata.kind
 import javax.lang.model.element.Element
 
 /**
@@ -45,7 +46,7 @@ internal fun generateFuncSpecBuilder(element: Element): Result<FunSpec.Builder> 
     val valueParameters = constructors.first().valueParameters
     val statementBuilder: StringBuilder =
         StringBuilder(metadata.name.replace("/", "."))
-    if (metadata.isObject.not()) {
+    if (metadata.kind != ClassKind.OBJECT) {
         statementBuilder.append("(")
         valueParameters.forEachIndexed { index, parameter ->
             statementBuilder.append(
