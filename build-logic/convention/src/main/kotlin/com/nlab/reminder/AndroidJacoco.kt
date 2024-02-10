@@ -46,7 +46,7 @@ internal fun Project.configureJacocoAndroid(extension: AndroidComponentsExtensio
 
             sourceDirectories.setFrom(androidJacocoSourcesDirectories(variant))
             classDirectories.setFrom(androidJacocoClassDirectories(variant))
-            executionData.setFrom(file("$buildDir/jacoco/$testTaskName.exec"))
+            executionData.setFrom(file("${layout.buildDirectory.get()}/jacoco/$testTaskName.exec"))
         }
 
         jacocoTestReport.dependsOn(reportTask)
@@ -72,7 +72,7 @@ private fun Project.androidJacocoSourcesDirectories(variant: Variant): Configura
     )
 
 private fun Project.androidJacocoClassDirectories(variant: Variant): ConfigurableFileTree =
-    fileTree("$buildDir/tmp/kotlin-classes/${variant.name}") {
+    fileTree("${layout.buildDirectory.get()}/tmp/kotlin-classes/${variant.name}") {
         exclude(
             jacocoExcludePatterns + setOf(
                 "**/R.class",

@@ -37,7 +37,7 @@ android {
             arguments {
                 arg("dagger.fastInit", "enabled")
                 arg("dagger.formatGeneratedSource", "disabled")
-                arg("room.schemaLocation", "$buildDir/schemas")
+                arg("room.schemaLocation", "${layout.buildDirectory.get()}/schemas")
             }
         }
     }
