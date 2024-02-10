@@ -25,7 +25,7 @@ import androidx.room.Entity
 @Entity(tableName = "link_metadata", primaryKeys = ["link"])
 data class LinkMetadataEntity(
     @ColumnInfo(name = "link") val link: String,
-    @ColumnInfo(name = "title") val title: String?,
-    @ColumnInfo(name = "imageUrl") val imageUrl: String?,
+    @ColumnInfo(name = "title") val title: String,
+    @ColumnInfo(name = "imageUrl") val imageUrl: String,
     @ColumnInfo(name = "timestamp") val timestamp: Long
 )

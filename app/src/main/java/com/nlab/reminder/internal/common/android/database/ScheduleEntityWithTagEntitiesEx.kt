@@ -17,10 +17,10 @@
 package com.nlab.reminder.internal.common.android.database
 
 import com.nlab.reminder.domain.common.schedule.Schedule
+import com.nlab.reminder.internal.data.model.toModels
 
 /**
  * @author Doohyun
  */
 fun ScheduleEntityWithTagEntities.toSchedule(): Schedule =
-    scheduleEntity.toSchedule(tags = tagEntities.toTags().sortedBy { it.name })
-fun List<ScheduleEntityWithTagEntities>.toSchedules(): List<Schedule> = map { it.toSchedule() }
+    scheduleEntity.toSchedule(tags = tagEntities.toModels().sortedBy { it.name })

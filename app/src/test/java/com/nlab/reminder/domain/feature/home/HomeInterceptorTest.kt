@@ -17,9 +17,9 @@
 package com.nlab.reminder.domain.feature.home
 
 import com.nlab.reminder.core.kotlin.util.Result
-import com.nlab.reminder.domain.common.data.model.genTag
-import com.nlab.reminder.domain.common.data.model.genTagUsageCount
-import com.nlab.reminder.domain.common.data.repository.TagRepository
+import com.nlab.reminder.core.data.model.genTag
+import com.nlab.reminder.core.data.model.genTagUsageCount
+import com.nlab.reminder.core.data.repository.TagRepository
 import com.nlab.statekit.middleware.interceptor.scenario
 import com.nlab.testkit.genBothify
 import com.nlab.testkit.once

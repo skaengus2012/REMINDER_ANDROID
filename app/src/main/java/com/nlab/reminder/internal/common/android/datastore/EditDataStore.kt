@@ -22,7 +22,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import com.nlab.reminder.core.kotlin.util.Result
 import com.nlab.reminder.core.kotlin.util.catching
-import com.nlab.reminder.core.util.test.annotation.ExcludeFromGeneratedTestReport
+import com.nlab.reminder.core.annotation.ExcludeFromGeneratedTestReport
 
 /**
  * @author thalys

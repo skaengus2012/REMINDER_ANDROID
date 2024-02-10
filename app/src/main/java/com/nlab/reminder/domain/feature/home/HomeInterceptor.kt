@@ -21,7 +21,7 @@ import com.nlab.reminder.core.kotlin.util.flatMap
 import com.nlab.reminder.core.kotlin.util.getOrThrow
 import com.nlab.reminder.core.kotlin.util.onFailure
 import com.nlab.reminder.core.kotlin.util.onSuccess
-import com.nlab.reminder.domain.common.data.repository.TagRepository
+import com.nlab.reminder.core.data.repository.TagRepository
 import com.nlab.statekit.middleware.interceptor.Interceptor
 import com.nlab.statekit.util.buildDslInterceptor
 import javax.inject.Inject

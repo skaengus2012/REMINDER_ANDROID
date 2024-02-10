@@ -15,6 +15,10 @@
  */
 package com.nlab.reminder.domain.common.util.link.infra
 
+import com.nlab.reminder.core.data.repository.infra.OG_IMAGE
+import com.nlab.reminder.core.data.repository.infra.OG_TITLE
+import com.nlab.reminder.core.data.repository.infra.toContent
+import com.nlab.reminder.core.data.repository.infra.toProperty
 import com.nlab.reminder.core.kotlin.util.Result
 import com.nlab.reminder.core.kotlin.util.catching
 import com.nlab.reminder.domain.common.util.link.LinkMetadata

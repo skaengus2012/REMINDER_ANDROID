@@ -16,9 +16,9 @@
 
 package com.nlab.reminder.domain.feature.home
 
-import com.nlab.reminder.core.util.test.annotation.ExcludeFromGeneratedTestReport
-import com.nlab.reminder.domain.common.data.model.Tag
-import com.nlab.reminder.domain.common.data.model.TagUsageCount
+import com.nlab.reminder.core.annotation.ExcludeFromGeneratedTestReport
+import com.nlab.reminder.core.data.model.Tag
+import com.nlab.reminder.core.data.model.TagUsageCount
 
 /**
  * @author thalys

@@ -38,7 +38,6 @@ class NavGraph<T> internal constructor(
     }
 }
 
-@Suppress("FunctionName")
 fun <T> NavGraph(block: NavGraphBuilder<T>.() -> Unit): NavGraph<T> = NavGraph(
     NavGraphBuilder<T>()
         .apply(block)

@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (C) 2024 The N's lab Open Source Project
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~        http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layout_delete"
+        android:layout_width="@dimen/schedule_clamp_width"
+        android:layout_height="match_parent"
+        android:layout_gravity="end"
+        android:background="@color/bg_delete_clamp">
+
+        <ImageView
+            android:id="@+id/imageview_trash"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginBottom="1dp"
+            android:importantForAccessibility="no"
+            app:layout_constraintBottom_toTopOf="@id/textview_delete"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="packed"
+            app:srcCompat="@drawable/ic_trash"
+            app:tint="@color/white" />
+
+        <TextView
+            android:id="@+id/textview_delete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="1dp"
+            android:text="@string/delete"
+            android:textColor="@color/white"
+            android:textSize="11sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/imageview_trash" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layout_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?android:windowBackground">
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline_textStart"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            app:layout_constraintGuide_begin="@dimen/schedule_checkbox_touchable_size" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline_textStartCompleteSelection"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            app:layout_constraintGuide_begin="@dimen/schedule_checkbox_touchable_size_2x" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline_textEnd"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            app:layout_constraintGuide_end="@dimen/default_side_padding" />
+
+        <ImageButton
+            android:id="@+id/button_complete"
+            android:layout_width="@dimen/schedule_checkbox_touchable_size"
+            android:layout_height="@dimen/schedule_checkbox_touchable_size"
+            android:alpha="1"
+            android:background="@android:color/transparent"
+            android:padding="@dimen/default_side_padding"
+            android:scaleType="fitXY"
+            android:src="@drawable/checkbox_schedule"
+            app:layout_constraintEnd_toEndOf="@id/guideline_textStart"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="ContentDescription"
+            tools:src="@drawable/checkbox_schedule_checked" />
+
+        <ImageButton
+            android:id="@+id/button_selection"
+            android:layout_width="@dimen/schedule_checkbox_touchable_size"
+            android:layout_height="@dimen/schedule_checkbox_touchable_size"
+            android:alpha="0.5"
+            android:background="@android:color/transparent"
+            android:padding="16dp"
+            android:scaleType="fitXY"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/button_complete"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/checkbox_schedule_selection"
+            tools:ignore="ContentDescription" />
+
+        <View
+            android:id="@+id/view_button_complete_hidden"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="?android:windowBackground"
+            android:clickable="false"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@id/guideline_textStartCompleteSelection"
+            app:layout_constraintStart_toStartOf="@id/guideline_textStart"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layout_data_holder"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toTopOf="@id/view_line"
+            app:layout_constraintEnd_toEndOf="@id/guideline_textEnd"
+            app:layout_constraintHeight="wrap_content"
+            app:layout_constraintHeight_min="@dimen/schedule_checkbox_touchable_size"
+            app:layout_constraintStart_toStartOf="@id/guideline_textStart"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <EditText
+                android:id="@+id/edittext_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="@null"
+                android:gravity="center_vertical"
+                android:textColor="?attr/font_color_1"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toTopOf="@id/edittext_note"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHeight_min="@dimen/schedule_check_size"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="Autofill,LabelFor,TextFields"
+                tools:text="@tools:sample/lorem" />
+
+            <EditText
+                android:id="@+id/edittext_note"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:background="@null"
+                android:gravity="center_vertical"
+                android:textColor="?attr/font_color_2"
+                android:textSize="14sp"
+                app:layout_constraintEnd_toEndOf="@id/edittext_title"
+                app:layout_constraintStart_toStartOf="@id/edittext_title"
+                app:layout_constraintTop_toBottomOf="@id/edittext_title"
+                tools:ignore="Autofill,LabelFor,TextFields"
+                tools:text="@tools:sample/lorem" />
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/card_link"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="7.5dp"
+                android:background="?attr/bg_color_card_2"
+                android:contentDescription="@string/open_link"
+                android:descendantFocusability="blocksDescendants"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="0dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/edittext_note"
+                app:layout_constraintWidth_max="500dp"
+                app:strokeColor="?attr/bg_color_stroke_1"
+                app:strokeWidth="0.5dp"
+                tools:visibility="visible">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/bg_color_card_2"
+                    android:paddingBottom="8dp">
+
+                    <ImageView
+                        android:id="@+id/imageview_bg_link_thumbnail"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:background="?attr/bg_schedule_placeholder"
+                        android:importantForAccessibility="no"
+                        app:layout_constraintDimensionRatio="1:0.4"
+                        app:layout_constraintHorizontal_bias="0"
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:srcCompat="@drawable/ic_schedule_link_error"
+                        tools:tint="?attr/tint_schedule_placeholder" />
+
+                    <TextView
+                        android:id="@+id/textview_title_link"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginBottom="0.5dp"
+                        android:textColor="?attr/font_color_1"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        app:layout_constraintBottom_toTopOf="@id/textview_link"
+                        app:layout_constraintEnd_toEndOf="@id/textview_link"
+                        app:layout_constraintStart_toStartOf="@id/textview_link"
+                        app:layout_constraintTop_toBottomOf="@id/imageview_bg_link_thumbnail"
+                        tools:text="타이틀" />
+
+                    <TextView
+                        android:id="@+id/textview_link"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginTop="0.5dp"
+                        android:layout_marginEnd="6dp"
+                        android:textColor="?attr/font_color_2"
+                        android:textSize="11sp"
+                        app:layout_constraintEnd_toStartOf="@id/imageview_browser"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/textview_title_link"
+                        app:layout_goneMarginTop="8dp"
+                        tools:text="@tools:sample/lorem" />
+
+                    <ImageView
+                        android:id="@+id/imageview_browser"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginEnd="10dp"
+                        android:importantForAccessibility="no"
+                        android:scaleType="fitXY"
+                        app:layout_constraintBottom_toBottomOf="@id/textview_link"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="@id/textview_link"
+                        app:srcCompat="@drawable/ic_schedule_browser"
+                        app:tint="?attr/font_color_1" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </androidx.cardview.widget.CardView>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <ImageButton
+            android:id="@+id/button_drag_handle"
+            android:layout_width="@dimen/schedule_checkbox_touchable_size"
+            android:layout_height="@dimen/schedule_checkbox_touchable_size"
+            android:background="?selectableItemBackgroundBorderless"
+            android:contentDescription="@string/handle_drag"
+            android:padding="15dp"
+            android:scaleType="fitXY"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_drag_handle"
+            app:tint="@color/tint_schedule_drag_handle" />
+
+        <View
+            android:id="@+id/view_line"
+            android:layout_width="0dp"
+            android:layout_height="0.5dp"
+            android:layout_marginTop="15dp"
+            android:background="?attr/bg_color_line_1"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@id/guideline_textStart"
+            app:layout_constraintTop_toBottomOf="@id/layout_data_holder" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</FrameLayout>

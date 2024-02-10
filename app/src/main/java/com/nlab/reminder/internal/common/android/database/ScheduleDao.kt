@@ -17,7 +17,6 @@
 package com.nlab.reminder.internal.common.android.database
 
 import androidx.room.*
-import com.nlab.reminder.domain.common.schedule.Schedule
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -28,6 +27,9 @@ abstract class ScheduleDao {
     @Insert
     abstract suspend fun insert(schedule: ScheduleEntity): Long
 
+    @Update
+    abstract suspend fun update(schedule: ScheduleEntity)
+
     @Transaction
     @Query("SELECT * FROM schedule ORDER BY is_complete, visible_priority")
     abstract fun findAsStream(): Flow<List<ScheduleEntityWithTagEntities>>
@@ -37,7 +39,7 @@ abstract class ScheduleDao {
     abstract fun findByCompleteAsStream(isComplete: Boolean): Flow<List<ScheduleEntityWithTagEntities>>
 
     @Query("SELECT * FROM schedule WHERE schedule_id IN (:scheduleIds)")
-    abstract suspend fun findByScheduleIds(scheduleIds: List<Long>): List<ScheduleEntity>
+    abstract suspend fun findByScheduleIds(scheduleIds: Collection<Long>): List<ScheduleEntity>
 
     @Query(
         """
@@ -54,21 +56,57 @@ abstract class ScheduleDao {
     abstract suspend fun updateVisiblePriority(scheduleId: Long, visiblePriority: Long)
 
     @Transaction
-    open suspend fun updateVisiblePriorities(requests: List<Pair<Long, Long>>) {
-        requests.forEach { (scheduleId, visiblePriority) -> updateVisiblePriority(scheduleId, visiblePriority) }
+    open suspend fun updateCompletes(idToCompleteTable: Map<Long, Boolean>) {
+        val completeToEntities: Map<Boolean, List<ScheduleEntity>> =
+            findByScheduleIds(scheduleIds = idToCompleteTable.keys)
+                .filter { entity -> entity.isComplete != idToCompleteTable.getValue(entity.scheduleId) }
+                .groupBy { it.isComplete }
+        updateCompletesInternal(completeToEntities[true], targetComplete = false)
+        updateCompletesInternal(completeToEntities[false], targetComplete = true)
     }
 
+    private suspend fun updateCompletesInternal(entities: List<ScheduleEntity>?, targetComplete: Boolean) {
+        if (entities == null) return
+        if (entities.isEmpty()) return
+
+        val maxVisiblePriority: Long = getMaxVisiblePriority(targetComplete) ?: -1
+        entities.sortedBy { it.visiblePriority }.forEachIndexed { index, entity ->
+            update(
+                entity.copy(
+                    isComplete = targetComplete,
+                    visiblePriority = maxVisiblePriority + index + 1
+                )
+            )
+        }
+    }
+
+    @Transaction
+    open suspend fun updateVisiblePriorities(idToVisiblePriorityTable: Map<Long, Long>) {
+        idToVisiblePriorityTable
+            .forEach { (scheduleId, visiblePriority) -> updateVisiblePriority(scheduleId, visiblePriority) }
+    }
+
+    // deprecate zone.
     @Query(
         """
         UPDATE schedule 
         SET is_complete = :isComplete, visible_priority = :visiblePriority 
-        WHERE schedule_id IN (:scheduleIds)
+        WHERE schedule_id = :scheduleId
         """
     )
-    abstract suspend fun updateCompletes(scheduleIds: List<Long>, isComplete: Boolean, visiblePriority: Long)
+    abstract suspend fun updateComplete(scheduleId: Long, isComplete: Boolean, visiblePriority: Long)
+
+    private suspend fun updateCompletesWithIds(scheduleIds: List<Long>, isComplete: Boolean) {
+        if (scheduleIds.isEmpty()) return
+
+        val maxVisiblePriority: Long = getMaxVisiblePriority(isComplete) ?: -1
+        scheduleIds.forEachIndexed { index, scheduleId ->
+            updateComplete(scheduleId, isComplete, visiblePriority = maxVisiblePriority + index + 1)
+        }
+    }
 
     @Transaction
-    open suspend fun updateCompletes(requests: List<Pair<Long, Boolean>>) {
+    open suspend fun updateCompletesLegacy(requests: List<Pair<Long, Boolean>>) {
         val curIdToComplete: Map<Long, Boolean> =
             findByScheduleIds(scheduleIds = requests.map { (first) -> first }).associateBy(
                 keySelector = { it.scheduleId },
@@ -78,11 +116,11 @@ abstract class ScheduleDao {
             requests
                 .filter { (scheduleId) -> curIdToComplete.containsKey(scheduleId) }
                 .filter { (scheduleId, isComplete) -> curIdToComplete[scheduleId] != isComplete }
-        updateCompletesInternal(diffCompleteRequests, isComplete = true)
-        updateCompletesInternal(diffCompleteRequests, isComplete = false)
+        updateCompletesInternalLegacy(diffCompleteRequests, isComplete = true)
+        updateCompletesInternalLegacy(diffCompleteRequests, isComplete = false)
     }
 
-    private suspend fun updateCompletesInternal(requests: List<Pair<Long, Boolean>>, isComplete: Boolean) {
+    private suspend fun updateCompletesInternalLegacy(requests: List<Pair<Long, Boolean>>, isComplete: Boolean) {
         updateCompletesWithIds(
             scheduleIds = requests
                 .filter { (_, mappingComplete) -> mappingComplete == isComplete }
@@ -92,22 +130,13 @@ abstract class ScheduleDao {
     }
 
     @Transaction
-    open suspend fun updateCompletes(scheduleIds: List<Long>, isComplete: Boolean) {
+    open suspend fun updateCompletesLegacy(scheduleIds: List<Long>, isComplete: Boolean) {
         updateCompletesWithIds(
             scheduleIds = findByScheduleIds(scheduleIds)
                 .filter { it.isComplete != isComplete }
                 .map { it.scheduleId },
             isComplete
         )
-    }
-
-    private suspend fun updateCompletesWithIds(scheduleIds: List<Long>, isComplete: Boolean) {
-        if (scheduleIds.isEmpty()) return
-
-        val maxVisiblePriority: Long = getMaxVisiblePriority(isComplete) ?: -1
-        scheduleIds.forEachIndexed { index, scheduleId ->
-            updateCompletes(listOf(scheduleId), isComplete, visiblePriority = maxVisiblePriority + index + 1)
-        }
     }
 
     @Delete

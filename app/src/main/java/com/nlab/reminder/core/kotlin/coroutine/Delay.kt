@@ -16,9 +16,17 @@
 
 package com.nlab.reminder.core.kotlin.coroutine
 
+import kotlinx.coroutines.delay
+
 /**
  * @author Doohyun
  */
 interface Delay {
     suspend operator fun invoke()
+}
+
+fun Delay(timeMillis: Long): Delay = object : Delay {
+    override suspend fun invoke() {
+        delay(timeMillis)
+    }
 }

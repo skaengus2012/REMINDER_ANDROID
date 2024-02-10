@@ -43,16 +43,16 @@ class LocalScheduleRepository(
     override suspend fun update(request: UpdateRequest): Result<Unit> = when (request) {
         // When outside the catch block, jacoco does not recognize. 😭
         is UpdateRequest.Completes -> catching {
-            scheduleDao.updateCompletes(
+            scheduleDao.updateCompletesLegacy(
                 requests = request.values.map { request -> request.scheduleId.value to request.isComplete }
             )
         }
         is UpdateRequest.BulkCompletes -> catching {
-            scheduleDao.updateCompletes(scheduleIds = request.scheduleIds.map { it.value }, request.isComplete)
+            scheduleDao.updateCompletesLegacy(scheduleIds = request.scheduleIds.map { it.value }, request.isComplete)
         }
         is UpdateRequest.VisiblePriorities -> catching {
             scheduleDao.updateVisiblePriorities(
-                requests = request.values.map { request -> request.scheduleId.value to request.visiblePriority }
+                request.values.associate { request -> request.scheduleId.value to request.visiblePriority }
             )
         }
     }

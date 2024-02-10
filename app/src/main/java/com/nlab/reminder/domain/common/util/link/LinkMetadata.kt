@@ -16,7 +16,7 @@
 
 package com.nlab.reminder.domain.common.util.link
 
-import com.nlab.reminder.core.util.test.annotation.ExcludeFromGeneratedTestReport
+import com.nlab.reminder.core.annotation.ExcludeFromGeneratedTestReport
 
 /**
  * @author thalys

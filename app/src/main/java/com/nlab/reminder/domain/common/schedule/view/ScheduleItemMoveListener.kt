@@ -26,7 +26,7 @@ class ScheduleItemMoveListener(
     private val getItem: (position: Int) -> ScheduleUiState?,
     private val notifyItemMoved: (fromPosition: Int, toPosition: Int) -> Unit
 ) : ItemMoveListener {
-    override fun onMove(fromPosition: Int, toPosition: Int): Boolean {
+    override fun onItemMoved(fromPosition: Int, toPosition: Int): Boolean {
         val fromState: ScheduleUiState? = getItem(fromPosition)
         val toState: ScheduleUiState? = getItem(toPosition)
         val isMoveNeeded: Boolean =

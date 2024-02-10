@@ -21,12 +21,15 @@
 
 	<application
 		android:name=".ReminderApplication"
+		android:enableOnBackInvokedCallback="true"
 		android:icon="@mipmap/ic_launcher"
 		android:label="@string/app_name"
+		android:largeHeap="true"
 		android:roundIcon="@mipmap/ic_launcher_round"
 		android:supportsRtl="true"
 		android:theme="@style/AppSplashScreen"
-		tools:ignore="AllowBackup">
+		tools:ignore="AllowBackup"
+		tools:targetApi="tiramisu">
 
 		<activity
 			android:name=".domain.feature.main.view.MainActivity"

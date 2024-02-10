@@ -21,7 +21,6 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.javafaker.Faker
 import com.nlab.reminder.internal.common.android.database.*
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.After
@@ -33,7 +32,6 @@ import java.util.*
 /**
  * @author Doohyun
  */
-@OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
 class InsertDummyInfoToDatabaseMacro {
     private val faker: Faker = Faker(Locale("ko"))

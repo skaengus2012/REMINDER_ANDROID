@@ -17,6 +17,7 @@
 package com.nlab.statekit.middleware.interceptor.dsl
 
 import com.nlab.statekit.Action
+import com.nlab.statekit.UpdateSource
 import com.nlab.statekit.dsl.BuilderDsl
 import com.nlab.statekit.middleware.interceptor.ActionDispatcher
 
@@ -28,3 +29,6 @@ import com.nlab.statekit.middleware.interceptor.ActionDispatcher
 value class InterceptEndScope<A : Action> internal constructor(
     private val actionDispatcher: ActionDispatcher<A>
 ) : ActionDispatcher<A> by actionDispatcher
+
+typealias InterceptorEndType2<A, S> = suspend InterceptEndScope<A>.(UpdateSource<A, S>) -> Unit
+typealias InterceptorEndType3<A, S, T> = suspend InterceptEndScope<A>.(UpdateSource<T, S>) -> Unit

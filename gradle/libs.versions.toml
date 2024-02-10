@@ -7,8 +7,9 @@ minSdk = "23"
 
 # library version
 afollestedDragselectRecyclerView = "2.4.0"
-androidGradlePlugin = "8.1.4"
+androidGradlePlugin = "8.2.0"
 androidxAppCompat = "1.6.1"
+androidxCardview = "1.0.0"
 androidxComposeBom = "2023.06.01"
 androidxComposeCompiler = "1.4.7"
 androidxConstaintLayout = "2.1.4"
@@ -19,15 +20,14 @@ androidxFragment = "1.6.1"
 androidxHiltNavigationCompose = "1.0.0"
 androidxLifecycle = "2.6.1"
 androidxNavigation = "2.6.0"
-androidxRecyclerView = "1.3.1"
+androidxRecyclerView = "1.3.2"
 androidxRoom = "2.5.2"
 androidxStartUp = "1.1.1"
 androidxTestEspresso = "3.5.1"
 androidxTestJunit = "1.1.5"
-androidxTestRules = "1.5.2"
+androidxTestRules = "1.5.0"
 facebookFlipper = "0.246.0"
 facebookSoloader = "0.11.0"
-googleAndroidMaterial = "1.9.0"
 googleHilt = "2.50"
 glide = "4.16.0"
 jacoco = "0.8.9"
@@ -49,6 +49,7 @@ afollested-dragselectRecyclerView = { module = "com.afollestad:drag-select-recyc
 android-gradle-plugin = { group = "com.android.tools.build", name = "gradle", version.ref = "androidGradlePlugin" }
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose" }
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "androidxAppCompat" }
+androidx-cardview = { module = "androidx.cardview:cardview", version.ref = "androidxCardview" }
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "androidxComposeBom" }
 androidx-compose-foundation = { group = "androidx.compose.foundation", name = "foundation" }
 androidx-compose-material = { group = "androidx.compose.material", name = "material" }   # For using ModalBottomSheetLayout
@@ -78,7 +79,6 @@ androidx-test-runner = { module = "androidx.test:runner", version.ref = "android
 facebook-flipper = { module = "com.facebook.flipper:flipper", version.ref = "facebookFlipper" }
 facebook-flipper-leakcanary = { module = "com.facebook.flipper:flipper-leakcanary2-plugin", version.ref = "facebookFlipper" }
 facebook-soloader = { module = "com.facebook.soloader:soloader", version.ref = "facebookSoloader" }
-google-android-material = { module = "com.google.android.material:material", version.ref = "googleAndroidMaterial" }
 google-hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "googleHilt" }
 google-hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "googleHilt" }
 glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }

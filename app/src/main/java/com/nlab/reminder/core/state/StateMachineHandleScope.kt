@@ -16,7 +16,7 @@
 package com.nlab.reminder.core.state
 
 import com.nlab.reminder.core.kotlin.coroutine.flow.map
-import com.nlab.reminder.core.util.test.annotation.ExcludeFromGeneratedTestReport
+import com.nlab.reminder.core.annotation.ExcludeFromGeneratedTestReport
 import kotlinx.coroutines.flow.*
 
 /**

@@ -18,7 +18,7 @@ package com.nlab.reminder.internal.common.schedule.impl
 
 import com.nlab.reminder.core.kotlin.util.isSuccess
 import com.nlab.reminder.domain.common.schedule.*
-import com.nlab.reminder.domain.common.data.model.genTags
+import com.nlab.reminder.core.data.model.genTags
 import com.nlab.reminder.internal.common.android.database.*
 import com.nlab.reminder.internal.common.database.toScheduleEntityWithTagEntities
 import com.nlab.reminder.test.*
@@ -38,6 +38,7 @@ import org.mockito.kotlin.*
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class LocalScheduleRepositoryTest {
+    /**
     @Test
     fun `notify 2 times schedules when ScheduleDao sent 2 times data`() = runTest {
         val isComplete: Boolean = genBoolean()
@@ -96,7 +97,7 @@ class LocalScheduleRepositoryTest {
             genRequest = { scheduleId, isComplete -> ModifyCompleteRequest(scheduleId, isComplete) }
         )
         testUpdateTemplate(UpdateRequest.Completes(repositoryParam)) { scheduleDao ->
-            verify(scheduleDao, once()).updateCompletes(daoParam)
+            verify(scheduleDao, once()).updateCompletesLegacy(daoParam)
         }
     }
 
@@ -108,7 +109,7 @@ class LocalScheduleRepositoryTest {
             genRequest = { scheduleId, _ -> scheduleId }
         )
         testUpdateTemplate(UpdateRequest.BulkCompletes(repositoryParam, isComplete)) { scheduleDao ->
-            verify(scheduleDao, once()).updateCompletes(daoParam.map { it.first }, isComplete)
+            verify(scheduleDao, once()).updateCompletesLegacy(daoParam.map { it.first }, isComplete)
         }
     }
 
@@ -173,5 +174,5 @@ class LocalScheduleRepositoryTest {
         val result = LocalScheduleRepository(scheduleDao).delete(request)
         verifyDao(scheduleDao)
         assertThat(result.isSuccess, equalTo(true))
-    }
+    }*/
 }

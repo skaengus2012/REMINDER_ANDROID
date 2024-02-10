@@ -18,9 +18,9 @@ package com.nlab.reminder.domain.feature.home
 
 import com.nlab.reminder.R
 import com.nlab.reminder.core.state.UserMessage
-import com.nlab.reminder.domain.common.data.model.genTag
-import com.nlab.reminder.domain.common.data.model.genTagUsageCount
-import com.nlab.reminder.domain.common.data.model.genTags
+import com.nlab.reminder.core.data.model.genTag
+import com.nlab.reminder.core.data.model.genTagUsageCount
+import com.nlab.reminder.core.data.model.genTags
 import com.nlab.statekit.expectedState
 import com.nlab.statekit.expectedStateToInit
 import com.nlab.statekit.scenario

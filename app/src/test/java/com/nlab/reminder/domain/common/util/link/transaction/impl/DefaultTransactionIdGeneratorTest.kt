@@ -16,7 +16,7 @@
 
 package com.nlab.reminder.domain.common.util.link.transaction.impl
 
-import com.nlab.reminder.domain.common.util.transaction.TransactionId
+import com.nlab.reminder.core.data.model.TransactionId
 import com.nlab.reminder.domain.common.util.transaction.TransactionIdGenerator
 import com.nlab.reminder.domain.common.util.transaction.impl.DefaultTransactionIdGenerator
 import com.nlab.testkit.genBothify

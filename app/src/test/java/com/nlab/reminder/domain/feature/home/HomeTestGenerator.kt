@@ -16,8 +16,12 @@
 
 package com.nlab.reminder.domain.feature.home
 
+import com.nlab.reminder.core.data.model.Tag
+import com.nlab.reminder.core.data.model.TagUsageCount
+import com.nlab.reminder.core.data.model.genTag
+import com.nlab.reminder.core.data.model.genTagUsageCount
+import com.nlab.reminder.core.data.model.genTags
 import com.nlab.reminder.core.state.UserMessage
-import com.nlab.reminder.domain.common.data.model.*
 import com.nlab.testkit.genBoolean
 import com.nlab.testkit.genBothify
 import com.nlab.testkit.genLong

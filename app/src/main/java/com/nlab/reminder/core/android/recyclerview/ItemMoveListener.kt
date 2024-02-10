@@ -20,5 +20,6 @@ package com.nlab.reminder.core.android.recyclerview
  * @author thalys
  */
 interface ItemMoveListener {
-    fun onMove(fromPosition: Int, toPosition: Int): Boolean
+    fun onItemMoved(fromPosition: Int, toPosition: Int): Boolean
+    fun onItemMoveEnded() {} // todo remove default
 }

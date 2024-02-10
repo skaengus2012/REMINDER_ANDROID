@@ -58,7 +58,7 @@ import com.nlab.reminder.core.android.designsystem.component.ThemeLoadingIndicat
 import com.nlab.reminder.core.android.designsystem.theme.ReminderTheme
 import com.nlab.reminder.core.state.UserMessage
 import com.nlab.reminder.domain.common.android.widget.showToast
-import com.nlab.reminder.domain.common.data.model.Tag
+import com.nlab.reminder.core.data.model.Tag
 import com.nlab.reminder.domain.common.tag.ui.TagDeleteBottomSheetContent
 import com.nlab.reminder.domain.common.tag.ui.TagRenameDialog
 import com.nlab.reminder.domain.feature.home.*

@@ -17,7 +17,7 @@
 package com.nlab.reminder.domain.common.tag.ui
 
 import androidx.compose.runtime.Composable
-import com.nlab.reminder.domain.common.data.model.TagUsageCount
+import com.nlab.reminder.core.data.model.TagUsageCount
 
 /**
  * @author Doohyun
