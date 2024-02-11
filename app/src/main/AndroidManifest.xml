@@ -46,9 +46,6 @@
 			android:exported="false"
 			tools:node="merge">
 			<meta-data
-				android:name="com.nlab.reminder.internal.common.android.init.StateMachinePluginInitializer"
-				android:value="androidx.startup" />
-			<meta-data
 				android:name="com.nlab.reminder.internal.common.android.init.StorekitPluginInitializer"
 				android:value="androidx.startup" />
 		</provider>

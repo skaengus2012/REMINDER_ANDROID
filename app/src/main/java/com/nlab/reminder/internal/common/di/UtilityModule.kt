@@ -20,11 +20,8 @@ import android.app.Application
 import com.nlab.reminder.core.android.widget.ToastHandle
 import com.nlab.reminder.domain.common.kotlin.coroutine.inject.DefaultDispatcher
 import com.nlab.reminder.domain.common.kotlin.coroutine.inject.GlobalScope
-import com.nlab.reminder.domain.common.util.transaction.TransactionIdGenerator
-import com.nlab.reminder.domain.common.util.transaction.impl.DefaultTransactionIdGenerator
 import dagger.Module
 import dagger.Provides
-import dagger.Reusable
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineDispatcher
@@ -41,13 +38,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 class UtilityModule {
-    @Reusable
-    @Provides
-    fun provideTransactionIdGenerator(): TransactionIdGenerator = DefaultTransactionIdGenerator(
-        randomPrefix = { UUID.randomUUID().toString() },
-        timestamp = { Calendar.getInstance().timeInMillis }
-    )
-
     @Singleton
     @Provides
     fun provideToastHandle(application: Application): ToastHandle = ToastHandle(application)
