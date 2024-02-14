@@ -78,9 +78,9 @@ android {
 }
 
 dependencies {
-    implementation(project(":statekit:runtime"))
-    implementation(project(":statekit:viewmodel"))
-    kapt(project(":statekit:compiler"))
+    implementation(projects.statekit.runtime)
+    implementation(projects.statekit.viewmodel)
+    kapt(projects.statekit.compiler)
 
     implementation(libs.kotlin.coroutines.android)
     implementation(libs.kotlin.collections.immutable)
@@ -129,8 +129,8 @@ dependencies {
 
     debugImplementation(libs.squeare.leakcanary)
 
-    testImplementation(project(":testkit"))
-    testImplementation(project(":statekit:test"))
+    testImplementation(projects.testkit)
+    testImplementation(projects.statekit.test)
     testImplementation(libs.junit)
     testImplementation(libs.kotlin.coroutines.test)
     testImplementation(libs.mockito.inline)

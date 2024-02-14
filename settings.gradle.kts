@@ -32,7 +32,8 @@ dependencyResolutionManagement {
 
 rootProject.name = "REMINDER_ANDROID"
 
-// nlab third-party
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+// nlab-kits.
 include(
     ":statekit:compiler",
     ":statekit:core",
@@ -41,5 +42,5 @@ include(
     ":statekit:viewmodel",
     ":testkit"
 )
-// reminder
+// Reminder
 include(":app")
