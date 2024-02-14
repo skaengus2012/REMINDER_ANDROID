@@ -30,11 +30,16 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name="REMINDER_ANDROID"
+rootProject.name = "REMINDER_ANDROID"
+
+// nlab third-party
+include(
+    ":statekit:compiler",
+    ":statekit:core",
+    ":statekit:runtime",
+    ":statekit:test",
+    ":statekit:viewmodel",
+    ":testkit"
+)
+// reminder
 include(":app")
-include(":statekit:compiler")
-include(":statekit:core")
-include(":statekit:runtime")
-include(":statekit:test")
-include(":statekit:viewmodel")
-include(":testkit")
