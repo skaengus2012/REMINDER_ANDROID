@@ -35,6 +35,7 @@ javafaker = "1.0.2"
 jsoup = "1.17.2"
 junit = "4.13.2"
 kotlin = "1.9.22"
+ksp = "1.9.22-1.0.17"
 kotlinCollectionsImmutable = "0.3.7"
 kotlinCoroutine = "1.7.3"
 mockitoInline = "5.2.0"
@@ -103,6 +104,7 @@ android-application = { id = "com.android.application", version.ref = "androidGr
 androidx-navigation-safearges = { id = "androidx.navigation.safeargs.kotlin", version.ref = "androidxNavigation" }
 google-hilt = { id = "com.google.dagger.hilt.android", version.ref = "googleHilt" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 
 # reminder's custom plugin
 nlab-android-application = { id = "nlab.android.application", version = "unspecified" }

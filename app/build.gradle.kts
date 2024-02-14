@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 plugins {
     alias(libs.plugins.nlab.android.application)
     alias(libs.plugins.nlab.android.application.jacoco)
     alias(libs.plugins.google.hilt)
     alias(libs.plugins.androidx.navigation.safearges)
+    alias(libs.plugins.ksp)
     id("kotlin-parcelize")
     kotlin("kapt")
 }
@@ -33,12 +33,8 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        kapt {
-            arguments {
-                arg("dagger.fastInit", "enabled")
-                arg("dagger.formatGeneratedSource", "disabled")
-                arg("room.schemaLocation", "${layout.buildDirectory.get()}/schemas")
-            }
+        ksp {
+            arg("room.schemaLocation", "${layout.buildDirectory.get()}/schemas")
         }
     }
 
@@ -104,7 +100,7 @@ dependencies {
     implementation(libs.androidx.navigation.ui.ktx)
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
-    kapt(libs.androidx.room.compiler)
+    ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.startup.runtime)
     implementation(libs.androidx.datastore.preferences)
     implementation(platform(libs.androidx.compose.bom))
@@ -116,12 +112,12 @@ dependencies {
     implementation(libs.androidx.compose.foundation)
 
     implementation(libs.google.hilt.android)
-    kapt(libs.google.hilt.android.compiler)
+    ksp(libs.google.hilt.android.compiler)
 
     implementation(libs.timber)
 
     implementation(libs.glide)
-    kapt(libs.glide.compiler)
+    ksp(libs.glide.compiler)
 
     implementation(libs.jsoup)
 
