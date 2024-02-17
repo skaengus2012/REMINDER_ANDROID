@@ -19,7 +19,7 @@ package com.nlab.reminder.internal.common.di
 import com.nlab.reminder.core.data.repository.ScheduleCompleteMarkRepository
 import com.nlab.reminder.core.data.repository.ScheduleRepository
 import com.nlab.reminder.core.domain.CompleteScheduleWithMarkUseCase
-import com.nlab.reminder.core.kotlin.coroutine.Delay
+import com.nlab.reminder.core.kotlinx.coroutine.delay.Delay
 import com.nlab.reminder.domain.common.kotlin.coroutine.inject.DefaultDispatcher
 import dagger.Module
 import dagger.Provides

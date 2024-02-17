@@ -79,6 +79,7 @@ android {
 
 dependencies {
     implementation(projects.core.kotlin)
+    implementation(projects.core.kotlinxCoroutine)
 
     implementation(projects.statekit.runtime)
     implementation(projects.statekit.viewmodel)
