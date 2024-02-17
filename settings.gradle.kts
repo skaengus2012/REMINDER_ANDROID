@@ -43,9 +43,12 @@ include(
     ":testkit"
 )
 // Reminder
-include(":app")
+include(
+    ":app"
+)
 include(
     ":core:android",
+    ":core:androidx:lifecycle",
     ":core:kotlin",
     ":core:kotlinx-coroutine"
 )

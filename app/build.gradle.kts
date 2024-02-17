@@ -81,6 +81,7 @@ dependencies {
     implementation(projects.core.android)
     implementation(projects.core.kotlin)
     implementation(projects.core.kotlinxCoroutine)
+    implementation(projects.core.androidx.lifecycle)
 
     implementation(projects.statekit.runtime)
     implementation(projects.statekit.viewmodel)
@@ -96,7 +97,6 @@ dependencies {
     implementation(libs.androidx.constaintlayout)
     implementation(libs.androidx.recyclerview)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.runtimeCompose)
     implementation(libs.androidx.fragment.ktx)
     implementation(libs.androidx.navigation.fragment.ktx)
