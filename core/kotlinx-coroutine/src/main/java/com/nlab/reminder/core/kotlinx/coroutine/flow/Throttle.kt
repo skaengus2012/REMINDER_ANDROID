@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 The N's lab Open Source Project
+ * Copyright (C) 2024 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,23 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.kotlin.coroutine.flow
+package com.nlab.reminder.core.kotlinx.coroutine.flow
 
-import com.nlab.reminder.core.util.test.annotation.InlineRequired
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.flow
 
 /**
  * @author Doohyun
  */
-
-/**
- * jacoco cannot recognize this function..
- */
-@InlineRequired
-@Suppress("NOTHING_TO_INLINE")
-inline fun <T, R> Flow<T>.map(noinline transform: (value: T) -> R): Flow<R> = map { transform(it) }
+fun <T> Flow<T>.throttleFirst(windowDuration: Long): Flow<T> = flow {
+    var lastEmissionTime = 0L
+    collect { upstream ->
+        val currentTime = System.currentTimeMillis()
+        val mayEmit = currentTime - lastEmissionTime > windowDuration
+        if (mayEmit)
+        {
+            lastEmissionTime = currentTime
+            emit(upstream)
+        }
+    }
+}

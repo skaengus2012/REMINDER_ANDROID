@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.kotlin.coroutine.flow
+package com.nlab.reminder.core.kotlinx.coroutine.flow
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.mapNotNull
