@@ -20,7 +20,7 @@ import com.nlab.reminder.core.data.model.ScheduleId
 import com.nlab.reminder.core.data.repository.ScheduleRepository
 import com.nlab.reminder.core.data.repository.ScheduleUpdateRequest
 import com.nlab.reminder.core.kotlin.collections.associateWith
-import com.nlab.reminder.core.kotlin.util.Result
+import com.nlab.reminder.core.kotlin.Result
 import com.nlab.reminder.domain.common.kotlin.coroutine.inject.DefaultDispatcher
 import dagger.Reusable
 import kotlinx.coroutines.CoroutineDispatcher

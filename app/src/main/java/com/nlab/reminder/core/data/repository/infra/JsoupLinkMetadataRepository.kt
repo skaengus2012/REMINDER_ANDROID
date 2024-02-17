@@ -19,8 +19,8 @@ package com.nlab.reminder.core.data.repository.infra
 import com.nlab.reminder.core.data.model.Link
 import com.nlab.reminder.core.data.model.LinkMetadata
 import com.nlab.reminder.core.data.repository.LinkMetadataRepository
-import com.nlab.reminder.core.kotlin.util.Result
-import com.nlab.reminder.core.kotlin.util.catching
+import com.nlab.reminder.core.kotlin.Result
+import com.nlab.reminder.core.kotlin.catching
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

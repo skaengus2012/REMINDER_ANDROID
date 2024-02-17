@@ -29,7 +29,8 @@ import com.nlab.reminder.core.data.repository.TagRepository
 import com.nlab.reminder.core.data.repository.TimestampRepository
 import com.nlab.reminder.core.data.repository.infra.DefaultTimestampRepository
 import com.nlab.reminder.core.data.repository.infra.JsoupLinkMetadataRepository
-import com.nlab.reminder.core.kotlin.util.*
+import com.nlab.reminder.core.kotlin.Result
+import com.nlab.reminder.core.kotlin.onFailure
 import com.nlab.reminder.internal.common.android.datastore.PreferenceKeys
 import com.nlab.reminder.internal.data.repository.LocalCompletedScheduleShownRepository
 import com.nlab.reminder.internal.data.repository.LocalScheduleRepository
@@ -39,7 +40,6 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.Dispatchers
 import timber.log.Timber
-import javax.inject.Singleton
 
 /**
  * @author thalys

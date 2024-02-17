@@ -20,8 +20,8 @@ import com.nlab.reminder.core.data.model.Tag
 import com.nlab.reminder.core.data.model.TagUsageCount
 import com.nlab.reminder.core.data.repository.TagRepository
 import com.nlab.reminder.core.kotlin.coroutine.flow.map
-import com.nlab.reminder.core.kotlin.util.Result
-import com.nlab.reminder.core.kotlin.util.catching
+import com.nlab.reminder.core.kotlin.Result
+import com.nlab.reminder.core.kotlin.catching
 import com.nlab.reminder.internal.common.android.database.ScheduleTagListDao
 import com.nlab.reminder.internal.common.android.database.TagDao
 import com.nlab.reminder.internal.data.model.toEntity

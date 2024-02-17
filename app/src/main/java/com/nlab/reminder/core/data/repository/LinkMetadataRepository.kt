@@ -16,7 +16,7 @@
 
 package com.nlab.reminder.core.data.repository
 
-import com.nlab.reminder.core.kotlin.util.Result
+import com.nlab.reminder.core.kotlin.Result
 import com.nlab.reminder.core.data.model.Link
 import com.nlab.reminder.core.data.model.LinkMetadata
 

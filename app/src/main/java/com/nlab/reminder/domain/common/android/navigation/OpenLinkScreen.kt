@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.annotation.StringRes
 import com.nlab.reminder.R
 import com.nlab.reminder.core.android.navigation.Screen
-import com.nlab.reminder.core.kotlin.util.onFailure
+import com.nlab.reminder.core.kotlin.onFailure
 import com.nlab.reminder.domain.common.android.widget.showToast
 import timber.log.Timber
 

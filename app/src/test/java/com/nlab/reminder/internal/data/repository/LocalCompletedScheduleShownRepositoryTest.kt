@@ -20,8 +20,8 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
-import com.nlab.reminder.core.kotlin.util.isFailure
-import com.nlab.reminder.core.kotlin.util.isSuccess
+import com.nlab.reminder.core.kotlin.isFailure
+import com.nlab.reminder.core.kotlin.isSuccess
 import com.nlab.testkit.genBoolean
 import com.nlab.testkit.genBothify
 import com.nlab.testkit.once

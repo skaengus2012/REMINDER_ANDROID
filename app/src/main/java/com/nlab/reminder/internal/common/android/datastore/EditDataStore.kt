@@ -20,8 +20,8 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
-import com.nlab.reminder.core.kotlin.util.Result
-import com.nlab.reminder.core.kotlin.util.catching
+import com.nlab.reminder.core.kotlin.Result
+import com.nlab.reminder.core.kotlin.catching
 import com.nlab.reminder.core.annotation.ExcludeFromGeneratedTestReport
 
 /**

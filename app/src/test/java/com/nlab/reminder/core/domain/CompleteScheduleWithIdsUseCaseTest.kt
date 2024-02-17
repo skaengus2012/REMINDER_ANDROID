@@ -4,8 +4,8 @@ import com.nlab.reminder.core.data.model.ScheduleId
 import com.nlab.reminder.core.data.model.genScheduleId
 import com.nlab.reminder.core.data.repository.ScheduleRepository
 import com.nlab.reminder.core.data.repository.ScheduleUpdateRequest
-import com.nlab.reminder.core.kotlin.util.Result
-import com.nlab.reminder.core.kotlin.util.isSuccess
+import com.nlab.reminder.core.kotlin.Result
+import com.nlab.reminder.core.kotlin.isSuccess
 import com.nlab.testkit.genBoolean
 import com.nlab.testkit.genInt
 import com.nlab.testkit.once

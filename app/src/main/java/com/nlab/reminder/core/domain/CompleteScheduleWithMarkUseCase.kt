@@ -22,7 +22,7 @@ import com.nlab.reminder.core.data.repository.ScheduleRepository
 import com.nlab.reminder.core.data.repository.ScheduleUpdateRequest
 import com.nlab.reminder.core.data.repository.getSnapshot
 import com.nlab.reminder.core.kotlin.coroutine.Delay
-import com.nlab.reminder.core.kotlin.util.Result
+import com.nlab.reminder.core.kotlin.Result
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 

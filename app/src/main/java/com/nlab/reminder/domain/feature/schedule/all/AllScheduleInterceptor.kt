@@ -17,7 +17,7 @@
 package com.nlab.reminder.domain.feature.schedule.all
 
 import com.nlab.reminder.core.data.model.ScheduleId
-import com.nlab.reminder.core.kotlin.util.getOrThrow
+import com.nlab.reminder.core.kotlin.getOrThrow
 import com.nlab.reminder.core.data.repository.*
 import com.nlab.reminder.core.domain.*
 import com.nlab.reminder.core.kotlin.collections.minOf
