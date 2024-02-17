@@ -44,3 +44,4 @@ include(
 )
 // Reminder
 include(":app")
+include(":core:kotlin")
