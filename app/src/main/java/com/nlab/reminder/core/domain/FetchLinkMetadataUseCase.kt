@@ -19,7 +19,6 @@ package com.nlab.reminder.core.domain
 import com.nlab.reminder.core.data.model.Link
 import com.nlab.reminder.core.data.model.isNotEmpty
 import com.nlab.reminder.core.data.repository.LinkMetadataTableRepository
-import com.nlab.reminder.core.kotlin.collection.filter
 import com.nlab.reminder.core.schedule.model.ScheduleElement
 import com.nlab.reminder.domain.common.kotlin.coroutine.inject.DefaultDispatcher
 import dagger.Reusable
