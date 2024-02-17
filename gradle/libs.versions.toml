@@ -36,8 +36,8 @@ jsoup = "1.17.2"
 junit = "4.13.2"
 kotlin = "1.9.22"
 ksp = "1.9.23-1.0.19"
-kotlinCollectionsImmutable = "0.3.7"
-kotlinCoroutine = "1.8.0"
+kotlinxCollectionsImmutable = "0.3.7"
+kotlinxCoroutine = "1.8.0"
 mockitoInline = "5.2.0"
 mockitoKotlin = "5.2.1"
 squareLeakcanary = "2.13"
@@ -87,11 +87,11 @@ glide-compiler = { module = "com.github.bumptech.glide:compiler", version.ref = 
 javafaker = { module = "com.github.javafaker:javafaker", version.ref = "javafaker" }
 jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
 junit = { module = "junit:junit", version.ref = "junit" }
-kotlin-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlinCollectionsImmutable" }
-kotlin-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinCoroutine" }
-kotlin-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinCoroutine" }
-kotlin-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinCoroutine" }
 kotlin-gradle-plugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" } # Dependencies of the included build-logic
+kotlinx-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlinxCollectionsImmutable" }
+kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutine" }
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutine" }
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutine" }
 mockito-inline = { module = "org.mockito:mockito-inline", version.ref = "mockitoInline" }
 mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockitoKotlin" }
 squeare-leakcanary = { module = "com.squareup.leakcanary:leakcanary-android", version.ref = "squareLeakcanary" }

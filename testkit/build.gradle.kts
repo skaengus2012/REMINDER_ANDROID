@@ -23,5 +23,5 @@ dependencies {
     implementation(libs.javafaker)
     implementation(libs.mockito.inline)
     implementation(libs.mockito.kotlin)
-    implementation(libs.kotlin.coroutines.test)
+    implementation(libs.kotlinx.coroutines.test)
 }
