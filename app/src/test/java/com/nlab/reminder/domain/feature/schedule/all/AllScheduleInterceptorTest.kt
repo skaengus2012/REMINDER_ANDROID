@@ -18,7 +18,7 @@ package com.nlab.reminder.domain.feature.schedule.all
 
 import com.nlab.reminder.core.data.model.anyScheduleId
 import com.nlab.reminder.core.data.model.genSchedule
-import com.nlab.reminder.core.kotlin.util.Result
+import com.nlab.reminder.core.kotlin.Result
 import com.nlab.reminder.core.data.model.genScheduleId
 import com.nlab.reminder.core.data.model.genSchedules
 import com.nlab.reminder.core.data.repository.CompletedScheduleShownRepository

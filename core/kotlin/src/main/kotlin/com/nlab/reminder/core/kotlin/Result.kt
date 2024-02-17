@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 The N's lab Open Source Project
+ * Copyright (C) 2024 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,19 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.kotlin.util
+package com.nlab.reminder.core.kotlin
+
+/**
+ * Replication of Kotlin Result
+ *
+ * Because Kotlin's Result is a value class, jacoco doesn't work properly.
+ * So, I remastered it in the form of a data class.
+ * @author Doohyun
+ */
+sealed class Result<T> {
+    data class Failure<T>(val throwable: Throwable) : Result<T>()
+    data class Success<T>(val value: T) : Result<T>()
+}
 
 /**
  * Created because Jacoco doesn't recognize Kotlin's Result with runCatching.

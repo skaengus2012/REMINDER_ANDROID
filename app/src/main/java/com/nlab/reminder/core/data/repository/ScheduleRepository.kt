@@ -16,7 +16,7 @@
 
 package com.nlab.reminder.core.data.repository
 
-import com.nlab.reminder.core.kotlin.util.Result
+import com.nlab.reminder.core.kotlin.Result
 import com.nlab.reminder.core.data.model.Schedule
 import com.nlab.reminder.core.data.model.ScheduleId
 import kotlinx.coroutines.flow.Flow

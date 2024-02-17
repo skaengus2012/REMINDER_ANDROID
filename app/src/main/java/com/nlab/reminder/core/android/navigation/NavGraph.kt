@@ -16,9 +16,9 @@
 
 package com.nlab.reminder.core.android.navigation
 
-import com.nlab.reminder.core.kotlin.util.Result
-import com.nlab.reminder.core.kotlin.util.catching
-import com.nlab.reminder.core.kotlin.util.getOrThrow
+import com.nlab.reminder.core.kotlin.Result
+import com.nlab.reminder.core.kotlin.catching
+import com.nlab.reminder.core.kotlin.getOrThrow
 import kotlin.reflect.KClass
 
 /**

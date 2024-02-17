@@ -17,7 +17,7 @@
 package com.nlab.reminder.core.data.repository
 
 import kotlinx.coroutines.flow.Flow
-import com.nlab.reminder.core.kotlin.util.Result
+import com.nlab.reminder.core.kotlin.Result
 import com.nlab.reminder.core.data.model.Tag
 import com.nlab.reminder.core.data.model.TagUsageCount
 

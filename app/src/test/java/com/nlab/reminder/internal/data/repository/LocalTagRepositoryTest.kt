@@ -21,7 +21,7 @@ import com.nlab.reminder.core.data.model.TagUsageCount
 import com.nlab.reminder.core.data.model.genTag
 import com.nlab.reminder.core.data.model.genTags
 import com.nlab.reminder.core.data.repository.TagRepository
-import com.nlab.reminder.core.kotlin.util.Result
+import com.nlab.reminder.core.kotlin.Result
 import com.nlab.reminder.internal.common.android.database.ScheduleTagListDao
 import com.nlab.reminder.internal.common.android.database.TagDao
 import com.nlab.reminder.internal.common.android.database.TagEntity
