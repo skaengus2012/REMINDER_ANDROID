@@ -34,7 +34,9 @@ import com.nlab.testkit.genLong
 import com.nlab.testkit.once
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -57,7 +59,9 @@ import org.mockito.kotlin.whenever
 internal class LocalTagRepositoryTest {
     @Test
     fun `Get tags from dao`() {
-        val tagDao: TagDao = mock()
+        val tagDao: TagDao = mock {
+            whenever(mock.find()) doReturn emptyFlow()
+        }
         genTagRepository(tagDao = tagDao).getStream()
         verify(tagDao, once()).find()
     }

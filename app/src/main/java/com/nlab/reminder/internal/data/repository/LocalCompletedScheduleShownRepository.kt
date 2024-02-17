@@ -19,7 +19,7 @@ package com.nlab.reminder.internal.data.repository
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import com.nlab.reminder.core.data.repository.CompletedScheduleShownRepository
-import com.nlab.reminder.core.kotlin.coroutine.flow.map
+import com.nlab.reminder.core.kotlinx.coroutine.flow.map
 import com.nlab.reminder.core.kotlin.Result
 import com.nlab.reminder.internal.common.android.datastore.EditDataStore
 import kotlinx.coroutines.flow.Flow

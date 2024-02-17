@@ -22,7 +22,7 @@ import com.nlab.reminder.core.data.repository.ScheduleDeleteRequest
 import com.nlab.reminder.core.data.repository.ScheduleGetStreamRequest
 import com.nlab.reminder.core.data.repository.ScheduleRepository
 import com.nlab.reminder.core.data.repository.ScheduleUpdateRequest
-import com.nlab.reminder.core.kotlin.coroutine.flow.map
+import com.nlab.reminder.core.kotlinx.coroutine.flow.map
 import com.nlab.reminder.core.kotlin.Result
 import com.nlab.reminder.core.kotlin.catching
 import com.nlab.reminder.internal.common.android.database.ScheduleDao

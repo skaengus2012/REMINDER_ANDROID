@@ -33,7 +33,4 @@ internal fun Project.configureJacocoToolVersion() {
 }
 
 internal val jacocoExcludePatterns: Set<String>
-    get() = setOf(
-        "**/kotlin/**",
-        "**/infra/**",
-    )
+    get() = setOf("**/infra/**")

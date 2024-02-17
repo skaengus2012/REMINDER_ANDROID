@@ -38,7 +38,7 @@ import com.nlab.reminder.core.android.recyclerview.scrollState
 import com.nlab.reminder.core.android.recyclerview.suspendSubmitList
 import com.nlab.reminder.core.android.view.throttleClicks
 import com.nlab.reminder.core.android.view.touches
-import com.nlab.reminder.core.kotlin.coroutine.flow.withBefore
+import com.nlab.reminder.core.kotlinx.coroutine.flow.withBefore
 import com.nlab.reminder.core.schedule.view.*
 import com.nlab.reminder.databinding.FragmentAllScheduleBinding
 import com.nlab.reminder.domain.common.android.navigation.navigateOpenLink

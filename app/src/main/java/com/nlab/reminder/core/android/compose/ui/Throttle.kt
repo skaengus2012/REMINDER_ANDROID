@@ -19,7 +19,7 @@ package com.nlab.reminder.core.android.compose.ui
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.*
-import com.nlab.reminder.core.kotlin.coroutine.flow.throttleFirst
+import com.nlab.reminder.core.kotlinx.coroutine.flow.throttleFirst
 import kotlinx.coroutines.flow.MutableSharedFlow
 
 /**

@@ -14,12 +14,18 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.util.test.annotation
+package com.nlab.reminder.core.kotlinx.coroutine.flow
+
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flatMapLatest as kotlinFlatMapLatest
 
 /**
- * When writing inline, jacoco does not recognize it 😭.
- *
  * @author thalys
  */
-@Retention(AnnotationRetention.SOURCE)
-annotation class NoInlineRequired
+
+/**
+ * The flatMapLatest function does not support suspend.
+ * If the transform function does not use suspend, there may be cases that Jacoco does not recognize
+ */
+fun <T, R> Flow<T>.flatMapLatest(transform: (value: T) -> Flow<R>): Flow<R> =
+    kotlinFlatMapLatest(transform)

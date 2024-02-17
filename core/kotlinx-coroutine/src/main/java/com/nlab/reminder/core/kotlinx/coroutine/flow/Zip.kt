@@ -14,12 +14,18 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.util.test.annotation
+package com.nlab.reminder.core.kotlinx.coroutine.flow
+
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine as kotlinCombine
 
 /**
- * jacoco made npe on coverageReport if not inlined
- *
- * @author Doohyun
+ * @author thalys
  */
-@Retention(AnnotationRetention.SOURCE)
-annotation class InlineRequired
+fun <T1, T2, T3, T4, R> combine(
+    flow: Flow<T1>,
+    flow2: Flow<T2>,
+    flow3: Flow<T3>,
+    flow4: Flow<T4>,
+    transform: (a: T1, b: T2, c: T3, d: T4) -> R
+): Flow<R> = kotlinCombine(flow, flow2, flow3, flow4, transform)

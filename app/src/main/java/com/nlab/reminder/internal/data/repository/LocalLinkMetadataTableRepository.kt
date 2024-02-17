@@ -23,7 +23,7 @@ import com.nlab.reminder.core.data.model.isNotEmpty
 import com.nlab.reminder.core.data.repository.LinkMetadataRepository
 import com.nlab.reminder.core.data.repository.LinkMetadataTableRepository
 import com.nlab.reminder.core.data.repository.TimestampRepository
-import com.nlab.reminder.core.kotlin.coroutine.flow.map
+import com.nlab.reminder.core.kotlinx.coroutine.flow.map
 import com.nlab.reminder.core.kotlin.onSuccess
 import com.nlab.reminder.domain.common.kotlin.coroutine.inject.GlobalScope
 import com.nlab.reminder.internal.common.android.database.LinkMetadataDao
