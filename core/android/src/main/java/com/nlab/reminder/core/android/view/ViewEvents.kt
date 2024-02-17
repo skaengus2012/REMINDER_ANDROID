@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 The N's lab Open Source Project
+ * Copyright (C) 2024 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 package com.nlab.reminder.core.android.view
 
+import android.view.MotionEvent
 import android.view.View
 import com.nlab.reminder.core.kotlinx.coroutine.flow.throttleFirst
 import kotlinx.coroutines.channels.awaitClose
@@ -25,19 +26,18 @@ import kotlinx.coroutines.flow.callbackFlow
 /**
  * @author Doohyun
  */
+fun View.touches(): Flow<MotionEvent> = callbackFlow {
+    setOnTouchListener { v, event ->
+        trySend(event)
+        v.performClick()
+    }
+
+    awaitClose { setOnTouchListener(null) }
+}
+
 fun View.clicks(): Flow<View> = callbackFlow {
     setOnClickListener { trySend(it) }
     awaitClose { setOnClickListener(null) }
 }
 
-fun View.longClicks(isEventConsumed: Boolean = false): Flow<View> = callbackFlow {
-    setOnLongClickListener { trySend(it); isEventConsumed }
-    awaitClose { setOnLongClickListener(null) }
-}
-
 fun View.throttleClicks(windowDuration: Long = 100): Flow<View> = clicks().throttleFirst(windowDuration)
-
-fun View.throttleLongClicks(
-    windowDuration: Long = 100,
-    isEventConsumed: Boolean = false
-): Flow<View> = longClicks(isEventConsumed).throttleFirst(windowDuration)

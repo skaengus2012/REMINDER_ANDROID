@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.android.widget
+package com.nlab.reminder.core.android.view
 
 import android.view.View
 

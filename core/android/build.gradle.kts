@@ -19,4 +19,16 @@ plugins {
 
 android {
     namespace = "com.nlab.reminder.core.android"
+
+    buildFeatures {
+        viewBinding = true
+    }
+}
+
+dependencies {
+    implementation(libs.kotlinx.coroutines.android)
+    implementation(projects.core.kotlinxCoroutine)
+
+    implementation(libs.androidx.annotation)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
 }
