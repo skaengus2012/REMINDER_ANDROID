@@ -78,6 +78,8 @@ android {
 }
 
 dependencies {
+    implementation(projects.core.kotlin)
+
     implementation(projects.statekit.runtime)
     implementation(projects.statekit.viewmodel)
     kapt(projects.statekit.compiler)
