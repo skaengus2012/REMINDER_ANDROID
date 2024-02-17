@@ -20,5 +20,5 @@ plugins {
 
 dependencies {
     api(projects.statekit.core)
-    implementation(libs.kotlin.coroutines.core)
+    implementation(libs.kotlinx.coroutines.core)
 }

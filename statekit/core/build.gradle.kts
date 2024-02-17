@@ -20,11 +20,11 @@ plugins {
 }
 
 dependencies {
-    implementation(libs.kotlin.coroutines.core)
+    implementation(libs.kotlinx.coroutines.core)
 
     testImplementation(projects.testkit)
     testImplementation(libs.junit)
-    testImplementation(libs.kotlin.coroutines.test)
+    testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.mockito.inline)
     testImplementation(libs.mockito.kotlin)
 }
