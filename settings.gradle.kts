@@ -45,6 +45,7 @@ include(
 // Reminder
 include(":app")
 include(
+    ":core:android",
     ":core:kotlin",
     ":core:kotlinx-coroutine"
 )
