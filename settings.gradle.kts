@@ -44,4 +44,7 @@ include(
 )
 // Reminder
 include(":app")
-include(":core:kotlin")
+include(
+    ":core:kotlin",
+    ":core:kotlinx-coroutine"
+)
