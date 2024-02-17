@@ -28,8 +28,7 @@ import androidx.fragment.app.Fragment
  * @author Doohyun
  */
 abstract class ComponentFragment : Fragment() {
-    private var _composeView: ComposeView? = null
-    val composeView: ComposeView get() = checkNotNull(_composeView)
+    private var composeView: ComposeView? = null
 
     final override fun onCreateView(
         inflater: LayoutInflater,
@@ -37,11 +36,18 @@ abstract class ComponentFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View = ComposeView(requireContext())
         .apply { setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed) }
-        .also { _composeView = it }
+        .also { composeView = it }
 
     final override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         onViewCreated(savedInstanceState)
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        composeView = null
+    }
+
     protected abstract fun onViewCreated(savedInstanceState: Bundle?)
+
+    internal fun requireComposeView(): ComposeView = checkNotNull(composeView)
 }

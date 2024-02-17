@@ -22,5 +22,5 @@ import androidx.compose.runtime.Composable
  * @author Doohyun
  */
 fun ComponentFragment.setContent(content: @Composable () -> Unit) {
-    composeView.setContent(content)
+    requireComposeView().setContent(content)
 }
