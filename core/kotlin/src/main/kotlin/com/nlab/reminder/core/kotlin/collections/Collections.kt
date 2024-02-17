@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 The N's lab Open Source Project
+ * Copyright (C) 2024 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,33 +14,22 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.kotlin.collection
+package com.nlab.reminder.core.kotlin.collections
 
 import kotlin.collections.minOf as kotlinMinOf
-import kotlin.collections.maxOf as kotlinMaxOf
-import kotlin.collections.filter as kotlinFilter
 import kotlin.collections.associateWith as kotlinAssociateWith
-import kotlin.collections.find as kotlinFind
 
 /**
+ * There exists coverage that Jacoco does not recognize for inline functions.
+ * Therefore, We create non-inline functions to replace them.
+ *
  * @author thalys
  */
+
 fun <T, R : Comparable<R>> Iterable<T>.minOf(selector: (T) -> R): R {
     return kotlinMinOf(selector)
 }
 
-fun <T, R : Comparable<R>> Iterable<T>.maxOf(selector: (T) -> R): R {
-    return kotlinMaxOf(selector)
-}
-
-fun <T> Iterable<T>.filter(predicate: (T) -> Boolean): List<T> {
-    return kotlinFilter(predicate)
-}
-
 fun <K, V> Iterable<K>.associateWith(valueSelector: (K) -> V): Map<K, V> {
     return kotlinAssociateWith(valueSelector)
-}
-
-fun <T> Iterable<T>.find(predicate: (T) -> Boolean): T? {
-    return kotlinFind(predicate)
 }
