@@ -37,7 +37,7 @@ import com.nlab.reminder.core.android.transition.transitionListenerOf
 import com.nlab.reminder.core.android.view.initWithLifecycleOwner
 import com.nlab.reminder.core.android.view.throttleClicks
 import com.nlab.reminder.core.android.view.touches
-import com.nlab.reminder.core.android.widget.bindSelected
+import com.nlab.reminder.core.android.view.bindSelected
 import com.nlab.reminder.core.android.widget.bindText
 import com.nlab.reminder.core.data.model.isEmpty
 import com.nlab.reminder.core.schedule.model.ScheduleElement
