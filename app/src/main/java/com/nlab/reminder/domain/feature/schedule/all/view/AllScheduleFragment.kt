@@ -31,8 +31,8 @@ import androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_IDLE
 import com.nlab.reminder.R
 import com.nlab.reminder.core.android.fragment.viewLifecycle
 import com.nlab.reminder.core.android.fragment.viewLifecycleScope
-import com.nlab.reminder.core.android.lifecycle.event
-import com.nlab.reminder.core.android.lifecycle.filterLifecycleEvent
+import com.nlab.reminder.core.androidx.lifecycle.event
+import com.nlab.reminder.core.androidx.lifecycle.filterLifecycleEvent
 import com.nlab.reminder.core.android.recyclerview.SingleItemAdapter
 import com.nlab.reminder.core.android.recyclerview.scrollState
 import com.nlab.reminder.core.android.recyclerview.suspendSubmitList
