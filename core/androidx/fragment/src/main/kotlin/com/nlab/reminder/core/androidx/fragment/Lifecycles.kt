@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.android.fragment
+package com.nlab.reminder.core.androidx.fragment
 
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
