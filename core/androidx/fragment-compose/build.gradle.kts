@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 The N's lab Open Source Project
+ * Copyright (C) 2024 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,26 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.android.fragment
+plugins {
+    alias(libs.plugins.nlab.android.library)
+}
 
-import androidx.compose.runtime.Composable
+android {
+    namespace = "com.nlab.reminder.core.androidx.fragment.compose"
 
-/**
- * @author Doohyun
- */
-fun ComponentFragment.setContent(content: @Composable () -> Unit) {
-    requireComposeView().setContent(content)
+    // TODO make compose build convention
+    buildFeatures {
+        compose = true
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = libs.versions.androidxComposeCompiler.get()
+    }
+}
+
+dependencies {
+    api(libs.androidx.fragment)
+
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.compose.ui)
 }
