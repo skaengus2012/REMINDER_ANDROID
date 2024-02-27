@@ -44,6 +44,8 @@ mockitoKotlin = "5.2.1"
 squareLeakcanary = "2.13"
 squareKotlinpoet = "1.16.0"
 timber = "5.0.1"
+kotlin1922 = "1.9.22"
+material = "1.11.0"
 
 
 [libraries]
@@ -100,6 +102,7 @@ squeare-leakcanary = { module = "com.squareup.leakcanary:leakcanary-android", ve
 squeare-kotlinpoet = { module = "com.squareup:kotlinpoet", version.ref = "squareKotlinpoet" }
 squeare-kotlinpoet-metadata = { module = "com.squareup:kotlinpoet-metadata", version.ref = "squareKotlinpoet" }
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
@@ -115,3 +118,5 @@ nlab-android-library = { id = "nlab.android.library", version = "unspecified" }
 nlab-android-library-jacoco = { id = "nlab.android.library.jacoco", version = "unspecified" }
 nlab-jvm-library = { id = "nlab.jvm.library", version = "unspecified" }
 nlab-jvm-library-jacoco = { id = "nlab.jvm.library.jacoco", version = "unspecified" }
+androidLibrary = { id = "com.android.library", version.ref = "androidGradlePlugin" }
+kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin1922" }

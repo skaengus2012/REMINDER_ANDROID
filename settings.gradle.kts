@@ -48,6 +48,7 @@ include(
 )
 include(
     ":core:android",
+    ":core:androidx:fragment",
     ":core:androidx:lifecycle",
     ":core:kotlin",
     ":core:kotlinx-coroutine"

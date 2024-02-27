@@ -29,8 +29,8 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_DRAGGING
 import androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_IDLE
 import com.nlab.reminder.R
-import com.nlab.reminder.core.android.fragment.viewLifecycle
-import com.nlab.reminder.core.android.fragment.viewLifecycleScope
+import com.nlab.reminder.core.androidx.fragment.viewLifecycle
+import com.nlab.reminder.core.androidx.fragment.viewLifecycleScope
 import com.nlab.reminder.core.androidx.lifecycle.event
 import com.nlab.reminder.core.androidx.lifecycle.filterLifecycleEvent
 import com.nlab.reminder.core.android.recyclerview.SingleItemAdapter
