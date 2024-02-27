@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 The N's lab Open Source Project
+ * Copyright (C) 2024 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.android.fragment
+package com.nlab.reminder.core.androidx.frgment.compose
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.*
 import androidx.fragment.app.Fragment
 
@@ -50,4 +51,8 @@ abstract class ComponentFragment : Fragment() {
     protected abstract fun onViewCreated(savedInstanceState: Bundle?)
 
     internal fun requireComposeView(): ComposeView = checkNotNull(composeView)
+}
+
+fun ComponentFragment.setContent(content: @Composable () -> Unit) {
+    requireComposeView().setContent(content)
 }
