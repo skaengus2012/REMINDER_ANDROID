@@ -15,6 +15,7 @@
  */
 plugins {
     alias(libs.plugins.nlab.android.application)
+    alias(libs.plugins.nlab.android.application.compose)
     alias(libs.plugins.nlab.android.application.jacoco)
     alias(libs.plugins.google.hilt)
     alias(libs.plugins.androidx.navigation.safearges)
@@ -69,11 +70,6 @@ android {
 
     buildFeatures {
         viewBinding = true
-        compose = true
-    }
-
-    composeOptions {
-        kotlinCompilerExtensionVersion = libs.versions.androidxComposeCompiler.get()
     }
 }
 
@@ -108,7 +104,6 @@ dependencies {
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.startup.runtime)
     implementation(libs.androidx.datastore.preferences)
-    implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material)
     implementation(libs.androidx.compose.material3)

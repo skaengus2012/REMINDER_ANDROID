@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 The N's lab Open Source Project
+ * Copyright (C) 2024 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,25 @@
 
 package com.nlab.reminder
 
+import com.android.build.api.dsl.CommonExtension
 import org.gradle.api.Project
-import org.gradle.kotlin.dsl.configure
-import org.gradle.testing.jacoco.plugins.JacocoPluginExtension
+import org.gradle.kotlin.dsl.dependencies
 
 /**
  * @author Doohyun
  */
-internal fun Project.configureJacocoToolVersion() {
-    configure<JacocoPluginExtension> {
-        toolVersion = libs.findVersion("jacoco").get().toString()
+internal fun Project.configureComposeAndroid(extension: CommonExtension<*, *, *, *, *, *>) = with(extension) {
+    buildFeatures {
+        compose = true
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = libs.findVersion("androidxComposeCompiler").get().toString()
+    }
+
+    dependencies {
+        val bom = libs.findLibrary("androidx-compose-bom").get()
+        add("implementation", platform(bom))
+        add("androidTestImplementation", platform(bom))
     }
 }
-
-internal val jacocoExcludePatterns: Set<String>
-    get() = setOf("**/infra/**")

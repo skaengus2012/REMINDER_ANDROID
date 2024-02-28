@@ -1,5 +1,9 @@
+import com.android.build.api.dsl.ApplicationExtension
+import com.nlab.reminder.configureComposeAndroid
+import org.gradle.kotlin.dsl.configure
+
 /*
- * Copyright (C) 2024 The N's lab Open Source Project
+ * Copyright (C) 2023 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,17 +17,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-plugins {
-    alias(libs.plugins.nlab.android.library)
-    alias(libs.plugins.nlab.android.library.compose)
+with(pluginManager) {
+    apply("com.android.application")
 }
 
-android {
-    namespace = "com.nlab.reminder.core.androidx.fragment.compose"
-}
-
-dependencies {
-    api(libs.androidx.fragment)
-    implementation(libs.androidx.compose.ui)
+extensions.configure<ApplicationExtension> {
+    configureComposeAndroid(this)
 }
