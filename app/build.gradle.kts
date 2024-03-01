@@ -81,6 +81,7 @@ dependencies {
     implementation(projects.core.androidx.fragmentCompose)
     implementation(projects.core.androidx.lifecycle)
     implementation(projects.core.androidx.recyclerview)
+    implementation(projects.core.androidx.transition)
 
     implementation(projects.statekit.runtime)
     implementation(projects.statekit.viewmodel)
