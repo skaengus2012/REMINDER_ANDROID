@@ -33,9 +33,9 @@ import com.nlab.reminder.core.androidx.fragment.viewLifecycle
 import com.nlab.reminder.core.androidx.fragment.viewLifecycleScope
 import com.nlab.reminder.core.androidx.lifecycle.event
 import com.nlab.reminder.core.androidx.lifecycle.filterLifecycleEvent
-import com.nlab.reminder.core.android.recyclerview.SingleItemAdapter
-import com.nlab.reminder.core.android.recyclerview.scrollState
-import com.nlab.reminder.core.android.recyclerview.suspendSubmitList
+import com.nlab.reminder.core.androix.recyclerview.SingleItemAdapter
+import com.nlab.reminder.core.androix.recyclerview.scrollState
+import com.nlab.reminder.core.androix.recyclerview.suspendSubmitList
 import com.nlab.reminder.core.android.view.throttleClicks
 import com.nlab.reminder.core.android.view.touches
 import com.nlab.reminder.core.kotlinx.coroutine.flow.withBefore

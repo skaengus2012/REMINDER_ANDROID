@@ -80,6 +80,7 @@ dependencies {
     implementation(projects.core.androidx.fragment)
     implementation(projects.core.androidx.fragmentCompose)
     implementation(projects.core.androidx.lifecycle)
+    implementation(projects.core.androidx.recyclerview)
 
     implementation(projects.statekit.runtime)
     implementation(projects.statekit.viewmodel)
@@ -93,7 +94,6 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.cardview)
     implementation(libs.androidx.constaintlayout)
-    implementation(libs.androidx.recyclerview)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.lifecycle.runtimeCompose)
     implementation(libs.androidx.navigation.fragment.ktx)

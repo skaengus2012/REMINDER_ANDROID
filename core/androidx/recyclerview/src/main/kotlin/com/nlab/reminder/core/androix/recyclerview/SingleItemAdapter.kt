@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.android.recyclerview
+package com.nlab.reminder.core.androix.recyclerview
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
