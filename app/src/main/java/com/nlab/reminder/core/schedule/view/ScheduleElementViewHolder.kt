@@ -33,7 +33,7 @@ import com.nlab.reminder.R
 import com.nlab.reminder.core.android.content.getThemeColor
 import com.nlab.reminder.core.androix.recyclerview.absoluteAdapterOptionalPosition
 import com.nlab.reminder.core.androix.recyclerview.bindingAdapterOptionalPosition
-import com.nlab.reminder.core.android.transition.transitionListenerOf
+import com.nlab.reminder.core.androidx.transition.transitionListenerOf
 import com.nlab.reminder.core.android.view.initWithLifecycleOwner
 import com.nlab.reminder.core.android.view.throttleClicks
 import com.nlab.reminder.core.android.view.touches

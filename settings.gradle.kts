@@ -52,6 +52,7 @@ include(
     ":core:androidx:fragment-compose",
     ":core:androidx:lifecycle",
     ":core:androidx:recyclerview",
+    ":core:androidx:transition",
     ":core:kotlin",
     ":core:kotlinx-coroutine"
 )

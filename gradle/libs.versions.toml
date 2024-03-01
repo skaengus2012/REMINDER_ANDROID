@@ -27,6 +27,7 @@ androidxStartUp = "1.1.1"
 androidxTestEspresso = "3.5.1"
 androidxTestJunit = "1.1.5"
 androidxTestRules = "1.5.0"
+androidxTransition = "1.4.1"
 facebookFlipper = "0.250.0"
 facebookSoloader = "0.11.0"
 googleHilt = "2.51.1"
@@ -44,8 +45,6 @@ mockitoKotlin = "5.2.1"
 squareLeakcanary = "2.13"
 squareKotlinpoet = "1.16.0"
 timber = "5.0.1"
-kotlin1922 = "1.9.22"
-material = "1.11.0"
 
 
 [libraries]
@@ -82,6 +81,7 @@ androidx-test-espresso-core = { module = "androidx.test.espresso:espresso-core",
 androidx-test-junit = { module = "androidx.test.ext:junit", version.ref = "androidxTestJunit" }
 androidx-test-rules = { module = "androidx.test:rules", version.ref = "androidxTestRules" }
 androidx-test-runner = { module = "androidx.test:runner", version.ref = "androidxTestRules" }
+androidx-transition-ktx = { module = "androidx.transition:transition-ktx", version.ref = "androidxTransition" }
 facebook-flipper = { module = "com.facebook.flipper:flipper", version.ref = "facebookFlipper" }
 facebook-flipper-leakcanary = { module = "com.facebook.flipper:flipper-leakcanary2-plugin", version.ref = "facebookFlipper" }
 facebook-soloader = { module = "com.facebook.soloader:soloader", version.ref = "facebookSoloader" }
@@ -103,7 +103,6 @@ squeare-leakcanary = { module = "com.squareup.leakcanary:leakcanary-android", ve
 squeare-kotlinpoet = { module = "com.squareup:kotlinpoet", version.ref = "squareKotlinpoet" }
 squeare-kotlinpoet-metadata = { module = "com.squareup:kotlinpoet-metadata", version.ref = "squareKotlinpoet" }
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
-material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
