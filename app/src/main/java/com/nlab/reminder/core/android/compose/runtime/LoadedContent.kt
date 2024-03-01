@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 The N's lab Open Source Project
+ * Copyright (C) 2024 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,9 @@
 package com.nlab.reminder.core.android.compose.runtime
 
 import androidx.compose.runtime.Composable
+import com.nlab.reminder.core.ui.compose.transition.DelayedVisibility
+import com.nlab.reminder.core.ui.compose.transition.DelayedVisibleState
+import com.nlab.reminder.core.ui.compose.transition.rememberDelayedVisibleState
 
 /**
  * @author Doohyun
@@ -25,9 +28,9 @@ import androidx.compose.runtime.Composable
 fun LoadedContent(
     isDelay: Boolean,
     visibleState: DelayedVisibleState = rememberDelayedVisibleState(),
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
-    DelayedVisibleContent(
+    DelayedVisibility(
         delayTimeMillis = if (isDelay) 100 else 0,
         visibleState = visibleState,
         key = Unit,

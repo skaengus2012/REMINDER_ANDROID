@@ -23,10 +23,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.nlab.reminder.core.android.compose.runtime.DelayedVisibleContent
-import com.nlab.reminder.core.android.compose.runtime.DelayedVisibleState
-import com.nlab.reminder.core.android.compose.runtime.rememberDelayedVisibleState
 import com.nlab.reminder.core.android.designsystem.theme.ReminderTheme
+import com.nlab.reminder.core.ui.compose.transition.DelayedVisibility
+import com.nlab.reminder.core.ui.compose.transition.DelayedVisibleState
+import com.nlab.reminder.core.ui.compose.transition.rememberDelayedVisibleState
 
 /**
  * @author Doohyun
@@ -39,7 +39,7 @@ fun ThemeLoadingIndicator(
     delayTime: Long = 500,
     visibleState: DelayedVisibleState = rememberDelayedVisibleState()
 ) {
-    DelayedVisibleContent(
+    DelayedVisibility(
         delayTimeMillis = delayTime,
         visibleState = visibleState,
         key = Unit,

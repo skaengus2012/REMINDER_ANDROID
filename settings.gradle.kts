@@ -54,5 +54,6 @@ include(
     ":core:androidx:recyclerview",
     ":core:androidx:transition",
     ":core:kotlin",
-    ":core:kotlinx-coroutine"
+    ":core:kotlinx-coroutine",
+    ":core:ui:compose"
 )
