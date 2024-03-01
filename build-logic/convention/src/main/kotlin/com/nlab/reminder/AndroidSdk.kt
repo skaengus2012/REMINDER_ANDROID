@@ -22,7 +22,7 @@ import org.gradle.api.Project
 /**
  * @author Doohyun
  */
-internal fun Project.configureAndroidSdk(commonExtension: CommonExtension<*, *, *, *, *>) = with(commonExtension) {
+internal fun Project.configureAndroidSdk(commonExtension: CommonExtension<*, *, *, *, *, *>) = with(commonExtension) {
     compileSdk = libs.findVersion("compileSdk").get().toString().toInt()
     defaultConfig.minSdk = libs.findVersion("minSdk").get().toString().toInt()
 }
