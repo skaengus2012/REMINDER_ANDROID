@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 The N's lab Open Source Project
+ * Copyright (C) 2024 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.android.recyclerview
+package com.nlab.reminder.core.androix.recyclerview
 
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.channels.awaitClose
@@ -24,6 +24,12 @@ import kotlinx.coroutines.flow.callbackFlow
 /**
  * @author thalys
  */
+val RecyclerView.ViewHolder.bindingAdapterOptionalPosition: Int?
+    get() = bindingAdapterPosition.takeUnless { it == RecyclerView.NO_POSITION }
+
+val RecyclerView.ViewHolder.absoluteAdapterOptionalPosition: Int?
+    get() = absoluteAdapterPosition.takeUnless { it == RecyclerView.NO_POSITION }
+
 fun RecyclerView.scrollState(): Flow<Int> = callbackFlow {
     val listener = object : RecyclerView.OnScrollListener() {
         override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {

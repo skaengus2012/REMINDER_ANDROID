@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 The N's lab Open Source Project
+ * Copyright (C) 2024 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,13 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+plugins {
+    alias(libs.plugins.nlab.android.library)
+}
 
-package com.nlab.reminder.core.android.recyclerview
+android {
+    namespace = "com.nlab.reminder.core.androix.recyclerview"
+}
 
-/**
- * @author thalys
- */
-sealed class DragPosition {
-    object Empty : DragPosition()
-    data class Success(val from: Int, val to: Int) : DragPosition()
+dependencies {
+    api(libs.androidx.recyclerview)
+
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.androidx.annotation)
 }

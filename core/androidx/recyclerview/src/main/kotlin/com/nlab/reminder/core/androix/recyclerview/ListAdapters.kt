@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 The N's lab Open Source Project
+ * Copyright (C) 2024 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,17 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.android.recyclerview
+package com.nlab.reminder.core.androix.recyclerview
+
+import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
+import kotlinx.coroutines.CompletableDeferred
 
 /**
  * @author thalys
  */
-interface DragSnapshotCalculator<T> {
-    fun calculateDraggedSnapshot(): DragSnapshot<T>
+suspend fun <T, VH : RecyclerView.ViewHolder> ListAdapter<T, VH>.suspendSubmitList(list: List<T>?) {
+    val deferred = CompletableDeferred<Unit>()
+    submitList(list) { deferred.complete(Unit) }
+    deferred.await()
 }
