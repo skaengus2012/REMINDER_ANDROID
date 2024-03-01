@@ -82,6 +82,7 @@ dependencies {
     implementation(projects.core.androidx.lifecycle)
     implementation(projects.core.androidx.recyclerview)
     implementation(projects.core.androidx.transition)
+    implementation(projects.core.ui.compose)
 
     implementation(projects.statekit.runtime)
     implementation(projects.statekit.viewmodel)

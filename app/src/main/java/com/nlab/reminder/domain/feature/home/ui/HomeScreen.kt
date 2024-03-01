@@ -52,13 +52,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nlab.reminder.R
 import com.nlab.reminder.core.android.compose.runtime.LoadedContent
 import com.nlab.reminder.core.android.compose.runtime.UserMessageHandler
-import com.nlab.reminder.core.android.compose.runtime.rememberDelayedVisibleState
 import com.nlab.reminder.core.android.designsystem.component.ThemeBottomSheetLayout
 import com.nlab.reminder.core.android.designsystem.component.ThemeLoadingIndicator
 import com.nlab.reminder.core.android.designsystem.theme.ReminderTheme
 import com.nlab.reminder.core.state.UserMessage
 import com.nlab.reminder.domain.common.android.widget.showToast
 import com.nlab.reminder.core.data.model.Tag
+import com.nlab.reminder.core.ui.compose.transition.rememberDelayedVisibleState
 import com.nlab.reminder.domain.common.tag.ui.TagDeleteBottomSheetContent
 import com.nlab.reminder.domain.common.tag.ui.TagRenameDialog
 import com.nlab.reminder.domain.feature.home.*

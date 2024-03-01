@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 The N's lab Open Source Project
+ * Copyright (C) 2024 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.android.compose.runtime
+package com.nlab.reminder.core.ui.compose.transition
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -29,7 +29,7 @@ import kotlinx.coroutines.delay
  * @author Doohyun
  */
 @Composable
-fun DelayedVisibleContent(
+fun DelayedVisibility(
     delayTimeMillis: Long,
     visibleState: DelayedVisibleState,
     key: Any?,
