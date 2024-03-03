@@ -13,14 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+plugins {
+    alias(libs.plugins.nlab.jvm.library)
+    alias(libs.plugins.nlab.jvm.library.jacoco)
+}
 
-package com.nlab.reminder.core.data.repository
+dependencies {
+    implementation(projects.core.annotation)
+    implementation(projects.core.kotlin)
+    implementation(projects.core.kotlinxCoroutine)
 
-import javax.inject.Qualifier
-
-/**
- * @author Doohyun
- */
-@Qualifier
-@Retention(AnnotationRetention.BINARY)
-annotation class AllScheduleData
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.kotlinx.collections.immutable)
+}

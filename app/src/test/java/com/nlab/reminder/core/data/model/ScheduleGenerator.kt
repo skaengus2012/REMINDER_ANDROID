@@ -22,7 +22,6 @@ import com.nlab.testkit.genInt
 import com.nlab.testkit.genLong
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
-import org.mockito.kotlin.any
 
 /**
  * @author thalys

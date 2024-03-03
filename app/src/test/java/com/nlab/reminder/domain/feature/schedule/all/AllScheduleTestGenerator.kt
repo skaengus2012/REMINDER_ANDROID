@@ -20,7 +20,6 @@ import com.nlab.reminder.core.data.model.Link
 import com.nlab.reminder.core.data.model.genLink
 import com.nlab.reminder.core.schedule.model.ScheduleElement
 import com.nlab.reminder.core.schedule.model.genScheduleElements
-import com.nlab.reminder.core.schedule.state.SelectedAction
 import com.nlab.testkit.genBoolean
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf

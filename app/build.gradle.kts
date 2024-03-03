@@ -82,6 +82,7 @@ dependencies {
     implementation(projects.core.androidx.transition)
     implementation(projects.core.annotation)
     implementation(projects.core.annotationAndroid)
+    implementation(projects.core.data)
     implementation(projects.core.kotlin)
     implementation(projects.core.kotlinxCoroutine)
     implementation(projects.core.ui.compose)

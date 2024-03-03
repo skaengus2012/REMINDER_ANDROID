@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 The N's lab Open Source Project
+ * Copyright (C) 2024 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,19 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.data.repository
+package com.nlab.reminder.core.data.model
 
-import com.nlab.reminder.core.data.model.ScheduleId
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.collections.immutable.ImmutableList
 
 /**
- * @author thalys
+ * @author Doohyun
  */
-interface ScheduleCompleteMarkRepository {
-    fun getStream(): StateFlow<Map<ScheduleId, Boolean>>
-    fun add(scheduleId: ScheduleId, isComplete: Boolean)
-}
-
-fun ScheduleCompleteMarkRepository.getSnapshot(): Map<ScheduleId, Boolean> =
-    getStream().value
+data class Schedule(
+    val id: ScheduleId,
+    val title: String,
+    val note: String,
+    val link: Link,
+    val tags: ImmutableList<Tag>,
+    val visiblePriority: Long,
+    val isComplete: Boolean
+)

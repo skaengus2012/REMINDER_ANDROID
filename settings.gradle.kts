@@ -55,6 +55,7 @@ include(
     ":core:androidx:transition",
     ":core:annotation",
     ":core:annotation-android",
+    ":core:data",
     ":core:kotlin",
     ":core:kotlinx-coroutine",
     ":core:ui:compose"

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 The N's lab Open Source Project
+ * Copyright (C) 2024 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,19 +16,11 @@
 
 package com.nlab.reminder.core.data.model
 
-import com.nlab.reminder.core.annotation.platform.Immutable
-import kotlinx.collections.immutable.ImmutableList
+import com.nlab.reminder.core.annotation.test.ExcludeFromGeneratedTestReport
 
 /**
  * @author Doohyun
  */
-@Immutable
-data class Schedule(
-    val id: ScheduleId,
-    val title: String,
-    val note: String,
-    val link: Link,
-    val tags: ImmutableList<Tag>,
-    val visiblePriority: Long,
-    val isComplete: Boolean
-)
+@JvmInline
+@ExcludeFromGeneratedTestReport
+value class LinkMetadataTable(val value: Map<Link, LinkMetadata>)
