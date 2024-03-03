@@ -16,7 +16,7 @@
 
 package com.nlab.reminder.internal.data.repository.fake
 
-import com.nlab.reminder.core.annotation.ExcludeFromGeneratedTestReport
+import com.nlab.reminder.core.annotation.test.ExcludeFromGeneratedTestReport
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow

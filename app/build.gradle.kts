@@ -75,13 +75,15 @@ android {
 
 dependencies {
     implementation(projects.core.android)
-    implementation(projects.core.kotlin)
-    implementation(projects.core.kotlinxCoroutine)
     implementation(projects.core.androidx.fragment)
     implementation(projects.core.androidx.fragmentCompose)
     implementation(projects.core.androidx.lifecycle)
     implementation(projects.core.androidx.recyclerview)
     implementation(projects.core.androidx.transition)
+    implementation(projects.core.annotation)
+    implementation(projects.core.annotationAndroid)
+    implementation(projects.core.kotlin)
+    implementation(projects.core.kotlinxCoroutine)
     implementation(projects.core.ui.compose)
 
     implementation(projects.statekit.runtime)

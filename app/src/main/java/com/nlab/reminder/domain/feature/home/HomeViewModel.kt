@@ -18,7 +18,7 @@ package com.nlab.reminder.domain.feature.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nlab.reminder.core.annotation.ExcludeFromGeneratedTestReport
+import com.nlab.reminder.core.annotation.test.ExcludeFromGeneratedTestReport
 import com.nlab.statekit.lifecycle.UiActionDispatchable
 import com.nlab.statekit.util.createStore
 import com.nlab.statekit.util.stateIn

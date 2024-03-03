@@ -53,6 +53,8 @@ include(
     ":core:androidx:lifecycle",
     ":core:androidx:recyclerview",
     ":core:androidx:transition",
+    ":core:annotation",
+    ":core:annotation-android",
     ":core:kotlin",
     ":core:kotlinx-coroutine",
     ":core:ui:compose"
