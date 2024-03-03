@@ -16,7 +16,7 @@
 
 package com.nlab.reminder.internal.data.repository
 
-import com.nlab.reminder.core.annotation.ExcludeFromGeneratedTestReport
+import com.nlab.reminder.core.annotation.test.ExcludeFromGeneratedTestReport
 import com.nlab.reminder.core.data.model.Schedule
 import com.nlab.reminder.core.data.repository.ScheduleDeleteRequest
 import com.nlab.reminder.core.data.repository.ScheduleGetStreamRequest

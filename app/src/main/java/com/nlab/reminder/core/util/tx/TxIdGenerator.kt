@@ -16,7 +16,7 @@
 
 package com.nlab.reminder.core.util.tx
 
-import com.nlab.reminder.core.annotation.ExcludeFromGeneratedTestReport
+import com.nlab.reminder.core.annotation.test.ExcludeFromGeneratedTestReport
 import java.util.Calendar
 import java.util.UUID
 

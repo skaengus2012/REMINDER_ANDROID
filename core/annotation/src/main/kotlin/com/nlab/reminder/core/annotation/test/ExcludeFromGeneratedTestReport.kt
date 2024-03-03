@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 The N's lab Open Source Project
+ * Copyright (C) 2024 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,20 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.annotation
+package com.nlab.reminder.core.annotation.test
 
 /**
- * If a test has been completed but is excluded from coverage, use this annotation.
+ * Classes and methods annotated with annotation whose retention policy is runtime or class and
+ * whose simple name is Generated are filtered out during generation of report
  *
- *  Example:
- *  When creating an inline function,
- *  it may not be recognized in the coverage instruction,
- *  so it is excluded from the coverage report.
+ * @author Doohyun
+ * @see <a href="https://github.com/jacoco/jacoco/releases/tag/v0.8.2">jacoco update</a>
+ * @see <a href="https://github.com/jacoco/jacoco/pull/731">jacoco issue</a>
  */
-@Retention(AnnotationRetention.SOURCE)
+@Retention(AnnotationRetention.BINARY)
 @Target(
     AnnotationTarget.CLASS,
-    AnnotationTarget.FUNCTION
+    AnnotationTarget.FUNCTION,
+    AnnotationTarget.CONSTRUCTOR
 )
-annotation class TestCompleted
+annotation class ExcludeFromGeneratedTestReport

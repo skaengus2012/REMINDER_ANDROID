@@ -16,7 +16,7 @@
 
 package com.nlab.reminder.core.schedule.model
 
-import com.nlab.reminder.core.annotation.ExcludeFromGeneratedTestReport
+import com.nlab.reminder.core.annotation.test.ExcludeFromGeneratedTestReport
 import com.nlab.reminder.core.data.model.Link
 import com.nlab.reminder.core.data.model.LinkMetadata
 import com.nlab.reminder.core.data.model.Schedule

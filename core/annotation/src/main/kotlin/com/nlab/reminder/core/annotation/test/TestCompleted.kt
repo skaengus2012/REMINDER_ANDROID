@@ -14,10 +14,19 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.annotation
+package com.nlab.reminder.core.annotation.test
 
 /**
- * @author Doohyun
+ * If a test has been completed but is excluded from coverage, use this annotation.
+ *
+ *  Example:
+ *  When creating an inline function,
+ *  it may not be recognized in the coverage instruction,
+ *  so it is excluded from the coverage report.
  */
-typealias Stable = androidx.compose.runtime.Stable
-typealias Immutable = androidx.compose.runtime.Immutable
+@Retention(AnnotationRetention.SOURCE)
+@Target(
+    AnnotationTarget.CLASS,
+    AnnotationTarget.FUNCTION
+)
+annotation class TestCompleted

@@ -34,6 +34,7 @@ googleHilt = "2.51.1"
 glide = "4.16.0"
 jacoco = "0.8.11" # use in configureJacocoToolVersion -> Jacoco.kt
 javafaker = "1.0.2"
+javaInject = "1"
 jsoup = "1.17.2"
 junit = "4.13.2"
 kotlin = "1.9.22"
@@ -45,6 +46,8 @@ mockitoKotlin = "5.2.1"
 squareLeakcanary = "2.13"
 squareKotlinpoet = "1.16.0"
 timber = "5.0.1"
+kotlinVersion = "1.9.0"
+material = "1.11.0"
 
 
 [libraries]
@@ -58,6 +61,7 @@ androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", versi
 androidx-compose-foundation = { group = "androidx.compose.foundation", name = "foundation" }
 androidx-compose-material = { group = "androidx.compose.material", name = "material" }   # For using ModalBottomSheetLayout
 androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
+androidx-compose-runtime = { group = "androidx.compose.runtime", name = "runtime" }
 androidx-compose-ui = { group = "androidx.compose.ui", name = "ui" }
 androidx-compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
@@ -90,6 +94,7 @@ google-hilt-android-compiler = { module = "com.google.dagger:hilt-android-compil
 glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
 glide-compiler = { module = "com.github.bumptech.glide:compiler", version.ref = "glide" }
 javafaker = { module = "com.github.javafaker:javafaker", version.ref = "javafaker" }
+javax-inject = { module = "javax.inject:javax.inject", version.ref = "javaInject" }
 jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
 junit = { module = "junit:junit", version.ref = "junit" }
 kotlin-gradle-plugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" } # Dependencies of the included build-logic
