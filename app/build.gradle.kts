@@ -136,11 +136,6 @@ dependencies {
 
     testImplementation(projects.testkit)
     testImplementation(projects.statekit.test)
-    testImplementation(libs.junit)
-    testImplementation(libs.kotlinx.coroutines.test)
-    testImplementation(libs.mockito.inline)
-    testImplementation(libs.mockito.kotlin)
-    testImplementation(libs.javafaker)
     androidTestImplementation(libs.kotlinx.coroutines.test)
     androidTestImplementation(libs.javafaker)
     androidTestImplementation(libs.androidx.test.junit)

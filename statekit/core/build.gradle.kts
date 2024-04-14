@@ -21,10 +21,5 @@ plugins {
 
 dependencies {
     implementation(libs.kotlinx.coroutines.core)
-
     testImplementation(projects.testkit)
-    testImplementation(libs.junit)
-    testImplementation(libs.kotlinx.coroutines.test)
-    testImplementation(libs.mockito.inline)
-    testImplementation(libs.mockito.kotlin)
 }
