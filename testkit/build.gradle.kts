@@ -19,9 +19,10 @@ plugins {
 }
 
 dependencies {
-    implementation(libs.junit)
     implementation(libs.javafaker)
-    implementation(libs.mockito.inline)
-    implementation(libs.mockito.kotlin)
-    implementation(libs.kotlinx.coroutines.test)
+
+    api(libs.junit)
+    api(libs.kotlinx.coroutines.test)
+    api(libs.mockito.inline)
+    api(libs.mockito.kotlin)
 }

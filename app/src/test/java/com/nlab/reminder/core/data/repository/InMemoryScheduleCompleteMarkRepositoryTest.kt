@@ -1,7 +1,7 @@
 package com.nlab.reminder.core.data.repository
 
 import com.nlab.reminder.core.data.model.genScheduleId
-import com.nlab.testkit.genBoolean
+import com.nlab.testkit.faker.genBoolean
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat

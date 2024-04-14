@@ -16,7 +16,10 @@
 
 package com.nlab.reminder.core.data.model
 
-import com.nlab.testkit.*
+import com.nlab.testkit.faker.genBothify
+import com.nlab.testkit.faker.genInt
+import com.nlab.testkit.faker.genLong
+import com.nlab.testkit.faker.genLongGreaterThanZero
 
 /**
  * @author Doohyun

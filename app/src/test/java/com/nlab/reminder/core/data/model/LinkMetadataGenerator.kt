@@ -16,7 +16,7 @@
 
 package com.nlab.reminder.core.data.model
 
-import com.nlab.testkit.genBothify
+import com.nlab.testkit.faker.genBothify
 
 /**
  * @author thalys

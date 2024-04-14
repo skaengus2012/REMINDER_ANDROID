@@ -22,9 +22,9 @@ import com.nlab.reminder.core.data.model.genTag
 import com.nlab.reminder.core.data.model.genTagUsageCount
 import com.nlab.reminder.core.data.model.genTags
 import com.nlab.reminder.core.state.UserMessage
-import com.nlab.testkit.genBoolean
-import com.nlab.testkit.genBothify
-import com.nlab.testkit.genLong
+import com.nlab.testkit.faker.genBoolean
+import com.nlab.testkit.faker.genBothify
+import com.nlab.testkit.faker.genLong
 import kotlinx.collections.immutable.toPersistentList
 import kotlin.reflect.KClass
 

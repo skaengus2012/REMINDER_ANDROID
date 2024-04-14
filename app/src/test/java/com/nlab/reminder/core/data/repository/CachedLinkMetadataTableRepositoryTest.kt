@@ -3,7 +3,7 @@ package com.nlab.reminder.core.data.repository
 import com.nlab.reminder.core.data.model.LinkMetadataTable
 import com.nlab.reminder.core.data.model.genLink
 import com.nlab.reminder.core.data.model.genLinkMetadata
-import com.nlab.testkit.once
+import org.mockito.kotlin.once
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.emptyFlow

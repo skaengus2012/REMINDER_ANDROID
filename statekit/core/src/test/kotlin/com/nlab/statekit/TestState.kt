@@ -16,8 +16,8 @@
 
 package com.nlab.statekit
 
-import com.nlab.testkit.genBothify
-import com.nlab.testkit.genInt
+import com.nlab.testkit.faker.genBothify
+import com.nlab.testkit.faker.genInt
 
 /**
  * @author thalys

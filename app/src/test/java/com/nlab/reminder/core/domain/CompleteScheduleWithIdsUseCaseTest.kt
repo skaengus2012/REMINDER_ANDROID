@@ -6,9 +6,9 @@ import com.nlab.reminder.core.data.repository.ScheduleRepository
 import com.nlab.reminder.core.data.repository.ScheduleUpdateRequest
 import com.nlab.reminder.core.kotlin.Result
 import com.nlab.reminder.core.kotlin.isSuccess
-import com.nlab.testkit.genBoolean
-import com.nlab.testkit.genInt
-import com.nlab.testkit.once
+import com.nlab.testkit.faker.genBoolean
+import com.nlab.testkit.faker.genInt
+import org.mockito.kotlin.once
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.runTest

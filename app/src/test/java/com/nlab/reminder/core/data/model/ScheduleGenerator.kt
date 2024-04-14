@@ -16,10 +16,10 @@
 
 package com.nlab.reminder.core.data.model
 
-import com.nlab.testkit.genBoolean
-import com.nlab.testkit.genBothify
-import com.nlab.testkit.genInt
-import com.nlab.testkit.genLong
+import com.nlab.testkit.faker.genBoolean
+import com.nlab.testkit.faker.genBothify
+import com.nlab.testkit.faker.genInt
+import com.nlab.testkit.faker.genLong
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 

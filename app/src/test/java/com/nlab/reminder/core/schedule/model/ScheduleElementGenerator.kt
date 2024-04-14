@@ -20,8 +20,8 @@ import com.nlab.reminder.core.data.model.LinkMetadata
 import com.nlab.reminder.core.data.model.Schedule
 import com.nlab.reminder.core.data.model.genLinkMetadata
 import com.nlab.reminder.core.data.model.genSchedule
-import com.nlab.testkit.genBoolean
-import com.nlab.testkit.genInt
+import com.nlab.testkit.faker.genBoolean
+import com.nlab.testkit.faker.genInt
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList

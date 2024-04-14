@@ -12,8 +12,8 @@ import com.nlab.reminder.core.data.repository.LinkMetadataTableRepository
 import com.nlab.reminder.core.data.repository.ScheduleCompleteMarkRepository
 import com.nlab.reminder.core.data.repository.ScheduleSelectedIdRepository
 import com.nlab.reminder.core.schedule.model.ScheduleElement
-import com.nlab.testkit.genBoolean
-import com.nlab.testkit.genInt
+import com.nlab.testkit.faker.genBoolean
+import com.nlab.testkit.faker.genInt
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first

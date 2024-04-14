@@ -5,8 +5,8 @@ import com.nlab.reminder.core.data.model.genLink
 import com.nlab.reminder.core.data.model.genSchedule
 import com.nlab.reminder.core.data.repository.LinkMetadataTableRepository
 import com.nlab.reminder.core.schedule.model.genScheduleElement
-import com.nlab.testkit.genInt
-import com.nlab.testkit.once
+import com.nlab.testkit.faker.genInt
+import org.mockito.kotlin.once
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.runTest
 import org.junit.Test

@@ -17,7 +17,7 @@
 package com.nlab.statekit.middleware.interceptor
 
 import com.nlab.statekit.*
-import com.nlab.testkit.once
+import org.mockito.kotlin.once
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Test

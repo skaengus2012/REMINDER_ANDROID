@@ -29,9 +29,9 @@ import com.nlab.reminder.internal.common.database.toEntities
 import com.nlab.reminder.internal.data.model.toEntity
 import com.nlab.reminder.test.genFlowExecutionDispatcher
 import com.nlab.reminder.test.genFlowObserveCoroutineScope
-import com.nlab.testkit.genBothify
-import com.nlab.testkit.genLong
-import com.nlab.testkit.once
+import com.nlab.testkit.faker.genBothify
+import com.nlab.testkit.faker.genLong
+import org.mockito.kotlin.once
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.emptyFlow

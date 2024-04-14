@@ -20,7 +20,7 @@ import com.nlab.statekit.middleware.interceptor.*
 import com.nlab.statekit.middleware.epic.*
 import com.nlab.statekit.util.*
 import com.nlab.statekit.*
-import com.nlab.testkit.*
+import com.nlab.testkit.faker.genIntGreaterThanZero
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.test.runTest

@@ -6,9 +6,9 @@ import com.nlab.reminder.core.data.repository.ScheduleCompleteMarkRepository
 import com.nlab.reminder.core.data.repository.ScheduleRepository
 import com.nlab.reminder.core.data.repository.ScheduleUpdateRequest
 import com.nlab.reminder.core.kotlinx.coroutine.delay.Delay
-import com.nlab.testkit.genBoolean
-import com.nlab.testkit.genInt
-import com.nlab.testkit.once
+import com.nlab.testkit.faker.genBoolean
+import com.nlab.testkit.faker.genInt
+import org.mockito.kotlin.once
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.collections.immutable.toPersistentMap

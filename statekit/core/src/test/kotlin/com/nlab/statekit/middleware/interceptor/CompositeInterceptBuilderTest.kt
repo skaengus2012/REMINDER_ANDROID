@@ -18,7 +18,7 @@ package com.nlab.statekit.middleware.interceptor
 
 import com.nlab.statekit.*
 import com.nlab.statekit.middleware.interceptor.dsl.InterceptEndScope
-import com.nlab.testkit.once
+import org.mockito.kotlin.once
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.advanceTimeBy

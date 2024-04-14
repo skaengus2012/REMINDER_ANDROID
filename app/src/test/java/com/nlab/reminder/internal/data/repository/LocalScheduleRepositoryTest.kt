@@ -26,10 +26,10 @@ import com.nlab.reminder.core.data.repository.ScheduleUpdateRequest
 import com.nlab.reminder.internal.common.android.database.ScheduleDao
 import com.nlab.reminder.internal.common.android.database.ScheduleEntityWithTagEntities
 import com.nlab.reminder.internal.data.model.toEntity
-import com.nlab.testkit.genBoolean
-import com.nlab.testkit.genInt
-import com.nlab.testkit.genLong
-import com.nlab.testkit.once
+import com.nlab.testkit.faker.genBoolean
+import com.nlab.testkit.faker.genInt
+import com.nlab.testkit.faker.genLong
+import org.mockito.kotlin.once
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.take

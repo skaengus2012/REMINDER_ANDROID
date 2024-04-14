@@ -34,9 +34,9 @@ import com.nlab.reminder.core.domain.FetchLinkMetadataUseCase
 import com.nlab.reminder.core.schedule.model.genScheduleElements
 import com.nlab.reminder.core.schedule.model.mapToScheduleElementsAsImmutableList
 import com.nlab.statekit.middleware.interceptor.scenario
-import com.nlab.testkit.genBoolean
-import com.nlab.testkit.genInt
-import com.nlab.testkit.once
+import com.nlab.testkit.faker.genBoolean
+import com.nlab.testkit.faker.genInt
+import org.mockito.kotlin.once
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest

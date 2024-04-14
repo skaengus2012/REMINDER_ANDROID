@@ -22,9 +22,9 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import com.nlab.reminder.core.kotlin.isFailure
 import com.nlab.reminder.core.kotlin.isSuccess
-import com.nlab.testkit.genBoolean
-import com.nlab.testkit.genBothify
-import com.nlab.testkit.once
+import com.nlab.testkit.faker.genBoolean
+import com.nlab.testkit.faker.genBothify
+import org.mockito.kotlin.once
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.first

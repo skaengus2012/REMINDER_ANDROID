@@ -18,7 +18,7 @@ package com.nlab.statekit.util
 
 import com.nlab.statekit.TestAction
 import com.nlab.statekit.TestState
-import com.nlab.testkit.once
+import org.mockito.kotlin.once
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
