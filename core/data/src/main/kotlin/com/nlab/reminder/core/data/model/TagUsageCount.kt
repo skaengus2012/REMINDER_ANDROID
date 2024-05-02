@@ -16,11 +16,10 @@
 
 package com.nlab.reminder.core.data.model
 
-import com.nlab.reminder.core.annotation.test.ExcludeFromGeneratedTestReport
-
 /**
+ * // TODO After removal, replace with Long
+ *
  * @author Doohyun
  */
-@ExcludeFromGeneratedTestReport
 @JvmInline
 value class TagUsageCount(val value: Long)

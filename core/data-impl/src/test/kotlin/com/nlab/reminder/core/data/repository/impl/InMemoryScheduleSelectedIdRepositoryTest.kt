@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 The N's lab Open Source Project
+ * Copyright (C) 2024 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.data.repository
+package com.nlab.reminder.core.data.repository.impl
 
 import com.nlab.reminder.core.data.model.genScheduleId
 import com.nlab.testkit.faker.genInt

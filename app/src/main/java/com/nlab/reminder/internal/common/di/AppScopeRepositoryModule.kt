@@ -27,8 +27,8 @@ import com.nlab.reminder.core.data.repository.LinkMetadataRepository
 import com.nlab.reminder.core.data.repository.ScheduleRepository
 import com.nlab.reminder.core.data.repository.TagRepository
 import com.nlab.reminder.core.data.repository.TimestampRepository
-import com.nlab.reminder.core.data.repository.infra.DefaultTimestampRepository
-import com.nlab.reminder.core.data.repository.infra.JsoupLinkMetadataRepository
+import com.nlab.reminder.core.data.repository.impl.infra.DefaultTimestampRepository
+import com.nlab.reminder.core.data.repository.impl.infra.JsoupLinkMetadataRepository
 import com.nlab.reminder.core.kotlin.Result
 import com.nlab.reminder.core.kotlin.onFailure
 import com.nlab.reminder.internal.common.android.datastore.PreferenceKeys

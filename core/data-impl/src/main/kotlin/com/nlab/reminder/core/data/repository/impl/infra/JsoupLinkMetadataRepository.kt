@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.data.repository.infra
+package com.nlab.reminder.core.data.repository.impl.infra
 
 import com.nlab.reminder.core.data.model.Link
 import com.nlab.reminder.core.data.model.LinkMetadata
@@ -30,6 +30,13 @@ import org.jsoup.nodes.Element
 /**
  * @author thalys
  */
+private const val OG_TITLE = "og:title"
+private const val OG_IMAGE = "og:image"
+private val TAGS_REQUIRED: Set<String> = setOf(OG_TITLE, OG_IMAGE)
+
+private fun Element.toProperty(): String = attr("property")
+private fun Element.toContent(): String = attr("content")
+
 class JsoupLinkMetadataRepository(
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : LinkMetadataRepository {
@@ -51,11 +58,3 @@ class JsoupLinkMetadataRepository(
         }
     }
 }
-
-// TODO 임시적 허용.
-internal const val OG_TITLE = "og:title"
-internal const val OG_IMAGE = "og:image"
-internal val TAGS_REQUIRED: Set<String> = setOf(OG_TITLE, OG_IMAGE)
-
-internal fun Element.toProperty(): String = attr("property")
-internal fun Element.toContent(): String = attr("content")

@@ -16,11 +16,8 @@
 
 package com.nlab.reminder.core.data.model
 
-import com.nlab.reminder.core.annotation.test.ExcludeFromGeneratedTestReport
-
 /**
  * @author Doohyun
  */
 @JvmInline
-@ExcludeFromGeneratedTestReport
 value class ScheduleId(val value: Long)

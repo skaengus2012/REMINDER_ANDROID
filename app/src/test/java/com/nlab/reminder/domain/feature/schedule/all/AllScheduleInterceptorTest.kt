@@ -24,7 +24,6 @@ import com.nlab.reminder.core.data.model.genSchedules
 import com.nlab.reminder.core.data.repository.CompletedScheduleShownRepository
 import com.nlab.reminder.core.data.repository.ScheduleDeleteRequest
 import com.nlab.reminder.core.data.repository.ScheduleRepository
-import com.nlab.reminder.core.data.repository.InMemoryScheduleSelectedIdRepository
 import com.nlab.reminder.core.data.repository.ScheduleSelectedIdRepository
 import com.nlab.reminder.core.data.repository.ScheduleUpdateRequest
 import com.nlab.reminder.core.domain.CalculateItemSwapResultUseCase
@@ -254,7 +253,7 @@ internal class AllScheduleInterceptorTest {
     fun `Given state loaded, When OnScheduleSelected, Then repository called`() = runTest {
         val schedule = genSchedule()
         val scheduleElements = schedule.mapToScheduleElementsAsImmutableList()
-        val selectedIdRepository: InMemoryScheduleSelectedIdRepository = mock()
+        val selectedIdRepository: ScheduleSelectedIdRepository = mock()
         val isSelected = genBoolean()
 
         genInterceptor(selectedIdRepository = selectedIdRepository)
@@ -267,7 +266,7 @@ internal class AllScheduleInterceptorTest {
 
     @Test
     fun `Given State Loaded with empty schedules, When OnScheduleSelected, Then repository never called`() = runTest {
-        val selectedIdRepository: InMemoryScheduleSelectedIdRepository = mock()
+        val selectedIdRepository: ScheduleSelectedIdRepository = mock()
         genInterceptor(selectedIdRepository = selectedIdRepository)
             .scenario()
             .initState(genAllScheduleUiStateLoaded(scheduleElements = persistentListOf()))

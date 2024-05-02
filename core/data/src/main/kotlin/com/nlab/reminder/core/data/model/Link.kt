@@ -16,20 +16,15 @@
 
 package com.nlab.reminder.core.data.model
 
-import com.nlab.reminder.core.annotation.test.ExcludeFromGeneratedTestReport
-
 /**
+ * // TODO Convert Link to String
+ *
  * @author thalys
  */
 @JvmInline
-@ExcludeFromGeneratedTestReport
 value class Link private constructor(val value: String) {
     companion object {
         val EMPTY = Link("")
         operator fun invoke(value: String): Link = if (value.isBlank()) EMPTY else Link(value)
     }
 }
-
-fun Link.isEmpty(): Boolean = value.isBlank()
-fun Link.isNotEmpty(): Boolean = isEmpty().not()
-fun Link?.orEmpty(): Link = this ?: Link.EMPTY

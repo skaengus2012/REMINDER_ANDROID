@@ -16,9 +16,9 @@
 
 package com.nlab.reminder.internal.common.di
 
-import com.nlab.reminder.core.data.repository.CachedLinkMetadataTableRepository
-import com.nlab.reminder.core.data.repository.InMemoryScheduleCompleteMarkRepository
-import com.nlab.reminder.core.data.repository.InMemoryScheduleSelectedIdRepository
+import com.nlab.reminder.core.data.repository.impl.CachedLinkMetadataTableRepository
+import com.nlab.reminder.core.data.repository.impl.InMemoryScheduleCompleteMarkRepository
+import com.nlab.reminder.core.data.repository.impl.InMemoryScheduleSelectedIdRepository
 import com.nlab.reminder.core.data.repository.LinkMetadataTableRepository
 import com.nlab.reminder.core.data.repository.ScheduleCompleteMarkRepository
 import com.nlab.reminder.core.data.repository.ScheduleSelectedIdRepository

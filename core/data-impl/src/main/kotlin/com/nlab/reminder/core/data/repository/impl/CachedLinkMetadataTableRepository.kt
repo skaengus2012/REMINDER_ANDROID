@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.data.repository
+package com.nlab.reminder.core.data.repository.impl
 
 import com.nlab.reminder.core.data.model.Link
 import com.nlab.reminder.core.data.model.LinkMetadataTable
+import com.nlab.reminder.core.data.repository.LinkMetadataTableRepository
 import kotlinx.collections.immutable.persistentHashMapOf
 import kotlinx.collections.immutable.toPersistentHashMap
 import kotlinx.coroutines.CoroutineDispatcher

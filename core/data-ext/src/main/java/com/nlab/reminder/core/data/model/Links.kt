@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 The N's lab Open Source Project
+ * Copyright (C) 2024 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,11 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.data.repository.infra
-
-import android.os.SystemClock
-import com.nlab.reminder.core.data.repository.TimestampRepository
-import javax.inject.Inject
+package com.nlab.reminder.core.data.model
 
 /**
- * @author thalys
+ * @author Doohyun
  */
-class DefaultTimestampRepository @Inject constructor() : TimestampRepository {
-    override fun get(): Long {
-        return SystemClock.elapsedRealtime()
-    }
-}
+fun Link.isEmpty(): Boolean = value.isBlank()
+fun Link.isNotEmpty(): Boolean = isEmpty().not()
+fun Link?.orEmpty(): Link = this ?: Link.EMPTY

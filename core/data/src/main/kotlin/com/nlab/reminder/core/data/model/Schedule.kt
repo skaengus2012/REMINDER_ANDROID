@@ -26,7 +26,7 @@ data class Schedule(
     val title: String,
     val note: String,
     val link: Link,
-    val tags: ImmutableList<Tag>,
+    val tags: ImmutableList<Tag>,   // TODO CHANGE ImmutableList TO List
     val visiblePriority: Long,
     val isComplete: Boolean
 )

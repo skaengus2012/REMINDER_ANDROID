@@ -83,6 +83,8 @@ dependencies {
     implementation(projects.core.annotation)
     implementation(projects.core.annotationAndroid)
     implementation(projects.core.data)
+    implementation(projects.core.dataExt)
+    implementation(projects.core.dataImpl)
     implementation(projects.core.kotlin)
     implementation(projects.core.kotlinxCoroutine)
     implementation(projects.core.ui.compose)
@@ -124,8 +126,6 @@ dependencies {
     implementation(libs.glide)
     ksp(libs.glide.compiler)
 
-    implementation(libs.jsoup)
-
     implementation(libs.afollested.dragselectRecyclerView)
 
     debugImplementation(libs.facebook.flipper)
@@ -136,6 +136,7 @@ dependencies {
 
     testImplementation(projects.testkit)
     testImplementation(projects.statekit.test)
+    testImplementation(projects.core.dataTest)
     androidTestImplementation(libs.kotlinx.coroutines.test)
     androidTestImplementation(libs.javafaker)
     androidTestImplementation(libs.androidx.test.junit)

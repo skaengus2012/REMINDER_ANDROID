@@ -56,6 +56,9 @@ include(
     ":core:annotation",
     ":core:annotation-android",
     ":core:data",
+    ":core:data-ext",
+    ":core:data-impl",
+    ":core:data-test",
     ":core:kotlin",
     ":core:kotlinx-coroutine",
     ":core:ui:compose"

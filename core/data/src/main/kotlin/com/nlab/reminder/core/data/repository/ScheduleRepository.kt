@@ -34,7 +34,7 @@ interface ScheduleRepository {
 }
 
 sealed class ScheduleGetStreamRequest private constructor() {
-    object All : ScheduleGetStreamRequest()
+    data object All : ScheduleGetStreamRequest()
     data class ByComplete(val isComplete: Boolean) : ScheduleGetStreamRequest()
 }
 

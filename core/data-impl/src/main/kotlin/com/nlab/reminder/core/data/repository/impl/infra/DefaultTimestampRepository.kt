@@ -14,21 +14,17 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.data.repository
+package com.nlab.reminder.core.data.repository.impl.infra
 
-import com.nlab.reminder.core.data.model.ScheduleId
-import kotlinx.coroutines.flow.*
-import javax.inject.Inject
+import android.os.SystemClock
+import com.nlab.reminder.core.annotation.inject.Inject
+import com.nlab.reminder.core.data.repository.TimestampRepository
 
 /**
  * @author thalys
  */
-class InMemoryScheduleCompleteMarkRepository @Inject constructor() : ScheduleCompleteMarkRepository {
-    private val chunkRequests = MutableStateFlow(emptyMap<ScheduleId, Boolean>())
-
-    override fun getStream(): StateFlow<Map<ScheduleId, Boolean>> = chunkRequests.asStateFlow()
-
-    override fun add(scheduleId: ScheduleId, isComplete: Boolean) {
-        chunkRequests.update { old -> old + (scheduleId to isComplete) }
+class DefaultTimestampRepository @Inject constructor() : TimestampRepository {
+    override fun get(): Long {
+        return SystemClock.elapsedRealtime()
     }
 }

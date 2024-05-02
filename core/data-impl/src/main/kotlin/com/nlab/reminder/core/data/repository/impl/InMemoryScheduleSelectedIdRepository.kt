@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.data.repository
+package com.nlab.reminder.core.data.repository.impl
 
 import com.nlab.reminder.core.annotation.inject.Inject
 import com.nlab.reminder.core.data.model.ScheduleId
+import com.nlab.reminder.core.data.repository.ScheduleSelectedIdRepository
 import kotlinx.collections.immutable.persistentHashSetOf
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
