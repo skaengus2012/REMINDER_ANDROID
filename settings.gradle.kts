@@ -59,6 +59,7 @@ include(
     ":core:data-ext",
     ":core:data-impl",
     ":core:data-test",
+    ":core:domain",
     ":core:kotlin",
     ":core:kotlinx-coroutine",
     ":core:ui:compose"

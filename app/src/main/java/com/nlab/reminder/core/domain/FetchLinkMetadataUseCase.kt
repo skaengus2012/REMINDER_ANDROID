@@ -20,7 +20,7 @@ import com.nlab.reminder.core.data.model.Link
 import com.nlab.reminder.core.data.model.isNotEmpty
 import com.nlab.reminder.core.data.repository.LinkMetadataTableRepository
 import com.nlab.reminder.core.schedule.model.ScheduleElement
-import com.nlab.reminder.domain.common.kotlin.coroutine.inject.DefaultDispatcher
+import com.nlab.reminder.core.annotation.inject.kotlin.coroutine.DefaultDispatcher
 import dagger.Reusable
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext

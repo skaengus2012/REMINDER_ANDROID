@@ -22,7 +22,7 @@ import com.nlab.reminder.core.data.repository.impl.InMemoryScheduleSelectedIdRep
 import com.nlab.reminder.core.data.repository.LinkMetadataTableRepository
 import com.nlab.reminder.core.data.repository.ScheduleCompleteMarkRepository
 import com.nlab.reminder.core.data.repository.ScheduleSelectedIdRepository
-import com.nlab.reminder.domain.common.kotlin.coroutine.inject.DefaultDispatcher
+import com.nlab.reminder.core.annotation.inject.kotlin.coroutine.DefaultDispatcher
 import com.nlab.reminder.internal.data.repository.LocalLinkMetadataTableRepository
 import dagger.Binds
 import dagger.Module

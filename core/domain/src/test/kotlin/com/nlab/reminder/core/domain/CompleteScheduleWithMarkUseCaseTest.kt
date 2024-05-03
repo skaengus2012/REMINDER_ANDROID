@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2024 The N's lab Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.nlab.reminder.core.domain
 
 import com.nlab.reminder.core.data.model.ScheduleId
@@ -8,10 +24,6 @@ import com.nlab.reminder.core.data.repository.ScheduleUpdateRequest
 import com.nlab.reminder.core.kotlinx.coroutine.delay.Delay
 import com.nlab.testkit.faker.genBoolean
 import com.nlab.testkit.faker.genInt
-import org.mockito.kotlin.once
-import kotlinx.collections.immutable.ImmutableMap
-import kotlinx.collections.immutable.persistentMapOf
-import kotlinx.collections.immutable.toPersistentMap
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,6 +34,7 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.once
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -45,10 +58,8 @@ class CompleteScheduleWithMarkUseCaseTest {
 
     @Test
     fun `Given completed mark added, Then scheduleRepository update complete from completeMark tables`() = runTest {
-        val expectedCompleteTable: ImmutableMap<ScheduleId, Boolean> =
-            List(genInt(min = 1, max = 10)) { index -> genScheduleId(index.toLong()) }
-                .associateWith { true }
-                .toPersistentMap()
+        val expectedCompleteTable: Map<ScheduleId, Boolean> =
+            List(genInt(min = 1, max = 10)) { index -> genScheduleId(index.toLong()) }.associateWith { true }
         val scheduleRepository: ScheduleRepository = mock()
         val completeMarkRepository: ScheduleCompleteMarkRepository = mock {
             whenever(mock.getStream()) doReturn MutableStateFlow(
@@ -63,8 +74,8 @@ class CompleteScheduleWithMarkUseCaseTest {
         useCase.invoke(genScheduleId(), genBoolean())
         verify(scheduleRepository, once()).update(ScheduleUpdateRequest.Completes(expectedCompleteTable))
     }
-    
-    @Test  
+
+    @Test
     fun `Given completed mark not existed, Then scheduleRepository never updated`() = runTest {
         val scheduleRepository: ScheduleRepository = mock()
         val useCase = genUpdateScheduleCompletionUseCase(
@@ -79,7 +90,7 @@ class CompleteScheduleWithMarkUseCaseTest {
     @Test
     fun `AggregateDelay called between adding completeMark and updating scheduleRepository`() = runTest {
         val completeMarkRepository: ScheduleCompleteMarkRepository = mock {
-            whenever(mock.getStream()) doReturn MutableStateFlow(persistentMapOf(genScheduleId() to genBoolean()))
+            whenever(mock.getStream()) doReturn MutableStateFlow(mapOf(genScheduleId() to genBoolean()))
         }
         val aggregateDelay: Delay = mock()
         val scheduleRepository: ScheduleRepository = mock()
@@ -91,7 +102,7 @@ class CompleteScheduleWithMarkUseCaseTest {
         val scheduleId = genScheduleId()
         val isComplete = genBoolean()
 
-        useCase.invoke(scheduleId,isComplete)
+        useCase.invoke(scheduleId, isComplete)
         inOrder(scheduleRepository, completeMarkRepository, aggregateDelay) {
             verify(completeMarkRepository).add(scheduleId, isComplete)
             verify(aggregateDelay).invoke()
@@ -113,5 +124,5 @@ private fun genUpdateScheduleCompletionUseCase(
 )
 
 private fun genCompleteMarkRepositoryMockWithEmptyTable(): ScheduleCompleteMarkRepository = mock {
-    whenever(mock.getStream()) doReturn MutableStateFlow(persistentMapOf())
+    whenever(mock.getStream()) doReturn MutableStateFlow(mapOf())
 }

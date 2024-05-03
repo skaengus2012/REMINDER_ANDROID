@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 The N's lab Open Source Project
+ * Copyright (C) 2024 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.common.kotlin.coroutine.inject
+package com.nlab.reminder.core.annotation.inject.kotlin.coroutine
 
-import javax.inject.Qualifier
+import com.nlab.reminder.core.annotation.inject.Qualifier
 
 /**
+ * Annotation for configuring CoroutineScope with Application lifecycle
+ *
  * @author thalys
  */
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
-annotation class DefaultDispatcher
+annotation class GlobalScope

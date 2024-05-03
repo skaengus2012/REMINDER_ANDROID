@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-plugins {
-    alias(libs.plugins.nlab.jvm.library)
-}
 
-dependencies {
-    implementation(projects.core.annotation)
-    implementation(projects.core.kotlin)
-    implementation(projects.core.kotlinxCoroutine)
+package com.nlab.reminder.core.annotation.inject.kotlin.coroutine
 
-    implementation(libs.kotlinx.collections.immutable)
-}
+import com.nlab.reminder.core.annotation.inject.Qualifier
+
+/**
+ * @author thalys
+ */
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class DefaultDispatcher

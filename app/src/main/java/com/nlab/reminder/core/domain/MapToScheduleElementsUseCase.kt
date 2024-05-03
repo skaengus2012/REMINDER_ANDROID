@@ -23,19 +23,16 @@ import com.nlab.reminder.core.data.model.ScheduleId
 import com.nlab.reminder.core.data.model.isEmpty
 import com.nlab.reminder.core.data.repository.*
 import com.nlab.reminder.core.schedule.model.ScheduleElement
-import com.nlab.reminder.domain.common.kotlin.coroutine.inject.DefaultDispatcher
-import dagger.hilt.android.scopes.ViewModelScoped
+import com.nlab.reminder.core.annotation.inject.kotlin.coroutine.DefaultDispatcher
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
-import javax.inject.Inject
 
 /**
  * @author Doohyun
  */
-@ViewModelScoped
-class MapToScheduleElementsUseCase @Inject constructor(
+class MapToScheduleElementsUseCase(
     private val completeMarkRepository: ScheduleCompleteMarkRepository,
     private val linkMetadataTableRepository: LinkMetadataTableRepository,
     private val selectionRepository: ScheduleSelectedIdRepository,

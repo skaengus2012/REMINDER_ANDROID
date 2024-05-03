@@ -20,7 +20,10 @@ import com.nlab.reminder.core.data.repository.ScheduleCompleteMarkRepository
 import com.nlab.reminder.core.data.repository.ScheduleRepository
 import com.nlab.reminder.core.domain.CompleteScheduleWithMarkUseCase
 import com.nlab.reminder.core.kotlinx.coroutine.delay.Delay
-import com.nlab.reminder.domain.common.kotlin.coroutine.inject.DefaultDispatcher
+import com.nlab.reminder.core.annotation.inject.kotlin.coroutine.DefaultDispatcher
+import com.nlab.reminder.core.data.repository.LinkMetadataTableRepository
+import com.nlab.reminder.core.data.repository.ScheduleSelectedIdRepository
+import com.nlab.reminder.core.domain.MapToScheduleElementsUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -44,6 +47,20 @@ internal class ViewModelScopeUseCaseModule {
         scheduleRepository,
         scheduleCompleteMarkRepository,
         aggregateDelay = Delay(timeMillis = 1000),
+        dispatcher
+    )
+
+    @ViewModelScoped
+    @Provides
+    fun provideMapToScheduleElementsUseCase(
+        completeMarkRepository: ScheduleCompleteMarkRepository,
+        linkMetadataTableRepository: LinkMetadataTableRepository,
+        selectionRepository: ScheduleSelectedIdRepository,
+        @DefaultDispatcher dispatcher: CoroutineDispatcher
+    ) = MapToScheduleElementsUseCase(
+        completeMarkRepository,
+        linkMetadataTableRepository,
+        selectionRepository,
         dispatcher
     )
 }

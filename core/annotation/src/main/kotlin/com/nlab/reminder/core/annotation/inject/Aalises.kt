@@ -23,3 +23,4 @@ typealias Inject = javax.inject.Inject
 typealias Qualifier = javax.inject.Qualifier
 typealias Named = javax.inject.Named
 typealias Singleton = javax.inject.Singleton
+typealias Reusable = dagger.Reusable

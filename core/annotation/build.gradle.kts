@@ -3,5 +3,5 @@ plugins {
 }
 
 dependencies {
-    api(libs.javax.inject)
+    api(libs.google.dagger)
 }

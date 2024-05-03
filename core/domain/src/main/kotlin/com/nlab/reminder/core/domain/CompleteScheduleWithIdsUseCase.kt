@@ -16,16 +16,16 @@
 
 package com.nlab.reminder.core.domain
 
+import com.nlab.reminder.core.annotation.inject.Inject
+import com.nlab.reminder.core.annotation.inject.Reusable
+import com.nlab.reminder.core.annotation.inject.kotlin.coroutine.DefaultDispatcher
 import com.nlab.reminder.core.data.model.ScheduleId
 import com.nlab.reminder.core.data.repository.ScheduleRepository
 import com.nlab.reminder.core.data.repository.ScheduleUpdateRequest
 import com.nlab.reminder.core.kotlin.collections.associateWith
 import com.nlab.reminder.core.kotlin.Result
-import com.nlab.reminder.domain.common.kotlin.coroutine.inject.DefaultDispatcher
-import dagger.Reusable
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
 /**
  * @author thalys

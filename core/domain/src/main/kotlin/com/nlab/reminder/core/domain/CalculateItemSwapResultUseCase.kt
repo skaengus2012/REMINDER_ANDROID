@@ -16,8 +16,7 @@
 
 package com.nlab.reminder.core.domain
 
-import dagger.Reusable
-import javax.inject.Inject
+import com.nlab.reminder.core.annotation.inject.*
 
 /**
  * @author Doohyun
