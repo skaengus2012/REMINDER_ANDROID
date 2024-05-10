@@ -62,5 +62,6 @@ include(
     ":core:domain",
     ":core:kotlin",
     ":core:kotlinx-coroutine",
+    ":core:schedule",
     ":core:ui:compose"
 )

@@ -88,6 +88,7 @@ dependencies {
     implementation(projects.core.domain)
     implementation(projects.core.kotlin)
     implementation(projects.core.kotlinxCoroutine)
+    implementation(projects.core.schedule)
     implementation(projects.core.ui.compose)
 
     implementation(projects.statekit.runtime)
