@@ -17,7 +17,7 @@ plugins {
     alias(libs.plugins.nlab.android.application)
     alias(libs.plugins.nlab.android.application.compose)
     alias(libs.plugins.nlab.android.application.jacoco)
-    alias(libs.plugins.google.hilt)
+    alias(libs.plugins.nlab.android.hilt)
     alias(libs.plugins.androidx.navigation.safearges)
     alias(libs.plugins.ksp)
     id("kotlin-parcelize")
@@ -120,9 +120,6 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     implementation(libs.androidx.compose.foundation)
 
-    implementation(libs.google.hilt.android)
-    ksp(libs.google.hilt.android.compiler)
-
     implementation(libs.timber)
 
     implementation(libs.glide)
@@ -145,10 +142,4 @@ dependencies {
     androidTestImplementation(libs.androidx.test.espresso.core)
     androidTestImplementation(libs.androidx.test.runner)
     androidTestImplementation(libs.androidx.test.rules)
-}
-
-kapt {
-    // guide in dagger hilt
-    // https://developer.android.com/training/dependency-injection/hilt-android?hl=ko#setup
-    correctErrorTypes = true
 }

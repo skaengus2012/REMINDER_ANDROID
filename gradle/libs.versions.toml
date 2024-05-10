@@ -45,15 +45,10 @@ mockitoKotlin = "5.2.1"
 squareLeakcanary = "2.13"
 squareKotlinpoet = "1.16.0"
 timber = "5.0.1"
-kotlinVersion = "1.9.0"
-material = "1.11.0"
-kotlin2 = "1.9.0"
-materialVersion = "1.10.0"
 
 
 [libraries]
 afollested-dragselectRecyclerView = { module = "com.afollestad:drag-select-recyclerview", version.ref = "afollestedDragselectRecyclerView" }
-android-gradle-plugin = { group = "com.android.tools.build", name = "gradle", version.ref = "androidGradlePlugin" }
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose" }
 androidx-annotation = { group = "androidx.annotation", name = "annotation", version.ref = "androidxAnnotation" }
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "androidxAppCompat" }
@@ -91,14 +86,13 @@ facebook-flipper = { module = "com.facebook.flipper:flipper", version.ref = "fac
 facebook-flipper-leakcanary = { module = "com.facebook.flipper:flipper-leakcanary2-plugin", version.ref = "facebookFlipper" }
 facebook-soloader = { module = "com.facebook.soloader:soloader", version.ref = "facebookSoloader" }
 google-dagger = { module = "com.google.dagger:dagger", version.ref = "googleDagger" }
-google-hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "googleDagger" }
-google-hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "googleDagger" }
+google-hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "googleDagger" }       # use in nlab.android.hilt.gradle.kts
+google-hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "googleDagger" }     # use in nlab.android.hilt.gradle.kts
 glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
 glide-compiler = { module = "com.github.bumptech.glide:compiler", version.ref = "glide" }
 javafaker = { module = "com.github.javafaker:javafaker", version.ref = "javafaker" }
 jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
 junit = { module = "junit:junit", version.ref = "junit" }
-kotlin-gradle-plugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" } # Dependencies of the included build-logic
 kotlinx-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlinxCollectionsImmutable" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutine" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutine" }
@@ -109,6 +103,12 @@ squeare-leakcanary = { module = "com.squareup.leakcanary:leakcanary-android", ve
 squeare-kotlinpoet = { module = "com.squareup:kotlinpoet", version.ref = "squareKotlinpoet" }
 squeare-kotlinpoet-metadata = { module = "com.squareup:kotlinpoet-metadata", version.ref = "squareKotlinpoet" }
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
+
+# Dependencies of the included build-logic
+android-gradle-plugin = { group = "com.android.tools.build", name = "gradle", version.ref = "androidGradlePlugin" }
+kotlin-gradle-plugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
+ksp-gradle-plugin = { group = "com.google.devtools.ksp", name = "com.google.devtools.ksp.gradle.plugin", version.ref = "ksp" }
+
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
@@ -121,6 +121,7 @@ ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 nlab-android-application = { id = "nlab.android.application", version = "unspecified" }
 nlab-android-application-compose = { id = "nlab.android.application.compose", version = "unspecified" }
 nlab-android-application-jacoco = { id = "nlab.android.application.jacoco", version = "unspecified" }
+nlab-android-hilt = { id = "nlab.android.hilt", version = "unspecified" }
 nlab-android-library = { id = "nlab.android.library", version = "unspecified" }
 nlab-android-library-compose = { id = "nlab.android.library.compose", version = "unspecified" }
 nlab-android-library-jacoco = { id = "nlab.android.library.jacoco", version = "unspecified" }

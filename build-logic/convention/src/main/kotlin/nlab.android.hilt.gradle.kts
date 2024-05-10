@@ -1,5 +1,9 @@
+import com.nlab.reminder.kspExtension
+import com.nlab.reminder.libs
+import org.gradle.kotlin.dsl.dependencies
+
 /*
- * Copyright (C) 2023 The N's lab Open Source Project
+ * Copyright (C) 2024 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,27 +17,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-plugins {
-    `kotlin-dsl`
-}
-
-group = "com.nlab.reminder.buildlogic"
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
-}
-
-tasks.withType<KotlinCompile>().configureEach {
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_17.toString()
-    }
+with(pluginManager) {
+    apply("com.google.devtools.ksp")
+    apply("dagger.hilt.android.plugin")
 }
 
 dependencies {
-    compileOnly(libs.android.gradle.plugin)
-    compileOnly(libs.kotlin.gradle.plugin)
-    compileOnly(libs.ksp.gradle.plugin)
+    "implementation"(libs.findLibrary("google.hilt.android").get())
+    "ksp"(libs.findLibrary("google.hilt.android.compiler").get())
 }
+
+// guide in dagger hilt
+// https://developer.android.com/training/dependency-injection/hilt-android?hl=ko#setup
+kspExtension.arg("correctErrorTypes", "true")
