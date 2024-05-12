@@ -22,7 +22,6 @@ import com.nlab.reminder.core.data.repository.LinkMetadataRepository
 import com.nlab.reminder.core.kotlin.Result
 import com.nlab.reminder.core.kotlin.catching
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
@@ -37,9 +36,7 @@ private val TAGS_REQUIRED: Set<String> = setOf(OG_TITLE, OG_IMAGE)
 private fun Element.toProperty(): String = attr("property")
 private fun Element.toContent(): String = attr("content")
 
-class JsoupLinkMetadataRepository(
-    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
-) : LinkMetadataRepository {
+class JsoupLinkMetadataRepository(private val dispatcher: CoroutineDispatcher) : LinkMetadataRepository {
     override suspend fun get(link: Link): Result<LinkMetadata> = withContext(dispatcher) {
         catching {
             val tagNameToValues: Map<String, String> = buildMap {

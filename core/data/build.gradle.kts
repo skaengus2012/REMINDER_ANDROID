@@ -18,9 +18,8 @@ plugins {
 }
 
 dependencies {
-    implementation(projects.core.annotation)
-    implementation(projects.core.kotlin)
-    implementation(projects.core.kotlinxCoroutine)
-
-    implementation(libs.kotlinx.collections.immutable)
+    api(projects.core.kotlin)
+    
+    api(libs.kotlinx.collections.immutable)
+    api(libs.kotlinx.coroutines.core)
 }

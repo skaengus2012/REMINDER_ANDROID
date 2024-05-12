@@ -18,11 +18,11 @@ package com.nlab.reminder.internal.common.di
 
 import android.app.Application
 import com.nlab.reminder.core.android.widget.ToastHandle
-import com.nlab.reminder.core.annotation.inject.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
 
 /**
  * @author Doohyun

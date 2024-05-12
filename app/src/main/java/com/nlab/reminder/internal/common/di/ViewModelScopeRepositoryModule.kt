@@ -17,15 +17,10 @@
 package com.nlab.reminder.internal.common.di
 
 import com.nlab.reminder.core.data.repository.impl.CachedLinkMetadataTableRepository
-import com.nlab.reminder.core.data.repository.impl.InMemoryScheduleCompleteMarkRepository
-import com.nlab.reminder.core.data.repository.impl.InMemoryScheduleSelectedIdRepository
 import com.nlab.reminder.core.data.repository.LinkMetadataTableRepository
-import com.nlab.reminder.core.data.repository.ScheduleCompleteMarkRepository
-import com.nlab.reminder.core.data.repository.ScheduleSelectedIdRepository
 import com.nlab.reminder.core.di.coroutine.Dispatcher
 import com.nlab.reminder.core.di.coroutine.DispatcherOption.*
 import com.nlab.reminder.internal.data.repository.LocalLinkMetadataTableRepository
-import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -39,17 +34,6 @@ import kotlinx.coroutines.CoroutineDispatcher
 @Module
 @InstallIn(ViewModelComponent::class)
 internal abstract class ViewModelScopeRepositoryModule {
-    @ViewModelScoped
-    @Binds
-    abstract fun bindScheduleCompleteMarkRepository(
-        repository: InMemoryScheduleCompleteMarkRepository
-    ): ScheduleCompleteMarkRepository
-
-    @ViewModelScoped
-    @Binds
-    abstract fun bindScheduleSelectedIdRepository(
-        repository: InMemoryScheduleSelectedIdRepository
-    ): ScheduleSelectedIdRepository
 
     companion object {
         @ViewModelScoped

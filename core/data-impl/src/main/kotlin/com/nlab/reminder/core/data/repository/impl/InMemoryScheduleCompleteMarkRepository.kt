@@ -19,12 +19,11 @@ package com.nlab.reminder.core.data.repository.impl
 import com.nlab.reminder.core.data.model.ScheduleId
 import com.nlab.reminder.core.data.repository.ScheduleCompleteMarkRepository
 import kotlinx.coroutines.flow.*
-import javax.inject.Inject
 
 /**
  * @author thalys
  */
-class InMemoryScheduleCompleteMarkRepository @Inject constructor() : ScheduleCompleteMarkRepository {
+class InMemoryScheduleCompleteMarkRepository : ScheduleCompleteMarkRepository {
     private val chunkRequests = MutableStateFlow(emptyMap<ScheduleId, Boolean>())
 
     override fun getStream(): StateFlow<Map<ScheduleId, Boolean>> = chunkRequests.asStateFlow()

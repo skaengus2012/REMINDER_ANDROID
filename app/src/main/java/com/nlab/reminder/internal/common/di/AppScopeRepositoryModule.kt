@@ -19,18 +19,10 @@ package com.nlab.reminder.internal.common.di
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
-import com.nlab.reminder.core.data.model.Link
-import com.nlab.reminder.core.data.model.LinkMetadata
 import com.nlab.reminder.core.data.repository.AllScheduleData
 import com.nlab.reminder.core.data.repository.CompletedScheduleShownRepository
-import com.nlab.reminder.core.data.repository.LinkMetadataRepository
 import com.nlab.reminder.core.data.repository.ScheduleRepository
 import com.nlab.reminder.core.data.repository.TagRepository
-import com.nlab.reminder.core.data.repository.TimestampRepository
-import com.nlab.reminder.core.data.repository.impl.infra.DefaultTimestampRepository
-import com.nlab.reminder.core.data.repository.impl.infra.JsoupLinkMetadataRepository
-import com.nlab.reminder.core.kotlin.Result
-import com.nlab.reminder.core.kotlin.onFailure
 import com.nlab.reminder.internal.common.android.datastore.PreferenceKeys
 import com.nlab.reminder.internal.data.repository.LocalCompletedScheduleShownRepository
 import com.nlab.reminder.internal.data.repository.LocalScheduleRepository
@@ -38,8 +30,6 @@ import com.nlab.reminder.internal.data.repository.LocalTagRepository
 import dagger.*
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.Dispatchers
-import timber.log.Timber
 
 /**
  * @author thalys
@@ -55,21 +45,7 @@ internal abstract class AppScopeRepositoryModule {
     @Binds
     abstract fun bindTagRepository(repository: LocalTagRepository): TagRepository
 
-    @Reusable
-    @Binds
-    abstract fun bindTimestampRepository(repository: DefaultTimestampRepository): TimestampRepository
-
     companion object {
-        @Reusable
-        @Provides
-        fun provideScheduleRepository(): LinkMetadataRepository = object : LinkMetadataRepository {
-            private val internalRepository = JsoupLinkMetadataRepository(dispatcher = Dispatchers.IO)
-            override suspend fun get(link: Link): Result<LinkMetadata> {
-                return internalRepository.get(link).onFailure {
-                    Timber.w(it, "LinkMetadata load failed.")
-                }
-            }
-        }
 
         @AllScheduleData
         @Reusable

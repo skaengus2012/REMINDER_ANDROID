@@ -16,7 +16,8 @@
 
 package com.nlab.reminder.core.data.repository
 
-import com.nlab.reminder.core.annotation.inject.Qualifier
+import javax.inject.Qualifier
+
 
 /**
  * @author Doohyun

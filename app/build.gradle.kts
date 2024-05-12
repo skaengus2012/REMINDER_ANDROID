@@ -82,6 +82,7 @@ dependencies {
     implementation(projects.core.androidx.transition)
     implementation(projects.core.annotation)
     implementation(projects.core.annotationAndroid)
+    implementation(projects.core.dataDi)
     implementation(projects.core.dataExt)
     implementation(projects.core.dataImpl)
     implementation(projects.core.di)

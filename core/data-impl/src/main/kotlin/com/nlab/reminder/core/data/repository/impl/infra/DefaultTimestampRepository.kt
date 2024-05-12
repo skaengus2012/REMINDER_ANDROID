@@ -17,13 +17,12 @@
 package com.nlab.reminder.core.data.repository.impl.infra
 
 import android.os.SystemClock
-import com.nlab.reminder.core.annotation.inject.Inject
 import com.nlab.reminder.core.data.repository.TimestampRepository
 
 /**
  * @author thalys
  */
-class DefaultTimestampRepository @Inject constructor() : TimestampRepository {
+class DefaultTimestampRepository : TimestampRepository {
     override fun get(): Long {
         return SystemClock.elapsedRealtime()
     }
