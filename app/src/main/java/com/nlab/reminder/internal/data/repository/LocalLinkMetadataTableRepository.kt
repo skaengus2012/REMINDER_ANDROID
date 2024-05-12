@@ -25,7 +25,7 @@ import com.nlab.reminder.core.data.repository.LinkMetadataTableRepository
 import com.nlab.reminder.core.data.repository.TimestampRepository
 import com.nlab.reminder.core.kotlinx.coroutine.flow.map
 import com.nlab.reminder.core.kotlin.onSuccess
-import com.nlab.reminder.core.annotation.inject.kotlin.coroutine.GlobalScope
+import com.nlab.reminder.core.di.coroutine.AppScope
 import com.nlab.reminder.internal.common.android.database.LinkMetadataDao
 import com.nlab.reminder.internal.data.model.toEntity
 import kotlinx.coroutines.CoroutineScope
@@ -42,7 +42,7 @@ internal class LocalLinkMetadataTableRepository @Inject constructor(
     private val linkMetadataDao: LinkMetadataDao,
     private val linkMetadataRepository: LinkMetadataRepository,
     private val timestampRepository: TimestampRepository,
-    @GlobalScope private val coroutineScope: CoroutineScope,
+    @AppScope private val coroutineScope: CoroutineScope,
 ) : LinkMetadataTableRepository {
     override suspend fun fetch(links: Set<Link>) {
         links.filter(Link::isNotEmpty).forEach { link ->

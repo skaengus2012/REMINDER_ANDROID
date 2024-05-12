@@ -19,14 +19,10 @@ package com.nlab.reminder.internal.common.di
 import android.app.Application
 import com.nlab.reminder.core.android.widget.ToastHandle
 import com.nlab.reminder.core.annotation.inject.*
-import com.nlab.reminder.core.annotation.inject.kotlin.coroutine.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.CoroutineName
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.SupervisorJob
 
 /**
  * @author Doohyun
@@ -37,11 +33,4 @@ class UtilityModule {
     @Singleton
     @Provides
     fun provideToastHandle(application: Application): ToastHandle = ToastHandle(application)
-
-    @GlobalScope
-    @Singleton
-    @Provides
-    fun provideGlobalCoroutineScope(): CoroutineScope = CoroutineScope(
-        context = SupervisorJob() + CoroutineName("ReminderGlobalScope")
-    )
 }

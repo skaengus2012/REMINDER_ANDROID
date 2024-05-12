@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@file:Suppress("unused")
 
 package com.nlab.reminder.core.di.coroutine
 
@@ -21,41 +20,33 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import javax.inject.Qualifier
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import javax.inject.Qualifier
+import javax.inject.Singleton
 import kotlin.annotation.AnnotationRetention.BINARY
-
+import com.nlab.reminder.core.di.coroutine.DispatcherOption.*
 
 /**
- * Annotations for CoroutineDispatcher injection.
- * Using [option], you can define the Dispatcher to be injected.
+ * Annotation for configuring CoroutineScope with Application lifecycle
  *
- * @see [com.nlab.reminder.core.di.coroutine.DispatcherOption]
  * @author Doohyun
  */
 @Qualifier
 @Retention(BINARY)
-annotation class Dispatcher(val option: DispatcherOption)
-
-enum class DispatcherOption {
-    Default,
-    IO,
-    Main
-}
+annotation class AppScope
 
 @Module
 @InstallIn(SingletonComponent::class)
-internal class DispatcherModule {
+internal class CoroutineScopesModule {
     @Provides
-    @Dispatcher(DispatcherOption.Default)
-    fun provideDefaultDispatcher(): CoroutineDispatcher = Dispatchers.Default
-
-    @Provides
-    @Dispatcher(DispatcherOption.IO)
-    fun provideIODispatcher(): CoroutineDispatcher = Dispatchers.IO
-
-    @Provides
-    @Dispatcher(DispatcherOption.Main)
-    fun provideMainDispatcher(): CoroutineDispatcher = Dispatchers.Main
+    @Singleton
+    @AppScope
+    fun provideAppScope(
+        @Dispatcher(Default) dispatcher: CoroutineDispatcher
+    ): CoroutineScope = CoroutineScope(
+        context = SupervisorJob() + dispatcher + CoroutineName(name = "ReminderAppScope")
+    )
 }
