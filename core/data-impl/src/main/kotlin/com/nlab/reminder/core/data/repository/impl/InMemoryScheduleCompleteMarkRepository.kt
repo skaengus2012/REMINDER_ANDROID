@@ -16,10 +16,10 @@
 
 package com.nlab.reminder.core.data.repository.impl
 
-import com.nlab.reminder.core.annotation.inject.Inject
 import com.nlab.reminder.core.data.model.ScheduleId
 import com.nlab.reminder.core.data.repository.ScheduleCompleteMarkRepository
 import kotlinx.coroutines.flow.*
+import javax.inject.Inject
 
 /**
  * @author thalys

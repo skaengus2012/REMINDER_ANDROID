@@ -22,7 +22,8 @@ import com.nlab.reminder.core.data.repository.impl.InMemoryScheduleSelectedIdRep
 import com.nlab.reminder.core.data.repository.LinkMetadataTableRepository
 import com.nlab.reminder.core.data.repository.ScheduleCompleteMarkRepository
 import com.nlab.reminder.core.data.repository.ScheduleSelectedIdRepository
-import com.nlab.reminder.core.annotation.inject.kotlin.coroutine.DefaultDispatcher
+import com.nlab.reminder.core.di.coroutine.Dispatcher
+import com.nlab.reminder.core.di.coroutine.DispatcherOption.*
 import com.nlab.reminder.internal.data.repository.LocalLinkMetadataTableRepository
 import dagger.Binds
 import dagger.Module
@@ -55,7 +56,7 @@ internal abstract class ViewModelScopeRepositoryModule {
         @Provides
         fun provideCachedLinkMetadataTableRepository(
             repository: LocalLinkMetadataTableRepository,
-            @DefaultDispatcher dispatcher: CoroutineDispatcher
+            @Dispatcher(Default) dispatcher: CoroutineDispatcher
         ): LinkMetadataTableRepository = CachedLinkMetadataTableRepository(repository, dispatcher)
     }
 }

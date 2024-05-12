@@ -23,7 +23,6 @@ import com.nlab.reminder.core.data.model.ScheduleId
 import com.nlab.reminder.core.data.model.isEmpty
 import com.nlab.reminder.core.data.repository.*
 import com.nlab.reminder.core.schedule.model.ScheduleElement
-import com.nlab.reminder.core.annotation.inject.kotlin.coroutine.DefaultDispatcher
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -36,7 +35,7 @@ class MapToScheduleElementsUseCase(
     private val completeMarkRepository: ScheduleCompleteMarkRepository,
     private val linkMetadataTableRepository: LinkMetadataTableRepository,
     private val selectionRepository: ScheduleSelectedIdRepository,
-    @DefaultDispatcher private val dispatcher: CoroutineDispatcher
+    private val dispatcher: CoroutineDispatcher
 ) {
     operator fun invoke(
         schedulesStream: Flow<List<Schedule>>

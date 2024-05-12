@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.nlab.android.library)
     alias(libs.plugins.nlab.android.library.jacoco)
+    alias(libs.plugins.nlab.android.hilt)
 }
 
 android {

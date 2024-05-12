@@ -19,7 +19,6 @@ plugins {
 }
 
 dependencies {
-    implementation(projects.core.annotation)
     implementation(projects.core.data)
     implementation(projects.core.kotlin)
     implementation(projects.core.kotlinxCoroutine)

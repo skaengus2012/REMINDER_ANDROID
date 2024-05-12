@@ -4,7 +4,7 @@ plugins {
 }
 
 dependencies {
-    implementation(projects.core.data)
+    api(projects.core.data)
 
     testImplementation(projects.testkit)
     testImplementation(projects.core.dataTest)

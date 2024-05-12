@@ -16,13 +16,10 @@
 
 package com.nlab.reminder.core.domain
 
-import com.nlab.reminder.core.annotation.inject.*
-
 /**
  * @author Doohyun
  */
-@Reusable
-class CalculateItemSwapResultUseCase @Inject constructor() {
+class CalculateItemSwapResultUseCase {
     /**
      * Returns only the part of the swap of items from [fromPosition] and [toPosition] in [items].
      *

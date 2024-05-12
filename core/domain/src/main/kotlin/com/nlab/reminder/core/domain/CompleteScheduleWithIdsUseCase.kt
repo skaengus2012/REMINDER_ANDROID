@@ -16,9 +16,6 @@
 
 package com.nlab.reminder.core.domain
 
-import com.nlab.reminder.core.annotation.inject.Inject
-import com.nlab.reminder.core.annotation.inject.Reusable
-import com.nlab.reminder.core.annotation.inject.kotlin.coroutine.DefaultDispatcher
 import com.nlab.reminder.core.data.model.ScheduleId
 import com.nlab.reminder.core.data.repository.ScheduleRepository
 import com.nlab.reminder.core.data.repository.ScheduleUpdateRequest
@@ -30,10 +27,9 @@ import kotlinx.coroutines.withContext
 /**
  * @author thalys
  */
-@Reusable
-class CompleteScheduleWithIdsUseCase @Inject constructor(
+class CompleteScheduleWithIdsUseCase(
     private val scheduleRepository: ScheduleRepository,
-    @DefaultDispatcher private val dispatcher: CoroutineDispatcher
+    private val dispatcher: CoroutineDispatcher
 ) {
     suspend operator fun invoke(ids: Collection<ScheduleId>, isComplete: Boolean): Result<Unit> =
         if (ids.isEmpty()) Result.Success(Unit)
