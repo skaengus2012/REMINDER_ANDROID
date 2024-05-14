@@ -17,8 +17,8 @@
 package com.nlab.reminder.internal.data.model
 
 import com.nlab.reminder.core.data.model.isEmpty
-import com.nlab.reminder.internal.common.android.database.ScheduleEntity
-import com.nlab.reminder.internal.common.android.database.ScheduleEntityWithTagEntities
+import com.nlab.reminder.core.local.database.ScheduleEntity
+import com.nlab.reminder.core.local.database.ScheduleEntityWithTagEntities
 import org.junit.Test
 
 /**

@@ -25,7 +25,7 @@ import com.nlab.reminder.core.data.repository.LinkMetadataRepository
 import com.nlab.reminder.core.data.repository.LinkMetadataTableRepository
 import com.nlab.reminder.core.data.repository.TimestampRepository
 import com.nlab.reminder.core.kotlin.Result
-import com.nlab.reminder.internal.common.android.database.LinkMetadataDao
+import com.nlab.reminder.core.local.database.LinkMetadataDao
 import com.nlab.reminder.internal.data.model.toEntity
 import com.nlab.testkit.faker.genBlank
 import com.nlab.testkit.faker.genInt

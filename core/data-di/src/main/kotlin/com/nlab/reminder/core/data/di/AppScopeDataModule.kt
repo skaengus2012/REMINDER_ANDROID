@@ -33,6 +33,10 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineDispatcher
 import timber.log.Timber
+import com.nlab.reminder.core.data.di.ScheduleDataOption.*
+import com.nlab.reminder.core.data.repository.CompletedScheduleShownRepository
+import com.nlab.reminder.core.data.repository.impl.CompletedScheduleShownRepositoryImpl
+import com.nlab.reminder.core.local.datastore.PreferenceDataSource
 
 /**
  * @author Doohyun
@@ -56,4 +60,14 @@ internal class AppScopeDataModule {
     @Provides
     @Reusable
     fun provideTimestampRepository(): TimestampRepository = DefaultTimestampRepository()
+
+    @Provides
+    @Reusable
+    @ScheduleData(All)
+    fun provideCompletedScheduleShownRepository(
+        preferenceDataSource: PreferenceDataSource
+    ): CompletedScheduleShownRepository = CompletedScheduleShownRepositoryImpl(
+        getAsStreamFunction = { preferenceDataSource.getAllScheduleCompleteShownAsStream() },
+        setShownFunction = { preferenceDataSource.setAllScheduleCompleteShown(it) }
+    )
 }

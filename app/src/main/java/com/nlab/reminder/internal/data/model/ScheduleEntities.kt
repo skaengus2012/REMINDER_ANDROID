@@ -19,9 +19,9 @@ package com.nlab.reminder.internal.data.model
 import com.nlab.reminder.core.data.model.Link
 import com.nlab.reminder.core.data.model.Schedule
 import com.nlab.reminder.core.data.model.ScheduleId
-import com.nlab.reminder.internal.common.android.database.ScheduleEntity
-import com.nlab.reminder.internal.common.android.database.ScheduleEntityWithTagEntities
-import com.nlab.reminder.internal.common.android.database.TagEntity
+import com.nlab.reminder.core.local.database.ScheduleEntity
+import com.nlab.reminder.core.local.database.ScheduleEntityWithTagEntities
+import com.nlab.reminder.core.local.database.TagEntity
 import kotlinx.collections.immutable.toImmutableList
 
 /**

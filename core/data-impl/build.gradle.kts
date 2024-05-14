@@ -1,7 +1,6 @@
 plugins {
     alias(libs.plugins.nlab.android.library)
     alias(libs.plugins.nlab.android.library.jacoco)
-    alias(libs.plugins.nlab.android.hilt)
 }
 
 android {
@@ -11,6 +10,7 @@ android {
 dependencies {
     implementation(projects.core.data)
     implementation(projects.core.kotlinxCoroutine)
+    implementation(projects.core.local)
 
     implementation(libs.jsoup)
 

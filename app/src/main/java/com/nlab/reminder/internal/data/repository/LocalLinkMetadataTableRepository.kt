@@ -26,7 +26,7 @@ import com.nlab.reminder.core.data.repository.TimestampRepository
 import com.nlab.reminder.core.kotlinx.coroutine.flow.map
 import com.nlab.reminder.core.kotlin.onSuccess
 import com.nlab.reminder.core.di.coroutine.AppScope
-import com.nlab.reminder.internal.common.android.database.LinkMetadataDao
+import com.nlab.reminder.core.local.database.LinkMetadataDao
 import com.nlab.reminder.internal.data.model.toEntity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow

@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.internal.common.database
+package com.nlab.reminder.core.local.database
 
-import com.nlab.reminder.core.data.model.Tag
-import com.nlab.reminder.core.local.database.TagEntity
-import com.nlab.reminder.internal.data.model.toEntity
+import androidx.room.TypeConverter
 
 /**
  * @author Doohyun
  */
-fun List<Tag>.toEntities(): List<TagEntity> = map { it.toEntity() }
+class StringValuesConverter {
+    @TypeConverter fun listToString(values: List<String>): String = values.joinToString(separator = ",")
+    @TypeConverter fun stringToList(list: String): List<String> = list.split(",")
+}

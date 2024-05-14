@@ -18,7 +18,7 @@ package com.nlab.reminder.internal.data.model
 
 import com.nlab.reminder.core.data.model.Link
 import com.nlab.reminder.core.data.model.LinkMetadata
-import com.nlab.reminder.internal.common.android.database.LinkMetadataEntity
+import com.nlab.reminder.core.local.database.LinkMetadataEntity
 
 /**
  * @author thalys

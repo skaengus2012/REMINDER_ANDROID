@@ -22,9 +22,9 @@ import com.nlab.reminder.core.data.model.genTag
 import com.nlab.reminder.core.data.model.genTags
 import com.nlab.reminder.core.data.repository.TagRepository
 import com.nlab.reminder.core.kotlin.Result
-import com.nlab.reminder.internal.common.android.database.ScheduleTagListDao
-import com.nlab.reminder.internal.common.android.database.TagDao
-import com.nlab.reminder.internal.common.android.database.TagEntity
+import com.nlab.reminder.core.local.database.ScheduleTagListDao
+import com.nlab.reminder.core.local.database.TagDao
+import com.nlab.reminder.core.local.database.TagEntity
 import com.nlab.reminder.internal.common.database.toEntities
 import com.nlab.reminder.internal.data.model.toEntity
 import com.nlab.reminder.test.genFlowExecutionDispatcher

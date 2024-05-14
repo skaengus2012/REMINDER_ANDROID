@@ -25,8 +25,8 @@ import com.nlab.reminder.core.data.repository.ScheduleUpdateRequest
 import com.nlab.reminder.core.kotlinx.coroutine.flow.map
 import com.nlab.reminder.core.kotlin.Result
 import com.nlab.reminder.core.kotlin.catching
-import com.nlab.reminder.internal.common.android.database.ScheduleDao
-import com.nlab.reminder.internal.common.android.database.ScheduleEntityWithTagEntities
+import com.nlab.reminder.core.local.database.ScheduleDao
+import com.nlab.reminder.core.local.database.ScheduleEntityWithTagEntities
 import com.nlab.reminder.internal.data.repository.fake.FakeScheduleRepositoryDelegate
 import com.nlab.reminder.internal.data.model.toModel
 import kotlinx.coroutines.flow.Flow

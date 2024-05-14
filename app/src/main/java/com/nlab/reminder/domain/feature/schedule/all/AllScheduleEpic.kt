@@ -16,9 +16,10 @@
 
 package com.nlab.reminder.domain.feature.schedule.all
 
+import com.nlab.reminder.core.data.di.ScheduleData
+import com.nlab.reminder.core.data.di.ScheduleDataOption.*
 import com.nlab.reminder.core.data.model.Schedule
 import com.nlab.reminder.core.kotlinx.coroutine.flow.map
-import com.nlab.reminder.core.data.repository.AllScheduleData
 import com.nlab.reminder.core.data.repository.CompletedScheduleShownRepository
 import com.nlab.reminder.core.data.repository.ScheduleGetStreamRequest
 import com.nlab.reminder.core.data.repository.ScheduleRepository
@@ -33,7 +34,7 @@ import javax.inject.Inject
  * @author thalys
  */
 class AllScheduleEpic @Inject constructor(
-    @AllScheduleData completedScheduleShownRepository: CompletedScheduleShownRepository,
+    @ScheduleData(All) completedScheduleShownRepository: CompletedScheduleShownRepository,
     scheduleRepository: ScheduleRepository,
     mapToScheduleElements: MapToScheduleElementsUseCase
 ) : Epic<AllScheduleAction> by buildDslEpic(buildDSL = {

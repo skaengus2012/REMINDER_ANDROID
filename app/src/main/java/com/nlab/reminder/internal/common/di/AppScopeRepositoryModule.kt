@@ -16,15 +16,8 @@
 
 package com.nlab.reminder.internal.common.di
 
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.booleanPreferencesKey
-import com.nlab.reminder.core.data.repository.AllScheduleData
-import com.nlab.reminder.core.data.repository.CompletedScheduleShownRepository
 import com.nlab.reminder.core.data.repository.ScheduleRepository
 import com.nlab.reminder.core.data.repository.TagRepository
-import com.nlab.reminder.internal.common.android.datastore.PreferenceKeys
-import com.nlab.reminder.internal.data.repository.LocalCompletedScheduleShownRepository
 import com.nlab.reminder.internal.data.repository.LocalScheduleRepository
 import com.nlab.reminder.internal.data.repository.LocalTagRepository
 import dagger.*
@@ -44,17 +37,4 @@ internal abstract class AppScopeRepositoryModule {
     @Reusable
     @Binds
     abstract fun bindTagRepository(repository: LocalTagRepository): TagRepository
-
-    companion object {
-
-        @AllScheduleData
-        @Reusable
-        @Provides
-        fun provideCompletedScheduleShownAllScopeRepository(
-            dataStore: DataStore<Preferences>
-        ): CompletedScheduleShownRepository = LocalCompletedScheduleShownRepository(
-            dataStore,
-            booleanPreferencesKey(PreferenceKeys.PREFERENCE_KEY_ALL_SCHEDULE_COMPLETE_SHOWN)
-        )
-    }
 }

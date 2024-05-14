@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 The N's lab Open Source Project
+ * Copyright (C) 2024 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,18 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.internal.common.database
+package com.nlab.reminder.core.data.di
 
-import com.nlab.reminder.core.data.model.Tag
-import com.nlab.reminder.core.local.database.TagEntity
-import com.nlab.reminder.internal.data.model.toEntity
+import javax.inject.Qualifier
+import kotlin.annotation.AnnotationRetention.BINARY
 
 /**
  * @author Doohyun
  */
-fun List<Tag>.toEntities(): List<TagEntity> = map { it.toEntity() }
+@Qualifier
+@Retention(BINARY)
+annotation class ScheduleData(val option: ScheduleDataOption)
+
+enum class ScheduleDataOption {
+    All
+}

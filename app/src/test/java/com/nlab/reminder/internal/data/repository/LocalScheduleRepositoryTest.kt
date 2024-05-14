@@ -23,8 +23,8 @@ import com.nlab.reminder.core.data.repository.ScheduleDeleteRequest
 import com.nlab.reminder.core.data.repository.ScheduleGetStreamRequest
 import com.nlab.reminder.core.data.repository.ScheduleRepository
 import com.nlab.reminder.core.data.repository.ScheduleUpdateRequest
-import com.nlab.reminder.internal.common.android.database.ScheduleDao
-import com.nlab.reminder.internal.common.android.database.ScheduleEntityWithTagEntities
+import com.nlab.reminder.core.local.database.ScheduleDao
+import com.nlab.reminder.core.local.database.ScheduleEntityWithTagEntities
 import com.nlab.reminder.internal.data.model.toEntity
 import com.nlab.testkit.faker.genBoolean
 import com.nlab.testkit.faker.genInt

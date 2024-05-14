@@ -14,13 +14,18 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.internal.common.database
+package com.nlab.reminder.core.local.database
 
-import com.nlab.reminder.core.data.model.Tag
-import com.nlab.reminder.core.local.database.TagEntity
-import com.nlab.reminder.internal.data.model.toEntity
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.Index
+import androidx.room.PrimaryKey
 
 /**
  * @author Doohyun
  */
-fun List<Tag>.toEntities(): List<TagEntity> = map { it.toEntity() }
+@Entity(tableName = "tag", indices = [Index(value = ["name"], unique = true)])
+data class TagEntity(
+    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "tag_id") val tagId: Long = 0,
+    @ColumnInfo(name = "name") val name: String
+)

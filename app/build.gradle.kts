@@ -33,10 +33,6 @@ android {
         versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-
-        ksp {
-            arg("room.schemaLocation", "${layout.buildDirectory.get()}/schemas")
-        }
     }
 
     buildTypes {
@@ -89,6 +85,7 @@ dependencies {
     implementation(projects.core.domain)
     implementation(projects.core.kotlin)
     implementation(projects.core.kotlinxCoroutine)
+    implementation(projects.core.localDi)
     implementation(projects.core.schedule)
     implementation(projects.core.ui.compose)
 
@@ -109,9 +106,6 @@ dependencies {
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.androidx.navigation.ui.ktx)
-    implementation(libs.androidx.room.runtime)
-    implementation(libs.androidx.room.ktx)
-    ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.startup.runtime)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.activity.compose)

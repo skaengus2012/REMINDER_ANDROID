@@ -40,7 +40,7 @@ import org.mockito.kotlin.whenever
 /**
  * @author thalys
  */
-class CachedLinkMetadataTableRepositoryTest {
+internal class CachedLinkMetadataTableRepositoryTest {
     @Test
     fun `When fetched, Then internalRepository fetched`() = runTest {
         val link = genLink()

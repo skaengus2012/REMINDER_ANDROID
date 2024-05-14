@@ -14,13 +14,21 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.internal.common.database
+package com.nlab.reminder.core.local.database
 
-import com.nlab.reminder.core.data.model.Tag
-import com.nlab.reminder.core.local.database.TagEntity
-import com.nlab.reminder.internal.data.model.toEntity
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 
 /**
  * @author Doohyun
  */
-fun List<Tag>.toEntities(): List<TagEntity> = map { it.toEntity() }
+@Entity(tableName = "schedule")
+data class ScheduleEntity(
+    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "schedule_id") val scheduleId: Long = 0,
+    @ColumnInfo(name = "title") val title: String,
+    @ColumnInfo(name = "description") val description: String? = null,
+    @ColumnInfo(name = "link") val link: String? = null,
+    @ColumnInfo(name = "visible_priority") val visiblePriority: Long = 0,
+    @ColumnInfo(name = "is_complete") val isComplete: Boolean = false,
+)

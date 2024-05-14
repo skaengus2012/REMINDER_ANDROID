@@ -16,6 +16,8 @@
 
 package com.nlab.reminder.domain.feature.schedule.all
 
+import com.nlab.reminder.core.data.di.ScheduleData
+import com.nlab.reminder.core.data.di.ScheduleDataOption.*
 import com.nlab.reminder.core.data.model.ScheduleId
 import com.nlab.reminder.core.kotlin.getOrThrow
 import com.nlab.reminder.core.data.repository.*
@@ -32,7 +34,7 @@ import javax.inject.Inject
  */
 class AllScheduleInterceptor @Inject constructor(
     scheduleRepository: ScheduleRepository,
-    @AllScheduleData completedScheduleShownRepository: CompletedScheduleShownRepository,
+    @ScheduleData(All) completedScheduleShownRepository: CompletedScheduleShownRepository,
     selectedIdRepository: ScheduleSelectedIdRepository,
     completeScheduleWithMark: CompleteScheduleWithMarkUseCase,
     completeScheduleWithIds: CompleteScheduleWithIdsUseCase,
