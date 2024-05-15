@@ -8,7 +8,8 @@ android {
 }
 
 dependencies {
-    implementation(projects.core.data)
+    implementation(projects.core.annotation)
+    implementation(projects.core.dataExt)
     implementation(projects.core.kotlinxCoroutine)
     implementation(projects.core.local)
 

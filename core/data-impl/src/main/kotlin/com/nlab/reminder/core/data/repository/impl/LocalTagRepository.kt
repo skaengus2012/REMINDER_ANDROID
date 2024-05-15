@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 The N's lab Open Source Project
+ * Copyright (C) 2024 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.internal.data.repository
+package com.nlab.reminder.core.data.repository.impl
 
+import com.nlab.reminder.core.data.local.database.toEntity
+import com.nlab.reminder.core.data.local.database.toModels
 import com.nlab.reminder.core.data.model.Tag
 import com.nlab.reminder.core.data.model.TagUsageCount
 import com.nlab.reminder.core.data.repository.TagRepository
@@ -24,15 +26,13 @@ import com.nlab.reminder.core.kotlin.Result
 import com.nlab.reminder.core.kotlin.catching
 import com.nlab.reminder.core.local.database.ScheduleTagListDao
 import com.nlab.reminder.core.local.database.TagDao
-import com.nlab.reminder.internal.data.model.toEntity
-import com.nlab.reminder.internal.data.model.toModels
+import com.nlab.reminder.core.local.database.TagEntity
 import kotlinx.coroutines.flow.Flow
-import javax.inject.Inject
 
 /**
  * @author Doohyun
  */
-internal class LocalTagRepository @Inject constructor(
+class LocalTagRepository(
     private val tagDao: TagDao,
     private val scheduleTagListDao: ScheduleTagListDao
 ) : TagRepository {
@@ -43,7 +43,7 @@ internal class LocalTagRepository @Inject constructor(
     }
 
     override suspend fun updateName(tag: Tag, name: String): Result<Unit> = catching {
-        tagDao.update(tag.toEntity(name = name))
+        tagDao.update(TagEntity(tagId = tag.tagId, name = name))
     }
 
     override suspend fun delete(tag: Tag): Result<Unit> = catching {

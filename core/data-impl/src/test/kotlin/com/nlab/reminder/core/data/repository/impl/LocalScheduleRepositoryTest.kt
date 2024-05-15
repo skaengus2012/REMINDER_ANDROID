@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 The N's lab Open Source Project
+ * Copyright (C) 2024 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.internal.data.repository
+package com.nlab.reminder.core.data.repository.impl
 
+import com.nlab.reminder.core.data.local.database.toEntity
 import com.nlab.reminder.core.data.model.Schedule
 import com.nlab.reminder.core.data.model.genScheduleId
 import com.nlab.reminder.core.data.model.genSchedules
@@ -25,11 +26,9 @@ import com.nlab.reminder.core.data.repository.ScheduleRepository
 import com.nlab.reminder.core.data.repository.ScheduleUpdateRequest
 import com.nlab.reminder.core.local.database.ScheduleDao
 import com.nlab.reminder.core.local.database.ScheduleEntityWithTagEntities
-import com.nlab.reminder.internal.data.model.toEntity
 import com.nlab.testkit.faker.genBoolean
 import com.nlab.testkit.faker.genInt
 import com.nlab.testkit.faker.genLong
-import org.mockito.kotlin.once
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.take
@@ -39,6 +38,7 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.once
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 

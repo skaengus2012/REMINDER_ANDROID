@@ -22,8 +22,6 @@ import com.nlab.reminder.core.data.repository.LinkMetadataRepository
 import com.nlab.reminder.core.data.repository.TimestampRepository
 import com.nlab.reminder.core.data.repository.impl.infra.DefaultTimestampRepository
 import com.nlab.reminder.core.data.repository.impl.infra.JsoupLinkMetadataRepository
-import com.nlab.reminder.core.di.coroutine.Dispatcher
-import com.nlab.reminder.core.di.coroutine.DispatcherOption.IO
 import com.nlab.reminder.core.kotlin.Result
 import com.nlab.reminder.core.kotlin.onFailure
 import dagger.Module
@@ -35,8 +33,22 @@ import kotlinx.coroutines.CoroutineDispatcher
 import timber.log.Timber
 import com.nlab.reminder.core.data.di.ScheduleDataOption.*
 import com.nlab.reminder.core.data.repository.CompletedScheduleShownRepository
+import com.nlab.reminder.core.data.repository.ScheduleRepository
+import com.nlab.reminder.core.data.repository.TagRepository
 import com.nlab.reminder.core.data.repository.impl.CompletedScheduleShownRepositoryImpl
+import com.nlab.reminder.core.data.repository.impl.LocalLinkMetadataTableRepository
+import com.nlab.reminder.core.data.repository.impl.LocalScheduleRepository
+import com.nlab.reminder.core.data.repository.impl.LocalTagRepository
+import com.nlab.reminder.core.di.coroutine.AppScope
+import com.nlab.reminder.core.di.coroutine.Dispatcher
+import com.nlab.reminder.core.di.coroutine.DispatcherOption.IO
+import com.nlab.reminder.core.local.database.LinkMetadataDao
+import com.nlab.reminder.core.local.database.ScheduleDao
+import com.nlab.reminder.core.local.database.ScheduleTagListDao
+import com.nlab.reminder.core.local.database.TagDao
 import com.nlab.reminder.core.local.datastore.PreferenceDataSource
+import kotlinx.coroutines.CoroutineScope
+import javax.inject.Singleton
 
 /**
  * @author Doohyun
@@ -44,6 +56,16 @@ import com.nlab.reminder.core.local.datastore.PreferenceDataSource
 @Module
 @InstallIn(SingletonComponent::class)
 internal class AppScopeDataModule {
+    @Provides
+    @Reusable
+    @ScheduleData(All)
+    fun provideCompletedScheduleShownRepository(
+        preferenceDataSource: PreferenceDataSource
+    ): CompletedScheduleShownRepository = CompletedScheduleShownRepositoryImpl(
+        getAsStreamFunction = { preferenceDataSource.getAllScheduleCompleteShownAsStream() },
+        setShownFunction = { preferenceDataSource.setAllScheduleCompleteShown(it) }
+    )
+
     @Provides
     @Reusable
     fun provideLinkMetadataRepository(
@@ -58,16 +80,33 @@ internal class AppScopeDataModule {
     }
 
     @Provides
-    @Reusable
-    fun provideTimestampRepository(): TimestampRepository = DefaultTimestampRepository()
+    @Singleton
+    fun provideLocalLinkMetadataTableRepository(
+        linkMetadataDao: LinkMetadataDao,
+        linkMetadataRepository: LinkMetadataRepository,
+        timestampRepository: TimestampRepository,
+        @AppScope applicationScope: CoroutineScope
+    ) = LocalLinkMetadataTableRepository(
+        linkMetadataDao,
+        linkMetadataRepository,
+        timestampRepository,
+        applicationScope
+    )
 
     @Provides
     @Reusable
-    @ScheduleData(All)
-    fun provideCompletedScheduleShownRepository(
-        preferenceDataSource: PreferenceDataSource
-    ): CompletedScheduleShownRepository = CompletedScheduleShownRepositoryImpl(
-        getAsStreamFunction = { preferenceDataSource.getAllScheduleCompleteShownAsStream() },
-        setShownFunction = { preferenceDataSource.setAllScheduleCompleteShown(it) }
-    )
+    fun provideScheduleRepository(
+        scheduleDao: ScheduleDao
+    ): ScheduleRepository = LocalScheduleRepository(scheduleDao)
+
+    @Provides
+    @Reusable
+    fun provideTagRepository(
+        tagDao: TagDao,
+        scheduleTagListDao: ScheduleTagListDao
+    ): TagRepository = LocalTagRepository(tagDao, scheduleTagListDao)
+
+    @Provides
+    @Reusable
+    fun provideTimestampRepository(): TimestampRepository = DefaultTimestampRepository()
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 The N's lab Open Source Project
+ * Copyright (C) 2024 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.internal.data.repository
+package com.nlab.reminder.core.data.repository.impl
 
+import com.nlab.reminder.core.data.local.database.toEntity
 import com.nlab.reminder.core.data.model.Link
 import com.nlab.reminder.core.data.model.LinkMetadata
 import com.nlab.reminder.core.data.model.LinkMetadataTable
@@ -23,26 +24,21 @@ import com.nlab.reminder.core.data.model.isNotEmpty
 import com.nlab.reminder.core.data.repository.LinkMetadataRepository
 import com.nlab.reminder.core.data.repository.LinkMetadataTableRepository
 import com.nlab.reminder.core.data.repository.TimestampRepository
-import com.nlab.reminder.core.kotlinx.coroutine.flow.map
 import com.nlab.reminder.core.kotlin.onSuccess
-import com.nlab.reminder.core.di.coroutine.AppScope
+import com.nlab.reminder.core.kotlinx.coroutine.flow.map
 import com.nlab.reminder.core.local.database.LinkMetadataDao
-import com.nlab.reminder.internal.data.model.toEntity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
-import javax.inject.Singleton
 
 /**
  * @author thalys
  */
-@Singleton
-internal class LocalLinkMetadataTableRepository @Inject constructor(
+class LocalLinkMetadataTableRepository(
     private val linkMetadataDao: LinkMetadataDao,
     private val linkMetadataRepository: LinkMetadataRepository,
     private val timestampRepository: TimestampRepository,
-    @AppScope private val coroutineScope: CoroutineScope,
+    private val coroutineScope: CoroutineScope,
 ) : LinkMetadataTableRepository {
     override suspend fun fetch(links: Set<Link>) {
         links.filter(Link::isNotEmpty).forEach { link ->

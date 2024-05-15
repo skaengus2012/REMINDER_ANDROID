@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 The N's lab Open Source Project
+ * Copyright (C) 2024 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.internal.data.repository
+package com.nlab.reminder.core.data.repository.impl
 
+import com.nlab.reminder.core.data.local.database.toEntity
 import com.nlab.reminder.core.data.model.Tag
 import com.nlab.reminder.core.data.model.TagUsageCount
 import com.nlab.reminder.core.data.model.genTag
@@ -25,36 +26,28 @@ import com.nlab.reminder.core.kotlin.Result
 import com.nlab.reminder.core.local.database.ScheduleTagListDao
 import com.nlab.reminder.core.local.database.TagDao
 import com.nlab.reminder.core.local.database.TagEntity
-import com.nlab.reminder.internal.common.database.toEntities
-import com.nlab.reminder.internal.data.model.toEntity
-import com.nlab.reminder.test.genFlowExecutionDispatcher
-import com.nlab.reminder.test.genFlowObserveCoroutineScope
 import com.nlab.testkit.faker.genBothify
 import com.nlab.testkit.faker.genLong
-import org.mockito.kotlin.once
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
-import org.hamcrest.CoreMatchers
-import org.hamcrest.MatcherAssert
+import org.hamcrest.CoreMatchers.equalTo
+import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doThrow
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.once
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 /**
  * @author Doohyun
  */
-@OptIn(ExperimentalCoroutinesApi::class)
 internal class LocalTagRepositoryTest {
     @Test
     fun `Get tags from dao`() {
@@ -67,27 +60,25 @@ internal class LocalTagRepositoryTest {
 
     @Test
     fun `Notify tag list when dao updated`() = runTest {
-        val executeDispatcher = genFlowExecutionDispatcher(testScheduler)
-        val actualTags = mutableListOf<List<Tag>>()
         val firstTags: List<Tag> = listOf(genTag())
         val secondTags: List<Tag> = genTags().sortedBy { it.name }.reversed()
         val tagDao: TagDao = mock {
             val mockFlow = flow {
                 emit(firstTags.toEntities())
-
-                delay(500)
                 emit(secondTags.toEntities())
             }
-            whenever(mock.find()) doReturn mockFlow.flowOn(executeDispatcher)
+            whenever(mock.find()) doReturn mockFlow
         }
-
-        genTagRepository(tagDao = tagDao)
-            .getStream()
-            .onEach(actualTags::add)
-            .launchIn(genFlowObserveCoroutineScope())
-
-        advanceTimeBy(1_000)
-        MatcherAssert.assertThat(actualTags, CoreMatchers.equalTo(listOf(firstTags, secondTags)))
+        val tagFlow: Flow<List<Tag>> = genTagRepository(tagDao = tagDao).getStream()
+        val actualTags = buildList<List<Tag>> {
+            repeat(times = 2) { index ->
+                this += tagFlow.drop(count = index).first()
+            }
+        }
+        assertThat(
+            actualTags,
+            equalTo(listOf(firstTags, secondTags))
+        )
     }
 
     @Test
@@ -99,7 +90,10 @@ internal class LocalTagRepositoryTest {
         }
         val result = genTagRepository(scheduleTagListDao = scheduleTagListDao).getUsageCount(input)
 
-        MatcherAssert.assertThat(result, CoreMatchers.equalTo(Result.Success(TagUsageCount(usageCount))))
+        assertThat(
+            result,
+            equalTo(Result.Success(TagUsageCount(usageCount)))
+        )
     }
 
     @Test
@@ -109,7 +103,10 @@ internal class LocalTagRepositoryTest {
         val scheduleTagListDao: ScheduleTagListDao = mock { whenever(mock.findTagUsageCount(any())) doThrow exception }
         val result = genTagRepository(scheduleTagListDao = scheduleTagListDao).getUsageCount(input)
 
-        MatcherAssert.assertThat(result, CoreMatchers.equalTo(Result.Failure(exception)))
+        assertThat(
+            result,
+            equalTo(Result.Failure(exception))
+        )
     }
 
     @Test
@@ -128,7 +125,10 @@ internal class LocalTagRepositoryTest {
         val tagDao: TagDao = mock { whenever(mock.update(any())) doThrow exception }
         val result = genTagRepository(tagDao = tagDao).updateName(genTag(), genBothify())
 
-        MatcherAssert.assertThat(result, CoreMatchers.equalTo(Result.Failure(exception)))
+        assertThat(
+            result,
+            equalTo(Result.Failure(exception))
+        )
     }
 
     @Test
@@ -147,7 +147,10 @@ internal class LocalTagRepositoryTest {
         val tagDao: TagDao = mock { whenever(mock.delete(any())) doThrow exception }
         val result = genTagRepository(tagDao = tagDao).delete(input)
 
-        MatcherAssert.assertThat(result, CoreMatchers.equalTo(Result.Failure(exception)))
+        assertThat(
+            result,
+            equalTo(Result.Failure(exception))
+        )
     }
 }
 
@@ -155,3 +158,5 @@ private fun genTagRepository(
     tagDao: TagDao = mock(),
     scheduleTagListDao: ScheduleTagListDao = mock()
 ): TagRepository = LocalTagRepository(tagDao, scheduleTagListDao)
+
+private fun List<Tag>.toEntities(): List<TagEntity> = map { it.toEntity() }

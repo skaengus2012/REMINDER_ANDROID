@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 The N's lab Open Source Project
+ * Copyright (C) 2024 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.internal.data.repository
+package com.nlab.reminder.core.data.repository.impl
 
+import com.nlab.reminder.core.data.local.database.toEntity
 import com.nlab.reminder.core.data.model.Link
 import com.nlab.reminder.core.data.model.LinkMetadata
 import com.nlab.reminder.core.data.model.LinkMetadataTable
@@ -26,25 +27,24 @@ import com.nlab.reminder.core.data.repository.LinkMetadataTableRepository
 import com.nlab.reminder.core.data.repository.TimestampRepository
 import com.nlab.reminder.core.kotlin.Result
 import com.nlab.reminder.core.local.database.LinkMetadataDao
-import com.nlab.reminder.internal.data.model.toEntity
 import com.nlab.testkit.faker.genBlank
 import com.nlab.testkit.faker.genInt
 import com.nlab.testkit.faker.genLong
 import com.nlab.testkit.faker.genLongGreaterThanZero
-import org.mockito.kotlin.once
-import kotlinx.coroutines.test.unconfinedCoroutineScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
-import org.hamcrest.CoreMatchers
+import kotlinx.coroutines.test.unconfinedCoroutineScope
+import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.once
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -142,7 +142,7 @@ internal class LocalLinkMetadataTableRepositoryTest {
             .first()
         assertThat(
             linkMetadataTable,
-            CoreMatchers.equalTo(LinkMetadataTable(mapOf(link to linkMetadata)))
+            equalTo(LinkMetadataTable(mapOf(link to linkMetadata)))
         )
     }
 }

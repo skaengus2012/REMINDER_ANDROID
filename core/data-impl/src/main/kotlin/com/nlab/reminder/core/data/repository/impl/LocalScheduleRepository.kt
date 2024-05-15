@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.internal.data.repository
+package com.nlab.reminder.core.data.repository.impl
 
 import com.nlab.reminder.core.annotation.test.ExcludeFromGeneratedTestReport
 import com.nlab.reminder.core.data.model.Schedule
@@ -27,17 +27,14 @@ import com.nlab.reminder.core.kotlin.Result
 import com.nlab.reminder.core.kotlin.catching
 import com.nlab.reminder.core.local.database.ScheduleDao
 import com.nlab.reminder.core.local.database.ScheduleEntityWithTagEntities
-import com.nlab.reminder.internal.data.repository.fake.FakeScheduleRepositoryDelegate
-import com.nlab.reminder.internal.data.model.toModel
+import com.nlab.reminder.core.data.repository.fake.FakeScheduleRepositoryDelegate
+import com.nlab.reminder.core.data.local.database.toModel
 import kotlinx.coroutines.flow.Flow
-import javax.inject.Inject
 
 /**
  * @author Doohyun
  */
-internal class LocalScheduleRepository @Inject constructor(
-    private val scheduleDao: ScheduleDao
-) : ScheduleRepository {
+class LocalScheduleRepository(private val scheduleDao: ScheduleDao) : ScheduleRepository {
     @ExcludeFromGeneratedTestReport
     override fun getTodaySchedulesCount(): Flow<Long> =
         FakeScheduleRepositoryDelegate.getTodaySchedulesCount()

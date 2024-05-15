@@ -16,15 +16,21 @@
 
 package com.nlab.reminder.core.data.di
 
+import com.nlab.reminder.core.data.repository.LinkMetadataTableRepository
 import com.nlab.reminder.core.data.repository.ScheduleCompleteMarkRepository
 import com.nlab.reminder.core.data.repository.ScheduleSelectedIdRepository
+import com.nlab.reminder.core.data.repository.impl.CachedLinkMetadataTableRepository
 import com.nlab.reminder.core.data.repository.impl.InMemoryScheduleCompleteMarkRepository
 import com.nlab.reminder.core.data.repository.impl.InMemoryScheduleSelectedIdRepository
+import com.nlab.reminder.core.data.repository.impl.LocalLinkMetadataTableRepository
+import com.nlab.reminder.core.di.coroutine.Dispatcher
+import com.nlab.reminder.core.di.coroutine.DispatcherOption
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.android.scopes.ViewModelScoped
+import kotlinx.coroutines.CoroutineDispatcher
 
 /**
  * @author Doohyun
@@ -32,6 +38,13 @@ import dagger.hilt.android.scopes.ViewModelScoped
 @Module
 @InstallIn(ViewModelComponent::class)
 internal class ViewModelScopeDataModule {
+    @ViewModelScoped
+    @Provides
+    fun provideCachedLinkMetadataTableRepository(
+        repository: LocalLinkMetadataTableRepository,
+        @Dispatcher(DispatcherOption.Default) dispatcher: CoroutineDispatcher
+    ): LinkMetadataTableRepository = CachedLinkMetadataTableRepository(repository, dispatcher)
+
     @Provides
     @ViewModelScoped
     fun provideScheduleCompleteMarkRepository(): ScheduleCompleteMarkRepository =
