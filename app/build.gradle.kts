@@ -86,7 +86,7 @@ dependencies {
     implementation(projects.core.kotlin)
     implementation(projects.core.kotlinxCoroutine)
     implementation(projects.core.localDi)
-    implementation(projects.core.schedule)
+    implementation(projects.core.scheduleExt)
     implementation(projects.core.ui.compose)
 
     implementation(projects.statekit.runtime)
@@ -130,6 +130,7 @@ dependencies {
     testImplementation(projects.testkit)
     testImplementation(projects.statekit.test)
     testImplementation(projects.core.dataTest)
+    testImplementation(projects.core.scheduleTest)
     androidTestImplementation(libs.kotlinx.coroutines.test)
     androidTestImplementation(libs.javafaker)
     androidTestImplementation(libs.androidx.test.junit)

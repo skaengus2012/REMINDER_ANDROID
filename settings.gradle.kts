@@ -67,5 +67,7 @@ include(
     ":core:local",
     ":core:local-di",
     ":core:schedule",
+    ":core:schedule-ext",
+    ":core:schedule-test",
     ":core:ui:compose"
 )
