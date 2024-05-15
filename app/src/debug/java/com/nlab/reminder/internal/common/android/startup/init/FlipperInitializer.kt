@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.internal.common.android.init
+package com.nlab.reminder.internal.common.android.startup.init
 
 import android.content.Context
 import androidx.startup.Initializer
@@ -27,6 +27,7 @@ import com.facebook.flipper.plugins.inspector.InspectorFlipperPlugin
 import com.facebook.flipper.plugins.leakcanary2.FlipperLeakEventListener
 import com.facebook.flipper.plugins.leakcanary2.LeakCanary2FlipperPlugin
 import com.facebook.soloader.SoLoader
+import com.nlab.reminder.internal.common.android.startup.EmptyDependencies
 import leakcanary.LeakCanary
 
 /**
@@ -52,5 +53,5 @@ class FlipperInitializer : Initializer<Unit> {
         }
     }
 
-    override fun dependencies(): List<Class<out Initializer<*>>> = emptyList()
+    override fun dependencies() = EmptyDependencies()
 }

@@ -201,6 +201,7 @@
                         android:layout_height="0dp"
                         android:background="?attr/bg_schedule_placeholder"
                         android:importantForAccessibility="no"
+                        android:scaleType="centerCrop"
                         app:layout_constraintDimensionRatio="1:0.4"
                         app:layout_constraintHorizontal_bias="0"
                         app:layout_constraintTop_toTopOf="parent"

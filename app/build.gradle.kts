@@ -115,10 +115,9 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     implementation(libs.androidx.compose.foundation)
 
-    implementation(libs.timber)
+    implementation(libs.coil.kt)
 
-    implementation(libs.glide)
-    ksp(libs.glide.compiler)
+    implementation(libs.timber)
 
     implementation(libs.afollested.dragselectRecyclerView)
 

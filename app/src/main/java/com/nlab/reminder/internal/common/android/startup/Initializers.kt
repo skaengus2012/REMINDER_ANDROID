@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 The N's lab Open Source Project
+ * Copyright (C) 2024 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,13 @@
  * limitations under the License.
  */
 
-package com.nlab.statekit.util
+@file:Suppress("FunctionName")
 
-import kotlinx.coroutines.CoroutineExceptionHandler
+package com.nlab.reminder.internal.common.android.startup
+
+import androidx.startup.Initializer
 
 /**
  * @author Doohyun
  */
-
-internal var globalExceptionHandler: CoroutineExceptionHandler? = null
-    private set
-
-fun StorekitPlugin.Companion.configureGlobalExceptionHandler(handler: CoroutineExceptionHandler?) {
-    globalExceptionHandler = handler
-}
+fun EmptyDependencies(): List<Class<out Initializer<*>>> = emptyList()

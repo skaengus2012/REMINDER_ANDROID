@@ -28,6 +28,7 @@ androidxTestEspresso = "3.5.1"
 androidxTestJunit = "1.1.5"
 androidxTestRules = "1.5.0"
 androidxTransition = "1.4.1"
+coil = "2.6.0"
 facebookFlipper = "0.250.0"
 facebookSoloader = "0.11.0"
 googleDagger = "2.51.1"
@@ -82,6 +83,7 @@ androidx-test-junit = { module = "androidx.test.ext:junit", version.ref = "andro
 androidx-test-rules = { module = "androidx.test:rules", version.ref = "androidxTestRules" }
 androidx-test-runner = { module = "androidx.test:runner", version.ref = "androidxTestRules" }
 androidx-transition-ktx = { module = "androidx.transition:transition-ktx", version.ref = "androidxTransition" }
+coil-kt = { module = "io.coil-kt:coil", version.ref = "coil" }
 facebook-flipper = { module = "com.facebook.flipper:flipper", version.ref = "facebookFlipper" }
 facebook-flipper-leakcanary = { module = "com.facebook.flipper:flipper-leakcanary2-plugin", version.ref = "facebookFlipper" }
 facebook-soloader = { module = "com.facebook.soloader:soloader", version.ref = "facebookSoloader" }

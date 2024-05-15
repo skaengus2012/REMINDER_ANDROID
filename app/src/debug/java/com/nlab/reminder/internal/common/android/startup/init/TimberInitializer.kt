@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 The N's lab Open Source Project
+ * Copyright (C) 2024 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,21 @@
  * limitations under the License.
  */
 
-package com.nlab.statekit.util
+package com.nlab.reminder.internal.common.android.startup.init
+
+import android.content.Context
+import androidx.startup.Initializer
+import com.nlab.reminder.internal.common.android.startup.EmptyDependencies
+import timber.log.Timber
 
 /**
- * @author Doohyun
+ * @author thalys
  */
-sealed interface StorekitPlugin {
-    companion object
+@Suppress("unused")
+class TimberInitializer : Initializer<Unit> {
+    override fun create(context: Context) {
+        Timber.plant(Timber.DebugTree())
+    }
+
+    override fun dependencies() = EmptyDependencies()
 }

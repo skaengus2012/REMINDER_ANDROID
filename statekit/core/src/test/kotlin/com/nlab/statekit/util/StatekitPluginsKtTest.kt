@@ -35,20 +35,20 @@ import org.mockito.kotlin.verify
  * @author Doohyun
  */
 @ExperimentalCoroutinesApi
-internal class StorekitPluginsKtTest {
+internal class StatekitPluginsKtTest {
     private lateinit var globalExceptionHandler: (Throwable) -> Unit
 
     @Before
     fun setup() = runTest {
         globalExceptionHandler = mock()
-        StorekitPlugin.configureGlobalExceptionHandler(CoroutineExceptionHandler { _, throwable ->
+        StatekitPlugin.configureGlobalExceptionHandler(CoroutineExceptionHandler { _, throwable ->
             globalExceptionHandler(throwable)
         })
     }
 
     @After
     fun tearDown() {
-        StorekitPlugin.configureGlobalExceptionHandler(null)
+        StatekitPlugin.configureGlobalExceptionHandler(null)
     }
 
     @Test

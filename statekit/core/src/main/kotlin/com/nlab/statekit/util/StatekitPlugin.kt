@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 The N's lab Open Source Project
+ * Copyright (C) 2023 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,11 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.internal.common.android.init
-
-import android.content.Context
-import androidx.startup.Initializer
-import timber.log.Timber
+package com.nlab.statekit.util
 
 /**
- * @author thalys
+ * @author Doohyun
  */
-@Suppress("unused")
-class TimberInitializer : Initializer<Unit> {
-    override fun create(context: Context) {
-        Timber.plant(Timber.DebugTree())
-    }
-
-    override fun dependencies(): List<Class<out Initializer<*>>> = emptyList()
+sealed interface StatekitPlugin {
+    companion object
 }

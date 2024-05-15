@@ -14,25 +14,17 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.internal.common.android.init
+package com.nlab.statekit.util
 
-import android.content.Context
-import androidx.startup.Initializer
-import com.nlab.statekit.util.StorekitPlugin
-import com.nlab.statekit.util.configureGlobalExceptionHandler
 import kotlinx.coroutines.CoroutineExceptionHandler
-import timber.log.Timber
 
 /**
  * @author Doohyun
  */
-@Suppress("unused")
-internal class StorekitPluginInitializer : Initializer<Unit> {
-    override fun create(context: Context) {
-        StorekitPlugin.configureGlobalExceptionHandler(CoroutineExceptionHandler { _, throwable ->
-            Timber.tag("StoreGlobalErr").e(throwable)
-        })
-    }
 
-    override fun dependencies(): List<Class<out Initializer<*>>> = emptyList()
+internal var globalExceptionHandler: CoroutineExceptionHandler? = null
+    private set
+
+fun StatekitPlugin.Companion.configureGlobalExceptionHandler(handler: CoroutineExceptionHandler?) {
+    globalExceptionHandler = handler
 }

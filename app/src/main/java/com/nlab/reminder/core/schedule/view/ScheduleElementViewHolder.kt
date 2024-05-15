@@ -28,7 +28,7 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.transition.AutoTransition
 import androidx.transition.TransitionManager
-import com.bumptech.glide.Glide
+import coil.load
 import com.nlab.reminder.R
 import com.nlab.reminder.core.android.content.getThemeColor
 import com.nlab.reminder.core.androix.recyclerview.absoluteAdapterOptionalPosition
@@ -188,13 +188,8 @@ private fun ImageView.bindLinkMetadataImage(newImage: String?, placeHolder: Draw
     val oldImage: String? = tag as? String
     if (oldImage == newImage) return
     tag = newImage
-
-    Glide.with(context)
-        .load(newImage)
-        .override(1000, 400)
-        .dontTransform()
-        .optionalCenterCrop()
-        .placeholder(placeHolder)
-        .error(placeHolder)
-        .into(/* view= */this)
+    load(newImage) {
+        placeholder(placeHolder)
+        error(placeHolder)
+    }
 }
