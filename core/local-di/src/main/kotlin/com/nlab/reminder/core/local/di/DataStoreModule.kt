@@ -16,7 +16,7 @@
 
 package com.nlab.reminder.core.local.di
 
-import android.app.Application
+import android.content.Context
 import com.nlab.reminder.core.di.coroutine.AppScope
 import com.nlab.reminder.core.di.coroutine.Dispatcher
 import com.nlab.reminder.core.di.coroutine.DispatcherOption.IO
@@ -25,6 +25,7 @@ import com.nlab.reminder.core.local.datastore.ReminderDataStore
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -40,12 +41,12 @@ internal class DataStoreModule {
     @Provides
     @Singleton
     fun providePreferenceDataSource(
-        application: Application,
+        @ApplicationContext context: Context,
         @AppScope applicationScope: CoroutineScope,
         @Dispatcher(IO) dispatcher: CoroutineDispatcher
     ): PreferenceDataSource = PreferenceDataSource(
         dataStore = ReminderDataStore(
-            context = application,
+            context = context,
             coroutineScope = applicationScope + dispatcher
         )
     )

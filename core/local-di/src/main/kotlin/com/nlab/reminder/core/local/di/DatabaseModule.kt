@@ -16,7 +16,7 @@
 
 package com.nlab.reminder.core.local.di
 
-import android.app.Application
+import android.content.Context
 import com.nlab.reminder.core.local.database.LinkMetadataDao
 import com.nlab.reminder.core.local.database.ReminderDatabase
 import com.nlab.reminder.core.local.database.ScheduleDao
@@ -25,6 +25,7 @@ import com.nlab.reminder.core.local.database.TagDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
@@ -36,7 +37,9 @@ import javax.inject.Singleton
 internal class DatabaseModule {
     @Singleton
     @Provides
-    fun provideReminderDatabase(application: Application): ReminderDatabase = ReminderDatabase.getDatabase(application)
+    fun provideReminderDatabase(
+        @ApplicationContext context: Context
+    ): ReminderDatabase = ReminderDatabase.getDatabase(context)
 
     @Provides
     fun provideLinkMetadataDao(reminderDatabase: ReminderDatabase): LinkMetadataDao = reminderDatabase.linkMetadataDao()
