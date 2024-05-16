@@ -19,10 +19,12 @@ plugins {
 }
 
 dependencies {
-    implementation(projects.core.data)
+    implementation(projects.core.dataExt)
     implementation(projects.core.kotlin)
     implementation(projects.core.kotlinxCoroutine)
+    implementation(projects.core.scheduleExt)
 
     testImplementation(projects.core.dataTest)
+    testImplementation(projects.core.scheduleTest)
     testImplementation(projects.testkit)
 }

@@ -62,6 +62,7 @@ include(
     ":core:data-test",
     ":core:di",
     ":core:domain",
+    ":core:domain-di",
     ":core:kotlin",
     ":core:kotlinx-coroutine",
     ":core:local",

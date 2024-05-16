@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.internal.common.di
+package com.nlab.reminder.core.domain.di
 
 import com.nlab.reminder.core.data.repository.ScheduleCompleteMarkRepository
 import com.nlab.reminder.core.data.repository.ScheduleRepository

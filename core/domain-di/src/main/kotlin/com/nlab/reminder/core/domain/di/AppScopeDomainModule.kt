@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.internal.common.di
+package com.nlab.reminder.core.domain.di
 
 import com.nlab.reminder.core.data.repository.LinkMetadataTableRepository
 import com.nlab.reminder.core.data.repository.ScheduleRepository
 import com.nlab.reminder.core.di.coroutine.Dispatcher
-import com.nlab.reminder.core.di.coroutine.DispatcherOption.Default
+import com.nlab.reminder.core.di.coroutine.DispatcherOption
 import com.nlab.reminder.core.domain.CalculateItemSwapResultUseCase
 import com.nlab.reminder.core.domain.CompleteScheduleWithIdsUseCase
 import com.nlab.reminder.core.domain.FetchLinkMetadataUseCase
@@ -45,13 +45,14 @@ internal class AppScopeDomainModule {
     @Reusable
     fun provideCompleteScheduleWithIdsUseCase(
         scheduleRepository: ScheduleRepository,
-        @Dispatcher(Default) dispatcher: CoroutineDispatcher
+        @Dispatcher(DispatcherOption.Default) dispatcher: CoroutineDispatcher
     ): CompleteScheduleWithIdsUseCase = CompleteScheduleWithIdsUseCase(scheduleRepository, dispatcher)
 
     @Provides
     @Reusable
     fun provideFetchLinkMetadataUseCase(
         linkMetadataTableRepository: LinkMetadataTableRepository,
-        @Dispatcher(Default) dispatcher: CoroutineDispatcher
+        @Dispatcher(DispatcherOption.Default) dispatcher: CoroutineDispatcher
     ): FetchLinkMetadataUseCase = FetchLinkMetadataUseCase(linkMetadataTableRepository, dispatcher)
+
 }
