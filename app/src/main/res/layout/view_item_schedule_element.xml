@@ -26,7 +26,7 @@
         android:layout_width="@dimen/schedule_clamp_width"
         android:layout_height="match_parent"
         android:layout_gravity="end"
-        android:background="@color/bg_delete_clamp">
+        android:background="?red1">
 
         <ImageView
             android:id="@+id/imageview_trash"
@@ -40,7 +40,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_chainStyle="packed"
             app:srcCompat="@drawable/ic_trash"
-            app:tint="@color/white" />
+            app:tint="?white" />
 
         <TextView
             android:id="@+id/textview_delete"
@@ -48,7 +48,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="1dp"
             android:text="@string/delete"
-            android:textColor="@color/white"
+            android:textColor="?white"
             android:textSize="11sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -145,7 +145,7 @@
                 android:layout_marginTop="10dp"
                 android:background="@null"
                 android:gravity="center_vertical"
-                android:textColor="?attr/font_color_1"
+                android:textColor="?content_1"
                 android:textSize="16sp"
                 app:layout_constraintBottom_toTopOf="@id/edittext_note"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -162,7 +162,7 @@
                 android:layout_marginTop="2dp"
                 android:background="@null"
                 android:gravity="center_vertical"
-                android:textColor="?attr/font_color_2"
+                android:textColor="?content_2"
                 android:textSize="14sp"
                 app:layout_constraintEnd_toEndOf="@id/edittext_title"
                 app:layout_constraintStart_toStartOf="@id/edittext_title"
@@ -175,7 +175,6 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="7.5dp"
-                android:background="?attr/bg_color_card_2"
                 android:contentDescription="@string/open_link"
                 android:descendantFocusability="blocksDescendants"
                 app:cardCornerRadius="8dp"
@@ -185,28 +184,28 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/edittext_note"
                 app:layout_constraintWidth_max="500dp"
-                app:strokeColor="?attr/bg_color_stroke_1"
+                app:strokeColor="?bg_card_stroke_1"
                 app:strokeWidth="0.5dp"
                 tools:visibility="visible">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="?attr/bg_color_card_2"
+                    android:background="?bg_card_2"
                     android:paddingBottom="8dp">
 
                     <ImageView
                         android:id="@+id/imageview_bg_link_thumbnail"
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
-                        android:background="?attr/bg_schedule_placeholder"
+                        android:background="?bg_placeholder_1"
                         android:importantForAccessibility="no"
                         android:scaleType="centerCrop"
                         app:layout_constraintDimensionRatio="1:0.4"
                         app:layout_constraintHorizontal_bias="0"
                         app:layout_constraintTop_toTopOf="parent"
                         tools:srcCompat="@drawable/ic_schedule_link_error"
-                        tools:tint="?attr/tint_schedule_placeholder" />
+                        tools:tint="?content_2" />
 
                     <TextView
                         android:id="@+id/textview_title_link"
@@ -214,7 +213,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="5dp"
                         android:layout_marginBottom="0.5dp"
-                        android:textColor="?attr/font_color_1"
+                        android:textColor="?content_1"
                         android:textSize="14sp"
                         android:textStyle="bold"
                         app:layout_constraintBottom_toTopOf="@id/textview_link"
@@ -230,7 +229,7 @@
                         android:layout_marginStart="10dp"
                         android:layout_marginTop="0.5dp"
                         android:layout_marginEnd="6dp"
-                        android:textColor="?attr/font_color_2"
+                        android:textColor="?content_2"
                         android:textSize="11sp"
                         app:layout_constraintEnd_toStartOf="@id/imageview_browser"
                         app:layout_constraintStart_toStartOf="parent"
@@ -249,7 +248,7 @@
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="@id/textview_link"
                         app:srcCompat="@drawable/ic_schedule_browser"
-                        app:tint="?attr/font_color_1" />
+                        app:tint="?content_1" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -269,14 +268,14 @@
             app:layout_constraintStart_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_drag_handle"
-            app:tint="@color/tint_schedule_drag_handle" />
+            app:tint="?content_3" />
 
         <View
             android:id="@+id/view_line"
             android:layout_width="0dp"
             android:layout_height="0.5dp"
             android:layout_marginTop="15dp"
-            android:background="?attr/bg_color_line_1"
+            android:background="?bg_line_1"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@id/guideline_textStart"

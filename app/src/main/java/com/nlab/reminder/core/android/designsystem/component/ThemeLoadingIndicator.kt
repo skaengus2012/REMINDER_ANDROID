@@ -21,12 +21,8 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.nlab.reminder.core.android.designsystem.theme.ReminderTheme
-import com.nlab.reminder.core.ui.compose.transition.DelayedVisibility
-import com.nlab.reminder.core.ui.compose.transition.DelayedVisibleState
-import com.nlab.reminder.core.ui.compose.transition.rememberDelayedVisibleState
+import com.nlab.reminder.core.designsystem.compose.theme.ReminderTheme
 
 /**
  * @author Doohyun
@@ -34,20 +30,11 @@ import com.nlab.reminder.core.ui.compose.transition.rememberDelayedVisibleState
 @Composable
 fun ThemeLoadingIndicator(
     modifier: Modifier = Modifier,
-    color: Color = ReminderTheme.colors.pointColor1,
-    strokeWidth: Dp = 3.5.dp,
-    delayTime: Long = 500,
-    visibleState: DelayedVisibleState = rememberDelayedVisibleState()
+    color: Color = ReminderTheme.colors.point1,
 ) {
-    DelayedVisibility(
-        delayTimeMillis = delayTime,
-        visibleState = visibleState,
-        key = Unit,
-    ) {
-        CircularProgressIndicator(
-            modifier = modifier.size(36.dp),
-            color = color,
-            strokeWidth = strokeWidth
-        )
-    }
+    CircularProgressIndicator(
+        modifier = modifier.size(36.dp),
+        color = color,
+        strokeWidth = 3.5.dp
+    )
 }

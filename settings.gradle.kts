@@ -60,6 +60,7 @@ include(
     ":core:data-ext",
     ":core:data-impl",
     ":core:data-test",
+    ":core:designsystem:compose",
     ":core:di",
     ":core:domain",
     ":core:domain-di",
@@ -70,5 +71,6 @@ include(
     ":core:schedule",
     ":core:schedule-ext",
     ":core:schedule-test",
-    ":core:ui:compose"
+    ":core:ui:compose",
+    ":core:ui:view"
 )

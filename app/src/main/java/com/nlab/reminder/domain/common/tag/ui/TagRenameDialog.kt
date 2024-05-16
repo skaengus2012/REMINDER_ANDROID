@@ -37,8 +37,7 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material3.Divider
-import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -67,7 +66,7 @@ import androidx.compose.ui.unit.sp
 import com.nlab.reminder.R
 import com.nlab.reminder.core.android.designsystem.component.ColorPressButton
 import com.nlab.reminder.core.android.designsystem.component.ThemeDialog
-import com.nlab.reminder.core.android.designsystem.theme.ReminderTheme
+import com.nlab.reminder.core.designsystem.compose.theme.ReminderTheme
 import com.nlab.reminder.core.data.model.TagUsageCount
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.debounce
@@ -98,9 +97,10 @@ fun TagRenameDialog(
                 Text(
                     modifier = Modifier.padding(top = 15.dp),
                     text = LocalContext.current.getString(R.string.tag_rename),
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp,
-                    color = ReminderTheme.colors.font1
+                    style = ReminderTheme.typography
+                        .bodyLarge
+                        .copy(fontWeight = FontWeight.Bold),
+                    color = ReminderTheme.colors.content1
                 )
 
                 Text(
@@ -122,9 +122,10 @@ fun TagRenameDialog(
                             )
                         }
                     ),
-                    fontSize = 12.sp,
-                    color = ReminderTheme.colors.font1,
-                    lineHeight = 15.sp,
+                    style = ReminderTheme.typography
+                        .bodySmall
+                        .copy(lineHeight = 15.sp),
+                    color = ReminderTheme.colors.content1,
                     textAlign = TextAlign.Center
                 )
 
@@ -137,7 +138,7 @@ fun TagRenameDialog(
                         .padding(bottom = 10.dp)
                 )
             }
-            Divider(
+            HorizontalDivider(
                 thickness = 0.5.dp,
                 color = ReminderTheme.colors.bgLine2
             )
@@ -148,7 +149,7 @@ fun TagRenameDialog(
 
             ) {
                 ColorPressButton(
-                    contentColor = ReminderTheme.colors.pointColor1,
+                    contentColor = ReminderTheme.colors.point1,
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight(),
@@ -158,8 +159,9 @@ fun TagRenameDialog(
                         modifier = Modifier.fillMaxWidth(),
                         color = contentColor,
                         text = LocalContext.current.getString(R.string.cancel),
-                        fontSize = 16.5.sp,
-                        textAlign = TextAlign.Center
+                        style = ReminderTheme.typography
+                            .bodyLarge
+                            .copy(textAlign = TextAlign.Center)
                     )
                 }
 
@@ -171,7 +173,7 @@ fun TagRenameDialog(
                 )
 
                 ColorPressButton(
-                    contentColor = ReminderTheme.colors.pointColor1,
+                    contentColor = ReminderTheme.colors.point1,
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight(),
@@ -181,8 +183,9 @@ fun TagRenameDialog(
                         modifier = Modifier.fillMaxWidth(),
                         color = contentColor,
                         text = LocalContext.current.getString(R.string.ok),
-                        fontSize = 16.5.sp,
-                        textAlign = TextAlign.Center
+                        style = ReminderTheme.typography
+                            .bodyLarge
+                            .copy(textAlign = TextAlign.Center)
                     )
                 }
             }
@@ -241,18 +244,19 @@ private fun TagRenameTextBox(
                 .focusRequester(focusRequester),
             value = localTextFieldValue,
             onValueChange = { localTextFieldValue = it },
-            textStyle = LocalTextStyle.current.copy(
-                color = ReminderTheme.colors.font1,
-                fontSize = 14.sp,
-                textAlign = TextAlign.Start,
-            ),
+            textStyle = ReminderTheme.typography
+                .bodyMedium
+                .copy(
+                    textAlign = TextAlign.Start,
+                    color = ReminderTheme.colors.content1
+                ),
             decorationBox = { innerTextField ->
                 Box(contentAlignment = Alignment.CenterStart, modifier = Modifier.fillMaxWidth()) {
                     innerTextField()
                 }
             },
             singleLine = true,
-            cursorBrush = SolidColor(ReminderTheme.colors.pointColor1),
+            cursorBrush = SolidColor(ReminderTheme.colors.point1),
         )
         Surface(
             modifier = Modifier

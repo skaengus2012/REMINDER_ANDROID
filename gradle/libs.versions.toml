@@ -31,7 +31,8 @@ androidxTransition = "1.4.1"
 coil = "2.6.0"
 facebookFlipper = "0.250.0"
 facebookSoloader = "0.11.0"
-googleDagger = "2.51.1"
+googleHilt = "2.51.1"
+googleMaterial = "1.12.0"
 glide = "4.16.0"
 jacoco = "0.8.11" # use in configureJacocoToolVersion -> Jacoco.kt
 javafaker = "1.0.2"
@@ -87,9 +88,9 @@ coil-kt = { module = "io.coil-kt:coil", version.ref = "coil" }
 facebook-flipper = { module = "com.facebook.flipper:flipper", version.ref = "facebookFlipper" }
 facebook-flipper-leakcanary = { module = "com.facebook.flipper:flipper-leakcanary2-plugin", version.ref = "facebookFlipper" }
 facebook-soloader = { module = "com.facebook.soloader:soloader", version.ref = "facebookSoloader" }
-google-dagger = { module = "com.google.dagger:dagger", version.ref = "googleDagger" }
-google-hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "googleDagger" }       # use in nlab.android.hilt.gradle.kts
-google-hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "googleDagger" }     # use in nlab.android.hilt.gradle.kts
+google-hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "googleHilt" }       # use in nlab.android.hilt.gradle.kts
+google-hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "googleHilt" }     # use in nlab.android.hilt.gradle.kts
+google-material = { group = "com.google.android.material", name = "material", version.ref = "googleMaterial" }
 glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
 glide-compiler = { module = "com.github.bumptech.glide:compiler", version.ref = "glide" }
 javafaker = { module = "com.github.javafaker:javafaker", version.ref = "javafaker" }
@@ -115,7 +116,7 @@ ksp-gradle-plugin = { group = "com.google.devtools.ksp", name = "com.google.devt
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
 androidx-navigation-safearges = { id = "androidx.navigation.safeargs.kotlin", version.ref = "androidxNavigation" }
-google-hilt = { id = "com.google.dagger.hilt.android", version.ref = "googleDagger" }
+google-hilt = { id = "com.google.dagger.hilt.android", version.ref = "googleHilt" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 

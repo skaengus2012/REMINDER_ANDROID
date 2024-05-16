@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 The N's lab Open Source Project
+ * Copyright (C) 2024 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,4 +24,4 @@ import com.nlab.reminder.R
  * @author Doohyun
  */
 
-val FontSbAggroM = FontFamily(Font(R.font.sb_aggro_m))
+internal val CategoryCountFontFamily = FontFamily(Font(R.font.sb_aggro_m))

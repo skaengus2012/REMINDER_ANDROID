@@ -34,9 +34,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.nlab.reminder.R
-import com.nlab.reminder.core.android.designsystem.theme.ReminderTheme
+import com.nlab.reminder.core.designsystem.compose.theme.ReminderTheme
 import com.nlab.reminder.core.data.model.Tag
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -66,8 +65,8 @@ internal fun TagTextsBox(
             ) {
                 Text(
                     text = LocalContext.current.getString(R.string.common_tag_empty),
-                    fontSize = 14.sp,
-                    color = ReminderTheme.colors.font2,
+                    style = ReminderTheme.typography.bodyMedium,
+                    color = ReminderTheme.colors.content2,
                 )
             }
         } else {

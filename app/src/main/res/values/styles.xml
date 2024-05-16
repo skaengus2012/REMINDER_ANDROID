@@ -15,9 +15,7 @@
   -->
 
 <resources>
-	<style name="BaseAppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-		<item name="android:windowBackground">?attr/bg_color_1</item>
-		<item name="android:statusBarColor">@android:color/transparent</item>
-		<item name="colorControlHighlight">?attr/bg_color_ripple_1</item>
-	</style>
+
+
+
 </resources>

@@ -80,6 +80,7 @@ dependencies {
     implementation(projects.core.annotationAndroid)
     implementation(projects.core.dataDi)
     implementation(projects.core.dataExt)
+    implementation(projects.core.designsystem.compose)
     implementation(projects.core.di)
     implementation(projects.core.domain)
     implementation(projects.core.domainDi)
@@ -88,6 +89,7 @@ dependencies {
     implementation(projects.core.localDi)
     implementation(projects.core.scheduleExt)
     implementation(projects.core.ui.compose)
+    implementation(projects.core.ui.view)
 
     implementation(projects.statekit.runtime)
     implementation(projects.statekit.viewmodel)
@@ -114,6 +116,8 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     debugImplementation(libs.androidx.compose.ui.tooling)
     implementation(libs.androidx.compose.foundation)
+
+    implementation(libs.google.material)
 
     implementation(libs.coil.kt)
 

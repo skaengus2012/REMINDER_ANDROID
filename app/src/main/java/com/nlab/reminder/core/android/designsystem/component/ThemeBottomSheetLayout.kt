@@ -27,8 +27,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.nlab.reminder.core.android.designsystem.theme.ReminderTheme
 import kotlinx.coroutines.flow.dropWhile
 import kotlinx.coroutines.flow.filter
 
@@ -57,7 +57,7 @@ fun ThemeBottomSheetLayout(
         sheetState = sheetState,
         modifier = modifier,
         sheetShape = RoundedCornerShape(topStart = 15.dp, topEnd = 15.dp),
-        scrimColor = ReminderTheme.colors.bgDim,
+        scrimColor = Color.Black.copy(alpha = 0.5f),
         sheetContent = sheetContent,
         content = content
     )

@@ -28,7 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import com.nlab.reminder.core.android.designsystem.theme.ReminderTheme
+import com.nlab.reminder.core.designsystem.compose.theme.ReminderTheme
 
 /**
  * @author Doohyun
@@ -65,7 +65,7 @@ private fun ThemeDialogPreview() {
             Box(modifier = Modifier.padding(10.dp)) {
                 Text(
                     text = "Hello, Dialogs",
-                    color = ReminderTheme.colors.font1,
+                    color = ReminderTheme.colors.content1,
                 )
             }
         }

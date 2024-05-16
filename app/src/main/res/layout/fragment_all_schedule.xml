@@ -27,7 +27,6 @@
         android:id="@+id/button_completed_schedule_shown_toggle"
         android:layout_width="wrap_content"
         android:layout_height="@dimen/default_toolbar_height"
-        android:textColor="@color/white"
         app:layout_constraintBottom_toTopOf="@id/button_delete_all_if_completed"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -46,7 +45,6 @@
         android:layout_width="wrap_content"
         android:layout_height="@dimen/default_toolbar_height"
         android:text="@string/schedule_erase_all_if_completed"
-        android:textColor="@color/white"
         app:layout_constraintBottom_toTopOf="@id/button_selection_mode_on_off"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/button_completed_schedule_shown_toggle" />
@@ -64,7 +62,6 @@
         android:id="@+id/button_selection_mode_on_off"
         android:layout_width="wrap_content"
         android:layout_height="@dimen/default_toolbar_height"
-        android:textColor="@color/white"
         app:layout_constraintBottom_toTopOf="@id/button_selected_item_deleted"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/button_delete_all_if_completed" />
@@ -74,7 +71,6 @@
         android:layout_width="wrap_content"
         android:layout_height="@dimen/default_toolbar_height"
         android:text="delete selected item (TODO text)"
-        android:textColor="@color/white"
         app:layout_constraintBottom_toTopOf="@id/recyclerview_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/button_selection_mode_on_off"
