@@ -60,7 +60,7 @@ include(
     ":core:data-ext",
     ":core:data-impl",
     ":core:data-test",
-    ":core:designsystem:compose",
+    ":core:designsystem-compose",
     ":core:di",
     ":core:domain",
     ":core:domain-di",

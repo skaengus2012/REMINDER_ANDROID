@@ -47,6 +47,7 @@ mockitoKotlin = "5.2.1"
 squareLeakcanary = "2.13"
 squareKotlinpoet = "1.16.0"
 timber = "5.0.1"
+kotlinVersion = "1.9.0"
 
 
 [libraries]
@@ -130,3 +131,5 @@ nlab-android-library-compose = { id = "nlab.android.library.compose", version = 
 nlab-android-library-jacoco = { id = "nlab.android.library.jacoco", version = "unspecified" }
 nlab-jvm-library = { id = "nlab.jvm.library", version = "unspecified" }
 nlab-jvm-library-jacoco = { id = "nlab.jvm.library.jacoco", version = "unspecified" }
+android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
+jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlinVersion" }
