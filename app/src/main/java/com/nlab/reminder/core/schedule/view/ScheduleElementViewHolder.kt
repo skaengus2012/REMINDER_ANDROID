@@ -59,7 +59,12 @@ internal class ScheduleElementViewHolder(
     private val linkThumbnailPlaceHolderDrawable: Drawable? = with(itemView) {
         AppCompatResources.getDrawable(context, R.drawable.ic_schedule_link_error)
             ?.let(DrawableCompat::wrap)
-            ?.apply { DrawableCompat.setTint(mutate(), context.getThemeColor(R.attr.content_2)) }
+            ?.apply {
+                DrawableCompat.setTint(
+                    mutate(),
+                    context.getThemeColor(com.nlab.reminder.core.designsystem.R.attr.content_2)
+                )
+            }
     }
     private val layoutContentNormalSet: ConstraintSet =
         ConstraintSet().apply { clone(binding.layoutContent) }

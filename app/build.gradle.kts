@@ -80,6 +80,7 @@ dependencies {
     implementation(projects.core.annotationAndroid)
     implementation(projects.core.dataDi)
     implementation(projects.core.dataExt)
+    implementation(projects.core.designsystem)
     implementation(projects.core.designsystemCompose)
     implementation(projects.core.di)
     implementation(projects.core.domain)
