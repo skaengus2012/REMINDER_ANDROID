@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.schedule.view
+package com.nlab.reminder.core.schedule.ui
 
-import com.nlab.reminder.core.schedule.model.ScheduleElement
+import android.view.View
+import androidx.recyclerview.widget.RecyclerView
 
 /**
- * @author thalys
+ * @author Doohyun
  */
-class DefaultScheduleElementItemMovePolicy : ScheduleElementItemMovePolicy() {
-    override fun isMovable(from: ScheduleElement, to: ScheduleElement): Boolean = true
-}
+sealed class ScheduleItemViewHolder(view: View) : RecyclerView.ViewHolder(view)

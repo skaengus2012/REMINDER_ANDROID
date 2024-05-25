@@ -22,7 +22,7 @@
 
     <fragment
         android:id="@+id/allScheduleFragment"
-        android:name="com.nlab.reminder.domain.feature.schedule.all.view.AllScheduleFragment"
+        android:name="com.nlab.reminder.domain.feature.schedule.all.ui.AllScheduleFragment"
         android:label="AllScheduleEnd"
         tools:layout="@layout/fragment_all_schedule" />
 

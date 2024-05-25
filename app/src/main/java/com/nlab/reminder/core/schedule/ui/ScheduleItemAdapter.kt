@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.schedule.view
+package com.nlab.reminder.core.schedule.ui
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter

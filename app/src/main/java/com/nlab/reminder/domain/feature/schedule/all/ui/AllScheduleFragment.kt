@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.feature.schedule.all.view
+package com.nlab.reminder.domain.feature.schedule.all.ui
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -39,7 +39,7 @@ import com.nlab.reminder.core.androix.recyclerview.suspendSubmitList
 import com.nlab.reminder.core.android.view.throttleClicks
 import com.nlab.reminder.core.android.view.touches
 import com.nlab.reminder.core.kotlinx.coroutine.flow.withBefore
-import com.nlab.reminder.core.schedule.view.*
+import com.nlab.reminder.core.schedule.ui.*
 import com.nlab.reminder.databinding.FragmentAllScheduleBinding
 import com.nlab.reminder.domain.common.android.navigation.navigateOpenLink
 import com.nlab.reminder.domain.common.android.view.loadingFlow
