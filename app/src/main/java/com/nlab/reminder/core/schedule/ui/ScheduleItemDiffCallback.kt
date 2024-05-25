@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.schedule.view
+package com.nlab.reminder.core.schedule.ui
 
 import androidx.recyclerview.widget.DiffUtil
 import com.nlab.reminder.core.schedule.model.ScheduleElement

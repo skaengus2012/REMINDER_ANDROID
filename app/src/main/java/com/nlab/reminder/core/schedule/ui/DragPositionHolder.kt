@@ -14,12 +14,31 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.schedule.view
-
-import android.view.View
-import androidx.recyclerview.widget.RecyclerView
+package com.nlab.reminder.core.schedule.ui
 
 /**
- * @author Doohyun
+ * @author thalys
  */
-sealed class ScheduleItemViewHolder(view: View) : RecyclerView.ViewHolder(view)
+internal class DragPositionHolder {
+    private var from: Int? = null
+    private var to: Int? = null
+
+    /**
+     * @return first is from, second is to
+     */
+    fun snapshot(): Pair<Int, Int>? {
+        val curFrom: Int = from ?: return null
+        val curTo: Int = to ?: return null
+        return curFrom to curTo
+    }
+
+    fun setPosition(from: Int, to: Int) {
+        if (this.from == null) this.from = from
+        this.to = to
+    }
+
+    fun clearPosition() {
+        from = null
+        to = null
+    }
+}
