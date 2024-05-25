@@ -40,6 +40,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -74,7 +75,9 @@ internal fun HomeRoute(
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     HomeScreen(
-        uiState = viewModel.uiState.collectAsStateWithLifecycle(),
+        uiState = viewModel.uiState.collectAsStateWithLifecycle(
+            lifecycleOwner = LocalLifecycleOwner.current // error : CompositionLocal LocalLifecycleOwner not present
+        ),
         onTodayCategoryClicked = viewModel::onTodayCategoryClicked,
         onTimetableCategoryClicked = viewModel::onTimetableCategoryClicked,
         onAllCategoryClicked = viewModel::onAllCategoryClicked,
