@@ -22,7 +22,7 @@
 				android:height="@dimen/schedule_check_size" />
 			<stroke
 				android:width="@dimen/schedule_check_external_dither"
-				android:color="@color/schedule_checkbox_checked_color" />
+				android:color="?point_1" />
 		</shape>
 	</item>
 
@@ -35,7 +35,7 @@
 			<size
 				android:width="@dimen/schedule_check_size"
 				android:height="@dimen/schedule_check_size" />
-			<solid android:color="@color/schedule_checkbox_checked_color" />
+			<solid android:color="?point_1" />
 		</shape>
 	</item>
 </layer-list>

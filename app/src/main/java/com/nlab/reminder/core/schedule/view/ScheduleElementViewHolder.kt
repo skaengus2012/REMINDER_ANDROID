@@ -28,16 +28,16 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.transition.AutoTransition
 import androidx.transition.TransitionManager
-import com.bumptech.glide.Glide
+import coil.load
 import com.nlab.reminder.R
 import com.nlab.reminder.core.android.content.getThemeColor
-import com.nlab.reminder.core.android.recyclerview.absoluteAdapterOptionalPosition
-import com.nlab.reminder.core.android.recyclerview.bindingAdapterOptionalPosition
-import com.nlab.reminder.core.android.transition.transitionListenerOf
+import com.nlab.reminder.core.androix.recyclerview.absoluteAdapterOptionalPosition
+import com.nlab.reminder.core.androix.recyclerview.bindingAdapterOptionalPosition
+import com.nlab.reminder.core.androidx.transition.transitionListenerOf
 import com.nlab.reminder.core.android.view.initWithLifecycleOwner
 import com.nlab.reminder.core.android.view.throttleClicks
 import com.nlab.reminder.core.android.view.touches
-import com.nlab.reminder.core.android.widget.bindSelected
+import com.nlab.reminder.core.android.view.bindSelected
 import com.nlab.reminder.core.android.widget.bindText
 import com.nlab.reminder.core.data.model.isEmpty
 import com.nlab.reminder.core.schedule.model.ScheduleElement
@@ -59,7 +59,12 @@ internal class ScheduleElementViewHolder(
     private val linkThumbnailPlaceHolderDrawable: Drawable? = with(itemView) {
         AppCompatResources.getDrawable(context, R.drawable.ic_schedule_link_error)
             ?.let(DrawableCompat::wrap)
-            ?.apply { DrawableCompat.setTint(mutate(), context.getThemeColor(R.attr.tint_schedule_placeholder)) }
+            ?.apply {
+                DrawableCompat.setTint(
+                    mutate(),
+                    context.getThemeColor(com.nlab.reminder.core.designsystem.R.attr.content_2)
+                )
+            }
     }
     private val layoutContentNormalSet: ConstraintSet =
         ConstraintSet().apply { clone(binding.layoutContent) }
@@ -188,13 +193,8 @@ private fun ImageView.bindLinkMetadataImage(newImage: String?, placeHolder: Draw
     val oldImage: String? = tag as? String
     if (oldImage == newImage) return
     tag = newImage
-
-    Glide.with(context)
-        .load(newImage)
-        .override(1000, 400)
-        .dontTransform()
-        .optionalCenterCrop()
-        .placeholder(placeHolder)
-        .error(placeHolder)
-        .into(/* view= */this)
+    load(newImage) {
+        placeholder(placeHolder)
+        error(placeHolder)
+    }
 }

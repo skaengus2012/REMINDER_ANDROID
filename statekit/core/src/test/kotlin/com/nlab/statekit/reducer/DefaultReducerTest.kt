@@ -17,9 +17,9 @@
 package com.nlab.statekit.reducer
 
 import com.nlab.statekit.*
-import com.nlab.testkit.*
 import org.junit.Test
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.once
 import org.mockito.kotlin.verify
 
 /**

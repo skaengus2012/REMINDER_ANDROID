@@ -17,7 +17,7 @@
 package com.nlab.statekit.middleware.epic
 
 import com.nlab.statekit.TestAction
-import com.nlab.testkit.genIntGreaterThanZero
+import com.nlab.testkit.faker.genIntGreaterThanZero
 import kotlinx.coroutines.flow.flowOf
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat

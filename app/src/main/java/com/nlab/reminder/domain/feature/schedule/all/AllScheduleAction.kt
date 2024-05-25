@@ -16,7 +16,6 @@
 
 package com.nlab.reminder.domain.feature.schedule.all
 
-import com.nlab.reminder.core.data.model.ScheduleId
 import com.nlab.reminder.core.schedule.model.ScheduleElement
 import com.nlab.reminder.core.schedule.state.SelectedAction
 import com.nlab.statekit.Action

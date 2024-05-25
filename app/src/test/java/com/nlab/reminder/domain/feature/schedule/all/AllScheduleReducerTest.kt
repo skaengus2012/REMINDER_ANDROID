@@ -24,7 +24,7 @@ import com.nlab.reminder.core.schedule.model.mapToScheduleElementsAsImmutableLis
 import com.nlab.statekit.expectedState
 import com.nlab.statekit.expectedStateToInit
 import com.nlab.statekit.scenario
-import com.nlab.testkit.genInt
+import com.nlab.testkit.faker.genInt
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.test.runTest

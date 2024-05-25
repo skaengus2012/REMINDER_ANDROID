@@ -17,7 +17,7 @@
 package com.nlab.statekit.util
 
 import com.nlab.statekit.TestAction
-import com.nlab.testkit.genIntGreaterThanZero
+import com.nlab.testkit.faker.genIntGreaterThanZero
 import com.nlab.statekit.middleware.epic.EpicSource
 import com.nlab.statekit.middleware.epic.SubscriptionStrategy
 import kotlinx.coroutines.ExperimentalCoroutinesApi

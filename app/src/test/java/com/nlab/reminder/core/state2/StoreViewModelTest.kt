@@ -20,7 +20,7 @@ import com.nlab.reminder.test.genFlowExecutionDispatcher
 import com.nlab.reminder.test.genFlowObserveCoroutineScope
 import com.nlab.statekit.*
 import com.nlab.statekit.util.*
-import com.nlab.testkit.once
+import org.mockito.kotlin.once
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancelAndJoin

@@ -35,9 +35,8 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.nlab.reminder.core.android.compose.ui.throttle
-import com.nlab.reminder.core.android.designsystem.theme.ReminderTheme
+import com.nlab.reminder.core.androidx.compose.ui.throttle
+import com.nlab.reminder.core.designsystem.compose.theme.ReminderTheme
 
 /**
  * @author Doohyun
@@ -48,16 +47,14 @@ fun ColorPressButton(
     modifier: Modifier = Modifier,
     pressedContentColor: Color = contentColor.copy(alpha = 0.5f),
     onClick: () -> Unit = {},
-    content: @Composable RowScope.(contentColor: Color) -> Unit
+    content: @Composable RowScope.(Color) -> Unit
 ) {
     InternalColorPressButton(
         modifier = modifier,
         onClick = onClick,
     ) { interactionSource ->
         val isPressed by interactionSource.collectIsPressedAsState()
-        content(
-            contentColor = if (isPressed) pressedContentColor else contentColor
-        )
+        content(if (isPressed) pressedContentColor else contentColor)
     }
 }
 
@@ -88,14 +85,15 @@ private fun InternalColorPressButton(
 fun ColorPressButtonPreview() {
     ReminderTheme {
         ColorPressButton(
-            contentColor = ReminderTheme.colors.pointColor1,
+            contentColor = ReminderTheme.colors.point1,
             modifier = Modifier.padding(10.dp)
         ) { contentColor ->
             Text(
                 text = "Button",
                 color = contentColor,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold
+                style = ReminderTheme.typography
+                    .bodyLarge
+                    .copy(fontWeight = FontWeight.Bold)
             )
         }
     }

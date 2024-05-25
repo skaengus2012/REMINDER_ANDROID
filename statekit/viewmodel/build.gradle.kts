@@ -20,15 +20,10 @@ plugins {
 
 android {
     namespace = "com.nlab.statekit.viewmodel"
-    buildTypes {
-        release {
-            isMinifyEnabled = true
-        }
-    }
 }
 
 dependencies {
-    implementation(project(":statekit:runtime"))
-    implementation(libs.kotlin.coroutines.android)
+    implementation(projects.statekit.runtime)
+    implementation(libs.kotlinx.coroutines.android)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
 }

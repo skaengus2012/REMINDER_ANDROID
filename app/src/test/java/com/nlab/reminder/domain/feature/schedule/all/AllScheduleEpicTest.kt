@@ -22,7 +22,7 @@ import com.nlab.reminder.core.data.model.genSchedules
 import com.nlab.reminder.core.data.repository.ScheduleGetStreamRequest
 import com.nlab.reminder.core.schedule.model.genScheduleElement
 import com.nlab.statekit.middleware.epic.scenario
-import com.nlab.testkit.genInt
+import com.nlab.testkit.faker.genInt
 import kotlinx.coroutines.flow.flowOf
 import org.junit.Test
 import org.mockito.kotlin.doReturn

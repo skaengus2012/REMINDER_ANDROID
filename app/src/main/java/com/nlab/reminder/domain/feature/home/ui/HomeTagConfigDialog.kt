@@ -45,9 +45,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.nlab.reminder.R
-import com.nlab.reminder.core.android.designsystem.component.ThemeDialog
-import com.nlab.reminder.core.android.compose.ui.throttle
-import com.nlab.reminder.core.android.designsystem.theme.ReminderTheme
+import com.nlab.reminder.core.designsystem.compose.component.ReminderDialog
+import com.nlab.reminder.core.androidx.compose.ui.throttle
+import com.nlab.reminder.core.designsystem.compose.theme.ReminderTheme
 import com.nlab.reminder.core.data.model.TagUsageCount
 import com.nlab.reminder.domain.common.tag.ui.mapToString
 
@@ -62,7 +62,7 @@ internal fun HomeTagConfigDialog(
     onRenameRequestClicked: () -> Unit = {},
     onDeleteRequestClicked: () -> Unit = {}
 ) {
-    ThemeDialog(onDismiss) {
+    ReminderDialog(onDismiss) {
         Column(
             modifier = Modifier
                 .width(250.dp)
@@ -75,7 +75,7 @@ internal fun HomeTagConfigDialog(
                     .padding(horizontal = 20.dp),
                 text = LocalContext.current.getString(R.string.format_tag, tagName),
                 style = MaterialTheme.typography.titleSmall,
-                color = ReminderTheme.colors.font1,
+                color = ReminderTheme.colors.content1,
                 textAlign = TextAlign.Center
             )
             Divider(
@@ -88,7 +88,7 @@ internal fun HomeTagConfigDialog(
             HomeTagConfigButton(
                 text = LocalContext.current.getString(R.string.tag_rename),
                 onClick = onRenameRequestClicked,
-                fontColor = ReminderTheme.colors.font1,
+                fontColor = ReminderTheme.colors.content1,
                 modifier = Modifier
                     .fillMaxWidth()
                     .wrapContentHeight()
@@ -104,7 +104,7 @@ internal fun HomeTagConfigDialog(
                     }
                 ),
                 onClick = onDeleteRequestClicked,
-                fontColor = ReminderTheme.colors.red,
+                fontColor = ReminderTheme.colors.red1,
                 modifier = Modifier
                     .fillMaxWidth()
                     .wrapContentHeight()

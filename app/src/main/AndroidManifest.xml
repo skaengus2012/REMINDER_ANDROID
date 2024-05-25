@@ -27,7 +27,7 @@
 		android:largeHeap="true"
 		android:roundIcon="@mipmap/ic_launcher_round"
 		android:supportsRtl="true"
-		android:theme="@style/AppSplashScreen"
+		android:theme="@style/Theme.Reminder.SplashScreen"
 		tools:ignore="AllowBackup"
 		tools:targetApi="tiramisu">
 
@@ -46,7 +46,10 @@
 			android:exported="false"
 			tools:node="merge">
 			<meta-data
-				android:name="com.nlab.reminder.internal.common.android.init.StorekitPluginInitializer"
+				android:name="com.nlab.reminder.internal.common.android.startup.init.CoilInitializer"
+				android:value="androidx.startup" />
+			<meta-data
+				android:name="com.nlab.reminder.internal.common.android.startup.init.StatekitPluginInitializer"
 				android:value="androidx.startup" />
 		</provider>
 

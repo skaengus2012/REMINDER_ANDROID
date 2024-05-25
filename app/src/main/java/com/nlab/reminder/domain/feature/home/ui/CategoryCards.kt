@@ -44,15 +44,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.nlab.reminder.R
-import com.nlab.reminder.core.android.compose.ui.throttle
+import com.nlab.reminder.core.androidx.compose.ui.throttle
 import com.nlab.reminder.core.android.designsystem.icon.ReminderIcons
-import com.nlab.reminder.core.android.designsystem.theme.FontSbAggroM
-import com.nlab.reminder.core.android.designsystem.theme.ReminderTheme
-import com.nlab.reminder.domain.feature.home.icon.IcHomeCategoryAll
-import com.nlab.reminder.domain.feature.home.icon.IcHomeCategoryTimetable
-import com.nlab.reminder.domain.feature.home.icon.IcHomeCategoryToday
+import com.nlab.reminder.domain.feature.home.resource.font.CategoryCountFontFamily
+import com.nlab.reminder.core.designsystem.compose.theme.ReminderTheme
+import com.nlab.reminder.domain.feature.home.resource.icon.IcHomeCategoryAll
+import com.nlab.reminder.domain.feature.home.resource.icon.IcHomeCategoryTimetable
+import com.nlab.reminder.domain.feature.home.resource.icon.IcHomeCategoryToday
 
 /**
  * @author Doohyun
@@ -228,8 +227,8 @@ private fun CategoryIcon(icon: @Composable () -> Unit) {
 private fun CategoryTitleText(text: String) {
     Text(
         text = text,
-        fontSize = 14.sp,
-        color = ReminderTheme.colors.font2
+        style = ReminderTheme.typography.bodyMedium,
+        color = ReminderTheme.colors.content2
     )
 }
 
@@ -237,9 +236,9 @@ private fun CategoryTitleText(text: String) {
 private fun CategoryCountText(count: Long) {
     Text(
         text = count.toString(),
-        fontSize = 16.sp,
-        color = ReminderTheme.colors.font1,
-        fontFamily = FontSbAggroM
+        style = ReminderTheme.typography.bodyLarge,
+        color = ReminderTheme.colors.content1,
+        fontFamily = CategoryCountFontFamily
     )
 }
 

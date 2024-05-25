@@ -42,35 +42,34 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nlab.reminder.R
-import com.nlab.reminder.core.android.compose.runtime.LoadedContent
 import com.nlab.reminder.core.android.compose.runtime.UserMessageHandler
-import com.nlab.reminder.core.android.compose.runtime.rememberDelayedVisibleState
 import com.nlab.reminder.core.android.designsystem.component.ThemeBottomSheetLayout
-import com.nlab.reminder.core.android.designsystem.component.ThemeLoadingIndicator
-import com.nlab.reminder.core.android.designsystem.theme.ReminderTheme
+import com.nlab.reminder.core.designsystem.compose.component.ReminderLoadingIndicator
+import com.nlab.reminder.core.designsystem.compose.theme.ReminderTheme
 import com.nlab.reminder.core.state.UserMessage
 import com.nlab.reminder.domain.common.android.widget.showToast
 import com.nlab.reminder.core.data.model.Tag
+import com.nlab.reminder.core.androidx.compose.ui.DelayedVisibleContent
+import com.nlab.reminder.core.androidx.compose.ui.rememberDelayedVisibleState
 import com.nlab.reminder.domain.common.tag.ui.TagDeleteBottomSheetContent
 import com.nlab.reminder.domain.common.tag.ui.TagRenameDialog
 import com.nlab.reminder.domain.feature.home.*
 import kotlinx.collections.immutable.*
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
 /**
  * @author Doohyun
  */
 @Composable
-internal fun HomeRoot(
+internal fun HomeRoute(
     navigateToAllScheduleEnd: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
@@ -114,17 +113,30 @@ private fun HomeScreen(
         .fillMaxSize()
         .statusBarsPadding()
         .navigationBarsPadding()
-    val loadingVisibleState = rememberDelayedVisibleState()
-
+    var isLoadedDelayNeeded by remember { mutableStateOf(false) }
     when (val curUi = uiState.value) {
-        is HomeUiState.Loading -> Box(modifier = windowModifier) {
-            ThemeLoadingIndicator(
-                modifier = Modifier.align(Alignment.Center),
-                visibleState = loadingVisibleState
-            )
+        HomeUiState.Loading -> {
+            val visibleState = rememberDelayedVisibleState()
+            LaunchedEffect(curUi) {
+                snapshotFlow { visibleState.isVisible }
+                    .distinctUntilChanged()
+                    .collect { isLoadedDelayNeeded = it }
+            }
+            DelayedVisibleContent(
+                delayTimeMillis = 500,
+                visibleState = visibleState,
+                key = curUi
+            ) {
+                Box(modifier = windowModifier) {
+                    ReminderLoadingIndicator(modifier = Modifier.align(Alignment.Center))
+                }
+            }
         }
 
-        is HomeUiState.Success -> LoadedContent(isDelay = loadingVisibleState.value) {
+        is HomeUiState.Success -> DelayedVisibleContent(
+            delayTimeMillis = if (isLoadedDelayNeeded) 100 else 0,
+            key = curUi
+        ) {
             val context = LocalContext.current
             val coroutineScope = rememberCoroutineScope()
             val sheetState = rememberModalBottomSheetState(
@@ -289,7 +301,7 @@ private fun HomeItems(
             modifier = Modifier
                 .padding(top = 14.dp, bottom = 10.dp)
                 .fillMaxWidth(),
-            tags = tags,
+            tags = tags, // Tag 가 모듈로 분리되면서, skip 작동하지 않음. strong-skip 존버.
             onTagClicked = {},
             onTagLongClicked = onTagLongClicked
         )
@@ -304,7 +316,7 @@ private fun Logo(modifier: Modifier = Modifier) {
             .height(30.dp),
         painter = painterResource(id = R.drawable.ic_logo),
         contentDescription = null,
-        tint = ReminderTheme.colors.font1
+        tint = ReminderTheme.colors.content1
     )
 }
 
@@ -315,9 +327,8 @@ private fun HomeTitle(
 ) {
     Text(
         text = stringResource(textRes),
-        color = ReminderTheme.colors.font1,
-        fontSize = 17.sp,
-        fontWeight = FontWeight.Bold,
+        style = ReminderTheme.typography.titleMedium,
+        color = ReminderTheme.colors.content1,
         modifier = modifier
     )
 }

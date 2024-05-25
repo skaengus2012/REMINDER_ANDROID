@@ -16,35 +16,11 @@
 
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <style name="AppTheme" parent="BaseAppTheme">
-        <item name="android:windowLightStatusBar">true</item>
-
-        <!-- common -->
-        <item name="bg_color_1">@color/bg_1_light</item>
-        <item name="bg_color_card_1">@color/bg_card_1_light</item>
-        <item name="bg_color_card_2">@color/bg_card_2_light</item>
-        <item name="bg_color_tag">@color/bg_tag_light</item>
-        <item name="bg_color_ripple_1">@color/bg_ripple_1_light</item>
-        <item name="bg_color_line_1">@color/bg_line_1_light</item>
-        <item name="bg_color_stroke_1">@color/bg_stroke_1_light</item>
-        <item name="font_color_1">@color/font_1_light</item>
-        <item name="font_color_2">@color/font_2_light</item>
-        <item name="font_color_tag">@color/font_tag_light</item>
-        <item name="progress_color_1">@color/point_color_1</item>
-
-        <!-- schedule -->
-        <item name="bg_schedule_placeholder">@color/bg_schedule_placeholder_light</item>
-        <item name="tint_schedule_placeholder">@color/tint_schedule_placeholder_light</item>
-    </style>
-
-    <style name="AppSplashScreenBase" parent="Theme.SplashScreen">
+    <style name="Theme.Reminder.SplashScreen" parent="Theme.SplashScreen">
         <item name="android:windowSplashScreenBrandingImage" tools:targetApi="s">@drawable/ic_brand_splash</item>
         <item name="windowSplashScreenAnimatedIcon">@drawable/ic_logo_splash</item>
-        <item name="postSplashScreenTheme">@style/AppTheme</item>
-    </style>
-
-    <style name="AppSplashScreen" parent="AppSplashScreenBase">
-        <item name="windowSplashScreenBackground">@color/bg_1_light</item>
+        <item name="postSplashScreenTheme">@style/Theme.Reminder.App</item>
+        <item name="windowSplashScreenBackground">?bg_1</item>
     </style>
 
 </resources>

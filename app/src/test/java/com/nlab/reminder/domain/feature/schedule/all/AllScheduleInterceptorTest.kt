@@ -18,13 +18,12 @@ package com.nlab.reminder.domain.feature.schedule.all
 
 import com.nlab.reminder.core.data.model.anyScheduleId
 import com.nlab.reminder.core.data.model.genSchedule
-import com.nlab.reminder.core.kotlin.util.Result
+import com.nlab.reminder.core.kotlin.Result
 import com.nlab.reminder.core.data.model.genScheduleId
 import com.nlab.reminder.core.data.model.genSchedules
 import com.nlab.reminder.core.data.repository.CompletedScheduleShownRepository
 import com.nlab.reminder.core.data.repository.ScheduleDeleteRequest
 import com.nlab.reminder.core.data.repository.ScheduleRepository
-import com.nlab.reminder.core.data.repository.InMemoryScheduleSelectedIdRepository
 import com.nlab.reminder.core.data.repository.ScheduleSelectedIdRepository
 import com.nlab.reminder.core.data.repository.ScheduleUpdateRequest
 import com.nlab.reminder.core.domain.CalculateItemSwapResultUseCase
@@ -34,9 +33,9 @@ import com.nlab.reminder.core.domain.FetchLinkMetadataUseCase
 import com.nlab.reminder.core.schedule.model.genScheduleElements
 import com.nlab.reminder.core.schedule.model.mapToScheduleElementsAsImmutableList
 import com.nlab.statekit.middleware.interceptor.scenario
-import com.nlab.testkit.genBoolean
-import com.nlab.testkit.genInt
-import com.nlab.testkit.once
+import com.nlab.testkit.faker.genBoolean
+import com.nlab.testkit.faker.genInt
+import org.mockito.kotlin.once
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
@@ -254,7 +253,7 @@ internal class AllScheduleInterceptorTest {
     fun `Given state loaded, When OnScheduleSelected, Then repository called`() = runTest {
         val schedule = genSchedule()
         val scheduleElements = schedule.mapToScheduleElementsAsImmutableList()
-        val selectedIdRepository: InMemoryScheduleSelectedIdRepository = mock()
+        val selectedIdRepository: ScheduleSelectedIdRepository = mock()
         val isSelected = genBoolean()
 
         genInterceptor(selectedIdRepository = selectedIdRepository)
@@ -267,7 +266,7 @@ internal class AllScheduleInterceptorTest {
 
     @Test
     fun `Given State Loaded with empty schedules, When OnScheduleSelected, Then repository never called`() = runTest {
-        val selectedIdRepository: InMemoryScheduleSelectedIdRepository = mock()
+        val selectedIdRepository: ScheduleSelectedIdRepository = mock()
         genInterceptor(selectedIdRepository = selectedIdRepository)
             .scenario()
             .initState(genAllScheduleUiStateLoaded(scheduleElements = persistentListOf()))

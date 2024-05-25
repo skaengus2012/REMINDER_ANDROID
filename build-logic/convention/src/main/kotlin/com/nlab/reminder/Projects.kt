@@ -16,6 +16,7 @@
 
 package com.nlab.reminder
 
+import com.google.devtools.ksp.gradle.KspExtension
 import org.gradle.api.Project
 import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.api.plugins.ExtensionAware
@@ -28,6 +29,9 @@ import org.gradle.kotlin.dsl.getByType
 internal fun Project.java(block: JavaPluginExtension.() -> Unit) {
     (this as ExtensionAware).extensions.configure("java", block)
 }
+
+internal val Project.kspExtension get() =
+    (this as ExtensionAware).extensions.getByType<KspExtension>()
 
 internal val Project.libs get() =
     extensions.getByType<VersionCatalogsExtension>().named("libs")

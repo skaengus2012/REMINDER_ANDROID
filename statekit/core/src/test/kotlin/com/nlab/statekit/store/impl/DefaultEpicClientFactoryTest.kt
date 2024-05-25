@@ -18,7 +18,7 @@ package com.nlab.statekit.store.impl
 
 import com.nlab.statekit.middleware.epic.SubscriptionStrategy
 import com.nlab.statekit.middleware.epic.infra.WhileStateUsedEpicClient
-import com.nlab.testkit.instanceOf
+import org.hamcrest.instanceOf
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test

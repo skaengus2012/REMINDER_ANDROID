@@ -20,7 +20,13 @@ import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.javafaker.Faker
-import com.nlab.reminder.internal.common.android.database.*
+import com.nlab.reminder.core.local.database.ReminderDatabase
+import com.nlab.reminder.core.local.database.ScheduleDao
+import com.nlab.reminder.core.local.database.ScheduleEntity
+import com.nlab.reminder.core.local.database.ScheduleTagListDao
+import com.nlab.reminder.core.local.database.ScheduleTagListEntity
+import com.nlab.reminder.core.local.database.TagDao
+import com.nlab.reminder.core.local.database.TagEntity
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.After

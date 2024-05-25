@@ -19,7 +19,7 @@ plugins {
 }
 
 dependencies {
-    implementation(project(":statekit:runtime"))
+    implementation(projects.statekit.runtime)
 
     implementation(libs.squeare.kotlinpoet)
     implementation(libs.squeare.kotlinpoet.metadata)
