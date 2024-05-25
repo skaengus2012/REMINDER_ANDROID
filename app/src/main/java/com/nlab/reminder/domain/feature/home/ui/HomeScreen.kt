@@ -55,8 +55,8 @@ import com.nlab.reminder.core.designsystem.compose.theme.ReminderTheme
 import com.nlab.reminder.core.state.UserMessage
 import com.nlab.reminder.domain.common.android.widget.showToast
 import com.nlab.reminder.core.data.model.Tag
-import com.nlab.reminder.core.ui.compose.transition.DelayedVisibleContent
-import com.nlab.reminder.core.ui.compose.transition.rememberDelayedVisibleState
+import com.nlab.reminder.core.androidx.compose.ui.DelayedVisibleContent
+import com.nlab.reminder.core.androidx.compose.ui.rememberDelayedVisibleState
 import com.nlab.reminder.domain.common.tag.ui.TagDeleteBottomSheetContent
 import com.nlab.reminder.domain.common.tag.ui.TagRenameDialog
 import com.nlab.reminder.domain.feature.home.*

@@ -45,7 +45,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.nlab.reminder.R
-import com.nlab.reminder.core.android.compose.ui.throttle
+import com.nlab.reminder.core.androidx.compose.ui.throttle
 import com.nlab.reminder.core.android.designsystem.icon.ReminderIcons
 import com.nlab.reminder.core.android.designsystem.theme.CategoryCountFontFamily
 import com.nlab.reminder.core.designsystem.compose.theme.ReminderTheme

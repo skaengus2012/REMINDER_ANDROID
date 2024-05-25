@@ -71,6 +71,7 @@ android {
 
 dependencies {
     implementation(projects.core.android)
+    implementation(projects.core.androidx.composeExt)
     implementation(projects.core.androidx.fragment)
     implementation(projects.core.androidx.fragmentCompose)
     implementation(projects.core.androidx.lifecycle)
@@ -86,10 +87,7 @@ dependencies {
     implementation(projects.core.domainDi)
     implementation(projects.core.kotlin)
     implementation(projects.core.kotlinxCoroutine)
-    implementation(projects.core.localDi)
     implementation(projects.core.scheduleExt)
-    implementation(projects.core.ui.compose)
-    implementation(projects.core.ui.view)
 
     implementation(projects.statekit.runtime)
     implementation(projects.statekit.viewmodel)

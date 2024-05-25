@@ -48,6 +48,7 @@ include(
 )
 include(
     ":core:android",
+    ":core:androidx:compose-ext",
     ":core:androidx:fragment",
     ":core:androidx:fragment-compose",
     ":core:androidx:lifecycle",
@@ -71,6 +72,4 @@ include(
     ":core:schedule",
     ":core:schedule-ext",
     ":core:schedule-test",
-    ":core:ui:compose",
-    ":core:ui:view"
 )
