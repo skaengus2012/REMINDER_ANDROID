@@ -16,6 +16,7 @@
 
 package com.nlab.reminder.domain.feature.home
 
+import com.nlab.reminder.core.annotation.platform.Stable
 import com.nlab.reminder.core.annotation.test.ExcludeFromGeneratedTestReport
 import com.nlab.reminder.core.data.model.Tag
 import com.nlab.reminder.core.data.model.TagUsageCount
@@ -23,11 +24,12 @@ import com.nlab.reminder.core.data.model.TagUsageCount
 /**
  * @author thalys
  */
+@Stable
 internal sealed interface HomeWorkflow {
-    object Empty : HomeWorkflow
-    object TodaySchedule : HomeWorkflow
-    object TimetableSchedule : HomeWorkflow
-    object AllSchedule : HomeWorkflow
+    data object Empty : HomeWorkflow
+    data object TodaySchedule : HomeWorkflow
+    data object TimetableSchedule : HomeWorkflow
+    data object AllSchedule : HomeWorkflow
 
     @ExcludeFromGeneratedTestReport
     data class TagConfig(

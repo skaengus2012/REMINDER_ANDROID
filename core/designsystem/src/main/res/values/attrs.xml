@@ -31,5 +31,6 @@
     <attr name="point_2" format="color" />
     <attr name="point_3" format="color" />
     <attr name="white" format="color" />
+    <attr name="black" format="color" />
     <attr name="red1" format="color" />
 </resources>

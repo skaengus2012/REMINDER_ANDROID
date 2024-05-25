@@ -17,7 +17,7 @@
 <resources>
 
     <style name="Base.Theme.Reminder" parent="Theme.Material3.DayNight.NoActionBar">
-        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:statusBarColor">?bg_1</item>
         <item name="android:windowBackground">?bg_1</item>
         <item name="colorControlHighlight">?bg_ripple_1</item>
 
@@ -25,6 +25,7 @@
         <item name="point_2">@color/point_2</item>
         <item name="point_3">@color/point_3</item>
         <item name="white">@android:color/white</item>
+        <item name="black">@android:color/black</item>
         <item name="red1">@color/red_400</item>
     </style>
 

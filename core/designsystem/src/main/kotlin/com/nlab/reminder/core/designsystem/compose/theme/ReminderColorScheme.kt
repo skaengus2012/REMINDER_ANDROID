@@ -49,7 +49,8 @@ data class ReminderColorScheme(
     val point2: Color = Point2,
     val point3: Color = Point3,
     val red1: Color = Red400,
-    val white: Color = Color.White
+    val white: Color = Color.White,
+    val black: Color = Color.Black
 )
 
 internal val LocalReminderColorScheme = staticCompositionLocalOf {
