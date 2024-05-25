@@ -81,7 +81,6 @@ private fun Project.androidJacocoClassDirectories(variant: Variant): Configurabl
                 "**/Manifest*.*",
                 "**/android/**",
                 "**/resource/**",
-                "**/view/**",
                 "**/ui/**",
                 "**/test/**",
                 "**/di/**",
