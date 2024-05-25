@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 The N's lab Open Source Project
+ * Copyright (C) 2024 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.android.designsystem.component
+package com.nlab.reminder.core.designsystem.compose.component
 
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CircularProgressIndicator
@@ -28,7 +28,7 @@ import com.nlab.reminder.core.designsystem.compose.theme.ReminderTheme
  * @author Doohyun
  */
 @Composable
-fun ThemeLoadingIndicator(
+fun ReminderLoadingIndicator(
     modifier: Modifier = Modifier,
     color: Color = ReminderTheme.colors.point1,
 ) {

@@ -19,7 +19,7 @@ package com.nlab.reminder.core.designsystem.compose.theme
 import androidx.compose.ui.graphics.Color
 
 /**
- * sync with [./core/ui/view/src/main/res/values/color.xml]
+ * sync with [./main/res/values/color.xml]
  * @author Doohyun
  */
 

@@ -50,7 +50,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nlab.reminder.R
 import com.nlab.reminder.core.android.compose.runtime.UserMessageHandler
 import com.nlab.reminder.core.android.designsystem.component.ThemeBottomSheetLayout
-import com.nlab.reminder.core.android.designsystem.component.ThemeLoadingIndicator
+import com.nlab.reminder.core.designsystem.compose.component.ReminderLoadingIndicator
 import com.nlab.reminder.core.designsystem.compose.theme.ReminderTheme
 import com.nlab.reminder.core.state.UserMessage
 import com.nlab.reminder.domain.common.android.widget.showToast
@@ -128,7 +128,7 @@ private fun HomeScreen(
                 key = curUi
             ) {
                 Box(modifier = windowModifier) {
-                    ThemeLoadingIndicator(modifier = Modifier.align(Alignment.Center))
+                    ReminderLoadingIndicator(modifier = Modifier.align(Alignment.Center))
                 }
             }
         }

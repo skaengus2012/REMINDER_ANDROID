@@ -8,5 +8,7 @@ android {
 }
 
 dependencies {
+    implementation(projects.core.kotlinxCoroutine)
+
     implementation(libs.androidx.compose.foundation)
 }

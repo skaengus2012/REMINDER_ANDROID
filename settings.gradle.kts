@@ -61,7 +61,6 @@ include(
     ":core:data-impl",
     ":core:data-test",
     ":core:designsystem",
-    ":core:designsystem-compose",
     ":core:di",
     ":core:domain",
     ":core:domain-di",

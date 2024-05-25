@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 The N's lab Open Source Project
+ * Copyright (C) 2024 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.android.designsystem.component
+package com.nlab.reminder.core.designsystem.compose.component
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -34,11 +36,14 @@ import com.nlab.reminder.core.designsystem.compose.theme.ReminderTheme
  * @author Doohyun
  */
 @Composable
-fun ThemeDialog(
-    onDismissRequest: () -> Unit = {},
+fun ReminderDialog(
+    onDismissRequest: () -> Unit,
     content: @Composable () -> Unit
 ) {
-    Dialog(onDismissRequest = onDismissRequest) {
+    Dialog(
+        onDismissRequest = onDismissRequest
+        // TODO properties 적용.
+    ) {
         Surface(
             modifier = Modifier.wrapContentSize(),
             shape = RoundedCornerShape(8.94.dp),
@@ -49,24 +54,30 @@ fun ThemeDialog(
 }
 
 @Preview(
-    name = "LightThemeDialogPreview",
+    name = "LightReminderDialogPreview",
     showBackground = true,
     uiMode = Configuration.UI_MODE_NIGHT_NO
 )
 @Preview(
-    name = "DarkThemeDialogPreview",
+    name = "DarkReminderDialogPreview",
     showBackground = true,
     uiMode = Configuration.UI_MODE_NIGHT_YES
 )
 @Composable
-private fun ThemeDialogPreview() {
+private fun ReminderDialogPreview() {
     ReminderTheme {
-        ThemeDialog {
-            Box(modifier = Modifier.padding(10.dp)) {
-                Text(
-                    text = "Hello, Dialogs",
-                    color = ReminderTheme.colors.content1,
-                )
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(300.dp)
+        ) {
+            ReminderDialog(onDismissRequest = {}) {
+                Box(modifier = Modifier.padding(10.dp)) {
+                    Text(
+                        text = "Hello, Dialogs",
+                        color = ReminderTheme.colors.content1,
+                    )
+                }
             }
         }
     }
