@@ -133,6 +133,7 @@ dependencies {
     testImplementation(projects.statekit.test)
     testImplementation(projects.core.dataTest)
     testImplementation(projects.core.scheduleTest)
+    androidTestImplementation(projects.core.local)
     androidTestImplementation(libs.kotlinx.coroutines.test)
     androidTestImplementation(libs.javafaker)
     androidTestImplementation(libs.androidx.test.junit)

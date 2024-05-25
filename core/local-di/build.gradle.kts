@@ -9,5 +9,5 @@ android {
 
 dependencies {
     implementation(projects.core.di)
-    api(projects.core.local)
+    implementation(projects.core.local)
 }
