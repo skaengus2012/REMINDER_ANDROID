@@ -8,18 +8,18 @@ minSdk = "23"
 # library version
 afollestedDragselectRecyclerView = "2.4.0"
 androidGradlePlugin = "8.4.1"
-androidxAnnotation = "1.7.1"
+androidxAnnotation = "1.8.0"
 androidxAppCompat = "1.6.1"
 androidxCardview = "1.0.0"
-androidxComposeBom = "2024.03.00"
-androidxComposeCompiler = "1.5.9"  # use in configureComposeAndroid AndroidCompose.kt
+androidxComposeBom = "2024.05.00"
+androidxComposeCompiler = "1.5.14"  # use in configureComposeAndroid AndroidCompose.kt
 androidxConstaintLayout = "2.1.4"
-androidxCoreKtx = "1.12.0"
+androidxCoreKtx = "1.13.1"
 androidxCoreSplashScreen = "1.0.1"
-androidxDataStore = "1.0.0"
-androidxFragment = "1.6.2"
+androidxDataStore = "1.1.1"
+androidxFragment = "1.7.1"
 androidxHiltNavigationCompose = "1.2.0"
-androidxLifecycle = "2.7.0"
+androidxLifecycle = "2.8.0"
 androidxNavigation = "2.7.7"
 androidxRecyclerView = "1.3.2"
 androidxRoom = "2.6.1"
@@ -27,19 +27,18 @@ androidxStartUp = "1.1.1"
 androidxTestEspresso = "3.5.1"
 androidxTestJunit = "1.1.5"
 androidxTestRules = "1.5.0"
-androidxTransition = "1.4.1"
+androidxTransition = "1.5.0"
 coil = "2.6.0"
 facebookFlipper = "0.250.0"
 facebookSoloader = "0.11.0"
 googleHilt = "2.51.1"
 googleMaterial = "1.12.0"
-glide = "4.16.0"
 jacoco = "0.8.11" # use in configureJacocoToolVersion -> Jacoco.kt
 javafaker = "1.0.2"
 jsoup = "1.17.2"
 junit = "4.13.2"
-kotlin = "1.9.22"
-ksp = "1.9.23-1.0.19"
+kotlin = "1.9.24"
+ksp = "1.9.24-1.0.20"
 kotlinxCollectionsImmutable = "0.3.7"
 kotlinxCoroutine = "1.8.0"
 mockitoInline = "5.2.0"
@@ -58,7 +57,6 @@ androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "a
 androidx-cardview = { module = "androidx.cardview:cardview", version.ref = "androidxCardview" }
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "androidxComposeBom" } # use in configureComposeAndroid AndroidCompose.kt
 androidx-compose-foundation = { group = "androidx.compose.foundation", name = "foundation" }
-androidx-compose-material = { group = "androidx.compose.material", name = "material" }   # For using ModalBottomSheetLayout
 androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-compose-runtime = { group = "androidx.compose.runtime", name = "runtime" }
 androidx-compose-ui = { group = "androidx.compose.ui", name = "ui" }
@@ -92,8 +90,6 @@ facebook-soloader = { module = "com.facebook.soloader:soloader", version.ref = "
 google-hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "googleHilt" }       # use in nlab.android.hilt.gradle.kts
 google-hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "googleHilt" }     # use in nlab.android.hilt.gradle.kts
 google-material = { group = "com.google.android.material", name = "material", version.ref = "googleMaterial" }
-glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
-glide-compiler = { module = "com.github.bumptech.glide:compiler", version.ref = "glide" }
 javafaker = { module = "com.github.javafaker:javafaker", version.ref = "javafaker" }
 jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
 junit = { module = "junit:junit", version.ref = "junit" }

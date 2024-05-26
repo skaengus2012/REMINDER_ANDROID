@@ -29,7 +29,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.ripple.rememberRipple
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -78,10 +78,8 @@ internal fun HomeTagConfigDialog(
                 color = ReminderTheme.colors.content1,
                 textAlign = TextAlign.Center
             )
-            Divider(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 17.dp),
+            HorizontalDivider(
+                modifier = Modifier.padding(top = 17.dp),
                 thickness = 0.5.dp,
                 color = ReminderTheme.colors.bgLine1,
             )

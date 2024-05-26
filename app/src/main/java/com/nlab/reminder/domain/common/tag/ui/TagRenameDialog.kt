@@ -64,10 +64,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nlab.reminder.R
-import com.nlab.reminder.core.android.designsystem.component.ColorPressButton
 import com.nlab.reminder.core.designsystem.compose.component.ReminderDialog
 import com.nlab.reminder.core.designsystem.compose.theme.ReminderTheme
 import com.nlab.reminder.core.data.model.TagUsageCount
+import com.nlab.reminder.core.androidx.compose.ui.component.ColorPressButton
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.debounce
 
