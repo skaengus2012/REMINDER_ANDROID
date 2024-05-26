@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (C) 2024 The N's lab Open Source Project
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~        http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+
+    <style name="Base.Theme.Reminder" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:statusBarColor">?bg_1</item>
+        <item name="android:windowBackground">?bg_1</item>
+        <item name="colorControlHighlight">?bg_ripple_1</item>
+
+        <item name="point_1">@color/point_1</item>
+        <item name="point_2">@color/point_2</item>
+        <item name="point_3">@color/point_3</item>
+        <item name="white">@android:color/white</item>
+        <item name="black">@android:color/black</item>
+        <item name="red1">@color/red_400</item>
+    </style>
+
+    <style name="Theme.Reminder.App" parent="Base.Theme.Reminder">
+        <item name="android:windowLightStatusBar">true</item>
+
+        <item name="bg_1">@color/bg_1_light</item>
+        <item name="bg_2">@color/bg_2_light</item>
+        <item name="bg_ripple_1">@color/bg_ripple_1_light</item>
+        <item name="bg_card_1">@color/bg_card_1_light</item>
+        <item name="bg_card_2">@color/bg_card_2_light</item>
+        <item name="bg_card_stroke_1">@color/bg_card_stroke_1_light</item>
+        <item name="bg_line_1">@color/bg_line_1_light</item>
+        <item name="bg_line_2">@color/bg_line_2_light</item>
+        <item name="bg_placeholder_1">@color/bg_placeholder_1_light</item>
+        <item name="content_1">@color/content_1_light</item>
+        <item name="content_2">@color/content_2_light</item>
+        <item name="content_3">@color/content_3_light</item>
+    </style>
+
+</resources>

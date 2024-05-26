@@ -36,10 +36,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.nlab.reminder.R
-import com.nlab.reminder.core.android.compose.ui.throttle
-import com.nlab.reminder.core.android.designsystem.theme.ReminderTheme
+import com.nlab.reminder.core.androidx.compose.ui.throttle
+import com.nlab.reminder.core.designsystem.compose.theme.ReminderTheme
 
 /**
  * @author Doohyun
@@ -62,8 +61,8 @@ fun TagText(
         )
         Text(
             text = LocalContext.current.getString(R.string.format_tag, text),
-            fontSize = 14.sp,
-            color = ReminderTheme.colors.fontTag,
+            style = ReminderTheme.typography.bodyMedium,
+            color = ReminderTheme.colors.contentTag,
             modifier = Modifier.padding(horizontal = 12.dp, vertical = 5.dp),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis

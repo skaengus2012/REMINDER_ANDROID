@@ -16,7 +16,7 @@
 
 package com.nlab.statekit
 
-import com.nlab.testkit.genInt
+import com.nlab.testkit.faker.genInt
 
 
 /**

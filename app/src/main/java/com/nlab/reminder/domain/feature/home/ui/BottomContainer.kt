@@ -31,7 +31,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.nlab.reminder.core.android.designsystem.theme.ReminderTheme
+import com.nlab.reminder.core.designsystem.compose.theme.ReminderTheme
 
 /**
  * @author Doohyun

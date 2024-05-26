@@ -16,8 +16,8 @@
 package com.nlab.reminder.core.state
 
 import androidx.annotation.StringRes
-import com.nlab.reminder.core.annotation.ExcludeFromGeneratedTestReport
-import com.nlab.reminder.core.annotation.Stable
+import com.nlab.reminder.core.annotation.test.ExcludeFromGeneratedTestReport
+import com.nlab.reminder.core.annotation.platform.Stable
 import kotlinx.collections.immutable.*
 
 /**

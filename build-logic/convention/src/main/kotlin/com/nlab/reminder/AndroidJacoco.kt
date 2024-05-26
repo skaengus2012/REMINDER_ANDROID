@@ -80,13 +80,12 @@ private fun Project.androidJacocoClassDirectories(variant: Variant): Configurabl
                 "**/BuildConfig.*",
                 "**/Manifest*.*",
                 "**/android/**",
-                "**/view/**",
+                "**/resource/**",
                 "**/ui/**",
                 "**/test/**",
                 "**/di/**",
-                "**/icon/**",
+                "**/resource/**",
                 "**/fake/**",
-                "**/*_PublicEventsKt.class",        /* filtering PublicEvent generated classes */
                 "**/*_GeneratedUiActionsKt.class",  /* filtering UiAction generated classes */
                 "**/*Args*.*",                      /* filtering Navigation Component generated classes */
                 "**/*Directions*.*"                 /* filtering Navigation Component generated classes */

@@ -110,14 +110,14 @@
         app:layout_constraintStart_toStartOf="@id/guideline_textEnd"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_drag_handle"
-        app:tint="@color/tint_schedule_drag_handle" />
+        app:tint="?content_3" />
 
     <View
         android:id="@+id/view_line"
         android:layout_width="0dp"
         android:layout_height="0.5dp"
         android:layout_marginTop="15dp"
-        android:background="?attr/bg_color_line_1"
+        android:background="?bg_line_1"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@id/guideline_textStart"

@@ -17,7 +17,6 @@
 package com.nlab.reminder.domain.feature.home.ui
 
 import android.content.res.Configuration.*
-import androidx.activity.compose.BackHandler
 import androidx.annotation.StringRes
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Box
@@ -25,57 +24,55 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ModalBottomSheetValue
-import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nlab.reminder.R
-import com.nlab.reminder.core.android.compose.runtime.LoadedContent
 import com.nlab.reminder.core.android.compose.runtime.UserMessageHandler
-import com.nlab.reminder.core.android.compose.runtime.rememberDelayedVisibleState
-import com.nlab.reminder.core.android.designsystem.component.ThemeBottomSheetLayout
-import com.nlab.reminder.core.android.designsystem.component.ThemeLoadingIndicator
-import com.nlab.reminder.core.android.designsystem.theme.ReminderTheme
+import com.nlab.reminder.core.designsystem.compose.component.ReminderLoadingIndicator
+import com.nlab.reminder.core.designsystem.compose.theme.ReminderTheme
 import com.nlab.reminder.core.state.UserMessage
 import com.nlab.reminder.domain.common.android.widget.showToast
 import com.nlab.reminder.core.data.model.Tag
+import com.nlab.reminder.core.androidx.compose.ui.DelayedVisibleContent
+import com.nlab.reminder.core.androidx.compose.ui.rememberDelayedVisibleState
+import com.nlab.reminder.core.designsystem.compose.component.ReminderBottomSheet
 import com.nlab.reminder.domain.common.tag.ui.TagDeleteBottomSheetContent
 import com.nlab.reminder.domain.common.tag.ui.TagRenameDialog
 import com.nlab.reminder.domain.feature.home.*
 import kotlinx.collections.immutable.*
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
 /**
  * @author Doohyun
  */
 @Composable
-internal fun HomeRoot(
+internal fun HomeRoute(
     navigateToAllScheduleEnd: () -> Unit,
+    modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     HomeScreen(
-        uiState = viewModel.uiState.collectAsStateWithLifecycle(),
+        uiState = viewModel.uiState.collectAsStateWithLifecycle(
+            lifecycleOwner = LocalLifecycleOwner.current // error : CompositionLocal LocalLifecycleOwner not present
+        ),
         onTodayCategoryClicked = viewModel::onTodayCategoryClicked,
         onTimetableCategoryClicked = viewModel::onTimetableCategoryClicked,
         onAllCategoryClicked = viewModel::onAllCategoryClicked,
@@ -88,11 +85,11 @@ internal fun HomeRoot(
         onTagDeleteConfirmClicked = viewModel::onTagDeleteConfirmClicked,
         completeWorkflow = viewModel::completeWorkflow,
         userMessageShown = viewModel::userMessageShown,
-        navigateToAllScheduleEnd = navigateToAllScheduleEnd
+        navigateToAllScheduleEnd = navigateToAllScheduleEnd,
+        modifier = modifier
     )
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun HomeScreen(
     uiState: State<HomeUiState>,
@@ -108,108 +105,63 @@ private fun HomeScreen(
     onTagDeleteConfirmClicked: () -> Unit,
     completeWorkflow: () -> Unit,
     userMessageShown: (UserMessage) -> Unit,
-    navigateToAllScheduleEnd: () -> Unit
+    navigateToAllScheduleEnd: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    val windowModifier = Modifier
-        .fillMaxSize()
-        .statusBarsPadding()
-        .navigationBarsPadding()
-    val loadingVisibleState = rememberDelayedVisibleState()
+    val context = LocalContext.current
+    var isLoadedDelayNeeded by remember { mutableStateOf(false) }
 
-    when (val curUi = uiState.value) {
-        is HomeUiState.Loading -> Box(modifier = windowModifier) {
-            ThemeLoadingIndicator(
-                modifier = Modifier.align(Alignment.Center),
-                visibleState = loadingVisibleState
-            )
-        }
+    Box(modifier = modifier.fillMaxSize()) {
+        when (val curUi = uiState.value) {
+            HomeUiState.Loading -> {
+                val visibleState = rememberDelayedVisibleState()
+                LaunchedEffect(curUi) {
+                    snapshotFlow { visibleState.isVisible }
+                        .distinctUntilChanged()
+                        .collect { isLoadedDelayNeeded = it }
+                }
+                DelayedVisibleContent(
+                    delayTimeMillis = 500,
+                    visibleState = visibleState,
+                    key = curUi
+                ) {
+                    ReminderLoadingIndicator(modifier = Modifier.align(Alignment.Center))
+                }
+            }
 
-        is HomeUiState.Success -> LoadedContent(isDelay = loadingVisibleState.value) {
-            val context = LocalContext.current
-            val coroutineScope = rememberCoroutineScope()
-            val sheetState = rememberModalBottomSheetState(
-                initialValue = ModalBottomSheetValue.Hidden,
-                skipHalfExpanded = true
-            )
-            ThemeBottomSheetLayout(
-                sheetState = sheetState,
-                sheetContent = {
-                    if (curUi.workflow is HomeWorkflow.TagDelete) {
-                        TagDeleteBottomSheetContent(
-                            tagName = curUi.workflow.tag.name,
-                            usageCount = curUi.workflow.usageCount,
-                            modifier = Modifier.navigationBarsPadding(),
-                            onCancelClicked = { coroutineScope.launch { sheetState.hide() } },
-                            onConfirmClicked = {
-                                onTagDeleteConfirmClicked()
-                                coroutineScope.launch { sheetState.hide() }
-                            }
-                        )
-                    }
-                },
-                onHide = completeWorkflow
-            ) {
-                HomeContent(
-                    uiState = curUi,
-                    modifier = windowModifier,
-                    onTodayCategoryClicked = onTodayCategoryClicked,
-                    onTimetableCategoryClicked = onTimetableCategoryClicked,
-                    onAllCategoryClicked = onAllCategoryClicked,
-                    onTagLongClicked = onTagLongClicked
+            is HomeUiState.Success -> {
+                DelayedVisibleContent(
+                    delayTimeMillis = if (isLoadedDelayNeeded) 100 else 0,
+                    key = curUi
+                ) {
+                    HomeContent(
+                        todayScheduleCount = curUi.todayScheduleCount,
+                        timetableScheduleCount = curUi.timetableScheduleCount,
+                        allScheduleCount = curUi.allScheduleCount,
+                        tags = curUi.tags,
+                        onTodayCategoryClicked = onTodayCategoryClicked,
+                        onTimetableCategoryClicked = onTimetableCategoryClicked,
+                        onAllCategoryClicked = onAllCategoryClicked,
+                        onTagLongClicked = onTagLongClicked
+                    )
+                }
+
+                UserMessageHandler(
+                    messages = curUi.userMessages,
+                    onMessageReleased = userMessageShown
+                ) { context.showToast(displayMessage) }
+
+                HomeWorkflowHandler(
+                    workflow = curUi.workflow,
+                    completeWorkflow = completeWorkflow,
+                    onTagRenameRequestClicked = onTagRenameRequestClicked,
+                    onTagRenameTextChanged = onTagRenameTextChanged,
+                    onTagRenameConfirmClicked = onTagRenameConfirmClicked,
+                    onTagRenameKeyboardShown = onTagRenameKeyboardShown,
+                    onTagDeleteRequestClicked = onTagDeleteRequestClicked,
+                    onTagDeleteConfirmClicked = onTagDeleteConfirmClicked,
+                    navigateToAllScheduleEnd = navigateToAllScheduleEnd
                 )
-            }
-
-            BackHandler(enabled = sheetState.isVisible) {
-                coroutineScope.launch { sheetState.hide() }
-            }
-
-            UserMessageHandler(messages = curUi.userMessages, onMessageReleased = userMessageShown) {
-                context.showToast(displayMessage)
-            }
-
-            when (val workflow = curUi.workflow) {
-                is HomeWorkflow.Empty -> {}
-                is HomeWorkflow.TagConfig -> {
-                    HomeTagConfigDialog(
-                        tagName = workflow.tag.name,
-                        usageCount = workflow.usageCount,
-                        onDismiss = completeWorkflow,
-                        onRenameRequestClicked = onTagRenameRequestClicked,
-                        onDeleteRequestClicked = onTagDeleteRequestClicked
-                    )
-                }
-
-                is HomeWorkflow.TagRename -> {
-                    TagRenameDialog(
-                        initText = workflow.renameText,
-                        tagName = workflow.tag.name,
-                        usageCount = workflow.usageCount,
-                        shouldKeyboardShown = workflow.shouldKeyboardShown,
-                        onCancel = completeWorkflow,
-                        onTextChanged = onTagRenameTextChanged,
-                        onConfirm = {
-                            onTagRenameConfirmClicked()
-                            completeWorkflow()
-                        }
-                    )
-                    if (workflow.shouldKeyboardShown) {
-                        SideEffect { onTagRenameKeyboardShown() }
-                    }
-                }
-
-                is HomeWorkflow.TagDelete -> {
-                    LaunchedEffect(workflow) {
-                        delay(200) // for animation showing, with HomeTagConfigDialog..
-                        sheetState.show()
-                    }
-                }
-
-                else -> {
-                    LaunchedEffect(workflow) {
-                        completeWorkflow()
-                        if (workflow is HomeWorkflow.AllSchedule) navigateToAllScheduleEnd()
-                    }
-                }
             }
         }
     }
@@ -217,21 +169,24 @@ private fun HomeScreen(
 
 @Composable
 private fun HomeContent(
-    uiState: HomeUiState.Success,
+    todayScheduleCount: Long,
+    timetableScheduleCount: Long,
+    allScheduleCount: Long,
+    tags: ImmutableList<Tag>,
     modifier: Modifier = Modifier,
-    onTodayCategoryClicked: () -> Unit = {},
-    onTimetableCategoryClicked: () -> Unit = {},
-    onAllCategoryClicked: () -> Unit = {},
-    onTagLongClicked: (Tag) -> Unit = {},
+    onTodayCategoryClicked: () -> Unit,
+    onTimetableCategoryClicked: () -> Unit,
+    onAllCategoryClicked: () -> Unit,
+    onTagLongClicked: (Tag) -> Unit,
 ) {
     val homeContentPaddingBottom = 76.dp
     val homeContentScrollState = rememberScrollState()
     Box(modifier = modifier) {
         HomeItems(
-            todayScheduleCount = uiState.todayScheduleCount,
-            timetableScheduleCount = uiState.timetableScheduleCount,
-            allScheduleCount = uiState.allScheduleCount,
-            tags = uiState.tags,
+            todayScheduleCount = todayScheduleCount,
+            timetableScheduleCount = timetableScheduleCount,
+            allScheduleCount = allScheduleCount,
+            tags = tags,
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(homeContentScrollState)
@@ -289,7 +244,7 @@ private fun HomeItems(
             modifier = Modifier
                 .padding(top = 14.dp, bottom = 10.dp)
                 .fillMaxWidth(),
-            tags = tags,
+            tags = tags, // Tag 가 모듈로 분리되면서, skip 작동하지 않음. strong-skip 존버.
             onTagClicked = {},
             onTagLongClicked = onTagLongClicked
         )
@@ -304,7 +259,7 @@ private fun Logo(modifier: Modifier = Modifier) {
             .height(30.dp),
         painter = painterResource(id = R.drawable.ic_logo),
         contentDescription = null,
-        tint = ReminderTheme.colors.font1
+        tint = ReminderTheme.colors.content1
     )
 }
 
@@ -315,9 +270,8 @@ private fun HomeTitle(
 ) {
     Text(
         text = stringResource(textRes),
-        color = ReminderTheme.colors.font1,
-        fontSize = 17.sp,
-        fontWeight = FontWeight.Bold,
+        style = ReminderTheme.typography.titleMedium,
+        color = ReminderTheme.colors.content1,
         modifier = modifier
     )
 }
@@ -356,6 +310,84 @@ private fun BottomContent(
     }
 }
 
+@Composable
+private fun HomeWorkflowHandler(
+    workflow: HomeWorkflow,
+    completeWorkflow: () -> Unit,
+    onTagRenameRequestClicked: () -> Unit,
+    onTagRenameTextChanged: (String) -> Unit,
+    onTagRenameConfirmClicked: () -> Unit,
+    onTagRenameKeyboardShown: () -> Unit,
+    onTagDeleteRequestClicked: () -> Unit,
+    onTagDeleteConfirmClicked: () -> Unit,
+    navigateToAllScheduleEnd: () -> Unit,
+) {
+    val coroutineScope = rememberCoroutineScope()
+    when (workflow) {
+        is HomeWorkflow.Empty -> {}
+        is HomeWorkflow.TagConfig -> {
+            HomeTagConfigDialog(
+                tagName = workflow.tag.name,
+                usageCount = workflow.usageCount,
+                onDismiss = completeWorkflow,
+                onRenameRequestClicked = onTagRenameRequestClicked,
+                onDeleteRequestClicked = onTagDeleteRequestClicked
+            )
+        }
+
+        is HomeWorkflow.TagRename -> {
+            TagRenameDialog(
+                initText = workflow.renameText,
+                tagName = workflow.tag.name,
+                usageCount = workflow.usageCount,
+                shouldKeyboardShown = workflow.shouldKeyboardShown,
+                onCancel = completeWorkflow,
+                onTextChanged = onTagRenameTextChanged,
+                onConfirm = {
+                    onTagRenameConfirmClicked()
+                    completeWorkflow()
+                }
+            )
+            if (workflow.shouldKeyboardShown) {
+                SideEffect { onTagRenameKeyboardShown() }
+            }
+        }
+
+        is HomeWorkflow.TagDelete -> {
+            val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+            ReminderBottomSheet(
+                onDismissRequest = completeWorkflow,
+                sheetState = sheetState
+            ) {
+                TagDeleteBottomSheetContent(
+                    tagName = workflow.tag.name,
+                    usageCount = workflow.usageCount,
+                    onCancelClicked = {
+                        coroutineScope.launch {
+                            sheetState.hide()
+                            completeWorkflow()
+                        }
+                    },
+                    onConfirmClicked = {
+                        onTagDeleteConfirmClicked()
+                        coroutineScope.launch {
+                            sheetState.hide()
+                            completeWorkflow()
+                        }
+                    }
+                )
+            }
+        }
+
+        else -> {
+            LaunchedEffect(workflow) {
+                completeWorkflow()
+                if (workflow is HomeWorkflow.AllSchedule) navigateToAllScheduleEnd()
+            }
+        }
+    }
+}
+
 @Preview(
     name = "LightHomeContentPreview",
     showBackground = true,
@@ -370,16 +402,16 @@ private fun BottomContent(
 private fun HomeContentPreview() {
     ReminderTheme {
         HomeContent(
-            uiState = HomeUiState.Success(
-                todayScheduleCount = 10,
-                timetableScheduleCount = 20,
-                allScheduleCount = 30,
-                tags = (0L..100)
-                    .map { index -> Tag(tagId = index, name = "TagName $index") }
-                    .toImmutableList(),
-                workflow = HomeWorkflow.Empty,
-                userMessages = persistentListOf()
-            ),
+            todayScheduleCount = 10,
+            timetableScheduleCount = 20,
+            allScheduleCount = 30,
+            tags = (0L..100)
+                .map { index -> Tag(tagId = index, name = "TagName $index") }
+                .toImmutableList(),
+            onTodayCategoryClicked = {},
+            onTimetableCategoryClicked = {},
+            onAllCategoryClicked = {},
+            onTagLongClicked = {},
             modifier = Modifier.fillMaxSize()
         )
     }

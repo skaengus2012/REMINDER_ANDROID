@@ -17,23 +17,17 @@
 package com.nlab.reminder
 
 import org.gradle.api.Project
-import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.kotlin.dsl.configure
-import org.gradle.kotlin.dsl.getByType
 import org.gradle.testing.jacoco.plugins.JacocoPluginExtension
 
 /**
  * @author Doohyun
  */
 internal fun Project.configureJacocoToolVersion() {
-    val libs = extensions.getByType<VersionCatalogsExtension>().named("libs")
     configure<JacocoPluginExtension> {
         toolVersion = libs.findVersion("jacoco").get().toString()
     }
 }
 
 internal val jacocoExcludePatterns: Set<String>
-    get() = setOf(
-        "**/kotlin/**",
-        "**/infra/**",
-    )
+    get() = setOf("**/infra/**")

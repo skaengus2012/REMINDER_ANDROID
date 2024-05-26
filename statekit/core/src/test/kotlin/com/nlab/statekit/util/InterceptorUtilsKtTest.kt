@@ -18,7 +18,7 @@ package com.nlab.statekit.util
 
 import com.nlab.statekit.*
 import com.nlab.statekit.UpdateSource
-import com.nlab.testkit.once
+import org.mockito.kotlin.once
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Test

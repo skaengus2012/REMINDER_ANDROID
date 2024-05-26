@@ -19,9 +19,6 @@ plugins {
 }
 
 dependencies {
-    implementation(project(":statekit:core"))
-    implementation(libs.junit)
-    implementation(libs.mockito.inline)
-    implementation(libs.mockito.kotlin)
-    implementation(libs.kotlin.coroutines.test)
+    implementation(projects.statekit.core)
+    implementation(projects.testkit)
 }

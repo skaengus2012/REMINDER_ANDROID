@@ -16,20 +16,13 @@
 
 package com.nlab.reminder.internal.common.di
 
-import android.app.Application
+import android.content.Context
 import com.nlab.reminder.core.android.widget.ToastHandle
-import com.nlab.reminder.domain.common.kotlin.coroutine.inject.DefaultDispatcher
-import com.nlab.reminder.domain.common.kotlin.coroutine.inject.GlobalScope
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineName
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import java.util.*
 import javax.inject.Singleton
 
 /**
@@ -40,16 +33,5 @@ import javax.inject.Singleton
 class UtilityModule {
     @Singleton
     @Provides
-    fun provideToastHandle(application: Application): ToastHandle = ToastHandle(application)
-
-    @GlobalScope
-    @Singleton
-    @Provides
-    fun provideGlobalCoroutineScope(): CoroutineScope = CoroutineScope(
-        context = SupervisorJob() + CoroutineName("ReminderGlobalScope")
-    )
-
-    @DefaultDispatcher
-    @Provides
-    fun provideDefaultDispatcher(): CoroutineDispatcher = Dispatchers.Default
+    fun provideToastHandle(@ApplicationContext context: Context): ToastHandle = ToastHandle(context)
 }

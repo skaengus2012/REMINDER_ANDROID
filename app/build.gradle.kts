@@ -15,8 +15,9 @@
  */
 plugins {
     alias(libs.plugins.nlab.android.application)
+    alias(libs.plugins.nlab.android.application.compose)
     alias(libs.plugins.nlab.android.application.jacoco)
-    alias(libs.plugins.google.hilt)
+    alias(libs.plugins.nlab.android.hilt)
     alias(libs.plugins.androidx.navigation.safearges)
     alias(libs.plugins.ksp)
     id("kotlin-parcelize")
@@ -32,10 +33,6 @@ android {
         versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-
-        ksp {
-            arg("room.schemaLocation", "${layout.buildDirectory.get()}/schemas")
-        }
     }
 
     buildTypes {
@@ -69,57 +66,59 @@ android {
 
     buildFeatures {
         viewBinding = true
-        compose = true
-    }
-
-    composeOptions {
-        kotlinCompilerExtensionVersion = libs.versions.androidxComposeCompiler.get()
     }
 }
 
 dependencies {
-    implementation(project(":statekit:runtime"))
-    implementation(project(":statekit:viewmodel"))
-    kapt(project(":statekit:compiler"))
+    implementation(projects.core.android)
+    implementation(projects.core.androidx.composeExt)
+    implementation(projects.core.androidx.fragment)
+    implementation(projects.core.androidx.fragmentCompose)
+    implementation(projects.core.androidx.lifecycle)
+    implementation(projects.core.androidx.recyclerview)
+    implementation(projects.core.androidx.transition)
+    implementation(projects.core.annotation)
+    implementation(projects.core.annotationAndroid)
+    implementation(projects.core.dataDi)
+    implementation(projects.core.dataExt)
+    implementation(projects.core.designsystem)
+    implementation(projects.core.di)
+    implementation(projects.core.domain)
+    implementation(projects.core.domainDi)
+    implementation(projects.core.kotlin)
+    implementation(projects.core.kotlinxCoroutine)
+    implementation(projects.core.scheduleExt)
 
-    implementation(libs.kotlin.coroutines.android)
-    implementation(libs.kotlin.collections.immutable)
+    implementation(projects.statekit.runtime)
+    implementation(projects.statekit.viewmodel)
+    kapt(projects.statekit.compiler)
+
+    implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.kotlinx.collections.immutable)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.cardview)
     implementation(libs.androidx.constaintlayout)
-    implementation(libs.androidx.recyclerview)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.runtimeCompose)
-    implementation(libs.androidx.fragment.ktx)
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.androidx.navigation.ui.ktx)
-    implementation(libs.androidx.room.runtime)
-    implementation(libs.androidx.room.ktx)
-    ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.startup.runtime)
     implementation(libs.androidx.datastore.preferences)
-    implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
-    implementation(libs.androidx.compose.material)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.ui.tooling.preview)
     debugImplementation(libs.androidx.compose.ui.tooling)
     implementation(libs.androidx.compose.foundation)
 
-    implementation(libs.google.hilt.android)
-    ksp(libs.google.hilt.android.compiler)
+    implementation(libs.google.material)
+
+    implementation(libs.coil.kt)
 
     implementation(libs.timber)
-
-    implementation(libs.glide)
-    ksp(libs.glide.compiler)
-
-    implementation(libs.jsoup)
 
     implementation(libs.afollested.dragselectRecyclerView)
 
@@ -129,23 +128,15 @@ dependencies {
 
     debugImplementation(libs.squeare.leakcanary)
 
-    testImplementation(project(":testkit"))
-    testImplementation(project(":statekit:test"))
-    testImplementation(libs.junit)
-    testImplementation(libs.kotlin.coroutines.test)
-    testImplementation(libs.mockito.inline)
-    testImplementation(libs.mockito.kotlin)
-    testImplementation(libs.javafaker)
-    androidTestImplementation(libs.kotlin.coroutines.test)
+    testImplementation(projects.testkit)
+    testImplementation(projects.statekit.test)
+    testImplementation(projects.core.dataTest)
+    testImplementation(projects.core.scheduleTest)
+    androidTestImplementation(projects.core.local)
+    androidTestImplementation(libs.kotlinx.coroutines.test)
     androidTestImplementation(libs.javafaker)
     androidTestImplementation(libs.androidx.test.junit)
     androidTestImplementation(libs.androidx.test.espresso.core)
     androidTestImplementation(libs.androidx.test.runner)
     androidTestImplementation(libs.androidx.test.rules)
-}
-
-kapt {
-    // guide in dagger hilt
-    // https://developer.android.com/training/dependency-injection/hilt-android?hl=ko#setup
-    correctErrorTypes = true
 }

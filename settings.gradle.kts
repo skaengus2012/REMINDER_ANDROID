@@ -30,11 +30,46 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name="REMINDER_ANDROID"
-include(":app")
-include(":statekit:compiler")
-include(":statekit:core")
-include(":statekit:runtime")
-include(":statekit:test")
-include(":statekit:viewmodel")
-include(":testkit")
+rootProject.name = "REMINDER_ANDROID"
+
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+// nlab-kits.
+include(
+    ":statekit:compiler",
+    ":statekit:core",
+    ":statekit:runtime",
+    ":statekit:test",
+    ":statekit:viewmodel",
+    ":testkit"
+)
+// Reminder
+include(
+    ":app"
+)
+include(
+    ":core:android",
+    ":core:androidx:compose-ext",
+    ":core:androidx:fragment",
+    ":core:androidx:fragment-compose",
+    ":core:androidx:lifecycle",
+    ":core:androidx:recyclerview",
+    ":core:androidx:transition",
+    ":core:annotation",
+    ":core:annotation-android",
+    ":core:data",
+    ":core:data-di",
+    ":core:data-ext",
+    ":core:data-impl",
+    ":core:data-test",
+    ":core:designsystem",
+    ":core:di",
+    ":core:domain",
+    ":core:domain-di",
+    ":core:kotlin",
+    ":core:kotlinx-coroutine",
+    ":core:local",
+    ":core:local-di",
+    ":core:schedule",
+    ":core:schedule-ext",
+    ":core:schedule-test",
+)

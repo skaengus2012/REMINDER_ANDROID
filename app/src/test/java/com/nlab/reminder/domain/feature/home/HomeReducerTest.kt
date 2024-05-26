@@ -24,9 +24,9 @@ import com.nlab.reminder.core.data.model.genTags
 import com.nlab.statekit.expectedState
 import com.nlab.statekit.expectedStateToInit
 import com.nlab.statekit.scenario
-import com.nlab.testkit.genBothify
-import com.nlab.testkit.genInt
-import com.nlab.testkit.genLong
+import com.nlab.testkit.faker.genBothify
+import com.nlab.testkit.faker.genInt
+import com.nlab.testkit.faker.genLong
 import kotlinx.collections.immutable.*
 import org.junit.Test
 

@@ -23,20 +23,18 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.Icon
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.nlab.reminder.R
-import com.nlab.reminder.core.android.designsystem.component.ColorPressButton
-import com.nlab.reminder.core.android.compose.ui.throttle
-import com.nlab.reminder.core.android.designsystem.theme.ReminderTheme
+import com.nlab.reminder.core.androidx.compose.ui.component.ColorPressButton
+import com.nlab.reminder.core.androidx.compose.ui.throttle
+import com.nlab.reminder.core.designsystem.compose.theme.ReminderTheme
 
 /**
  * @author thalys
@@ -47,7 +45,7 @@ internal fun NewPlanButton(
     onClick: () -> Unit = {}
 ) {
     ColorPressButton(
-        contentColor = ReminderTheme.colors.pointColor1,
+        contentColor = ReminderTheme.colors.point1,
         modifier = modifier
             .padding(horizontal = 10.dp)
             .fillMaxHeight(),
@@ -63,8 +61,7 @@ internal fun NewPlanButton(
         )
         Text(
             text = LocalContext.current.getString(R.string.new_schedule_label),
-            fontSize = 17.sp,
-            fontWeight = FontWeight.Bold,
+            style = ReminderTheme.typography.titleMedium,
             color = contentColor
         )
     }
@@ -77,7 +74,7 @@ internal fun TimePushSwitchButton(
     onClick: () -> Unit = {}
 ) {
     ColorPressButton(
-        contentColor = ReminderTheme.colors.pointColor1,
+        contentColor = ReminderTheme.colors.point1,
         modifier = modifier
             .padding(horizontal = 10.dp)
             .fillMaxHeight(),
@@ -96,8 +93,7 @@ internal fun TimePushSwitchButton(
             text = LocalContext
                 .current
                 .getString(if (isPushOn) R.string.home_push_off_label else R.string.home_push_on_label),
-            fontSize = 17.sp,
-            fontWeight = FontWeight.Bold,
+            style = ReminderTheme.typography.titleMedium,
             color = contentColor
         )
     }

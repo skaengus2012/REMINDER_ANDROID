@@ -20,9 +20,9 @@ import android.os.Bundle
 import androidx.navigation.fragment.findNavController
 
 import dagger.hilt.android.AndroidEntryPoint
-import com.nlab.reminder.core.android.designsystem.theme.ReminderTheme
-import com.nlab.reminder.core.android.fragment.ComponentFragment
-import com.nlab.reminder.core.android.fragment.setContent
+import com.nlab.reminder.core.designsystem.compose.theme.ReminderTheme
+import com.nlab.reminder.core.androidx.frgment.compose.ComponentFragment
+import com.nlab.reminder.core.androidx.frgment.compose.setContent
 import com.nlab.reminder.domain.common.android.navigation.navigateToAllScheduleEnd
 
 /**
@@ -34,7 +34,7 @@ internal class HomeFragment : ComponentFragment() {
         val navController = findNavController()
         setContent {
             ReminderTheme {
-                HomeRoot(
+                HomeRoute(
                     navigateToAllScheduleEnd = navController::navigateToAllScheduleEnd
                 )
             }
