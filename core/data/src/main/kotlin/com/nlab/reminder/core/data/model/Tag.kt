@@ -19,4 +19,4 @@ package com.nlab.reminder.core.data.model
 /**
  * @author Doohyun
  */
-data class Tag(val tagId: Long, val name: String)
+data class Tag(val id: TagId, val name: String)

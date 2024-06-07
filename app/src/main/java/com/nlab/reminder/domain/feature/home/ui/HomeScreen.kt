@@ -52,6 +52,7 @@ import com.nlab.reminder.domain.common.android.widget.showToast
 import com.nlab.reminder.core.data.model.Tag
 import com.nlab.reminder.core.androidx.compose.ui.DelayedVisibleContent
 import com.nlab.reminder.core.androidx.compose.ui.rememberDelayedVisibleState
+import com.nlab.reminder.core.data.model.TagId
 import com.nlab.reminder.core.designsystem.compose.component.ReminderBottomSheet
 import com.nlab.reminder.domain.common.tag.ui.TagDeleteBottomSheetContent
 import com.nlab.reminder.domain.common.tag.ui.TagRenameDialog
@@ -407,7 +408,7 @@ private fun HomeContentPreview() {
             timetableScheduleCount = 20,
             allScheduleCount = 30,
             tags = (0L..100)
-                .map { index -> Tag(tagId = index, name = "TagName $index") }
+                .map { index -> Tag(id = TagId(index), name = "TagName $index") }
                 .toImmutableList(),
             onTodayCategoryClicked = {},
             onTimetableCategoryClicked = {},

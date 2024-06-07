@@ -14,15 +14,10 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.data.local.database
-
-import com.nlab.reminder.core.data.model.Tag
-import com.nlab.reminder.core.data.model.TagId
-import com.nlab.reminder.core.local.database.TagEntity
+package com.nlab.reminder.core.data.model
 
 /**
  * @author Doohyun
  */
-internal fun Tag.toEntity(): TagEntity = TagEntity(id.value, name)
-internal fun TagEntity.toModel(): Tag = Tag(TagId(tagId), name)
-internal fun List<TagEntity>.toModels(): List<Tag> = map(TagEntity::toModel)
+@JvmInline
+value class TagId(val value: Long)

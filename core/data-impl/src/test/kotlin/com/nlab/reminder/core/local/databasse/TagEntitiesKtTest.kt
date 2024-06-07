@@ -34,7 +34,7 @@ internal class TagEntitiesKtTest {
         val tag = genTag()
         val tagEntity = tag.toEntity()
 
-        assert(tag.tagId == tagEntity.tagId)
+        assert(tag.id.value == tagEntity.tagId)
         assert(tag.name == tagEntity.name)
     }
 
