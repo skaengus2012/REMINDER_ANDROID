@@ -18,7 +18,7 @@ package com.nlab.reminder.domain.feature.home
 
 import com.nlab.reminder.core.kotlin.Result
 import com.nlab.reminder.core.data.model.genTag
-import com.nlab.reminder.core.data.model.genTagUsageCount
+import com.nlab.testkit.faker.genLongGreaterThanZero
 import com.nlab.reminder.core.data.repository.TagRepository
 import com.nlab.statekit.middleware.interceptor.scenario
 import com.nlab.testkit.faker.genBothify
@@ -37,7 +37,7 @@ internal class HomeInterceptorTest {
     @Test
     fun `Sending TagConfigMetadata, when tag was long clicked`() = runTest {
         val target = genTag()
-        val usageCount = genTagUsageCount()
+        val usageCount = genLongGreaterThanZero()
         val tagRepository = mock<TagRepository> {
             whenever(mock.getUsageCount(target)) doReturn Result.Success(usageCount)
         }

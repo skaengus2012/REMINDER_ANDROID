@@ -19,7 +19,6 @@ package com.nlab.reminder.core.data.model
 import com.nlab.testkit.faker.genBothify
 import com.nlab.testkit.faker.genInt
 import com.nlab.testkit.faker.genLong
-import com.nlab.testkit.faker.genLongGreaterThanZero
 
 /**
  * @author Doohyun
@@ -28,5 +27,3 @@ import com.nlab.testkit.faker.genLongGreaterThanZero
 fun genTag(tagId: Long = genLong(), name: String = genBothify()) = Tag(tagId, name)
 fun genTags(count: Int = genInt(min = 5, max = 10)): List<Tag> =
     List(count) { index -> genTag(index.toLong()) }.distinctBy { it.name }
-
-fun genTagUsageCount(count: Long = genLongGreaterThanZero()) = TagUsageCount(count)

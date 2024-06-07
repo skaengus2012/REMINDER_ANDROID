@@ -18,7 +18,6 @@ package com.nlab.reminder.core.data.repository.impl
 
 import com.nlab.reminder.core.data.local.database.toEntity
 import com.nlab.reminder.core.data.model.Tag
-import com.nlab.reminder.core.data.model.TagUsageCount
 import com.nlab.reminder.core.data.model.genTag
 import com.nlab.reminder.core.data.model.genTags
 import com.nlab.reminder.core.data.repository.TagRepository
@@ -92,7 +91,7 @@ internal class LocalTagRepositoryTest {
 
         assertThat(
             result,
-            equalTo(Result.Success(TagUsageCount(usageCount)))
+            equalTo(Result.Success(usageCount))
         )
     }
 

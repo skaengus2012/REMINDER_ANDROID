@@ -19,7 +19,6 @@ package com.nlab.reminder.core.data.repository.impl
 import com.nlab.reminder.core.data.local.database.toEntity
 import com.nlab.reminder.core.data.local.database.toModels
 import com.nlab.reminder.core.data.model.Tag
-import com.nlab.reminder.core.data.model.TagUsageCount
 import com.nlab.reminder.core.data.repository.TagRepository
 import com.nlab.reminder.core.kotlinx.coroutine.flow.map
 import com.nlab.reminder.core.kotlin.Result
@@ -38,8 +37,8 @@ class LocalTagRepository(
 ) : TagRepository {
     override fun getStream(): Flow<List<Tag>> = tagDao.find().map { it.toModels() }
 
-    override suspend fun getUsageCount(tag: Tag): Result<TagUsageCount> = catching {
-        TagUsageCount(scheduleTagListDao.findTagUsageCount(tagId = tag.tagId))
+    override suspend fun getUsageCount(tag: Tag): Result<Long> = catching {
+        scheduleTagListDao.findTagUsageCount(tagId = tag.tagId)
     }
 
     override suspend fun updateName(tag: Tag, name: String): Result<Unit> = catching {
