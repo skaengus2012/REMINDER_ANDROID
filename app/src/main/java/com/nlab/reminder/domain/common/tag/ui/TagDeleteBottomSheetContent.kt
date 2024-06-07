@@ -41,7 +41,6 @@ import androidx.compose.ui.unit.dp
 import com.nlab.reminder.R
 import com.nlab.reminder.core.androidx.compose.ui.throttle
 import com.nlab.reminder.core.designsystem.compose.theme.ReminderTheme
-import com.nlab.reminder.core.data.model.TagUsageCount
 
 /**
  * @author Doohyun
@@ -49,7 +48,7 @@ import com.nlab.reminder.core.data.model.TagUsageCount
 @Composable
 fun TagDeleteBottomSheetContent(
     tagName: String,
-    usageCount: TagUsageCount,
+    usageCount: DisplayUsageCount,
     modifier: Modifier = Modifier,
     onConfirmClicked: () -> Unit = {},
     onCancelClicked: () -> Unit = {},
@@ -61,7 +60,7 @@ fun TagDeleteBottomSheetContent(
     ) {
         Text(
             modifier = Modifier.fillMaxWidth(),
-            text = usageCount.mapToString(
+            text = usageCount.format(
                 transform = { pluralStringResource(id = R.plurals.tag_delete, count = it, it) },
                 transformWhenOverflow = { stringResource(id = R.string.tag_delete_overflow, it) }
             ),
@@ -75,7 +74,7 @@ fun TagDeleteBottomSheetContent(
                 .fillMaxWidth()
                 .padding(start = 30.dp, top = 6.dp, end = 30.dp, bottom = 22.dp),
             style = ReminderTheme.typography.bodySmall,
-            text = usageCount.mapToString(
+            text = usageCount.format(
                 transform = {
                     pluralStringResource(id = R.plurals.tag_delete_dialog_description, count = it, tagName, it)
                 },
@@ -152,7 +151,7 @@ private fun TagDeleteBottomSheetContentPreview() {
         Box(modifier = Modifier.background(color = ReminderTheme.colors.bgDialogSurface)) {
             TagDeleteBottomSheetContent(
                 tagName = "Hello TagDeleteBottomSheetContentPreview",
-                usageCount = TagUsageCount(1)
+                usageCount = DisplayUsageCount(1)
             )
         }
     }

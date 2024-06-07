@@ -55,6 +55,7 @@ import com.nlab.reminder.core.androidx.compose.ui.rememberDelayedVisibleState
 import com.nlab.reminder.core.designsystem.compose.component.ReminderBottomSheet
 import com.nlab.reminder.domain.common.tag.ui.TagDeleteBottomSheetContent
 import com.nlab.reminder.domain.common.tag.ui.TagRenameDialog
+import com.nlab.reminder.domain.common.tag.ui.DisplayUsageCount
 import com.nlab.reminder.domain.feature.home.*
 import kotlinx.collections.immutable.*
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -328,7 +329,7 @@ private fun HomeWorkflowHandler(
         is HomeWorkflow.TagConfig -> {
             HomeTagConfigDialog(
                 tagName = workflow.tag.name,
-                usageCount = workflow.usageCount,
+                usageCount = DisplayUsageCount(workflow.usageCount),
                 onDismiss = completeWorkflow,
                 onRenameRequestClicked = onTagRenameRequestClicked,
                 onDeleteRequestClicked = onTagDeleteRequestClicked
@@ -339,7 +340,7 @@ private fun HomeWorkflowHandler(
             TagRenameDialog(
                 initText = workflow.renameText,
                 tagName = workflow.tag.name,
-                usageCount = workflow.usageCount,
+                usageCount = DisplayUsageCount(workflow.usageCount),
                 shouldKeyboardShown = workflow.shouldKeyboardShown,
                 onCancel = completeWorkflow,
                 onTextChanged = onTagRenameTextChanged,
@@ -361,7 +362,7 @@ private fun HomeWorkflowHandler(
             ) {
                 TagDeleteBottomSheetContent(
                     tagName = workflow.tag.name,
-                    usageCount = workflow.usageCount,
+                    usageCount = DisplayUsageCount(workflow.usageCount),
                     onCancelClicked = {
                         coroutineScope.launch {
                             sheetState.hide()

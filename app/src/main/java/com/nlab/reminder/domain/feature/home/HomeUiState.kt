@@ -28,7 +28,7 @@ import kotlinx.collections.immutable.*
  */
 @Stable
 internal sealed interface HomeUiState : State {
-    object Loading : HomeUiState
+    data object Loading : HomeUiState
 
     @ExcludeFromGeneratedTestReport
     data class Success(
