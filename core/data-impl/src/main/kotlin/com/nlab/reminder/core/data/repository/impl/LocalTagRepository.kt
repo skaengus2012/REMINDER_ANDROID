@@ -38,11 +38,11 @@ class LocalTagRepository(
     override fun getStream(): Flow<List<Tag>> = tagDao.find().map { it.toModels() }
 
     override suspend fun getUsageCount(tag: Tag): Result<Long> = catching {
-        scheduleTagListDao.findTagUsageCount(tagId = tag.tagId)
+        scheduleTagListDao.findTagUsageCount(tagId = tag.id.value)
     }
 
     override suspend fun updateName(tag: Tag, name: String): Result<Unit> = catching {
-        tagDao.update(TagEntity(tagId = tag.tagId, name = name))
+        tagDao.update(TagEntity(tagId = tag.id.value, name = name))
     }
 
     override suspend fun delete(tag: Tag): Result<Unit> = catching {

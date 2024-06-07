@@ -85,7 +85,7 @@ internal class LocalTagRepositoryTest {
         val usageCount: Long = genLong()
         val input: Tag = genTag()
         val scheduleTagListDao: ScheduleTagListDao = mock {
-            whenever(mock.findTagUsageCount(input.tagId)) doReturn usageCount
+            whenever(mock.findTagUsageCount(input.id.value)) doReturn usageCount
         }
         val result = genTagRepository(scheduleTagListDao = scheduleTagListDao).getUsageCount(input)
 
@@ -115,7 +115,7 @@ internal class LocalTagRepositoryTest {
         val tagDao: TagDao = mock()
 
         genTagRepository(tagDao = tagDao).updateName(input, name)
-        verify(tagDao, once()).update(TagEntity(input.tagId, name))
+        verify(tagDao, once()).update(TagEntity(input.id.value, name))
     }
 
     @Test
