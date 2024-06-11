@@ -30,15 +30,6 @@ import org.junit.Test
  */
 internal class TagEntitiesKtTest {
     @Test
-    fun testToEntity() {
-        val tag = genTag()
-        val tagEntity = tag.toEntity()
-
-        assert(tag.id.value == tagEntity.tagId)
-        assert(tag.name == tagEntity.name)
-    }
-
-    @Test
     fun testToModel() {
         val expectedTag = genTag()
         val actualTag = expectedTag.toEntity().toModel()

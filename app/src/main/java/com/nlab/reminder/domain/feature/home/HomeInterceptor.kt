@@ -34,7 +34,7 @@ internal class HomeInterceptor @Inject constructor(
 ) : Interceptor<HomeAction, HomeUiState> by buildDslInterceptor(defineDSL = {
     state<HomeUiState.Success> {
         action<HomeAction.OnTagLongClicked> { (action) ->
-            tagRepository.getUsageCount(action.tag)
+            tagRepository.getUsageCount(action.tag.id)
                 .onSuccess { usageCount ->
                     dispatch(HomeAction.TagConfigMetadataLoaded(action.tag, usageCount))
                 }
@@ -43,12 +43,12 @@ internal class HomeInterceptor @Inject constructor(
         }
         action<HomeAction.OnTagRenameConfirmClicked> { (_, before) ->
             catching { checkNotNull(before.workflow as? HomeWorkflow.TagRename) { "TagRename workflow was not set" } }
-                .flatMap { tagRename -> tagRepository.updateName(tagRename.tag, tagRename.renameText) }
+                .flatMap { tagRename -> tagRepository.updateName(tagRename.tag.id, tagRename.renameText) }
                 .getOrThrow()
         }
         action<HomeAction.OnTagDeleteConfirmClicked> { (_, before) ->
             catching { checkNotNull(before.workflow as? HomeWorkflow.TagDelete) { "TagDelete workflow was not set" } }
-                .flatMap { tagDelete -> tagRepository.delete(tagDelete.tag) }
+                .flatMap { tagDelete -> tagRepository.delete(tagDelete.tag.id) }
                 .getOrThrow()
         }
     }

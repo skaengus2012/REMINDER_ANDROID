@@ -39,7 +39,7 @@ internal class HomeInterceptorTest {
         val target = genTag()
         val usageCount = genLongGreaterThanZero()
         val tagRepository = mock<TagRepository> {
-            whenever(mock.getUsageCount(target)) doReturn Result.Success(usageCount)
+            whenever(mock.getUsageCount(target.id)) doReturn Result.Success(usageCount)
         }
         val loadedTagConfigMetadata: (HomeAction.TagConfigMetadataLoaded) -> Unit = mock()
 
@@ -57,7 +57,7 @@ internal class HomeInterceptorTest {
         val target = genTag()
         val error = IllegalStateException()
         val tagRepository = mock<TagRepository> {
-            whenever(mock.getUsageCount(target)) doReturn Result.Failure(error)
+            whenever(mock.getUsageCount(target.id)) doReturn Result.Failure(error)
         }
         val errorOccurred: (HomeAction.ErrorOccurred) -> Unit = mock()
 
@@ -75,7 +75,7 @@ internal class HomeInterceptorTest {
         val tag = genTag()
         val updateName = genBothify("update name: ????")
         val tagRepository: TagRepository = mock {
-            whenever(mock.updateName(tag, updateName)) doReturn Result.Success(Unit)
+            whenever(mock.updateName(tag.id, updateName)) doReturn Result.Success(Unit)
         }
 
         genHomeInterceptor(tagRepository = tagRepository)
@@ -83,7 +83,7 @@ internal class HomeInterceptorTest {
             .initState(genHomeUiStateSuccess(workflow = genHomeTagRenameWorkflow(tag = tag, renameText = updateName)))
             .action(HomeAction.OnTagRenameConfirmClicked)
             .dispatchIn(testScope = this)
-        verify(tagRepository, once()).updateName(tag, updateName)
+        verify(tagRepository, once()).updateName(tag.id, updateName)
     }
 
     @Test(expected = IllegalStateException::class)
@@ -103,7 +103,7 @@ internal class HomeInterceptorTest {
     fun `Delete tag, when tag delete confirmed`() = runTest {
         val tagDelete = genHomeTagDeleteConfig()
         val tagRepository: TagRepository = mock {
-            whenever(mock.delete(tagDelete.tag)) doReturn Result.Success(Unit)
+            whenever(mock.delete(tagDelete.tag.id)) doReturn Result.Success(Unit)
         }
 
         genHomeInterceptor(tagRepository = tagRepository)
@@ -111,7 +111,7 @@ internal class HomeInterceptorTest {
             .initState(genHomeUiStateSuccess(workflow = tagDelete))
             .action(HomeAction.OnTagDeleteConfirmClicked)
             .dispatchIn(testScope = this)
-        verify(tagRepository, once()).delete(tagDelete.tag)
+        verify(tagRepository, once()).delete(tagDelete.tag.id)
     }
 
     @Test(expected = IllegalStateException::class)
