@@ -34,7 +34,7 @@ internal sealed interface HomeAction : Action {
     ) : HomeAction
 
     @ContractUiAction
-    object CompleteWorkflow : HomeAction
+    data object CompleteWorkflow : HomeAction
 
     @ContractUiAction
     data class UserMessageShown(val shownMessage: UserMessage) : HomeAction
@@ -43,10 +43,10 @@ internal sealed interface HomeAction : Action {
     data class ErrorOccurred(val throwable: Throwable) : HomeAction
 
     @ContractUiAction
-    object OnTodayCategoryClicked : HomeAction
+    data object OnTodayCategoryClicked : HomeAction
 
     @ContractUiAction
-    object OnTimetableCategoryClicked : HomeAction
+    data object OnTimetableCategoryClicked : HomeAction
 
     @ContractUiAction
     object OnAllCategoryClicked : HomeAction
@@ -57,20 +57,20 @@ internal sealed interface HomeAction : Action {
     data class TagConfigMetadataLoaded(val tag: Tag, val usageCount: Long) : HomeAction
 
     @ContractUiAction
-    object OnTagRenameRequestClicked : HomeAction
+    data object OnTagRenameRequestClicked : HomeAction
 
     @ContractUiAction
-    object OnTagRenameInputKeyboardShown : HomeAction
+    data object OnTagRenameInputKeyboardShown : HomeAction
 
     @ContractUiAction
-    object OnTagRenameConfirmClicked : HomeAction
+    data object OnTagRenameConfirmClicked : HomeAction
 
     @ContractUiAction
     data class OnTagRenameInputted(val text: String) : HomeAction
 
     @ContractUiAction
-    object OnTagDeleteRequestClicked : HomeAction
+    data object OnTagDeleteRequestClicked : HomeAction
 
     @ContractUiAction
-    object OnTagDeleteConfirmClicked : HomeAction
+    data object OnTagDeleteConfirmClicked : HomeAction
 }

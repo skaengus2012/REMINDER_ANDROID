@@ -113,7 +113,7 @@ class InsertDummyInfoToDatabaseMacro {
     }
 
     private suspend fun resetTagEntities() {
-        tagDao.find().first().forEach { tagDao.delete(it) }
+        tagDao.getAsStream().first().forEach { tagDao.deleteById(it.tagId) }
         inputTagEntities.forEach { tagDao.insert(it) }
     }
 
@@ -132,7 +132,7 @@ class InsertDummyInfoToDatabaseMacro {
     }
 
     private suspend fun resetScheduleTagList() {
-        val tagEntities = tagDao.find().first()
+        val tagEntities = tagDao.getAsStream().first()
         scheduleDao.findByCompleteAsStream(isComplete = false)
             .first()
             .map { it.scheduleEntity }

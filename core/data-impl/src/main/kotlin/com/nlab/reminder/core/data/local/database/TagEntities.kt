@@ -23,6 +23,5 @@ import com.nlab.reminder.core.local.database.TagEntity
 /**
  * @author Doohyun
  */
-internal fun Tag.toEntity(): TagEntity = TagEntity(id.value, name)
 internal fun TagEntity.toModel(): Tag = Tag(TagId(tagId), name)
 internal fun List<TagEntity>.toModels(): List<Tag> = map(TagEntity::toModel)

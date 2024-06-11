@@ -16,9 +16,9 @@
 
 package com.nlab.reminder.core.data.repository.impl
 
-import com.nlab.reminder.core.data.local.database.toEntity
 import com.nlab.reminder.core.data.local.database.toModels
 import com.nlab.reminder.core.data.model.Tag
+import com.nlab.reminder.core.data.model.TagId
 import com.nlab.reminder.core.data.repository.TagRepository
 import com.nlab.reminder.core.kotlinx.coroutine.flow.map
 import com.nlab.reminder.core.kotlin.Result
@@ -35,17 +35,17 @@ class LocalTagRepository(
     private val tagDao: TagDao,
     private val scheduleTagListDao: ScheduleTagListDao
 ) : TagRepository {
-    override fun getStream(): Flow<List<Tag>> = tagDao.find().map { it.toModels() }
+    override fun getStream(): Flow<List<Tag>> = tagDao.getAsStream().map { it.toModels() }
 
-    override suspend fun getUsageCount(tag: Tag): Result<Long> = catching {
-        scheduleTagListDao.findTagUsageCount(tagId = tag.id.value)
+    override suspend fun getUsageCount(id: TagId): Result<Long> = catching {
+        scheduleTagListDao.findTagUsageCount(tagId = id.value)
     }
 
-    override suspend fun updateName(tag: Tag, name: String): Result<Unit> = catching {
-        tagDao.update(TagEntity(tagId = tag.id.value, name = name))
+    override suspend fun updateName(id: TagId, name: String): Result<Unit> = catching {
+        tagDao.update(TagEntity(tagId = id.value, name = name))
     }
 
-    override suspend fun delete(tag: Tag): Result<Unit> = catching {
-        tagDao.delete(tag.toEntity())
+    override suspend fun delete(id: TagId): Result<Unit> = catching {
+        tagDao.deleteById(id.value)
     }
 }

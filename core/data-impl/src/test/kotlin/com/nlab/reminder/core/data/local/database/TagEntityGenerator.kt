@@ -14,31 +14,13 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.local.database
+package com.nlab.reminder.core.data.local.database
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.Query
-import androidx.room.Update
-import kotlinx.coroutines.flow.Flow
+import com.nlab.reminder.core.data.model.Tag
+import com.nlab.reminder.core.local.database.TagEntity
 
 /**
  * @author Doohyun
  */
-@Dao
-interface TagDao {
-    @Insert
-    suspend fun insert(tag: TagEntity): Long
-
-    @Update
-    suspend fun update(tag: TagEntity)
-
-    @Query("DELETE FROM tag WHERE tag_id = :tagId")
-    suspend fun deleteById(tagId: Long)
-
-    @Query("SELECT * FROM tag")
-    fun getAsStream(): Flow<List<TagEntity>>
-
-    @Query("SELECT * FROM tag WHERE tag_id IN (:tagIds)")
-    fun findByIdsAsStream(tagIds: List<Long>): Flow<TagEntity>
-}
+internal fun Tag.toEntity(): TagEntity = TagEntity(id.value, name)
+internal fun List<Tag>.toEntities(): List<TagEntity> = map { it.toEntity() }
