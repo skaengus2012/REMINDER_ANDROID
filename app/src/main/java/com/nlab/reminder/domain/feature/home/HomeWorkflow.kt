@@ -16,7 +16,7 @@
 
 package com.nlab.reminder.domain.feature.home
 
-import com.nlab.reminder.core.annotation.test.ExcludeFromGeneratedTestReport
+import com.nlab.reminder.core.annotation.test.ExcludeGeneratedFromTestReport
 import com.nlab.reminder.core.data.model.Tag
 
 /**
@@ -28,13 +28,13 @@ internal sealed interface HomeWorkflow {
     data object TimetableSchedule : HomeWorkflow
     data object AllSchedule : HomeWorkflow
 
-    @ExcludeFromGeneratedTestReport
+    @ExcludeGeneratedFromTestReport
     data class TagConfig(
         val tag: Tag,
         val usageCount: Long
     ) : HomeWorkflow
 
-    @ExcludeFromGeneratedTestReport
+    @ExcludeGeneratedFromTestReport
     data class TagRename(
         val tag: Tag,
         val usageCount: Long,
@@ -42,7 +42,7 @@ internal sealed interface HomeWorkflow {
         val shouldKeyboardShown: Boolean
     ) : HomeWorkflow
 
-    @ExcludeFromGeneratedTestReport
+    @ExcludeGeneratedFromTestReport
     data class TagDelete(
         val tag: Tag,
         val usageCount: Long

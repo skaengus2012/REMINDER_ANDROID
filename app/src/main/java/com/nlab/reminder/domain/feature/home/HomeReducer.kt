@@ -17,7 +17,7 @@
 package com.nlab.reminder.domain.feature.home
 
 import com.nlab.reminder.R
-import com.nlab.reminder.core.annotation.test.ExcludeFromGeneratedTestReport
+import com.nlab.reminder.core.annotation.test.ExcludeGeneratedFromTestReport
 import com.nlab.reminder.core.annotation.test.TestCompleted
 import com.nlab.reminder.core.state.UserMessage
 import com.nlab.reminder.core.state.userMessageShown
@@ -113,13 +113,13 @@ internal class HomeReducer @Inject constructor() : DomainReducer by buildDslRedu
     }
 })
 
-@ExcludeFromGeneratedTestReport
+@ExcludeGeneratedFromTestReport
 @TestCompleted
 private inline fun HomeUiState.Success.mapIfWorkflowEmpty(
     transform: (HomeUiState.Success) -> HomeUiState
 ): HomeUiState = if (workflow is HomeWorkflow.Empty) transform(this) else this
 
-@ExcludeFromGeneratedTestReport
+@ExcludeGeneratedFromTestReport
 @TestCompleted
 private inline fun HomeUiState.Success.mapIfTagExists(
     target: Tag,
@@ -128,7 +128,7 @@ private inline fun HomeUiState.Success.mapIfTagExists(
     if (target in tags) transform(this)
     else copy(userMessages = userMessages + UserMessage(R.string.tag_not_exist))
 
-@ExcludeFromGeneratedTestReport
+@ExcludeGeneratedFromTestReport
 @TestCompleted
 private inline fun <reified T : HomeWorkflow> HomeUiState.Success.mapIfWorkflowMatches(
     transform: (old: HomeUiState.Success, workflow: T) -> HomeUiState

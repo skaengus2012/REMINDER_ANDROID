@@ -16,11 +16,13 @@
 
 package com.nlab.reminder.core.data.model
 
+import com.nlab.reminder.core.annotation.test.ExcludeGeneratedFromTestReport
 import kotlinx.collections.immutable.ImmutableList
 
 /**
  * @author Doohyun
  */
+@ExcludeGeneratedFromTestReport
 data class Schedule(
     val id: ScheduleId,
     val title: String,
