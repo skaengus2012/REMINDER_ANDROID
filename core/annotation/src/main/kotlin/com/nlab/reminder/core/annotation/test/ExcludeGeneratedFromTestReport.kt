@@ -30,4 +30,4 @@ package com.nlab.reminder.core.annotation.test
     AnnotationTarget.FUNCTION,
     AnnotationTarget.CONSTRUCTOR
 )
-annotation class ExcludeFromGeneratedTestReport
+annotation class ExcludeGeneratedFromTestReport

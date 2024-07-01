@@ -16,7 +16,10 @@
 
 package com.nlab.reminder.core.data.model
 
+import com.nlab.reminder.core.annotation.test.ExcludeGeneratedFromTestReport
+
 /**
  * @author thalys
  */
+@ExcludeGeneratedFromTestReport
 data class LinkMetadata(val title: String, val imageUrl: String)

@@ -21,4 +21,11 @@ internal class TagIdTest {
         val actual = TagId.Empty
         assertThat(actual, equalTo(expected))
     }
+
+    @Test
+    fun `Given number greater than zero, When constructed, Than created TagId`() {
+        val given = genLongGreaterThanZero()
+        val id = TagId(given)
+        assert(id.value == given)
+    }
 }

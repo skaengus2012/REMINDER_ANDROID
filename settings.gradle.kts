@@ -58,7 +58,6 @@ include(
     ":core:annotation-android",
     ":core:data",
     ":core:data-di",
-    ":core:data-ext",
     ":core:data-impl",
     ":core:data-test",
     ":core:designsystem",
