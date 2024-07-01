@@ -63,9 +63,8 @@ fun genBlank(count: Int = genInt(min = 2, max = 10)): String = List(count) { ' '
 fun genLong(min: Long = 0, max: Long = 9999999): Long = f.number().numberBetween(min, max)
 
 /**
- * Create a number using the [min]..[max]
+ * Create a number using the 1..[max]
  *
- * @param min Minimum value for randomValue.
  * @param max Maximum value for randomValue.
  * @return random double type number.
  */
@@ -81,9 +80,8 @@ fun genLongGreaterThanZero(max: Int = 9999): Long = genInt(min = 1, max).toLong(
 fun genInt(min: Int = 0, max: Int = 9999): Int = f.number().numberBetween(min, max)
 
 /**
- * Create a number using the [min]..[max]
+ * Create a number using the 1..[max]
  *
- * @param min Minimum value for randomValue.
  * @param max Maximum value for randomValue.
  * @return random double type number.
  */

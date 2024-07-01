@@ -72,18 +72,19 @@ internal class HomeInterceptorTest {
 
     @Test
     fun `update tag name, when tag rename confirmed`() = runTest {
-        val tag = genTag()
-        val updateName = genBothify("update name: ????")
+        val origin = genTag(name = genBothify("update name: ????"))
+        val name = genBothify("update name: ????")
+        val input = genTag(id = origin.id, name = name)
         val tagRepository: TagRepository = mock {
-            whenever(mock.updateName(tag.id, updateName)) doReturn Result.Success(Unit)
+            whenever(mock.save(input)) doReturn Result.Success(input)
         }
 
         genHomeInterceptor(tagRepository = tagRepository)
             .scenario()
-            .initState(genHomeUiStateSuccess(workflow = genHomeTagRenameWorkflow(tag = tag, renameText = updateName)))
+            .initState(genHomeUiStateSuccess(workflow = genHomeTagRenameWorkflow(tag = origin, renameText = name)))
             .action(HomeAction.OnTagRenameConfirmClicked)
             .dispatchIn(testScope = this)
-        verify(tagRepository, once()).updateName(tag.id, updateName)
+        verify(tagRepository, once()).save(input)
     }
 
     @Test(expected = IllegalStateException::class)

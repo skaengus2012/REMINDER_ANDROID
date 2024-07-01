@@ -28,4 +28,4 @@ fun genTagId(value: Long = genLongGreaterThanZero()) = TagId(value)
 fun genTag(id: TagId = genTagId(), name: String = genBothify()) = Tag(id, name)
 
 fun genTags(count: Int = genInt(min = 5, max = 10)): List<Tag> =
-    List(count) { index -> genTag(genTagId(index.toLong())) }.distinctBy { it.name }
+    List(count) { index -> genTag(genTagId(index.toLong() + 1)) }.distinctBy { it.name }

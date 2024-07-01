@@ -16,6 +16,7 @@
 
 package com.nlab.reminder.core.data.repository.impl
 
+import com.nlab.reminder.core.data.local.database.toModel
 import com.nlab.reminder.core.data.local.database.toModels
 import com.nlab.reminder.core.data.model.Tag
 import com.nlab.reminder.core.data.model.TagId
@@ -35,17 +36,27 @@ class LocalTagRepository(
     private val tagDao: TagDao,
     private val scheduleTagListDao: ScheduleTagListDao
 ) : TagRepository {
+    override suspend fun save(tag: Tag): Result<Tag> = catching {
+        val savedTagId = saveAndGetTagId(tag)
+        val curTag = tagDao.findById(tagId = savedTagId.value) ?: throw IllegalStateException("Tag was empty")
+        return@catching curTag.toModel()
+    }
+
+    private suspend fun saveAndGetTagId(tag: Tag): TagId {
+        val id: Long = when (tag.id) {
+            TagId.Empty -> tagDao.insert(TagEntity(name = tag.name))
+            else -> tag.id.value.also { tagDao.update(TagEntity(tagId = it, name = tag.name)) }
+        }
+        return TagId(id)
+    }
+
+    override suspend fun delete(id: TagId) = catching {
+        tagDao.deleteById(id.value)
+    }
+
     override fun getStream(): Flow<List<Tag>> = tagDao.getAsStream().map { it.toModels() }
 
     override suspend fun getUsageCount(id: TagId): Result<Long> = catching {
         scheduleTagListDao.findTagUsageCount(tagId = id.value)
-    }
-
-    override suspend fun updateName(id: TagId, name: String): Result<Unit> = catching {
-        tagDao.update(TagEntity(tagId = id.value, name = name))
-    }
-
-    override suspend fun delete(id: TagId): Result<Unit> = catching {
-        tagDao.deleteById(id.value)
     }
 }
