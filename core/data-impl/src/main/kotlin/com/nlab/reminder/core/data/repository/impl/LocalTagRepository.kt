@@ -16,10 +16,10 @@
 
 package com.nlab.reminder.core.data.repository.impl
 
-import com.nlab.reminder.core.data.local.database.toEntity
+import com.nlab.reminder.core.data.local.database.toModel
 import com.nlab.reminder.core.data.local.database.toModels
 import com.nlab.reminder.core.data.model.Tag
-import com.nlab.reminder.core.data.model.TagUsageCount
+import com.nlab.reminder.core.data.model.TagId
 import com.nlab.reminder.core.data.repository.TagRepository
 import com.nlab.reminder.core.kotlinx.coroutine.flow.map
 import com.nlab.reminder.core.kotlin.Result
@@ -36,17 +36,31 @@ class LocalTagRepository(
     private val tagDao: TagDao,
     private val scheduleTagListDao: ScheduleTagListDao
 ) : TagRepository {
-    override fun getStream(): Flow<List<Tag>> = tagDao.find().map { it.toModels() }
-
-    override suspend fun getUsageCount(tag: Tag): Result<TagUsageCount> = catching {
-        TagUsageCount(scheduleTagListDao.findTagUsageCount(tagId = tag.tagId))
+    override suspend fun save(tag: Tag): Result<Tag> = catching {
+        val savedTagId = saveAndGetTagId(tag)
+        val curTag = tagDao.findById(tagId = savedTagId.value) ?: throw IllegalStateException("Tag was empty")
+        return@catching curTag.toModel()
     }
 
-    override suspend fun updateName(tag: Tag, name: String): Result<Unit> = catching {
-        tagDao.update(TagEntity(tagId = tag.tagId, name = name))
+    private suspend fun saveAndGetTagId(tag: Tag): TagId {
+        val id: Long = when (tag.id) {
+            TagId.Empty -> tagDao.insert(TagEntity(name = tag.name))
+            else -> {
+                val targetId = tag.id.value
+                tagDao.update(TagEntity(tagId = targetId, name = tag.name))
+                targetId
+            }
+        }
+        return TagId(id)
     }
 
-    override suspend fun delete(tag: Tag): Result<Unit> = catching {
-        tagDao.delete(tag.toEntity())
+    override suspend fun delete(id: TagId) = catching {
+        tagDao.deleteById(id.value)
+    }
+
+    override fun getStream(): Flow<List<Tag>> = tagDao.getAsStream().map { it.toModels() }
+
+    override suspend fun getUsageCount(id: TagId): Result<Long> = catching {
+        scheduleTagListDao.findTagUsageCount(tagId = id.value)
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 The N's lab Open Source Project
+ * Copyright (C) 2024 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,23 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.data.model
+package com.nlab.reminder.domain.common.tag.ui
+
+import androidx.compose.runtime.Composable
 
 /**
- * // TODO After removal, replace with Long
- *
  * @author Doohyun
  */
+private const val MAX_PRESENTABLE_USAGE_COUNT = 1_000
+
 @JvmInline
-value class TagUsageCount(val value: Long)
+value class DisplayUsageCount(private val value: Long) {
+    @Composable
+    fun format(
+        transform: @Composable (count: Int) -> String,
+        transformWhenOverflow: @Composable (count: Int) -> String
+    ): String {
+        return if (value <= MAX_PRESENTABLE_USAGE_COUNT) transform(value.toInt())
+        else transformWhenOverflow(MAX_PRESENTABLE_USAGE_COUNT)
+    }
+}

@@ -4,7 +4,7 @@ plugins {
 }
 
 dependencies {
-    implementation(projects.core.dataExt)
+    implementation(projects.core.data)
     api(projects.core.schedule)
 
     testImplementation(projects.core.dataTest)

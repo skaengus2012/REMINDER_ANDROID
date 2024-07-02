@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import com.nlab.reminder.R
 import com.nlab.reminder.core.designsystem.compose.theme.ReminderTheme
 import com.nlab.reminder.core.data.model.Tag
+import com.nlab.reminder.core.data.model.TagId
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
@@ -77,7 +78,7 @@ internal fun TagTextsBox(
                 horizontalArrangement = Arrangement.spacedBy(14.dp, Alignment.Start)
             ) {
                 tags.forEach { tag ->
-                    key(tag.tagId) {
+                    key(tag.id) {
                         TagText(
                             text = tag.name,
                             modifier = Modifier.padding(vertical = 6.5.dp),
@@ -106,9 +107,9 @@ private fun TagTextsBoxPreview() {
     ReminderTheme {
         TagTextsBox(
             persistentListOf(
-                Tag(tagId = 1, name = "MyTag"),
-                Tag(tagId = 2, name = "YourTag"),
-                Tag(tagId = 3, name = "OurTag")
+                Tag(id = TagId(1), name = "MyTag"),
+                Tag(id = TagId(2), name = "YourTag"),
+                Tag(id = TagId(3), name = "OurTag")
             )
         )
     }

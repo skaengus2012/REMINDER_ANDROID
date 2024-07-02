@@ -16,7 +16,7 @@
 
 package com.nlab.reminder.core.data.repository.impl
 
-import com.nlab.reminder.core.annotation.test.ExcludeFromGeneratedTestReport
+import com.nlab.reminder.core.annotation.test.ExcludeGeneratedFromTestReport
 import com.nlab.reminder.core.data.model.Schedule
 import com.nlab.reminder.core.data.repository.ScheduleDeleteRequest
 import com.nlab.reminder.core.data.repository.ScheduleGetStreamRequest
@@ -35,15 +35,15 @@ import kotlinx.coroutines.flow.Flow
  * @author Doohyun
  */
 class LocalScheduleRepository(private val scheduleDao: ScheduleDao) : ScheduleRepository {
-    @ExcludeFromGeneratedTestReport
+    @ExcludeGeneratedFromTestReport
     override fun getTodaySchedulesCount(): Flow<Long> =
         FakeScheduleRepositoryDelegate.getTodaySchedulesCount()
 
-    @ExcludeFromGeneratedTestReport
+    @ExcludeGeneratedFromTestReport
     override fun getTimetableSchedulesCount(): Flow<Long> =
         FakeScheduleRepositoryDelegate.getTimetableSchedulesCount()
 
-    @ExcludeFromGeneratedTestReport
+    @ExcludeGeneratedFromTestReport
     override fun getAllSchedulesCount(): Flow<Long> =
         FakeScheduleRepositoryDelegate.getAllSchedulesCount()
 

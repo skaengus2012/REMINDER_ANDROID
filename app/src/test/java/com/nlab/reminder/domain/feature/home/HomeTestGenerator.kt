@@ -17,14 +17,13 @@
 package com.nlab.reminder.domain.feature.home
 
 import com.nlab.reminder.core.data.model.Tag
-import com.nlab.reminder.core.data.model.TagUsageCount
 import com.nlab.reminder.core.data.model.genTag
-import com.nlab.reminder.core.data.model.genTagUsageCount
 import com.nlab.reminder.core.data.model.genTags
 import com.nlab.reminder.core.state.UserMessage
 import com.nlab.testkit.faker.genBoolean
 import com.nlab.testkit.faker.genBothify
 import com.nlab.testkit.faker.genLong
+import com.nlab.testkit.faker.genLongGreaterThanZero
 import kotlinx.collections.immutable.toPersistentList
 import kotlin.reflect.KClass
 
@@ -49,12 +48,12 @@ internal fun genHomeUiStateSuccess(
 
 internal fun genHomeTagConfigWorkflow(
     tag: Tag = genTag(),
-    usageCount: TagUsageCount = genTagUsageCount(),
+    usageCount: Long = genLongGreaterThanZero(),
 ) = HomeWorkflow.TagConfig(tag, usageCount)
 
 internal fun genHomeTagRenameWorkflow(
     tag: Tag = genTag(),
-    usageCount: TagUsageCount = genTagUsageCount(),
+    usageCount: Long = genLongGreaterThanZero(),
     renameText: String = genBothify(),
     shouldKeyboardShown: Boolean = genBoolean()
 ) = HomeWorkflow.TagRename(tag, usageCount, renameText, shouldKeyboardShown)
@@ -62,7 +61,7 @@ internal fun genHomeTagRenameWorkflow(
 
 internal fun genHomeTagDeleteConfig(
     tag: Tag = genTag(),
-    usageCount: TagUsageCount = genTagUsageCount(),
+    usageCount: Long = genLongGreaterThanZero(),
 ) = HomeWorkflow.TagDelete(tag, usageCount)
 
 private fun genHomeWorkflowsExcludeEmpty(): List<HomeWorkflow> = listOf(

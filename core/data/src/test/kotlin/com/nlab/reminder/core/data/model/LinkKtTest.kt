@@ -1,4 +1,4 @@
-/*
+package com.nlab.reminder.core.data.model/*
  * Copyright (C) 2024 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,12 +14,8 @@
  * limitations under the License.
  */
 
-import com.nlab.reminder.core.data.model.Link
-import com.nlab.reminder.core.data.model.genLink
-import com.nlab.reminder.core.data.model.isEmpty
-import com.nlab.reminder.core.data.model.isNotEmpty
-import com.nlab.reminder.core.data.model.orEmpty
 import com.nlab.testkit.faker.genBlank
+import com.nlab.testkit.faker.genBothify
 import com.nlab.testkit.faker.genNumerify
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
@@ -52,7 +48,7 @@ class LinkKtTest {
         val nullInstance: Link? = null
         assertThat(nullInstance.orEmpty(), equalTo(Link.EMPTY))
 
-        val notNullInstance: Link = genLink()
+        val notNullInstance = Link(genBothify())
         assertThat(notNullInstance.orEmpty(), equalTo(notNullInstance))
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 The N's lab Open Source Project
+ * Copyright (C) 2024 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,21 +14,13 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.common.tag.ui
+package com.nlab.reminder.core.data.local.database
 
-import androidx.compose.runtime.Composable
-import com.nlab.reminder.core.data.model.TagUsageCount
+import com.nlab.reminder.core.data.model.Tag
+import com.nlab.reminder.core.local.database.TagEntity
 
 /**
  * @author Doohyun
  */
-private const val MAX_PRESENTABLE_USAGE_COUNT = 1_000
-
-@Composable
-fun TagUsageCount.mapToString(
-    transform: @Composable (count: Int) -> String,
-    transformWhenOverflow: @Composable (count: Int) -> String
-): String {
-    return if (value <= MAX_PRESENTABLE_USAGE_COUNT) transform(value.toInt())
-    else transformWhenOverflow(MAX_PRESENTABLE_USAGE_COUNT)
-}
+internal fun Tag.toEntity(): TagEntity = TagEntity(id.value, name)
+internal fun List<Tag>.toEntities(): List<TagEntity> = map { it.toEntity() }
