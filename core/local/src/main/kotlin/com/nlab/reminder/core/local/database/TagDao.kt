@@ -36,8 +36,8 @@ interface TagDao {
     @Query("DELETE FROM tag WHERE tag_id = :tagId")
     suspend fun deleteById(tagId: Long)
 
-    @Query("SELECT * FROM tag WHERE tag_id = :tagId")
-    suspend fun findById(tagId: Long): TagEntity?
+    @Query("SELECT * FROM tag WHERE tag_id IN (:tagIds)")
+    suspend fun findByIds(tagIds: List<Long>): List<TagEntity>
 
     @Query("SELECT * FROM tag WHERE name = :name")
     suspend fun findByName(name: String): TagEntity?

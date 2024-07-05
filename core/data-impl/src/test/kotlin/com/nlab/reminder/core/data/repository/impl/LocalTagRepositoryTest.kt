@@ -58,9 +58,11 @@ internal class LocalTagRepositoryTest {
         val expectedName = genBothify()
         val tagDao = mock<TagDao> {
             whenever(mock.insert(TagEntity(name = expectedName))) doReturn expectedNewId.value
-            whenever(mock.findById(tagId = expectedNewId.value)) doReturn TagEntity(
-                tagId = expectedNewId.value,
-                name = expectedName
+            whenever(mock.findByIds(listOf(expectedNewId.value))) doReturn listOf(
+                TagEntity(
+                    tagId = expectedNewId.value,
+                    name = expectedName
+                )
             )
         }
         val actualTag = genTagRepository(tagDao = tagDao)
@@ -74,7 +76,7 @@ internal class LocalTagRepositoryTest {
     fun `Given tag, When saved tag, dao called update`() = runTest {
         val expectedTag = genTag()
         val tagDao = mock<TagDao> {
-            whenever(mock.findById(tagId = expectedTag.id.value)) doReturn expectedTag.toEntity()
+            whenever(mock.findByIds(listOf(expectedTag.id.value))) doReturn listOf(expectedTag.toEntity())
         }
         val actualTag = genTagRepository(tagDao = tagDao)
             .save(expectedTag)
@@ -87,7 +89,7 @@ internal class LocalTagRepositoryTest {
     fun `Given tag saving is successful, but not found tag, When saved tag, throw exception`() = runTest {
         val expectedTag = genTag()
         val tagDao = mock<TagDao> {
-            whenever(mock.findById(tagId = expectedTag.id.value)) doReturn null
+            whenever(mock.findByIds(listOf(expectedTag.id.value))) doReturn emptyList()
         }
         genTagRepository(tagDao = tagDao)
             .save(expectedTag)

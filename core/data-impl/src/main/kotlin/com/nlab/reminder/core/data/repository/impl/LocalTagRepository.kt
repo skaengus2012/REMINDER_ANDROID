@@ -38,7 +38,9 @@ class LocalTagRepository(
 ) : TagRepository {
     override suspend fun save(tag: Tag): Result<Tag> = catching {
         val savedTagId = saveAndGetTagId(tag)
-        val curTag = tagDao.findById(tagId = savedTagId.value) ?: throw IllegalStateException("Tag was empty")
+        val curTag = tagDao.findByIds(tagIds = listOf(savedTagId.value))
+            .firstOrNull()
+            ?: throw IllegalStateException("Tag was empty")
         return@catching curTag.toModel()
     }
 
