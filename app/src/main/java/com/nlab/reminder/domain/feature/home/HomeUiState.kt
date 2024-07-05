@@ -18,7 +18,7 @@ package com.nlab.reminder.domain.feature.home
 
 import com.nlab.reminder.core.annotation.platform.Stable
 import com.nlab.reminder.core.state.UserMessage
-import com.nlab.reminder.core.annotation.test.ExcludeGeneratedFromTestReport
+import com.nlab.reminder.core.kotlin.annotation.Generated
 import com.nlab.reminder.core.data.model.Tag
 import com.nlab.statekit.State
 import kotlinx.collections.immutable.*
@@ -30,7 +30,7 @@ import kotlinx.collections.immutable.*
 internal sealed interface HomeUiState : State {
     data object Loading : HomeUiState
 
-    @ExcludeGeneratedFromTestReport
+    @Generated
     data class Success(
         val todayScheduleCount: Long,
         val timetableScheduleCount: Long,

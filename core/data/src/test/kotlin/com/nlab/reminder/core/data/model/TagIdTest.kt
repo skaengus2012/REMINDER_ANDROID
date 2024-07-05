@@ -1,8 +1,6 @@
 package com.nlab.reminder.core.data.model
 
 import com.nlab.testkit.faker.genLongGreaterThanZero
-import org.hamcrest.CoreMatchers.equalTo
-import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
 
 /**
@@ -10,20 +8,24 @@ import org.junit.Test
  */
 internal class TagIdTest {
     @Test(expected = IllegalArgumentException::class)
-    fun `When a value less then 0 is given, Then contract error occurred`() {
-        val given = -genLongGreaterThanZero()
-        TagId(value = given)
+    fun `Given zero, When created, Then the precondition failed`() {
+        TagId(0)
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun `Given value less than 0, When created, Then the precondition failed`() {
+        TagId(-genLongGreaterThanZero())
     }
 
     @Test
     fun `The created Empty objects are always equivalent`() {
         val expected = TagId.Empty
         val actual = TagId.Empty
-        assertThat(actual, equalTo(expected))
+        assert(actual == expected)
     }
 
     @Test
-    fun `Given number greater than zero, When constructed, Than created TagId`() {
+    fun `Given value greater than 0, When created, Than success`() {
         val given = genLongGreaterThanZero()
         val id = TagId(given)
         assert(id.value == given)

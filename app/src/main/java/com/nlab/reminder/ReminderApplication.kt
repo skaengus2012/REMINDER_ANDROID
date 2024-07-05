@@ -17,12 +17,12 @@
 package com.nlab.reminder
 
 import android.app.Application
-import com.nlab.reminder.core.annotation.test.ExcludeGeneratedFromTestReport
+import com.nlab.reminder.core.kotlin.annotation.Generated
 import dagger.hilt.android.HiltAndroidApp
 
 /**
  * @author Doohyun
  */
-@ExcludeGeneratedFromTestReport
+@Generated
 @HiltAndroidApp
 class ReminderApplication : Application()

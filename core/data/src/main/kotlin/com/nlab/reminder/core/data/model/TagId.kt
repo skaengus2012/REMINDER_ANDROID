@@ -16,14 +16,15 @@
 
 package com.nlab.reminder.core.data.model
 
-import com.nlab.reminder.core.annotation.test.ExcludeGeneratedFromTestReport
+import com.nlab.reminder.core.kotlin.annotation.Generated
+
 
 /**
  * [value] must be greater than 0. If you want to use a value of 0, use Empty.
  *
  * @author Doohyun
  */
-@ExcludeGeneratedFromTestReport
+@Generated
 @JvmInline
 value class TagId private constructor(val value: Long) {
     companion object {

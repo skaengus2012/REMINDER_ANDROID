@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.annotation.test
+package com.nlab.reminder.core.kotlin.annotation
 
 /**
  * Classes and methods annotated with annotation whose retention policy is runtime or class and
@@ -30,4 +30,4 @@ package com.nlab.reminder.core.annotation.test
     AnnotationTarget.FUNCTION,
     AnnotationTarget.CONSTRUCTOR
 )
-annotation class ExcludeGeneratedFromTestReport
+annotation class Generated

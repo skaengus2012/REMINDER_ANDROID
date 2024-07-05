@@ -16,10 +16,10 @@
 
 package com.nlab.reminder.core.data.model
 
-import com.nlab.reminder.core.annotation.test.ExcludeGeneratedFromTestReport
+import com.nlab.reminder.core.kotlin.annotation.Generated
 
 /**
  * @author Doohyun
  */
-@ExcludeGeneratedFromTestReport
+@Generated
 data class Tag(val id: TagId, val name: String)

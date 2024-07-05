@@ -16,7 +16,7 @@
 
 package com.nlab.reminder.core.data.repository
 
-import com.nlab.reminder.core.annotation.test.ExcludeGeneratedFromTestReport
+import com.nlab.reminder.core.kotlin.annotation.Generated
 import com.nlab.reminder.core.kotlin.Result
 import com.nlab.reminder.core.data.model.Schedule
 import com.nlab.reminder.core.data.model.ScheduleId
@@ -35,28 +35,28 @@ interface ScheduleRepository {
 }
 
 sealed class ScheduleGetStreamRequest private constructor() {
-    @ExcludeGeneratedFromTestReport
+    @Generated
     data object All : ScheduleGetStreamRequest()
 
-    @ExcludeGeneratedFromTestReport
+    @Generated
     data class ByComplete(val isComplete: Boolean) : ScheduleGetStreamRequest()
 }
 
 sealed class ScheduleUpdateRequest private constructor() {
-    @ExcludeGeneratedFromTestReport
+    @Generated
     data class Completes(val idToCompleteTable: Map<ScheduleId, Boolean>) : ScheduleUpdateRequest()
 
-    @ExcludeGeneratedFromTestReport
+    @Generated
     data class VisiblePriority(val idToVisiblePriorityTable: Map<ScheduleId, Long>) : ScheduleUpdateRequest()
 }
 
 sealed class ScheduleDeleteRequest private constructor() {
-    @ExcludeGeneratedFromTestReport
+    @Generated
     data class ByComplete(val isComplete: Boolean) : ScheduleDeleteRequest()
 
-    @ExcludeGeneratedFromTestReport
+    @Generated
     data class ById(val scheduleId: ScheduleId) : ScheduleDeleteRequest()
 
-    @ExcludeGeneratedFromTestReport
+    @Generated
     data class ByIds(val scheduleIds: Collection<ScheduleId>) : ScheduleDeleteRequest()
 }

@@ -16,7 +16,7 @@
 
 package com.nlab.reminder.core.data.repository.fake
 
-import com.nlab.reminder.core.annotation.test.ExcludeGeneratedFromTestReport
+import com.nlab.reminder.core.kotlin.annotation.Generated
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -26,7 +26,7 @@ import kotlinx.coroutines.flow.flowOf
  * TODO : Remove this class and Jacoco fake whitelist.
  * @author thalys
  */
-@ExcludeGeneratedFromTestReport
+@Generated
 @Deprecated("Fake method used")
 internal object FakeScheduleRepositoryDelegate {
     fun getTodaySchedulesCount(): Flow<Long> = flow {

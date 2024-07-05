@@ -17,7 +17,7 @@
 package com.nlab.reminder.domain.feature.home
 
 import com.nlab.reminder.core.state.UserMessage
-import com.nlab.reminder.core.annotation.test.ExcludeGeneratedFromTestReport
+import com.nlab.reminder.core.kotlin.annotation.Generated
 import com.nlab.reminder.core.data.model.Tag
 import com.nlab.statekit.Action
 import com.nlab.statekit.lifecycle.viewmodel.ContractUiAction
@@ -39,7 +39,7 @@ internal sealed interface HomeAction : Action {
     @ContractUiAction
     data class UserMessageShown(val shownMessage: UserMessage) : HomeAction
 
-    @ExcludeGeneratedFromTestReport
+    @Generated
     data class ErrorOccurred(val throwable: Throwable) : HomeAction
 
     @ContractUiAction

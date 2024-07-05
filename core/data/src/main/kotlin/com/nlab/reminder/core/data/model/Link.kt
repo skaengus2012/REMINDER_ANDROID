@@ -16,14 +16,14 @@
 
 package com.nlab.reminder.core.data.model
 
-import com.nlab.reminder.core.annotation.test.ExcludeGeneratedFromTestReport
+import com.nlab.reminder.core.kotlin.annotation.Generated
 
 /**
  * // TODO Convert Link to String
  *
  * @author thalys
  */
-@ExcludeGeneratedFromTestReport
+@Generated
 @JvmInline
 value class Link private constructor(val value: String) {
     companion object {

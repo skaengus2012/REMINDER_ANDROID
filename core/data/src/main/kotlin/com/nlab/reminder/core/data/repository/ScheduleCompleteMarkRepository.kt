@@ -16,7 +16,7 @@
 
 package com.nlab.reminder.core.data.repository
 
-import com.nlab.reminder.core.annotation.test.ExcludeGeneratedFromTestReport
+import com.nlab.reminder.core.kotlin.annotation.Generated
 import com.nlab.reminder.core.data.model.ScheduleId
 import kotlinx.coroutines.flow.StateFlow
 
@@ -29,6 +29,6 @@ interface ScheduleCompleteMarkRepository {
 }
 
 // TODO make test
-@ExcludeGeneratedFromTestReport
+@Generated
 fun ScheduleCompleteMarkRepository.getSnapshot(): Map<ScheduleId, Boolean> =
     getStream().value
