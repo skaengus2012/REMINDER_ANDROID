@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.Flow
 import com.nlab.reminder.core.kotlin.Result
 import com.nlab.reminder.core.data.model.Tag
 import com.nlab.reminder.core.data.model.TagId
+import com.nlab.reminder.core.kotlin.annotation.Generated
 
 /**
  * @author Doohyun
@@ -27,6 +28,16 @@ import com.nlab.reminder.core.data.model.TagId
 interface TagRepository {
     suspend fun save(tag: Tag): Result<Tag>
     suspend fun delete(id: TagId): Result<Unit>
-    suspend fun getUsageCount(id: TagId): Result<Long>
+    suspend fun getTags(query: TagGetQuery): Result<List<Tag>>
     fun getStream(): Flow<List<Tag>>
+
+    suspend fun getUsageCount(id: TagId): Result<Long>
+}
+
+sealed class TagGetQuery private constructor() {
+    @Generated
+    data object All : TagGetQuery()
+
+    @Generated
+    data class ByIds(val tagIds: List<TagId>) : TagGetQuery()
 }

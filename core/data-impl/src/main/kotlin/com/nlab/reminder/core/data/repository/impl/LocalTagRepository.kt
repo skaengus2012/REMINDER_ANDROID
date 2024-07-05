@@ -20,10 +20,12 @@ import com.nlab.reminder.core.data.local.database.toModel
 import com.nlab.reminder.core.data.local.database.toModels
 import com.nlab.reminder.core.data.model.Tag
 import com.nlab.reminder.core.data.model.TagId
+import com.nlab.reminder.core.data.repository.TagGetQuery
 import com.nlab.reminder.core.data.repository.TagRepository
 import com.nlab.reminder.core.kotlinx.coroutine.flow.map
 import com.nlab.reminder.core.kotlin.Result
 import com.nlab.reminder.core.kotlin.catching
+import com.nlab.reminder.core.kotlin.map
 import com.nlab.reminder.core.local.database.ScheduleTagListDao
 import com.nlab.reminder.core.local.database.TagDao
 import com.nlab.reminder.core.local.database.TagEntity
@@ -54,6 +56,15 @@ class LocalTagRepository(
 
     override suspend fun delete(id: TagId) = catching {
         tagDao.deleteById(id.value)
+    }
+
+    override suspend fun getTags(query: TagGetQuery): Result<List<Tag>> {
+        val tagEntities = when (query) {
+            // When outside the catch block, jacoco does not recognize. 😭
+            is TagGetQuery.All -> catching { tagDao.get() }
+            is TagGetQuery.ByIds -> catching { tagDao.findByIds(query.tagIds.map { it.value }) }
+        }
+        return tagEntities.map { it.toModels() }
     }
 
     override fun getStream(): Flow<List<Tag>> = tagDao.getAsStream().map { it.toModels() }

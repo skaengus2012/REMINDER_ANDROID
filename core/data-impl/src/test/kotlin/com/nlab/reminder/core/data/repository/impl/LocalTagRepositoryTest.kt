@@ -23,6 +23,7 @@ import com.nlab.reminder.core.data.model.TagId
 import com.nlab.reminder.core.data.model.genTag
 import com.nlab.reminder.core.data.model.genTagId
 import com.nlab.reminder.core.data.model.genTags
+import com.nlab.reminder.core.data.repository.TagGetQuery
 import com.nlab.reminder.core.data.repository.TagRepository
 import com.nlab.reminder.core.kotlin.Result
 import com.nlab.reminder.core.kotlin.getOrThrow
@@ -97,7 +98,24 @@ internal class LocalTagRepositoryTest {
     }
 
     @Test
-    fun `Get tags from dao`() {
+    fun `Get tags from dao`() = runTest {
+        val tags = genTags()
+        val tagEntities = tags.toEntities()
+
+        testGet(
+            tagDao = mock<TagDao> { whenever(mock.get()) doReturn tagEntities },
+            query = TagGetQuery.All,
+            expectedResult = tags
+        )
+        testGet(
+            tagDao = mock<TagDao> { whenever(mock.findByIds(tags.map { it.id.value })) doReturn tagEntities },
+            query = TagGetQuery.ByIds(tags.map { it.id }),
+            expectedResult = tags
+        )
+    }
+
+    @Test
+    fun `Get tags stream from dao`() {
         val tagDao: TagDao = mock {
             whenever(mock.getAsStream()) doReturn emptyFlow()
         }
@@ -181,3 +199,13 @@ private fun genTagRepository(
     tagDao: TagDao = mock(),
     scheduleTagListDao: ScheduleTagListDao = mock()
 ): TagRepository = LocalTagRepository(tagDao, scheduleTagListDao)
+
+private suspend fun testGet(
+    tagDao: TagDao,
+    query: TagGetQuery,
+    expectedResult: List<Tag>
+) {
+    val tagRepository = genTagRepository(tagDao = tagDao)
+    val actualTags = tagRepository.getTags(query)
+    assert(actualTags.getOrThrow() == expectedResult)
+}
