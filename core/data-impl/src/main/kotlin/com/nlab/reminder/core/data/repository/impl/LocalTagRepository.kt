@@ -58,6 +58,10 @@ class LocalTagRepository(
         tagDao.deleteById(id.value)
     }
 
+    override suspend fun getUsageCount(id: TagId): Result<Long> = catching {
+        scheduleTagListDao.findTagUsageCount(tagId = id.value)
+    }
+
     override suspend fun getTags(query: TagGetQuery): Result<List<Tag>> {
         val tagEntities = when (query) {
             // When outside the catch block, jacoco does not recognize. 😭
@@ -67,9 +71,11 @@ class LocalTagRepository(
         return tagEntities.map { it.toModels() }
     }
 
-    override fun getStream(): Flow<List<Tag>> = tagDao.getAsStream().map { it.toModels() }
-
-    override suspend fun getUsageCount(id: TagId): Result<Long> = catching {
-        scheduleTagListDao.findTagUsageCount(tagId = id.value)
+    override fun getTagsAsStream(query: TagGetQuery): Flow<List<Tag>> {
+        val entitiesFlow: Flow<List<TagEntity>> = when (query) {
+            is TagGetQuery.All -> tagDao.getAsStream()
+            is TagGetQuery.ByIds -> tagDao.findByIdsAsStream(query.tagIds.map { it.value })
+        }
+        return entitiesFlow.map { it.toModels() }
     }
 }

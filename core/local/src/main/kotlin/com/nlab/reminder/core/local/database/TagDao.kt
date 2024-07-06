@@ -42,12 +42,9 @@ interface TagDao {
     @Query("SELECT * FROM tag WHERE tag_id IN (:tagIds)")
     suspend fun findByIds(tagIds: List<Long>): List<TagEntity>
 
-    @Query("SELECT * FROM tag WHERE name = :name")
-    suspend fun findByName(name: String): TagEntity?
-
     @Query("SELECT * FROM tag")
     fun getAsStream(): Flow<List<TagEntity>>
 
     @Query("SELECT * FROM tag WHERE tag_id IN (:tagIds)")
-    fun findByIdsAsStream(tagIds: List<Long>): Flow<TagEntity>
+    fun findByIdsAsStream(tagIds: List<Long>): Flow<List<TagEntity>>
 }

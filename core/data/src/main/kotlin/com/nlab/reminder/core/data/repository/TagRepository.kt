@@ -28,10 +28,9 @@ import com.nlab.reminder.core.kotlin.annotation.Generated
 interface TagRepository {
     suspend fun save(tag: Tag): Result<Tag>
     suspend fun delete(id: TagId): Result<Unit>
-    suspend fun getTags(query: TagGetQuery): Result<List<Tag>>
-    fun getStream(): Flow<List<Tag>>
-
     suspend fun getUsageCount(id: TagId): Result<Long>
+    suspend fun getTags(query: TagGetQuery): Result<List<Tag>>
+    fun getTagsAsStream(query: TagGetQuery): Flow<List<Tag>>
 }
 
 sealed class TagGetQuery private constructor() {
