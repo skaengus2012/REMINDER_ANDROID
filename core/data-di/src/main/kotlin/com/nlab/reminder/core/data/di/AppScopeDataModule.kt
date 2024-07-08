@@ -35,6 +35,7 @@ import com.nlab.reminder.core.data.di.ScheduleDataOption.*
 import com.nlab.reminder.core.data.repository.CompletedScheduleShownRepository
 import com.nlab.reminder.core.data.repository.ScheduleRepository
 import com.nlab.reminder.core.data.repository.TagRepository
+import com.nlab.reminder.core.data.repository.impl.CachedTagRepository
 import com.nlab.reminder.core.data.repository.impl.CompletedScheduleShownRepositoryImpl
 import com.nlab.reminder.core.data.repository.impl.LocalLinkMetadataTableRepository
 import com.nlab.reminder.core.data.repository.impl.LocalScheduleRepository
@@ -100,11 +101,15 @@ internal class AppScopeDataModule {
     ): ScheduleRepository = LocalScheduleRepository(scheduleDao)
 
     @Provides
-    @Reusable
+    @Singleton
     fun provideTagRepository(
         tagDao: TagDao,
-        scheduleTagListDao: ScheduleTagListDao
-    ): TagRepository = LocalTagRepository(tagDao, scheduleTagListDao)
+        scheduleTagListDao: ScheduleTagListDao,
+        @AppScope applicationScope: CoroutineScope
+    ): TagRepository = CachedTagRepository(
+        internalRepository = LocalTagRepository(tagDao, scheduleTagListDao),
+        coroutineScope = applicationScope
+    )
 
     @Provides
     @Reusable
