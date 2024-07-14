@@ -31,6 +31,7 @@ import com.nlab.reminder.core.local.database.ScheduleTagListDao
 import com.nlab.reminder.core.local.database.TagDao
 import com.nlab.reminder.core.local.database.TagEntity
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emptyFlow
 
 /**
@@ -81,7 +82,7 @@ class LocalTagRepository(
         val entitiesFlow: Flow<List<TagEntity>> = when (query) {
             is TagGetQuery.All -> tagDao.getAsStream()
             is TagGetQuery.ByIds -> query.tagIds.mapTo(
-                transform = { ids -> tagDao.findByIdsAsStream(ids) },
+                transform = { ids -> tagDao.findByIdsAsStream(ids).distinctUntilChanged() },
                 onEmpty = { emptyFlow() }
             )
         }

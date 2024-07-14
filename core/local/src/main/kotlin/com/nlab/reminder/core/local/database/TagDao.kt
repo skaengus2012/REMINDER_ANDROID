@@ -19,6 +19,7 @@ package com.nlab.reminder.core.local.database
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 
@@ -45,6 +46,7 @@ interface TagDao {
     @Query("SELECT * FROM tag")
     fun getAsStream(): Flow<List<TagEntity>>
 
+    @Transaction
     @Query("SELECT * FROM tag WHERE tag_id IN (:tagIds)")
     fun findByIdsAsStream(tagIds: List<Long>): Flow<List<TagEntity>>
 }

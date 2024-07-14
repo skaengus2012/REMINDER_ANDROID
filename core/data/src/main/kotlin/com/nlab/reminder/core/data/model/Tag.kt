@@ -19,7 +19,14 @@ package com.nlab.reminder.core.data.model
 import com.nlab.reminder.core.kotlin.annotation.Generated
 
 /**
+ * @param id Id of tag. If you need to create a Tag, please refer to TagId.Empty.
+ * @param name Name cannot be blank
+ *
  * @author Doohyun
  */
 @Generated
-data class Tag(val id: TagId, val name: String)
+data class Tag(val id: TagId, val name: String) {
+    init {
+        require(name.isNotBlank())
+    }
+}
