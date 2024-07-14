@@ -16,22 +16,19 @@
 
 package com.nlab.reminder.core.data.model
 
-import com.nlab.reminder.core.kotlin.annotation.Generated
-
 
 /**
- * [value] must be greater than 0. If you want to use a value of 0, use Empty.
- *
  * @author Doohyun
  */
-@Generated
-@JvmInline
-value class TagId private constructor(val value: Long) {
-    companion object {
-        val Empty: TagId get() = TagId(value = 0)
-        operator fun invoke(value: Long): TagId {
+sealed class TagId private constructor() {
+    data object Empty : TagId()
+
+    /**
+     * [value] must be greater than 0. If you want to use a value of 0, use Empty.
+     */
+    data class Present(val value: Long) : TagId() {
+        init {
             require(value > 0) { "value must be greater than 0." }
-            return TagId(value)
         }
     }
 }

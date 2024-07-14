@@ -107,9 +107,9 @@ private fun TagTextsBoxPreview() {
     ReminderTheme {
         TagTextsBox(
             persistentListOf(
-                Tag(id = TagId(1), name = "MyTag"),
-                Tag(id = TagId(2), name = "YourTag"),
-                Tag(id = TagId(3), name = "OurTag")
+                Tag(id = TagId.Empty, name = "MyTag"),
+                Tag(id = TagId.Empty, name = "YourTag"),
+                Tag(id = TagId.Empty, name = "OurTag")
             )
         )
     }

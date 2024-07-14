@@ -17,10 +17,15 @@
 package com.nlab.reminder.core.data.local.database
 
 import com.nlab.reminder.core.data.model.Tag
+import com.nlab.reminder.core.data.model.requireTagIdValue
 import com.nlab.reminder.core.local.database.TagEntity
 
 /**
  * @author Doohyun
  */
-internal fun Tag.toEntity(): TagEntity = TagEntity(id.value, name)
+internal fun Tag.toEntity(): TagEntity = TagEntity(
+    tagId = requireTagIdValue(),
+    name = name
+)
+
 internal fun List<Tag>.toEntities(): List<TagEntity> = map { it.toEntity() }

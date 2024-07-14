@@ -407,8 +407,8 @@ private fun HomeContentPreview() {
             todayScheduleCount = 10,
             timetableScheduleCount = 20,
             allScheduleCount = 30,
-            tags = (0L..100)
-                .map { index -> Tag(id = TagId(index), name = "TagName $index") }
+            tags = (1L..100)
+                .map { index -> Tag(id = TagId.Empty, name = "TagName $index") }
                 .toImmutableList(),
             onTodayCategoryClicked = {},
             onTimetableCategoryClicked = {},
