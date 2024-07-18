@@ -18,7 +18,7 @@ package com.nlab.reminder.domain.feature.schedule.all
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nlab.reminder.core.kotlin.annotation.Generated
+import com.nlab.reminder.core.foundation.annotation.Generated
 import com.nlab.statekit.lifecycle.UiActionDispatchable
 import com.nlab.statekit.util.createStore
 import com.nlab.statekit.util.stateIn

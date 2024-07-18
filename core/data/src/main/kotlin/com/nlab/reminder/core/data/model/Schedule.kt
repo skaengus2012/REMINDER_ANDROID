@@ -16,7 +16,7 @@
 
 package com.nlab.reminder.core.data.model
 
-import com.nlab.reminder.core.kotlin.annotation.Generated
+import com.nlab.reminder.core.foundation.annotation.Generated
 import kotlinx.collections.immutable.ImmutableList
 
 /**

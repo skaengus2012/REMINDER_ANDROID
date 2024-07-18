@@ -17,7 +17,7 @@
 package com.nlab.reminder.domain.feature.home
 
 import com.nlab.reminder.core.state.UserMessage
-import com.nlab.reminder.core.kotlin.annotation.Generated
+import com.nlab.reminder.core.foundation.annotation.Generated
 import com.nlab.reminder.core.data.model.Tag
 import com.nlab.statekit.Action
 import com.nlab.statekit.lifecycle.viewmodel.ContractUiAction

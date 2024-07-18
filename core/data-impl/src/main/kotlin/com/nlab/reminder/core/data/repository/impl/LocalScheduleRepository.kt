@@ -16,7 +16,7 @@
 
 package com.nlab.reminder.core.data.repository.impl
 
-import com.nlab.reminder.core.kotlin.annotation.Generated
+import com.nlab.reminder.core.foundation.annotation.Generated
 import com.nlab.reminder.core.data.model.Schedule
 import com.nlab.reminder.core.data.repository.ScheduleDeleteRequest
 import com.nlab.reminder.core.data.repository.ScheduleGetStreamRequest

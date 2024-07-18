@@ -17,7 +17,7 @@
 package com.nlab.reminder
 
 import android.app.Application
-import com.nlab.reminder.core.kotlin.annotation.Generated
+import com.nlab.reminder.core.foundation.annotation.Generated
 import dagger.hilt.android.HiltAndroidApp
 
 /**

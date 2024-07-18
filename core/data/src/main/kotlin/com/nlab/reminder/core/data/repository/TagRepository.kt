@@ -20,7 +20,7 @@ import kotlinx.coroutines.flow.Flow
 import com.nlab.reminder.core.kotlin.Result
 import com.nlab.reminder.core.data.model.Tag
 import com.nlab.reminder.core.data.model.TagId
-import com.nlab.reminder.core.kotlin.annotation.Generated
+import com.nlab.reminder.core.foundation.annotation.Generated
 
 /**
  * @author Doohyun

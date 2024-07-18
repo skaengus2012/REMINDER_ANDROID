@@ -19,6 +19,7 @@ plugins {
 }
 
 dependencies {
+    implementation(projects.core.foundation)
     api(projects.core.kotlin)
 
     api(libs.kotlinx.collections.immutable)

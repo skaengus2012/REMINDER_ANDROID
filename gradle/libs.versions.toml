@@ -11,6 +11,7 @@ androidGradlePlugin = "8.5.0"
 androidxAnnotation = "1.8.0"
 androidxAppCompat = "1.7.0"
 androidxCardview = "1.0.0"
+androidxCollection = "1.4.1"
 androidxComposeBom = "2024.06.00"
 androidxComposeCompiler = "1.5.14"  # use in configureComposeAndroid AndroidCompose.kt
 androidxConstaintLayout = "2.1.4"
@@ -55,6 +56,7 @@ androidx-activity-compose = { group = "androidx.activity", name = "activity-comp
 androidx-annotation = { group = "androidx.annotation", name = "annotation", version.ref = "androidxAnnotation" }
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "androidxAppCompat" }
 androidx-cardview = { module = "androidx.cardview:cardview", version.ref = "androidxCardview" }
+androidx-collection = { module = "androidx.collection:collection", version.ref = "androidxCollection" }
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "androidxComposeBom" } # use in configureComposeAndroid AndroidCompose.kt
 androidx-compose-foundation = { group = "androidx.compose.foundation", name = "foundation" }
 androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }

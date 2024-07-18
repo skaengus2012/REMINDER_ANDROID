@@ -16,7 +16,7 @@
 
 package com.nlab.reminder.domain.feature.schedule.all
 
-import com.nlab.reminder.core.kotlin.annotation.Generated
+import com.nlab.reminder.core.foundation.annotation.Generated
 import com.nlab.reminder.core.annotation.platform.Stable
 import com.nlab.reminder.core.schedule.model.ScheduleElement
 import com.nlab.statekit.State

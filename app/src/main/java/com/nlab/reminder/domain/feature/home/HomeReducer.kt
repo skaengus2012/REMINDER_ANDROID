@@ -17,7 +17,7 @@
 package com.nlab.reminder.domain.feature.home
 
 import com.nlab.reminder.R
-import com.nlab.reminder.core.kotlin.annotation.Generated
+import com.nlab.reminder.core.foundation.annotation.Generated
 import com.nlab.reminder.core.annotation.test.TestCompleted
 import com.nlab.reminder.core.state.UserMessage
 import com.nlab.reminder.core.state.userMessageShown

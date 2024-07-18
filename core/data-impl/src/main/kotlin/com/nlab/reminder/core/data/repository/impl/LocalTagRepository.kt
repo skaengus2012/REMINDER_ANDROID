@@ -24,7 +24,7 @@ import com.nlab.reminder.core.data.repository.TagGetQuery
 import com.nlab.reminder.core.data.repository.TagRepository
 import com.nlab.reminder.core.kotlinx.coroutine.flow.map
 import com.nlab.reminder.core.kotlin.Result
-import com.nlab.reminder.core.kotlin.annotation.Generated
+import com.nlab.reminder.core.foundation.annotation.Generated
 import com.nlab.reminder.core.kotlin.catching
 import com.nlab.reminder.core.kotlin.map
 import com.nlab.reminder.core.local.database.ScheduleTagListDao

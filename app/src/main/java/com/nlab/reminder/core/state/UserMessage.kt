@@ -16,7 +16,7 @@
 package com.nlab.reminder.core.state
 
 import androidx.annotation.StringRes
-import com.nlab.reminder.core.kotlin.annotation.Generated
+import com.nlab.reminder.core.foundation.annotation.Generated
 import com.nlab.reminder.core.annotation.platform.Stable
 import kotlinx.collections.immutable.*
 
