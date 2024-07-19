@@ -21,11 +21,6 @@ import com.nlab.reminder.core.local.database.TagEntity
 /**
  * @author Doohyun
  */
-internal fun Tag.requireTagIdValue() = (id as TagId.Present).value
-
-internal fun Tag.toEntity() = TagEntity(
-    tagId = requireTagIdValue(),
-    name = name
-)
-
-internal fun List<Tag>.toEntities(): List<TagEntity> = map { it.toEntity() }
+abstract class TagFactory {
+    internal abstract fun create(entity: TagEntity): Tag
+}

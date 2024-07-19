@@ -39,7 +39,7 @@ import kotlinx.coroutines.flow.emptyFlow
  */
 class LocalTagRepository(
     private val tagDao: TagDao,
-    private val scheduleTagListDao: ScheduleTagListDao
+    private val scheduleTagListDao: ScheduleTagListDao,
 ) : TagRepository {
     override suspend fun save(tag: Tag): Result<Tag> = catching {
         val savedTagId = saveAndGetTagId(tag)

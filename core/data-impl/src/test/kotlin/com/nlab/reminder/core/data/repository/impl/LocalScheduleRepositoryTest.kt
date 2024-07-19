@@ -17,6 +17,7 @@
 package com.nlab.reminder.core.data.repository.impl
 
 import com.nlab.reminder.core.data.local.database.toEntity
+import com.nlab.reminder.core.data.model.toEntity
 import com.nlab.reminder.core.data.model.Schedule
 import com.nlab.reminder.core.data.model.genScheduleId
 import com.nlab.reminder.core.data.model.genSchedules

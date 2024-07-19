@@ -14,18 +14,19 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.data.model
+package com.nlab.reminder.core.data.model.impl
 
+import com.nlab.reminder.core.data.model.Tag
+import com.nlab.reminder.core.data.model.TagId
+import com.nlab.reminder.core.data.model.TagFactory
 import com.nlab.reminder.core.local.database.TagEntity
 
 /**
  * @author Doohyun
  */
-internal fun Tag.requireTagIdValue() = (id as TagId.Present).value
-
-internal fun Tag.toEntity() = TagEntity(
-    tagId = requireTagIdValue(),
-    name = name
-)
-
-internal fun List<Tag>.toEntities(): List<TagEntity> = map { it.toEntity() }
+class DefaultTagFactory : TagFactory() {
+    override fun create(entity: TagEntity): Tag = Tag(
+        id = TagId.Present(entity.tagId),
+        name = entity.name
+    )
+}

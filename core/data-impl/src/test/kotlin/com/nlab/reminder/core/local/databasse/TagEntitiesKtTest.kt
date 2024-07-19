@@ -16,7 +16,7 @@
 
 package com.nlab.reminder.core.local.databasse
 
-import com.nlab.reminder.core.data.local.database.toEntity
+import com.nlab.reminder.core.data.model.toEntity
 import com.nlab.reminder.core.data.local.database.toModel
 import com.nlab.reminder.core.data.local.database.toModels
 import com.nlab.reminder.core.data.model.genTag

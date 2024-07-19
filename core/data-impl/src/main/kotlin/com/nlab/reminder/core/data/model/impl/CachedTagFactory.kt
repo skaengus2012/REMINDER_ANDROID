@@ -14,18 +14,25 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.data.local.database
+package com.nlab.reminder.core.data.model.impl
 
 import com.nlab.reminder.core.data.model.Tag
-import com.nlab.reminder.core.data.model.requireTagIdValue
+import com.nlab.reminder.core.data.model.TagFactory
+import com.nlab.reminder.core.foundation.cache.CacheFactory
 import com.nlab.reminder.core.local.database.TagEntity
 
 /**
  * @author Doohyun
  */
-internal fun Tag.toEntity(): TagEntity = TagEntity(
-    tagId = requireTagIdValue(),
-    name = name
-)
+class CachedTagFactory(
+    internalFactory: TagFactory,
+    cacheFactory: CacheFactory,
+    maxSize: Int,
+) : TagFactory() {
+    private val cache = cacheFactory.create(
+        maxSize = maxSize,
+        createValueIfNeeded = internalFactory::create
+    )
 
-internal fun List<Tag>.toEntities(): List<TagEntity> = map { it.toEntity() }
+    override fun create(entity: TagEntity): Tag = cache[entity]
+}

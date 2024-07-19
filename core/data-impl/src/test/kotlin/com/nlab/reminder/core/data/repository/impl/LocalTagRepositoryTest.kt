@@ -16,7 +16,6 @@
 
 package com.nlab.reminder.core.data.repository.impl
 
-import com.nlab.reminder.core.data.local.database.*
 import com.nlab.reminder.core.data.model.*
 import com.nlab.reminder.core.data.repository.*
 import com.nlab.reminder.core.kotlin.*

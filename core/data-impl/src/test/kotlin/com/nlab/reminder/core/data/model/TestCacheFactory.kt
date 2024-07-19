@@ -16,16 +16,24 @@
 
 package com.nlab.reminder.core.data.model
 
-import com.nlab.reminder.core.local.database.TagEntity
+import com.nlab.reminder.core.foundation.cache.Cache
+import com.nlab.reminder.core.foundation.cache.CacheFactory
 
 /**
+ * Facade for using cacheFactory for testing.
+ * Currently expected to be used primarily in data-impl, added here.
+ * If you need to use it in another module, create `foundation-impl`!
+ *
  * @author Doohyun
  */
-internal fun Tag.requireTagIdValue() = (id as TagId.Present).value
-
-internal fun Tag.toEntity() = TagEntity(
-    tagId = requireTagIdValue(),
-    name = name
-)
-
-internal fun List<Tag>.toEntities(): List<TagEntity> = map { it.toEntity() }
+@Suppress("UNCHECKED_CAST")
+internal class TestCacheFactory(
+    private val transform: (key: Any) -> Any
+) : CacheFactory {
+    override fun <K : Any, V : Any> create(
+        maxSize: Int,
+        createValueIfNeeded: (K) -> V
+    ): Cache<K, V> = object : Cache<K, V> {
+        override fun get(key: K): V = transform(key) as V
+    }
+}
