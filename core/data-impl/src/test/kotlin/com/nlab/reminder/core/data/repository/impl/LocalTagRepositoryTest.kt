@@ -17,6 +17,7 @@
 package com.nlab.reminder.core.data.repository.impl
 
 import com.nlab.reminder.core.data.model.*
+import com.nlab.reminder.core.data.model.impl.DefaultTagFactory
 import com.nlab.reminder.core.data.repository.*
 import com.nlab.reminder.core.kotlin.*
 import com.nlab.reminder.core.local.database.*
@@ -191,8 +192,9 @@ internal class LocalTagRepositoryTest {
 
 private fun genTagRepository(
     tagDao: TagDao = mock(),
-    scheduleTagListDao: ScheduleTagListDao = mock()
-): TagRepository = LocalTagRepository(tagDao, scheduleTagListDao)
+    scheduleTagListDao: ScheduleTagListDao = mock(),
+    tagFactory: TagFactory = DefaultTagFactory()
+): TagRepository = LocalTagRepository(tagDao, scheduleTagListDao, tagFactory)
 
 private suspend fun testGet(
     tagDao: TagDao,

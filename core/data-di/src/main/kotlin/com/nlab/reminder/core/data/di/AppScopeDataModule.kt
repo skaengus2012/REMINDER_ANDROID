@@ -32,6 +32,8 @@ import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineDispatcher
 import timber.log.Timber
 import com.nlab.reminder.core.data.di.ScheduleDataOption.*
+import com.nlab.reminder.core.data.model.impl.CachedTagFactory
+import com.nlab.reminder.core.data.model.impl.DefaultTagFactory
 import com.nlab.reminder.core.data.repository.CompletedScheduleShownRepository
 import com.nlab.reminder.core.data.repository.ScheduleRepository
 import com.nlab.reminder.core.data.repository.TagRepository
@@ -42,6 +44,7 @@ import com.nlab.reminder.core.data.repository.impl.LocalTagRepository
 import com.nlab.reminder.core.di.coroutine.AppScope
 import com.nlab.reminder.core.di.coroutine.Dispatcher
 import com.nlab.reminder.core.di.coroutine.DispatcherOption.IO
+import com.nlab.reminder.core.foundation.cache.CacheFactory
 import com.nlab.reminder.core.local.database.LinkMetadataDao
 import com.nlab.reminder.core.local.database.ScheduleDao
 import com.nlab.reminder.core.local.database.ScheduleTagListDao
@@ -104,7 +107,16 @@ internal class AppScopeDataModule {
     fun provideTagRepository(
         tagDao: TagDao,
         scheduleTagListDao: ScheduleTagListDao,
-    ): TagRepository = LocalTagRepository(tagDao, scheduleTagListDao)
+        cacheFactory: CacheFactory,
+    ): TagRepository = LocalTagRepository(
+        tagDao,
+        scheduleTagListDao,
+        CachedTagFactory(
+            internalFactory = DefaultTagFactory(),
+            cacheFactory = cacheFactory,
+            maxSize = 1000
+        )
+    )
 
     @Provides
     @Reusable

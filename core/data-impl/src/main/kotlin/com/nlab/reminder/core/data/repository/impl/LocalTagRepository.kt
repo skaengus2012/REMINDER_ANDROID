@@ -16,9 +16,8 @@
 
 package com.nlab.reminder.core.data.repository.impl
 
-import com.nlab.reminder.core.data.local.database.toModel
-import com.nlab.reminder.core.data.local.database.toModels
 import com.nlab.reminder.core.data.model.Tag
+import com.nlab.reminder.core.data.model.TagFactory
 import com.nlab.reminder.core.data.model.TagId
 import com.nlab.reminder.core.data.repository.TagGetQuery
 import com.nlab.reminder.core.data.repository.TagRepository
@@ -40,13 +39,15 @@ import kotlinx.coroutines.flow.emptyFlow
 class LocalTagRepository(
     private val tagDao: TagDao,
     private val scheduleTagListDao: ScheduleTagListDao,
+    private val tagFactory: TagFactory,
 ) : TagRepository {
     override suspend fun save(tag: Tag): Result<Tag> = catching {
         val savedTagId = saveAndGetTagId(tag)
-        val curTag = tagDao.findByIds(tagIds = listOf(savedTagId))
+        val entity = tagDao
+            .findByIds(tagIds = listOf(savedTagId))
             .firstOrNull()
-            ?: throw IllegalStateException("Tag was empty")
-        return@catching curTag.toModel()
+            ?: error("Tag was empty")
+        return@catching tagFactory.create(entity)
     }
 
     private suspend fun saveAndGetTagId(tag: Tag): Long = when (val tagId = tag.id) {
@@ -75,7 +76,7 @@ class LocalTagRepository(
                 )
             }
         }
-        return tagEntities.map { it.toModels() }
+        return tagEntities.map { it.toModels(tagFactory) }
     }
 
     override fun getTagsAsStream(query: TagGetQuery): Flow<List<Tag>> {
@@ -86,7 +87,7 @@ class LocalTagRepository(
                 onEmpty = { emptyFlow() }
             )
         }
-        return entitiesFlow.map { it.toModels() }
+        return entitiesFlow.map { it.toModels(tagFactory) }
     }
 }
 
@@ -99,3 +100,5 @@ private inline fun <T> List<TagId>.mapTo(
     val ids = map { (it as TagId.Present).value }.distinct()
     return if (ids.isEmpty()) onEmpty() else transform(ids)
 }
+
+private fun List<TagEntity>.toModels(tagFactory: TagFactory): List<Tag> = map(tagFactory::create)
