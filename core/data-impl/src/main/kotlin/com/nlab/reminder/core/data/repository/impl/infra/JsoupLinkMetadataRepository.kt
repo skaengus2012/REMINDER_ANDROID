@@ -39,19 +39,26 @@ private fun Element.toContent(): String = attr("content")
 class JsoupLinkMetadataRepository(private val dispatcher: CoroutineDispatcher) : LinkMetadataRepository {
     override suspend fun get(link: Link): Result<LinkMetadata> = withContext(dispatcher) {
         catching {
-            val tagNameToValues: Map<String, String> = buildMap {
-                Jsoup.connect(link.value)
-                    .get()
-                    .select("meta[property^=og:]")
-                    .asSequence()
-                    .filter { element -> element.toProperty() in TAGS_REQUIRED }
-                    .forEach { element -> put(element.toProperty(), element.toContent()) }
-            }
-
+            val tagNameToValues = Jsoup.connect(link.value)
+                .execute()
+                .streamParser()
+                .use { parser ->
+                    parser.selectFirst("head")
+                        ?.let { parseTagNameToValues(it) }
+                        ?: return@use emptyMap()
+                }
             LinkMetadata(
                 title = tagNameToValues[OG_TITLE] ?: "",
                 imageUrl = tagNameToValues[OG_IMAGE] ?: ""
             )
+        }
+    }
+
+    private fun parseTagNameToValues(headElement: Element): Map<String, String> = buildMap {
+        headElement.select("meta[property^=og:]").forEach { element ->
+            if (element.toProperty() in TAGS_REQUIRED) {
+                put(element.toProperty(), element.toContent())
+            }
         }
     }
 }
