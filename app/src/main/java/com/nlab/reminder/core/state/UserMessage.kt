@@ -16,7 +16,7 @@
 package com.nlab.reminder.core.state
 
 import androidx.annotation.StringRes
-import com.nlab.reminder.core.annotation.test.ExcludeFromGeneratedTestReport
+import com.nlab.reminder.core.foundation.annotation.Generated
 import com.nlab.reminder.core.annotation.platform.Stable
 import kotlinx.collections.immutable.*
 
@@ -25,7 +25,7 @@ import kotlinx.collections.immutable.*
  */
 @Stable
 sealed interface UserMessage {
-    @ExcludeFromGeneratedTestReport
+    @Generated
     @JvmInline
     value class ResIdValue(@StringRes val value: Int) : UserMessage
 }

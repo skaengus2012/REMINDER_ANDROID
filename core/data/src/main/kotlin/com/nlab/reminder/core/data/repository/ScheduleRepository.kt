@@ -16,6 +16,7 @@
 
 package com.nlab.reminder.core.data.repository
 
+import com.nlab.reminder.core.foundation.annotation.Generated
 import com.nlab.reminder.core.kotlin.Result
 import com.nlab.reminder.core.data.model.Schedule
 import com.nlab.reminder.core.data.model.ScheduleId
@@ -34,17 +35,28 @@ interface ScheduleRepository {
 }
 
 sealed class ScheduleGetStreamRequest private constructor() {
+    @Generated
     data object All : ScheduleGetStreamRequest()
+
+    @Generated
     data class ByComplete(val isComplete: Boolean) : ScheduleGetStreamRequest()
 }
 
 sealed class ScheduleUpdateRequest private constructor() {
+    @Generated
     data class Completes(val idToCompleteTable: Map<ScheduleId, Boolean>) : ScheduleUpdateRequest()
+
+    @Generated
     data class VisiblePriority(val idToVisiblePriorityTable: Map<ScheduleId, Long>) : ScheduleUpdateRequest()
 }
 
 sealed class ScheduleDeleteRequest private constructor() {
+    @Generated
     data class ByComplete(val isComplete: Boolean) : ScheduleDeleteRequest()
+
+    @Generated
     data class ById(val scheduleId: ScheduleId) : ScheduleDeleteRequest()
+
+    @Generated
     data class ByIds(val scheduleIds: Collection<ScheduleId>) : ScheduleDeleteRequest()
 }

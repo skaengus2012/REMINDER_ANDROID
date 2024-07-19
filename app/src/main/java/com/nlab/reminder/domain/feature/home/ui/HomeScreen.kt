@@ -52,9 +52,11 @@ import com.nlab.reminder.domain.common.android.widget.showToast
 import com.nlab.reminder.core.data.model.Tag
 import com.nlab.reminder.core.androidx.compose.ui.DelayedVisibleContent
 import com.nlab.reminder.core.androidx.compose.ui.rememberDelayedVisibleState
+import com.nlab.reminder.core.data.model.TagId
 import com.nlab.reminder.core.designsystem.compose.component.ReminderBottomSheet
 import com.nlab.reminder.domain.common.tag.ui.TagDeleteBottomSheetContent
 import com.nlab.reminder.domain.common.tag.ui.TagRenameDialog
+import com.nlab.reminder.domain.common.tag.ui.DisplayUsageCount
 import com.nlab.reminder.domain.feature.home.*
 import kotlinx.collections.immutable.*
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -328,7 +330,7 @@ private fun HomeWorkflowHandler(
         is HomeWorkflow.TagConfig -> {
             HomeTagConfigDialog(
                 tagName = workflow.tag.name,
-                usageCount = workflow.usageCount,
+                usageCount = DisplayUsageCount(workflow.usageCount),
                 onDismiss = completeWorkflow,
                 onRenameRequestClicked = onTagRenameRequestClicked,
                 onDeleteRequestClicked = onTagDeleteRequestClicked
@@ -339,7 +341,7 @@ private fun HomeWorkflowHandler(
             TagRenameDialog(
                 initText = workflow.renameText,
                 tagName = workflow.tag.name,
-                usageCount = workflow.usageCount,
+                usageCount = DisplayUsageCount(workflow.usageCount),
                 shouldKeyboardShown = workflow.shouldKeyboardShown,
                 onCancel = completeWorkflow,
                 onTextChanged = onTagRenameTextChanged,
@@ -361,7 +363,7 @@ private fun HomeWorkflowHandler(
             ) {
                 TagDeleteBottomSheetContent(
                     tagName = workflow.tag.name,
-                    usageCount = workflow.usageCount,
+                    usageCount = DisplayUsageCount(workflow.usageCount),
                     onCancelClicked = {
                         coroutineScope.launch {
                             sheetState.hide()
@@ -405,8 +407,8 @@ private fun HomeContentPreview() {
             todayScheduleCount = 10,
             timetableScheduleCount = 20,
             allScheduleCount = 30,
-            tags = (0L..100)
-                .map { index -> Tag(tagId = index, name = "TagName $index") }
+            tags = (1L..100)
+                .map { index -> Tag(id = TagId.Empty, name = "TagName $index") }
                 .toImmutableList(),
             onTodayCategoryClicked = {},
             onTimetableCategoryClicked = {},

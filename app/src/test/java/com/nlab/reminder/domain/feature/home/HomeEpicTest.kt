@@ -16,6 +16,7 @@
 
 package com.nlab.reminder.domain.feature.home
 
+import com.nlab.reminder.core.data.repository.TagGetQuery
 import com.nlab.statekit.middleware.epic.scenario
 import kotlinx.coroutines.flow.flowOf
 import org.junit.Test
@@ -32,7 +33,7 @@ internal class HomeEpicTest {
         val uiState = genHomeUiStateSuccess()
 
         HomeEpic(
-            tagRepository = mock { whenever(mock.getStream()) doReturn flowOf(uiState.tags) },
+            tagRepository = mock { whenever(mock.getTagsAsStream(TagGetQuery.All)) doReturn flowOf(uiState.tags) },
             scheduleRepository = mock {
                 whenever(mock.getTodaySchedulesCount()) doReturn flowOf(uiState.todayScheduleCount)
                 whenever(mock.getTimetableSchedulesCount()) doReturn flowOf(uiState.timetableScheduleCount)

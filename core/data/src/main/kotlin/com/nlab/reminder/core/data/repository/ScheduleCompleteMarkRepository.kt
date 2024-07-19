@@ -16,6 +16,7 @@
 
 package com.nlab.reminder.core.data.repository
 
+import com.nlab.reminder.core.foundation.annotation.Generated
 import com.nlab.reminder.core.data.model.ScheduleId
 import kotlinx.coroutines.flow.StateFlow
 
@@ -27,5 +28,7 @@ interface ScheduleCompleteMarkRepository {
     fun add(scheduleId: ScheduleId, isComplete: Boolean)
 }
 
+// TODO make test
+@Generated
 fun ScheduleCompleteMarkRepository.getSnapshot(): Map<ScheduleId, Boolean> =
     getStream().value

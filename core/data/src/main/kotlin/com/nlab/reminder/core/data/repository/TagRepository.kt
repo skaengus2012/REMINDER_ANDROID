@@ -19,14 +19,24 @@ package com.nlab.reminder.core.data.repository
 import kotlinx.coroutines.flow.Flow
 import com.nlab.reminder.core.kotlin.Result
 import com.nlab.reminder.core.data.model.Tag
-import com.nlab.reminder.core.data.model.TagUsageCount
+import com.nlab.reminder.core.data.model.TagId
+import com.nlab.reminder.core.foundation.annotation.Generated
 
 /**
  * @author Doohyun
  */
 interface TagRepository {
-    fun getStream(): Flow<List<Tag>>
-    suspend fun getUsageCount(tag: Tag): Result<TagUsageCount>
-    suspend fun updateName(tag: Tag, name: String): Result<Unit>
-    suspend fun delete(tag: Tag): Result<Unit>
+    suspend fun save(tag: Tag): Result<Tag>
+    suspend fun delete(id: TagId): Result<Unit>
+    suspend fun getUsageCount(id: TagId): Result<Long>
+    suspend fun getTags(query: TagGetQuery): Result<List<Tag>>
+    fun getTagsAsStream(query: TagGetQuery): Flow<List<Tag>>
+}
+
+sealed class TagGetQuery private constructor() {
+    @Generated
+    data object All : TagGetQuery()
+
+    @Generated
+    data class ByIds(val tagIds: List<TagId>) : TagGetQuery()
 }

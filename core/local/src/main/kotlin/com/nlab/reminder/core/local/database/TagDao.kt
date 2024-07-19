@@ -17,9 +17,9 @@
 package com.nlab.reminder.core.local.database
 
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 
@@ -29,14 +29,24 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface TagDao {
     @Insert
-    suspend fun insert(tag: TagEntity): Long
-
-    @Delete
-    suspend fun delete(tag: TagEntity)
+    suspend fun insert(tagEntity: TagEntity): Long
 
     @Update
-    suspend fun update(tag: TagEntity)
+    suspend fun update(tagEntity: TagEntity)
+
+    @Query("DELETE FROM tag WHERE tag_id = :tagId")
+    suspend fun deleteById(tagId: Long)
 
     @Query("SELECT * FROM tag")
-    fun find(): Flow<List<TagEntity>>
+    suspend fun get(): List<TagEntity>
+
+    @Query("SELECT * FROM tag WHERE tag_id IN (:tagIds)")
+    suspend fun findByIds(tagIds: List<Long>): List<TagEntity>
+
+    @Query("SELECT * FROM tag")
+    fun getAsStream(): Flow<List<TagEntity>>
+
+    @Transaction
+    @Query("SELECT * FROM tag WHERE tag_id IN (:tagIds)")
+    fun findByIdsAsStream(tagIds: List<Long>): Flow<List<TagEntity>>
 }

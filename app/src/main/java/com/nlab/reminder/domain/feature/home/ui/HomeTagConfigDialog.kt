@@ -48,8 +48,7 @@ import com.nlab.reminder.R
 import com.nlab.reminder.core.designsystem.compose.component.ReminderDialog
 import com.nlab.reminder.core.androidx.compose.ui.throttle
 import com.nlab.reminder.core.designsystem.compose.theme.ReminderTheme
-import com.nlab.reminder.core.data.model.TagUsageCount
-import com.nlab.reminder.domain.common.tag.ui.mapToString
+import com.nlab.reminder.domain.common.tag.ui.DisplayUsageCount
 
 /**
  * @author Doohyun
@@ -57,7 +56,7 @@ import com.nlab.reminder.domain.common.tag.ui.mapToString
 @Composable
 internal fun HomeTagConfigDialog(
     tagName: String,
-    usageCount: TagUsageCount,
+    usageCount: DisplayUsageCount,
     onDismiss: () -> Unit = {},
     onRenameRequestClicked: () -> Unit = {},
     onDeleteRequestClicked: () -> Unit = {}
@@ -93,7 +92,7 @@ internal fun HomeTagConfigDialog(
                     .padding(top = 10.dp)
             )
             HomeTagConfigButton(
-                text = usageCount.mapToString(
+                text = usageCount.format(
                     transform = { count ->
                         pluralStringResource(R.plurals.tag_delete, count, count)
                     },
@@ -172,7 +171,7 @@ private fun HomeTagConfigDialogPreview() {
     ReminderTheme {
         HomeTagConfigDialog(
             tagName = "Hello HomeTag Config DialogPreview",
-            usageCount = TagUsageCount(1)
+            usageCount = DisplayUsageCount(1)
         )
     }
 }

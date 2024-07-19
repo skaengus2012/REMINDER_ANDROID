@@ -16,8 +16,11 @@
 
 package com.nlab.reminder.core.data.model
 
+import com.nlab.reminder.core.foundation.annotation.Generated
+
 /**
  * @author Doohyun
  */
+@Generated
 @JvmInline
 value class LinkMetadataTable(val value: Map<Link, LinkMetadata>)

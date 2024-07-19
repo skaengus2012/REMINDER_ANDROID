@@ -16,147 +16,202 @@
 
 package com.nlab.reminder.core.data.repository.impl
 
-import com.nlab.reminder.core.data.local.database.toEntity
-import com.nlab.reminder.core.data.model.Tag
-import com.nlab.reminder.core.data.model.TagUsageCount
-import com.nlab.reminder.core.data.model.genTag
-import com.nlab.reminder.core.data.model.genTags
-import com.nlab.reminder.core.data.repository.TagRepository
-import com.nlab.reminder.core.kotlin.Result
-import com.nlab.reminder.core.local.database.ScheduleTagListDao
-import com.nlab.reminder.core.local.database.TagDao
-import com.nlab.reminder.core.local.database.TagEntity
-import com.nlab.testkit.faker.genBothify
-import com.nlab.testkit.faker.genLong
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.drop
-import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flow
+import com.nlab.reminder.core.data.model.*
+import com.nlab.reminder.core.data.model.impl.DefaultTagFactory
+import com.nlab.reminder.core.data.repository.*
+import com.nlab.reminder.core.kotlin.*
+import com.nlab.reminder.core.local.database.*
+import com.nlab.testkit.faker.*
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
-import org.mockito.kotlin.any
-import org.mockito.kotlin.doReturn
-import org.mockito.kotlin.doThrow
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.once
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
+import org.mockito.kotlin.*
 
 /**
  * @author Doohyun
  */
 internal class LocalTagRepositoryTest {
     @Test
-    fun `Get tags from dao`() {
-        val tagDao: TagDao = mock {
-            whenever(mock.find()) doReturn emptyFlow()
+    fun `Given tag with empty tagId, When saved tag, dao called insert`() = runTest {
+        val expectedNewId = genTagId()
+        val expectedName = genBothify()
+        val tagDao = mock<TagDao> {
+            whenever(mock.insert(TagEntity(name = expectedName))) doReturn expectedNewId.value
+            whenever(mock.findByIds(listOf(expectedNewId.value))) doReturn listOf(
+                TagEntity(
+                    tagId = expectedNewId.value,
+                    name = expectedName
+                )
+            )
         }
-        genTagRepository(tagDao = tagDao).getStream()
-        verify(tagDao, once()).find()
+        val actualTag = genTagRepository(tagDao = tagDao)
+            .save(Tag(id = TagId.Empty, name = expectedName))
+            .getOrThrow()
+        verify(tagDao, once()).insert(TagEntity(name = expectedName))
+        assert(actualTag == genTag(expectedNewId, expectedName))
     }
 
     @Test
-    fun `Notify tag list when dao updated`() = runTest {
-        val firstTags: List<Tag> = listOf(genTag())
-        val secondTags: List<Tag> = genTags().sortedBy { it.name }.reversed()
-        val tagDao: TagDao = mock {
-            val mockFlow = flow {
-                emit(firstTags.toEntities())
-                emit(secondTags.toEntities())
-            }
-            whenever(mock.find()) doReturn mockFlow
+    fun `Given tag, When saved tag, dao called update`() = runTest {
+        val expectedTag = genTag()
+        val tagDao = mock<TagDao> {
+            whenever(mock.findByIds(listOf(expectedTag.requireTagIdValue()))) doReturn listOf(expectedTag.toEntity())
         }
-        val tagFlow: Flow<List<Tag>> = genTagRepository(tagDao = tagDao).getStream()
-        val actualTags = buildList<List<Tag>> {
-            repeat(times = 2) { index ->
-                this += tagFlow.drop(count = index).first()
-            }
+        val actualTag = genTagRepository(tagDao = tagDao)
+            .save(expectedTag)
+            .getOrThrow()
+        verify(tagDao, once()).update(expectedTag.toEntity())
+        assert(actualTag == expectedTag)
+    }
+
+    @Test(expected = IllegalStateException::class)
+    fun `Given tag saving is successful, but not found tag, When saved tag, throw exception`() = runTest {
+        val expectedTag = genTag()
+        val tagDao = mock<TagDao> {
+            whenever(mock.findByIds(listOf(expectedTag.requireTagIdValue()))) doReturn emptyList()
         }
-        assertThat(
-            actualTags,
-            equalTo(listOf(firstTags, secondTags))
+        genTagRepository(tagDao = tagDao)
+            .save(expectedTag)
+            .getOrThrow()
+    }
+
+    @Test
+    fun `Given presented tagId, When delete, Then dao called deleteById`() = runTest {
+        val id = genTagId()
+        val tagDao: TagDao = mock()
+
+        genTagRepository(tagDao = tagDao)
+            .delete(id)
+            .getOrThrow()
+        verify(tagDao, once()).deleteById(id.value)
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun `Given empty tagId, When delete, Then precondition failed`() = runTest {
+        val id = TagId.Empty
+
+        genTagRepository()
+            .delete(id)
+            .getOrThrow()
+    }
+
+    @Test
+    fun `Given presented tagId, When get tags, Then get from dao`() = runTest {
+        val tags = genTags()
+        val tagEntities = tags.toEntities()
+
+        testGet(
+            tagDao = mock<TagDao> { whenever(mock.get()) doReturn tagEntities },
+            query = TagGetQuery.All,
+            expectedResult = tags
+        )
+        testGet(
+            tagDao = mock<TagDao> { whenever(mock.findByIds(tags.map { it.requireTagIdValue() })) doReturn tagEntities },
+            query = TagGetQuery.ByIds(tags.map { it.id }),
+            expectedResult = tags
         )
     }
 
+    @Test(expected = IllegalArgumentException::class)
+    fun `Given get query with empty tagId, When get tags, Then precondition failed`() = runTest {
+        val query = TagGetQuery.ByIds(listOf(TagId.Empty))
+        genTagRepository()
+            .getTags(query)
+            .getOrThrow()
+    }
+
     @Test
-    fun `Repository get usage count from scheduleTagListDao`() = runTest {
+    fun `Given get query with empty tagId list, When get tags, Then return empty list`() = runTest {
+        val query = TagGetQuery.ByIds(emptyList())
+        val actualTagIds = genTagRepository()
+            .getTags(query)
+            .getOrThrow()
+        assert(actualTagIds.isEmpty())
+    }
+
+    @Test
+    fun `Given presented tagId, When get tags stream, Then get stream from dao`() = runTest {
+        val tags = genTags()
+        val tagEntities = tags.toEntities()
+
+        testGetAsStream(
+            tagDao = mock<TagDao> { whenever(mock.getAsStream()) doReturn flowOf(tagEntities) },
+            query = TagGetQuery.All,
+            expectedResult = tags
+        )
+
+        testGetAsStream(
+            tagDao = mock<TagDao> {
+                whenever(mock.findByIdsAsStream(tags.map { it.requireTagIdValue() })) doReturn flowOf(tagEntities)
+            },
+            query = TagGetQuery.ByIds(tags.map { it.id }),
+            expectedResult = tags
+        )
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun `Given get query with empty tagId, When get tags stream, Then precondition failed`() = runTest {
+        val query = TagGetQuery.ByIds(listOf(TagId.Empty))
+        genTagRepository()
+            .getTagsAsStream(query)
+            .first()
+    }
+
+    @Test
+    fun `Given get query with empty tagId list, When get tags stream, Then return empty flow`() = runTest {
+        val query = TagGetQuery.ByIds(emptyList())
+        val actualResult = genTagRepository()
+            .getTagsAsStream(query)
+            .firstOrNull()
+        assertThat(actualResult, equalTo(null))
+    }
+
+    @Test
+    fun `Given presented tagId, When get tag usage count, Then Get from dao`() = runTest {
+        val id = genTagId()
         val usageCount: Long = genLong()
-        val input: Tag = genTag()
         val scheduleTagListDao: ScheduleTagListDao = mock {
-            whenever(mock.findTagUsageCount(input.tagId)) doReturn usageCount
+            whenever(mock.findTagUsageCount(id.value)) doReturn usageCount
         }
-        val result = genTagRepository(scheduleTagListDao = scheduleTagListDao).getUsageCount(input)
+        val result = genTagRepository(scheduleTagListDao = scheduleTagListDao).getUsageCount(id)
 
         assertThat(
             result,
-            equalTo(Result.Success(TagUsageCount(usageCount)))
+            equalTo(Result.Success(usageCount))
         )
     }
 
-    @Test
-    fun `Repository return error when scheduleTagListDao occurred error while find by usage count`() = runTest {
-        val exception = RuntimeException()
-        val input: Tag = genTag()
-        val scheduleTagListDao: ScheduleTagListDao = mock { whenever(mock.findTagUsageCount(any())) doThrow exception }
-        val result = genTagRepository(scheduleTagListDao = scheduleTagListDao).getUsageCount(input)
-
-        assertThat(
-            result,
-            equalTo(Result.Failure(exception))
-        )
-    }
-
-    @Test
-    fun `TagDao updated when repository update name requested`() = runTest {
-        val name: String = genBothify()
-        val input: Tag = genTag()
-        val tagDao: TagDao = mock()
-
-        genTagRepository(tagDao = tagDao).updateName(input, name)
-        verify(tagDao, once()).update(TagEntity(input.tagId, name))
-    }
-
-    @Test
-    fun `TagDao return error when repository update name requested`() = runTest {
-        val exception = RuntimeException()
-        val tagDao: TagDao = mock { whenever(mock.update(any())) doThrow exception }
-        val result = genTagRepository(tagDao = tagDao).updateName(genTag(), genBothify())
-
-        assertThat(
-            result,
-            equalTo(Result.Failure(exception))
-        )
-    }
-
-    @Test
-    fun `TagDao delete tag when repository deleting requested`() = runTest {
-        val input: Tag = genTag()
-        val tagDao: TagDao = mock()
-
-        genTagRepository(tagDao = tagDao).delete(input)
-        verify(tagDao, once()).delete(input.toEntity())
-    }
-
-    @Test
-    fun `TagDao return error when repository deleting requested`() = runTest {
-        val exception = RuntimeException()
-        val input: Tag = genTag()
-        val tagDao: TagDao = mock { whenever(mock.delete(any())) doThrow exception }
-        val result = genTagRepository(tagDao = tagDao).delete(input)
-
-        assertThat(
-            result,
-            equalTo(Result.Failure(exception))
-        )
+    @Test(expected = IllegalArgumentException::class)
+    fun `Given empty tagId, When get tag usage count, Then precondition failed`() = runTest {
+        val id = TagId.Empty
+        genTagRepository().getUsageCount(id).getOrThrow()
     }
 }
 
 private fun genTagRepository(
     tagDao: TagDao = mock(),
-    scheduleTagListDao: ScheduleTagListDao = mock()
-): TagRepository = LocalTagRepository(tagDao, scheduleTagListDao)
+    scheduleTagListDao: ScheduleTagListDao = mock(),
+    tagFactory: TagFactory = DefaultTagFactory()
+): TagRepository = LocalTagRepository(tagDao, scheduleTagListDao, tagFactory)
 
-private fun List<Tag>.toEntities(): List<TagEntity> = map { it.toEntity() }
+private suspend fun testGet(
+    tagDao: TagDao,
+    query: TagGetQuery,
+    expectedResult: List<Tag>
+) {
+    val tagRepository = genTagRepository(tagDao = tagDao)
+    val actualTags = tagRepository.getTags(query)
+    assertThat(actualTags.getOrThrow(), equalTo(expectedResult))
+}
+
+private suspend fun testGetAsStream(
+    tagDao: TagDao,
+    query: TagGetQuery,
+    expectedResult: List<Tag>
+) {
+    val tagRepository = genTagRepository(tagDao = tagDao)
+    val actualTags = tagRepository.getTagsAsStream(query)
+    assertThat(actualTags.first(), equalTo(expectedResult))
+}

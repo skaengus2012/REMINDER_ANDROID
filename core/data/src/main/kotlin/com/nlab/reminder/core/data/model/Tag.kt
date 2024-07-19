@@ -16,7 +16,17 @@
 
 package com.nlab.reminder.core.data.model
 
+import com.nlab.reminder.core.foundation.annotation.Generated
+
 /**
+ * @param id Id of tag. If you need to create a Tag, please refer to TagId.Empty.
+ * @param name Name cannot be blank
+ *
  * @author Doohyun
  */
-data class Tag(val tagId: Long, val name: String)
+@Generated
+data class Tag(val id: TagId, val name: String) {
+    init {
+        require(name.isNotBlank())
+    }
+}
