@@ -50,27 +50,27 @@ internal class LocalTagRepositoryTest {
             .save(Tag(id = TagId.Empty, name = expectedName))
             .getOrThrow()
         verify(tagDao, once()).insert(TagEntity(name = expectedName))
-        assert(actualTag == genTag(expectedNewId, expectedName))
+        assertThat(actualTag, equalTo(genTag(expectedNewId, expectedName)))
     }
 
     @Test
     fun `Given tag, When saved tag, dao called update`() = runTest {
-        val expectedTag = genTag()
+        val (expectedTag, expectedEntity) = genTagAndEntity()
         val tagDao = mock<TagDao> {
-            whenever(mock.findByIds(listOf(expectedTag.requireTagIdValue()))) doReturn listOf(expectedTag.toEntity())
+            whenever(mock.findByIds(listOf(expectedEntity.tagId))) doReturn listOf(expectedEntity)
         }
         val actualTag = genTagRepository(tagDao = tagDao)
             .save(expectedTag)
             .getOrThrow()
-        verify(tagDao, once()).update(expectedTag.toEntity())
-        assert(actualTag == expectedTag)
+        verify(tagDao, once()).update(expectedEntity)
+        assertThat(actualTag, equalTo(expectedTag))
     }
 
     @Test(expected = IllegalStateException::class)
     fun `Given tag saving is successful, but not found tag, When saved tag, throw exception`() = runTest {
-        val expectedTag = genTag()
+        val (expectedTag, expectedEntity) = genTagAndEntity()
         val tagDao = mock<TagDao> {
-            whenever(mock.findByIds(listOf(expectedTag.requireTagIdValue()))) doReturn emptyList()
+            whenever(mock.findByIds(listOf(expectedEntity.tagId))) doReturn emptyList()
         }
         genTagRepository(tagDao = tagDao)
             .save(expectedTag)
@@ -99,18 +99,20 @@ internal class LocalTagRepositoryTest {
 
     @Test
     fun `Given presented tagId, When get tags, Then get from dao`() = runTest {
-        val tags = genTags()
-        val tagEntities = tags.toEntities()
-
+        val (expectedTag, expectedEntity) = genTagAndEntity()
+        val expectedTags = listOf(expectedTag)
+        val expectedEntities = listOf(expectedEntity)
         testGet(
-            tagDao = mock<TagDao> { whenever(mock.get()) doReturn tagEntities },
+            tagDao = mock<TagDao> { whenever(mock.get()) doReturn expectedEntities },
             query = TagGetQuery.All,
-            expectedResult = tags
+            expectedResult = listOf(expectedTag)
         )
         testGet(
-            tagDao = mock<TagDao> { whenever(mock.findByIds(tags.map { it.requireTagIdValue() })) doReturn tagEntities },
-            query = TagGetQuery.ByIds(tags.map { it.id }),
-            expectedResult = tags
+            tagDao = mock<TagDao> {
+                whenever(mock.findByIds(expectedEntities.map { it.tagId })) doReturn expectedEntities
+            },
+            query = TagGetQuery.ByIds(expectedTags.map { it.id }),
+            expectedResult = expectedTags
         )
     }
 
@@ -133,21 +135,22 @@ internal class LocalTagRepositoryTest {
 
     @Test
     fun `Given presented tagId, When get tags stream, Then get stream from dao`() = runTest {
-        val tags = genTags()
-        val tagEntities = tags.toEntities()
+        val (expectedTag, expectedEntity) = genTagAndEntity()
+        val expectedTags = listOf(expectedTag)
+        val expectedEntities = listOf(expectedEntity)
 
         testGetAsStream(
-            tagDao = mock<TagDao> { whenever(mock.getAsStream()) doReturn flowOf(tagEntities) },
+            tagDao = mock<TagDao> { whenever(mock.getAsStream()) doReturn flowOf(expectedEntities) },
             query = TagGetQuery.All,
-            expectedResult = tags
+            expectedResult = expectedTags
         )
 
         testGetAsStream(
             tagDao = mock<TagDao> {
-                whenever(mock.findByIdsAsStream(tags.map { it.requireTagIdValue() })) doReturn flowOf(tagEntities)
+                whenever(mock.findByIdsAsStream(expectedEntities.map { it.tagId })) doReturn flowOf(expectedEntities)
             },
-            query = TagGetQuery.ByIds(tags.map { it.id }),
-            expectedResult = tags
+            query = TagGetQuery.ByIds(expectedTags.map { it.id }),
+            expectedResult = expectedTags
         )
     }
 

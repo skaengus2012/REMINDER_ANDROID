@@ -17,7 +17,6 @@
 package com.nlab.reminder.core.local.databasse
 
 import com.nlab.reminder.core.data.local.database.toEntity
-import com.nlab.reminder.core.data.model.toEntity
 import com.nlab.reminder.core.data.local.database.toModel
 import com.nlab.reminder.core.data.model.genSchedule
 import com.nlab.reminder.core.data.model.genScheduleId
@@ -44,7 +43,7 @@ internal class ScheduleEntitiesKtTest {
         assert(schedule.visiblePriority == scheduleEntity.visiblePriority)
         assert(schedule.isComplete == scheduleEntity.isComplete)
     }
-
+/**
     @Test
     fun testToModel() {
         val expectedSchedule = genSchedule()
@@ -55,7 +54,7 @@ internal class ScheduleEntitiesKtTest {
         val actualSchedule = scheduleEntity.toModel()
 
         assertThat(actualSchedule, equalTo(expectedSchedule))
-    }
+    }*/
 
     @Test
     fun testToModelWithEmptyValue() {

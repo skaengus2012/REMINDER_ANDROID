@@ -17,8 +17,8 @@
 package com.nlab.reminder.core.data.repository.impl
 
 import com.nlab.reminder.core.data.local.database.toEntity
-import com.nlab.reminder.core.data.model.toEntity
 import com.nlab.reminder.core.data.model.Schedule
+import com.nlab.reminder.core.data.model.TagId
 import com.nlab.reminder.core.data.model.genScheduleId
 import com.nlab.reminder.core.data.model.genSchedules
 import com.nlab.reminder.core.data.repository.ScheduleDeleteRequest
@@ -27,6 +27,7 @@ import com.nlab.reminder.core.data.repository.ScheduleRepository
 import com.nlab.reminder.core.data.repository.ScheduleUpdateRequest
 import com.nlab.reminder.core.local.database.ScheduleDao
 import com.nlab.reminder.core.local.database.ScheduleEntityWithTagEntities
+import com.nlab.reminder.core.local.database.TagEntity
 import com.nlab.testkit.faker.genBoolean
 import com.nlab.testkit.faker.genInt
 import com.nlab.testkit.faker.genLong
@@ -53,7 +54,12 @@ internal class LocalScheduleRepositoryTest {
         val scheduleEntities = schedules.map { schedule ->
             ScheduleEntityWithTagEntities(
                 schedule.toEntity(),
-                schedule.tags.map { it.toEntity() }
+                schedule.tags.map {
+                    TagEntity(
+                        tagId = (it.id as TagId.Present).value, // TODO 임시처리
+                        name = it.name
+                    )
+                }
             )
         }
         val isComplete = genBoolean()

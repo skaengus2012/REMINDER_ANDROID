@@ -19,9 +19,9 @@ package com.nlab.reminder.core.data.local.database
 import com.nlab.reminder.core.data.model.Link
 import com.nlab.reminder.core.data.model.Schedule
 import com.nlab.reminder.core.data.model.ScheduleId
+import com.nlab.reminder.core.data.model.impl.DefaultTagFactory
 import com.nlab.reminder.core.local.database.ScheduleEntity
 import com.nlab.reminder.core.local.database.ScheduleEntityWithTagEntities
-import com.nlab.reminder.core.local.database.TagEntity
 import kotlinx.collections.immutable.toImmutableList
 
 /**
@@ -46,5 +46,5 @@ internal fun ScheduleEntityWithTagEntities.toModel(): Schedule = Schedule(
     link = Link.of(scheduleEntity.link),
     visiblePriority = scheduleEntity.visiblePriority,
     isComplete = scheduleEntity.isComplete,
-    tags = tagEntities.map(TagEntity::toModel).toImmutableList()
+    tags = tagEntities.map(DefaultTagFactory()::create).toImmutableList()
 )

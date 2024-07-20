@@ -1,7 +1,6 @@
 package com.nlab.reminder.core.data.model.impl
 
-import com.nlab.reminder.core.data.model.genTag
-import com.nlab.reminder.core.data.model.toEntity
+import com.nlab.reminder.core.data.model.genTagAndEntity
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
@@ -12,9 +11,9 @@ import org.junit.Test
 internal class DefaultTagFactoryTest {
     @Test
     fun testCreate() {
-        val expectedTag = genTag()
+        val (expectedTag, expectedEntity) = genTagAndEntity()
         val factory = DefaultTagFactory()
-        val actualTag = factory.create(expectedTag.toEntity())
+        val actualTag = factory.create(expectedEntity)
         assertThat(actualTag, equalTo(expectedTag))
     }
 }

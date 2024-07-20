@@ -27,5 +27,7 @@ fun genTagId(value: Long = genLongGreaterThanZero()) = TagId.Present(value)
 
 fun genTag(id: TagId = genTagId(), name: String = genBothify()) = Tag(id, name)
 
-fun genTags(count: Int = genInt(min = 5, max = 10)): List<Tag> =
-    List(count) { index -> genTag(genTagId(index.toLong() + 1)) }.distinctBy { it.name }
+fun genTags(count: Int = genInt(min = 5, max = 10)): List<Tag> = List(count) { index ->
+    val rawTagId = index.toLong() + 1
+    genTag(genTagId(rawTagId), name = "Tag-$rawTagId")
+}
