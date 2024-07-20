@@ -18,6 +18,19 @@ package com.nlab.reminder.core.data.model
 
 
 /**
+ * Identity of [Tag].
+ * If Tag exists status becomes [TagId.Present], and the value is greater than 0.
+ *
+ * If the conditions are not met, the [TagId.Empty] value must be used.
+ * If an Id has not yet been specified for Tag, [TagId.Empty] can be used.
+ *
+ * ```
+ * val tag = Tag(
+ *      id = TagId.Empty,
+ *      value = "My Tag"
+ * )
+ * ```
+ *
  * @author Doohyun
  */
 sealed class TagId private constructor() {

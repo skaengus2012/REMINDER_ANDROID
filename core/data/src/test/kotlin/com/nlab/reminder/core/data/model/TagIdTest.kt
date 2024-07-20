@@ -20,7 +20,7 @@ internal class TagIdTest {
     }
 
     @Test
-    fun `The created Empty objects are always equivalent`() {
+    fun `Empty objects are always equivalent`() {
         val expected = TagId.Empty
         val actual = TagId.Empty
         assert(actual == expected)

@@ -16,22 +16,23 @@
 
 package com.nlab.reminder.core.data.model
 
-import com.nlab.reminder.core.foundation.annotation.Generated
-
 /**
- * // TODO Convert Link to String
+ * If Link exists, the state becomes [Link.Present].
+ * [Link.Present] cannot be a blank value.
+ *
+ * If the conditions are not met, the [Link.Empty] value must be used.
  *
  * @author thalys
  */
-@Generated
-@JvmInline
-value class Link private constructor(val value: String) {
+sealed class Link private constructor() {
+    data object Empty : Link()
+    data class Present(val value: String) : Link() {
+        init {
+            require(value.isNotBlank())
+        }
+    }
+
     companion object {
-        val EMPTY = Link("")
-        operator fun invoke(value: String): Link = if (value.isBlank()) EMPTY else Link(value)
+        fun of(value: String): Link = if (value.isBlank()) Empty else Present(value)
     }
 }
-
-fun Link.isEmpty(): Boolean = value.isBlank()
-fun Link.isNotEmpty(): Boolean = isEmpty().not()
-fun Link?.orEmpty(): Link = this ?: Link.EMPTY

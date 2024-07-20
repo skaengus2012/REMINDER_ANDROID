@@ -21,4 +21,4 @@ import com.nlab.testkit.faker.genBothify
 /**
  * @author thalys
  */
-fun genLink(value: String = "https://${genBothify()}"): Link = Link(value)
+fun genLink(value: String = "https://${genBothify()}") = Link.Present(value)
