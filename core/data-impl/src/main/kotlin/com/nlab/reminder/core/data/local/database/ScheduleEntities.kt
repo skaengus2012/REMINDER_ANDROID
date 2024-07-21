@@ -31,7 +31,10 @@ internal fun Schedule.toEntity(): ScheduleEntity = ScheduleEntity(
     scheduleId = id.value,
     title = title,
     description = note,
-    link = link.value,
+    link = when (val typeLink = link) {
+        is Link.Present -> typeLink.value
+        is Link.Empty -> null
+    },
     visiblePriority = visiblePriority,
     isComplete = isComplete
 )
@@ -40,7 +43,7 @@ internal fun ScheduleEntityWithTagEntities.toModel(): Schedule = Schedule(
     id = ScheduleId(scheduleEntity.scheduleId),
     title = scheduleEntity.title,
     note = scheduleEntity.description.orEmpty(),
-    link = Link(scheduleEntity.link.orEmpty()),
+    link = Link.of(scheduleEntity.link),
     visiblePriority = scheduleEntity.visiblePriority,
     isComplete = scheduleEntity.isComplete,
     tags = tagEntities.map(TagEntity::toModel).toImmutableList()

@@ -33,6 +33,6 @@ sealed class Link private constructor() {
     }
 
     companion object {
-        fun of(value: String): Link = if (value.isBlank()) Empty else Present(value)
+        fun of(value: String?): Link = if (value.isNullOrBlank()) Empty else Present(value)
     }
 }

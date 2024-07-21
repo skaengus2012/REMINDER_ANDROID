@@ -76,7 +76,7 @@ internal class LocalLinkMetadataTableRepositoryTest {
     @Test
     fun `Only metadata of valid links was cached`() = runTest {
         val links = List(genInt(min = 2, max = 10)) { genLink() }
-        val emptyLink = Link(genBlank())
+        val emptyLink = Link.of(genBlank())
         val linkMetadataDao: LinkMetadataDao = mock()
         val linkMetadataTableRepository = genLinkMetadataTableRepository(
             linkMetadataDao = linkMetadataDao,
@@ -93,8 +93,8 @@ internal class LocalLinkMetadataTableRepositoryTest {
 
     @Test
     fun `Cached, when metadata loading succeed`() = runTest {
-        val successTargetLink = Link("A")
-        val failedTargetLink = Link("B")
+        val successTargetLink = Link.of("A")
+        val failedTargetLink = Link.of("B")
         val linkMetadataDao: LinkMetadataDao = mock()
         val linkMetadataTableRepository = genLinkMetadataTableRepository(
             linkMetadataDao = linkMetadataDao,

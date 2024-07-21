@@ -23,7 +23,7 @@ import com.nlab.reminder.core.local.database.LinkMetadataEntity
 /**
  * @author thalys
  */
-internal fun LinkMetadata.toEntity(link: Link, timestamp: Long): LinkMetadataEntity = LinkMetadataEntity(
+internal fun LinkMetadata.toEntity(link: Link.Present, timestamp: Long): LinkMetadataEntity = LinkMetadataEntity(
     link = link.value,
     title = title,
     imageUrl = imageUrl,

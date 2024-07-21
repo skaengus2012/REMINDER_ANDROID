@@ -20,7 +20,6 @@ import com.nlab.reminder.core.data.local.database.toEntity
 import com.nlab.reminder.core.data.model.Link
 import com.nlab.reminder.core.data.model.LinkMetadata
 import com.nlab.reminder.core.data.model.LinkMetadataTable
-import com.nlab.reminder.core.data.model.isNotEmpty
 import com.nlab.reminder.core.data.repository.LinkMetadataRepository
 import com.nlab.reminder.core.data.repository.LinkMetadataTableRepository
 import com.nlab.reminder.core.data.repository.TimestampRepository
@@ -40,29 +39,9 @@ class LocalLinkMetadataTableRepository(
     private val timestampRepository: TimestampRepository,
     private val coroutineScope: CoroutineScope,
 ) : LinkMetadataTableRepository {
-    override suspend fun fetch(links: Set<Link>) {
-        links.filter(Link::isNotEmpty).forEach { link ->
-            coroutineScope.launch { cachingLink(link) }
-        }
-    }
+    override suspend fun fetch(links: Set<Link>) = TODO()
 
-    private suspend fun cachingLink(link: Link) {
-        linkMetadataRepository.get(link).onSuccess { linkMetadata ->
-            if (linkMetadata.isCacheable()) {
-                linkMetadataDao.insertAndClearOldData(
-                    linkMetadata.toEntity(link, timestampRepository.get())
-                )
-            }
-        }
-    }
-
-    override fun getStream(): Flow<LinkMetadataTable> =
-        linkMetadataDao.findAsStream().map { entities ->
-            LinkMetadataTable(entities.associateBy(
-                keySelector = { Link(it.link) },
-                valueTransform = { LinkMetadata(it.title, it.imageUrl) }
-            ))
-        }
+    override fun getStream(): Flow<LinkMetadataTable> = TODO()
 }
 
 private fun LinkMetadata.isCacheable(): Boolean = title.isNotBlank() || imageUrl.isNotBlank()
