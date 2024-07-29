@@ -71,6 +71,7 @@ include(
     ":core:kotlinx-coroutine",
     ":core:local",
     ":core:local-di",
+    ":core:network",
     ":core:schedule",
     ":core:schedule-ext",
     ":core:schedule-test",

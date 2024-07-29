@@ -14,23 +14,14 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.foundation.di
+package com.nlab.reminder.core.foundation.time.infra
 
-import com.nlab.reminder.core.foundation.cache.CacheFactory
-import com.nlab.reminder.core.foundation.cache.LruCacheWrapperFactory
-import dagger.Module
-import dagger.Provides
-import dagger.Reusable
-import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
+import android.os.SystemClock
+import com.nlab.reminder.core.foundation.time.TimestampProvider
 
 /**
  * @author Doohyun
  */
-@Module
-@InstallIn(SingletonComponent::class)
-internal class CacheModule {
-    @Reusable
-    @Provides
-    fun provideCacheFactory(): CacheFactory = LruCacheWrapperFactory()
+class DefaultTimestampProvider : TimestampProvider {
+    override fun now(): Long = SystemClock.elapsedRealtime()
 }

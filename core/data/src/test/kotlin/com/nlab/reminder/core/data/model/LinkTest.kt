@@ -44,18 +44,4 @@ internal class LinkTest {
         val link = Link.Present(given)
         assertThat(link.value, equalTo(given))
     }
-
-    @Test
-    fun `Given blank, When created using of, Then empty returned`() {
-        val given = genBlank()
-        val actualLink = Link.of(given)
-        assertThat(actualLink, equalTo(Link.Empty))
-    }
-
-    @Test
-    fun `Given non-blank, When created using of, Then present returned`() {
-        val given = genBothify()
-        val actualLink = Link.of(given)
-        assertThat(actualLink, equalTo(Link.Present(given)))
-    }
 }

@@ -17,7 +17,6 @@
 package com.nlab.reminder.core.local.database
 
 import androidx.room.*
-import kotlinx.coroutines.flow.Flow
 
 /**
  * @author thalys
@@ -25,13 +24,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 abstract class LinkMetadataDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract suspend fun insert(linkMetadata: LinkMetadataEntity)
-
-    @Query("SELECT * FROM link_metadata")
-    abstract fun findAsStream(): Flow<List<LinkMetadataEntity>>
-
-    @Query("SELECT count(*) FROM link_metadata")
-    abstract suspend fun getCount(): Int
+    protected abstract suspend fun insertInternal(linkMetadata: LinkMetadataEntity)
 
     @Query(
         """
@@ -45,17 +38,23 @@ abstract class LinkMetadataDao {
         )
         """
     )
-    abstract suspend fun deleteOldData(count: Int)
+    protected abstract suspend fun deleteOldData(count: Int)
+
+    @Query("SELECT count(*) FROM link_metadata")
+    protected abstract suspend fun getCount(): Int
 
     @Transaction
-    open suspend fun insertAndClearOldData(linkMetadata: LinkMetadataEntity) {
-        insert(linkMetadata)
+    open suspend fun insert(linkMetadata: LinkMetadataEntity) {
+        insertInternal(linkMetadata)
 
         val curCount: Int = getCount()
         if (curCount > MAX_CACHE_COUNT) {
             deleteOldData(count = MAX_CACHE_COUNT - curCount)
         }
     }
+
+    @Query("SELECT * FROM link_metadata WHERE link = :link")
+    abstract suspend fun findByLinks(link: List<String>): List<LinkMetadataEntity>
 
     companion object {
         private const val MAX_CACHE_COUNT = 100

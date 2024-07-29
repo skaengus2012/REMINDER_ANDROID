@@ -14,8 +14,7 @@ dependencies {
     implementation(projects.core.foundationDi)
     implementation(projects.core.kotlinxCoroutine)
     implementation(projects.core.local)
-
-    implementation(libs.jsoup)
+    implementation(projects.core.network)
 
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.collections.immutable)

@@ -16,7 +16,6 @@
 
 package com.nlab.reminder.core.domain.di
 
-import com.nlab.reminder.core.data.repository.LinkMetadataTableRepository
 import com.nlab.reminder.core.data.repository.ScheduleRepository
 import com.nlab.reminder.core.di.coroutine.Dispatcher
 import com.nlab.reminder.core.di.coroutine.DispatcherOption

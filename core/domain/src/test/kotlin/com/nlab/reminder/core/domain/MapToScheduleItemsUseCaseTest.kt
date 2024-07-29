@@ -24,7 +24,6 @@ import com.nlab.reminder.core.data.model.genLinkMetadata
 import com.nlab.reminder.core.data.model.genSchedule
 import com.nlab.reminder.core.data.model.genScheduleId
 import com.nlab.reminder.core.data.model.genSchedules
-import com.nlab.reminder.core.data.repository.LinkMetadataTableRepository
 import com.nlab.reminder.core.data.repository.ScheduleCompleteMarkRepository
 import com.nlab.reminder.core.data.repository.ScheduleSelectedIdRepository
 import com.nlab.reminder.core.schedule.model.ScheduleElement

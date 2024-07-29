@@ -20,7 +20,6 @@ import com.nlab.reminder.core.data.repository.ScheduleCompleteMarkRepository
 import com.nlab.reminder.core.data.repository.ScheduleRepository
 import com.nlab.reminder.core.domain.CompleteScheduleWithMarkUseCase
 import com.nlab.reminder.core.kotlinx.coroutine.delay.Delay
-import com.nlab.reminder.core.data.repository.LinkMetadataTableRepository
 import com.nlab.reminder.core.data.repository.ScheduleSelectedIdRepository
 import com.nlab.reminder.core.di.coroutine.Dispatcher
 import com.nlab.reminder.core.di.coroutine.DispatcherOption.*

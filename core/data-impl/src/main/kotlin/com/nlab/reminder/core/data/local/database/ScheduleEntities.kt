@@ -43,7 +43,10 @@ internal fun ScheduleEntityWithTagEntities.toModel(): Schedule = Schedule(
     id = ScheduleId(scheduleEntity.scheduleId),
     title = scheduleEntity.title,
     note = scheduleEntity.description.orEmpty(),
-    link = Link.of(scheduleEntity.link),
+    link = scheduleEntity.link.let { rawLink ->
+        if (rawLink.isNullOrBlank()) Link.Empty
+        else Link.Present(rawLink)
+    },
     visiblePriority = scheduleEntity.visiblePriority,
     isComplete = scheduleEntity.isComplete,
     tags = tagEntities.map(DefaultTagFactory()::create).toImmutableList()

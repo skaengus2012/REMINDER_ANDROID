@@ -16,13 +16,13 @@
 
 package com.nlab.reminder.core.data.repository
 
-import com.nlab.reminder.core.kotlin.Result
 import com.nlab.reminder.core.data.model.Link
 import com.nlab.reminder.core.data.model.LinkMetadata
+import kotlinx.coroutines.flow.Flow
 
 /**
  * @author thalys
  */
 interface LinkMetadataRepository {
-    suspend fun get(link: Link): Result<LinkMetadata>
+    suspend fun getAsStream(links: Set<Link.Present>): Flow<Map<Link.Present, LinkMetadata>>
 }

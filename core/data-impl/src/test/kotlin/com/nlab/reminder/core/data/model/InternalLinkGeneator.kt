@@ -16,19 +16,24 @@
 
 package com.nlab.reminder.core.data.model
 
+import com.nlab.reminder.core.local.database.LinkMetadataEntity
+import com.nlab.testkit.faker.genBothify
+
 /**
- * If Link exists, the state becomes [Link.Present].
- * [Link.Present] cannot be a blank value.
- *
- * If the conditions are not met, the [Link.Empty] value must be used.
- *
- * @author thalys
+ * @author Doohyun
  */
-sealed class Link private constructor() {
-    data object Empty : Link()
-    data class Present(val value: String) : Link() {
-        init {
-            require(value.isNotBlank())
-        }
-    }
-}
+fun genLinkAndMetadataAndEntity(
+    link: String = "https://${genBothify()}",
+    title: String = genBothify("Title_${genBothify()}"),
+    imageUrl: String = genBothify("ImageUrl_${genBothify()}"),
+    timestamp: Long = System.currentTimeMillis()
+): Triple<Link.Present, LinkMetadata, LinkMetadataEntity> = Triple(
+    genLink(link),
+    genLinkMetadata(title, imageUrl),
+    LinkMetadataEntity(
+        link = link,
+        title = title,
+        imageUrl = imageUrl,
+        timestamp = timestamp
+    )
+)
