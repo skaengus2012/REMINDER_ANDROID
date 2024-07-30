@@ -19,7 +19,7 @@ package com.nlab.reminder.core.domain
 import com.nlab.reminder.core.data.model.ScheduleId
 import com.nlab.reminder.core.data.repository.ScheduleCompleteMarkRepository
 import com.nlab.reminder.core.data.repository.ScheduleRepository
-import com.nlab.reminder.core.data.repository.ScheduleUpdateRequest
+import com.nlab.reminder.core.data.repository.UpdateSchedulesQuery
 import com.nlab.reminder.core.data.repository.getSnapshot
 import com.nlab.reminder.core.kotlinx.coroutine.delay.Delay
 import com.nlab.reminder.core.kotlin.Result
@@ -41,6 +41,6 @@ class CompleteScheduleWithMarkUseCase(
         val completeMarkTable = completeMarkRepository.getSnapshot()
 
         if (completeMarkTable.isEmpty()) Result.Success(Unit)
-        else scheduleRepository.update(ScheduleUpdateRequest.Completes(completeMarkTable))
+        else scheduleRepository.updateBulk(UpdateSchedulesQuery.Completes(completeMarkTable))
     }
 }

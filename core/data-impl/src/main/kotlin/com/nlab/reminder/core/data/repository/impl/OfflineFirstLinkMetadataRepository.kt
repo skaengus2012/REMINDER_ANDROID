@@ -18,12 +18,13 @@ package com.nlab.reminder.core.data.repository.impl
 
 import com.nlab.reminder.core.data.model.Link
 import com.nlab.reminder.core.data.model.LinkMetadata
+import com.nlab.reminder.core.data.model.toLocalEntity
 import com.nlab.reminder.core.data.repository.LinkMetadataRepository
 import com.nlab.reminder.core.foundation.time.TimestampProvider
 import com.nlab.reminder.core.kotlin.onSuccess
 import com.nlab.reminder.core.kotlinx.coroutine.flow.flatMapLatest
-import com.nlab.reminder.core.local.database.LinkMetadataDao
-import com.nlab.reminder.core.local.database.LinkMetadataEntity
+import com.nlab.reminder.core.kotlinx.coroutine.flow.map
+import com.nlab.reminder.core.local.database.dao.LinkMetadataDAO
 import com.nlab.reminder.core.network.LinkThumbnailDataSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -31,6 +32,7 @@ import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -38,19 +40,25 @@ import kotlinx.coroutines.launch
  * @author Doohyun
  */
 class OfflineFirstLinkMetadataRepository(
-    private val linkMetadataDao: LinkMetadataDao,
+    private val linkMetadataDAO: LinkMetadataDAO,
     private val linkThumbnailDataSource: LinkThumbnailDataSource,
     private val timestampProvider: TimestampProvider,
-    initialCache: Map<Link.Present, LinkMetadata>
+    initialCache: Map<Link, LinkMetadata>
 ) : LinkMetadataRepository {
     private val inMemoryTableFlow = MutableStateFlow(initialCache)
 
-    override suspend fun getAsStream(links: Set<Link.Present>): Flow<Map<Link.Present, LinkMetadata>> =
+    override suspend fun getAsStream(links: Set<Link>): Flow<Map<Link, LinkMetadata>> =
         suspend { sync(links) }
             .asFlow()
             .flatMapLatest { inMemoryTableFlow }
+            .distinctUntilChanged()
+            .map { table ->
+                buildMap {
+                    links.forEach { link -> table[link]?.let { put(link, it) } }
+                }
+            }
 
-    private suspend fun sync(links: Set<Link.Present>) {
+    private suspend fun sync(links: Set<Link>) {
         val curCacheTable = inMemoryTableFlow.value
         val notCachedRawValueToLinks = links
             .asSequence()
@@ -62,44 +70,33 @@ class OfflineFirstLinkMetadataRepository(
         val scope = CoroutineScope(currentCoroutineContext())
         syncFromRemote(
             scope,
-            target = notCachedRawValueToLinks,
+            rawValueToLinkTable = notCachedRawValueToLinks,
             localSyncJob = scope.launch { syncFromLocal(notCachedRawValueToLinks) },
         )
     }
 
-    private suspend fun syncFromLocal(target: Map<String, Link.Present>) {
-        val newCache = linkMetadataDao
-            .findByLinks(target.keys.toList())
-            .map { entity ->
-                val link = target.getValue(entity.link)
-                val metadata = LinkMetadata(title = entity.title, imageUrl = entity.imageUrl)
-                link to metadata
-            }
+    private suspend fun syncFromLocal(rawValueToLinkTable: Map<String, Link>) {
+        val newCache = linkMetadataDAO
+            .findByLinks(rawValueToLinkTable.keys)
+            .map { entity -> rawValueToLinkTable.getValue(entity.link) to LinkMetadata(entity) }
         inMemoryTableFlow.update { old -> old + newCache }
     }
 
     private fun syncFromRemote(
         scope: CoroutineScope,
-        target: Map<String, Link.Present>,
+        rawValueToLinkTable: Map<String, Link>,
         localSyncJob: Job
     ) {
-        target.map { (rawLink, link) ->
+        rawValueToLinkTable.map { (rawLink, link) ->
             scope.launch {
                 linkThumbnailDataSource.getLinkThumbnailResource(rawLink).onSuccess { resource ->
-                    val newTable = link to LinkMetadata(
+                    val linkMetadata = LinkMetadata(
                         title = resource.title,
                         imageUrl = resource.image
                     )
                     localSyncJob.join()
-                    inMemoryTableFlow.update { old -> old + newTable }
-                    linkMetadataDao.insert(
-                        LinkMetadataEntity(
-                            link = link.value,
-                            title = resource.title,
-                            imageUrl = resource.image,
-                            timestamp = timestampProvider.now()
-                        )
-                    )
+                    inMemoryTableFlow.update { old -> old + (link to linkMetadata) }
+                    linkMetadataDAO.insert(linkMetadata.toLocalEntity(link, timestampProvider.now()))
                 }
             }
         }

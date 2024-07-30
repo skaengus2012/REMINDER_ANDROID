@@ -21,4 +21,5 @@ dependencies {
 
     testImplementation(projects.testkit)
     testImplementation(projects.core.dataTest)
+    testImplementation(projects.core.kotlinTest)
 }

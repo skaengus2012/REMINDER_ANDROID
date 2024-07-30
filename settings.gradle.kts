@@ -68,6 +68,7 @@ include(
     ":core:foundation-di",
     ":core:foundation-impl",
     ":core:kotlin",
+    ":core:kotlin-test",
     ":core:kotlinx-coroutine",
     ":core:local",
     ":core:local-di",

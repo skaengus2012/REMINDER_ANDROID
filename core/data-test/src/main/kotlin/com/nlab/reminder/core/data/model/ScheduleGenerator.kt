@@ -16,31 +16,42 @@
 
 package com.nlab.reminder.core.data.model
 
+import com.nlab.reminder.core.kotlin.NonBlankString
+import com.nlab.reminder.core.kotlin.NonNegativeLong
+import com.nlab.reminder.core.kotlin.genNonBlankString
+import com.nlab.reminder.core.kotlin.genNonNegativeLong
 import com.nlab.testkit.faker.genBoolean
 import com.nlab.testkit.faker.genBothify
 import com.nlab.testkit.faker.genInt
 import com.nlab.testkit.faker.genLong
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.toImmutableList
 
 /**
  * @author thalys
  */
-fun genScheduleId(value: Long = genLong(min = 1)): ScheduleId = ScheduleId(value)
-fun anyScheduleId(): ScheduleId = ScheduleId(0L)
+fun genScheduleId(): ScheduleId = ScheduleId(rawId = genLong())
+
+fun genScheduleContent(
+    title: String = genBothify(),
+    note: NonBlankString? = genNonBlankString(),
+    link: Link? = genLink(),
+): ScheduleContent = ScheduleContent(
+    title = title,
+    note = note,
+    link = link
+)
 
 fun genSchedule(
-    scheduleId: ScheduleId = genScheduleId(),
-    title: String = genBothify(),
-    note: String = genBothify(),
-    link: Link = genLink(),
-    tags: ImmutableList<Tag> = genTags().toImmutableList(),
-    visiblePriority: Long = genLong(min = 1),
+    id: ScheduleId = genScheduleId(),
+    content: ScheduleContent = genScheduleContent(),
+    visiblePriority: NonNegativeLong = genNonNegativeLong(),
     isComplete: Boolean = genBoolean()
 ): Schedule = Schedule(
-    scheduleId, title, note, link, tags, visiblePriority, isComplete
+    id = id,
+    content = content,
+    visiblePriority = visiblePriority,
+    isComplete = isComplete
 )
 
 fun genSchedules(count: Int = genInt(min = 5, max = 10)): List<Schedule> = List(count) {
-    genSchedule(scheduleId = genScheduleId(value = it.toLong() + 1))
+    genSchedule(id = ScheduleId(rawId = it.toLong() + 1))
 }

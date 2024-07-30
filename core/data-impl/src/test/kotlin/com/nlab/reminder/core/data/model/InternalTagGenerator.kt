@@ -16,18 +16,10 @@
 
 package com.nlab.reminder.core.data.model
 
-import com.nlab.reminder.core.local.database.TagEntity
-import com.nlab.testkit.faker.genBothify
-import com.nlab.testkit.faker.genLongGreaterThanZero
+import com.nlab.reminder.core.local.database.model.TagEntity
 
 /**
  * @author Doohyun
  */
-internal fun genTagAndEntity(
-    tagId: Long = genLongGreaterThanZero(),
-    text: String = genBothify()
-): Pair<Tag, TagEntity> {
-    val tag = genTag(TagId.Present(tagId), text)
-    val entity = TagEntity(tagId, text)
-    return tag to entity
-}
+internal fun genTagAndEntity(tag: Tag = genTag()): Pair<Tag, TagEntity> =
+    tag to TagEntity(tag.id.rawId, tag.name.value)

@@ -17,88 +17,68 @@
 package com.nlab.reminder.core.data.repository.impl
 
 import com.nlab.reminder.core.data.model.Tag
-import com.nlab.reminder.core.data.model.TagFactory
 import com.nlab.reminder.core.data.model.TagId
 import com.nlab.reminder.core.data.repository.GetTagQuery
+import com.nlab.reminder.core.data.repository.SaveTagQuery
 import com.nlab.reminder.core.data.repository.TagRepository
+import com.nlab.reminder.core.kotlin.NonNegativeLong
 import com.nlab.reminder.core.kotlinx.coroutine.flow.map
 import com.nlab.reminder.core.kotlin.Result
-import com.nlab.reminder.core.foundation.annotation.Generated
 import com.nlab.reminder.core.kotlin.catching
 import com.nlab.reminder.core.kotlin.map
-import com.nlab.reminder.core.local.database.ScheduleTagListDao
-import com.nlab.reminder.core.local.database.TagDao
-import com.nlab.reminder.core.local.database.TagEntity
+import com.nlab.reminder.core.kotlin.toNonNegativeLong
+import com.nlab.reminder.core.local.database.dao.ScheduleTagListDAO
+import com.nlab.reminder.core.local.database.dao.TagRelationDAO
+import com.nlab.reminder.core.local.database.dao.TagDAO
+import com.nlab.reminder.core.local.database.model.TagEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.emptyFlow
 
 /**
  * @author Doohyun
  */
 class LocalTagRepository(
-    private val tagDao: TagDao,
-    private val scheduleTagListDao: ScheduleTagListDao,
-    private val tagFactory: TagFactory,
+    private val tagDAO: TagDAO,
+    private val tagRelationDAO: TagRelationDAO,
+    private val scheduleTagListDAO: ScheduleTagListDAO,
 ) : TagRepository {
-    override suspend fun save(tag: Tag): Result<Tag> = catching {
-        val savedTagId = saveAndGetTagId(tag)
-        val entity = tagDao
-            .findByIds(tagIds = listOf(savedTagId))
-            .firstOrNull()
-            ?: error("Tag was empty")
-        return@catching tagFactory.create(entity)
-    }
+    override suspend fun save(query: SaveTagQuery): Result<Tag> {
+        val entityResult = catching {
+            when (query) {
+                is SaveTagQuery.Add -> {
+                    tagDAO.insertAndGet(name = query.name.value)
+                }
 
-    private suspend fun saveAndGetTagId(tag: Tag): Long = when (val tagId = tag.id) {
-        is TagId.Empty -> tagDao.insert(TagEntity(name = tag.name))
-        is TagId.Present -> tagId.value.also { tagDao.update(TagEntity(tagId = it, name = tag.name)) }
+                is SaveTagQuery.Modify -> {
+                    tagRelationDAO.updateOrReplaceAndGet(
+                        tagId = query.id.rawId,
+                        name = query.name.value
+                    )
+                }
+            }
+        }
+        return entityResult.map(::Tag)
     }
 
     override suspend fun delete(id: TagId) = catching {
-        require(id is TagId.Present)
-        tagDao.deleteById(id.value)
+        tagDAO.deleteById(id.rawId)
     }
 
-    override suspend fun getUsageCount(id: TagId): Result<Long> = catching {
-        require(id is TagId.Present)
-        scheduleTagListDao.findTagUsageCount(tagId = id.value)
+    override suspend fun getUsageCount(id: TagId): Result<NonNegativeLong> = catching {
+        scheduleTagListDAO
+            .findTagUsageCount(tagId = id.rawId)
+            .toNonNegativeLong()
     }
 
-    override suspend fun getTags(query: GetTagQuery): Result<List<Tag>> {
-        val tagEntities = when (query) {
-            // When outside the catch block, jacoco does not recognize. 😭
-            is GetTagQuery.All -> catching { tagDao.get() }
-            is GetTagQuery.ByIds -> catching {
-                query.tagIds.mapTo(
-                    transform = { ids -> tagDao.findByIds(ids) },
-                    onEmpty = { emptyList() }
-                )
-            }
-        }
-        return tagEntities.map { it.toModels(tagFactory) }
-    }
-
-    override fun getTagsAsStream(query: GetTagQuery): Flow<List<Tag>> {
-        val entitiesFlow: Flow<List<TagEntity>> = when (query) {
-            is GetTagQuery.All -> tagDao.getAsStream()
-            is GetTagQuery.ByIds -> query.tagIds.mapTo(
-                transform = { ids -> tagDao.findByIdsAsStream(ids).distinctUntilChanged() },
-                onEmpty = { emptyFlow() }
+    override fun getTagsAsStream(query: GetTagQuery): Flow<Collection<Tag>> {
+        val entitiesFlow: Flow<Array<TagEntity>> = when (query) {
+            is GetTagQuery.All -> tagDAO.getAsStream()
+            is GetTagQuery.ByIds -> tagDAO.findByIdsAsStream(
+                buildSet { query.tagIds.mapTo(destination = this, transform = TagId::rawId) }
             )
         }
-        return entitiesFlow.map { it.toModels(tagFactory) }
+        return entitiesFlow.distinctUntilChanged().map { entities ->
+            ArrayList<Tag>(entities.size).apply { entities.mapTo(destination = this, ::Tag) }
+        }
     }
 }
-
-@Generated
-private inline fun <T> List<TagId>.mapTo(
-    transform: (List<Long>) -> T,
-    onEmpty: () -> T,
-): T {
-    require(all { it is TagId.Present })
-    val ids = map { (it as TagId.Present).value }.distinct()
-    return if (ids.isEmpty()) onEmpty() else transform(ids)
-}
-
-private fun List<TagEntity>.toModels(tagFactory: TagFactory): List<Tag> = map(tagFactory::create)

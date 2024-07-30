@@ -16,19 +16,11 @@
 
 package com.nlab.reminder.core.data.model
 
+import com.nlab.reminder.core.kotlin.NonBlankString
+
 /**
- * If Link exists, the state becomes [Link.Present].
- * [Link.Present] cannot be a blank value.
- *
- * If the conditions are not met, the [Link.Empty] value must be used.
- *
- * @author thalys
+ * @author Doohyun
  */
-sealed class Link private constructor() {
-    data object Empty : Link()
-    data class Present(val value: String) : Link() {
-        init {
-            require(value.isNotBlank())
-        }
-    }
+data class Link(private val rawLink: NonBlankString) {
+    val value: String get() = rawLink.value
 }

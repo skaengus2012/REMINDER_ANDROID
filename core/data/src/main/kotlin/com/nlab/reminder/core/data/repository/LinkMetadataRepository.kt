@@ -24,5 +24,5 @@ import kotlinx.coroutines.flow.Flow
  * @author thalys
  */
 interface LinkMetadataRepository {
-    suspend fun getAsStream(links: Set<Link.Present>): Flow<Map<Link.Present, LinkMetadata>>
+    suspend fun getAsStream(links: Set<Link>): Flow<Map<Link, LinkMetadata>>
 }

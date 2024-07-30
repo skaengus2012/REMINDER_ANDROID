@@ -16,8 +16,6 @@
 
 package com.nlab.reminder.core.foundation.di
 
-import com.nlab.reminder.core.foundation.cache.CacheFactory
-import com.nlab.reminder.core.foundation.cache.LruCacheWrapperFactory
 import com.nlab.reminder.core.foundation.time.TimestampProvider
 import com.nlab.reminder.core.foundation.time.infra.DefaultTimestampProvider
 import dagger.Module
@@ -32,10 +30,6 @@ import dagger.hilt.components.SingletonComponent
 @Module
 @InstallIn(SingletonComponent::class)
 internal class AppScopeFoundationModule {
-    @Reusable
-    @Provides
-    fun provideCacheFactory(): CacheFactory = LruCacheWrapperFactory()
-
     @Reusable
     @Provides
     fun provideTimestampProvider(): TimestampProvider = DefaultTimestampProvider()

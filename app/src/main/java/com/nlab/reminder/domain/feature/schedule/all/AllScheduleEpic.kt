@@ -18,10 +18,10 @@ package com.nlab.reminder.domain.feature.schedule.all
 
 import com.nlab.reminder.core.data.di.ScheduleData
 import com.nlab.reminder.core.data.di.ScheduleDataOption.*
-import com.nlab.reminder.core.data.model.Schedule
+import com.nlab.reminder.core.data.model.ScheduleDetails
 import com.nlab.reminder.core.kotlinx.coroutine.flow.map
 import com.nlab.reminder.core.data.repository.CompletedScheduleShownRepository
-import com.nlab.reminder.core.data.repository.ScheduleGetStreamRequest
+import com.nlab.reminder.core.data.repository.GetScheduleQuery
 import com.nlab.reminder.core.data.repository.ScheduleRepository
 import com.nlab.reminder.core.domain.MapToScheduleElementsUseCase
 import com.nlab.reminder.core.kotlinx.coroutine.flow.flatMapLatest
@@ -49,10 +49,10 @@ class AllScheduleEpic @Inject constructor(
 
 private fun ScheduleRepository.getAllSchedulesStream(
     isCompletedScheduleShown: Boolean
-): Flow<List<Schedule>> =
-    getAsStream(
+): Flow<List<ScheduleDetails>> =
+    getSchedulesAsStream(
         when (isCompletedScheduleShown) {
-            true -> ScheduleGetStreamRequest.All
-            else -> ScheduleGetStreamRequest.ByComplete(isComplete = false)
+            true -> GetScheduleQuery.All
+            else -> GetScheduleQuery.ByComplete(isComplete = false)
         }
     )

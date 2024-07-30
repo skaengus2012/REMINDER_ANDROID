@@ -16,24 +16,23 @@
 
 package com.nlab.reminder.core.data.model
 
-import com.nlab.reminder.core.local.database.LinkMetadataEntity
-import com.nlab.testkit.faker.genBothify
+import com.nlab.reminder.core.local.database.model.LinkMetadataEntity
+import com.nlab.testkit.faker.genLongGreaterThanZero
 
 /**
  * @author Doohyun
  */
 fun genLinkAndMetadataAndEntity(
-    link: String = "https://${genBothify()}",
-    title: String = genBothify("Title_${genBothify()}"),
-    imageUrl: String = genBothify("ImageUrl_${genBothify()}"),
-    timestamp: Long = System.currentTimeMillis()
-): Triple<Link.Present, LinkMetadata, LinkMetadataEntity> = Triple(
-    genLink(link),
-    genLinkMetadata(title, imageUrl),
+    link: Link = genLink(),
+    linkMetadata: LinkMetadata = genLinkMetadata(),
+    timestamp: Long = genLongGreaterThanZero()
+): Triple<Link, LinkMetadata, LinkMetadataEntity> = Triple(
+    link,
+    linkMetadata,
     LinkMetadataEntity(
-        link = link,
-        title = title,
-        imageUrl = imageUrl,
+        link = link.value,
+        title = linkMetadata.title,
+        imageUrl = linkMetadata.imageUrl,
         timestamp = timestamp
     )
 )

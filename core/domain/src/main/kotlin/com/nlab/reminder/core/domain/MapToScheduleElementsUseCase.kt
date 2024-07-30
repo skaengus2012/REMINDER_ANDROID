@@ -18,7 +18,7 @@ package com.nlab.reminder.core.domain
 
 import com.nlab.reminder.core.data.model.Link
 import com.nlab.reminder.core.data.model.LinkMetadataTable
-import com.nlab.reminder.core.data.model.Schedule
+import com.nlab.reminder.core.data.model.ScheduleDetails
 import com.nlab.reminder.core.data.model.ScheduleId
 import com.nlab.reminder.core.data.model.isEmpty
 import com.nlab.reminder.core.data.repository.ScheduleCompleteMarkRepository
@@ -39,7 +39,7 @@ class MapToScheduleElementsUseCase(
     private val dispatcher: CoroutineDispatcher
 ) {
     operator fun invoke(
-        schedulesStream: Flow<List<Schedule>>
+        schedulesStream: Flow<List<ScheduleDetails>>
     ): Flow<List<ScheduleElement>> = combine(
         schedulesStream,
         completeMarkRepository.getStream(),
@@ -50,7 +50,7 @@ class MapToScheduleElementsUseCase(
 }
 
 private fun createScheduleItems(
-    schedules: List<Schedule>,
+    schedules: List<ScheduleDetails>,
     completeMarkTable: Map<ScheduleId, Boolean>,
     linkMetadataTable: LinkMetadataTable,
     selectedIds: Set<ScheduleId>,

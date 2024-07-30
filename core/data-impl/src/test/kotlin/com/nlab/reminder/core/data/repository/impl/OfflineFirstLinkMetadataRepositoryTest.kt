@@ -5,9 +5,9 @@ import com.nlab.reminder.core.data.model.LinkMetadata
 import com.nlab.reminder.core.data.model.genLinkAndMetadataAndEntity
 import com.nlab.reminder.core.data.model.genLinkMetadata
 import com.nlab.reminder.core.foundation.time.TimestampProvider
-import com.nlab.reminder.core.kotlin.Result
-import com.nlab.reminder.core.local.database.LinkMetadataDao
+import com.nlab.reminder.core.local.database.dao.LinkMetadataDAO
 import com.nlab.reminder.core.network.LinkThumbnailDataSource
+import com.nlab.reminder.core.kotlin.Result
 import com.nlab.reminder.core.network.LinkThumbnailResource
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharingStarted
@@ -33,33 +33,34 @@ import org.mockito.kotlin.whenever
  * @author Doohyun
  */
 internal class OfflineFirstLinkMetadataRepositoryTest {
+
     @Test
     fun `Given cached in memory data, When getAsFlow, Then dataSources never works`() = runTest {
         val (expectedLink, expectedMetadata) = genLinkAndMetadataAndEntity()
-        val linkMetadataDao = mock<LinkMetadataDao>()
+        val linkMetadataDAO = mock<LinkMetadataDAO>()
         val linkMetadataRepository = getLinkMetadataRepository(
-            linkMetadataDao = linkMetadataDao,
+            linkMetadataDAO = linkMetadataDAO,
             initialCache = mapOf(expectedLink to expectedMetadata)
         )
         linkMetadataRepository
             .getAsStream(setOf(expectedLink))
             .shareIn(unconfinedCoroutineScope(), SharingStarted.Eagerly)
         advanceUntilIdle()
-        verify(linkMetadataDao, never()).findByLinks(any())
+        verify(linkMetadataDAO, never()).findByLinks(any())
     }
 
     @Test
     fun `Given local cache existed, When getAsFlow, Then flow returns metadata async`() = runTest {
         val (expectedLink, expectedMetadata, expectedEntity) = genLinkAndMetadataAndEntity()
-        val linkMetadataDao = mock<LinkMetadataDao> {
-            whenever(mock.findByLinks(listOf(expectedEntity.link))) doReturn listOf(expectedEntity)
+        val linkMetadataDAO = mock<LinkMetadataDAO> {
+            whenever(mock.findByLinks(setOf(expectedEntity.link))) doReturn arrayOf(expectedEntity)
         }
         val linkThumbnailDataSource = mock<LinkThumbnailDataSource> {
             whenever(mock.getLinkThumbnailResource(any())) doReturn Result.Failure(Throwable())
         }
-        val initCache = emptyMap<Link.Present, LinkMetadata>()
+        val initCache = emptyMap<Link, LinkMetadata>()
         val linkMetadataRepository = getLinkMetadataRepository(
-            linkMetadataDao = linkMetadataDao,
+            linkMetadataDAO = linkMetadataDAO,
             linkThumbnailDataSource = linkThumbnailDataSource,
             initialCache = initCache
         )
@@ -85,10 +86,10 @@ internal class OfflineFirstLinkMetadataRepositoryTest {
             title = expectedMetadata.title + "_remote",
             imageUrl = expectedMetadata.imageUrl + "_remote"
         )
-        val linkMetadataDao = mock<LinkMetadataDao> {
+        val linkMetadataDAO = mock<LinkMetadataDAO> {
             whenever(mock.findByLinks(any())) doSuspendableAnswer {
                 delay(5000)
-                listOf(expectedEntity)
+                arrayOf(expectedEntity)
             }
         }
         val linkThumbnailDataSource = mock<LinkThumbnailDataSource> {
@@ -99,9 +100,9 @@ internal class OfflineFirstLinkMetadataRepositoryTest {
                 )
             )
         }
-        val initCache = emptyMap<Link.Present, LinkMetadata>()
+        val initCache = emptyMap<Link, LinkMetadata>()
         val linkMetadataRepository = getLinkMetadataRepository(
-            linkMetadataDao = linkMetadataDao,
+            linkMetadataDAO = linkMetadataDAO,
             linkThumbnailDataSource = linkThumbnailDataSource,
             initialCache = initCache
         )
@@ -123,14 +124,14 @@ internal class OfflineFirstLinkMetadataRepositoryTest {
 }
 
 private fun getLinkMetadataRepository(
-    linkMetadataDao: LinkMetadataDao = mock<LinkMetadataDao>(),
+    linkMetadataDAO: LinkMetadataDAO = mock<LinkMetadataDAO>(),
     linkThumbnailDataSource: LinkThumbnailDataSource = mock<LinkThumbnailDataSource>(),
     timestampProvider: TimestampProvider = mock {
         whenever(mock.now()) doReturn 0L
     },
-    initialCache: Map<Link.Present, LinkMetadata> = emptyMap()
+    initialCache: Map<Link, LinkMetadata> = emptyMap()
 ) = OfflineFirstLinkMetadataRepository(
-    linkMetadataDao = linkMetadataDao,
+    linkMetadataDAO = linkMetadataDAO,
     linkThumbnailDataSource = linkThumbnailDataSource,
     timestampProvider = timestampProvider,
     initialCache = initialCache,
@@ -138,8 +139,8 @@ private fun getLinkMetadataRepository(
 
 private suspend fun TestScope.foldActualResultsWhenScopeUntilIdle(
     linkMetadataRepository: OfflineFirstLinkMetadataRepository,
-    parameter: Link.Present,
-): List<Map<Link.Present, LinkMetadata>> = buildList {
+    parameter: Link,
+): List<Map<Link, LinkMetadata>> = buildList {
     linkMetadataRepository
         .getAsStream(setOf(parameter))
         .onEach { add(it) }

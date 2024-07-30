@@ -15,15 +15,9 @@
  */
 plugins {
     alias(libs.plugins.nlab.jvm.library)
-    alias(libs.plugins.nlab.jvm.library.jacoco)
 }
 
 dependencies {
-    implementation(projects.core.foundation)
     api(projects.core.kotlin)
-
-    api(libs.kotlinx.collections.immutable)
-    api(libs.kotlinx.coroutines.core)
-
-    testImplementation(projects.testkit)
+    api(projects.core.kotlinxCoroutine)
 }

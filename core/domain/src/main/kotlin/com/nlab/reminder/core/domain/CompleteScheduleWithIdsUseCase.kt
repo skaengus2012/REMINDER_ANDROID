@@ -18,7 +18,7 @@ package com.nlab.reminder.core.domain
 
 import com.nlab.reminder.core.data.model.ScheduleId
 import com.nlab.reminder.core.data.repository.ScheduleRepository
-import com.nlab.reminder.core.data.repository.ScheduleUpdateRequest
+import com.nlab.reminder.core.data.repository.UpdateSchedulesQuery
 import com.nlab.reminder.core.kotlin.collections.associateWith
 import com.nlab.reminder.core.kotlin.Result
 import kotlinx.coroutines.CoroutineDispatcher
@@ -34,8 +34,8 @@ class CompleteScheduleWithIdsUseCase(
     suspend operator fun invoke(ids: Collection<ScheduleId>, isComplete: Boolean): Result<Unit> =
         if (ids.isEmpty()) Result.Success(Unit)
         else withContext(dispatcher) {
-            scheduleRepository.update(
-                ScheduleUpdateRequest.Completes(idToCompleteTable = ids.associateWith { isComplete })
+            scheduleRepository.updateBulk(
+                UpdateSchedulesQuery.Completes(idToCompleteTable = ids.associateWith { isComplete })
             )
         }
 }

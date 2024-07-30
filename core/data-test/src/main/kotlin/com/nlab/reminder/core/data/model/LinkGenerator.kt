@@ -16,9 +16,10 @@
 
 package com.nlab.reminder.core.data.model
 
+import com.nlab.reminder.core.kotlin.toNonBlankString
 import com.nlab.testkit.faker.genBothify
 
 /**
  * @author thalys
  */
-fun genLink(value: String = "https://${genBothify()}") = Link.Present(value)
+fun genLink(): Link = Link(rawLink = "https://${genBothify()}".toNonBlankString())

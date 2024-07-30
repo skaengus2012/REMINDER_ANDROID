@@ -71,17 +71,17 @@ class AllScheduleInterceptor @Inject constructor(
         action<AllScheduleAction.OnScheduleDeleteClicked> { (action, before) ->
             val scheduleId: ScheduleId = before.scheduleElements.getOrNull(action.position)?.id ?: return@action
             scheduleRepository
-                .delete(ScheduleDeleteRequest.ById(scheduleId))
+                .delete(DeleteScheduleQuery.ById(scheduleId))
                 .getOrThrow()
         }
         action<AllScheduleAction.OnSelectedSchedulesDeleteClicked> { (_, before) ->
             val result = scheduleRepository
-                .delete(ScheduleDeleteRequest.ByIds(before.scheduleElements.getSelectedIds()))
+                .delete(DeleteScheduleQuery.ByIds(before.scheduleElements.getSelectedIds()))
             selectedIdRepository.clear()
             result.getOrThrow()
         }
         action<AllScheduleAction.OnCompletedScheduleDeleteClicked> {
-            scheduleRepository.delete(ScheduleDeleteRequest.ByComplete(isComplete = true))
+            scheduleRepository.delete(DeleteScheduleQuery.ByComplete(isComplete = true))
                 .getOrThrow()
         }
 
@@ -95,7 +95,7 @@ class AllScheduleInterceptor @Inject constructor(
 
             val minVisiblePriority = swapResult.minOf { it.visiblePriority }
             scheduleRepository
-                .update(ScheduleUpdateRequest.VisiblePriority(buildMap {
+                .updateBulk(UpdateSchedulesQuery.VisiblePriorities(buildMap {
                     swapResult.forEachIndexed { index, scheduleElement ->
                         this[scheduleElement.id] = minVisiblePriority + index
                     }

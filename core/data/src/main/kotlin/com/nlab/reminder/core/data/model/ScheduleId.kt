@@ -16,11 +16,9 @@
 
 package com.nlab.reminder.core.data.model
 
-import com.nlab.reminder.core.foundation.annotation.Generated
-
 /**
+ * Identity of [Schedule].
+ *
  * @author Doohyun
  */
-@Generated
-@JvmInline
-value class ScheduleId(val value: Long)
+data class ScheduleId(val rawId: Long)

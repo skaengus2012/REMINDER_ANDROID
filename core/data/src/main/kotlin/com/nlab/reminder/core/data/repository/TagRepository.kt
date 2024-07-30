@@ -20,23 +20,25 @@ import kotlinx.coroutines.flow.Flow
 import com.nlab.reminder.core.kotlin.Result
 import com.nlab.reminder.core.data.model.Tag
 import com.nlab.reminder.core.data.model.TagId
-import com.nlab.reminder.core.foundation.annotation.Generated
+import com.nlab.reminder.core.kotlin.NonBlankString
+import com.nlab.reminder.core.kotlin.NonNegativeLong
 
 /**
  * @author Doohyun
  */
 interface TagRepository {
-    suspend fun save(tag: Tag): Result<Tag>
+    suspend fun save(query: SaveTagQuery): Result<Tag>
     suspend fun delete(id: TagId): Result<Unit>
-    suspend fun getUsageCount(id: TagId): Result<Long>
-    suspend fun getTags(query: GetTagQuery): Result<List<Tag>>
-    fun getTagsAsStream(query: GetTagQuery): Flow<List<Tag>>
+    suspend fun getUsageCount(id: TagId): Result<NonNegativeLong>
+    fun getTagsAsStream(query: GetTagQuery): Flow<Collection<Tag>>
+}
+
+sealed class SaveTagQuery private constructor() {
+    data class Add(val name: NonBlankString) : SaveTagQuery()
+    data class Modify(val id: TagId, val name: NonBlankString) : SaveTagQuery()
 }
 
 sealed class GetTagQuery private constructor() {
-    @Generated
     data object All : GetTagQuery()
-
-    @Generated
-    data class ByIds(val tagIds: List<TagId>) : GetTagQuery()
+    data class ByIds(val tagIds: Set<TagId>) : GetTagQuery()
 }
