@@ -104,21 +104,21 @@ internal class LocalTagRepositoryTest {
         val expectedEntities = listOf(expectedEntity)
         testGet(
             tagDao = mock<TagDao> { whenever(mock.get()) doReturn expectedEntities },
-            query = TagGetQuery.All,
+            query = GetTagQuery.All,
             expectedResult = listOf(expectedTag)
         )
         testGet(
             tagDao = mock<TagDao> {
                 whenever(mock.findByIds(expectedEntities.map { it.tagId })) doReturn expectedEntities
             },
-            query = TagGetQuery.ByIds(expectedTags.map { it.id }),
+            query = GetTagQuery.ByIds(expectedTags.map { it.id }),
             expectedResult = expectedTags
         )
     }
 
     @Test(expected = IllegalArgumentException::class)
     fun `Given get query with empty tagId, When get tags, Then precondition failed`() = runTest {
-        val query = TagGetQuery.ByIds(listOf(TagId.Empty))
+        val query = GetTagQuery.ByIds(listOf(TagId.Empty))
         genTagRepository()
             .getTags(query)
             .getOrThrow()
@@ -126,7 +126,7 @@ internal class LocalTagRepositoryTest {
 
     @Test
     fun `Given get query with empty tagId list, When get tags, Then return empty list`() = runTest {
-        val query = TagGetQuery.ByIds(emptyList())
+        val query = GetTagQuery.ByIds(emptyList())
         val actualTagIds = genTagRepository()
             .getTags(query)
             .getOrThrow()
@@ -141,7 +141,7 @@ internal class LocalTagRepositoryTest {
 
         testGetAsStream(
             tagDao = mock<TagDao> { whenever(mock.getAsStream()) doReturn flowOf(expectedEntities) },
-            query = TagGetQuery.All,
+            query = GetTagQuery.All,
             expectedResult = expectedTags
         )
 
@@ -149,14 +149,14 @@ internal class LocalTagRepositoryTest {
             tagDao = mock<TagDao> {
                 whenever(mock.findByIdsAsStream(expectedEntities.map { it.tagId })) doReturn flowOf(expectedEntities)
             },
-            query = TagGetQuery.ByIds(expectedTags.map { it.id }),
+            query = GetTagQuery.ByIds(expectedTags.map { it.id }),
             expectedResult = expectedTags
         )
     }
 
     @Test(expected = IllegalArgumentException::class)
     fun `Given get query with empty tagId, When get tags stream, Then precondition failed`() = runTest {
-        val query = TagGetQuery.ByIds(listOf(TagId.Empty))
+        val query = GetTagQuery.ByIds(listOf(TagId.Empty))
         genTagRepository()
             .getTagsAsStream(query)
             .first()
@@ -164,7 +164,7 @@ internal class LocalTagRepositoryTest {
 
     @Test
     fun `Given get query with empty tagId list, When get tags stream, Then return empty flow`() = runTest {
-        val query = TagGetQuery.ByIds(emptyList())
+        val query = GetTagQuery.ByIds(emptyList())
         val actualResult = genTagRepository()
             .getTagsAsStream(query)
             .firstOrNull()
@@ -201,7 +201,7 @@ private fun genTagRepository(
 
 private suspend fun testGet(
     tagDao: TagDao,
-    query: TagGetQuery,
+    query: GetTagQuery,
     expectedResult: List<Tag>
 ) {
     val tagRepository = genTagRepository(tagDao = tagDao)
@@ -211,7 +211,7 @@ private suspend fun testGet(
 
 private suspend fun testGetAsStream(
     tagDao: TagDao,
-    query: TagGetQuery,
+    query: GetTagQuery,
     expectedResult: List<Tag>
 ) {
     val tagRepository = genTagRepository(tagDao = tagDao)

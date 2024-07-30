@@ -29,14 +29,14 @@ interface TagRepository {
     suspend fun save(tag: Tag): Result<Tag>
     suspend fun delete(id: TagId): Result<Unit>
     suspend fun getUsageCount(id: TagId): Result<Long>
-    suspend fun getTags(query: TagGetQuery): Result<List<Tag>>
-    fun getTagsAsStream(query: TagGetQuery): Flow<List<Tag>>
+    suspend fun getTags(query: GetTagQuery): Result<List<Tag>>
+    fun getTagsAsStream(query: GetTagQuery): Flow<List<Tag>>
 }
 
-sealed class TagGetQuery private constructor() {
+sealed class GetTagQuery private constructor() {
     @Generated
-    data object All : TagGetQuery()
+    data object All : GetTagQuery()
 
     @Generated
-    data class ByIds(val tagIds: List<TagId>) : TagGetQuery()
+    data class ByIds(val tagIds: List<TagId>) : GetTagQuery()
 }

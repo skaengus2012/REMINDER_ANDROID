@@ -19,7 +19,7 @@ package com.nlab.reminder.core.data.repository.impl
 import com.nlab.reminder.core.data.model.Tag
 import com.nlab.reminder.core.data.model.TagFactory
 import com.nlab.reminder.core.data.model.TagId
-import com.nlab.reminder.core.data.repository.TagGetQuery
+import com.nlab.reminder.core.data.repository.GetTagQuery
 import com.nlab.reminder.core.data.repository.TagRepository
 import com.nlab.reminder.core.kotlinx.coroutine.flow.map
 import com.nlab.reminder.core.kotlin.Result
@@ -65,11 +65,11 @@ class LocalTagRepository(
         scheduleTagListDao.findTagUsageCount(tagId = id.value)
     }
 
-    override suspend fun getTags(query: TagGetQuery): Result<List<Tag>> {
+    override suspend fun getTags(query: GetTagQuery): Result<List<Tag>> {
         val tagEntities = when (query) {
             // When outside the catch block, jacoco does not recognize. 😭
-            is TagGetQuery.All -> catching { tagDao.get() }
-            is TagGetQuery.ByIds -> catching {
+            is GetTagQuery.All -> catching { tagDao.get() }
+            is GetTagQuery.ByIds -> catching {
                 query.tagIds.mapTo(
                     transform = { ids -> tagDao.findByIds(ids) },
                     onEmpty = { emptyList() }
@@ -79,10 +79,10 @@ class LocalTagRepository(
         return tagEntities.map { it.toModels(tagFactory) }
     }
 
-    override fun getTagsAsStream(query: TagGetQuery): Flow<List<Tag>> {
+    override fun getTagsAsStream(query: GetTagQuery): Flow<List<Tag>> {
         val entitiesFlow: Flow<List<TagEntity>> = when (query) {
-            is TagGetQuery.All -> tagDao.getAsStream()
-            is TagGetQuery.ByIds -> query.tagIds.mapTo(
+            is GetTagQuery.All -> tagDao.getAsStream()
+            is GetTagQuery.ByIds -> query.tagIds.mapTo(
                 transform = { ids -> tagDao.findByIdsAsStream(ids).distinctUntilChanged() },
                 onEmpty = { emptyFlow() }
             )

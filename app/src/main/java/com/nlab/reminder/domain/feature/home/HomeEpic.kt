@@ -17,7 +17,7 @@
 package com.nlab.reminder.domain.feature.home
 
 import com.nlab.reminder.core.data.repository.ScheduleRepository
-import com.nlab.reminder.core.data.repository.TagGetQuery
+import com.nlab.reminder.core.data.repository.GetTagQuery
 import com.nlab.reminder.core.data.repository.TagRepository
 import com.nlab.reminder.core.kotlinx.coroutine.flow.combine
 import com.nlab.statekit.middleware.epic.Epic
@@ -36,7 +36,7 @@ internal class HomeEpic @Inject constructor(
             scheduleRepository.getTodaySchedulesCount(),
             scheduleRepository.getTimetableSchedulesCount(),
             scheduleRepository.getAllSchedulesCount(),
-            tagRepository.getTagsAsStream(TagGetQuery.All),
+            tagRepository.getTagsAsStream(GetTagQuery.All),
         ) { todaySchedulesCount, timetableSchedulesCount, allSchedulesCount, tags ->
             HomeAction.SummaryLoaded(
                 todaySchedulesCount = todaySchedulesCount,
