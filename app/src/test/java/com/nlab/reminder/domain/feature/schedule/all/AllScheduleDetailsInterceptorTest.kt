@@ -26,10 +26,6 @@ import com.nlab.reminder.core.data.repository.DeleteScheduleQuery
 import com.nlab.reminder.core.data.repository.ScheduleRepository
 import com.nlab.reminder.core.data.repository.ScheduleSelectedIdRepository
 import com.nlab.reminder.core.data.repository.UpdateSchedulesQuery
-import com.nlab.reminder.core.domain.CalculateItemSwapResultUseCase
-import com.nlab.reminder.core.domain.CompleteScheduleWithIdsUseCase
-import com.nlab.reminder.core.domain.CompleteScheduleWithMarkUseCase
-import com.nlab.reminder.core.domain.FetchLinkMetadataUseCase
 import com.nlab.reminder.core.schedule.model.genScheduleElements
 import com.nlab.reminder.core.schedule.model.mapToScheduleElementsAsImmutableList
 import com.nlab.statekit.middleware.interceptor.scenario

@@ -16,8 +16,6 @@
 
 package com.nlab.reminder.domain.feature.schedule.all
 
-import com.nlab.reminder.core.data.model.isEmpty
-import com.nlab.reminder.core.data.model.orEmpty
 import com.nlab.reminder.core.schedule.state.SelectedAction
 import com.nlab.statekit.Reducer
 import com.nlab.statekit.util.buildDslReducer
@@ -29,6 +27,7 @@ private typealias DomainReducer = Reducer<AllScheduleAction, AllScheduleUiState>
 /**
  * @author Doohyun
  */
+/**
 class AllScheduleReducer @Inject constructor() : DomainReducer by buildDslReducer(defineDSL = {
     action<AllScheduleAction.ScheduleElementsLoaded> {
         state<AllScheduleUiState.Empty> { (action) ->
@@ -70,4 +69,4 @@ class AllScheduleReducer @Inject constructor() : DomainReducer by buildDslReduce
             before.copy(workflows = before.workflows.toPersistentList() - action.workflow)
         }
     }
-})
+})*/

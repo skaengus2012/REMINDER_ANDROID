@@ -19,7 +19,6 @@ package com.nlab.reminder.core.network
 import com.nlab.reminder.core.kotlin.Result
 import com.nlab.reminder.core.kotlin.catching
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
@@ -39,7 +38,7 @@ interface LinkThumbnailDataSource {
 }
 
 class LinkThumbnailDataSourceImpl(
-    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+    private val dispatcher: CoroutineDispatcher
 ) : LinkThumbnailDataSource {
     override suspend fun getLinkThumbnailResource(url: String): Result<LinkThumbnailResource> = catching {
         require(url.isNotBlank())

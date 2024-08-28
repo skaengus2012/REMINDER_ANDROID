@@ -22,7 +22,8 @@ import com.nlab.reminder.core.data.model.Link
 /**
  * @author thalys
  */
+/**
 sealed interface AllScheduleWorkflow {
     @Generated
     data class LinkPage(val link: Link) : AllScheduleWorkflow
-}
+}*/

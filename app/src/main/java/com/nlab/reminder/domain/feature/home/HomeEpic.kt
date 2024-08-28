@@ -16,6 +16,7 @@
 
 package com.nlab.reminder.domain.feature.home
 
+import com.nlab.reminder.core.data.repository.GetScheduleCountQuery
 import com.nlab.reminder.core.data.repository.ScheduleRepository
 import com.nlab.reminder.core.data.repository.GetTagQuery
 import com.nlab.reminder.core.data.repository.TagRepository
@@ -33,16 +34,16 @@ internal class HomeEpic @Inject constructor(
 ) : Epic<HomeAction> by buildDslEpic(buildDSL = {
     whileStateUsed {
         combine(
-            scheduleRepository.getTodaySchedulesCount(),
-            scheduleRepository.getTimetableSchedulesCount(),
-            scheduleRepository.getAllSchedulesCount(),
+            scheduleRepository.getScheduleCountAsStream(GetScheduleCountQuery.Today),
+            scheduleRepository.getScheduleCountAsStream(GetScheduleCountQuery.Timetable),
+            scheduleRepository.getScheduleCountAsStream(GetScheduleCountQuery.All),
             tagRepository.getTagsAsStream(GetTagQuery.All),
         ) { todaySchedulesCount, timetableSchedulesCount, allSchedulesCount, tags ->
             HomeAction.SummaryLoaded(
                 todaySchedulesCount = todaySchedulesCount,
                 timetableSchedulesCount = timetableSchedulesCount,
                 allSchedulesCount = allSchedulesCount,
-                tags = tags
+                tags = tags.sortedBy { it.name.value }
             )
         }
     }

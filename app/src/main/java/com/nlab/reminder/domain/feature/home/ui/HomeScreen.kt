@@ -54,6 +54,7 @@ import com.nlab.reminder.core.androidx.compose.ui.DelayedVisibleContent
 import com.nlab.reminder.core.androidx.compose.ui.rememberDelayedVisibleState
 import com.nlab.reminder.core.data.model.TagId
 import com.nlab.reminder.core.designsystem.compose.component.ReminderBottomSheet
+import com.nlab.reminder.core.kotlin.toNonBlankString
 import com.nlab.reminder.domain.common.tag.ui.TagDeleteBottomSheetContent
 import com.nlab.reminder.domain.common.tag.ui.TagRenameDialog
 import com.nlab.reminder.domain.common.tag.ui.DisplayUsageCount
@@ -329,7 +330,7 @@ private fun HomeWorkflowHandler(
         is HomeWorkflow.Empty -> {}
         is HomeWorkflow.TagConfig -> {
             HomeTagConfigDialog(
-                tagName = workflow.tag.name,
+                tagName = workflow.tag.name.value,
                 usageCount = DisplayUsageCount(workflow.usageCount),
                 onDismiss = completeWorkflow,
                 onRenameRequestClicked = onTagRenameRequestClicked,
@@ -340,7 +341,7 @@ private fun HomeWorkflowHandler(
         is HomeWorkflow.TagRename -> {
             TagRenameDialog(
                 initText = workflow.renameText,
-                tagName = workflow.tag.name,
+                tagName = workflow.tag.name.value,
                 usageCount = DisplayUsageCount(workflow.usageCount),
                 shouldKeyboardShown = workflow.shouldKeyboardShown,
                 onCancel = completeWorkflow,
@@ -362,7 +363,7 @@ private fun HomeWorkflowHandler(
                 sheetState = sheetState
             ) {
                 TagDeleteBottomSheetContent(
-                    tagName = workflow.tag.name,
+                    tagName = workflow.tag.name.value,
                     usageCount = DisplayUsageCount(workflow.usageCount),
                     onCancelClicked = {
                         coroutineScope.launch {
@@ -408,7 +409,7 @@ private fun HomeContentPreview() {
             timetableScheduleCount = 20,
             allScheduleCount = 30,
             tags = (1L..100)
-                .map { index -> Tag(id = TagId.Empty, name = "TagName $index") }
+                .map { index -> Tag(id = TagId(rawId = 1), name = "TagName $index".toNonBlankString()) }
                 .toImmutableList(),
             onTodayCategoryClicked = {},
             onTimetableCategoryClicked = {},

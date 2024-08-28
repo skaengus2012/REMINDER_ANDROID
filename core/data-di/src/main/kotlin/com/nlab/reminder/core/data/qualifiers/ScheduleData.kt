@@ -14,13 +14,18 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.schedule.ui
+package com.nlab.reminder.core.data.qualifiers
 
+import javax.inject.Qualifier
+import kotlin.annotation.AnnotationRetention.BINARY
 
 /**
- * @author thalys
+ * @author Doohyun
  */
-/**
-class DefaultScheduleElementItemMovePolicy : ScheduleElementItemMovePolicy() {
-    override fun isMovable(from: ScheduleElement, to: ScheduleElement): Boolean = true
-}*/
+@Qualifier
+@Retention(BINARY)
+annotation class ScheduleData(val option: ScheduleDataOption)
+
+enum class ScheduleDataOption {
+    All
+}

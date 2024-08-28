@@ -14,13 +14,16 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.schedule.model
+package com.nlab.reminder.core.foundation.qualifiers.coroutine
 
-import com.nlab.reminder.core.data.model.ScheduleId
+import javax.inject.Qualifier
+import kotlin.annotation.AnnotationRetention.BINARY
 
 /**
- * @author thalys
+ * Annotation for configuring CoroutineScope with Application lifecycle
+ *
+ * @author Doohyun
  */
-fun List<ScheduleElement>.findId(position: Int): ScheduleId? = getOrNull(position)?.id
-
-fun List<ScheduleElement>.getSelectedIds(): List<ScheduleId> = filter { it.isSelected }.map { it.id }
+@Qualifier
+@Retention(BINARY)
+annotation class AppScope

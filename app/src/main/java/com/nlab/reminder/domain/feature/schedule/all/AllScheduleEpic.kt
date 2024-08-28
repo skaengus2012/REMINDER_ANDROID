@@ -16,14 +16,13 @@
 
 package com.nlab.reminder.domain.feature.schedule.all
 
-import com.nlab.reminder.core.data.di.ScheduleData
-import com.nlab.reminder.core.data.di.ScheduleDataOption.*
+import com.nlab.reminder.core.data.qualifiers.ScheduleData
+import com.nlab.reminder.core.data.qualifiers.ScheduleDataOption.*
 import com.nlab.reminder.core.data.model.ScheduleDetails
 import com.nlab.reminder.core.kotlinx.coroutine.flow.map
 import com.nlab.reminder.core.data.repository.CompletedScheduleShownRepository
 import com.nlab.reminder.core.data.repository.GetScheduleQuery
 import com.nlab.reminder.core.data.repository.ScheduleRepository
-import com.nlab.reminder.core.domain.MapToScheduleElementsUseCase
 import com.nlab.reminder.core.kotlinx.coroutine.flow.flatMapLatest
 import com.nlab.statekit.middleware.epic.Epic
 import com.nlab.statekit.util.buildDslEpic
@@ -33,6 +32,7 @@ import javax.inject.Inject
 /**
  * @author thalys
  */
+/**
 class AllScheduleEpic @Inject constructor(
     @ScheduleData(All) completedScheduleShownRepository: CompletedScheduleShownRepository,
     scheduleRepository: ScheduleRepository,
@@ -56,3 +56,4 @@ private fun ScheduleRepository.getAllSchedulesStream(
             else -> GetScheduleQuery.ByComplete(isComplete = false)
         }
     )
+*/

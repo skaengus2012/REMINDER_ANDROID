@@ -16,13 +16,17 @@
 
 package com.nlab.reminder.core.data.di
 
+import com.nlab.reminder.core.data.repository.LinkMetadataRepository
 import com.nlab.reminder.core.data.repository.ScheduleCompleteMarkRepository
 import com.nlab.reminder.core.data.repository.ScheduleSelectedIdRepository
 import com.nlab.reminder.core.data.repository.impl.InMemoryScheduleCompleteMarkRepository
 import com.nlab.reminder.core.data.repository.impl.InMemoryScheduleSelectedIdRepository
-import com.nlab.reminder.core.data.repository.impl.LocalLinkMetadataTableRepository
-import com.nlab.reminder.core.di.coroutine.Dispatcher
-import com.nlab.reminder.core.di.coroutine.DispatcherOption
+import com.nlab.reminder.core.data.repository.impl.OfflineFirstLinkMetadataRepository
+import com.nlab.reminder.core.foundation.qualifiers.coroutine.Dispatcher
+import com.nlab.reminder.core.foundation.qualifiers.coroutine.DispatcherOption.*
+import com.nlab.reminder.core.foundation.time.TimestampProvider
+import com.nlab.reminder.core.local.database.dao.LinkMetadataDAO
+import com.nlab.reminder.core.network.LinkThumbnailDataSourceImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -39,9 +43,15 @@ internal class ViewModelScopeDataModule {
     @ViewModelScoped
     @Provides
     fun provideCachedLinkMetadataTableRepository(
-        repository: LocalLinkMetadataTableRepository,
-        @Dispatcher(DispatcherOption.Default) dispatcher: CoroutineDispatcher
-    ): LinkMetadataTableRepository = CachedLinkMetadataTableRepository(repository, dispatcher)
+        linkMetadataDAO: LinkMetadataDAO,
+        timestampProvider: TimestampProvider,
+        @Dispatcher(IO) remoteDispatcher: CoroutineDispatcher,
+    ): LinkMetadataRepository = OfflineFirstLinkMetadataRepository(
+        linkMetadataDAO = linkMetadataDAO,
+        linkThumbnailDataSource = LinkThumbnailDataSourceImpl(remoteDispatcher),
+        timestampProvider = timestampProvider,
+        initialCache = emptyMap()
+    )
 
     @Provides
     @ViewModelScoped

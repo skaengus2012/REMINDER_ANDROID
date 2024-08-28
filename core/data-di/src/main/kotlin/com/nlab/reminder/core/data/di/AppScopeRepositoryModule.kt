@@ -16,12 +16,13 @@
 
 package com.nlab.reminder.core.data.di
 
+import com.nlab.reminder.core.data.qualifiers.ScheduleData
 import dagger.Module
 import dagger.Provides
 import dagger.Reusable
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import com.nlab.reminder.core.data.di.ScheduleDataOption.*
+import com.nlab.reminder.core.data.qualifiers.ScheduleDataOption.*
 import com.nlab.reminder.core.data.repository.CompletedScheduleShownRepository
 import com.nlab.reminder.core.data.repository.ScheduleRepository
 import com.nlab.reminder.core.data.repository.TagRepository

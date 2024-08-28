@@ -25,6 +25,7 @@ import com.nlab.reminder.core.android.content.getDimension
 /**
  * @author thalys
  */
+/**
 class ScheduleItemDragSelectionHelper(
     recyclerView: RecyclerView,
     hotspotHeight: Int = recyclerView.context.getDimension(R.dimen.schedule_dragged_hotspot_height).toInt(),
@@ -78,3 +79,4 @@ class ScheduleItemDragSelectionHelper(
 
 private fun RecyclerView.findScheduleElementViewHolder(position: Int): ScheduleElementViewHolder? =
     findViewHolderForAdapterPosition(position) as? ScheduleElementViewHolder
+ */

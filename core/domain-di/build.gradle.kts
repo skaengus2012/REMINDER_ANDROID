@@ -10,7 +10,7 @@ android {
 dependencies {
     implementation(projects.core.data)
     implementation(projects.core.dataDi)
-    implementation(projects.core.di)
+    implementation(projects.core.foundationDi)
     implementation(projects.core.domain)
     implementation(projects.core.kotlinxCoroutine)
 }

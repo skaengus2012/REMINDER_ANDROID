@@ -63,6 +63,8 @@ internal class HomeReducer @Inject constructor() : DomainReducer by buildDslRedu
             }
         }
         action<HomeAction.OnTagRenameRequestClicked> { (_, before) ->
+            before
+            /** TODO
             before.mapIfWorkflowMatches<HomeWorkflow.TagConfig> { old, workflow ->
                 old.copy(
                     workflow = HomeWorkflow.TagRename(
@@ -72,7 +74,7 @@ internal class HomeReducer @Inject constructor() : DomainReducer by buildDslRedu
                         shouldKeyboardShown = true
                     )
                 )
-            }
+            }*/
         }
         action<HomeAction.OnTagRenameInputKeyboardShown> { (_, before) ->
             before.mapIfWorkflowMatches<HomeWorkflow.TagRename> { cur, workflow ->

@@ -8,7 +8,6 @@ android {
 }
 
 dependencies {
-    implementation(projects.core.di)
     implementation(projects.core.foundation)
     implementation(projects.core.foundationImpl)
 }

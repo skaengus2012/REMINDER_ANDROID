@@ -36,15 +36,23 @@ internal class HomeInterceptor @Inject constructor(
     state<HomeUiState.Success> {
         action<HomeAction.OnTagLongClicked> { (action) ->
             tagRepository.getUsageCount(action.tag.id)
-                .onSuccess { usageCount -> dispatch(HomeAction.TagConfigMetadataLoaded(action.tag, usageCount)) }
+                .onSuccess { usageCount ->
+                    // todo
+                 //   dispatch(HomeAction.TagConfigMetadataLoaded(action.tag, usageCount))
+                }
                 .onFailure { e -> dispatch(HomeAction.ErrorOccurred(e)) }
                 .getOrThrow()
         }
         action<HomeAction.OnTagRenameConfirmClicked> { (_, before) ->
+            /** TODO
             catching { checkNotNull(before.workflow as? HomeWorkflow.TagRename) { "TagRename workflow was not set" } }
                 .map { tagRename -> with(tagRename) { tag.copy(name = renameText) } }
-                .flatMap { tag -> tagRepository.save(tag) }
+                .flatMap { tag ->
+
+                //    tagRepository.save(tag)
+                }
                 .getOrThrow()
+            */
         }
         action<HomeAction.OnTagDeleteConfirmClicked> { (_, before) ->
             catching { checkNotNull(before.workflow as? HomeWorkflow.TagDelete) { "TagDelete workflow was not set" } }

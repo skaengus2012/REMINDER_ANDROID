@@ -16,17 +16,11 @@
 
 package com.nlab.reminder.core.schedule.ui
 
-import android.view.LayoutInflater
-import android.view.ViewGroup
-import com.nlab.reminder.R
-import com.nlab.reminder.core.schedule.model.ScheduleElement
-import com.nlab.reminder.core.schedule.model.ScheduleItem
-import com.nlab.reminder.databinding.ViewItemScheduleElementBinding
-import kotlinx.coroutines.flow.Flow
 
 /**
  * @author Doohyun
  */
+/**
 internal class ScheduleItemViewTypeDelegate(
     private val getItem: (position: Int) -> ScheduleItem,
     private val selectionEnabled: Flow<Boolean>,
@@ -53,3 +47,4 @@ internal class ScheduleItemViewTypeDelegate(
         is ScheduleElement -> R.layout.view_item_schedule_element
     }
 }
+*/

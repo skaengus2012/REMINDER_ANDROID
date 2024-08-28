@@ -14,18 +14,24 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.data.di
+package com.nlab.reminder.core.foundation.qualifiers.coroutine
 
 import javax.inject.Qualifier
 import kotlin.annotation.AnnotationRetention.BINARY
 
 /**
+ * Annotations for CoroutineDispatcher injection.
+ * Using [option], you can define the Dispatcher to be injected.
+ *
+ * @see [com.nlab.reminder.core.foundation.coroutine.DispatcherOption]
  * @author Doohyun
  */
 @Qualifier
 @Retention(BINARY)
-annotation class ScheduleData(val option: ScheduleDataOption)
+annotation class Dispatcher(val option: DispatcherOption)
 
-enum class ScheduleDataOption {
-    All
+enum class DispatcherOption {
+    Default,
+    IO,
+    Main
 }

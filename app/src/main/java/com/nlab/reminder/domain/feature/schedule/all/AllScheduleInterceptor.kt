@@ -16,22 +16,14 @@
 
 package com.nlab.reminder.domain.feature.schedule.all
 
-import com.nlab.reminder.core.data.di.ScheduleData
-import com.nlab.reminder.core.data.di.ScheduleDataOption.*
-import com.nlab.reminder.core.data.model.ScheduleId
-import com.nlab.reminder.core.kotlin.getOrThrow
+import com.nlab.reminder.core.data.qualifiers.ScheduleDataOption.*
 import com.nlab.reminder.core.data.repository.*
 import com.nlab.reminder.core.domain.*
-import com.nlab.reminder.core.kotlin.collections.minOf
-import com.nlab.reminder.core.schedule.model.findId
-import com.nlab.reminder.core.schedule.model.getSelectedIds
-import com.nlab.statekit.middleware.interceptor.Interceptor
-import com.nlab.statekit.util.buildDslInterceptor
-import javax.inject.Inject
 
 /**
  * @author thalys
  */
+/**
 class AllScheduleInterceptor @Inject constructor(
     scheduleRepository: ScheduleRepository,
     @ScheduleData(All) completedScheduleShownRepository: CompletedScheduleShownRepository,
@@ -113,4 +105,4 @@ class AllScheduleInterceptor @Inject constructor(
             fetchLinkMetadata(action.scheduleElements)
         }
     }
-})
+})*/

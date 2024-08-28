@@ -34,15 +34,10 @@ import javax.inject.Inject
 @Generated
 @HiltViewModel
 internal class AllScheduleViewModel @Inject constructor(
-    reducer: AllScheduleReducer,
-    interceptor: AllScheduleInterceptor,
-    epic: AllScheduleEpic,
 ) : ViewModel(),
     UiActionDispatchable<AllScheduleAction> {
-    private val store = createStore(initState = AllScheduleUiState.Empty, reducer, interceptor, epic)
 
-    val uiState: StateFlow<AllScheduleUiState> =
-        store.stateIn(viewModelScope, SharingStarted.WhileSubscribed(stopTimeoutMillis = 5_000))
+    val uiState: StateFlow<AllScheduleUiState> = TODO()
 
-    override fun dispatch(action: AllScheduleAction): Job = store.dispatch(action)
+    override fun dispatch(action: AllScheduleAction): Job = TODO()
 }
