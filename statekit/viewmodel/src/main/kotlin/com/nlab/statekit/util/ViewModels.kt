@@ -23,6 +23,7 @@ import com.nlab.statekit.*
 import com.nlab.statekit.middleware.epic.Epic
 import com.nlab.statekit.middleware.interceptor.Interceptor
 import com.nlab.statekit.store.EpicClientFactory
+import com.nlab.statekit.store.Store
 import com.nlab.statekit.util.createStore as createStoreOrigin
 
 /**
