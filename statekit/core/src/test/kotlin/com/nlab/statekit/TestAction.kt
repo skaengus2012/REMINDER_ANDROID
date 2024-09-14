@@ -22,9 +22,10 @@ import com.nlab.testkit.faker.genInt
 /**
  * @author thalys
  */
-internal sealed class TestAction private constructor() : Action {
-    object Action1 : TestAction()
-    object Action2 : TestAction()
+sealed class TestAction private constructor() {
+    data object Action1 : TestAction()
+    data object Action2 : TestAction()
+    data object Action3 : TestAction()
 
     companion object {
         fun genAction(): TestAction {

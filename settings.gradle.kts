@@ -37,6 +37,7 @@ enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 include(
     ":statekit:compiler",
     ":statekit:core",
+    ":statekit:dsl",
     ":statekit:runtime",
     ":statekit:test",
     ":statekit:viewmodel",

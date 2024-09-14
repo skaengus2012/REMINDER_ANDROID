@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 The N's lab Open Source Project
+ * Copyright (C) 2024 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,23 +16,20 @@
 
 package com.nlab.statekit.store
 
-import com.nlab.statekit.middleware.interceptor.ActionDispatcher
-import com.nlab.statekit.Action
-import com.nlab.statekit.State
-import com.nlab.statekit.Store
+import com.nlab.statekit.reduce.ActionDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 /**
- * @author thalys
+ * @author Doohyun
  */
-internal class DefaultStore<A : Action, S : State>(
+internal class DefaultStore<A : Any, S : Any>(
     override val state: StateFlow<S>,
     private val coroutineScope: CoroutineScope,
     private val actionDispatcher: ActionDispatcher<A>,
-    @Suppress("unused") private val initJobs: List<Job>  // for strong reference
+    @Suppress("unused") private val initJobs: Collection<Job>  // for strong reference
 ) : Store<A, S>() {
     override fun dispatch(action: A): Job = coroutineScope.launch { actionDispatcher.dispatch(action) }
 }

@@ -19,6 +19,7 @@ package com.nlab.reminder.core.state2
 import com.nlab.reminder.test.genFlowExecutionDispatcher
 import com.nlab.reminder.test.genFlowObserveCoroutineScope
 import com.nlab.statekit.*
+import com.nlab.statekit.store.Store
 import com.nlab.statekit.util.*
 import org.mockito.kotlin.once
 import kotlinx.coroutines.Dispatchers

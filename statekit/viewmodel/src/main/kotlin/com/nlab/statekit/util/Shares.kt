@@ -17,7 +17,7 @@
 package com.nlab.statekit.util
 
 import com.nlab.statekit.State
-import com.nlab.statekit.Store
+import com.nlab.statekit.store.Store
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow

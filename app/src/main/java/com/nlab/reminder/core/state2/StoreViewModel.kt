@@ -20,6 +20,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nlab.statekit.*
 import com.nlab.statekit.lifecycle.*
+import com.nlab.statekit.store.Store
 import com.nlab.statekit.util.stateIn
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.SharingStarted
