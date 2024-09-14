@@ -17,9 +17,13 @@
 package kotlinx.coroutines.test
 
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.plus
 
 /**
  * @author Doohyun
  */
 fun TestScope.unconfinedTestDispatcher() = UnconfinedTestDispatcher(testScheduler)
 fun TestScope.unconfinedCoroutineScope() = CoroutineScope(unconfinedTestDispatcher())
+
+val TestScope.unconfinedBackgroundScope get() = backgroundScope + Dispatchers.Unconfined

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 The N's lab Open Source Project
+ * Copyright (C) 2024 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,38 +16,30 @@
 
 package com.nlab.statekit.store
 
-import com.nlab.statekit.Action
-import com.nlab.statekit.Reducer
-import com.nlab.statekit.State
-import com.nlab.statekit.Store
-import com.nlab.statekit.middleware.interceptor.Interceptor
-import com.nlab.statekit.middleware.epic.Epic
+import com.nlab.statekit.bootstrap.Bootstrap
+import com.nlab.statekit.reduce.DefaultActionDispatcher
+import com.nlab.statekit.reduce.Reduce
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 /**
- * @author thalys
+ * @author Doohyun
  */
 internal class DefaultStoreFactory {
-    fun <A : Action, S : State> createStore(
+    fun <A : Any, S : Any> createStore(
         coroutineScope: CoroutineScope,
-        baseState: MutableStateFlow<S>,
-        reducer: Reducer<A, S>,
-        interceptor: Interceptor<A, S>,
-        epic: Epic<A>,
-        epicClientFactory: EpicClientFactory
+        initState: S,
+        reduce: Reduce<A, S>,
+        bootstrap: Bootstrap<A>
     ): Store<A, S> {
-        val actionDispatcher = StoreActionDispatcher(baseState, reducer, interceptor)
+        val baseState = MutableStateFlow(initState)
+        val actionDispatcher = DefaultActionDispatcher(baseState, reduce)
         return DefaultStore(
             baseState.asStateFlow(),
             coroutineScope,
             actionDispatcher,
-            initJobs = epic().map { epicSource ->
-                epicClientFactory
-                    .create(epicSource.subscriptionStrategy)
-                    .fetch(coroutineScope, epicSource.stream, actionDispatcher)
-            }
+            initJobs = bootstrap.fetch(coroutineScope, actionDispatcher, baseState.subscriptionCount)
         )
     }
 }
