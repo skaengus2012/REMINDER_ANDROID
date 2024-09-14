@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 The N's lab Open Source Project
+ * Copyright (C) 2024 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,24 +16,33 @@
 
 package com.nlab.statekit.store
 
-import com.nlab.statekit.Action
-import com.nlab.statekit.Reducer
-import com.nlab.statekit.State
-import com.nlab.statekit.UpdateSource
-import com.nlab.statekit.middleware.interceptor.ActionDispatcher
-import com.nlab.statekit.middleware.interceptor.Interceptor
+import com.nlab.statekit.reduce.ActionDispatcher
+import com.nlab.statekit.reduce.Reduce
+import com.nlab.statekit.reduce.launch
+import com.nlab.statekit.reduce.transitionTo
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.getAndUpdate
 
 /**
- * @author thalys
+ * @author Doohyun
  */
-internal class StoreActionDispatcher<A : Action, S : State>(
+internal class StoreActionDispatcher<A : Any, S : Any>(
     private val state: MutableStateFlow<S>,
-    private val reduce: Reducer<A, S>,
-    private val intercept: Interceptor<A, S>
+    private val reduce: Reduce<A, S>
 ) : ActionDispatcher<A> {
     override suspend fun dispatch(action: A) {
-        intercept(this, UpdateSource(action, before = state.getAndUpdate { cur -> reduce(UpdateSource(action, cur)) }))
+        val transition = reduce.transition
+        val current = when {
+            transition == null -> state.value
+            else -> state.getAndUpdate { old -> transition.transitionTo(action, old) }
+        }
+        reduce.effect?.launch(
+            action,
+            current,
+            actionDispatcher = this@StoreActionDispatcher,
+            coroutineScope = CoroutineScope(currentCoroutineContext())
+        )
     }
 }

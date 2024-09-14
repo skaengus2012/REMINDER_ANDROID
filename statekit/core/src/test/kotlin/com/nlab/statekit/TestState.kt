@@ -16,17 +16,15 @@
 
 package com.nlab.statekit
 
-import com.nlab.testkit.faker.genBothify
 import com.nlab.testkit.faker.genInt
 
 /**
  * @author thalys
  */
-internal sealed class TestState private constructor() : State {
-    object State1 : TestState()
-    object State2 : TestState()
-    object State3 : TestState()
-    data class State4(val value: String = genBothify()) : TestState()
+sealed class TestState private constructor() {
+    data object State1 : TestState()
+    data object State2 : TestState()
+    data object State3 : TestState()
 
     companion object {
         fun genState(): TestState = when (genInt() % 3) {
