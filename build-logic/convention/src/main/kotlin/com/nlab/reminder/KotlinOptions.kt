@@ -27,7 +27,6 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
  * @author Doohyun
  */
 private val javaVersion: JavaVersion get() = JavaVersion.VERSION_17
-private val javaVersionToNumber: Int get() = 17
 
 internal fun Project.configureKotlinAndroid(commonExtension: CommonExtension<*, *, *, *, *, *>) {
     commonExtension.apply {
