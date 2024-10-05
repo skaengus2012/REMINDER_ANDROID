@@ -32,6 +32,8 @@ internal class DslReduceBuilderDelegate<A : Any, S : RS, RA : Any, RS : Any> {
         transitionBuilder.add(block)
     }
 
+    // TODO define inline function after fix below
+    // https://github.com/jacoco/jacoco/pull/1670
     fun addTransitionWithPredicate(
         predicate: (UpdateSource<A, S>) -> Boolean,
         block: (DslTransitionScope<A, S>) -> RS
@@ -39,6 +41,8 @@ internal class DslReduceBuilderDelegate<A : Any, S : RS, RA : Any, RS : Any> {
         addTransition { scope -> if (predicate(scope)) block(scope) else scope.current }
     }
 
+    // TODO define inline function after fix below
+    // https://github.com/jacoco/jacoco/pull/1670
     fun <T : Any, U : RS> addTransitionWithTransformSource(
         transformSource: (UpdateSource<A, S>) -> UpdateSource<T, U>?,
         block: (DslTransitionScope<T, U>) -> RS
@@ -51,6 +55,8 @@ internal class DslReduceBuilderDelegate<A : Any, S : RS, RA : Any, RS : Any> {
         }
     }
 
+    // TODO define inline function after fix below
+    // https://github.com/jacoco/jacoco/pull/1670
     fun <T : A> addTransitionWithActionType(
         actionType: KClass<T>,
         block: (DslTransitionScope<T, S>) -> RS
@@ -61,6 +67,8 @@ internal class DslReduceBuilderDelegate<A : Any, S : RS, RA : Any, RS : Any> {
         )
     }
 
+    // TODO define inline function after fix below
+    // https://github.com/jacoco/jacoco/pull/1670
     fun <T : S> addTransitionWithStateType(
         stateType: KClass<T>,
         block: (DslTransitionScope<A, T>) -> RS
