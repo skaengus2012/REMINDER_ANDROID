@@ -81,6 +81,8 @@ internal class DslReduceBuilderDelegate<A : Any, S : RS, RA : Any, RS : Any> {
         effectBuilder.add(block)
     }
 
+    // TODO define inline function after fix below
+    // https://github.com/jacoco/jacoco/pull/1670
     fun addEffectWithPredicate(
         predicate: (UpdateSource<A, S>) -> Boolean,
         block: suspend (DslEffectScope<A, S, RA>) -> Unit
@@ -88,6 +90,8 @@ internal class DslReduceBuilderDelegate<A : Any, S : RS, RA : Any, RS : Any> {
         addEffect { scope -> if (predicate(scope)) block(scope) }
     }
 
+    // TODO define inline function after fix below
+    // https://github.com/jacoco/jacoco/pull/1670
     fun <T : Any, U : Any> addEffectWithTransformSource(
         transformSource: (UpdateSource<A, S>) -> UpdateSource<T, U>?,
         block: suspend (DslEffectScope<T, U, RA>) -> Unit
@@ -97,6 +101,8 @@ internal class DslReduceBuilderDelegate<A : Any, S : RS, RA : Any, RS : Any> {
         }
     }
 
+    // TODO define inline function after fix below
+    // https://github.com/jacoco/jacoco/pull/1670
     fun <T : A> addEffectWithActionType(
         actionType: KClass<T>,
         block: suspend (DslEffectScope<T, S, RA>) -> Unit
@@ -107,6 +113,8 @@ internal class DslReduceBuilderDelegate<A : Any, S : RS, RA : Any, RS : Any> {
         )
     }
 
+    // TODO define inline function after fix below
+    // https://github.com/jacoco/jacoco/pull/1670
     fun <T : S> addEffectWithStateType(
         stateType: KClass<T>,
         block: suspend (DslEffectScope<A, T, RA>) -> Unit

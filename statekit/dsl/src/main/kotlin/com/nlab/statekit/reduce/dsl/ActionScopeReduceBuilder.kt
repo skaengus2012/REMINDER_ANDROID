@@ -36,7 +36,7 @@ class ActionScopeReduceBuilder<A : Any, S : RS, RA : Any, RS : Any> internal con
     }
 
     @OperationDsl
-    fun <T : Any, U : S> transition(
+    fun <T : Any, U : Any> transition(
         transformSource: UpdateSource<A, S>.() -> UpdateSource<T, U>?,
         block: DslTransitionScope<T, U>.() -> RS
     ) {
@@ -66,7 +66,7 @@ class ActionScopeReduceBuilder<A : Any, S : RS, RA : Any, RS : Any> internal con
     }
 
     @OperationDsl
-    fun <T : Any, U : S> effect(
+    fun <T : Any, U : Any> effect(
         transformSource: UpdateSource<A, S>.() -> UpdateSource<T, U>?,
         block: suspend DslEffectScope<T, U, RA>.() -> Unit
     ) {

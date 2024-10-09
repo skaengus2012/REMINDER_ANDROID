@@ -26,6 +26,5 @@ class ActionScopeReduceBuilderTest {
     fun `When build transition, Then added block to delegate`() {
         val transitionBlock = noOpTestDslTransitionBlock
         val delegate = TestDslReduceBuilderDelegate()
-        val actionScopeReduceBuilder =
     }
 }
