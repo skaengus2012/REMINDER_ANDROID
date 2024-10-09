@@ -43,15 +43,13 @@ internal class DslReduceBuilderDelegate<A : Any, S : RS, RA : Any, RS : Any> {
 
     // TODO define inline function after fix below
     // https://github.com/jacoco/jacoco/pull/1670
-    fun <T : Any, U : RS> addTransitionWithTransformSource(
+    fun <T : Any, U : Any> addTransitionWithTransformSource(
         transformSource: (UpdateSource<A, S>) -> UpdateSource<T, U>?,
         block: (DslTransitionScope<T, U>) -> RS
     ) {
         addTransition { scope ->
-            transformSource(scope)
-                ?.let(::DslTransitionScope)
-                ?.run(block)
-                ?: scope.current
+            val newSource = transformSource(scope)
+            if (newSource == null) scope.current else block(DslTransitionScope(newSource))
         }
     }
 
@@ -90,7 +88,7 @@ internal class DslReduceBuilderDelegate<A : Any, S : RS, RA : Any, RS : Any> {
         addEffect { scope -> if (predicate(scope)) block(scope) }
     }
 
-    fun <T : Any, U : RS> addEffectWithTransformSource(
+    fun <T : Any, U : Any> addEffectWithTransformSource(
         transformSource: (UpdateSource<A, S>) -> UpdateSource<T, U>?,
         block: suspend (DslEffectScope<T, U, RA>) -> Unit
     ) {
