@@ -23,9 +23,9 @@ import kotlin.reflect.KClass
  * @author Doohyun
  */
 @BuilderDsl
-class ActionScopeReduceBuilder<A : Any, S : RS, RA : Any, RS : Any> internal constructor() {
-    private val delegate = DslReduceBuilderDelegate<A, S, RA, RS>()
-
+class ActionScopeReduceBuilder<A : Any, S : RS, RA : Any, RS : Any> internal constructor(
+    private val delegate: DslReduceBuilderDelegate<A, S, RA, RS> = DslReduceBuilderDelegate()
+) {
     internal fun buildTransition() = delegate.buildTransition()
 
     internal fun buildEffect() = delegate.buildEffect()

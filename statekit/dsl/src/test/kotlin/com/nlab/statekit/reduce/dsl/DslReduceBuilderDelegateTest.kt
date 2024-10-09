@@ -13,8 +13,6 @@ import org.mockito.kotlin.once
 import org.mockito.kotlin.verify
 import org.mockito.verification.VerificationMode
 
-private typealias TestDslReduceBuilderDelegate = DslReduceBuilderDelegate<TestAction, TestState, TestAction, TestState>
-
 /**
  * @author Doohyun
  */
