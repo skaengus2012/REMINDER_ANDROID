@@ -4,14 +4,9 @@ import com.nlab.statekit.TestAction
 import com.nlab.statekit.TestState
 import com.nlab.testkit.faker.genInt
 import kotlinx.coroutines.test.runTest
-import org.hamcrest.CoreMatchers.equalTo
-import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
-import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.once
-import org.mockito.kotlin.verify
-import org.mockito.verification.VerificationMode
 
 /**
  * @author Doohyun
@@ -213,35 +208,4 @@ class DslReduceBuilderDelegateTest {
         testAddEffectWithStateType(isInputStateMatched = true)
         testAddEffectWithStateType(isInputStateMatched = false)
     }
-}
-
-private fun testTransition(
-    inputAction: TestAction = TestAction.genAction(),
-    inputState: TestState,
-    expectedNextState: TestState,
-    setupReduce: TestDslReduceBuilderDelegate.() -> Unit
-) {
-    val compositeTransition = TestDslReduceBuilderDelegate()
-        .apply { setupReduce() }
-        .buildTransition()
-    val actualState = compositeTransition.invoke(
-        DslTransitionScope(UpdateSource(inputAction, inputState))
-    )
-    assertThat(actualState, equalTo(expectedNextState))
-}
-
-private suspend fun testEffect(
-    inputAction: TestAction = TestAction.genAction(),
-    inputState: TestState = TestState.genState(),
-    setupReduce: TestDslReduceBuilderDelegate.(mockEffect: () -> Unit) -> Unit,
-    verificationMode: VerificationMode
-) {
-    val runnable: () -> Unit = mock()
-    val compositeEffect = TestDslReduceBuilderDelegate()
-        .apply { setupReduce(runnable) }
-        .buildEffect()
-    compositeEffect.invoke(
-        DslEffectScope(UpdateSource(inputAction, inputState), mock()),
-    )
-    verify(runnable, verificationMode).invoke()
 }

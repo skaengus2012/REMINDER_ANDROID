@@ -36,22 +36,11 @@ class ActionScopeReduceBuilder<A : Any, S : RS, RA : Any, RS : Any> internal con
     }
 
     @OperationDsl
-    fun <T : Any, U : Any> transition(
-        transformSource: UpdateSource<A, S>.() -> UpdateSource<T, U>?,
-        block: DslTransitionScope<T, U>.() -> RS
-    ) {
-        delegate.addTransitionWithTransformSource(transformSource, block)
-    }
-
-    @OperationDsl
     fun <T : S> transition(
         stateType: KClass<T>,
         block: DslTransitionScope<A, T>.() -> RS
     ) {
-        transition(
-            transformSource = { tryCopyWithStateType(stateType) },
-            block = block
-        )
+        delegate.addTransitionWithStateType(stateType, block)
     }
 
     @JvmName(name = "transitionWithStateType")
@@ -66,22 +55,11 @@ class ActionScopeReduceBuilder<A : Any, S : RS, RA : Any, RS : Any> internal con
     }
 
     @OperationDsl
-    fun <T : Any, U : Any> effect(
-        transformSource: UpdateSource<A, S>.() -> UpdateSource<T, U>?,
-        block: suspend DslEffectScope<T, U, RA>.() -> Unit
-    ) {
-        delegate.addEffectWithTransformSource(transformSource, block)
-    }
-
-    @OperationDsl
     fun <T : S> effect(
         stateType: KClass<T>,
         block: suspend DslEffectScope<A, T, RA>.() -> Unit
     ) {
-        effect(
-            transformSource = { tryCopyWithStateType(stateType) },
-            block = block
-        )
+        delegate.addEffectWithStateType(stateType, block)
     }
 
     @JvmName(name = "effectWithStateType")
