@@ -22,9 +22,9 @@ import kotlin.reflect.KClass
  * @author Doohyun
  */
 @BuilderDsl
-class ScopeReduceBuilder<A : Any, S : RS, RA : Any, RS : Any> internal constructor() {
-    private val delegate = DslReduceBuilderDelegate<A, S, RA, RS>()
-
+class ScopeReduceBuilder<A : Any, S : RS, RA : Any, RS : Any> internal constructor(
+    private val delegate: DslReduceBuilderDelegate<A, S, RA, RS> = DslReduceBuilderDelegate()
+) {
     internal fun buildTransition() = delegate.buildTransition()
 
     internal fun buildEffect() = delegate.buildEffect()
@@ -35,24 +35,8 @@ class ScopeReduceBuilder<A : Any, S : RS, RA : Any, RS : Any> internal construct
     }
 
     @OperationDsl
-    fun <T : Any, U : S> transition(
-        transformSource: UpdateSource<A, S>.() -> UpdateSource<T, U>?,
-        block: DslTransitionScope<T, U>.() -> RS
-    ) {
-        delegate.addTransitionWithTransformSource(transformSource, block)
-    }
-
-    @OperationDsl
     fun effect(block: suspend DslEffectScope<A, S, RA>.() -> Unit) {
         delegate.addEffect(block)
-    }
-
-    @OperationDsl
-    fun <T : Any, U : RS> effect(
-        transformSource: UpdateSource<A, S>.() -> UpdateSource<T, U>?,
-        block: suspend DslEffectScope<T, U, RA>.() -> Unit
-    ) {
-        delegate.addEffectWithTransformSource(transformSource, block)
     }
 
     @JvmName(name = "scopeWithPredicate")

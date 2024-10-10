@@ -30,80 +30,59 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.mockito.verification.VerificationMode
 
-private typealias TestStateScopeReduceBuilder = StateScopeReduceBuilder<TestAction, TestState, TestAction, TestState>
+private typealias TestScopeReduceBuilder = ScopeReduceBuilder<TestAction, TestState, TestAction, TestState>
 
 /**
  * @author Doohyun
  */
-class StateScopeReduceBuilderTest {
+class ScopeReduceBuilderTest {
     @Test
     fun `When create scope without external delegate, Then success`() {
-        TestStateScopeReduceBuilder()
+        TestScopeReduceBuilder()
     }
 
     @Test
     fun `When build transition, Then get from delegate`() {
         val expectedTransition: TestDslTransitionBlock = { current }
-        val stateScopeReduceBuilder = TestStateScopeReduceBuilder(
+        val scopeReduceBuilder = TestScopeReduceBuilder(
             delegate = mock {
                 whenever(mock.buildTransition()) doReturn expectedTransition
             }
         )
 
-        assertThat(stateScopeReduceBuilder.buildTransition(), equalTo(expectedTransition))
+        assertThat(scopeReduceBuilder.buildTransition(), equalTo(expectedTransition))
     }
 
     @Test
     fun `When build effect, Then get from delegate`() {
         val expectedEffect: TestDslEffectBlock = {}
-        val stateScopeReduceBuilder = TestStateScopeReduceBuilder(
+        val scopeReduceBuilder = TestScopeReduceBuilder(
             delegate = mock {
                 whenever(mock.buildEffect()) doReturn expectedEffect
             }
         )
 
-        assertThat(stateScopeReduceBuilder.buildEffect(), equalTo(expectedEffect))
+        assertThat(scopeReduceBuilder.buildEffect(), equalTo(expectedEffect))
     }
 
     @Test
     fun `Given transition block, When transition, Then added to delegate`() {
         val transition: TestDslTransitionBlock = { current }
         val delegate = mock<TestDslReduceBuilderDelegate>()
-        val stateScopeReduceBuilder = TestStateScopeReduceBuilder(delegate)
+        val scopeReduceBuilder = TestScopeReduceBuilder(delegate)
 
-        stateScopeReduceBuilder.transition(transition)
+        scopeReduceBuilder.transition(transition)
         verify(delegate, once()).addTransition(transition)
-    }
-
-
-    @Test
-    fun `Given action type and transition block, When transition, Then added to delegate`() {
-        val transition: DslTransitionScope<TestAction.Action1, TestState>.() -> TestState = { current }
-        val delegate = mock<TestDslReduceBuilderDelegate>()
-        val stateScopeReduceBuilder = TestStateScopeReduceBuilder(delegate)
-
-        stateScopeReduceBuilder.transition<TestAction.Action1>(transition)
-        verify(delegate, once()).addTransitionWithActionType(TestAction.Action1::class, transition)
     }
 
     @Test
     fun `Given effect block, When effect, Then added to delegate`() {
         val effect: TestDslEffectBlock = {}
         val delegate = mock<TestDslReduceBuilderDelegate>()
-        val stateScopeReduceBuilder = TestStateScopeReduceBuilder(delegate)
+        val scopeReduceBuilder = TestScopeReduceBuilder(delegate)
 
-        stateScopeReduceBuilder.effect(effect)
+        scopeReduceBuilder.effect(effect)
         verify(delegate, once()).addEffect(effect)
-    }
-
-    @Test
-    fun `Given action type and effect block, When effect, Then added to delegate`() {
-        val effect: suspend DslEffectScope<TestAction.Action1, TestState, TestAction>.() -> Unit = {}
-        val delegate = mock<TestDslReduceBuilderDelegate>()
-        val stateScopeReduceBuilder = TestStateScopeReduceBuilder(delegate)
-
-        stateScopeReduceBuilder.effect<TestAction.Action1>(effect)
-        verify(delegate, once()).addEffectWithActionType(TestAction.Action1::class, effect)
     }
 
     @Test
@@ -111,7 +90,7 @@ class StateScopeReduceBuilderTest {
         suspend fun testScopeWithPredicate(
             predicateResult: Boolean
         ) {
-            testScopeInStateScopeReduceBuilder(
+            testScopeScopeReduceBuilder(
                 setupReduce = { mockEffect ->
                     scope(predicate = { predicateResult }) {
                         effect { mockEffect.invoke() }
@@ -130,7 +109,7 @@ class StateScopeReduceBuilderTest {
         suspend fun testScopeWithTransformSource(
             canSourceConvert: Boolean
         ) {
-            testScopeInStateScopeReduceBuilder(
+            testScopeScopeReduceBuilder(
                 setupReduce = { mockEffect ->
                     scope(transformSource = { if (canSourceConvert) this else null }) {
                         effect { mockEffect.invoke() }
@@ -145,43 +124,39 @@ class StateScopeReduceBuilderTest {
     }
 
     @Test
-    fun `When scope with state type, Then launched effect optionally`() = runTest {
-        suspend fun testScopeWithActionType(
+    fun `When actionScope, Then launched effect optionally`() = runTest {
+        testScopeScopeReduceBuilder(
+            setupReduce = { mockEffect ->
+                actionScope {
+                    effect { mockEffect.invoke() }
+                }
+            },
+            verificationMode = once()
+        )
+    }
+
+    @Test
+    fun `When actionScope with action type, Then launched effect optionally`() = runTest {
+        suspend fun testActionScopeWithActionType(
             isInputActionMatched: Boolean
         ) {
-            val inputState = TestState.State1
-            testScopeInStateScopeReduceBuilder(
-                inputState = inputState,
-                setupReduce = { mockEffect ->
-                    if (isInputActionMatched) {
-                        scope<TestState.State1> {
-                            effect { mockEffect.invoke() }
-                        }
-                    } else {
-                        scope<TestState.State2> {
-                            effect { mockEffect.invoke() }
-                        }
-                    }
-                },
-                verificationMode = if (isInputActionMatched) once() else never()
-            )
+
         }
-        testScopeWithActionType(isInputActionMatched = true)
-        testScopeWithActionType(isInputActionMatched = false)
     }
 }
 
-private suspend fun testScopeInStateScopeReduceBuilder(
+private suspend fun testScopeScopeReduceBuilder(
+    inputAction: TestAction = TestAction.genAction(),
     inputState: TestState = TestState.genState(),
-    setupReduce: TestStateScopeReduceBuilder.(mockEffect: () -> Unit) -> Unit,
+    setupReduce: TestScopeReduceBuilder.(mockEffect: () -> Unit) -> Unit,
     verificationMode: VerificationMode
 ) {
     val runnable: () -> Unit = mock()
-    val compositeEffect = TestStateScopeReduceBuilder()
+    val compositeEffect = TestScopeReduceBuilder()
         .apply { setupReduce(runnable) }
         .buildEffect()
     compositeEffect.invoke(
-        DslEffectScope(UpdateSource(TestAction.genAction(), inputState), mock()),
+        DslEffectScope(UpdateSource(inputAction, inputState), mock()),
     )
     verify(runnable, verificationMode).invoke()
 }
