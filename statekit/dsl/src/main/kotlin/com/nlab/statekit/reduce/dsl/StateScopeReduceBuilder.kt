@@ -23,9 +23,9 @@ import kotlin.reflect.KClass
  * @author Doohyun
  */
 @BuilderDsl
-class StateScopeReduceBuilder<A : Any, S : RS, RA : Any, RS : Any> internal constructor() {
-    private val delegate = DslReduceBuilderDelegate<A, S, RA, RS>()
-
+class StateScopeReduceBuilder<A : Any, S : RS, RA : Any, RS : Any> internal constructor(
+    private val delegate: DslReduceBuilderDelegate<A, S, RA, RS> = DslReduceBuilderDelegate()
+) {
     internal fun buildTransition() = delegate.buildTransition()
 
     internal fun buildEffect() = delegate.buildEffect()
@@ -36,22 +36,11 @@ class StateScopeReduceBuilder<A : Any, S : RS, RA : Any, RS : Any> internal cons
     }
 
     @OperationDsl
-    fun <T : Any, U : S> transition(
-        transformSource: UpdateSource<A, S>.() -> UpdateSource<T, U>?,
-        block: DslTransitionScope<T, U>.() -> RS
-    ) {
-        delegate.addTransitionWithTransformSource(transformSource, block)
-    }
-
-    @OperationDsl
     fun <T : A> transition(
         actionType: KClass<T>,
         block: DslTransitionScope<T, S>.() -> RS
     ) {
-        transition(
-            transformSource = { tryCopyWithActionType(actionType) },
-            block = block
-        )
+        delegate.addTransitionWithActionType(actionType, block)
     }
 
     @JvmName(name = "transitionWithActionType")
@@ -66,22 +55,11 @@ class StateScopeReduceBuilder<A : Any, S : RS, RA : Any, RS : Any> internal cons
     }
 
     @OperationDsl
-    fun <T : Any, U : S> effect(
-        transformSource: UpdateSource<A, S>.() -> UpdateSource<T, U>?,
-        block: suspend DslEffectScope<T, U, RA>.() -> Unit
-    ) {
-        delegate.addEffectWithTransformSource(transformSource, block)
-    }
-
-    @OperationDsl
     fun <T : A> effect(
         actionType: KClass<T>,
         block: suspend DslEffectScope<T, S, RA>.() -> Unit
     ) {
-        effect(
-            transformSource = { tryCopyWithActionType(actionType) },
-            block = block
-        )
+        delegate.addEffectWithActionType(actionType, block)
     }
 
     @JvmName(name = "effectWithActionType")
