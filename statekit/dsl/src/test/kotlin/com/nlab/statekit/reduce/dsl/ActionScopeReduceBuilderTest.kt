@@ -24,9 +24,11 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.once
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import org.mockito.verification.VerificationMode
 
 private typealias TestActionScopeReduceBuilder = ActionScopeReduceBuilder<TestAction, TestState, TestAction, TestState>
 
@@ -108,22 +110,77 @@ class ActionScopeReduceBuilderTest {
         suspend fun testScopeWithPredicate(
             predicateResult: Boolean
         ) {
-            val onEffect: suspend () -> Unit = mock()
-            val compositeEffect = TestActionScopeReduceBuilder()
-                .apply {
+            testScopeInActionScopeReduceBuilder(
+                setupReduce = { mockEffect ->
                     scope(predicate = { predicateResult }) {
-                        effect { onEffect.invoke() }
+                        effect { mockEffect.invoke() }
                     }
-                }
-                .buildEffect()
-            compositeEffect.invoke(
-                DslEffectScope(
-                    UpdateSource(TestAction.genAction(), TestState.genState()),
-                    mock()
-                )
+                },
+                verificationMode = if (predicateResult) once() else never()
             )
         }
+
         testScopeWithPredicate(predicateResult = true)
         testScopeWithPredicate(predicateResult = false)
     }
+
+    @Test
+    fun `When scope with transform source, Then launched effect optionally`() = runTest {
+        suspend fun testScopeWithTransformSource(
+            canSourceConvert: Boolean
+        ) {
+            testScopeInActionScopeReduceBuilder(
+                setupReduce = { mockEffect ->
+                    scope(transformSource = { if (canSourceConvert) this else null }) {
+                       effect { mockEffect.invoke() }
+                    }
+                },
+                verificationMode = if (canSourceConvert) once() else never()
+            )
+        }
+
+        testScopeWithTransformSource(canSourceConvert = true)
+        testScopeWithTransformSource(canSourceConvert = false)
+    }
+
+    @Test
+    fun `When scope with action type, Then launched effect optionally`() = runTest {
+        suspend fun testScopeWithActionType(
+            isInputActionMatched: Boolean
+        ) {
+            val inputAction = TestAction.Action1
+            testScopeInActionScopeReduceBuilder(
+                inputAction = inputAction,
+                setupReduce = { mockEffect ->
+                    if (isInputActionMatched) {
+                        scope<TestAction.Action1> {
+                            effect { mockEffect.invoke() }
+                        }
+                    } else {
+                        scope<TestAction.Action2> {
+                            effect { mockEffect.invoke() }
+                        }
+                    }
+                },
+                verificationMode = if (isInputActionMatched) once() else never()
+            )
+        }
+        testScopeWithActionType(isInputActionMatched = true)
+        testScopeWithActionType(isInputActionMatched = false)
+    }
+}
+
+private suspend fun testScopeInActionScopeReduceBuilder(
+    inputAction: TestAction = TestAction.genAction(),
+    setupReduce: TestActionScopeReduceBuilder.(mockEffect: () -> Unit) -> Unit,
+    verificationMode: VerificationMode
+) {
+    val runnable: () -> Unit = mock()
+    val compositeEffect = TestActionScopeReduceBuilder()
+        .apply { setupReduce(runnable) }
+        .buildEffect()
+    compositeEffect.invoke(
+        DslEffectScope(UpdateSource(inputAction, TestState.genState()), mock()),
+    )
+    verify(runnable, verificationMode).invoke()
 }

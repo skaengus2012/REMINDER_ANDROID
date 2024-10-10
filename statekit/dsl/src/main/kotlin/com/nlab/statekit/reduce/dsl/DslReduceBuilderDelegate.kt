@@ -43,7 +43,7 @@ internal class DslReduceBuilderDelegate<A : Any, S : RS, RA : Any, RS : Any> {
 
     // TODO define inline function after fix below
     // https://github.com/jacoco/jacoco/pull/1670
-    fun <T : Any, U : Any> addTransitionWithTransformSource(
+    fun <T : Any, U : RS> addTransitionWithTransformSource(
         transformSource: (UpdateSource<A, S>) -> UpdateSource<T, U>?,
         block: (DslTransitionScope<T, U>) -> RS
     ) {
@@ -92,7 +92,7 @@ internal class DslReduceBuilderDelegate<A : Any, S : RS, RA : Any, RS : Any> {
 
     // TODO define inline function after fix below
     // https://github.com/jacoco/jacoco/pull/1670
-    fun <T : Any, U : Any> addEffectWithTransformSource(
+    fun <T : Any, U : RS> addEffectWithTransformSource(
         transformSource: (UpdateSource<A, S>) -> UpdateSource<T, U>?,
         block: suspend (DslEffectScope<T, U, RA>) -> Unit
     ) {
