@@ -21,7 +21,7 @@ import com.nlab.statekit.reduce.Reduce
 import com.nlab.statekit.reduce.launch
 import com.nlab.statekit.reduce.transitionTo
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.getAndUpdate
 
@@ -30,19 +30,25 @@ import kotlinx.coroutines.flow.getAndUpdate
  */
 internal class StoreActionDispatcher<A : Any, S : Any>(
     private val state: MutableStateFlow<S>,
-    private val reduce: Reduce<A, S>
+    private val reduce: Reduce<A, S>,
 ) : ActionDispatcher<A> {
     override suspend fun dispatch(action: A) {
-        val transition = reduce.transition
-        val current = when {
-            transition == null -> state.value
+        val current = when (val transition = reduce.transition) {
+            null -> state.value
             else -> state.getAndUpdate { old -> transition.transitionTo(action, old) }
         }
-        reduce.effect?.launch(
-            action,
-            current,
-            actionDispatcher = this@StoreActionDispatcher,
-            coroutineScope = CoroutineScope(currentCoroutineContext())
-        )
+        reduce.effect
+            ?.let { effect ->
+                 val block = { coroutineScope: CoroutineScope ->
+                     effect.launch(
+                         action,
+                         current,
+                         actionDispatcher = this,
+                         coroutineScope = coroutineScope
+                     )
+                }
+                coroutineScope(block)
+            }
+            ?: Unit
     }
 }

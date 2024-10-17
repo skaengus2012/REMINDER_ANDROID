@@ -22,7 +22,7 @@ import kotlin.reflect.KClass
  * @author Doohyun
  */
 internal class DslReduceBuilderDelegate<A : Any, S : RS, RA : Any, RS : Any> {
-    private val transitionBuilder = DslTransitionBuilder<A, S, RS>()
+    private val transitionBuilder = DslTransitionBuilder<RS, A, S>()
     private val effectBuilder = DslEffectBuilder<A, S, RA>()
 
     fun buildTransition() = transitionBuilder.build()

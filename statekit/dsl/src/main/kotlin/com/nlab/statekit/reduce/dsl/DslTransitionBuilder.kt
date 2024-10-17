@@ -16,25 +16,23 @@
 
 package com.nlab.statekit.reduce.dsl
 
-import com.nlab.statekit.reduce.MergeReduceHelper
-
 
 /**
  * @author Doohyun
  */
-internal class DslTransitionBuilder<A : Any, S : R, R : Any> {
-    private val transitions = mutableListOf<(DslTransitionScope<A, S>) -> R>()
+internal class DslTransitionBuilder<R : Any, A : Any, S : R> {
+    private val transitions = mutableListOf<DslTransition<R, A, S>>()
 
-    fun add(block: (DslTransitionScope<A, S>) -> R) {
+    fun add(block: DslTransition.NodeTransition<R, A, S>) {
         transitions.add(block)
     }
 
-    fun build(): (DslTransitionScope<A, S>) -> R = { source ->
-        MergeReduceHelper.findNextTransitionState(
-            current = source.current,
-            nextStates = transitions
-                .asSequence()
-                .map { transition -> transition(source) },
+    fun build(): DslTransition<R, A, S>? = when (transitions.size) {
+        0 -> null
+        1 -> transitions.first()
+        else -> DslTransition.CompositeTransition(
+            head = transitions.first(),
+            tail = transitions.subList(1, transitions.size)
         )
     }
 }

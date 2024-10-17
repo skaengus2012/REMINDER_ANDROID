@@ -16,19 +16,14 @@
 
 package com.nlab.statekit.reduce.dsl
 
-import kotlinx.coroutines.coroutineScope
-
 /**
- * @author Doohyun
+ * @author Thalys
  */
-internal class DslEffectBuilder<A : Any, S : Any, R : Any> {
-    private val effects = mutableListOf<suspend (DslEffectScope<A, S, R>) -> Unit>()
-
-    fun add(block: suspend (DslEffectScope<A, S, R>) -> Unit) {
-        effects += block
+internal sealed interface DslTransition<R : Any, A : Any, S : R> {
+    fun interface NodeTransition<R : Any, A : Any, S : R> : DslTransition<R, A, S> {
+        fun next(scope: DslTransitionScope<A, S>): R
     }
+    class CompositeTransition<R : Any, A : Any, S : R>(
 
-    fun build(): suspend (DslEffectScope<A, S, R>) -> Unit = { scope ->
-        coroutineScope(MergeReduceHelper.launchEffectAsync(effects, onLaunched = { it(scope) }))
-    }
+    ) : DslTransition<R, A, S>
 }

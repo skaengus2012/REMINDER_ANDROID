@@ -6,7 +6,6 @@ import com.nlab.statekit.reduce.TestNodeEffect
 import com.nlab.statekit.reduce.TestNodeTransition
 import com.nlab.statekit.reduce.TestReduce
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
@@ -62,8 +61,6 @@ class StoreActionDispatcherTest {
             )
         )
         actionDispatcher.dispatch(TestAction.genAction())
-        advanceUntilIdle()
-
         verify(runnable, once()).invoke(initState)
     }
 }

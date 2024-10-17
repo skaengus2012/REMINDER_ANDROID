@@ -14,21 +14,14 @@
  * limitations under the License.
  */
 
-package com.nlab.statekit.reduce.dsl
-
-import kotlinx.coroutines.coroutineScope
+package com.nlab.statekit.collections
 
 /**
- * @author Doohyun
+ * @author Thalys
  */
-internal class DslEffectBuilder<A : Any, S : Any, R : Any> {
-    private val effects = mutableListOf<suspend (DslEffectScope<A, S, R>) -> Unit>()
-
-    fun add(block: suspend (DslEffectScope<A, S, R>) -> Unit) {
-        effects += block
-    }
-
-    fun build(): suspend (DslEffectScope<A, S, R>) -> Unit = { scope ->
-        coroutineScope(MergeReduceHelper.launchEffectAsync(effects, onLaunched = { it(scope) }))
-    }
+@JvmInline
+value class NotEmptyList<T>(val value: List<T>) {
+   init {
+       check(value.isNotEmpty())
+   }
 }
