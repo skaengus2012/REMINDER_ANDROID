@@ -32,7 +32,7 @@ class StateScopeReduceBuilder<A : Any, S : RS, RA : Any, RS : Any> internal cons
 
     @OperationDsl
     fun transition(block: DslTransitionScope<A, S>.() -> RS) {
-        delegate.addTransition(block)
+        delegate.addNodeTransition(block)
     }
 
     @OperationDsl

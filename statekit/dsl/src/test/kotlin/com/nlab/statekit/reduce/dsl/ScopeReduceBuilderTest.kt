@@ -72,7 +72,7 @@ class ScopeReduceBuilderTest {
         val scopeReduceBuilder = TestScopeReduceBuilder(delegate)
 
         scopeReduceBuilder.transition(transition)
-        verify(delegate, once()).addTransition(transition)
+        verify(delegate, once()).addNodeTransition(transition)
     }
 
     @Test

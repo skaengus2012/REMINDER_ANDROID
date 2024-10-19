@@ -16,6 +16,8 @@
 
 package com.nlab.statekit.reduce.dsl
 
+import com.nlab.statekit.collections.NotEmptyList
+
 /**
  * @author Thalys
  */
@@ -23,7 +25,18 @@ internal sealed interface DslTransition<R : Any, A : Any, S : R> {
     fun interface NodeTransition<R : Any, A : Any, S : R> : DslTransition<R, A, S> {
         fun next(scope: DslTransitionScope<A, S>): R
     }
-    class CompositeTransition<R : Any, A : Any, S : R>(
 
+    class CompositeTransition<R : Any, A : Any, S : R>(
+        val transitions: NotEmptyList<DslTransition<R, A, S>>
+    ) : DslTransition<R, A, S>
+
+    class PredicateScopeTransition<R : Any, A : Any, S : R>(
+        val predicate: (UpdateSource<A, S>) -> Boolean,
+        val transition: DslTransition<R, A, S>
+    ) : DslTransition<R, A, S>
+
+    class TransformSourceScopeTransition<R : Any, A : Any, S : R, T : Any, U : R>(
+        val transformSource: (UpdateSource<A, S>) -> UpdateSource<T, U>?,
+        val transition: DslTransition<R, T, U>
     ) : DslTransition<R, A, S>
 }

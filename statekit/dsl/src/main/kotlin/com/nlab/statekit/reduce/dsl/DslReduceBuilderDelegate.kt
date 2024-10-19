@@ -28,7 +28,12 @@ internal class DslReduceBuilderDelegate<A : Any, S : RS, RA : Any, RS : Any> {
     fun buildTransition() = transitionBuilder.build()
     fun buildEffect() = effectBuilder.build()
 
-    fun addTransition(block: (DslTransitionScope<A, S>) -> RS) {
+    fun addTransition(transition: DslTransition<RS, A, S>?) {
+        transition ?: return
+        transitionBuilder.add(transition)
+    }
+
+    fun addNodeTransition(block: DslTransition.NodeTransition<RS, A, S>) {
         transitionBuilder.add(block)
     }
 
@@ -36,28 +41,34 @@ internal class DslReduceBuilderDelegate<A : Any, S : RS, RA : Any, RS : Any> {
     // https://github.com/jacoco/jacoco/pull/1670
     fun addTransitionWithPredicate(
         predicate: (UpdateSource<A, S>) -> Boolean,
-        block: (DslTransitionScope<A, S>) -> RS
+        transition: DslTransition<RS, A, S>?
     ) {
-        addTransition { scope -> if (predicate(scope)) block(scope) else scope.current }
+        transition ?: return
+        transitionBuilder.add(
+            DslTransition.PredicateScopeTransition(
+                predicate,
+                transition = transition
+            )
+        )
     }
 
     // TODO define inline function after fix below
     // https://github.com/jacoco/jacoco/pull/1670
     fun <T : Any, U : RS> addTransitionWithTransformSource(
         transformSource: (UpdateSource<A, S>) -> UpdateSource<T, U>?,
-        block: (DslTransitionScope<T, U>) -> RS
+        transition: DslTransition<RS, T, U>?
     ) {
-        addTransition { scope ->
-            val newSource = transformSource(scope)
-            if (newSource == null) scope.current else block(DslTransitionScope(newSource))
-        }
+        transition ?: return
+        transitionBuilder.add(
+            DslTransition.TransformSourceScopeTransition(transformSource, transition)
+        )
     }
 
     // TODO define inline function after fix below
     // https://github.com/jacoco/jacoco/pull/1670
     fun <T : A> addTransitionWithActionType(
         actionType: KClass<T>,
-        block: (DslTransitionScope<T, S>) -> RS
+        block: DslTransition.NodeTransition<RS, T, S>
     ) {
         addTransitionWithTransformSource(
             transformSource = { it.tryCopyWithActionType(actionType) },
@@ -69,7 +80,7 @@ internal class DslReduceBuilderDelegate<A : Any, S : RS, RA : Any, RS : Any> {
     // https://github.com/jacoco/jacoco/pull/1670
     fun <T : S> addTransitionWithStateType(
         stateType: KClass<T>,
-        block: (DslTransitionScope<A, T>) -> RS
+        block: DslTransition.NodeTransition<RS, A, T>
     ) {
         addTransitionWithTransformSource(
             transformSource = { it.tryCopyWithStateType(stateType) },

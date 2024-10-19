@@ -24,7 +24,7 @@ class DslReduceBuilderDelegateTest {
             inputState = inputState,
             expectedNextState = expectedNextState,
             setupReduce = {
-                addTransition { expectedNextState }
+                addNodeTransition { expectedNextState }
             }
         )
     }
@@ -42,7 +42,7 @@ class DslReduceBuilderDelegateTest {
                 setupReduce = {
                     addTransitionWithPredicate(
                         predicate = { predicateResult },
-                        block = { transitionReturnState }
+                        transition = { transitionReturnState }
                     )
                 }
             )
@@ -68,7 +68,7 @@ class DslReduceBuilderDelegateTest {
                             if (canSourceConvert) updateSource
                             else null
                         },
-                        block = { transitionReturnState }
+                        transition = { transitionReturnState }
                     )
                 }
             )

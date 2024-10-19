@@ -72,7 +72,7 @@ class StateScopeReduceBuilderTest {
         val stateScopeReduceBuilder = TestStateScopeReduceBuilder(delegate)
 
         stateScopeReduceBuilder.transition(transition)
-        verify(delegate, once()).addTransition(transition)
+        verify(delegate, once()).addNodeTransition(transition)
     }
 
 

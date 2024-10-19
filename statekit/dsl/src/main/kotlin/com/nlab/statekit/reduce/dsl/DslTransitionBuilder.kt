@@ -23,16 +23,9 @@ package com.nlab.statekit.reduce.dsl
 internal class DslTransitionBuilder<R : Any, A : Any, S : R> {
     private val transitions = mutableListOf<DslTransition<R, A, S>>()
 
-    fun add(block: DslTransition.NodeTransition<R, A, S>) {
+    fun add(block: DslTransition<R, A, S>) {
         transitions.add(block)
     }
 
-    fun build(): DslTransition<R, A, S>? = when (transitions.size) {
-        0 -> null
-        1 -> transitions.first()
-        else -> DslTransition.CompositeTransition(
-            head = transitions.first(),
-            tail = transitions.subList(1, transitions.size)
-        )
-    }
+    fun build(): DslTransition<R, A, S>? = TODO()
 }

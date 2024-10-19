@@ -20,7 +20,7 @@ package com.nlab.statekit.collections
  * @author Thalys
  */
 @JvmInline
-value class NotEmptyList<T>(val value: List<T>) {
+internal value class NotEmptyList<T>(val value: List<T>) {
    init {
        check(value.isNotEmpty())
    }
