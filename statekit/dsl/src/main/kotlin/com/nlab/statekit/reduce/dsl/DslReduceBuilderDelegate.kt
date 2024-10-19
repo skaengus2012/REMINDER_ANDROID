@@ -28,59 +28,34 @@ internal class DslReduceBuilderDelegate<A : Any, S : RS, RA : Any, RS : Any> {
     fun buildTransition() = transitionBuilder.build()
     fun buildEffect() = effectBuilder.build()
 
-    fun addTransition(transition: DslTransition<RS, A, S>?) {
-        transition ?: return
+    fun addTransition(transition: DslTransition<RS, A, S>) {
         transitionBuilder.add(transition)
     }
 
-    fun addNodeTransition(block: DslTransition.NodeTransition<RS, A, S>) {
-        transitionBuilder.add(block)
-    }
-
-    // TODO define inline function after fix below
-    // https://github.com/jacoco/jacoco/pull/1670
     fun addTransitionWithPredicate(
         predicate: (UpdateSource<A, S>) -> Boolean,
-        transition: DslTransition<RS, A, S>?
+        transition: DslTransition<RS, A, S>
     ) {
-        transition ?: return
-        transitionBuilder.add(
-            DslTransition.PredicateScopeTransition(
-                predicate,
-                transition = transition
-            )
-        )
+        transitionBuilder.add(DslTransition.PredicateScopeTransition(predicate, transition))
     }
 
-    // TODO define inline function after fix below
-    // https://github.com/jacoco/jacoco/pull/1670
     fun <T : Any, U : RS> addTransitionWithTransformSource(
         transformSource: (UpdateSource<A, S>) -> UpdateSource<T, U>?,
-        transition: DslTransition<RS, T, U>?
+        transition: DslTransition<RS, T, U>
     ) {
-        transition ?: return
-        transitionBuilder.add(
-            DslTransition.TransformSourceScopeTransition(transformSource, transition)
-        )
+        transitionBuilder.add(DslTransition.TransformSourceScopeTransition(transformSource, transition))
     }
 
-    // TODO define inline function after fix below
-    // https://github.com/jacoco/jacoco/pull/1670
     fun <T : A> addTransitionWithActionType(
         actionType: KClass<T>,
-        block: DslTransition.NodeTransition<RS, T, S>
+        block: DslTransition<RS, T, S>
     ) {
-        addTransitionWithTransformSource(
-            transformSource = { it.tryCopyWithActionType(actionType) },
-            block
-        )
+        addTransitionWithTransformSource(transformSource = { it.tryCopyWithActionType(actionType) }, block)
     }
 
-    // TODO define inline function after fix below
-    // https://github.com/jacoco/jacoco/pull/1670
     fun <T : S> addTransitionWithStateType(
         stateType: KClass<T>,
-        block: DslTransition.NodeTransition<RS, A, T>
+        block: DslTransition<RS, A, T>
     ) {
         addTransitionWithTransformSource(
             transformSource = { it.tryCopyWithStateType(stateType) },
@@ -135,4 +110,19 @@ internal class DslReduceBuilderDelegate<A : Any, S : RS, RA : Any, RS : Any> {
             block
         )
     }
+}
+
+internal fun <A : Any, S : RS, RA : Any, RS : Any>
+        DslReduceBuilderDelegate<A, S, RA, RS>.addNodeTransition(
+    block: DslTransition.NodeTransition<RS, A, S>
+) {
+    addTransition(block)
+}
+
+internal fun <A : Any, S : RS, RA : Any, RS : Any, T : A>
+        DslReduceBuilderDelegate<A, S, RA, RS>.addNodeTransitionWithActionType(
+    actionType: KClass<T>,
+    block: DslTransition.NodeTransition<RS, T, S>
+) {
+    addTransitionWithActionType(actionType, block)
 }
