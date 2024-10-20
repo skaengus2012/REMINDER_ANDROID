@@ -22,6 +22,7 @@ import com.nlab.statekit.reduce.Reduce
  */
 typealias RootReduceBuilder<A, S> = ScopeReduceBuilder<A, S, A, S>
 
+/**
 @Suppress("FunctionName")
 fun <A : Any, S : Any> DslReduce(defineDSL: RootReduceBuilder<A, S>.() -> Unit): Reduce<A, S> =
     RootReduceBuilder<A, S>()
@@ -39,4 +40,4 @@ private fun <A : Any, S : Any> dslReduceOf(reduceBuilder: RootReduceBuilder<A, S
             effect(DslEffectScope(UpdateSource(action, current), actionDispatcher))
         }
     )
-}
+}*/

@@ -22,6 +22,7 @@ import kotlinx.coroutines.coroutineScope
  * @author Doohyun
  */
 internal class DslEffectBuilder<A : Any, S : Any, R : Any> {
+    /**
     private val effects = mutableListOf<suspend (DslEffectScope<A, S, R>) -> Unit>()
 
     fun add(block: suspend (DslEffectScope<A, S, R>) -> Unit) {
@@ -30,5 +31,5 @@ internal class DslEffectBuilder<A : Any, S : Any, R : Any> {
 
     fun build(): suspend (DslEffectScope<A, S, R>) -> Unit = { scope ->
         coroutineScope(MergeReduceHelper.launchEffectAsync(effects, onLaunched = { it(scope) }))
-    }
+    }*/
 }

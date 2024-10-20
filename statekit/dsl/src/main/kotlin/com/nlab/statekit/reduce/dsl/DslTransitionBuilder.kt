@@ -20,12 +20,55 @@ package com.nlab.statekit.reduce.dsl
 /**
  * @author Doohyun
  */
-internal class DslTransitionBuilder<R : Any, A : Any, S : R> {
-    private val transitions = mutableListOf<DslTransition<R, A, S>>()
+internal class DslTransitionBuilder(
+    private val scope: Any
+) {
+    private val transitions = mutableListOf<DslTransition>()
 
-    fun add(block: DslTransition<R, A, S>) {
-        transitions.add(block)
+    fun build(): DslTransition? = when (transitions.size) {
+        0 -> null
+        1 -> transitions.first()
+        else -> DslTransition.CompositeTransition(scope, transitions)
     }
 
-    fun build(): DslTransition<R, A, S>? = TODO()
+    fun <R : Any, A : Any, S : R> addNodeTransition(block: (DslTransitionScope<A, S>) -> R) {
+        transitions.add(
+            DslTransition.NodeTransition(
+                scope = scope,
+                next = block
+            )
+        )
+    }
+
+    fun addScopeTransition(transition: DslTransition) {
+        transitions.add(transition)
+    }
+
+    fun <A : Any, S : Any> addPredicateScopeTransition(
+        isMatch: (UpdateSource<A, S>) -> Boolean,
+        transition: DslTransition
+    ) {
+        transitions.add(
+            DslTransition.PredicateScopeTransition(
+                scope = scope,
+                isMatch = isMatch,
+                transition = transition,
+            )
+        )
+    }
+
+    fun <A : Any, S : Any, T : Any, U : Any> addTransformSourceScopeTransition(
+        subScope: Any,
+        transformSource: (UpdateSource<A, S>) -> UpdateSource<T, U>?,
+        transition: DslTransition
+    ) {
+        transitions.add(
+            DslTransition.TransformSourceScopeTransition(
+                scope = scope,
+                subScope = subScope,
+                transformSource = transformSource,
+                transition = transition,
+            )
+        )
+    }
 }

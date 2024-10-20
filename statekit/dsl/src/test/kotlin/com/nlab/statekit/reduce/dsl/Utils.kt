@@ -24,4 +24,3 @@ import com.nlab.statekit.TestState
  */
 typealias TestDslTransitionBlock = (DslTransitionScope<TestAction, TestState>).() -> TestState
 typealias TestDslEffectBlock = suspend (DslEffectScope<TestAction, TestState, TestAction>) -> Unit
-internal typealias TestDslReduceBuilderDelegate = DslReduceBuilderDelegate<TestAction, TestState, TestAction, TestState>

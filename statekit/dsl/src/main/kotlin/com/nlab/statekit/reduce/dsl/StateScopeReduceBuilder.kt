@@ -24,8 +24,9 @@ import kotlin.reflect.KClass
  */
 @BuilderDsl
 class StateScopeReduceBuilder<A : Any, S : RS, RA : Any, RS : Any> internal constructor(
-    private val delegate: DslReduceBuilderDelegate<A, S, RA, RS> = DslReduceBuilderDelegate()
+  //  private val delegate: DslReduceBuilderDelegate<A, S, RA, RS> = DslReduceBuilderDelegate()
 ) {
+    /**
     internal fun buildTransition() = delegate.buildTransition()
 
     internal fun buildEffect() = delegate.buildEffect()
@@ -103,5 +104,5 @@ class StateScopeReduceBuilder<A : Any, S : RS, RA : Any, RS : Any> internal cons
     @OperationDsl
     inline fun <reified T : S> scope(noinline block: StateScopeReduceBuilder<A, T, RA, RS>.() -> Unit) {
         scope(T::class, block)
-    }
+    }*/
 }

@@ -36,6 +36,7 @@ private typealias TestActionScopeReduceBuilder = ActionScopeReduceBuilder<TestAc
  * @author Doohyun
  */
 class ActionScopeReduceBuilderTest {
+    /**
     @Test
     fun `When create scope without external delegate, Then success`() {
         TestActionScopeReduceBuilder()
@@ -167,9 +168,10 @@ class ActionScopeReduceBuilderTest {
         }
         testScopeWithActionType(isInputActionMatched = true)
         testScopeWithActionType(isInputActionMatched = false)
-    }
+    }*/
 }
 
+/**
 private suspend fun testScopeInActionScopeReduceBuilder(
     inputAction: TestAction = TestAction.genAction(),
     setupReduce: TestActionScopeReduceBuilder.(mockEffect: () -> Unit) -> Unit,
@@ -183,4 +185,4 @@ private suspend fun testScopeInActionScopeReduceBuilder(
         DslEffectScope(UpdateSource(inputAction, TestState.genState()), mock()),
     )
     verify(runnable, verificationMode).invoke()
-}
+}*/

@@ -23,20 +23,20 @@ import kotlin.reflect.KClass
  */
 @BuilderDsl
 class ScopeReduceBuilder<A : Any, S : RS, RA : Any, RS : Any> internal constructor(
-    private val delegate: DslReduceBuilderDelegate<A, S, RA, RS> = DslReduceBuilderDelegate()
+    private val scope: Any,
 ) {
+    private val transitionBuilder = DslTransitionBuilder(scope)
+
+    internal fun buildTransition(): DslTransition? = transitionBuilder.build()
+
+   /**
     internal fun buildTransition() = delegate.buildTransition()
 
     internal fun buildEffect() = delegate.buildEffect()
-
+*/
     @OperationDsl
     fun transition(block: DslTransitionScope<A, S>.() -> RS) {
-        delegate.addNodeTransition(block)
-    }
-
-    @OperationDsl
-    fun effect(block: suspend DslEffectScope<A, S, RA>.() -> Unit) {
-        delegate.addEffect(block)
+       transitionBuilder.addNodeTransition(block)
     }
 
     @JvmName(name = "scopeWithPredicate")
@@ -45,9 +45,11 @@ class ScopeReduceBuilder<A : Any, S : RS, RA : Any, RS : Any> internal construct
         predicate: UpdateSource<A, S>.() -> Boolean,
         block: ScopeReduceBuilder<A, S, RA, RS>.() -> Unit
     ) {
-        val subReduceBuilder = ScopeReduceBuilder<A, S, RA, RS>().apply(block)
-        delegate.addTransitionWithPredicate(predicate, subReduceBuilder.buildTransition())
-        delegate.addEffectWithPredicate(predicate, subReduceBuilder.buildEffect())
+        val subReduceBuilder = ScopeReduceBuilder<A, S, RA, RS>(scope).apply(block)
+        val subTransition = subReduceBuilder.buildTransition()
+        if (subTransition != null) {
+            transitionBuilder.addPredicateScopeTransition(predicate, subTransition)
+        }
     }
 
     @JvmName(name = "scopeWithTransformSource")
@@ -56,18 +58,31 @@ class ScopeReduceBuilder<A : Any, S : RS, RA : Any, RS : Any> internal construct
         transformSource: UpdateSource<A, S>.() -> UpdateSource<T, U>?,
         block: ScopeReduceBuilder<T, U, RA, RS>.() -> Unit
     ) {
-        val subReduceBuilder = ScopeReduceBuilder<T, U, RA, RS>().apply(block)
-        delegate.addTransitionWithTransformSource(transformSource, subReduceBuilder.buildTransition())
-        delegate.addEffectWithTransformSource(transformSource, subReduceBuilder.buildEffect())
+        val subScope = Any()
+        val subReduceBuilder = ScopeReduceBuilder<T, U, RA, RS>(subScope).apply(block)
+        val subTransition = subReduceBuilder.buildTransition()
+        if (subTransition != null) {
+            transitionBuilder.addTransformSourceScopeTransition(
+                subScope,
+                transformSource,
+                subTransition
+            )
+        }
+
+        // delegate.addEffectWithTransformSource(transformSource, subReduceBuilder.buildEffect())
     }
 
     @OperationDsl
     fun actionScope(
         block: ActionScopeReduceBuilder<A, S, RA, RS>.() -> Unit
     ) {
-        val subReduceBuilder = ActionScopeReduceBuilder<A, S, RA, RS>().apply(block)
-        delegate.addTransition(subReduceBuilder.buildTransition())
-        delegate.addEffect(subReduceBuilder.buildEffect())
+        val subReduceBuilder = ActionScopeReduceBuilder<A, S, RA, RS>(scope).apply(block)
+        val subTransition = subReduceBuilder.buildTransition()
+        if (subTransition != null) {
+            transitionBuilder.addScopeTransition(subTransition)
+        }
+
+        //   delegate.addEffect(subReduceBuilder.buildEffect())
     }
 
     @OperationDsl
@@ -75,9 +90,17 @@ class ScopeReduceBuilder<A : Any, S : RS, RA : Any, RS : Any> internal construct
         actionType: KClass<T>,
         block: ActionScopeReduceBuilder<T, S, RA, RS>.() -> Unit
     ) {
-        val subReduceBuilder = ActionScopeReduceBuilder<T, S, RA, RS>().apply(block)
-        delegate.addTransitionWithActionType(actionType, subReduceBuilder.buildTransition())
-        delegate.addEffectWithActionType(actionType, subReduceBuilder.buildEffect())
+        val subReduceBuilder = ActionScopeReduceBuilder<T, S, RA, RS>(scope).apply(block)
+        val subTransition = subReduceBuilder.buildTransition()
+        if (subTransition != null) {
+            transitionBuilder.addPredicateScopeTransition<A, S>(
+                isMatch = { updateSource -> actionType.isInstance(updateSource.action) },
+                transition = subTransition
+            )
+        }
+
+
+     //   delegate.addEffectWithActionType(actionType, subReduceBuilder.buildEffect())
     }
 
     @JvmName(name = "actionScopeWithActionType")
@@ -86,6 +109,15 @@ class ScopeReduceBuilder<A : Any, S : RS, RA : Any, RS : Any> internal construct
         actionScope(T::class, block)
     }
 
+
+    /**
+    @OperationDsl
+    fun effect(block: suspend DslEffectScope<A, S, RA>.() -> Unit) {
+        delegate.addEffect(block)
+    }
+*/
+
+/**
     @OperationDsl
     fun stateScope(
         block: StateScopeReduceBuilder<A, S, RA, RS>.() -> Unit
@@ -109,5 +141,5 @@ class ScopeReduceBuilder<A : Any, S : RS, RA : Any, RS : Any> internal construct
     @OperationDsl
     inline fun <reified T : S> stateScope(noinline block: StateScopeReduceBuilder<A, T, RA, RS>.() -> Unit) {
         stateScope(T::class, block)
-    }
+    }*/
 }

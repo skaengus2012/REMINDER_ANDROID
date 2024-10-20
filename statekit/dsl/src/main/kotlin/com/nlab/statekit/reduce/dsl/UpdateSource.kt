@@ -23,3 +23,11 @@ interface UpdateSource<A : Any, S : Any> {
     val action: A
     val current: S
 }
+
+fun <A : Any, S : Any> UpdateSource(
+    action: A,
+    current: S
+): UpdateSource<A, S> = object : UpdateSource<A, S> {
+    override val action: A = action
+    override val current: S = current
+}

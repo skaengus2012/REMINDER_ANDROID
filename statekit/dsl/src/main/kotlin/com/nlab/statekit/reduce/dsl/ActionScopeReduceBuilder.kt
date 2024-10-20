@@ -17,24 +17,23 @@
 package com.nlab.statekit.reduce.dsl
 
 import com.nlab.statekit.annotation.*
-import kotlin.reflect.KClass
 
 /**
  * @author Doohyun
  */
 @BuilderDsl
 class ActionScopeReduceBuilder<A : Any, S : RS, RA : Any, RS : Any> internal constructor(
-    private val delegate: DslReduceBuilderDelegate<A, S, RA, RS> = DslReduceBuilderDelegate()
+    private val scope: Any
 ) {
-    internal fun buildTransition() = delegate.buildTransition()
+    private val transitionBuilder = DslTransitionBuilder(scope)
 
-    internal fun buildEffect() = delegate.buildEffect()
+    internal fun buildTransition(): DslTransition? = transitionBuilder.build()
 
     @OperationDsl
     fun transition(block: DslTransitionScope<A, S>.() -> RS) {
-        delegate.addNodeTransition(block)
+    //    transitions.add(DslTransition.NodeTransition(scope = this, next = block))
     }
-
+/**
     @OperationDsl
     fun <T : S> transition(
         stateType: KClass<T>,
@@ -103,5 +102,5 @@ class ActionScopeReduceBuilder<A : Any, S : RS, RA : Any, RS : Any> internal con
     @OperationDsl
     inline fun <reified T : A> scope(noinline block: ActionScopeReduceBuilder<T, S, RA, RS>.() -> Unit) {
         scope(T::class, block)
-    }
+    }*/
 }
