@@ -24,7 +24,7 @@ import kotlinx.coroutines.flow.getAndUpdate
 /**
  * @author Doohyun
  */
-interface ActionDispatcher<A : Any> {
+interface ActionDispatcher<in A : Any> {
     suspend fun dispatch(action: A)
 }
 

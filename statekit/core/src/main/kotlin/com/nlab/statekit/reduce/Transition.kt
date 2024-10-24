@@ -50,38 +50,38 @@ fun <A : Any, S : Any> Transition<A, S>.transitionTo(
     tailrec fun <A : Any, S : Any> transitionInternal(
         action: A,
         current: S,
+        node: Transition<A, S>?,
         acc: Accumulator<Transition<A, S>>,
         accPool: AccumulatorPool,
-        node: Transition<A, S>?,
     ): S? = if (node == null) null else when (node) {
         is Transition.NodeTransition -> {
             val next = node.next(action, current)
             if (next != current) next
-            else transitionInternal(action, current, acc, accPool, acc.removeLastOrNull())
+            else transitionInternal(action, current, acc.removeLastOrNull(), acc, accPool)
         }
 
         is Transition.LifecycleNodeTransition -> {
             val next = node.next(action, current, accPool)
             if (next != current) next
-            else transitionInternal(action, current, acc, accPool, acc.removeLastOrNull())
+            else transitionInternal(action, current, acc.removeLastOrNull(), acc, accPool)
         }
 
         is Transition.CompositeTransition -> {
             transitionInternal(
                 action,
                 current,
+                node.head,
                 acc.apply {
                     node.tails.let { tails ->
                         for (index in tails.size - 1 downTo 0) add(tails[index])
                     }
                 },
-                accPool,
-                node.head
+                accPool
             )
         }
     }
 
     return accumulatorPool.use { acc ->
-        transitionInternal(action, current, acc, accumulatorPool, node = this) ?: current
+        transitionInternal(action, current, node = this, acc, accumulatorPool) ?: current
     }
 }

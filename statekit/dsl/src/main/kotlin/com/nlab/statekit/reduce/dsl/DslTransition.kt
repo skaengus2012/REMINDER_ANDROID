@@ -117,7 +117,7 @@ private tailrec fun transition(
                 node = childTransitions.first(),
                 scope,
                 dslTransitionScope,
-                accTransition = accTransition.apply {
+                accTransition.apply {
                     for (index in childTransitions.size - 1 downTo 1) add(childTransitions[index])
                 },
                 accScope,
@@ -152,9 +152,9 @@ private tailrec fun transition(
                     node = node.transition,
                     scope = node.subScope,
                     dslTransitionScope = DslTransitionScope(newSource),
-                    accTransition = accTransition,
-                    accScope = accScope.apply { add(scope) },
-                    accDslTransitionScope = accDslTransitionScope.apply { add(dslTransitionScope) }
+                    accTransition,
+                    accScope.apply { add(scope) },
+                    accDslTransitionScope.apply { add(dslTransitionScope) }
                 )
             }
         }

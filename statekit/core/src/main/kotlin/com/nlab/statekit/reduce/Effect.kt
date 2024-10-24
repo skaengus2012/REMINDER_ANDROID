@@ -61,11 +61,11 @@ fun <A : Any, S : Any> Effect<A, S>.launch(
     tailrec fun <A : Any, S : Any> launchInternal(
         action: A,
         current: S,
+        node: Effect<A, S>?,
         actionDispatcher: ActionDispatcher<A>,
         acc: Accumulator<Effect<A, S>>,
         accPool: AccumulatorPool,
         coroutineScope: CoroutineScope,
-        node: Effect<A, S>?,
     ) {
         if (node == null) return
 
@@ -88,11 +88,11 @@ fun <A : Any, S : Any> Effect<A, S>.launch(
         launchInternal(
             action,
             current,
+            nextNode,
             actionDispatcher,
             acc,
             accPool,
             coroutineScope,
-            nextNode
         )
     }
 
@@ -100,11 +100,11 @@ fun <A : Any, S : Any> Effect<A, S>.launch(
         launchInternal(
             action,
             current,
+            node = this,
             actionDispatcher,
             acc,
             accumulatorPool,
             coroutineScope,
-            node = this
         )
     }
 }
