@@ -42,14 +42,14 @@ internal sealed interface DslTransition {
 
     class PredicateScopeTransition<out A : Any, out S : Any>(
         override val scope: Any,
-        val isMatch: (UpdateSource<@UnsafeVariance A, @UnsafeVariance S>) -> Boolean,
+        val isMatch: (UnsafeUpdateSource<A, S>) -> Boolean,
         val transition: DslTransition
     ) : DslTransition
 
     class TransformSourceScopeTransition<out A : Any, out S : Any, out T : Any, out U : Any>(
         override val scope: Any,
         val subScope: Any,
-        val transformSource: (UpdateSource<@UnsafeVariance A, @UnsafeVariance S>) -> UpdateSource<@UnsafeVariance T, @UnsafeVariance U>?,
+        val transformSource: (UnsafeUpdateSource<A, S>) -> UnsafeUpdateSource<T, U>?,
         val transition: DslTransition
     ) : DslTransition
 }

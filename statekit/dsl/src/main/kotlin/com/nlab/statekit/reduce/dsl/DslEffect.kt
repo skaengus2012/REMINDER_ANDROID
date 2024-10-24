@@ -16,30 +16,32 @@
 
 package com.nlab.statekit.reduce.dsl
 
-import com.nlab.statekit.reduce.ActionDispatcher
-
 /**
  * @author Thalys
  */
 internal sealed interface DslEffect {
     val scope: Any
 
-    /**
-    claas NodeEffect<out R : Any, out A : Any, out S : Any> : DslEffect {
-        suspend fun invoke(action: @UnsafeVariance A, current: @UnsafeVariance S, actionDispatcher: ActionDispatcher<@UnsafeVariance R>)
-    }
+    class NodeEffect<out R : Any, out A : Any, out S : Any>(
+        override val scope: Any,
+        val invoke: suspend (DslEffectScope<@UnsafeVariance A, @UnsafeVariance S, @UnsafeVariance R>) -> Unit
+    ) : DslEffect
 
-    class CompositeEffect<R : Any, A : Any, S : Any>(
-        val effects: List<DslEffect<R, A, S>>
-    ) : DslEffect<R, A, S>
+    class CompositeEffect(
+        override val scope: Any,
+        val effects: List<DslEffect>
+    ) : DslEffect
 
-    class PredicateScopeEffect<R : Any, A : Any, S : R>(
-        val predicate: (UpdateSource<A, S>) -> Boolean,
-        val effect: DslEffect<R, A, S>
-    ) : DslEffect<R, A, S>
+    class PredicateScopeEffect<out A : Any, out S : Any>(
+        override val scope: Any,
+        val isMatch: (UnsafeUpdateSource<A, S>) -> Boolean,
+        val effect: DslEffect
+    ) : DslEffect
 
-    class TransformSourceScopeEffect<R : Any, A : Any, S : R, T : Any, U : R>(
-        val transformSource: (UpdateSource<A, S>) -> UpdateSource<T, U>?,
-        val effect: DslEffect<R, T, U>
-    ) : DslEffect<R, A, S>*/
+    class TransformSourceScopeEffect<out A : Any, out S : Any, out T : Any, out U : Any>(
+        override val scope: Any,
+        val subScope: Any,
+        val transformSource: (UnsafeUpdateSource<A, S>) -> UnsafeUpdateSource<T, U>?,
+        val effect: DslEffect
+    ) : DslEffect
 }

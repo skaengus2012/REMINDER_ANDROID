@@ -19,6 +19,8 @@ package com.nlab.statekit.reduce.dsl
 /**
  * @author Doohyun
  */
+internal typealias UnsafeUpdateSource<A, S> = UpdateSource<@UnsafeVariance A, @UnsafeVariance S>
+
 interface UpdateSource<A : Any, S : Any> {
     val action: A
     val current: S
