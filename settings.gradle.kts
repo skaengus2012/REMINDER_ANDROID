@@ -40,7 +40,6 @@ include(
     ":statekit:dsl",
     ":statekit:runtime",
     ":statekit:test",
-    ":statekit:viewmodel",
     ":testkit"
 )
 // Reminder

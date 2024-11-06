@@ -90,7 +90,6 @@ dependencies {
     implementation(projects.core.scheduleExt)
 
     implementation(projects.statekit.runtime)
-    implementation(projects.statekit.viewmodel)
     kapt(projects.statekit.compiler)
 
     implementation(libs.kotlinx.coroutines.android)
