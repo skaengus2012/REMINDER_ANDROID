@@ -18,7 +18,7 @@ package com.nlab.reminder.domain.feature.schedule.all
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nlab.reminder.core.annotation.test.ExcludeFromGeneratedTestReport
+import com.nlab.reminder.core.foundation.annotation.Generated
 import com.nlab.statekit.lifecycle.UiActionDispatchable
 import com.nlab.statekit.util.createStore
 import com.nlab.statekit.util.stateIn
@@ -31,18 +31,13 @@ import javax.inject.Inject
 /**
  * @author Doohyun
  */
-@ExcludeFromGeneratedTestReport
+@Generated
 @HiltViewModel
 internal class AllScheduleViewModel @Inject constructor(
-    reducer: AllScheduleReducer,
-    interceptor: AllScheduleInterceptor,
-    epic: AllScheduleEpic,
 ) : ViewModel(),
     UiActionDispatchable<AllScheduleAction> {
-    private val store = createStore(initState = AllScheduleUiState.Empty, reducer, interceptor, epic)
 
-    val uiState: StateFlow<AllScheduleUiState> =
-        store.stateIn(viewModelScope, SharingStarted.WhileSubscribed(stopTimeoutMillis = 5_000))
+    val uiState: StateFlow<AllScheduleUiState> = TODO()
 
-    override fun dispatch(action: AllScheduleAction): Job = store.dispatch(action)
+    override fun dispatch(action: AllScheduleAction): Job = TODO()
 }

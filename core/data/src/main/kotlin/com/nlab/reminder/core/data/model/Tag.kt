@@ -16,7 +16,9 @@
 
 package com.nlab.reminder.core.data.model
 
+import com.nlab.reminder.core.kotlin.NonBlankString
+
 /**
  * @author Doohyun
  */
-data class Tag(val tagId: Long, val name: String)
+data class Tag(val id: TagId, val name: NonBlankString)

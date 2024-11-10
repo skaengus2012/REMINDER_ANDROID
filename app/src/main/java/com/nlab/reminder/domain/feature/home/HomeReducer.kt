@@ -17,7 +17,7 @@
 package com.nlab.reminder.domain.feature.home
 
 import com.nlab.reminder.R
-import com.nlab.reminder.core.annotation.test.ExcludeFromGeneratedTestReport
+import com.nlab.reminder.core.foundation.annotation.Generated
 import com.nlab.reminder.core.annotation.test.TestCompleted
 import com.nlab.reminder.core.state.UserMessage
 import com.nlab.reminder.core.state.userMessageShown
@@ -66,6 +66,8 @@ internal class HomeReducer @Inject constructor(
             }
         }
         action<HomeAction.OnTagRenameRequestClicked> { (_, before) ->
+            before
+            /** TODO
             before.mapIfWorkflowMatches<HomeWorkflow.TagConfig> { old, workflow ->
                 old.copy(
                     workflow = HomeWorkflow.TagRename(
@@ -75,7 +77,7 @@ internal class HomeReducer @Inject constructor(
                         shouldKeyboardShown = true
                     )
                 )
-            }
+            }*/
         }
         action<HomeAction.OnTagRenameInputKeyboardShown> { (_, before) ->
             before.mapIfWorkflowMatches<HomeWorkflow.TagRename> { cur, workflow ->
@@ -116,13 +118,13 @@ internal class HomeReducer @Inject constructor(
     }
 })
 
-@ExcludeFromGeneratedTestReport
+@Generated
 @TestCompleted
 private inline fun HomeUiState.Success.mapIfWorkflowEmpty(
     transform: (HomeUiState.Success) -> HomeUiState
 ): HomeUiState = if (workflow is HomeWorkflow.Empty) transform(this) else this
 
-@ExcludeFromGeneratedTestReport
+@Generated
 @TestCompleted
 private inline fun HomeUiState.Success.mapIfTagExists(
     target: Tag,
@@ -131,7 +133,7 @@ private inline fun HomeUiState.Success.mapIfTagExists(
     if (target in tags) transform(this)
     else copy(userMessages = userMessages + UserMessage(R.string.tag_not_exist))
 
-@ExcludeFromGeneratedTestReport
+@Generated
 @TestCompleted
 private inline fun <reified T : HomeWorkflow> HomeUiState.Success.mapIfWorkflowMatches(
     transform: (old: HomeUiState.Success, workflow: T) -> HomeUiState

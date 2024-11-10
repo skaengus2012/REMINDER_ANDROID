@@ -71,6 +71,7 @@ class AllScheduleFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        /**
         val scheduleItemAdapter = ScheduleItemAdapter()
         val itemTouchCallback = ScheduleItemTouchCallback(
             context = requireContext(),
@@ -243,7 +244,7 @@ class AllScheduleFragment : Fragment() {
             .flowWithLifecycle(viewLifecycle)
             .take(count = 1)
             .onEach { startPostponedEnterTransition() }
-            .launchIn(viewLifecycleScope)
+            .launchIn(viewLifecycleScope)*/
     }
 
     override fun onDestroyView() {
@@ -251,5 +252,3 @@ class AllScheduleFragment : Fragment() {
         _binding = null
     }
 }
-
-private val AllScheduleViewModel.loadedUiState: Flow<AllScheduleUiState.Loaded> get() = uiState.filterIsInstance()

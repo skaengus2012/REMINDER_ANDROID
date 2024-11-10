@@ -20,13 +20,13 @@ import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.javafaker.Faker
-import com.nlab.reminder.core.local.database.ReminderDatabase
-import com.nlab.reminder.core.local.database.ScheduleDao
-import com.nlab.reminder.core.local.database.ScheduleEntity
-import com.nlab.reminder.core.local.database.ScheduleTagListDao
-import com.nlab.reminder.core.local.database.ScheduleTagListEntity
-import com.nlab.reminder.core.local.database.TagDao
-import com.nlab.reminder.core.local.database.TagEntity
+import com.nlab.reminder.core.local.database.configuration.ReminderDatabase
+import com.nlab.reminder.core.local.database.dao.ScheduleDAO
+import com.nlab.reminder.core.local.database.model.ScheduleEntity
+import com.nlab.reminder.core.local.database.dao.ScheduleTagListDAO
+import com.nlab.reminder.core.local.database.model.ScheduleTagListEntity
+import com.nlab.reminder.core.local.database.dao.TagDAO
+import com.nlab.reminder.core.local.database.model.TagEntity
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.After
@@ -87,17 +87,17 @@ class InsertDummyInfoToDatabaseMacro {
     }
 
     private lateinit var database: ReminderDatabase
-    private lateinit var scheduleDao: ScheduleDao
-    private lateinit var tagDao: TagDao
-    private lateinit var scheduleTagListDao: ScheduleTagListDao
+    private lateinit var scheduleDao: ScheduleDAO
+    private lateinit var tagDao: TagDAO
+    private lateinit var scheduleTagListDao: ScheduleTagListDAO
 
     @Before
     fun setup() {
         val context: Context = ApplicationProvider.getApplicationContext()
         database = ReminderDatabase.getDatabase(context)
-        scheduleDao = database.scheduleDao()
-        tagDao = database.tagDao()
-        scheduleTagListDao = database.scheduleTagListDao()
+        scheduleDao = database.scheduleDAO()
+        tagDao = database.tagDAO()
+        scheduleTagListDao = database.scheduleTagListDAO()
     }
 
     @After
@@ -113,7 +113,7 @@ class InsertDummyInfoToDatabaseMacro {
     }
 
     private suspend fun resetTagEntities() {
-        tagDao.find().first().forEach { tagDao.delete(it) }
+        tagDao.getAsStream().first().forEach { tagDao.deleteById(it.tagId) }
         inputTagEntities.forEach { tagDao.insert(it) }
     }
 
@@ -132,7 +132,7 @@ class InsertDummyInfoToDatabaseMacro {
     }
 
     private suspend fun resetScheduleTagList() {
-        val tagEntities = tagDao.find().first()
+        val tagEntities = tagDao.getAsStream().first()
         scheduleDao.findByCompleteAsStream(isComplete = false)
             .first()
             .map { it.scheduleEntity }

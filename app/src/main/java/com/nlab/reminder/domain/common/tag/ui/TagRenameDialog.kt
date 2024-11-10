@@ -42,7 +42,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
@@ -66,7 +65,6 @@ import androidx.compose.ui.unit.sp
 import com.nlab.reminder.R
 import com.nlab.reminder.core.designsystem.compose.component.ReminderDialog
 import com.nlab.reminder.core.designsystem.compose.theme.ReminderTheme
-import com.nlab.reminder.core.data.model.TagUsageCount
 import com.nlab.reminder.core.androidx.compose.ui.component.ColorPressButton
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.debounce
@@ -78,7 +76,7 @@ import kotlinx.coroutines.flow.debounce
 fun TagRenameDialog(
     initText: String,
     tagName: String,
-    usageCount: TagUsageCount,
+    usageCount: DisplayUsageCount,
     shouldKeyboardShown: Boolean = false,
     onTextChanged: (String) -> Unit = {},
     onCancel: () -> Unit = {},
@@ -105,7 +103,7 @@ fun TagRenameDialog(
 
                 Text(
                     modifier = Modifier.padding(start = 20.dp, top = 2.5.dp, end = 20.dp, bottom = 15.dp),
-                    text = usageCount.mapToString(
+                    text = usageCount.format(
                         transform = { count ->
                             pluralStringResource(
                                 R.plurals.tag_rename_dialog_description,
@@ -194,7 +192,6 @@ fun TagRenameDialog(
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun TagRenameTextBox(
     initText: String,
@@ -303,7 +300,7 @@ private fun TagRenameDialogPreview() {
         TagRenameDialog(
             initText = "Modify Tag Name...",
             tagName = "Hello, TagRenameDialog check long text",
-            usageCount = TagUsageCount(2)
+            usageCount = DisplayUsageCount(2)
         )
     }
 }

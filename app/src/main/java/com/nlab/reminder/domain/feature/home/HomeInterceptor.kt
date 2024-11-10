@@ -22,6 +22,7 @@ import com.nlab.reminder.core.kotlin.getOrThrow
 import com.nlab.reminder.core.kotlin.onFailure
 import com.nlab.reminder.core.kotlin.onSuccess
 import com.nlab.reminder.core.data.repository.TagRepository
+import com.nlab.reminder.core.kotlin.map
 import com.nlab.statekit.middleware.interceptor.Interceptor
 import com.nlab.statekit.util.buildDslInterceptor
 import javax.inject.Inject
@@ -34,21 +35,28 @@ internal class HomeInterceptor @Inject constructor(
 ) : Interceptor<HomeAction, HomeUiState> by buildDslInterceptor(defineDSL = {
     state<HomeUiState.Success> {
         action<HomeAction.OnTagLongClicked> { (action) ->
-            tagRepository.getUsageCount(action.tag)
+            tagRepository.getUsageCount(action.tag.id)
                 .onSuccess { usageCount ->
-                    dispatch(HomeAction.TagConfigMetadataLoaded(action.tag, usageCount))
+                    // todo
+                 //   dispatch(HomeAction.TagConfigMetadataLoaded(action.tag, usageCount))
                 }
                 .onFailure { e -> dispatch(HomeAction.ErrorOccurred(e)) }
                 .getOrThrow()
         }
         action<HomeAction.OnTagRenameConfirmClicked> { (_, before) ->
+            /** TODO
             catching { checkNotNull(before.workflow as? HomeWorkflow.TagRename) { "TagRename workflow was not set" } }
-                .flatMap { tagRename -> tagRepository.updateName(tagRename.tag, tagRename.renameText) }
+                .map { tagRename -> with(tagRename) { tag.copy(name = renameText) } }
+                .flatMap { tag ->
+
+                //    tagRepository.save(tag)
+                }
                 .getOrThrow()
+            */
         }
         action<HomeAction.OnTagDeleteConfirmClicked> { (_, before) ->
             catching { checkNotNull(before.workflow as? HomeWorkflow.TagDelete) { "TagDelete workflow was not set" } }
-                .flatMap { tagDelete -> tagRepository.delete(tagDelete.tag) }
+                .flatMap { tagDelete -> tagRepository.delete(tagDelete.tag.id) }
                 .getOrThrow()
         }
     }

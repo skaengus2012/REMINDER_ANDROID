@@ -16,35 +16,48 @@
 
 package com.nlab.reminder.core.data.repository
 
+import com.nlab.reminder.core.data.model.*
 import com.nlab.reminder.core.kotlin.Result
-import com.nlab.reminder.core.data.model.Schedule
-import com.nlab.reminder.core.data.model.ScheduleId
+import com.nlab.reminder.core.kotlin.NonNegativeLong
 import kotlinx.coroutines.flow.Flow
 
 /**
  * @author thalys
  */
 interface ScheduleRepository {
-    fun getTodaySchedulesCount(): Flow<Long>
-    fun getTimetableSchedulesCount(): Flow<Long>
-    fun getAllSchedulesCount(): Flow<Long>
-    fun getAsStream(request: ScheduleGetStreamRequest): Flow<List<Schedule>>
-    suspend fun update(request: ScheduleUpdateRequest): Result<Unit>
-    suspend fun delete(request: ScheduleDeleteRequest): Result<Unit>
+    suspend fun save(query: SaveScheduleQuery): Result<Schedule>
+    suspend fun updateBulk(query: UpdateSchedulesQuery): Result<Unit>
+    suspend fun delete(query: DeleteScheduleQuery): Result<Unit>
+    fun getSchedulesAsStream(request: GetScheduleQuery): Flow<Collection<Schedule>>
+    fun getScheduleCountAsStream(query: GetScheduleCountQuery): Flow<Long>
 }
 
-sealed class ScheduleGetStreamRequest private constructor() {
-    data object All : ScheduleGetStreamRequest()
-    data class ByComplete(val isComplete: Boolean) : ScheduleGetStreamRequest()
+sealed class SaveScheduleQuery {
+    data class Add(val content: ScheduleContent) : SaveScheduleQuery()
+    data class Modify(val id: ScheduleId, val content: ScheduleContent) : SaveScheduleQuery()
 }
 
-sealed class ScheduleUpdateRequest private constructor() {
-    data class Completes(val idToCompleteTable: Map<ScheduleId, Boolean>) : ScheduleUpdateRequest()
-    data class VisiblePriority(val idToVisiblePriorityTable: Map<ScheduleId, Long>) : ScheduleUpdateRequest()
+sealed class UpdateSchedulesQuery private constructor() {
+    class Completes(val idToCompleteTable: Map<ScheduleId, Boolean>) : UpdateSchedulesQuery()
+
+    data class VisiblePriorities(
+        val idToVisiblePriorityTable: Map<ScheduleId, NonNegativeLong>,
+        val isCompletedRange: Boolean
+    ) : UpdateSchedulesQuery()
 }
 
-sealed class ScheduleDeleteRequest private constructor() {
-    data class ByComplete(val isComplete: Boolean) : ScheduleDeleteRequest()
-    data class ById(val scheduleId: ScheduleId) : ScheduleDeleteRequest()
-    data class ByIds(val scheduleIds: Collection<ScheduleId>) : ScheduleDeleteRequest()
+sealed class DeleteScheduleQuery private constructor() {
+    data class ByComplete(val isComplete: Boolean) : DeleteScheduleQuery()
+    data class ByIds(val scheduleIds: Set<ScheduleId>) : DeleteScheduleQuery()
+}
+
+sealed class GetScheduleQuery private constructor() {
+    data object All : GetScheduleQuery()
+    data class ByComplete(val isComplete: Boolean) : GetScheduleQuery()
+}
+
+sealed class GetScheduleCountQuery private constructor() {
+    data object Today : GetScheduleCountQuery()
+    data object Timetable : GetScheduleCountQuery()
+    data object All : GetScheduleCountQuery()
 }

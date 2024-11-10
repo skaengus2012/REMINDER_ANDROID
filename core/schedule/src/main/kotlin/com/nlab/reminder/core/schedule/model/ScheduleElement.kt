@@ -18,22 +18,17 @@ package com.nlab.reminder.core.schedule.model
 
 import com.nlab.reminder.core.data.model.Link
 import com.nlab.reminder.core.data.model.LinkMetadata
-import com.nlab.reminder.core.data.model.Schedule
+import com.nlab.reminder.core.data.model.ScheduleDetails
 import com.nlab.reminder.core.data.model.ScheduleId
 
 /**
  * @author thalys
  */
 data class ScheduleElement(
-    val schedule: Schedule,
+    val schedule: ScheduleDetails,
     val isCompleteMarked: Boolean,
     val linkMetadata: LinkMetadata?,
     val isSelected: Boolean
 ) : ScheduleItem {
-    val id: ScheduleId get() = schedule.id
-    val title: String get() = schedule.title
-    val note: String get() = schedule.note
-    val link: Link get() = schedule.link
-    val isComplete: Boolean get() = schedule.isComplete
-    val visiblePriority: Long get() = schedule.visiblePriority
+
 }
