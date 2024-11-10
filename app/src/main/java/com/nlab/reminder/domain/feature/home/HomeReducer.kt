@@ -33,7 +33,10 @@ private typealias DomainReducer = Reducer<HomeAction, HomeUiState>
 /**
  * @author Doohyun
  */
-internal class HomeReducer @Inject constructor() : DomainReducer by buildDslReducer(defineDSL = {
+
+
+internal class HomeReducer @Inject constructor(
+) : DomainReducer by buildDslReducer(defineDSL = {
     state<HomeUiState.Success> {
         action<HomeAction.CompleteWorkflow> { (_, before) -> before.copy(workflow = HomeWorkflow.Empty) }
         action<HomeAction.UserMessageShown> { (action, before) ->

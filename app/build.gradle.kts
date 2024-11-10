@@ -88,10 +88,8 @@ dependencies {
     implementation(projects.core.foundationDi)
     implementation(projects.core.kotlin)
     implementation(projects.core.kotlinxCoroutine)
-  //  implementation(projects.core.scheduleExt)
-
-    implementation(projects.statekit.runtime)
-    implementation(projects.statekit.viewmodel)
+    // implementation(projects.core.scheduleExt)
+    implementation(projects.core.statekit)
     kapt(projects.statekit.compiler)
 
     implementation(libs.kotlinx.coroutines.android)
