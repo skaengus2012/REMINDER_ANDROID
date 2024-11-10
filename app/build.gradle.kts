@@ -88,8 +88,7 @@ dependencies {
     implementation(projects.core.kotlin)
     implementation(projects.core.kotlinxCoroutine)
     implementation(projects.core.scheduleExt)
-
-    implementation(projects.statekit.runtime)
+    implementation(projects.core.statekit)
     kapt(projects.statekit.compiler)
 
     implementation(libs.kotlinx.coroutines.android)

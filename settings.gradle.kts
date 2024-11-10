@@ -72,4 +72,5 @@ include(
     ":core:schedule",
     ":core:schedule-ext",
     ":core:schedule-test",
+    ":core:statekit",
 )
