@@ -33,7 +33,7 @@ import org.junit.Test
 /**
  * @author Doohyun
  */
-internal class HomeReduceTest {
+internal class HomeReducerTest {
     @Test
     fun testCompleteWorkflow() {
         HomeReducer().scenario()
