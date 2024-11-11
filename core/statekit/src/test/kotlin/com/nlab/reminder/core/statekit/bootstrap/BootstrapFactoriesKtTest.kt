@@ -16,19 +16,22 @@
 
 package com.nlab.reminder.core.statekit.bootstrap
 
-import com.nlab.statekit.bootstrap.Bootstrap
+import com.nlab.reminder.core.statekit.TestAction
 import com.nlab.statekit.bootstrap.DeliveryStarted
-import com.nlab.statekit.bootstrap.collectAsBootstrap
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
+import org.junit.Test
 
 /**
  * @author Doohyun
  */
+class BootstrapFactoriesKtTest {
+    @Test
+    fun `When collect as Bootstrap without started, Then created with started`() {
+        flowOf(TestAction).collectAsBootstrap()
+    }
 
-/**
- * Create a Bootstrap that is valid only when there are subscribers of the state.
- * @param started Inject a collect strategy. If you don't put it in, Subscriptions should be canceled with a 5-second grace period.
- */
-fun <A : Any> Flow<A>.collectAsBootstrap(
-    started: DeliveryStarted = DeliveryStarted.WhileSubscribed(stopTimeoutMillis = 5_000)
-): Bootstrap<A> = collectAsBootstrap(started)
+    @Test
+    fun `Given delivery started, When collect as Bootstrap, Then created with started`() {
+        flowOf(TestAction).collectAsBootstrap(DeliveryStarted.Lazily)
+    }
+}

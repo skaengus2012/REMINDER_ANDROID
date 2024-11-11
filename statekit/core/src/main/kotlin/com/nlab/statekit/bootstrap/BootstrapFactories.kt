@@ -34,7 +34,7 @@ fun <A : Any> Bootstrap(
 @Suppress("FunctionName")
 fun <A : Any> EmptyBootstrap(): Bootstrap<A> = EmptyBootstrap
 
-fun <A : Any> Flow<A>.streamingBootstrap(started: DeliveryStarted): Bootstrap<A> =
+fun <A : Any> Flow<A>.collectAsBootstrap(started: DeliveryStarted): Bootstrap<A> =
     FlowBootstrap(actionStream = this, started = started)
 
 fun <A : Any> combineBootstrap(
