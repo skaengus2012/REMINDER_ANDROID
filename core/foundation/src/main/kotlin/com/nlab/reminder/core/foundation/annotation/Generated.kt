@@ -28,6 +28,8 @@ package com.nlab.reminder.core.foundation.annotation
 @Target(
     AnnotationTarget.CLASS,
     AnnotationTarget.FUNCTION,
-    AnnotationTarget.CONSTRUCTOR
+    AnnotationTarget.CONSTRUCTOR,
+    AnnotationTarget.PROPERTY_GETTER,
+    AnnotationTarget.PROPERTY_SETTER
 )
 annotation class Generated
