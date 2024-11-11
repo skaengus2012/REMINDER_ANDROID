@@ -27,6 +27,7 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.plus
+import kotlin.coroutines.CoroutineContext
 import com.nlab.statekit.store.createStore as createStoreOrigin
 
 /**
@@ -39,30 +40,34 @@ fun <A : Any, S : Any> ViewModel.createStore(
     reduce: Reduce<A, S> = EmptyReduce(),
     bootstrap: Bootstrap<A> = EmptyBootstrap()
 ): Store<A, S> = createStoreOrigin(
-    coroutineScope = createStoreMaterialScope(),
+    coroutineScope = viewModelScope.toStoreMaterialScope(),
     initState = initState,
     reduce = reduce,
     bootstrap = bootstrap
 )
 
-fun ViewModel.createStoreMaterialScope(): CoroutineScope {
-    var ret = viewModelScope
+fun CoroutineScope.toStoreMaterialScope(): CoroutineScope {
+    var ret = this
     ret += Dispatchers.Default
-    ret.setupGlobalAndLocalMergedCoroutineExceptionHandler { ret += it }
+    setupGlobalAndLocalMergedCoroutineExceptionHandler { ret += it }
     return ret
 }
 
 private fun CoroutineScope.setupGlobalAndLocalMergedCoroutineExceptionHandler(
     block: (CoroutineExceptionHandler) -> Unit
 ) {
-    val globals = globalExceptionHandlers.takeIf { it.isEmpty() } ?: return
+    val globals = globalExceptionHandlers.takeIf { it.isNotEmpty() } ?: return
     val local = coroutineContext[CoroutineExceptionHandler]
-    val exceptionHandler = when {
-        local == null && globals.size == 1 -> globals.first()
-        else -> CoroutineExceptionHandler { context, throwable ->
-            local?.handleException(context, throwable)
-            globals.forEach { it.handleException(context, throwable) }
-        }
+    val exceptionHandler = if (local == null) {
+        if (globals.size == 1) globals.first()
+        else CoroutineExceptionHandler { context, throwable -> globals.handleException(context, throwable) }
+    } else CoroutineExceptionHandler { context, throwable ->
+        local.handleException(context, throwable)
+        globals.handleException(context, throwable)
     }
     block(exceptionHandler)
+}
+
+private fun List<CoroutineExceptionHandler>.handleException(context: CoroutineContext, throwable: Throwable) {
+    forEach { it.handleException(context, throwable) }
 }

@@ -14,24 +14,9 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.statekit.bootstrap
-
-import com.nlab.reminder.core.statekit.TestAction
-import com.nlab.statekit.bootstrap.DeliveryStarted
-import kotlinx.coroutines.flow.flowOf
-import org.junit.Test
+package com.nlab.reminder.core.statekit
 
 /**
  * @author Doohyun
  */
-class BootstrapFactoriesKtTest {
-    @Test
-    fun `When collect as Bootstrap without started, Then created with started`() {
-        flowOf(TestAction).collectAsBootstrap()
-    }
-
-    @Test
-    fun `Given delivery started, When collect as Bootstrap, Then created with started`() {
-        flowOf(TestAction).collectAsBootstrap(DeliveryStarted.Lazily)
-    }
-}
+data object TestAction
