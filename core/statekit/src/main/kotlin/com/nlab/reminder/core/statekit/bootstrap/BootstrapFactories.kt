@@ -18,7 +18,7 @@ package com.nlab.reminder.core.statekit.bootstrap
 
 import com.nlab.statekit.bootstrap.Bootstrap
 import com.nlab.statekit.bootstrap.DeliveryStarted
-import com.nlab.statekit.bootstrap.streamingBootstrap
+import com.nlab.statekit.bootstrap.collectAsBootstrap
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -27,7 +27,8 @@ import kotlinx.coroutines.flow.Flow
 
 /**
  * Create a Bootstrap that is valid only when there are subscribers of the state.
- * Subscriptions may be canceled with a 5-second grace period.
+ * @param started Inject a collect strategy. If you don't put it in, Subscriptions should be canceled with a 5-second grace period.
  */
-fun <A : Any> Flow<A>.toBootstrap(): Bootstrap<A> =
-    streamingBootstrap(started = DeliveryStarted.WhileSubscribed(stopTimeoutMillis = 5_000))
+fun <A : Any> Flow<A>.collectAsBootstrap(
+    started: DeliveryStarted = DeliveryStarted.WhileSubscribed(stopTimeoutMillis = 5_000)
+): Bootstrap<A> = collectAsBootstrap(started)

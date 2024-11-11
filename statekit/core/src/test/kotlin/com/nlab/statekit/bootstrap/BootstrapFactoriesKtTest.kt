@@ -84,7 +84,7 @@ class BootstrapFactoriesKtTest {
         val actionStream = Channel<TestAction>(Channel.UNLIMITED)
             .apply { expectedActions.forEach { trySend(it) } }
             .receiveAsFlow()
-        val bootstrap = actionStream.streamingBootstrap(started = DeliveryStarted.Eagerly)
+        val bootstrap = actionStream.collectAsBootstrap(started = DeliveryStarted.Eagerly)
         val actualActions = mutableListOf<TestAction>()
 
         val actionDispatcher: ActionDispatcher<TestAction> = object : ActionDispatcher<TestAction> {
