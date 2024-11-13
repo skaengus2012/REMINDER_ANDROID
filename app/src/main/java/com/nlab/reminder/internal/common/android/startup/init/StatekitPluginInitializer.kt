@@ -19,10 +19,8 @@ package com.nlab.reminder.internal.common.android.startup.init
 
 import android.content.Context
 import androidx.startup.Initializer
+import com.nlab.reminder.core.statekit.plugins.StateKitPlugin
 import com.nlab.reminder.internal.common.android.startup.EmptyDependencies
-import com.nlab.statekit.plugins.StateKitPlugin
-import com.nlab.statekit.plugins.extension.setGlobalExceptionHandler
-import kotlinx.coroutines.CoroutineExceptionHandler
 import timber.log.Timber
 
 /**
@@ -30,9 +28,7 @@ import timber.log.Timber
  */
 internal class StatekitPluginInitializer : Initializer<Unit> {
     override fun create(context: Context) {
-        StateKitPlugin.setGlobalExceptionHandler(CoroutineExceptionHandler { _, throwable ->
-            Timber.tag("StateKitGlobalErr").e(throwable)
-        })
+        StateKitPlugin.addGlobalExceptionHandler { _, throwable -> Timber.tag("StateKitGlobalErr").e(throwable) }
     }
 
     override fun dependencies() = EmptyDependencies()
