@@ -19,13 +19,12 @@ package com.nlab.reminder.domain.feature.home
 import com.nlab.reminder.core.state.UserMessage
 import com.nlab.reminder.core.foundation.annotation.Generated
 import com.nlab.reminder.core.data.model.Tag
-import com.nlab.statekit.Action
 import com.nlab.statekit.lifecycle.viewmodel.ContractUiAction
 
 /**
  * @author Doohyun
  */
-internal sealed interface HomeAction : Action {
+internal sealed interface HomeAction  {
     data class SummaryLoaded(
         val todaySchedulesCount: Long,
         val timetableSchedulesCount: Long,
@@ -33,44 +32,44 @@ internal sealed interface HomeAction : Action {
         val tags: List<Tag>,
     ) : HomeAction
 
-    @ContractUiAction
+ //   @ContractUiAction
     data object CompleteWorkflow : HomeAction
 
-    @ContractUiAction
+//    @ContractUiAction
     data class UserMessageShown(val shownMessage: UserMessage) : HomeAction
 
-    @Generated
+  //  @Generated
     data class ErrorOccurred(val throwable: Throwable) : HomeAction
 
-    @ContractUiAction
+  //  @ContractUiAction
     data object OnTodayCategoryClicked : HomeAction
 
-    @ContractUiAction
+  //  @ContractUiAction
     data object OnTimetableCategoryClicked : HomeAction
 
-    @ContractUiAction
+ //   @ContractUiAction
     object OnAllCategoryClicked : HomeAction
 
-    @ContractUiAction
+ //   @ContractUiAction
     data class OnTagLongClicked(val tag: Tag) : HomeAction
 
     data class TagConfigMetadataLoaded(val tag: Tag, val usageCount: Long) : HomeAction
 
-    @ContractUiAction
+  //  @ContractUiAction
     data object OnTagRenameRequestClicked : HomeAction
 
-    @ContractUiAction
+   // @ContractUiAction
     data object OnTagRenameInputKeyboardShown : HomeAction
 
-    @ContractUiAction
+   // @ContractUiAction
     data object OnTagRenameConfirmClicked : HomeAction
 
-    @ContractUiAction
+    // @ContractUiAction
     data class OnTagRenameInputted(val text: String) : HomeAction
 
-    @ContractUiAction
+    // @ContractUiAction
     data object OnTagDeleteRequestClicked : HomeAction
 
-    @ContractUiAction
+    // @ContractUiAction
     data object OnTagDeleteConfirmClicked : HomeAction
 }

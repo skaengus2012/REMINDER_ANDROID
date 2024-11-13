@@ -16,24 +16,13 @@
 
 package com.nlab.reminder.domain.feature.schedule.all
 
-import com.nlab.reminder.core.data.model.Link
-import com.nlab.reminder.core.data.model.genLink
-import com.nlab.reminder.core.data.model.genSchedule
-import com.nlab.reminder.core.schedule.model.genScheduleElements
-import com.nlab.reminder.core.schedule.model.mapToScheduleElementsAsImmutableList
-import com.nlab.statekit.expectedState
-import com.nlab.statekit.expectedStateToInit
-import com.nlab.statekit.scenario
-import com.nlab.testkit.faker.genInt
-import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.toImmutableList
-import kotlinx.coroutines.test.runTest
-import org.junit.Test
+
 
 /**
  * @author thalys
  */
 internal class AllScheduleDetailsReducerTest {
+    /**
     @Test
     fun `Load schedules, when empty`() {
         val expectedState = genAllScheduleUiStateLoaded(
@@ -154,10 +143,12 @@ internal class AllScheduleDetailsReducerTest {
             }
             .verify()
     }
+    */
 }
 
+/**
 private fun AllScheduleUiState.Loaded.toLoadedAction(): AllScheduleAction.ScheduleElementsLoaded =
     AllScheduleAction.ScheduleElementsLoaded(
         scheduleElements = scheduleElements,
         isCompletedScheduleShown = isCompletedScheduleShown
-    )
+    )*/

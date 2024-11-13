@@ -21,9 +21,6 @@ import com.nlab.reminder.core.state.UserMessage
 import com.nlab.reminder.core.data.model.genTag
 import com.nlab.testkit.faker.genLongGreaterThanZero
 import com.nlab.reminder.core.data.model.genTags
-import com.nlab.statekit.expectedState
-import com.nlab.statekit.expectedStateToInit
-import com.nlab.statekit.scenario
 import com.nlab.testkit.faker.genBothify
 import com.nlab.testkit.faker.genInt
 import com.nlab.testkit.faker.genLong
@@ -34,6 +31,7 @@ import org.junit.Test
  * @author Doohyun
  */
 internal class HomeReducerTest {
+    /**
     @Test
     fun testCompleteWorkflow() {
         HomeReducer().scenario()
@@ -293,12 +291,12 @@ internal class HomeReducerTest {
             .action(HomeAction.OnTagDeleteRequestClicked)
             .expectedStateToInit()
             .verify()
-    }
+    }*/
 }
-
+/**
 private fun HomeUiState.Success.toSummaryLoadedAction() = HomeAction.SummaryLoaded(
     todaySchedulesCount = todayScheduleCount,
     timetableSchedulesCount = timetableScheduleCount,
     allSchedulesCount = allScheduleCount,
     tags = tags
-)
+)*/

@@ -54,7 +54,7 @@ import kotlinx.coroutines.flow.*
  */
 @AndroidEntryPoint
 class AllScheduleFragment : Fragment() {
-    private val viewModel: AllScheduleViewModel by viewModels()
+
 
     private var _binding: FragmentAllScheduleBinding? = null
     private val binding: FragmentAllScheduleBinding get() = checkNotNull(_binding)

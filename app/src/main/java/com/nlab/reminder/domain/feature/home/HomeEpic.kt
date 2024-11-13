@@ -21,13 +21,12 @@ import com.nlab.reminder.core.data.repository.ScheduleRepository
 import com.nlab.reminder.core.data.repository.GetTagQuery
 import com.nlab.reminder.core.data.repository.TagRepository
 import com.nlab.reminder.core.kotlinx.coroutine.flow.combine
-import com.nlab.statekit.middleware.epic.Epic
-import com.nlab.statekit.util.buildDslEpic
 import javax.inject.Inject
 
 /**
  * @author thalys
  */
+/**
 internal class HomeEpic @Inject constructor(
     tagRepository: TagRepository,
     scheduleRepository: ScheduleRepository
@@ -47,4 +46,4 @@ internal class HomeEpic @Inject constructor(
             )
         }
     }
-})
+})*/

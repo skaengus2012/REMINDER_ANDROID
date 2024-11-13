@@ -70,8 +70,9 @@ import kotlinx.coroutines.launch
 internal fun HomeRoute(
     navigateToAllScheduleEnd: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: HomeViewModel = hiltViewModel()
+
 ) {
+    /**
     HomeScreen(
         uiState = viewModel.uiState.collectAsStateWithLifecycle(
             lifecycleOwner = LocalLifecycleOwner.current // error : CompositionLocal LocalLifecycleOwner not present
@@ -90,7 +91,7 @@ internal fun HomeRoute(
         userMessageShown = viewModel::userMessageShown,
         navigateToAllScheduleEnd = navigateToAllScheduleEnd,
         modifier = modifier
-    )
+    )*/
 }
 
 @Composable

@@ -17,20 +17,17 @@
 package com.nlab.reminder.domain.feature.schedule.all
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.nlab.reminder.core.foundation.annotation.Generated
 import com.nlab.statekit.lifecycle.UiActionDispatchable
-import com.nlab.statekit.util.createStore
-import com.nlab.statekit.util.stateIn
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
 /**
  * @author Doohyun
  */
+/**
 @Generated
 @HiltViewModel
 internal class AllScheduleViewModel @Inject constructor(
@@ -40,4 +37,4 @@ internal class AllScheduleViewModel @Inject constructor(
     val uiState: StateFlow<AllScheduleUiState> = TODO()
 
     override fun dispatch(action: AllScheduleAction): Job = TODO()
-}
+}*/

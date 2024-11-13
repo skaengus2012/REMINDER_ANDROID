@@ -16,39 +16,12 @@
 
 package com.nlab.reminder.domain.feature.schedule.all
 
-import com.nlab.reminder.core.data.model.anyScheduleId
-import com.nlab.reminder.core.data.model.genSchedule
-import com.nlab.reminder.core.kotlin.Result
-import com.nlab.reminder.core.data.model.genScheduleId
-import com.nlab.reminder.core.data.model.genSchedules
-import com.nlab.reminder.core.data.repository.CompletedScheduleShownRepository
-import com.nlab.reminder.core.data.repository.DeleteScheduleQuery
-import com.nlab.reminder.core.data.repository.ScheduleRepository
-import com.nlab.reminder.core.data.repository.ScheduleSelectedIdRepository
-import com.nlab.reminder.core.data.repository.UpdateSchedulesQuery
-import com.nlab.reminder.core.schedule.model.genScheduleElements
-import com.nlab.reminder.core.schedule.model.mapToScheduleElementsAsImmutableList
-import com.nlab.statekit.middleware.interceptor.scenario
-import com.nlab.testkit.faker.genBoolean
-import com.nlab.testkit.faker.genInt
-import org.mockito.kotlin.once
-import kotlinx.collections.immutable.persistentListOf
-import kotlinx.coroutines.test.TestScope
-import kotlinx.coroutines.test.runTest
-import org.junit.Test
-import org.mockito.kotlin.any
-import org.mockito.kotlin.doReturn
-import org.mockito.kotlin.inOrder
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.never
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
-import org.mockito.verification.VerificationMode
 
 /**
  * @author thalys
  */
 internal class AllScheduleDetailsInterceptorTest {
+    /**
     @Test
     fun `Given state Loaded with selectionMode, When OnSelectionModeToggleClicked, Then selectedIdRepo reacted`() = runTest {
         suspend fun testTemplated(isSelectionMode: Boolean, mode: VerificationMode) {
@@ -280,9 +253,10 @@ internal class AllScheduleDetailsInterceptorTest {
             .action(AllScheduleAction.ScheduleElementsLoaded(genScheduleElements(), genBoolean()))
             .dispatchIn(testScope = this)
         verify(useCase, once()).invoke(any())
-    }
+    }*/
 }
 
+/**
 private fun genInterceptor(
     scheduleRepository: ScheduleRepository = mock(),
     completedScheduleShownRepository: CompletedScheduleShownRepository = mock(),
@@ -299,4 +273,4 @@ private fun genInterceptor(
     completeScheduleWithIds = completeScheduleWithIds,
     fetchLinkMetadata = fetchLinkMetadata,
     calculateItemSwapResult = calculateItemSwapResult
-)
+)*/

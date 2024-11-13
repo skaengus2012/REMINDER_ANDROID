@@ -16,21 +16,12 @@
 
 package com.nlab.reminder.domain.feature.home
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.nlab.reminder.core.foundation.annotation.Generated
-import com.nlab.statekit.lifecycle.UiActionDispatchable
-import com.nlab.statekit.util.createStore
-import com.nlab.statekit.util.stateIn
-import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import javax.inject.Inject
+
 
 /**
  * @author Doohyun
  */
+/**
 @Generated
 @HiltViewModel
 internal class HomeViewModel @Inject constructor(
@@ -50,4 +41,4 @@ internal class HomeViewModel @Inject constructor(
         store.stateIn(viewModelScope, SharingStarted.WhileSubscribed(stopTimeoutMillis = 5_000))
 
     override fun dispatch(action: HomeAction): Job = store.dispatch(action)
-}
+}*/

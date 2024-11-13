@@ -20,14 +20,13 @@ import com.nlab.reminder.core.annotation.platform.Stable
 import com.nlab.reminder.core.state.UserMessage
 import com.nlab.reminder.core.foundation.annotation.Generated
 import com.nlab.reminder.core.data.model.Tag
-import com.nlab.statekit.State
 import kotlinx.collections.immutable.*
 
 /**
  * @author Doohyun
  */
 @Stable
-internal sealed interface HomeUiState : State {
+internal sealed interface HomeUiState {
     data object Loading : HomeUiState
 
     @Generated

@@ -16,24 +16,12 @@
 
 package com.nlab.reminder.domain.feature.home
 
-import com.nlab.reminder.core.kotlin.Result
-import com.nlab.reminder.core.data.model.genTag
-import com.nlab.testkit.faker.genLongGreaterThanZero
-import com.nlab.reminder.core.data.repository.TagRepository
-import com.nlab.statekit.middleware.interceptor.scenario
-import com.nlab.testkit.faker.genBothify
-import org.mockito.kotlin.once
-import kotlinx.coroutines.test.runTest
-import org.junit.Test
-import org.mockito.kotlin.doReturn
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
 
 /**
  * @author Doohyun
  */
 internal class HomeInterceptorTest {
+    /**
     @Test
     fun `Sending TagConfigMetadata, when tag was long clicked`() = runTest {
         val target = genTag()
@@ -126,9 +114,9 @@ internal class HomeInterceptorTest {
             )
             .action(HomeAction.OnTagDeleteConfirmClicked)
             .dispatchIn(testScope = this)
-    }
+    }*/
 }
-
+/**
 private fun genHomeInterceptor(tagRepository: TagRepository = mock()) = HomeInterceptor(
     tagRepository = tagRepository
-)
+)*/

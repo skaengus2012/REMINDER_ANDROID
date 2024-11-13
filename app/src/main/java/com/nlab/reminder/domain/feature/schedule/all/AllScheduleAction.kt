@@ -16,12 +16,10 @@
 
 package com.nlab.reminder.domain.feature.schedule.all
 
-import com.nlab.statekit.Action
-
 /**
  * @author Doohyun
  */
-sealed interface AllScheduleAction : Action {
+sealed interface AllScheduleAction {
     /**
     data class ScheduleElementsLoaded(
         val scheduleElements: List<ScheduleElement>,

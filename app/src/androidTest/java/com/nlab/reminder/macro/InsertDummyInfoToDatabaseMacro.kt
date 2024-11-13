@@ -114,10 +114,11 @@ class InsertDummyInfoToDatabaseMacro {
 
     private suspend fun resetTagEntities() {
         tagDao.getAsStream().first().forEach { tagDao.deleteById(it.tagId) }
-        inputTagEntities.forEach { tagDao.insert(it) }
+     //   inputTagEntities.forEach { tagDao.insert(it) }
     }
 
     private suspend fun resetScheduleEntities() {
+        /**
         scheduleDao.findByCompleteAsStream(isComplete = true).first().forEach { scheduleDao.delete(it.scheduleEntity) }
         scheduleDao.findByCompleteAsStream(isComplete = false).first().forEach { scheduleDao.delete(it.scheduleEntity) }
 
@@ -128,10 +129,11 @@ class InsertDummyInfoToDatabaseMacro {
                     title = "#$index ${scheduleEntity.title}"
                 )
             )
-        }
+        }*/
     }
 
     private suspend fun resetScheduleTagList() {
+        /**
         val tagEntities = tagDao.getAsStream().first()
         scheduleDao.findByCompleteAsStream(isComplete = false)
             .first()
@@ -145,6 +147,6 @@ class InsertDummyInfoToDatabaseMacro {
                 }
             }
             .flatten()
-            .forEach { inputEntities -> scheduleTagListDao.insert(inputEntities) }
+            .forEach { inputEntities -> scheduleTagListDao.insert(inputEntities) }*/
     }
 }

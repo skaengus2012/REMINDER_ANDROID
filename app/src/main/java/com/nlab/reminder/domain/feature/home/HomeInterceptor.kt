@@ -16,20 +16,10 @@
 
 package com.nlab.reminder.domain.feature.home
 
-import com.nlab.reminder.core.kotlin.catching
-import com.nlab.reminder.core.kotlin.flatMap
-import com.nlab.reminder.core.kotlin.getOrThrow
-import com.nlab.reminder.core.kotlin.onFailure
-import com.nlab.reminder.core.kotlin.onSuccess
-import com.nlab.reminder.core.data.repository.TagRepository
-import com.nlab.reminder.core.kotlin.map
-import com.nlab.statekit.middleware.interceptor.Interceptor
-import com.nlab.statekit.util.buildDslInterceptor
-import javax.inject.Inject
-
 /**
  * @author Doohyun
  */
+/**
 internal class HomeInterceptor @Inject constructor(
     tagRepository: TagRepository
 ) : Interceptor<HomeAction, HomeUiState> by buildDslInterceptor(defineDSL = {
@@ -60,4 +50,4 @@ internal class HomeInterceptor @Inject constructor(
                 .getOrThrow()
         }
     }
-})
+})*/

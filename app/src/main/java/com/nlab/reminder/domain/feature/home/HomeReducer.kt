@@ -16,25 +16,12 @@
 
 package com.nlab.reminder.domain.feature.home
 
-import com.nlab.reminder.R
-import com.nlab.reminder.core.foundation.annotation.Generated
-import com.nlab.reminder.core.annotation.test.TestCompleted
-import com.nlab.reminder.core.state.UserMessage
-import com.nlab.reminder.core.state.userMessageShown
-import com.nlab.reminder.core.data.model.Tag
-import com.nlab.statekit.Reducer
-import com.nlab.statekit.util.buildDslReducer
-import kotlinx.collections.immutable.*
-import javax.inject.Inject
-import kotlin.reflect.cast
-
-private typealias DomainReducer = Reducer<HomeAction, HomeUiState>
 
 /**
  * @author Doohyun
  */
 
-
+/**
 internal class HomeReducer @Inject constructor(
 ) : DomainReducer by buildDslReducer(defineDSL = {
     state<HomeUiState.Success> {
@@ -140,4 +127,4 @@ private inline fun <reified T : HomeWorkflow> HomeUiState.Success.mapIfWorkflowM
 ): HomeUiState {
     val clazz = T::class
     return if (clazz.isInstance(workflow)) transform(this, clazz.cast(workflow)) else this
-}
+}*/

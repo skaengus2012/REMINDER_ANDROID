@@ -16,13 +16,13 @@
 
 package com.nlab.reminder.domain.feature.schedule.all
 
-import com.nlab.reminder.core.annotation.platform.Stable
-import com.nlab.statekit.State
+
 
 /**
  * @author Doohyun
  */
+/**
 @Stable
 sealed interface AllScheduleUiState : State {
     object Empty : AllScheduleUiState
-}
+}*/

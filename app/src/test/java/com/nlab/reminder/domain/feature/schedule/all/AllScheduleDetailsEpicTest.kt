@@ -16,23 +16,12 @@
 
 package com.nlab.reminder.domain.feature.schedule.all
 
-import com.nlab.reminder.core.data.model.ScheduleId
-import com.nlab.reminder.core.data.model.genSchedule
-import com.nlab.reminder.core.data.model.genSchedules
-import com.nlab.reminder.core.data.repository.GetScheduleQuery
-import com.nlab.reminder.core.schedule.model.genScheduleElement
-import com.nlab.statekit.middleware.epic.scenario
-import com.nlab.testkit.faker.genInt
-import kotlinx.coroutines.flow.flowOf
-import org.junit.Test
-import org.mockito.kotlin.doReturn
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
 
 /**
  * @author thalys
  */
 internal class AllScheduleDetailsEpicTest {
+    /**
     @Test
     fun `Loaded only not completed schedules from repository`() {
         val isCompletedSchedulesShown = false
@@ -78,5 +67,5 @@ internal class AllScheduleDetailsEpicTest {
             .scenario()
             .action(AllScheduleAction.ScheduleElementsLoaded(scheduleItems, isCompletedSchedulesShown))
             .verify()
-    }
+    }*/
 }

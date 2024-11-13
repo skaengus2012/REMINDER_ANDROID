@@ -16,13 +16,9 @@
 
 package com.nlab.reminder.domain.feature.schedule.all
 
-import com.nlab.reminder.core.schedule.state.SelectedAction
-import com.nlab.statekit.Reducer
-import com.nlab.statekit.util.buildDslReducer
-import kotlinx.collections.immutable.*
-import javax.inject.Inject
 
-private typealias DomainReducer = Reducer<AllScheduleAction, AllScheduleUiState>
+
+
 
 /**
  * @author Doohyun
