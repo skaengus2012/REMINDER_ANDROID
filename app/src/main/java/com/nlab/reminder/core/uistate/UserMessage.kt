@@ -13,17 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nlab.reminder.core.state
+package com.nlab.reminder.core.uistate
 
 import androidx.annotation.StringRes
 import com.nlab.reminder.core.foundation.annotation.Generated
-import com.nlab.reminder.core.annotation.platform.Stable
-import kotlinx.collections.immutable.*
 
 /**
  * @author Doohyun
  */
-@Stable
 sealed interface UserMessage {
     @Generated
     @JvmInline
@@ -31,7 +28,3 @@ sealed interface UserMessage {
 }
 
 fun UserMessage(@StringRes value: Int): UserMessage = UserMessage.ResIdValue(value)
-
-fun PersistentList<UserMessage>.userMessageShown(
-    shownMessage: UserMessage
-): PersistentList<UserMessage> = this - shownMessage

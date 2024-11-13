@@ -59,6 +59,8 @@ fun <T> Result<T>.getOrNull(): T? = when (this) {
     is Result.Failure -> null
 }
 
+inline fun <T> Result<out T>.getOrElse(defaultValue: () -> T): T = getOrNull() ?: defaultValue()
+
 inline fun <T, U> Result<T>.map(transform: (T) -> U): Result<U> = when (this) {
     is Result.Success -> Result.Success(transform(value))
     is Result.Failure -> Result.Failure(throwable)

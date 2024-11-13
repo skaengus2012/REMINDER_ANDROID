@@ -47,11 +47,11 @@ import androidx.compose.ui.unit.dp
 import com.nlab.reminder.R
 import com.nlab.reminder.core.androidx.compose.ui.throttle
 import com.nlab.reminder.core.android.designsystem.icon.ReminderIcons
-import com.nlab.reminder.domain.feature.home.resource.font.CategoryCountFontFamily
+import com.nlab.reminder.core.android.resources.font.CategoryCountFontFamily
 import com.nlab.reminder.core.designsystem.compose.theme.ReminderTheme
-import com.nlab.reminder.domain.feature.home.resource.icon.IcHomeCategoryAll
-import com.nlab.reminder.domain.feature.home.resource.icon.IcHomeCategoryTimetable
-import com.nlab.reminder.domain.feature.home.resource.icon.IcHomeCategoryToday
+import com.nlab.reminder.core.android.resources.icon.IcHomeCategoryAll
+import com.nlab.reminder.core.android.resources.icon.IcHomeCategoryTimetable
+import com.nlab.reminder.core.android.resources.icon.IcHomeCategoryToday
 
 /**
  * @author Doohyun

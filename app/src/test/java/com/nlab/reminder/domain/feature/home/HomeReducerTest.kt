@@ -16,17 +16,6 @@
 
 package com.nlab.reminder.domain.feature.home
 
-import com.nlab.reminder.R
-import com.nlab.reminder.core.state.UserMessage
-import com.nlab.reminder.core.data.model.genTag
-import com.nlab.testkit.faker.genLongGreaterThanZero
-import com.nlab.reminder.core.data.model.genTags
-import com.nlab.testkit.faker.genBothify
-import com.nlab.testkit.faker.genInt
-import com.nlab.testkit.faker.genLong
-import kotlinx.collections.immutable.*
-import org.junit.Test
-
 /**
  * @author Doohyun
  */

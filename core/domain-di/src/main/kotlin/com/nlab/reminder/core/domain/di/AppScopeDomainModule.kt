@@ -14,14 +14,27 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.feature.home.resource.font
+package com.nlab.reminder.core.domain.di
 
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
-import com.nlab.reminder.R
+import com.nlab.reminder.core.data.repository.TagRepository
+import com.nlab.reminder.core.domain.UpdateTagNameUseCase
+import dagger.Module
+import dagger.Provides
+import dagger.Reusable
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
 
 /**
- * @author Doohyun
+ * @author Thalys
  */
-
-internal val CategoryCountFontFamily = FontFamily(Font(R.font.sb_aggro_m))
+@Module
+@InstallIn(SingletonComponent::class)
+class AppScopeDomainModule {
+    @Provides
+    @Reusable
+    fun provideUpdateTagNameUseCase(
+        tagRepository: TagRepository,
+    ): UpdateTagNameUseCase = UpdateTagNameUseCase(
+        tagRepository = tagRepository
+    )
+}

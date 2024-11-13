@@ -24,7 +24,6 @@ import org.junit.Test
 internal class HomeEpicTest {
     @Test
     fun `Loaded summary from repository`() {
-        val uiState = genHomeUiStateSuccess()
 /**
         HomeEpic(
             tagRepository = mock { whenever(mock.getTagsAsStream(GetTagQuery.All)) doReturn flowOf(uiState.tags) },

@@ -16,52 +16,50 @@
 
 package com.nlab.reminder.domain.feature.home
 
-import com.nlab.reminder.core.state.UserMessage
-import com.nlab.reminder.core.foundation.annotation.Generated
+import com.nlab.reminder.core.uistate.UserMessage
 import com.nlab.reminder.core.data.model.Tag
-import com.nlab.statekit.lifecycle.viewmodel.ContractUiAction
+import com.nlab.reminder.core.kotlin.NonNegativeLong
 
 /**
  * @author Doohyun
  */
-internal sealed interface HomeAction  {
-    data class SummaryLoaded(
-        val todaySchedulesCount: Long,
-        val timetableSchedulesCount: Long,
-        val allSchedulesCount: Long,
+internal sealed interface HomeAction {
+    data class StateSynced(
+        val todaySchedulesCount: NonNegativeLong,
+        val timetableSchedulesCount: NonNegativeLong,
+        val allSchedulesCount: NonNegativeLong,
         val tags: List<Tag>,
     ) : HomeAction
 
- //   @ContractUiAction
-    data object CompleteWorkflow : HomeAction
+    data class PostMessage(val message: UserMessage) : HomeAction
 
-//    @ContractUiAction
-    data class UserMessageShown(val shownMessage: UserMessage) : HomeAction
+    //    @ContractUiAction
+    data class ShownMessage(val message: UserMessage) : HomeAction
 
-  //  @Generated
-    data class ErrorOccurred(val throwable: Throwable) : HomeAction
+    //   @ContractUiAction
+    data object Interacted : HomeAction
 
-  //  @ContractUiAction
+    //  @ContractUiAction
     data object OnTodayCategoryClicked : HomeAction
 
-  //  @ContractUiAction
+    //  @ContractUiAction
     data object OnTimetableCategoryClicked : HomeAction
 
- //   @ContractUiAction
-    object OnAllCategoryClicked : HomeAction
+    //   @ContractUiAction
+    data object OnAllCategoryClicked : HomeAction
 
- //   @ContractUiAction
+    //   @ContractUiAction
     data class OnTagLongClicked(val tag: Tag) : HomeAction
 
-    data class TagConfigMetadataLoaded(val tag: Tag, val usageCount: Long) : HomeAction
+    data class TagConfigMetadataLoaded(val tag: Tag, val usageCount: NonNegativeLong) : HomeAction
 
-  //  @ContractUiAction
+    //  @ContractUiAction
     data object OnTagRenameRequestClicked : HomeAction
 
-   // @ContractUiAction
-    data object OnTagRenameInputKeyboardShown : HomeAction
+    // @ContractUiAction
+    data object OnTagRenameInputReady : HomeAction
 
-   // @ContractUiAction
+    // @ContractUiAction
     data object OnTagRenameConfirmClicked : HomeAction
 
     // @ContractUiAction

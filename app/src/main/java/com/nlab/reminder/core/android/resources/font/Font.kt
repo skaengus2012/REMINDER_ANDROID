@@ -14,24 +14,14 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.feature.home
+package com.nlab.reminder.core.android.resources.font
 
-import com.nlab.reminder.core.data.model.Tag
-import com.nlab.reminder.core.kotlin.NonNegativeLong
-import com.nlab.reminder.core.uistate.UserMessage
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import com.nlab.reminder.R
 
 /**
  * @author Doohyun
  */
-internal sealed interface HomeUiState {
-    data object Loading : HomeUiState
 
-    data class Success(
-        val todayScheduleCount: NonNegativeLong,
-        val timetableScheduleCount: NonNegativeLong,
-        val allScheduleCount: NonNegativeLong,
-        val tags: List<Tag>,
-        val interaction: HomeInteraction,
-        val userMessages: List<UserMessage>
-    ) : HomeUiState
-}
+internal val CategoryCountFontFamily = FontFamily(Font(R.font.sb_aggro_m))

@@ -40,7 +40,7 @@ import com.nlab.reminder.core.local.datastore.PreferenceDataSource
  */
 @Module
 @InstallIn(SingletonComponent::class)
-internal class AppScopeRepositoryModule {
+internal class AppScopeDataModule {
     @Provides
     @Reusable
     @ScheduleData(All)
@@ -54,18 +54,18 @@ internal class AppScopeRepositoryModule {
     @Provides
     @Reusable
     fun provideScheduleRepository(
-        scheduleDao: ScheduleDAO,
-    ): ScheduleRepository = LocalScheduleRepository(scheduleDAO = scheduleDao)
+        scheduleDAO: ScheduleDAO,
+    ): ScheduleRepository = LocalScheduleRepository(scheduleDAO = scheduleDAO)
 
     @Provides
     @Reusable
     fun provideTagRepository(
-        tagDao: TagDAO,
+        tagDAO: TagDAO,
         tagRelationDAO: TagRelationDAO,
-        scheduleTagListDao: ScheduleTagListDAO,
+        scheduleTagListDAO: ScheduleTagListDAO,
     ): TagRepository = LocalTagRepository(
-        tagDAO = tagDao,
+        tagDAO = tagDAO,
         tagRelationDAO = tagRelationDAO,
-        scheduleTagListDAO = scheduleTagListDao,
+        scheduleTagListDAO = scheduleTagListDAO,
     )
 }

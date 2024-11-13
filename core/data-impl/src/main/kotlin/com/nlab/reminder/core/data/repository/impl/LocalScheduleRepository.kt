@@ -30,6 +30,8 @@ import com.nlab.reminder.core.data.repository.GetScheduleQuery
 import com.nlab.reminder.core.data.repository.SaveScheduleQuery
 import com.nlab.reminder.core.data.repository.ScheduleRepository
 import com.nlab.reminder.core.data.repository.UpdateSchedulesQuery
+import com.nlab.reminder.core.kotlin.NonNegativeLong
+import com.nlab.reminder.core.kotlin.tryToNonNegativeLongOrZero
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 
@@ -96,9 +98,12 @@ class LocalScheduleRepository(
     }
 
     @Generated
-    override fun getScheduleCountAsStream(query: GetScheduleCountQuery): Flow<Long> = when (query) {
-        is GetScheduleCountQuery.Today -> FakeScheduleRepositoryDelegate.getTodaySchedulesCount()
-        is GetScheduleCountQuery.Timetable -> FakeScheduleRepositoryDelegate.getTimetableSchedulesCount()
-        is GetScheduleCountQuery.All -> FakeScheduleRepositoryDelegate.getAllSchedulesCount()
+    override fun getScheduleCountAsStream(query: GetScheduleCountQuery): Flow<NonNegativeLong> {
+        val rawCountFlow = when (query) {
+            is GetScheduleCountQuery.Today -> FakeScheduleRepositoryDelegate.getTodaySchedulesCount()
+            is GetScheduleCountQuery.Timetable -> FakeScheduleRepositoryDelegate.getTimetableSchedulesCount()
+            is GetScheduleCountQuery.All -> FakeScheduleRepositoryDelegate.getAllSchedulesCount()
+        }
+        return rawCountFlow.map(Long::tryToNonNegativeLongOrZero)
     }
 }

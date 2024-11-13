@@ -19,7 +19,7 @@ package com.nlab.reminder.core.android.compose.runtime
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
-import com.nlab.reminder.core.state.UserMessage
+import com.nlab.reminder.core.uistate.UserMessage
 
 /**
  * @author Doohyun

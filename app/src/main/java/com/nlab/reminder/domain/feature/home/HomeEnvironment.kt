@@ -16,22 +16,14 @@
 
 package com.nlab.reminder.domain.feature.home
 
-import com.nlab.reminder.core.data.model.Tag
-import com.nlab.reminder.core.kotlin.NonNegativeLong
-import com.nlab.reminder.core.uistate.UserMessage
+import com.nlab.reminder.core.data.repository.TagRepository
+import com.nlab.reminder.core.domain.UpdateTagNameUseCase
+import javax.inject.Inject
 
 /**
- * @author Doohyun
+ * @author Thalys
  */
-internal sealed interface HomeUiState {
-    data object Loading : HomeUiState
-
-    data class Success(
-        val todayScheduleCount: NonNegativeLong,
-        val timetableScheduleCount: NonNegativeLong,
-        val allScheduleCount: NonNegativeLong,
-        val tags: List<Tag>,
-        val interaction: HomeInteraction,
-        val userMessages: List<UserMessage>
-    ) : HomeUiState
-}
+internal class HomeEnvironment @Inject constructor(
+    val tagRepository: TagRepository,
+    val updateTagName: UpdateTagNameUseCase
+)

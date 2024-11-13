@@ -35,19 +35,16 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nlab.reminder.R
 import com.nlab.reminder.core.android.compose.runtime.UserMessageHandler
 import com.nlab.reminder.core.designsystem.compose.component.ReminderLoadingIndicator
 import com.nlab.reminder.core.designsystem.compose.theme.ReminderTheme
-import com.nlab.reminder.core.state.UserMessage
+import com.nlab.reminder.core.uistate.UserMessage
 import com.nlab.reminder.domain.common.android.widget.showToast
 import com.nlab.reminder.core.data.model.Tag
 import com.nlab.reminder.core.androidx.compose.ui.DelayedVisibleContent
@@ -93,7 +90,7 @@ internal fun HomeRoute(
         modifier = modifier
     )*/
 }
-
+/**
 @Composable
 private fun HomeScreen(
     uiState: State<HomeUiState>,
@@ -156,7 +153,7 @@ private fun HomeScreen(
                 ) { context.showToast(displayMessage) }
 
                 HomeWorkflowHandler(
-                    workflow = curUi.workflow,
+                    workflow = curUi.interaction,
                     completeWorkflow = completeWorkflow,
                     onTagRenameRequestClicked = onTagRenameRequestClicked,
                     onTagRenameTextChanged = onTagRenameTextChanged,
@@ -316,7 +313,7 @@ private fun BottomContent(
 
 @Composable
 private fun HomeWorkflowHandler(
-    workflow: HomeWorkflow,
+    workflow: HomeInteraction,
     completeWorkflow: () -> Unit,
     onTagRenameRequestClicked: () -> Unit,
     onTagRenameTextChanged: (String) -> Unit,
@@ -328,8 +325,8 @@ private fun HomeWorkflowHandler(
 ) {
     val coroutineScope = rememberCoroutineScope()
     when (workflow) {
-        is HomeWorkflow.Empty -> {}
-        is HomeWorkflow.TagConfig -> {
+        is HomeInteraction.Empty -> {}
+        is HomeInteraction.TagConfig -> {
             HomeTagConfigDialog(
                 tagName = workflow.tag.name.value,
                 usageCount = DisplayUsageCount(workflow.usageCount),
@@ -339,12 +336,12 @@ private fun HomeWorkflowHandler(
             )
         }
 
-        is HomeWorkflow.TagRename -> {
+        is HomeInteraction.TagRename -> {
             TagRenameDialog(
                 initText = workflow.renameText,
                 tagName = workflow.tag.name.value,
                 usageCount = DisplayUsageCount(workflow.usageCount),
-                shouldKeyboardShown = workflow.shouldKeyboardShown,
+                shouldKeyboardShown = workflow.shouldUserInputReady,
                 onCancel = completeWorkflow,
                 onTextChanged = onTagRenameTextChanged,
                 onConfirm = {
@@ -352,12 +349,12 @@ private fun HomeWorkflowHandler(
                     completeWorkflow()
                 }
             )
-            if (workflow.shouldKeyboardShown) {
+            if (workflow.shouldUserInputReady) {
                 SideEffect { onTagRenameKeyboardShown() }
             }
         }
 
-        is HomeWorkflow.TagDelete -> {
+        is HomeInteraction.TagDelete -> {
             val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
             ReminderBottomSheet(
                 onDismissRequest = completeWorkflow,
@@ -386,7 +383,7 @@ private fun HomeWorkflowHandler(
         else -> {
             LaunchedEffect(workflow) {
                 completeWorkflow()
-                if (workflow is HomeWorkflow.AllSchedule) navigateToAllScheduleEnd()
+                if (workflow is HomeInteraction.AllSchedule) navigateToAllScheduleEnd()
             }
         }
     }
@@ -419,4 +416,4 @@ private fun HomeContentPreview() {
             modifier = Modifier.fillMaxSize()
         )
     }
-}
+}*/
