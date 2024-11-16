@@ -8,8 +8,6 @@ android {
 }
 
 dependencies {
-    implementation(projects.core.foundation)
-
     implementation(libs.androidx.annotation)
     implementation(libs.androidx.compose.material3)
 }

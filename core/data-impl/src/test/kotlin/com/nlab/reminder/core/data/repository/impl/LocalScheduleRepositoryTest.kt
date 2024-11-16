@@ -26,7 +26,7 @@ import com.nlab.reminder.core.data.repository.GetScheduleQuery
 import com.nlab.reminder.core.data.repository.SaveScheduleQuery
 import com.nlab.reminder.core.data.repository.ScheduleRepository
 import com.nlab.reminder.core.data.repository.UpdateSchedulesQuery
-import com.nlab.reminder.core.kotlin.genNonNegativeLong
+import com.nlab.reminder.core.kotlin.faker.genNonNegativeLong
 import com.nlab.reminder.core.kotlin.getOrThrow
 import com.nlab.reminder.core.local.database.dao.ScheduleDAO
 import com.nlab.testkit.faker.genBoolean

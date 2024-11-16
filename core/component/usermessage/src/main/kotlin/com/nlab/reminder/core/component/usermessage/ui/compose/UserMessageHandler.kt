@@ -18,8 +18,11 @@ package com.nlab.reminder.core.component.usermessage.ui.compose
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import com.nlab.reminder.core.component.usermessage.UserMessage
+import com.nlab.reminder.core.component.usermessage.UserMessage.*
 
 /**
  * @author Doohyun
@@ -28,17 +31,29 @@ import com.nlab.reminder.core.component.usermessage.UserMessage
 fun UserMessageHandler(
     messages: List<UserMessage>,
     onMessageReleased: (UserMessage) -> Unit,
-    block: suspend UserMessageEffectScope.() -> Unit
+    block: suspend String.() -> Unit
 ) {
     messages.firstOrNull()?.let { message ->
-        val context = LocalContext.current
-        LaunchedEffect(message) {
-            val displayMessage = when (message) {
-                is UserMessage.ResIdValue -> context.getString(message.value)
-            }
-            block(UserMessageEffectScope(displayMessage))
+        val displayMessage = message.toDisplayMessage()
+        LaunchedEffect(displayMessage) {
+            block(displayMessage)
             onMessageReleased(message)
         }
+    }
+}
+
+@ReadOnlyComposable
+@Composable
+private fun UserMessage.toDisplayMessage(): String = when (this) {
+    is Default -> value
+    is ResId -> {
+        if (args == null) stringResource(resId)
+        else stringResource(resId, *args)
+    }
+
+    is PluralsResId -> {
+        if (args == null) pluralStringResource(resId, count)
+        else pluralStringResource(resId, count, *args)
     }
 }
 

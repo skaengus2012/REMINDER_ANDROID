@@ -14,11 +14,16 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.kotlin
-
-import com.nlab.testkit.faker.genBothify
+package com.nlab.testkit.faker
 
 /**
  * @author Doohyun
  */
-fun genNonBlankString(): NonBlankString = genBothify().toNonBlankString()
+fun <T> Iterable<T>.shuffleAndGetFirst(
+    predicate: (T) -> Boolean = { true }
+): T {
+    val target = filter(predicate).shuffled()
+    check(target.isNotEmpty()) { "Cannot found any element satisfying the predicate" }
+
+    return target.first()
+}

@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.kotlin
+package com.nlab.reminder.core.kotlin.faker
 
+import com.nlab.reminder.core.kotlin.NonNegativeLong
+import com.nlab.reminder.core.kotlin.toNonNegativeLong
 import com.nlab.testkit.faker.genLongGreaterThanZero
 
 /**

@@ -17,19 +17,20 @@
 package com.nlab.reminder.core.component.tag.model
 
 import com.nlab.reminder.core.data.model.Tag
+import com.nlab.reminder.core.foundation.annotation.Generated
 import com.nlab.reminder.core.kotlin.NonNegativeLong
 
 /**
  * @author Doohyun
  */
 sealed interface TagEditInteraction {
-    data object Empty : TagEditInteraction
-
+    @Generated
     data class Intro(
         val tag: Tag,
         val usageCount: NonNegativeLong
     ) : TagEditInteraction
 
+    @Generated
     data class Rename(
         val tag: Tag,
         val usageCount: NonNegativeLong,
@@ -37,11 +38,13 @@ sealed interface TagEditInteraction {
         val shouldUserInputReady: Boolean
     ) : TagEditInteraction
 
+    @Generated
     data class Merge(
         val from: Tag,
-        val to: Tag,
+        val to: Tag
     ) : TagEditInteraction
 
+    @Generated
     data class Delete(
         val tag: Tag,
         val usageCount: NonNegativeLong

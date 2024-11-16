@@ -18,8 +18,8 @@ package com.nlab.reminder.core.data.model
 
 import com.nlab.reminder.core.kotlin.NonBlankString
 import com.nlab.reminder.core.kotlin.NonNegativeLong
-import com.nlab.reminder.core.kotlin.genNonBlankString
-import com.nlab.reminder.core.kotlin.genNonNegativeLong
+import com.nlab.reminder.core.kotlin.faker.genNonBlankString
+import com.nlab.reminder.core.kotlin.faker.genNonNegativeLong
 import com.nlab.testkit.faker.genBoolean
 import com.nlab.testkit.faker.genBothify
 import com.nlab.testkit.faker.genInt
