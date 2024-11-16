@@ -35,6 +35,7 @@ import com.nlab.reminder.R
 import com.nlab.reminder.core.androidx.compose.ui.component.ColorPressButton
 import com.nlab.reminder.core.androidx.compose.ui.throttle
 import com.nlab.reminder.core.designsystem.compose.theme.ReminderTheme
+import com.nlab.reminder.core.translation.StringIds
 
 /**
  * @author thalys
@@ -60,7 +61,7 @@ internal fun NewPlanButton(
             tint = contentColor
         )
         Text(
-            text = LocalContext.current.getString(R.string.new_schedule_label),
+            text = LocalContext.current.getString(StringIds.new_schedule_label),
             style = ReminderTheme.typography.titleMedium,
             color = contentColor
         )
@@ -92,7 +93,7 @@ internal fun TimePushSwitchButton(
         Text(
             text = LocalContext
                 .current
-                .getString(if (isPushOn) R.string.home_push_off_label else R.string.home_push_on_label),
+                .getString(if (isPushOn) StringIds.home_push_off_label else StringIds.home_push_on_label),
             style = ReminderTheme.typography.titleMedium,
             color = contentColor
         )

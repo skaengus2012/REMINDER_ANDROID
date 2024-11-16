@@ -16,11 +16,11 @@
 
 package com.nlab.reminder.domain.feature.home
 
-import com.nlab.reminder.R
 import com.nlab.reminder.core.domain.TagGroupSource
 import com.nlab.reminder.core.kotlin.getOrElse
 import com.nlab.reminder.core.kotlin.map
 import com.nlab.reminder.core.kotlin.tryToNonBlankStringOrNull
+import com.nlab.reminder.core.translation.StringIds
 import com.nlab.reminder.core.uistate.UserMessage
 import com.nlab.statekit.dsl.reduce.DslReduce
 import com.nlab.statekit.reduce.Reduce
@@ -32,7 +32,7 @@ internal typealias HomeReduce = Reduce<HomeAction, HomeUiState>
 /**
  * @author Doohyun
  */
-internal fun HomeReduce(environment: HomeEnvironment): HomeReduce = DslReduce {
+internal fun HomeReduce(dependency: HomeDependency): HomeReduce = DslReduce {
     actionScope<StateSynced> {
         transition<Loading> {
             Success(
@@ -65,10 +65,10 @@ internal fun HomeReduce(environment: HomeEnvironment): HomeReduce = DslReduce {
                 current.copy(interaction = HomeInteraction.AllSchedule)
             }
             effect<OnTagLongClicked> {
-                val nextAction = environment.tagRepository
+                val nextAction = dependency.tagRepository
                     .getUsageCount(id = action.tag.id)
                     .map { TagConfigMetadataLoaded(action.tag, it) }
-                    .getOrElse { PostMessage(UserMessage(R.string.tag_not_found)) }
+                    .getOrElse { PostMessage(UserMessage(StringIds.tag_not_found)) }
                 dispatch(nextAction)
             }
             transition<TagConfigMetadataLoaded> {
@@ -108,7 +108,7 @@ internal fun HomeReduce(environment: HomeEnvironment): HomeReduce = DslReduce {
             effect<OnTagRenameConfirmClicked> {
                 val tagRename = current.requireTagRename()
                 val newName = tagRename.renameText.tryToNonBlankStringOrNull() ?: return@effect
-                val result = environment.updateTagName(
+                val result = dependency.updateTagName(
                     tagId = tagRename.tag.id,
                     newName = newName,
                     tagGroup = TagGroupSource.Snapshot(current.tags)

@@ -44,7 +44,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.nlab.reminder.R
 import com.nlab.reminder.core.androidx.compose.ui.throttle
 import com.nlab.reminder.core.android.designsystem.icon.ReminderIcons
 import com.nlab.reminder.core.android.resources.font.CategoryCountFontFamily
@@ -52,6 +51,7 @@ import com.nlab.reminder.core.designsystem.compose.theme.ReminderTheme
 import com.nlab.reminder.core.android.resources.icon.IcHomeCategoryAll
 import com.nlab.reminder.core.android.resources.icon.IcHomeCategoryTimetable
 import com.nlab.reminder.core.android.resources.icon.IcHomeCategoryToday
+import com.nlab.reminder.core.translation.StringIds
 
 /**
  * @author Doohyun
@@ -98,7 +98,7 @@ private fun TodayCategoryCard(
     onClick: () -> Unit = {},
 ) {
     BasicCategoryCard(
-        name = stringResource(R.string.home_category_today),
+        name = stringResource(StringIds.home_category_today),
         remainCount = remainCount,
         icon = {
             Image(
@@ -121,7 +121,7 @@ private fun TimetableCategoryCard(
     onClick: () -> Unit = {},
 ) {
     BasicCategoryCard(
-        name = stringResource(R.string.home_category_timetable),
+        name = stringResource(StringIds.home_category_timetable),
         remainCount = remainCount,
         icon = {
             // case1: If you use webp, the image quality is not good when in landscape mode.
@@ -147,7 +147,7 @@ private fun AllCategoryCard(
     onClick: () -> Unit = {},
 ) {
     BasicCategoryCard(
-        name = stringResource(R.string.home_category_timetable),
+        name = stringResource(StringIds.home_category_timetable),
         remainCount = remainCount,
         icon = {
             Image(

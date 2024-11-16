@@ -44,10 +44,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.nlab.reminder.R
 import com.nlab.reminder.core.designsystem.compose.component.ReminderDialog
 import com.nlab.reminder.core.androidx.compose.ui.throttle
 import com.nlab.reminder.core.designsystem.compose.theme.ReminderTheme
+import com.nlab.reminder.core.translation.PluralsIds
+import com.nlab.reminder.core.translation.StringIds
 import com.nlab.reminder.domain.common.tag.ui.DisplayUsageCount
 
 /**
@@ -72,7 +73,7 @@ internal fun HomeTagConfigDialog(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 20.dp),
-                text = LocalContext.current.getString(R.string.format_tag, tagName),
+                text = LocalContext.current.getString(StringIds.format_tag, tagName),
                 style = MaterialTheme.typography.titleSmall,
                 color = ReminderTheme.colors.content1,
                 textAlign = TextAlign.Center
@@ -83,7 +84,7 @@ internal fun HomeTagConfigDialog(
                 color = ReminderTheme.colors.bgLine1,
             )
             HomeTagConfigButton(
-                text = LocalContext.current.getString(R.string.tag_rename),
+                text = LocalContext.current.getString(StringIds.tag_rename),
                 onClick = onRenameRequestClicked,
                 fontColor = ReminderTheme.colors.content1,
                 modifier = Modifier
@@ -94,10 +95,10 @@ internal fun HomeTagConfigDialog(
             HomeTagConfigButton(
                 text = usageCount.format(
                     transform = { count ->
-                        pluralStringResource(R.plurals.tag_delete, count, count)
+                        pluralStringResource(PluralsIds.tag_delete, count, count)
                     },
                     transformWhenOverflow = { count ->
-                        stringResource(R.string.tag_delete_overflow, count)
+                        stringResource(StringIds.tag_delete_overflow, count)
                     }
                 ),
                 onClick = onDeleteRequestClicked,

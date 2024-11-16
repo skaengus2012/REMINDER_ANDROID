@@ -36,9 +36,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.nlab.reminder.R
 import com.nlab.reminder.core.androidx.compose.ui.throttle
 import com.nlab.reminder.core.designsystem.compose.theme.ReminderTheme
+import com.nlab.reminder.core.translation.StringIds
 
 /**
  * @author Doohyun
@@ -60,7 +60,7 @@ fun TagText(
             onLongClickLabel = onLongClickLabel
         )
         Text(
-            text = LocalContext.current.getString(R.string.format_tag, text),
+            text = LocalContext.current.getString(StringIds.format_tag, text),
             style = ReminderTheme.typography.bodyMedium,
             color = ReminderTheme.colors.contentTag,
             modifier = Modifier.padding(horizontal = 12.dp, vertical = 5.dp),

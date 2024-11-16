@@ -39,6 +39,7 @@ import com.nlab.reminder.core.designsystem.compose.theme.ReminderTheme
 import com.nlab.reminder.core.data.model.Tag
 import com.nlab.reminder.core.data.model.TagId
 import com.nlab.reminder.core.kotlin.toNonBlankString
+import com.nlab.reminder.core.translation.StringIds
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
@@ -66,7 +67,7 @@ internal fun TagTextsBox(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = LocalContext.current.getString(R.string.common_tag_empty),
+                    text = LocalContext.current.getString(StringIds.common_tag_empty),
                     style = ReminderTheme.typography.bodyMedium,
                     color = ReminderTheme.colors.content2,
                 )

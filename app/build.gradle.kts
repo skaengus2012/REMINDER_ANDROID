@@ -91,6 +91,7 @@ dependencies {
     // implementation(projects.core.scheduleExt)
     implementation(projects.core.statekit)
     kapt(projects.statekit.compiler)
+    implementation(projects.core.translation)
 
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.collections.immutable)

@@ -66,6 +66,8 @@ import com.nlab.reminder.R
 import com.nlab.reminder.core.designsystem.compose.component.ReminderDialog
 import com.nlab.reminder.core.designsystem.compose.theme.ReminderTheme
 import com.nlab.reminder.core.androidx.compose.ui.component.ColorPressButton
+import com.nlab.reminder.core.translation.PluralsIds
+import com.nlab.reminder.core.translation.StringIds
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.debounce
 
@@ -94,7 +96,7 @@ fun TagRenameDialog(
             ) {
                 Text(
                     modifier = Modifier.padding(top = 15.dp),
-                    text = LocalContext.current.getString(R.string.tag_rename),
+                    text = LocalContext.current.getString(StringIds.tag_rename),
                     style = ReminderTheme.typography
                         .bodyLarge
                         .copy(fontWeight = FontWeight.Bold),
@@ -106,7 +108,7 @@ fun TagRenameDialog(
                     text = usageCount.format(
                         transform = { count ->
                             pluralStringResource(
-                                R.plurals.tag_rename_dialog_description,
+                                PluralsIds.tag_rename_dialog_description,
                                 count,
                                 tagName,
                                 count
@@ -114,7 +116,7 @@ fun TagRenameDialog(
                         },
                         transformWhenOverflow = { count ->
                             stringResource(
-                                R.string.tag_rename_dialog_description_overflow,
+                                StringIds.tag_rename_dialog_description_overflow,
                                 tagName,
                                 count
                             )
@@ -156,7 +158,7 @@ fun TagRenameDialog(
                     Text(
                         modifier = Modifier.fillMaxWidth(),
                         color = contentColor,
-                        text = LocalContext.current.getString(R.string.cancel),
+                        text = LocalContext.current.getString(StringIds.cancel),
                         style = ReminderTheme.typography
                             .bodyLarge
                             .copy(textAlign = TextAlign.Center)
@@ -180,7 +182,7 @@ fun TagRenameDialog(
                     Text(
                         modifier = Modifier.fillMaxWidth(),
                         color = contentColor,
-                        text = LocalContext.current.getString(R.string.ok),
+                        text = LocalContext.current.getString(StringIds.ok),
                         style = ReminderTheme.typography
                             .bodyLarge
                             .copy(textAlign = TextAlign.Center)

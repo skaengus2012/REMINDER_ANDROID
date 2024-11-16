@@ -23,7 +23,7 @@ import javax.inject.Inject
 /**
  * @author Thalys
  */
-internal class HomeEnvironment @Inject constructor(
+internal class HomeDependency @Inject constructor(
     val tagRepository: TagRepository,
     val updateTagName: UpdateTagNameUseCase
 )

@@ -38,9 +38,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.nlab.reminder.R
 import com.nlab.reminder.core.androidx.compose.ui.throttle
 import com.nlab.reminder.core.designsystem.compose.theme.ReminderTheme
+import com.nlab.reminder.core.translation.PluralsIds
+import com.nlab.reminder.core.translation.StringIds
 
 /**
  * @author Doohyun
@@ -61,8 +62,8 @@ fun TagDeleteBottomSheetContent(
         Text(
             modifier = Modifier.fillMaxWidth(),
             text = usageCount.format(
-                transform = { pluralStringResource(id = R.plurals.tag_delete, count = it, it) },
-                transformWhenOverflow = { stringResource(id = R.string.tag_delete_overflow, it) }
+                transform = { pluralStringResource(id = PluralsIds.tag_delete, count = it, it) },
+                transformWhenOverflow = { stringResource(id = StringIds.tag_delete_overflow, it) }
             ),
             style = ReminderTheme.typography.bodySmall,
             color = ReminderTheme.colors.content1,
@@ -76,10 +77,10 @@ fun TagDeleteBottomSheetContent(
             style = ReminderTheme.typography.bodySmall,
             text = usageCount.format(
                 transform = {
-                    pluralStringResource(id = R.plurals.tag_delete_dialog_description, count = it, tagName, it)
+                    pluralStringResource(id = PluralsIds.tag_delete_dialog_description, count = it, tagName, it)
                 },
                 transformWhenOverflow = {
-                    stringResource(id = R.string.tag_delete_dialog_description_overflow, tagName, it)
+                    stringResource(id = StringIds.tag_delete_dialog_description_overflow, tagName, it)
                 }
             ),
             color = ReminderTheme.colors.content1,
@@ -92,13 +93,13 @@ fun TagDeleteBottomSheetContent(
         )
 
         InternalButton(
-            text = LocalContext.current.getString(R.string.delete),
+            text = LocalContext.current.getString(StringIds.delete),
             fontColor = ReminderTheme.colors.red1,
             onClick = onConfirmClicked
         )
 
         InternalButton(
-            text = LocalContext.current.getString(R.string.cancel),
+            text = LocalContext.current.getString(StringIds.cancel),
             fontColor = ReminderTheme.colors.content2,
             onClick = onCancelClicked,
             modifier = Modifier.padding(bottom = 10.dp)
