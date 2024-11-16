@@ -16,12 +16,10 @@
 
 package com.nlab.reminder.domain.feature.home
 
-import com.nlab.reminder.core.domain.TagGroupSource
 import com.nlab.reminder.core.kotlin.getOrElse
 import com.nlab.reminder.core.kotlin.map
-import com.nlab.reminder.core.kotlin.tryToNonBlankStringOrNull
 import com.nlab.reminder.core.translation.StringIds
-import com.nlab.reminder.core.uistate.UserMessage
+import com.nlab.reminder.core.component.usermessage.UserMessage
 import com.nlab.statekit.dsl.reduce.DslReduce
 import com.nlab.statekit.reduce.Reduce
 import com.nlab.reminder.domain.feature.home.HomeAction.*

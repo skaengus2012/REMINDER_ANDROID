@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 The N's lab Open Source Project
+ * Copyright (C) 2024 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nlab.reminder.core.uistate
+package com.nlab.reminder.core.component.usermessage
 
 import androidx.annotation.StringRes
 import com.nlab.reminder.core.foundation.annotation.Generated

@@ -16,49 +16,8 @@
 
 package com.nlab.reminder.domain.feature.home.ui
 
-import android.content.res.Configuration.*
-import androidx.annotation.StringRes
-import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
-import com.nlab.reminder.R
-import com.nlab.reminder.core.android.compose.runtime.UserMessageHandler
-import com.nlab.reminder.core.designsystem.compose.component.ReminderLoadingIndicator
-import com.nlab.reminder.core.designsystem.compose.theme.ReminderTheme
-import com.nlab.reminder.core.uistate.UserMessage
-import com.nlab.reminder.domain.common.android.widget.showToast
-import com.nlab.reminder.core.data.model.Tag
-import com.nlab.reminder.core.androidx.compose.ui.DelayedVisibleContent
-import com.nlab.reminder.core.androidx.compose.ui.rememberDelayedVisibleState
-import com.nlab.reminder.core.data.model.TagId
-import com.nlab.reminder.core.designsystem.compose.component.ReminderBottomSheet
-import com.nlab.reminder.core.kotlin.toNonBlankString
-import com.nlab.reminder.domain.common.tag.ui.TagDeleteBottomSheetContent
-import com.nlab.reminder.domain.common.tag.ui.TagRenameDialog
-import com.nlab.reminder.domain.common.tag.ui.DisplayUsageCount
-import com.nlab.reminder.domain.feature.home.*
-import kotlinx.collections.immutable.*
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.launch
 
 /**
  * @author Doohyun

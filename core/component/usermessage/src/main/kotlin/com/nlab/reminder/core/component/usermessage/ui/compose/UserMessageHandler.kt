@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 The N's lab Open Source Project
+ * Copyright (C) 2024 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.android.compose.runtime
+package com.nlab.reminder.core.component.usermessage.ui.compose
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
-import com.nlab.reminder.core.uistate.UserMessage
+import com.nlab.reminder.core.component.usermessage.UserMessage
 
 /**
  * @author Doohyun
  */
 @Composable
-inline fun UserMessageHandler(
+fun UserMessageHandler(
     messages: List<UserMessage>,
-    crossinline onMessageReleased: (UserMessage) -> Unit,
-    crossinline block: suspend UserMessageEffectScope.() -> Unit
+    onMessageReleased: (UserMessage) -> Unit,
+    block: suspend UserMessageEffectScope.() -> Unit
 ) {
     messages.firstOrNull()?.let { message ->
         val context = LocalContext.current
