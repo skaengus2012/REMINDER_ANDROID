@@ -27,30 +27,26 @@ import com.nlab.reminder.core.kotlin.map
 /**
  * @author Thalys
  */
-class UpdateTagNameUseCase(
+class TryUpdateTagNameUseCase(
     private val tagRepository: TagRepository
 ) {
     suspend operator fun invoke(
         tagId: TagId,
         newName: NonBlankString,
         tagGroup: TagGroupSource
-    ): UpdateTagNameResult {
+    ): TryUpdateTagNameResult {
         val compareTags = when (tagGroup) {
             is TagGroupSource.Snapshot -> tagGroup.tags
         }
-        val sameNameTagIds = compareTags
-            .asSequence()
-            .filter { it.name == newName }
-            .map { it.id }
-            .toSet()
+        val sameNameTags = compareTags.filter { it.name == newName }
         return when {
-            sameNameTagIds.isEmpty() -> {
+            sameNameTags.isEmpty() -> {
                 tagRepository.save(SaveTagQuery.Modify(tagId, newName))
-                    .map { UpdateTagNameResult.Success(it) }
-                    .getOrElse { UpdateTagNameResult.UnknownError }
+                    .map { TryUpdateTagNameResult.Success(it) }
+                    .getOrElse { TryUpdateTagNameResult.UnknownError }
             }
-            tagId in sameNameTagIds -> UpdateTagNameResult.NotChanged
-            else -> UpdateTagNameResult.DuplicateNameError
+            sameNameTags.any { it.id == tagId } -> TryUpdateTagNameResult.NotChanged
+            else -> TryUpdateTagNameResult.DuplicateNameError(duplicateTag = sameNameTags.first())
         }
     }
 }
@@ -59,9 +55,9 @@ sealed class TagGroupSource private constructor() {
     data class Snapshot(val tags: List<Tag>) : TagGroupSource()
 }
 
-sealed class UpdateTagNameResult private constructor() {
-    data class Success(val tag: Tag) : UpdateTagNameResult()
-    data object NotChanged : UpdateTagNameResult()
-    data object DuplicateNameError : UpdateTagNameResult()
-    data object UnknownError : UpdateTagNameResult()
+sealed class TryUpdateTagNameResult private constructor() {
+    data class Success(val tag: Tag) : TryUpdateTagNameResult()
+    data object NotChanged : TryUpdateTagNameResult()
+    data class DuplicateNameError(val duplicateTag: Tag) : TryUpdateTagNameResult()
+    data object UnknownError : TryUpdateTagNameResult()
 }

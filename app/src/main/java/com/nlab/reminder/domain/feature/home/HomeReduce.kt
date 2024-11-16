@@ -67,16 +67,17 @@ internal fun HomeReduce(dependency: HomeDependency): HomeReduce = DslReduce {
             effect<OnTagLongClicked> {
                 val nextAction = dependency.tagRepository
                     .getUsageCount(id = action.tag.id)
-                    .map { TagConfigMetadataLoaded(action.tag, it) }
+                    .map { TagEditMetadataLoaded(action.tag, it) }
                     .getOrElse { PostMessage(UserMessage(StringIds.tag_not_found)) }
                 dispatch(nextAction)
             }
-            transition<TagConfigMetadataLoaded> {
-                current.copy(interaction = HomeInteraction.TagConfig(action.tag, action.usageCount))
+            transition<TagEditMetadataLoaded> {
+                current.copy()
             }
         }
-        scope(isMatch = { current.interaction is HomeInteraction.TagConfig }) {
-            fun Success.requireTagConfig() = interaction as HomeInteraction.TagConfig
+        /**
+        scope(isMatch = { current.interaction is HomeInteraction.TagEdit }) {
+            fun Success.requireTagConfig() = interaction as HomeInteraction.TagEdit
             transition<OnTagRenameRequestClicked> {
                 current.copy(
                     interaction = current.requireTagConfig().let { tagConfig ->
@@ -108,7 +109,7 @@ internal fun HomeReduce(dependency: HomeDependency): HomeReduce = DslReduce {
             effect<OnTagRenameConfirmClicked> {
                 val tagRename = current.requireTagRename()
                 val newName = tagRename.renameText.tryToNonBlankStringOrNull() ?: return@effect
-                val result = dependency.updateTagName(
+                val result = dependency.tryUpdateTagName(
                     tagId = tagRename.tag.id,
                     newName = newName,
                     tagGroup = TagGroupSource.Snapshot(current.tags)
@@ -119,7 +120,7 @@ internal fun HomeReduce(dependency: HomeDependency): HomeReduce = DslReduce {
         effect<OnTagDeleteConfirmClicked> {
             val tagDelete = current.interaction as? HomeInteraction.TagDelete ?: return@effect
             // TODO 구현
-        }
+        }*/
         transition<PostMessage> { current.copy(userMessages = current.userMessages + action.message) }
         transition<ShownMessage> { current.copy(userMessages = current.userMessages - action.message) }
         transition<Interacted> { current.copy(interaction = HomeInteraction.Empty) }

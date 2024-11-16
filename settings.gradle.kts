@@ -58,6 +58,7 @@ include(
     ":core:androidx:transition",
     ":core:annotation",
     ":core:annotation-android",
+    ":core:component:tag",
     ":core:data",
     ":core:data-di",
     ":core:data-impl",

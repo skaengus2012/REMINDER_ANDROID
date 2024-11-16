@@ -51,7 +51,7 @@ internal sealed interface HomeAction {
     //   @ContractUiAction
     data class OnTagLongClicked(val tag: Tag) : HomeAction
 
-    data class TagConfigMetadataLoaded(val tag: Tag, val usageCount: NonNegativeLong) : HomeAction
+    data class TagEditMetadataLoaded(val tag: Tag, val usageCount: NonNegativeLong) : HomeAction
 
     //  @ContractUiAction
     data object OnTagRenameRequestClicked : HomeAction

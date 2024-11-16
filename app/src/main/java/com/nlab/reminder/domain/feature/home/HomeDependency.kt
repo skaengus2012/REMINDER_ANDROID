@@ -17,7 +17,7 @@
 package com.nlab.reminder.domain.feature.home
 
 import com.nlab.reminder.core.data.repository.TagRepository
-import com.nlab.reminder.core.domain.UpdateTagNameUseCase
+import com.nlab.reminder.core.domain.TryUpdateTagNameUseCase
 import javax.inject.Inject
 
 /**
@@ -25,5 +25,5 @@ import javax.inject.Inject
  */
 internal class HomeDependency @Inject constructor(
     val tagRepository: TagRepository,
-    val updateTagName: UpdateTagNameUseCase
+    val tryUpdateTagName: TryUpdateTagNameUseCase
 )

@@ -35,7 +35,7 @@ import org.mockito.kotlin.whenever
 /**
  * @author Thalys
  */
-class UpdateTagNameUseCaseTest {
+class TryUpdateTagNameUseCaseTest {
     private val inputTagId: TagId = TagId(1)
     private val inputName: NonBlankString = "A".toNonBlankString()
 
@@ -48,12 +48,12 @@ class UpdateTagNameUseCaseTest {
         val tagRepository: TagRepository = mock {
             whenever(mock.save(SaveTagQuery.Modify(inputTagId, inputName))) doReturn Result.Success(expectedChangeTag)
         }
-        val result = UpdateTagNameUseCase(tagRepository).invoke(
+        val result = TryUpdateTagNameUseCase(tagRepository).invoke(
             inputTagId,
             inputName,
             TagGroupSource.Snapshot(tagGroups)
         )
-        result as UpdateTagNameResult.Success
+        result as TryUpdateTagNameResult.Success
         assertThat(result.tag, equalTo(expectedChangeTag))
     }
 
@@ -65,34 +65,34 @@ class UpdateTagNameUseCaseTest {
         val tagRepository: TagRepository = mock {
             whenever(mock.save(SaveTagQuery.Modify(inputTagId, inputName))) doReturn Result.Failure(RuntimeException())
         }
-        val result = UpdateTagNameUseCase(tagRepository).invoke(
+        val result = TryUpdateTagNameUseCase(tagRepository).invoke(
             inputTagId,
             inputName,
             TagGroupSource.Snapshot(tagGroups)
         )
-        assertThat(result, equalTo(UpdateTagNameResult.UnknownError))
+        assertThat(result, equalTo(TryUpdateTagNameResult.UnknownError))
     }
 
     @Test
     fun `Given id, name and same input tag group, When invoke, Then return not changed`() = runTest {
         val expectedChangeTag = genTag(inputTagId, inputName)
         val tagGroups = listOf(expectedChangeTag)
-        val result = UpdateTagNameUseCase(tagRepository = mock()).invoke(
+        val result = TryUpdateTagNameUseCase(tagRepository = mock()).invoke(
             inputTagId,
             inputName,
             TagGroupSource.Snapshot(tagGroups)
         )
-        assertThat(result, equalTo(UpdateTagNameResult.NotChanged))
+        assertThat(result, equalTo(TryUpdateTagNameResult.NotChanged))
     }
 
     @Test
     fun `Given id, duplicate name and tag group, When invoke, Then return duplicate name error`() = runTest {
         val tagGroups = listOf(genTag(id = TagId(inputTagId.rawId + 1), name = inputName))
-        val result = UpdateTagNameUseCase(tagRepository = mock()).invoke(
+        val result = TryUpdateTagNameUseCase(tagRepository = mock()).invoke(
             inputTagId,
             inputName,
             TagGroupSource.Snapshot(tagGroups)
         )
-        assertThat(result, equalTo(UpdateTagNameResult.DuplicateNameError))
+        assertThat(result, equalTo(TryUpdateTagNameResult.DuplicateNameError))
     }
 }

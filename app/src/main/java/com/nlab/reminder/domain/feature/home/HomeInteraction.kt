@@ -16,10 +16,6 @@
 
 package com.nlab.reminder.domain.feature.home
 
-import com.nlab.reminder.core.foundation.annotation.Generated
-import com.nlab.reminder.core.data.model.Tag
-import com.nlab.reminder.core.kotlin.NonNegativeLong
-
 /**
  * @author thalys
  */
@@ -28,24 +24,5 @@ internal sealed interface HomeInteraction {
     data object TodaySchedule : HomeInteraction
     data object TimetableSchedule : HomeInteraction
     data object AllSchedule : HomeInteraction
-
-    @Generated
-    data class TagConfig(
-        val tag: Tag,
-        val usageCount: NonNegativeLong
-    ) : HomeInteraction
-
-    @Generated
-    data class TagRename(
-        val tag: Tag,
-        val usageCount: NonNegativeLong,
-        val renameText: String,
-        val shouldUserInputReady: Boolean
-    ) : HomeInteraction
-
-    @Generated
-    data class TagDelete(
-        val tag: Tag,
-        val usageCount: NonNegativeLong
-    ) : HomeInteraction
+    data class TagEdit(val interaction: TagEditInteraction) : HomeInteraction
 }

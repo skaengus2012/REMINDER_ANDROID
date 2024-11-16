@@ -17,7 +17,7 @@
 package com.nlab.reminder.core.domain.di
 
 import com.nlab.reminder.core.data.repository.TagRepository
-import com.nlab.reminder.core.domain.UpdateTagNameUseCase
+import com.nlab.reminder.core.domain.TryUpdateTagNameUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.Reusable
@@ -34,7 +34,7 @@ class AppScopeDomainModule {
     @Reusable
     fun provideUpdateTagNameUseCase(
         tagRepository: TagRepository,
-    ): UpdateTagNameUseCase = UpdateTagNameUseCase(
+    ): TryUpdateTagNameUseCase = TryUpdateTagNameUseCase(
         tagRepository = tagRepository
     )
 }
