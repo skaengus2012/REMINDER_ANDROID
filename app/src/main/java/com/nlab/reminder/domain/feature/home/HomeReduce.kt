@@ -16,21 +16,22 @@
 
 package com.nlab.reminder.domain.feature.home
 
+import com.nlab.reminder.core.component.tag.delegate.LazyTagEditResult
+import com.nlab.reminder.core.component.tag.model.TagEditStep
 import com.nlab.reminder.core.kotlin.getOrElse
 import com.nlab.reminder.core.kotlin.map
 import com.nlab.reminder.core.translation.StringIds
 import com.nlab.reminder.core.component.usermessage.UserMessage
+import com.nlab.reminder.core.kotlinx.coroutine.flow.map
 import com.nlab.statekit.dsl.reduce.DslReduce
 import com.nlab.statekit.reduce.Reduce
 import com.nlab.reminder.domain.feature.home.HomeAction.*
 import com.nlab.reminder.domain.feature.home.HomeUiState.*
 
-internal typealias HomeReduce = Reduce<HomeAction, HomeUiState>
-
 /**
  * @author Doohyun
  */
-internal fun HomeReduce(dependency: HomeDependency): HomeReduce = DslReduce {
+internal fun HomeReduce(dependency: HomeDependency): Reduce<HomeAction, HomeUiState> = DslReduce {
     actionScope<StateSynced> {
         transition<Loading> {
             Success(
@@ -52,7 +53,7 @@ internal fun HomeReduce(dependency: HomeDependency): HomeReduce = DslReduce {
         }
     }
     stateScope<Success> {
-        scope(isMatch = { current.interaction != HomeInteraction.Empty }) {
+        scope(isMatch = { current.interaction == HomeInteraction.Empty }) {
             transition<OnTodayCategoryClicked> {
                 current.copy(interaction = HomeInteraction.TodaySchedule)
             }
@@ -63,64 +64,95 @@ internal fun HomeReduce(dependency: HomeDependency): HomeReduce = DslReduce {
                 current.copy(interaction = HomeInteraction.AllSchedule)
             }
             effect<OnTagLongClicked> {
-                val nextAction = dependency.tagRepository
-                    .getUsageCount(id = action.tag.id)
-                    .map { TagEditMetadataLoaded(action.tag, it) }
-                    .getOrElse { PostMessage(UserMessage(StringIds.tag_not_found)) }
+                val nextAction = dependency.tagEditDelegate
+                    .startEditing(tag = action.tag)
+                    .map { TagEditStarted(it) }
+                    .getOrElse { UserMessagePosted(UserMessage(StringIds.tag_not_found)) }
                 dispatch(nextAction)
             }
-            transition<TagEditMetadataLoaded> {
-                current.copy()
+            transition<TagEditStarted> {
+                current.copy(interaction = HomeInteraction.TagEdit(action.intro))
+            }
+            transition<TagEditChangedLazily> {
+                current.copy(
+                    interaction = current.tagEditStep
+                        .let(action.toNextStepInteraction::invoke)
+                        ?.toTagEdit()
+                        ?: HomeInteraction.Empty
+                )
             }
         }
-        /**
         scope(isMatch = { current.interaction is HomeInteraction.TagEdit }) {
-            fun Success.requireTagConfig() = interaction as HomeInteraction.TagEdit
             transition<OnTagRenameRequestClicked> {
                 current.copy(
-                    interaction = current.requireTagConfig().let { tagConfig ->
-                        HomeInteraction.TagRename(
-                            tag = tagConfig.tag,
-                            usageCount = tagConfig.usageCount,
-                            renameText = tagConfig.tag.name.value,
-                            shouldUserInputReady = true
-                        )
-                    }
+                    interaction = dependency
+                        .tagEditDelegate
+                        .startRename(current.requireTagEditInteraction())
+                        .toTagEdit()
                 )
+            }
+            transition<OnTagRenameInputReady> {
+                current.copy(
+                    interaction = dependency
+                        .tagEditDelegate
+                        .readyRenameInput(current.requireTagEditInteraction())
+                        .toTagEdit()
+                )
+            }
+            transition<OnTagRenameInputted> {
+                current.copy(
+                    interaction = dependency
+                        .tagEditDelegate
+                        .changeRenameText(current.requireTagEditInteraction(), action.text)
+                        .toTagEdit()
+                )
+            }
+            effect<OnTagRenameConfirmClicked> {
+                dependency.tagEditDelegate
+                    .tryUpdateTagName(current.requireTagEditInteraction(), loadedTagsSnapshot = current.tags)
+                    .map(LazyTagEditResult::toAction)
+                    .collect(this::dispatch)
+            }
+            effect<OnTagReplaceConfirmClicked> {
+                dependency.tagEditDelegate
+                    .mergeTag(current.requireTagEditInteraction())
+                    .map(LazyTagEditResult::toAction)
+                    .collect(this::dispatch)
             }
             transition<OnTagDeleteRequestClicked> {
                 current.copy(
-                    interaction = current.requireTagConfig().let { tagConfig ->
-                        HomeInteraction.TagDelete(tag = tagConfig.tag, usageCount = tagConfig.usageCount)
-                    }
+                    interaction = dependency
+                        .tagEditDelegate
+                        .startDelete(current.requireTagEditInteraction())
+                        .toTagEdit()
                 )
             }
-        }
-        scope(isMatch = { current.interaction is HomeInteraction.TagRename }) {
-            fun Success.requireTagRename() = interaction as HomeInteraction.TagRename
-            transition<OnTagRenameInputReady> {
-                current.copy(interaction = current.requireTagRename().copy(shouldUserInputReady = false))
-            }
-            transition<OnTagRenameInputted> {
-                current.copy(interaction = current.requireTagRename().copy(renameText = action.text))
-            }
-            effect<OnTagRenameConfirmClicked> {
-                val tagRename = current.requireTagRename()
-                val newName = tagRename.renameText.tryToNonBlankStringOrNull() ?: return@effect
-                val result = dependency.tryUpdateTagName(
-                    tagId = tagRename.tag.id,
-                    newName = newName,
-                    tagGroup = TagGroupSource.Snapshot(current.tags)
-                )
-                // TODO 더 구현..
+            effect<OnTagDeleteConfirmClicked> {
+                dependency.tagEditDelegate
+                    .deleteTag(current.requireTagEditInteraction())
+                    .map(LazyTagEditResult::toAction)
+                    .collect(this::dispatch)
             }
         }
-        effect<OnTagDeleteConfirmClicked> {
-            val tagDelete = current.interaction as? HomeInteraction.TagDelete ?: return@effect
-            // TODO 구현
-        }*/
-        transition<PostMessage> { current.copy(userMessages = current.userMessages + action.message) }
-        transition<ShownMessage> { current.copy(userMessages = current.userMessages - action.message) }
+        transition<UserMessagePosted> { current.copy(userMessages = current.userMessages + action.message) }
+        transition<UserMessageShown> { current.copy(userMessages = current.userMessages - action.message) }
         transition<Interacted> { current.copy(interaction = HomeInteraction.Empty) }
+    }
+}
+
+private val Success.tagEditStep: TagEditStep?
+    get() = (interaction as? HomeInteraction.TagEdit)?.tagEditStep
+
+private fun Success.requireTagEditInteraction(): TagEditStep = checkNotNull(tagEditStep)
+
+private fun TagEditStep.toTagEdit(): HomeInteraction.TagEdit =
+    HomeInteraction.TagEdit(this)
+
+private fun LazyTagEditResult.toAction(): HomeAction = when (this) {
+    is LazyTagEditResult.ToNextStep -> {
+        TagEditChangedLazily(toNextStepInteraction = this)
+    }
+    is LazyTagEditResult.UnknownError -> {
+        UserMessagePosted(UserMessage(StringIds.unknown_error))
     }
 }

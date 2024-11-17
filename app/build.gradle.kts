@@ -79,6 +79,7 @@ dependencies {
     implementation(projects.core.androidx.transition)
     implementation(projects.core.annotation)
     implementation(projects.core.annotationAndroid)
+    implementation(projects.core.component.tag)
     implementation(projects.core.component.usermessage)
     implementation(projects.core.dataDi)
     implementation(projects.core.data)

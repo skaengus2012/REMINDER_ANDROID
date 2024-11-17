@@ -16,7 +16,7 @@
 
 package com.nlab.reminder.core.component.tag.delegate
 
-import com.nlab.reminder.core.component.tag.model.TagEditInteraction
+import com.nlab.reminder.core.component.tag.model.TagEditStep
 import com.nlab.reminder.core.data.model.Tag
 import com.nlab.reminder.core.data.model.genTag
 import com.nlab.reminder.core.data.model.genTags
@@ -51,13 +51,13 @@ import org.mockito.kotlin.whenever
 /**
  * @author Doohyun
  */
-class TagEditInteractionDelegateTest {
+class TagEditDelegateTest {
     @Test
     fun `Given tag, When start editing, Then return intro`() = runTest {
         val inputTag = genTag()
         val expectedUsageCount = genNonNegativeLong()
-        val expectedIntro = TagEditInteraction.Intro(inputTag, expectedUsageCount)
-        val delegate = genTagEditInteractionDelegate(
+        val expectedIntro = TagEditStep.Intro(inputTag, expectedUsageCount)
+        val delegate = genTagEditDelegate(
             tagRepository = mock {
                 whenever(mock.getUsageCount(inputTag.id)) doReturn Result.Success(expectedUsageCount)
             }
@@ -67,40 +67,40 @@ class TagEditInteractionDelegateTest {
     }
 
     @Test
-    fun `Given intro interaction, When start rename, Then return rename interaction`() {
-        val inputInteraction = genIntroInteraction()
-        val expectedRenameInteraction = TagEditInteraction.Rename(
+    fun `Given intro, When start rename, Then return rename`() {
+        val inputInteraction = genIntroStep()
+        val expectedRenameInteraction = TagEditStep.Rename(
             tag = inputInteraction.tag,
             usageCount = inputInteraction.usageCount,
             renameText = inputInteraction.tag.name.value,
             shouldUserInputReady = true,
         )
-        val delegate = genTagEditInteractionDelegate()
+        val delegate = genTagEditDelegate()
         val actualInteraction = delegate.startRename(inputInteraction)
         assertThat(actualInteraction, equalTo(expectedRenameInteraction))
     }
 
     @Test
-    fun `Given any interaction without intro, When start rename, Then return input interaction`() {
-        val inputInteraction = genTagEditInteractionWithoutTypeOf<TagEditInteraction.Intro>()
-        val delegate = genTagEditInteractionDelegate()
+    fun `Given any step without intro, When start rename, Then return input step`() {
+        val inputInteraction = genTagEditInteractionWithoutTypeOf<TagEditStep.Intro>()
+        val delegate = genTagEditDelegate()
         val actualInteraction = delegate.startRename(inputInteraction)
         assertThat(actualInteraction, sameInstance(inputInteraction))
     }
 
     @Test
-    fun `Given rename interaction, When ready to rename input, Then return interaction that shouldUserInputReady is false`() {
-        val inputInteraction = genRenameInteraction(shouldUserInputReady = true)
+    fun `Given rename, When ready input, Then return step that shouldUserInputReady is false`() {
+        val inputInteraction = genRenameStep(shouldUserInputReady = true)
         val expectedInteraction = inputInteraction.copy(shouldUserInputReady = false)
-        val delegate = genTagEditInteractionDelegate()
+        val delegate = genTagEditDelegate()
         val actualInteraction =delegate.readyRenameInput(inputInteraction)
         assertThat(actualInteraction, equalTo(expectedInteraction))
     }
 
     @Test
-    fun `Given any interaction without rename, When ready to rename input, Then return input interaction`() {
-        val inputInteraction = genTagEditInteractionWithoutTypeOf<TagEditInteraction.Rename>()
-        val delegate = genTagEditInteractionDelegate()
+    fun `Given any step without rename, When ready input, Then return input step`() {
+        val inputInteraction = genTagEditInteractionWithoutTypeOf<TagEditStep.Rename>()
+        val delegate = genTagEditDelegate()
         val actualInteraction = delegate.readyRenameInput(inputInteraction)
         assertThat(actualInteraction, sameInstance(inputInteraction))
     }
@@ -108,9 +108,9 @@ class TagEditInteractionDelegateTest {
     @Test
     fun `Given inputText and rename interaction, When change rename text, Then return interaction that renameText changed`() {
         val inputText = genBothify()
-        val inputInteraction = genRenameInteraction(renameText = "")
+        val inputInteraction = genRenameStep(renameText = "")
         val expectedInteraction = inputInteraction.copy(renameText = inputText)
-        val delegate = genTagEditInteractionDelegate()
+        val delegate = genTagEditDelegate()
         val actualInteraction =delegate.changeRenameText(inputInteraction, inputText)
         assertThat(actualInteraction, equalTo(expectedInteraction))
     }
@@ -118,35 +118,35 @@ class TagEditInteractionDelegateTest {
     @Test
     fun `Given inputText and any interaction without rename, When change rename text, Then return input interaction`() {
         val inputText = genBothify()
-        val inputInteraction = genTagEditInteractionWithoutTypeOf<TagEditInteraction.Rename>()
-        val delegate = genTagEditInteractionDelegate()
+        val inputInteraction = genTagEditInteractionWithoutTypeOf<TagEditStep.Rename>()
+        val delegate = genTagEditDelegate()
         val actualInteraction = delegate.changeRenameText(inputInteraction, inputText)
         assertThat(actualInteraction, sameInstance(inputInteraction))
     }
 
     @Test
     fun `Given any interaction without rename, When try update tag name, Then return a flow that emits a identity LazyTagEditInteractionResult`() = runTest {
-        val initInteraction = genTagEditInteractionWithoutTypeOf<TagEditInteraction.Rename>()
-        val delegate = genTagEditInteractionDelegate()
+        val initInteraction = genTagEditInteractionWithoutTypeOf<TagEditStep.Rename>()
+        val delegate = genTagEditDelegate()
         val actualResults = delegate.tryUpdateTagName(initInteraction, genTags()).toList()
         assertThat(actualResults.size, equalTo(1))
 
-        val nextInteractionFunc = (actualResults.first() as LazyTagEditInteractionResult.NextInteraction)
-        assertThat(nextInteractionFunc(initInteraction), sameInstance(initInteraction))
+        val toNextStepInteractionFunc = (actualResults.first() as LazyTagEditResult.ToNextStep)
+        assertThat(toNextStepInteractionFunc(initInteraction), sameInstance(initInteraction))
     }
 
     @Test
     fun `Given blank input rename interaction, When try update tag name, Then return a flow that emits a terminable LazyTagEditInteractionResult`() = runTest {
-        val initInteraction = genRenameInteraction(renameText = genBlank())
-        val delegate = genTagEditInteractionDelegate()
+        val initInteraction = genRenameStep(renameText = genBlank())
+        val delegate = genTagEditDelegate()
         val actualResults = delegate.tryUpdateTagName(initInteraction, genTags()).toList()
         assertThat(actualResults.size, equalTo(1))
 
-        val nextInteractionFunc = (actualResults.first() as LazyTagEditInteractionResult.NextInteraction)
-        assertThat(nextInteractionFunc(initInteraction), nullValue())
+        val toNextStepInteractionFunc = (actualResults.first() as LazyTagEditResult.ToNextStep)
+        assertThat(toNextStepInteractionFunc(initInteraction), nullValue())
 
         val newInteraction = initInteraction.copy(renameText = genBothify())
-        assertThat(nextInteractionFunc(newInteraction), sameInstance(newInteraction))
+        assertThat(toNextStepInteractionFunc(newInteraction), sameInstance(newInteraction))
     }
 
     @Test
@@ -157,18 +157,18 @@ class TagEditInteractionDelegateTest {
             val tag = genTag()
             val renameText = genNonBlankString()
             val tags = genTags()
-            val delegate = genTagEditInteractionDelegate(
+            val delegate = genTagEditDelegate(
                 tryUpdateTagNameUseCase = mock {
                     whenever(mock.invoke(tag.id, renameText, TagGroupSource.Snapshot(tags))) doReturn expectedTryUpdateTagNameResult
                 }
             )
             val actualResults = delegate
                 .tryUpdateTagName(
-                    genRenameInteraction(tag = tag, renameText = renameText.value),
+                    genRenameStep(tag = tag, renameText = renameText.value),
                     genTags()
                 )
                 .toList()
-            assert(actualResults.all { it !is LazyTagEditInteractionResult.UnknownError })
+            assert(actualResults.all { it !is LazyTagEditResult.UnknownError })
         }
 
         testTryUpdateTagNameResultSuccess(expectedTryUpdateTagNameResult = TryUpdateTagNameResult.Success(genTag()))
@@ -181,18 +181,18 @@ class TagEditInteractionDelegateTest {
         val tag = genTag()
         val renameText = genNonBlankString()
         val tags = genTags()
-        val delegate = genTagEditInteractionDelegate(
+        val delegate = genTagEditDelegate(
             tryUpdateTagNameUseCase = mock {
                 whenever(mock.invoke(tag.id, renameText, TagGroupSource.Snapshot(tags))) doReturn TryUpdateTagNameResult.UnknownError
             }
         )
         val actualResults = delegate
-            .tryUpdateTagName(genRenameInteraction(tag = tag, renameText = renameText.value), tags)
+            .tryUpdateTagName(genRenameStep(tag = tag, renameText = renameText.value), tags)
             .toList()
         assert(actualResults.size == 2)
         assertThat(
             actualResults.last(),
-            equalTo(LazyTagEditInteractionResult.UnknownError)
+            equalTo(LazyTagEditResult.UnknownError)
         )
     }
 
@@ -201,8 +201,8 @@ class TagEditInteractionDelegateTest {
         val tag = genTag()
         val renameText = genNonBlankString()
         val duplicateTag = tag.copy(name = (tag.name.value + "_duplicate").toNonBlankString())
-        val initInteraction = genRenameInteraction(tag = tag, renameText = renameText.value)
-        val delegate = genTagEditInteractionDelegate(
+        val initInteraction = genRenameStep(tag = tag, renameText = renameText.value)
+        val delegate = genTagEditDelegate(
             tryUpdateTagNameUseCase = mock {
                 whenever(mock.invoke(tag.id, renameText, TagGroupSource.Snapshot(listOf(duplicateTag))))
                     .doReturn(TryUpdateTagNameResult.DuplicateNameError(duplicateTag))
@@ -214,42 +214,42 @@ class TagEditInteractionDelegateTest {
             .toList()
         assert(actualResults.size == 2)
 
-        val nextInteractionFunc = (actualResults.last() as LazyTagEditInteractionResult.NextInteraction)
+        val toNextStepInteractionFunc = (actualResults.last() as LazyTagEditResult.ToNextStep)
         assertThat(
-            nextInteractionFunc(null),
-            equalTo(TagEditInteraction.Merge(from = tag, to = duplicateTag))
+            toNextStepInteractionFunc(null),
+            equalTo(TagEditStep.Merge(from = tag, to = duplicateTag))
         )
 
-        val newInteraction = genTagEditInteraction()
+        val newInteraction = genTagEditStep()
         assertThat(
-            nextInteractionFunc(newInteraction),
+            toNextStepInteractionFunc(newInteraction),
             sameInstance(newInteraction)
         )
     }
 
     @Test
     fun `Given any interaction without merge, When merge tag, Then return a flow that emits a identity LazyTagEditInteractionResult`() = runTest {
-        val interaction = genTagEditInteractionWithoutTypeOf<TagEditInteraction.Merge>()
-        val delegate = genTagEditInteractionDelegate()
+        val interaction = genTagEditInteractionWithoutTypeOf<TagEditStep.Merge>()
+        val delegate = genTagEditDelegate()
         val actualResults = delegate.mergeTag(interaction).toList()
         assertThat(actualResults.size, equalTo(1))
 
-        val nextInteraction = (actualResults.first() as LazyTagEditInteractionResult.NextInteraction)(interaction)
-        assertThat(nextInteraction, sameInstance(interaction))
+        val toNextStepInteraction = (actualResults.first() as LazyTagEditResult.ToNextStep)(interaction)
+        assertThat(toNextStepInteraction, sameInstance(interaction))
     }
 
     @Test
     fun `Given merge interaction, When merge tag, Then tagRepository called save`() = runTest {
         val from = genTag()
         val to = genTag(name = (from.name.value + "duplicated").toNonBlankString())
-        val interaction = TagEditInteraction.Merge(
+        val interaction = TagEditStep.Merge(
             from = from,
             to = to,
         )
         val tagRepository: TagRepository = mock {
             whenever(mock.save(any())) doReturn Result.Success(genTag(from.id, to.name))
         }
-        val delegate = genTagEditInteractionDelegate(tagRepository = tagRepository)
+        val delegate = genTagEditDelegate(tagRepository = tagRepository)
         delegate.mergeTag(interaction).toList()
         verify(tagRepository, once()).save(SaveTagQuery.Modify(id = from.id, name = to.name))
     }
@@ -258,115 +258,115 @@ class TagEditInteractionDelegateTest {
     fun `Given merge interaction, When merge tag and repository occurred error, Then return results include UnknownError`() = runTest {
         val from = genTag()
         val to = genTag(name = (from.name.value + "duplicated").toNonBlankString())
-        val interaction = TagEditInteraction.Merge(
+        val interaction = TagEditStep.Merge(
             from = from,
             to = to,
         )
         val tagRepository: TagRepository = mock {
             whenever(mock.save(any())) doReturn Result.Failure(RuntimeException())
         }
-        val delegate = genTagEditInteractionDelegate(tagRepository = tagRepository)
+        val delegate = genTagEditDelegate(tagRepository = tagRepository)
         val actualResults = delegate.mergeTag(interaction).toList()
         assertThat(actualResults.size, equalTo(2))
         assertThat(
             actualResults.last(),
-            equalTo(LazyTagEditInteractionResult.UnknownError)
+            equalTo(LazyTagEditResult.UnknownError)
         )
     }
 
     @Test
     fun `Given intro interaction, When delete tag, Then return delete interaction`() {
-        val inputInteraction = genIntroInteraction()
-        val expectedRenameInteraction = TagEditInteraction.Delete(
+        val inputInteraction = genIntroStep()
+        val expectedRenameInteraction = TagEditStep.Delete(
             tag = inputInteraction.tag,
             usageCount = inputInteraction.usageCount,
         )
-        val delegate = genTagEditInteractionDelegate()
+        val delegate = genTagEditDelegate()
         val actualInteraction = delegate.startDelete(inputInteraction)
         assertThat(actualInteraction, equalTo(expectedRenameInteraction))
     }
 
     @Test
     fun `Given any interaction without intro, When delete tag, Then return input interaction`() {
-        val inputInteraction = genTagEditInteractionWithoutTypeOf<TagEditInteraction.Intro>()
-        val delegate = genTagEditInteractionDelegate()
+        val inputInteraction = genTagEditInteractionWithoutTypeOf<TagEditStep.Intro>()
+        val delegate = genTagEditDelegate()
         val actualInteraction = delegate.startDelete(inputInteraction)
         assertThat(actualInteraction, sameInstance(inputInteraction))
     }
 
     @Test
     fun `Given any interaction without delete, When delete tag, Then return a flow that emits a identity LazyTagEditInteractionResult`() = runTest {
-        val interaction = genTagEditInteractionWithoutTypeOf<TagEditInteraction.Delete>()
-        val delegate = genTagEditInteractionDelegate()
+        val interaction = genTagEditInteractionWithoutTypeOf<TagEditStep.Delete>()
+        val delegate = genTagEditDelegate()
         val actualResults = delegate.deleteTag(interaction).toList()
         assertThat(actualResults.size, equalTo(1))
 
-        val nextInteraction = (actualResults.first() as LazyTagEditInteractionResult.NextInteraction)(interaction)
-        assertThat(nextInteraction, sameInstance(interaction))
+        val toNextStepInteraction = (actualResults.first() as LazyTagEditResult.ToNextStep)(interaction)
+        assertThat(toNextStepInteraction, sameInstance(interaction))
     }
 
     @Test
     fun `Given delete interaction, When delete tag, Then tagRepository called delete`() = runTest {
-        val interaction = TagEditInteraction.Delete(
+        val interaction = TagEditStep.Delete(
             genTag(),
             genNonNegativeLong()
         )
         val tagRepository: TagRepository = mock {
             whenever(mock.delete(interaction.tag.id)) doReturn Result.Success(Unit)
         }
-        val delegate = genTagEditInteractionDelegate(tagRepository = tagRepository)
+        val delegate = genTagEditDelegate(tagRepository = tagRepository)
         delegate.deleteTag(interaction).toList()
         verify(tagRepository, once()).delete(interaction.tag.id)
     }
 
     @Test
     fun `Given delete interaction, When delete tag and repository occurred error, Then return results include UnknownError`() = runTest {
-        val interaction = TagEditInteraction.Delete(
+        val interaction = TagEditStep.Delete(
             genTag(),
             genNonNegativeLong()
         )
         val tagRepository: TagRepository = mock {
             whenever(mock.delete(interaction.tag.id)) doReturn Result.Failure(RuntimeException())
         }
-        val delegate = genTagEditInteractionDelegate(tagRepository = tagRepository)
+        val delegate = genTagEditDelegate(tagRepository = tagRepository)
         val actualResults = delegate.deleteTag(interaction).toList()
         assertThat(actualResults.size, equalTo(2))
         assertThat(
             actualResults.last(),
-            equalTo(LazyTagEditInteractionResult.UnknownError)
+            equalTo(LazyTagEditResult.UnknownError)
         )
     }
 }
 
-private fun genTagEditInteractionDelegate(
+private fun genTagEditDelegate(
     tagRepository: TagRepository = mock(),
     tryUpdateTagNameUseCase: TryUpdateTagNameUseCase = mock(),
-): TagEditInteractionDelegate = TagEditInteractionDelegate(tagRepository, tryUpdateTagNameUseCase)
+): TagEditDelegate = TagEditDelegate(tagRepository, tryUpdateTagNameUseCase)
 
-private val sampleInteraction: List<TagEditInteraction> get() = listOf(
-    genIntroInteraction(),
-    genRenameInteraction(),
-    TagEditInteraction.Merge(
+private val sampleSteps: List<TagEditStep> get() = listOf(
+    genIntroStep(),
+    genRenameStep(),
+    TagEditStep.Merge(
         from = genTag(),
         to = genTag(),
     ),
-    TagEditInteraction.Delete(
+    TagEditStep.Delete(
         tag = genTag(),
         usageCount = genNonNegativeLong(),
     )
 )
 
-private fun genTagEditInteraction(): TagEditInteraction =
-    sampleInteraction.shuffled().first()
+private fun genTagEditStep(): TagEditStep =
+    sampleSteps.shuffled().first()
 
-private inline fun <reified T : TagEditInteraction> genTagEditInteractionWithoutTypeOf(): TagEditInteraction =
-    sampleInteraction.shuffleAndGetFirst { interaction -> interaction !is T }
+private inline fun <reified T : TagEditStep> genTagEditInteractionWithoutTypeOf(): TagEditStep =
+    sampleSteps.shuffleAndGetFirst { interaction -> interaction !is T }
 
-private fun genIntroInteraction() = TagEditInteraction.Intro(tag = genTag(), usageCount = genNonNegativeLong())
+private fun genIntroStep() = TagEditStep.Intro(tag = genTag(), usageCount = genNonNegativeLong())
 
-private fun genRenameInteraction(
+private fun genRenameStep(
     tag: Tag = genTag(),
     usageCount: NonNegativeLong = genNonNegativeLong(),
     renameText: String = genBothify(),
     shouldUserInputReady: Boolean = genBoolean(),
-) = TagEditInteraction.Rename(tag, usageCount, renameText, shouldUserInputReady)
+) = TagEditStep.Rename(tag, usageCount, renameText, shouldUserInputReady)

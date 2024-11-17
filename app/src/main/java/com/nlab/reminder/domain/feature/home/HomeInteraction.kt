@@ -16,6 +16,8 @@
 
 package com.nlab.reminder.domain.feature.home
 
+import com.nlab.reminder.core.component.tag.model.TagEditStep
+
 /**
  * @author thalys
  */
@@ -24,5 +26,5 @@ internal sealed interface HomeInteraction {
     data object TodaySchedule : HomeInteraction
     data object TimetableSchedule : HomeInteraction
     data object AllSchedule : HomeInteraction
-    data class TagEdit(val interaction: TagEditInteraction) : HomeInteraction
+    data class TagEdit(val tagEditStep: TagEditStep) : HomeInteraction
 }
