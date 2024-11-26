@@ -19,4 +19,4 @@ package com.nlab.statekit.reduce
 /**
  * @author Doohyun
  */
-interface Reduce<A : Any, S : Any> : TransitionOwner<A, S>, EffectOwner<A, S>
+sealed interface Reduce<A : Any, S : Any> : TransitionOwner<A, S>, EffectOwner<A, S>

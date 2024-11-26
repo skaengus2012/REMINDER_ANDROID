@@ -21,18 +21,39 @@ import com.nlab.statekit.internal.Generated
 /**
  * @author Doohyun
  */
-class AccumulatorPool {
+interface AccumulatorPool {
+    fun <T : Any> request(): Accumulator<T>
+    fun release(pool: Accumulator<out Any>)
+}
+
+fun AccumulatorPool(): AccumulatorPool = ThreadLocalsAccumulatorPoolProxy()
+
+private class DefaultAccumulatorPool : AccumulatorPool {
     private val pool = mutableListOf<Accumulator<out Any>>()
 
-    fun <T : Any> request(): Accumulator<T> {
+    override fun <T : Any> request(): Accumulator<T> {
         val ret = pool.find { it.isReady.not() } ?: Accumulator<Any>().also { pool.add(it) }
         ret.ready()
         @Suppress("UNCHECKED_CAST")
         return ret as Accumulator<T>
     }
 
-    fun release(pool: Accumulator<out Any>) {
+    override fun release(pool: Accumulator<out Any>) {
         pool.release()
+    }
+}
+
+private class ThreadLocalsAccumulatorPoolProxy : AccumulatorPool {
+    private val locals = ThreadLocal<DefaultAccumulatorPool>()
+    private val localsPool: DefaultAccumulatorPool
+        get() = locals.get() ?: DefaultAccumulatorPool().also { locals.set(it) }
+
+    override fun <T : Any> request(): Accumulator<T> {
+        return localsPool.request()
+    }
+
+    override fun release(pool: Accumulator<out Any>) {
+        localsPool.release(pool)
     }
 }
 
