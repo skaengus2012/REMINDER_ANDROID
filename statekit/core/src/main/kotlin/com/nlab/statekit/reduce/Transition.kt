@@ -16,6 +16,8 @@
 
 package com.nlab.statekit.reduce
 
+import com.nlab.statekit.internal.forEachReversed
+
 
 /**
  * @author Doohyun
@@ -71,11 +73,7 @@ fun <A : Any, S : Any> Transition<A, S>.transitionTo(
                 action,
                 current,
                 node.head,
-                acc.apply {
-                    node.tails.let { tails ->
-                        for (index in tails.size - 1 downTo 0) add(tails[index])
-                    }
-                },
+                acc.apply { node.tails.forEachReversed { add(it) } },
                 accPool
             )
         }

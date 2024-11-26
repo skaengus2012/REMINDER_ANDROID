@@ -23,6 +23,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
+import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.once
 import org.mockito.kotlin.verify
@@ -73,7 +74,7 @@ class EffectKtTest {
     }
 
     @Test
-    fun `Given lifecycle node, When launch Then effect invoked`() {
+    fun `Given two lifecycle node, When launch, Then effect invoked all in order`() {
         val inputAction = TestAction.genAction()
         val inputState = TestState.genState()
         val fakeActionDispatcher: ActionDispatcher<TestAction> = object : ActionDispatcher<TestAction> {
@@ -84,14 +85,30 @@ class EffectKtTest {
                 get() = error("Fake coroutine scope does not have a coroutine context.")
         }
         val accPool = AccumulatorPool()
-        val effect: TestEffectLifecycleNode = mock()
-        effect.launch(
+        val firstEffect: TestEffectLifecycleNode = mock()
+        val secondEffect: TestEffectLifecycleNode = mock()
+        Effect.Composite(firstEffect, secondEffect).launch(
             inputAction,
             inputState,
             actionDispatcher = fakeActionDispatcher,
             accumulatorPool = accPool,
             coroutineScope = fakeCoroutineScope,
         )
-        verify(effect, once()).invoke(inputAction, inputState, fakeActionDispatcher, fakeCoroutineScope, accPool)
+        inOrder(firstEffect, secondEffect) {
+            verify(firstEffect, once()).invoke(
+                inputAction,
+                inputState,
+                fakeActionDispatcher,
+                fakeCoroutineScope,
+                accPool
+            )
+            verify(secondEffect, once()).invoke(
+                inputAction,
+                inputState,
+                fakeActionDispatcher,
+                fakeCoroutineScope,
+                accPool
+            )
+        }
     }
 }
