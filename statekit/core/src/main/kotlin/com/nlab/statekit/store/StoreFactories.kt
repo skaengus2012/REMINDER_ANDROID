@@ -25,7 +25,7 @@ import kotlinx.coroutines.CoroutineScope
 /**
  * @author Thalys
  */
-private val storeFactory = DefaultStoreFactory()
+private val storeFactory = StoreFactory()
 
 fun <A : Any, S : Any> createStore(
     coroutineScope: CoroutineScope,

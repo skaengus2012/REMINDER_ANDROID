@@ -15,12 +15,12 @@ import org.mockito.kotlin.verify
 /**
  * @author Doohyun
  */
-class DefaultStoreTest {
+class StoreImplTest {
     @Test
     fun `When store dispatched, Then actionDispatcher should be dispatched`() = runTest {
         val input = TestAction.genAction()
         val actionDispatcher: ActionDispatcher<TestAction> = mock()
-        val store = DefaultStore<TestAction, TestState>(
+        val store = StoreImpl<TestAction, TestState>(
             state = mock(),
             coroutineScope = this,
             actionDispatcher = actionDispatcher,
@@ -33,7 +33,7 @@ class DefaultStoreTest {
     @Test
     fun `Given init state, When store created, Then store has init state`() = runTest {
         val expectedState = TestState.genState()
-        val store = DefaultStore<TestAction, TestState>(
+        val store = StoreImpl<TestAction, TestState>(
             state = MutableStateFlow(expectedState),
             coroutineScope = this,
             actionDispatcher = mock(),
