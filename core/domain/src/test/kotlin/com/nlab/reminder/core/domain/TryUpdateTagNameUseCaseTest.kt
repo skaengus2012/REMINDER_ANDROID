@@ -26,6 +26,7 @@ import com.nlab.reminder.core.kotlin.toNonBlankString
 import com.nlab.testkit.faker.genInt
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.equalTo
+import org.hamcrest.CoreMatchers.sameInstance
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
 import org.mockito.kotlin.doReturn
@@ -59,11 +60,12 @@ class TryUpdateTagNameUseCaseTest {
 
     @Test
     fun `Given id, unique name and tag group, When invoke, Then return error if repository save failure`() = runTest {
+       val expectedException = RuntimeException()
         val tagGroups = List(genInt(min = 5, max = 10)) {
             genTag(id = TagId(it.toLong()), name = it.toString().toNonBlankString())
         }
         val tagRepository: TagRepository = mock {
-            whenever(mock.save(SaveTagQuery.Modify(inputTagId, inputName))) doReturn Result.Failure(RuntimeException())
+            whenever(mock.save(SaveTagQuery.Modify(inputTagId, inputName))) doReturn Result.Failure(expectedException)
         }
         val result = TryUpdateTagNameUseCase(tagRepository).invoke(
             inputTagId,
@@ -87,12 +89,13 @@ class TryUpdateTagNameUseCaseTest {
 
     @Test
     fun `Given id, duplicate name and tag group, When invoke, Then return duplicate name error`() = runTest {
-        val tagGroups = listOf(genTag(id = TagId(inputTagId.rawId + 1), name = inputName))
+        val expectedDuplicateTag = genTag(id = TagId(inputTagId.rawId + 1), name = inputName)
         val result = TryUpdateTagNameUseCase(tagRepository = mock()).invoke(
             inputTagId,
             inputName,
-            TagGroupSource.Snapshot(tagGroups)
-        )
-        assertThat(result, equalTo(TryUpdateTagNameResult.DuplicateNameError))
+            TagGroupSource.Snapshot(listOf(expectedDuplicateTag))
+        ) as TryUpdateTagNameResult.DuplicateNameError
+
+        assertThat(result.duplicateTag, equalTo(expectedDuplicateTag))
     }
 }

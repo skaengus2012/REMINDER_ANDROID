@@ -16,7 +16,9 @@
 
 package com.nlab.reminder.domain.feature.home
 
-import com.nlab.reminder.core.uistate.UserMessage
+import com.nlab.reminder.core.component.tag.delegate.LazyTagEditResult
+import com.nlab.reminder.core.component.tag.model.TagEditStep
+import com.nlab.reminder.core.component.usermessage.UserMessage
 import com.nlab.reminder.core.data.model.Tag
 import com.nlab.reminder.core.kotlin.NonNegativeLong
 
@@ -31,10 +33,10 @@ internal sealed interface HomeAction {
         val tags: List<Tag>,
     ) : HomeAction
 
-    data class PostMessage(val message: UserMessage) : HomeAction
+    data class UserMessagePosted(val message: UserMessage) : HomeAction
 
     //    @ContractUiAction
-    data class ShownMessage(val message: UserMessage) : HomeAction
+    data class UserMessageShown(val message: UserMessage) : HomeAction
 
     //   @ContractUiAction
     data object Interacted : HomeAction
@@ -51,7 +53,11 @@ internal sealed interface HomeAction {
     //   @ContractUiAction
     data class OnTagLongClicked(val tag: Tag) : HomeAction
 
-    data class TagEditMetadataLoaded(val tag: Tag, val usageCount: NonNegativeLong) : HomeAction
+    data class TagEditStarted(val intro: TagEditStep.Intro) : HomeAction
+
+    data class TagEditChangedLazily(
+        val toNextStepInteraction: LazyTagEditResult.ToNextStep
+    ) : HomeAction
 
     //  @ContractUiAction
     data object OnTagRenameRequestClicked : HomeAction
@@ -60,10 +66,13 @@ internal sealed interface HomeAction {
     data object OnTagRenameInputReady : HomeAction
 
     // @ContractUiAction
+    data class OnTagRenameInputted(val text: String) : HomeAction
+
+    // @ContractUiAction
     data object OnTagRenameConfirmClicked : HomeAction
 
     // @ContractUiAction
-    data class OnTagRenameInputted(val text: String) : HomeAction
+    data object OnTagReplaceConfirmClicked : HomeAction
 
     // @ContractUiAction
     data object OnTagDeleteRequestClicked : HomeAction

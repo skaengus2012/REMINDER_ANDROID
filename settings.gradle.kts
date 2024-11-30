@@ -59,6 +59,7 @@ include(
     ":core:annotation",
     ":core:annotation-android",
     ":core:component:tag",
+    ":core:component:usermessage",
     ":core:data",
     ":core:data-di",
     ":core:data-impl",

@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.kotlin
+package com.nlab.reminder.core.kotlin.faker
 
-import com.nlab.testkit.faker.genBothify
+import com.nlab.reminder.core.kotlin.NonNegativeLong
+import com.nlab.reminder.core.kotlin.toNonNegativeLong
+import com.nlab.testkit.faker.genLongGreaterThanZero
 
 /**
  * @author Doohyun
  */
-fun genNonBlankString(): NonBlankString = genBothify().toNonBlankString()
+fun genNonNegativeLong(): NonNegativeLong = genLongGreaterThanZero().toNonNegativeLong()

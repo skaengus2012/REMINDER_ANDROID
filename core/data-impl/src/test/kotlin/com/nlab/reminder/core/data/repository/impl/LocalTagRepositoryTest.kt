@@ -18,7 +18,7 @@ package com.nlab.reminder.core.data.repository.impl
 
 import com.nlab.reminder.core.data.model.*
 import com.nlab.reminder.core.data.repository.*
-import com.nlab.reminder.core.kotlin.genNonNegativeLong
+import com.nlab.reminder.core.kotlin.faker.genNonNegativeLong
 import com.nlab.reminder.core.kotlin.getOrThrow
 import com.nlab.reminder.core.kotlin.toNonBlankString
 import com.nlab.reminder.core.local.database.dao.ScheduleTagListDAO

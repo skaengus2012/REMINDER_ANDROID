@@ -16,14 +16,12 @@
 
 package com.nlab.reminder.domain.feature.home
 
-import com.nlab.reminder.core.data.repository.TagRepository
-import com.nlab.reminder.core.domain.TryUpdateTagNameUseCase
+import com.nlab.reminder.core.component.tag.delegate.TagEditDelegate
 import javax.inject.Inject
 
 /**
  * @author Thalys
  */
 internal class HomeDependency @Inject constructor(
-    val tagRepository: TagRepository,
-    val tryUpdateTagName: TryUpdateTagNameUseCase
+    val tagEditDelegate: TagEditDelegate
 )

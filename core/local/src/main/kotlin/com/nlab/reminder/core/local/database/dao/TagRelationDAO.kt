@@ -31,9 +31,9 @@ class TagRelationDAO(
     suspend fun updateOrReplaceAndGet(
         tagId: Long,
         name: String
-    ): TagEntity = transactionScope {
+    ): TagEntity {
         val tagEntity = tagDAO.findByName(name)
-        when {
+        return when {
             tagEntity == null -> {
                 // case1 : not conflict name, just update
                 tagDAO.updateAndGet(tagId, name)
@@ -44,7 +44,7 @@ class TagRelationDAO(
                 TagEntity(tagId = tagId, name = name)
             }
 
-            else -> {
+            else -> transactionScope {
                 // case3 : conflict name, replace
                 scheduleTagListDAO.copyScheduleIds(fromTagId = tagId, toTagId = tagEntity.tagId)
                 tagDAO.deleteById(tagId)

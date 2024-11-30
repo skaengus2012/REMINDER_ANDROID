@@ -16,91 +16,119 @@
 
 package com.nlab.reminder.core.component.tag.delegate
 
-import com.nlab.reminder.core.component.tag.model.TagEditInteraction
+import com.nlab.reminder.core.component.tag.model.TagEditStep
 import com.nlab.reminder.core.data.model.Tag
+import com.nlab.reminder.core.data.repository.SaveTagQuery
 import com.nlab.reminder.core.data.repository.TagRepository
 import com.nlab.reminder.core.domain.TagGroupSource
 import com.nlab.reminder.core.domain.TryUpdateTagNameResult
 import com.nlab.reminder.core.domain.TryUpdateTagNameUseCase
 import com.nlab.reminder.core.kotlin.Result
+import com.nlab.reminder.core.kotlin.isFailure
 import com.nlab.reminder.core.kotlin.map
 import com.nlab.reminder.core.kotlin.tryToNonBlankStringOrNull
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import javax.inject.Inject
 
 /**
  * @author Doohyun
  */
-class TagEditDelegate(
+class TagEditDelegate @Inject constructor(
     private val tagRepository: TagRepository,
-    private val tryUpdateTagNameUseCase: TryUpdateTagNameUseCase
+    private val tryUpdateTagNameUseCase: TryUpdateTagNameUseCase,
 ) {
-    private val _interaction = MutableStateFlow<TagEditInteraction>(value = TagEditInteraction.Empty)
-    val interaction: StateFlow<TagEditInteraction> = _interaction.asStateFlow()
-
-    suspend fun startEditing(tag: Tag): Result<Unit> =
+    suspend fun startEditing(tag: Tag): Result<TagEditStep.Intro> =
         tagRepository.getUsageCount(id = tag.id)
-            .map { usageCount ->
-                val intro = TagEditInteraction.Intro(tag, usageCount)
-                _interaction.update { current ->
-                    if (current is TagEditInteraction.Empty) intro
-                    else current
-                }
-            }
+            .map { usageCount -> TagEditStep.Intro(tag, usageCount) }
 
-    fun startRename() {
-        _interaction.update { current ->
-            if (current !is TagEditInteraction.Intro) current
-            else TagEditInteraction.Rename(
-                tag = current.tag,
-                usageCount = current.usageCount,
-                renameText = current.tag.name.value,
-                shouldUserInputReady = true
-            )
-        }
-    }
+    fun startRename(current: TagEditStep): TagEditStep =
+        if (current !is TagEditStep.Intro) current
+        else TagEditStep.Rename(
+            tag = current.tag,
+            usageCount = current.usageCount,
+            renameText = current.tag.name.value,
+            shouldUserInputReady = true,
+        )
 
-    fun readyRenameInput() {
-        _interaction.update { current ->
-            if (current !is TagEditInteraction.Rename) current
-            else current.copy(shouldUserInputReady = false)
-        }
-    }
+    fun readyRenameInput(current: TagEditStep): TagEditStep =
+        if (current !is TagEditStep.Rename) current
+        else current.copy(shouldUserInputReady = false)
 
-    fun changeRenameText(input: String) {
-        _interaction.update { current ->
-            if (current !is TagEditInteraction.Rename) current
-            else current.copy(renameText = input)
-        }
-    }
+    fun changeRenameText(current: TagEditStep, input: String): TagEditStep =
+        if (current !is TagEditStep.Rename) current
+        else current.copy(renameText = input)
 
-    suspend fun tryUpdateTagName(loadedTagsSnapshot: List<Tag>) {
-        val curRenameInteraction = _interaction.value as? TagEditInteraction.Rename ?: return
-        val result = tryUpdateTagNameUseCase.invoke(
-            tagId = curRenameInteraction.tag.id,
-            newName = curRenameInteraction.renameText.tryToNonBlankStringOrNull() ?: return,
+    fun tryUpdateTagName(
+        current: TagEditStep,
+        loadedTagsSnapshot: List<Tag>
+    ): Flow<LazyTagEditResult> = flow {
+        if (current !is TagEditStep.Rename) return@flow
+        emit(FinishTagEditResult(current))
+
+        val newName = current.renameText.tryToNonBlankStringOrNull() ?: return@flow
+        val tryUpdateTagNameResult = tryUpdateTagNameUseCase.invoke(
+            tagId = current.tag.id,
+            newName = newName,
             tagGroup = TagGroupSource.Snapshot(loadedTagsSnapshot)
         )
-        when (result) {
-            is TryUpdateTagNameResult.Success,
-            is TryUpdateTagNameResult.NotChanged -> {
-                _interaction.update { current ->
-                    if (current == curRenameInteraction) TagEditInteraction.Empty
-                    else current
-                }
-            }
+        when (tryUpdateTagNameResult) {
             is TryUpdateTagNameResult.DuplicateNameError -> {
-                val merge = TagEditInteraction.Merge(from = curRenameInteraction.tag, to = result.duplicateTag)
-                _interaction.update { current ->
-                    if (current == curRenameInteraction) merge
-                    else current
-                }
-            }
-            is TryUpdateTagNameResult.UnknownError -> {
+                val merge = TagEditStep.Merge(
+                    from = current.tag,
+                    to = tryUpdateTagNameResult.duplicateTag,
+                )
 
+                emit(LazyTagEditResult.ToNextStep { current -> current ?: merge })
             }
+
+            is TryUpdateTagNameResult.UnknownError -> {
+                emit(LazyTagEditResult.UnknownError)
+            }
+
+            else -> Unit
         }
     }
+
+    fun mergeTag(current: TagEditStep): Flow<LazyTagEditResult> = flow {
+        if (current !is TagEditStep.Merge) return@flow
+        emit(FinishTagEditResult(current))
+
+        val query = SaveTagQuery.Modify(id = current.from.id, name = current.to.name)
+        val result = tagRepository.save(query)
+        if (result.isFailure) {
+            emit(LazyTagEditResult.UnknownError)
+        }
+    }
+
+    fun startDelete(current: TagEditStep): TagEditStep =
+        if (current !is TagEditStep.Intro) current
+        else TagEditStep.Delete(
+            tag = current.tag,
+            usageCount = current.usageCount
+        )
+
+    fun deleteTag(current: TagEditStep): Flow<LazyTagEditResult> = flow {
+        if (current !is TagEditStep.Delete) return@flow
+        emit(FinishTagEditResult(current))
+
+        val result = tagRepository.delete(current.tag.id)
+        if (result.isFailure) {
+            emit(LazyTagEditResult.UnknownError)
+        }
+    }
+}
+
+sealed interface LazyTagEditResult {
+    fun interface ToNextStep : LazyTagEditResult {
+        operator fun invoke(currentStep: TagEditStep?): TagEditStep?
+    }
+
+    data object UnknownError : LazyTagEditResult
+}
+
+@Suppress("FunctionName")
+private fun FinishTagEditResult(compare: TagEditStep) = LazyTagEditResult.ToNextStep { currentStep ->
+    if (currentStep == compare) null
+    else currentStep
 }

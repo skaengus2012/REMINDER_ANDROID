@@ -17,7 +17,7 @@
 package com.nlab.reminder.core.data.model
 
 import com.nlab.reminder.core.kotlin.NonBlankString
-import com.nlab.reminder.core.kotlin.genNonBlankString
+import com.nlab.reminder.core.kotlin.faker.genNonBlankString
 import com.nlab.reminder.core.kotlin.toNonBlankString
 import com.nlab.testkit.faker.genInt
 import com.nlab.testkit.faker.genLong

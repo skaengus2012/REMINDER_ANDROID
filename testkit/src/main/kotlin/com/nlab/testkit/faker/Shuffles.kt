@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 The N's lab Open Source Project
+ * Copyright (C) 2024 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,18 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nlab.reminder.core.uistate
 
-import androidx.annotation.StringRes
-import com.nlab.reminder.core.foundation.annotation.Generated
+package com.nlab.testkit.faker
 
 /**
  * @author Doohyun
  */
-sealed interface UserMessage {
-    @Generated
-    @JvmInline
-    value class ResIdValue(@StringRes val value: Int) : UserMessage
-}
+fun <T> Iterable<T>.shuffleAndGetFirst(
+    predicate: (T) -> Boolean = { true }
+): T {
+    val target = filter(predicate).shuffled()
+    check(target.isNotEmpty()) { "Cannot found any element satisfying the predicate" }
 
-fun UserMessage(@StringRes value: Int): UserMessage = UserMessage.ResIdValue(value)
+    return target.first()
+}
