@@ -4,6 +4,7 @@ import com.nlab.statekit.TestAction
 import com.nlab.statekit.TestState
 import com.nlab.statekit.bootstrap.Bootstrap
 import com.nlab.statekit.bootstrap.EmptyBootstrap
+import com.nlab.statekit.reduce.AccumulatorPool
 import com.nlab.statekit.reduce.Reduce
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.test.TestScope
@@ -19,11 +20,11 @@ import org.mockito.kotlin.verify
 /**
  * @author Doohyun
  */
-class DefaultStoreFactoryTest {
+class StoreFactoryTest {
     @Test
     fun `Given initState, When create store, Then store has initState`() = runTest {
         val initState = TestState.genState()
-        val store = createStoreFromDefaultStoreFactory(initState = initState)
+        val store = createStoreFromStoreFactory(initState = initState)
 
         assertThat(store.state.value, equalTo(initState))
     }
@@ -32,18 +33,18 @@ class DefaultStoreFactoryTest {
     fun `When create store, Then bootstrap fetched`() = runTest {
         val initState = TestState.genState()
         val bootstrap: Bootstrap<TestAction> = mock()
-        createStoreFromDefaultStoreFactory(initState = initState, bootstrap = bootstrap)
+        createStoreFromStoreFactory(initState = initState, bootstrap = bootstrap)
 
         verify(bootstrap, once()).fetch(any(), any(), any())
     }
 }
 
-private fun TestScope.createStoreFromDefaultStoreFactory(
+private fun TestScope.createStoreFromStoreFactory(
     coroutineScope: CoroutineScope = this,
     initState: TestState = TestState.genState(),
     reduce: Reduce<TestAction, TestState> = Reduce(),
     bootstrap: Bootstrap<TestAction> = EmptyBootstrap()
-): Store<TestAction, TestState> = DefaultStoreFactory().createStore(
+): Store<TestAction, TestState> = StoreFactory(AccumulatorPool()).create(
     coroutineScope,
     initState,
     reduce,

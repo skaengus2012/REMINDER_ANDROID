@@ -16,33 +16,41 @@
 
 package com.nlab.statekit.store
 
-import com.nlab.statekit.bootstrap.Bootstrap
 import com.nlab.statekit.reduce.AccumulatorPool
+import com.nlab.statekit.reduce.ActionDispatcher
 import com.nlab.statekit.reduce.DefaultActionDispatcher
 import com.nlab.statekit.reduce.Reduce
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 /**
- * @author Doohyun
+ * @author Thalys
  */
-internal class DefaultStoreFactory {
-    private val accPool = AccumulatorPool()
+abstract class ComponentStore<A : Any, S : Any> internal constructor() {
+    abstract val state: StateFlow<S>
+    abstract suspend fun dispatch(action: A)
+}
 
-    fun <A : Any, S : Any> createStore(
-        coroutineScope: CoroutineScope,
+internal class ComponentStoreImpl<A : Any, S : Any>(
+    override val state: StateFlow<S>,
+    private val actionDispatcher: ActionDispatcher<A>,
+) : ComponentStore<A, S>() {
+    override suspend fun dispatch(action: A) = actionDispatcher.dispatch(action)
+}
+
+internal class ComponentStoreFactory(
+    private val accPool: AccumulatorPool
+) {
+    fun <A : Any, S : Any> create(
         initState: S,
-        reduce: Reduce<A, S>,
-        bootstrap: Bootstrap<A>
-    ): Store<A, S> {
+        reduce: Reduce<A, S>
+    ): ComponentStore<A, S> {
         val baseState = MutableStateFlow(initState)
         val actionDispatcher = DefaultActionDispatcher(reduce, baseState, accPool)
-        return DefaultStore(
+        return ComponentStoreImpl(
             baseState.asStateFlow(),
-            coroutineScope,
-            actionDispatcher,
-            initJobs = bootstrap.fetch(coroutineScope, actionDispatcher, baseState.subscriptionCount)
+            actionDispatcher
         )
     }
 }
