@@ -32,8 +32,12 @@ internal class ReduceBuilderDelegate(
         transitionBuilder.addNode(block)
     }
 
-    fun <R : Any, A : Any, S : Any> addEffectNode(block: suspend (DslSuspendEffectScope<R, A, S>) -> Unit) {
+    fun <A : Any, S : Any> addEffectNode(block: (DslEffectScope<A, S>) -> Unit) {
         effectBuilder.addNode(block)
+    }
+
+    fun <R : Any, A : Any, S : Any> addSuspendEffectNode(block: suspend (DslSuspendEffectScope<R, A, S>) -> Unit) {
+        effectBuilder.addSuspendNode(block)
     }
 
     // Test OK @see {com.nlab.statekit.dsl.reduce.ReduceBuilderDelegateTest}

@@ -16,10 +16,8 @@
 
 package com.nlab.reminder.domain.feature.home
 
-import com.nlab.reminder.core.domain.TagGroupSource
 import com.nlab.reminder.core.kotlin.getOrElse
 import com.nlab.reminder.core.kotlin.map
-import com.nlab.reminder.core.kotlin.tryToNonBlankStringOrNull
 import com.nlab.reminder.core.translation.StringIds
 import com.nlab.reminder.core.uistate.UserMessage
 import com.nlab.statekit.dsl.reduce.DslReduce
@@ -64,7 +62,7 @@ internal fun HomeReduce(dependency: HomeDependency): HomeReduce = DslReduce {
             transition<OnAllCategoryClicked> {
                 current.copy(interaction = HomeInteraction.AllSchedule)
             }
-            effect<OnTagLongClicked> {
+            suspendEffect<OnTagLongClicked> {
                 val nextAction = dependency.tagRepository
                     .getUsageCount(id = action.tag.id)
                     .map { TagEditMetadataLoaded(action.tag, it) }

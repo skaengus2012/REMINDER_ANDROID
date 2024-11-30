@@ -29,7 +29,7 @@ class ReduceBuilderDelegateKtTest {
         val scope = "1"
         val delegate = ReduceBuilderDelegate(scope)
         delegate.addTransitionNode { dslTransitionScope: TestDslTransitionScope -> dslTransitionScope.current }
-        delegate.addEffectNode { _: TestDslEffectScope -> }
+        delegate.addSuspendEffectNode { _: TestDslSuspendEffectScope -> }
 
         val transition = checkNotNull(delegate.buildTransition())
         val effect = checkNotNull(delegate.buildEffect())

@@ -52,23 +52,45 @@ class StateScopeReduceBuilder<RA : Any, RS : Any, A : Any, S : RS> internal cons
         transition(actionType = T::class, block = block)
     }
 
-    fun effect(block: suspend DslSuspendEffectScope<RA, A, S>.() -> Unit) {
+    fun effect(block: DslEffectScope<A, S>.() -> Unit) {
         delegate.addEffectNode(block)
     }
 
     fun <T : A> effect(
         actionType: KClass<T>,
+        block: DslEffectScope<T, S>.() -> Unit
+    ) {
+        effect {
+            if (actionType.isInstance(action)) {
+                @Suppress("UNCHECKED_CAST")
+                val newScope = this as DslEffectScope<T, S>
+                block(newScope)
+            }
+        }
+    }
+
+    @JvmName(name = "effectWithActionType")
+    inline fun <reified T : A> effect(noinline block: DslEffectScope<T, S>.() -> Unit) {
+        effect(actionType = T::class, block)
+    }
+
+    fun suspendEffect(block: suspend DslSuspendEffectScope<RA, A, S>.() -> Unit) {
+        delegate.addSuspendEffectNode(block)
+    }
+
+    fun <T : A> suspendEffect(
+        actionType: KClass<T>,
         block: suspend DslSuspendEffectScope<RA, T, S>.() -> Unit
     ) {
         delegate.addPredicateScope<A, S>(
             isMatch = { actionType.isInstance(action) },
-            from = ReduceBuilderDelegate(scope).apply { addEffectNode(block) }
+            from = ReduceBuilderDelegate(scope).apply { addSuspendEffectNode(block) }
         )
     }
 
-    @JvmName(name = "effectWithActionType")
-    inline fun <reified T : A> effect(noinline block: suspend DslSuspendEffectScope<RA, T, S>.() -> Unit) {
-        effect(actionType = T::class, block)
+    @JvmName(name = "suspendEffectWithActionType")
+    inline fun <reified T : A> suspendEffect(noinline block: suspend DslSuspendEffectScope<RA, T, S>.() -> Unit) {
+        suspendEffect(actionType = T::class, block)
     }
 
     @JvmName(name = "scopeWithPredicate")

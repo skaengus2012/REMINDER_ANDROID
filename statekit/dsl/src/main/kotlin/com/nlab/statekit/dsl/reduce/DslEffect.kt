@@ -28,7 +28,12 @@ import kotlinx.coroutines.launch
 internal sealed interface DslEffect {
     val scope: Any
 
-    class Node<out R : Any, out A : Any, out S : Any>(
+    class Node<out A : Any, out S : Any>(
+        override val scope: Any,
+        val invoke: (DslEffectScope<@UnsafeVariance A, @UnsafeVariance S>) -> Unit
+    ) : DslEffect
+
+    class SuspendNode<out R : Any, out A : Any, out S : Any>(
         override val scope: Any,
         val invoke: suspend (DslSuspendEffectScope<@UnsafeVariance R, @UnsafeVariance A, @UnsafeVariance S>) -> Unit
     ) : DslEffect
@@ -107,10 +112,17 @@ private tailrec fun <A : Any> launch(
     val nextScope: Any
     val nextDslEffectScope: DslSuspendEffectScope<A, Any, Any>
     when (node) {
-        is DslEffect.Node<*, *, *> -> {
+        is DslEffect.Node<*, *> -> {
+            (node as DslEffect.Node<Any, Any>).invoke(dslEffectScope)
+            nextNode = accEffect.removeLastOrNull()
+            nextScope = scope
+            nextDslEffectScope = dslEffectScope
+        }
+
+        is DslEffect.SuspendNode<*, *, *> -> {
             coroutineScope.launch {
                 @Suppress("UNCHECKED_CAST")
-                (node as DslEffect.Node<A, Any, Any>).invoke(dslEffectScope)
+                (node as DslEffect.SuspendNode<A, Any, Any>).invoke(dslEffectScope)
             }
             nextNode = accEffect.removeLastOrNull()
             nextScope = scope

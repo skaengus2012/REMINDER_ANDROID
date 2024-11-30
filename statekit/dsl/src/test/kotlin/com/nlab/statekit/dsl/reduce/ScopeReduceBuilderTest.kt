@@ -50,23 +50,39 @@ class ScopeReduceBuilderTest {
     }
 
     @Test
-    fun `Given inputs and actionDispatcher, When launch effect from builder, Then actionDispatcher invoked`() =
-        runTest {
-            val inputAction = TestAction.Action1
-            val inputState = TestState.State1
-            val expectedAction = TestAction.Action2
-            val actionDispatcher: ActionDispatcher<TestAction> = mock()
-            val reduceBuilder = TestScopeReduceBuilder {
-                effect {
-                    if (action == inputAction && current == inputState) {
-                        dispatch(expectedAction)
-                    }
+    fun `Given inputs, When launch effect from builder, Then runner invoked`() = runTest {
+        val inputAction = TestAction.Action1
+        val inputState = TestState.State1
+        val runner: () -> Unit = mock()
+        val reduceBuilder = TestScopeReduceBuilder {
+            effect {
+                if (action == inputAction && current == inputState) {
+                    runner()
                 }
             }
-            val effect = checkNotNull(reduceBuilder.delegate.buildEffect())
-            effect.launch(inputAction, inputState, actionDispatcher)
-            verify(actionDispatcher, once()).dispatch(expectedAction)
         }
+        val effect = checkNotNull(reduceBuilder.delegate.buildEffect())
+        effect.launch(inputAction, inputState)
+        verify(runner, once()).invoke()
+    }
+
+    @Test
+    fun `Given inputs and actionDispatcher, When launch suspend effect from builder, Then actionDispatcher invoked`() = runTest {
+        val inputAction = TestAction.Action1
+        val inputState = TestState.State1
+        val expectedAction = TestAction.Action2
+        val actionDispatcher: ActionDispatcher<TestAction> = mock()
+        val reduceBuilder = TestScopeReduceBuilder {
+            suspendEffect {
+                if (action == inputAction && current == inputState) {
+                    dispatch(expectedAction)
+                }
+            }
+        }
+        val effect = checkNotNull(reduceBuilder.delegate.buildEffect())
+        effect.launch(inputAction, inputState, actionDispatcher)
+        verify(actionDispatcher, once()).dispatch(expectedAction)
+    }
 
     @Test
     fun `Given inputs and predicated block, When transition from predicate scope builder, Then return expected state`() {

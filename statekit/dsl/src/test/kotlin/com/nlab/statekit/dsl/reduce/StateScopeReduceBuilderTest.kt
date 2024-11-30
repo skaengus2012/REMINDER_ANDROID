@@ -22,6 +22,7 @@ import com.nlab.statekit.reduce.ActionDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import org.mockito.Mockito.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.once
 import org.mockito.kotlin.verify
 
@@ -56,13 +57,52 @@ class StateScopeReduceBuilderTest {
     }
 
     @Test
-    fun `Given matched input and actionDispatcher, When launch effect from builder, Then actionDispatcher invoked`() = runTest {
+    fun `Given matched input and runner, When launch effect form builder, Then runner invoked`() = runTest {
+        val inputAction = TestAction.Action1
+        val inputState = TestState.State1
+        val runner: () -> Unit = mock()
+        val reduceBuilder = TestStateScopeReduceBuilder {
+            effect {
+                if (action == inputAction && current == inputState) {
+                    runner.invoke()
+                }
+            }
+        }
+        val effect = checkNotNull(reduceBuilder.delegate.buildEffect())
+        effect.launch(inputAction, inputState)
+        verify(runner, once()).invoke()
+    }
+
+    @Test
+    fun `Given input state and runner, When launch effect with action type form builder, Then runner invoked conditionally`() = runTest {
+        suspend fun invokeWhenStateTypeIsAction1(
+            inputAction: TestAction,
+            runner: () -> Unit
+        ) {
+            val reduceBuilder = TestStateScopeReduceBuilder {
+                effect<TestAction.Action1> { runner.invoke() }
+            }
+            val effect = checkNotNull(reduceBuilder.delegate.buildEffect())
+            effect.launch(inputAction, TestState.genState())
+        }
+
+        val runnerWithAction1: () -> Unit = mock()
+        val runnerWithAction2: () -> Unit = mock()
+        invokeWhenStateTypeIsAction1(inputAction = TestAction.Action1, runnerWithAction1)
+        invokeWhenStateTypeIsAction1(inputAction = TestAction.Action2, runnerWithAction2)
+
+        verify(runnerWithAction1, once()).invoke()
+        verify(runnerWithAction2, never()).invoke()
+    }
+
+    @Test
+    fun `Given matched input and actionDispatcher, When launch suspend effect from builder, Then actionDispatcher invoked`() = runTest {
         val inputAction = TestAction.Action1
         val inputState = TestState.State1
         val expectedAction = TestAction.Action2
         val actionDispatcher: ActionDispatcher<TestAction> = mock()
         val reduceBuilder = TestStateScopeReduceBuilder {
-            effect {
+            suspendEffect {
                 if (action == inputAction && current == inputState) dispatch(expectedAction)
             }
         }
@@ -72,13 +112,13 @@ class StateScopeReduceBuilderTest {
     }
 
     @Test
-    fun `Given matched inputs and actionDispatcher, When launch effect with action type from builder, Then actionDispatcher invoked`() = runTest {
+    fun `Given matched inputs and actionDispatcher, When launch suspend effect with action type from builder, Then actionDispatcher invoked`() = runTest {
         val inputAction = TestAction.Action1
         val inputState = TestState.State1
         val expectedAction = TestAction.Action2
         val actionDispatcher: ActionDispatcher<TestAction> = mock()
         val reduceBuilder = TestStateScopeReduceBuilder {
-            effect<TestAction.Action1> {
+            suspendEffect<TestAction.Action1> {
                 if (current == inputState) dispatch(expectedAction)
             }
         }
@@ -102,7 +142,7 @@ class StateScopeReduceBuilderTest {
     }
 
     @Test
-    fun `Given inputs, actionDispatcher and transformSource block, When launch effect with transformSource scope from builder, Then actionDispatcher invoked`() = runTest {
+    fun `Given inputs, actionDispatcher and transformSource block, When launch suspend effect with transformSource scope from builder, Then actionDispatcher invoked`() = runTest {
         val inputAction = TestAction.Action1
         val inputState = TestState.State1
         val expectedAction = TestAction.Action2
@@ -113,7 +153,7 @@ class StateScopeReduceBuilderTest {
                 else null
             }) {
                 scope(transformSource = { UpdateSource(action = action + 2, current = current) }) {
-                    effect {
+                    suspendEffect {
                         if (action == 3) {
                             dispatch(expectedAction)
                         }
@@ -127,14 +167,14 @@ class StateScopeReduceBuilderTest {
     }
 
     @Test
-    fun `Given inputs, actionType and actionDispatcher, When launch effect with stateType scope from builder, Then actionDispatcher invoked`() = runTest {
+    fun `Given inputs, actionType and actionDispatcher, When launch suspend effect with stateType scope from builder, Then actionDispatcher invoked`() = runTest {
         val inputAction = TestAction.Action1
         val inputState = TestState.State1
         val expectedAction = TestAction.Action2
         val actionDispatcher: ActionDispatcher<TestAction> = mock()
         val reduceBuilder = TestStateScopeReduceBuilder {
             scope<TestState.State1> {
-                effect {
+                suspendEffect {
                     if (action == inputAction) dispatch(expectedAction)
                 }
             }

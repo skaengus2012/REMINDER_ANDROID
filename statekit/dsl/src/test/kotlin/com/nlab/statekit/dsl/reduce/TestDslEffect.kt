@@ -27,8 +27,10 @@ import org.mockito.kotlin.mock
 /**
  * @author Doohyun
  */
-typealias TestDslEffectScope = DslSuspendEffectScope<TestAction, TestAction, TestState>
-internal typealias TestDslEffectNode = DslEffect.Node<TestAction, TestAction, TestState>
+typealias TestDslEffectScope = DslEffectScope<TestAction, TestAction>
+typealias TestDslSuspendEffectScope = DslSuspendEffectScope<TestAction, TestAction, TestState>
+internal typealias TestDslEffectNode = DslEffect.Node<TestAction, TestState>
+internal typealias TestDslEffectSuspendNode = DslEffect.SuspendNode<TestAction, TestAction, TestState>
 
 @Suppress("TestFunctionName")
 internal fun TestDslEffect(
@@ -37,8 +39,13 @@ internal fun TestDslEffect(
 
 @Suppress("TestFunctionName")
 internal fun TestDslEffectNode(
-    scope: Any = Any(),
+    scope: Any = Any()
 ): TestDslEffectNode = TestDslEffectNode(scope) {}
+
+@Suppress("TestFunctionName")
+internal fun TestDslEffectSuspendNode(
+    scope: Any = Any(),
+): TestDslEffectSuspendNode = TestDslEffectSuspendNode(scope) {}
 
 internal suspend fun DslEffect.launch(
     action: TestAction = TestAction.genAction(),
