@@ -13,11 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.nlab.statekit.reduce
-
-import com.nlab.statekit.internal.forEachReversed
-
 
 /**
  * @author Doohyun
@@ -73,7 +69,7 @@ fun <A : Any, S : Any> Transition<A, S>.transitionTo(
                 action,
                 current,
                 node.head,
-                acc.apply { node.tails.forEachReversed { add(it) } },
+                acc.addAllReversed(node.tails),
                 accPool
             )
         }

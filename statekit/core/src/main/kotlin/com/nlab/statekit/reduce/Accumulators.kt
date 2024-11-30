@@ -14,16 +14,13 @@
  * limitations under the License.
  */
 
-package com.nlab.statekit.internal
+package com.nlab.statekit.reduce
 
 /**
- * @author Doohyun
+ * @author Thalys
  */
-
-// Test OK @see {com.nlab.statekit.internal.CollectionsKtTest}
-// TODO remove Generated annotation after deploy below issue
-// https://github.com/jacoco/jacoco/pull/1670
-@Generated
-internal inline fun <T> List<T>.forEachReversed(action: (T) -> Unit) {
-    for (index in size - 1 downTo 0) action(this[index])
+internal fun <T : Any> Accumulator<T>.addAllReversed(
+    elements: List<T>
+): Accumulator<T> = apply {
+    for (index in elements.size - 1 downTo 0) add(elements[index])
 }

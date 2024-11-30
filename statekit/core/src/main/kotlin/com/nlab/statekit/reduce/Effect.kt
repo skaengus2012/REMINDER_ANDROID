@@ -16,7 +16,6 @@
 
 package com.nlab.statekit.reduce
 
-import com.nlab.statekit.internal.forEachReversed
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -91,7 +90,7 @@ fun <A : Any, S : Any> Effect<A, S>.launch(
             }
 
             is Effect.Composite -> {
-                node.tails.forEachReversed { acc.add(it) }
+                acc.addAllReversed(node.tails)
                 node.head
             }
         }
