@@ -4,6 +4,7 @@ import com.nlab.statekit.TestAction
 import com.nlab.statekit.TestState
 import com.nlab.statekit.bootstrap.Bootstrap
 import com.nlab.statekit.bootstrap.EmptyBootstrap
+import com.nlab.statekit.reduce.AccumulatorPool
 import com.nlab.statekit.reduce.Reduce
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.test.TestScope
@@ -43,7 +44,7 @@ private fun TestScope.createStoreFromStoreFactory(
     initState: TestState = TestState.genState(),
     reduce: Reduce<TestAction, TestState> = Reduce(),
     bootstrap: Bootstrap<TestAction> = EmptyBootstrap()
-): Store<TestAction, TestState> = StoreFactory().createStore(
+): Store<TestAction, TestState> = StoreFactory(AccumulatorPool()).create(
     coroutineScope,
     initState,
     reduce,

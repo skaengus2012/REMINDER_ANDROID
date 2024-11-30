@@ -16,36 +16,32 @@
 
 package com.nlab.statekit.store
 
-import com.nlab.statekit.bootstrap.Bootstrap
-import com.nlab.statekit.bootstrap.EmptyBootstrap
+import com.nlab.statekit.TestAction
+import com.nlab.statekit.TestState
 import com.nlab.statekit.reduce.AccumulatorPool
-import com.nlab.statekit.reduce.EmptyReduce
 import com.nlab.statekit.reduce.Reduce
-import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.test.runTest
+import org.hamcrest.CoreMatchers.equalTo
+import org.hamcrest.MatcherAssert.assertThat
+import org.junit.Test
 
 /**
  * @author Thalys
  */
-private val accPool = AccumulatorPool()
-private val storeFactory = StoreFactory(accPool)
-private val componentStoreFactory = ComponentStoreFactory(accPool)
+class ComponentStoreFactoryTest {
+    @Test
+    fun `Given initState, When create store, Then store has initState`() = runTest {
+        val initState = TestState.genState()
+        val store = createComponentStoreFromStoreFactory(initState = initState)
 
-fun <A : Any, S : Any> createStore(
-    coroutineScope: CoroutineScope,
-    initState: S,
-    reduce: Reduce<A, S> = EmptyReduce(),
-    bootstrap: Bootstrap<A> = EmptyBootstrap()
-): Store<A, S> = storeFactory.create(
-    coroutineScope,
-    initState,
-    reduce,
-    bootstrap
-)
+        assertThat(store.state.value, equalTo(initState))
+    }
+}
 
-fun <A : Any, S : Any> createComponentStore(
-    initState: S,
-    reduce: Reduce<A, S>
-): ComponentStore<A, S> = componentStoreFactory.create(
+private fun createComponentStoreFromStoreFactory(
+    initState: TestState = TestState.genState(),
+    reduce: Reduce<TestAction, TestState> = Reduce(),
+): ComponentStore<TestAction, TestState> = ComponentStoreFactory(AccumulatorPool()).create(
     initState,
     reduce
 )
