@@ -17,9 +17,7 @@
 package com.nlab.statekit.test.reduce
 
 import com.nlab.statekit.reduce.Reduce
-import com.nlab.statekit.store.createStore
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.currentCoroutineContext
+import com.nlab.statekit.store.createComponentStore
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 
@@ -74,12 +72,11 @@ class TransitionScenario<A : Any, S : Any> internal constructor(
     private val transformInitToExpectedState: (S) -> S,
 ) {
     suspend fun verify() {
-        val store = createStore(
-            coroutineScope = CoroutineScope(currentCoroutineContext()),
+        val store = createComponentStore(
             initState = current,
             reduce = reduce
         )
-        store.dispatch(action).join()
+        store.dispatch(action)
         assertThat(store.state.value, equalTo(transformInitToExpectedState(current)))
     }
 }
