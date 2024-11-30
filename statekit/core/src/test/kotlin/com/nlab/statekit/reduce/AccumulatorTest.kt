@@ -61,15 +61,6 @@ class AccumulatorTest {
     }
 
     @Test
-    fun `Given data list, When addAll and removeLastOrNull, Then return inputted data list`() {
-        val size = genInt(min = 5, max = 10)
-        val values = List(size) { genLong() }
-        val acc = Accumulator<Long>()
-        acc.addAll(values)
-        assertThat(List(size) { acc.removeLastOrNull() }, equalTo(values.reversed()))
-    }
-
-    @Test
     fun `Given no data, When removeLastOrNull, Then return null`() {
         val data = Accumulator<Long>().removeLastOrNull()
         assert(data == null)

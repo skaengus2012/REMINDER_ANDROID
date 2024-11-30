@@ -14,32 +14,15 @@
  * limitations under the License.
  */
 
-package com.nlab.statekit.reduce
+package com.nlab.statekit.dsl.reduce
+
+import com.nlab.statekit.reduce.Accumulator
 
 /**
- * @author Doohyun
+ * @author Thalys
  */
-class Accumulator<T : Any> internal constructor() {
-    private val acc = ArrayDeque<Any>()
-    internal var isReady: Boolean = false
-        private set
-
-    internal fun ready() {
-        isReady = true
-    }
-
-    internal fun release() {
-        isReady = false
-        acc.clear()
-    }
-
-    fun add(value: T) {
-        acc.add(value)
-    }
-
-    @Suppress("UNCHECKED_CAST")
-    fun removeLastOrNull(): T? = acc.removeLastOrNull() as? T
-
-    @Suppress("UNCHECKED_CAST")
-    fun removeLast(): T = acc.removeLast() as T
+internal fun <T : Any> Accumulator<T>.addAllReversedWithoutHead(
+    elements: List<T>
+): Accumulator<T> = apply {
+    for (index in elements.size - 1 downTo 1) add(elements[index])
 }

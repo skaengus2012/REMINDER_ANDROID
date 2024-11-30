@@ -118,9 +118,7 @@ private tailrec fun <A : Any> launch(
         }
         is DslEffect.Composite -> {
             val childEffects = node.effects
-            for (index in 1 until childEffects.size) {
-                accEffect.add(childEffects[index])
-            }
+            accEffect.addAllReversedWithoutHead(childEffects)
             nextNode = childEffects.first()
             nextScope = scope
             nextDslEffectScope = dslEffectScope
