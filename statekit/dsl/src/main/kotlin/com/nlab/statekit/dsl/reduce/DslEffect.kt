@@ -58,10 +58,10 @@ internal sealed interface DslEffect {
 
 internal fun <A : Any, S : Any> effectOf(
     dslEffect: DslEffect
-): Effect<A, S> = Effect.LifecycleNode { action, current, actionDispatcher, accumulatorPool, coroutineScope ->
-    accumulatorPool.use { accEffect: Accumulator<DslEffect> ->
-        accumulatorPool.use { accScope: Accumulator<Any> ->
-            accumulatorPool.use { accDslEffectScope: Accumulator<DslSuspendEffectScope<A, Any, Any>> ->
+): Effect<A, S> = Effect.LifecycleNode { action, current, actionDispatcher, accPool, coroutineScope ->
+    accPool.use { accEffect: Accumulator<DslEffect> ->
+        accPool.use { accScope: Accumulator<Any> ->
+            accPool.use { accDslEffectScope: Accumulator<DslSuspendEffectScope<A, Any, Any>> ->
                 launch(
                     node = dslEffect,
                     scope = dslEffect.scope,
