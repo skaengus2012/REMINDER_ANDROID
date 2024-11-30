@@ -52,13 +52,13 @@ class StateScopeReduceBuilder<RA : Any, RS : Any, A : Any, S : RS> internal cons
         transition(actionType = T::class, block = block)
     }
 
-    fun effect(block: suspend DslEffectScope<RA, A, S>.() -> Unit) {
+    fun effect(block: suspend DslSuspendEffectScope<RA, A, S>.() -> Unit) {
         delegate.addEffectNode(block)
     }
 
     fun <T : A> effect(
         actionType: KClass<T>,
-        block: suspend DslEffectScope<RA, T, S>.() -> Unit
+        block: suspend DslSuspendEffectScope<RA, T, S>.() -> Unit
     ) {
         delegate.addPredicateScope<A, S>(
             isMatch = { actionType.isInstance(action) },
@@ -67,7 +67,7 @@ class StateScopeReduceBuilder<RA : Any, RS : Any, A : Any, S : RS> internal cons
     }
 
     @JvmName(name = "effectWithActionType")
-    inline fun <reified T : A> effect(noinline block: suspend DslEffectScope<RA, T, S>.() -> Unit) {
+    inline fun <reified T : A> effect(noinline block: suspend DslSuspendEffectScope<RA, T, S>.() -> Unit) {
         effect(actionType = T::class, block)
     }
 

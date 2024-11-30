@@ -31,7 +31,7 @@ class ScopeReduceBuilder<RA : Any, RS : Any, A : Any, S : RS> internal construct
         delegate.addTransitionNode(block)
     }
 
-    fun effect(block: suspend DslEffectScope<RA, A, S>.()-> Unit) {
+    fun effect(block: suspend DslSuspendEffectScope<RA, A, S>.()-> Unit) {
         delegate.addEffectNode(block)
     }
 

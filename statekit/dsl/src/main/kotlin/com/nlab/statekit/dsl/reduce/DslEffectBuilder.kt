@@ -34,7 +34,7 @@ internal class DslEffectBuilder(
         effects.add(effect)
     }
 
-    fun <R : Any, A : Any, S : Any> addNode(block: suspend (DslEffectScope<R, A, S>) -> Unit) {
+    fun <R : Any, A : Any, S : Any> addNode(block: suspend (DslSuspendEffectScope<R, A, S>) -> Unit) {
         effects.add(
             DslEffect.Node(
                 scope = scope,

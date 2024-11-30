@@ -27,7 +27,7 @@ import org.mockito.kotlin.mock
 /**
  * @author Doohyun
  */
-typealias TestDslEffectScope = DslEffectScope<TestAction, TestAction, TestState>
+typealias TestDslEffectScope = DslSuspendEffectScope<TestAction, TestAction, TestState>
 internal typealias TestDslEffectNode = DslEffect.Node<TestAction, TestAction, TestState>
 
 @Suppress("TestFunctionName")

@@ -20,11 +20,15 @@ import com.nlab.statekit.dsl.annotation.DslReduceMarker
 import com.nlab.statekit.reduce.ActionDispatcher
 
 /**
- * @author Doohyun
+ * @author Thalys
  */
 @DslReduceMarker
-class DslEffectScope<R : Any, A : Any, S : Any> internal constructor(
+sealed interface DslEffectScope<R : Any, A : Any, S : Any> : UpdateSource<A, S>
+
+@DslReduceMarker
+class DslSuspendEffectScope<R : Any, A : Any, S : Any> internal constructor(
     updateSource: UpdateSource<A, S>,
     internal val actionDispatcher: ActionDispatcher<R>
-) : UpdateSource<A, S> by updateSource,
+) : DslEffectScope<R, A, S>,
+    UpdateSource<A, S> by updateSource,
     ActionDispatcher<R> by actionDispatcher

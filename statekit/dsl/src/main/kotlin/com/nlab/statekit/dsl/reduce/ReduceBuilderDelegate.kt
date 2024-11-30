@@ -32,7 +32,7 @@ internal class ReduceBuilderDelegate(
         transitionBuilder.addNode(block)
     }
 
-    fun <R : Any, A : Any, S : Any> addEffectNode(block: suspend (DslEffectScope<R, A, S>) -> Unit) {
+    fun <R : Any, A : Any, S : Any> addEffectNode(block: suspend (DslSuspendEffectScope<R, A, S>) -> Unit) {
         effectBuilder.addNode(block)
     }
 
