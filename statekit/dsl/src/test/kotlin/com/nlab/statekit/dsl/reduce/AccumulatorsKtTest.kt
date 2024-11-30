@@ -16,24 +16,29 @@
 
 package com.nlab.statekit.dsl.reduce
 
+import com.nlab.statekit.reduce.AccumulatorPool
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
 
 /**
- * @author Doohyun
+ * @author Thalys
  */
-class ReduceBuilderDelegateKtTest {
+class AccumulatorsKtTest {
     @Test
-    fun `Given scope, When build transition and effect from create reduceBuilderDelegate with scope, Then return transition and effect with scope`() {
-        val scope = "1"
-        val delegate = ReduceBuilderDelegate(scope)
-        delegate.addTransitionNode { dslTransitionScope: TestDslTransitionScope -> dslTransitionScope.current }
-        delegate.addSuspendEffectNode { _: TestDslSuspendEffectScope -> }
+    fun `Given ordered number list, When collect numbers using addAllReversedWithoutHead, Then acc has reversed list without first element`() {
+        val orderedList = listOf(1, 2, 3, 4, 5)
+        val expectedList = orderedList.subList(1, orderedList.size)
+        val acc = AccumulatorPool().request<Int>()
+        acc.addAllReversedWithoutHead(orderedList)
 
-        val transition = checkNotNull(delegate.buildTransition())
-        val effect = checkNotNull(delegate.buildEffect())
-        assertThat(transition.scope, equalTo(scope))
-        assertThat(effect.scope, equalTo(scope))
+        val actual = buildList {
+            while (true) {
+                val element = acc.removeLastOrNull()
+                if (element == null) break
+                else add(element)
+            }
+        }
+        assertThat(actual, equalTo(expectedList))
     }
 }

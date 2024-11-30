@@ -50,7 +50,7 @@ class ReduceFactoriesKtTest {
     @Test
     fun `Given transition, effect, When create reduce, Then reduce has transition and effect`() {
         val transition = TestTransitionNode { _, current -> current }
-        val effect = TestEffectNode { _, _, _ ->  }
+        val effect = TestEffectSuspendNode { _, _, _ ->  }
         val reduce = TestReduce(transition, effect)
 
         assertThat(reduce.transition, sameInstance(transition))
@@ -88,8 +88,8 @@ class ReduceFactoriesKtTest {
     @Test
     fun `Given multiple effects, When launch effect from combineReduce, Then all effect invoked`() = runTest {
         val runner: () -> Unit = mock()
-        val firstEffect = TestEffectNode { _, _, _ -> runner() }
-        val secondEffect = TestEffectNode { _, _, _ -> runner() }
+        val firstEffect = TestEffectSuspendNode { _, _, _ -> runner() }
+        val secondEffect = TestEffectSuspendNode { _, _, _ -> runner() }
 
         val reduce = combineReduce(
             TestReduce(effect = firstEffect),

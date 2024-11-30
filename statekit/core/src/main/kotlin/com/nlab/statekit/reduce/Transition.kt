@@ -13,9 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.nlab.statekit.reduce
-
 
 /**
  * @author Doohyun
@@ -71,11 +69,7 @@ fun <A : Any, S : Any> Transition<A, S>.transitionTo(
                 action,
                 current,
                 node.head,
-                acc.apply {
-                    node.tails.let { tails ->
-                        for (index in tails.size - 1 downTo 0) add(tails[index])
-                    }
-                },
+                acc.addAllReversed(node.tails),
                 accPool
             )
         }

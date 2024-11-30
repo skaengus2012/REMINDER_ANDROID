@@ -66,6 +66,15 @@ class DslEffectBuilderTest {
     }
 
     @Test
+    fun `Given scope to result block, When build after addSuspendNode, Then return suspend node`() {
+        val block: (TestDslSuspendEffectScope) -> Unit = {}
+        val effectBuilder = DslEffectBuilder(scope = Any())
+        effectBuilder.addSuspendNode(block)
+
+        assertThat(effectBuilder.build(), instanceOf(DslEffect.SuspendNode::class))
+    }
+
+    @Test
     fun `Given predicate and effect, When build after addPredicateScope, Then return predicateScope`() {
         val scope = Any()
         val isMatch: (TestUpdateSource) -> Boolean = { false }

@@ -124,7 +124,7 @@ class TransitionKtTest {
     }
 
     @Test
-    fun `Given two non changeable transitions, When transitionTo, Then invoke all`() {
+    fun `Given two non changeable transitions, When transitionTo, Then transition invoked all in order`() {
         val inputAction = TestAction.genAction()
         val inputState = TestState.State1
         val nonChangeable1 = mock<TestTransitionNode> {

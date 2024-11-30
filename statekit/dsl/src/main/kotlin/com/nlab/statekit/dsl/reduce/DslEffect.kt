@@ -28,9 +28,14 @@ import kotlinx.coroutines.launch
 internal sealed interface DslEffect {
     val scope: Any
 
-    class Node<out R : Any, out A : Any, out S : Any>(
+    class Node<out A : Any, out S : Any>(
         override val scope: Any,
-        val invoke: suspend (DslEffectScope<@UnsafeVariance R, @UnsafeVariance A, @UnsafeVariance S>) -> Unit
+        val invoke: (DslEffectScope<@UnsafeVariance A, @UnsafeVariance S>) -> Unit
+    ) : DslEffect
+
+    class SuspendNode<out R : Any, out A : Any, out S : Any>(
+        override val scope: Any,
+        val invoke: suspend (DslSuspendEffectScope<@UnsafeVariance R, @UnsafeVariance A, @UnsafeVariance S>) -> Unit
     ) : DslEffect
 
     class Composite(
@@ -58,14 +63,14 @@ internal sealed interface DslEffect {
 
 internal fun <A : Any, S : Any> effectOf(
     dslEffect: DslEffect
-): Effect<A, S> = Effect.LifecycleNode { action, current, actionDispatcher, coroutineScope, accumulatorPool ->
-    accumulatorPool.use { accEffect: Accumulator<DslEffect> ->
-        accumulatorPool.use { accScope: Accumulator<Any> ->
-            accumulatorPool.use { accDslEffectScope: Accumulator<DslEffectScope<A, Any, Any>> ->
+): Effect<A, S> = Effect.LifecycleNode { action, current, actionDispatcher, accPool, coroutineScope ->
+    accPool.use { accEffect: Accumulator<DslEffect> ->
+        accPool.use { accScope: Accumulator<Any> ->
+            accPool.use { accDslEffectScope: Accumulator<DslSuspendEffectScope<A, Any, Any>> ->
                 launch(
                     node = dslEffect,
                     scope = dslEffect.scope,
-                    dslEffectScope = DslEffectScope(
+                    dslEffectScope = DslSuspendEffectScope(
                         UpdateSource(action, current),
                         actionDispatcher
                     ),
@@ -82,10 +87,10 @@ internal fun <A : Any, S : Any> effectOf(
 private tailrec fun <A : Any> launch(
     node: DslEffect?,
     scope: Any,
-    dslEffectScope: DslEffectScope<A, Any, Any>,
+    dslEffectScope: DslSuspendEffectScope<A, Any, Any>,
     accEffect: Accumulator<DslEffect>,
     accScope: Accumulator<Any>,
-    accDslEffectScope: Accumulator<DslEffectScope<A, Any, Any>>,
+    accDslEffectScope: Accumulator<DslSuspendEffectScope<A, Any, Any>>,
     coroutineScope: CoroutineScope
 ) {
     if (node == null) return
@@ -105,12 +110,19 @@ private tailrec fun <A : Any> launch(
 
     val nextNode: DslEffect?
     val nextScope: Any
-    val nextDslEffectScope: DslEffectScope<A, Any, Any>
+    val nextDslEffectScope: DslSuspendEffectScope<A, Any, Any>
     when (node) {
-        is DslEffect.Node<*, *, *> -> {
+        is DslEffect.Node<*, *> -> {
+            (node as DslEffect.Node<Any, Any>).invoke(dslEffectScope)
+            nextNode = accEffect.removeLastOrNull()
+            nextScope = scope
+            nextDslEffectScope = dslEffectScope
+        }
+
+        is DslEffect.SuspendNode<*, *, *> -> {
             coroutineScope.launch {
                 @Suppress("UNCHECKED_CAST")
-                (node as DslEffect.Node<A, Any, Any>).invoke(dslEffectScope)
+                (node as DslEffect.SuspendNode<A, Any, Any>).invoke(dslEffectScope)
             }
             nextNode = accEffect.removeLastOrNull()
             nextScope = scope
@@ -118,9 +130,7 @@ private tailrec fun <A : Any> launch(
         }
         is DslEffect.Composite -> {
             val childEffects = node.effects
-            for (index in 1 until childEffects.size) {
-                accEffect.add(childEffects[index])
-            }
+            accEffect.addAllReversedWithoutHead(childEffects)
             nextNode = childEffects.first()
             nextScope = scope
             nextDslEffectScope = dslEffectScope
@@ -141,7 +151,7 @@ private tailrec fun <A : Any> launch(
                 accDslEffectScope.add(dslEffectScope)
                 nextNode = node.effect
                 nextScope = node.subScope
-                nextDslEffectScope = DslEffectScope(newSource, dslEffectScope.actionDispatcher)
+                nextDslEffectScope = DslSuspendEffectScope(newSource, dslEffectScope.actionDispatcher)
             }
         }
     }

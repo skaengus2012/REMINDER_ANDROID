@@ -27,10 +27,10 @@ import org.mockito.kotlin.mock
 /**
  * @author Thalys
  */
-class DslEffectScopeTest {
+class DslSuspendEffectScopeTest {
     @Test
     fun successCreateDslEffectScope() {
-        DslEffectScope(
+        DslSuspendEffectScope(
             UpdateSource(TestAction.genAction(), TestState.genState()),
             actionDispatcher = mock<ActionDispatcher<TestAction>>()
         )
@@ -41,7 +41,7 @@ class DslEffectScopeTest {
         val expectedActionDispatcher = object : ActionDispatcher<TestAction> {
             override suspend fun dispatch(action: TestAction) = Unit
         }
-        val scope = DslEffectScope(
+        val scope = DslSuspendEffectScope(
             UpdateSource(TestAction.genAction(), TestState.genState()),
             actionDispatcher = expectedActionDispatcher
         )

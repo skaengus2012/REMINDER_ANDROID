@@ -29,28 +29,58 @@ interface ActionDispatcher<in A : Any> {
 }
 
 internal class DefaultActionDispatcher<A : Any, S : Any>(
-    private val state: MutableStateFlow<S>,
     private val reduce: Reduce<A, S>,
+    private val baseState: MutableStateFlow<S>,
+    private val accPool: AccumulatorPool
 ) : ActionDispatcher<A> {
     override suspend fun dispatch(action: A) {
-        val accumulatorPool = AccumulatorPool()
-        val current = when (val transition = reduce.transition) {
-            null -> state.value
-            else -> state.getAndUpdate { old -> transition.transitionTo(action, old, accumulatorPool) }
-        }
-        reduce.effect
-            ?.let { effect ->
-                val block = { coroutineScope: CoroutineScope ->
-                    effect.launch(
-                        action,
-                        current,
-                        actionDispatcher = this,
-                        accumulatorPool = accumulatorPool,
-                        coroutineScope = coroutineScope,
-                    )
-                }
-                coroutineScope(block)
+        val transition = reduce.transition
+        val current = baseState.getAndTransitionTo(action, transition, accPool)
+        reduce.effect?.let { effect ->
+            val block = { coroutineScope: CoroutineScope ->
+                effect.launch(
+                    action,
+                    current,
+                    actionDispatcher = ChildActionDispatcher(
+                        baseState,
+                        transition,
+                        effect,
+                        coroutineScope,
+                        accPool
+                    ),
+                    coroutineScope = coroutineScope,
+                    accPool = accPool,
+                )
             }
-            ?: Unit
+            coroutineScope(block)
+        } ?: Unit
     }
+}
+
+private class ChildActionDispatcher<A : Any, S : Any>(
+    private val state: MutableStateFlow<S>,
+    private val transition: Transition<A, S>?,
+    private val effect: Effect<A, S>,
+    private val coroutineScope: CoroutineScope,
+    private val accPool: AccumulatorPool,
+) : ActionDispatcher<A> {
+    override suspend fun dispatch(action: A) {
+        val current = state.getAndTransitionTo(action, transition, accPool)
+        effect.launch(
+            action,
+            current,
+            actionDispatcher = this,
+            coroutineScope = coroutineScope,
+            accPool = accPool
+        )
+    }
+}
+
+private fun <A : Any, S : Any> MutableStateFlow<S>.getAndTransitionTo(
+    action: A,
+    transition: Transition<A, S>?,
+    accumulatorPool: AccumulatorPool,
+): S = when (transition) {
+    null -> value
+    else -> getAndUpdate { old -> transition.transitionTo(action, old, accumulatorPool) }
 }

@@ -117,9 +117,7 @@ private tailrec fun transition(
                 node = childTransitions.first(),
                 scope,
                 dslTransitionScope,
-                accTransition.apply {
-                    for (index in childTransitions.size - 1 downTo 1) add(childTransitions[index])
-                },
+                accTransition.addAllReversedWithoutHead(childTransitions),
                 accScope,
                 accDslTransitionScope
             )

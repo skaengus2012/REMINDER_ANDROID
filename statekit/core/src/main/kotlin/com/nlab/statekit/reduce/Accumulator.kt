@@ -37,10 +37,6 @@ class Accumulator<T : Any> internal constructor() {
         acc.add(value)
     }
 
-    fun addAll(values: List<T>) {
-        acc.addAll(values)
-    }
-
     @Suppress("UNCHECKED_CAST")
     fun removeLastOrNull(): T? = acc.removeLastOrNull() as? T
 

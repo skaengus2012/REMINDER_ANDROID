@@ -54,7 +54,7 @@ class EffectScenario<A : Any, S : Any> internal constructor(
         reduce,
         action,
         initState,
-        additionalEffects = additionalEffects + Effect.Node { action, _, _ -> block(action) }
+        additionalEffects = additionalEffects + Effect.SuspendNode { action, _, _ -> block(action) }
     )
 
     inline fun <reified T : A> hookIf(crossinline block: suspend (T) -> Unit) = hook { action ->

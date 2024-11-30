@@ -14,21 +14,13 @@
  * limitations under the License.
  */
 
-package com.nlab.statekit.dsl.reduce
-
-import com.nlab.statekit.dsl.annotation.DslReduceMarker
-import com.nlab.statekit.reduce.ActionDispatcher
+package com.nlab.statekit.reduce
 
 /**
  * @author Thalys
  */
-@DslReduceMarker
-sealed interface DslEffectScope<A : Any, S : Any> : UpdateSource<A, S>
-
-@DslReduceMarker
-class DslSuspendEffectScope<R : Any, A : Any, S : Any> internal constructor(
-    updateSource: UpdateSource<A, S>,
-    internal val actionDispatcher: ActionDispatcher<R>
-) : DslEffectScope<A, S>,
-    UpdateSource<A, S> by updateSource,
-    ActionDispatcher<R> by actionDispatcher
+internal fun <T : Any> Accumulator<T>.addAllReversed(
+    elements: List<T>
+): Accumulator<T> = apply {
+    for (index in elements.size - 1 downTo 0) add(elements[index])
+}

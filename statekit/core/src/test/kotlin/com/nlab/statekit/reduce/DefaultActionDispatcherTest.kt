@@ -39,8 +39,9 @@ class DefaultActionDispatcherTest {
         val initState = TestState.genState()
         val baseState = spy(MutableStateFlow(initState))
         val actionDispatcher = DefaultActionDispatcher(
+            TestReduce(transition = null),
             baseState,
-            TestReduce(transition = null)
+            AccumulatorPool()
         )
 
         actionDispatcher.dispatch(TestAction.genAction())
@@ -54,26 +55,52 @@ class DefaultActionDispatcherTest {
         val expectedState = TestState.State2
         val baseState = MutableStateFlow<TestState>(initState)
         val actionDispatcher = DefaultActionDispatcher(
+            TestReduce(transition = TestTransitionNode { _, _ -> expectedState }),
             baseState,
-            TestReduce(transition = TestTransitionNode { _, _ -> expectedState })
+            AccumulatorPool()
         )
         actionDispatcher.dispatch(TestAction.genAction())
         assertThat(baseState.value, equalTo(expectedState))
     }
 
     @Test
-    fun `Given matching effect and transition, When action dispatched, Then effect works with initState`() = runTest {
+    fun `Given matching effect, When action dispatched, Then effect works with initState`() = runTest {
         val runnable: (TestState) -> Unit = mock()
         val initState = TestState.State1
-        val transitionState = TestState.State2
         val actionDispatcher = DefaultActionDispatcher(
-            MutableStateFlow(initState),
             TestReduce(
-                transition = TestTransitionNode { _, _ -> transitionState },
-                effect = TestEffectNode { _, current, _ -> runnable(current) }
-            )
+                effect = TestEffectSuspendNode { _, current, _ -> runnable(current) },
+            ),
+            MutableStateFlow(initState),
+            AccumulatorPool()
         )
         actionDispatcher.dispatch(TestAction.genAction())
+        verify(runnable, once()).invoke(initState)
+    }
+
+    @Test
+    fun `Given effects that can deliver action1 to action3 and action3 matching transition, When action dispatched, Then action3 effect works with changed state`() = runTest {
+        val runnable: (TestState) -> Unit = mock()
+        val initState = TestState.State1
+        val expectedState = TestState.State3
+        val actionDispatcher = DefaultActionDispatcher(
+            TestReduce(
+                transition = TestTransitionNode { action, current ->
+                    if (action == TestAction.Action3) expectedState
+                    else current
+                },
+                effect = TestEffectSuspendNode { action, current, actionDispatcher ->
+                    when (action) {
+                        is TestAction.Action1 -> actionDispatcher.dispatch(TestAction.Action3)
+                        is TestAction.Action2 -> Unit
+                        is TestAction.Action3 -> runnable(current)
+                    }
+                }
+            ),
+            MutableStateFlow(initState),
+            AccumulatorPool()
+        )
+        actionDispatcher.dispatch(TestAction.Action1)
         verify(runnable, once()).invoke(initState)
     }
 }

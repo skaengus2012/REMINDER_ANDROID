@@ -22,6 +22,8 @@ import com.nlab.statekit.TestState
 /**
  * @author Doohyun
  */
+typealias TestEffect = Effect<TestAction, TestState>
 typealias TestEffectNode = Effect.Node<TestAction, TestState>
+typealias TestEffectSuspendNode = Effect.SuspendNode<TestAction, TestState>
 typealias TestEffectLifecycleNode = Effect.LifecycleNode<TestAction, TestState>
 typealias TestEffectComposite = Effect.Composite<TestAction, TestState>

@@ -25,6 +25,10 @@ import kotlinx.coroutines.launch
  */
 sealed interface Effect<A : Any, S : Any> {
     fun interface Node<A : Any, S : Any> : Effect<A, S> {
+        fun invoke(action: A, current: S)
+    }
+
+    fun interface SuspendNode<A : Any, S : Any> : Effect<A, S> {
         suspend fun invoke(action: A, current: S, actionDispatcher: ActionDispatcher<A>)
     }
 
@@ -33,8 +37,8 @@ sealed interface Effect<A : Any, S : Any> {
             action: A,
             current: S,
             actionDispatcher: ActionDispatcher<A>,
+            accPool: AccumulatorPool,
             coroutineScope: CoroutineScope,
-            accumulatorPool: AccumulatorPool
         )
     }
 
@@ -55,7 +59,7 @@ fun <A : Any, S : Any> Effect<A, S>.launch(
     action: A,
     current: S,
     actionDispatcher: ActionDispatcher<A>,
-    accumulatorPool: AccumulatorPool,
+    accPool: AccumulatorPool,
     coroutineScope: CoroutineScope,
 ) {
     tailrec fun <A : Any, S : Any> launchInternal(
@@ -71,17 +75,22 @@ fun <A : Any, S : Any> Effect<A, S>.launch(
 
         val nextNode = when (node) {
             is Effect.Node -> {
+                node.invoke(action, current)
+                acc.removeLastOrNull()
+            }
+
+            is Effect.SuspendNode -> {
                 coroutineScope.launch { node.invoke(action, current, actionDispatcher) }
                 acc.removeLastOrNull()
             }
 
             is Effect.LifecycleNode -> {
-                node.invoke(action, current, actionDispatcher, coroutineScope, accPool)
+                node.invoke(action, current, actionDispatcher, accPool, coroutineScope)
                 acc.removeLastOrNull()
             }
 
             is Effect.Composite -> {
-                acc.apply { addAll(node.tails) }
+                acc.addAllReversed(node.tails)
                 node.head
             }
         }
@@ -96,14 +105,14 @@ fun <A : Any, S : Any> Effect<A, S>.launch(
         )
     }
 
-    accumulatorPool.use { acc ->
+    accPool.use { acc ->
         launchInternal(
             action,
             current,
             node = this,
             actionDispatcher,
             acc,
-            accumulatorPool,
+            accPool,
             coroutineScope,
         )
     }

@@ -64,12 +64,22 @@ class ReduceBuilderDelegateTest {
 
     @Test
     fun `Given effect builder and block, When add effect node, Then block added to effect builder`() {
-        val block: suspend (TestDslEffectScope) -> Unit = {}
+        val block: (TestDslEffectScope) -> Unit = {}
         val effectBuilder: DslEffectBuilder = mock()
         val delegate = ReduceBuilderDelegate(transitionBuilder = mock(), effectBuilder = effectBuilder)
 
         delegate.addEffectNode(block)
         verify(effectBuilder, once()).addNode(block)
+    }
+
+    @Test
+    fun `Given suspend effect builder and block, When add suspend effect node, Then block added to effect builder`() {
+        val block: suspend (TestDslSuspendEffectScope) -> Unit = {}
+        val effectBuilder: DslEffectBuilder = mock()
+        val delegate = ReduceBuilderDelegate(transitionBuilder = mock(), effectBuilder = effectBuilder)
+
+        delegate.addSuspendEffectNode(block)
+        verify(effectBuilder, once()).addSuspendNode(block)
     }
 
     @Test

@@ -3,6 +3,7 @@ package com.nlab.statekit.store
 import com.nlab.statekit.TestAction
 import com.nlab.statekit.TestState
 import com.nlab.statekit.bootstrap.Bootstrap
+import com.nlab.statekit.bootstrap.EmptyBootstrap
 import com.nlab.statekit.reduce.Reduce
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.test.TestScope
@@ -40,8 +41,8 @@ class DefaultStoreFactoryTest {
 private fun TestScope.createStoreFromDefaultStoreFactory(
     coroutineScope: CoroutineScope = this,
     initState: TestState = TestState.genState(),
-    reduce: Reduce<TestAction, TestState> = mock(),
-    bootstrap: Bootstrap<TestAction> = mock()
+    reduce: Reduce<TestAction, TestState> = Reduce(),
+    bootstrap: Bootstrap<TestAction> = EmptyBootstrap()
 ): Store<TestAction, TestState> = DefaultStoreFactory().createStore(
     coroutineScope,
     initState,

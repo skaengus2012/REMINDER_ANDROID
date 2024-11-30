@@ -17,6 +17,7 @@
 package com.nlab.statekit.store
 
 import com.nlab.statekit.bootstrap.Bootstrap
+import com.nlab.statekit.reduce.AccumulatorPool
 import com.nlab.statekit.reduce.DefaultActionDispatcher
 import com.nlab.statekit.reduce.Reduce
 import kotlinx.coroutines.CoroutineScope
@@ -27,6 +28,8 @@ import kotlinx.coroutines.flow.asStateFlow
  * @author Doohyun
  */
 internal class DefaultStoreFactory {
+    private val accPool = AccumulatorPool()
+
     fun <A : Any, S : Any> createStore(
         coroutineScope: CoroutineScope,
         initState: S,
@@ -34,7 +37,7 @@ internal class DefaultStoreFactory {
         bootstrap: Bootstrap<A>
     ): Store<A, S> {
         val baseState = MutableStateFlow(initState)
-        val actionDispatcher = DefaultActionDispatcher(baseState, reduce)
+        val actionDispatcher = DefaultActionDispatcher(reduce, baseState, accPool)
         return DefaultStore(
             baseState.asStateFlow(),
             coroutineScope,
