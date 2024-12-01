@@ -21,6 +21,7 @@ import com.nlab.reminder.core.component.usermessage.UserMessage
 import com.nlab.reminder.core.data.model.Tag
 import com.nlab.reminder.core.foundation.annotation.Generated
 import com.nlab.reminder.core.kotlin.NonNegativeLong
+import com.nlab.statekit.annotation.UiAction
 
 /**
  * @author Doohyun
@@ -60,7 +61,7 @@ internal sealed interface HomeAction {
     @Generated
     data object OnAllCategoryClicked : HomeAction
 
-    //   @ContractUiAction
+    @UiAction
     @Generated
     data class OnTagLongClicked(val tag: Tag) : HomeAction
 
@@ -88,7 +89,7 @@ internal sealed interface HomeAction {
     @Generated
     data object OnTagDeleteRequestClicked : HomeAction
 
-    // @ContractUiAction
+    @UiAction
     @Generated
     data object OnTagDeleteConfirmClicked : HomeAction
 }

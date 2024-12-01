@@ -24,18 +24,18 @@ import kotlinx.metadata.KmType
  * @author thalys
  */
 internal object CollectionTypeUtils {
-    private const val iterableTypeName = "kotlin/collections/Iterable"
-    private const val collectionTypeName = "kotlin/collections/Collection"
-    private const val listTypeName = "kotlin/collections/List"
-    private const val setTypeName = "kotlin/collections/Set"
-    private const val mapTypeName = "kotlin/collections/Map"
+    private const val ITERABLE_TYPE_NAME = "kotlin/collections/Iterable"
+    private const val COLLECTION_TYPE_NAME = "kotlin/collections/Collection"
+    private const val LIST_TYPE_NAME = "kotlin/collections/List"
+    private const val SET_TYPE_NAME = "kotlin/collections/Set"
+    private const val MAP_TYPE_NAME = "kotlin/collections/Map"
 
     private val supportedCollections = setOf(
-        iterableTypeName,
-        collectionTypeName,
-        listTypeName,
-        setTypeName,
-        mapTypeName
+        ITERABLE_TYPE_NAME,
+        COLLECTION_TYPE_NAME,
+        LIST_TYPE_NAME,
+        SET_TYPE_NAME,
+        MAP_TYPE_NAME
     )
 
     fun isSupportType(type: KmType): Boolean {
@@ -44,11 +44,11 @@ internal object CollectionTypeUtils {
 
     fun createCollectionTypeName(type: KmType, parameters: List<TypeName>): TypeName =
         when (type.toClassName()) {
-            collectionTypeName -> COLLECTION.parameterizedBy(parameters)
-            iterableTypeName -> ITERABLE.parameterizedBy(parameters)
-            listTypeName -> LIST.parameterizedBy(parameters)
-            setTypeName -> SET.parameterizedBy(parameters)
-            mapTypeName -> MAP.parameterizedBy(parameters)
+            COLLECTION_TYPE_NAME -> COLLECTION.parameterizedBy(parameters)
+            ITERABLE_TYPE_NAME -> ITERABLE.parameterizedBy(parameters)
+            LIST_TYPE_NAME -> LIST.parameterizedBy(parameters)
+            SET_TYPE_NAME -> SET.parameterizedBy(parameters)
+            MAP_TYPE_NAME -> MAP.parameterizedBy(parameters)
             else -> throw IllegalArgumentException("Unsupported collection type -> [${type}]")
         }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 The N's lab Open Source Project
+ * Copyright (C) 2024 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-package com.nlab.statekit.compiler
+package com.nlab.statekit.annotation
+
+import kotlin.reflect.KClass
 
 /**
- * @author Doohyun
+ * @author Thalys
  */
-internal data class Destination(
-    val packageMetadata: List<String>,
-    val clazzMetadata: List<String>
-) {
-    val packageInfo: String = packageMetadata.joinToString(".")
-    val filePath: String = packageMetadata.joinToString("/")
-    val fileName: String = "${clazzMetadata.last()}_GeneratedUiActions"
-}
+@Retention(AnnotationRetention.SOURCE)
+@Target(AnnotationTarget.CLASS)
+annotation class UiActionMapping(
+    vararg val actions: KClass<*>
+)
