@@ -16,7 +16,7 @@
 
 package com.nlab.reminder.domain.feature.home
 
-import com.nlab.reminder.core.component.tag.model.TagEditStep
+import com.nlab.reminder.core.component.tag.edit.TagEditStep
 
 /**
  * @author thalys

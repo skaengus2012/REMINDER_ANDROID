@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.component.tag.model
+package com.nlab.reminder.core.component.tag.edit
 
 import com.nlab.reminder.core.data.model.Tag
 import com.nlab.reminder.core.foundation.annotation.Generated
@@ -23,12 +23,15 @@ import com.nlab.reminder.core.kotlin.NonNegativeLong
 /**
  * @author Doohyun
  */
-sealed interface TagEditStep {
+sealed class TagEditStep private constructor() {
+    @Generated
+    data object Empty : TagEditStep()
+
     @Generated
     data class Intro(
         val tag: Tag,
         val usageCount: NonNegativeLong
-    ) : TagEditStep
+    ) : TagEditStep()
 
     @Generated
     data class Rename(
@@ -36,17 +39,17 @@ sealed interface TagEditStep {
         val usageCount: NonNegativeLong,
         val renameText: String,
         val shouldUserInputReady: Boolean
-    ) : TagEditStep
+    ) : TagEditStep()
 
     @Generated
     data class Merge(
         val from: Tag,
         val to: Tag
-    ) : TagEditStep
+    ) : TagEditStep()
 
     @Generated
     data class Delete(
         val tag: Tag,
         val usageCount: NonNegativeLong
-    ) : TagEditStep
+    ) : TagEditStep()
 }

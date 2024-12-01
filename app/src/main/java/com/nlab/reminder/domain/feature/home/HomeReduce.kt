@@ -16,8 +16,8 @@
 
 package com.nlab.reminder.domain.feature.home
 
-import com.nlab.reminder.core.component.tag.delegate.LazyTagEditResult
-import com.nlab.reminder.core.component.tag.model.TagEditStep
+import com.nlab.reminder.core.component.tag.edit.LazyTagEditResult
+import com.nlab.reminder.core.component.tag.edit.TagEditStep
 import com.nlab.reminder.core.kotlin.getOrElse
 import com.nlab.reminder.core.kotlin.map
 import com.nlab.reminder.core.translation.StringIds

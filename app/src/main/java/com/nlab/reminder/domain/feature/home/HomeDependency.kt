@@ -16,7 +16,7 @@
 
 package com.nlab.reminder.domain.feature.home
 
-import com.nlab.reminder.core.component.tag.delegate.TagEditDelegate
+import com.nlab.reminder.core.component.tag.edit.TagEditDelegate
 import javax.inject.Inject
 
 /**
