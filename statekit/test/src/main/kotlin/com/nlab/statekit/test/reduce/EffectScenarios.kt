@@ -18,7 +18,10 @@ package com.nlab.statekit.test.reduce
 
 import com.nlab.statekit.reduce.Effect
 import com.nlab.statekit.reduce.Reduce
-import com.nlab.statekit.store.createComponentStore
+import com.nlab.statekit.store.createStore
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.currentCoroutineContext
 
 /**
  * @author Doohyun
@@ -59,13 +62,18 @@ class EffectScenario<A : Any, S : Any> internal constructor(
         block(action)
     }
 
-    suspend fun execute() {
-        val store = createComponentStore(
+    fun launchIn(coroutineScope: CoroutineScope): Job {
+        val store = createStore(
+            coroutineScope = coroutineScope,
             initState = initState,
             reduce = Reduce(effect = reduce.effect?.let { baseEffect ->
                 additionalEffects.fold(baseEffect) { acc, effect -> Effect.Composite(effect, acc) }
             })
         )
-        store.dispatch(action)
+        return store.dispatch(action)
+    }
+
+    suspend fun launchAndJoin() {
+        launchIn(CoroutineScope(currentCoroutineContext())).join()
     }
 }

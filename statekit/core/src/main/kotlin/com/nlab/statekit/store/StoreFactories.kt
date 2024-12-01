@@ -28,7 +28,6 @@ import kotlinx.coroutines.CoroutineScope
  */
 private val accPool = AccumulatorPool()
 private val storeFactory = StoreFactory(accPool)
-private val componentStoreFactory = ComponentStoreFactory(accPool)
 
 fun <A : Any, S : Any> createStore(
     coroutineScope: CoroutineScope,
@@ -40,12 +39,4 @@ fun <A : Any, S : Any> createStore(
     initState,
     reduce,
     bootstrap
-)
-
-fun <A : Any, S : Any> createComponentStore(
-    initState: S,
-    reduce: Reduce<A, S>
-): ComponentStore<A, S> = componentStoreFactory.create(
-    initState,
-    reduce
 )
