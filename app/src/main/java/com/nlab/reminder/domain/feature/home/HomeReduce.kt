@@ -16,22 +16,21 @@
 
 package com.nlab.reminder.domain.feature.home
 
-import com.nlab.reminder.core.component.tag.edit.LazyTagEditResult
 import com.nlab.reminder.core.component.tag.edit.TagEditStep
-import com.nlab.reminder.core.kotlin.getOrElse
-import com.nlab.reminder.core.kotlin.map
 import com.nlab.reminder.core.translation.StringIds
 import com.nlab.reminder.core.component.usermessage.UserMessage
-import com.nlab.reminder.core.kotlinx.coroutine.flow.map
+import com.nlab.reminder.core.kotlin.onFailure
 import com.nlab.statekit.dsl.reduce.DslReduce
 import com.nlab.statekit.reduce.Reduce
 import com.nlab.reminder.domain.feature.home.HomeAction.*
 import com.nlab.reminder.domain.feature.home.HomeUiState.*
 
+internal typealias HomeReduce = Reduce<HomeAction, HomeUiState>
+
 /**
  * @author Doohyun
  */
-internal fun HomeReduce(dependency: HomeDependency): Reduce<HomeAction, HomeUiState> = DslReduce {
+internal fun HomeReduce(dependency: HomeDependency): HomeReduce = DslReduce {
     actionScope<StateSynced> {
         transition<Loading> {
             Success(
@@ -52,6 +51,24 @@ internal fun HomeReduce(dependency: HomeDependency): Reduce<HomeAction, HomeUiSt
             )
         }
     }
+    actionScope<TagEditStepSynced> {
+        transition<Success> {
+            if (current.interaction !is HomeInteraction.TagEdit) current
+            else current.copy(
+                interaction = when (action.step) {
+                    is TagEditStep.Empty -> HomeInteraction.Empty
+                    else -> HomeInteraction.TagEdit(action.step)
+                }
+            )
+        }
+        effect {
+            val isTagEditEmpty = action.step is TagEditStep.Empty
+            val isTagEditInteraction = (current as? Success)?.interaction is HomeInteraction.TagEdit
+            if (isTagEditEmpty.not() && isTagEditInteraction.not()) {
+                dependency.tagEditDelegate.clearStep()
+            }
+        }
+    }
     stateScope<Success> {
         scope(isMatch = { current.interaction == HomeInteraction.Empty }) {
             transition<OnTodayCategoryClicked> {
@@ -63,96 +80,35 @@ internal fun HomeReduce(dependency: HomeDependency): Reduce<HomeAction, HomeUiSt
             transition<OnAllCategoryClicked> {
                 current.copy(interaction = HomeInteraction.AllSchedule)
             }
-            effect<OnTagLongClicked> {
-                val nextAction = dependency.tagEditDelegate
+            suspendEffect<OnTagLongClicked> {
+                dependency.tagEditDelegate
                     .startEditing(tag = action.tag)
-                    .map { TagEditStarted(it) }
-                    .getOrElse { UserMessagePosted(UserMessage(StringIds.tag_not_found)) }
-                dispatch(nextAction)
-            }
-            transition<TagEditStarted> {
-                current.copy(interaction = HomeInteraction.TagEdit(action.intro))
-            }
-            transition<TagEditChangedLazily> {
-                current.copy(
-                    interaction = current.tagEditStep
-                        .let(action.toNextStepInteraction::invoke)
-                        ?.toTagEdit()
-                        ?: HomeInteraction.Empty
-                )
+                    .onFailure { dispatch(UserMessagePosted(UserMessage(StringIds.tag_not_found))) }
             }
         }
         scope(isMatch = { current.interaction is HomeInteraction.TagEdit }) {
-            transition<OnTagRenameRequestClicked> {
-                current.copy(
-                    interaction = dependency
-                        .tagEditDelegate
-                        .startRename(current.requireTagEditInteraction())
-                        .toTagEdit()
-                )
-            }
-            transition<OnTagRenameInputReady> {
-                current.copy(
-                    interaction = dependency
-                        .tagEditDelegate
-                        .readyRenameInput(current.requireTagEditInteraction())
-                        .toTagEdit()
-                )
-            }
-            transition<OnTagRenameInputted> {
-                current.copy(
-                    interaction = dependency
-                        .tagEditDelegate
-                        .changeRenameText(current.requireTagEditInteraction(), action.text)
-                        .toTagEdit()
-                )
-            }
-            effect<OnTagRenameConfirmClicked> {
+            effect<OnTagRenameRequestClicked> { dependency.tagEditDelegate.startRename() }
+            effect<OnTagRenameInputReady> { dependency.tagEditDelegate.readyRenameInput() }
+            effect<OnTagRenameInputted> { dependency.tagEditDelegate.changeRenameText(action.text) }
+            suspendEffect<OnTagRenameConfirmClicked> {
                 dependency.tagEditDelegate
-                    .tryUpdateTagName(current.requireTagEditInteraction(), loadedTagsSnapshot = current.tags)
-                    .map(LazyTagEditResult::toAction)
-                    .collect(this::dispatch)
+                    .tryUpdateTagName(current.tags)
+                    .onFailure { dispatch(UserMessagePosted(UserMessage(StringIds.unknown_error))) }
             }
-            effect<OnTagReplaceConfirmClicked> {
+            suspendEffect<OnTagReplaceConfirmClicked> {
                 dependency.tagEditDelegate
-                    .mergeTag(current.requireTagEditInteraction())
-                    .map(LazyTagEditResult::toAction)
-                    .collect(this::dispatch)
+                    .mergeTag()
+                    .onFailure { dispatch(UserMessagePosted(UserMessage(StringIds.unknown_error))) }
             }
-            transition<OnTagDeleteRequestClicked> {
-                current.copy(
-                    interaction = dependency
-                        .tagEditDelegate
-                        .startDelete(current.requireTagEditInteraction())
-                        .toTagEdit()
-                )
-            }
-            effect<OnTagDeleteConfirmClicked> {
+            effect<OnTagDeleteRequestClicked> { dependency.tagEditDelegate.startDelete() }
+            suspendEffect<OnTagDeleteConfirmClicked> {
                 dependency.tagEditDelegate
-                    .deleteTag(current.requireTagEditInteraction())
-                    .map(LazyTagEditResult::toAction)
-                    .collect(this::dispatch)
+                    .deleteTag()
+                    .onFailure { dispatch(UserMessagePosted(UserMessage(StringIds.unknown_error))) }
             }
         }
         transition<UserMessagePosted> { current.copy(userMessages = current.userMessages + action.message) }
         transition<UserMessageShown> { current.copy(userMessages = current.userMessages - action.message) }
         transition<Interacted> { current.copy(interaction = HomeInteraction.Empty) }
-    }
-}
-
-private val Success.tagEditStep: TagEditStep?
-    get() = (interaction as? HomeInteraction.TagEdit)?.tagEditStep
-
-private fun Success.requireTagEditInteraction(): TagEditStep = checkNotNull(tagEditStep)
-
-private fun TagEditStep.toTagEdit(): HomeInteraction.TagEdit =
-    HomeInteraction.TagEdit(this)
-
-private fun LazyTagEditResult.toAction(): HomeAction = when (this) {
-    is LazyTagEditResult.ToNextStep -> {
-        TagEditChangedLazily(toNextStepInteraction = this)
-    }
-    is LazyTagEditResult.UnknownError -> {
-        UserMessagePosted(UserMessage(StringIds.unknown_error))
     }
 }

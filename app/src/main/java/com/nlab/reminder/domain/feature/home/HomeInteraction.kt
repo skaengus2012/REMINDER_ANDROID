@@ -17,14 +17,24 @@
 package com.nlab.reminder.domain.feature.home
 
 import com.nlab.reminder.core.component.tag.edit.TagEditStep
+import com.nlab.reminder.core.foundation.annotation.Generated
 
 /**
  * @author thalys
  */
 internal sealed interface HomeInteraction {
+    @Generated
     data object Empty : HomeInteraction
+
+    @Generated
     data object TodaySchedule : HomeInteraction
+
+    @Generated
     data object TimetableSchedule : HomeInteraction
+
+    @Generated
     data object AllSchedule : HomeInteraction
+
+    @Generated
     data class TagEdit(val tagEditStep: TagEditStep) : HomeInteraction
 }

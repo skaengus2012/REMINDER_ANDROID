@@ -19,13 +19,16 @@ package com.nlab.reminder.domain.feature.home
 import com.nlab.reminder.core.data.model.Tag
 import com.nlab.reminder.core.kotlin.NonNegativeLong
 import com.nlab.reminder.core.component.usermessage.UserMessage
+import com.nlab.reminder.core.foundation.annotation.Generated
 
 /**
  * @author Doohyun
  */
 internal sealed interface HomeUiState {
+    @Generated
     data object Loading : HomeUiState
 
+    @Generated
     data class Success(
         val todayScheduleCount: NonNegativeLong,
         val timetableScheduleCount: NonNegativeLong,

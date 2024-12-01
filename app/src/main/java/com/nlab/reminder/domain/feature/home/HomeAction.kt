@@ -16,16 +16,17 @@
 
 package com.nlab.reminder.domain.feature.home
 
-import com.nlab.reminder.core.component.tag.edit.LazyTagEditResult
 import com.nlab.reminder.core.component.tag.edit.TagEditStep
 import com.nlab.reminder.core.component.usermessage.UserMessage
 import com.nlab.reminder.core.data.model.Tag
+import com.nlab.reminder.core.foundation.annotation.Generated
 import com.nlab.reminder.core.kotlin.NonNegativeLong
 
 /**
  * @author Doohyun
  */
 internal sealed interface HomeAction {
+    @Generated
     data class StateSynced(
         val todaySchedulesCount: NonNegativeLong,
         val timetableSchedulesCount: NonNegativeLong,
@@ -33,50 +34,61 @@ internal sealed interface HomeAction {
         val tags: List<Tag>,
     ) : HomeAction
 
+    @Generated
+    data class TagEditStepSynced(val step: TagEditStep) : HomeAction
+
+    @Generated
     data class UserMessagePosted(val message: UserMessage) : HomeAction
 
     //    @ContractUiAction
+    @Generated
     data class UserMessageShown(val message: UserMessage) : HomeAction
 
     //   @ContractUiAction
+    @Generated
     data object Interacted : HomeAction
 
     //  @ContractUiAction
+    @Generated
     data object OnTodayCategoryClicked : HomeAction
 
     //  @ContractUiAction
+    @Generated
     data object OnTimetableCategoryClicked : HomeAction
 
     //   @ContractUiAction
+    @Generated
     data object OnAllCategoryClicked : HomeAction
 
     //   @ContractUiAction
+    @Generated
     data class OnTagLongClicked(val tag: Tag) : HomeAction
 
-    data class TagEditStarted(val intro: TagEditStep.Intro) : HomeAction
-
-    data class TagEditChangedLazily(
-        val toNextStepInteraction: LazyTagEditResult.ToNextStep
-    ) : HomeAction
-
     //  @ContractUiAction
+    @Generated
     data object OnTagRenameRequestClicked : HomeAction
 
     // @ContractUiAction
+    @Generated
     data object OnTagRenameInputReady : HomeAction
 
     // @ContractUiAction
+    @Generated
     data class OnTagRenameInputted(val text: String) : HomeAction
 
     // @ContractUiAction
+    @Generated
     data object OnTagRenameConfirmClicked : HomeAction
 
     // @ContractUiAction
+    @Generated
     data object OnTagReplaceConfirmClicked : HomeAction
 
     // @ContractUiAction
+    @Generated
     data object OnTagDeleteRequestClicked : HomeAction
 
     // @ContractUiAction
+    @Generated
     data object OnTagDeleteConfirmClicked : HomeAction
 }
