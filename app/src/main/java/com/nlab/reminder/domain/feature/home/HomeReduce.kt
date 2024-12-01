@@ -30,7 +30,7 @@ internal typealias HomeReduce = Reduce<HomeAction, HomeUiState>
 /**
  * @author Doohyun
  */
-internal fun HomeReduce(dependency: HomeDependency): HomeReduce = DslReduce {
+internal fun HomeReduce(environment: HomeEnvironment): HomeReduce = DslReduce {
     actionScope<StateSynced> {
         transition<Loading> {
             Success(
@@ -65,7 +65,7 @@ internal fun HomeReduce(dependency: HomeDependency): HomeReduce = DslReduce {
             val isTagEditEmpty = action.step is TagEditStep.Empty
             val isTagEditInteraction = (current as? Success)?.interaction is HomeInteraction.TagEdit
             if (isTagEditEmpty.not() && isTagEditInteraction.not()) {
-                dependency.tagEditDelegate.clearStep()
+                environment.tagEditDelegate.clearStep()
             }
         }
     }
@@ -81,28 +81,28 @@ internal fun HomeReduce(dependency: HomeDependency): HomeReduce = DslReduce {
                 current.copy(interaction = HomeInteraction.AllSchedule)
             }
             suspendEffect<OnTagLongClicked> {
-                dependency.tagEditDelegate
+                environment.tagEditDelegate
                     .startEditing(tag = action.tag)
                     .onFailure { dispatch(UserMessagePosted(UserMessage(StringIds.tag_not_found))) }
             }
         }
         scope(isMatch = { current.interaction is HomeInteraction.TagEdit }) {
-            effect<OnTagRenameRequestClicked> { dependency.tagEditDelegate.startRename() }
-            effect<OnTagRenameInputReady> { dependency.tagEditDelegate.readyRenameInput() }
-            effect<OnTagRenameInputted> { dependency.tagEditDelegate.changeRenameText(action.text) }
+            effect<OnTagRenameRequestClicked> { environment.tagEditDelegate.startRename() }
+            effect<OnTagRenameInputReady> { environment.tagEditDelegate.readyRenameInput() }
+            effect<OnTagRenameInputted> { environment.tagEditDelegate.changeRenameText(action.text) }
             suspendEffect<OnTagRenameConfirmClicked> {
-                dependency.tagEditDelegate
+                environment.tagEditDelegate
                     .tryUpdateTagName(current.tags)
                     .onFailure { dispatch(UserMessagePosted(UserMessage(StringIds.unknown_error))) }
             }
             suspendEffect<OnTagReplaceConfirmClicked> {
-                dependency.tagEditDelegate
+                environment.tagEditDelegate
                     .mergeTag()
                     .onFailure { dispatch(UserMessagePosted(UserMessage(StringIds.unknown_error))) }
             }
-            effect<OnTagDeleteRequestClicked> { dependency.tagEditDelegate.startDelete() }
+            effect<OnTagDeleteRequestClicked> { environment.tagEditDelegate.startDelete() }
             suspendEffect<OnTagDeleteConfirmClicked> {
-                dependency.tagEditDelegate
+                environment.tagEditDelegate
                     .deleteTag()
                     .onFailure { dispatch(UserMessagePosted(UserMessage(StringIds.unknown_error))) }
             }

@@ -22,6 +22,6 @@ import javax.inject.Inject
 /**
  * @author Thalys
  */
-internal class HomeDependency @Inject constructor(
+internal class HomeEnvironment @Inject constructor(
     val tagEditDelegate: TagEditDelegate
 )
