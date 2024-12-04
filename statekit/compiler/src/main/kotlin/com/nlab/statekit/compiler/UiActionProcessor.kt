@@ -18,10 +18,12 @@ package com.nlab.statekit.compiler
 
 import com.nlab.statekit.annotation.UiAction
 import com.nlab.statekit.annotation.UiActionMapping
+import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import javax.annotation.processing.AbstractProcessor
+import javax.annotation.processing.Generated
 import javax.annotation.processing.RoundEnvironment
 import javax.annotation.processing.SupportedAnnotationTypes
 import javax.annotation.processing.SupportedOptions
@@ -115,7 +117,15 @@ class UiActionProcessor : AbstractProcessor() {
 
     private fun putUiActionElement(elements: List<TypeElement>) {
         elements.forEach { element ->
-            val lazyFuncSpec = lazy(LazyThreadSafetyMode.NONE) { generateFuncSpecBuilder(element).getOrThrow() }
+            val lazyFuncSpec = lazy(LazyThreadSafetyMode.NONE) {
+                generateFuncSpecBuilder(element)
+                    .getOrThrow()
+                    .addAnnotation(
+                        AnnotationSpec.builder(Generated::class)
+                            .addMember("value = [%S]", "com.nlab.statekit.compiler.UiActionProcessor")
+                            .build()
+                    )
+            }
             element.parseNestedClassExcludeChildNames().forEach { className ->
                 val funcSpecs = actionToFuncSpecsTable.getOrPut(className) { mutableListOf() }
                 funcSpecs += lazyFuncSpec
