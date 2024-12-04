@@ -22,31 +22,31 @@ import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.TypeName
-import com.squareup.kotlinpoet.metadata.KotlinPoetMetadataPreview
-import com.squareup.kotlinpoet.metadata.toKmClass
-import kotlinx.metadata.ClassKind
-import kotlinx.metadata.KmType
-import kotlinx.metadata.KmValueParameter
-import kotlinx.metadata.kind
 import javax.lang.model.element.Element
+import kotlin.metadata.ClassKind
+import kotlin.metadata.KmType
+import kotlin.metadata.KmValueParameter
+import kotlin.metadata.jvm.KotlinClassMetadata
+import kotlin.metadata.kind
 
 /**
  * @author Doohyun
  */
-@OptIn(KotlinPoetMetadataPreview::class)
 internal fun generateFuncSpecBuilder(element: Element): Result<FunSpec.Builder> = runCatching {
-    val metadata = element.getAnnotation(Metadata::class.java).toKmClass()
-    val constructors = metadata.constructors
+    val clazzMetadata =
+        (KotlinClassMetadata.readStrict(element.getAnnotation(Metadata::class.java)) as KotlinClassMetadata.Class)
+            .kmClass
+    val constructors = clazzMetadata.constructors
     require(constructors.size == 1) {
         """There are invalid constructor annotated clazz.
-           Clazz should be have only one constructor. -> [${metadata.name}]
+           Clazz should be have only one constructor. -> [${clazzMetadata.name}]
         """.trimMargin()
     }
 
     val valueParameters = constructors.first().valueParameters
     val statementBuilder: StringBuilder =
-        StringBuilder(metadata.name.replace("/", "."))
-    if (metadata.kind != ClassKind.OBJECT) {
+        StringBuilder(clazzMetadata.name.replace("/", "."))
+    if (clazzMetadata.kind != ClassKind.OBJECT) {
         statementBuilder.append("(")
         valueParameters.forEachIndexed { index, parameter ->
             statementBuilder.append(
