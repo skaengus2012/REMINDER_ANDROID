@@ -17,6 +17,7 @@
 package com.nlab.statekit.compiler
 
 import com.nlab.statekit.annotation.UiAction
+import com.nlab.statekit.annotation.internal.StateKitGenerated
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
@@ -60,6 +61,7 @@ internal fun generateFuncSpecBuilder(element: Element): Result<FunSpec.Builder> 
             val str = name.toString()
             "${str[0].lowercaseChar()}${str.substring(1, str.length)}"
         })
+        .addAnnotation(StateKitGenerated::class)
         .addStatement("return dispatch($statementBuilder)")
         .returns(ClassName("kotlinx.coroutines", "Job"))
 

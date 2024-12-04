@@ -41,23 +41,23 @@ internal sealed interface HomeAction {
     @Generated
     data class UserMessagePosted(val message: UserMessage) : HomeAction
 
-    //    @ContractUiAction
+    @UiAction
     @Generated
     data class UserMessageShown(val message: UserMessage) : HomeAction
 
-    //   @ContractUiAction
+    @UiAction
     @Generated
     data object Interacted : HomeAction
 
-    //  @ContractUiAction
+    @UiAction
     @Generated
     data object OnTodayCategoryClicked : HomeAction
 
-    //  @ContractUiAction
+    @UiAction
     @Generated
     data object OnTimetableCategoryClicked : HomeAction
 
-    //   @ContractUiAction
+    @UiAction
     @Generated
     data object OnAllCategoryClicked : HomeAction
 
@@ -65,27 +65,27 @@ internal sealed interface HomeAction {
     @Generated
     data class OnTagLongClicked(val tag: Tag) : HomeAction
 
-    //  @ContractUiAction
+    @UiAction
     @Generated
     data object OnTagRenameRequestClicked : HomeAction
 
-    // @ContractUiAction
+    @UiAction
     @Generated
     data object OnTagRenameInputReady : HomeAction
 
-    // @ContractUiAction
+    @UiAction
     @Generated
     data class OnTagRenameInputted(val text: String) : HomeAction
 
-    // @ContractUiAction
+    @UiAction
     @Generated
     data object OnTagRenameConfirmClicked : HomeAction
 
-    // @ContractUiAction
+    @UiAction
     @Generated
     data object OnTagReplaceConfirmClicked : HomeAction
 
-    // @ContractUiAction
+    @UiAction
     @Generated
     data object OnTagDeleteRequestClicked : HomeAction
 
