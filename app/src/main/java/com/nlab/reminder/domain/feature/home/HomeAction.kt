@@ -21,6 +21,7 @@ import com.nlab.reminder.core.component.usermessage.UserMessage
 import com.nlab.reminder.core.data.model.Tag
 import com.nlab.reminder.core.foundation.annotation.Generated
 import com.nlab.reminder.core.kotlin.NonNegativeLong
+import com.nlab.statekit.annotation.UiAction
 
 /**
  * @author Doohyun
@@ -40,55 +41,55 @@ internal sealed interface HomeAction {
     @Generated
     data class UserMessagePosted(val message: UserMessage) : HomeAction
 
-    //    @ContractUiAction
+    @UiAction
     @Generated
     data class UserMessageShown(val message: UserMessage) : HomeAction
 
-    //   @ContractUiAction
+    @UiAction
     @Generated
     data object Interacted : HomeAction
 
-    //  @ContractUiAction
+    @UiAction
     @Generated
     data object OnTodayCategoryClicked : HomeAction
 
-    //  @ContractUiAction
+    @UiAction
     @Generated
     data object OnTimetableCategoryClicked : HomeAction
 
-    //   @ContractUiAction
+    @UiAction
     @Generated
     data object OnAllCategoryClicked : HomeAction
 
-    //   @ContractUiAction
+    @UiAction
     @Generated
     data class OnTagLongClicked(val tag: Tag) : HomeAction
 
-    //  @ContractUiAction
+    @UiAction
     @Generated
     data object OnTagRenameRequestClicked : HomeAction
 
-    // @ContractUiAction
+    @UiAction
     @Generated
     data object OnTagRenameInputReady : HomeAction
 
-    // @ContractUiAction
+    @UiAction
     @Generated
     data class OnTagRenameInputted(val text: String) : HomeAction
 
-    // @ContractUiAction
+    @UiAction
     @Generated
     data object OnTagRenameConfirmClicked : HomeAction
 
-    // @ContractUiAction
+    @UiAction
     @Generated
     data object OnTagReplaceConfirmClicked : HomeAction
 
-    // @ContractUiAction
+    @UiAction
     @Generated
     data object OnTagDeleteRequestClicked : HomeAction
 
-    // @ContractUiAction
+    @UiAction
     @Generated
     data object OnTagDeleteConfirmClicked : HomeAction
 }

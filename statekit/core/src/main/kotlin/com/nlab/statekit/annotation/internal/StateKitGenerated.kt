@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 The N's lab Open Source Project
+ * Copyright (C) 2024 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-plugins {
-    alias(libs.plugins.nlab.jvm.library)
-}
+package com.nlab.statekit.annotation.internal
 
-dependencies {
-    implementation(projects.statekit.core)
-
-    implementation(libs.squeare.kotlinpoet)
-    implementation(libs.squeare.kotlinpoet.metadata)
-}
+/**
+ * Each created extension function is annotated by the UiAction annotation.
+ *
+ * @author Thalys
+ */
+@MustBeDocumented
+@Retention(AnnotationRetention.BINARY)
+@Target(AnnotationTarget.FUNCTION)
+annotation class StateKitGenerated

@@ -16,8 +16,8 @@
 
 package com.nlab.statekit.compiler
 
-import com.nlab.statekit.lifecycle.UiAction
-import com.nlab.statekit.lifecycle.viewmodel.ContractUiAction
+import com.nlab.statekit.annotation.UiAction
+import com.nlab.statekit.annotation.internal.StateKitGenerated
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
@@ -61,12 +61,14 @@ internal fun generateFuncSpecBuilder(element: Element): Result<FunSpec.Builder> 
             val str = name.toString()
             "${str[0].lowercaseChar()}${str.substring(1, str.length)}"
         })
+        .addAnnotation(StateKitGenerated::class)
         .addStatement("return dispatch($statementBuilder)")
         .returns(ClassName("kotlinx.coroutines", "Job"))
 
     constructors.first().valueParameters.map { parameter ->
-        funcSpecBuilder.addParameter(parameter.name,
-            convertTypeName(parameter)
+        funcSpecBuilder.addParameter(
+            name = parameter.name,
+            type = convertTypeName(parameter)
         )
     }
 
@@ -100,7 +102,7 @@ private tailrec fun setParameterRelations(
         emptyList()
     } else {
         check(CollectionTypeUtils.isSupportType(curType)) {
-            "Unsupported collection type -> ${curType.toTypeName()}"
+            "Unsupported type -> ${curType.toTypeName()}"
         }
         curArguments.map { argument ->
             checkNotNull(argument.type) { "star protection not supported." }
@@ -156,6 +158,5 @@ private tailrec fun registerTypeName(
 private fun Element.isPublicFunction(): Boolean {
     return getAnnotation(UiAction::class.java)
         ?.isPublic
-        ?: getAnnotation(ContractUiAction::class.java)?.isPublic
         ?: throw IllegalArgumentException("Cannot recognize any actions annotation")
 }
