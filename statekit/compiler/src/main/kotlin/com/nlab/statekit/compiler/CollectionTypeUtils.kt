@@ -18,7 +18,7 @@ package com.nlab.statekit.compiler
 
 import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
-import kotlinx.metadata.KmType
+import kotlin.metadata.KmType
 
 /**
  * @author thalys

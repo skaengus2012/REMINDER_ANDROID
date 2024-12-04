@@ -18,8 +18,8 @@ package com.nlab.statekit.compiler
 
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.TypeName
-import kotlinx.metadata.KmClassifier
-import kotlinx.metadata.KmType
+import kotlin.metadata.KmClassifier
+import kotlin.metadata.KmType
 
 /**
  * @author thalys
