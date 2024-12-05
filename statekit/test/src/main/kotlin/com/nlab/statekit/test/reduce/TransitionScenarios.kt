@@ -26,60 +26,52 @@ import org.hamcrest.MatcherAssert.assertThat
 /**
  * @author Doohyun
  */
-class TransitionScenarioActionSetup<A : Any, S : Any> internal constructor(
-    reduce: Reduce<A, S>,
-    shouldTestWithEffect: Boolean
+class TransitionScenarioInitSetup<A : Any, S : Any> internal constructor(
+    private val reduce: Reduce<A, S>,
 ) {
-    private val reduce: Reduce<A, S> =
-        if (shouldTestWithEffect) reduce
-        else Reduce(transition = reduce.transition)
-
-    fun action(action: A) = TransitionScenarioCurrentSetup(reduce, action)
+    fun <T : S> initState(state: T) = TransitionScenarioActionSetup(reduce, state)
 }
 
-class TransitionScenarioCurrentSetup<A : Any, S : Any> internal constructor(
+class TransitionScenarioActionSetup<A : Any, S : Any, IS : S> internal constructor(
     private val reduce: Reduce<A, S>,
-    private val action: A
+    private val initState: IS
 ) {
-    fun current(current: S) = TransitionScenarioExpectedStateSetup(reduce, action, current)
+    fun <T : A> action(action: T) = TransitionScenarioExpectedStateSetup(reduce, initState, action)
 }
 
-class TransitionScenarioExpectedStateSetup<A : Any, S : Any> internal constructor(
+class TransitionScenarioExpectedStateSetup<A : Any, S : Any, IA : A, IS : S> internal constructor(
     private val reduce: Reduce<A, S>,
-    private val action: A,
-    private val current: S,
+    private val initState: IS,
+    private val action: IA,
 ) {
-    fun expectedStateFromInit(transformInitToExpectedState: (S) -> S) = TransitionScenario(
+    fun expectedStateFromInput(block: ScenarioInput<IA, IS>.() -> S) = TransitionScenario(
         reduce,
-        action,
-        current,
-        transformInitToExpectedState
+        ScenarioInput(action, initState),
+        block
     )
-
-    inline fun <reified T : S> expectedStateFromInitTypeOf(
-        crossinline transformInitToExpectedState: (T) -> S
-    ) = expectedStateFromInit { transformInitToExpectedState(it as T) }
 }
 
-fun <A : Any, S : Any> TransitionScenarioExpectedStateSetup<A, S>.expectedState(state: S) =
-    expectedStateFromInit { state }
-
-fun <A : Any, S : Any> TransitionScenarioExpectedStateSetup<A, S>.expectedStateToInit() =
-    expectedStateFromInit { it }
-
-class TransitionScenario<A : Any, S : Any> internal constructor(
+class TransitionScenario<A : Any, S : Any, IA : A, IS : S> internal constructor(
     private val reduce: Reduce<A, S>,
-    private val action: A,
-    private val current: S,
-    private val transformInitToExpectedState: (S) -> S,
+    private val input: ScenarioInput<IA, IS>,
+    private val transformInitToExpectedState: ScenarioInput<IA, IS>.() -> S,
 ) {
-    suspend fun verify() {
+    suspend fun verify(shouldVerifyWithEffect: Boolean = false) {
         val store = createStore(
             coroutineScope = CoroutineScope(currentCoroutineContext()),
-            initState = current,
-            reduce = reduce
+            initState = input.initState,
+            reduce = if (shouldVerifyWithEffect) reduce else Reduce(transition = reduce.transition)
         )
-        store.dispatch(action).join()
-        assertThat(store.state.value, equalTo(transformInitToExpectedState(current)))
+        store.dispatch(input.action).join()
+        assertThat(
+            store.state.value,
+            equalTo(transformInitToExpectedState(input))
+        )
     }
 }
+
+fun <A : Any, S : Any> TransitionScenarioExpectedStateSetup<A, S, *, *>.expectedState(state: S) =
+    expectedStateFromInput { state }
+
+fun <A : Any, S : Any, IS : S> TransitionScenarioExpectedStateSetup<A, S, *, IS>.expectedStateToInit() =
+    expectedStateFromInput { initState }

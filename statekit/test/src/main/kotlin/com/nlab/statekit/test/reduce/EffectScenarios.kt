@@ -26,54 +26,46 @@ import kotlinx.coroutines.currentCoroutineContext
 /**
  * @author Doohyun
  */
-class EffectScenarioActionSetup<A : Any, S : Any> internal constructor(
-    reduce: Reduce<A, S>,
-    shouldTestWithTransition: Boolean
+class EffectScenarioInitSetup<A : Any, S : Any> internal constructor(
+    private val reduce: Reduce<A, S>
 ) {
-    private val reduce: Reduce<A, S> =
-        if (shouldTestWithTransition) reduce
-        else Reduce(effect = reduce.effect)
-
-    fun action(action: A) = EffectScenarioCurrentSetup(reduce, action)
+    fun <T : S> initState(state: T) = EffectScenarioActionSetup(reduce, state)
 }
 
-class EffectScenarioCurrentSetup<A : Any, S : Any> internal constructor(
+class EffectScenarioActionSetup<A : Any, S : Any, IS : S> internal constructor(
     private val reduce: Reduce<A, S>,
-    private val action: A
+    private val initState: IS
 ) {
-    fun current(current: S) = EffectScenario(reduce, action, current, emptyList())
+    fun <T : A> action(action: T) = EffectScenario(reduce, ScenarioInput(action, initState), emptyList())
 }
 
-class EffectScenario<A : Any, S : Any> internal constructor(
+class EffectScenario<A : Any, S : Any, IA : A, IS : S> internal constructor(
     private val reduce: Reduce<A, S>,
-    private val action: A,
-    private val initState: S,
+    private val input: ScenarioInput<IA, IS>,
     private val additionalEffects: List<Effect<A, S>>
 ) {
-    fun hook(block: suspend (A) -> Unit) = EffectScenario(
+    fun hook(block: suspend ScenarioInput<IA, IS>.() -> Unit) = EffectScenario(
         reduce,
-        action,
-        initState,
-        additionalEffects = additionalEffects + Effect.SuspendNode { action, _, _ -> block(action) }
+        input,
+        additionalEffects = additionalEffects + Effect.SuspendNode { _, _, _ -> block(input) }
     )
 
-    inline fun <reified T : A> hookIf(crossinline block: suspend (T) -> Unit) = hook { action ->
-        if (action !is T) return@hook
-        block(action)
-    }
-
-    fun launchIn(coroutineScope: CoroutineScope): Job {
+    fun launchIn(
+        coroutineScope: CoroutineScope,
+        shouldLaunchWithTransition: Boolean = false
+    ): Job {
+        val reduce = if (shouldLaunchWithTransition) reduce else Reduce(effect = reduce.effect)
         val store = createStore(
             coroutineScope = coroutineScope,
-            initState = initState,
+            initState = input.initState,
             reduce = Reduce(effect = reduce.effect?.let { baseEffect ->
                 additionalEffects.fold(baseEffect) { acc, effect -> Effect.Composite(effect, acc) }
             })
         )
-        return store.dispatch(action)
+        return store.dispatch(input.action)
     }
 
-    suspend fun launchAndJoin() {
-        launchIn(CoroutineScope(currentCoroutineContext())).join()
+    suspend fun launchAndJoin(shouldLaunchWithTransition: Boolean = false) {
+        launchIn(CoroutineScope(currentCoroutineContext()), shouldLaunchWithTransition).join()
     }
 }
