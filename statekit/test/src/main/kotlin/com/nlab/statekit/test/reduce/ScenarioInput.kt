@@ -16,11 +16,10 @@
 
 package com.nlab.statekit.test.reduce
 
-import com.nlab.statekit.reduce.Reduce
-
 /**
  * @author Doohyun
  */
-fun <A : Any, S : Any> Reduce<A, S>.transitionScenario() = TransitionScenarioInitSetup(this)
-
-fun <A : Any, S : Any> Reduce<A, S>.effectScenario() = EffectScenarioInitSetup(this)
+class ScenarioInput<A : Any, S : Any> internal constructor(
+    val action: A,
+    val initState: S
+)
