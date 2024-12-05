@@ -18,7 +18,7 @@ package com.nlab.reminder.domain.feature.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nlab.reminder.core.foundation.annotation.Generated
+import com.nlab.reminder.core.foundation.annotation.ExcludeFromGeneratedTestReport
 import com.nlab.statekit.annotation.UiActionMapping
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -28,7 +28,7 @@ import javax.inject.Inject
 /**
  * @author Doohyun
  */
-@Generated
+@ExcludeFromGeneratedTestReport
 @UiActionMapping(HomeAction::class)
 @HiltViewModel
 internal class HomeViewModel @Inject constructor(

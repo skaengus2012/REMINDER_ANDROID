@@ -17,7 +17,7 @@
 package com.nlab.reminder.core.data.repository.impl
 
 import com.nlab.reminder.core.data.model.Schedule
-import com.nlab.reminder.core.foundation.annotation.Generated
+import com.nlab.reminder.core.foundation.annotation.ExcludeFromGeneratedTestReport
 import com.nlab.reminder.core.data.model.toLocalDTO
 import com.nlab.reminder.core.kotlinx.coroutine.flow.map
 import com.nlab.reminder.core.kotlin.Result
@@ -97,7 +97,7 @@ class LocalScheduleRepository(
         }
     }
 
-    @Generated
+    @ExcludeFromGeneratedTestReport
     override fun getScheduleCountAsStream(query: GetScheduleCountQuery): Flow<NonNegativeLong> {
         val rawCountFlow = when (query) {
             is GetScheduleCountQuery.Today -> FakeScheduleRepositoryDelegate.getTodaySchedulesCount()

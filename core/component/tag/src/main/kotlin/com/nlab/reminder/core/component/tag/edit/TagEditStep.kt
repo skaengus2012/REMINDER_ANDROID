@@ -17,23 +17,23 @@
 package com.nlab.reminder.core.component.tag.edit
 
 import com.nlab.reminder.core.data.model.Tag
-import com.nlab.reminder.core.foundation.annotation.Generated
+import com.nlab.reminder.core.foundation.annotation.ExcludeFromGeneratedTestReport
 import com.nlab.reminder.core.kotlin.NonNegativeLong
 
 /**
  * @author Doohyun
  */
 sealed class TagEditStep private constructor() {
-    @Generated
+    @ExcludeFromGeneratedTestReport
     data object Empty : TagEditStep()
 
-    @Generated
+    @ExcludeFromGeneratedTestReport
     data class Intro(
         val tag: Tag,
         val usageCount: NonNegativeLong
     ) : TagEditStep()
 
-    @Generated
+    @ExcludeFromGeneratedTestReport
     data class Rename(
         val tag: Tag,
         val usageCount: NonNegativeLong,
@@ -41,13 +41,13 @@ sealed class TagEditStep private constructor() {
         val shouldUserInputReady: Boolean
     ) : TagEditStep()
 
-    @Generated
+    @ExcludeFromGeneratedTestReport
     data class Merge(
         val from: Tag,
         val to: Tag
     ) : TagEditStep()
 
-    @Generated
+    @ExcludeFromGeneratedTestReport
     data class Delete(
         val tag: Tag,
         val usageCount: NonNegativeLong

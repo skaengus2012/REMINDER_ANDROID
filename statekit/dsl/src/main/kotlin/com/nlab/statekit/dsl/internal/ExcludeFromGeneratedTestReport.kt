@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.statekit.internal
+package com.nlab.statekit.dsl.internal
 
 /**
  * Classes and methods annotated with annotation whose retention policy is runtime or class and
@@ -30,4 +30,4 @@ package com.nlab.statekit.internal
     AnnotationTarget.FUNCTION,
     AnnotationTarget.CONSTRUCTOR
 )
-internal annotation class Generated
+internal annotation class ExcludeFromGeneratedTestReport

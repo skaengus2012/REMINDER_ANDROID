@@ -23,7 +23,7 @@ package com.nlab.statekit.internal
 // Test OK @see {com.nlab.statekit.internal.MergeHelpersKtTest}
 // TODO remove Generated annotation after deploy below issue
 // https://github.com/jacoco/jacoco/pull/1670
-@Generated
+@ExcludeFromGeneratedTestReport
 internal inline fun <T : Any> List<T>.merge(
     onMerge: (head: T, tails: List<T>) -> T,
 ): T? =  when (size) {

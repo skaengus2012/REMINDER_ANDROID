@@ -32,4 +32,4 @@ package com.nlab.reminder.core.foundation.annotation
     AnnotationTarget.PROPERTY_GETTER,
     AnnotationTarget.PROPERTY_SETTER
 )
-annotation class Generated
+annotation class ExcludeFromGeneratedTestReport

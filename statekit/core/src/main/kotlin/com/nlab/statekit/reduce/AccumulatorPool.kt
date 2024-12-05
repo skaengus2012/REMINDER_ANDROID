@@ -16,7 +16,7 @@
 
 package com.nlab.statekit.reduce
 
-import com.nlab.statekit.internal.Generated
+import com.nlab.statekit.internal.ExcludeFromGeneratedTestReport
 
 /**
  * @author Doohyun
@@ -60,7 +60,7 @@ private class ThreadLocalsAccumulatorPoolProxy : AccumulatorPool {
 // Test OK @see {com.nlab.statekit.reduce.AccumulatorPoolKtTest}
 // TODO remove Generated annotation after deploy below issue
 // https://github.com/jacoco/jacoco/pull/1670
-@Generated
+@ExcludeFromGeneratedTestReport
 inline fun <T : Any, R> AccumulatorPool.use(block: (Accumulator<T>) -> R): R {
     val acc = request<T>()
     val ret = block.invoke(acc)
