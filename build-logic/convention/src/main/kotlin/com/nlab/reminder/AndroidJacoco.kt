@@ -83,8 +83,16 @@ private fun Project.androidJacocoClassDirectories(variant: Variant): Configurabl
                 "**/test/**",
                 "**/di/**",
                 "**/fake/**",
-                "**/*Args*.*",                      /* filtering Navigation Component generated classes */
-                "**/*Directions*.*"                 /* filtering Navigation Component generated classes */
+
+                /* filtering unnecessary feature components */
+                "**/*Action$*.class",
+                "**/*UiState$*.class",
+                "**/*Interaction$*.class",
+                "**/*Environment$*.class",
+
+                /* filtering Navigation Component generated classes */
+                "**/*Args*.*",
+                "**/*Directions*.*",
             )
         )
     }

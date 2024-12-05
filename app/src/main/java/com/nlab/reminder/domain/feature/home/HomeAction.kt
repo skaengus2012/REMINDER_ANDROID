@@ -19,77 +19,60 @@ package com.nlab.reminder.domain.feature.home
 import com.nlab.reminder.core.component.tag.edit.TagEditStep
 import com.nlab.reminder.core.component.usermessage.UserMessage
 import com.nlab.reminder.core.data.model.Tag
-import com.nlab.reminder.core.foundation.annotation.Generated
 import com.nlab.reminder.core.kotlin.NonNegativeLong
 import com.nlab.statekit.annotation.UiAction
 
 /**
  * @author Doohyun
  */
-internal sealed interface HomeAction {
-    @Generated
+internal sealed class HomeAction private constructor() {
     data class StateSynced(
         val todaySchedulesCount: NonNegativeLong,
         val timetableSchedulesCount: NonNegativeLong,
         val allSchedulesCount: NonNegativeLong,
         val tags: List<Tag>,
-    ) : HomeAction
+    ) : HomeAction()
 
-    @Generated
-    data class TagEditStepSynced(val step: TagEditStep) : HomeAction
+    data class TagEditStepSynced(val step: TagEditStep) : HomeAction()
 
-    @Generated
-    data class UserMessagePosted(val message: UserMessage) : HomeAction
+    data class UserMessagePosted(val message: UserMessage) : HomeAction()
 
     @UiAction
-    @Generated
-    data class UserMessageShown(val message: UserMessage) : HomeAction
+    data class UserMessageShown(val message: UserMessage) : HomeAction()
 
     @UiAction
-    @Generated
-    data object Interacted : HomeAction
+    data object Interacted : HomeAction()
 
     @UiAction
-    @Generated
-    data object OnTodayCategoryClicked : HomeAction
+    data object OnTodayCategoryClicked : HomeAction()
 
     @UiAction
-    @Generated
-    data object OnTimetableCategoryClicked : HomeAction
+    data object OnTimetableCategoryClicked : HomeAction()
 
     @UiAction
-    @Generated
-    data object OnAllCategoryClicked : HomeAction
+    data object OnAllCategoryClicked : HomeAction()
 
     @UiAction
-    @Generated
-    data class OnTagLongClicked(val tag: Tag) : HomeAction
+    data class OnTagLongClicked(val tag: Tag) : HomeAction()
 
     @UiAction
-    @Generated
-    data object OnTagRenameRequestClicked : HomeAction
+    data object OnTagRenameRequestClicked : HomeAction()
 
     @UiAction
-    @Generated
-    data object OnTagRenameInputReady : HomeAction
+    data object OnTagRenameInputReady : HomeAction()
 
     @UiAction
-    @Generated
-    data class OnTagRenameInputted(val text: String) : HomeAction
+    data class OnTagRenameInputted(val text: String) : HomeAction()
 
     @UiAction
-    @Generated
-    data object OnTagRenameConfirmClicked : HomeAction
+    data object OnTagRenameConfirmClicked : HomeAction()
 
     @UiAction
-    @Generated
-    data object OnTagReplaceConfirmClicked : HomeAction
+    data object OnTagReplaceConfirmClicked : HomeAction()
 
     @UiAction
-    @Generated
-    data object OnTagDeleteRequestClicked : HomeAction
+    data object OnTagDeleteRequestClicked : HomeAction()
 
     @UiAction
-    @Generated
-    data object OnTagDeleteConfirmClicked : HomeAction
+    data object OnTagDeleteConfirmClicked : HomeAction()
 }
