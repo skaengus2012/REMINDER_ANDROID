@@ -16,13 +16,12 @@
 
 package com.nlab.reminder.domain.feature.home
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.nlab.reminder.core.foundation.annotation.ExcludeFromGeneratedTestReport
+import com.nlab.reminder.core.statekit.store.androidx.lifecycle.StoreViewModel
+import com.nlab.reminder.core.statekit.store.androidx.lifecycle.createStore
 import com.nlab.statekit.annotation.UiActionMapping
+import com.nlab.statekit.store.Store
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
@@ -33,6 +32,9 @@ import javax.inject.Inject
 @HiltViewModel
 internal class HomeViewModel @Inject constructor(
     private val environment: HomeEnvironment
-) : ViewModel() {
-    fun dispatch(action: HomeAction): Job = viewModelScope.launch {  }
+) : StoreViewModel<HomeAction, HomeUiState>() {
+    override fun onCreateStore(): Store<HomeAction, HomeUiState> = createStore(
+        initState = HomeUiState.Loading,
+        reduce = HomeReduce(environment),
+    )
 }
