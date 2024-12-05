@@ -26,7 +26,7 @@ import timber.log.Timber
 /**
  * @author Doohyun
  */
-internal class StatekitPluginInitializer : Initializer<Unit> {
+internal class StateKitPluginInitializer : Initializer<Unit> {
     override fun create(context: Context) {
         StateKitPlugin.addGlobalExceptionHandler { _, throwable -> Timber.tag("StateKitGlobalErr").e(throwable) }
     }
