@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 The N's lab Open Source Project
+ * Copyright (C) 2024 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,21 +14,9 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.feature.home
-
-import com.nlab.reminder.core.component.tag.edit.TagEditState
+package com.nlab.reminder.core.component.tag.edit
 
 /**
- * @author thalys
+ * @author Doohyun
  */
-internal sealed class HomeInteraction private constructor() {
-    data object Empty : HomeInteraction()
-
-    data object TodaySchedule : HomeInteraction()
-
-    data object TimetableSchedule : HomeInteraction()
-
-    data object AllSchedule : HomeInteraction()
-
-    data class TagEdit(val tagEditState: TagEditState) : HomeInteraction()
-}
+sealed interface Processable

@@ -18,7 +18,12 @@ package kotlinx.coroutines.test
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
+import org.hamcrest.CoreMatchers.equalTo
+import org.hamcrest.MatcherAssert.assertThat
 
 /**
  * @author Doohyun
@@ -27,3 +32,12 @@ fun TestScope.unconfinedTestDispatcher() = UnconfinedTestDispatcher(testSchedule
 fun TestScope.unconfinedCoroutineScope() = CoroutineScope(unconfinedTestDispatcher())
 
 val TestScope.unconfinedBackgroundScope get() = backgroundScope + Dispatchers.Unconfined
+
+fun <T> TestScope.assertFlowEmissionsLazy(
+    flow: Flow<T>,
+    expectedEmits: List<T>
+): () -> Unit {
+    val actualEmits = mutableListOf<T>()
+    unconfinedBackgroundScope.launch { flow.toList(actualEmits) }
+    return { assertThat(actualEmits, equalTo(expectedEmits)) }
+}

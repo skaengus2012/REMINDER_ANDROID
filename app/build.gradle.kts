@@ -132,6 +132,8 @@ dependencies {
 
     testImplementation(projects.testkit)
     testImplementation(projects.statekit.test)
+    testImplementation(projects.core.component.tagTest)
+    testImplementation(projects.core.component.usermessageTest)
     testImplementation(projects.core.dataTest)
     testImplementation(projects.core.kotlinTest)
     testImplementation(projects.core.scheduleTest)

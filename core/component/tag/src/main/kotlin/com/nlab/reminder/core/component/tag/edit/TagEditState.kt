@@ -23,33 +23,38 @@ import com.nlab.reminder.core.kotlin.NonNegativeLong
 /**
  * @author Doohyun
  */
-sealed class TagEditStep private constructor() {
+sealed class TagEditState private constructor() {
     @ExcludeFromGeneratedTestReport
-    data object Empty : TagEditStep()
+    data object Empty : TagEditState()
 
     @ExcludeFromGeneratedTestReport
     data class Intro(
         val tag: Tag,
         val usageCount: NonNegativeLong
-    ) : TagEditStep()
+    ) : TagEditState()
 
     @ExcludeFromGeneratedTestReport
     data class Rename(
         val tag: Tag,
         val usageCount: NonNegativeLong,
         val renameText: String,
-        val shouldUserInputReady: Boolean
-    ) : TagEditStep()
+        val shouldUserInputReady: Boolean,
+    ) : TagEditState(), Processable
 
     @ExcludeFromGeneratedTestReport
     data class Merge(
         val from: Tag,
-        val to: Tag
-    ) : TagEditStep()
+        val to: Tag,
+    ) : TagEditState(), Processable
 
     @ExcludeFromGeneratedTestReport
     data class Delete(
         val tag: Tag,
-        val usageCount: NonNegativeLong
-    ) : TagEditStep()
+        val usageCount: NonNegativeLong,
+    ) : TagEditState(), Processable
+
+    @ExcludeFromGeneratedTestReport
+    data class Processing<T>(
+        val state: T
+    ) : TagEditState() where T : TagEditState, T : Processable
 }

@@ -16,7 +16,7 @@
 
 package com.nlab.reminder.domain.feature.home
 
-import com.nlab.reminder.core.component.tag.edit.TagEditStep
+import com.nlab.reminder.core.component.tag.edit.TagEditState
 import com.nlab.reminder.core.translation.StringIds
 import com.nlab.reminder.core.component.usermessage.UserMessage
 import com.nlab.reminder.core.kotlin.onFailure
@@ -56,16 +56,17 @@ internal fun HomeReduce(environment: HomeEnvironment): HomeReduce = DslReduce {
             if (current.interaction !is HomeInteraction.TagEdit) current
             else current.copy(
                 interaction = when (action.step) {
-                    is TagEditStep.Empty -> HomeInteraction.Empty
+                    is TagEditState.Empty -> HomeInteraction.Empty
                     else -> HomeInteraction.TagEdit(action.step)
                 }
             )
         }
-        effect {
-            val isTagEditEmpty = action.step is TagEditStep.Empty
-            val isTagEditInteraction = (current as? Success)?.interaction is HomeInteraction.TagEdit
-            if (isTagEditEmpty.not() && isTagEditInteraction.not()) {
-                environment.tagEditDelegate.clearStep()
+        scope(isMatch = { action.step != TagEditState.Empty }) {
+            effect<Loading> { environment.tagEditDelegate.clearState() }
+            effect<Success> {
+                if (current.interaction !is HomeInteraction.TagEdit) {
+                    environment.tagEditDelegate.clearState()
+                }
             }
         }
     }

@@ -16,6 +16,8 @@
 
 package com.nlab.testkit.faker
 
+import kotlin.reflect.KClass
+
 /**
  * @author Doohyun
  */
@@ -26,4 +28,12 @@ fun <T> Iterable<T>.shuffleAndGetFirst(
     check(target.isNotEmpty()) { "Cannot found any element satisfying the predicate" }
 
     return target.first()
+}
+
+fun <T : Any> Iterable<T>.requireSample(): T = shuffled().first()
+
+fun <T : Any> Iterable<T>.requireSampleExcludeTypeOf(
+    types: List<KClass<out T>>,
+): T = shuffleAndGetFirst { sample ->
+    types.all { it.isInstance(sample).not() }
 }

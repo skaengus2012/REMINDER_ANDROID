@@ -16,55 +16,73 @@
 
 package com.nlab.reminder.domain.feature.home
 
+import com.nlab.reminder.core.component.tag.edit.TagEditDelegate
+import com.nlab.reminder.core.component.tag.edit.genTagEditState
+import com.nlab.reminder.core.component.usermessage.UserMessage
+import com.nlab.reminder.core.component.usermessage.genUserMessages
+import com.nlab.reminder.core.data.model.Tag
+import com.nlab.reminder.core.data.model.genTags
+import com.nlab.reminder.core.kotlin.NonNegativeLong
+import com.nlab.reminder.core.kotlin.faker.genNonNegativeLong
+import com.nlab.testkit.faker.shuffleAndGetFirst
+import org.mockito.kotlin.mock
+import kotlin.reflect.KClass
+
 /**
  * @author Doohyun
  */
-/**
+internal fun genHomeEnvironment(
+    tagEditDelegate: TagEditDelegate = mock()
+) = HomeEnvironment(
+    tagEditDelegate = tagEditDelegate
+)
+
+internal fun genHomeActionStateSynced(
+    todaySchedulesCount: NonNegativeLong = genNonNegativeLong(),
+    timetableSchedulesCount: NonNegativeLong = genNonNegativeLong(),
+    allSchedulesCount: NonNegativeLong = genNonNegativeLong(),
+    tags: List<Tag> = genTags()
+) = HomeAction.StateSynced(
+    todaySchedulesCount = todaySchedulesCount,
+    timetableSchedulesCount = timetableSchedulesCount,
+    allSchedulesCount = allSchedulesCount,
+    tags = tags
+)
+
 internal fun genHomeUiStateSuccess(
-    todayScheduleCount: Long = genLong(),
-    timetableScheduleCount: Long = genLong(),
-    allScheduleCount: Long = genLong(),
+    todayScheduleCount: NonNegativeLong = genNonNegativeLong(),
+    timetableScheduleCount: NonNegativeLong = genNonNegativeLong(),
+    allScheduleCount: NonNegativeLong = genNonNegativeLong(),
     tags: List<Tag> = genTags(),
-    workflow: HomeInteraction = genHomeWorkflowExcludeEmpty(),
-    userMessages: List<UserMessage> = emptyList()
-): HomeUiState.Success = HomeUiState.Success(
+    interaction: HomeInteraction = genHomeInteraction(),
+    userMessages: List<UserMessage> = genUserMessages()
+) = HomeUiState.Success(
     todayScheduleCount = todayScheduleCount,
     timetableScheduleCount = timetableScheduleCount,
     allScheduleCount = allScheduleCount,
-    tags = tags.toPersistentList(),
-    interaction = workflow,
-    userMessages = userMessages.toPersistentList()
+    tags = tags,
+    interaction = interaction,
+    userMessages = userMessages
 )
 
-internal fun genHomeTagConfigWorkflow(
-    tag: Tag = genTag(),
-    usageCount: Long = genLongGreaterThanZero(),
-) = HomeInteraction.TagConfig(tag, usageCount)
-
-internal fun genHomeTagRenameWorkflow(
-    tag: Tag = genTag(),
-    usageCount: Long = genLongGreaterThanZero(),
-    renameText: String = genBothify(),
-    shouldKeyboardShown: Boolean = genBoolean()
-) = HomeInteraction.TagRename(tag, usageCount, renameText, shouldKeyboardShown)
-
-
-internal fun genHomeTagDeleteConfig(
-    tag: Tag = genTag(),
-    usageCount: Long = genLongGreaterThanZero(),
-) = HomeInteraction.TagDelete(tag, usageCount)
-
-private fun genHomeWorkflowsExcludeEmpty(): List<HomeInteraction> = listOf(
+private val sampleHomeInteractions get() =  listOf(
+    HomeInteraction.Empty,
     HomeInteraction.TodaySchedule,
     HomeInteraction.TimetableSchedule,
     HomeInteraction.AllSchedule,
-    genHomeTagConfigWorkflow(),
-    genHomeTagRenameWorkflow(),
-    genHomeTagDeleteConfig()
+    HomeInteraction.TagEdit(genTagEditState())
 )
 
-internal fun genHomeWorkflowExcludeEmpty(ignoreCases: Set<KClass<out HomeInteraction>> = emptySet()): HomeInteraction =
-    genHomeWorkflowsExcludeEmpty()
-        .filterNot { it::class in ignoreCases }
-        .random()
- */
+internal fun genHomeInteraction(): HomeInteraction =
+    sampleHomeInteractions.shuffled().first()
+
+internal fun genHomeInteractionWithExcludeTypes(
+    firstType: KClass<out HomeInteraction>,
+    vararg anotherTypes: KClass<out HomeInteraction>
+): HomeInteraction =
+    sampleHomeInteractions.shuffleAndGetFirst { interaction ->
+        buildList {
+            add(firstType)
+            addAll(anotherTypes)
+        }.any { it.isInstance(interaction).not() }
+    }
