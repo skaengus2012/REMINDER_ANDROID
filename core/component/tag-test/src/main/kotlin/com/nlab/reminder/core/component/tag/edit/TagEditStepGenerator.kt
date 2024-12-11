@@ -59,7 +59,6 @@ private fun getSampleTagEditState(): List<TagEditState> {
         usageCount = genNonNegativeLong()
     )
     return listOf(
-        TagEditState.Empty,
         TagEditState.Intro(
             tag = genTag(),
             usageCount = genNonNegativeLong()

@@ -31,7 +31,6 @@ import com.nlab.testkit.faker.requireSampleExcludeTypeOf
  */
 private val sampleTagEditStates: List<TagEditState>
     get() = listOf(
-        TagEditState.Empty,
         genIntroState(),
         genRenameState(),
         genMergeState(),

@@ -25,9 +25,6 @@ import com.nlab.reminder.core.kotlin.NonNegativeLong
  */
 sealed class TagEditState private constructor() {
     @ExcludeFromGeneratedTestReport
-    data object Empty : TagEditState()
-
-    @ExcludeFromGeneratedTestReport
     data class Intro(
         val tag: Tag,
         val usageCount: NonNegativeLong
@@ -54,7 +51,24 @@ sealed class TagEditState private constructor() {
     ) : TagEditState(), Processable
 
     @ExcludeFromGeneratedTestReport
-    data class Processing<T>(
-        val state: T
-    ) : TagEditState() where T : TagEditState, T : Processable
+    class Processing private constructor(val state: TagEditState) : TagEditState() {
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+
+            other as Processing
+
+            return state == other.state
+        }
+
+        override fun hashCode(): Int {
+            return state.hashCode()
+        }
+
+        companion object {
+            operator fun <T> invoke(
+                state: T
+            ): Processing where T : TagEditState, T : Processable = Processing(state)
+        }
+    }
 }

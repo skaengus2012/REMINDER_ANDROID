@@ -35,17 +35,17 @@ import kotlinx.coroutines.flow.update
  * @author Doohyun
  */
 class TagEditDelegate(
-    initialState: TagEditState,
+    initialState: TagEditState?,
     private val tagRepository: TagRepository,
     private val tryUpdateTagNameUseCase: TryUpdateTagNameUseCase,
 ) {
     private val _state = MutableStateFlow(initialState)
-    val state: StateFlow<TagEditState> = _state.asStateFlow()
+    val state: StateFlow<TagEditState?> = _state.asStateFlow()
 
     suspend fun startEditing(tag: Tag): Result<TagEditState.Intro> =
         tagRepository.getUsageCount(id = tag.id)
             .map { usageCount -> TagEditState.Intro(tag, usageCount) }
-            .onSuccess { intro -> _state.updateIfTypeOf<TagEditState.Empty> { intro } }
+            .onSuccess { intro -> _state.update { current -> current ?: intro } }
 
     fun startRename() {
         _state.updateIfTypeOf<TagEditState.Intro> { current ->
@@ -100,10 +100,7 @@ class TagEditDelegate(
 
                 _state.updateIfProcessingStateEquals(
                     target = emitState,
-                    to = when (duplicateTag) {
-                        null -> TagEditState.Empty
-                        else -> TagEditState.Merge(from = emitState.tag, to = duplicateTag)
-                    }
+                    to = duplicateTag?.let { TagEditState.Merge(from = emitState.tag, to = it) }
                 )
 
                 if (isSuccessReturn) Result.Success(Unit)
@@ -129,6 +126,6 @@ class TagEditDelegate(
     }
 
     fun clearState() {
-        _state.update { TagEditState.Empty }
+        _state.update { null }
     }
 }

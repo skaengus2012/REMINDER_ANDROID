@@ -51,17 +51,17 @@ internal fun HomeReduce(environment: HomeEnvironment): HomeReduce = DslReduce {
             )
         }
     }
-    actionScope<TagEditStepSynced> {
+    actionScope<TagEditStateSynced> {
         transition<Success> {
             if (current.interaction !is HomeInteraction.TagEdit) current
             else current.copy(
-                interaction = when (action.step) {
+                interaction = when (action.state) {
                     is TagEditState.Empty -> HomeInteraction.Empty
-                    else -> HomeInteraction.TagEdit(action.step)
+                    else -> HomeInteraction.TagEdit(action.state)
                 }
             )
         }
-        scope(isMatch = { action.step != TagEditState.Empty }) {
+        scope(isMatch = { action.state != TagEditState.Empty }) {
             effect<Loading> { environment.tagEditDelegate.clearState() }
             effect<Success> {
                 if (current.interaction !is HomeInteraction.TagEdit) {

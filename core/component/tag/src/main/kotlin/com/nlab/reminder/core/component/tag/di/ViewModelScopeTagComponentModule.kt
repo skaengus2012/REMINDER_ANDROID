@@ -17,7 +17,6 @@
 package com.nlab.reminder.core.component.tag.di
 
 import com.nlab.reminder.core.component.tag.edit.TagEditDelegate
-import com.nlab.reminder.core.component.tag.edit.TagEditState
 import com.nlab.reminder.core.data.repository.TagRepository
 import com.nlab.reminder.core.domain.TryUpdateTagNameUseCase
 import dagger.Module
@@ -38,7 +37,7 @@ internal class ViewModelScopeTagComponentModule {
         tagRepository: TagRepository,
         tryUpdateTagNameUseCase: TryUpdateTagNameUseCase,
     ): TagEditDelegate = TagEditDelegate(
-        initialState = TagEditState.Empty,
+        initialState = null,
         tagRepository = tagRepository,
         tryUpdateTagNameUseCase = tryUpdateTagNameUseCase,
     )

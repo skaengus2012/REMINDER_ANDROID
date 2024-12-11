@@ -24,16 +24,16 @@ import kotlinx.coroutines.flow.update
 /**
  * @author Doohyun
  */
-internal inline fun <reified T : TagEditState> MutableStateFlow<TagEditState>.updateIfTypeOf(
+internal inline fun <reified T : TagEditState> MutableStateFlow<TagEditState?>.updateIfTypeOf(
     block: (T) -> TagEditState
 ) = update { current ->
     if (current is T) block(current)
     else current
 }
 
-internal inline fun <reified T, reified U> MutableStateFlow<TagEditState>.processingScope(
+internal inline fun <reified T, reified U> MutableStateFlow<TagEditState?>.processingScope(
     request: (emitState: T) -> U,
-    onFinished: MutableStateFlow<TagEditState>.(T, U) -> Result<Unit>
+    onFinished: MutableStateFlow<TagEditState?>.(T, U) -> Result<Unit>
 ): Result<Unit> where T : TagEditState, T : Processable {
     val emitStep = getAndUpdate { current ->
         if (current is T) TagEditState.Processing(current)
@@ -42,24 +42,24 @@ internal inline fun <reified T, reified U> MutableStateFlow<TagEditState>.proces
     return if (emitStep is T) onFinished(emitStep, request(emitStep)) else Result.Success(Unit)
 }
 
-internal inline fun <reified T> MutableStateFlow<TagEditState>.processingScope(
+internal inline fun <reified T> MutableStateFlow<TagEditState?>.processingScope(
     request: (emitState: T) -> Result<Unit>
 ): Result<Unit> where T : TagEditState, T : Processable = processingScope(
     request,
     onFinished = { emitState, result ->
-        updateIfProcessingStateEquals(target = emitState, to = TagEditState.Empty)
+        updateIfProcessingStateEquals(target = emitState, to = null)
         result
     }
 )
 
-internal fun <T> MutableStateFlow<TagEditState>.updateIfProcessingStateEquals(
+internal fun <T> MutableStateFlow<TagEditState?>.updateIfProcessingStateEquals(
     target: T,
-    to: TagEditState,
+    to: TagEditState?,
 ) where T : TagEditState, T : Processable = update { current ->
     if (current.isProcessingStateEquals(target)) to
     else current
 }
 
-private fun <T> TagEditState.isProcessingStateEquals(
+private fun <T> TagEditState?.isProcessingStateEquals(
     target: T
-): Boolean where T : TagEditState, T : Processable = this is TagEditState.Processing<*> && state == target
+): Boolean where T : TagEditState, T : Processable = this is TagEditState.Processing && state == target

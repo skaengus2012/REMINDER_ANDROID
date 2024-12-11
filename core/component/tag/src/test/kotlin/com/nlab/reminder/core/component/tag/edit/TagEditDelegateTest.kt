@@ -28,12 +28,15 @@ import com.nlab.reminder.core.kotlin.faker.genNonNegativeLong
 import com.nlab.reminder.core.kotlin.isFailure
 import com.nlab.reminder.core.kotlin.isSuccess
 import com.nlab.reminder.core.kotlin.toNonBlankString
+import com.nlab.testkit.faker.genBlank
 import com.nlab.testkit.faker.genBothify
+import com.nlab.testkit.faker.genInt
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.test.assertFlowEmissionsLazy
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.equalTo
+import org.hamcrest.CoreMatchers.nullValue
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
 
@@ -55,8 +58,8 @@ class TagEditDelegateTest {
     }
 
     @Test
-    fun `Given empty state, tag and success of getUsageCount, When startEditing, Then return success and changed state to Intro`() = runTest {
-        val initState = TagEditState.Empty
+    fun `Given no state, tag and success of getUsageCount, When startEditing, Then return success and state changed to Intro`() = runTest {
+        val initState: TagEditState? = null
         val tag = genTag()
         val usageCount = genNonNegativeLong()
         val delegate = genTagEditDelegate(
@@ -76,8 +79,8 @@ class TagEditDelegateTest {
     }
 
     @Test
-    fun `Given not empty state and success of getUsageCount, When startEditing, Then return success and not changed state`() = runTest {
-        val initState = genTagEditStateExcludeTypeOf<TagEditState.Empty>()
+    fun `Given any state and success of getUsageCount, When startEditing, Then return success and state not changed`() = runTest {
+        val initState = genTagEditState()
         val tag = genTag()
         val delegate = genTagEditDelegate(
             initState,
@@ -121,7 +124,7 @@ class TagEditDelegateTest {
     }
 
     @Test
-    fun `Given not intro state, When start rename, Then not changed state`() {
+    fun `Given not intro state, When start rename, Then state not changed`() {
         val initState = genTagEditStateExcludeTypeOf<TagEditState.Intro>()
         val delegate = genTagEditDelegate(initState = initState)
 
@@ -130,7 +133,7 @@ class TagEditDelegateTest {
     }
 
     @Test
-    fun `Given rename state, When ready rename input, Then changed shouldUserInputReady to false`() {
+    fun `Given rename state, When ready rename input, Then state changed shouldUserInputReady to false`() {
         val initState = genRenameState(shouldUserInputReady = true)
         val delegate = genTagEditDelegate(initState = initState)
         val expectedState = initState.copy(shouldUserInputReady = false)
@@ -140,7 +143,7 @@ class TagEditDelegateTest {
     }
 
     @Test
-    fun `Given rename state and inputText, When change rename text, Then changed rename to inputText`() {
+    fun `Given rename state and inputText, When change rename text, Then state changed rename to inputText`() {
         val initState = genRenameState(renameText = "")
         val inputText = genBothify()
         val delegate = genTagEditDelegate(initState = initState)
@@ -151,7 +154,7 @@ class TagEditDelegateTest {
     }
 
     @Test
-    fun `Given not rename state, When try update tag name, Then return success and not changed state`() = runTest {
+    fun `Given not rename state, When try update tag name, Then return success and state not changed`() = runTest {
         val initState = genTagEditStateExcludeTypeOf<TagEditState.Rename>()
         val delegate = genTagEditDelegate(initState = initState)
 
@@ -161,17 +164,17 @@ class TagEditDelegateTest {
     }
 
     @Test
-    fun `Given empty input rename state, When try update tag name, Then return success and changed state to empty`() = runTest {
-        val initState = genRenameState(renameText = "")
+    fun `Given blank input rename state, When try update tag name, Then return success and state is cleared`() = runTest {
+        val initState = genRenameState(renameText = genBlank(genInt(min = 2, max = 10)))
         val delegate = genTagEditDelegate(initState = initState)
 
         val result = delegate.tryUpdateTagName(loadedTagsSnapshot = genTags())
         assertThat(result.isSuccess, equalTo(true))
-        assertThat(delegate.state.value, equalTo(TagEditState.Empty))
+        assertThat(delegate.state.value, nullValue())
     }
     
     @Test
-    fun `Given rename state, tags and result of tryUpdateTagNameUseCase is Success or NotChanged, When try update tag name, Then return success and changed state to processing rename, empty`() = runTest {
+    fun `Given rename state, tags and result of tryUpdateTagNameUseCase is Success or NotChanged, When try update tag name, Then return success and state changes to processing, null`() = runTest {
         suspend fun testTryUpdateTagName(tryUpdateTagNameResult: TryUpdateTagNameResult) {
             val initState = genRenameState()
             val tags = genTags()
@@ -194,7 +197,7 @@ class TagEditDelegateTest {
                 flow = delegate.state.drop(1),
                 expectedEmits = listOf(
                     TagEditState.Processing(initState),
-                    TagEditState.Empty
+                    null
                 )
             )
 
@@ -208,7 +211,7 @@ class TagEditDelegateTest {
     }
 
     @Test
-    fun `Given rename state, tags and result of tryUpdateTagNameUseCase is DuplicateNameError, When try update tag name, Then return success and changed state to processing, merge`() = runTest {
+    fun `Given rename state, tags and result of tryUpdateTagNameUseCase is DuplicateNameError, When try update tag name, Then return success and state changed to processing, merge`() = runTest {
         val targetTag = genTag()
         val duplicateTag = genTag()
         val initState = genRenameState(tag = targetTag)
@@ -241,7 +244,7 @@ class TagEditDelegateTest {
     }
 
     @Test
-    fun `Given rename state, tags and result of tryUpdateTagNameUseCase is UnknownError, When try update tag name, Then return fail and changed state to processing, empty`() = runTest {
+    fun `Given rename state, tags and result of tryUpdateTagNameUseCase is UnknownError, When try update tag name, Then return fail and state changed to processing, null`() = runTest {
         val initState = genRenameState()
         val tags = genTags()
         val delegate = genTagEditDelegate(
@@ -260,7 +263,7 @@ class TagEditDelegateTest {
             flow = delegate.state.drop(1),
             expectedEmits = listOf(
                 TagEditState.Processing(initState),
-                TagEditState.Empty
+                null
             )
         )
         val result = delegate.tryUpdateTagName(tags)
@@ -269,7 +272,7 @@ class TagEditDelegateTest {
     }
 
     @Test
-    fun `Given not merge state, When merge tag, Then return success and not changed state`() = runTest {
+    fun `Given not merge state, When merge tag, Then return success and state not changed`() = runTest {
         val initState = genTagEditStateExcludeTypeOf<TagEditState.Merge>()
         val delegate = genTagEditDelegate(initState = initState)
 
@@ -280,7 +283,7 @@ class TagEditDelegateTest {
 
 
     @Test
-    fun `Given merge tag and success of save, When merge tag, Then return success and changed state to processing, empty`() = runTest {
+    fun `Given merge tag and success of save, When merge tag, Then return success and state changed to processing, null`() = runTest {
         val initState = genMergeState()
         val delegate = genTagEditDelegate(
             initState = initState,
@@ -293,7 +296,7 @@ class TagEditDelegateTest {
             flow = delegate.state.drop(1),
             expectedEmits = listOf(
                 TagEditState.Processing(initState),
-                TagEditState.Empty
+                null
             )
         )
         val result = delegate.mergeTag()
@@ -302,7 +305,7 @@ class TagEditDelegateTest {
     }
 
     @Test
-    fun `Given merge tag and fail of save, When merge tag, Then return fail and changed state to processing, empty`() = runTest {
+    fun `Given merge tag and fail of save, When merge tag, Then return fail and state changed to processing, null`() = runTest {
         val initState = genMergeState()
         val delegate = genTagEditDelegate(
             initState = initState,
@@ -315,7 +318,7 @@ class TagEditDelegateTest {
             flow = delegate.state.drop(1),
             expectedEmits = listOf(
                 TagEditState.Processing(initState),
-                TagEditState.Empty
+                null
             )
         )
         val result = delegate.mergeTag()
@@ -337,7 +340,7 @@ class TagEditDelegateTest {
     }
 
     @Test
-    fun `Given not delete state, When delete tag, Then return success and not changed state`() = runTest {
+    fun `Given not delete state, When delete tag, Then return success and state not changed`() = runTest {
         val initState = genTagEditStateExcludeTypeOf<TagEditState.Delete>()
         val delegate = genTagEditDelegate(initState = initState)
 
@@ -347,7 +350,7 @@ class TagEditDelegateTest {
     }
 
     @Test
-    fun `Given delete state and success of delete, When delete tag, Then return success and changed state to processing, empty`() = runTest {
+    fun `Given delete state and success of delete, When delete tag, Then return success and state changed to processing, null`() = runTest {
         val initState = genDeleteState()
         val delegate = genTagEditDelegate(
             initState = initState,
@@ -359,7 +362,7 @@ class TagEditDelegateTest {
             flow = delegate.state.drop(1),
             expectedEmits = listOf(
                 TagEditState.Processing(initState),
-                TagEditState.Empty
+                null
             )
         )
         val result = delegate.deleteTag()
@@ -368,7 +371,7 @@ class TagEditDelegateTest {
     }
 
     @Test
-    fun `Given delete state and fail of delete, When delete tag, Then return fail and changed state to empty`() = runTest {
+    fun `Given delete state and fail of delete, When delete tag, Then return fail and state changed to processing, null`() = runTest {
         val initState = genDeleteState()
         val delegate = genTagEditDelegate(
             initState = initState,
@@ -380,7 +383,7 @@ class TagEditDelegateTest {
             flow = delegate.state.drop(1),
             expectedEmits = listOf(
                 TagEditState.Processing(initState),
-                TagEditState.Empty
+                null
             )
         )
         val result = delegate.deleteTag()
@@ -389,17 +392,17 @@ class TagEditDelegateTest {
     }
 
     @Test
-    fun `Given not empty state, When clear state, Then change state to empty`() {
+    fun `Given not empty state, When clear state, Then state change to null`() {
         val initState = genTagEditState()
         val delegate = genTagEditDelegate(initState = initState)
         delegate.clearState()
 
-        assertThat(delegate.state.value, equalTo(TagEditState.Empty))
+        assertThat(delegate.state.value, equalTo(null))
     }
 }
 
 private fun genTagEditDelegate(
-    initState: TagEditState,
+    initState: TagEditState?,
     tagRepository: TagRepository = mock(),
     tryUpdateTagNameUseCase: TryUpdateTagNameUseCase = mock(),
 ): TagEditDelegate = TagEditDelegate(initState, tagRepository, tryUpdateTagNameUseCase)

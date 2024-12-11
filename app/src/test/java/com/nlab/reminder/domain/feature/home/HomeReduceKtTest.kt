@@ -72,23 +72,23 @@ class HomeReduceKtTest {
     }
 
     @Test
-    fun `Given loading, When empty tagEditStep synced, Then tagEditDelegate never invoked clearStep`() = runTest {
+    fun `Given loading, When empty tagEditeState synced, Then tagEditDelegate never invoked clearStep`() = runTest {
         val tagEditDelegate: TagEditDelegate = mock()
         genHomeReduce(environment = genHomeEnvironment(tagEditDelegate))
             .effectScenario()
             .initState(HomeUiState.Loading)
-            .action(HomeAction.TagEditStepSynced(TagEditState.Empty))
+            .action(HomeAction.TagEditStateSynced(TagEditState.Empty))
             .launchAndJoin()
         verify(tagEditDelegate, never()).clearState()
     }
 
     @Test
-    fun `Given loading, When non-empty tagEditStep synced, Then tagEditDelegate invoked clearStep`() = runTest {
+    fun `Given loading, When non-empty tagEditState synced, Then tagEditDelegate invoked clearStep`() = runTest {
         val tagEditDelegate: TagEditDelegate = mock()
         genHomeReduce(environment = genHomeEnvironment(tagEditDelegate))
             .effectScenario()
             .initState(HomeUiState.Loading)
-            .action(HomeAction.TagEditStepSynced(genTagEditStateExcludeTypeOf<TagEditState.Empty>()))
+            .action(HomeAction.TagEditStateSynced(genTagEditStateExcludeTypeOf<TagEditState.Empty>()))
             .launchAndJoin()
         verify(tagEditDelegate, once()).clearState()
     }
@@ -99,12 +99,10 @@ class HomeReduceKtTest {
             .transitionScenario()
             .initState(
                 genHomeUiStateSuccess(
-                    interaction = genHomeInteractionWithExcludeTypes(
-                        HomeInteraction.TagEdit::class
-                    )
+                    interaction = genHomeInteractionWithExcludeTypes(HomeInteraction.TagEdit::class)
                 )
             )
-            .action(HomeAction.TagEditStepSynced(TagEditState.Empty))
+            .action(HomeAction.TagEditStateSynced(TagEditState.Empty))
             .expectedStateToInit()
             .verify()
     }
@@ -116,11 +114,11 @@ class HomeReduceKtTest {
             .initState(
                 genHomeUiStateSuccess(
                     interaction = HomeInteraction.TagEdit(
-                        tagEditState = genTagEditStateExcludeTypeOf<TagEditState.Empty>()
+                        state = genTagEditStateExcludeTypeOf<TagEditState.Empty>()
                     )
                 )
             )
-            .action(HomeAction.TagEditStepSynced(TagEditState.Empty))
+            .action(HomeAction.TagEditStateSynced(TagEditState.Empty))
             .expectedStateFromInput { initState.copy(interaction = HomeInteraction.Empty) }
             .verify()
     }
@@ -132,14 +130,14 @@ class HomeReduceKtTest {
             .initState(
                 genHomeUiStateSuccess(
                     interaction = HomeInteraction.TagEdit(
-                        tagEditState = genTagEditStateExcludeTypeOf<TagEditState.Empty>()
+                        state = genTagEditStateExcludeTypeOf<TagEditState.Empty>()
                     )
                 )
             )
-            .action(HomeAction.TagEditStepSynced(genTagEditStateExcludeTypeOf<TagEditState.Empty>()))
+            .action(HomeAction.TagEditStateSynced(genTagEditStateExcludeTypeOf<TagEditState.Empty>()))
             .expectedStateFromInput {
                 initState.copy(
-                    interaction = HomeInteraction.TagEdit(tagEditState = action.step)
+                    interaction = HomeInteraction.TagEdit(state = action.state)
                 )
             }
             .verify()

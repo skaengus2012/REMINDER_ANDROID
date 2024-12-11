@@ -24,7 +24,8 @@ import com.nlab.reminder.core.data.model.Tag
 import com.nlab.reminder.core.data.model.genTags
 import com.nlab.reminder.core.kotlin.NonNegativeLong
 import com.nlab.reminder.core.kotlin.faker.genNonNegativeLong
-import com.nlab.testkit.faker.shuffleAndGetFirst
+import com.nlab.testkit.faker.requireSample
+import com.nlab.testkit.faker.requireSampleExcludeTypeOf
 import org.mockito.kotlin.mock
 import kotlin.reflect.KClass
 
@@ -74,15 +75,15 @@ private val sampleHomeInteractions get() =  listOf(
 )
 
 internal fun genHomeInteraction(): HomeInteraction =
-    sampleHomeInteractions.shuffled().first()
+    sampleHomeInteractions.requireSample()
 
 internal fun genHomeInteractionWithExcludeTypes(
     firstType: KClass<out HomeInteraction>,
     vararg anotherTypes: KClass<out HomeInteraction>
 ): HomeInteraction =
-    sampleHomeInteractions.shuffleAndGetFirst { interaction ->
+    sampleHomeInteractions.requireSampleExcludeTypeOf(
         buildList {
             add(firstType)
             addAll(anotherTypes)
-        }.any { it.isInstance(interaction).not() }
-    }
+        }
+    )

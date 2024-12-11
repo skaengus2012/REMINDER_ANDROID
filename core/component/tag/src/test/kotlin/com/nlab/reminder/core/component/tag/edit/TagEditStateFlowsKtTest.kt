@@ -29,7 +29,7 @@ class TagEditStateFlowsKtTest {
     fun `Given processing with rename, When updateIfProcessingStateEquals with same target, Then stateFlow changed to expected state`() {
         val rename = genRenameState()
         val initState = TagEditState.Processing(rename)
-        val stateFlow = MutableStateFlow<TagEditState>(initState)
+        val stateFlow = MutableStateFlow<TagEditState?>(initState)
 
         val expectedState = genTagEditState()
 
@@ -40,7 +40,7 @@ class TagEditStateFlowsKtTest {
     @Test
     fun `Given processing with rename, When updateIfProcessingStateEquals with another target, Then stateFlow never changed`() {
         val initState = TagEditState.Processing(genRenameState())
-        val stateFlow = MutableStateFlow<TagEditState>(initState)
+        val stateFlow = MutableStateFlow<TagEditState?>(initState)
 
         stateFlow.updateIfProcessingStateEquals(target = genDeleteState(), to = genTagEditState())
         assertThat(stateFlow.value, equalTo(initState))
@@ -48,8 +48,8 @@ class TagEditStateFlowsKtTest {
 
     @Test
     fun `Given not processing, When updateIfProcessingStateEquals, Then stateFlow never changed`() {
-        val initState = genTagEditStateExcludeTypeOf<TagEditState.Processing<*>>()
-        val stateFlow = MutableStateFlow(initState)
+        val initState = genTagEditStateExcludeTypeOf<TagEditState.Processing>()
+        val stateFlow = MutableStateFlow<TagEditState?>(initState)
 
         stateFlow.updateIfProcessingStateEquals(target = genRenameState(), to = genTagEditState())
         assertThat(stateFlow.value, equalTo(initState))

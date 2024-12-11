@@ -22,6 +22,7 @@ import com.nlab.reminder.core.component.tag.edit.TagEditState
  * @author thalys
  */
 internal sealed class HomeInteraction private constructor() {
+    @E
     data object Empty : HomeInteraction()
 
     data object TodaySchedule : HomeInteraction()
@@ -30,5 +31,9 @@ internal sealed class HomeInteraction private constructor() {
 
     data object AllSchedule : HomeInteraction()
 
-    data class TagEdit(val tagEditState: TagEditState) : HomeInteraction()
+    data class TagEdit(val state: TagEditState) : HomeInteraction() {
+        init {
+            require(state !is TagEditState.Empty)
+        }
+    }
 }
