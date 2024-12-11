@@ -44,10 +44,12 @@ class EffectScenario<A : Any, S : Any, IA : A, IS : S> internal constructor(
     private val input: ScenarioInput<IA, IS>,
     private val additionalEffects: List<Effect<A, S>>
 ) {
-    fun hook(block: suspend ScenarioInput<IA, IS>.() -> Unit) = EffectScenario(
+    fun hook(block: suspend TestEffectScope<A, S, IA, IS>.() -> Unit) = EffectScenario(
         reduce,
         input,
-        additionalEffects = additionalEffects + Effect.SuspendNode { _, _, _ -> block(input) }
+        additionalEffects = additionalEffects + Effect.SuspendNode { action, current, _ ->
+            TestEffectScope(input, action, current).block()
+        }
     )
 
     fun launchIn(
@@ -68,4 +70,13 @@ class EffectScenario<A : Any, S : Any, IA : A, IS : S> internal constructor(
     suspend fun launchAndJoin(shouldLaunchWithTransition: Boolean = false) {
         launchIn(CoroutineScope(currentCoroutineContext()), shouldLaunchWithTransition).join()
     }
+}
+
+class TestEffectScope<A : Any, S : Any, IA : A, IS : S> internal constructor(
+    private val input: ScenarioInput<IA, IS>,
+    val action: A,
+    val current: S
+) {
+    val inputIAction: IA get() = input.action
+    val inputState: IS get() = input.initState
 }

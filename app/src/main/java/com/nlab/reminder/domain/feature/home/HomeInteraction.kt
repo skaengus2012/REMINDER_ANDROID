@@ -17,23 +17,24 @@
 package com.nlab.reminder.domain.feature.home
 
 import com.nlab.reminder.core.component.tag.edit.TagEditState
+import com.nlab.reminder.core.foundation.annotation.ExcludeFromGeneratedTestReport
 
 /**
  * @author thalys
  */
 internal sealed class HomeInteraction private constructor() {
-    @E
+    @ExcludeFromGeneratedTestReport
     data object Empty : HomeInteraction()
 
+    @ExcludeFromGeneratedTestReport
     data object TodaySchedule : HomeInteraction()
 
+    @ExcludeFromGeneratedTestReport
     data object TimetableSchedule : HomeInteraction()
 
+    @ExcludeFromGeneratedTestReport
     data object AllSchedule : HomeInteraction()
 
-    data class TagEdit(val state: TagEditState) : HomeInteraction() {
-        init {
-            require(state !is TagEditState.Empty)
-        }
-    }
+    @ExcludeFromGeneratedTestReport
+    data class TagEdit(val state: TagEditState) : HomeInteraction()
 }

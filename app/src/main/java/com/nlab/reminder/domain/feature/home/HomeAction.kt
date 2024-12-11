@@ -33,7 +33,7 @@ internal sealed class HomeAction private constructor() {
         val tags: List<Tag>,
     ) : HomeAction()
 
-    data class TagEditStateSynced(val state: TagEditState) : HomeAction()
+    data class TagEditStateSynced(val state: TagEditState?) : HomeAction()
 
     data class UserMessagePosted(val message: UserMessage) : HomeAction()
 

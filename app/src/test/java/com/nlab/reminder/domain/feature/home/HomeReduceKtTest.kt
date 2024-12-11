@@ -17,17 +17,28 @@
 package com.nlab.reminder.domain.feature.home
 
 import com.nlab.reminder.core.component.tag.edit.TagEditDelegate
-import com.nlab.reminder.core.component.tag.edit.TagEditState
-import com.nlab.reminder.core.component.tag.edit.genTagEditStateExcludeTypeOf
+import com.nlab.reminder.core.component.tag.edit.genTagEditState
+import com.nlab.reminder.core.component.usermessage.UserMessage
+import com.nlab.reminder.core.component.usermessage.genUserMessages
+import com.nlab.reminder.core.data.model.genTag
+import com.nlab.reminder.core.kotlin.Result
+import com.nlab.reminder.core.translation.StringIds
 import com.nlab.statekit.test.reduce.effectScenario
 import com.nlab.statekit.test.reduce.expectedStateToInit
 import com.nlab.statekit.test.reduce.transitionScenario
+import com.nlab.testkit.faker.genBothify
+import com.nlab.testkit.faker.genInt
+import kotlinx.collections.immutable.*
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.once
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
+import org.mockito.verification.VerificationMode
 
 /**
  * @author Thalys
@@ -44,9 +55,9 @@ class HomeReduceKtTest {
                     todayScheduleCount = action.todaySchedulesCount,
                     timetableScheduleCount = action.timetableSchedulesCount,
                     allScheduleCount = action.allSchedulesCount,
-                    tags = action.tags,
+                    tags = action.tags.toImmutableList(),
                     interaction = HomeInteraction.Empty,
-                    userMessages = emptyList(),
+                    userMessages = persistentListOf()
                 )
             }
             .verify()
@@ -63,7 +74,7 @@ class HomeReduceKtTest {
                     todayScheduleCount = action.todaySchedulesCount,
                     timetableScheduleCount = action.timetableSchedulesCount,
                     allScheduleCount = action.allSchedulesCount,
-                    tags = action.tags,
+                    tags = action.tags.toImmutableList(),
                     interaction = initState.interaction,
                     userMessages = initState.userMessages
                 )
@@ -72,29 +83,43 @@ class HomeReduceKtTest {
     }
 
     @Test
-    fun `Given loading, When empty tagEditeState synced, Then tagEditDelegate never invoked clearStep`() = runTest {
+    fun `Given loading, When sync tagEditState, Then tagEditDelegate invoke clearState conditionally`() = runTest {
+        suspend fun testTagEditStateSyncedWhenLoading(
+            action: HomeAction.TagEditStateSynced,
+            mockVerifyMode: VerificationMode
+        ) {
+            val tagEditDelegate: TagEditDelegate = mock()
+            genHomeReduce(environment = genHomeEnvironment(tagEditDelegate))
+                .effectScenario()
+                .initState(HomeUiState.Loading)
+                .action(action)
+                .launchAndJoin()
+            verify(tagEditDelegate, mockVerifyMode).clearState()
+        }
+
+        testTagEditStateSyncedWhenLoading(
+            action = HomeAction.TagEditStateSynced(genTagEditState()),
+            mockVerifyMode = once()
+        )
+        testTagEditStateSyncedWhenLoading(
+            action = HomeAction.TagEditStateSynced(null),
+            mockVerifyMode = never()
+        )
+    }
+
+    @Test
+    fun `Given loading, When sync tagEditStep as null, Then tagEditDelegate never invoked clearState`() = runTest {
         val tagEditDelegate: TagEditDelegate = mock()
         genHomeReduce(environment = genHomeEnvironment(tagEditDelegate))
             .effectScenario()
             .initState(HomeUiState.Loading)
-            .action(HomeAction.TagEditStateSynced(TagEditState.Empty))
+            .action(HomeAction.TagEditStateSynced(null))
             .launchAndJoin()
         verify(tagEditDelegate, never()).clearState()
     }
 
     @Test
-    fun `Given loading, When non-empty tagEditState synced, Then tagEditDelegate invoked clearStep`() = runTest {
-        val tagEditDelegate: TagEditDelegate = mock()
-        genHomeReduce(environment = genHomeEnvironment(tagEditDelegate))
-            .effectScenario()
-            .initState(HomeUiState.Loading)
-            .action(HomeAction.TagEditStateSynced(genTagEditStateExcludeTypeOf<TagEditState.Empty>()))
-            .launchAndJoin()
-        verify(tagEditDelegate, once()).clearState()
-    }
-
-    @Test
-    fun `Given success with not tag edit interaction, When empty tagEditStep synced, Then state never changed`() = runTest {
+    fun `Given success with not tag edit interaction, When sync exist tagEditStep, Then state never changed`() = runTest {
         genHomeReduce()
             .transitionScenario()
             .initState(
@@ -102,44 +127,282 @@ class HomeReduceKtTest {
                     interaction = genHomeInteractionWithExcludeTypes(HomeInteraction.TagEdit::class)
                 )
             )
-            .action(HomeAction.TagEditStateSynced(TagEditState.Empty))
+            .action(HomeAction.TagEditStateSynced(genTagEditState()))
             .expectedStateToInit()
             .verify()
     }
 
     @Test
-    fun `Given success with tag edit interaction, When empty tagEditStep synced, Then state interaction changed to empty`() = runTest {
+    fun `Given success with not tag edit interaction, When sync tagEditStep, Then tagEditDelegate invoked clearState conditionally`() = runTest {
+        suspend fun testTagEditStateSyncedWhenSuccessWithNotTagEditInteraction(
+            action: HomeAction.TagEditStateSynced,
+            mockVerifyMode: VerificationMode
+        ) {
+            val tagEditDelegate: TagEditDelegate = mock()
+            genHomeReduce(environment = genHomeEnvironment(tagEditDelegate))
+                .effectScenario()
+                .initState(
+                    genHomeUiStateSuccess(
+                        interaction = genHomeInteractionWithExcludeTypes(HomeInteraction.TagEdit::class)
+                    )
+                )
+                .action(action)
+                .launchAndJoin()
+            verify(tagEditDelegate, mockVerifyMode).clearState()
+        }
+
+        testTagEditStateSyncedWhenSuccessWithNotTagEditInteraction(
+            action = HomeAction.TagEditStateSynced(genTagEditState()),
+            mockVerifyMode = once()
+        )
+        testTagEditStateSyncedWhenSuccessWithNotTagEditInteraction(
+            action = HomeAction.TagEditStateSynced(null),
+            mockVerifyMode = never()
+        )
+    }
+
+    @Test
+    fun `Given success with tag edit interaction, When sync tagEditStep as null, Then interaction changed to empty`() = runTest {
         genHomeReduce()
             .transitionScenario()
             .initState(
                 genHomeUiStateSuccess(
-                    interaction = HomeInteraction.TagEdit(
-                        state = genTagEditStateExcludeTypeOf<TagEditState.Empty>()
-                    )
+                    interaction = HomeInteraction.TagEdit(genTagEditState())
                 )
             )
-            .action(HomeAction.TagEditStateSynced(TagEditState.Empty))
+            .action(HomeAction.TagEditStateSynced(null))
             .expectedStateFromInput { initState.copy(interaction = HomeInteraction.Empty) }
             .verify()
     }
 
     @Test
-    fun `Given success with tag edit interaction, When non-empty tagEditStep synced, Then state interaction changed with tagEditStep`() = runTest {
+    fun `Given success with tag edit interaction, When sync exist tagEditStep, Then tagEditDelegate never invoked clearState`() = runTest {
+        val tagEditDelegate: TagEditDelegate = mock()
+        genHomeReduce(environment = genHomeEnvironment(tagEditDelegate))
+            .effectScenario()
+            .initState(
+                genHomeUiStateSuccess(
+                    interaction = HomeInteraction.TagEdit(state = genTagEditState())
+                )
+            )
+            .action(HomeAction.TagEditStateSynced(genTagEditState()))
+            .launchAndJoin()
+        verify(tagEditDelegate, never()).clearState()
+    }
+
+    @Test
+    fun `Given success with tag edit interaction, When sync exist tagEditStep, Then interaction changed with tagEditStep`() = runTest {
         genHomeReduce()
             .transitionScenario()
             .initState(
                 genHomeUiStateSuccess(
-                    interaction = HomeInteraction.TagEdit(
-                        state = genTagEditStateExcludeTypeOf<TagEditState.Empty>()
-                    )
+                    interaction = HomeInteraction.TagEdit(state = genTagEditState())
                 )
             )
-            .action(HomeAction.TagEditStateSynced(genTagEditStateExcludeTypeOf<TagEditState.Empty>()))
+            .action(HomeAction.TagEditStateSynced(genTagEditState()))
             .expectedStateFromInput {
                 initState.copy(
-                    interaction = HomeInteraction.TagEdit(state = action.state)
+                    interaction = HomeInteraction.TagEdit(state = action.state!!)
                 )
             }
+            .verify()
+    }
+
+    @Test
+    fun `Given success with empty interaction, When todayCategory clicked, Then interaction changed to today schedule`() = runTest {
+        genHomeReduce()
+            .transitionScenario()
+            .initState(genHomeUiStateSuccess(interaction = HomeInteraction.Empty))
+            .action(HomeAction.OnTodayCategoryClicked)
+            .expectedStateFromInput {
+                initState.copy(interaction = HomeInteraction.TodaySchedule)
+            }
+            .verify()
+    }
+
+    @Test
+    fun `Given success with empty interaction, When timetableCategory clicked, Then interaction changed to timetable schedule`() = runTest {
+        genHomeReduce()
+            .transitionScenario()
+            .initState(genHomeUiStateSuccess(interaction = HomeInteraction.Empty))
+            .action(HomeAction.OnTimetableCategoryClicked)
+            .expectedStateFromInput {
+                initState.copy(interaction = HomeInteraction.TimetableSchedule)
+            }
+            .verify()
+    }
+
+    @Test
+    fun `Given success with empty interaction, When all category clicked, Then interaction changed to all schedule`() = runTest {
+        genHomeReduce()
+            .transitionScenario()
+            .initState(genHomeUiStateSuccess(interaction = HomeInteraction.Empty))
+            .action(HomeAction.OnAllCategoryClicked)
+            .expectedStateFromInput {
+                initState.copy(interaction = HomeInteraction.AllSchedule)
+            }
+            .verify()
+    }
+
+    @Test
+    fun `Given success with no interaction and user messages, When tag long clicked, Then user message filled if TagEditDelegate startEditing result fails`() = runTest {
+        val tagEditDelegate: TagEditDelegate = mock {
+            whenever(mock.startEditing(any())) doReturn Result.Failure(IllegalStateException())
+        }
+        genHomeReduce(environment = genHomeEnvironment(tagEditDelegate))
+            .transitionScenario()
+            .initState(genHomeUiStateSuccess(interaction = HomeInteraction.Empty, userMessages = emptyList()))
+            .action(HomeAction.OnTagLongClicked(genTag()))
+            .expectedStateFromInput {
+                initState.copy(userMessages = persistentListOf(UserMessage(StringIds.tag_not_found)))
+            }
+            .verify(shouldVerifyWithEffect = true)
+    }
+
+    @Test
+    fun `Given success with tagEdit interaction, When tag rename request clicked, Then tagEditDelegate called startRename`() = runTest {
+        val tagEditDelegate: TagEditDelegate = mock()
+        genHomeReduce(environment = genHomeEnvironment(tagEditDelegate))
+            .effectScenario()
+            .initState(genHomeUiStateSuccess(interaction = HomeInteraction.TagEdit(genTagEditState())))
+            .action(HomeAction.OnTagRenameRequestClicked)
+            .launchAndJoin()
+        verify(tagEditDelegate, once()).startRename()
+    }
+
+    @Test
+    fun `Given success with tagEdit interaction, When tag rename input ready, Then tagEditDelegate called readyRenameInput`() = runTest {
+        val tagEditDelegate: TagEditDelegate = mock()
+        genHomeReduce(environment = genHomeEnvironment(tagEditDelegate))
+            .effectScenario()
+            .initState(genHomeUiStateSuccess(interaction = HomeInteraction.TagEdit(genTagEditState())))
+            .action(HomeAction.OnTagRenameInputReady)
+            .launchAndJoin()
+        verify(tagEditDelegate, once()).readyRenameInput()
+    }
+
+    @Test
+    fun `Given success with tagEdit interaction, When tag rename inputted, Then tagEditDelegate called changeRenameText`() = runTest {
+        val tagEditDelegate: TagEditDelegate = mock()
+        val input = genBothify()
+        genHomeReduce(environment = genHomeEnvironment(tagEditDelegate))
+            .effectScenario()
+            .initState(genHomeUiStateSuccess(interaction = HomeInteraction.TagEdit(genTagEditState())))
+            .action(HomeAction.OnTagRenameInputted(input))
+            .launchAndJoin()
+        verify(tagEditDelegate, once()).changeRenameText(input)
+    }
+
+    @Test
+    fun `Given success with tagEdit interaction and no user messages, When tag rename confirmed, Then user message filled if TagEditDelegate tryUpdateTagRename result fails`() = runTest {
+        val tagEditDelegate: TagEditDelegate = mock {
+            whenever(mock.tryUpdateTagName(any())) doReturn Result.Failure(IllegalStateException())
+        }
+        genHomeReduce(environment = genHomeEnvironment(tagEditDelegate))
+            .transitionScenario()
+            .initState(
+                genHomeUiStateSuccess(
+                    interaction = HomeInteraction.TagEdit(genTagEditState()),
+                    userMessages = emptyList()
+                )
+            )
+            .action(HomeAction.OnTagRenameConfirmClicked)
+            .expectedStateFromInput {
+                initState.copy(userMessages = persistentListOf(UserMessage(StringIds.unknown_error)))
+            }
+            .verify(shouldVerifyWithEffect = true)
+    }
+
+    @Test
+    fun `Given success with tagEdit interaction and no user messages, When tag replace confirm clicked, Then user message filled if TagEditDelegate mergeTag result fails`() = runTest {
+        val tagEditDelegate: TagEditDelegate = mock {
+            whenever(mock.mergeTag()) doReturn Result.Failure(IllegalStateException())
+        }
+        genHomeReduce(environment = genHomeEnvironment(tagEditDelegate))
+            .transitionScenario()
+            .initState(
+                genHomeUiStateSuccess(
+                    interaction = HomeInteraction.TagEdit(genTagEditState()),
+                    userMessages = emptyList()
+                )
+            )
+            .action(HomeAction.OnTagReplaceConfirmClicked)
+            .expectedStateFromInput {
+                initState.copy(userMessages = persistentListOf(UserMessage(StringIds.unknown_error)))
+            }
+            .verify(shouldVerifyWithEffect = true)
+    }
+
+    @Test
+    fun `Given success with tagEdit interaction, When tag delete request clicked, Then tagEditDelegate called startDelete`() = runTest {
+        val tagEditDelegate: TagEditDelegate = mock()
+        genHomeReduce(environment = genHomeEnvironment(tagEditDelegate))
+            .effectScenario()
+            .initState(genHomeUiStateSuccess(interaction = HomeInteraction.TagEdit(genTagEditState())))
+            .action(HomeAction.OnTagDeleteRequestClicked)
+            .launchAndJoin()
+        verify(tagEditDelegate, once()).startDelete()
+    }
+
+    @Test
+    fun `Given success with tagEdit interaction and no user messages, When tag delete confirm clicked, Then user message filled if TagEditDelegate deleteTag result fails`() = runTest {
+        val tagEditDelegate: TagEditDelegate = mock {
+            whenever(mock.deleteTag()) doReturn Result.Failure(IllegalStateException())
+        }
+        genHomeReduce(environment = genHomeEnvironment(tagEditDelegate))
+            .transitionScenario()
+            .initState(
+                genHomeUiStateSuccess(
+                    interaction = HomeInteraction.TagEdit(genTagEditState()),
+                    userMessages = emptyList()
+                )
+            )
+            .action(HomeAction.OnTagDeleteConfirmClicked)
+            .expectedStateFromInput {
+                initState.copy(userMessages = persistentListOf(UserMessage(StringIds.unknown_error)))
+            }
+            .verify(shouldVerifyWithEffect = true)
+    }
+
+    @Test
+    fun `Given success with empty user messages, When user message posted, Then user message added to state`() = runTest {
+        genHomeReduce()
+            .transitionScenario()
+            .initState(genHomeUiStateSuccess(userMessages = emptyList()))
+            .action(HomeAction.UserMessagePosted(UserMessage(genBothify())))
+            .expectedStateFromInput {
+                initState.copy(
+                    userMessages = persistentListOf(action.message)
+                )
+            }
+            .verify()
+    }
+
+    @Test
+    fun `Given success with 2 or more user messages, When user message shown, Then user message removed`() = runTest {
+        val userMessages = genUserMessages(genInt(min = 2, max = 10))
+
+        genHomeReduce()
+            .transitionScenario()
+            .initState(genHomeUiStateSuccess(userMessages = userMessages))
+            .action(HomeAction.UserMessageShown(userMessages[1]))
+            .expectedStateFromInput {
+                initState.copy(
+                    userMessages = initState.userMessages - action.message
+                )
+            }
+            .verify()
+    }
+
+    @Test
+    fun `Given success with interaction exclude empty, When interacted, Then interaction changed to empty`() = runTest {
+        genHomeReduce()
+            .transitionScenario()
+            .initState(
+                genHomeUiStateSuccess(interaction = genHomeInteractionWithExcludeTypes(HomeInteraction.Empty::class))
+            )
+            .action(HomeAction.Interacted)
+            .expectedStateFromInput { initState.copy(interaction = HomeInteraction.Empty) }
             .verify()
     }
 }

@@ -30,7 +30,7 @@ fun <T> Iterable<T>.shuffleAndGetFirst(
     return target.first()
 }
 
-fun <T : Any> Iterable<T>.requireSample(): T = shuffled().first()
+fun <T> Iterable<T>.requireSample(): T = shuffled().first()
 
 fun <T : Any> Iterable<T>.requireSampleExcludeTypeOf(
     types: List<KClass<out T>>,

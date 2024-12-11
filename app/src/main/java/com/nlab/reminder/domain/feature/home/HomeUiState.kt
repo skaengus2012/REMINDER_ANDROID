@@ -19,6 +19,8 @@ package com.nlab.reminder.domain.feature.home
 import com.nlab.reminder.core.data.model.Tag
 import com.nlab.reminder.core.kotlin.NonNegativeLong
 import com.nlab.reminder.core.component.usermessage.UserMessage
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.PersistentList
 
 /**
  * @author Doohyun
@@ -30,8 +32,8 @@ internal sealed class HomeUiState private constructor() {
         val todayScheduleCount: NonNegativeLong,
         val timetableScheduleCount: NonNegativeLong,
         val allScheduleCount: NonNegativeLong,
-        val tags: List<Tag>,
+        val tags: ImmutableList<Tag>,
         val interaction: HomeInteraction,
-        val userMessages: List<UserMessage>
+        val userMessages: PersistentList<UserMessage>
     ) : HomeUiState()
 }

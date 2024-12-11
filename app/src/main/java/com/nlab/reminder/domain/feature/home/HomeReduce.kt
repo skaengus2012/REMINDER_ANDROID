@@ -16,7 +16,6 @@
 
 package com.nlab.reminder.domain.feature.home
 
-import com.nlab.reminder.core.component.tag.edit.TagEditState
 import com.nlab.reminder.core.translation.StringIds
 import com.nlab.reminder.core.component.usermessage.UserMessage
 import com.nlab.reminder.core.kotlin.onFailure
@@ -24,6 +23,7 @@ import com.nlab.statekit.dsl.reduce.DslReduce
 import com.nlab.statekit.reduce.Reduce
 import com.nlab.reminder.domain.feature.home.HomeAction.*
 import com.nlab.reminder.domain.feature.home.HomeUiState.*
+import kotlinx.collections.immutable.*
 
 internal typealias HomeReduce = Reduce<HomeAction, HomeUiState>
 
@@ -37,9 +37,9 @@ internal fun HomeReduce(environment: HomeEnvironment): HomeReduce = DslReduce {
                 todayScheduleCount = action.todaySchedulesCount,
                 timetableScheduleCount = action.timetableSchedulesCount,
                 allScheduleCount = action.allSchedulesCount,
-                tags = action.tags,
+                tags = action.tags.toImmutableList(),
                 interaction = HomeInteraction.Empty,
-                userMessages = emptyList()
+                userMessages = persistentListOf()
             )
         }
         transition<Success> {
@@ -47,7 +47,7 @@ internal fun HomeReduce(environment: HomeEnvironment): HomeReduce = DslReduce {
                 todayScheduleCount = action.todaySchedulesCount,
                 timetableScheduleCount = action.timetableSchedulesCount,
                 allScheduleCount = action.allSchedulesCount,
-                tags = action.tags,
+                tags = action.tags.toImmutableList(),
             )
         }
     }
@@ -55,13 +55,12 @@ internal fun HomeReduce(environment: HomeEnvironment): HomeReduce = DslReduce {
         transition<Success> {
             if (current.interaction !is HomeInteraction.TagEdit) current
             else current.copy(
-                interaction = when (action.state) {
-                    is TagEditState.Empty -> HomeInteraction.Empty
-                    else -> HomeInteraction.TagEdit(action.state)
-                }
+                interaction = action.state
+                    ?.let(HomeInteraction::TagEdit)
+                    ?: HomeInteraction.Empty
             )
         }
-        scope(isMatch = { action.state != TagEditState.Empty }) {
+        scope(isMatch = { action.state != null }) {
             effect<Loading> { environment.tagEditDelegate.clearState() }
             effect<Success> {
                 if (current.interaction !is HomeInteraction.TagEdit) {

@@ -28,12 +28,14 @@ import kotlin.reflect.KClass
 /**
  * @author Thalys
  */
-fun genTagEditState(): TagEditState = getSampleTagEditState().requireSample()
+fun genTagEditStateOrNull(): TagEditState? = getNullableTagEditStates().requireSample()
+
+fun genTagEditState(): TagEditState = getNullableTagEditStates().filterNotNull().requireSample()
 
 fun genTagEditStateExcludeTypeOf(
     firstType: KClass<out TagEditState>,
     vararg anotherTypes: KClass<out TagEditState>
-): TagEditState = getSampleTagEditState().requireSampleExcludeTypeOf(
+): TagEditState = getNullableTagEditStates().filterNotNull().requireSampleExcludeTypeOf(
     buildList {
         add(firstType)
         addAll(anotherTypes)
@@ -43,7 +45,7 @@ fun genTagEditStateExcludeTypeOf(
 inline fun <reified T : TagEditState> genTagEditStateExcludeTypeOf(): TagEditState =
     genTagEditStateExcludeTypeOf(T::class)
 
-private fun getSampleTagEditState(): List<TagEditState> {
+private fun getNullableTagEditStates(): List<TagEditState?> {
     val rename = TagEditState.Rename(
         tag = genTag(),
         usageCount = genNonNegativeLong(),
@@ -59,6 +61,7 @@ private fun getSampleTagEditState(): List<TagEditState> {
         usageCount = genNonNegativeLong()
     )
     return listOf(
+        null,
         TagEditState.Intro(
             tag = genTag(),
             usageCount = genNonNegativeLong()
