@@ -16,6 +16,7 @@
 
 package com.nlab.statekit.reduce
 
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -75,12 +76,22 @@ fun <A : Any, S : Any> Effect<A, S>.launch(
 
         val nextNode = when (node) {
             is Effect.Node -> {
-                node.invoke(action, current)
+                try {
+                    node.invoke(action, current)
+                } catch (t: Throwable) {
+                    coroutineScope.handleThrowable(t)
+                }
                 acc.removeLastOrNull()
             }
 
             is Effect.SuspendNode -> {
-                coroutineScope.launch { node.invoke(action, current, actionDispatcher) }
+                coroutineScope.launch {
+                    try {
+                        node.invoke(action, current, actionDispatcher)
+                    } catch (t: Throwable) {
+                        handleThrowable(t)
+                    }
+                }
                 acc.removeLastOrNull()
             }
 
@@ -116,4 +127,10 @@ fun <A : Any, S : Any> Effect<A, S>.launch(
             coroutineScope,
         )
     }
+}
+
+private fun CoroutineScope.handleThrowable(throwable: Throwable) {
+    val exceptionHandler = coroutineContext[CoroutineExceptionHandler]
+    if (exceptionHandler == null) throw throwable
+    else exceptionHandler.handleException(coroutineContext, throwable)
 }

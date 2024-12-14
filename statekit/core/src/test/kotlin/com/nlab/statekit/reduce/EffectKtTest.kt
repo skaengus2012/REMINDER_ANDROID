@@ -18,8 +18,12 @@ package com.nlab.statekit.reduce
 
 import com.nlab.statekit.TestAction
 import com.nlab.statekit.TestState
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.plus
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
@@ -121,5 +125,64 @@ class EffectKtTest {
         )
         advanceTimeBy(2000)
         runners.forEach { verify(it, once()).invoke() }
+    }
+
+    @Test(expected = RuntimeException::class)
+    fun `Given throwable effect nodes, When effect launched, Then exception be thrown`() {
+        val effect = TestEffectNode { _, _ -> throw RuntimeException() }
+        effect.launch(
+            TestAction.genAction(),
+            TestState.genState(),
+            actionDispatcher = mock(),
+            accPool = AccumulatorPool(),
+            coroutineScope = CoroutineScope(Dispatchers.Unconfined),
+        )
+    }
+
+    @Test
+    fun `Given throwable effect nodes and exceptionHandler, When effect launched, Then exception be thrown to exceptionHandler`() {
+        val exceptionBlock: () -> Unit = mock()
+        val effect = TestEffectNode { _, _ -> throw RuntimeException() }
+        effect.launch(
+            TestAction.genAction(),
+            TestState.genState(),
+            actionDispatcher = mock(),
+            accPool = AccumulatorPool(),
+            coroutineScope = CoroutineScope(Dispatchers.Unconfined) + CoroutineExceptionHandler { _, _ ->
+                exceptionBlock()
+            }
+        )
+        verify(exceptionBlock, once()).invoke()
+    }
+
+    @Test(expected = RuntimeException::class)
+    fun `Given throwable suspend effect nodes, When effect launched, Then exception be thrown`() = runTest {
+        val effect = TestEffectSuspendNode { _, _, _ -> throw RuntimeException() }
+        effect.launch(
+            TestAction.genAction(),
+            TestState.genState(),
+            actionDispatcher = mock(),
+            accPool = AccumulatorPool(),
+            coroutineScope = CoroutineScope(Dispatchers.Unconfined),
+        )
+    }
+
+    @Test
+    fun `Given throwable suspend effect nodes and exceptionHandler, When effect launched, Then exception be thrown to exceptionHandler`() = runTest {
+        val effect = TestEffectSuspendNode { _, _, _ -> throw RuntimeException() }
+        val exceptionBlock: () -> Unit = mock()
+        val superJob = SupervisorJob()
+        effect.launch(
+            TestAction.genAction(),
+            TestState.genState(),
+            actionDispatcher = mock(),
+            accPool = AccumulatorPool(),
+            coroutineScope = CoroutineScope(Dispatchers.Unconfined) + superJob + CoroutineExceptionHandler { _, _ ->
+                exceptionBlock()
+                superJob.cancel()
+            }
+        )
+        superJob.join()
+        verify(exceptionBlock, once()).invoke()
     }
 }
