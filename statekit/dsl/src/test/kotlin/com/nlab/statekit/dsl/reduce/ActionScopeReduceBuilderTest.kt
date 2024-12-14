@@ -80,7 +80,7 @@ class ActionScopeReduceBuilderTest {
             }
         }
         val effect = checkNotNull(reduceBuilder.delegate.buildEffect())
-        effect.launch(inputAction, inputState)
+        effect.launchAndJoinForTest(inputAction, inputState)
         verify(runner, once()).invoke()
     }
 
@@ -94,7 +94,7 @@ class ActionScopeReduceBuilderTest {
                 effect<TestState.State1> { runner.invoke() }
             }
             val effect = checkNotNull(reduceBuilder.delegate.buildEffect())
-            effect.launch(TestAction.genAction(), inputState)
+            effect.launchAndJoinForTest(TestAction.genAction(), inputState)
         }
 
         val runnerWithState1: () -> Unit = mock()
@@ -118,7 +118,7 @@ class ActionScopeReduceBuilderTest {
             }
         }
         val effect = checkNotNull(reduceBuilder.delegate.buildEffect())
-        effect.launch(inputAction, inputState, actionDispatcher,)
+        effect.launchAndJoinForTest(inputAction, inputState, actionDispatcher,)
         verify(actionDispatcher, once()).dispatch(expectedAction)
     }
 
@@ -134,7 +134,7 @@ class ActionScopeReduceBuilderTest {
             }
         }
         val effect = checkNotNull(reduceBuilder.delegate.buildEffect())
-        effect.launch(inputAction, inputState, actionDispatcher)
+        effect.launchAndJoinForTest(inputAction, inputState, actionDispatcher)
         verify(actionDispatcher, once()).dispatch(expectedAction)
     }
 
@@ -173,7 +173,7 @@ class ActionScopeReduceBuilderTest {
             }
         }
         val effect = checkNotNull(reduceBuilder.delegate.buildEffect())
-        effect.launch(
+        effect.launchAndJoinForTest(
             inputAction,
             inputState,
             actionDispatcher
@@ -195,7 +195,7 @@ class ActionScopeReduceBuilderTest {
             }
         }
         val effect = checkNotNull(reduceBuilder.delegate.buildEffect())
-        effect.launch(
+        effect.launchAndJoinForTest(
             inputAction,
             inputState,
             actionDispatcher,

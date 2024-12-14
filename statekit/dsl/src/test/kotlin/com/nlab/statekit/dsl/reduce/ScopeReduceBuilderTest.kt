@@ -62,7 +62,7 @@ class ScopeReduceBuilderTest {
             }
         }
         val effect = checkNotNull(reduceBuilder.delegate.buildEffect())
-        effect.launch(inputAction, inputState)
+        effect.launchAndJoinForTest(inputAction, inputState)
         verify(runner, once()).invoke()
     }
 
@@ -80,7 +80,7 @@ class ScopeReduceBuilderTest {
             }
         }
         val effect = checkNotNull(reduceBuilder.delegate.buildEffect())
-        effect.launch(inputAction, inputState, actionDispatcher)
+        effect.launchAndJoinForTest(inputAction, inputState, actionDispatcher)
         verify(actionDispatcher, once()).dispatch(expectedAction)
     }
 
@@ -130,7 +130,7 @@ class ScopeReduceBuilderTest {
             }
         }
         val effect = checkNotNull(reduceBuilder.delegate.buildEffect())
-        effect.launch(inputAction, inputState)
+        effect.launchAndJoinForTest(inputAction, inputState)
         verify(runner, once()).invoke()
     }
 
@@ -161,7 +161,7 @@ class ScopeReduceBuilderTest {
             }
         }
         val effect = checkNotNull(reduceBuilder.delegate.buildEffect())
-        effect.launch(inputAction, inputState)
+        effect.launchAndJoinForTest(inputAction, inputState)
         verify(runner, once()).invoke()
     }
 

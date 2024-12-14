@@ -69,7 +69,7 @@ class StateScopeReduceBuilderTest {
             }
         }
         val effect = checkNotNull(reduceBuilder.delegate.buildEffect())
-        effect.launch(inputAction, inputState)
+        effect.launchAndJoinForTest(inputAction, inputState)
         verify(runner, once()).invoke()
     }
 
@@ -83,7 +83,7 @@ class StateScopeReduceBuilderTest {
                 effect<TestAction.Action1> { runner.invoke() }
             }
             val effect = checkNotNull(reduceBuilder.delegate.buildEffect())
-            effect.launch(inputAction, TestState.genState())
+            effect.launchAndJoinForTest(inputAction, TestState.genState())
         }
 
         val runnerWithAction1: () -> Unit = mock()
@@ -107,7 +107,7 @@ class StateScopeReduceBuilderTest {
             }
         }
         val effect = checkNotNull(reduceBuilder.delegate.buildEffect())
-        effect.launch(inputAction, inputState, actionDispatcher)
+        effect.launchAndJoinForTest(inputAction, inputState, actionDispatcher)
         verify(actionDispatcher, once()).dispatch(expectedAction)
     }
 
@@ -123,7 +123,7 @@ class StateScopeReduceBuilderTest {
             }
         }
         val effect = checkNotNull(reduceBuilder.delegate.buildEffect())
-        effect.launch(inputAction, inputState, actionDispatcher)
+        effect.launchAndJoinForTest(inputAction, inputState, actionDispatcher)
         verify(actionDispatcher, once()).dispatch(expectedAction)
     }
 
@@ -162,7 +162,7 @@ class StateScopeReduceBuilderTest {
             }
         }
         val effect = checkNotNull(reduceBuilder.delegate.buildEffect())
-        effect.launch(inputAction, inputState, actionDispatcher)
+        effect.launchAndJoinForTest(inputAction, inputState, actionDispatcher)
         verify(actionDispatcher, once()).dispatch(expectedAction)
     }
 
@@ -180,7 +180,7 @@ class StateScopeReduceBuilderTest {
             }
         }
         val effect = checkNotNull(reduceBuilder.delegate.buildEffect())
-        effect.launch(inputAction, inputState, actionDispatcher)
+        effect.launchAndJoinForTest(inputAction, inputState, actionDispatcher)
         verify(actionDispatcher, once()).dispatch(expectedAction)
     }
 }

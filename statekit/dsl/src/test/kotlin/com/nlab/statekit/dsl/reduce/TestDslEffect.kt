@@ -21,6 +21,7 @@ import com.nlab.statekit.dsl.TestState
 import com.nlab.statekit.reduce.AccumulatorPool
 import com.nlab.statekit.reduce.ActionDispatcher
 import com.nlab.statekit.reduce.launch
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.coroutineScope
 import org.mockito.kotlin.mock
 
@@ -47,19 +48,35 @@ internal fun TestDslEffectSuspendNode(
     scope: Any = Any(),
 ): TestDslEffectSuspendNode = TestDslEffectSuspendNode(scope) {}
 
-internal suspend fun DslEffect.launch(
+internal suspend fun DslEffect.launchAndJoinForTest(
     action: TestAction = TestAction.genAction(),
     state: TestState = TestState.genState(),
     actionDispatcher: ActionDispatcher<TestAction> = mock(),
-    accumulatorPool: AccumulatorPool = AccumulatorPool(),
+    accPool: AccumulatorPool = AccumulatorPool(),
 ) {
     coroutineScope {
-        effectOf<TestAction, TestState>(dslEffect = this@launch).launch(
+        effectOf<TestAction, TestState>(dslEffect = this@launchAndJoinForTest).launch(
             action,
             state,
             actionDispatcher,
-            accumulatorPool,
+            accPool,
             coroutineScope = this
         )
     }
+}
+
+internal fun DslEffect.launchForTest(
+    action: TestAction = TestAction.genAction(),
+    state: TestState = TestState.genState(),
+    actionDispatcher: ActionDispatcher<TestAction> = mock(),
+    accPool: AccumulatorPool = AccumulatorPool(),
+    coroutineScope: CoroutineScope
+) {
+    effectOf<TestAction, TestState>(dslEffect = this@launchForTest).launch(
+        action,
+        state,
+        actionDispatcher,
+        accPool,
+        coroutineScope
+    )
 }

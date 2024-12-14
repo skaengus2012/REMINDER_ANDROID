@@ -19,7 +19,12 @@ package com.nlab.statekit.dsl.reduce
 import com.nlab.statekit.dsl.TestAction
 import com.nlab.statekit.dsl.TestState
 import com.nlab.testkit.faker.genInt
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.plus
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
@@ -68,7 +73,7 @@ class DslEffectKtTest {
                 )
             )
         )
-        nodEffect.launch()
+        nodEffect.launchAndJoinForTest()
         inOrder(firstBehavior, secondBehavior, thirdBehavior) {
             verify(firstBehavior, once()).invoke()
             verify(secondBehavior, once()).invoke()
@@ -99,7 +104,7 @@ class DslEffectKtTest {
                 }
             )
         )
-        nodEffect.launch()
+        nodEffect.launchAndJoinForTest()
         advanceTimeBy(5_500)
         verify(firstBehavior, once()).invoke()
         verify(secondBehavior, once()).invoke()
@@ -116,7 +121,7 @@ class DslEffectKtTest {
             isMatch = { true },
             effect = nodeEffect
         )
-        effect.launch()
+        effect.launchAndJoinForTest()
         verify(runner, once()).invoke()
     }
 
@@ -130,7 +135,7 @@ class DslEffectKtTest {
             isMatch = { false },
             effect = nodeEffect
         )
-        effect.launch()
+        effect.launchAndJoinForTest()
         verify(runner, never()).invoke()
     }
 
@@ -146,7 +151,7 @@ class DslEffectKtTest {
             transformSource = { source -> UpdateSource(action = 1, source.current) },
             effect = nodeEffect
         )
-        effect.launch()
+        effect.launchAndJoinForTest()
         verify(runner, once()).invoke()
     }
 
@@ -168,7 +173,46 @@ class DslEffectKtTest {
                 effect = nodeEffect
             )
         )
-        effect.launch()
+        effect.launchAndJoinForTest()
         verify(runner, never()).invoke()
+    }
+
+    @Test(expected = RuntimeException::class)
+    fun `Given throwable effect nodes, When effect launched, Then exception be thrown`() {
+        val effect = TestDslEffectNode(scope = "1") { throw RuntimeException() }
+        effect.launchForTest(coroutineScope = CoroutineScope(Dispatchers.Unconfined))
+    }
+
+    @Test
+    fun `Given throwable effect nodes and exceptionHandler, When effect launched, Then exception be thrown to exceptionHandler`() {
+        val effect = TestDslEffectNode(scope = "1") { throw RuntimeException() }
+        val exceptionBlock: () -> Unit = mock()
+        effect.launchForTest(
+            coroutineScope = CoroutineScope(Dispatchers.Unconfined) + CoroutineExceptionHandler { _, _ ->
+                exceptionBlock()
+            }
+        )
+        verify(exceptionBlock, once()).invoke()
+    }
+
+    @Test(expected = RuntimeException::class)
+    fun `Given throwable suspend effect nodes, When effect launched, Then exception be thrown`() = runTest {
+        val effect = TestDslEffectSuspendNode(scope = "1") { throw RuntimeException() }
+        effect.launchForTest(coroutineScope = CoroutineScope(Dispatchers.Unconfined))
+    }
+
+    @Test
+    fun `Given throwable suspend effect nodes and exceptionHandler, When effect launched, Then exception be thrown to exceptionHandler`() = runTest {
+        val effect = TestDslEffectSuspendNode(scope = "1") { throw RuntimeException() }
+        val exceptionBlock: () -> Unit = mock()
+        val superJob = SupervisorJob()
+        effect.launchForTest(
+            coroutineScope = CoroutineScope(Dispatchers.Unconfined) + superJob + CoroutineExceptionHandler { _, _ ->
+                exceptionBlock()
+                superJob.cancel()
+            }
+        )
+        superJob.join()
+        verify(exceptionBlock, once()).invoke()
     }
 }

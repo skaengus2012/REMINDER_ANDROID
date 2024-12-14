@@ -19,6 +19,7 @@ package com.nlab.statekit.dsl.reduce
 import com.nlab.statekit.reduce.Accumulator
 import com.nlab.statekit.reduce.Effect
 import com.nlab.statekit.reduce.use
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -113,7 +114,12 @@ private tailrec fun <A : Any> launch(
     val nextDslEffectScope: DslSuspendEffectScope<A, Any, Any>
     when (node) {
         is DslEffect.Node<*, *> -> {
-            (node as DslEffect.Node<Any, Any>).invoke(dslEffectScope)
+            try {
+                (node as DslEffect.Node<Any, Any>).invoke(dslEffectScope)
+            } catch (t: Throwable) {
+                coroutineScope.handleThrowable(t)
+            }
+
             nextNode = accEffect.removeLastOrNull()
             nextScope = scope
             nextDslEffectScope = dslEffectScope
@@ -121,8 +127,12 @@ private tailrec fun <A : Any> launch(
 
         is DslEffect.SuspendNode<*, *, *> -> {
             coroutineScope.launch {
-                @Suppress("UNCHECKED_CAST")
-                (node as DslEffect.SuspendNode<A, Any, Any>).invoke(dslEffectScope)
+                try {
+                    @Suppress("UNCHECKED_CAST")
+                    (node as DslEffect.SuspendNode<A, Any, Any>).invoke(dslEffectScope)
+                } catch (t: Throwable) {
+                    coroutineScope.handleThrowable(t)
+                }
             }
             nextNode = accEffect.removeLastOrNull()
             nextScope = scope
@@ -165,4 +175,10 @@ private tailrec fun <A : Any> launch(
         accDslEffectScope.apply { add(dslEffectScope) },
         coroutineScope
     )
+}
+
+private fun CoroutineScope.handleThrowable(throwable: Throwable) {
+    val exceptionHandler = coroutineContext[CoroutineExceptionHandler]
+    if (exceptionHandler == null) throw throwable
+    else exceptionHandler.handleException(coroutineContext, throwable)
 }
