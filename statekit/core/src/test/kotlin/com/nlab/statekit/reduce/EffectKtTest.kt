@@ -116,13 +116,7 @@ class EffectKtTest {
                 runners[4].invoke()
             }
         )
-        effect.launch(
-            TestAction.genAction(),
-            TestState.genState(),
-            actionDispatcher = mock(),
-            accPool = AccumulatorPool(),
-            coroutineScope = this,
-        )
+        effect.launchForTest(coroutineScope = this)
         advanceTimeBy(2000)
         runners.forEach { verify(it, once()).invoke() }
     }
@@ -130,11 +124,7 @@ class EffectKtTest {
     @Test(expected = RuntimeException::class)
     fun `Given throwable effect nodes, When effect launched, Then exception be thrown`() {
         val effect = TestEffectNode { _, _ -> throw RuntimeException() }
-        effect.launch(
-            TestAction.genAction(),
-            TestState.genState(),
-            actionDispatcher = mock(),
-            accPool = AccumulatorPool(),
+        effect.launchForTest(
             coroutineScope = CoroutineScope(Dispatchers.Unconfined),
         )
     }
@@ -143,11 +133,7 @@ class EffectKtTest {
     fun `Given throwable effect nodes and exceptionHandler, When effect launched, Then exception be thrown to exceptionHandler`() {
         val exceptionBlock: () -> Unit = mock()
         val effect = TestEffectNode { _, _ -> throw RuntimeException() }
-        effect.launch(
-            TestAction.genAction(),
-            TestState.genState(),
-            actionDispatcher = mock(),
-            accPool = AccumulatorPool(),
+        effect.launchForTest(
             coroutineScope = CoroutineScope(Dispatchers.Unconfined) + CoroutineExceptionHandler { _, _ ->
                 exceptionBlock()
             }
@@ -158,11 +144,7 @@ class EffectKtTest {
     @Test(expected = RuntimeException::class)
     fun `Given throwable suspend effect nodes, When effect launched, Then exception be thrown`() = runTest {
         val effect = TestEffectSuspendNode { _, _, _ -> throw RuntimeException() }
-        effect.launch(
-            TestAction.genAction(),
-            TestState.genState(),
-            actionDispatcher = mock(),
-            accPool = AccumulatorPool(),
+        effect.launchForTest(
             coroutineScope = CoroutineScope(Dispatchers.Unconfined),
         )
     }
@@ -172,11 +154,7 @@ class EffectKtTest {
         val effect = TestEffectSuspendNode { _, _, _ -> throw RuntimeException() }
         val exceptionBlock: () -> Unit = mock()
         val superJob = SupervisorJob()
-        effect.launch(
-            TestAction.genAction(),
-            TestState.genState(),
-            actionDispatcher = mock(),
-            accPool = AccumulatorPool(),
+        effect.launchForTest(
             coroutineScope = CoroutineScope(Dispatchers.Unconfined) + superJob + CoroutineExceptionHandler { _, _ ->
                 exceptionBlock()
                 superJob.cancel()

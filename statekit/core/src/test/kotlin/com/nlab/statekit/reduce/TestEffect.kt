@@ -18,6 +18,8 @@ package com.nlab.statekit.reduce
 
 import com.nlab.statekit.TestAction
 import com.nlab.statekit.TestState
+import kotlinx.coroutines.CoroutineScope
+import org.mockito.kotlin.mock
 
 /**
  * @author Doohyun
@@ -27,3 +29,19 @@ typealias TestEffectNode = Effect.Node<TestAction, TestState>
 typealias TestEffectSuspendNode = Effect.SuspendNode<TestAction, TestState>
 typealias TestEffectLifecycleNode = Effect.LifecycleNode<TestAction, TestState>
 typealias TestEffectComposite = Effect.Composite<TestAction, TestState>
+
+internal fun TestEffect.launchForTest(
+    action: TestAction = TestAction.genAction(),
+    state: TestState = TestState.genState(),
+    actionDispatcher: ActionDispatcher<TestAction> = mock(),
+    accPool: AccumulatorPool = AccumulatorPool(),
+    coroutineScope: CoroutineScope
+) {
+    launch(
+        action,
+        state,
+        actionDispatcher,
+        accPool,
+        coroutineScope
+    )
+}
