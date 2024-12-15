@@ -28,7 +28,6 @@ import com.nlab.statekit.test.reduce.expectedStateToInit
 import com.nlab.statekit.test.reduce.transitionScenario
 import com.nlab.testkit.faker.genBothify
 import com.nlab.testkit.faker.genInt
-import kotlinx.collections.immutable.*
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -55,9 +54,9 @@ class HomeReduceKtTest {
                     todayScheduleCount = action.todaySchedulesCount,
                     timetableScheduleCount = action.timetableSchedulesCount,
                     allScheduleCount = action.allSchedulesCount,
-                    tags = action.tags.toImmutableList(),
+                    tags = action.tags,
                     interaction = HomeInteraction.Empty,
-                    userMessages = persistentListOf()
+                    userMessages = emptyList()
                 )
             }
             .verify()
@@ -74,7 +73,7 @@ class HomeReduceKtTest {
                     todayScheduleCount = action.todaySchedulesCount,
                     timetableScheduleCount = action.timetableSchedulesCount,
                     allScheduleCount = action.allSchedulesCount,
-                    tags = action.tags.toImmutableList(),
+                    tags = action.tags,
                     interaction = initState.interaction,
                     userMessages = initState.userMessages
                 )
@@ -254,7 +253,7 @@ class HomeReduceKtTest {
             .initState(genHomeUiStateSuccess(interaction = HomeInteraction.Empty, userMessages = emptyList()))
             .action(HomeAction.OnTagLongClicked(genTag()))
             .expectedStateFromInput {
-                initState.copy(userMessages = persistentListOf(UserMessage(StringIds.tag_not_found)))
+                initState.copy(userMessages = listOf(UserMessage(StringIds.tag_not_found)))
             }
             .verify(shouldVerifyWithEffect = true)
     }
@@ -308,7 +307,7 @@ class HomeReduceKtTest {
             )
             .action(HomeAction.OnTagRenameConfirmClicked)
             .expectedStateFromInput {
-                initState.copy(userMessages = persistentListOf(UserMessage(StringIds.unknown_error)))
+                initState.copy(userMessages = listOf(UserMessage(StringIds.unknown_error)))
             }
             .verify(shouldVerifyWithEffect = true)
     }
@@ -328,7 +327,7 @@ class HomeReduceKtTest {
             )
             .action(HomeAction.OnTagReplaceConfirmClicked)
             .expectedStateFromInput {
-                initState.copy(userMessages = persistentListOf(UserMessage(StringIds.unknown_error)))
+                initState.copy(userMessages = listOf(UserMessage(StringIds.unknown_error)))
             }
             .verify(shouldVerifyWithEffect = true)
     }
@@ -359,7 +358,7 @@ class HomeReduceKtTest {
             )
             .action(HomeAction.OnTagDeleteConfirmClicked)
             .expectedStateFromInput {
-                initState.copy(userMessages = persistentListOf(UserMessage(StringIds.unknown_error)))
+                initState.copy(userMessages = listOf(UserMessage(StringIds.unknown_error)))
             }
             .verify(shouldVerifyWithEffect = true)
     }
@@ -372,7 +371,7 @@ class HomeReduceKtTest {
             .action(HomeAction.UserMessagePosted(UserMessage(genBothify())))
             .expectedStateFromInput {
                 initState.copy(
-                    userMessages = persistentListOf(action.message)
+                    userMessages = listOf(action.message)
                 )
             }
             .verify()

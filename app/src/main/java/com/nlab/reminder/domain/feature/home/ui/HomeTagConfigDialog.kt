@@ -28,10 +28,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -149,7 +149,7 @@ private fun BoxScope.HomeTagConfigButtonBackground(
             .matchParentSize()
             .combinedClickable(
                 interactiveSource,
-                indication = rememberRipple(color = ReminderTheme.colors.bgRipple1),
+                indication = ripple(color = ReminderTheme.colors.bgRipple1),
                 onClick = onClick.throttle(),
                 onClickLabel = onClickLabel,
                 role = Role.Button

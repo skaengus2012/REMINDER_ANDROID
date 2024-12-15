@@ -28,8 +28,6 @@ import com.nlab.reminder.core.kotlin.NonNegativeLong
 import com.nlab.reminder.core.kotlin.faker.genNonNegativeLong
 import com.nlab.testkit.faker.requireSample
 import com.nlab.testkit.faker.requireSampleExcludeTypeOf
-import kotlinx.collections.immutable.toImmutableList
-import kotlinx.collections.immutable.toPersistentList
 import org.mockito.kotlin.mock
 import kotlin.reflect.KClass
 
@@ -69,9 +67,9 @@ internal fun genHomeUiStateSuccess(
     todayScheduleCount = todayScheduleCount,
     timetableScheduleCount = timetableScheduleCount,
     allScheduleCount = allScheduleCount,
-    tags = tags.toImmutableList(),
+    tags = tags,
     interaction = interaction,
-    userMessages = userMessages.toPersistentList()
+    userMessages = userMessages
 )
 
 private val sampleHomeInteractions get() =  listOf(

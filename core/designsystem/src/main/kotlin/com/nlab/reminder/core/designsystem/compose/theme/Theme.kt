@@ -17,14 +17,10 @@
 package com.nlab.reminder.core.designsystem.compose.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material.ripple.LocalRippleTheme
-import androidx.compose.material.ripple.RippleAlpha
-import androidx.compose.material.ripple.RippleTheme
-import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.LocalUseFallbackRippleImplementation
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.ReadOnlyComposable
 
 /**
@@ -43,31 +39,16 @@ object ReminderTheme {
         get() = LocalReminderTypography.current
 }
 
-@Immutable
-private object DefaultRippleTheme : RippleTheme {
-    @Composable
-    override fun defaultColor() = LocalContentColor.current
-
-    @Composable
-    override fun rippleAlpha() = RippleAlpha(
-        pressedAlpha = 0.5f,
-        focusedAlpha = 0.5f,
-        draggedAlpha = 0.5f,
-        hoveredAlpha = 0.5f,
-    )
-}
-
 @Composable
 fun ReminderTheme(
     isDarkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
     val reminderColorScheme = if (isDarkTheme) DarkReminderColorScheme else LightReminderColorScheme
-    MaterialTheme {
-        CompositionLocalProvider(
-            LocalReminderColorScheme provides reminderColorScheme,
-            LocalRippleTheme provides DefaultRippleTheme,
-            content = content
-        )
+    CompositionLocalProvider(
+        LocalReminderColorScheme provides reminderColorScheme,
+        LocalUseFallbackRippleImplementation provides true
+    ) {
+        MaterialTheme(content = content)
     }
 }

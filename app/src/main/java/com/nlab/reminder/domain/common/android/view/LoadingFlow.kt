@@ -16,7 +16,6 @@
 
 package com.nlab.reminder.domain.common.android.view
 
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filterIsInstance
@@ -24,7 +23,6 @@ import kotlinx.coroutines.flow.filterIsInstance
 /**
  * @author thalys
  */
-@OptIn(FlowPreview::class)
 inline fun <reified R> Flow<*>.loadingFlow(delayTimeInMillis: Long = 500): Flow<R> {
     return debounce(delayTimeInMillis).filterIsInstance()
 }

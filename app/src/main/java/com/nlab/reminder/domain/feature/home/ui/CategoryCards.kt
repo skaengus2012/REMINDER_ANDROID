@@ -33,8 +33,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Text
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -201,7 +201,7 @@ private fun CategoryCardBackground(
             .clip(RoundedCornerShape(8.dp))
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
-                indication = rememberRipple(color = ReminderTheme.colors.bgCard1Ripple),
+                indication = ripple(color = ReminderTheme.colors.bgCard1Ripple),
                 onClick = onClick.throttle(),
                 onClickLabel = onClickLabel,
                 role = Role.Tab
