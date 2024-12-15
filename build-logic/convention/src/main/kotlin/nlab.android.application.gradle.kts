@@ -19,11 +19,8 @@ import org.gradle.kotlin.dsl.configure
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-with(pluginManager) {
-    apply("com.android.application")
-    apply("org.jetbrains.kotlin.android")
-}
+apply(plugin = "com.android.application")
+apply(plugin = "org.jetbrains.kotlin.android")
 
 extensions.configure<ApplicationExtension> {
     defaultConfig {

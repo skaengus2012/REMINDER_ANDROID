@@ -17,11 +17,8 @@ import org.gradle.kotlin.dsl.dependencies
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-with(pluginManager) {
-    apply("com.google.devtools.ksp")
-    apply("dagger.hilt.android.plugin")
-}
+apply(plugin = "com.google.devtools.ksp")
+apply(plugin = "dagger.hilt.android.plugin")
 
 dependencies {
     "implementation"(libs.findLibrary("google.hilt.android").get())
