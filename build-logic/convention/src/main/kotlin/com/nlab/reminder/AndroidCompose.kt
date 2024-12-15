@@ -18,25 +18,48 @@ package com.nlab.reminder
 
 import com.android.build.api.dsl.CommonExtension
 import org.gradle.api.Project
+import org.gradle.api.provider.Provider
+import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
+import org.jetbrains.kotlin.compose.compiler.gradle.ComposeCompilerGradlePluginExtension
 
 /**
  * @author Doohyun
  */
-internal fun Project.configureComposeAndroid(extension: CommonExtension<*, *, *, *, *, *>) = with(extension) {
-    buildFeatures {
-        compose = true
+internal fun Project.configureComposeAndroid(commonExtension: CommonExtension<*, *, *, *, *, *>) {
+    commonExtension.apply {
+        buildFeatures {
+            compose = true
+        }
+
+        composeOptions {
+            kotlinCompilerExtensionVersion = libs.findVersion("androidxComposeCompiler").get().toString()
+        }
+
+        dependencies {
+            val bom = libs.findLibrary("androidx-compose-bom").get()
+            "implementation"(platform(bom))
+            "androidTestImplementation"(platform(bom))
+        }
     }
 
-    composeOptions {
-        kotlinCompilerExtensionVersion = libs.findVersion("androidxComposeCompiler").get().toString()
-    }
+    extensions.configure<ComposeCompilerGradlePluginExtension> {
+        fun Provider<String>.onlyIfTrue() = flatMap { provider { it.takeIf(String::toBoolean) } }
+        fun Provider<*>.relativeToRootProject(dir: String) = flatMap {
+            rootProject.layout.buildDirectory.dir(projectDir.toRelativeString(rootDir))
+        }.map { it.dir(dir) }
 
-    dependencies {
-        val bom = libs.findLibrary("androidx-compose-bom").get()
-        "implementation"(platform(bom))
-        "androidTestImplementation"(platform(bom))
-    }
+        // Generate reports according to enableComposeCompilerMetrics and enableComposeCompilerReports settings.
+        // Example:
+        // ./gradlew assembleRelease -PenableComposeCompilerMetrics=true -PenableComposeCompilerReports=true
 
-    extension.composeOptions
+        project.providers.gradleProperty("enableComposeCompilerMetrics")
+            .onlyIfTrue()
+            .relativeToRootProject("compose-metrics")
+            .let(metricsDestination::set)
+        project.providers.gradleProperty("enableComposeCompilerReports")
+            .onlyIfTrue()
+            .relativeToRootProject("compose-reports")
+            .let(reportsDestination::set)
+    }
 }

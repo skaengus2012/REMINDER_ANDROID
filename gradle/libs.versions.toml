@@ -37,8 +37,8 @@ jacoco = "0.8.12" # use in configureJacocoToolVersion -> Jacoco.kt
 javafaker = "1.0.2"
 jsoup = "1.18.1"
 junit = "4.13.2"
-kotlin = "1.9.24"
-ksp = "1.9.24-1.0.20"
+kotlin = "2.0.20"
+ksp = "2.0.20-1.0.25"
 kotlinxCollectionsImmutable = "0.3.7"
 kotlinxCoroutine = "1.9.0"
 mockitoInline = "5.2.0"
@@ -106,6 +106,7 @@ timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 
 # Dependencies of the included build-logic
 android-gradle-plugin = { group = "com.android.tools.build", name = "gradle", version.ref = "androidGradlePlugin" }
+compose-gradle-plugin = { module = "org.jetbrains.kotlin:compose-compiler-gradle-plugin", version.ref = "kotlin" }
 kotlin-gradle-plugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
 ksp-gradle-plugin = { group = "com.google.devtools.ksp", name = "com.google.devtools.ksp.gradle.plugin", version.ref = "ksp" }
 
@@ -113,6 +114,7 @@ ksp-gradle-plugin = { group = "com.google.devtools.ksp", name = "com.google.devt
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
 androidx-navigation-safearges = { id = "androidx.navigation.safeargs.kotlin", version.ref = "androidxNavigation" }
+compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 google-hilt = { id = "com.google.dagger.hilt.android", version.ref = "googleHilt" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
