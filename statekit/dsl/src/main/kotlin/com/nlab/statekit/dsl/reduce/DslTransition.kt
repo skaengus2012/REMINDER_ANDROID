@@ -124,8 +124,9 @@ private tailrec fun transition(
         }
 
         is DslTransition.PredicateScope<Any, Any> -> {
+            val nextNode = if (node.isMatch(dslTransitionScope)) node.transition else accTransition.removeLastOrNull()
             transition(
-                node = if (node.isMatch(dslTransitionScope)) node.transition else accTransition.removeLastOrNull(),
+                nextNode,
                 scope,
                 dslTransitionScope,
                 accTransition,
@@ -137,8 +138,9 @@ private tailrec fun transition(
         is DslTransition.TransformSourceScope<Any, Any, Any, Any> -> {
             val newSource = node.transformSource(dslTransitionScope)
             if (newSource == null) {
+                val nextNode = accTransition.removeLastOrNull()
                 transition(
-                    node = accTransition.removeLastOrNull(),
+                    nextNode,
                     scope,
                     dslTransitionScope,
                     accTransition,
@@ -146,13 +148,15 @@ private tailrec fun transition(
                     accDslTransitionScope
                 )
             } else {
+                accScope.add(scope)
+                accDslTransitionScope.add(dslTransitionScope)
                 transition(
-                    node = node.transition,
-                    scope = node.subScope,
-                    dslTransitionScope = DslTransitionScope(newSource),
+                    node.transition,
+                    node.subScope,
+                    DslTransitionScope(newSource),
                     accTransition,
-                    accScope.apply { add(scope) },
-                    accDslTransitionScope.apply { add(dslTransitionScope) }
+                    accScope,
+                    accDslTransitionScope
                 )
             }
         }
