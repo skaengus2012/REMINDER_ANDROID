@@ -22,6 +22,7 @@ import org.gradle.api.provider.Provider
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
 import org.jetbrains.kotlin.compose.compiler.gradle.ComposeCompilerGradlePluginExtension
+import org.jetbrains.kotlin.compose.compiler.gradle.ComposeFeatureFlag
 
 /**
  * @author Doohyun
@@ -51,6 +52,11 @@ internal fun Project.configureComposeAndroid(commonExtension: CommonExtension<*,
                 .projectDirectory
                 .file("compose_compiler_stability.conf")
         )
+        featureFlags.set(
+            setOf(
+                ComposeFeatureFlag.StrongSkipping
+            )
+        )
     }
 }
 
@@ -58,7 +64,9 @@ internal fun Project.configureComposeAndroid(commonExtension: CommonExtension<*,
  * Generate reports according to enableComposeCompilerMetrics and enableComposeCompilerReports settings.
  *
  * Example:
+ * ```
  * ./gradlew assembleRelease -PenableComposeCompilerMetrics=true -PenableComposeCompilerReports=true
+ * ```
  */
 private fun Project.configureComposeCompilerReport(
     extension: ComposeCompilerGradlePluginExtension,
