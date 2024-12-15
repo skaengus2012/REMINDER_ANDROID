@@ -17,11 +17,15 @@
 package com.nlab.reminder.domain.feature.home
 
 import com.nlab.reminder.core.component.tag.edit.TagEditDelegate
+import com.nlab.reminder.core.data.repository.ScheduleRepository
+import com.nlab.reminder.core.data.repository.TagRepository
 import javax.inject.Inject
 
 /**
  * @author Thalys
  */
 internal class HomeEnvironment @Inject constructor(
-    val tagEditDelegate: TagEditDelegate
+    val tagEditDelegate: TagEditDelegate,
+    val scheduleRepository: ScheduleRepository,
+    val tagRepository: TagRepository
 )

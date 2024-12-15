@@ -87,8 +87,7 @@ private fun Project.androidJacocoClassDirectories(variant: Variant): Configurabl
                 /* filtering unnecessary feature components */
                 "**/*Action$*.class",
                 "**/*UiState$*.class",
-                "**/*Interaction$*.class",
-                "**/*Environment$*.class",
+                "**/*Environment.class",
 
                 /* filtering Navigation Component generated classes */
                 "**/*Args*.*",

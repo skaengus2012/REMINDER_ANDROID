@@ -18,7 +18,7 @@ package com.nlab.reminder.core.statekit.bootstrap
 
 import com.nlab.statekit.bootstrap.Bootstrap
 import com.nlab.statekit.bootstrap.DeliveryStarted
-import com.nlab.statekit.bootstrap.collectAsBootstrap
+import com.nlab.statekit.bootstrap.collectAsBootstrap as collectAsBootstrapOrigin
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -31,4 +31,4 @@ import kotlinx.coroutines.flow.Flow
  */
 fun <A : Any> Flow<A>.collectAsBootstrap(
     started: DeliveryStarted = DeliveryStarted.WhileSubscribed(stopTimeoutMillis = 5_000)
-): Bootstrap<A> = collectAsBootstrap(started)
+): Bootstrap<A> = collectAsBootstrapOrigin(started)

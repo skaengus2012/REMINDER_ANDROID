@@ -22,6 +22,8 @@ import com.nlab.reminder.core.component.usermessage.UserMessage
 import com.nlab.reminder.core.component.usermessage.genUserMessages
 import com.nlab.reminder.core.data.model.Tag
 import com.nlab.reminder.core.data.model.genTags
+import com.nlab.reminder.core.data.repository.ScheduleRepository
+import com.nlab.reminder.core.data.repository.TagRepository
 import com.nlab.reminder.core.kotlin.NonNegativeLong
 import com.nlab.reminder.core.kotlin.faker.genNonNegativeLong
 import com.nlab.testkit.faker.requireSample
@@ -35,9 +37,13 @@ import kotlin.reflect.KClass
  * @author Doohyun
  */
 internal fun genHomeEnvironment(
-    tagEditDelegate: TagEditDelegate = mock()
+    tagEditDelegate: TagEditDelegate = mock(),
+    scheduleRepository: ScheduleRepository = mock(),
+    tagRepository: TagRepository = mock()
 ) = HomeEnvironment(
-    tagEditDelegate = tagEditDelegate
+    tagEditDelegate = tagEditDelegate,
+    scheduleRepository = scheduleRepository,
+    tagRepository = tagRepository
 )
 
 internal fun genHomeActionStateSynced(
