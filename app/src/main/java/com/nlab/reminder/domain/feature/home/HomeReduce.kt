@@ -23,7 +23,6 @@ import com.nlab.statekit.dsl.reduce.DslReduce
 import com.nlab.statekit.reduce.Reduce
 import com.nlab.reminder.domain.feature.home.HomeAction.*
 import com.nlab.reminder.domain.feature.home.HomeUiState.*
-import kotlinx.collections.immutable.*
 
 internal typealias HomeReduce = Reduce<HomeAction, HomeUiState>
 
@@ -37,9 +36,9 @@ internal fun HomeReduce(environment: HomeEnvironment): HomeReduce = DslReduce {
                 todayScheduleCount = action.todaySchedulesCount,
                 timetableScheduleCount = action.timetableSchedulesCount,
                 allScheduleCount = action.allSchedulesCount,
-                tags = action.tags.toImmutableList(),
+                tags = action.tags,
                 interaction = HomeInteraction.Empty,
-                userMessages = persistentListOf()
+                userMessages = emptyList()
             )
         }
         transition<Success> {
@@ -47,7 +46,7 @@ internal fun HomeReduce(environment: HomeEnvironment): HomeReduce = DslReduce {
                 todayScheduleCount = action.todaySchedulesCount,
                 timetableScheduleCount = action.timetableSchedulesCount,
                 allScheduleCount = action.allSchedulesCount,
-                tags = action.tags.toImmutableList(),
+                tags = action.tags,
             )
         }
     }
