@@ -23,9 +23,9 @@ import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.provideDelegate
 import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinBaseExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
-import org.jetbrains.kotlin.gradle.dsl.KotlinTopLevelExtension
 
 /**
  * @author Doohyun
@@ -65,7 +65,7 @@ internal fun Project.configureKotlinJvm() {
     configureKotlin<KotlinJvmProjectExtension>()
 }
 
-private inline fun <reified T : KotlinTopLevelExtension> Project.configureKotlin(
+private inline fun <reified T : KotlinBaseExtension> Project.configureKotlin(
     crossinline block: KotlinJvmCompilerOptions.() -> Unit = {}
 ) = configure<T> {
     // Override by setting warningsAsErrors=true in your ~/.gradle/gradle.properties
@@ -73,7 +73,7 @@ private inline fun <reified T : KotlinTopLevelExtension> Project.configureKotlin
     when (this) {
         is KotlinAndroidProjectExtension -> compilerOptions
         is KotlinJvmProjectExtension -> compilerOptions
-        else -> TODO("Unsupported project extension $this ${T::class}")
+        else -> error("Unsupported project extension $this ${T::class}")
     }.apply {
         jvmTarget.set(selectedJvmTarget)
         allWarningsAsErrors.set(warningsAsErrors.toBoolean())

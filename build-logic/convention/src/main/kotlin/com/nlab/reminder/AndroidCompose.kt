@@ -45,11 +45,13 @@ internal fun Project.configureComposeAndroid(commonExtension: CommonExtension<*,
 
     extensions.configure<ComposeCompilerGradlePluginExtension> {
         configureComposeCompilerReport(extension = this)
-        stabilityConfigurationFile.set(
-            rootProject
-                .layout
-                .projectDirectory
-                .file("compose_compiler_stability.conf")
+        stabilityConfigurationFiles.set(
+            listOf(
+                rootProject
+                    .layout
+                    .projectDirectory
+                    .file("compose_compiler_stability.conf")
+            )
         )
     }
 }
