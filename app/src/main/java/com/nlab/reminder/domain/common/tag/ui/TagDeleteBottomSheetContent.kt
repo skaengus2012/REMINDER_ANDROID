@@ -25,9 +25,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -121,7 +121,7 @@ private fun InternalButton(
                 onClick = onClick.throttle(),
                 onClickLabel = text,
                 interactionSource = remember { MutableInteractionSource() },
-                indication = rememberRipple(color = ReminderTheme.colors.bgRipple1)
+                indication = ripple(color = ReminderTheme.colors.bgRipple1)
             ),
     ) {
         Text(

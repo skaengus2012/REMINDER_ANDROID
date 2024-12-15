@@ -26,8 +26,8 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Text
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -86,7 +86,7 @@ private fun BoxScope.TagTextBackground(
             .background(ReminderTheme.colors.bgTag)
             .combinedClickable(
                 interactiveSource,
-                indication = rememberRipple(color = ReminderTheme.colors.bgTagRipple),
+                indication = ripple(color = ReminderTheme.colors.bgTagRipple),
                 onClick = onClick.throttle(),
                 onClickLabel = onClickLabel,
                 onLongClick = onLongClick,
