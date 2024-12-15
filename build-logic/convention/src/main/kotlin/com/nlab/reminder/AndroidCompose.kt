@@ -22,7 +22,6 @@ import org.gradle.api.provider.Provider
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
 import org.jetbrains.kotlin.compose.compiler.gradle.ComposeCompilerGradlePluginExtension
-import org.jetbrains.kotlin.compose.compiler.gradle.ComposeFeatureFlag
 
 /**
  * @author Doohyun
@@ -46,15 +45,12 @@ internal fun Project.configureComposeAndroid(commonExtension: CommonExtension<*,
 
     extensions.configure<ComposeCompilerGradlePluginExtension> {
         configureComposeCompilerReport(extension = this)
-        stabilityConfigurationFile.set(
-            rootProject
-                .layout
-                .projectDirectory
-                .file("compose_compiler_stability.conf")
-        )
-        featureFlags.set(
-            setOf(
-                ComposeFeatureFlag.StrongSkipping
+        stabilityConfigurationFiles.set(
+            listOf(
+                rootProject
+                    .layout
+                    .projectDirectory
+                    .file("compose_compiler_stability.conf")
             )
         )
     }
