@@ -14,38 +14,22 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.component.usermessage.ui.compose
+package com.nlab.reminder.core.component.text.ui.compose
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import com.nlab.reminder.core.component.usermessage.UserMessage
-import com.nlab.reminder.core.component.usermessage.UserMessage.*
+import com.nlab.reminder.core.component.text.UiText
+import com.nlab.reminder.core.component.text.UiText.*
 
 /**
  * @author Doohyun
  */
-@Composable
-fun UserMessageHandler(
-    messages: List<UserMessage>,
-    onMessageReleased: (UserMessage) -> Unit,
-    block: suspend String.() -> Unit
-) {
-    messages.firstOrNull()?.let { message ->
-        val displayMessage = message.toDisplayMessage()
-        LaunchedEffect(displayMessage) {
-            block(displayMessage)
-            onMessageReleased(message)
-        }
-    }
-}
-
 @ReadOnlyComposable
 @Composable
-private fun UserMessage.toDisplayMessage(): String = when (this) {
-    is Default -> value
+fun UiText.toText(): String = when (this) {
+    is Direct -> value
     is ResId -> {
         if (args == null) stringResource(resId)
         else stringResource(resId, *args)
@@ -56,6 +40,3 @@ private fun UserMessage.toDisplayMessage(): String = when (this) {
         else pluralStringResource(resId, count, *args)
     }
 }
-
-@JvmInline
-value class UserMessageEffectScope(val displayMessage: String)

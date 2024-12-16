@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nlab.reminder.core.component.usermessage
+package com.nlab.reminder.core.component.text
 
 import androidx.annotation.PluralsRes
 import androidx.annotation.StringRes
@@ -21,10 +21,10 @@ import androidx.annotation.StringRes
 /**
  * @author Doohyun
  */
-sealed class UserMessage private constructor() {
-    data class Default(val value: String) : UserMessage()
+sealed class UiText private constructor() {
+    data class Direct(val value: String) : UiText()
 
-    data class ResId(@StringRes val resId: Int, val args: Array<Any>?) : UserMessage() {
+    data class ResId(@StringRes val resId: Int, val args: Array<Any>?) : UiText() {
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
             if (javaClass != other?.javaClass) return false
@@ -47,7 +47,7 @@ sealed class UserMessage private constructor() {
         }
     }
 
-    data class PluralsResId(@PluralsRes val resId: Int, val count: Int, val args: Array<Any>?) : UserMessage() {
+    data class PluralsResId(@PluralsRes val resId: Int, val count: Int, val args: Array<Any>?) : UiText() {
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
             if (javaClass != other?.javaClass) return false
@@ -73,40 +73,40 @@ sealed class UserMessage private constructor() {
     }
 }
 
-fun UserMessage(value: String): UserMessage = UserMessage.Default(value)
+fun UiText(value: String): UiText = UiText.Direct(value)
 
-fun UserMessage(@StringRes resId: Int): UserMessage = UserMessage.ResId(resId, args = null)
+fun UiText(@StringRes resId: Int): UiText = UiText.ResId(resId, args = null)
 
-fun UserMessage(
+fun UiText(
     @StringRes resId: Int,
     arg: Any,
-): UserMessage = UserMessage.ResId(resId, arrayOf(arg))
+): UiText = UiText.ResId(resId, arrayOf(arg))
 
-fun UserMessage(
+fun UiText(
     @StringRes resId: Int,
     firstArg: Any,
     secondArg: Any,
     vararg etcArgs: Any,
-): UserMessage = UserMessage.ResId(resId, mergeArgs(firstArg, secondArg, etcArgs))
+): UiText = UiText.ResId(resId, mergeArgs(firstArg, secondArg, etcArgs))
 
-fun PluralsUserMessage(
+fun PluralsUiText(
     @PluralsRes resId: Int,
     count: Int
-): UserMessage = UserMessage.PluralsResId(resId, count, args = null)
+): UiText = UiText.PluralsResId(resId, count, args = null)
 
-fun PluralsUserMessage(
+fun PluralsUiText(
     @PluralsRes resId: Int,
     count: Int,
     args: Any,
-): UserMessage = UserMessage.PluralsResId(resId, count, arrayOf(args))
+): UiText = UiText.PluralsResId(resId, count, arrayOf(args))
 
-fun PluralsUserMessage(
+fun PluralsUiText(
     @PluralsRes resId: Int,
     count: Int,
     firstArg: Any,
     secondArg: Any,
     vararg etcArgs: Any,
-): UserMessage = UserMessage.PluralsResId(resId, count, mergeArgs(firstArg, secondArg, etcArgs))
+): UiText = UiText.PluralsResId(resId, count, mergeArgs(firstArg, secondArg, etcArgs))
 
 private fun mergeArgs(
     firstArg: Any,

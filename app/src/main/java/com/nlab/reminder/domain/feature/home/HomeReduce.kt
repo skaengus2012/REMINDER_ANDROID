@@ -17,7 +17,7 @@
 package com.nlab.reminder.domain.feature.home
 
 import com.nlab.reminder.core.translation.StringIds
-import com.nlab.reminder.core.component.usermessage.UserMessage
+import com.nlab.reminder.core.component.text.UiText
 import com.nlab.reminder.core.kotlin.onFailure
 import com.nlab.statekit.dsl.reduce.DslReduce
 import com.nlab.statekit.reduce.Reduce
@@ -82,7 +82,7 @@ internal fun HomeReduce(environment: HomeEnvironment): HomeReduce = DslReduce {
             suspendEffect<OnTagLongClicked> {
                 environment.tagEditDelegate
                     .startEditing(tag = action.tag)
-                    .onFailure { dispatch(UserMessagePosted(UserMessage(StringIds.tag_not_found))) }
+                    .onFailure { dispatch(UserMessagePosted(UiText(StringIds.tag_not_found))) }
             }
         }
         scope(isMatch = { current.interaction is HomeInteraction.TagEdit }) {
@@ -92,18 +92,18 @@ internal fun HomeReduce(environment: HomeEnvironment): HomeReduce = DslReduce {
             suspendEffect<OnTagRenameConfirmClicked> {
                 environment.tagEditDelegate
                     .tryUpdateTagName(current.tags)
-                    .onFailure { dispatch(UserMessagePosted(UserMessage(StringIds.unknown_error))) }
+                    .onFailure { dispatch(UserMessagePosted(UiText(StringIds.unknown_error))) }
             }
             suspendEffect<OnTagReplaceConfirmClicked> {
                 environment.tagEditDelegate
                     .mergeTag()
-                    .onFailure { dispatch(UserMessagePosted(UserMessage(StringIds.unknown_error))) }
+                    .onFailure { dispatch(UserMessagePosted(UiText(StringIds.unknown_error))) }
             }
             effect<OnTagDeleteRequestClicked> { environment.tagEditDelegate.startDelete() }
             suspendEffect<OnTagDeleteConfirmClicked> {
                 environment.tagEditDelegate
                     .deleteTag()
-                    .onFailure { dispatch(UserMessagePosted(UserMessage(StringIds.unknown_error))) }
+                    .onFailure { dispatch(UserMessagePosted(UiText(StringIds.unknown_error))) }
             }
         }
         transition<UserMessagePosted> { current.copy(userMessages = current.userMessages + action.message) }

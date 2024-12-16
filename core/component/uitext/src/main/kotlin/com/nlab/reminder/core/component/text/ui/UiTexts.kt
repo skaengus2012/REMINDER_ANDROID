@@ -14,16 +14,23 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.component.usermessage
+package com.nlab.reminder.core.component.text.ui
 
-import com.nlab.testkit.faker.genBothify
-import com.nlab.testkit.faker.genInt
+import android.content.Context
+import com.nlab.reminder.core.component.text.UiText
 
 /**
- * @author Thalys
+ * @author Doohyun
  */
-fun genUserMessage(value: String = genBothify()): UserMessage = UserMessage(value)
+fun UiText.toText(context: Context): String = when (this) {
+    is UiText.Direct -> value
+    is UiText.ResId -> {
+        if (args == null) context.getString(resId)
+        else context.getString(resId, *args)
+    }
 
-fun genUserMessages(size: Int = genInt(min = 1, max = 10)): List<UserMessage> = List(size) {
-    genUserMessage(value = "${genBothify()}_$it")
+    is UiText.PluralsResId -> {
+        if (args == null) context.resources.getQuantityString(resId, count)
+        else context.resources.getQuantityString(resId, count, *args)
+    }
 }

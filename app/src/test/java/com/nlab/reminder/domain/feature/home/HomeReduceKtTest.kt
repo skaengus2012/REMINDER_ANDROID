@@ -18,8 +18,8 @@ package com.nlab.reminder.domain.feature.home
 
 import com.nlab.reminder.core.component.tag.edit.TagEditDelegate
 import com.nlab.reminder.core.component.tag.edit.genTagEditState
-import com.nlab.reminder.core.component.usermessage.UserMessage
-import com.nlab.reminder.core.component.usermessage.genUserMessages
+import com.nlab.reminder.core.component.text.UiText
+import com.nlab.reminder.core.component.text.genUiTexts
 import com.nlab.reminder.core.data.model.genTag
 import com.nlab.reminder.core.kotlin.Result
 import com.nlab.reminder.core.translation.StringIds
@@ -253,7 +253,7 @@ class HomeReduceKtTest {
             .initState(genHomeUiStateSuccess(interaction = HomeInteraction.Empty, userMessages = emptyList()))
             .action(HomeAction.OnTagLongClicked(genTag()))
             .expectedStateFromInput {
-                initState.copy(userMessages = listOf(UserMessage(StringIds.tag_not_found)))
+                initState.copy(userMessages = listOf(UiText(StringIds.tag_not_found)))
             }
             .verify(shouldVerifyWithEffect = true)
     }
@@ -307,7 +307,7 @@ class HomeReduceKtTest {
             )
             .action(HomeAction.OnTagRenameConfirmClicked)
             .expectedStateFromInput {
-                initState.copy(userMessages = listOf(UserMessage(StringIds.unknown_error)))
+                initState.copy(userMessages = listOf(UiText(StringIds.unknown_error)))
             }
             .verify(shouldVerifyWithEffect = true)
     }
@@ -327,7 +327,7 @@ class HomeReduceKtTest {
             )
             .action(HomeAction.OnTagReplaceConfirmClicked)
             .expectedStateFromInput {
-                initState.copy(userMessages = listOf(UserMessage(StringIds.unknown_error)))
+                initState.copy(userMessages = listOf(UiText(StringIds.unknown_error)))
             }
             .verify(shouldVerifyWithEffect = true)
     }
@@ -358,7 +358,7 @@ class HomeReduceKtTest {
             )
             .action(HomeAction.OnTagDeleteConfirmClicked)
             .expectedStateFromInput {
-                initState.copy(userMessages = listOf(UserMessage(StringIds.unknown_error)))
+                initState.copy(userMessages = listOf(UiText(StringIds.unknown_error)))
             }
             .verify(shouldVerifyWithEffect = true)
     }
@@ -368,7 +368,7 @@ class HomeReduceKtTest {
         genHomeReduce()
             .transitionScenario()
             .initState(genHomeUiStateSuccess(userMessages = emptyList()))
-            .action(HomeAction.UserMessagePosted(UserMessage(genBothify())))
+            .action(HomeAction.UserMessagePosted(UiText(genBothify())))
             .expectedStateFromInput {
                 initState.copy(
                     userMessages = listOf(action.message)
@@ -379,7 +379,7 @@ class HomeReduceKtTest {
 
     @Test
     fun `Given success with 2 or more user messages, When user message shown, Then user message removed`() = runTest {
-        val userMessages = genUserMessages(genInt(min = 2, max = 10))
+        val userMessages = genUiTexts(genInt(min = 2, max = 10))
 
         genHomeReduce()
             .transitionScenario()

@@ -14,24 +14,16 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.feature.home
+package com.nlab.reminder.core.component.text
 
-import com.nlab.reminder.core.data.model.Tag
-import com.nlab.reminder.core.kotlin.NonNegativeLong
-import com.nlab.reminder.core.component.text.UiText
+import com.nlab.testkit.faker.genBothify
+import com.nlab.testkit.faker.genInt
 
 /**
- * @author Doohyun
+ * @author Thalys
  */
-internal sealed class HomeUiState private constructor() {
-    data object Loading : HomeUiState()
+fun genUiText(value: String = genBothify()): UiText = UiText(value)
 
-    data class Success(
-        val todayScheduleCount: NonNegativeLong,
-        val timetableScheduleCount: NonNegativeLong,
-        val allScheduleCount: NonNegativeLong,
-        val tags: List<Tag>,
-        val interaction: HomeInteraction,
-        val userMessages: List<UiText>
-    ) : HomeUiState()
+fun genUiTexts(size: Int = genInt(min = 1, max = 10)): List<UiText> = List(size) {
+    genUiText(value = "${genBothify()}_$it")
 }
