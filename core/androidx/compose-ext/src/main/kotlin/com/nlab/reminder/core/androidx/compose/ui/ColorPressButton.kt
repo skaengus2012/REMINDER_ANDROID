@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.androidx.compose.ui.component
+package com.nlab.reminder.core.androidx.compose.ui
 
 import android.content.res.Configuration.UI_MODE_NIGHT_NO
 import androidx.compose.foundation.clickable
@@ -35,7 +35,6 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.nlab.reminder.core.androidx.compose.ui.throttle
 import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
 
 /**
@@ -44,9 +43,9 @@ import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
 @Composable
 fun ColorPressButton(
     contentColor: Color,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
     pressedContentColor: Color = contentColor.copy(alpha = 0.5f),
-    onClick: () -> Unit = {},
     content: @Composable RowScope.(Color) -> Unit
 ) {
     InternalColorPressButton(
@@ -70,7 +69,7 @@ private fun InternalColorPressButton(
             .clickable(
                 interactionSource = interactionSource,
                 indication = null,
-                onClick = onClick.throttle(),
+                onClick = onClick,
                 role = Role.Button
             ),
         verticalAlignment = Alignment.CenterVertically
@@ -86,7 +85,8 @@ fun ColorPressButtonPreview() {
     PlaneatTheme {
         ColorPressButton(
             contentColor = PlaneatTheme.colors.point1,
-            modifier = Modifier.padding(10.dp)
+            modifier = Modifier.padding(10.dp),
+            onClick = {}
         ) { contentColor ->
             Text(
                 text = "Button",

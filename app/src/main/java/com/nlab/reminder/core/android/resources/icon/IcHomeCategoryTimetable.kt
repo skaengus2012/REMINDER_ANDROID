@@ -25,13 +25,13 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.ImageVector.Builder
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
-import com.nlab.reminder.core.android.designsystem.icon.ReminderIcons
+import com.nlab.reminder.core.android.designsystem.icon.PlanetIcons
 
 /**
  * @author Doohyun
  */
 @Suppress("UnusedReceiverParameter")
-val ReminderIcons.IcHomeCategoryTimetable: ImageVector
+val PlanetIcons.IcHomeCategoryTimetable: ImageVector
     get() {
         if (_icHomeCategoryTimetable != null) {
             return _icHomeCategoryTimetable!!

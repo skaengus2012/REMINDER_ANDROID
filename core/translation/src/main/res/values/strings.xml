@@ -68,8 +68,6 @@
     <string name="home_category_timetable">예정</string>
     <string name="home_category_all">전체</string>
     <string name="home_tag_header">나의 태그</string>
-    <string name="home_push_on_label">시간 알림 on</string>
-    <string name="home_push_off_label">시간 알림 off</string>
     <string name="new_schedule_label">새로운 플랜</string>
 
     <string name="home_tag_config_label_rename">Rename Tag</string>

@@ -64,7 +64,5 @@
     <string name="home_category_timetable">Scheduled</string>
     <string name="home_category_all">All</string>
     <string name="home_tag_header">My Tags</string>
-    <string name="home_push_on_label">Time-Push on</string>
-    <string name="home_push_off_label">Time-Push off</string>
     <string name="new_schedule_label">New Plan</string>
 </resources>

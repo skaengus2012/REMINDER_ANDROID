@@ -16,83 +16,11 @@
 
 package com.nlab.reminder.domain.feature.home.ui
 
-import android.content.res.Configuration
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Text
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
-import com.nlab.reminder.core.data.model.Tag
-import com.nlab.reminder.core.data.model.TagId
-import com.nlab.reminder.core.kotlin.toNonBlankString
-import com.nlab.reminder.core.translation.StringIds
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
-
 /**
  * @author Doohyun
  */
-@OptIn(ExperimentalLayoutApi::class)
-@Composable
-internal fun TagTextsBox(
-    tags: ImmutableList<Tag>,
-    modifier: Modifier = Modifier,
-    onTagClicked: (Tag) -> Unit = {},
-    onTagLongClicked: (Tag) -> Unit = {}
-) {
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .defaultMinSize(minHeight = 160.dp)
-            .clip(RoundedCornerShape(8.dp))
-            .background(PlaneatTheme.colors.bgCard1),
-    ) {
-        if (tags.isEmpty()) {
-            Box(
-                modifier = Modifier.matchParentSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = LocalContext.current.getString(StringIds.common_tag_empty),
-                    style = PlaneatTheme.typography.bodyMedium,
-                    color = PlaneatTheme.colors.content2,
-                )
-            }
-        } else {
-            FlowRow(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 18.dp, vertical = 11.5.dp),
-                horizontalArrangement = Arrangement.spacedBy(14.dp, Alignment.Start)
-            ) {
-                tags.forEach { tag ->
-                    key(tag.id) {
-                        TagText(
-                            text = tag.name.value,
-                            modifier = Modifier.padding(vertical = 6.5.dp),
-                            onClick = { onTagClicked(tag) },
-                            onLongClick = { onTagLongClicked(tag) }
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
 
+/**
 @Preview(
     name = "DarkTagTextsBoxPreview",
     uiMode = Configuration.UI_MODE_NIGHT_YES,
@@ -131,4 +59,4 @@ private fun TagTextsBoxEmptyPreview() {
     PlaneatTheme {
         TagTextsBox(persistentListOf())
     }
-}
+}*/

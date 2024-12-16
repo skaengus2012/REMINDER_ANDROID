@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 The N's lab Open Source Project
+ * Copyright (C) 2024 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.feature.home.ui
+package com.nlab.reminder.core.component.tag.ui.compose
 
-import android.content.res.Configuration
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
@@ -25,26 +24,28 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.nlab.reminder.core.androidx.compose.ui.throttle
+import com.nlab.reminder.core.androidx.compose.ui.tooling.preview.Previews
+import com.nlab.reminder.core.androidx.compose.ui.throttleClick
 import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
 import com.nlab.reminder.core.translation.StringIds
 
 /**
- * @author Doohyun
+ * @author Thalys
  */
 @Composable
-fun TagText(
+fun TagCard(
     text: String,
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
@@ -60,7 +61,7 @@ fun TagText(
             onLongClickLabel = onLongClickLabel
         )
         Text(
-            text = LocalContext.current.getString(StringIds.format_tag, text),
+            text = stringResource(StringIds.format_tag, text),
             style = PlaneatTheme.typography.bodyMedium,
             color = PlaneatTheme.colors.contentTag,
             modifier = Modifier.padding(horizontal = 12.dp, vertical = 5.dp),
@@ -87,7 +88,7 @@ private fun BoxScope.TagTextBackground(
             .combinedClickable(
                 interactiveSource,
                 indication = ripple(color = PlaneatTheme.colors.bgTagRipple),
-                onClick = onClick.throttle(),
+                onClick = throttleClick(onClick = onClick),
                 onClickLabel = onClickLabel,
                 onLongClick = onLongClick,
                 onLongClickLabel = onLongClickLabel
@@ -95,23 +96,18 @@ private fun BoxScope.TagTextBackground(
     )
 }
 
-@Preview(
-    name = "DarkTagTextPreview",
-    uiMode = Configuration.UI_MODE_NIGHT_YES,
-    showBackground = true,
-)
-@Preview(
-    name = "LightTagTextPreview",
-    uiMode = Configuration.UI_MODE_NIGHT_NO,
-    showBackground = true,
-)
+@Previews
 @Composable
-private fun TagTextPreview() {
+private fun TagCardPreview() {
     PlaneatTheme {
         Box(
-            modifier = Modifier.background(PlaneatTheme.colors.bgCard1)
-        ) {
-            TagText(text = "Hello")
+            modifier = Modifier
+                .size(150.dp)
+                .background(PlaneatTheme.colors.bgCard1)) {
+            TagCard(
+                modifier = Modifier.align(Alignment.Center),
+                text = "Hello TagCard"
+            )
         }
     }
 }

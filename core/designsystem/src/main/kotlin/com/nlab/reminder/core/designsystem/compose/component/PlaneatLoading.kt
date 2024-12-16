@@ -16,9 +16,11 @@
 
 package com.nlab.reminder.core.designsystem.compose.component
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -37,4 +39,17 @@ fun PlaneatLoading(
         color = color,
         strokeWidth = 3.5.dp
     )
+}
+
+@Composable
+fun PlaneatLoadingContent(
+    modifier: Modifier = Modifier,
+    color: Color = PlaneatTheme.colors.point1,
+) {
+    Box(modifier = modifier) {
+        PlaneatLoading(
+            modifier = Modifier.align(Alignment.Center),
+            color = color,
+        )
+    }
 }

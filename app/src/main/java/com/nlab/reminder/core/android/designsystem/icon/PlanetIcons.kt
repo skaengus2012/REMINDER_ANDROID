@@ -19,4 +19,4 @@ package com.nlab.reminder.core.android.designsystem.icon
 /**
  * @author thalys
  */
-object ReminderIcons
+object PlanetIcons

@@ -126,6 +126,7 @@ nlab-android-application-jacoco = { id = "nlab.android.application.jacoco", vers
 nlab-android-hilt = { id = "nlab.android.hilt", version = "unspecified" }
 nlab-android-library = { id = "nlab.android.library", version = "unspecified" }
 nlab-android-library-compose = { id = "nlab.android.library.compose", version = "unspecified" }
+nlab-android-library-compose-component = { id = "nlab.android.library.compose.component", version = "unspecified" }
 nlab-android-library-jacoco = { id = "nlab.android.library.jacoco", version = "unspecified" }
 nlab-jvm-library = { id = "nlab.jvm.library", version = "unspecified" }
 nlab-jvm-library-jacoco = { id = "nlab.jvm.library.jacoco", version = "unspecified" }

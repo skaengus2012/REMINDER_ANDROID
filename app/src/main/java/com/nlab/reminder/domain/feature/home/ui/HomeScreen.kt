@@ -16,196 +16,248 @@
 
 package com.nlab.reminder.domain.feature.home.ui
 
+import androidx.annotation.StringRes
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.windowInsetsBottomHeight
+import androidx.compose.foundation.layout.windowInsetsStartWidth
+import androidx.compose.foundation.layout.windowInsetsTopHeight
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.nlab.reminder.core.androidx.compose.ui.DelayedContent
+import com.nlab.reminder.core.androidx.compose.ui.tooling.preview.Previews
+import com.nlab.reminder.core.data.model.Tag
+import com.nlab.reminder.core.data.model.TagId
+import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
+import com.nlab.reminder.core.kotlin.toNonBlankString
+import com.nlab.reminder.core.kotlin.toNonNegativeLong
+import com.nlab.reminder.domain.feature.home.HomeInteraction
+import com.nlab.reminder.domain.feature.home.HomeUiState
+import com.nlab.reminder.domain.feature.home.HomeViewModel
+import com.nlab.reminder.domain.feature.home.onTodayCategoryClicked
+import com.nlab.reminder.R
+import com.nlab.reminder.core.android.designsystem.icon.PlanetIcons
+import com.nlab.reminder.core.android.resources.font.CategoryCountFontFamily
+import com.nlab.reminder.core.android.resources.icon.IcHomeCategoryAll
+import com.nlab.reminder.core.android.resources.icon.IcHomeCategoryTimetable
+import com.nlab.reminder.core.android.resources.icon.IcHomeCategoryToday
+import com.nlab.reminder.core.androidx.compose.ui.ColorPressButton
+import com.nlab.reminder.core.androidx.compose.ui.throttleClick
+import com.nlab.reminder.core.component.tag.ui.compose.TagCard
+import com.nlab.reminder.core.designsystem.compose.component.PlaneatLoadingContent
+import com.nlab.reminder.core.kotlin.NonNegativeLong
+import com.nlab.reminder.core.translation.StringIds
+import com.nlab.reminder.domain.feature.home.interacted
+import com.nlab.reminder.domain.feature.home.onAllCategoryClicked
+import com.nlab.reminder.domain.feature.home.onTagLongClicked
+import com.nlab.reminder.domain.feature.home.onTimetableCategoryClicked
 
 /**
  * @author Doohyun
  */
 @Composable
-internal fun HomeRoute(
+internal fun HomeScreen(
     navigateToAllScheduleEnd: () -> Unit,
     modifier: Modifier = Modifier,
-
+    viewModel: HomeViewModel = hiltViewModel()
 ) {
-    /**
+    val uiState: HomeUiState by viewModel.uiState.collectAsStateWithLifecycle()
     HomeScreen(
-        uiState = viewModel.uiState.collectAsStateWithLifecycle(
-            lifecycleOwner = LocalLifecycleOwner.current // error : CompositionLocal LocalLifecycleOwner not present
-        ),
-        onTodayCategoryClicked = viewModel::onTodayCategoryClicked,
-        onTimetableCategoryClicked = viewModel::onTimetableCategoryClicked,
-        onAllCategoryClicked = viewModel::onAllCategoryClicked,
-        onTagLongClicked = viewModel::onTagLongClicked,
-        onTagRenameRequestClicked = viewModel::onTagRenameRequestClicked,
-        onTagRenameKeyboardShown = viewModel::onTagRenameInputKeyboardShown,
-        onTagRenameTextChanged = viewModel::onTagRenameInputted,
-        onTagRenameConfirmClicked = viewModel::onTagRenameConfirmClicked,
-        onTagDeleteRequestClicked = viewModel::onTagDeleteRequestClicked,
-        onTagDeleteConfirmClicked = viewModel::onTagDeleteConfirmClicked,
-        completeWorkflow = viewModel::completeWorkflow,
-        userMessageShown = viewModel::userMessageShown,
-        navigateToAllScheduleEnd = navigateToAllScheduleEnd,
-        modifier = modifier
-    )*/
+        uiState = uiState,
+        modifier = modifier,
+        onTodayCategoryClicked = throttleClick { viewModel.onTodayCategoryClicked() },
+        onTimetableCategoryClicked = { viewModel.onTimetableCategoryClicked() },
+        onAllCategoryClicked = { viewModel.onAllCategoryClicked() },
+        onInteracted = { viewModel.interacted() },
+        onTagClicked = {
+            // TODO implements
+        },
+        onTagLongClicked = { tag -> viewModel.onTagLongClicked(tag) },
+        onNewPlanClicked = {
+            // TODO implements
+        }
+    )
 }
-/**
+
 @Composable
 private fun HomeScreen(
-    uiState: State<HomeUiState>,
+    uiState: HomeUiState,
     onTodayCategoryClicked: () -> Unit,
     onTimetableCategoryClicked: () -> Unit,
     onAllCategoryClicked: () -> Unit,
+    onInteracted: () -> Unit,
+    onTagClicked: (Tag) -> Unit,
     onTagLongClicked: (Tag) -> Unit,
-    onTagRenameRequestClicked: () -> Unit,
-    onTagRenameKeyboardShown: () -> Unit,
-    onTagRenameTextChanged: (String) -> Unit,
-    onTagRenameConfirmClicked: () -> Unit,
-    onTagDeleteRequestClicked: () -> Unit,
-    onTagDeleteConfirmClicked: () -> Unit,
-    completeWorkflow: () -> Unit,
-    userMessageShown: (UserMessage) -> Unit,
-    navigateToAllScheduleEnd: () -> Unit,
-    modifier: Modifier = Modifier,
+    onNewPlanClicked: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    val context = LocalContext.current
-    var isLoadedDelayNeeded by remember { mutableStateOf(false) }
-
-    Box(modifier = modifier.fillMaxSize()) {
-        when (val curUi = uiState.value) {
-            HomeUiState.Loading -> {
-                val visibleState = rememberDelayedVisibleState()
-                LaunchedEffect(curUi) {
-                    snapshotFlow { visibleState.isVisible }
-                        .distinctUntilChanged()
-                        .collect { isLoadedDelayNeeded = it }
-                }
-                DelayedVisibleContent(
-                    delayTimeMillis = 500,
-                    visibleState = visibleState,
-                    key = curUi
-                ) {
-                    ReminderLoadingIndicator(modifier = Modifier.align(Alignment.Center))
-                }
+    when (uiState) {
+        is HomeUiState.Loading -> {
+            DelayedContent(delayTimeMillis = 500) {
+                PlaneatLoadingContent()
             }
+        }
 
-            is HomeUiState.Success -> {
-                DelayedVisibleContent(
-                    delayTimeMillis = if (isLoadedDelayNeeded) 100 else 0,
-                    key = curUi
-                ) {
-                    HomeContent(
-                        todayScheduleCount = curUi.todayScheduleCount,
-                        timetableScheduleCount = curUi.timetableScheduleCount,
-                        allScheduleCount = curUi.allScheduleCount,
-                        tags = curUi.tags,
-                        onTodayCategoryClicked = onTodayCategoryClicked,
-                        onTimetableCategoryClicked = onTimetableCategoryClicked,
-                        onAllCategoryClicked = onAllCategoryClicked,
-                        onTagLongClicked = onTagLongClicked
-                    )
-                }
-
-                UserMessageHandler(
-                    messages = curUi.userMessages,
-                    onMessageReleased = userMessageShown
-                ) { context.showToast(displayMessage) }
-
-                HomeWorkflowHandler(
-                    workflow = curUi.interaction,
-                    completeWorkflow = completeWorkflow,
-                    onTagRenameRequestClicked = onTagRenameRequestClicked,
-                    onTagRenameTextChanged = onTagRenameTextChanged,
-                    onTagRenameConfirmClicked = onTagRenameConfirmClicked,
-                    onTagRenameKeyboardShown = onTagRenameKeyboardShown,
-                    onTagDeleteRequestClicked = onTagDeleteRequestClicked,
-                    onTagDeleteConfirmClicked = onTagDeleteConfirmClicked,
-                    navigateToAllScheduleEnd = navigateToAllScheduleEnd
+        is HomeUiState.Success -> {
+            DelayedContent(delayTimeMillis = 100) {
+                HomeContents(
+                    modifier = modifier,
+                    todayCount = uiState.todayScheduleCount,
+                    timetableCount = uiState.timetableScheduleCount,
+                    allCount = uiState.allScheduleCount,
+                    tags = uiState.tags,
+                    onTodayCategoryClicked = onTodayCategoryClicked,
+                    onTimetableCategoryClicked = onTimetableCategoryClicked,
+                    onAllCategoryClicked = onAllCategoryClicked,
+                    onTagClicked = onTagClicked,
+                    onTagLongClicked = onTagLongClicked,
+                    onNewPlanClicked = onNewPlanClicked
                 )
             }
+            HomeInteractionHandler(
+                interaction = uiState.interaction,
+                onInteracted = onInteracted
+            )
         }
     }
 }
 
 @Composable
-private fun HomeContent(
-    todayScheduleCount: Long,
-    timetableScheduleCount: Long,
-    allScheduleCount: Long,
-    tags: ImmutableList<Tag>,
-    modifier: Modifier = Modifier,
+private fun HomeContents(
+    todayCount: NonNegativeLong,
+    timetableCount: NonNegativeLong,
+    allCount: NonNegativeLong,
+    tags: List<Tag>,
     onTodayCategoryClicked: () -> Unit,
     onTimetableCategoryClicked: () -> Unit,
     onAllCategoryClicked: () -> Unit,
+    onTagClicked: (Tag) -> Unit,
     onTagLongClicked: (Tag) -> Unit,
+    onNewPlanClicked: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    val homeContentPaddingBottom = 76.dp
-    val homeContentScrollState = rememberScrollState()
-    Box(modifier = modifier) {
-        HomeItems(
-            todayScheduleCount = todayScheduleCount,
-            timetableScheduleCount = timetableScheduleCount,
-            allScheduleCount = allScheduleCount,
-            tags = tags,
+    Box(modifier = modifier.fillMaxSize()) {
+        val bodyScrollState = rememberScrollState()
+        val bodyPaddingTop = 32.dp
+        val bodyPaddingBottom = 75.dp
+        HomeBody(
             modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(homeContentScrollState)
-                .padding(horizontal = 20.dp)
-                .padding(bottom = homeContentPaddingBottom),
+                .fillMaxWidth()
+                .verticalScroll(bodyScrollState)
+                .statusBarsPadding()
+                .navigationBarsPadding()
+                .padding(start = 20.dp, top = bodyPaddingTop, end = 20.dp, bottom = bodyPaddingBottom),
+            todayCount = todayCount,
+            timetableCount = timetableCount,
+            allCount = allCount,
+            tags = tags,
             onTodayCategoryClicked = onTodayCategoryClicked,
             onTimetableCategoryClicked = onTimetableCategoryClicked,
             onAllCategoryClicked = onAllCategoryClicked,
-            onTagLongClicked = onTagLongClicked
+            onTagClicked = onTagClicked,
+            onTagLongClicked = onTagLongClicked,
         )
-
-        BottomContent(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp)
-                .align(Alignment.BottomCenter),
-            homeContentPaddingBottom = homeContentPaddingBottom,
-            homeContentScrollState = homeContentScrollState
+        HeadBlurLayer(
+            modifier = Modifier.align(Alignment.TopCenter),
+            startAnimOffset = 20.dp,
+            bodyPaddingTop = bodyPaddingTop,
+            bodyScrollState = bodyScrollState
+        )
+        BottomActions(
+            modifier = Modifier.align(Alignment.BottomCenter),
+            contentHeight = 50.dp,
+            bodyBottomPadding = bodyPaddingBottom,
+            bodyScrollState = bodyScrollState,
+            onNewPlanClicked = onNewPlanClicked
         )
     }
 }
 
 @Composable
-private fun HomeItems(
-    todayScheduleCount: Long,
-    timetableScheduleCount: Long,
-    allScheduleCount: Long,
-    tags: ImmutableList<Tag>,
-    modifier: Modifier = Modifier,
-    onTodayCategoryClicked: () -> Unit = {},
-    onTimetableCategoryClicked: () -> Unit = {},
-    onAllCategoryClicked: () -> Unit = {},
-    onTagLongClicked: (Tag) -> Unit = {},
+private fun HomeBody(
+    todayCount: NonNegativeLong,
+    timetableCount: NonNegativeLong,
+    allCount: NonNegativeLong,
+    tags: List<Tag>,
+    onTodayCategoryClicked: () -> Unit,
+    onTimetableCategoryClicked: () -> Unit,
+    onAllCategoryClicked: () -> Unit,
+    onTagClicked: (Tag) -> Unit,
+    onTagLongClicked: (Tag) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
-        Logo(modifier = Modifier.padding(top = 32.dp))
+        Logo()
         HomeTitle(
-            textRes = R.string.home_category_header,
-            modifier = Modifier.padding(top = 42.5.dp)
+            textRes = StringIds.home_category_header,
+            modifier = Modifier.padding(top = 25.dp)
         )
         CategoryCardsRow(
-            modifier = Modifier.padding(top = 14.dp),
-            todayCount = todayScheduleCount,
-            timetableCount = timetableScheduleCount,
-            allCount = allScheduleCount,
+            modifier = Modifier
+                .widthIn(max = 478.dp)
+                .fillMaxWidth(),
+            todayCount = todayCount,
+            timetableCount = timetableCount,
+            allCount = allCount,
             onTodayCategoryClicked = onTodayCategoryClicked,
             onTimetableCategoryClicked = onTimetableCategoryClicked,
             onAllCategoryClicked = onAllCategoryClicked
         )
         HomeTitle(
-            textRes = R.string.home_tag_header,
-            modifier = Modifier.padding(top = 59.dp)
+            textRes = StringIds.home_tag_header,
+            modifier = Modifier.padding(top = 25.dp)
         )
-        TagTextsBox(
+        TagCards(
             modifier = Modifier
-                .padding(top = 14.dp, bottom = 10.dp)
-                .fillMaxWidth(),
-            tags = tags, // Tag 가 모듈로 분리되면서, skip 작동하지 않음. strong-skip 존버.
-            onTagClicked = {},
+                .fillMaxWidth()
+                .heightIn(min = 160.dp),
+            tags = tags,
+            onTagClicked = onTagClicked,
             onTagLongClicked = onTagLongClicked
         )
     }
@@ -219,7 +271,7 @@ private fun Logo(modifier: Modifier = Modifier) {
             .height(30.dp),
         painter = painterResource(id = R.drawable.ic_logo),
         contentDescription = null,
-        tint = ReminderTheme.colors.content1
+        tint = PlaneatTheme.colors.content1
     )
 }
 
@@ -230,46 +282,447 @@ private fun HomeTitle(
 ) {
     Text(
         text = stringResource(textRes),
-        style = ReminderTheme.typography.titleMedium,
-        color = ReminderTheme.colors.content1,
-        modifier = modifier
+        style = PlaneatTheme.typography.titleMedium,
+        color = PlaneatTheme.colors.content1,
+        modifier = modifier.padding(vertical = 15.dp)
     )
 }
 
 @Composable
-private fun BottomContent(
-    homeContentPaddingBottom: Dp,
-    homeContentScrollState: ScrollState,
+internal fun CategoryCardsRow(
+    todayCount: NonNegativeLong,
+    timetableCount: NonNegativeLong,
+    allCount: NonNegativeLong,
+    onTodayCategoryClicked: () -> Unit,
+    onTimetableCategoryClicked: () -> Unit,
+    onAllCategoryClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    BottomContainer(
-        contentPaddingBottom = homeContentPaddingBottom,
-        contentScrollState = homeContentScrollState,
-        modifier = modifier
-    ) {
-        NewPlanButton(
-            modifier = Modifier
-                .align(Alignment.CenterStart)
-                .padding(start = 10.dp),
-            onClick = {
-                // configTag = Tag(tagId = 1, name = "Config시도중..")
-            }
+    Row(modifier = modifier) {
+        TodayCategoryCard(
+            modifier = Modifier.weight(1f),
+            remainCount = todayCount,
+            onClick = onTodayCategoryClicked
         )
 
-        TimePushSwitchButton(
-            isPushOn = true,
-            modifier = Modifier
-                .align(Alignment.CenterEnd)
-                .padding(end = 10.dp),
-            onClick = {
-                /**
-                isPushOn = isPushOn.not()
-                deleteTag = DeleteTagEvent(Tag(tagId = 1, name = "삭제시도중.."))*/
-            },
+        Spacer(modifier = Modifier.width(14.dp))
+
+        TimetableCategoryCard(
+            modifier = Modifier.weight(1f),
+            remainCount = timetableCount,
+            onClick = onTimetableCategoryClicked
+        )
+
+        Spacer(modifier = Modifier.width(14.dp))
+
+        AllCategoryCard(
+            modifier = Modifier.weight(1f),
+            remainCount = allCount,
+            onClick = onAllCategoryClicked
         )
     }
 }
 
+@Composable
+private fun TodayCategoryCard(
+    remainCount: NonNegativeLong,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {},
+) {
+    BasicCategoryCard(
+        name = stringResource(StringIds.home_category_today),
+        remainCount = remainCount.value,
+        icon = {
+            Image(
+                imageVector = PlanetIcons.IcHomeCategoryToday,
+                contentDescription = null,
+                modifier = Modifier
+                    .fillMaxWidth(0.4883f)
+                    .aspectRatio(1f)
+            )
+        },
+        modifier = modifier,
+        onClick = onClick
+    )
+}
+
+@Composable
+private fun TimetableCategoryCard(
+    remainCount: NonNegativeLong,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {},
+) {
+    BasicCategoryCard(
+        name = stringResource(StringIds.home_category_timetable),
+        remainCount = remainCount.value,
+        icon = {
+            // case1: If you use webp, the image quality is not good when in landscape mode.
+            // case2: When using svg, the square is not drawn properly. (No problem when using view system)
+            // case3: Resolve when using image vector
+            Image(
+                imageVector = PlanetIcons.IcHomeCategoryTimetable,
+                contentDescription = null,
+                modifier = Modifier
+                    .fillMaxWidth(0.4f)
+                    .aspectRatio(1f)
+            )
+        },
+        modifier = modifier,
+        onClick = onClick
+    )
+}
+
+@Composable
+private fun AllCategoryCard(
+    remainCount: NonNegativeLong,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {},
+) {
+    BasicCategoryCard(
+        name = stringResource(StringIds.home_category_timetable),
+        remainCount = remainCount.value,
+        icon = {
+            Image(
+                imageVector = PlanetIcons.IcHomeCategoryAll,
+                contentDescription = null,
+                modifier = Modifier
+                    .fillMaxWidth(0.4232f)
+                    .aspectRatio(18.22f / 15.93f)
+            )
+        },
+        modifier = modifier,
+        onClick = onClick
+    )
+}
+
+@Composable
+private fun BasicCategoryCard(
+    name: String,
+    remainCount: Long,
+    icon: @Composable () -> Unit,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {},
+    onClickLabel: String = name,
+) {
+    Box(modifier = modifier) {
+        CategoryCardBackground(onClick, onClickLabel)
+        Column(
+            modifier = Modifier.matchParentSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top
+        ) {
+            Spacer(modifier = Modifier.fillMaxHeight(0.1346f))
+            CategoryIcon(icon)
+            Spacer(modifier = Modifier.fillMaxHeight(0.048f))
+            CategoryTitleText(name)
+            Spacer(modifier = Modifier.fillMaxHeight(0.17f))
+            CategoryCountText(remainCount)
+        }
+    }
+}
+
+@Composable
+private fun CategoryCardBackground(
+    onClick: () -> Unit = {},
+    onClickLabel: String? = null
+) {
+    Spacer(
+        modifier = Modifier
+            .aspectRatio(1 / 1.625f)
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(8.dp))
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = ripple(color = PlaneatTheme.colors.bgCard1Ripple),
+                onClick = onClick,
+                onClickLabel = onClickLabel,
+                role = Role.Tab
+            )
+            .background(PlaneatTheme.colors.bgCard1)
+    )
+}
+
+@Composable
+private fun CategoryIcon(icon: @Composable () -> Unit) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth(0.4479f)
+            .aspectRatio(1f)
+            .background(PlaneatTheme.colors.bg1, shape = CircleShape),
+        contentAlignment = Alignment.Center
+    ) {
+        icon()
+    }
+}
+
+@Composable
+private fun CategoryTitleText(text: String) {
+    Text(
+        text = text,
+        style = PlaneatTheme.typography.bodyMedium,
+        color = PlaneatTheme.colors.content2
+    )
+}
+
+@Composable
+private fun CategoryCountText(count: Long) {
+    Text(
+        text = count.toString(),
+        style = PlaneatTheme.typography.bodyLarge,
+        color = PlaneatTheme.colors.content1,
+        fontFamily = CategoryCountFontFamily
+    )
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun TagCards(
+    tags: List<Tag>,
+    modifier: Modifier = Modifier,
+    onTagClicked: (Tag) -> Unit,
+    onTagLongClicked: (Tag) -> Unit
+) {
+    Box(
+        modifier = modifier
+            .clip(RoundedCornerShape(8.dp))
+            .background(PlaneatTheme.colors.bgCard1),
+    ) {
+        if (tags.isEmpty()) {
+            Text(
+                modifier = Modifier.align(Alignment.Center),
+                text = LocalContext.current.getString(StringIds.common_tag_empty),
+                style = PlaneatTheme.typography.bodyMedium,
+                color = PlaneatTheme.colors.content2,
+            )
+        } else {
+            FlowRow(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 18.dp, vertical = 11.5.dp),
+                horizontalArrangement = Arrangement.spacedBy(14.dp, Alignment.Start)
+            ) {
+                tags.forEach { tag ->
+                    key(tag.id) {
+                        TagCard(
+                            text = tag.name.value,
+                            modifier = Modifier.padding(vertical = 6.5.dp),
+                            onClick = { onTagClicked(tag) },
+                            onLongClick = { onTagLongClicked(tag) }
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun HeadBlurLayer(
+    startAnimOffset: Dp,
+    bodyPaddingTop: Dp,
+    bodyScrollState: ScrollState,
+    modifier: Modifier = Modifier,
+) {
+    val containerColor = PlaneatTheme.colors.bgCard1
+    val lineColor = PlaneatTheme.colors.bgLine1
+    var computedHeightToPx by remember { mutableIntStateOf(0) }
+    val startAnimOffsetToPx = with(LocalDensity.current) { startAnimOffset.toPx() }
+    val bodyPaddingTopToPx = with(LocalDensity.current) { bodyPaddingTop.toPx() }
+    val alphaState by remember(computedHeightToPx, startAnimOffsetToPx, bodyPaddingTopToPx, bodyScrollState) {
+        val maxBottomContainerAnimPx = (bodyPaddingTopToPx - startAnimOffsetToPx)
+        derivedStateOf {
+            val curState = bodyScrollState.value
+            when {
+                computedHeightToPx == 0 -> 0f
+                curState < startAnimOffsetToPx -> 0f
+                curState > bodyPaddingTopToPx -> 1f
+                else -> (curState - startAnimOffsetToPx) / maxBottomContainerAnimPx
+            }
+        }
+    }
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .windowInsetsTopHeight(WindowInsets.statusBars)
+            .onSizeChanged { computedHeightToPx = it.height }
+    ) {
+        Spacer(
+            modifier = Modifier
+                .fillMaxSize()
+                .drawBehind { drawRect(color = containerColor.copy(alpha = 0.96f * alphaState)) }
+        )
+        Spacer(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(0.5.dp)
+                .align(Alignment.BottomCenter)
+                .drawBehind { drawRect(color = lineColor.copy(alpha = alphaState)) }
+        )
+    }
+}
+
+@Composable
+private fun BottomActions(
+    contentHeight: Dp,
+    bodyBottomPadding: Dp,
+    bodyScrollState: ScrollState,
+    onNewPlanClicked: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    var computedHeightToPx by remember { mutableIntStateOf(0) }
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(IntrinsicSize.Min)
+            .onSizeChanged { computedHeightToPx = it.height }
+    ) {
+        if (computedHeightToPx != 0) {
+            BottomBlurLayer(
+                computedHeightToPx = computedHeightToPx,
+                alphaAnimScrollTriggerOffsetToPx = with(LocalDensity.current) {
+                    remember(contentHeight, bodyBottomPadding) { (bodyBottomPadding - contentHeight).toPx().toInt() }
+                },
+                bodyScrollState = bodyScrollState,
+            )
+        }
+        Row {
+            Spacer(modifier = Modifier.windowInsetsStartWidth(WindowInsets.safeDrawing))
+            Column {
+                NewPlanButton(
+                    modifier = Modifier
+                        .height(contentHeight)
+                        .padding(start = 20.dp, end = 10.dp),
+                    onClick = onNewPlanClicked
+                )
+                Spacer(modifier = Modifier.windowInsetsBottomHeight(WindowInsets.safeDrawing))
+            }
+        }
+    }
+}
+
+@Composable
+private fun BottomBlurLayer(
+    bodyScrollState: ScrollState,
+    computedHeightToPx: Int,
+    alphaAnimScrollTriggerOffsetToPx: Int,
+    modifier: Modifier = Modifier
+) {
+    val containerColor = PlaneatTheme.colors.bgCard1
+    val lineColor = PlaneatTheme.colors.bgLine1
+    val alphaState by remember(computedHeightToPx, alphaAnimScrollTriggerOffsetToPx, bodyScrollState) {
+        val computedHeightWithOffsetToPx = computedHeightToPx + alphaAnimScrollTriggerOffsetToPx
+        val maxBottomContainerAnimPx = (computedHeightWithOffsetToPx - computedHeightToPx).toFloat()
+        derivedStateOf {
+            if (bodyScrollState.maxValue == Int.MAX_VALUE) 0f
+            else {
+                val remainScrollToPx = bodyScrollState.maxValue - bodyScrollState.value
+                val visibleClipToPaddingHeight =
+                    maxOf(computedHeightWithOffsetToPx - remainScrollToPx, 0)
+                val bottomContainerAnimPx = maxOf(visibleClipToPaddingHeight - computedHeightToPx, 0)
+                1f - bottomContainerAnimPx / maxBottomContainerAnimPx
+            }
+        }
+    }
+    Box(modifier = modifier.fillMaxSize()) {
+        Spacer(
+            modifier = Modifier
+                .fillMaxSize()
+                .drawBehind { drawRect(color = containerColor.copy(alpha = 0.925f * alphaState)) }
+        )
+        Spacer(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(0.5.dp)
+                .align(Alignment.TopCenter)
+                .drawBehind { drawRect(color = lineColor.copy(alpha = alphaState)) }
+        )
+    }
+}
+
+@Composable
+private fun NewPlanButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    ColorPressButton(
+        contentColor = PlaneatTheme.colors.point1,
+        modifier = modifier,
+        onClick = throttleClick(onClick = onClick)
+    ) { contentColor ->
+        Icon(
+            modifier = Modifier
+                .width(35.73.dp)
+                .height(20.69.dp),
+            painter = painterResource(id = R.drawable.ic_new_plan),
+            contentDescription = null,
+            tint = contentColor
+        )
+        Text(
+            text = stringResource(StringIds.new_schedule_label),
+            style = PlaneatTheme.typography.titleMedium,
+            color = contentColor
+        )
+    }
+}
+
+@Composable
+private fun HomeInteractionHandler(
+    interaction: HomeInteraction,
+    onInteracted: () -> Unit
+) {
+    when (interaction) {
+        is HomeInteraction.Empty -> Unit
+        is HomeInteraction.TodaySchedule -> {
+            LaunchedEffect(interaction) {
+                onInteracted()
+            }
+        }
+        is HomeInteraction.TimetableSchedule -> {
+            LaunchedEffect(interaction) {
+                onInteracted()
+            }
+        }
+        is HomeInteraction.AllSchedule -> {
+            LaunchedEffect(interaction) {
+                onInteracted()
+            }
+        }
+
+        else -> Unit
+    }
+}
+
+@Previews
+@Composable
+private fun HomeScreenPopulated() {
+    PlaneatTheme {
+        HomeScreen(
+            uiState = HomeUiState.Success(
+                todayScheduleCount = 10L.toNonNegativeLong(),
+                timetableScheduleCount = 20L.toNonNegativeLong(),
+                allScheduleCount = 30L.toNonNegativeLong(),
+                tags = (1L..100).map { index ->
+                    Tag(
+                        id = TagId(rawId = index),
+                        name = "TagName $index".toNonBlankString()
+                    )
+                },
+                interaction = HomeInteraction.Empty,
+                userMessages = emptyList()
+            ),
+            onTodayCategoryClicked = {},
+            onTimetableCategoryClicked = {},
+            onAllCategoryClicked = {},
+            onInteracted = {},
+            onTagClicked = {},
+            onTagLongClicked = {},
+            onNewPlanClicked = {}
+        )
+    }
+}
+
+
+/**
 @Composable
 private fun HomeWorkflowHandler(
     workflow: HomeInteraction,
@@ -345,34 +798,5 @@ private fun HomeWorkflowHandler(
                 if (workflow is HomeInteraction.AllSchedule) navigateToAllScheduleEnd()
             }
         }
-    }
-}
-
-@Preview(
-    name = "LightHomeContentPreview",
-    showBackground = true,
-    uiMode = UI_MODE_NIGHT_NO
-)
-@Preview(
-    name = "DarkHomeContentPreview",
-    showBackground = true,
-    uiMode = UI_MODE_NIGHT_YES
-)
-@Composable
-private fun HomeContentPreview() {
-    ReminderTheme {
-        HomeContent(
-            todayScheduleCount = 10,
-            timetableScheduleCount = 20,
-            allScheduleCount = 30,
-            tags = (1L..100)
-                .map { index -> Tag(id = TagId(rawId = 1), name = "TagName $index".toNonBlankString()) }
-                .toImmutableList(),
-            onTodayCategoryClicked = {},
-            onTimetableCategoryClicked = {},
-            onAllCategoryClicked = {},
-            onTagLongClicked = {},
-            modifier = Modifier.fillMaxSize()
-        )
     }
 }*/

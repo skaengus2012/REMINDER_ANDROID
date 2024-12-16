@@ -25,6 +25,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 /**
  * @author Doohyun
  */
+@Deprecated("Use throttleClick")
 @Composable
 fun (() -> Unit).throttle(
     windowDuration: Long = 100
@@ -37,4 +38,22 @@ fun (() -> Unit).throttle(
     }
 
     return { clickEvent.tryEmit(Unit) }
+}
+
+@Composable
+fun throttleClick(
+    windowDuration: Long = 500,
+    onClick: () -> Unit
+): () -> Unit {
+    val clickEvent = remember { MutableSharedFlow<Unit>(extraBufferCapacity = 1) }
+    LaunchedEffect(windowDuration, onClick) {
+        clickEvent
+            .throttleFirst(windowDuration)
+            .collect { onClick() }
+    }
+
+    val a: () -> Unit = {
+        clickEvent.tryEmit(Unit)
+    }
+    return a
 }
