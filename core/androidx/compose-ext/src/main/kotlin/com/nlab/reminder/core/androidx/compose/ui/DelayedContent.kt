@@ -18,9 +18,11 @@ package com.nlab.reminder.core.androidx.compose.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import kotlinx.coroutines.delay
 
@@ -28,32 +30,38 @@ import kotlinx.coroutines.delay
  * @author Doohyun
  */
 @Composable
-fun DelayedVisibleContent(
+fun DelayedContent(
     delayTimeMillis: Long,
-    visibleState: DelayedVisibleState = rememberDelayedVisibleState(),
-    key: Any? = Unit,
+    visibleState: DelayedContentState = rememberDelayedContentState(),
     content: @Composable () -> Unit
 ) {
     if (visibleState.isVisible) {
         content()
     } else {
-        LaunchedEffect(key) {
+        LaunchedEffect(Unit) {
             delay(delayTimeMillis)
             visibleState.setVisible()
         }
     }
 }
 
-class DelayedVisibleState internal constructor(initial: Boolean) {
+@Composable
+fun rememberDelayedContentState(visible: Boolean = false): DelayedContentState =
+    rememberSaveable(visible, saver = DelayedContentState.Saver()) { DelayedContentState(initial = visible) }
+
+@Stable
+class DelayedContentState internal constructor(initial: Boolean) {
     var isVisible: Boolean by mutableStateOf(initial)
         private set
 
     internal fun setVisible() {
         isVisible = true
     }
-}
 
-@Composable
-fun rememberDelayedVisibleState(visible: Boolean = false): DelayedVisibleState {
-    return remember { DelayedVisibleState(initial = visible) }
+    companion object {
+        fun Saver() = Saver<DelayedContentState, Boolean>(
+            save = { it.isVisible },
+            restore = { DelayedContentState(it) }
+        )
+    }
 }
