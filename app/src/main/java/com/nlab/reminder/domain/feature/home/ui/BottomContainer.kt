@@ -31,7 +31,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.nlab.reminder.core.designsystem.compose.theme.ReminderTheme
+import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
 
 /**
  * @author Doohyun
@@ -89,8 +89,8 @@ private fun AnimatedBottomContainerBackground(
  */
 @Composable
 private fun BottomContainerBackground(alphaState: State<Float>) {
-    val containerColor = ReminderTheme.colors.bgCard1
-    val lineColor = ReminderTheme.colors.bgLine1
+    val containerColor = PlaneatTheme.colors.bgCard1
+    val lineColor = PlaneatTheme.colors.bgLine1
     Box(modifier = Modifier.fillMaxSize()) {
         Spacer(
             modifier = Modifier

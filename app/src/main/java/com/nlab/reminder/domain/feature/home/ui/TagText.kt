@@ -37,7 +37,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.nlab.reminder.core.androidx.compose.ui.throttle
-import com.nlab.reminder.core.designsystem.compose.theme.ReminderTheme
+import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
 import com.nlab.reminder.core.translation.StringIds
 
 /**
@@ -61,8 +61,8 @@ fun TagText(
         )
         Text(
             text = LocalContext.current.getString(StringIds.format_tag, text),
-            style = ReminderTheme.typography.bodyMedium,
-            color = ReminderTheme.colors.contentTag,
+            style = PlaneatTheme.typography.bodyMedium,
+            color = PlaneatTheme.colors.contentTag,
             modifier = Modifier.padding(horizontal = 12.dp, vertical = 5.dp),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
@@ -83,10 +83,10 @@ private fun BoxScope.TagTextBackground(
         modifier = Modifier
             .matchParentSize()
             .clip(RoundedCornerShape(topStart = 17.5.dp, topEnd = 17.5.dp, bottomEnd = 0.dp, bottomStart = 17.5.dp))
-            .background(ReminderTheme.colors.bgTag)
+            .background(PlaneatTheme.colors.bgTag)
             .combinedClickable(
                 interactiveSource,
-                indication = ripple(color = ReminderTheme.colors.bgTagRipple),
+                indication = ripple(color = PlaneatTheme.colors.bgTagRipple),
                 onClick = onClick.throttle(),
                 onClickLabel = onClickLabel,
                 onLongClick = onLongClick,
@@ -107,9 +107,9 @@ private fun BoxScope.TagTextBackground(
 )
 @Composable
 private fun TagTextPreview() {
-    ReminderTheme {
+    PlaneatTheme {
         Box(
-            modifier = Modifier.background(ReminderTheme.colors.bgCard1)
+            modifier = Modifier.background(PlaneatTheme.colors.bgCard1)
         ) {
             TagText(text = "Hello")
         }

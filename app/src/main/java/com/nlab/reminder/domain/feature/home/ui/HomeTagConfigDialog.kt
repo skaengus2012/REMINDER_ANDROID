@@ -44,9 +44,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.nlab.reminder.core.designsystem.compose.component.ReminderDialog
+import com.nlab.reminder.core.designsystem.compose.component.PlaneatDialog
 import com.nlab.reminder.core.androidx.compose.ui.throttle
-import com.nlab.reminder.core.designsystem.compose.theme.ReminderTheme
+import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
 import com.nlab.reminder.core.translation.PluralsIds
 import com.nlab.reminder.core.translation.StringIds
 import com.nlab.reminder.domain.common.tag.ui.DisplayUsageCount
@@ -62,7 +62,7 @@ internal fun HomeTagConfigDialog(
     onRenameRequestClicked: () -> Unit = {},
     onDeleteRequestClicked: () -> Unit = {}
 ) {
-    ReminderDialog(onDismiss) {
+    PlaneatDialog(onDismiss) {
         Column(
             modifier = Modifier
                 .width(250.dp)
@@ -75,18 +75,18 @@ internal fun HomeTagConfigDialog(
                     .padding(horizontal = 20.dp),
                 text = LocalContext.current.getString(StringIds.format_tag, tagName),
                 style = MaterialTheme.typography.titleSmall,
-                color = ReminderTheme.colors.content1,
+                color = PlaneatTheme.colors.content1,
                 textAlign = TextAlign.Center
             )
             HorizontalDivider(
                 modifier = Modifier.padding(top = 17.dp),
                 thickness = 0.5.dp,
-                color = ReminderTheme.colors.bgLine1,
+                color = PlaneatTheme.colors.bgLine1,
             )
             HomeTagConfigButton(
                 text = LocalContext.current.getString(StringIds.tag_rename),
                 onClick = onRenameRequestClicked,
-                fontColor = ReminderTheme.colors.content1,
+                fontColor = PlaneatTheme.colors.content1,
                 modifier = Modifier
                     .fillMaxWidth()
                     .wrapContentHeight()
@@ -102,7 +102,7 @@ internal fun HomeTagConfigDialog(
                     }
                 ),
                 onClick = onDeleteRequestClicked,
-                fontColor = ReminderTheme.colors.red1,
+                fontColor = PlaneatTheme.colors.red1,
                 modifier = Modifier
                     .fillMaxWidth()
                     .wrapContentHeight()
@@ -149,7 +149,7 @@ private fun BoxScope.HomeTagConfigButtonBackground(
             .matchParentSize()
             .combinedClickable(
                 interactiveSource,
-                indication = ripple(color = ReminderTheme.colors.bgRipple1),
+                indication = ripple(color = PlaneatTheme.colors.bgRipple1),
                 onClick = onClick.throttle(),
                 onClickLabel = onClickLabel,
                 role = Role.Button
@@ -169,7 +169,7 @@ private fun BoxScope.HomeTagConfigButtonBackground(
 )
 @Composable
 private fun HomeTagConfigDialogPreview() {
-    ReminderTheme {
+    PlaneatTheme {
         HomeTagConfigDialog(
             tagName = "Hello HomeTag Config DialogPreview",
             usageCount = DisplayUsageCount(1)

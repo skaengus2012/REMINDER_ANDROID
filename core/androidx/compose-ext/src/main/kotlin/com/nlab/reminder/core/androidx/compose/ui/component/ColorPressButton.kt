@@ -36,7 +36,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.nlab.reminder.core.androidx.compose.ui.throttle
-import com.nlab.reminder.core.designsystem.compose.theme.ReminderTheme
+import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
 
 /**
  * @author Doohyun
@@ -83,15 +83,15 @@ private fun InternalColorPressButton(
 )
 @Composable
 fun ColorPressButtonPreview() {
-    ReminderTheme {
+    PlaneatTheme {
         ColorPressButton(
-            contentColor = ReminderTheme.colors.point1,
+            contentColor = PlaneatTheme.colors.point1,
             modifier = Modifier.padding(10.dp)
         ) { contentColor ->
             Text(
                 text = "Button",
                 color = contentColor,
-                style = ReminderTheme.typography
+                style = PlaneatTheme.typography
                     .bodyLarge
                     .copy(fontWeight = FontWeight.Bold)
             )

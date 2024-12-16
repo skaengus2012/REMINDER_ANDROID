@@ -34,8 +34,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.nlab.reminder.R
-import com.nlab.reminder.core.designsystem.compose.theme.ReminderTheme
+import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
 import com.nlab.reminder.core.data.model.Tag
 import com.nlab.reminder.core.data.model.TagId
 import com.nlab.reminder.core.kotlin.toNonBlankString
@@ -59,7 +58,7 @@ internal fun TagTextsBox(
             .fillMaxWidth()
             .defaultMinSize(minHeight = 160.dp)
             .clip(RoundedCornerShape(8.dp))
-            .background(ReminderTheme.colors.bgCard1),
+            .background(PlaneatTheme.colors.bgCard1),
     ) {
         if (tags.isEmpty()) {
             Box(
@@ -68,8 +67,8 @@ internal fun TagTextsBox(
             ) {
                 Text(
                     text = LocalContext.current.getString(StringIds.common_tag_empty),
-                    style = ReminderTheme.typography.bodyMedium,
-                    color = ReminderTheme.colors.content2,
+                    style = PlaneatTheme.typography.bodyMedium,
+                    color = PlaneatTheme.colors.content2,
                 )
             }
         } else {
@@ -106,7 +105,7 @@ internal fun TagTextsBox(
 )
 @Composable
 private fun TagTextsBoxPreview() {
-    ReminderTheme {
+    PlaneatTheme {
         TagTextsBox(
             persistentListOf(
                 Tag(id = TagId(1), name = "MyTag".toNonBlankString()),
@@ -129,7 +128,7 @@ private fun TagTextsBoxPreview() {
 )
 @Composable
 private fun TagTextsBoxEmptyPreview() {
-    ReminderTheme {
+    PlaneatTheme {
         TagTextsBox(persistentListOf())
     }
 }

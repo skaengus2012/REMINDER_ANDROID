@@ -25,7 +25,7 @@ import androidx.compose.ui.graphics.Color
  * @author Doohyun
  */
 @Immutable
-data class ReminderColorScheme(
+data class PlaneatColorScheme(
     val bg1: Color,
     val bg2: Color,
     val bgRipple1: Color,
@@ -53,8 +53,8 @@ data class ReminderColorScheme(
     val black: Color = Color.Black
 )
 
-internal val LocalReminderColorScheme = staticCompositionLocalOf {
-    ReminderColorScheme(
+internal val LocalPlaneatColorScheme = staticCompositionLocalOf {
+    PlaneatColorScheme(
         bg1 = Color.Unspecified,
         bg2 = Color.Unspecified,
         bgRipple1 = Color.Unspecified,
@@ -76,7 +76,7 @@ internal val LocalReminderColorScheme = staticCompositionLocalOf {
     )
 }
 
-internal val LightReminderColorScheme = ReminderColorScheme(
+internal val LightPlaneatColorScheme = PlaneatColorScheme(
     bg1 = Bg1Light,
     bg2 = Bg2Light,
     bgRipple1 = BgRipple1Light,
@@ -97,7 +97,7 @@ internal val LightReminderColorScheme = ReminderColorScheme(
     contentTag = ContentTagLight,
 )
 
-internal val DarkReminderColorScheme = ReminderColorScheme(
+internal val DarkPlaneatColorScheme = PlaneatColorScheme(
     bg1 = Bg1Dark,
     bg2 = Bg2Dark,
     bgRipple1 = BgRipple1Dark,

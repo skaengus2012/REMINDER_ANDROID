@@ -29,7 +29,7 @@ import androidx.compose.ui.unit.sp
  * @author Doohyun
  */
 @Immutable
-data class ReminderTypography(
+data class PlaneatTypography(
     val titleMedium: TextStyle = createTextStyle(
         fontSize = 17.sp,
         fontWeight = FontWeight.Bold,
@@ -48,7 +48,7 @@ data class ReminderTypography(
     )
 )
 
-internal val LocalReminderTypography = staticCompositionLocalOf { ReminderTypography() }
+internal val LocalPlaneatTypography = staticCompositionLocalOf { PlaneatTypography() }
 
 private fun createTextStyle(
     fontSize: TextUnit,

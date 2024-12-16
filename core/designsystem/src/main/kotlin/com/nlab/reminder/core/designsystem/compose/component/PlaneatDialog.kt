@@ -30,13 +30,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import com.nlab.reminder.core.designsystem.compose.theme.ReminderTheme
+import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
 
 /**
  * @author Doohyun
  */
 @Composable
-fun ReminderDialog(
+fun PlaneatDialog(
     onDismissRequest: () -> Unit,
     content: @Composable () -> Unit
 ) {
@@ -47,35 +47,35 @@ fun ReminderDialog(
         Surface(
             modifier = Modifier.wrapContentSize(),
             shape = RoundedCornerShape(8.94.dp),
-            color = ReminderTheme.colors.bgDialogSurface,
+            color = PlaneatTheme.colors.bgDialogSurface,
             content = content
         )
     }
 }
 
 @Preview(
-    name = "LightReminderDialogPreview",
+    name = "LightPlaneatDialogPreview",
     showBackground = true,
     uiMode = Configuration.UI_MODE_NIGHT_NO
 )
 @Preview(
-    name = "DarkReminderDialogPreview",
+    name = "DarkPlaneatDialogPreview",
     showBackground = true,
     uiMode = Configuration.UI_MODE_NIGHT_YES
 )
 @Composable
-private fun ReminderDialogPreview() {
-    ReminderTheme {
+private fun PlaneatDialogPreview() {
+    PlaneatTheme {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(300.dp)
         ) {
-            ReminderDialog(onDismissRequest = {}) {
+            PlaneatDialog(onDismissRequest = {}) {
                 Box(modifier = Modifier.padding(10.dp)) {
                     Text(
                         text = "Hello, Dialogs",
-                        color = ReminderTheme.colors.content1,
+                        color = PlaneatTheme.colors.content1,
                     )
                 }
             }

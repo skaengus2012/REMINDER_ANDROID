@@ -27,26 +27,26 @@ import androidx.compose.runtime.ReadOnlyComposable
  * Extended Theme for Reminder.
  * @author Doohyun
  */
-object ReminderTheme {
-    val colors: ReminderColorScheme
+object PlaneatTheme {
+    val colors: PlaneatColorScheme
         @Composable
         @ReadOnlyComposable
-        get() = LocalReminderColorScheme.current
+        get() = LocalPlaneatColorScheme.current
 
-    val typography: ReminderTypography
+    val typography: PlaneatTypography
         @Composable
         @ReadOnlyComposable
-        get() = LocalReminderTypography.current
+        get() = LocalPlaneatTypography.current
 }
 
 @Composable
-fun ReminderTheme(
+fun PlaneatTheme(
     isDarkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
-    val reminderColorScheme = if (isDarkTheme) DarkReminderColorScheme else LightReminderColorScheme
+    val reminderColorScheme = if (isDarkTheme) DarkPlaneatColorScheme else LightPlaneatColorScheme
     CompositionLocalProvider(
-        LocalReminderColorScheme provides reminderColorScheme,
+        LocalPlaneatColorScheme provides reminderColorScheme,
         LocalUseFallbackRippleImplementation provides true
     ) {
         MaterialTheme(content = content)

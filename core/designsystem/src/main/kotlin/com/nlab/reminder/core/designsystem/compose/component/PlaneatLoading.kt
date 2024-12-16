@@ -22,15 +22,15 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.nlab.reminder.core.designsystem.compose.theme.ReminderTheme
+import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
 
 /**
  * @author Doohyun
  */
 @Composable
-fun ReminderLoadingIndicator(
+fun PlaneatLoading(
     modifier: Modifier = Modifier,
-    color: Color = ReminderTheme.colors.point1,
+    color: Color = PlaneatTheme.colors.point1,
 ) {
     CircularProgressIndicator(
         modifier = modifier.size(36.dp),

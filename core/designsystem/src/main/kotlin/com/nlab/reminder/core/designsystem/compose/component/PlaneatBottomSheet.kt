@@ -35,22 +35,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.nlab.reminder.core.designsystem.compose.theme.ReminderTheme
+import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
 
 /**
  * @author Doohyun
  */
 @Composable
-inline fun ReminderBottomSheet(
+inline fun PlaneatBottomSheet(
     noinline onDismissRequest: () -> Unit,
     sheetState: SheetState = rememberModalBottomSheetState(),
-    scrimColor: Color = ReminderTheme.colors.black.copy(alpha = 0.5f),
+    scrimColor: Color = PlaneatTheme.colors.black.copy(alpha = 0.5f),
     crossinline content: @Composable ColumnScope.() -> Unit,
 ) {
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
         sheetState = sheetState,
-        containerColor = ReminderTheme.colors.bgDialogSurface,
+        containerColor = PlaneatTheme.colors.bgDialogSurface,
         scrimColor = scrimColor,
         content = {
             content()
@@ -60,23 +60,23 @@ inline fun ReminderBottomSheet(
 }
 
 @Preview(
-    name = "LightReminderBottomSheetPreview",
+    name = "LightPlaneatBottomSheetPreview",
     showBackground = true,
     widthDp = 800,
     heightDp = 300,
     uiMode = Configuration.UI_MODE_NIGHT_NO
 )
 @Preview(
-    name = "DarkReminderBottomSheetPreview",
+    name = "DarkPlaneatBottomSheetPreview",
     showBackground = true,
     widthDp = 800,
     heightDp = 300,
     uiMode = Configuration.UI_MODE_NIGHT_YES
 )
 @Composable
-private fun ReminderDialogPreview() {
-    ReminderTheme {
-        ReminderBottomSheet(
+private fun PlaneatDialogPreview() {
+    PlaneatTheme {
+        PlaneatBottomSheet(
             onDismissRequest = {},
             sheetState = rememberStandardBottomSheetState(initialValue = SheetValue.Expanded)
         ) {
@@ -88,7 +88,7 @@ private fun ReminderDialogPreview() {
             ) {
                 Text(
                     text = "Hello, Dialogs",
-                    color = ReminderTheme.colors.content1,
+                    color = PlaneatTheme.colors.content1,
                 )
             }
         }

@@ -34,7 +34,7 @@ import androidx.compose.ui.unit.dp
 import com.nlab.reminder.R
 import com.nlab.reminder.core.androidx.compose.ui.component.ColorPressButton
 import com.nlab.reminder.core.androidx.compose.ui.throttle
-import com.nlab.reminder.core.designsystem.compose.theme.ReminderTheme
+import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
 import com.nlab.reminder.core.translation.StringIds
 
 /**
@@ -46,7 +46,7 @@ internal fun NewPlanButton(
     onClick: () -> Unit = {}
 ) {
     ColorPressButton(
-        contentColor = ReminderTheme.colors.point1,
+        contentColor = PlaneatTheme.colors.point1,
         modifier = modifier
             .padding(horizontal = 10.dp)
             .fillMaxHeight(),
@@ -62,7 +62,7 @@ internal fun NewPlanButton(
         )
         Text(
             text = LocalContext.current.getString(StringIds.new_schedule_label),
-            style = ReminderTheme.typography.titleMedium,
+            style = PlaneatTheme.typography.titleMedium,
             color = contentColor
         )
     }
@@ -75,7 +75,7 @@ internal fun TimePushSwitchButton(
     onClick: () -> Unit = {}
 ) {
     ColorPressButton(
-        contentColor = ReminderTheme.colors.point1,
+        contentColor = PlaneatTheme.colors.point1,
         modifier = modifier
             .padding(horizontal = 10.dp)
             .fillMaxHeight(),
@@ -94,7 +94,7 @@ internal fun TimePushSwitchButton(
             text = LocalContext
                 .current
                 .getString(if (isPushOn) StringIds.home_push_off_label else StringIds.home_push_on_label),
-            style = ReminderTheme.typography.titleMedium,
+            style = PlaneatTheme.typography.titleMedium,
             color = contentColor
         )
     }
@@ -112,7 +112,7 @@ internal fun TimePushSwitchButton(
 )
 @Composable
 private fun BottomContainerButtonsPreview() {
-    ReminderTheme {
+    PlaneatTheme {
         Row(Modifier.height(56.dp)) {
             NewPlanButton()
             Spacer(Modifier.width(30.dp))

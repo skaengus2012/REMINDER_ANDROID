@@ -47,7 +47,7 @@ import androidx.compose.ui.unit.dp
 import com.nlab.reminder.core.androidx.compose.ui.throttle
 import com.nlab.reminder.core.android.designsystem.icon.ReminderIcons
 import com.nlab.reminder.core.android.resources.font.CategoryCountFontFamily
-import com.nlab.reminder.core.designsystem.compose.theme.ReminderTheme
+import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
 import com.nlab.reminder.core.android.resources.icon.IcHomeCategoryAll
 import com.nlab.reminder.core.android.resources.icon.IcHomeCategoryTimetable
 import com.nlab.reminder.core.android.resources.icon.IcHomeCategoryToday
@@ -201,12 +201,12 @@ private fun CategoryCardBackground(
             .clip(RoundedCornerShape(8.dp))
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
-                indication = ripple(color = ReminderTheme.colors.bgCard1Ripple),
+                indication = ripple(color = PlaneatTheme.colors.bgCard1Ripple),
                 onClick = onClick.throttle(),
                 onClickLabel = onClickLabel,
                 role = Role.Tab
             )
-            .background(ReminderTheme.colors.bgCard1)
+            .background(PlaneatTheme.colors.bgCard1)
     )
 }
 
@@ -216,7 +216,7 @@ private fun CategoryIcon(icon: @Composable () -> Unit) {
         modifier = Modifier
             .fillMaxWidth(0.4479f)
             .aspectRatio(1f)
-            .background(ReminderTheme.colors.bg1, shape = CircleShape),
+            .background(PlaneatTheme.colors.bg1, shape = CircleShape),
         contentAlignment = Alignment.Center
     ) {
         icon()
@@ -227,8 +227,8 @@ private fun CategoryIcon(icon: @Composable () -> Unit) {
 private fun CategoryTitleText(text: String) {
     Text(
         text = text,
-        style = ReminderTheme.typography.bodyMedium,
-        color = ReminderTheme.colors.content2
+        style = PlaneatTheme.typography.bodyMedium,
+        color = PlaneatTheme.colors.content2
     )
 }
 
@@ -236,8 +236,8 @@ private fun CategoryTitleText(text: String) {
 private fun CategoryCountText(count: Long) {
     Text(
         text = count.toString(),
-        style = ReminderTheme.typography.bodyLarge,
-        color = ReminderTheme.colors.content1,
+        style = PlaneatTheme.typography.bodyLarge,
+        color = PlaneatTheme.colors.content1,
         fontFamily = CategoryCountFontFamily
     )
 }
@@ -254,7 +254,7 @@ private fun CategoryCountText(count: Long) {
 )
 @Composable
 private fun CategoryCardSectionPreview() {
-    ReminderTheme {
+    PlaneatTheme {
         CategoryCardsRow(
             todayCount = 10,
             timetableCount = 20,
