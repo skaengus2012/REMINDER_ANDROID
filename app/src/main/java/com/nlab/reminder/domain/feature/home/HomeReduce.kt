@@ -36,7 +36,7 @@ internal fun HomeReduce(environment: HomeEnvironment): HomeReduce = DslReduce {
                 todayScheduleCount = action.todaySchedulesCount,
                 timetableScheduleCount = action.timetableSchedulesCount,
                 allScheduleCount = action.allSchedulesCount,
-                tags = action.tags,
+                tags = action.sortedTags,
                 interaction = HomeInteraction.Empty,
                 userMessages = emptyList()
             )
@@ -46,7 +46,7 @@ internal fun HomeReduce(environment: HomeEnvironment): HomeReduce = DslReduce {
                 todayScheduleCount = action.todaySchedulesCount,
                 timetableScheduleCount = action.timetableSchedulesCount,
                 allScheduleCount = action.allSchedulesCount,
-                tags = action.tags,
+                tags = action.sortedTags,
             )
         }
     }

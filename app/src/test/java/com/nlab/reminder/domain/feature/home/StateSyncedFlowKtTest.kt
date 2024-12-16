@@ -55,7 +55,7 @@ class StateSyncedFlowKtTest {
                     todaySchedulesCount = expectedScheduleCount,
                     timetableSchedulesCount = expectedScheduleCount,
                     allSchedulesCount = expectedScheduleCount,
-                    tags = expectedTags
+                    sortedTags = expectedTags
                 )
             )
         )

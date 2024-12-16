@@ -53,7 +53,7 @@ internal fun genHomeActionStateSynced(
     todaySchedulesCount = todaySchedulesCount,
     timetableSchedulesCount = timetableSchedulesCount,
     allSchedulesCount = allSchedulesCount,
-    tags = tags
+    sortedTags = tags
 )
 
 internal fun genHomeUiStateSuccess(

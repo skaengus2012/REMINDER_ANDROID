@@ -30,7 +30,7 @@ internal sealed class HomeAction private constructor() {
         val todaySchedulesCount: NonNegativeLong,
         val timetableSchedulesCount: NonNegativeLong,
         val allSchedulesCount: NonNegativeLong,
-        val tags: List<Tag>,
+        val sortedTags: List<Tag>,
     ) : HomeAction()
 
     data class TagEditStateSynced(val state: TagEditState?) : HomeAction()

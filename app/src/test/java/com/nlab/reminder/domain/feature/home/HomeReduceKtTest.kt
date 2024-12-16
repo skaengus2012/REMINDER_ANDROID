@@ -54,7 +54,7 @@ class HomeReduceKtTest {
                     todayScheduleCount = action.todaySchedulesCount,
                     timetableScheduleCount = action.timetableSchedulesCount,
                     allScheduleCount = action.allSchedulesCount,
-                    tags = action.tags,
+                    tags = action.sortedTags,
                     interaction = HomeInteraction.Empty,
                     userMessages = emptyList()
                 )
@@ -73,7 +73,7 @@ class HomeReduceKtTest {
                     todayScheduleCount = action.todaySchedulesCount,
                     timetableScheduleCount = action.timetableSchedulesCount,
                     allScheduleCount = action.allSchedulesCount,
-                    tags = action.tags,
+                    tags = action.sortedTags,
                     interaction = initState.interaction,
                     userMessages = initState.userMessages
                 )
