@@ -28,10 +28,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -44,12 +44,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.nlab.reminder.R
-import com.nlab.reminder.core.designsystem.compose.component.ReminderDialog
+import com.nlab.reminder.core.designsystem.compose.component.PlaneatDialog
 import com.nlab.reminder.core.androidx.compose.ui.throttle
-import com.nlab.reminder.core.designsystem.compose.theme.ReminderTheme
-import com.nlab.reminder.core.data.model.TagUsageCount
-import com.nlab.reminder.domain.common.tag.ui.mapToString
+import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
+import com.nlab.reminder.core.translation.PluralsIds
+import com.nlab.reminder.core.translation.StringIds
+import com.nlab.reminder.domain.common.tag.ui.DisplayUsageCount
 
 /**
  * @author Doohyun
@@ -57,12 +57,12 @@ import com.nlab.reminder.domain.common.tag.ui.mapToString
 @Composable
 internal fun HomeTagConfigDialog(
     tagName: String,
-    usageCount: TagUsageCount,
+    usageCount: DisplayUsageCount,
     onDismiss: () -> Unit = {},
     onRenameRequestClicked: () -> Unit = {},
     onDeleteRequestClicked: () -> Unit = {}
 ) {
-    ReminderDialog(onDismiss) {
+    PlaneatDialog(onDismiss) {
         Column(
             modifier = Modifier
                 .width(250.dp)
@@ -73,36 +73,36 @@ internal fun HomeTagConfigDialog(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 20.dp),
-                text = LocalContext.current.getString(R.string.format_tag, tagName),
+                text = LocalContext.current.getString(StringIds.format_tag, tagName),
                 style = MaterialTheme.typography.titleSmall,
-                color = ReminderTheme.colors.content1,
+                color = PlaneatTheme.colors.content1,
                 textAlign = TextAlign.Center
             )
             HorizontalDivider(
                 modifier = Modifier.padding(top = 17.dp),
                 thickness = 0.5.dp,
-                color = ReminderTheme.colors.bgLine1,
+                color = PlaneatTheme.colors.bgLine1,
             )
             HomeTagConfigButton(
-                text = LocalContext.current.getString(R.string.tag_rename),
+                text = LocalContext.current.getString(StringIds.tag_rename),
                 onClick = onRenameRequestClicked,
-                fontColor = ReminderTheme.colors.content1,
+                fontColor = PlaneatTheme.colors.content1,
                 modifier = Modifier
                     .fillMaxWidth()
                     .wrapContentHeight()
                     .padding(top = 10.dp)
             )
             HomeTagConfigButton(
-                text = usageCount.mapToString(
+                text = usageCount.format(
                     transform = { count ->
-                        pluralStringResource(R.plurals.tag_delete, count, count)
+                        pluralStringResource(PluralsIds.tag_delete, count, count)
                     },
                     transformWhenOverflow = { count ->
-                        stringResource(R.string.tag_delete_overflow, count)
+                        stringResource(StringIds.tag_delete_overflow, count)
                     }
                 ),
                 onClick = onDeleteRequestClicked,
-                fontColor = ReminderTheme.colors.red1,
+                fontColor = PlaneatTheme.colors.red1,
                 modifier = Modifier
                     .fillMaxWidth()
                     .wrapContentHeight()
@@ -149,7 +149,7 @@ private fun BoxScope.HomeTagConfigButtonBackground(
             .matchParentSize()
             .combinedClickable(
                 interactiveSource,
-                indication = rememberRipple(color = ReminderTheme.colors.bgRipple1),
+                indication = ripple(color = PlaneatTheme.colors.bgRipple1),
                 onClick = onClick.throttle(),
                 onClickLabel = onClickLabel,
                 role = Role.Button
@@ -169,10 +169,10 @@ private fun BoxScope.HomeTagConfigButtonBackground(
 )
 @Composable
 private fun HomeTagConfigDialogPreview() {
-    ReminderTheme {
+    PlaneatTheme {
         HomeTagConfigDialog(
             tagName = "Hello HomeTag Config DialogPreview",
-            usageCount = TagUsageCount(1)
+            usageCount = DisplayUsageCount(1)
         )
     }
 }

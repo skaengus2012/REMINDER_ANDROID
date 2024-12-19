@@ -19,8 +19,6 @@ package com.nlab.reminder.core.schedule.ui
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import com.nlab.reminder.core.schedule.model.ScheduleElement
-import com.nlab.reminder.core.schedule.model.ScheduleItem
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -31,6 +29,7 @@ import kotlinx.coroutines.flow.asStateFlow
 /**
  * @author Doohyun
  */
+/**
 class ScheduleItemAdapter internal constructor(
     private val diffCallback: ScheduleItemDiffCallback,
     private val scheduleElementItemMovePolicy: ScheduleElementItemMovePolicy = DefaultScheduleElementItemMovePolicy()
@@ -146,4 +145,4 @@ class ScheduleItemAdapter internal constructor(
 
 fun ScheduleItemAdapter(
     scheduleElementItemMovePolicy: ScheduleElementItemMovePolicy = DefaultScheduleElementItemMovePolicy()
-): ScheduleItemAdapter = ScheduleItemAdapter(ScheduleItemDiffCallback(), scheduleElementItemMovePolicy)
+): ScheduleItemAdapter = ScheduleItemAdapter(ScheduleItemDiffCallback(), scheduleElementItemMovePolicy)*/

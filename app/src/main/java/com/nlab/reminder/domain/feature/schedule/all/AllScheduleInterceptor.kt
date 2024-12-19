@@ -16,22 +16,14 @@
 
 package com.nlab.reminder.domain.feature.schedule.all
 
-import com.nlab.reminder.core.data.di.ScheduleData
-import com.nlab.reminder.core.data.di.ScheduleDataOption.*
-import com.nlab.reminder.core.data.model.ScheduleId
-import com.nlab.reminder.core.kotlin.getOrThrow
+import com.nlab.reminder.core.data.qualifiers.ScheduleDataOption.*
 import com.nlab.reminder.core.data.repository.*
 import com.nlab.reminder.core.domain.*
-import com.nlab.reminder.core.kotlin.collections.minOf
-import com.nlab.reminder.core.schedule.model.findId
-import com.nlab.reminder.core.schedule.model.getSelectedIds
-import com.nlab.statekit.middleware.interceptor.Interceptor
-import com.nlab.statekit.util.buildDslInterceptor
-import javax.inject.Inject
 
 /**
  * @author thalys
  */
+/**
 class AllScheduleInterceptor @Inject constructor(
     scheduleRepository: ScheduleRepository,
     @ScheduleData(All) completedScheduleShownRepository: CompletedScheduleShownRepository,
@@ -71,17 +63,17 @@ class AllScheduleInterceptor @Inject constructor(
         action<AllScheduleAction.OnScheduleDeleteClicked> { (action, before) ->
             val scheduleId: ScheduleId = before.scheduleElements.getOrNull(action.position)?.id ?: return@action
             scheduleRepository
-                .delete(ScheduleDeleteRequest.ById(scheduleId))
+                .delete(DeleteScheduleQuery.ById(scheduleId))
                 .getOrThrow()
         }
         action<AllScheduleAction.OnSelectedSchedulesDeleteClicked> { (_, before) ->
             val result = scheduleRepository
-                .delete(ScheduleDeleteRequest.ByIds(before.scheduleElements.getSelectedIds()))
+                .delete(DeleteScheduleQuery.ByIds(before.scheduleElements.getSelectedIds()))
             selectedIdRepository.clear()
             result.getOrThrow()
         }
         action<AllScheduleAction.OnCompletedScheduleDeleteClicked> {
-            scheduleRepository.delete(ScheduleDeleteRequest.ByComplete(isComplete = true))
+            scheduleRepository.delete(DeleteScheduleQuery.ByComplete(isComplete = true))
                 .getOrThrow()
         }
 
@@ -95,7 +87,7 @@ class AllScheduleInterceptor @Inject constructor(
 
             val minVisiblePriority = swapResult.minOf { it.visiblePriority }
             scheduleRepository
-                .update(ScheduleUpdateRequest.VisiblePriority(buildMap {
+                .updateBulk(UpdateSchedulesQuery.VisiblePriorities(buildMap {
                     swapResult.forEachIndexed { index, scheduleElement ->
                         this[scheduleElement.id] = minVisiblePriority + index
                     }
@@ -113,4 +105,4 @@ class AllScheduleInterceptor @Inject constructor(
             fetchLinkMetadata(action.scheduleElements)
         }
     }
-})
+})*/

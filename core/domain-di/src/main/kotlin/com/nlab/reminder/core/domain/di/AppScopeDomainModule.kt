@@ -16,43 +16,25 @@
 
 package com.nlab.reminder.core.domain.di
 
-import com.nlab.reminder.core.data.repository.LinkMetadataTableRepository
-import com.nlab.reminder.core.data.repository.ScheduleRepository
-import com.nlab.reminder.core.di.coroutine.Dispatcher
-import com.nlab.reminder.core.di.coroutine.DispatcherOption
-import com.nlab.reminder.core.domain.CalculateItemSwapResultUseCase
-import com.nlab.reminder.core.domain.CompleteScheduleWithIdsUseCase
-import com.nlab.reminder.core.domain.FetchLinkMetadataUseCase
+import com.nlab.reminder.core.data.repository.TagRepository
+import com.nlab.reminder.core.domain.TryUpdateTagNameUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.Reusable
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.CoroutineDispatcher
 
 /**
- * @author Doohyun
+ * @author Thalys
  */
 @Module
 @InstallIn(SingletonComponent::class)
-internal class AppScopeDomainModule {
+class AppScopeDomainModule {
     @Provides
     @Reusable
-    fun provideCalculateItemSwapResultUseCase(): CalculateItemSwapResultUseCase =
-        CalculateItemSwapResultUseCase()
-
-    @Provides
-    @Reusable
-    fun provideCompleteScheduleWithIdsUseCase(
-        scheduleRepository: ScheduleRepository,
-        @Dispatcher(DispatcherOption.Default) dispatcher: CoroutineDispatcher
-    ): CompleteScheduleWithIdsUseCase = CompleteScheduleWithIdsUseCase(scheduleRepository, dispatcher)
-
-    @Provides
-    @Reusable
-    fun provideFetchLinkMetadataUseCase(
-        linkMetadataTableRepository: LinkMetadataTableRepository,
-        @Dispatcher(DispatcherOption.Default) dispatcher: CoroutineDispatcher
-    ): FetchLinkMetadataUseCase = FetchLinkMetadataUseCase(linkMetadataTableRepository, dispatcher)
-
+    fun provideUpdateTagNameUseCase(
+        tagRepository: TagRepository,
+    ): TryUpdateTagNameUseCase = TryUpdateTagNameUseCase(
+        tagRepository = tagRepository
+    )
 }

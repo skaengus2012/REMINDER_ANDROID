@@ -16,15 +16,11 @@
 
 package com.nlab.reminder.core.data.model
 
+import com.nlab.reminder.core.kotlin.NonBlankString
+
 /**
- * // TODO Convert Link to String
- *
- * @author thalys
+ * @author Doohyun
  */
-@JvmInline
-value class Link private constructor(val value: String) {
-    companion object {
-        val EMPTY = Link("")
-        operator fun invoke(value: String): Link = if (value.isBlank()) EMPTY else Link(value)
-    }
+data class Link(private val rawLink: NonBlankString) {
+    val value: String get() = rawLink.value
 }

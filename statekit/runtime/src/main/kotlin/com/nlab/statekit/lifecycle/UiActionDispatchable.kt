@@ -16,9 +16,8 @@
 
 package com.nlab.statekit.lifecycle
 
-import com.nlab.statekit.Action
 import kotlinx.coroutines.Job
 
-interface UiActionDispatchable<T : Action> {
+interface UiActionDispatchable<T : Any> {
     fun dispatch(action: T): Job
 }

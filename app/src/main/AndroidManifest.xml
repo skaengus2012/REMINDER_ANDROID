@@ -49,7 +49,7 @@
 				android:name="com.nlab.reminder.internal.common.android.startup.init.CoilInitializer"
 				android:value="androidx.startup" />
 			<meta-data
-				android:name="com.nlab.reminder.internal.common.android.startup.init.StatekitPluginInitializer"
+				android:name="com.nlab.reminder.internal.common.android.startup.init.StateKitPluginInitializer"
 				android:value="androidx.startup" />
 		</provider>
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 The N's lab Open Source Project
+ * Copyright (C) 2024 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,38 +16,37 @@
 
 package com.nlab.reminder.domain.feature.home
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.nlab.reminder.core.annotation.test.ExcludeFromGeneratedTestReport
-import com.nlab.statekit.lifecycle.UiActionDispatchable
-import com.nlab.statekit.util.createStore
-import com.nlab.statekit.util.stateIn
+import com.nlab.reminder.core.foundation.annotation.ExcludeFromGeneratedTestReport
+import com.nlab.reminder.core.kotlinx.coroutine.flow.map
+import com.nlab.reminder.core.statekit.bootstrap.collectAsBootstrap
+import com.nlab.reminder.core.statekit.store.androidx.lifecycle.StoreViewModel
+import com.nlab.reminder.core.statekit.store.androidx.lifecycle.createStore
+import com.nlab.statekit.annotation.UiActionMapping
+import com.nlab.statekit.bootstrap.DeliveryStarted
+import com.nlab.statekit.bootstrap.combineBootstrap
+import com.nlab.statekit.store.Store
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
 /**
  * @author Doohyun
  */
 @ExcludeFromGeneratedTestReport
+@UiActionMapping(HomeAction::class)
 @HiltViewModel
 internal class HomeViewModel @Inject constructor(
-    reducer: HomeReducer,
-    interceptor: HomeInterceptor,
-    epic: HomeEpic
-) : ViewModel(),
-    UiActionDispatchable<HomeAction> {
-    private val store = createStore(
+    private val environment: HomeEnvironment
+) : StoreViewModel<HomeAction, HomeUiState>() {
+    override fun onCreateStore(): Store<HomeAction, HomeUiState> = createStore(
         initState = HomeUiState.Loading,
-        reducer = reducer,
-        interceptor = interceptor,
-        epic = epic
+        reduce = HomeReduce(environment),
+        bootstrap = combineBootstrap(
+            StateSyncFlow(environment)
+                .collectAsBootstrap(),
+            environment.tagEditDelegate
+                .state
+                .map(HomeAction::TagEditStateSynced)
+                .collectAsBootstrap(started = DeliveryStarted.Eagerly)
+        )
     )
-
-    val uiState: StateFlow<HomeUiState> =
-        store.stateIn(viewModelScope, SharingStarted.WhileSubscribed(stopTimeoutMillis = 5_000))
-
-    override fun dispatch(action: HomeAction): Job = store.dispatch(action)
 }

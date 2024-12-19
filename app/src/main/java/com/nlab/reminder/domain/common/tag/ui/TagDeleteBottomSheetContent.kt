@@ -25,9 +25,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -38,10 +38,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.nlab.reminder.R
 import com.nlab.reminder.core.androidx.compose.ui.throttle
-import com.nlab.reminder.core.designsystem.compose.theme.ReminderTheme
-import com.nlab.reminder.core.data.model.TagUsageCount
+import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
+import com.nlab.reminder.core.translation.PluralsIds
+import com.nlab.reminder.core.translation.StringIds
 
 /**
  * @author Doohyun
@@ -49,7 +49,7 @@ import com.nlab.reminder.core.data.model.TagUsageCount
 @Composable
 fun TagDeleteBottomSheetContent(
     tagName: String,
-    usageCount: TagUsageCount,
+    usageCount: DisplayUsageCount,
     modifier: Modifier = Modifier,
     onConfirmClicked: () -> Unit = {},
     onCancelClicked: () -> Unit = {},
@@ -61,12 +61,12 @@ fun TagDeleteBottomSheetContent(
     ) {
         Text(
             modifier = Modifier.fillMaxWidth(),
-            text = usageCount.mapToString(
-                transform = { pluralStringResource(id = R.plurals.tag_delete, count = it, it) },
-                transformWhenOverflow = { stringResource(id = R.string.tag_delete_overflow, it) }
+            text = usageCount.format(
+                transform = { pluralStringResource(id = PluralsIds.tag_delete, count = it, it) },
+                transformWhenOverflow = { stringResource(id = StringIds.tag_delete_overflow, it) }
             ),
-            style = ReminderTheme.typography.bodySmall,
-            color = ReminderTheme.colors.content1,
+            style = PlaneatTheme.typography.bodySmall,
+            color = PlaneatTheme.colors.content1,
             textAlign = TextAlign.Center
         )
 
@@ -74,33 +74,33 @@ fun TagDeleteBottomSheetContent(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 30.dp, top = 6.dp, end = 30.dp, bottom = 22.dp),
-            style = ReminderTheme.typography.bodySmall,
-            text = usageCount.mapToString(
+            style = PlaneatTheme.typography.bodySmall,
+            text = usageCount.format(
                 transform = {
-                    pluralStringResource(id = R.plurals.tag_delete_dialog_description, count = it, tagName, it)
+                    pluralStringResource(id = PluralsIds.tag_delete_dialog_description, count = it, tagName, it)
                 },
                 transformWhenOverflow = {
-                    stringResource(id = R.string.tag_delete_dialog_description_overflow, tagName, it)
+                    stringResource(id = StringIds.tag_delete_dialog_description_overflow, tagName, it)
                 }
             ),
-            color = ReminderTheme.colors.content1,
+            color = PlaneatTheme.colors.content1,
             textAlign = TextAlign.Center
         )
 
         HorizontalDivider(
             thickness = 0.5.dp,
-            color = ReminderTheme.colors.bgLine1,
+            color = PlaneatTheme.colors.bgLine1,
         )
 
         InternalButton(
-            text = LocalContext.current.getString(R.string.delete),
-            fontColor = ReminderTheme.colors.red1,
+            text = LocalContext.current.getString(StringIds.delete),
+            fontColor = PlaneatTheme.colors.red1,
             onClick = onConfirmClicked
         )
 
         InternalButton(
-            text = LocalContext.current.getString(R.string.cancel),
-            fontColor = ReminderTheme.colors.content2,
+            text = LocalContext.current.getString(StringIds.cancel),
+            fontColor = PlaneatTheme.colors.content2,
             onClick = onCancelClicked,
             modifier = Modifier.padding(bottom = 10.dp)
         )
@@ -121,7 +121,7 @@ private fun InternalButton(
                 onClick = onClick.throttle(),
                 onClickLabel = text,
                 interactionSource = remember { MutableInteractionSource() },
-                indication = rememberRipple(color = ReminderTheme.colors.bgRipple1)
+                indication = ripple(color = PlaneatTheme.colors.bgRipple1)
             ),
     ) {
         Text(
@@ -131,7 +131,7 @@ private fun InternalButton(
             text = text,
             textAlign = TextAlign.Center,
             color = fontColor,
-            style = ReminderTheme.typography.bodyLarge,
+            style = PlaneatTheme.typography.bodyLarge,
         )
     }
 }
@@ -148,11 +148,11 @@ private fun InternalButton(
 )
 @Composable
 private fun TagDeleteBottomSheetContentPreview() {
-    ReminderTheme {
-        Box(modifier = Modifier.background(color = ReminderTheme.colors.bgDialogSurface)) {
+    PlaneatTheme {
+        Box(modifier = Modifier.background(color = PlaneatTheme.colors.bgDialogSurface)) {
             TagDeleteBottomSheetContent(
                 tagName = "Hello TagDeleteBottomSheetContentPreview",
-                usageCount = TagUsageCount(1)
+                usageCount = DisplayUsageCount(1)
             )
         }
     }

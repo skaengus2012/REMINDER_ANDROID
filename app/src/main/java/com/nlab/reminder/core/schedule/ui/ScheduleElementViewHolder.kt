@@ -39,8 +39,6 @@ import com.nlab.reminder.core.android.view.throttleClicks
 import com.nlab.reminder.core.android.view.touches
 import com.nlab.reminder.core.android.view.bindSelected
 import com.nlab.reminder.core.android.widget.bindText
-import com.nlab.reminder.core.data.model.isEmpty
-import com.nlab.reminder.core.schedule.model.ScheduleElement
 import com.nlab.reminder.databinding.ViewItemScheduleElementBinding
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
@@ -51,6 +49,7 @@ import kotlinx.coroutines.flow.onEach
 /**
  * @author Doohyun
  */
+/**
 internal class ScheduleElementViewHolder(
     internal val binding: ViewItemScheduleElementBinding,
     selectionEnabled: Flow<Boolean>,
@@ -197,4 +196,4 @@ private fun ImageView.bindLinkMetadataImage(newImage: String?, placeHolder: Draw
         placeholder(placeHolder)
         error(placeHolder)
     }
-}
+}*/

@@ -17,6 +17,7 @@
 package com.nlab.reminder.core.schedule.ui
 
 import androidx.recyclerview.widget.DiffUtil
+/**
 import com.nlab.reminder.core.schedule.model.ScheduleElement
 import com.nlab.reminder.core.schedule.model.ScheduleItem
 
@@ -56,4 +57,4 @@ internal class ScheduleItemDiffCallback : DiffUtil.ItemCallback<ScheduleItem>() 
     fun onItemUpdated() {
         isDragCompare = false
     }
-}
+}*/

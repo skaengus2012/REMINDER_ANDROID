@@ -18,11 +18,8 @@ import org.gradle.kotlin.dsl.getByType
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-with(pluginManager) {
-    apply("org.gradle.jacoco")
-    apply("com.android.application")
-}
+apply(plugin = "org.gradle.jacoco")
+apply(plugin = "com.android.application")
 
 configureJacocoToolVersion()
 configureJacocoAndroid(extensions.getByType<ApplicationAndroidComponentsExtension>())

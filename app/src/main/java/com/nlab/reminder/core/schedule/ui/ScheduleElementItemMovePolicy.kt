@@ -16,11 +16,11 @@
 
 package com.nlab.reminder.core.schedule.ui
 
-import com.nlab.reminder.core.schedule.model.ScheduleElement
 
 /**
  * @author thalys
  */
+/**
 abstract class ScheduleElementItemMovePolicy {
     protected abstract fun isMovable(
         from: ScheduleElement,
@@ -28,4 +28,4 @@ abstract class ScheduleElementItemMovePolicy {
     ): Boolean
 
     internal fun isMovableInternal(from: ScheduleElement, to: ScheduleElement): Boolean = isMovable(from, to)
-}
+}*/

@@ -16,39 +16,24 @@
 
 package com.nlab.reminder.core.data.di
 
-import com.nlab.reminder.core.data.model.Link
-import com.nlab.reminder.core.data.model.LinkMetadata
-import com.nlab.reminder.core.data.repository.LinkMetadataRepository
-import com.nlab.reminder.core.data.repository.TimestampRepository
-import com.nlab.reminder.core.data.repository.impl.infra.DefaultTimestampRepository
-import com.nlab.reminder.core.data.repository.impl.infra.JsoupLinkMetadataRepository
-import com.nlab.reminder.core.kotlin.Result
-import com.nlab.reminder.core.kotlin.onFailure
+import com.nlab.reminder.core.data.qualifiers.ScheduleData
 import dagger.Module
 import dagger.Provides
 import dagger.Reusable
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.CoroutineDispatcher
-import timber.log.Timber
-import com.nlab.reminder.core.data.di.ScheduleDataOption.*
+import com.nlab.reminder.core.data.qualifiers.ScheduleDataOption.*
 import com.nlab.reminder.core.data.repository.CompletedScheduleShownRepository
 import com.nlab.reminder.core.data.repository.ScheduleRepository
 import com.nlab.reminder.core.data.repository.TagRepository
 import com.nlab.reminder.core.data.repository.impl.CompletedScheduleShownRepositoryImpl
-import com.nlab.reminder.core.data.repository.impl.LocalLinkMetadataTableRepository
 import com.nlab.reminder.core.data.repository.impl.LocalScheduleRepository
 import com.nlab.reminder.core.data.repository.impl.LocalTagRepository
-import com.nlab.reminder.core.di.coroutine.AppScope
-import com.nlab.reminder.core.di.coroutine.Dispatcher
-import com.nlab.reminder.core.di.coroutine.DispatcherOption.IO
-import com.nlab.reminder.core.local.database.LinkMetadataDao
-import com.nlab.reminder.core.local.database.ScheduleDao
-import com.nlab.reminder.core.local.database.ScheduleTagListDao
-import com.nlab.reminder.core.local.database.TagDao
+import com.nlab.reminder.core.local.database.dao.ScheduleDAO
+import com.nlab.reminder.core.local.database.dao.ScheduleTagListDAO
+import com.nlab.reminder.core.local.database.dao.TagRelationDAO
+import com.nlab.reminder.core.local.database.dao.TagDAO
 import com.nlab.reminder.core.local.datastore.PreferenceDataSource
-import kotlinx.coroutines.CoroutineScope
-import javax.inject.Singleton
 
 /**
  * @author Doohyun
@@ -68,45 +53,19 @@ internal class AppScopeDataModule {
 
     @Provides
     @Reusable
-    fun provideLinkMetadataRepository(
-        @Dispatcher(IO) dispatcher: CoroutineDispatcher
-    ): LinkMetadataRepository = object : LinkMetadataRepository {
-        private val internalRepository = JsoupLinkMetadataRepository(dispatcher = dispatcher)
-        override suspend fun get(link: Link): Result<LinkMetadata> {
-            return internalRepository.get(link).onFailure {
-                Timber.w(it, "LinkMetadata load failed.")
-            }
-        }
-    }
-
-    @Provides
-    @Singleton
-    fun provideLocalLinkMetadataTableRepository(
-        linkMetadataDao: LinkMetadataDao,
-        linkMetadataRepository: LinkMetadataRepository,
-        timestampRepository: TimestampRepository,
-        @AppScope applicationScope: CoroutineScope
-    ) = LocalLinkMetadataTableRepository(
-        linkMetadataDao,
-        linkMetadataRepository,
-        timestampRepository,
-        applicationScope
-    )
-
-    @Provides
-    @Reusable
     fun provideScheduleRepository(
-        scheduleDao: ScheduleDao
-    ): ScheduleRepository = LocalScheduleRepository(scheduleDao)
+        scheduleDAO: ScheduleDAO,
+    ): ScheduleRepository = LocalScheduleRepository(scheduleDAO = scheduleDAO)
 
     @Provides
     @Reusable
     fun provideTagRepository(
-        tagDao: TagDao,
-        scheduleTagListDao: ScheduleTagListDao
-    ): TagRepository = LocalTagRepository(tagDao, scheduleTagListDao)
-
-    @Provides
-    @Reusable
-    fun provideTimestampRepository(): TimestampRepository = DefaultTimestampRepository()
+        tagDAO: TagDAO,
+        tagRelationDAO: TagRelationDAO,
+        scheduleTagListDAO: ScheduleTagListDAO,
+    ): TagRepository = LocalTagRepository(
+        tagDAO = tagDAO,
+        tagRelationDAO = tagRelationDAO,
+        scheduleTagListDAO = scheduleTagListDAO,
+    )
 }

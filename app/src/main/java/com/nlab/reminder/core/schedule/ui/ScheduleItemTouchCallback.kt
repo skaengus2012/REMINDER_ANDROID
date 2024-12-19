@@ -42,6 +42,7 @@ import kotlin.math.min
  * @see <a href="https://min-wachya.tistory.com/171">docs2</a>
  * @author thalys
  */
+/**
 class ScheduleItemTouchCallback(
     private val clampWidth: Float,
     private val draggedWhenLinkImageVisibleHeight: Float,
@@ -287,4 +288,4 @@ fun ScheduleItemTouchCallback(
     clampWidth = context.getDimension(R.dimen.schedule_clamp_width),
     draggedWhenLinkImageVisibleHeight = context.getDimension(R.dimen.schedule_dragged_when_link_thumbnail_height),
     itemMoveListener = itemMoveListener
-)
+)*/

@@ -42,7 +42,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
@@ -64,10 +63,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nlab.reminder.R
-import com.nlab.reminder.core.designsystem.compose.component.ReminderDialog
-import com.nlab.reminder.core.designsystem.compose.theme.ReminderTheme
-import com.nlab.reminder.core.data.model.TagUsageCount
-import com.nlab.reminder.core.androidx.compose.ui.component.ColorPressButton
+import com.nlab.reminder.core.designsystem.compose.component.PlaneatDialog
+import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
+import com.nlab.reminder.core.androidx.compose.ui.ColorPressButton
+import com.nlab.reminder.core.translation.PluralsIds
+import com.nlab.reminder.core.translation.StringIds
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.debounce
 
@@ -78,13 +78,13 @@ import kotlinx.coroutines.flow.debounce
 fun TagRenameDialog(
     initText: String,
     tagName: String,
-    usageCount: TagUsageCount,
+    usageCount: DisplayUsageCount,
     shouldKeyboardShown: Boolean = false,
     onTextChanged: (String) -> Unit = {},
     onCancel: () -> Unit = {},
     onConfirm: () -> Unit = {}
 ) {
-    ReminderDialog(onDismissRequest = onCancel) {
+    PlaneatDialog(onDismissRequest = onCancel) {
         Column(
             modifier = Modifier
                 .width(250.dp)
@@ -96,19 +96,19 @@ fun TagRenameDialog(
             ) {
                 Text(
                     modifier = Modifier.padding(top = 15.dp),
-                    text = LocalContext.current.getString(R.string.tag_rename),
-                    style = ReminderTheme.typography
+                    text = LocalContext.current.getString(StringIds.tag_rename),
+                    style = PlaneatTheme.typography
                         .bodyLarge
                         .copy(fontWeight = FontWeight.Bold),
-                    color = ReminderTheme.colors.content1
+                    color = PlaneatTheme.colors.content1
                 )
 
                 Text(
                     modifier = Modifier.padding(start = 20.dp, top = 2.5.dp, end = 20.dp, bottom = 15.dp),
-                    text = usageCount.mapToString(
+                    text = usageCount.format(
                         transform = { count ->
                             pluralStringResource(
-                                R.plurals.tag_rename_dialog_description,
+                                PluralsIds.tag_rename_dialog_description,
                                 count,
                                 tagName,
                                 count
@@ -116,16 +116,16 @@ fun TagRenameDialog(
                         },
                         transformWhenOverflow = { count ->
                             stringResource(
-                                R.string.tag_rename_dialog_description_overflow,
+                                StringIds.tag_rename_dialog_description_overflow,
                                 tagName,
                                 count
                             )
                         }
                     ),
-                    style = ReminderTheme.typography
+                    style = PlaneatTheme.typography
                         .bodySmall
                         .copy(lineHeight = 15.sp),
-                    color = ReminderTheme.colors.content1,
+                    color = PlaneatTheme.colors.content1,
                     textAlign = TextAlign.Center
                 )
 
@@ -140,7 +140,7 @@ fun TagRenameDialog(
             }
             HorizontalDivider(
                 thickness = 0.5.dp,
-                color = ReminderTheme.colors.bgLine2
+                color = PlaneatTheme.colors.bgLine2
             )
             Row(
                 modifier = Modifier
@@ -149,7 +149,7 @@ fun TagRenameDialog(
 
             ) {
                 ColorPressButton(
-                    contentColor = ReminderTheme.colors.point1,
+                    contentColor = PlaneatTheme.colors.point1,
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight(),
@@ -158,8 +158,8 @@ fun TagRenameDialog(
                     Text(
                         modifier = Modifier.fillMaxWidth(),
                         color = contentColor,
-                        text = LocalContext.current.getString(R.string.cancel),
-                        style = ReminderTheme.typography
+                        text = LocalContext.current.getString(StringIds.cancel),
+                        style = PlaneatTheme.typography
                             .bodyLarge
                             .copy(textAlign = TextAlign.Center)
                     )
@@ -169,11 +169,11 @@ fun TagRenameDialog(
                     modifier = Modifier
                         .width(0.5.dp)
                         .fillMaxHeight()
-                        .background(ReminderTheme.colors.bgLine2)
+                        .background(PlaneatTheme.colors.bgLine2)
                 )
 
                 ColorPressButton(
-                    contentColor = ReminderTheme.colors.point1,
+                    contentColor = PlaneatTheme.colors.point1,
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight(),
@@ -182,8 +182,8 @@ fun TagRenameDialog(
                     Text(
                         modifier = Modifier.fillMaxWidth(),
                         color = contentColor,
-                        text = LocalContext.current.getString(R.string.ok),
-                        style = ReminderTheme.typography
+                        text = LocalContext.current.getString(StringIds.ok),
+                        style = PlaneatTheme.typography
                             .bodyLarge
                             .copy(textAlign = TextAlign.Center)
                     )
@@ -194,7 +194,6 @@ fun TagRenameDialog(
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun TagRenameTextBox(
     initText: String,
@@ -217,10 +216,10 @@ private fun TagRenameTextBox(
             .clip(RoundedCornerShape(5.dp))
             .border(
                 width = 0.5.dp,
-                color = ReminderTheme.colors.bgLine1,
+                color = PlaneatTheme.colors.bgLine1,
                 shape = RoundedCornerShape(5.dp)
             )
-            .background(ReminderTheme.colors.bg2), verticalAlignment = Alignment.CenterVertically
+            .background(PlaneatTheme.colors.bg2), verticalAlignment = Alignment.CenterVertically
     ) {
         var localTextFieldValue by remember {
             mutableStateOf(TextFieldValue(initText, selection = TextRange(initText.length)))
@@ -244,11 +243,11 @@ private fun TagRenameTextBox(
                 .focusRequester(focusRequester),
             value = localTextFieldValue,
             onValueChange = { localTextFieldValue = it },
-            textStyle = ReminderTheme.typography
+            textStyle = PlaneatTheme.typography
                 .bodyMedium
                 .copy(
                     textAlign = TextAlign.Start,
-                    color = ReminderTheme.colors.content1
+                    color = PlaneatTheme.colors.content1
                 ),
             decorationBox = { innerTextField ->
                 Box(contentAlignment = Alignment.CenterStart, modifier = Modifier.fillMaxWidth()) {
@@ -256,7 +255,7 @@ private fun TagRenameTextBox(
                 }
             },
             singleLine = true,
-            cursorBrush = SolidColor(ReminderTheme.colors.point1),
+            cursorBrush = SolidColor(PlaneatTheme.colors.point1),
         )
         Surface(
             modifier = Modifier
@@ -299,11 +298,11 @@ private fun TagRenameTextBox(
 )
 @Composable
 private fun TagRenameDialogPreview() {
-    ReminderTheme {
+    PlaneatTheme {
         TagRenameDialog(
             initText = "Modify Tag Name...",
             tagName = "Hello, TagRenameDialog check long text",
-            usageCount = TagUsageCount(2)
+            usageCount = DisplayUsageCount(2)
         )
     }
 }

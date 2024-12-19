@@ -16,23 +16,11 @@
 
 package com.nlab.reminder.domain.feature.schedule.all
 
-import com.nlab.reminder.core.data.di.ScheduleData
-import com.nlab.reminder.core.data.di.ScheduleDataOption.*
-import com.nlab.reminder.core.data.model.Schedule
-import com.nlab.reminder.core.kotlinx.coroutine.flow.map
-import com.nlab.reminder.core.data.repository.CompletedScheduleShownRepository
-import com.nlab.reminder.core.data.repository.ScheduleGetStreamRequest
-import com.nlab.reminder.core.data.repository.ScheduleRepository
-import com.nlab.reminder.core.domain.MapToScheduleElementsUseCase
-import com.nlab.reminder.core.kotlinx.coroutine.flow.flatMapLatest
-import com.nlab.statekit.middleware.epic.Epic
-import com.nlab.statekit.util.buildDslEpic
-import kotlinx.coroutines.flow.Flow
-import javax.inject.Inject
 
 /**
  * @author thalys
  */
+/**
 class AllScheduleEpic @Inject constructor(
     @ScheduleData(All) completedScheduleShownRepository: CompletedScheduleShownRepository,
     scheduleRepository: ScheduleRepository,
@@ -49,10 +37,11 @@ class AllScheduleEpic @Inject constructor(
 
 private fun ScheduleRepository.getAllSchedulesStream(
     isCompletedScheduleShown: Boolean
-): Flow<List<Schedule>> =
-    getAsStream(
+): Flow<List<ScheduleDetails>> =
+    getSchedulesAsStream(
         when (isCompletedScheduleShown) {
-            true -> ScheduleGetStreamRequest.All
-            else -> ScheduleGetStreamRequest.ByComplete(isComplete = false)
+            true -> GetScheduleQuery.All
+            else -> GetScheduleQuery.ByComplete(isComplete = false)
         }
     )
+*/

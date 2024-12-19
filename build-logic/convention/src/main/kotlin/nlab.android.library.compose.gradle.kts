@@ -17,9 +17,8 @@ import org.gradle.kotlin.dsl.configure
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-with(pluginManager) {
-    apply("com.android.library")
-}
+apply(plugin = "com.android.library")
+apply(plugin = "org.jetbrains.kotlin.plugin.compose")
 
 extensions.configure<LibraryExtension> {
     configureComposeAndroid(this)

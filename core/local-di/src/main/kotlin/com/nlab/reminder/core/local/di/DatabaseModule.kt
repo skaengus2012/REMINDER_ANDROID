@@ -17,13 +17,16 @@
 package com.nlab.reminder.core.local.di
 
 import android.content.Context
-import com.nlab.reminder.core.local.database.LinkMetadataDao
-import com.nlab.reminder.core.local.database.ReminderDatabase
-import com.nlab.reminder.core.local.database.ScheduleDao
-import com.nlab.reminder.core.local.database.ScheduleTagListDao
-import com.nlab.reminder.core.local.database.TagDao
+import com.nlab.reminder.core.local.database.dao.LinkMetadataDAO
+import com.nlab.reminder.core.local.database.configuration.ReminderDatabase
+import com.nlab.reminder.core.local.database.dao.ScheduleDAO
+import com.nlab.reminder.core.local.database.dao.ScheduleTagListDAO
+import com.nlab.reminder.core.local.database.dao.TagRelationDAO
+import com.nlab.reminder.core.local.database.dao.TagDAO
+import com.nlab.reminder.core.local.database.util.TransactionScope
 import dagger.Module
 import dagger.Provides
+import dagger.Reusable
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
@@ -41,17 +44,40 @@ internal class DatabaseModule {
         @ApplicationContext context: Context
     ): ReminderDatabase = ReminderDatabase.getDatabase(context)
 
+    @Reusable
     @Provides
-    fun provideLinkMetadataDao(reminderDatabase: ReminderDatabase): LinkMetadataDao = reminderDatabase.linkMetadataDao()
-
-    @Provides
-    fun provideScheduleDao(reminderDatabase: ReminderDatabase): ScheduleDao = reminderDatabase.scheduleDao()
-
-    @Provides
-    fun provideScheduleTagListDao(
+    fun provideTransactionScope(
         reminderDatabase: ReminderDatabase
-    ): ScheduleTagListDao = reminderDatabase.scheduleTagListDao()
+    ): TransactionScope = TransactionScope(reminderDatabase)
 
     @Provides
-    fun provideTagDao(reminderDatabase: ReminderDatabase): TagDao = reminderDatabase.tagDao()
+    fun provideLinkMetadataDAO(
+        reminderDatabase: ReminderDatabase
+    ): LinkMetadataDAO = reminderDatabase.linkMetadataDAO()
+
+    @Provides
+    fun provideScheduleDAO(
+        reminderDatabase: ReminderDatabase
+    ): ScheduleDAO = reminderDatabase.scheduleDAO()
+
+    @Provides
+    fun provideScheduleTagListDAO(
+        reminderDatabase: ReminderDatabase
+    ): ScheduleTagListDAO = reminderDatabase.scheduleTagListDAO()
+
+    @Provides
+    fun provideTagRelationDAO(
+        transactionScope: TransactionScope,
+        tagDAO: TagDAO,
+        scheduleTagListDAO: ScheduleTagListDAO
+    ): TagRelationDAO = TagRelationDAO(
+        transactionScope = transactionScope,
+        tagDAO = tagDAO,
+        scheduleTagListDAO = scheduleTagListDAO
+    )
+
+    @Provides
+    fun provideTagDAO(
+        reminderDatabase: ReminderDatabase
+    ): TagDAO = reminderDatabase.tagDAO()
 }

@@ -16,11 +16,11 @@
 
 package com.nlab.reminder.core.schedule.ui
 
-import com.nlab.reminder.core.schedule.model.ScheduleElement
 
 /**
  * @author thalys
  */
+/**
 class DefaultScheduleElementItemMovePolicy : ScheduleElementItemMovePolicy() {
     override fun isMovable(from: ScheduleElement, to: ScheduleElement): Boolean = true
-}
+}*/

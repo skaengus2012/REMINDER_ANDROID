@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 The N's lab Open Source Project
+ * Copyright (C) 2024 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,27 +16,22 @@
 
 package com.nlab.reminder.domain.feature.home
 
-import com.nlab.reminder.core.annotation.platform.Stable
-import com.nlab.reminder.core.state.UserMessage
-import com.nlab.reminder.core.annotation.test.ExcludeFromGeneratedTestReport
 import com.nlab.reminder.core.data.model.Tag
-import com.nlab.statekit.State
-import kotlinx.collections.immutable.*
+import com.nlab.reminder.core.kotlin.NonNegativeLong
+import com.nlab.reminder.core.component.text.UiText
 
 /**
  * @author Doohyun
  */
-@Stable
-internal sealed interface HomeUiState : State {
-    object Loading : HomeUiState
+internal sealed class HomeUiState private constructor() {
+    data object Loading : HomeUiState()
 
-    @ExcludeFromGeneratedTestReport
     data class Success(
-        val todayScheduleCount: Long,
-        val timetableScheduleCount: Long,
-        val allScheduleCount: Long,
-        val tags: ImmutableList<Tag>,
-        val workflow: HomeWorkflow,
-        val userMessages: PersistentList<UserMessage>
-    ) : HomeUiState
+        val todayScheduleCount: NonNegativeLong,
+        val timetableScheduleCount: NonNegativeLong,
+        val allScheduleCount: NonNegativeLong,
+        val tags: List<Tag>,
+        val interaction: HomeInteraction,
+        val userMessages: List<UiText>
+    ) : HomeUiState()
 }

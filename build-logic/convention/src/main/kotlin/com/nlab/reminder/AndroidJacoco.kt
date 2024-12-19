@@ -79,15 +79,19 @@ private fun Project.androidJacocoClassDirectories(variant: Variant): Configurabl
                 "**/BuildConfig.*",
                 "**/Manifest*.*",
                 "**/android/**",
-                "**/resource/**",
                 "**/ui/**",
                 "**/test/**",
                 "**/di/**",
-                "**/resource/**",
                 "**/fake/**",
-                "**/*_GeneratedUiActionsKt.class",  /* filtering UiAction generated classes */
-                "**/*Args*.*",                      /* filtering Navigation Component generated classes */
-                "**/*Directions*.*"                 /* filtering Navigation Component generated classes */
+
+                /* filtering unnecessary feature components */
+                "**/*Action$*.class",
+                "**/*UiState$*.class",
+                "**/*Environment.class",
+
+                /* filtering Navigation Component generated classes */
+                "**/*Args*.*",
+                "**/*Directions*.*",
             )
         )
     }

@@ -16,65 +16,80 @@
 
 package com.nlab.reminder.domain.feature.home
 
+import com.nlab.reminder.core.component.tag.edit.TagEditDelegate
+import com.nlab.reminder.core.component.tag.edit.genTagEditState
+import com.nlab.reminder.core.component.text.UiText
+import com.nlab.reminder.core.component.text.genUiTexts
 import com.nlab.reminder.core.data.model.Tag
-import com.nlab.reminder.core.data.model.TagUsageCount
-import com.nlab.reminder.core.data.model.genTag
-import com.nlab.reminder.core.data.model.genTagUsageCount
 import com.nlab.reminder.core.data.model.genTags
-import com.nlab.reminder.core.state.UserMessage
-import com.nlab.testkit.faker.genBoolean
-import com.nlab.testkit.faker.genBothify
-import com.nlab.testkit.faker.genLong
-import kotlinx.collections.immutable.toPersistentList
+import com.nlab.reminder.core.data.repository.ScheduleRepository
+import com.nlab.reminder.core.data.repository.TagRepository
+import com.nlab.reminder.core.kotlin.NonNegativeLong
+import com.nlab.reminder.core.kotlin.faker.genNonNegativeLong
+import com.nlab.testkit.faker.requireSample
+import com.nlab.testkit.faker.requireSampleExcludeTypeOf
+import org.mockito.kotlin.mock
 import kotlin.reflect.KClass
 
 /**
  * @author Doohyun
  */
+internal fun genHomeEnvironment(
+    tagEditDelegate: TagEditDelegate = mock(),
+    scheduleRepository: ScheduleRepository = mock(),
+    tagRepository: TagRepository = mock()
+) = HomeEnvironment(
+    tagEditDelegate = tagEditDelegate,
+    scheduleRepository = scheduleRepository,
+    tagRepository = tagRepository
+)
+
+internal fun genHomeActionStateSynced(
+    todaySchedulesCount: NonNegativeLong = genNonNegativeLong(),
+    timetableSchedulesCount: NonNegativeLong = genNonNegativeLong(),
+    allSchedulesCount: NonNegativeLong = genNonNegativeLong(),
+    tags: List<Tag> = genTags()
+) = HomeAction.StateSynced(
+    todaySchedulesCount = todaySchedulesCount,
+    timetableSchedulesCount = timetableSchedulesCount,
+    allSchedulesCount = allSchedulesCount,
+    sortedTags = tags
+)
+
 internal fun genHomeUiStateSuccess(
-    todayScheduleCount: Long = genLong(),
-    timetableScheduleCount: Long = genLong(),
-    allScheduleCount: Long = genLong(),
+    todayScheduleCount: NonNegativeLong = genNonNegativeLong(),
+    timetableScheduleCount: NonNegativeLong = genNonNegativeLong(),
+    allScheduleCount: NonNegativeLong = genNonNegativeLong(),
     tags: List<Tag> = genTags(),
-    workflow: HomeWorkflow = genHomeWorkflowExcludeEmpty(),
-    userMessages: List<UserMessage> = emptyList()
-): HomeUiState.Success = HomeUiState.Success(
+    interaction: HomeInteraction = genHomeInteraction(),
+    userMessages: List<UiText> = genUiTexts()
+) = HomeUiState.Success(
     todayScheduleCount = todayScheduleCount,
     timetableScheduleCount = timetableScheduleCount,
     allScheduleCount = allScheduleCount,
-    tags = tags.toPersistentList(),
-    workflow = workflow,
-    userMessages = userMessages.toPersistentList()
+    tags = tags,
+    interaction = interaction,
+    userMessages = userMessages
 )
 
-internal fun genHomeTagConfigWorkflow(
-    tag: Tag = genTag(),
-    usageCount: TagUsageCount = genTagUsageCount(),
-) = HomeWorkflow.TagConfig(tag, usageCount)
-
-internal fun genHomeTagRenameWorkflow(
-    tag: Tag = genTag(),
-    usageCount: TagUsageCount = genTagUsageCount(),
-    renameText: String = genBothify(),
-    shouldKeyboardShown: Boolean = genBoolean()
-) = HomeWorkflow.TagRename(tag, usageCount, renameText, shouldKeyboardShown)
-
-
-internal fun genHomeTagDeleteConfig(
-    tag: Tag = genTag(),
-    usageCount: TagUsageCount = genTagUsageCount(),
-) = HomeWorkflow.TagDelete(tag, usageCount)
-
-private fun genHomeWorkflowsExcludeEmpty(): List<HomeWorkflow> = listOf(
-    HomeWorkflow.TodaySchedule,
-    HomeWorkflow.TimetableSchedule,
-    HomeWorkflow.AllSchedule,
-    genHomeTagConfigWorkflow(),
-    genHomeTagRenameWorkflow(),
-    genHomeTagDeleteConfig()
+private val sampleHomeInteractions get() =  listOf(
+    HomeInteraction.Empty,
+    HomeInteraction.TodaySchedule,
+    HomeInteraction.TimetableSchedule,
+    HomeInteraction.AllSchedule,
+    HomeInteraction.TagEdit(genTagEditState())
 )
 
-internal fun genHomeWorkflowExcludeEmpty(ignoreCases: Set<KClass<out HomeWorkflow>> = emptySet()): HomeWorkflow =
-    genHomeWorkflowsExcludeEmpty()
-        .filterNot { it::class in ignoreCases }
-        .random()
+internal fun genHomeInteraction(): HomeInteraction =
+    sampleHomeInteractions.requireSample()
+
+internal fun genHomeInteractionWithExcludeTypes(
+    firstType: KClass<out HomeInteraction>,
+    vararg anotherTypes: KClass<out HomeInteraction>
+): HomeInteraction =
+    sampleHomeInteractions.requireSampleExcludeTypeOf(
+        buildList {
+            add(firstType)
+            addAll(anotherTypes)
+        }
+    )
