@@ -18,7 +18,6 @@ package com.nlab.reminder.domain.feature.home
 
 import com.nlab.reminder.core.translation.StringIds
 import com.nlab.reminder.core.component.text.UiText
-import com.nlab.reminder.core.kotlin.getOrThrow
 import com.nlab.reminder.core.kotlin.onFailure
 import com.nlab.statekit.dsl.reduce.DslReduce
 import com.nlab.statekit.reduce.Reduce
