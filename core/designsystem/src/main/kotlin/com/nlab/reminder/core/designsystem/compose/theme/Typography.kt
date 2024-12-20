@@ -30,6 +30,10 @@ import androidx.compose.ui.unit.sp
  */
 @Immutable
 data class PlaneatTypography(
+    val titleSmall: TextStyle = createTextStyle(
+        fontSize = 14.sp,
+        fontWeight = FontWeight.Medium,
+    ),
     val titleMedium: TextStyle = createTextStyle(
         fontSize = 17.sp,
         fontWeight = FontWeight.Bold,

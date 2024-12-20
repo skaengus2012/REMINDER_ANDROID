@@ -41,6 +41,7 @@ sealed class TagEditState private constructor() {
     @ExcludeFromGeneratedTestReport
     data class Merge(
         val from: Tag,
+        val fromUsageCount: NonNegativeLong,
         val to: Tag,
     ) : TagEditState(), Processable
 

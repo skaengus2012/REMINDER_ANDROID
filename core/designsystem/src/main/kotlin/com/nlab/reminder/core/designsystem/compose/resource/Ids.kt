@@ -14,23 +14,11 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.common.tag.ui
+package com.nlab.reminder.core.designsystem.compose.resource
 
-import androidx.compose.runtime.Composable
+import com.nlab.reminder.core.designsystem.R
 
 /**
  * @author Doohyun
  */
-private const val MAX_PRESENTABLE_USAGE_COUNT = 1_000
-
-@JvmInline
-value class DisplayUsageCount(private val value: Long) {
-    @Composable
-    fun format(
-        transform: @Composable (count: Int) -> String,
-        transformWhenOverflow: @Composable (count: Int) -> String
-    ): String {
-        return if (value <= MAX_PRESENTABLE_USAGE_COUNT) transform(value.toInt())
-        else transformWhenOverflow(MAX_PRESENTABLE_USAGE_COUNT)
-    }
-}
+typealias DrawableIds = R.drawable

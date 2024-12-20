@@ -61,8 +61,9 @@ fun genRenameState(
 
 fun genMergeState(
     from: Tag = genTag(),
+    fromUsageCount: NonNegativeLong = genNonNegativeLong(),
     to: Tag = genTag(),
-) = TagEditState.Merge(from, to)
+) = TagEditState.Merge(from, fromUsageCount, to)
 
 fun genDeleteState(
     tag: Tag = genTag(),

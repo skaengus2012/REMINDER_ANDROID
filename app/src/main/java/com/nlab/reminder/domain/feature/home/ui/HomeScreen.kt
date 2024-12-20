@@ -88,14 +88,12 @@ import com.nlab.reminder.core.android.resources.icon.IcHomeCategoryTimetable
 import com.nlab.reminder.core.android.resources.icon.IcHomeCategoryToday
 import com.nlab.reminder.core.androidx.compose.ui.ColorPressButton
 import com.nlab.reminder.core.androidx.compose.ui.throttleClick
+import com.nlab.reminder.core.component.tag.edit.ui.compose.TagEditStateHandler
 import com.nlab.reminder.core.component.tag.ui.compose.TagCard
 import com.nlab.reminder.core.designsystem.compose.component.PlaneatLoadingContent
 import com.nlab.reminder.core.kotlin.NonNegativeLong
 import com.nlab.reminder.core.translation.StringIds
-import com.nlab.reminder.domain.feature.home.interacted
-import com.nlab.reminder.domain.feature.home.onAllCategoryClicked
-import com.nlab.reminder.domain.feature.home.onTagLongClicked
-import com.nlab.reminder.domain.feature.home.onTimetableCategoryClicked
+import com.nlab.reminder.domain.feature.home.*
 
 /**
  * @author Doohyun
@@ -120,7 +118,15 @@ internal fun HomeScreen(
         onTagLongClicked = { tag -> viewModel.onTagLongClicked(tag) },
         onNewPlanClicked = {
             // TODO implements
-        }
+        },
+        onTagRenameRequestClicked = { viewModel.onTagRenameRequestClicked() },
+        onTagDeleteRequestClicked = { viewModel.onTagDeleteRequestClicked() },
+        onTagRenameInputReady = { viewModel.onTagRenameInputReady() },
+        onTagRenameInputted = { input -> viewModel.onTagRenameInputted(input) },
+        onTagRenameConfirmClicked = { viewModel.onTagRenameConfirmClicked() },
+        onTagMergeCancelClicked = { viewModel.onTagReplaceCancelClicked() },
+        onTagMergeConfirmClicked = { viewModel.onTagReplaceConfirmClicked() },
+        onTagDeleteConfirmClicked = { viewModel.onTagDeleteConfirmClicked() }
     )
 }
 
@@ -134,6 +140,14 @@ private fun HomeScreen(
     onTagClicked: (Tag) -> Unit,
     onTagLongClicked: (Tag) -> Unit,
     onNewPlanClicked: () -> Unit,
+    onTagRenameRequestClicked: () -> Unit,
+    onTagDeleteRequestClicked: () -> Unit,
+    onTagRenameInputReady: () -> Unit,
+    onTagRenameInputted: (String) -> Unit,
+    onTagRenameConfirmClicked: () -> Unit,
+    onTagMergeCancelClicked: () -> Unit,
+    onTagMergeConfirmClicked: () -> Unit,
+    onTagDeleteConfirmClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     when (uiState) {
@@ -161,7 +175,15 @@ private fun HomeScreen(
             }
             HomeInteractionHandler(
                 interaction = uiState.interaction,
-                onInteracted = onInteracted
+                onInteracted = onInteracted,
+                onTagRenameRequestClicked = onTagRenameRequestClicked,
+                onTagDeleteRequestClicked = onTagDeleteRequestClicked,
+                onTagRenameInputReady = onTagRenameInputReady,
+                onTagRenameInputted = onTagRenameInputted,
+                onTagRenameConfirmClicked = onTagRenameConfirmClicked,
+                onTagMergeCancelClicked = onTagMergeCancelClicked,
+                onTagMergeConfirmClicked = onTagMergeConfirmClicked,
+                onTagDeleteConfirmClicked = onTagDeleteConfirmClicked
             )
         }
     }
@@ -626,7 +648,7 @@ private fun BottomBlurLayer(
     Box(modifier = modifier.fillMaxSize()) {
         Spacer(
             modifier = Modifier
-                .fillMaxSize()
+                .matchParentSize()
                 .drawBehind { drawRect(color = containerColor.copy(alpha = 0.925f * alphaState)) }
         )
         Spacer(
@@ -668,7 +690,15 @@ private fun NewPlanButton(
 @Composable
 private fun HomeInteractionHandler(
     interaction: HomeInteraction,
-    onInteracted: () -> Unit
+    onInteracted: () -> Unit,
+    onTagRenameRequestClicked: () -> Unit,
+    onTagDeleteRequestClicked: () -> Unit,
+    onTagRenameInputReady: () -> Unit,
+    onTagRenameInputted: (String) -> Unit,
+    onTagRenameConfirmClicked: () -> Unit,
+    onTagMergeCancelClicked: () -> Unit,
+    onTagMergeConfirmClicked: () -> Unit,
+    onTagDeleteConfirmClicked: () -> Unit
 ) {
     when (interaction) {
         is HomeInteraction.Empty -> Unit
@@ -687,8 +717,20 @@ private fun HomeInteractionHandler(
                 onInteracted()
             }
         }
-
-        else -> Unit
+        is HomeInteraction.TagEdit -> {
+            TagEditStateHandler(
+                state = interaction.state,
+                onCompleted = onInteracted,
+                onRenameRequestClicked = onTagRenameRequestClicked,
+                onDeleteRequestClicked = onTagDeleteRequestClicked,
+                onRenameInputReady = onTagRenameInputReady,
+                onRenameInputted = onTagRenameInputted,
+                onRenameConfirmClicked = onTagRenameConfirmClicked,
+                onMergeCancelClicked = onTagMergeCancelClicked,
+                onMergeConfirmClicked = onTagMergeConfirmClicked,
+                onDeleteConfirmClicked = onTagDeleteConfirmClicked
+            )
+        }
     }
 }
 
@@ -716,7 +758,15 @@ private fun HomeScreenPopulated() {
             onInteracted = {},
             onTagClicked = {},
             onTagLongClicked = {},
-            onNewPlanClicked = {}
+            onNewPlanClicked = {},
+            onTagRenameRequestClicked = {},
+            onTagDeleteRequestClicked = {},
+            onTagRenameInputReady = {},
+            onTagRenameInputted = {},
+            onTagRenameConfirmClicked = {},
+            onTagMergeCancelClicked = {},
+            onTagMergeConfirmClicked = {},
+            onTagDeleteConfirmClicked = {},
         )
     }
 }

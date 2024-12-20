@@ -235,7 +235,7 @@ class TagEditDelegateTest {
             flow = delegate.state.drop(1),
             expectedEmits = listOf(
                 TagEditState.Processing(initState),
-                TagEditState.Merge(from = targetTag, to = duplicateTag)
+                TagEditState.Merge(from = targetTag, fromUsageCount = initState.usageCount, to = duplicateTag)
             )
         )
         val result = delegate.tryUpdateTagName(tags)
@@ -324,6 +324,24 @@ class TagEditDelegateTest {
         val result = delegate.mergeTag()
         assertThat(result.isFailure, equalTo(true))
         assertStateChanged()
+    }
+
+    @Test
+    fun `Given merge tag, When cancel merge tag, Then state changed to rename`() = runTest {
+        val initState = genMergeState()
+        val delegate = genTagEditDelegate(initState = initState)
+        delegate.cancelMergeTag()
+        assertThat(
+            delegate.state.value,
+            equalTo(
+                TagEditState.Rename(
+                    tag = initState.from,
+                    usageCount = initState.fromUsageCount,
+                    renameText = initState.to.name.value,
+                    shouldUserInputReady = true,
+                )
+            )
+        )
     }
 
     @Test

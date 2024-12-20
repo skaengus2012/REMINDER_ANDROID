@@ -57,8 +57,7 @@ class TagRelationDAO(
 private suspend fun ScheduleTagListDAO.copyScheduleIds(fromTagId: Long, toTagId: Long) {
     val fromScheduleIds = findScheduleIdsByTagId(fromTagId).toSet()
     val toScheduleIds = findScheduleIdsByTagId(toTagId).toSet()
-
-    val targetScheduleIds = toScheduleIds - fromScheduleIds
+    val targetScheduleIds = fromScheduleIds - toScheduleIds
     targetScheduleIds.forEach { scheduleId ->
         insert(ScheduleTagListEntity(scheduleId = scheduleId, tagId = toTagId))
     }

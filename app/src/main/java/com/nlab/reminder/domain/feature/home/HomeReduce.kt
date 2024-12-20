@@ -18,6 +18,7 @@ package com.nlab.reminder.domain.feature.home
 
 import com.nlab.reminder.core.translation.StringIds
 import com.nlab.reminder.core.component.text.UiText
+import com.nlab.reminder.core.kotlin.getOrThrow
 import com.nlab.reminder.core.kotlin.onFailure
 import com.nlab.statekit.dsl.reduce.DslReduce
 import com.nlab.statekit.reduce.Reduce
@@ -51,8 +52,10 @@ internal fun HomeReduce(environment: HomeEnvironment): HomeReduce = DslReduce {
         }
     }
     actionScope<TagEditStateSynced> {
+        fun HomeInteraction.isTagEditStateUnsupported(): Boolean =
+            this !is HomeInteraction.Empty && this !is HomeInteraction.TagEdit
         transition<Success> {
-            if (current.interaction !is HomeInteraction.TagEdit) current
+            if (current.interaction.isTagEditStateUnsupported()) current
             else current.copy(
                 interaction = action.state
                     ?.let(HomeInteraction::TagEdit)
@@ -62,7 +65,7 @@ internal fun HomeReduce(environment: HomeEnvironment): HomeReduce = DslReduce {
         scope(isMatch = { action.state != null }) {
             effect<Loading> { environment.tagEditDelegate.clearState() }
             effect<Success> {
-                if (current.interaction !is HomeInteraction.TagEdit) {
+                if (current.interaction.isTagEditStateUnsupported()) {
                     environment.tagEditDelegate.clearState()
                 }
             }
@@ -99,6 +102,7 @@ internal fun HomeReduce(environment: HomeEnvironment): HomeReduce = DslReduce {
                     .mergeTag()
                     .onFailure { dispatch(UserMessagePosted(UiText(StringIds.unknown_error))) }
             }
+            effect<OnTagReplaceCancelClicked> { environment.tagEditDelegate.cancelMergeTag() }
             effect<OnTagDeleteRequestClicked> { environment.tagEditDelegate.startDelete() }
             suspendEffect<OnTagDeleteConfirmClicked> {
                 environment.tagEditDelegate
@@ -109,5 +113,10 @@ internal fun HomeReduce(environment: HomeEnvironment): HomeReduce = DslReduce {
         transition<UserMessagePosted> { current.copy(userMessages = current.userMessages + action.message) }
         transition<UserMessageShown> { current.copy(userMessages = current.userMessages - action.message) }
         transition<Interacted> { current.copy(interaction = HomeInteraction.Empty) }
+        effect<Interacted> {
+            if (current.interaction is HomeInteraction.TagEdit) {
+                environment.tagEditDelegate.clearState()
+            }
+        }
     }
 }

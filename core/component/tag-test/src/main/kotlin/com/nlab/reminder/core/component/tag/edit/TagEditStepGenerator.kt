@@ -54,6 +54,7 @@ private fun getNullableTagEditStates(): List<TagEditState?> {
     )
     val merge = TagEditState.Merge(
         from = genTag(),
+        fromUsageCount = genNonNegativeLong(),
         to = genTag()
     )
     val delete = TagEditState.Delete(

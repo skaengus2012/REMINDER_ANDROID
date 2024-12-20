@@ -100,7 +100,9 @@ class TagEditDelegate(
 
                 _state.updateIfProcessingStateEquals(
                     target = emitState,
-                    to = duplicateTag?.let { TagEditState.Merge(from = emitState.tag, to = it) }
+                    to = duplicateTag?.let { tag ->
+                        TagEditState.Merge(from = emitState.tag, fromUsageCount = emitState.usageCount, to = tag)
+                    }
                 )
 
                 if (isSuccessReturn) Result.Success(Unit)
@@ -114,6 +116,17 @@ class TagEditDelegate(
             tagRepository
                 .save(SaveTagQuery.Modify(id = emitState.from.id, name = emitState.to.name))
                 .map {}
+        }
+    }
+
+    fun cancelMergeTag() {
+        _state.updateIfTypeOf<TagEditState.Merge> { current ->
+            TagEditState.Rename(
+                tag = current.from,
+                usageCount = current.fromUsageCount,
+                renameText = current.to.name.value,
+                shouldUserInputReady = true
+            )
         }
     }
 
