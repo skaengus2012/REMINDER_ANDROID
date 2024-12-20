@@ -27,21 +27,20 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsBottomHeight
@@ -209,10 +208,9 @@ private fun HomeContents(
         val bodyPaddingBottom = 75.dp
         HomeBody(
             modifier = Modifier
-                .fillMaxWidth()
+                .fillMaxSize()
                 .verticalScroll(bodyScrollState)
-                .statusBarsPadding()
-                .navigationBarsPadding()
+                .safeDrawingPadding()
                 .padding(start = 20.dp, top = bodyPaddingTop, end = 20.dp, bottom = bodyPaddingBottom),
             todayCount = todayCount,
             timetableCount = timetableCount,
@@ -595,11 +593,11 @@ private fun BottomActions(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(IntrinsicSize.Min)
             .onSizeChanged { computedHeightToPx = it.height }
     ) {
         if (computedHeightToPx != 0) {
             BottomBlurLayer(
+                modifier = Modifier.matchParentSize(),
                 computedHeightToPx = computedHeightToPx,
                 alphaAnimScrollTriggerOffsetToPx = with(LocalDensity.current) {
                     remember(contentHeight, bodyBottomPadding) { (bodyBottomPadding - contentHeight).toPx().toInt() }
@@ -608,7 +606,7 @@ private fun BottomActions(
             )
         }
         Row {
-            Spacer(modifier = Modifier.windowInsetsStartWidth(WindowInsets.safeDrawing))
+            Spacer(modifier = Modifier.windowInsetsStartWidth(WindowInsets.displayCutout))
             Column {
                 NewPlanButton(
                     modifier = Modifier
@@ -616,7 +614,7 @@ private fun BottomActions(
                         .padding(start = 20.dp, end = 10.dp),
                     onClick = onNewPlanClicked
                 )
-                Spacer(modifier = Modifier.windowInsetsBottomHeight(WindowInsets.safeDrawing))
+                Spacer(modifier = Modifier.windowInsetsBottomHeight(WindowInsets.navigationBars))
             }
         }
     }
@@ -645,7 +643,7 @@ private fun BottomBlurLayer(
             }
         }
     }
-    Box(modifier = modifier.fillMaxSize()) {
+    Box(modifier = modifier) {
         Spacer(
             modifier = Modifier
                 .matchParentSize()
