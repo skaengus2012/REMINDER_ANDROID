@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 The N's lab Open Source Project
+ * Copyright (C) 2024 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,24 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.common.android.lifecycle
+package com.nlab.reminder.apps.ui
 
-import androidx.lifecycle.SavedStateHandle
-import com.nlab.reminder.core.data.model.Tag
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 
 /**
- * @see <a href="./nav_main.xml">argument defined</a>
- * @author Doohyun
+ * @author Thalys
  */
-val SavedStateHandle.tag: Tag get() = checkNotNull(get<Tag>("tag"))
+@Stable
+class PlaneatAppState(
+    val navController: NavHostController
+)
+
+@Composable
+fun rememberPlaneatAppState(
+    navController: NavHostController = rememberNavController()
+): PlaneatAppState = PlaneatAppState(
+    navController = navController
+)

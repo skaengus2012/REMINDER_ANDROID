@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 The N's lab Open Source Project
+ * Copyright (C) 2024 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,25 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.android.navigation
+package com.nlab.reminder.domain.feature.schedule.all.ui
+
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.fragment.compose.AndroidFragment
+import timber.log.Timber
 
 /**
- * @author Doohyun
+ * @author Thalys
  */
-abstract class NavNode<T> internal constructor() {
-    internal abstract fun visit(navHandle: T, screen: Screen)
+@Composable
+internal fun AllScheduleScreen(
+    onBackClicked: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    AndroidFragment<AllScheduleFragment>(
+        modifier = modifier,
+    ) {
+        // TODO impl
+        Timber.i("AllScheduleFragment view created")
+    }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 The N's lab Open Source Project
+ * Copyright (C) 2024 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.feature.main.ui
+package com.nlab.reminder.apps.ui
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import com.nlab.reminder.R
+import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 /**
@@ -30,8 +31,14 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
-        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+
+        enableEdgeToEdge()
+        setContent {
+            val appState = rememberPlaneatAppState()
+            PlaneatTheme {
+                PlaneatApp(appState = appState)
+            }
+        }
     }
 }

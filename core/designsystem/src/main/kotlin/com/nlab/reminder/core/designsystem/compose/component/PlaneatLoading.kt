@@ -17,6 +17,7 @@
 package com.nlab.reminder.core.designsystem.compose.component
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.*
@@ -46,7 +47,7 @@ fun PlaneatLoadingContent(
     modifier: Modifier = Modifier,
     color: Color = PlaneatTheme.colors.point1,
 ) {
-    Box(modifier = modifier) {
+    Box(modifier = modifier.fillMaxSize()) {
         PlaneatLoading(
             modifier = Modifier.align(Alignment.Center),
             color = color,

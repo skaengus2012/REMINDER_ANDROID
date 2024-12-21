@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 The N's lab Open Source Project
+ * Copyright (C) 2024 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,21 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.android.navigation
+package com.nlab.reminder.apps.ui
+
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 
 /**
- * @author Doohyun
+ * @author Thalys
  */
-@NavGraphDsl
-@JvmInline
-value class NavGraphScope<T>(val navHandle: T)
+@Composable
+fun PlaneatApp(
+    appState: PlaneatAppState
+) {
+    PlaneatNavHost(
+        modifier = Modifier.fillMaxSize(),
+        appState = appState
+    )
+}
