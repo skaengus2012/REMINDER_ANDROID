@@ -14,21 +14,23 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.apps.ui
+package com.nlab.reminder.domain.feature.schedule.all.ui
 
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.fragment.compose.AndroidFragment
 
 /**
  * @author Thalys
  */
 @Composable
-fun PlaneatApp(
-    appState: PlaneatAppState
+internal fun AllScheduleScreen(
+    onBackClicked: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    PlaneatNavHost(
-        modifier = Modifier.fillMaxSize(),
-        appState = appState
-    )
+    AndroidFragment<AllScheduleFragment>(
+        modifier = modifier,
+    ) {
+        // TODO impl
+    }
 }

@@ -54,14 +54,12 @@ import kotlinx.coroutines.flow.*
  */
 @AndroidEntryPoint
 class AllScheduleFragment : Fragment() {
-
-
     private var _binding: FragmentAllScheduleBinding? = null
     private val binding: FragmentAllScheduleBinding get() = checkNotNull(_binding)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        postponeEnterTransition()
+       // postponeEnterTransition()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =

@@ -16,11 +16,15 @@
 
 package com.nlab.reminder.apps.ui
 
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import com.nlab.reminder.domain.feature.home.navigation.HomeBaseRoute
 import com.nlab.reminder.domain.feature.home.navigation.homeScreen
+import com.nlab.reminder.domain.feature.schedule.all.navigation.allScheduleScreen
+import com.nlab.reminder.domain.feature.schedule.all.navigation.navigateToAllSchedule
 
 /**
  * @author Thalys
@@ -34,11 +38,21 @@ fun PlaneatNavHost(
     NavHost(
         navController = navController,
         startDestination = HomeBaseRoute,
-        modifier = modifier
+        modifier = modifier,
+        enterTransition = { EnterTransition.None },
+        exitTransition = { ExitTransition.None },
+        popEnterTransition = { EnterTransition.None },
+        popExitTransition = { ExitTransition.None }
     ) {
         homeScreen(
-            onAllScheduleClicked = {},
-            allScheduleDestination = {}
+            onAllScheduleClicked = {
+                navController.navigateToAllSchedule()
+            },
+            allScheduleDestination = {
+                allScheduleScreen(
+                    onBackClicked = { navController.popBackStack() }
+                )
+            }
         )
     }
 }
