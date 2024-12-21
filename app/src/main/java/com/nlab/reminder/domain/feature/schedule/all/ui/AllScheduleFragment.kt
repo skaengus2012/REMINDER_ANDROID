@@ -41,7 +41,6 @@ import com.nlab.reminder.core.android.view.touches
 import com.nlab.reminder.core.kotlinx.coroutine.flow.withBefore
 import com.nlab.reminder.core.schedule.ui.*
 import com.nlab.reminder.databinding.FragmentAllScheduleBinding
-import com.nlab.reminder.domain.common.android.navigation.navigateOpenLink
 import com.nlab.reminder.domain.common.android.view.loadingFlow
 import com.nlab.reminder.domain.feature.schedule.all.*
 import dagger.hilt.android.AndroidEntryPoint
