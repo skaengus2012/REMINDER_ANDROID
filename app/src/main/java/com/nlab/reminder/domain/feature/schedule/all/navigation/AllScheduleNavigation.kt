@@ -16,21 +16,12 @@
 
 package com.nlab.reminder.domain.feature.schedule.all.navigation
 
-import androidx.compose.animation.AnimatedContentTransitionScope
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
-import androidx.compose.animation.core.EaseIn
-import androidx.compose.animation.core.EaseOut
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.compose.composable
+import com.nlab.reminder.apps.ui.EnterTransitionFactory
+import com.nlab.reminder.apps.ui.ExitTransitionFactory
 import com.nlab.reminder.domain.feature.schedule.all.ui.AllScheduleScreen
 import kotlinx.serialization.Serializable
 
@@ -44,34 +35,13 @@ fun NavController.navigateToAllSchedule(navOptions: NavOptionsBuilder.() -> Unit
     navigate(route = AllScheduleRoute, builder = navOptions)
 
 fun NavGraphBuilder.allScheduleScreen(
-    onBackClicked: () -> Unit
+    onBackClicked: () -> Unit,
+    provideEnterTransition: EnterTransitionFactory? = null,
+    providePopExitTransition: ExitTransitionFactory? = null
 ) {
     composable<AllScheduleRoute>(
-        enterTransition = {
-           slideIntoContainer(
-                animationSpec = tween(150, easing = EaseIn),
-                towards = AnimatedContentTransitionScope.SlideDirection.Start
-            )
-        },
-        exitTransition = {
-            slideOutOfContainer(
-                animationSpec = tween(150, easing = EaseOut),
-                towards = AnimatedContentTransitionScope.SlideDirection.End
-            )
-        },
-        popEnterTransition = {
-            slideIntoContainer(
-                animationSpec = tween(150, easing = EaseIn),
-                towards = AnimatedContentTransitionScope.SlideDirection.End,
-                initialOffset = { fullWidth -> (fullWidth * 0.3f).toInt() }
-            )
-        },
-        popExitTransition = {
-            slideOutOfContainer(
-                animationSpec = tween(150, easing = EaseOut),
-                towards = AnimatedContentTransitionScope.SlideDirection.Start
-            )
-        }
+        enterTransition = provideEnterTransition,
+        popExitTransition = providePopExitTransition
     ) {
         AllScheduleScreen(
             onBackClicked = onBackClicked

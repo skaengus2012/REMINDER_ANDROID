@@ -14,25 +14,17 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.feature.schedule.all.ui
+package com.nlab.reminder.apps.ui
 
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.fragment.compose.AndroidFragment
-import timber.log.Timber
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.navigation.NavBackStackEntry
 
 /**
  * @author Thalys
  */
-@Composable
-internal fun AllScheduleScreen(
-    onBackClicked: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    AndroidFragment<AllScheduleFragment>(
-        modifier = modifier,
-    ) {
-        // TODO impl
-        Timber.i("AllScheduleFragment view created")
-    }
-}
+typealias EnterTransitionFactory =
+        AnimatedContentTransitionScope<NavBackStackEntry>.() -> @JvmSuppressWildcards EnterTransition?
+typealias ExitTransitionFactory =
+        AnimatedContentTransitionScope<NavBackStackEntry>.() -> @JvmSuppressWildcards ExitTransition?

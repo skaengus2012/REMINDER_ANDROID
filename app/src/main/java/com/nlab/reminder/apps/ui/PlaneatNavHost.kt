@@ -16,12 +16,20 @@
 
 package com.nlab.reminder.apps.ui
 
+import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.EaseIn
+import androidx.compose.animation.core.EaseOut
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
-import com.nlab.reminder.domain.feature.home.navigation.HomeBaseRoute
+import com.nlab.reminder.domain.feature.home.navigation.HomeEntryPointRoute
+import com.nlab.reminder.domain.feature.home.navigation.homeEntryPoint
 import com.nlab.reminder.domain.feature.home.navigation.homeScreen
 import com.nlab.reminder.domain.feature.schedule.all.navigation.allScheduleScreen
 import com.nlab.reminder.domain.feature.schedule.all.navigation.navigateToAllSchedule
@@ -29,6 +37,8 @@ import com.nlab.reminder.domain.feature.schedule.all.navigation.navigateToAllSch
 /**
  * @author Thalys
  */
+private const val HOME_TRANSITION_DURATION = 300
+
 @Composable
 fun PlaneatNavHost(
     appState: PlaneatAppState,
@@ -37,22 +47,56 @@ fun PlaneatNavHost(
     val navController = appState.navController
     NavHost(
         navController = navController,
-        startDestination = HomeBaseRoute,
+        startDestination = HomeEntryPointRoute,
         modifier = modifier,
         enterTransition = { EnterTransition.None },
         exitTransition = { ExitTransition.None },
         popEnterTransition = { EnterTransition.None },
         popExitTransition = { ExitTransition.None }
     ) {
-        homeScreen(
-            onAllScheduleClicked = {
-                navController.navigateToAllSchedule()
-            },
-            allScheduleDestination = {
-                allScheduleScreen(
-                    onBackClicked = { navController.popBackStack() }
-                )
-            }
-        )
+        homeEntryPoint {
+            val enterTransitionFactoryFromHome = createFromHomeEnterTransitionFactory()
+            val popExitTransitionFactoryFromHome = createFromHomePopExitTransitionFactory()
+            homeScreen(
+                provideExitTransition = createHomeExitTransition(),
+                providePopEnterTransition = createHomePopEnterTransitionFactory(),
+                onAllScheduleClicked = { navController.navigateToAllSchedule() }
+            )
+            allScheduleScreen(
+                provideEnterTransition = enterTransitionFactoryFromHome,
+                providePopExitTransition = popExitTransitionFactoryFromHome,
+                onBackClicked = { navController.popBackStack() }
+            )
+        }
     }
+}
+
+private fun createFromHomeEnterTransitionFactory(): EnterTransitionFactory = {
+    slideIntoContainer(
+        animationSpec = tween(HOME_TRANSITION_DURATION, easing = EaseIn),
+        towards = AnimatedContentTransitionScope.SlideDirection.Start
+    )
+}
+
+private fun createHomeExitTransition(): ExitTransitionFactory = {
+    slideOutOfContainer(
+        animationSpec = tween(HOME_TRANSITION_DURATION, easing = EaseOut),
+        towards = AnimatedContentTransitionScope.SlideDirection.Start,
+        targetOffset = { (it * 0.3f).toInt() }
+    ) + fadeOut(animationSpec = tween(HOME_TRANSITION_DURATION, easing = LinearEasing), targetAlpha = 0.2f)
+}
+
+private fun createHomePopEnterTransitionFactory(): EnterTransitionFactory = {
+    slideIntoContainer(
+        animationSpec = tween(HOME_TRANSITION_DURATION, easing = EaseIn),
+        towards = AnimatedContentTransitionScope.SlideDirection.End,
+        initialOffset = { (it * 0.3f).toInt() }
+    ) + fadeIn(animationSpec = tween(HOME_TRANSITION_DURATION, easing = LinearEasing), initialAlpha = 0.2f)
+}
+
+private fun createFromHomePopExitTransitionFactory(): ExitTransitionFactory = {
+    slideOutOfContainer(
+        animationSpec = tween(HOME_TRANSITION_DURATION, easing = EaseOut),
+        towards = AnimatedContentTransitionScope.SlideDirection.End
+    )
 }
