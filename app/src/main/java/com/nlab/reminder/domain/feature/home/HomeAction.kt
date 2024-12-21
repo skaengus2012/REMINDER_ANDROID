@@ -16,62 +16,66 @@
 
 package com.nlab.reminder.domain.feature.home
 
-import com.nlab.reminder.core.state.UserMessage
-import com.nlab.reminder.core.annotation.test.ExcludeFromGeneratedTestReport
+import com.nlab.reminder.core.component.tag.edit.TagEditState
+import com.nlab.reminder.core.component.text.UiText
 import com.nlab.reminder.core.data.model.Tag
-import com.nlab.reminder.core.data.model.TagUsageCount
-import com.nlab.statekit.Action
-import com.nlab.statekit.lifecycle.viewmodel.ContractUiAction
+import com.nlab.reminder.core.kotlin.NonNegativeLong
+import com.nlab.statekit.annotation.UiAction
 
 /**
  * @author Doohyun
  */
-internal sealed interface HomeAction : Action {
-    data class SummaryLoaded(
-        val todaySchedulesCount: Long,
-        val timetableSchedulesCount: Long,
-        val allSchedulesCount: Long,
-        val tags: List<Tag>,
-    ) : HomeAction
+internal sealed class HomeAction private constructor() {
+    data class StateSynced(
+        val todaySchedulesCount: NonNegativeLong,
+        val timetableSchedulesCount: NonNegativeLong,
+        val allSchedulesCount: NonNegativeLong,
+        val sortedTags: List<Tag>,
+    ) : HomeAction()
 
-    @ContractUiAction
-    object CompleteWorkflow : HomeAction
+    data class TagEditStateSynced(val state: TagEditState?) : HomeAction()
 
-    @ContractUiAction
-    data class UserMessageShown(val shownMessage: UserMessage) : HomeAction
+    data class UserMessagePosted(val message: UiText) : HomeAction()
 
-    @ExcludeFromGeneratedTestReport
-    data class ErrorOccurred(val throwable: Throwable) : HomeAction
+    @UiAction
+    data class UserMessageShown(val message: UiText) : HomeAction()
 
-    @ContractUiAction
-    object OnTodayCategoryClicked : HomeAction
+    @UiAction
+    data object Interacted : HomeAction()
 
-    @ContractUiAction
-    object OnTimetableCategoryClicked : HomeAction
+    @UiAction
+    data object OnTodayCategoryClicked : HomeAction()
 
-    @ContractUiAction
-    object OnAllCategoryClicked : HomeAction
+    @UiAction
+    data object OnTimetableCategoryClicked : HomeAction()
 
-    @ContractUiAction
-    data class OnTagLongClicked(val tag: Tag) : HomeAction
+    @UiAction
+    data object OnAllCategoryClicked : HomeAction()
 
-    data class TagConfigMetadataLoaded(val tag: Tag, val usageCount: TagUsageCount) : HomeAction
+    @UiAction
+    data class OnTagLongClicked(val tag: Tag) : HomeAction()
 
-    @ContractUiAction
-    object OnTagRenameRequestClicked : HomeAction
+    @UiAction
+    data object OnTagRenameRequestClicked : HomeAction()
 
-    @ContractUiAction
-    object OnTagRenameInputKeyboardShown : HomeAction
+    @UiAction
+    data object OnTagRenameInputReady : HomeAction()
 
-    @ContractUiAction
-    object OnTagRenameConfirmClicked : HomeAction
+    @UiAction
+    data class OnTagRenameInputted(val text: String) : HomeAction()
 
-    @ContractUiAction
-    data class OnTagRenameInputted(val text: String) : HomeAction
+    @UiAction
+    data object OnTagRenameConfirmClicked : HomeAction()
 
-    @ContractUiAction
-    object OnTagDeleteRequestClicked : HomeAction
+    @UiAction
+    data object OnTagReplaceConfirmClicked : HomeAction()
 
-    @ContractUiAction
-    object OnTagDeleteConfirmClicked : HomeAction
+    @UiAction
+    data object OnTagReplaceCancelClicked : HomeAction()
+
+    @UiAction
+    data object OnTagDeleteRequestClicked : HomeAction()
+
+    @UiAction
+    data object OnTagDeleteConfirmClicked : HomeAction()
 }

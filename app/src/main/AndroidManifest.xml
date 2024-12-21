@@ -33,6 +33,7 @@
 
 		<activity
 			android:name=".domain.feature.main.ui.MainActivity"
+			android:windowSoftInputMode="adjustResize"
 			android:exported="true">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
@@ -49,7 +50,7 @@
 				android:name="com.nlab.reminder.internal.common.android.startup.init.CoilInitializer"
 				android:value="androidx.startup" />
 			<meta-data
-				android:name="com.nlab.reminder.internal.common.android.startup.init.StatekitPluginInitializer"
+				android:name="com.nlab.reminder.internal.common.android.startup.init.StateKitPluginInitializer"
 				android:value="androidx.startup" />
 		</provider>
 

@@ -16,15 +16,11 @@
 
 package com.nlab.reminder.domain.feature.schedule.all
 
-import com.nlab.reminder.core.schedule.model.ScheduleElement
-import com.nlab.reminder.core.schedule.state.SelectedAction
-import com.nlab.statekit.Action
-import com.nlab.statekit.lifecycle.viewmodel.ContractUiAction
-
 /**
  * @author Doohyun
  */
-sealed interface AllScheduleAction : Action {
+sealed interface AllScheduleAction {
+    /**
     data class ScheduleElementsLoaded(
         val scheduleElements: List<ScheduleElement>,
         val isCompletedScheduleShown: Boolean
@@ -68,4 +64,5 @@ sealed interface AllScheduleAction : Action {
 
     @ContractUiAction
     object AppliedSelectedActionWithSchedules : AllScheduleAction
+    */
 }

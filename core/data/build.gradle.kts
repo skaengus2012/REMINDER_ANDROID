@@ -19,7 +19,5 @@ plugins {
 
 dependencies {
     api(projects.core.kotlin)
-    
-    api(libs.kotlinx.collections.immutable)
-    api(libs.kotlinx.coroutines.core)
+    api(projects.core.kotlinxCoroutine)
 }

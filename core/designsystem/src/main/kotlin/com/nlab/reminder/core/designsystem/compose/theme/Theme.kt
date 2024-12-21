@@ -17,57 +17,38 @@
 package com.nlab.reminder.core.designsystem.compose.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material.ripple.LocalRippleTheme
-import androidx.compose.material.ripple.RippleAlpha
-import androidx.compose.material.ripple.RippleTheme
-import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.LocalUseFallbackRippleImplementation
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.ReadOnlyComposable
 
 /**
  * Extended Theme for Reminder.
  * @author Doohyun
  */
-object ReminderTheme {
-    val colors: ReminderColorScheme
+object PlaneatTheme {
+    val colors: PlaneatColorScheme
         @Composable
         @ReadOnlyComposable
-        get() = LocalReminderColorScheme.current
+        get() = LocalPlaneatColorScheme.current
 
-    val typography: ReminderTypography
+    val typography: PlaneatTypography
         @Composable
         @ReadOnlyComposable
-        get() = LocalReminderTypography.current
-}
-
-@Immutable
-private object DefaultRippleTheme : RippleTheme {
-    @Composable
-    override fun defaultColor() = LocalContentColor.current
-
-    @Composable
-    override fun rippleAlpha() = RippleAlpha(
-        pressedAlpha = 0.5f,
-        focusedAlpha = 0.5f,
-        draggedAlpha = 0.5f,
-        hoveredAlpha = 0.5f,
-    )
+        get() = LocalPlaneatTypography.current
 }
 
 @Composable
-fun ReminderTheme(
+fun PlaneatTheme(
     isDarkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
-    val reminderColorScheme = if (isDarkTheme) DarkReminderColorScheme else LightReminderColorScheme
-    MaterialTheme {
-        CompositionLocalProvider(
-            LocalReminderColorScheme provides reminderColorScheme,
-            LocalRippleTheme provides DefaultRippleTheme,
-            content = content
-        )
+    val reminderColorScheme = if (isDarkTheme) DarkPlaneatColorScheme else LightPlaneatColorScheme
+    CompositionLocalProvider(
+        LocalPlaneatColorScheme provides reminderColorScheme,
+        LocalUseFallbackRippleImplementation provides true
+    ) {
+        MaterialTheme(content = content)
     }
 }

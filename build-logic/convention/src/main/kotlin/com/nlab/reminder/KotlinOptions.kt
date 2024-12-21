@@ -19,20 +19,25 @@ package com.nlab.reminder
 import com.android.build.api.dsl.CommonExtension
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
+import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.provideDelegate
-import org.gradle.kotlin.dsl.withType
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinBaseExtension
+import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
+import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 
 /**
  * @author Doohyun
  */
-private val javaVersion: JavaVersion get() = JavaVersion.VERSION_17
+private val selectedJavaVersion: JavaVersion get() = JavaVersion.VERSION_17
+private val selectedJvmTarget: JvmTarget get() = JvmTarget.JVM_17
 
 internal fun Project.configureKotlinAndroid(commonExtension: CommonExtension<*, *, *, *, *, *>) {
     commonExtension.apply {
         compileOptions {
-            sourceCompatibility = javaVersion
-            targetCompatibility = javaVersion
+            sourceCompatibility = selectedJavaVersion
+            targetCompatibility = selectedJavaVersion
         }
 
         packaging {
@@ -42,47 +47,53 @@ internal fun Project.configureKotlinAndroid(commonExtension: CommonExtension<*, 
         }
     }
 
-    tasks.withType<KotlinCompile>().configureEach {
-        kotlinOptions {
-            // Enable JVM IR backend for Kotlin
-            jvmTarget = javaVersion.toString()
-
-            // Treat all Kotlin warnings as errors (disabled by default)
-            // Override by setting warningsAsErrors=true in your ~/.gradle/gradle.properties
-            val warningsAsErrors: String? by project
-            allWarningsAsErrors = warningsAsErrors.toBoolean()
-
-            // Exclude opt-in API warnings
-            freeCompilerArgs = listOf(
-                "-opt-in=kotlin.RequiresOptIn",
-                // Enable experimental coroutines APIs, including Flow
-                "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
-                "-opt-in=kotlinx.coroutines.FlowPreview",
-                "-opt-in=kotlin.Experimental",
-                "-opt-in=androidx.compose.material.ExperimentalMaterialApi",
-                "-opt-in=androidx.compose.material3.ExperimentalMaterial3Api",
-            )
-        }
+    configureKotlin<KotlinAndroidProjectExtension> {
+        freeCompilerArgs.addAll(
+            "-opt-in=kotlin.RequiresOptIn",
+            "-opt-in=androidx.compose.material.ExperimentalMaterialApi",
+            "-opt-in=androidx.compose.material3.ExperimentalMaterial3Api",
+        )
     }
 }
 
 internal fun Project.configureKotlinJvm() {
     java {
-        sourceCompatibility = javaVersion
-        targetCompatibility = javaVersion
+        sourceCompatibility = selectedJavaVersion
+        targetCompatibility = selectedJavaVersion
     }
 
-    tasks.withType<KotlinCompile>().configureEach {
-        kotlinOptions {
-            // Enable JVM IR backend for Kotlin
-            jvmTarget = javaVersion.toString()
+    configureKotlin<KotlinJvmProjectExtension>()
+}
 
-            // Exclude opt-in API warnings
-            freeCompilerArgs = listOf(
-                "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
-                "-opt-in=kotlinx.coroutines.FlowPreview",
-                "-opt-in=kotlin.Experimental"
-            )
-        }
+private inline fun <reified T : KotlinBaseExtension> Project.configureKotlin(
+    crossinline block: KotlinJvmCompilerOptions.() -> Unit = {}
+) = configure<T> {
+    // Override by setting warningsAsErrors=true in your ~/.gradle/gradle.properties
+    val warningsAsErrors: String? by project
+    when (this) {
+        is KotlinAndroidProjectExtension -> compilerOptions
+        is KotlinJvmProjectExtension -> compilerOptions
+        else -> error("Unsupported project extension $this ${T::class}")
+    }.apply {
+        jvmTarget.set(selectedJvmTarget)
+        allWarningsAsErrors.set(warningsAsErrors.toBoolean())
+        freeCompilerArgs.addAll(
+            "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
+            "-opt-in=kotlinx.coroutines.FlowPreview",
+            "-opt-in=kotlin.Experimental",
+            /**
+             * Remove this args after Phase 3.
+             * https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-consistent-copy-visibility/#deprecation-timeline
+             *
+             * Deprecation timeline
+             * Phase 3. (Supposedly Kotlin 2.2 or Kotlin 2.3).
+             * The default changes.
+             * Unless ExposedCopyVisibility is used, the generated 'copy' method has the same visibility as the primary constructor.
+             * The binary signature changes. The error on the declaration is no longer reported.
+             * '-Xconsistent-data-class-copy-visibility' compiler flag and ConsistentCopyVisibility annotation are now unnecessary.
+             */
+            "-Xconsistent-data-class-copy-visibility"
+        )
+        block()
     }
 }

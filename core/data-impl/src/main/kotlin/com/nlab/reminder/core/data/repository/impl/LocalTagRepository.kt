@@ -16,37 +16,69 @@
 
 package com.nlab.reminder.core.data.repository.impl
 
-import com.nlab.reminder.core.data.local.database.toEntity
-import com.nlab.reminder.core.data.local.database.toModels
 import com.nlab.reminder.core.data.model.Tag
-import com.nlab.reminder.core.data.model.TagUsageCount
+import com.nlab.reminder.core.data.model.TagId
+import com.nlab.reminder.core.data.repository.GetTagQuery
+import com.nlab.reminder.core.data.repository.SaveTagQuery
 import com.nlab.reminder.core.data.repository.TagRepository
+import com.nlab.reminder.core.kotlin.NonNegativeLong
 import com.nlab.reminder.core.kotlinx.coroutine.flow.map
 import com.nlab.reminder.core.kotlin.Result
 import com.nlab.reminder.core.kotlin.catching
-import com.nlab.reminder.core.local.database.ScheduleTagListDao
-import com.nlab.reminder.core.local.database.TagDao
-import com.nlab.reminder.core.local.database.TagEntity
+import com.nlab.reminder.core.kotlin.map
+import com.nlab.reminder.core.kotlin.toNonNegativeLong
+import com.nlab.reminder.core.local.database.dao.ScheduleTagListDAO
+import com.nlab.reminder.core.local.database.dao.TagRelationDAO
+import com.nlab.reminder.core.local.database.dao.TagDAO
+import com.nlab.reminder.core.local.database.model.TagEntity
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 
 /**
  * @author Doohyun
  */
 class LocalTagRepository(
-    private val tagDao: TagDao,
-    private val scheduleTagListDao: ScheduleTagListDao
+    private val tagDAO: TagDAO,
+    private val tagRelationDAO: TagRelationDAO,
+    private val scheduleTagListDAO: ScheduleTagListDAO,
 ) : TagRepository {
-    override fun getStream(): Flow<List<Tag>> = tagDao.find().map { it.toModels() }
+    override suspend fun save(query: SaveTagQuery): Result<Tag> {
+        val entityResult = catching {
+            when (query) {
+                is SaveTagQuery.Add -> {
+                    tagDAO.insertAndGet(name = query.name.value)
+                }
 
-    override suspend fun getUsageCount(tag: Tag): Result<TagUsageCount> = catching {
-        TagUsageCount(scheduleTagListDao.findTagUsageCount(tagId = tag.tagId))
+                is SaveTagQuery.Modify -> {
+                    tagRelationDAO.updateOrReplaceAndGet(
+                        tagId = query.id.rawId,
+                        name = query.name.value
+                    )
+                }
+            }
+        }
+        return entityResult.map(::Tag)
     }
 
-    override suspend fun updateName(tag: Tag, name: String): Result<Unit> = catching {
-        tagDao.update(TagEntity(tagId = tag.tagId, name = name))
+    override suspend fun delete(id: TagId) = catching {
+        tagDAO.deleteById(id.rawId)
     }
 
-    override suspend fun delete(tag: Tag): Result<Unit> = catching {
-        tagDao.delete(tag.toEntity())
+    override suspend fun getUsageCount(id: TagId): Result<NonNegativeLong> = catching {
+        scheduleTagListDAO
+            .findTagUsageCount(tagId = id.rawId)
+            .toNonNegativeLong()
+    }
+
+    override fun getTagsAsStream(query: GetTagQuery): Flow<Collection<Tag>> {
+        val entitiesFlow: Flow<Array<TagEntity>> = when (query) {
+            is GetTagQuery.All -> tagDAO.getAsStream()
+            is GetTagQuery.ByIds -> tagDAO.findByIdsAsStream(
+                buildSet { query.tagIds.mapTo(destination = this, transform = TagId::rawId) }
+            )
+        }
+        return entitiesFlow.distinctUntilChanged().map { entities ->
+            ArrayList<Tag>(entities.size).apply { entities.mapTo(destination = this, ::Tag) }
+        }
     }
 }

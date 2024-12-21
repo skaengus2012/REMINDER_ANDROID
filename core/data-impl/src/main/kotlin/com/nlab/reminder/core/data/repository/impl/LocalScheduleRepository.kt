@@ -16,71 +16,94 @@
 
 package com.nlab.reminder.core.data.repository.impl
 
-import com.nlab.reminder.core.annotation.test.ExcludeFromGeneratedTestReport
 import com.nlab.reminder.core.data.model.Schedule
-import com.nlab.reminder.core.data.repository.ScheduleDeleteRequest
-import com.nlab.reminder.core.data.repository.ScheduleGetStreamRequest
-import com.nlab.reminder.core.data.repository.ScheduleRepository
-import com.nlab.reminder.core.data.repository.ScheduleUpdateRequest
+import com.nlab.reminder.core.foundation.annotation.ExcludeFromGeneratedTestReport
+import com.nlab.reminder.core.data.model.toLocalDTO
 import com.nlab.reminder.core.kotlinx.coroutine.flow.map
 import com.nlab.reminder.core.kotlin.Result
 import com.nlab.reminder.core.kotlin.catching
-import com.nlab.reminder.core.local.database.ScheduleDao
-import com.nlab.reminder.core.local.database.ScheduleEntityWithTagEntities
+import com.nlab.reminder.core.local.database.dao.ScheduleDAO
 import com.nlab.reminder.core.data.repository.fake.FakeScheduleRepositoryDelegate
-import com.nlab.reminder.core.data.local.database.toModel
+import com.nlab.reminder.core.data.repository.DeleteScheduleQuery
+import com.nlab.reminder.core.data.repository.GetScheduleCountQuery
+import com.nlab.reminder.core.data.repository.GetScheduleQuery
+import com.nlab.reminder.core.data.repository.SaveScheduleQuery
+import com.nlab.reminder.core.data.repository.ScheduleRepository
+import com.nlab.reminder.core.data.repository.UpdateSchedulesQuery
+import com.nlab.reminder.core.kotlin.NonNegativeLong
+import com.nlab.reminder.core.kotlin.tryToNonNegativeLongOrZero
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 
 /**
  * @author Doohyun
  */
-class LocalScheduleRepository(private val scheduleDao: ScheduleDao) : ScheduleRepository {
-    @ExcludeFromGeneratedTestReport
-    override fun getTodaySchedulesCount(): Flow<Long> =
-        FakeScheduleRepositoryDelegate.getTodaySchedulesCount()
+class LocalScheduleRepository(
+    private val scheduleDAO: ScheduleDAO,
+) : ScheduleRepository {
+    override suspend fun save(query: SaveScheduleQuery): Result<Schedule> = catching {
+        val entity = when (query) {
+            is SaveScheduleQuery.Add -> scheduleDAO.insertAndGet(query.content.toLocalDTO())
+            is SaveScheduleQuery.Modify -> {
+                scheduleDAO.updateAndGet(scheduleId = query.id.rawId, contentDTO = query.content.toLocalDTO())
+            }
+        }
+        return@catching Schedule(entity)
+    }
 
-    @ExcludeFromGeneratedTestReport
-    override fun getTimetableSchedulesCount(): Flow<Long> =
-        FakeScheduleRepositoryDelegate.getTimetableSchedulesCount()
-
-    @ExcludeFromGeneratedTestReport
-    override fun getAllSchedulesCount(): Flow<Long> =
-        FakeScheduleRepositoryDelegate.getAllSchedulesCount()
-
-    override fun getAsStream(request: ScheduleGetStreamRequest): Flow<List<Schedule>> {
-        val entitiesFlow = when (request) {
-            is ScheduleGetStreamRequest.All -> scheduleDao.findAsStream()
-            is ScheduleGetStreamRequest.ByComplete -> scheduleDao.findByCompleteAsStream(request.isComplete)
+    override suspend fun updateBulk(query: UpdateSchedulesQuery): Result<Unit> = when (query) {
+        // When outside the catch block, jacoco does not recognize. 😭
+        is UpdateSchedulesQuery.Completes -> catching {
+            scheduleDAO.updateByCompletes(
+                idToCompleteTable = query.idToCompleteTable.mapKeys { (key) -> key.rawId }
+            )
         }
 
-        return entitiesFlow.map { entities ->
-            entities.map(ScheduleEntityWithTagEntities::toModel)
+        is UpdateSchedulesQuery.VisiblePriorities -> catching {
+            scheduleDAO.updateByVisiblePriorities(
+                idToVisiblePriorityTable = buildMap {
+                    query.idToVisiblePriorityTable.forEach { (id, visiblePriority) ->
+                        put(id.rawId, visiblePriority.value)
+                    }
+                },
+                isCompletedRange = query.isCompletedRange
+            )
         }
     }
 
-    override suspend fun update(request: ScheduleUpdateRequest): Result<Unit> = when (request) {
+    override suspend fun delete(query: DeleteScheduleQuery): Result<Unit> = when (query) {
         // When outside the catch block, jacoco does not recognize. 😭
-        is ScheduleUpdateRequest.Completes -> catching {
-            scheduleDao.updateCompletes(request.idToCompleteTable.mapKeys { (key) -> key.value })
+        is DeleteScheduleQuery.ByComplete -> catching {
+            scheduleDAO.deleteByComplete(query.isComplete)
         }
 
-        is ScheduleUpdateRequest.VisiblePriority -> catching {
-            scheduleDao.updateVisiblePriorities(request.idToVisiblePriorityTable.mapKeys { (key) -> key.value })
+        is DeleteScheduleQuery.ByIds -> catching {
+            scheduleDAO.deleteByScheduleIds(
+                scheduleIds = buildSet { query.scheduleIds.mapTo(destination = this) { it.rawId } }
+            )
         }
     }
 
-    override suspend fun delete(request: ScheduleDeleteRequest): Result<Unit> = when (request) {
-        // When outside the catch block, jacoco does not recognize. 😭
-        is ScheduleDeleteRequest.ByComplete -> catching {
-            scheduleDao.deleteByComplete(request.isComplete)
+    override fun getSchedulesAsStream(request: GetScheduleQuery): Flow<Collection<Schedule>> {
+        val scheduleEntitiesFlow = when (request) {
+            is GetScheduleQuery.All -> scheduleDAO.getAsStream()
+            is GetScheduleQuery.ByComplete -> scheduleDAO.findByCompleteAsStream(request.isComplete)
         }
 
-        is ScheduleDeleteRequest.ById -> catching {
-            scheduleDao.deleteByScheduleIds(listOf(request.scheduleId.value))
+        return scheduleEntitiesFlow.distinctUntilChanged().map { entities ->
+            ArrayList<Schedule>(entities.size).apply {
+                entities.mapTo(destination = this, ::Schedule)
+            }
         }
+    }
 
-        is ScheduleDeleteRequest.ByIds -> catching {
-            scheduleDao.deleteByScheduleIds(request.scheduleIds.map { it.value })
+    @ExcludeFromGeneratedTestReport
+    override fun getScheduleCountAsStream(query: GetScheduleCountQuery): Flow<NonNegativeLong> {
+        val rawCountFlow = when (query) {
+            is GetScheduleCountQuery.Today -> FakeScheduleRepositoryDelegate.getTodaySchedulesCount()
+            is GetScheduleCountQuery.Timetable -> FakeScheduleRepositoryDelegate.getTimetableSchedulesCount()
+            is GetScheduleCountQuery.All -> FakeScheduleRepositoryDelegate.getAllSchedulesCount()
         }
+        return rawCountFlow.map(Long::tryToNonNegativeLongOrZero)
     }
 }

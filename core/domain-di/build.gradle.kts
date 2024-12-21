@@ -8,9 +8,9 @@ android {
 }
 
 dependencies {
-    implementation(projects.core.data)
+    api(projects.core.domain)
+
     implementation(projects.core.dataDi)
-    implementation(projects.core.di)
-    implementation(projects.core.domain)
+    implementation(projects.core.foundationDi)
     implementation(projects.core.kotlinxCoroutine)
 }

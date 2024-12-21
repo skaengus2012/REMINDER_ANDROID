@@ -22,10 +22,8 @@ import org.gradle.testing.jacoco.tasks.JacocoReport
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-with(pluginManager) {
-    apply("org.gradle.jacoco")
-    apply("org.jetbrains.kotlin.jvm")
-}
+apply(plugin = "org.gradle.jacoco")
+apply(plugin = "org.jetbrains.kotlin.jvm")
 
 configureJacocoToolVersion()
 

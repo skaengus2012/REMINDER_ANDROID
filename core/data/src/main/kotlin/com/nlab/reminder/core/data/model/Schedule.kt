@@ -16,17 +16,14 @@
 
 package com.nlab.reminder.core.data.model
 
-import kotlinx.collections.immutable.ImmutableList
+import com.nlab.reminder.core.kotlin.NonNegativeLong
 
 /**
  * @author Doohyun
  */
 data class Schedule(
     val id: ScheduleId,
-    val title: String,
-    val note: String,
-    val link: Link,
-    val tags: ImmutableList<Tag>,   // TODO CHANGE ImmutableList TO List
-    val visiblePriority: Long,
+    val content: ScheduleContent,
+    val visiblePriority: NonNegativeLong,
     val isComplete: Boolean
 )

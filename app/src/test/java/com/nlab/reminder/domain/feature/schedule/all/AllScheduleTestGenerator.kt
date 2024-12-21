@@ -16,18 +16,12 @@
 
 package com.nlab.reminder.domain.feature.schedule.all
 
-import com.nlab.reminder.core.data.model.Link
-import com.nlab.reminder.core.data.model.genLink
-import com.nlab.reminder.core.schedule.model.ScheduleElement
-import com.nlab.reminder.core.schedule.model.genScheduleElements
-import com.nlab.testkit.faker.genBoolean
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.toImmutableList
+
 
 /**
  * @author Doohyun
  */
+/**
 internal fun genAllScheduleUiState(): AllScheduleUiState = when (genBoolean()) {
     true -> AllScheduleUiState.Empty
     false -> genAllScheduleUiStateLoaded()
@@ -61,3 +55,4 @@ internal fun genAllScheduleSelectedAction(): AllScheduleAction =
     )
         .shuffled()
         .first()
+ */

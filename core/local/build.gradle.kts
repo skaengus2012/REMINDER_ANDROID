@@ -12,7 +12,6 @@ android {
 }
 
 dependencies {
-    implementation(projects.core.di)
     implementation(projects.core.kotlin)
 
     api(libs.androidx.datastore.preferences)
