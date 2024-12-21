@@ -14,7 +14,7 @@
   ~ limitations under the License.
   -->
 
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <style name="Base.Theme.Reminder" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="android:statusBarColor">?bg_1</item>
@@ -31,6 +31,7 @@
 
     <style name="Theme.Reminder.App" parent="Base.Theme.Reminder">
         <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="27">true</item>
 
         <item name="bg_1">@color/bg_1_light</item>
         <item name="bg_2">@color/bg_2_light</item>

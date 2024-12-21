@@ -99,7 +99,7 @@ import com.nlab.reminder.domain.feature.home.*
  */
 @Composable
 internal fun HomeScreen(
-    navigateToAllScheduleEnd: () -> Unit,
+    onAllScheduleClicked: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
@@ -109,7 +109,10 @@ internal fun HomeScreen(
         modifier = modifier,
         onTodayCategoryClicked = throttleClick { viewModel.onTodayCategoryClicked() },
         onTimetableCategoryClicked = { viewModel.onTimetableCategoryClicked() },
-        onAllCategoryClicked = { viewModel.onAllCategoryClicked() },
+        onAllCategoryClicked = {
+            onAllScheduleClicked()
+            // viewModel.onAllCategoryClicked() TODO just logging,
+        },
         onInteracted = { viewModel.interacted() },
         onTagClicked = {
             // TODO implements

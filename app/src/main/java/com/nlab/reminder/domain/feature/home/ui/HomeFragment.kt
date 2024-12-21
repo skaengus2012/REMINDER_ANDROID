@@ -35,7 +35,7 @@ internal class HomeFragment : ComponentFragment() {
         setContent {
             PlaneatTheme {
                 HomeScreen(
-                    navigateToAllScheduleEnd = navController::navigateToAllScheduleEnd
+                    onAllScheduleClicked = navController::navigateToAllScheduleEnd
                 )
             }
         }
