@@ -410,7 +410,7 @@ private fun AllCategoryCard(
     onClick: () -> Unit = {},
 ) {
     BasicCategoryCard(
-        name = stringResource(StringIds.home_category_timetable),
+        name = stringResource(StringIds.home_category_all),
         remainCount = remainCount.value,
         icon = {
             Image(
