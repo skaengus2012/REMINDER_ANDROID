@@ -107,7 +107,7 @@ internal fun HomeScreen(
     HomeScreen(
         uiState = uiState,
         modifier = modifier,
-        onTodayCategoryClicked = throttleClick { viewModel.onTodayCategoryClicked() },
+        onTodayCategoryClicked = { viewModel.onTodayCategoryClicked() },
         onTimetableCategoryClicked = { viewModel.onTimetableCategoryClicked() },
         onAllCategoryClicked = {
             onAllScheduleClicked()
