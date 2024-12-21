@@ -60,7 +60,13 @@ fun PlaneatNavHost(
             homeScreen(
                 provideExitTransition = createHomeExitTransition(),
                 providePopEnterTransition = createHomePopEnterTransitionFactory(),
-                onAllScheduleClicked = { navController.navigateToAllSchedule() }
+                onTodayCategoryClicked = {
+                    // TODO implement
+                },
+                onTimetableCategoryClicked = {
+                    // TODO implement
+                },
+                onAllCategoryClicked = { navController.navigateToAllSchedule() }
             )
             allScheduleScreen(
                 provideEnterTransition = enterTransitionFactoryFromHome,

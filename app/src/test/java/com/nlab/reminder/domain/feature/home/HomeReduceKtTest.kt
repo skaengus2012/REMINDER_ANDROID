@@ -215,42 +215,6 @@ class HomeReduceKtTest {
     }
 
     @Test
-    fun `Given success with empty interaction, When todayCategory clicked, Then interaction changed to today schedule`() = runTest {
-        genHomeReduce()
-            .transitionScenario()
-            .initState(genHomeUiStateSuccess(interaction = HomeInteraction.Empty))
-            .action(HomeAction.OnTodayCategoryClicked)
-            .expectedStateFromInput {
-                initState.copy(interaction = HomeInteraction.TodaySchedule)
-            }
-            .verify()
-    }
-
-    @Test
-    fun `Given success with empty interaction, When timetableCategory clicked, Then interaction changed to timetable schedule`() = runTest {
-        genHomeReduce()
-            .transitionScenario()
-            .initState(genHomeUiStateSuccess(interaction = HomeInteraction.Empty))
-            .action(HomeAction.OnTimetableCategoryClicked)
-            .expectedStateFromInput {
-                initState.copy(interaction = HomeInteraction.TimetableSchedule)
-            }
-            .verify()
-    }
-
-    @Test
-    fun `Given success with empty interaction, When all category clicked, Then interaction changed to all schedule`() = runTest {
-        genHomeReduce()
-            .transitionScenario()
-            .initState(genHomeUiStateSuccess(interaction = HomeInteraction.Empty))
-            .action(HomeAction.OnAllCategoryClicked)
-            .expectedStateFromInput {
-                initState.copy(interaction = HomeInteraction.AllSchedule)
-            }
-            .verify()
-    }
-
-    @Test
     fun `Given success with no interaction and user messages, When tag long clicked, Then user message filled if TagEditDelegate startEditing result fails`() = runTest {
         val tagEditDelegate: TagEditDelegate = mock {
             whenever(mock.startEditing(any())) doReturn Result.Failure(IllegalStateException())

@@ -27,14 +27,5 @@ internal sealed class HomeInteraction private constructor() {
     data object Empty : HomeInteraction()
 
     @ExcludeFromGeneratedTestReport
-    data object TodaySchedule : HomeInteraction()
-
-    @ExcludeFromGeneratedTestReport
-    data object TimetableSchedule : HomeInteraction()
-
-    @ExcludeFromGeneratedTestReport
-    data object AllSchedule : HomeInteraction()
-
-    @ExcludeFromGeneratedTestReport
     data class TagEdit(val state: TagEditState) : HomeInteraction()
 }

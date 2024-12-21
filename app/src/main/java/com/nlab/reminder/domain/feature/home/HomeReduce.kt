@@ -72,15 +72,6 @@ internal fun HomeReduce(environment: HomeEnvironment): HomeReduce = DslReduce {
     }
     stateScope<Success> {
         scope(isMatch = { current.interaction == HomeInteraction.Empty }) {
-            transition<OnTodayCategoryClicked> {
-                current.copy(interaction = HomeInteraction.TodaySchedule)
-            }
-            transition<OnTimetableCategoryClicked> {
-                current.copy(interaction = HomeInteraction.TimetableSchedule)
-            }
-            transition<OnAllCategoryClicked> {
-                current.copy(interaction = HomeInteraction.AllSchedule)
-            }
             suspendEffect<OnTagLongClicked> {
                 environment.tagEditDelegate
                     .startEditing(tag = action.tag)
