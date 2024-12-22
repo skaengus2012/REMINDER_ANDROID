@@ -16,8 +16,8 @@
 
 package com.nlab.reminder.core.data.repository.impl
 
+import com.nlab.reminder.core.annotation.ExcludeFromGeneratedTestReport
 import com.nlab.reminder.core.data.model.Schedule
-import com.nlab.reminder.core.foundation.annotation.ExcludeFromGeneratedTestReport
 import com.nlab.reminder.core.data.model.toLocalDTO
 import com.nlab.reminder.core.kotlinx.coroutine.flow.map
 import com.nlab.reminder.core.kotlin.Result

@@ -16,8 +16,8 @@
 
 package com.nlab.reminder.core.component.tag.edit
 
+import com.nlab.reminder.core.annotation.ExcludeFromGeneratedTestReport
 import com.nlab.reminder.core.data.model.Tag
-import com.nlab.reminder.core.foundation.annotation.ExcludeFromGeneratedTestReport
 import com.nlab.reminder.core.kotlin.NonNegativeLong
 
 /**

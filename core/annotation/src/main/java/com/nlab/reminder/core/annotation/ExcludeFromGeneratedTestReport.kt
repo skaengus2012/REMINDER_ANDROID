@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.foundation.annotation
+package com.nlab.reminder.core.annotation
 
 /**
  * Classes and methods annotated with annotation whose retention policy is runtime or class and
