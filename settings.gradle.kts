@@ -56,8 +56,6 @@ include(
     ":core:androidx:lifecycle",
     ":core:androidx:recyclerview",
     ":core:androidx:transition",
-    ":core:annotation",
-    ":core:annotation-android",
     ":core:component:tag",
     ":core:component:tag-test",
     ":core:component:uitext",

@@ -77,8 +77,6 @@ dependencies {
     implementation(projects.core.androidx.lifecycle)
     implementation(projects.core.androidx.recyclerview)
     implementation(projects.core.androidx.transition)
-    implementation(projects.core.annotation)
-    implementation(projects.core.annotationAndroid)
     implementation(projects.core.component.tag)
     implementation(projects.core.component.uitext)
     implementation(projects.core.dataDi)
