@@ -53,7 +53,7 @@ class UserMessageExtKtTest {
     @Test
     fun `Given message, priority and failed result with user message, When getOrThrowMessage with message and priority, Then result UserMessageException with message and priority `() {
         val message = genUiText()
-        val priority = FeedbackPriority.MEDIUM
+        val priority = FeedbackPriority.URGENT
         val throwable = Throwable()
         val result = Result.Failure<Any>(
             UserMessageException(
