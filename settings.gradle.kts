@@ -62,6 +62,7 @@ include(
     ":core:component:tag-test",
     ":core:component:uitext",
     ":core:component:uitext-test",
+    ":core:component:usermessage",
     ":core:data",
     ":core:data-di",
     ":core:data-impl",
