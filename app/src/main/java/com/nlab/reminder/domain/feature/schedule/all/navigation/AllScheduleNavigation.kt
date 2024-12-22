@@ -20,8 +20,8 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.compose.composable
-import com.nlab.reminder.apps.ui.EnterTransitionFactory
-import com.nlab.reminder.apps.ui.ExitTransitionFactory
+import com.nlab.reminder.core.androidx.navigation.compose.EnterTransitionFactory
+import com.nlab.reminder.core.androidx.navigation.compose.ExitTransitionFactory
 import com.nlab.reminder.domain.feature.schedule.all.ui.AllScheduleScreen
 import kotlinx.serialization.Serializable
 

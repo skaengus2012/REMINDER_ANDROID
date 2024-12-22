@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.apps.ui
+package com.nlab.reminder.core.androidx.navigation.compose
 
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.EnterTransition
