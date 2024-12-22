@@ -118,55 +118,6 @@ class HomeReduceKtTest {
     }
 
     @Test
-    fun `Given success with not empty or tag edit interaction, When sync exist tagEditStep, Then state never changed`() = runTest {
-        genHomeReduce()
-            .transitionScenario()
-            .initState(
-                genHomeUiStateSuccess(
-                    interaction = genHomeInteractionWithExcludeTypes(
-                        HomeInteraction.Empty::class,
-                        HomeInteraction.TagEdit::class
-                    )
-                )
-            )
-            .action(HomeAction.TagEditStateSynced(genTagEditState()))
-            .expectedStateToInit()
-            .verify()
-    }
-
-    @Test
-    fun `Given success with not empty or tag edit interaction, When sync tagEditStep, Then tagEditDelegate invoked clearState conditionally`() = runTest {
-        suspend fun testTagEditStateSyncedWhenSuccessWithNotTagEditInteraction(
-            action: HomeAction.TagEditStateSynced,
-            mockVerifyMode: VerificationMode
-        ) {
-            val tagEditDelegate: TagEditDelegate = mock()
-            genHomeReduce(environment = genHomeEnvironment(tagEditDelegate))
-                .effectScenario()
-                .initState(
-                    genHomeUiStateSuccess(
-                        interaction = genHomeInteractionWithExcludeTypes(
-                            HomeInteraction.Empty::class,
-                            HomeInteraction.TagEdit::class
-                        )
-                    )
-                )
-                .action(action)
-                .launchAndJoin()
-            verify(tagEditDelegate, mockVerifyMode).clearState()
-        }
-
-        testTagEditStateSyncedWhenSuccessWithNotTagEditInteraction(
-            action = HomeAction.TagEditStateSynced(genTagEditState()),
-            mockVerifyMode = once()
-        )
-        testTagEditStateSyncedWhenSuccessWithNotTagEditInteraction(
-            action = HomeAction.TagEditStateSynced(null),
-            mockVerifyMode = never()
-        )
-    }
-
-    @Test
     fun `Given success with empty or tag edit interaction, When sync tagEditStep as null, Then interaction changed to empty`() = runTest {
         suspend fun testInteractionToEmpty(initInteraction: HomeInteraction) {
             genHomeReduce()
@@ -212,42 +163,6 @@ class HomeReduceKtTest {
         }
         testInteractionToTagEdit(initInteraction = HomeInteraction.Empty)
         testInteractionToTagEdit(initInteraction = HomeInteraction.TagEdit(genTagEditState()))
-    }
-
-    @Test
-    fun `Given success with empty interaction, When todayCategory clicked, Then interaction changed to today schedule`() = runTest {
-        genHomeReduce()
-            .transitionScenario()
-            .initState(genHomeUiStateSuccess(interaction = HomeInteraction.Empty))
-            .action(HomeAction.OnTodayCategoryClicked)
-            .expectedStateFromInput {
-                initState.copy(interaction = HomeInteraction.TodaySchedule)
-            }
-            .verify()
-    }
-
-    @Test
-    fun `Given success with empty interaction, When timetableCategory clicked, Then interaction changed to timetable schedule`() = runTest {
-        genHomeReduce()
-            .transitionScenario()
-            .initState(genHomeUiStateSuccess(interaction = HomeInteraction.Empty))
-            .action(HomeAction.OnTimetableCategoryClicked)
-            .expectedStateFromInput {
-                initState.copy(interaction = HomeInteraction.TimetableSchedule)
-            }
-            .verify()
-    }
-
-    @Test
-    fun `Given success with empty interaction, When all category clicked, Then interaction changed to all schedule`() = runTest {
-        genHomeReduce()
-            .transitionScenario()
-            .initState(genHomeUiStateSuccess(interaction = HomeInteraction.Empty))
-            .action(HomeAction.OnAllCategoryClicked)
-            .expectedStateFromInput {
-                initState.copy(interaction = HomeInteraction.AllSchedule)
-            }
-            .verify()
     }
 
     @Test

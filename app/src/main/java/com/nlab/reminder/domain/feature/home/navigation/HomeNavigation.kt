@@ -38,7 +38,9 @@ fun NavGraphBuilder.homeEntryPoint(builder: NavGraphBuilder.() -> Unit) {
 }
 
 fun NavGraphBuilder.homeScreen(
-    onAllScheduleClicked: () -> Unit,
+    onTodayCategoryClicked: () -> Unit,
+    onTimetableCategoryClicked: () -> Unit,
+    onAllCategoryClicked: () -> Unit,
     provideExitTransition: ExitTransitionFactory? = null,
     providePopEnterTransition: EnterTransitionFactory? = null
 ) {
@@ -46,7 +48,11 @@ fun NavGraphBuilder.homeScreen(
         exitTransition = provideExitTransition,
         popEnterTransition = providePopEnterTransition
     ) {
-        HomeScreen(onAllScheduleClicked)
+        HomeScreen(
+            onTodayCategoryClicked = onTodayCategoryClicked,
+            onTimetableCategoryClicked = onTimetableCategoryClicked,
+            onAllCategoryClicked = onAllCategoryClicked
+        )
     }
 }
 

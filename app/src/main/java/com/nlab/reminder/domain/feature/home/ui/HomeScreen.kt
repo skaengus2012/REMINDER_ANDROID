@@ -99,7 +99,9 @@ import com.nlab.reminder.domain.feature.home.*
  */
 @Composable
 internal fun HomeScreen(
-    onAllScheduleClicked: () -> Unit,
+    onTodayCategoryClicked: () -> Unit,
+    onTimetableCategoryClicked: () -> Unit,
+    onAllCategoryClicked: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
@@ -107,11 +109,17 @@ internal fun HomeScreen(
     HomeScreen(
         uiState = uiState,
         modifier = modifier,
-        onTodayCategoryClicked = throttleClick { viewModel.onTodayCategoryClicked() },
-        onTimetableCategoryClicked = { viewModel.onTimetableCategoryClicked() },
+        onTodayCategoryClicked = {
+            viewModel.onTodayCategoryClicked()
+            onTodayCategoryClicked()
+        },
+        onTimetableCategoryClicked = {
+            viewModel.onTimetableCategoryClicked()
+            onTimetableCategoryClicked()
+        },
         onAllCategoryClicked = {
-            onAllScheduleClicked()
-            // viewModel.onAllCategoryClicked() TODO just logging,
+            viewModel.onAllCategoryClicked()
+            onAllCategoryClicked()
         },
         onInteracted = { viewModel.interacted() },
         onTagClicked = {
@@ -402,7 +410,7 @@ private fun AllCategoryCard(
     onClick: () -> Unit = {},
 ) {
     BasicCategoryCard(
-        name = stringResource(StringIds.home_category_timetable),
+        name = stringResource(StringIds.home_category_all),
         remainCount = remainCount.value,
         icon = {
             Image(
@@ -703,21 +711,6 @@ private fun HomeInteractionHandler(
 ) {
     when (interaction) {
         is HomeInteraction.Empty -> Unit
-        is HomeInteraction.TodaySchedule -> {
-            LaunchedEffect(interaction) {
-                onInteracted()
-            }
-        }
-        is HomeInteraction.TimetableSchedule -> {
-            LaunchedEffect(interaction) {
-                onInteracted()
-            }
-        }
-        is HomeInteraction.AllSchedule -> {
-            LaunchedEffect(interaction) {
-                onInteracted()
-            }
-        }
         is HomeInteraction.TagEdit -> {
             TagEditStateHandler(
                 state = interaction.state,

@@ -74,9 +74,6 @@ internal fun genHomeUiStateSuccess(
 
 private val sampleHomeInteractions get() =  listOf(
     HomeInteraction.Empty,
-    HomeInteraction.TodaySchedule,
-    HomeInteraction.TimetableSchedule,
-    HomeInteraction.AllSchedule,
     HomeInteraction.TagEdit(genTagEditState())
 )
 
