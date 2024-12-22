@@ -17,9 +17,9 @@
 package com.nlab.reminder.core.local.di
 
 import android.content.Context
-import com.nlab.reminder.core.foundation.qualifiers.coroutine.AppScope
-import com.nlab.reminder.core.foundation.qualifiers.coroutine.Dispatcher
-import com.nlab.reminder.core.foundation.qualifiers.coroutine.DispatcherOption.IO
+import com.nlab.reminder.core.inject.qualifiers.coroutine.AppScope
+import com.nlab.reminder.core.inject.qualifiers.coroutine.Dispatcher
+import com.nlab.reminder.core.inject.qualifiers.coroutine.DispatcherOption.*
 import com.nlab.reminder.core.local.datastore.PreferenceDataSource
 import com.nlab.reminder.core.local.datastore.ReminderDataStore
 import dagger.Module

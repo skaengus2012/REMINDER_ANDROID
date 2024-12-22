@@ -16,7 +16,7 @@
 
 package com.nlab.reminder.domain.feature.home
 
-import com.nlab.reminder.core.foundation.annotation.ExcludeFromGeneratedTestReport
+import com.nlab.reminder.core.annotation.ExcludeFromGeneratedTestReport
 import com.nlab.reminder.core.kotlinx.coroutine.flow.map
 import com.nlab.reminder.core.statekit.bootstrap.collectAsBootstrap
 import com.nlab.reminder.core.statekit.store.androidx.lifecycle.StoreViewModel

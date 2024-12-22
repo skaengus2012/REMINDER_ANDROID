@@ -9,11 +9,10 @@ android {
 }
 
 dependencies {
-    api(projects.core.component.uitext)
-    implementation(projects.core.foundation)
+    api(projects.core.uitext)
     implementation(projects.core.kotlin)
     implementation(projects.core.translation)
 
-    testImplementation(projects.core.component.uitextTest)
+    testImplementation(projects.core.uitextTest)
     testImplementation(projects.testkit)
 }

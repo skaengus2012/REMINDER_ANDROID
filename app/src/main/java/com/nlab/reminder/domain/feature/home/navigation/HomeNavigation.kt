@@ -19,8 +19,8 @@ package com.nlab.reminder.domain.feature.home.navigation
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
-import com.nlab.reminder.apps.ui.EnterTransitionFactory
-import com.nlab.reminder.apps.ui.ExitTransitionFactory
+import com.nlab.reminder.core.androidx.navigation.compose.EnterTransitionFactory
+import com.nlab.reminder.core.androidx.navigation.compose.ExitTransitionFactory
 import com.nlab.reminder.domain.feature.home.ui.HomeScreen
 import kotlinx.serialization.Serializable
 

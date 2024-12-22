@@ -28,6 +28,8 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
+import com.nlab.reminder.core.androidx.navigation.compose.EnterTransitionFactory
+import com.nlab.reminder.core.androidx.navigation.compose.ExitTransitionFactory
 import com.nlab.reminder.domain.feature.home.navigation.HomeEntryPointRoute
 import com.nlab.reminder.domain.feature.home.navigation.homeEntryPoint
 import com.nlab.reminder.domain.feature.home.navigation.homeScreen

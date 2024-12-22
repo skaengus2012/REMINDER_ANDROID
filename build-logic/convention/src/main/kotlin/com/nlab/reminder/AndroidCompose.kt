@@ -41,6 +41,8 @@ internal fun Project.configureComposeAndroid(commonExtension: CommonExtension<*,
         val bom = libs.findLibrary("androidx-compose-bom").get()
         "implementation"(platform(bom))
         "androidTestImplementation"(platform(bom))
+
+        "implementation"(libs.findLibrary("androidx-compose-runtime").get())
     }
 
     extensions.configure<ComposeCompilerGradlePluginExtension> {

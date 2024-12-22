@@ -24,12 +24,11 @@ import org.gradle.kotlin.dsl.dependencies
  */
 fun Project.configureStdComposeDependencies() {
     dependencies {
-        "implementation"(project(":core:androidx:compose-ext"))
         "implementation"(project(":core:designsystem"))
+        "implementation"(project(":core:ui-compose"))
 
         "implementation"(libs.findLibrary("androidx-compose-foundation").get())
         "implementation"(libs.findLibrary("androidx-compose-material3").get())
-        "implementation"(libs.findLibrary("androidx-compose-runtime").get())
         "implementation"(libs.findLibrary("androidx-compose-ui").get())
         "implementation"(libs.findLibrary("androidx-compose-ui-tooling-preview").get())
         "debugImplementation"(libs.findLibrary("androidx-compose-ui-tooling").get())

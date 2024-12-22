@@ -4,7 +4,7 @@ import com.nlab.reminder.core.data.model.Link
 import com.nlab.reminder.core.data.model.LinkMetadata
 import com.nlab.reminder.core.data.model.genLinkAndMetadataAndEntity
 import com.nlab.reminder.core.data.model.genLinkMetadata
-import com.nlab.reminder.core.foundation.time.TimestampProvider
+import com.nlab.reminder.core.data.util.TimestampProvider
 import com.nlab.reminder.core.local.database.dao.LinkMetadataDAO
 import com.nlab.reminder.core.network.LinkThumbnailDataSource
 import com.nlab.reminder.core.kotlin.Result

@@ -20,7 +20,7 @@ import com.nlab.reminder.core.data.model.Link
 import com.nlab.reminder.core.data.model.LinkMetadata
 import com.nlab.reminder.core.data.model.toLocalEntity
 import com.nlab.reminder.core.data.repository.LinkMetadataRepository
-import com.nlab.reminder.core.foundation.time.TimestampProvider
+import com.nlab.reminder.core.data.util.TimestampProvider
 import com.nlab.reminder.core.kotlin.onSuccess
 import com.nlab.reminder.core.kotlinx.coroutine.flow.flatMapLatest
 import com.nlab.reminder.core.kotlinx.coroutine.flow.map

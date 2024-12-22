@@ -1,5 +1,3 @@
-import com.nlab.reminder.configureKotlinJvm
-
 /*
  * Copyright (C) 2023 The N's lab Open Source Project
  *
@@ -15,6 +13,8 @@ import com.nlab.reminder.configureKotlinJvm
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import com.nlab.reminder.configureKotlinJvm
+
 apply(plugin = "org.jetbrains.kotlin.jvm")
 
 configureKotlinJvm()

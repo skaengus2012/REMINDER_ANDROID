@@ -29,6 +29,8 @@ import com.nlab.reminder.core.data.repository.TagRepository
 import com.nlab.reminder.core.data.repository.impl.CompletedScheduleShownRepositoryImpl
 import com.nlab.reminder.core.data.repository.impl.LocalScheduleRepository
 import com.nlab.reminder.core.data.repository.impl.LocalTagRepository
+import com.nlab.reminder.core.data.util.SystemTimestampProvider
+import com.nlab.reminder.core.data.util.TimestampProvider
 import com.nlab.reminder.core.local.database.dao.ScheduleDAO
 import com.nlab.reminder.core.local.database.dao.ScheduleTagListDAO
 import com.nlab.reminder.core.local.database.dao.TagRelationDAO
@@ -68,4 +70,8 @@ internal class AppScopeDataModule {
         tagRelationDAO = tagRelationDAO,
         scheduleTagListDAO = scheduleTagListDAO,
     )
+
+    @Provides
+    @Reusable
+    fun provideTimestampProvider(): TimestampProvider = SystemTimestampProvider()
 }
