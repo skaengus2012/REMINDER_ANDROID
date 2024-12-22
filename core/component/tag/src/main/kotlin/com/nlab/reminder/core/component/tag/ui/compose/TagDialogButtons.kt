@@ -30,9 +30,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.nlab.reminder.core.androidx.compose.ui.ColorPressButton
-import com.nlab.reminder.core.androidx.compose.ui.throttleClick
-import com.nlab.reminder.core.androidx.compose.ui.tooling.preview.Previews
+import com.nlab.reminder.core.ui.compose.ColorPressButton
+import com.nlab.reminder.core.ui.compose.throttleClick
+import com.nlab.reminder.core.ui.compose.tooling.preview.Previews
 import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
 import com.nlab.reminder.core.translation.StringIds
 

@@ -50,7 +50,6 @@ include(
 )
 include(
     ":core:android",
-    ":core:androidx:compose-ext",
     ":core:androidx:fragment",
     ":core:androidx:lifecycle",
     ":core:androidx:recyclerview",
@@ -78,6 +77,7 @@ include(
     ":core:schedule-test",
     ":core:statekit",
     ":core:translation",
+    ":core:ui-compose",
     ":core:uitext",
     ":core:uitext-test",
 )

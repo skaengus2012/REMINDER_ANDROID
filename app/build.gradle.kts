@@ -71,7 +71,6 @@ android {
 
 dependencies {
     implementation(projects.core.android)
-    implementation(projects.core.androidx.composeExt)
     implementation(projects.core.androidx.fragment)
     implementation(projects.core.androidx.lifecycle)
     implementation(projects.core.androidx.recyclerview)
@@ -90,6 +89,7 @@ dependencies {
     implementation(projects.core.statekit)
     kapt(projects.statekit.compiler)
     implementation(projects.core.translation)
+    implementation(projects.core.uiCompose)
     implementation(projects.core.uitext)
 
     implementation(libs.kotlinx.coroutines.android)
