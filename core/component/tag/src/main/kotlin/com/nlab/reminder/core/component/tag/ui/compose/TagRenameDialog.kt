@@ -57,9 +57,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.nlab.reminder.core.androidx.compose.ui.rememberDebouncedTextFieldValueState
-import com.nlab.reminder.core.androidx.compose.ui.throttleClick
-import com.nlab.reminder.core.androidx.compose.ui.tooling.preview.Previews
+import com.nlab.reminder.core.ui.compose.rememberDebouncedTextFieldValueState
+import com.nlab.reminder.core.ui.compose.throttleClick
+import com.nlab.reminder.core.ui.compose.tooling.preview.Previews
 import com.nlab.reminder.core.component.tag.ui.getUsageCountLabel
 import com.nlab.reminder.core.designsystem.compose.component.PlaneatDialog
 import com.nlab.reminder.core.designsystem.compose.resource.DrawableIds

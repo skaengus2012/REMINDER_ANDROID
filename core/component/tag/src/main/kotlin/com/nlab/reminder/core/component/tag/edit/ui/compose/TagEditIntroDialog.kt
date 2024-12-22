@@ -41,14 +41,12 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.nlab.reminder.core.androidx.compose.ui.throttleClick
-import com.nlab.reminder.core.androidx.compose.ui.tooling.preview.Previews
+import com.nlab.reminder.core.ui.compose.throttleClick
+import com.nlab.reminder.core.ui.compose.tooling.preview.Previews
 import com.nlab.reminder.core.designsystem.compose.component.PlaneatDialog
 import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
 import com.nlab.reminder.core.kotlin.NonBlankString
-import com.nlab.reminder.core.kotlin.NonNegativeLong
 import com.nlab.reminder.core.kotlin.toNonBlankString
-import com.nlab.reminder.core.kotlin.toNonNegativeLong
 import com.nlab.reminder.core.translation.PluralsIds
 import com.nlab.reminder.core.translation.StringIds
 
@@ -58,7 +56,6 @@ import com.nlab.reminder.core.translation.StringIds
 @Composable
 internal fun TagEditIntroDialog(
     tagName: NonBlankString,
-    usageCount: NonNegativeLong,
     onDismissRequest: () -> Unit,
     onRenameRequestClicked: () -> Unit,
     onDeleteRequestClicked: () -> Unit
@@ -156,7 +153,6 @@ private fun TagEditIntroDialogPreview() {
         Box(modifier = Modifier.size(300.dp)) {
             TagEditIntroDialog(
                 tagName = "Hello, tag edit dialog".toNonBlankString(),
-                usageCount = 1L.toNonNegativeLong(),
                 onDismissRequest = {},
                 onRenameRequestClicked = {},
                 onDeleteRequestClicked = {}

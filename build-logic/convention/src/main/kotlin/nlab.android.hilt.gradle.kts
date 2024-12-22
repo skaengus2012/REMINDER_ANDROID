@@ -1,7 +1,3 @@
-import com.nlab.reminder.kspExtension
-import com.nlab.reminder.libs
-import org.gradle.kotlin.dsl.dependencies
-
 /*
  * Copyright (C) 2024 The N's lab Open Source Project
  *
@@ -17,6 +13,10 @@ import org.gradle.kotlin.dsl.dependencies
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import com.nlab.reminder.kspExtension
+import com.nlab.reminder.libs
+import org.gradle.kotlin.dsl.dependencies
+
 apply(plugin = "com.google.devtools.ksp")
 apply(plugin = "dagger.hilt.android.plugin")
 

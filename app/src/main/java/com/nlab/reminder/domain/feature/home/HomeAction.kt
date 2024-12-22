@@ -17,7 +17,7 @@
 package com.nlab.reminder.domain.feature.home
 
 import com.nlab.reminder.core.component.tag.edit.TagEditState
-import com.nlab.reminder.core.component.text.UiText
+import com.nlab.reminder.core.text.UiText
 import com.nlab.reminder.core.data.model.Tag
 import com.nlab.reminder.core.kotlin.NonNegativeLong
 import com.nlab.statekit.annotation.UiAction

@@ -44,7 +44,6 @@ fun TagEditStateHandler(
         is TagEditState.Intro -> {
             TagEditIntroDialog(
                 tagName = state.tag.name,
-                usageCount = state.usageCount,
                 onDismissRequest = onCompleted,
                 onRenameRequestClicked = onRenameRequestClicked,
                 onDeleteRequestClicked = onDeleteRequestClicked

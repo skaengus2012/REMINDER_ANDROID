@@ -16,8 +16,8 @@
 
 package com.nlab.reminder.domain.feature.home
 
+import com.nlab.reminder.core.annotation.ExcludeFromGeneratedTestReport
 import com.nlab.reminder.core.component.tag.edit.TagEditState
-import com.nlab.reminder.core.foundation.annotation.ExcludeFromGeneratedTestReport
 
 /**
  * @author thalys

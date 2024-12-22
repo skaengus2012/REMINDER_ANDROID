@@ -1,7 +1,3 @@
-import com.android.build.gradle.LibraryExtension
-import com.nlab.reminder.configureComposeAndroid
-import org.gradle.kotlin.dsl.configure
-
 /*
  * Copyright (C) 2023 The N's lab Open Source Project
  *
@@ -17,6 +13,10 @@ import org.gradle.kotlin.dsl.configure
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import com.android.build.gradle.LibraryExtension
+import com.nlab.reminder.configureComposeAndroid
+import org.gradle.kotlin.dsl.configure
+
 apply(plugin = "com.android.library")
 apply(plugin = "org.jetbrains.kotlin.plugin.compose")
 
