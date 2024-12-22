@@ -14,28 +14,27 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.component.text.ui.compose
+package com.nlab.reminder.core.text.ui.compose
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import com.nlab.reminder.core.component.text.UiText
-import com.nlab.reminder.core.component.text.UiText.*
+import com.nlab.reminder.core.text.UiText
 
 /**
- * @author Doohyun
+ * @author Thalys
  */
 @ReadOnlyComposable
 @Composable
 fun UiText.toText(): String = when (this) {
-    is Direct -> value
-    is ResId -> {
+    is UiText.Direct -> value
+    is UiText.ResId -> {
         if (args == null) stringResource(resId)
         else stringResource(resId, *args)
     }
 
-    is PluralsResId -> {
+    is UiText.PluralsResId -> {
         if (args == null) pluralStringResource(resId, count)
         else pluralStringResource(resId, count, *args)
     }

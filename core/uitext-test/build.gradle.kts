@@ -3,11 +3,11 @@ plugins {
 }
 
 android {
-    namespace = "com.nlab.reminder.core.component.uitext.test"
+    namespace = "com.nlab.reminder.core.uitext.test"
 }
 
 dependencies {
-    implementation(projects.core.component.uitext)
+    implementation(projects.core.uitext)
     implementation(projects.core.kotlin)
     implementation(projects.core.kotlinTest)
     implementation(projects.testkit)

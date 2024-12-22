@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nlab.reminder.core.component.text
+
+package com.nlab.reminder.core.text
 
 import androidx.annotation.PluralsRes
 import androidx.annotation.StringRes
 
 /**
- * @author Doohyun
+ * @author Thalys
  */
 sealed class UiText private constructor() {
     data class Direct(val value: String) : UiText()

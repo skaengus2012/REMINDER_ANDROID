@@ -59,8 +59,6 @@ include(
     ":core:annotation",
     ":core:component:tag",
     ":core:component:tag-test",
-    ":core:component:uitext",
-    ":core:component:uitext-test",
     ":core:data",
     ":core:data-di",
     ":core:data-impl",
@@ -80,5 +78,7 @@ include(
     ":core:schedule-ext",
     ":core:schedule-test",
     ":core:statekit",
-    ":core:translation"
+    ":core:translation",
+    ":core:uitext",
+    ":core:uitext-test",
 )

@@ -14,23 +14,16 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.component.text.ui
+package com.nlab.reminder.core.text
 
-import android.content.Context
-import com.nlab.reminder.core.component.text.UiText
+import com.nlab.testkit.faker.genBothify
+import com.nlab.testkit.faker.genInt
 
 /**
- * @author Doohyun
+ * @author Thalys
  */
-fun UiText.toText(context: Context): String = when (this) {
-    is UiText.Direct -> value
-    is UiText.ResId -> {
-        if (args == null) context.getString(resId)
-        else context.getString(resId, *args)
-    }
+fun genUiText(value: String = genBothify()): UiText = UiText(value)
 
-    is UiText.PluralsResId -> {
-        if (args == null) context.resources.getQuantityString(resId, count)
-        else context.resources.getQuantityString(resId, count, *args)
-    }
+fun genUiTexts(size: Int = genInt(min = 1, max = 10)): List<UiText> = List(size) {
+    genUiText(value = "${genBothify()}_$it")
 }

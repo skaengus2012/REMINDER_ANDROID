@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.nlab.reminder.core.component.uitext"
+    namespace = "com.nlab.reminder.core.uitext"
 }
 
 dependencies {

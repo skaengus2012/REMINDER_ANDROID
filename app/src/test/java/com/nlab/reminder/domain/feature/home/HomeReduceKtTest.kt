@@ -18,13 +18,12 @@ package com.nlab.reminder.domain.feature.home
 
 import com.nlab.reminder.core.component.tag.edit.TagEditDelegate
 import com.nlab.reminder.core.component.tag.edit.genTagEditState
-import com.nlab.reminder.core.component.text.UiText
-import com.nlab.reminder.core.component.text.genUiTexts
+import com.nlab.reminder.core.text.UiText
+import com.nlab.reminder.core.text.genUiTexts
 import com.nlab.reminder.core.data.model.genTag
 import com.nlab.reminder.core.kotlin.Result
 import com.nlab.reminder.core.translation.StringIds
 import com.nlab.statekit.test.reduce.effectScenario
-import com.nlab.statekit.test.reduce.expectedStateToInit
 import com.nlab.statekit.test.reduce.transitionScenario
 import com.nlab.testkit.faker.genBothify
 import com.nlab.testkit.faker.genInt
