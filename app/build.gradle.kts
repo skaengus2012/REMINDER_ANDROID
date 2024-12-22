@@ -85,7 +85,7 @@ dependencies {
     implementation(projects.core.domain)
     implementation(projects.core.domainDi)
     implementation(projects.core.foundation)
-    implementation(projects.core.foundationDi)
+    implementation(projects.core.inject)
     implementation(projects.core.kotlin)
     implementation(projects.core.kotlinxCoroutine)
     // implementation(projects.core.scheduleExt)

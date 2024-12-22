@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.foundation.qualifiers.coroutine
+package com.nlab.reminder.core.inject.qualifiers.coroutine
 
 import javax.inject.Qualifier
 import kotlin.annotation.AnnotationRetention.BINARY

@@ -122,15 +122,16 @@ kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", versi
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 
 # Plugins defined by this project
-nlab-android-application = { id = "nlab.android.application", version = "unspecified" }
-nlab-android-application-compose = { id = "nlab.android.application.compose", version = "unspecified" }
-nlab-android-application-jacoco = { id = "nlab.android.application.jacoco", version = "unspecified" }
-nlab-android-hilt = { id = "nlab.android.hilt", version = "unspecified" }
-nlab-android-library = { id = "nlab.android.library", version = "unspecified" }
-nlab-android-library-compose = { id = "nlab.android.library.compose", version = "unspecified" }
-nlab-android-library-compose-component = { id = "nlab.android.library.compose.component", version = "unspecified" }
-nlab-android-library-jacoco = { id = "nlab.android.library.jacoco", version = "unspecified" }
-nlab-jvm-library = { id = "nlab.jvm.library", version = "unspecified" }
-nlab-jvm-library-jacoco = { id = "nlab.jvm.library.jacoco", version = "unspecified" }
+nlab-android-application = { id = "nlab.android.application" }
+nlab-android-application-compose = { id = "nlab.android.application.compose" }
+nlab-android-application-jacoco = { id = "nlab.android.application.jacoco" }
+nlab-android-hilt = { id = "nlab.android.hilt" }
+nlab-android-library = { id = "nlab.android.library" }
+nlab-android-library-compose = { id = "nlab.android.library.compose" }
+nlab-android-library-compose-component = { id = "nlab.android.library.compose.component" }
+nlab-android-library-inject = { id = "nlab.android.library.inject" }
+nlab-android-library-jacoco = { id = "nlab.android.library.jacoco" }
+nlab-jvm-library = { id = "nlab.jvm.library" }
+nlab-jvm-library-jacoco = { id = "nlab.jvm.library.jacoco" }
 android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlinVersion" }

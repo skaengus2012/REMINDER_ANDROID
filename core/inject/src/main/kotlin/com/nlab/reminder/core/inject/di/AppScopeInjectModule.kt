@@ -14,16 +14,13 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.foundation.di
+package com.nlab.reminder.core.inject.di
 
-import com.nlab.reminder.core.foundation.qualifiers.coroutine.AppScope
-import com.nlab.reminder.core.foundation.qualifiers.coroutine.Dispatcher
-import com.nlab.reminder.core.foundation.qualifiers.coroutine.DispatcherOption.*
-import com.nlab.reminder.core.foundation.time.TimestampProvider
-import com.nlab.reminder.core.foundation.time.infra.DefaultTimestampProvider
+import com.nlab.reminder.core.inject.qualifiers.coroutine.AppScope
+import com.nlab.reminder.core.inject.qualifiers.coroutine.Dispatcher
+import com.nlab.reminder.core.inject.qualifiers.coroutine.DispatcherOption.*
 import dagger.Module
 import dagger.Provides
-import dagger.Reusable
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineDispatcher
@@ -34,11 +31,11 @@ import kotlinx.coroutines.SupervisorJob
 import javax.inject.Singleton
 
 /**
- * @author Doohyun
+ * @author Thalys
  */
 @Module
 @InstallIn(SingletonComponent::class)
-internal class AppScopeFoundationModule {
+class AppScopeInjectModule {
     @Provides
     @Dispatcher(Default)
     fun provideDefaultDispatcher(): CoroutineDispatcher = Dispatchers.Default
@@ -59,8 +56,4 @@ internal class AppScopeFoundationModule {
     ): CoroutineScope = CoroutineScope(
         context = SupervisorJob() + dispatcher + CoroutineName(name = "ReminderAppScope")
     )
-
-    @Reusable
-    @Provides
-    fun provideTimestampProvider(): TimestampProvider = DefaultTimestampProvider()
 }

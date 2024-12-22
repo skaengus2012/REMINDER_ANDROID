@@ -70,6 +70,7 @@ include(
     ":core:foundation",
     ":core:foundation-di",
     ":core:foundation-impl",
+    ":core:inject",
     ":core:kotlin",
     ":core:kotlin-test",
     ":core:kotlinx-coroutine",

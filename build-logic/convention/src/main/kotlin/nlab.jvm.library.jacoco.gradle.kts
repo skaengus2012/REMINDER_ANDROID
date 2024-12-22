@@ -1,12 +1,3 @@
-import com.nlab.reminder.configureJacocoToolVersion
-import com.nlab.reminder.jacocoExcludePatterns
-import org.gradle.api.plugins.JavaPlugin
-import org.gradle.api.tasks.testing.Test
-import org.gradle.kotlin.dsl.invoke
-import org.gradle.kotlin.dsl.named
-import org.gradle.testing.jacoco.tasks.JacocoReport
-
-
 /*
  * Copyright (C) 2023 The N's lab Open Source Project
  *
@@ -22,6 +13,14 @@ import org.gradle.testing.jacoco.tasks.JacocoReport
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import com.nlab.reminder.configureJacocoToolVersion
+import com.nlab.reminder.jacocoExcludePatterns
+import org.gradle.api.plugins.JavaPlugin
+import org.gradle.api.tasks.testing.Test
+import org.gradle.kotlin.dsl.invoke
+import org.gradle.kotlin.dsl.named
+import org.gradle.testing.jacoco.tasks.JacocoReport
+
 apply(plugin = "org.gradle.jacoco")
 apply(plugin = "org.jetbrains.kotlin.jvm")
 

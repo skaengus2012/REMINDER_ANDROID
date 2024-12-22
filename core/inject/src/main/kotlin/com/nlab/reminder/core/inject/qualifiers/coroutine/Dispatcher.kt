@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.foundation.qualifiers.coroutine
+package com.nlab.reminder.core.inject.qualifiers.coroutine
 
 import javax.inject.Qualifier
 import kotlin.annotation.AnnotationRetention.BINARY
@@ -23,7 +23,7 @@ import kotlin.annotation.AnnotationRetention.BINARY
  * Annotations for CoroutineDispatcher injection.
  * Using [option], you can define the Dispatcher to be injected.
  *
- * @see [com.nlab.reminder.core.foundation.coroutine.DispatcherOption]
+ * @see [com.nlab.reminder.core.inject.qualifiers.coroutine.DispatcherOption]
  * @author Doohyun
  */
 @Qualifier

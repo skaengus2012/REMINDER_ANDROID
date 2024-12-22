@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 The N's lab Open Source Project
+ * Copyright (C) 2024 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,13 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import com.android.build.api.variant.ApplicationAndroidComponentsExtension
-import com.nlab.reminder.configureJacocoAndroid
-import com.nlab.reminder.configureJacocoToolVersion
-import org.gradle.kotlin.dsl.getByType
+import org.gradle.kotlin.dsl.apply
 
-apply(plugin = "org.gradle.jacoco")
-apply(plugin = "com.android.application")
+apply(plugin = "com.android.library")
+apply(plugin = "nlab.android.hilt")
 
-configureJacocoToolVersion()
-configureJacocoAndroid(extensions.getByType<ApplicationAndroidComponentsExtension>())
+dependencies {
+    "implementation"(project(":core:inject"))
+}

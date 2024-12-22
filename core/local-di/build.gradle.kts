@@ -1,6 +1,6 @@
 plugins {
     alias(libs.plugins.nlab.android.library)
-    alias(libs.plugins.nlab.android.hilt)
+    alias(libs.plugins.nlab.android.library.inject)
 }
 
 android {
@@ -9,6 +9,4 @@ android {
 
 dependencies {
     api(projects.core.local)
-
-    implementation(projects.core.foundationDi)
 }
