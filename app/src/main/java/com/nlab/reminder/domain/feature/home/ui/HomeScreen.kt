@@ -744,7 +744,6 @@ private fun HomeScreenPopulated() {
                     )
                 },
                 interaction = HomeInteraction.Empty,
-                userMessages = emptyList()
             ),
             onTodayCategoryClicked = {},
             onTimetableCategoryClicked = {},

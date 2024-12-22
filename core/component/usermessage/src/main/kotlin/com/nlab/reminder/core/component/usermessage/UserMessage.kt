@@ -16,8 +16,8 @@
 
 package com.nlab.reminder.core.component.usermessage
 
-import com.nlab.reminder.core.component.text.UiText
-import com.nlab.reminder.core.foundation.annotation.ExcludeFromGeneratedTestReport
+import com.nlab.reminder.core.annotation.ExcludeFromGeneratedTestReport
+import com.nlab.reminder.core.text.UiText
 
 /**
  * @author Doohyun

@@ -16,7 +16,7 @@
 
 package com.nlab.reminder.core.component.usermessage
 
-import com.nlab.reminder.core.foundation.annotation.ExcludeFromGeneratedTestReport
+import com.nlab.reminder.core.annotation.ExcludeFromGeneratedTestReport
 
 /**
  * @author Doohyun

@@ -10,6 +10,7 @@ android {
 
 dependencies {
     api(projects.core.uitext)
+    implementation(projects.core.annotation)
     implementation(projects.core.kotlin)
     implementation(projects.core.translation)
 

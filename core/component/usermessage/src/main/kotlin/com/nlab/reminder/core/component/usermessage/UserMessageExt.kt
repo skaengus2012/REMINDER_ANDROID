@@ -16,9 +16,9 @@
 
 package com.nlab.reminder.core.component.usermessage
 
-import com.nlab.reminder.core.component.text.UiText
 import com.nlab.reminder.core.kotlin.Result
 import com.nlab.reminder.core.kotlin.getOrThrow
+import com.nlab.reminder.core.text.UiText
 import com.nlab.reminder.core.translation.StringIds
 
 /**

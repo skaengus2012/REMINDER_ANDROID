@@ -16,9 +16,9 @@
 
 package com.nlab.reminder.core.component.usermessage
 
-import com.nlab.reminder.core.component.text.UiText
-import com.nlab.reminder.core.component.text.genUiText
 import com.nlab.reminder.core.kotlin.Result
+import com.nlab.reminder.core.text.UiText
+import com.nlab.reminder.core.text.genUiText
 import com.nlab.reminder.core.translation.StringIds
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.sameInstance
@@ -46,10 +46,7 @@ class UserMessageExtKtTest {
         try {
             result.getOrThrowMessage()
         } catch (e: UserMessageException) {
-            assertThat(
-                e,
-                sameInstance(throwable)
-            )
+            assertThat(e, sameInstance(throwable))
         }
     }
 
