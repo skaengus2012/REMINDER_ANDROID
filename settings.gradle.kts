@@ -52,7 +52,6 @@ include(
     ":core:android",
     ":core:androidx:compose-ext",
     ":core:androidx:fragment",
-    ":core:androidx:fragment-compose",
     ":core:androidx:lifecycle",
     ":core:androidx:recyclerview",
     ":core:androidx:transition",
