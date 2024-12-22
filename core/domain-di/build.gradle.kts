@@ -1,6 +1,6 @@
 plugins {
     alias(libs.plugins.nlab.android.library)
-    alias(libs.plugins.nlab.android.library.inject)
+    alias(libs.plugins.nlab.android.library.di)
 }
 
 android {

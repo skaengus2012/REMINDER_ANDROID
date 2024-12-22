@@ -129,7 +129,7 @@ nlab-android-hilt = { id = "nlab.android.hilt" }
 nlab-android-library = { id = "nlab.android.library" }
 nlab-android-library-compose = { id = "nlab.android.library.compose" }
 nlab-android-library-compose-component = { id = "nlab.android.library.compose.component" }
-nlab-android-library-inject = { id = "nlab.android.library.inject" }
+nlab-android-library-di = { id = "nlab.android.library.di" }
 nlab-android-library-jacoco = { id = "nlab.android.library.jacoco" }
 nlab-jvm-library = { id = "nlab.jvm.library" }
 nlab-jvm-library-jacoco = { id = "nlab.jvm.library.jacoco" }

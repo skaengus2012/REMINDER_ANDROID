@@ -1,7 +1,7 @@
 plugins {
     alias(libs.plugins.nlab.android.library)
     alias(libs.plugins.nlab.android.library.compose.component)
-    alias(libs.plugins.nlab.android.library.inject)
+    alias(libs.plugins.nlab.android.library.di)
     alias(libs.plugins.nlab.android.library.jacoco)
 }
 
