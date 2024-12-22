@@ -51,23 +51,27 @@ internal fun HomeReduce(environment: HomeEnvironment): HomeReduce = DslReduce {
         }
     }
     actionScope<TagEditStateSynced> {
-        fun HomeInteraction.isTagEditStateUnsupported(): Boolean =
-            this !is HomeInteraction.Empty && this !is HomeInteraction.TagEdit
         transition<Success> {
-            if (current.interaction.isTagEditStateUnsupported()) current
-            else current.copy(
-                interaction = action.state
-                    ?.let(HomeInteraction::TagEdit)
-                    ?: HomeInteraction.Empty
-            )
+            when (current.interaction) {
+                is HomeInteraction.Empty,
+                is HomeInteraction.TagEdit -> current.copy(
+                    interaction = action.state?.let(HomeInteraction::TagEdit) ?: HomeInteraction.Empty
+                )
+                // When adding an Interaction type, effect activation is required.
+                // else -> current
+            }
         }
         scope(isMatch = { action.state != null }) {
             effect<Loading> { environment.tagEditDelegate.clearState() }
-            effect<Success> {
-                if (current.interaction.isTagEditStateUnsupported()) {
-                    environment.tagEditDelegate.clearState()
-                }
-            }
+            // When adding an Interaction type, effect activation is required.
+            // effect<Success> {
+            //   when (current.interaction) {
+            //      is HomeInteraction.Empty,
+            //      is HomeInteraction.TagEdit -> {
+            //         do nothing.
+            //      }
+            //      else -> environment.tagEditDelegate.clearState()
+            // }
         }
     }
     stateScope<Success> {
