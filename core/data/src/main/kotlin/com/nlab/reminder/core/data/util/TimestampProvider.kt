@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.foundation.time
+package com.nlab.reminder.core.data.util
 
 /**
  * @author Doohyun

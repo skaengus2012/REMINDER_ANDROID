@@ -22,9 +22,9 @@ import com.nlab.reminder.core.data.repository.ScheduleSelectedIdRepository
 import com.nlab.reminder.core.data.repository.impl.InMemoryScheduleCompleteMarkRepository
 import com.nlab.reminder.core.data.repository.impl.InMemoryScheduleSelectedIdRepository
 import com.nlab.reminder.core.data.repository.impl.OfflineFirstLinkMetadataRepository
-import com.nlab.reminder.core.foundation.qualifiers.coroutine.Dispatcher
-import com.nlab.reminder.core.foundation.qualifiers.coroutine.DispatcherOption.*
-import com.nlab.reminder.core.foundation.time.TimestampProvider
+import com.nlab.reminder.core.data.util.TimestampProvider
+import com.nlab.reminder.core.inject.qualifiers.coroutine.Dispatcher
+import com.nlab.reminder.core.inject.qualifiers.coroutine.DispatcherOption.*
 import com.nlab.reminder.core.local.database.dao.LinkMetadataDAO
 import com.nlab.reminder.core.network.LinkThumbnailDataSourceImpl
 import dagger.Module

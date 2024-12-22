@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.foundation.time.infra
+package com.nlab.reminder.core.data.util
 
 import android.os.SystemClock
-import com.nlab.reminder.core.foundation.time.TimestampProvider
 
 /**
- * @author Doohyun
+ * @author Thalys
  */
-class DefaultTimestampProvider : TimestampProvider {
+class SystemTimestampProvider : TimestampProvider {
     override fun now(): Long = SystemClock.elapsedRealtime()
 }
