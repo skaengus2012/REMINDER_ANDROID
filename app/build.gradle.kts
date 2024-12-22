@@ -81,6 +81,7 @@ dependencies {
     implementation(projects.core.annotationAndroid)
     implementation(projects.core.component.tag)
     implementation(projects.core.component.uitext)
+    implementation(projects.core.component.usermessage)
     implementation(projects.core.dataDi)
     implementation(projects.core.data)
     implementation(projects.core.designsystem)

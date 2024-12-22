@@ -18,8 +18,6 @@ package com.nlab.reminder.domain.feature.home
 
 import com.nlab.reminder.core.component.tag.edit.TagEditDelegate
 import com.nlab.reminder.core.component.tag.edit.genTagEditState
-import com.nlab.reminder.core.component.text.UiText
-import com.nlab.reminder.core.component.text.genUiTexts
 import com.nlab.reminder.core.data.model.Tag
 import com.nlab.reminder.core.data.model.genTags
 import com.nlab.reminder.core.data.repository.ScheduleRepository
@@ -62,14 +60,12 @@ internal fun genHomeUiStateSuccess(
     allScheduleCount: NonNegativeLong = genNonNegativeLong(),
     tags: List<Tag> = genTags(),
     interaction: HomeInteraction = genHomeInteraction(),
-    userMessages: List<UiText> = genUiTexts()
 ) = HomeUiState.Success(
     todayScheduleCount = todayScheduleCount,
     timetableScheduleCount = timetableScheduleCount,
     allScheduleCount = allScheduleCount,
     tags = tags,
     interaction = interaction,
-    userMessages = userMessages
 )
 
 private val sampleHomeInteractions get() =  listOf(
