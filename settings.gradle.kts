@@ -40,7 +40,6 @@ include(
     ":statekit:compiler",
     ":statekit:core",
     ":statekit:dsl",
-    ":statekit:runtime",
     ":statekit:test",
     ":testkit"
 )
@@ -59,6 +58,7 @@ include(
     ":core:component:tag",
     ":core:component:tag-test",
     ":core:component:usermessage",
+    ":core:component:usermessage-handle",
     ":core:data",
     ":core:data-di",
     ":core:data-impl",

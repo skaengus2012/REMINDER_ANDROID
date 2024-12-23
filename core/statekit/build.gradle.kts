@@ -10,7 +10,6 @@ android {
 dependencies {
     api(projects.statekit.core)
     api(projects.statekit.dsl)
-    api(projects.statekit.runtime)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.kotlinx.coroutines.android)
     testImplementation(projects.testkit)

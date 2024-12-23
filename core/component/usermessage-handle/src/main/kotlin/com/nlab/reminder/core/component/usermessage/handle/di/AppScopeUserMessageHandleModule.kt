@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.component.usermessage.di
+package com.nlab.reminder.core.component.usermessage.handle.di
 
-import com.nlab.reminder.core.component.usermessage.UserMessageMonitor
-import com.nlab.reminder.core.component.usermessage.impl.UserMessageBroadcastMonitor
+import com.nlab.reminder.core.component.usermessage.handle.UserMessageMonitor
+import com.nlab.reminder.core.component.usermessage.handle.impl.UserMessageBroadcastMonitor
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -30,7 +30,7 @@ import javax.inject.Singleton
  */
 @Module
 @InstallIn(SingletonComponent::class)
-internal abstract class AppScopeUserMessageModule {
+internal abstract class AppScopeUserMessageHandleModule {
     @Binds
     abstract fun bindUserMesMessageMonitor(impl: UserMessageBroadcastMonitor): UserMessageMonitor
 

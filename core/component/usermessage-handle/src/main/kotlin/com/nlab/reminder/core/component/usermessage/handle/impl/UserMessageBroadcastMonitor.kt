@@ -14,13 +14,22 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.component.usermessage
+package com.nlab.reminder.core.component.usermessage.handle.impl
 
+import com.nlab.reminder.core.component.usermessage.UserMessage
+import com.nlab.reminder.core.component.usermessage.handle.UserMessageMonitor
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.receiveAsFlow
 
 /**
  * @author Thalys
  */
-interface UserMessageMonitor {
-    val message: Flow<UserMessage>
+class UserMessageBroadcastMonitor : UserMessageMonitor {
+    private val _message = Channel<UserMessage>(Channel.RENDEZVOUS)
+    override val message: Flow<UserMessage> = _message.receiveAsFlow()
+
+    fun send(userMessage: UserMessage) {
+        _message.trySend(userMessage)
+    }
 }

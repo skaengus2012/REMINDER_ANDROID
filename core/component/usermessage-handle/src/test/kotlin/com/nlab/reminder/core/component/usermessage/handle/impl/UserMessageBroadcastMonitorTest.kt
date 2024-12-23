@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.component.usermessage.impl
+package com.nlab.reminder.core.component.usermessage.handle.impl
 
 import com.nlab.reminder.core.component.usermessage.FeedbackPriority
 import com.nlab.reminder.core.component.usermessage.UserMessage
@@ -36,7 +36,7 @@ class UserMessageBroadcastMonitorTest {
         )
         val userMessageProvider = UserMessageBroadcastMonitor()
         val assertion = assertFlowEmissionsLazy(userMessageProvider.message, listOf(userMessage))
-        userMessageProvider.emit(userMessage)
+        userMessageProvider.send(userMessage)
         assertion()
     }
 
@@ -47,7 +47,7 @@ class UserMessageBroadcastMonitorTest {
             priority = FeedbackPriority.URGENT
         )
         val userMessageProvider = UserMessageBroadcastMonitor()
-        userMessageProvider.emit(userMessage)
+        userMessageProvider.send(userMessage)
 
         val assertion = assertFlowEmissionsLazy(userMessageProvider.message, emptyList())
         advanceUntilIdle()

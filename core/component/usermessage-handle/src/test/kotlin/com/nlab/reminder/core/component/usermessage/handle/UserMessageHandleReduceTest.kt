@@ -1,4 +1,20 @@
-package com.nlab.reminder.apps
+/*
+ * Copyright (C) 2024 The N's lab Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.nlab.reminder.core.component.usermessage.handle
 
 import com.nlab.reminder.core.component.usermessage.FeedbackPriority
 import com.nlab.reminder.core.component.usermessage.UserMessage
@@ -10,14 +26,14 @@ import org.junit.Test
 /**
  * @author Thalys
  */
-class MainActivityReduceTest {
+class UserMessageHandleReduceTest {
     @Test
     fun `Given success with empty userMessage, When user message posted, Then state changed with user message`() = runTest {
-        genMainActivityReduce()
+        UserMessageHandleReduce()
             .transitionScenario()
-            .initState(genMainActivityUiStateSuccess(userMessages = emptyList()))
+            .initState(UserMessageUiState(userMessages = emptyList()))
             .action(
-                MainActivityAction.UserMessagePosted(
+                UserMessageHandleAction.UserMessagePosted(
                     UserMessage(
                         message = genUiText(),
                         priority = FeedbackPriority.LOW
@@ -36,19 +52,11 @@ class MainActivityReduceTest {
             message = genUiText(),
             priority = FeedbackPriority.URGENT
         )
-        genMainActivityReduce()
+        UserMessageHandleReduce()
             .transitionScenario()
-            .initState(genMainActivityUiStateSuccess(listOf(userMessage)))
-            .action(MainActivityAction.UserMessageShown(userMessage))
+            .initState(UserMessageUiState(listOf(userMessage)))
+            .action(UserMessageHandleAction.UserMessageShown(userMessage))
             .expectedStateFromInput { initState.copy(userMessages = emptyList()) }
             .verify()
     }
 }
-
-private fun genMainActivityReduce(): MainActivityReduce = MainActivityReduce()
-
-private fun genMainActivityUiStateSuccess(
-    userMessages: List<UserMessage> = emptyList()
-): MainActivityUiState.Success = MainActivityUiState.Success(
-    userMessages = userMessages
-)

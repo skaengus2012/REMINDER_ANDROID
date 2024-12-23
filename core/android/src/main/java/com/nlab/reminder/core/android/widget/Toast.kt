@@ -19,25 +19,26 @@ package com.nlab.reminder.core.android.widget
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
-import android.widget.Toast
+import android.widget.Toast as ToastOrigin
 import androidx.annotation.StringRes
 
 /**
  * @author thalys
  */
-class ToastHandle(private val context: Context) {
-    private var curToast: Toast? = null
+class Toast(private val context: Context) {
+    private val handler = Handler(Looper.getMainLooper())
+    private var curToast: ToastOrigin? = null
 
     fun showToast(@StringRes resId: Int) {
-        showToast { Toast.makeText(context, resId, Toast.LENGTH_SHORT) }
+        showToast { ToastOrigin.makeText(context, resId, ToastOrigin.LENGTH_SHORT) }
     }
 
     fun showToast(text: String) {
-        showToast { Toast.makeText(context, text, Toast.LENGTH_SHORT) }
+        showToast { ToastOrigin.makeText(context, text, ToastOrigin.LENGTH_SHORT) }
     }
 
-    private inline fun showToast(crossinline getToast: () -> Toast) {
-        Handler(Looper.getMainLooper()).post {
+    private inline fun showToast(crossinline getToast: () -> ToastOrigin) {
+        handler.post {
             curToast?.cancel()
             curToast = getToast().also { it.show() }
         }

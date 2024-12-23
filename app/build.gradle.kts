@@ -79,6 +79,7 @@ dependencies {
     implementation(projects.core.annotation)
     implementation(projects.core.component.tag)
     implementation(projects.core.component.usermessage)
+    implementation(projects.core.component.usermessageHandle)
     implementation(projects.core.dataDi)
     implementation(projects.core.data)
     implementation(projects.core.designsystem)

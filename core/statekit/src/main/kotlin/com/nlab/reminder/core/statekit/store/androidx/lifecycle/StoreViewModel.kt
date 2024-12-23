@@ -17,7 +17,6 @@
 package com.nlab.reminder.core.statekit.store.androidx.lifecycle
 
 import androidx.lifecycle.ViewModel
-import com.nlab.statekit.lifecycle.UiActionDispatchable
 import com.nlab.statekit.store.Store
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.StateFlow
@@ -25,10 +24,10 @@ import kotlinx.coroutines.flow.StateFlow
 /**
  * @author Doohyun
  */
-abstract class StoreViewModel<A : Any, S : Any> : ViewModel(), UiActionDispatchable<A> {
+abstract class StoreViewModel<A : Any, S : Any> : ViewModel() {
     private val store: Store<A, S> by lazy(LazyThreadSafetyMode.NONE) { onCreateStore() }
     val uiState: StateFlow<S> get() = store.state
 
-    final override fun dispatch(action: A): Job = store.dispatch(action)
+    fun dispatch(action: A): Job = store.dispatch(action)
     protected abstract fun onCreateStore(): Store<A, S>
 }

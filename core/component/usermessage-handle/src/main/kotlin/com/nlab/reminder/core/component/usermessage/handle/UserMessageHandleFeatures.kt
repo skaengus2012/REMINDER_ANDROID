@@ -14,32 +14,30 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.apps
+package com.nlab.reminder.core.component.usermessage.handle
 
+import com.nlab.reminder.core.annotation.ExcludeFromGeneratedTestReport
+import com.nlab.reminder.core.component.usermessage.UserMessage
+import com.nlab.reminder.core.component.usermessage.handle.UserMessageHandleAction.*
 import com.nlab.reminder.core.kotlinx.coroutine.flow.map
 import com.nlab.reminder.core.statekit.store.androidx.lifecycle.StoreViewModel
 import com.nlab.reminder.core.statekit.store.androidx.lifecycle.createStore
+import com.nlab.statekit.annotation.UiAction
 import com.nlab.statekit.annotation.UiActionMapping
 import com.nlab.statekit.bootstrap.DeliveryStarted
 import com.nlab.statekit.bootstrap.collectAsBootstrap
-import com.nlab.reminder.apps.MainActivityAction.*
-import com.nlab.reminder.apps.MainActivityUiState.Success
-import com.nlab.reminder.core.annotation.ExcludeFromGeneratedTestReport
-import com.nlab.reminder.core.component.usermessage.UserMessage
-import com.nlab.reminder.core.component.usermessage.UserMessageMonitor
-import com.nlab.statekit.annotation.UiAction
 import com.nlab.statekit.dsl.reduce.DslReduce
 import com.nlab.statekit.reduce.Reduce
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
-typealias MainActivityReduce = Reduce<MainActivityAction, MainActivityUiState>
+typealias UserMessageHandleReduce = Reduce<UserMessageHandleAction, UserMessageUiState>
 
 /**
  * @author Thalys
  */
-fun MainActivityReduce(): MainActivityReduce = DslReduce {
-    stateScope<Success> {
+fun UserMessageHandleReduce(): UserMessageHandleReduce = DslReduce {
+    stateScope {
         transition<UserMessagePosted> {
             current.copy(userMessages = current.userMessages + action.message)
         }
@@ -49,36 +47,27 @@ fun MainActivityReduce(): MainActivityReduce = DslReduce {
     }
 }
 
-sealed class MainActivityAction private constructor() {
-    data class UserMessagePosted(val message: UserMessage) : MainActivityAction()
+sealed class UserMessageHandleAction {
+    data class UserMessagePosted(val message: UserMessage) : UserMessageHandleAction()
 
     @UiAction
-    data class UserMessageShown(val message: UserMessage) : MainActivityAction()
+    data class UserMessageShown(val message: UserMessage) : UserMessageHandleAction()
 }
 
-sealed class MainActivityUiState private constructor() {
-    data object Loading : MainActivityUiState()
-
-    data class Success(
-        val userMessages: List<UserMessage>
-    ) : MainActivityUiState()
-}
-
-
-class MainActivityEnvironment @Inject constructor(
-    val userMessageMonitor: UserMessageMonitor
+data class UserMessageUiState(
+    val userMessages: List<UserMessage>
 )
 
 @ExcludeFromGeneratedTestReport
-@UiActionMapping(MainActivityAction::class)
+@UiActionMapping(UserMessageHandleAction::class)
 @HiltViewModel
-class MainActivityViewModel @Inject constructor(
-    private val environment: MainActivityEnvironment
-) : StoreViewModel<MainActivityAction, MainActivityUiState>() {
+class UserMessageHandleViewModel @Inject constructor(
+    private val userMessageMonitor: UserMessageMonitor
+) : StoreViewModel<UserMessageHandleAction, UserMessageUiState>() {
     override fun onCreateStore() = createStore(
-        initState = MainActivityUiState.Loading,
-        reduce = MainActivityReduce(),
-        bootstrap = environment.userMessageMonitor.message
+        initState = UserMessageUiState(userMessages = emptyList()),
+        reduce = UserMessageHandleReduce(),
+        bootstrap = userMessageMonitor.message
             .map(::UserMessagePosted)
             .collectAsBootstrap(DeliveryStarted.Lazily)
     )

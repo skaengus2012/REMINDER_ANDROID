@@ -19,10 +19,9 @@ package com.nlab.reminder.apps.ui
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import com.nlab.reminder.apps.MainActivityViewModel
+import com.nlab.reminder.core.android.widget.Toast
 import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -31,15 +30,16 @@ import dagger.hilt.android.AndroidEntryPoint
  */
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
-    private val viewModel: MainActivityViewModel by viewModels()
+    private val appToast: Toast = Toast(context = applicationContext)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
         super.onCreate(savedInstanceState)
-
         enableEdgeToEdge()
         setContent {
-            val appState = rememberPlaneatAppState()
+            val appState = rememberPlaneatAppState(
+                appToast = appToast
+            )
             PlaneatTheme {
                 PlaneatApp(appState = appState)
             }
