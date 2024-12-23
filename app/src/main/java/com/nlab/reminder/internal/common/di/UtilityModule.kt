@@ -17,7 +17,7 @@
 package com.nlab.reminder.internal.common.di
 
 import android.content.Context
-import com.nlab.reminder.core.android.widget.ToastHandle
+import com.nlab.reminder.core.android.widget.Toast
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -33,5 +33,5 @@ import javax.inject.Singleton
 class UtilityModule {
     @Singleton
     @Provides
-    fun provideToastHandle(@ApplicationContext context: Context): ToastHandle = ToastHandle(context)
+    fun provideToastHandle(@ApplicationContext context: Context): Toast = Toast(context)
 }

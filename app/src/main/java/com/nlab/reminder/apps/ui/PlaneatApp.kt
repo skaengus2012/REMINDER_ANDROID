@@ -19,16 +19,39 @@ package com.nlab.reminder.apps.ui
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import com.nlab.reminder.core.component.usermessage.UserMessage
 
 /**
  * @author Thalys
  */
 @Composable
 fun PlaneatApp(
-    appState: PlaneatAppState
+    appState: PlaneatAppState,
+    globalUserMessages: List<UserMessage>,
+    userMessageShown: (UserMessage) -> Unit
 ) {
     PlaneatNavHost(
         modifier = Modifier.fillMaxSize(),
         appState = appState
     )
+    UserMessageHandler(
+        appState = appState,
+        userMessages = globalUserMessages,
+        userMessageShown = userMessageShown
+    )
+}
+
+@Composable
+private fun UserMessageHandler(
+    appState: PlaneatAppState,
+    userMessages: List<UserMessage>,
+    userMessageShown: (UserMessage) -> Unit,
+) {
+    /**
+    val userMessages = uiState.userMessages.firstOrNull() ?: return
+    val messageText = userMessages.message.toText()
+    LaunchedEffect(userMessages) {
+        appState.appToast.showToast(messageText) // TODO implements user message with priority
+        userMessageShown(userMessages)
+    }*/
 }

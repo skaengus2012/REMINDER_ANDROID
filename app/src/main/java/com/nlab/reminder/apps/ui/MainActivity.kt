@@ -21,10 +21,20 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import com.nlab.reminder.apps.MainActivityUiState
+import com.nlab.reminder.apps.MainActivityUiState.*
 import com.nlab.reminder.apps.MainActivityViewModel
+import com.nlab.reminder.core.android.widget.Toast
 import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 /**
  * @author Doohyun
@@ -33,15 +43,35 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     private val viewModel: MainActivityViewModel by viewModels()
 
+    private val appToast: Toast = Toast(context = applicationContext)
+
     override fun onCreate(savedInstanceState: Bundle?) {
-        installSplashScreen()
+        val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
 
+        var uiState: MainActivityUiState by mutableStateOf(Loading)
+
+        lifecycleScope.launch {
+            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiState.collect { uiState = it }
+            }
+        }
+
+        splashScreen.setKeepOnScreenCondition {
+            when (uiState) {
+                Loading -> true
+                is Success -> false
+            }
+        }
+
         enableEdgeToEdge()
+
         setContent {
-            val appState = rememberPlaneatAppState()
+            val appState = rememberPlaneatAppState(
+                appToast = appToast
+            )
             PlaneatTheme {
-                PlaneatApp(appState = appState)
+                PlaneatApp(appState = appState) // TODO 구현..
             }
         }
     }

@@ -76,7 +76,7 @@ class MainActivityViewModel @Inject constructor(
     private val environment: MainActivityEnvironment
 ) : StoreViewModel<MainActivityAction, MainActivityUiState>() {
     override fun onCreateStore() = createStore(
-        initState = MainActivityUiState.Loading,
+        initState = Success(userMessages = emptyList()),
         reduce = MainActivityReduce(),
         bootstrap = environment.userMessageMonitor.message
             .map(::UserMessagePosted)
