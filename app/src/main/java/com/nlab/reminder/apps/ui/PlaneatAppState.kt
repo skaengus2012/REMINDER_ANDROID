@@ -20,18 +20,26 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.nlab.reminder.core.android.widget.Toast
 
 /**
  * @author Thalys
  */
 @Stable
 class PlaneatAppState(
-    val navController: NavHostController
-)
+    val navController: NavHostController,
+    private val appToast: Toast,
+) {
+    fun showApplicationToast(message: String) {
+        appToast.showToast(text = message)
+    }
+}
 
 @Composable
 fun rememberPlaneatAppState(
-    navController: NavHostController = rememberNavController()
+    navController: NavHostController = rememberNavController(),
+    appToast: Toast,
 ): PlaneatAppState = PlaneatAppState(
-    navController = navController
+    navController = navController,
+    appToast = appToast
 )

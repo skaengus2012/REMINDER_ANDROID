@@ -16,9 +16,7 @@
 
 package com.nlab.reminder.domain.feature.home
 
-import com.nlab.reminder.core.translation.StringIds
-import com.nlab.reminder.core.text.UiText
-import com.nlab.reminder.core.kotlin.onFailure
+import com.nlab.reminder.core.component.usermessage.getOrThrowMessage
 import com.nlab.statekit.dsl.reduce.DslReduce
 import com.nlab.statekit.reduce.Reduce
 import com.nlab.reminder.domain.feature.home.HomeAction.*
@@ -37,8 +35,7 @@ internal fun HomeReduce(environment: HomeEnvironment): HomeReduce = DslReduce {
                 timetableScheduleCount = action.timetableSchedulesCount,
                 allScheduleCount = action.allSchedulesCount,
                 tags = action.sortedTags,
-                interaction = HomeInteraction.Empty,
-                userMessages = emptyList()
+                interaction = HomeInteraction.Empty
             )
         }
         transition<Success> {
@@ -79,7 +76,7 @@ internal fun HomeReduce(environment: HomeEnvironment): HomeReduce = DslReduce {
             suspendEffect<OnTagLongClicked> {
                 environment.tagEditDelegate
                     .startEditing(tag = action.tag)
-                    .onFailure { dispatch(UserMessagePosted(UiText(StringIds.tag_not_found))) }
+                    .getOrThrowMessage()
             }
         }
         scope(isMatch = { current.interaction is HomeInteraction.TagEdit }) {
@@ -89,23 +86,21 @@ internal fun HomeReduce(environment: HomeEnvironment): HomeReduce = DslReduce {
             suspendEffect<OnTagRenameConfirmClicked> {
                 environment.tagEditDelegate
                     .tryUpdateTagName(current.tags)
-                    .onFailure { dispatch(UserMessagePosted(UiText(StringIds.unknown_error))) }
+                    .getOrThrowMessage()
             }
             suspendEffect<OnTagReplaceConfirmClicked> {
                 environment.tagEditDelegate
                     .mergeTag()
-                    .onFailure { dispatch(UserMessagePosted(UiText(StringIds.unknown_error))) }
+                    .getOrThrowMessage()
             }
             effect<OnTagReplaceCancelClicked> { environment.tagEditDelegate.cancelMergeTag() }
             effect<OnTagDeleteRequestClicked> { environment.tagEditDelegate.startDelete() }
             suspendEffect<OnTagDeleteConfirmClicked> {
                 environment.tagEditDelegate
                     .deleteTag()
-                    .onFailure { dispatch(UserMessagePosted(UiText(StringIds.unknown_error))) }
+                    .getOrThrowMessage()
             }
         }
-        transition<UserMessagePosted> { current.copy(userMessages = current.userMessages + action.message) }
-        transition<UserMessageShown> { current.copy(userMessages = current.userMessages - action.message) }
         transition<Interacted> { current.copy(interaction = HomeInteraction.Empty) }
         effect<Interacted> {
             if (current.interaction is HomeInteraction.TagEdit) {

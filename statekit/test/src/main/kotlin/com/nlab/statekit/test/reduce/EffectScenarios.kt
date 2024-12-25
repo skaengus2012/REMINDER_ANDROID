@@ -21,6 +21,7 @@ import com.nlab.statekit.reduce.Reduce
 import com.nlab.statekit.store.createStore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.currentCoroutineContext
 
 /**
@@ -55,7 +56,7 @@ class EffectScenario<A : Any, S : Any, IA : A, IS : S> internal constructor(
     fun launchIn(
         coroutineScope: CoroutineScope,
         shouldLaunchWithTransition: Boolean = false
-    ): Job {
+    ): EffectScenarioTestJob<IA, IS> {
         val reduce = if (shouldLaunchWithTransition) reduce else Reduce(effect = reduce.effect)
         val store = createStore(
             coroutineScope = coroutineScope,
@@ -64,11 +65,10 @@ class EffectScenario<A : Any, S : Any, IA : A, IS : S> internal constructor(
                 additionalEffects.fold(baseEffect) { acc, effect -> Effect.Composite(effect, acc) }
             })
         )
-        return store.dispatch(input.action)
-    }
-
-    suspend fun launchAndJoin(shouldLaunchWithTransition: Boolean = false) {
-        launchIn(CoroutineScope(currentCoroutineContext()), shouldLaunchWithTransition).join()
+        return EffectScenarioTestJob(
+            input = input,
+            job = store.dispatch(input.action)
+        )
     }
 }
 
@@ -79,4 +79,26 @@ class TestEffectScope<A : Any, S : Any, IA : A, IS : S> internal constructor(
 ) {
     val inputIAction: IA get() = input.action
     val inputState: IS get() = input.initState
+}
+
+class EffectScenarioTestJob<A : Any, S : Any> internal constructor(
+    val input: ScenarioInput<A, S>,
+    val job: Job
+) {
+    suspend fun join() {
+        job.join()
+    }
+
+    suspend fun cancelAndJoin() {
+        job.cancelAndJoin()
+    }
+}
+
+suspend inline fun <A : Any, S : Any, IA : A, IS : S> EffectScenario<A, S, IA, IS>.launchAndJoin(
+    shouldLaunchWithTransition: Boolean = false,
+    verifyBlock: ScenarioInput<IA, IS>.() -> Unit = {}
+) {
+    val job = launchIn(CoroutineScope(currentCoroutineContext()), shouldLaunchWithTransition)
+    job.join()
+    verifyBlock(job.input)
 }

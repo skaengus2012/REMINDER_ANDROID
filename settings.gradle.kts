@@ -40,7 +40,6 @@ include(
     ":statekit:compiler",
     ":statekit:core",
     ":statekit:dsl",
-    ":statekit:runtime",
     ":statekit:test",
     ":testkit"
 )
@@ -50,6 +49,7 @@ include(
 )
 include(
     ":core:android",
+    ":core:androidx:compose",
     ":core:androidx:fragment",
     ":core:androidx:lifecycle",
     ":core:androidx:navigation-compose",
@@ -58,6 +58,8 @@ include(
     ":core:annotation",
     ":core:component:tag",
     ":core:component:tag-test",
+    ":core:component:usermessage",
+    ":core:component:usermessage-handle",
     ":core:data",
     ":core:data-di",
     ":core:data-impl",
@@ -78,7 +80,6 @@ include(
     ":core:schedule-test",
     ":core:statekit",
     ":core:translation",
-    ":core:ui-compose",
     ":core:uitext",
     ":core:uitext-test",
 )

@@ -71,6 +71,7 @@ android {
 
 dependencies {
     implementation(projects.core.android)
+    implementation(projects.core.androidx.compose)
     implementation(projects.core.androidx.fragment)
     implementation(projects.core.androidx.lifecycle)
     implementation(projects.core.androidx.navigationCompose)
@@ -78,6 +79,8 @@ dependencies {
     implementation(projects.core.androidx.transition)
     implementation(projects.core.annotation)
     implementation(projects.core.component.tag)
+    implementation(projects.core.component.usermessage)
+    implementation(projects.core.component.usermessageHandle)
     implementation(projects.core.dataDi)
     implementation(projects.core.data)
     implementation(projects.core.designsystem)
@@ -90,7 +93,6 @@ dependencies {
     implementation(projects.core.statekit)
     kapt(projects.statekit.compiler)
     implementation(projects.core.translation)
-    implementation(projects.core.uiCompose)
     implementation(projects.core.uitext)
 
     implementation(libs.kotlinx.coroutines.android)

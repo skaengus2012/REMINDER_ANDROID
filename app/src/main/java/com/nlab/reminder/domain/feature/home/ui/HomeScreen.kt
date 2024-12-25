@@ -68,8 +68,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.nlab.reminder.core.ui.compose.DelayedContent
-import com.nlab.reminder.core.ui.compose.tooling.preview.Previews
+import com.nlab.reminder.core.androidx.compose.ui.DelayedContent
+import com.nlab.reminder.core.androidx.compose.ui.tooling.preview.Previews
 import com.nlab.reminder.core.data.model.Tag
 import com.nlab.reminder.core.data.model.TagId
 import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
@@ -85,8 +85,8 @@ import com.nlab.reminder.core.android.resources.font.CategoryCountFontFamily
 import com.nlab.reminder.core.android.resources.icon.IcHomeCategoryAll
 import com.nlab.reminder.core.android.resources.icon.IcHomeCategoryTimetable
 import com.nlab.reminder.core.android.resources.icon.IcHomeCategoryToday
-import com.nlab.reminder.core.ui.compose.ColorPressButton
-import com.nlab.reminder.core.ui.compose.throttleClick
+import com.nlab.reminder.core.androidx.compose.ui.ColorPressButton
+import com.nlab.reminder.core.androidx.compose.ui.throttleClick
 import com.nlab.reminder.core.component.tag.edit.ui.compose.TagEditStateHandler
 import com.nlab.reminder.core.component.tag.ui.compose.TagCard
 import com.nlab.reminder.core.designsystem.compose.component.PlaneatLoadingContent
@@ -744,7 +744,6 @@ private fun HomeScreenPopulated() {
                     )
                 },
                 interaction = HomeInteraction.Empty,
-                userMessages = emptyList()
             ),
             onTodayCategoryClicked = {},
             onTimetableCategoryClicked = {},

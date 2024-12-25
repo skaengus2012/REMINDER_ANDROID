@@ -75,7 +75,6 @@
         <item quantity="other">In addition to #%1$s, #%2$d tags are used in %3$d(+) notifications.</item>
     </plurals>
     <string name="tag_delete_dialog_description_overflow">%1$s is being used in %2$d(+) notifications.</string>
-    <string name="tag_not_found">Tag not found.</string>
     <string name="tag_merge">Tag Already Exists</string>
     <string name="tag_merge_dialog_description">Do you want to replace #%1$s with #%2$s in all of your schedules?</string>
 

@@ -18,15 +18,12 @@ package com.nlab.reminder.domain.feature.home
 
 import com.nlab.reminder.core.component.tag.edit.TagEditDelegate
 import com.nlab.reminder.core.component.tag.edit.genTagEditState
-import com.nlab.reminder.core.text.UiText
-import com.nlab.reminder.core.text.genUiTexts
 import com.nlab.reminder.core.data.model.genTag
 import com.nlab.reminder.core.kotlin.Result
-import com.nlab.reminder.core.translation.StringIds
 import com.nlab.statekit.test.reduce.effectScenario
+import com.nlab.statekit.test.reduce.launchAndJoin
 import com.nlab.statekit.test.reduce.transitionScenario
 import com.nlab.testkit.faker.genBothify
-import com.nlab.testkit.faker.genInt
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -54,8 +51,7 @@ class HomeReduceKtTest {
                     timetableScheduleCount = action.timetableSchedulesCount,
                     allScheduleCount = action.allSchedulesCount,
                     tags = action.sortedTags,
-                    interaction = HomeInteraction.Empty,
-                    userMessages = emptyList()
+                    interaction = HomeInteraction.Empty
                 )
             }
             .verify()
@@ -74,7 +70,6 @@ class HomeReduceKtTest {
                     allScheduleCount = action.allSchedulesCount,
                     tags = action.sortedTags,
                     interaction = initState.interaction,
-                    userMessages = initState.userMessages
                 )
             }
             .verify()
@@ -165,18 +160,17 @@ class HomeReduceKtTest {
     }
 
     @Test
-    fun `Given success with no interaction and user messages, When tag long clicked, Then user message filled if TagEditDelegate startEditing result fails`() = runTest {
+    fun `Given success with no interaction, When tag long clicked, Then TagEditDelegate invoke startEditing`() = runTest {
         val tagEditDelegate: TagEditDelegate = mock {
-            whenever(mock.startEditing(any())) doReturn Result.Failure(IllegalStateException())
+            whenever(mock.startEditing(any())) doReturn Result.Success(Unit)
         }
         genHomeReduce(environment = genHomeEnvironment(tagEditDelegate))
-            .transitionScenario()
-            .initState(genHomeUiStateSuccess(interaction = HomeInteraction.Empty, userMessages = emptyList()))
+            .effectScenario()
+            .initState(genHomeUiStateSuccess(interaction = HomeInteraction.Empty))
             .action(HomeAction.OnTagLongClicked(genTag()))
-            .expectedStateFromInput {
-                initState.copy(userMessages = listOf(UiText(StringIds.tag_not_found)))
+            .launchAndJoin {
+                verify(tagEditDelegate, once()).startEditing(action.tag)
             }
-            .verify(shouldVerifyWithEffect = true)
     }
 
     @Test
@@ -204,53 +198,41 @@ class HomeReduceKtTest {
     @Test
     fun `Given success with tagEdit interaction, When tag rename inputted, Then tagEditDelegate called changeRenameText`() = runTest {
         val tagEditDelegate: TagEditDelegate = mock()
-        val input = genBothify()
         genHomeReduce(environment = genHomeEnvironment(tagEditDelegate))
             .effectScenario()
             .initState(genHomeUiStateSuccess(interaction = HomeInteraction.TagEdit(genTagEditState())))
-            .action(HomeAction.OnTagRenameInputted(input))
-            .launchAndJoin()
-        verify(tagEditDelegate, once()).changeRenameText(input)
+            .action(HomeAction.OnTagRenameInputted(genBothify()))
+            .launchAndJoin {
+                verify(tagEditDelegate, once()).changeRenameText(action.text)
+            }
     }
 
     @Test
-    fun `Given success with tagEdit interaction and no user messages, When tag rename confirmed, Then user message filled if TagEditDelegate tryUpdateTagRename result fails`() = runTest {
+    fun `Given success with tagEdit interaction, When tag rename confirmed, Then TagEditDelegate invoke tryUpdateTagRename`() = runTest {
         val tagEditDelegate: TagEditDelegate = mock {
-            whenever(mock.tryUpdateTagName(any())) doReturn Result.Failure(IllegalStateException())
+            whenever(mock.tryUpdateTagName(any())) doReturn Result.Success(Unit)
         }
         genHomeReduce(environment = genHomeEnvironment(tagEditDelegate))
-            .transitionScenario()
-            .initState(
-                genHomeUiStateSuccess(
-                    interaction = HomeInteraction.TagEdit(genTagEditState()),
-                    userMessages = emptyList()
-                )
-            )
+            .effectScenario()
+            .initState( genHomeUiStateSuccess(interaction = HomeInteraction.TagEdit(genTagEditState())))
             .action(HomeAction.OnTagRenameConfirmClicked)
-            .expectedStateFromInput {
-                initState.copy(userMessages = listOf(UiText(StringIds.unknown_error)))
+            .launchAndJoin {
+                verify(tagEditDelegate, once()).tryUpdateTagName(initState.tags)
             }
-            .verify(shouldVerifyWithEffect = true)
     }
 
     @Test
-    fun `Given success with tagEdit interaction and no user messages, When tag replace confirm clicked, Then user message filled if TagEditDelegate mergeTag result fails`() = runTest {
+    fun `Given success with tagEdit interaction, When tag replace confirm clicked, Then TagEditDelegate invoke mergeTag`() = runTest {
         val tagEditDelegate: TagEditDelegate = mock {
-            whenever(mock.mergeTag()) doReturn Result.Failure(IllegalStateException())
+            whenever(mock.mergeTag()) doReturn Result.Success(Unit)
         }
         genHomeReduce(environment = genHomeEnvironment(tagEditDelegate))
-            .transitionScenario()
-            .initState(
-                genHomeUiStateSuccess(
-                    interaction = HomeInteraction.TagEdit(genTagEditState()),
-                    userMessages = emptyList()
-                )
-            )
+            .effectScenario()
+            .initState(genHomeUiStateSuccess(interaction = HomeInteraction.TagEdit(genTagEditState())))
             .action(HomeAction.OnTagReplaceConfirmClicked)
-            .expectedStateFromInput {
-                initState.copy(userMessages = listOf(UiText(StringIds.unknown_error)))
+            .launchAndJoin {
+                verify(tagEditDelegate, once()).mergeTag()
             }
-            .verify(shouldVerifyWithEffect = true)
     }
 
     @Test
@@ -276,53 +258,17 @@ class HomeReduceKtTest {
     }
 
     @Test
-    fun `Given success with tagEdit interaction and no user messages, When tag delete confirm clicked, Then user message filled if TagEditDelegate deleteTag result fails`() = runTest {
+    fun `Given success with tagEdit interaction, When tag delete confirm clicked, Then TagEditDelegate invoked deleteTag`() = runTest {
         val tagEditDelegate: TagEditDelegate = mock {
-            whenever(mock.deleteTag()) doReturn Result.Failure(IllegalStateException())
+            whenever(mock.deleteTag()) doReturn Result.Success(Unit)
         }
         genHomeReduce(environment = genHomeEnvironment(tagEditDelegate))
-            .transitionScenario()
-            .initState(
-                genHomeUiStateSuccess(
-                    interaction = HomeInteraction.TagEdit(genTagEditState()),
-                    userMessages = emptyList()
-                )
-            )
+            .effectScenario()
+            .initState(genHomeUiStateSuccess(interaction = HomeInteraction.TagEdit(genTagEditState())))
             .action(HomeAction.OnTagDeleteConfirmClicked)
-            .expectedStateFromInput {
-                initState.copy(userMessages = listOf(UiText(StringIds.unknown_error)))
+            .launchAndJoin {
+                verify(tagEditDelegate, once()).deleteTag()
             }
-            .verify(shouldVerifyWithEffect = true)
-    }
-
-    @Test
-    fun `Given success with empty user messages, When user message posted, Then user message added to state`() = runTest {
-        genHomeReduce()
-            .transitionScenario()
-            .initState(genHomeUiStateSuccess(userMessages = emptyList()))
-            .action(HomeAction.UserMessagePosted(UiText(genBothify())))
-            .expectedStateFromInput {
-                initState.copy(
-                    userMessages = listOf(action.message)
-                )
-            }
-            .verify()
-    }
-
-    @Test
-    fun `Given success with 2 or more user messages, When user message shown, Then user message removed`() = runTest {
-        val userMessages = genUiTexts(genInt(min = 2, max = 10))
-
-        genHomeReduce()
-            .transitionScenario()
-            .initState(genHomeUiStateSuccess(userMessages = userMessages))
-            .action(HomeAction.UserMessageShown(userMessages[1]))
-            .expectedStateFromInput {
-                initState.copy(
-                    userMessages = initState.userMessages - action.message
-                )
-            }
-            .verify()
     }
 
     @Test

@@ -74,7 +74,6 @@
         <item quantity="other">#%1$s 외 #%2$d개의 태그가 %3$d(+)개의 알림에서 사용되고 있습니다.</item>
     </plurals>
     <string name="tag_delete_dialog_description_overflow">#%1$s이(가) %2$d(+)개의 알림에서 사용되고 있습니다.</string>
-    <string name="tag_not_found">태그를 찾을 수 없습니다.</string>
     <string name="tag_merge">태그가 이미 존재함</string>
     <string name="tag_merge_dialog_description">사용자의 모든 스케줄에서 #%1$s을(를) #%2$s(으)로 대치하겠습니까?</string>
 

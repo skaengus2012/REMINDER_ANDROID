@@ -42,10 +42,11 @@ class TagEditDelegate(
     private val _state = MutableStateFlow(initialState)
     val state: StateFlow<TagEditState?> = _state.asStateFlow()
 
-    suspend fun startEditing(tag: Tag): Result<TagEditState.Intro> =
+    suspend fun startEditing(tag: Tag): Result<Unit> =
         tagRepository.getUsageCount(id = tag.id)
             .map { usageCount -> TagEditState.Intro(tag, usageCount) }
             .onSuccess { intro -> _state.update { current -> current ?: intro } }
+            .map {}
 
     fun startRename() {
         _state.updateIfTypeOf<TagEditState.Intro> { current ->
