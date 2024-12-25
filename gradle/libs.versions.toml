@@ -12,7 +12,7 @@ androidxAnnotation = "1.9.1"
 androidxAppCompat = "1.7.0"
 androidxCardview = "1.0.0"
 androidxComposeBom = "2024.12.01"
-androidxComposeCompiler = "1.5.14"  # use in configureComposeAndroid AndroidCompose.kt
+androidxComposeCompiler = "1.5.15"  # use in configureComposeAndroid AndroidCompose.kt
 androidxConstaintLayout = "2.2.0"
 androidxCoreKtx = "1.15.0"
 androidxCoreSplashScreen = "1.0.1"
@@ -71,7 +71,7 @@ androidx-fragment = { module = "androidx.fragment:fragment", version.ref = "andr
 androidx-fragment-compose = { module = "androidx.fragment:fragment-compose", version.ref = "androidxFragment"  }
 androidx-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "androidxHiltNavigationCompose" }
 androidx-lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "androidxLifecycle" }
-androidx-lifecycle-runtimeCompose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "androidxLifecycle" }
+androidx-lifecycle-runtime-compose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "androidxLifecycle" }
 androidx-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "androidxLifecycle" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "androidxNavigation" }
 androidx-recyclerview = { module = "androidx.recyclerview:recyclerview", version.ref = "androidxRecyclerView" }
@@ -130,6 +130,7 @@ nlab-android-library = { id = "nlab.android.library" }
 nlab-android-library-compose = { id = "nlab.android.library.compose" }
 nlab-android-library-compose-component = { id = "nlab.android.library.compose.component" }
 nlab-android-library-di = { id = "nlab.android.library.di" }
+nlab-android-library-feature-compose = { id = "nlab.android.library.feature.compose" }
 nlab-android-library-jacoco = { id = "nlab.android.library.jacoco" }
 nlab-android-library-statekit = { id = "nlab.android.library.statekit" }
 nlab-jvm-library = { id = "nlab.jvm.library" }

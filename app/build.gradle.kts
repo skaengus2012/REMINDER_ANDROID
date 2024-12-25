@@ -106,7 +106,7 @@ dependencies {
     implementation(libs.androidx.constaintlayout)
     implementation(libs.androidx.fragment.compose)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
-    implementation(libs.androidx.lifecycle.runtimeCompose)
+    implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.startup.runtime)

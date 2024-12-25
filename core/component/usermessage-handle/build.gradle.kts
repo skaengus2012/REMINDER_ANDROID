@@ -16,7 +16,7 @@ dependencies {
     implementation(projects.core.kotlinxCoroutine)
 
     implementation(libs.androidx.hilt.navigation.compose)
-    implementation(libs.androidx.lifecycle.runtimeCompose)
+    implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.navigation.compose)
 
     testImplementation(projects.core.uitextTest)
