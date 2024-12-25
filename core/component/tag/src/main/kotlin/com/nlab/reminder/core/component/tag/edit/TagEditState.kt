@@ -25,10 +25,7 @@ import com.nlab.reminder.core.kotlin.NonNegativeLong
  */
 sealed class TagEditState private constructor() {
     @ExcludeFromGeneratedTestReport
-    data class Intro(
-        val tag: Tag,
-        val usageCount: NonNegativeLong
-    ) : TagEditState()
+    data class Intro(val tag: Tag) : TagEditState()
 
     @ExcludeFromGeneratedTestReport
     data class Rename(

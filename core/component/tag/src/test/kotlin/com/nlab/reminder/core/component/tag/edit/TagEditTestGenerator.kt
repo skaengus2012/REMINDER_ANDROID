@@ -50,7 +50,7 @@ fun genTagEditState(): TagEditState =
 internal inline fun <reified T : TagEditState> genTagEditStateExcludeTypeOf(): TagEditState =
     sampleTagEditStates.requireSampleExcludeTypeOf(listOf(T::class))
 
-fun genIntroState() = TagEditState.Intro(tag = genTag(), usageCount = genNonNegativeLong())
+fun genIntroState() = TagEditState.Intro(tag = genTag())
 
 fun genRenameState(
     tag: Tag = genTag(),

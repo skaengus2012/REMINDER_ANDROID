@@ -24,7 +24,6 @@ import com.nlab.reminder.core.domain.TryUpdateTagNameResult
 import com.nlab.reminder.core.domain.TryUpdateTagNameUseCase
 import com.nlab.reminder.core.kotlin.Result
 import com.nlab.reminder.core.kotlin.map
-import com.nlab.reminder.core.kotlin.onSuccess
 import com.nlab.reminder.core.kotlin.tryToNonBlankStringOrNull
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -42,22 +41,22 @@ class TagEditDelegate(
     private val _state = MutableStateFlow(initialState)
     val state: StateFlow<TagEditState?> = _state.asStateFlow()
 
-    suspend fun startEditing(tag: Tag): Result<Unit> =
-        tagRepository.getUsageCount(id = tag.id)
-            .map { usageCount -> TagEditState.Intro(tag, usageCount) }
-            .onSuccess { intro -> _state.update { current -> current ?: intro } }
-            .map {}
+    fun startEditing(tag: Tag) {
+        val intro = TagEditState.Intro(tag)
+        _state.update { current -> current ?: intro }
+    }
 
-    fun startRename() {
-        _state.updateIfTypeOf<TagEditState.Intro> { current ->
+    suspend fun startRename(): Result<Unit> = _state.updateIfIntro(
+        getUsageCount = { tag -> tagRepository.getUsageCount(id = tag.id) },
+        transform = { tag, usageCount ->
             TagEditState.Rename(
-                tag = current.tag,
-                usageCount = current.usageCount,
-                renameText = current.tag.name.value,
+                tag = tag,
+                usageCount = usageCount,
+                renameText = tag.name.value,
                 shouldUserInputReady = true
             )
         }
-    }
+    )
 
     fun readyRenameInput() {
         _state.updateIfTypeOf<TagEditState.Rename> { current -> current.copy(shouldUserInputReady = false) }
@@ -67,57 +66,55 @@ class TagEditDelegate(
         _state.updateIfTypeOf<TagEditState.Rename> { current -> current.copy(renameText = input) }
     }
 
-    suspend fun tryUpdateTagName(loadedTagsSnapshot: List<Tag>): Result<Unit> {
-        return _state.processingScope<TagEditState.Rename, TryUpdateTagNameResult>(
-            request = { emitState ->
-                val newName = emitState.renameText.tryToNonBlankStringOrNull()
-                if (newName == null) TryUpdateTagNameResult.NotChanged
-                else tryUpdateTagNameUseCase.invoke(
-                    tagId = emitState.tag.id,
-                    newName = newName,
-                    tagGroup = TagGroupSource.Snapshot(loadedTagsSnapshot)
-                )
-            },
-            onFinished = { emitState, result ->
-                val duplicateTag: Tag?
-                val isSuccessReturn: Boolean
-                when (result) {
-                    is TryUpdateTagNameResult.Success,
-                    is TryUpdateTagNameResult.NotChanged -> {
-                        duplicateTag = null
-                        isSuccessReturn = true
-                    }
-
-                    is TryUpdateTagNameResult.DuplicateNameError -> {
-                        duplicateTag = result.duplicateTag
-                        isSuccessReturn = true
-                    }
-
-                    is TryUpdateTagNameResult.UnknownError -> {
-                        duplicateTag = null
-                        isSuccessReturn = false
-                    }
+    suspend fun tryUpdateTagName(
+        loadedTagsSnapshot: List<Tag>
+    ): Result<Unit> = _state.processingScope<TagEditState.Rename, TryUpdateTagNameResult>(
+        request = { emitState ->
+            val newName = emitState.renameText.tryToNonBlankStringOrNull()
+            if (newName == null) TryUpdateTagNameResult.NotChanged
+            else tryUpdateTagNameUseCase.invoke(
+                tagId = emitState.tag.id,
+                newName = newName,
+                tagGroup = TagGroupSource.Snapshot(loadedTagsSnapshot)
+            )
+        },
+        onFinished = { emitState, result ->
+            val duplicateTag: Tag?
+            val isSuccessReturn: Boolean
+            when (result) {
+                is TryUpdateTagNameResult.Success,
+                is TryUpdateTagNameResult.NotChanged -> {
+                    duplicateTag = null
+                    isSuccessReturn = true
                 }
 
-                _state.updateIfProcessingStateEquals(
-                    target = emitState,
-                    to = duplicateTag?.let { tag ->
-                        TagEditState.Merge(from = emitState.tag, fromUsageCount = emitState.usageCount, to = tag)
-                    }
-                )
+                is TryUpdateTagNameResult.DuplicateNameError -> {
+                    duplicateTag = result.duplicateTag
+                    isSuccessReturn = true
+                }
 
-                if (isSuccessReturn) Result.Success(Unit)
-                else Result.Failure(IllegalStateException())
+                is TryUpdateTagNameResult.UnknownError -> {
+                    duplicateTag = null
+                    isSuccessReturn = false
+                }
             }
-        )
-    }
 
-    suspend fun mergeTag(): Result<Unit> {
-        return _state.processingScope<TagEditState.Merge> { emitState ->
-            tagRepository
-                .save(SaveTagQuery.Modify(id = emitState.from.id, name = emitState.to.name))
-                .map {}
+            _state.updateIfProcessingStateEquals(
+                target = emitState,
+                to = duplicateTag?.let { tag ->
+                    TagEditState.Merge(from = emitState.tag, fromUsageCount = emitState.usageCount, to = tag)
+                }
+            )
+
+            if (isSuccessReturn) Result.Success(Unit)
+            else Result.Failure(IllegalStateException())
         }
+    )
+
+    suspend fun mergeTag(): Result<Unit> = _state.processingScope<TagEditState.Merge> { emitState ->
+        tagRepository
+            .save(SaveTagQuery.Modify(id = emitState.from.id, name = emitState.to.name))
+            .map {}
     }
 
     fun cancelMergeTag() {
@@ -131,9 +128,10 @@ class TagEditDelegate(
         }
     }
 
-    fun startDelete() {
-        _state.updateIfTypeOf<TagEditState.Intro> { current -> TagEditState.Delete(current.tag, current.usageCount) }
-    }
+    suspend fun startDelete(): Result<Unit> = _state.updateIfIntro(
+        getUsageCount = { tag -> tagRepository.getUsageCount(id = tag.id) },
+        transform = { tag, usageCount -> TagEditState.Delete(tag = tag, usageCount = usageCount) }
+    )
 
     suspend fun deleteTag(): Result<Unit> {
         return _state.processingScope<TagEditState.Delete> { emitState -> tagRepository.delete(emitState.tag.id) }
