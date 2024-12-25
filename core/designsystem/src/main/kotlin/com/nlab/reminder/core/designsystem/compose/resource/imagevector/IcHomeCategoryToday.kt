@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.android.resources.icon
+package com.nlab.reminder.core.designsystem.compose.resource.imagevector
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathFillType.Companion.EvenOdd
@@ -26,13 +26,11 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.ImageVector.Builder
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
-import com.nlab.reminder.core.android.designsystem.icon.PlanetIcons
 
 /**
  * @author Doohyun
  */
-@Suppress("UnusedReceiverParameter")
-val PlanetIcons.IcHomeCategoryToday: ImageVector
+val IcHomeCategoryToday: ImageVector
     get() {
         if (_icHomeCategoryToday != null) {
             return _icHomeCategoryToday!!

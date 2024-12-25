@@ -80,15 +80,12 @@ import com.nlab.reminder.domain.feature.home.HomeUiState
 import com.nlab.reminder.domain.feature.home.HomeViewModel
 import com.nlab.reminder.domain.feature.home.onTodayCategoryClicked
 import com.nlab.reminder.R
-import com.nlab.reminder.core.android.designsystem.icon.PlanetIcons
-import com.nlab.reminder.core.android.resources.icon.IcHomeCategoryAll
-import com.nlab.reminder.core.android.resources.icon.IcHomeCategoryTimetable
-import com.nlab.reminder.core.android.resources.icon.IcHomeCategoryToday
 import com.nlab.reminder.core.androidx.compose.ui.ColorPressButton
 import com.nlab.reminder.core.androidx.compose.ui.throttleClick
 import com.nlab.reminder.core.component.tag.edit.ui.compose.TagEditStateHandler
 import com.nlab.reminder.core.component.tag.ui.compose.TagCard
 import com.nlab.reminder.core.designsystem.compose.component.PlaneatLoadingContent
+import com.nlab.reminder.core.designsystem.compose.icon.PlaneatIcons
 import com.nlab.reminder.core.kotlin.NonNegativeLong
 import com.nlab.reminder.core.translation.StringIds
 import com.nlab.reminder.domain.feature.home.*
@@ -364,7 +361,7 @@ private fun TodayCategoryCard(
         remainCount = remainCount.value,
         icon = {
             Image(
-                imageVector = PlanetIcons.IcHomeCategoryToday,
+                imageVector = PlaneatIcons.todayLogo,
                 contentDescription = null,
                 modifier = Modifier
                     .fillMaxWidth(0.4883f)
@@ -390,7 +387,7 @@ private fun TimetableCategoryCard(
             // case2: When using svg, the square is not drawn properly. (No problem when using view system)
             // case3: Resolve when using image vector
             Image(
-                imageVector = PlanetIcons.IcHomeCategoryTimetable,
+                imageVector = PlaneatIcons.timetableLogo,
                 contentDescription = null,
                 modifier = Modifier
                     .fillMaxWidth(0.4f)
@@ -413,7 +410,7 @@ private fun AllCategoryCard(
         remainCount = remainCount.value,
         icon = {
             Image(
-                imageVector = PlanetIcons.IcHomeCategoryAll,
+                imageVector = PlaneatIcons.allLogo,
                 contentDescription = null,
                 modifier = Modifier
                     .fillMaxWidth(0.4232f)
