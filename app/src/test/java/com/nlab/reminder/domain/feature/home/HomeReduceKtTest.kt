@@ -161,9 +161,7 @@ class HomeReduceKtTest {
 
     @Test
     fun `Given success with no interaction, When tag long clicked, Then TagEditDelegate invoke startEditing`() = runTest {
-        val tagEditDelegate: TagEditDelegate = mock {
-            whenever(mock.startEditing(any())) doReturn Result.Success(Unit)
-        }
+        val tagEditDelegate: TagEditDelegate = mock()
         genHomeReduce(environment = genHomeEnvironment(tagEditDelegate))
             .effectScenario()
             .initState(genHomeUiStateSuccess(interaction = HomeInteraction.Empty))
@@ -175,7 +173,9 @@ class HomeReduceKtTest {
 
     @Test
     fun `Given success with tagEdit interaction, When tag rename request clicked, Then tagEditDelegate called startRename`() = runTest {
-        val tagEditDelegate: TagEditDelegate = mock()
+        val tagEditDelegate: TagEditDelegate = mock {
+            whenever(mock.startRename()) doReturn Result.Success(Unit)
+        }
         genHomeReduce(environment = genHomeEnvironment(tagEditDelegate))
             .effectScenario()
             .initState(genHomeUiStateSuccess(interaction = HomeInteraction.TagEdit(genTagEditState())))
@@ -248,7 +248,9 @@ class HomeReduceKtTest {
 
     @Test
     fun `Given success with tagEdit interaction, When tag delete request clicked, Then tagEditDelegate called startDelete`() = runTest {
-        val tagEditDelegate: TagEditDelegate = mock()
+        val tagEditDelegate: TagEditDelegate = mock {
+            whenever(mock.startDelete()) doReturn Result.Success(Unit)
+        }
         genHomeReduce(environment = genHomeEnvironment(tagEditDelegate))
             .effectScenario()
             .initState(genHomeUiStateSuccess(interaction = HomeInteraction.TagEdit(genTagEditState())))

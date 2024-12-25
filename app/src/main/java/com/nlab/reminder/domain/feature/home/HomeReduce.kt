@@ -73,14 +73,16 @@ internal fun HomeReduce(environment: HomeEnvironment): HomeReduce = DslReduce {
     }
     stateScope<Success> {
         scope(isMatch = { current.interaction == HomeInteraction.Empty }) {
-            suspendEffect<OnTagLongClicked> {
-                environment.tagEditDelegate
-                    .startEditing(tag = action.tag)
-                    .getOrThrowMessage()
+            effect<OnTagLongClicked> {
+                environment.tagEditDelegate.startEditing(tag = action.tag)
             }
         }
         scope(isMatch = { current.interaction is HomeInteraction.TagEdit }) {
-            effect<OnTagRenameRequestClicked> { environment.tagEditDelegate.startRename() }
+            suspendEffect<OnTagRenameRequestClicked> {
+                environment.tagEditDelegate
+                    .startRename()
+                    .getOrThrowMessage()
+            }
             effect<OnTagRenameInputReady> { environment.tagEditDelegate.readyRenameInput() }
             effect<OnTagRenameInputted> { environment.tagEditDelegate.changeRenameText(action.text) }
             suspendEffect<OnTagRenameConfirmClicked> {
@@ -94,7 +96,11 @@ internal fun HomeReduce(environment: HomeEnvironment): HomeReduce = DslReduce {
                     .getOrThrowMessage()
             }
             effect<OnTagReplaceCancelClicked> { environment.tagEditDelegate.cancelMergeTag() }
-            effect<OnTagDeleteRequestClicked> { environment.tagEditDelegate.startDelete() }
+            suspendEffect<OnTagDeleteRequestClicked> {
+                environment.tagEditDelegate
+                    .startDelete()
+                    .getOrThrowMessage()
+            }
             suspendEffect<OnTagDeleteConfirmClicked> {
                 environment.tagEditDelegate
                     .deleteTag()

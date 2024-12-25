@@ -16,7 +16,11 @@
 
 package com.nlab.reminder.core.component.tag.edit
 
+import com.nlab.reminder.core.annotation.ExcludeFromGeneratedTestReport
+import com.nlab.reminder.core.data.model.Tag
+import com.nlab.reminder.core.kotlin.NonNegativeLong
 import com.nlab.reminder.core.kotlin.Result
+import com.nlab.reminder.core.kotlin.map
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.getAndUpdate
 import kotlinx.coroutines.flow.update
@@ -24,6 +28,29 @@ import kotlinx.coroutines.flow.update
 /**
  * @author Doohyun
  */
+
+// Test OK @see {com.nlab.reminder.core.component.tag.edit.TagEditStateFlowsKtTest}
+// TODO remove Generated annotation after deploy below issue
+// https://github.com/jacoco/jacoco/pull/1670
+@ExcludeFromGeneratedTestReport
+internal inline fun MutableStateFlow<TagEditState?>.updateIfIntro(
+    getUsageCount: (Tag) -> Result<NonNegativeLong>,
+    transform: (tag: Tag, usageCount: NonNegativeLong) -> TagEditState
+): Result<Unit> = when (val pivotValue = value) {
+    is TagEditState.Intro -> {
+        val tag = pivotValue.tag
+        getUsageCount(tag).map { usageCount ->
+            val newState = transform(tag, usageCount)
+            update { current ->
+                if (current == pivotValue) newState
+                else current
+            }
+        }
+    }
+
+    else -> Result.Success(Unit)
+}
+
 internal inline fun <reified T : TagEditState> MutableStateFlow<TagEditState?>.updateIfTypeOf(
     block: (T) -> TagEditState
 ) = update { current ->

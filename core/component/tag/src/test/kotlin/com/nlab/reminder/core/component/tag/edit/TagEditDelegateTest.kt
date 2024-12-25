@@ -58,78 +58,44 @@ class TagEditDelegateTest {
     }
 
     @Test
-    fun `Given no state, tag and success of getUsageCount, When startEditing, Then return success and state changed to Intro`() = runTest {
+    fun `Given no state, tag, When startEditing, Then state changed to Intro`() {
         val initState: TagEditState? = null
         val tag = genTag()
-        val usageCount = genNonNegativeLong()
-        val delegate = genTagEditDelegate(
-            initState,
-            tagRepository = mock {
-                whenever(mock.getUsageCount(id = tag.id)) doReturn Result.Success(usageCount)
-            }
-        )
-        val expectedState = TagEditState.Intro(
-            tag = tag,
-            usageCount = usageCount
-        )
-
-        val actualResult = delegate.startEditing(tag)
-        assertThat(actualResult.isSuccess, equalTo(true))
+        val expectedState = TagEditState.Intro(tag = tag)
+        val delegate = genTagEditDelegate(initState)
+        delegate.startEditing(tag)
         assertThat(delegate.state.value, equalTo(expectedState))
     }
 
     @Test
-    fun `Given any state and success of getUsageCount, When startEditing, Then return success and state not changed`() = runTest {
+    fun `Given any state and success of getUsageCount, When startEditing, Then state not changed`() {
         val initState = genTagEditState()
         val tag = genTag()
-        val delegate = genTagEditDelegate(
-            initState,
-            tagRepository = mock {
-                whenever(mock.getUsageCount(id = tag.id)) doReturn Result.Success(genNonNegativeLong())
-            }
-        )
-
-        val actualResult = delegate.startEditing(tag)
-        assertThat(actualResult.isSuccess, equalTo(true))
+        val delegate = genTagEditDelegate(initState)
+        delegate.startEditing(tag)
         assertThat(delegate.state.value, equalTo(initState))
     }
 
     @Test
-    fun `Given tag and fail of getUsageCount, When startEditing, Then return failure`() = runTest {
-        val tag = genTag()
-        val delegate = genTagEditDelegate(
-            genTagEditState(),
-            tagRepository = mock {
-                whenever(mock.getUsageCount(id = tag.id)) doReturn Result.Failure(IllegalStateException())
-            }
-        )
-
-        val actualResult = delegate.startEditing(tag)
-        assertThat(actualResult.isFailure, equalTo(true))
-    }
-
-    @Test
-    fun `Given intro state, When start rename, Then changed state to rename`() {
+    fun `Given intro state and usageCount, When start rename, Then delegate return success and changed state to rename`() = runTest {
         val initState = genIntroState()
-        val delegate = genTagEditDelegate(initState = initState)
+        val usageCount = genNonNegativeLong()
         val expectedState = TagEditState.Rename(
             tag = initState.tag,
-            usageCount = initState.usageCount,
+            usageCount = usageCount,
             renameText = initState.tag.name.value,
             shouldUserInputReady = true,
         )
+        val delegate = genTagEditDelegate(
+            initState = initState,
+            tagRepository = mock {
+                whenever(mock.getUsageCount(initState.tag.id)) doReturn Result.Success(usageCount)
+            }
+        )
 
-        delegate.startRename()
+        val result = delegate.startRename()
+        assert(result.isSuccess)
         assertThat(delegate.state.value, equalTo(expectedState))
-    }
-
-    @Test
-    fun `Given not intro state, When start rename, Then state not changed`() {
-        val initState = genTagEditStateExcludeTypeOf<TagEditState.Intro>()
-        val delegate = genTagEditDelegate(initState = initState)
-
-        delegate.startRename()
-        assertThat(delegate.state.value, equalTo(initState))
     }
 
     @Test
@@ -345,26 +311,23 @@ class TagEditDelegateTest {
     }
 
     @Test
-    fun `Given intro tag, When start delete, Then changed state to delete`() {
-        val state = genIntroState()
-        val delegate = genTagEditDelegate(initState = state)
-        delegate.startDelete()
-
+    fun `Given intro state and usageCount, When startDelete, Then delegate return success and changed state to delete`() = runTest {
+        val initState = genIntroState()
+        val usageCount = genNonNegativeLong()
         val expectedState = TagEditState.Delete(
-            tag = state.tag,
-            usageCount = state.usageCount
+            tag = initState.tag,
+            usageCount = usageCount,
         )
+        val delegate = genTagEditDelegate(
+            initState = initState,
+            tagRepository = mock {
+                whenever(mock.getUsageCount(initState.tag.id)) doReturn Result.Success(usageCount)
+            }
+        )
+
+        val result = delegate.startDelete()
+        assert(result.isSuccess)
         assertThat(delegate.state.value, equalTo(expectedState))
-    }
-
-    @Test
-    fun `Given not delete state, When delete tag, Then return success and state not changed`() = runTest {
-        val initState = genTagEditStateExcludeTypeOf<TagEditState.Delete>()
-        val delegate = genTagEditDelegate(initState = initState)
-
-        val result = delegate.deleteTag()
-        assertThat(result.isSuccess, equalTo(true))
-        assertThat(delegate.state.value, equalTo(initState))
     }
 
     @Test
