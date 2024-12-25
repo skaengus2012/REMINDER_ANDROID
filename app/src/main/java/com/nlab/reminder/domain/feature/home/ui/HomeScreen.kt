@@ -79,13 +79,13 @@ import com.nlab.reminder.domain.feature.home.HomeInteraction
 import com.nlab.reminder.domain.feature.home.HomeUiState
 import com.nlab.reminder.domain.feature.home.HomeViewModel
 import com.nlab.reminder.domain.feature.home.onTodayCategoryClicked
-import com.nlab.reminder.R
 import com.nlab.reminder.core.androidx.compose.ui.ColorPressButton
 import com.nlab.reminder.core.androidx.compose.ui.throttleClick
 import com.nlab.reminder.core.component.tag.edit.ui.compose.TagEditStateHandler
 import com.nlab.reminder.core.component.tag.ui.compose.TagCard
 import com.nlab.reminder.core.designsystem.compose.component.PlaneatLoadingContent
 import com.nlab.reminder.core.designsystem.compose.icon.PlaneatIcons
+import com.nlab.reminder.core.designsystem.compose.theme.DrawableIds
 import com.nlab.reminder.core.kotlin.NonNegativeLong
 import com.nlab.reminder.core.translation.StringIds
 import com.nlab.reminder.domain.feature.home.*
@@ -296,7 +296,7 @@ private fun Logo(modifier: Modifier = Modifier) {
         modifier = modifier
             .width(120.dp)
             .height(30.dp),
-        painter = painterResource(id = R.drawable.ic_logo),
+        painter = painterResource(id = DrawableIds.ic_logo),
         contentDescription = null,
         tint = PlaneatTheme.colors.content1
     )
@@ -680,7 +680,7 @@ private fun NewPlanButton(
             modifier = Modifier
                 .width(35.73.dp)
                 .height(20.69.dp),
-            painter = painterResource(id = R.drawable.ic_new_plan),
+            painter = painterResource(id = DrawableIds.ic_new_plan),
             contentDescription = null,
             tint = contentColor
         )
