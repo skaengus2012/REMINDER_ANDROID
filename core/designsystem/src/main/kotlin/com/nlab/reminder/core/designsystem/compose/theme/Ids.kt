@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.android.resources.font
+package com.nlab.reminder.core.designsystem.compose.theme
 
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
-import com.nlab.reminder.R
+import com.nlab.reminder.core.designsystem.R
 
 /**
  * @author Doohyun
  */
-
-internal val CategoryCountFontFamily = FontFamily(Font(R.font.sb_aggro_m))
+typealias DrawableIds = R.drawable
+typealias FontIds = R.font

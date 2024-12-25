@@ -37,6 +37,11 @@ object PlaneatTheme {
         @Composable
         @ReadOnlyComposable
         get() = LocalPlaneatTypography.current
+
+    val extraFont: PlaneatExtraFont
+        @Composable
+        @ReadOnlyComposable
+        get() = LocalPlaneatExtraFont.current
 }
 
 @Composable

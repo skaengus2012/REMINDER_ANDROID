@@ -81,7 +81,6 @@ import com.nlab.reminder.domain.feature.home.HomeViewModel
 import com.nlab.reminder.domain.feature.home.onTodayCategoryClicked
 import com.nlab.reminder.R
 import com.nlab.reminder.core.android.designsystem.icon.PlanetIcons
-import com.nlab.reminder.core.android.resources.font.CategoryCountFontFamily
 import com.nlab.reminder.core.android.resources.icon.IcHomeCategoryAll
 import com.nlab.reminder.core.android.resources.icon.IcHomeCategoryTimetable
 import com.nlab.reminder.core.android.resources.icon.IcHomeCategoryToday
@@ -501,7 +500,7 @@ private fun CategoryCountText(count: Long) {
         text = count.toString(),
         style = PlaneatTheme.typography.bodyLarge,
         color = PlaneatTheme.colors.content1,
-        fontFamily = CategoryCountFontFamily
+        fontFamily = PlaneatTheme.extraFont.aggro
     )
 }
 

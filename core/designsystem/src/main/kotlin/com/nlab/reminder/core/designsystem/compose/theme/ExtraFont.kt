@@ -14,11 +14,19 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.designsystem.compose.resource
+package com.nlab.reminder.core.designsystem.compose.theme
 
-import com.nlab.reminder.core.designsystem.R
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 
 /**
  * @author Doohyun
  */
-typealias DrawableIds = R.drawable
+@Immutable
+data class PlaneatExtraFont(
+    val aggro: FontFamily = FontFamily(Font(FontIds.sb_aggro_m)),
+)
+
+internal val LocalPlaneatExtraFont = staticCompositionLocalOf { PlaneatExtraFont() }
