@@ -63,10 +63,7 @@ private fun getNullableTagEditStates(): List<TagEditState?> {
     )
     return listOf(
         null,
-        TagEditState.Intro(
-            tag = genTag(),
-            usageCount = genNonNegativeLong()
-        ),
+        TagEditState.Intro(tag = genTag()),
         rename,
         merge,
         delete,
