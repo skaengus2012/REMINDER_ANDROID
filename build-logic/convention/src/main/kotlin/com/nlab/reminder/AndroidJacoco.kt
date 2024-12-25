@@ -82,7 +82,7 @@ private fun Project.androidJacocoClassDirectories(variant: Variant): Configurabl
                 "**/di/**",
                 "**/fake/**",
                 "**/navigation/**",
-                "**/startup/init/**",
+                "**/startup/**",
                 "**/test/**",
                 "**/ui/**",
 
