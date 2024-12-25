@@ -131,6 +131,7 @@ nlab-android-library-compose = { id = "nlab.android.library.compose" }
 nlab-android-library-compose-component = { id = "nlab.android.library.compose.component" }
 nlab-android-library-di = { id = "nlab.android.library.di" }
 nlab-android-library-jacoco = { id = "nlab.android.library.jacoco" }
+nlab-android-library-statekit = { id = "nlab.android.library.statekit" }
 nlab-jvm-library = { id = "nlab.jvm.library" }
 nlab-jvm-library-jacoco = { id = "nlab.jvm.library.jacoco" }
 android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
