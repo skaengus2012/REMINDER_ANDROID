@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.nlab.reminder.core.ui.compose"
+    namespace = "com.nlab.reminder.core.androidx.compose"
 }
 
 dependencies {

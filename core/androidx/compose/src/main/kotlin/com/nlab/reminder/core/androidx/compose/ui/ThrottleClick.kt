@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.ui.compose
+package com.nlab.reminder.core.androidx.compose.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.ui.compose
+package com.nlab.reminder.core.androidx.compose.ui
 
 import android.content.res.Configuration.UI_MODE_NIGHT_NO
 import androidx.compose.foundation.clickable
