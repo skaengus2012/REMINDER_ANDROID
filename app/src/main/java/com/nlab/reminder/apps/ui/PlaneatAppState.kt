@@ -28,8 +28,12 @@ import com.nlab.reminder.core.android.widget.Toast
 @Stable
 class PlaneatAppState(
     val navController: NavHostController,
-    val appToast: Toast,
-)
+    private val appToast: Toast,
+) {
+    fun showApplicationToast(message: String) {
+        appToast.showToast(text = message)
+    }
+}
 
 @Composable
 fun rememberPlaneatAppState(

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 The N's lab Open Source Project
+ * Copyright (C) 2024 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.internal.common.di
+package com.nlab.reminder.core.android.di
 
 import android.content.Context
 import com.nlab.reminder.core.android.widget.Toast
@@ -26,12 +26,12 @@ import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
 /**
- * @author Doohyun
+ * @author Thalys
  */
 @Module
 @InstallIn(SingletonComponent::class)
-class UtilityModule {
+internal class AppScopeAndroidModule {
     @Singleton
     @Provides
-    fun provideToastHandle(@ApplicationContext context: Context): Toast = Toast(context)
+    fun provideToast(@ApplicationContext context: Context): Toast = Toast(context = context)
 }

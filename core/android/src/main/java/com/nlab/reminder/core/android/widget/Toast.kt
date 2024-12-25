@@ -19,6 +19,7 @@ package com.nlab.reminder.core.android.widget
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
+import android.widget.Toast
 import android.widget.Toast as ToastOrigin
 import androidx.annotation.StringRes
 
@@ -37,7 +38,7 @@ class Toast(private val context: Context) {
         showToast { ToastOrigin.makeText(context, text, ToastOrigin.LENGTH_SHORT) }
     }
 
-    private inline fun showToast(crossinline getToast: () -> ToastOrigin) {
+    private inline fun showToast(crossinline getToast: () -> Toast) {
         handler.post {
             curToast?.cancel()
             curToast = getToast().also { it.show() }

@@ -31,6 +31,6 @@ fun PlaneatApp(appState: PlaneatAppState) {
         appState = appState
     )
     UserMessageHandler(
-        showApplicationToast = {}
+        showApplicationToast = { message -> appState.showApplicationToast(message) }
     )
 }

@@ -24,13 +24,15 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.nlab.reminder.core.android.widget.Toast
 import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 /**
  * @author Doohyun
  */
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
-    private val appToast: Toast = Toast(context = applicationContext)
+    @Inject
+    lateinit var appToast: Toast
 
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
