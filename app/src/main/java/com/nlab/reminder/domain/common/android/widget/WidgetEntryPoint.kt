@@ -12,4 +12,4 @@ internal interface WidgetEntryPoint {
 
 internal fun Context.widgetEntryPoint(): WidgetEntryPoint =
     EntryPointAccessors
-        .fromApplication(this, WidgetEntryPoint::class.java)*/
+        .fromApplication(this, WidgetEntryPoint::class.kotlin)*/

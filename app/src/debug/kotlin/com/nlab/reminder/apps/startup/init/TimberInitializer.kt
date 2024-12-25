@@ -13,22 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@file:Suppress("unused")
 
-package com.nlab.reminder.internal.common.android.startup.init
+package com.nlab.reminder.apps.startup.init
 
 import android.content.Context
 import androidx.startup.Initializer
-import com.nlab.reminder.core.statekit.plugins.StateKitPlugin
-import com.nlab.reminder.internal.common.android.startup.EmptyDependencies
+import com.nlab.reminder.apps.startup.EmptyDependencies
 import timber.log.Timber
 
 /**
- * @author Doohyun
+ * @author thalys
  */
-internal class StateKitPluginInitializer : Initializer<Unit> {
+@Suppress("unused")
+class TimberInitializer : Initializer<Unit> {
     override fun create(context: Context) {
-        StateKitPlugin.addGlobalExceptionHandler { _, throwable -> Timber.tag("StateKitGlobalErr").e(throwable) }
+        Timber.plant(Timber.DebugTree())
     }
 
     override fun dependencies() = EmptyDependencies()

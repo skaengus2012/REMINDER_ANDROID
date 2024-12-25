@@ -16,7 +16,7 @@
 
 @file:Suppress("unused")
 
-package com.nlab.reminder.internal.common.android.startup.init
+package com.nlab.reminder.apps.startup.init
 
 import android.content.Context
 import androidx.startup.Initializer
@@ -24,7 +24,7 @@ import coil.Coil
 import coil.ImageLoader
 import coil.disk.DiskCache
 import coil.memory.MemoryCache
-import com.nlab.reminder.internal.common.android.startup.EmptyDependencies
+import com.nlab.reminder.apps.startup.EmptyDependencies
 
 /**
  * @author Doohyun

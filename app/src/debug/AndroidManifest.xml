@@ -29,10 +29,10 @@
             android:exported="false"
             tools:node="merge">
             <meta-data
-                android:name="com.nlab.reminder.internal.common.android.startup.init.FlipperInitializer"
+                android:name="com.nlab.reminder.apps.startup.init.FlipperInitializer"
                 android:value="androidx.startup" />
             <meta-data
-                android:name="com.nlab.reminder.internal.common.android.startup.init.TimberInitializer"
+                android:name="com.nlab.reminder.apps.startup.init.TimberInitializer"
                 android:value="androidx.startup" />
         </provider>
 

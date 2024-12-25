@@ -79,11 +79,12 @@ private fun Project.androidJacocoClassDirectories(variant: Variant): Configurabl
                 "**/BuildConfig.*",
                 "**/Manifest*.*",
                 "**/android/**",
-                "**/ui/**",
-                "**/navigation/**",
-                "**/test/**",
                 "**/di/**",
                 "**/fake/**",
+                "**/navigation/**",
+                "**/startup/init/**",
+                "**/test/**",
+                "**/ui/**",
 
                 /* filtering unnecessary feature components */
                 "**/*Action$*.class",

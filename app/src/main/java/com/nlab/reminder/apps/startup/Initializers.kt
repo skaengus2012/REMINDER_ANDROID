@@ -16,7 +16,7 @@
 
 @file:Suppress("FunctionName")
 
-package com.nlab.reminder.internal.common.android.startup
+package com.nlab.reminder.apps.startup
 
 import androidx.startup.Initializer
 

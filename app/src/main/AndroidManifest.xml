@@ -20,7 +20,7 @@
 	<uses-permission android:name="android.permission.INTERNET" />
 
 	<application
-		android:name=".ReminderApplication"
+		android:name=".PlaneatApplication"
 		android:enableOnBackInvokedCallback="true"
 		android:icon="@mipmap/ic_launcher"
 		android:label="@string/app_name"
@@ -47,10 +47,10 @@
 			android:exported="false"
 			tools:node="merge">
 			<meta-data
-				android:name="com.nlab.reminder.internal.common.android.startup.init.CoilInitializer"
+				android:name="com.nlab.reminder.apps.startup.init.CoilInitializer"
 				android:value="androidx.startup" />
 			<meta-data
-				android:name="com.nlab.reminder.internal.common.android.startup.init.StateKitPluginInitializer"
+				android:name="com.nlab.reminder.apps.startup.init.StateKitPluginInitializer"
 				android:value="androidx.startup" />
 		</provider>
 

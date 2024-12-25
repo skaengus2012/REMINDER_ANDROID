@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 The N's lab Open Source Project
+ * Copyright (C) 2022 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,21 +14,15 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.internal.common.android.startup.init
+package com.nlab.reminder
 
-import android.content.Context
-import androidx.startup.Initializer
-import com.nlab.reminder.internal.common.android.startup.EmptyDependencies
-import timber.log.Timber
+import android.app.Application
+import com.nlab.reminder.core.annotation.ExcludeFromGeneratedTestReport
+import dagger.hilt.android.HiltAndroidApp
 
 /**
- * @author thalys
+ * @author Doohyun
  */
-@Suppress("unused")
-class TimberInitializer : Initializer<Unit> {
-    override fun create(context: Context) {
-        Timber.plant(Timber.DebugTree())
-    }
-
-    override fun dependencies() = EmptyDependencies()
-}
+@ExcludeFromGeneratedTestReport
+@HiltAndroidApp
+class PlaneatApplication : Application()
