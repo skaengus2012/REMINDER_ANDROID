@@ -21,6 +21,9 @@ import android.content.Context
 import androidx.startup.Initializer
 import com.nlab.reminder.core.statekit.plugins.StateKitPlugin
 import com.nlab.reminder.apps.startup.EmptyDependencies
+import com.nlab.reminder.core.component.usermessage.UserMessageException
+import com.nlab.reminder.core.component.usermessage.handle.di.getUserMessageBroadcastMonitor
+import com.nlab.reminder.core.component.usermessage.handle.impl.UserMessageBroadcastMonitor
 import timber.log.Timber
 
 /**
@@ -28,7 +31,17 @@ import timber.log.Timber
  */
 internal class StateKitPluginInitializer : Initializer<Unit> {
     override fun create(context: Context) {
-        StateKitPlugin.addGlobalExceptionHandler { _, throwable -> Timber.tag("StateKitGlobalErr").e(throwable) }
+        val tag = "StateKitGlobalErr"
+        val userMessageBroadcastMonitor: UserMessageBroadcastMonitor =
+            context.getUserMessageBroadcastMonitor()
+        StateKitPlugin.addGlobalExceptionHandler { _, throwable ->
+            if (throwable is UserMessageException) {
+                Timber.tag(tag).e(throwable.origin)
+                userMessageBroadcastMonitor.send(userMessage = throwable.userMessage)
+            } else {
+                Timber.tag(tag).e(throwable)
+            }
+        }
     }
 
     override fun dependencies() = EmptyDependencies()
