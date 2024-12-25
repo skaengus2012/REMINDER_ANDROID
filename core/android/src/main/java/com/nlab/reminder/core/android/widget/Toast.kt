@@ -17,18 +17,21 @@
 package com.nlab.reminder.core.android.widget
 
 import android.content.Context
-import android.os.Handler
-import android.os.Looper
 import android.widget.Toast
-import android.widget.Toast as ToastOrigin
 import androidx.annotation.StringRes
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import android.widget.Toast as ToastOrigin
+import java.lang.ref.WeakReference
 
 /**
  * @author thalys
  */
-class Toast(private val context: Context) {
-    private val handler = Handler(Looper.getMainLooper())
-    private var curToast: ToastOrigin? = null
+class Toast(
+    private val context: Context,
+    private val coroutineScope: CoroutineScope,
+) {
+    private var curToastRef: WeakReference<ToastOrigin>? = null
 
     fun showToast(@StringRes resId: Int) {
         showToast { ToastOrigin.makeText(context, resId, ToastOrigin.LENGTH_SHORT) }
@@ -39,9 +42,9 @@ class Toast(private val context: Context) {
     }
 
     private inline fun showToast(crossinline getToast: () -> Toast) {
-        handler.post {
-            curToast?.cancel()
-            curToast = getToast().also { it.show() }
+        coroutineScope.launch {
+            curToastRef?.get()?.cancel()
+            curToastRef = WeakReference(getToast().also { it.show() })
         }
     }
 }

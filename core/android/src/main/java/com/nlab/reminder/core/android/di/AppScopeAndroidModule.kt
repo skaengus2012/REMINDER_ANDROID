@@ -18,11 +18,17 @@ package com.nlab.reminder.core.android.di
 
 import android.content.Context
 import com.nlab.reminder.core.android.widget.Toast
+import com.nlab.reminder.core.inject.qualifiers.coroutine.AppScope
+import com.nlab.reminder.core.inject.qualifiers.coroutine.Dispatcher
+import com.nlab.reminder.core.inject.qualifiers.coroutine.DispatcherOption.Main
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.plus
 import javax.inject.Singleton
 
 /**
@@ -33,5 +39,9 @@ import javax.inject.Singleton
 internal class AppScopeAndroidModule {
     @Singleton
     @Provides
-    fun provideToast(@ApplicationContext context: Context): Toast = Toast(context = context)
+    fun provideToast(
+        @ApplicationContext context: Context,
+        @AppScope coroutineScope: CoroutineScope,
+        @Dispatcher(Main) dispatcher: CoroutineDispatcher
+    ): Toast = Toast(context = context, coroutineScope = coroutineScope + dispatcher)
 }
