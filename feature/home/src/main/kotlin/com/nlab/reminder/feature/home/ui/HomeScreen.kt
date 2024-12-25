@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.feature.home.ui
+package com.nlab.reminder.feature.home.ui
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
@@ -75,10 +75,10 @@ import com.nlab.reminder.core.data.model.TagId
 import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
 import com.nlab.reminder.core.kotlin.toNonBlankString
 import com.nlab.reminder.core.kotlin.toNonNegativeLong
-import com.nlab.reminder.domain.feature.home.HomeInteraction
-import com.nlab.reminder.domain.feature.home.HomeUiState
-import com.nlab.reminder.domain.feature.home.HomeViewModel
-import com.nlab.reminder.domain.feature.home.onTodayCategoryClicked
+import com.nlab.reminder.feature.home.HomeInteraction
+import com.nlab.reminder.feature.home.HomeUiState
+import com.nlab.reminder.feature.home.HomeViewModel
+import com.nlab.reminder.feature.home.onTodayCategoryClicked
 import com.nlab.reminder.core.androidx.compose.ui.ColorPressButton
 import com.nlab.reminder.core.androidx.compose.ui.throttleClick
 import com.nlab.reminder.core.component.tag.edit.ui.compose.TagEditStateHandler
@@ -88,7 +88,7 @@ import com.nlab.reminder.core.designsystem.compose.icon.PlaneatIcons
 import com.nlab.reminder.core.designsystem.compose.theme.DrawableIds
 import com.nlab.reminder.core.kotlin.NonNegativeLong
 import com.nlab.reminder.core.translation.StringIds
-import com.nlab.reminder.domain.feature.home.*
+import com.nlab.reminder.feature.home.*
 
 /**
  * @author Doohyun

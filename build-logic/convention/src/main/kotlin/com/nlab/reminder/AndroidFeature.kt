@@ -17,18 +17,24 @@
 package com.nlab.reminder
 
 import org.gradle.api.Project
+import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.dependencies
 
 /**
  * @author Doohyun
  */
 internal fun Project.configureStdFeatureDependencies() {
+    apply(plugin = "org.jetbrains.kotlin.plugin.serialization")
+
     dependencies {
         "implementation"(project(":core:androidx:navigation-compose"))
         "implementation"(project(":core:annotation"))
+        "implementation"(project(":core:component:usermessage"))
         "implementation"(project(":core:kotlin"))
         "implementation"(project(":core:kotlinx-coroutine"))
         "implementation"(project(":core:translation"))
+
+        "implementation"(libs.findLibrary("kotlinx.serialization.json").get())
 
         "testImplementation"(project(":testkit"))
         "testImplementation"(project(":core:kotlin-test"))

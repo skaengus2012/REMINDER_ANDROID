@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import com.nlab.reminder.configureStdFeatureDependencies
 import com.nlab.reminder.libs
 import org.gradle.kotlin.dsl.apply
 
@@ -22,6 +23,8 @@ apply(plugin = "nlab.android.library.di")
 apply(plugin = "nlab.android.library.compose.component")
 apply(plugin = "nlab.android.library.jacoco")
 apply(plugin = "nlab.android.library.statekit")
+
+configureStdFeatureDependencies()
 
 dependencies {
     "implementation"(libs.findLibrary("androidx-hilt-navigation-compose").get())

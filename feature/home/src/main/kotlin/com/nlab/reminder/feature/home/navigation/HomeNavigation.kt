@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.feature.home.navigation
+package com.nlab.reminder.feature.home.navigation
 
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.nlab.reminder.core.androidx.navigation.compose.EnterTransitionFactory
 import com.nlab.reminder.core.androidx.navigation.compose.ExitTransitionFactory
-import com.nlab.reminder.domain.feature.home.ui.HomeScreen
+import com.nlab.reminder.feature.home.ui.HomeScreen
 import kotlinx.serialization.Serializable
 
 /**

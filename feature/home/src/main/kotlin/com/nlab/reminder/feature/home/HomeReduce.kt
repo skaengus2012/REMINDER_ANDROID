@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.feature.home
+package com.nlab.reminder.feature.home
 
 import com.nlab.reminder.core.component.usermessage.getOrThrowMessage
 import com.nlab.statekit.dsl.reduce.DslReduce
 import com.nlab.statekit.reduce.Reduce
-import com.nlab.reminder.domain.feature.home.HomeAction.*
-import com.nlab.reminder.domain.feature.home.HomeUiState.*
+import com.nlab.reminder.feature.home.HomeAction.*
+import com.nlab.reminder.feature.home.HomeUiState.*
 
 internal typealias HomeReduce = Reduce<HomeAction, HomeUiState>
 

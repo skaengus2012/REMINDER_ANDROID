@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.feature.home
+package com.nlab.reminder.feature.home
 
 import com.nlab.reminder.core.data.model.genTags
 import com.nlab.reminder.core.kotlin.faker.genNonNegativeLong

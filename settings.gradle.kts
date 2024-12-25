@@ -43,7 +43,7 @@ include(
     ":statekit:test",
     ":testkit"
 )
-// Reminder
+// Planeat
 include(
     ":app"
 )
@@ -82,4 +82,7 @@ include(
     ":core:translation",
     ":core:uitext",
     ":core:uitext-test",
+)
+include(
+    ":feature:home"
 )

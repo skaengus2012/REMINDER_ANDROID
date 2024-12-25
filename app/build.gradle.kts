@@ -95,6 +95,8 @@ dependencies {
     implementation(projects.core.translation)
     implementation(projects.core.uitext)
 
+    implementation(projects.feature.home)
+
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.collections.immutable)
     implementation(libs.kotlinx.serialization.json)
