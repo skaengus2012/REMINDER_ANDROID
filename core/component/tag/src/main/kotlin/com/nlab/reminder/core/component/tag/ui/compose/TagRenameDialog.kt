@@ -62,7 +62,7 @@ import com.nlab.reminder.core.androidx.compose.ui.throttleClick
 import com.nlab.reminder.core.androidx.compose.ui.tooling.preview.Previews
 import com.nlab.reminder.core.component.tag.ui.getUsageCountLabel
 import com.nlab.reminder.core.designsystem.compose.component.PlaneatDialog
-import com.nlab.reminder.core.designsystem.compose.resource.DrawableIds
+import com.nlab.reminder.core.designsystem.compose.theme.DrawableIds
 import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
 import com.nlab.reminder.core.kotlin.NonBlankString
 import com.nlab.reminder.core.kotlin.NonNegativeLong

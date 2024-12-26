@@ -1,0 +1,28 @@
+<!--
+  ~ Copyright (C) 2024 The N's lab Open Source Project
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~        http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="37dp"
+    android:height="21dp"
+    android:viewportWidth="37"
+    android:viewportHeight="21">
+  <path
+      android:pathData="M19.902,14.83L19.9,14.829C18.142,12.791 14.222,10.987 11.231,10.05C14.06,8.755 17.586,6.57 19.057,4.403C17.212,1.74 14.159,0 10.705,0C5.071,0 0.503,4.632 0.503,10.346C0.503,16.06 5.071,20.692 10.705,20.692C14.754,20.692 18.253,18.299 19.901,14.832L19.902,14.831V14.83ZM9.772,7.382C9.26,7.382 8.876,7.052 8.876,6.542C8.876,6.03 9.26,5.7 9.772,5.7C10.285,5.7 10.669,6.027 10.669,6.542C10.669,7.051 10.285,7.382 9.772,7.382ZM10.672,10.301L10.67,10.3L10.674,10.299L10.672,10.301Z"
+      android:fillColor="#1CCF98"/>
+  <path
+      android:pathData="M24.446,9.149H27.087V10.839H24.446V13.424H22.77V10.839H20.128V9.149H22.77V6.536H24.446V9.149Z"
+      android:fillColor="#1CCF98"/>
+</vector>

@@ -30,9 +30,9 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import com.nlab.reminder.core.androidx.navigation.compose.EnterTransitionFactory
 import com.nlab.reminder.core.androidx.navigation.compose.ExitTransitionFactory
-import com.nlab.reminder.domain.feature.home.navigation.HomeEntryPointRoute
-import com.nlab.reminder.domain.feature.home.navigation.homeEntryPoint
-import com.nlab.reminder.domain.feature.home.navigation.homeScreen
+import com.nlab.reminder.feature.home.navigation.HomeEntryPointRoute
+import com.nlab.reminder.feature.home.navigation.homeEntryPoint
+import com.nlab.reminder.feature.home.navigation.homeScreen
 import com.nlab.reminder.domain.feature.schedule.all.navigation.allScheduleScreen
 import com.nlab.reminder.domain.feature.schedule.all.navigation.navigateToAllSchedule
 
