@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import com.nlab.reminder.configureStdFeatureDependencies
 import com.nlab.reminder.libs
 import org.gradle.kotlin.dsl.apply
 
 apply(plugin = "com.android.library")
-apply(plugin = "nlab.android.library.component.compose")
+apply(plugin = "nlab.android.library.component.view")
+apply(plugin = "nlab.android.library.compose")
 apply(plugin = "nlab.android.library.di")
 apply(plugin = "nlab.android.library.jacoco")
 apply(plugin = "nlab.android.library.statekit")
@@ -27,6 +27,8 @@ apply(plugin = "nlab.android.library.statekit")
 configureStdFeatureDependencies()
 
 dependencies {
-    "implementation"(libs.findLibrary("androidx-hilt-navigation-compose").get())
-    "implementation"(libs.findLibrary("androidx-lifecycle-runtime-compose").get())
+    "implementation"(project(":core:androidx:fragment"))
+
+    "implementation"(libs.findLibrary("androidx-fragment-compose").get())
+    "implementation"(libs.findLibrary("androidx-lifecycle-viewmodel-ktx").get())
 }

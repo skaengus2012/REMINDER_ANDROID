@@ -14,15 +14,9 @@
  * limitations under the License.
  */
 
-import com.android.build.gradle.LibraryExtension
-import com.nlab.reminder.configureComposeAndroid
 import com.nlab.reminder.configureStdComposeDependencies
-import org.gradle.kotlin.dsl.configure
 
 apply(plugin = "com.android.library")
-apply(plugin = "org.jetbrains.kotlin.plugin.compose")
+apply(plugin = "nlab.android.library.compose")
 
-extensions.configure<LibraryExtension> {
-    configureComposeAndroid(this)
-    configureStdComposeDependencies()
-}
+configureStdComposeDependencies()

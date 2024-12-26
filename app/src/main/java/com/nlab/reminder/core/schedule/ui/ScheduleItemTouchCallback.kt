@@ -30,7 +30,6 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.nlab.reminder.R
 import com.nlab.reminder.core.android.animation.animatorListenerOf
 import com.nlab.reminder.core.android.content.getDimension
-import com.nlab.reminder.databinding.ViewItemScheduleElementBinding
 import kotlin.math.max
 import kotlin.math.min
 

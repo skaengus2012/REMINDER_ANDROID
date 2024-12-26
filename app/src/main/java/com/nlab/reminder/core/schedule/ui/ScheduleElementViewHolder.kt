@@ -39,7 +39,6 @@ import com.nlab.reminder.core.android.view.throttleClicks
 import com.nlab.reminder.core.android.view.touches
 import com.nlab.reminder.core.android.view.bindSelected
 import com.nlab.reminder.core.android.widget.bindText
-import com.nlab.reminder.databinding.ViewItemScheduleElementBinding
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.launchIn
