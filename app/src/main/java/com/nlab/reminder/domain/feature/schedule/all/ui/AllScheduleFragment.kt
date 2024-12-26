@@ -40,7 +40,6 @@ import com.nlab.reminder.core.android.view.throttleClicks
 import com.nlab.reminder.core.android.view.touches
 import com.nlab.reminder.core.kotlinx.coroutine.flow.withBefore
 import com.nlab.reminder.core.schedule.ui.*
-import com.nlab.reminder.databinding.FragmentAllScheduleBinding
 import com.nlab.reminder.domain.common.android.view.loadingFlow
 import com.nlab.reminder.domain.feature.schedule.all.*
 import dagger.hilt.android.AndroidEntryPoint
@@ -53,19 +52,20 @@ import kotlinx.coroutines.flow.*
  */
 @AndroidEntryPoint
 class AllScheduleFragment : Fragment() {
-    private var _binding: FragmentAllScheduleBinding? = null
-    private val binding: FragmentAllScheduleBinding get() = checkNotNull(_binding)
+  //  private var _binding: FragmentAllScheduleBinding? = null
+  //  private val binding: FragmentAllScheduleBinding get() = checkNotNull(_binding)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
        // postponeEnterTransition()
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? = null
+        /**
         FragmentAllScheduleBinding.inflate(inflater, container, false)
             .also { _binding = it }
             .root
-
+*/
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         /**
@@ -246,6 +246,6 @@ class AllScheduleFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        _binding = null
+    //    _binding = null
     }
 }

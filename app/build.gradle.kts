@@ -56,17 +56,6 @@ android {
             buildType.proguardFile("proguard-rules.pro")
         }
     }
-
-    sourceSets {
-        getByName("release") {
-            java.srcDirs("src/release/java")
-            res.srcDirs("src/release/res")
-        }
-    }
-
-    buildFeatures {
-        viewBinding = true
-    }
 }
 
 dependencies {
