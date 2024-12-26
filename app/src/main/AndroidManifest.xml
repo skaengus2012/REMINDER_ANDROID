@@ -27,7 +27,7 @@
 		android:largeHeap="true"
 		android:roundIcon="@mipmap/ic_launcher_round"
 		android:supportsRtl="true"
-		android:theme="@style/Theme.Reminder.SplashScreen"
+		android:theme="@style/Theme.Planeat.SplashScreen"
 		tools:ignore="AllowBackup"
 		tools:targetApi="tiramisu">
 
