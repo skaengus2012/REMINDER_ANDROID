@@ -15,13 +15,8 @@
   -->
 
 <resources>
-    <style name="Base.Theme.Planeat.SplashScreen" parent="Theme.SplashScreen">
-        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_logo_splash</item>
-        <item name="postSplashScreenTheme">@style/Theme.Reminder.App</item>
-    </style>
-
     <style name="Theme.Planeat.SplashScreen" parent="Base.Theme.Planeat.SplashScreen">
-        <item name="windowSplashScreenBackground">@color/bg_1_light</item>
+        <item name="android:windowSplashScreenBrandingImage">@drawable/ic_brand_splash</item>
+        <item name="windowSplashScreenBackground">?bg_1</item>
     </style>
-
 </resources>
