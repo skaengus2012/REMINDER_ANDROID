@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.feature.schedule.all.navigation
+package com.nlab.reminder.feature.all.navigation
 
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
@@ -22,29 +22,27 @@ import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.compose.composable
 import com.nlab.reminder.core.androidx.navigation.compose.EnterTransitionFactory
 import com.nlab.reminder.core.androidx.navigation.compose.ExitTransitionFactory
-import com.nlab.reminder.domain.feature.schedule.all.ui.AllScheduleScreen
+import com.nlab.reminder.feature.all.ui.AllScreen
 import kotlinx.serialization.Serializable
 
 /**
- * @author Thalys
+ * @author Doohyun
  */
 @Serializable
-internal data object AllScheduleRoute
+internal data object AllRoute
 
-fun NavController.navigateToAllSchedule(navOptions: NavOptionsBuilder.() -> Unit = {}) =
-    navigate(route = AllScheduleRoute, builder = navOptions)
+fun NavController.navigateToAll(navOptions: NavOptionsBuilder.() -> Unit = {}) =
+    navigate(route = AllRoute, builder = navOptions)
 
-fun NavGraphBuilder.allScheduleScreen(
+fun NavGraphBuilder.allScreen(
     onBackClicked: () -> Unit,
     provideEnterTransition: EnterTransitionFactory? = null,
     providePopExitTransition: ExitTransitionFactory? = null
 ) {
-    composable<AllScheduleRoute>(
+    composable<AllRoute>(
         enterTransition = provideEnterTransition,
         popExitTransition = providePopExitTransition
     ) {
-        AllScheduleScreen(
-            onBackClicked = onBackClicked
-        )
+        AllScreen(onBackClicked = onBackClicked)
     }
 }

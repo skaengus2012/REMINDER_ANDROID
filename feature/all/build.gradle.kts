@@ -6,6 +6,3 @@ plugins {
 android {
     namespace = "com.nlab.reminder.feature.all"
 }
-
-dependencies {
-}

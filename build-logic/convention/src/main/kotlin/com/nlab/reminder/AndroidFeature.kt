@@ -35,6 +35,7 @@ internal fun Project.configureStdFeatureDependencies() {
         "implementation"(project(":core:translation"))
 
         "implementation"(libs.findLibrary("kotlinx.serialization.json").get())
+        "implementation"(libs.findLibrary("timber").get())
 
         "testImplementation"(project(":testkit"))
         "testImplementation"(project(":core:kotlin-test"))
