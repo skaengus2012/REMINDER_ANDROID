@@ -84,5 +84,6 @@ include(
     ":core:uitext-test",
 )
 include(
+    ":feature:all",
     ":feature:home"
 )

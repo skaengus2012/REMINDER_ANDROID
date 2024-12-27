@@ -75,6 +75,7 @@ dependencies {
     implementation(projects.core.kotlinxCoroutine)
     implementation(projects.core.statekit)
 
+    implementation(projects.feature.all)
     implementation(projects.feature.home)
 
     implementation(libs.afollested.dragselectRecyclerView)
