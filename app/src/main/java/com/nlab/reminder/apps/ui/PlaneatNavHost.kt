@@ -33,8 +33,8 @@ import com.nlab.reminder.core.androidx.navigation.compose.ExitTransitionFactory
 import com.nlab.reminder.feature.home.navigation.HomeEntryPointRoute
 import com.nlab.reminder.feature.home.navigation.homeEntryPoint
 import com.nlab.reminder.feature.home.navigation.homeScreen
-import com.nlab.reminder.domain.feature.schedule.all.navigation.allScheduleScreen
-import com.nlab.reminder.domain.feature.schedule.all.navigation.navigateToAllSchedule
+import com.nlab.reminder.feature.all.navigation.allScreen
+import com.nlab.reminder.feature.all.navigation.navigateToAll
 
 /**
  * @author Thalys
@@ -68,9 +68,9 @@ fun PlaneatNavHost(
                 onTimetableCategoryClicked = {
                     // TODO implement
                 },
-                onAllCategoryClicked = { navController.navigateToAllSchedule() }
+                onAllCategoryClicked = { navController.navigateToAll() }
             )
-            allScheduleScreen(
+            allScreen(
                 provideEnterTransition = enterTransitionFactoryFromHome,
                 providePopExitTransition = popExitTransitionFactoryFromHome,
                 onBackClicked = { navController.popBackStack() }

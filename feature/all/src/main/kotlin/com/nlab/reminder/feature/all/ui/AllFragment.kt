@@ -14,25 +14,12 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.domain.feature.schedule.all.ui
+package com.nlab.reminder.feature.all.ui
 
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.fragment.compose.AndroidFragment
-import timber.log.Timber
+import androidx.fragment.app.Fragment
 
 /**
- * @author Thalys
+ * @author Doohyun
  */
-@Composable
-internal fun AllScheduleScreen(
-    onBackClicked: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    AndroidFragment<AllScheduleFragment>(
-        modifier = modifier,
-    ) {
-        // TODO impl
-        Timber.i("AllScheduleFragment view created")
-    }
+class AllFragment : Fragment() {
 }

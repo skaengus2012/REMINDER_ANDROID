@@ -18,7 +18,6 @@ plugins {
     alias(libs.plugins.nlab.android.application.compose)
     alias(libs.plugins.nlab.android.application.jacoco)
     alias(libs.plugins.nlab.android.hilt)
-    alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
     id("kotlin-parcelize")
     kotlin("kapt")
@@ -91,7 +90,6 @@ dependencies {
     implementation(libs.androidx.startup.runtime)
     implementation(libs.coil.kt)
     implementation(libs.google.material)
-    implementation(libs.kotlinx.serialization.json)
     implementation(libs.timber)
 
     debugImplementation(libs.facebook.flipper)
