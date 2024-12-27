@@ -6,3 +6,10 @@ plugins {
 android {
     namespace = "com.nlab.reminder.feature.all"
 }
+
+dependencies {
+    implementation(projects.core.component.schedule)
+    
+    implementation(projects.core.androidx.recyclerview)
+    implementation(libs.androidx.constaintlayout)
+}

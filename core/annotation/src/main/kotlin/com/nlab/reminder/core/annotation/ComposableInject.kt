@@ -14,21 +14,13 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.feature.all.ui
-
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.fragment.compose.AndroidFragment
+package com.nlab.reminder.core.annotation
 
 /**
+ * Annotations on fields with manual injection in Compose Screen
+ *
  * @author Doohyun
  */
-@Composable
-internal fun AllScreen(
-    onBackClicked: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    AndroidFragment<AllFragment>(modifier = modifier) { fragment ->
-        fragment.onBackClicked = onBackClicked
-    }
-}
+@Retention(AnnotationRetention.SOURCE)
+@Target(AnnotationTarget.FIELD)
+annotation class ComposableInject
