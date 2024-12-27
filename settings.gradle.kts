@@ -56,6 +56,7 @@ include(
     ":core:androidx:recyclerview",
     ":core:androidx:transition",
     ":core:annotation",
+    ":core:component:schedule",
     ":core:component:tag",
     ":core:component:tag-test",
     ":core:component:usermessage",

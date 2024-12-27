@@ -14,21 +14,24 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.feature.all.ui
+package com.nlab.reminder.core.designsystem.compose.component
 
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.fragment.compose.AndroidFragment
+import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
 
 /**
  * @author Doohyun
  */
 @Composable
-internal fun AllScreen(
-    onBackClicked: () -> Unit,
-    modifier: Modifier = Modifier
+fun PlaneatBackground(
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit = {}
 ) {
-    AndroidFragment<AllFragment>(modifier = modifier) { fragment ->
-        fragment.onBackClicked = onBackClicked
-    }
+    Surface(
+        modifier = modifier,
+        color = PlaneatTheme.colors.bg1,
+        content = content
+    )
 }

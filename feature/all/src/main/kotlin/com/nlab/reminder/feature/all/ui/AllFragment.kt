@@ -16,10 +16,37 @@
 
 package com.nlab.reminder.feature.all.ui
 
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.nlab.reminder.core.annotation.ComposableInject
+import com.nlab.reminder.feature.all.databinding.FragmentAllBinding
 
 /**
  * @author Doohyun
  */
 class AllFragment : Fragment() {
+    private var _binding: FragmentAllBinding? = null
+    private val binding: FragmentAllBinding get() = checkNotNull(_binding)
+
+    @ComposableInject
+    lateinit var onBackClicked: () -> Unit
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
+        FragmentAllBinding.inflate(inflater, container, false)
+            .also { _binding = it }
+            .root
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        // TODO implements
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
 }

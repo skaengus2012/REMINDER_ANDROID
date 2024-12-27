@@ -17,10 +17,6 @@
 <resources>
     <string name="app_name" translatable="false">Planeat</string>
 
-    <string name="category_today" translatable="false">Today</string>
-    <string name="category_timetable" translatable="false">Timetable</string>
-    <string name="category_all" translatable="false">All</string>
-
     <!-- common -->
     <string name="cancel">취소</string>
     <string name="ok">확인</string>
@@ -85,19 +81,8 @@
     <string name="home_tag_header">나의 태그</string>
     <string name="new_schedule_label">새로운 플랜</string>
 
-    <string name="home_tag_config_label_rename">Rename Tag</string>
-    <string name="home_tag_config_label_delete">Delete Tag</string>
-    <string name="home_tag_rename_edittext_hint">input tag</string>
-    <string name="home_tag_rename_confirm">@string/ok</string>
-    <string name="home_tag_rename_cancel">@string/cancel</string>
-    <plurals name="home_tag_rename_text_label">
-        <item quantity="one">#%1$s will be updated in %2$d reminder.</item>
-        <item quantity="other">#%1$s will be updated in %2$d reminders.</item>
-    </plurals>
-    <string name="home_tag_delete_confirm">Delete</string>
-    <string name="home_tag_delete_cancel">@string/cancel</string>
-    <plurals name="home_tag_delete_text_label">
-        <item quantity="one">#%1$s will be updated in %2$d reminder.</item>
-        <item quantity="other">#%1$s will be updated in %2$d reminders.</item>
-    </plurals>
+    <string name="label_lists">목록</string>
+
+    <string name="content_description_back_click">뒤로 가기</string>
+    <string name="content_description_more">더보기</string>
 </resources>
