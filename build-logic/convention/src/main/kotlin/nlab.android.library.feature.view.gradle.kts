@@ -28,7 +28,7 @@ configureStdFeatureDependencies()
 
 dependencies {
     "implementation"(project(":core:androidx:fragment"))
+    "implementation"(project(":core:androidx:fragment-compose"))
 
-    "implementation"(libs.findLibrary("androidx-fragment-compose").get())
     "implementation"(libs.findLibrary("androidx-lifecycle-viewmodel-ktx").get())
 }

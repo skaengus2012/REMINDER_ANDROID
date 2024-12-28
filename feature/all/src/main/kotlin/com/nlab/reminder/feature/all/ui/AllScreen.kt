@@ -18,7 +18,7 @@ package com.nlab.reminder.feature.all.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.fragment.compose.AndroidFragment
+import com.nlab.reminder.core.androidx.fragment.compose.AndroidFragment
 
 /**
  * @author Doohyun

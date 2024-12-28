@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-plugins {
-    alias(libs.plugins.nlab.android.library)
-}
+package com.nlab.reminder.core.androidx.fragment.compose
 
-android {
-    namespace = "com.nlab.reminder.core.androidx.fragment"
-}
-
-dependencies {
-    api(libs.androidx.fragment.ktx)
-}
+/**
+ * Annotations on fields with manual injection in Compose Screen
+ *
+ * @author Doohyun
+ */
+@Retention(AnnotationRetention.SOURCE)
+@Target(AnnotationTarget.FIELD)
+annotation class ComposableInject
