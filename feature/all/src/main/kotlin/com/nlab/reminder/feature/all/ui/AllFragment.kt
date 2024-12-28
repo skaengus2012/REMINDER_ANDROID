@@ -20,16 +20,21 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
-import com.nlab.reminder.core.annotation.ComposableInject
+import androidx.fragment.app.viewModels
+import com.nlab.reminder.core.androidx.fragment.compose.ComposableFragment
+import com.nlab.reminder.core.androidx.fragment.compose.ComposableInject
+import com.nlab.reminder.core.translation.StringIds
+import com.nlab.reminder.feature.all.AllViewModel
 import com.nlab.reminder.feature.all.databinding.FragmentAllBinding
 
 /**
  * @author Doohyun
  */
-class AllFragment : Fragment() {
+class AllFragment : ComposableFragment() {
     private var _binding: FragmentAllBinding? = null
     private val binding: FragmentAllBinding get() = checkNotNull(_binding)
+
+    private val viewModel: AllViewModel by viewModels()
 
     @ComposableInject
     lateinit var onBackClicked: () -> Unit
@@ -39,14 +44,19 @@ class AllFragment : Fragment() {
             .also { _binding = it }
             .root
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    override fun onComposed() {
+        binding.toolbar.titleText = requireContext().getString(StringIds.home_category_all)
+    }
 
-        // TODO implements
+    override fun onResume() {
+        super.onResume()
+        println("Hello onResume")
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
+        println("Hello onDestroyView")
+        binding.toolbar.titleText = ""
         _binding = null
     }
 }

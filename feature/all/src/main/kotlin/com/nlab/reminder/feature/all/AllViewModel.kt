@@ -16,8 +16,10 @@
 
 package com.nlab.reminder.feature.all
 
+import androidx.lifecycle.ViewModel
+
 /**
  * @author Doohyun
  */
-class AllViewModel {
+class AllViewModel : ViewModel(){
 }

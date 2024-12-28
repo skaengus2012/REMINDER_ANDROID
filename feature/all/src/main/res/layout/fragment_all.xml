@@ -23,7 +23,6 @@
 
     <com.nlab.reminder.core.component.schedule.ui.ScheduleListToolbar
         android:id="@+id/toolbar"
-        style="@style/PlaneatTheme.Style.Component.Toolbar.Layout"
-        app:titleText="@string/home_category_all" />
+        style="@style/PlaneatTheme.Style.Component.Toolbar.Layout" />
 
 </LinearLayout>

@@ -14,13 +14,23 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.annotation
+package com.nlab.reminder.core.androidx.fragment.compose
+
+import android.os.Bundle
+import android.view.View
+import androidx.fragment.app.Fragment
 
 /**
- * Annotations on fields with manual injection in Compose Screen
- *
- * @author Doohyun
+ * @author Thalys
  */
-@Retention(AnnotationRetention.SOURCE)
-@Target(AnnotationTarget.FIELD)
-annotation class ComposableInject
+abstract class ComposableFragment : Fragment() {
+    final override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+    }
+
+    protected abstract fun onComposed()
+
+    internal fun completeComposition() {
+        onComposed()
+    }
+}
