@@ -18,6 +18,7 @@ package com.nlab.reminder.apps.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.remember
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.nlab.reminder.core.android.widget.Toast
@@ -39,7 +40,9 @@ class PlaneatAppState(
 fun rememberPlaneatAppState(
     navController: NavHostController = rememberNavController(),
     appToast: Toast,
-): PlaneatAppState = PlaneatAppState(
-    navController = navController,
-    appToast = appToast
-)
+): PlaneatAppState = remember(navController, appToast) {
+    PlaneatAppState(
+        navController = navController,
+        appToast = appToast
+    )
+}
