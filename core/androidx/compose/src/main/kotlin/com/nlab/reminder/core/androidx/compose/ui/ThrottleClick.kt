@@ -36,9 +36,5 @@ fun throttleClick(
             .throttleFirst(windowDuration)
             .collect { onClick() }
     }
-
-    val a: () -> Unit = {
-        clickEvent.tryEmit(Unit)
-    }
-    return a
+    return { clickEvent.tryEmit(Unit) }
 }

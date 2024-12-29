@@ -82,12 +82,12 @@
     <string name="home_category_header">My Todo</string>
     <string name="home_category_today">Today</string>
     <string name="home_category_timetable">Scheduled</string>
-    <string name="home_category_all">All</string>
     <string name="home_tag_header">My Tags</string>
     <string name="new_schedule_label">New Plan</string>
 
+    <string name="label_all">All</string>
     <string name="label_lists">Lists</string>
 
-    <string name="content_description_back_click">go back</string>
+    <string name="content_description_back">go back</string>
     <string name="content_description_more">see more</string>
 </resources>

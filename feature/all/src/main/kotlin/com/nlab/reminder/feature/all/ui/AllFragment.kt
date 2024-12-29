@@ -20,24 +20,28 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.RecyclerView
 import com.nlab.reminder.core.androidx.fragment.compose.ComposableFragment
 import com.nlab.reminder.core.androidx.fragment.compose.ComposableInject
-import com.nlab.reminder.core.translation.StringIds
-import com.nlab.reminder.feature.all.AllViewModel
+import com.nlab.reminder.core.androidx.fragment.viewLifecycleScope
+import com.nlab.reminder.core.androix.recyclerview.verticalScrollRange
 import com.nlab.reminder.feature.all.databinding.FragmentAllBinding
+import com.nlab.reminder.feature.all.databinding.LayoutTestBinding
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 
 /**
  * @author Doohyun
  */
-class AllFragment : ComposableFragment() {
+internal class AllFragment : ComposableFragment() {
     private var _binding: FragmentAllBinding? = null
     private val binding: FragmentAllBinding get() = checkNotNull(_binding)
 
-    private val viewModel: AllViewModel by viewModels()
-
     @ComposableInject
-    lateinit var onBackClicked: () -> Unit
+    lateinit var fragmentStateBridge: AllFragmentStateBridge
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
         FragmentAllBinding.inflate(inflater, container, false)
@@ -45,18 +49,47 @@ class AllFragment : ComposableFragment() {
             .root
 
     override fun onComposed() {
-        binding.toolbar.titleText = requireContext().getString(StringIds.home_category_all)
-    }
+        binding.recyclerviewSchedule
+            .verticalScrollRange()
+            .distinctUntilChanged()
+            .onEach { fragmentStateBridge.verticalScrollRange = it }
+            .launchIn(viewLifecycleScope)
 
-    override fun onResume() {
-        super.onResume()
-        println("Hello onResume")
+        val adapter = TestAdapter()
+        binding.recyclerviewSchedule.adapter = adapter
+
+        viewLifecycleScope.launch {
+            /**
+            delay(2000)
+            adapter.a.add(1)
+            adapter.notifyDataSetChanged()*/
+            delay(2000)
+            adapter.a.addAll((1..1000).toList())
+            adapter.notifyDataSetChanged()
+        }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        println("Hello onDestroyView")
-        binding.toolbar.titleText = ""
         _binding = null
+    }
+}
+
+class TestAdapter : RecyclerView.Adapter<TestViewHolder>() {
+    var a = mutableListOf<Int>()
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TestViewHolder =
+        TestViewHolder(LayoutTestBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+
+    override fun onBindViewHolder(holder: TestViewHolder, position: Int) {
+        holder.onBind(a[position])
+    }
+
+    override fun getItemCount(): Int = a.size
+}
+
+class TestViewHolder(private val binding: LayoutTestBinding) : RecyclerView.ViewHolder(binding.root) {
+    fun onBind(poisition: Int) {
+        binding.editText.setText(poisition.toString())
     }
 }

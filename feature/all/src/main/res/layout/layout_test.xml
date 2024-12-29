@@ -14,8 +14,15 @@
   ~ limitations under the License.
   -->
 
-<resources>
-    <declare-styleable name="ScheduleListToolbar">
-        <attr name="titleText" format="string" />
-    </declare-styleable>
-</resources>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="45dp">
+
+    <EditText
+        android:id="@+id/editText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:hint="Input Number" />
+
+</FrameLayout>

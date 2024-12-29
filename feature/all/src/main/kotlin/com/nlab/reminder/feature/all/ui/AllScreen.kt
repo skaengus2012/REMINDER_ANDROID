@@ -16,9 +16,15 @@
 
 package com.nlab.reminder.feature.all.ui
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import com.nlab.reminder.core.androidx.fragment.compose.AndroidFragment
+import com.nlab.reminder.core.component.schedule.ui.compose.ScheduleListToolbar
+import com.nlab.reminder.core.translation.StringIds
 
 /**
  * @author Doohyun
@@ -28,7 +34,50 @@ internal fun AllScreen(
     onBackClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    AndroidFragment<AllFragment>(modifier = modifier) { fragment ->
-        fragment.onBackClicked = onBackClicked
+    AllScreen(
+        modifier = modifier,
+        fragmentStateBridge = rememberAllFragmentStateBridge(),
+        onBackClicked = onBackClicked,
+        onMoreClicked = {
+            // TODO implements
+        }
+    )
+}
+
+@Composable
+private fun AllScreen(
+    fragmentStateBridge: AllFragmentStateBridge,
+    onBackClicked: () -> Unit,
+    onMoreClicked: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(modifier = modifier) {
+        AllToolbar(
+            fragmentStateBridge = fragmentStateBridge,
+            onBackClicked = onBackClicked,
+            onMoreClicked = onMoreClicked
+        )
+        AndroidFragment<AllFragment>(
+            modifier = Modifier
+                .fillMaxSize()
+                .imePadding()
+        ) { it.fragmentStateBridge = fragmentStateBridge }
     }
+}
+
+@Composable
+private fun AllToolbar(
+    fragmentStateBridge: AllFragmentStateBridge,
+    onBackClicked: () -> Unit,
+    onMoreClicked: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    ScheduleListToolbar(
+        modifier = modifier,
+        title = stringResource(StringIds.label_all),
+        isTitleVisible = true,
+        backgroundAlpha = 1.0f,
+        onBackClicked = onBackClicked,
+        onMenuClicked = onMoreClicked
+    )
 }
