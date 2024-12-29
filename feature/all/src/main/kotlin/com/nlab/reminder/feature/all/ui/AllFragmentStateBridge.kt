@@ -14,13 +14,24 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.designsystem.compose.theme
+package com.nlab.reminder.feature.all.ui
 
-import com.nlab.reminder.core.designsystem.R
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 
 /**
- * @author Doohyun
+ * @author Thalys
  */
-typealias DrawableIds = R.drawable
-typealias FontIds = R.font
-typealias DimenIds = R.dimen
+@Stable
+class AllFragmentStateBridge internal constructor() {
+    var verticalScrollRange: Int by mutableIntStateOf(0)
+}
+
+@Composable
+fun rememberAllFragmentStateBridge(): AllFragmentStateBridge {
+    return remember { AllFragmentStateBridge() }
+}

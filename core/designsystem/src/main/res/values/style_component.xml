@@ -19,22 +19,4 @@
 
     <style name="PlaneatTheme.Style.Component" parent="PlaneatTheme.Style" />
 
-    <style name="PlaneatTheme.Style.Component.Toolbar" parent="PlaneatTheme.Style.Component">
-        <item name="android:layout_height">@dimen/toolbar_height</item>
-    </style>
-
-    <style name="PlaneatTheme.Style.Component.Toolbar.Layout" parent="PlaneatTheme.Style.Component.Toolbar">
-        <item name="android:layout_width">match_parent</item>
-    </style>
-
-    <style name="PlaneatTheme.Style.Component.Toolbar.Button" parent="PlaneatTheme.Style.Component.Toolbar">
-        <item name="android:layout_width">@dimen/toolbar_height</item>
-    </style>
-
-    <style name="PlaneatTheme.Style.Component.Toolbar.ImageTextButton" parent="PlaneatTheme.Style.Component.Toolbar">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:textSize">17sp</item>
-        <item name="android:layout_gravity">center</item>
-    </style>
-
 </resources>

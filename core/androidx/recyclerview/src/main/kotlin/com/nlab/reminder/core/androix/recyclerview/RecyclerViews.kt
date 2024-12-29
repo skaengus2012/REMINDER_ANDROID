@@ -19,7 +19,10 @@ package com.nlab.reminder.core.androix.recyclerview
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 /**
  * @author thalys
@@ -34,6 +37,20 @@ fun RecyclerView.scrollState(): Flow<Int> = callbackFlow {
     val listener = object : RecyclerView.OnScrollListener() {
         override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
             trySend(newState)
+        }
+    }
+    addOnScrollListener(listener)
+    awaitClose { removeOnScrollListener(listener) }
+}
+
+fun RecyclerView.verticalScrollRange(): Flow<Int> = callbackFlow {
+    val conflateFlow = MutableStateFlow(computeVerticalScrollRange())
+    conflateFlow
+        .onEach { send(it) }
+        .launchIn(scope = this)
+    val listener = object : RecyclerView.OnScrollListener() {
+        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+            conflateFlow.value = recyclerView.computeVerticalScrollRange()
         }
     }
     addOnScrollListener(listener)

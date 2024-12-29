@@ -406,7 +406,7 @@ private fun AllCategoryCard(
     onClick: () -> Unit = {},
 ) {
     BasicCategoryCard(
-        name = stringResource(StringIds.home_category_all),
+        name = stringResource(StringIds.label_all),
         remainCount = remainCount.value,
         icon = {
             Image(
