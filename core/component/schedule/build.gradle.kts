@@ -10,5 +10,6 @@ android {
 
 dependencies {
     implementation(projects.core.android)
+    implementation(projects.core.component.toolbar)
     implementation(projects.core.translation)
 }

@@ -60,6 +60,7 @@ include(
     ":core:component:schedule",
     ":core:component:tag",
     ":core:component:tag-test",
+    ":core:component:toolbar",
     ":core:component:usermessage",
     ":core:component:usermessage-handle",
     ":core:data",

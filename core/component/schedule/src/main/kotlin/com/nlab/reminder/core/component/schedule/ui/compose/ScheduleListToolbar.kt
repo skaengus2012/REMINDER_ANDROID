@@ -27,7 +27,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.wrapContentWidth
@@ -44,6 +43,9 @@ import androidx.compose.ui.unit.dp
 import com.nlab.reminder.core.androidx.compose.ui.IconButton
 import com.nlab.reminder.core.androidx.compose.ui.throttleClick
 import com.nlab.reminder.core.androidx.compose.ui.tooling.preview.Previews
+import com.nlab.reminder.core.component.toolbar.ui.compose.CompleteButton
+import com.nlab.reminder.core.component.toolbar.ui.compose.Title
+import com.nlab.reminder.core.component.toolbar.ui.compose.toolbarHeight
 import com.nlab.reminder.core.designsystem.compose.theme.DrawableIds
 import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
 import com.nlab.reminder.core.translation.StringIds
@@ -55,9 +57,12 @@ import com.nlab.reminder.core.translation.StringIds
 fun ScheduleListToolbar(
     title: String,
     isTitleVisible: Boolean,
+    isMoreVisible: Boolean,
+    isCompleteVisible: Boolean,
     @FloatRange(from = 0.0, to = 1.0) backgroundAlpha: Float,
     onBackClicked: () -> Unit,
     onMenuClicked: () -> Unit,
+    onCompleteClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val containerColor = PlaneatTheme.colors.bgCard1
@@ -73,11 +78,14 @@ fun ScheduleListToolbar(
                 .statusBarsPadding()
                 .displayCutoutPadding()
                 .fillMaxWidth()
-                .height(48.dp),
+                .toolbarHeight(),
             title = title,
             isTitleVisible = isTitleVisible,
+            isMoreVisible = isMoreVisible,
+            isCompleteVisible = isCompleteVisible,
             onBackClicked = onBackClicked,
-            onMenuClicked = onMenuClicked
+            onMenuClicked = onMenuClicked,
+            onCompleteClicked = onCompleteClicked,
         )
     }
 }
@@ -86,12 +94,15 @@ fun ScheduleListToolbar(
 private fun ScheduleListToolbarContent(
     title: String,
     isTitleVisible: Boolean,
+    isMoreVisible: Boolean,
+    isCompleteVisible: Boolean,
     onBackClicked: () -> Unit,
     onMenuClicked: () -> Unit,
+    onCompleteClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(modifier = modifier) {
-        Title(
+        ScheduleListTitle(
             modifier = Modifier.align(Alignment.Center),
             title = title,
             isVisible = isTitleVisible
@@ -100,17 +111,41 @@ private fun ScheduleListToolbarContent(
         BackButton(
             modifier = Modifier
                 .align(Alignment.CenterStart),
-            onClick = throttleClick(onClick = onBackClicked),
+            onClick = onBackClicked,
         )
 
-        IconButton(
-            modifier = Modifier
-                .align(Alignment.CenterEnd),
-            onClick = throttleClick(onClick = onMenuClicked),
-            painter = painterResource(DrawableIds.ic_more),
-            contentDescription = stringResource(StringIds.content_description_more),
-            tint = PlaneatTheme.colors.point1,
-        )
+        Row(
+            modifier = Modifier.align(Alignment.CenterEnd)
+        ) {
+            if (isMoreVisible) {
+                IconButton(
+                    onClick = throttleClick(onClick = onMenuClicked),
+                    painter = painterResource(DrawableIds.ic_more),
+                    contentDescription = stringResource(StringIds.content_description_more),
+                    tint = PlaneatTheme.colors.point1,
+                )
+            }
+
+            if (isCompleteVisible) {
+                CompleteButton(onClick = onCompleteClicked)
+            }
+        }
+    }
+}
+
+@Composable
+private fun ScheduleListTitle(
+    title: String,
+    isVisible: Boolean,
+    modifier: Modifier = Modifier
+) {
+    AnimatedVisibility(
+        modifier = modifier,
+        visible = isVisible,
+        enter = fadeIn(tween(durationMillis = 200)),
+        exit = fadeOut(tween(durationMillis = 200)),
+    ) {
+        Title(text = title)
     }
 }
 
@@ -122,7 +157,7 @@ private fun BackButton(
     Row(
         modifier = modifier
             .wrapContentWidth()
-            .height(48.dp)
+            .toolbarHeight()
             .clickable(
                 onClick = throttleClick(onClick = onClick),
                 onClickLabel = stringResource(StringIds.content_description_back),
@@ -145,25 +180,6 @@ private fun BackButton(
     }
 }
 
-@Composable
-private fun Title(
-    title: String,
-    isVisible: Boolean,
-    modifier: Modifier = Modifier
-) {
-    AnimatedVisibility(
-        modifier = modifier,
-        visible = isVisible,
-        enter = fadeIn(tween(durationMillis = 200)),
-        exit = fadeOut(tween(durationMillis = 200)),
-    ) {
-        Text(
-            text = title,
-            style = PlaneatTheme.typography.titleMedium,
-            color = PlaneatTheme.colors.content1,
-        )
-    }
-}
 
 @Previews
 @Composable
@@ -172,9 +188,12 @@ private fun ScheduleListToolbarPreview() {
         ScheduleListToolbar(
             title = "Today",
             isTitleVisible = true,
+            isMoreVisible = true,
+            isCompleteVisible = true,
             backgroundAlpha = 1.0f,
             onBackClicked = {},
             onMenuClicked = {},
+            onCompleteClicked = {},
             modifier = Modifier.fillMaxWidth()
         )
     }
