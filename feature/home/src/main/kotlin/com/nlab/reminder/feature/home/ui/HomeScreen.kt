@@ -21,6 +21,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.draganddrop.dragAndDropSource
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -41,6 +42,7 @@ import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsBottomHeight
@@ -86,6 +88,7 @@ import com.nlab.reminder.core.component.tag.ui.compose.TagCard
 import com.nlab.reminder.core.designsystem.compose.component.PlaneatLoadingContent
 import com.nlab.reminder.core.designsystem.compose.icon.PlaneatIcons
 import com.nlab.reminder.core.designsystem.compose.theme.DrawableIds
+import com.nlab.reminder.core.designsystem.compose.theme.horizontalMediumPadding
 import com.nlab.reminder.core.kotlin.NonNegativeLong
 import com.nlab.reminder.core.translation.StringIds
 import com.nlab.reminder.feature.home.*
@@ -218,7 +221,7 @@ private fun HomeContents(
                 .fillMaxSize()
                 .verticalScroll(bodyScrollState)
                 .safeDrawingPadding()
-                .padding(start = 20.dp, top = bodyPaddingTop, end = 20.dp, bottom = bodyPaddingBottom),
+                .horizontalMediumPadding(top = bodyPaddingTop, boolean = bodyPaddingBottom),
             todayCount = todayCount,
             timetableCount = timetableCount,
             allCount = allCount,
