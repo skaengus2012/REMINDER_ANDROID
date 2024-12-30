@@ -21,6 +21,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import com.nlab.reminder.core.androidx.fragment.compose.AndroidFragment
 import com.nlab.reminder.core.component.schedule.ui.compose.ScheduleListToolbar
@@ -40,6 +42,9 @@ internal fun AllScreen(
         onBackClicked = onBackClicked,
         onMoreClicked = {
             // TODO implements
+        },
+        onCompleteClicked = {
+            // TODO implements
         }
     )
 }
@@ -49,13 +54,15 @@ private fun AllScreen(
     fragmentStateBridge: AllFragmentStateBridge,
     onBackClicked: () -> Unit,
     onMoreClicked: () -> Unit,
+    onCompleteClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
         AllToolbar(
             fragmentStateBridge = fragmentStateBridge,
             onBackClicked = onBackClicked,
-            onMoreClicked = onMoreClicked
+            onMoreClicked = onMoreClicked,
+            onCompleteClicked = onCompleteClicked
         )
         AndroidFragment<AllFragment>(
             modifier = Modifier
@@ -70,14 +77,24 @@ private fun AllToolbar(
     fragmentStateBridge: AllFragmentStateBridge,
     onBackClicked: () -> Unit,
     onMoreClicked: () -> Unit,
+    onCompleteClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
     ScheduleListToolbar(
         modifier = modifier,
         title = stringResource(StringIds.label_all),
         isTitleVisible = true,
+        isMoreVisible = true,
+        isCompleteVisible = true,
         backgroundAlpha = 1.0f,
         onBackClicked = onBackClicked,
-        onMenuClicked = onMoreClicked
+        onMenuClicked = onMoreClicked,
+        onCompleteClicked = {
+            focusManager.clearFocus()
+            keyboardController?.hide()
+            onCompleteClicked()
+        }
     )
 }

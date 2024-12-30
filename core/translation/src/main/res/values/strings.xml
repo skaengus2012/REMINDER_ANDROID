@@ -80,9 +80,9 @@
     <string name="home_tag_header">나의 태그</string>
     <string name="new_schedule_label">새로운 플랜</string>
 
-    <string name="label_lists">목록</string>
-    <string name="label_all">전체</string>
-
     <string name="content_description_back">뒤로 가기</string>
     <string name="content_description_more">더보기</string>
+    <string name="label_complete">완료</string>
+    <string name="label_lists">목록</string>
+    <string name="label_all">전체</string>
 </resources>

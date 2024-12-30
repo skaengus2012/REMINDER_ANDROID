@@ -85,9 +85,9 @@
     <string name="home_tag_header">My Tags</string>
     <string name="new_schedule_label">New Plan</string>
 
-    <string name="label_all">All</string>
-    <string name="label_lists">Lists</string>
-
     <string name="content_description_back">go back</string>
     <string name="content_description_more">see more</string>
+    <string name="label_all">All</string>
+    <string name="label_complete">Done</string>
+    <string name="label_lists">Lists</string>
 </resources>
