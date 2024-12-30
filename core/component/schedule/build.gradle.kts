@@ -10,6 +10,13 @@ android {
 
 dependencies {
     implementation(projects.core.android)
+    implementation(projects.core.androidx.recyclerview)
     implementation(projects.core.component.toolbar)
+    implementation(projects.core.dataDi)
     implementation(projects.core.translation)
+
+    implementation(libs.androidx.constaintlayout)
+    implementation(libs.androidx.cardview)
+
+    testImplementation(projects.core.dataTest)
 }

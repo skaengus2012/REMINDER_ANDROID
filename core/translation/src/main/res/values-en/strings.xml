@@ -19,10 +19,7 @@
     <string name="cancel">Cancel</string>
     <string name="ok">OK</string>
     <string name="common_tag_empty">No tags assigned to the schedule.</string>
-    <string name="open_link">Open link</string>
     <string name="open_link_default_error">This link is not executable.</string>
-    <string name="delete">Delete</string>
-    <string name="handle_drag">Start drag</string>
     <string name="unknown_error">An unknown error has occurred.</string>
 
     <!-- schedule -->
@@ -86,8 +83,13 @@
     <string name="new_schedule_label">New Plan</string>
 
     <string name="content_description_back">go back</string>
+    <string name="content_description_complete">complete</string>
+    <string name="content_description_drag">dragging</string>
     <string name="content_description_more">see more</string>
+    <string name="content_description_open_link">open link</string>
+    <string name="content_description_select">select</string>
     <string name="label_all">All</string>
     <string name="label_complete">Done</string>
+    <string name="label_delete">Delete</string>
     <string name="label_lists">Lists</string>
 </resources>

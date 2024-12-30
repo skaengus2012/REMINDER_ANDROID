@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (C) 2024 The N's lab Open Source Project
+  ~ Copyright (C) 2025 The N's lab Open Source Project
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -14,6 +14,12 @@
   ~ limitations under the License.
   -->
 
-<resources>
-    <dimen name="horizontal_padding_medium">20dp</dimen>
-</resources>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <size
+        android:width="@dimen/schedule_check_size"
+        android:height="@dimen/schedule_check_size" />
+    <stroke
+        android:color="?content_3"
+        android:width="@dimen/schedule_check_external_dither" />
+</shape>

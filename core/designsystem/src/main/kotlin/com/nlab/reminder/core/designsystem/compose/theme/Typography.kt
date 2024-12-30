@@ -35,7 +35,11 @@ data class PlaneatTypography(
         fontWeight = FontWeight.Medium,
     ),
     val titleMedium: TextStyle = createTextStyle(
-        fontSize = 17.sp,
+        fontSize = 18.sp,
+        fontWeight = FontWeight.Bold,
+    ),
+    val titleLarge: TextStyle = createTextStyle(
+        fontSize = 22.sp,
         fontWeight = FontWeight.Bold,
     ),
     val bodyLarge: TextStyle = createTextStyle(
