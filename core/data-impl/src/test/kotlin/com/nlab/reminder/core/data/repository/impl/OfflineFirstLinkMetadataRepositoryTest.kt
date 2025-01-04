@@ -137,7 +137,7 @@ private fun getLinkMetadataRepository(
     initialCache = initialCache,
 )
 
-private suspend fun TestScope.foldActualResultsWhenScopeUntilIdle(
+private fun TestScope.foldActualResultsWhenScopeUntilIdle(
     linkMetadataRepository: OfflineFirstLinkMetadataRepository,
     parameter: Link,
 ): List<Map<Link, LinkMetadata>> = buildList {

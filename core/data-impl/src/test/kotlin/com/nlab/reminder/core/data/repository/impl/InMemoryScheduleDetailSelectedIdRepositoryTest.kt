@@ -27,7 +27,7 @@ import org.junit.Test
 /**
  * @author thalys
  */
-internal class InMemoryScheduleDetailsSelectedIdRepositoryTest {
+internal class InMemoryScheduleDetailSelectedIdRepositoryTest {
     @Test
     fun `When selected, Then return added id`() = runTest {
         val repository = InMemoryScheduleSelectedIdRepository()

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 The N's lab Open Source Project
+ * Copyright (C) 2025 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,18 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.data.model
+package com.nlab.reminder.core.data.repository
 
+import com.nlab.reminder.core.data.model.ScheduleId
+import com.nlab.reminder.core.data.model.TagId
+import com.nlab.reminder.core.kotlin.NonNegativeLong
+import com.nlab.reminder.core.kotlin.Result
+import kotlinx.coroutines.flow.Flow
 
 /**
- * Identity of [Tag].
- *
- * @author Doohyun
+ * @author Thalys
  */
-data class TagId(val rawId: Long)
+interface ScheduleTagListRepository {
+    fun getScheduleTagListAsStream(scheduleIds: Set<ScheduleId>): Flow<Map<ScheduleId, Set<TagId>>>
+    suspend fun getTagUsageCount(tagId: TagId): Result<NonNegativeLong>
+}

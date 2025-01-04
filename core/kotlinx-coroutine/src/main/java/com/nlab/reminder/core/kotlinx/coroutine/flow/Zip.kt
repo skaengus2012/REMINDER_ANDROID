@@ -22,10 +22,8 @@ import kotlinx.coroutines.flow.combine as kotlinCombine
 /**
  * @author thalys
  */
-fun <T1, T2, T3, T4, R> combine(
+fun <T1, T2, R> combine(
     flow: Flow<T1>,
     flow2: Flow<T2>,
-    flow3: Flow<T3>,
-    flow4: Flow<T4>,
-    transform: (a: T1, b: T2, c: T3, d: T4) -> R
-): Flow<R> = kotlinCombine(flow, flow2, flow3, flow4, transform)
+    transform: (a: T1, b: T2) -> R
+): Flow<R> = kotlinCombine(flow, flow2, transform)

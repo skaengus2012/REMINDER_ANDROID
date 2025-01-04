@@ -16,10 +16,11 @@
 
 package com.nlab.reminder.core.data.model
 
-
 /**
- * Identity of [Tag].
- *
  * @author Doohyun
  */
-data class TagId(val rawId: Long)
+data class ScheduleDetail(
+    val schedule: Schedule,
+    val tags: Set<Tag>,
+    val linkMetadata: LinkMetadata?
+)

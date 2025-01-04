@@ -27,7 +27,7 @@ import org.junit.Test
 /**
  * @author thalys
  */
-internal class InMemoryScheduleDetailsCompleteMarkRepositoryTest {
+internal class InMemoryScheduleDetailCompleteMarkRepositoryTest {
     @Test
     fun `When added, Then updated completeMark table`() = runTest {
         val scheduleId = genScheduleId()

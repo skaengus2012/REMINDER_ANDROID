@@ -140,7 +140,7 @@ internal class LocalScheduleRepositoryTest {
         suspend fun testGetScheduleAsStream(
             scheduleDAO: ScheduleDAO,
             request: GetScheduleQuery,
-            expectedResult: List<Schedule>
+            expectedResult: Set<Schedule>
         ) {
             val scheduleRepository = genScheduleRepository(scheduleDAO)
             val actualSchedules = scheduleRepository.getSchedulesAsStream(request)
@@ -158,14 +158,14 @@ internal class LocalScheduleRepositoryTest {
                 whenever(mock.getAsStream()) doReturn flowOf(entities.toTypedArray())
             },
             request = GetScheduleQuery.All,
-            expectedResult = schedules
+            expectedResult = schedules.toSet()
         )
         testGetScheduleAsStream(
             scheduleDAO = mock {
                 whenever(mock.findByCompleteAsStream(isComplete)) doReturn flowOf(entities.toTypedArray())
             },
             request = GetScheduleQuery.ByComplete(isComplete),
-            expectedResult = schedules
+            expectedResult = schedules.toSet()
         )
     }
 }

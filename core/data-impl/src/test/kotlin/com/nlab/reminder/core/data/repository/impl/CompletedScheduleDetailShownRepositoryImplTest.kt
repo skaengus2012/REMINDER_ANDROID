@@ -16,7 +16,7 @@ import org.mockito.kotlin.verify
 /**
  * @author Doohyun
  */
-internal class CompletedScheduleDetailsShownRepositoryImplTest {
+internal class CompletedScheduleDetailShownRepositoryImplTest {
     @Test
     fun `When get as stream, Then getAsStreamFunction published`() = runTest {
         val expectedComplete = genBoolean()

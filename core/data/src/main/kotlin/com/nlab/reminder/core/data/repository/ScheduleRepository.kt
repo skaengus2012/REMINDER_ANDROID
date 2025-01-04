@@ -28,7 +28,7 @@ interface ScheduleRepository {
     suspend fun save(query: SaveScheduleQuery): Result<Schedule>
     suspend fun updateBulk(query: UpdateSchedulesQuery): Result<Unit>
     suspend fun delete(query: DeleteScheduleQuery): Result<Unit>
-    fun getSchedulesAsStream(request: GetScheduleQuery): Flow<Collection<Schedule>>
+    fun getSchedulesAsStream(request: GetScheduleQuery): Flow<Set<Schedule>>
     fun getScheduleCountAsStream(query: GetScheduleCountQuery): Flow<NonNegativeLong>
 }
 

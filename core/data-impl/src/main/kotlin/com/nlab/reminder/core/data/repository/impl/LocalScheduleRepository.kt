@@ -31,6 +31,7 @@ import com.nlab.reminder.core.data.repository.SaveScheduleQuery
 import com.nlab.reminder.core.data.repository.ScheduleRepository
 import com.nlab.reminder.core.data.repository.UpdateSchedulesQuery
 import com.nlab.reminder.core.kotlin.NonNegativeLong
+import com.nlab.reminder.core.kotlin.collections.toSet
 import com.nlab.reminder.core.kotlin.tryToNonNegativeLongOrZero
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -84,17 +85,13 @@ class LocalScheduleRepository(
         }
     }
 
-    override fun getSchedulesAsStream(request: GetScheduleQuery): Flow<Collection<Schedule>> {
+    override fun getSchedulesAsStream(request: GetScheduleQuery): Flow<Set<Schedule>> {
         val scheduleEntitiesFlow = when (request) {
             is GetScheduleQuery.All -> scheduleDAO.getAsStream()
             is GetScheduleQuery.ByComplete -> scheduleDAO.findByCompleteAsStream(request.isComplete)
         }
 
-        return scheduleEntitiesFlow.distinctUntilChanged().map { entities ->
-            ArrayList<Schedule>(entities.size).apply {
-                entities.mapTo(destination = this, ::Schedule)
-            }
-        }
+        return scheduleEntitiesFlow.distinctUntilChanged().map { entities -> entities.toSet(::Schedule) }
     }
 
     @ExcludeFromGeneratedTestReport

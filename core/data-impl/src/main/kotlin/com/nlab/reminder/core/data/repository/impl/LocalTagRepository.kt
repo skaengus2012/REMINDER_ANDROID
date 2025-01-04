@@ -21,13 +21,11 @@ import com.nlab.reminder.core.data.model.TagId
 import com.nlab.reminder.core.data.repository.GetTagQuery
 import com.nlab.reminder.core.data.repository.SaveTagQuery
 import com.nlab.reminder.core.data.repository.TagRepository
-import com.nlab.reminder.core.kotlin.NonNegativeLong
 import com.nlab.reminder.core.kotlinx.coroutine.flow.map
 import com.nlab.reminder.core.kotlin.Result
 import com.nlab.reminder.core.kotlin.catching
+import com.nlab.reminder.core.kotlin.collections.toSet
 import com.nlab.reminder.core.kotlin.map
-import com.nlab.reminder.core.kotlin.toNonNegativeLong
-import com.nlab.reminder.core.local.database.dao.ScheduleTagListDAO
 import com.nlab.reminder.core.local.database.dao.TagRelationDAO
 import com.nlab.reminder.core.local.database.dao.TagDAO
 import com.nlab.reminder.core.local.database.model.TagEntity
@@ -40,7 +38,6 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 class LocalTagRepository(
     private val tagDAO: TagDAO,
     private val tagRelationDAO: TagRelationDAO,
-    private val scheduleTagListDAO: ScheduleTagListDAO,
 ) : TagRepository {
     override suspend fun save(query: SaveTagQuery): Result<Tag> {
         val entityResult = catching {
@@ -64,21 +61,16 @@ class LocalTagRepository(
         tagDAO.deleteById(id.rawId)
     }
 
-    override suspend fun getUsageCount(id: TagId): Result<NonNegativeLong> = catching {
-        scheduleTagListDAO
-            .findTagUsageCount(tagId = id.rawId)
-            .toNonNegativeLong()
-    }
-
-    override fun getTagsAsStream(query: GetTagQuery): Flow<Collection<Tag>> {
+    override fun getTagsAsStream(query: GetTagQuery): Flow<Set<Tag>> {
         val entitiesFlow: Flow<Array<TagEntity>> = when (query) {
-            is GetTagQuery.All -> tagDAO.getAsStream()
-            is GetTagQuery.ByIds -> tagDAO.findByIdsAsStream(
-                buildSet { query.tagIds.mapTo(destination = this, transform = TagId::rawId) }
-            )
+            is GetTagQuery.All -> {
+                tagDAO.getAsStream()
+            }
+
+            is GetTagQuery.ByIds -> {
+                tagDAO.findByIdsAsStream(query.tagIds.toSet(TagId::rawId))
+            }
         }
-        return entitiesFlow.distinctUntilChanged().map { entities ->
-            ArrayList<Tag>(entities.size).apply { entities.mapTo(destination = this, ::Tag) }
-        }
+        return entitiesFlow.distinctUntilChanged().map { entities -> entities.toSet(::Tag) }
     }
 }

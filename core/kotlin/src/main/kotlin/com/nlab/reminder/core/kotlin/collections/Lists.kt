@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 The N's lab Open Source Project
+ * Copyright (C) 2025 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.data.model
-
+package com.nlab.reminder.core.kotlin.collections
 
 /**
- * Identity of [Tag].
- *
- * @author Doohyun
+ * @author Thalys
  */
-data class TagId(val rawId: Long)
+inline fun <T, U> Array<T>.toList(
+    transform: (T) -> U
+): List<U> = ArrayList<U>(size).apply { mapTo(destination = this, transform) }

@@ -21,7 +21,6 @@ import com.nlab.reminder.core.kotlin.Result
 import com.nlab.reminder.core.data.model.Tag
 import com.nlab.reminder.core.data.model.TagId
 import com.nlab.reminder.core.kotlin.NonBlankString
-import com.nlab.reminder.core.kotlin.NonNegativeLong
 
 /**
  * @author Doohyun
@@ -29,8 +28,7 @@ import com.nlab.reminder.core.kotlin.NonNegativeLong
 interface TagRepository {
     suspend fun save(query: SaveTagQuery): Result<Tag>
     suspend fun delete(id: TagId): Result<Unit>
-    suspend fun getUsageCount(id: TagId): Result<NonNegativeLong>
-    fun getTagsAsStream(query: GetTagQuery): Flow<Collection<Tag>>
+    fun getTagsAsStream(query: GetTagQuery): Flow<Set<Tag>>
 }
 
 sealed class SaveTagQuery private constructor() {
