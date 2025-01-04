@@ -17,12 +17,31 @@
 package com.nlab.reminder.core.android.view
 
 import android.view.View
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.onStart
 
 /**
  * @author thalys
  */
+
+fun View.setVisible(isVisible: Boolean) {
+    visibility = if (isVisible) View.VISIBLE else View.GONE
+}
+
 fun View.bindSelected(selected: Boolean): Boolean {
     if (this.isSelected == selected) return false
     this.isSelected = selected
     return true
 }
+
+fun View.focusChanges(): Flow<Boolean> = callbackFlow {
+    val listener = View.OnFocusChangeListener { _, hasFocus ->
+        trySend(hasFocus)
+    }
+    onFocusChangeListener = listener
+    awaitClose { onFocusChangeListener = null }
+}
+
+fun View.focusState(): Flow<Boolean> = focusChanges().onStart { emit(hasFocus()) }

@@ -15,6 +15,6 @@
   -->
 
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:drawable="@drawable/ic_schedule_select_on" android:state_checked="true" />
+    <item android:drawable="@drawable/ic_schedule_select_on" android:state_selected="true" />
     <item android:drawable="@drawable/checkbox_schedule_off" />
 </selector>

@@ -92,7 +92,7 @@ private fun AllToolbar(
         onBackClicked = onBackClicked,
         onMenuClicked = onMoreClicked,
         onCompleteClicked = {
-            focusManager.clearFocus()
+            focusManager.clearFocus(force = true)
             keyboardController?.hide()
             onCompleteClicked()
         }

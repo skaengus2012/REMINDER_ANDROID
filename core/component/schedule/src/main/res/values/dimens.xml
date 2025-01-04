@@ -15,9 +15,11 @@
   -->
 
 <resources>
-    <dimen name="schedule_check_size">22dp</dimen>
     <dimen name="schedule_check_external_dither">1.5dp</dimen>
+    <dimen name="schedule_check_size">22dp</dimen>
+    <dimen name="schedule_checkbox_padding">15dp</dimen>
     <dimen name="schedule_checkbox_touchable_size">52dp</dimen>
-    <dimen name="schedule_checkbox_touchable_size_2x">104dp</dimen>
     <dimen name="schedule_clamp_width">60dp</dimen>
+    <dimen name="schedule_data_start">57dp</dimen>
+    <dimen name="schedule_data_start_complete_selection">109dp</dimen>
 </resources>

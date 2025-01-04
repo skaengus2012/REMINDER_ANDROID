@@ -14,10 +14,21 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.component.schedule.ui.view
+package com.nlab.reminder.core.android.view.inputmethod
+
+import android.content.Context
+import android.os.IBinder
+import android.view.View
+import android.view.inputmethod.InputMethodManager
+import androidx.core.content.getSystemService
 
 /**
- * @author Thalys
+ * @author Doohyun
  */
-class ScheduleContentViewHolder  {
+fun View.hideSoftInputFromWindow(flags: Int = 0) {
+    context.hideSoftInputFromWindow(windowToken, flags = flags)
+}
+
+fun Context.hideSoftInputFromWindow(windowToken: IBinder?, flags: Int = 0) {
+    getSystemService<InputMethodManager>()?.hideSoftInputFromWindow(windowToken, flags)
 }

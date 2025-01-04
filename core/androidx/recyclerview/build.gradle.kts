@@ -24,6 +24,6 @@ android {
 dependencies {
     api(libs.androidx.recyclerview)
 
-    implementation(libs.kotlinx.coroutines.core)
     implementation(libs.androidx.annotation)
+    implementation(libs.kotlinx.coroutines.core)
 }

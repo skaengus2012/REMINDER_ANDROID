@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 The N's lab Open Source Project
+ * Copyright (C) 2025 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.schedule.ui
+package com.nlab.reminder.core.component.schedule.ui.view.list
 
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 
 /**
- * @author Doohyun
+ * @author Thalys
  */
-sealed class ScheduleItemViewHolder(view: View) : RecyclerView.ViewHolder(view)
+sealed class ScheduleAdapterItemViewHolder(view: View) : RecyclerView.ViewHolder(view)

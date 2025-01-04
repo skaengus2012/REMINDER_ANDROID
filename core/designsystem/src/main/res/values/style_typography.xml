@@ -32,4 +32,9 @@
         <item name="android:textStyle">bold</item>
     </style>
 
+    <style name="PlaneatTheme.Style.Typography.TitleXlarge" parent="PlaneatTheme.Style.Typography">
+        <item name="android:textSize">26sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
 </resources>

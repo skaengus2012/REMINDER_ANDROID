@@ -82,8 +82,9 @@
     <string name="home_tag_header">My Tags</string>
     <string name="new_schedule_label">New Plan</string>
 
+    <string name="add_note">add note</string>
     <string name="content_description_back">go back</string>
-    <string name="content_description_complete">complete</string>
+    <string name="content_description_complete_toggle">check whether to complete</string>
     <string name="content_description_drag">dragging</string>
     <string name="content_description_more">see more</string>
     <string name="content_description_open_link">open link</string>

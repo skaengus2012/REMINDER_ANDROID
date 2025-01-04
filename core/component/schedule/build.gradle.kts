@@ -13,10 +13,12 @@ dependencies {
     implementation(projects.core.androidx.recyclerview)
     implementation(projects.core.component.toolbar)
     implementation(projects.core.dataDi)
+    implementation(projects.core.kotlinxCoroutine)
     implementation(projects.core.translation)
 
     implementation(libs.androidx.constaintlayout)
     implementation(libs.androidx.cardview)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
 
     testImplementation(projects.core.dataTest)
 }

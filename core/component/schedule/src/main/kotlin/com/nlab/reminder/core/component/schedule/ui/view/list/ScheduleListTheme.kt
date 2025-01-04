@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 The N's lab Open Source Project
+ * Copyright (C) 2025 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,22 +14,13 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.component.schedule.ui.view
-
-import androidx.annotation.ColorRes
-import androidx.annotation.StringRes
-import com.nlab.reminder.core.data.model.ScheduleDetail
+package com.nlab.reminder.core.component.schedule.ui.view.list
 
 /**
- * @author Doohyun
+ * @author Thalys
  */
-sealed class ScheduleAdapterItem private constructor() {
-    data class Headline(
-        @StringRes val textRes: Int,
-        @ColorRes val textColorRes: Int
-    ) : ScheduleAdapterItem()
-
-    data class Content(
-        val scheduleDetail: ScheduleDetail
-    ) : ScheduleAdapterItem()
+enum class ScheduleListTheme {
+    Point1,
+    Point2,
+    Point3
 }

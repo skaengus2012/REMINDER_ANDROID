@@ -14,7 +14,8 @@
   ~ limitations under the License.
   -->
 
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -54,21 +55,21 @@
         android:background="?android:windowBackground">
 
         <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guideline_textStart"
+            android:id="@+id/guideline_dataStart"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:orientation="vertical"
-            app:layout_constraintGuide_begin="@dimen/schedule_checkbox_touchable_size" />
+            app:layout_constraintGuide_begin="@dimen/schedule_data_start" />
 
         <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guideline_textStartCompleteSelection"
+            android:id="@+id/guideline_dataStartCompleteSelection"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:orientation="vertical"
-            app:layout_constraintGuide_begin="@dimen/schedule_checkbox_touchable_size_2x" />
+            app:layout_constraintGuide_begin="@dimen/schedule_data_start_complete_selection" />
 
         <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guideline_textEnd"
+            android:id="@+id/guideline_dataEnd"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:orientation="vertical"
@@ -80,11 +81,10 @@
             android:layout_height="@dimen/schedule_checkbox_touchable_size"
             android:alpha="1"
             android:background="@null"
-            android:contentDescription="@string/content_description_complete"
-            android:padding="15dp"
+            android:contentDescription="@string/content_description_complete_toggle"
+            android:padding="@dimen/schedule_checkbox_padding"
             android:scaleType="fitXY"
-            app:layout_constraintEnd_toEndOf="@id/guideline_textStart"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="@id/guideline_dataStart"
             app:layout_constraintTop_toTopOf="parent"
             tools:src="@drawable/checkbox_schedule_check_on_point1" />
 
@@ -95,10 +95,10 @@
             android:alpha="0.5"
             android:background="@null"
             android:contentDescription="@string/content_description_select"
-            android:padding="16dp"
+            android:padding="@dimen/schedule_checkbox_padding"
             android:scaleType="fitXY"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/button_complete"
+            app:layout_constraintEnd_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/checkbox_schedule_select_selector" />
 
@@ -111,8 +111,8 @@
             android:focusable="false"
             android:focusableInTouchMode="false"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="@id/guideline_textStartCompleteSelection"
-            app:layout_constraintStart_toStartOf="@id/guideline_textStart"
+            app:layout_constraintEnd_toEndOf="@id/guideline_dataStartCompleteSelection"
+            app:layout_constraintStart_toStartOf="@id/guideline_dataStart"
             app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -120,10 +120,10 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toTopOf="@id/view_line"
-            app:layout_constraintEnd_toEndOf="@id/guideline_textEnd"
+            app:layout_constraintEnd_toEndOf="@id/guideline_dataEnd"
             app:layout_constraintHeight="wrap_content"
             app:layout_constraintHeight_min="@dimen/schedule_checkbox_touchable_size"
-            app:layout_constraintStart_toStartOf="@id/guideline_textStart"
+            app:layout_constraintStart_toStartOf="@id/guideline_dataStart"
             app:layout_constraintTop_toTopOf="parent">
 
             <EditText
@@ -133,6 +133,8 @@
                 android:layout_marginTop="10dp"
                 android:background="@null"
                 android:gravity="center_vertical"
+                android:imeOptions="actionNext"
+                android:inputType="text"
                 android:textColor="?content_1"
                 android:textSize="16sp"
                 app:layout_constraintBottom_toTopOf="@id/edittext_note"
@@ -150,7 +152,11 @@
                 android:layout_marginTop="2dp"
                 android:background="@null"
                 android:gravity="center_vertical"
+                android:hint="@string/add_note"
+                android:imeOptions="actionDone"
+                android:inputType="text"
                 android:textColor="?content_2"
+                android:textColorHint="?content_2_hint"
                 android:textSize="14sp"
                 app:layout_constraintEnd_toEndOf="@id/edittext_title"
                 app:layout_constraintStart_toStartOf="@id/edittext_title"
@@ -266,7 +272,7 @@
             android:background="?bg_line_1"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="@id/guideline_textStart"
+            app:layout_constraintStart_toStartOf="@id/guideline_dataStart"
             app:layout_constraintTop_toBottomOf="@id/layout_data_holder" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

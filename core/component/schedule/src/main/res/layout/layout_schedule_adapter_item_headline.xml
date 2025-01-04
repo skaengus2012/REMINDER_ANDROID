@@ -20,11 +20,12 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:paddingHorizontal="@dimen/horizontal_padding_medium">
+    android:paddingHorizontal="@dimen/horizontal_padding_medium"
+    android:paddingVertical="10dp">
 
     <TextView
         android:id="@+id/textview_title"
-        style="@style/PlaneatTheme.Style.Typography.TitleLarge"
+        style="@style/PlaneatTheme.Style.Typography.TitleXlarge"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         tools:text="@tools:sample/lorem"

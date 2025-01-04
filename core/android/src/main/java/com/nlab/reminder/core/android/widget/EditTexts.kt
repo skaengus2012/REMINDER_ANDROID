@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 The N's lab Open Source Project
+ * Copyright (C) 2025 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.android.view
+package com.nlab.reminder.core.android.widget
 
-import android.view.MotionEvent
-import android.view.View
-import com.nlab.reminder.core.kotlinx.coroutine.flow.throttleFirst
+import android.text.Editable
+import android.text.TextWatcher
+import android.widget.EditText
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -26,18 +26,16 @@ import kotlinx.coroutines.flow.callbackFlow
 /**
  * @author Doohyun
  */
-fun View.touches(): Flow<MotionEvent> = callbackFlow {
-    setOnTouchListener { v, event ->
-        trySend(event)
-        v.performClick()
+fun EditText.textChanges(): Flow<CharSequence?> = callbackFlow {
+    val watcher = object : TextWatcher {
+        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+
+        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+            trySend(s)
+        }
+
+        override fun afterTextChanged(s: Editable?) = Unit
     }
-
-    awaitClose { setOnTouchListener(null) }
+    addTextChangedListener(watcher)
+    awaitClose { removeTextChangedListener(watcher) }
 }
-
-fun View.clicks(): Flow<View> = callbackFlow {
-    setOnClickListener { trySend(it) }
-    awaitClose { setOnClickListener(null) }
-}
-
-fun View.throttleClicks(windowDuration: Long = 500): Flow<View> = clicks().throttleFirst(windowDuration)

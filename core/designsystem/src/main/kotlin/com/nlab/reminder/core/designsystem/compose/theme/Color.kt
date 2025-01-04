@@ -55,6 +55,7 @@ internal val BgLine2Light = Gray2
 internal val BgPlaceHolder1Light = Color.White
 internal val Content1Light = Color(0xFF393939)
 internal val Content2Light = Color(0xFF8A8A8D)
+internal val Content2HintLight = Content2Light.copy(alpha = 0.6f)
 internal val Content3Light = Gray500
 // light (compose only)
 internal val BgCard1RippleLight = BgRipple1Light
@@ -74,6 +75,7 @@ internal val BgLine1Dark = Gray800
 internal val BgLine2Dark = Gray2
 internal val Content1Dark = Color.White
 internal val Content2Dark = Color(0xFFB7B7B7)
+internal val Content2DarkLight = Content2Dark.copy(alpha = 0.6f)
 internal val Content3Dark = Gray500
 // dark(compose only)
 internal val BgCard1RippleDark = BgRipple1Dark

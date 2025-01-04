@@ -110,12 +110,15 @@ private fun ScheduleListToolbarContent(
 
         BackButton(
             modifier = Modifier
-                .align(Alignment.CenterStart),
+                .align(Alignment.CenterStart)
+                .padding(start = 10.dp),
             onClick = onBackClicked,
         )
 
         Row(
-            modifier = Modifier.align(Alignment.CenterEnd)
+            modifier = Modifier
+                .align(Alignment.CenterEnd)
+                .padding(end = 5.dp)
         ) {
             if (isMoreVisible) {
                 IconButton(
@@ -166,7 +169,6 @@ private fun BackButton(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
-            modifier = Modifier.padding(start = 3.dp),
             painter = painterResource(DrawableIds.ic_back),
             contentDescription = null,
             tint = PlaneatTheme.colors.point1,

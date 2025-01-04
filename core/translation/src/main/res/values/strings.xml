@@ -77,8 +77,9 @@
     <string name="home_tag_header">나의 태그</string>
     <string name="new_schedule_label">새로운 플랜</string>
 
+    <string name="add_note">메모 추가</string>
     <string name="content_description_back">뒤로 가기</string>
-    <string name="content_description_complete">완료 하기</string>
+    <string name="content_description_complete_toggle">완료 여부 선택</string>
     <string name="content_description_drag">드래깅</string>
     <string name="content_description_more">더보기</string>
     <string name="content_description_open_link">링크 열기</string>
