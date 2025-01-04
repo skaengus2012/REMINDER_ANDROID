@@ -19,6 +19,7 @@ package com.nlab.reminder.core.component.tag.edit
 import com.nlab.reminder.core.data.model.genTag
 import com.nlab.reminder.core.data.model.genTags
 import com.nlab.reminder.core.data.repository.SaveTagQuery
+import com.nlab.reminder.core.data.repository.ScheduleTagListRepository
 import com.nlab.reminder.core.data.repository.TagRepository
 import com.nlab.reminder.core.domain.TagGroupSource
 import com.nlab.reminder.core.domain.TryUpdateTagNameResult
@@ -88,8 +89,8 @@ class TagEditDelegateTest {
         )
         val delegate = genTagEditDelegate(
             initState = initState,
-            tagRepository = mock {
-                whenever(mock.getUsageCount(initState.tag.id)) doReturn Result.Success(usageCount)
+            scheduleTagListRepository = mock {
+                whenever(mock.getTagUsageCount(initState.tag.id)) doReturn Result.Success(usageCount)
             }
         )
 
@@ -320,8 +321,8 @@ class TagEditDelegateTest {
         )
         val delegate = genTagEditDelegate(
             initState = initState,
-            tagRepository = mock {
-                whenever(mock.getUsageCount(initState.tag.id)) doReturn Result.Success(usageCount)
+            scheduleTagListRepository = mock {
+                whenever(mock.getTagUsageCount(initState.tag.id)) doReturn Result.Success(usageCount)
             }
         )
 
@@ -385,5 +386,6 @@ class TagEditDelegateTest {
 private fun genTagEditDelegate(
     initState: TagEditState?,
     tagRepository: TagRepository = mock(),
+    scheduleTagListRepository: ScheduleTagListRepository = mock(),
     tryUpdateTagNameUseCase: TryUpdateTagNameUseCase = mock(),
-): TagEditDelegate = TagEditDelegate(initState, tagRepository, tryUpdateTagNameUseCase)
+): TagEditDelegate = TagEditDelegate(initState, tagRepository, scheduleTagListRepository, tryUpdateTagNameUseCase)

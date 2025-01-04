@@ -16,26 +16,22 @@
 
 package com.nlab.reminder.core.data.repository.impl
 
-import com.nlab.reminder.core.data.model.ScheduleId
 import com.nlab.reminder.core.data.model.Tag
 import com.nlab.reminder.core.data.model.TagId
 import com.nlab.reminder.core.data.repository.GetTagQuery
 import com.nlab.reminder.core.data.repository.SaveTagQuery
 import com.nlab.reminder.core.data.repository.TagRepository
-import com.nlab.reminder.core.kotlin.NonNegativeLong
 import com.nlab.reminder.core.kotlinx.coroutine.flow.map
 import com.nlab.reminder.core.kotlin.Result
 import com.nlab.reminder.core.kotlin.catching
+import com.nlab.reminder.core.kotlin.collections.toList
 import com.nlab.reminder.core.kotlin.collections.toSet
 import com.nlab.reminder.core.kotlin.map
-import com.nlab.reminder.core.kotlin.toNonNegativeLong
-import com.nlab.reminder.core.local.database.dao.ScheduleTagListDAO
 import com.nlab.reminder.core.local.database.dao.TagRelationDAO
 import com.nlab.reminder.core.local.database.dao.TagDAO
 import com.nlab.reminder.core.local.database.model.TagEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.flatMapLatest
 
 /**
  * @author Doohyun
@@ -43,7 +39,6 @@ import kotlinx.coroutines.flow.flatMapLatest
 class LocalTagRepository(
     private val tagDAO: TagDAO,
     private val tagRelationDAO: TagRelationDAO,
-    private val scheduleTagListDAO: ScheduleTagListDAO,
 ) : TagRepository {
     override suspend fun save(query: SaveTagQuery): Result<Tag> {
         val entityResult = catching {
@@ -67,12 +62,6 @@ class LocalTagRepository(
         tagDAO.deleteById(id.rawId)
     }
 
-    override suspend fun getUsageCount(id: TagId): Result<NonNegativeLong> = catching {
-        scheduleTagListDAO
-            .findTagUsageCount(tagId = id.rawId)
-            .toNonNegativeLong()
-    }
-
     override fun getTagsAsStream(query: GetTagQuery): Flow<Collection<Tag>> {
         val entitiesFlow: Flow<Array<TagEntity>> = when (query) {
             is GetTagQuery.All -> {
@@ -82,17 +71,7 @@ class LocalTagRepository(
             is GetTagQuery.ByIds -> {
                 tagDAO.findByIdsAsStream(query.tagIds.toSet(TagId::rawId))
             }
-
-            is GetTagQuery.ByScheduleIds -> {
-                scheduleTagListDAO
-                    .findTagIdsByScheduleIdsAsStream(query.scheduleIds.toSet(ScheduleId::rawId))
-                    .map(Array<Long>::toSet)
-                    .distinctUntilChanged()
-                    .flatMapLatest(tagDAO::findByIdsAsStream)
-            }
         }
-        return entitiesFlow.distinctUntilChanged().map { entities ->
-            ArrayList<Tag>(entities.size).apply { entities.mapTo(destination = this, ::Tag) }
-        }
+        return entitiesFlow.distinctUntilChanged().map { entities -> entities.toList(::Tag) }
     }
 }

@@ -17,6 +17,7 @@
 package com.nlab.reminder.core.component.tag.di
 
 import com.nlab.reminder.core.component.tag.edit.TagEditDelegate
+import com.nlab.reminder.core.data.repository.ScheduleTagListRepository
 import com.nlab.reminder.core.data.repository.TagRepository
 import com.nlab.reminder.core.domain.TryUpdateTagNameUseCase
 import dagger.Module
@@ -35,10 +36,12 @@ internal class ViewModelScopeTagComponentModule {
     @Provides
     fun provideTagEditDelegate(
         tagRepository: TagRepository,
+        scheduleTagListRepository: ScheduleTagListRepository,
         tryUpdateTagNameUseCase: TryUpdateTagNameUseCase,
     ): TagEditDelegate = TagEditDelegate(
         initialState = null,
         tagRepository = tagRepository,
+        scheduleTagListRepository = scheduleTagListRepository,
         tryUpdateTagNameUseCase = tryUpdateTagNameUseCase,
     )
 }

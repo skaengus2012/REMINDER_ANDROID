@@ -16,13 +16,11 @@
 
 package com.nlab.reminder.core.data.repository
 
-import com.nlab.reminder.core.data.model.ScheduleId
 import kotlinx.coroutines.flow.Flow
 import com.nlab.reminder.core.kotlin.Result
 import com.nlab.reminder.core.data.model.Tag
 import com.nlab.reminder.core.data.model.TagId
 import com.nlab.reminder.core.kotlin.NonBlankString
-import com.nlab.reminder.core.kotlin.NonNegativeLong
 
 /**
  * @author Doohyun
@@ -30,7 +28,6 @@ import com.nlab.reminder.core.kotlin.NonNegativeLong
 interface TagRepository {
     suspend fun save(query: SaveTagQuery): Result<Tag>
     suspend fun delete(id: TagId): Result<Unit>
-    suspend fun getUsageCount(id: TagId): Result<NonNegativeLong>
     fun getTagsAsStream(query: GetTagQuery): Flow<Collection<Tag>>
 }
 
@@ -42,5 +39,4 @@ sealed class SaveTagQuery private constructor() {
 sealed class GetTagQuery private constructor() {
     data object All : GetTagQuery()
     data class ByIds(val tagIds: Set<TagId>) : GetTagQuery()
-    data class ByScheduleIds(val scheduleIds: Set<ScheduleId>) : GetTagQuery()
 }

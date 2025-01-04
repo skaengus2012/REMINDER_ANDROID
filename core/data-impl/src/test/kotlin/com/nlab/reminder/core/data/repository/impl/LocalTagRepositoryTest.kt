@@ -18,10 +18,8 @@ package com.nlab.reminder.core.data.repository.impl
 
 import com.nlab.reminder.core.data.model.*
 import com.nlab.reminder.core.data.repository.*
-import com.nlab.reminder.core.kotlin.faker.genNonNegativeLong
 import com.nlab.reminder.core.kotlin.getOrThrow
 import com.nlab.reminder.core.kotlin.toNonBlankString
-import com.nlab.reminder.core.local.database.dao.ScheduleTagListDAO
 import com.nlab.reminder.core.local.database.dao.TagDAO
 import com.nlab.reminder.core.local.database.dao.TagRelationDAO
 import kotlinx.coroutines.flow.*
@@ -73,20 +71,6 @@ internal class LocalTagRepositoryTest {
     }
 
     @Test
-    fun `Given tagId, When getUsageCount, Then usageCount found from dao`() = runTest {
-        val id = genTagId()
-        val expectedUsageCount = genNonNegativeLong()
-
-        val scheduleTagListDAO: ScheduleTagListDAO = mock {
-            whenever(mock.findTagUsageCount(id.rawId)) doReturn expectedUsageCount.value
-        }
-        val actualUsageCount = genTagRepository(scheduleTagListDAO = scheduleTagListDAO)
-            .getUsageCount(id)
-            .getOrThrow()
-        assertThat(actualUsageCount, equalTo(expectedUsageCount))
-    }
-
-    @Test
     fun `Given all getTagQuery, When getTagsAsStream, Then tags found from dao`() = runTest {
         val (expectedTag, entity) = genTagAndEntity()
         val tagRepository = genTagRepository(
@@ -114,30 +98,9 @@ internal class LocalTagRepositoryTest {
             .first()
         assertThat(actualTag, equalTo(expectedTag))
     }
-
-    @Test
-    fun `Given byScheduleIds getTagQuery, When getTagsAsStream, Then tags found from dao`() = runTest {
-        val scheduleId = genScheduleId()
-        val (expectedTag, entity) = genTagAndEntity()
-        val tagRepository = genTagRepository(
-            tagDAO = mock {
-                whenever(mock.findByIdsAsStream(tagIds = setOf(expectedTag.id.rawId))) doReturn flowOf(arrayOf(entity))
-            },
-            scheduleTagListDAO = mock {
-                whenever(mock.findTagIdsByScheduleIdsAsStream(setOf(scheduleId.rawId)))
-                    .doReturn(flowOf(arrayOf(expectedTag.id.rawId)))
-            }
-        )
-        val actualTag = tagRepository
-            .getTagsAsStream(GetTagQuery.ByScheduleIds(setOf(scheduleId)))
-            .first()
-            .first()
-        assertThat(actualTag, equalTo(expectedTag))
-    }
 }
 
 private fun genTagRepository(
     tagDAO: TagDAO = mock(),
-    tagRelationDAO: TagRelationDAO = mock(),
-    scheduleTagListDAO: ScheduleTagListDAO = mock(),
-): TagRepository = LocalTagRepository(tagDAO, tagRelationDAO, scheduleTagListDAO)
+    tagRelationDAO: TagRelationDAO = mock()
+): TagRepository = LocalTagRepository(tagDAO, tagRelationDAO)

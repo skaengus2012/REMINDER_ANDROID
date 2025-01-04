@@ -18,6 +18,7 @@ package com.nlab.reminder.core.component.tag.edit
 
 import com.nlab.reminder.core.data.model.Tag
 import com.nlab.reminder.core.data.repository.SaveTagQuery
+import com.nlab.reminder.core.data.repository.ScheduleTagListRepository
 import com.nlab.reminder.core.data.repository.TagRepository
 import com.nlab.reminder.core.domain.TagGroupSource
 import com.nlab.reminder.core.domain.TryUpdateTagNameResult
@@ -36,6 +37,7 @@ import kotlinx.coroutines.flow.update
 class TagEditDelegate(
     initialState: TagEditState?,
     private val tagRepository: TagRepository,
+    private val scheduleTagListRepository: ScheduleTagListRepository,
     private val tryUpdateTagNameUseCase: TryUpdateTagNameUseCase,
 ) {
     private val _state = MutableStateFlow(initialState)
@@ -47,7 +49,7 @@ class TagEditDelegate(
     }
 
     suspend fun startRename(): Result<Unit> = _state.updateIfIntro(
-        getUsageCount = { tag -> tagRepository.getUsageCount(id = tag.id) },
+        getUsageCount = { tag -> scheduleTagListRepository.getTagUsageCount(tagId = tag.id) },
         transform = { tag, usageCount ->
             TagEditState.Rename(
                 tag = tag,
@@ -129,7 +131,7 @@ class TagEditDelegate(
     }
 
     suspend fun startDelete(): Result<Unit> = _state.updateIfIntro(
-        getUsageCount = { tag -> tagRepository.getUsageCount(id = tag.id) },
+        getUsageCount = { tag -> scheduleTagListRepository.getTagUsageCount(tagId = tag.id) },
         transform = { tag, usageCount -> TagEditState.Delete(tag = tag, usageCount = usageCount) }
     )
 
