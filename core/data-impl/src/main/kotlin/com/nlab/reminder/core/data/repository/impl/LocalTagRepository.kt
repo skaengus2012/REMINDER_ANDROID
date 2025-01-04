@@ -16,6 +16,7 @@
 
 package com.nlab.reminder.core.data.repository.impl
 
+import com.nlab.reminder.core.data.model.ScheduleId
 import com.nlab.reminder.core.data.model.Tag
 import com.nlab.reminder.core.data.model.TagId
 import com.nlab.reminder.core.data.repository.GetTagQuery
@@ -25,6 +26,7 @@ import com.nlab.reminder.core.kotlin.NonNegativeLong
 import com.nlab.reminder.core.kotlinx.coroutine.flow.map
 import com.nlab.reminder.core.kotlin.Result
 import com.nlab.reminder.core.kotlin.catching
+import com.nlab.reminder.core.kotlin.collections.toSet
 import com.nlab.reminder.core.kotlin.map
 import com.nlab.reminder.core.kotlin.toNonNegativeLong
 import com.nlab.reminder.core.local.database.dao.ScheduleTagListDAO
@@ -33,6 +35,7 @@ import com.nlab.reminder.core.local.database.dao.TagDAO
 import com.nlab.reminder.core.local.database.model.TagEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
 
 /**
  * @author Doohyun
@@ -72,10 +75,21 @@ class LocalTagRepository(
 
     override fun getTagsAsStream(query: GetTagQuery): Flow<Collection<Tag>> {
         val entitiesFlow: Flow<Array<TagEntity>> = when (query) {
-            is GetTagQuery.All -> tagDAO.getAsStream()
-            is GetTagQuery.ByIds -> tagDAO.findByIdsAsStream(
-                buildSet { query.tagIds.mapTo(destination = this, transform = TagId::rawId) }
-            )
+            is GetTagQuery.All -> {
+                tagDAO.getAsStream()
+            }
+
+            is GetTagQuery.ByIds -> {
+                tagDAO.findByIdsAsStream(query.tagIds.toSet(TagId::rawId))
+            }
+
+            is GetTagQuery.ByScheduleIds -> {
+                scheduleTagListDAO
+                    .findTagIdsByScheduleIdsAsStream(query.scheduleIds.toSet(ScheduleId::rawId))
+                    .map(Array<Long>::toSet)
+                    .distinctUntilChanged()
+                    .flatMapLatest(tagDAO::findByIdsAsStream)
+            }
         }
         return entitiesFlow.distinctUntilChanged().map { entities ->
             ArrayList<Tag>(entities.size).apply { entities.mapTo(destination = this, ::Tag) }

@@ -21,6 +21,8 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import com.nlab.reminder.core.local.database.model.ScheduleTagListEntity
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 
 @Dao
 abstract class ScheduleTagListDAO {
@@ -35,4 +37,11 @@ abstract class ScheduleTagListDAO {
 
     @Query("SELECT schedule_id FROM schedule_tag_list WHERE tag_id = :tagId")
     abstract suspend fun findScheduleIdsByTagId(tagId: Long): Array<Long>
+
+    @Query("SELECT DISTINCT tag_id FROM schedule_tag_list WHERE tag_id IN (:scheduleIds)")
+    protected abstract fun findTagIdsByScheduleIdsAsStreamInternal(scheduleIds: Set<Long>): Flow<Array<Long>>
+
+    fun findTagIdsByScheduleIdsAsStream(scheduleIds: Set<Long>): Flow<Array<Long>> =
+        if (scheduleIds.isEmpty()) flowOf(emptyArray())
+        else findTagIdsByScheduleIdsAsStreamInternal(scheduleIds)
 }

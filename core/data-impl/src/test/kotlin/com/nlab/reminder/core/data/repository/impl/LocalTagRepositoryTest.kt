@@ -87,34 +87,52 @@ internal class LocalTagRepositoryTest {
     }
 
     @Test
-    fun `Given getTagQuery, When getTagsAsStream, Then tags found from dao`() = runTest {
-        suspend fun testGetScheduleAsStream(
-            tagDao: TagDAO,
-            query: GetTagQuery,
-            expectedResult: List<Tag>
-        ) {
-            val tagRepository = genTagRepository(tagDAO = tagDao)
-            val actualTags = tagRepository.getTagsAsStream(query)
-            assertThat(actualTags.first(), equalTo(expectedResult))
-        }
-
-        val (expectedTag, expectedEntity) = genTagAndEntity()
-        val expectedTags = listOf(expectedTag)
-        val expectedEntities = arrayOf(expectedEntity)
-
-        testGetScheduleAsStream(
-            tagDao = mock<TagDAO> { whenever(mock.getAsStream()) doReturn flowOf(expectedEntities) },
-            query = GetTagQuery.All,
-            expectedResult = expectedTags
+    fun `Given all getTagQuery, When getTagsAsStream, Then tags found from dao`() = runTest {
+        val (expectedTag, entity) = genTagAndEntity()
+        val tagRepository = genTagRepository(
+            tagDAO = mock<TagDAO> { whenever(mock.getAsStream()) doReturn flowOf(arrayOf(entity)) }
         )
-        testGetScheduleAsStream(
-            tagDao = mock<TagDAO> {
-                val expectedParams = expectedEntities.map { it.tagId }.toSet()
-                whenever(mock.findByIdsAsStream(expectedParams)) doReturn flowOf(expectedEntities)
+
+        val actualTag = tagRepository
+            .getTagsAsStream(GetTagQuery.All)
+            .first()
+            .first()
+        assertThat(actualTag, equalTo(expectedTag))
+    }
+
+    @Test
+    fun `Given byIds getTagQuery, When getTagsAsStream, Then tags found from dao`() = runTest {
+        val (expectedTag, entity) = genTagAndEntity()
+        val tagRepository = genTagRepository(
+            tagDAO = mock {
+                whenever(mock.findByIdsAsStream(tagIds = setOf(expectedTag.id.rawId))) doReturn flowOf(arrayOf(entity))
+            }
+        )
+        val actualTag = tagRepository
+            .getTagsAsStream(GetTagQuery.ByIds(setOf(expectedTag.id)))
+            .first()
+            .first()
+        assertThat(actualTag, equalTo(expectedTag))
+    }
+
+    @Test
+    fun `Given byScheduleIds getTagQuery, When getTagsAsStream, Then tags found from dao`() = runTest {
+        val scheduleId = genScheduleId()
+        val (expectedTag, entity) = genTagAndEntity()
+        val tagRepository = genTagRepository(
+            tagDAO = mock {
+                whenever(mock.findByIdsAsStream(tagIds = setOf(expectedTag.id.rawId))) doReturn flowOf(arrayOf(entity))
             },
-            query = GetTagQuery.ByIds(expectedTags.map { it.id }.toSet()),
-            expectedResult = expectedTags
+            scheduleTagListDAO = mock {
+                whenever(mock.findTagIdsByScheduleIdsAsStream(setOf(scheduleId.rawId)))
+                    .doReturn(flowOf(arrayOf(expectedTag.id.rawId)))
+            }
         )
+        val actualTag = tagRepository
+            .getTagsAsStream(GetTagQuery.ByScheduleIds(setOf(scheduleId)))
+            .first()
+            .first()
+        assertThat(actualTag, equalTo(expectedTag))
     }
 }
 

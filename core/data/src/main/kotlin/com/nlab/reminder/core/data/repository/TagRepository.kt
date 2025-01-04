@@ -16,6 +16,7 @@
 
 package com.nlab.reminder.core.data.repository
 
+import com.nlab.reminder.core.data.model.ScheduleId
 import kotlinx.coroutines.flow.Flow
 import com.nlab.reminder.core.kotlin.Result
 import com.nlab.reminder.core.data.model.Tag
@@ -41,4 +42,5 @@ sealed class SaveTagQuery private constructor() {
 sealed class GetTagQuery private constructor() {
     data object All : GetTagQuery()
     data class ByIds(val tagIds: Set<TagId>) : GetTagQuery()
+    data class ByScheduleIds(val scheduleIds: Set<ScheduleId>) : GetTagQuery()
 }
