@@ -19,7 +19,7 @@ package com.nlab.reminder.core.data.model
 /**
  * @author Doohyun
  */
-data class ScheduleDetails(
+data class ScheduleDetail(
     val schedule: Schedule,
     val tags: Set<Tag>,
     val linkMetadata: LinkMetadata?

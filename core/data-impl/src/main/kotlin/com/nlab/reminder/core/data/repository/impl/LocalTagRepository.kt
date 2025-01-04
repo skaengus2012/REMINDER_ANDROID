@@ -24,7 +24,6 @@ import com.nlab.reminder.core.data.repository.TagRepository
 import com.nlab.reminder.core.kotlinx.coroutine.flow.map
 import com.nlab.reminder.core.kotlin.Result
 import com.nlab.reminder.core.kotlin.catching
-import com.nlab.reminder.core.kotlin.collections.toList
 import com.nlab.reminder.core.kotlin.collections.toSet
 import com.nlab.reminder.core.kotlin.map
 import com.nlab.reminder.core.local.database.dao.TagRelationDAO
@@ -62,7 +61,7 @@ class LocalTagRepository(
         tagDAO.deleteById(id.rawId)
     }
 
-    override fun getTagsAsStream(query: GetTagQuery): Flow<Collection<Tag>> {
+    override fun getTagsAsStream(query: GetTagQuery): Flow<Set<Tag>> {
         val entitiesFlow: Flow<Array<TagEntity>> = when (query) {
             is GetTagQuery.All -> {
                 tagDAO.getAsStream()
@@ -72,6 +71,6 @@ class LocalTagRepository(
                 tagDAO.findByIdsAsStream(query.tagIds.toSet(TagId::rawId))
             }
         }
-        return entitiesFlow.distinctUntilChanged().map { entities -> entities.toList(::Tag) }
+        return entitiesFlow.distinctUntilChanged().map { entities -> entities.toSet(::Tag) }
     }
 }

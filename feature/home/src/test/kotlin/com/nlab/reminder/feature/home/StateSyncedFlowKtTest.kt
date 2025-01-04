@@ -42,7 +42,7 @@ class StateSyncedFlowKtTest {
                 whenever(mock.getScheduleCountAsStream(any())) doReturn flowOf(expectedScheduleCount)
             },
             tagRepository = mock {
-                whenever(mock.getTagsAsStream(any())) doReturn flowOf(expectedTags.shuffled())
+                whenever(mock.getTagsAsStream(any())) doReturn flowOf(expectedTags.toSet())
             }
         )
 

@@ -14,16 +14,14 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.kotlin.collections
+package com.nlab.reminder.core.data.repository
+
+import com.nlab.reminder.core.data.model.ScheduleDetail
+import kotlinx.coroutines.flow.Flow
 
 /**
  * @author Thalys
  */
-inline fun <T, U> Iterable<T>.toSet(transform: (T) -> U): Set<U> =
-    buildSet { mapTo(destination = this, transform = transform) }
-
-inline fun <T, U : Any> Iterable<T>.toSetNotNull(transform: (T) -> U?): Set<U> =
-    buildSet { mapNotNullTo(destination = this, transform = transform) }
-
-fun <T, U> Array<T>.toSet(transform: (T) -> U): Set<U> =
-    buildSet { mapTo(destination = this, transform = transform) }
+interface ScheduleDetailRepository {
+    suspend fun getScheduleDetailsAsStream(query: GetScheduleQuery): Flow<Set<ScheduleDetail>>
+}

@@ -28,7 +28,7 @@ import com.nlab.reminder.core.kotlin.NonBlankString
 interface TagRepository {
     suspend fun save(query: SaveTagQuery): Result<Tag>
     suspend fun delete(id: TagId): Result<Unit>
-    fun getTagsAsStream(query: GetTagQuery): Flow<Collection<Tag>>
+    fun getTagsAsStream(query: GetTagQuery): Flow<Set<Tag>>
 }
 
 sealed class SaveTagQuery private constructor() {
