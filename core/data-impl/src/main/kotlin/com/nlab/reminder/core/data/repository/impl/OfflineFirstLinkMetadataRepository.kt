@@ -31,8 +31,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -47,9 +47,8 @@ class OfflineFirstLinkMetadataRepository(
 ) : LinkMetadataRepository {
     private val inMemoryTableFlow = MutableStateFlow(initialCache)
 
-    override suspend fun getAsStream(links: Set<Link>): Flow<Map<Link, LinkMetadata>> =
-        suspend { sync(links) }
-            .asFlow()
+    override fun getAsStream(links: Set<Link>): Flow<Map<Link, LinkMetadata>> =
+        flow { emit(sync(links))  }
             .flatMapLatest { inMemoryTableFlow }
             .distinctUntilChanged()
             .map { table ->
