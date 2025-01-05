@@ -19,4 +19,9 @@
 
     <style name="PlaneatTheme.Style.Component" parent="PlaneatTheme.Style" />
 
+    <style name="PlaneatTheme.Style.Component.IconButton" parent="PlaneatTheme.Style.Component">
+        <item name="android:layout_width">@dimen/icon_button_size</item>
+        <item name="android:layout_height">@dimen/icon_button_size</item>
+    </style>
+
 </resources>

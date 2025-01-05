@@ -16,6 +16,7 @@
 
 package com.nlab.reminder.core.component.schedule.ui.view.list
 
+import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
 import android.text.InputType
 import androidx.appcompat.content.res.AppCompatResources
@@ -73,6 +74,17 @@ internal class ScheduleContentViewHolder(
                 ScheduleListTheme.Point3 -> R.drawable.checkbox_schedule_check_selector_point3
             }
         )
+        binding.buttonInfo.apply {
+            imageTintList = ColorStateList.valueOf(
+                context.getThemeColor(
+                    when (theme) {
+                        ScheduleListTheme.Point1 -> AttrIds.point_1
+                        ScheduleListTheme.Point2 -> AttrIds.point_2
+                        ScheduleListTheme.Point3 -> AttrIds.point_3
+                    }
+                )
+            )
+        }
 
         // Processing for multiline input and actionDone support
         binding.edittextTitle.setRawInputType(InputType.TYPE_CLASS_TEXT)
@@ -102,6 +114,7 @@ internal class ScheduleContentViewHolder(
             }
             jobs += viewLifecycleCoroutineScope.launch {
                 itemFocusedFlow.collect { focused ->
+                    binding.buttonInfo.setVisible(focused)
                     if (focused.not()) itemView.hideSoftInputFromWindow()
                 }
             }

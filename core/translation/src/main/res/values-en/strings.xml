@@ -86,6 +86,7 @@
     <string name="content_description_back">go back</string>
     <string name="content_description_complete_toggle">check whether to complete</string>
     <string name="content_description_drag">dragging</string>
+    <string name="content_description_info">information</string>
     <string name="content_description_more">see more</string>
     <string name="content_description_open_link">open link</string>
     <string name="content_description_select">select</string>

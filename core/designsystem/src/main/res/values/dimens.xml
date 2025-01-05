@@ -16,4 +16,5 @@
 
 <resources>
     <dimen name="horizontal_padding_medium">20dp</dimen>
+    <dimen name="icon_button_size">48dp</dimen>
 </resources>

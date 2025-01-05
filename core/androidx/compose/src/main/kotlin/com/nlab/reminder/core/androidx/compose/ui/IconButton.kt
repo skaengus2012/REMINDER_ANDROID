@@ -27,9 +27,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.dp
 import com.nlab.reminder.core.androidx.compose.ui.tooling.preview.Previews
+import com.nlab.reminder.core.designsystem.compose.theme.DimenIds
 import com.nlab.reminder.core.designsystem.compose.theme.DrawableIds
 import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
 
@@ -45,7 +46,7 @@ fun IconButton(
     tint: Color = LocalContentColor.current,
     indication: Indication? = null,
 ) {
-    Box(modifier = modifier.size(48.dp)) {
+    Box(modifier = modifier.size(dimensionResource(DimenIds.icon_button_size))) {
         ButtonBackground(
             onClick = onClick,
             onClickLabel = contentDescription,

@@ -14,8 +14,7 @@
   ~ limitations under the License.
   -->
 
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -73,7 +72,7 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:orientation="vertical"
-            app:layout_constraintGuide_end="@dimen/horizontal_padding_medium" />
+            app:layout_constraintGuide_end="0dp" />
 
         <ImageButton
             android:id="@+id/button_complete"
@@ -126,19 +125,30 @@
             app:layout_constraintStart_toStartOf="@id/guideline_dataStart"
             app:layout_constraintTop_toTopOf="parent">
 
+            <Button
+                android:id="@+id/textview_guideTitle"
+                android:layout_width="@dimen/schedule_checkbox_touchable_size"
+                android:layout_height="@dimen/schedule_checkbox_touchable_size"
+                android:background="@android:color/transparent"
+                android:clickable="false"
+                android:focusable="false"
+                android:focusableInTouchMode="false"
+                android:inputType="none"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
             <EditText
                 android:id="@+id/edittext_title"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
                 android:background="@null"
                 android:gravity="center_vertical"
                 android:imeOptions="actionDone"
                 android:inputType="textMultiLine"
                 android:textColor="?content_1"
                 android:textSize="16sp"
-                app:layout_constraintBottom_toTopOf="@id/edittext_note"
-                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBaseline_toBaselineOf="@id/textview_guideTitle"
+                app:layout_constraintEnd_toStartOf="@id/button_info"
                 app:layout_constraintHeight_min="@dimen/schedule_check_size"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -147,7 +157,7 @@
 
             <EditText
                 android:id="@+id/edittext_note"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
                 android:background="@null"
@@ -164,11 +174,24 @@
                 tools:ignore="Autofill,LabelFor,TextFields"
                 tools:text="@tools:sample/lorem" />
 
+            <ImageButton
+                android:id="@+id/button_info"
+                android:layout_width="@dimen/schedule_checkbox_touchable_size"
+                android:layout_height="@dimen/schedule_checkbox_touchable_size"
+                android:background="?selectableItemBackgroundBorderless"
+                android:contentDescription="@string/content_description_info"
+                android:padding="11.5dp"
+                android:scaleType="fitXY"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/ic_info" />
+
             <androidx.cardview.widget.CardView
                 android:id="@+id/card_link"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="7.5dp"
+                android:layout_marginEnd="@dimen/horizontal_padding_medium"
                 android:contentDescription="@string/content_description_open_link"
                 android:descendantFocusability="blocksDescendants"
                 app:cardCornerRadius="8dp"

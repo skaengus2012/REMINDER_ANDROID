@@ -118,7 +118,7 @@ private fun ScheduleListToolbarContent(
         Row(
             modifier = Modifier
                 .align(Alignment.CenterEnd)
-                .padding(end = 5.dp)
+                .padding(end = 2.dp)
         ) {
             if (isMoreVisible) {
                 IconButton(

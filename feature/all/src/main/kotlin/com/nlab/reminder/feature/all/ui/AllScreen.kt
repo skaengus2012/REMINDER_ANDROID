@@ -104,7 +104,7 @@ private fun AllToolbar(
         title = stringResource(StringIds.label_all),
         isTitleVisible = fragmentStateBridge.isToolbarTitleVisible,
         isMoreVisible = true,
-        isCompleteVisible = false,
+        isCompleteVisible = true,
         backgroundAlpha = 1.0f,
         onBackClicked = onBackClicked,
         onMenuClicked = onMoreClicked,

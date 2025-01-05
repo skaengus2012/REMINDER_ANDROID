@@ -81,6 +81,7 @@
     <string name="content_description_back">뒤로 가기</string>
     <string name="content_description_complete_toggle">완료 여부 선택</string>
     <string name="content_description_drag">드래깅</string>
+    <string name="content_description_info">정보</string>
     <string name="content_description_more">더보기</string>
     <string name="content_description_open_link">링크 열기</string>
     <string name="content_description_select">선택 하기</string>
