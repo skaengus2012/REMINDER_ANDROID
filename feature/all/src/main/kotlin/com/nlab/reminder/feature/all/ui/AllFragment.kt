@@ -63,7 +63,7 @@ internal class AllFragment : ComposableFragment() {
             .also { _binding = it }
             .root
 
-    override fun onComposed() {
+    override fun onViewReady(view: View, savedInstanceState: Bundle?) {
         val linearLayoutManager = LinearLayoutManager(requireContext())
         val scheduleListAdapter = ScheduleListAdapter(theme = ScheduleListTheme.Point3).apply {
             stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY

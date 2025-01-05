@@ -19,18 +19,28 @@ package com.nlab.reminder.core.androidx.fragment.compose
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
+import com.nlab.reminder.core.androidx.fragment.viewLifecycleScope
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.launch
 
 /**
  * @author Thalys
  */
 abstract class ComposableFragment : Fragment() {
+    private val isComposeCompleteJob = CompletableDeferred<Unit>()
+
     final override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-    }
 
-    protected abstract fun onComposed()
+        viewLifecycleScope.launch {
+            isComposeCompleteJob.await()
+            onViewReady(view, savedInstanceState)
+        }
+    }
 
     internal fun completeComposition() {
-        onComposed()
+        isComposeCompleteJob.complete(Unit)
     }
+
+    protected abstract fun onViewReady(view: View, savedInstanceState: Bundle?)
 }

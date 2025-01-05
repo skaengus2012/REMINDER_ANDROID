@@ -9,5 +9,7 @@ android {
 
 dependencies {
     api(libs.androidx.fragment.compose)
+
+    implementation(projects.core.androidx.fragment)
     implementation(libs.androidx.compose.ui)
 }
