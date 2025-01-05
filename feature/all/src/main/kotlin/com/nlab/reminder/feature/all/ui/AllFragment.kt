@@ -20,18 +20,30 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.recyclerview.widget.RecyclerView
 import com.nlab.reminder.core.androidx.fragment.compose.ComposableFragment
 import com.nlab.reminder.core.androidx.fragment.compose.ComposableInject
 import com.nlab.reminder.core.androidx.fragment.viewLifecycleScope
 import com.nlab.reminder.core.androix.recyclerview.verticalScrollRange
+import com.nlab.reminder.core.component.schedule.ui.view.list.ScheduleAdapterItem
+import com.nlab.reminder.core.component.schedule.ui.view.list.ScheduleListAdapter
+import com.nlab.reminder.core.component.schedule.ui.view.list.ScheduleListTheme
+import com.nlab.reminder.core.data.model.Link
+import com.nlab.reminder.core.data.model.LinkMetadata
+import com.nlab.reminder.core.data.model.Schedule
+import com.nlab.reminder.core.data.model.ScheduleContent
+import com.nlab.reminder.core.data.model.ScheduleDetail
+import com.nlab.reminder.core.data.model.ScheduleId
+import com.nlab.reminder.core.kotlin.toNonBlankString
+import com.nlab.reminder.core.kotlin.toNonNegativeLong
+import com.nlab.reminder.core.translation.StringIds
 import com.nlab.reminder.feature.all.databinding.FragmentAllBinding
-import com.nlab.reminder.feature.all.databinding.LayoutTestBinding
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * @author Doohyun
@@ -55,41 +67,55 @@ internal class AllFragment : ComposableFragment() {
             .onEach { fragmentStateBridge.verticalScrollRange = it }
             .launchIn(viewLifecycleScope)
 
-        val adapter = TestAdapter()
+        val adapter = ScheduleListAdapter(theme = ScheduleListTheme.Point3)
         binding.recyclerviewSchedule.adapter = adapter
 
+
         viewLifecycleScope.launch {
-            /**
-            delay(2000)
-            adapter.a.add(1)
-            adapter.notifyDataSetChanged()*/
-            delay(2000)
-            adapter.a.addAll((1..1000).toList())
-            adapter.notifyDataSetChanged()
+            delay(500)
+            val items = withContext(Dispatchers.Default) {
+                val imageSource = listOf(
+                    "https://i.namu.wiki/i/RyUyEbJKhi1iuG8y26lKjvMqjX8VzFUsk82z-9gqjV3KuIGg0krkOtcoZ69nvFREm9cuPbqQA7LSTt-LEfRjKA.webp",
+                    "https://img.kbs.co.kr/kbs/620/news.kbs.co.kr/data/fckeditor/new/image/2023/01/13/299931673597441715.png",
+                    "https://img.sbs.co.kr/newimg/news/20240726/201963680.jpg",
+                    null
+                )
+
+                buildList {
+                    this += ScheduleAdapterItem.Headline(StringIds.label_all)
+                    repeat(times = 10) {
+                        this += ScheduleAdapterItem.Content(
+                            scheduleDetail = ScheduleDetail(
+                                schedule = Schedule(
+                                    id = ScheduleId(it.toLong()),
+                                    content = ScheduleContent(
+                                        title = "Title $it",
+                                        note = "note $it".toNonBlankString(),
+                                        link = Link(
+                                            "https://www.naver.com/".toNonBlankString()
+                                        )
+                                    ),
+                                    isComplete = true,
+                                    visiblePriority = it.toLong().toNonNegativeLong()
+                                ),
+                                tags = emptySet(),
+                                linkMetadata = imageSource.shuffled().first()?.let {
+                                    LinkMetadata(
+                                        title = "네이버",
+                                        imageUrl = it
+                                    )
+                                }
+                            )
+                        )
+                    }
+                }
+            }
+            adapter.submitList(items)
         }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-}
-
-class TestAdapter : RecyclerView.Adapter<TestViewHolder>() {
-    var a = mutableListOf<Int>()
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TestViewHolder =
-        TestViewHolder(LayoutTestBinding.inflate(LayoutInflater.from(parent.context), parent, false))
-
-    override fun onBindViewHolder(holder: TestViewHolder, position: Int) {
-        holder.onBind(a[position])
-    }
-
-    override fun getItemCount(): Int = a.size
-}
-
-class TestViewHolder(private val binding: LayoutTestBinding) : RecyclerView.ViewHolder(binding.root) {
-    fun onBind(poisition: Int) {
-        binding.editText.setText(poisition.toString())
     }
 }

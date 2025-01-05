@@ -9,6 +9,7 @@ android {
 
 dependencies {
     implementation(projects.core.component.schedule)
+    implementation(projects.core.dataDi)
     
     implementation(projects.core.androidx.recyclerview)
     implementation(libs.androidx.constaintlayout)
