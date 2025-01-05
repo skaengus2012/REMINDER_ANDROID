@@ -71,6 +71,7 @@ fun PlaneatNavHost(
                 onAllCategoryClicked = { navController.navigateToAll() }
             )
             allScreen(
+                enterTransitionTimeInMillis = HOME_TRANSITION_DURATION,
                 provideEnterTransition = enterTransitionFactoryFromHome,
                 providePopExitTransition = popExitTransitionFactoryFromHome,
                 onBackClicked = { navController.popBackStack() }

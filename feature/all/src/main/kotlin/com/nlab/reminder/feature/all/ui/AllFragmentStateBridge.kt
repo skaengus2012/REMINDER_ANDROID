@@ -16,22 +16,23 @@
 
 package com.nlab.reminder.feature.all.ui
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 
 /**
  * @author Thalys
  */
 @Stable
-class AllFragmentStateBridge internal constructor() {
-    var verticalScrollRange: Int by mutableIntStateOf(0)
+internal class AllFragmentStateBridge(
+    isToolbarTitleVisible: Boolean
+) {
+    var isToolbarTitleVisible: Boolean by mutableStateOf(isToolbarTitleVisible)
 }
 
 @Composable
-fun rememberAllFragmentStateBridge(): AllFragmentStateBridge {
-    return remember { AllFragmentStateBridge() }
+internal fun rememberAllFragmentStateBridge(
+    isToolbarTitleVisible: Boolean,
+): AllFragmentStateBridge = remember {
+    AllFragmentStateBridge(
+        isToolbarTitleVisible = isToolbarTitleVisible
+    )
 }

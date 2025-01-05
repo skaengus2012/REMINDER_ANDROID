@@ -35,6 +35,7 @@ fun NavController.navigateToAll(navOptions: NavOptionsBuilder.() -> Unit = {}) =
     navigate(route = AllRoute, builder = navOptions)
 
 fun NavGraphBuilder.allScreen(
+    enterTransitionTimeInMillis: Int,
     onBackClicked: () -> Unit,
     provideEnterTransition: EnterTransitionFactory? = null,
     providePopExitTransition: ExitTransitionFactory? = null
@@ -43,6 +44,9 @@ fun NavGraphBuilder.allScreen(
         enterTransition = provideEnterTransition,
         popExitTransition = providePopExitTransition
     ) {
-        AllScreen(onBackClicked = onBackClicked)
+        AllScreen(
+            enterTransitionTimeInMillis = enterTransitionTimeInMillis,
+            onBackClicked = onBackClicked
+        )
     }
 }

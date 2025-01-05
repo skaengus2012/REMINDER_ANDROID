@@ -26,6 +26,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
+import com.nlab.reminder.core.androidx.compose.ui.DelayedContent
+import com.nlab.reminder.core.androidx.compose.ui.tooling.preview.Previews
 import com.nlab.reminder.core.androidx.fragment.compose.AndroidFragment
 import com.nlab.reminder.core.component.schedule.ui.compose.ScheduleListToolbar
 import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
@@ -36,12 +38,16 @@ import com.nlab.reminder.core.translation.StringIds
  */
 @Composable
 internal fun AllScreen(
+    enterTransitionTimeInMillis: Int,
     onBackClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     AllScreen(
         modifier = modifier,
-        fragmentStateBridge = rememberAllFragmentStateBridge(),
+        enterTransitionTimeInMillis = enterTransitionTimeInMillis,
+        fragmentStateBridge = rememberAllFragmentStateBridge(
+            isToolbarTitleVisible = false
+        ),
         onBackClicked = onBackClicked,
         onMoreClicked = {
             // TODO implements
@@ -54,25 +60,32 @@ internal fun AllScreen(
 
 @Composable
 private fun AllScreen(
+    enterTransitionTimeInMillis: Int,
     fragmentStateBridge: AllFragmentStateBridge,
     onBackClicked: () -> Unit,
     onMoreClicked: () -> Unit,
     onCompleteClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column(modifier = modifier.background(PlaneatTheme.colors.bg2)) {
+    Column(
+        modifier = modifier
+            .background(PlaneatTheme.colors.bg2)
+            .fillMaxSize()
+    ) {
         AllToolbar(
             fragmentStateBridge = fragmentStateBridge,
             onBackClicked = onBackClicked,
             onMoreClicked = onMoreClicked,
             onCompleteClicked = onCompleteClicked
         )
-        AndroidFragment<AllFragment>(
-            modifier = Modifier
-                .fillMaxSize()
-                .navigationBarsPadding()
-                .imePadding()
-        ) { it.fragmentStateBridge = fragmentStateBridge }
+        DelayedContent(delayTimeMillis = enterTransitionTimeInMillis.toLong()) {
+            AndroidFragment<AllFragment>(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .navigationBarsPadding()
+                    .imePadding()
+            ) { it.fragmentStateBridge = fragmentStateBridge }
+        }
     }
 }
 
@@ -89,7 +102,7 @@ private fun AllToolbar(
     ScheduleListToolbar(
         modifier = modifier,
         title = stringResource(StringIds.label_all),
-        isTitleVisible = false,
+        isTitleVisible = fragmentStateBridge.isToolbarTitleVisible,
         isMoreVisible = true,
         isCompleteVisible = false,
         backgroundAlpha = 1.0f,
@@ -101,4 +114,20 @@ private fun AllToolbar(
             onCompleteClicked()
         }
     )
+}
+
+@Previews
+@Composable
+private fun AllScreenPreview() {
+    PlaneatTheme {
+        AllScreen(
+            enterTransitionTimeInMillis = 0,
+            fragmentStateBridge = rememberAllFragmentStateBridge(
+                isToolbarTitleVisible = false
+            ),
+            onBackClicked = {},
+            onMoreClicked = {},
+            onCompleteClicked = {}
+        )
+    }
 }
