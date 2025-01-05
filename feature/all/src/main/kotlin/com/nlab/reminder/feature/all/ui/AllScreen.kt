@@ -16,9 +16,11 @@
 
 package com.nlab.reminder.feature.all.ui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
@@ -26,6 +28,7 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import com.nlab.reminder.core.androidx.fragment.compose.AndroidFragment
 import com.nlab.reminder.core.component.schedule.ui.compose.ScheduleListToolbar
+import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
 import com.nlab.reminder.core.translation.StringIds
 
 /**
@@ -57,7 +60,7 @@ private fun AllScreen(
     onCompleteClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column(modifier = modifier) {
+    Column(modifier = modifier.background(PlaneatTheme.colors.bg2)) {
         AllToolbar(
             fragmentStateBridge = fragmentStateBridge,
             onBackClicked = onBackClicked,
@@ -67,6 +70,7 @@ private fun AllScreen(
         AndroidFragment<AllFragment>(
             modifier = Modifier
                 .fillMaxSize()
+                .navigationBarsPadding()
                 .imePadding()
         ) { it.fragmentStateBridge = fragmentStateBridge }
     }
@@ -85,9 +89,9 @@ private fun AllToolbar(
     ScheduleListToolbar(
         modifier = modifier,
         title = stringResource(StringIds.label_all),
-        isTitleVisible = true,
+        isTitleVisible = false,
         isMoreVisible = true,
-        isCompleteVisible = true,
+        isCompleteVisible = false,
         backgroundAlpha = 1.0f,
         onBackClicked = onBackClicked,
         onMenuClicked = onMoreClicked,

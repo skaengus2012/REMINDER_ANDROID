@@ -17,6 +17,7 @@
 package com.nlab.reminder.core.component.schedule.ui.view.list
 
 import android.graphics.drawable.Drawable
+import android.text.InputType
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.graphics.drawable.DrawableCompat
@@ -72,6 +73,10 @@ internal class ScheduleContentViewHolder(
                 ScheduleListTheme.Point3 -> R.drawable.checkbox_schedule_check_selector_point3
             }
         )
+
+        // Processing for multiline input and actionDone support
+        binding.edittextTitle.setRawInputType(InputType.TYPE_CLASS_TEXT)
+        binding.edittextNote.setRawInputType(InputType.TYPE_CLASS_TEXT)
 
         val jobs = mutableListOf<Job>()
         itemView.doOnAttach { view ->

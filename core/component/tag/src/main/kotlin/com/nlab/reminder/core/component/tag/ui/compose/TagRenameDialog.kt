@@ -172,7 +172,7 @@ private fun TagRenameInputField(
                 color = PlaneatTheme.colors.bgLine1,
                 shape = RoundedCornerShape(5.dp)
             )
-            .background(PlaneatTheme.colors.bg2),
+            .background(PlaneatTheme.colors.bgDialogInput),
         verticalAlignment = Alignment.CenterVertically
     ) {
         var debouncedTextFieldValue by rememberDebouncedTextFieldValueState(

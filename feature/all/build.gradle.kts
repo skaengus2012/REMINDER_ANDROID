@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.nlab.android.library)
+    alias(libs.plugins.nlab.android.library.feature.compose)
     alias(libs.plugins.nlab.android.library.feature.view)
 }
 
@@ -8,9 +9,9 @@ android {
 }
 
 dependencies {
+    implementation(projects.core.androidx.recyclerview)
     implementation(projects.core.component.schedule)
     implementation(projects.core.dataDi)
-    
-    implementation(projects.core.androidx.recyclerview)
+
     implementation(libs.androidx.constaintlayout)
 }

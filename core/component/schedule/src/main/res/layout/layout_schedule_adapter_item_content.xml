@@ -52,7 +52,7 @@
         android:id="@+id/layout_body"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?android:windowBackground">
+        android:background="?bg_2">
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline_dataStart"
@@ -106,7 +106,7 @@
             android:id="@+id/view_button_complete_hidden"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:background="?android:windowBackground"
+            android:background="?bg_2"
             android:clickable="false"
             android:focusable="false"
             android:focusableInTouchMode="false"
@@ -133,8 +133,8 @@
                 android:layout_marginTop="10dp"
                 android:background="@null"
                 android:gravity="center_vertical"
-                android:imeOptions="actionNext"
-                android:inputType="text"
+                android:imeOptions="actionDone"
+                android:inputType="textMultiLine"
                 android:textColor="?content_1"
                 android:textSize="16sp"
                 app:layout_constraintBottom_toTopOf="@id/edittext_note"
@@ -154,7 +154,7 @@
                 android:gravity="center_vertical"
                 android:hint="@string/add_note"
                 android:imeOptions="actionDone"
-                android:inputType="text"
+                android:inputType="textMultiLine"
                 android:textColor="?content_2"
                 android:textColorHint="?content_2_hint"
                 android:textSize="14sp"
@@ -178,7 +178,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/edittext_note"
                 app:layout_constraintWidth_max="500dp"
-                app:strokeColor="?bg_card_stroke_1"
+                app:strokeColor="?attr/bg_card_2_stroke"
                 app:strokeWidth="0.5dp"
                 tools:visibility="visible">
 
