@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.schedule.ui
+package com.nlab.reminder.core.component.schedule.ui.view.list
 
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.RecyclerView
@@ -23,6 +23,6 @@ import androidx.recyclerview.widget.RecyclerView
  * @author Doohyun
  */
 @Suppress("FunctionName")
-fun ScheduleItemAnimator(): RecyclerView.ItemAnimator = DefaultItemAnimator().apply {
+fun ScheduleListAnimator(): RecyclerView.ItemAnimator = DefaultItemAnimator().apply {
     changeDuration = 0
 }

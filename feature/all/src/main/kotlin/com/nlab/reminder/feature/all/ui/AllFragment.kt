@@ -26,6 +26,7 @@ import com.nlab.reminder.core.androidx.fragment.viewLifecycleScope
 import com.nlab.reminder.core.androix.recyclerview.verticalScrollRange
 import com.nlab.reminder.core.component.schedule.ui.view.list.ScheduleAdapterItem
 import com.nlab.reminder.core.component.schedule.ui.view.list.ScheduleListAdapter
+import com.nlab.reminder.core.component.schedule.ui.view.list.ScheduleListAnimator
 import com.nlab.reminder.core.component.schedule.ui.view.list.ScheduleListTheme
 import com.nlab.reminder.core.data.model.Link
 import com.nlab.reminder.core.data.model.LinkMetadata
@@ -67,9 +68,11 @@ internal class AllFragment : ComposableFragment() {
             .onEach { fragmentStateBridge.verticalScrollRange = it }
             .launchIn(viewLifecycleScope)
 
-        val adapter = ScheduleListAdapter(theme = ScheduleListTheme.Point3)
-        binding.recyclerviewSchedule.adapter = adapter
-
+        val scheduleListAdapter = ScheduleListAdapter(theme = ScheduleListTheme.Point3)
+        binding.recyclerviewSchedule.apply {
+            adapter = scheduleListAdapter
+            itemAnimator = ScheduleListAnimator()
+        }
 
         viewLifecycleScope.launch {
             delay(500)
@@ -110,7 +113,7 @@ internal class AllFragment : ComposableFragment() {
                     }
                 }
             }
-            adapter.submitList(items)
+            scheduleListAdapter.submitList(items)
         }
     }
 
