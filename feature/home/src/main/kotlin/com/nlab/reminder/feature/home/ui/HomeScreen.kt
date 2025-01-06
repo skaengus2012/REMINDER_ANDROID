@@ -462,7 +462,7 @@ private fun CategoryCardBackground(
             .clip(RoundedCornerShape(8.dp))
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
-                indication = ripple(color = PlaneatTheme.colors.bgCard1Ripple),
+                indication = ripple(color = PlaneatTheme.colors.bgRipple1),
                 onClick = onClick,
                 onClickLabel = onClickLabel,
                 role = Role.Tab

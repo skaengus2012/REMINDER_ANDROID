@@ -40,7 +40,7 @@
     <color name="bg_2_light">@android:color/white</color>
     <color name="bg_2_card_light">#EEEEEE</color>
     <color name="bg_2_card_stroke_light">#D3D3D3</color>
-    <color name="bg_ripple_1_light">#CBCBCB</color>
+    <color name="bg_ripple_1_light">#DFDFDF</color>
     <color name="bg_line_1_light">@color/gray_400</color>
     <color name="bg_line_2_light">@color/gray_2</color>
     <color name="bg_placeholder_1_light">#D3D3D3</color>
