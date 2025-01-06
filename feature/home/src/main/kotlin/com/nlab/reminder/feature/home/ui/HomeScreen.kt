@@ -21,7 +21,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.draganddrop.dragAndDropSource
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -42,7 +41,6 @@ import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsBottomHeight
@@ -82,6 +80,7 @@ import com.nlab.reminder.feature.home.HomeUiState
 import com.nlab.reminder.feature.home.HomeViewModel
 import com.nlab.reminder.feature.home.onTodayCategoryClicked
 import com.nlab.reminder.core.androidx.compose.ui.ColorPressButton
+import com.nlab.reminder.core.androidx.compose.ui.HeadBlurLayer
 import com.nlab.reminder.core.androidx.compose.ui.throttleClick
 import com.nlab.reminder.core.component.tag.edit.ui.compose.TagEditStateHandler
 import com.nlab.reminder.core.component.tag.ui.compose.TagCard
@@ -232,7 +231,7 @@ private fun HomeContents(
             onTagClicked = onTagClicked,
             onTagLongClicked = onTagLongClicked,
         )
-        HeadBlurLayer(
+        HomeStatusBackground(
             modifier = Modifier.align(Alignment.TopCenter),
             startAnimOffset = 20.dp,
             bodyPaddingTop = bodyPaddingTop,
@@ -468,7 +467,7 @@ private fun CategoryCardBackground(
                 onClickLabel = onClickLabel,
                 role = Role.Tab
             )
-            .background(PlaneatTheme.colors.bgCard1)
+            .background(PlaneatTheme.colors.bg1Layer)
     )
 }
 
@@ -515,7 +514,7 @@ private fun TagCards(
     Box(
         modifier = modifier
             .clip(RoundedCornerShape(8.dp))
-            .background(PlaneatTheme.colors.bgCard1),
+            .background(PlaneatTheme.colors.bg1Layer),
     ) {
         if (tags.isEmpty()) {
             Text(
@@ -547,14 +546,12 @@ private fun TagCards(
 }
 
 @Composable
-private fun HeadBlurLayer(
+private fun HomeStatusBackground(
     startAnimOffset: Dp,
     bodyPaddingTop: Dp,
     bodyScrollState: ScrollState,
     modifier: Modifier = Modifier,
 ) {
-    val containerColor = PlaneatTheme.colors.bgCard1
-    val lineColor = PlaneatTheme.colors.bgLine1
     var computedHeightToPx by remember { mutableIntStateOf(0) }
     val startAnimOffsetToPx = with(LocalDensity.current) { startAnimOffset.toPx() }
     val bodyPaddingTopToPx = with(LocalDensity.current) { bodyPaddingTop.toPx() }
@@ -570,25 +567,13 @@ private fun HeadBlurLayer(
             }
         }
     }
-    Box(
+    HeadBlurLayer(
         modifier = modifier
             .fillMaxWidth()
             .windowInsetsTopHeight(WindowInsets.statusBars)
-            .onSizeChanged { computedHeightToPx = it.height }
-    ) {
-        Spacer(
-            modifier = Modifier
-                .fillMaxSize()
-                .drawBehind { drawRect(color = containerColor.copy(alpha = 0.96f * alphaState)) }
-        )
-        Spacer(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(0.5.dp)
-                .align(Alignment.BottomCenter)
-                .drawBehind { drawRect(color = lineColor.copy(alpha = alphaState)) }
-        )
-    }
+            .onSizeChanged { computedHeightToPx = it.height },
+        alpha = alphaState
+    )
 }
 
 @Composable
@@ -637,7 +622,7 @@ private fun BottomBlurLayer(
     alphaAnimScrollTriggerOffsetToPx: Int,
     modifier: Modifier = Modifier
 ) {
-    val containerColor = PlaneatTheme.colors.bgCard1
+    val containerColor = PlaneatTheme.colors.bg1Layer
     val lineColor = PlaneatTheme.colors.bgLine1
     val alphaState by remember(computedHeightToPx, alphaAnimScrollTriggerOffsetToPx, bodyScrollState) {
         val computedHeightWithOffsetToPx = computedHeightToPx + alphaAnimScrollTriggerOffsetToPx

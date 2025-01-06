@@ -16,20 +16,11 @@
 
 package com.nlab.reminder.core.component.schedule.ui.view.list
 
-import androidx.annotation.StringRes
-import com.nlab.reminder.core.data.model.ScheduleDetail
+import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapterItemHeadlinePaddingBinding
 
 /**
- * @author Doohyun
+ * @author Thalys
  */
-sealed class ScheduleAdapterItem private constructor() {
-    data class Headline(
-        @StringRes val textRes: Int
-    ) : ScheduleAdapterItem()
-
-    data object HeadlinePadding : ScheduleAdapterItem()
-
-    data class Content(
-        val scheduleDetail: ScheduleDetail
-    ) : ScheduleAdapterItem()
-}
+class ScheduleHeadlinePaddingViewHolder(
+    binding: LayoutScheduleAdapterItemHeadlinePaddingBinding
+) : ScheduleAdapterItemViewHolder(binding.root)

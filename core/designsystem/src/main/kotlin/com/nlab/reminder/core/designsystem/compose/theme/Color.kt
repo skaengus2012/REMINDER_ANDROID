@@ -42,11 +42,12 @@ internal val Point3 = Color(0xFFFFB631)
 
 // light
 internal val Bg1Light = Color(0xFFF2F2F6)
+internal val Bg1LayerLight = Color.White
 internal val Bg2Light = Color.White
+internal val Bg2LayerLight = Color(0xFFF8F8FA)
 internal val BgRipple1Light = Color(0xFFE5E5E5)
-internal val BgCard1Light = Color.White
-internal val BgCard2Light = Color(0xFFEEEEEE)
-internal val BgCard2StrokeLight = Color(0xFFD3D3D3)
+internal val Bg2CardLight = Color(0xFFEEEEEE)
+internal val Bg2CardStrokeLight = Color(0xFFD3D3D3)
 internal val BgLine1Light = Gray400
 internal val BgLine2Light = Gray2
 internal val BgPlaceHolder1Light = Color(0xFFD3D3D3)
@@ -64,11 +65,12 @@ internal val ContentTagLight = Gray2
 
 // dark
 internal val Bg1Dark = Color.Black
+internal val Bg1LayerDark = Color(0xFF1C1C1C)
 internal val Bg2Dark = Color.Black
+internal val Bg2LayerDark = Bg1LayerDark
+internal val Bg2CardDark = Gray800
+internal val Bg2CardStrokeDark = Color(0xFFEEEEEE)
 internal val BgRipple1Dark = Color(0xFF49494C)
-internal val BgCard1Dark = Color(0xFF1C1C1C)
-internal val BgCard2Dark = Gray800
-internal val BgCard2StrokeDark = Color(0xFFEEEEEE)
 internal val BgLine1Dark = Gray800
 internal val BgLine2Dark = Gray2
 internal val Content1Dark = Color.White

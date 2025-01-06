@@ -34,11 +34,11 @@
         <item name="android:windowLightNavigationBar" tools:targetApi="27">true</item>
 
         <item name="bg_1">@color/bg_1_light</item>
+        <item name="bg_1_layer">@color/bg_1_light_layer</item>
         <item name="bg_2">@color/bg_2_light</item>
+        <item name="bg_2_card">@color/bg_2_card_light</item>
+        <item name="bg_2_card_stroke">@color/bg_2_card_stroke_light</item>
         <item name="bg_ripple_1">@color/bg_ripple_1_light</item>
-        <item name="bg_card_1">@color/bg_card_1_light</item>
-        <item name="bg_card_2">@color/bg_card_2_light</item>
-        <item name="bg_card_2_stroke">@color/bg_card_2_stroke_light</item>
         <item name="bg_line_1">@color/bg_line_1_light</item>
         <item name="bg_line_2">@color/bg_line_2_light</item>
         <item name="bg_placeholder_1">@color/bg_placeholder_1_light</item>

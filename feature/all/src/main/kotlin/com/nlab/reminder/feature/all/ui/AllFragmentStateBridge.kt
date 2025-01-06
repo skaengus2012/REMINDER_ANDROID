@@ -23,16 +23,20 @@ import androidx.compose.runtime.*
  */
 @Stable
 internal class AllFragmentStateBridge(
-    isToolbarTitleVisible: Boolean
+    isToolbarTitleVisible: Boolean,
+    toolbarBackgroundAlpha: Float
 ) {
     var isToolbarTitleVisible: Boolean by mutableStateOf(isToolbarTitleVisible)
+    var toolbarBackgroundAlpha: Float by mutableFloatStateOf(toolbarBackgroundAlpha)
 }
 
 @Composable
 internal fun rememberAllFragmentStateBridge(
-    isToolbarTitleVisible: Boolean,
+    isToolbarTitleVisible: Boolean = false,
+    toolbarBackgroundAlpha: Float = 0f
 ): AllFragmentStateBridge = remember {
     AllFragmentStateBridge(
-        isToolbarTitleVisible = isToolbarTitleVisible
+        isToolbarTitleVisible = isToolbarTitleVisible,
+        toolbarBackgroundAlpha = toolbarBackgroundAlpha
     )
 }

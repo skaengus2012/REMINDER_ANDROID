@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (C) 2024 The N's lab Open Source Project
+  ~ Copyright (C) 2025 The N's lab Open Source Project
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -15,18 +15,5 @@
   -->
 
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:paddingHorizontal="@dimen/horizontal_padding_medium">
-
-    <TextView
-        android:id="@+id/textview_title"
-        style="@style/PlaneatTheme.Style.Typography.TitleXlarge"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        tools:text="@tools:sample/lorem"
-        tools:textColor="@color/point_1" />
-
-</FrameLayout>
+    android:layout_height="15dp" />

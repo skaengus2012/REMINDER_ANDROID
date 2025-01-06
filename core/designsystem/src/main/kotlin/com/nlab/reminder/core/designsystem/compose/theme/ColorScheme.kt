@@ -27,11 +27,12 @@ import androidx.compose.ui.graphics.Color
 @Immutable
 data class PlaneatColorScheme(
     val bg1: Color,
+    val bg1Layer: Color,
     val bg2: Color,
+    val bg2Layer: Color,
+    val bg2Card: Color,
+    val bg2CardStroke: Color,
     val bgRipple1: Color,
-    val bgCard1: Color,
-    val bgCard2: Color,
-    val bgCard2Stroke: Color,
     val bgLine1: Color,
     val bgLine2: Color,
     val bgPlaceHolder1: Color,
@@ -58,11 +59,12 @@ data class PlaneatColorScheme(
 internal val LocalPlaneatColorScheme = staticCompositionLocalOf {
     PlaneatColorScheme(
         bg1 = Color.Unspecified,
+        bg1Layer = Color.Unspecified,
         bg2 = Color.Unspecified,
+        bg2Layer = Color.Unspecified,
+        bg2Card = Color.Unspecified,
+        bg2CardStroke = Color.Unspecified,
         bgRipple1 = Color.Unspecified,
-        bgCard1 = Color.Unspecified,
-        bgCard2 = Color.Unspecified,
-        bgCard2Stroke = Color.Unspecified,
         bgLine1 = Color.Unspecified,
         bgLine2 = Color.Unspecified,
         bgPlaceHolder1 = Color.Unspecified,
@@ -82,11 +84,12 @@ internal val LocalPlaneatColorScheme = staticCompositionLocalOf {
 
 internal val LightPlaneatColorScheme = PlaneatColorScheme(
     bg1 = Bg1Light,
+    bg1Layer = Bg1LayerLight,
     bg2 = Bg2Light,
+    bg2Layer = Bg2LayerLight,
+    bg2Card = Bg2CardLight,
+    bg2CardStroke = Bg2CardStrokeLight,
     bgRipple1 = BgRipple1Light,
-    bgCard1 = BgCard1Light,
-    bgCard2 = BgCard2Light,
-    bgCard2Stroke = BgCard2StrokeLight,
     bgLine1 = BgLine1Light,
     bgLine2 = BgLine2Light,
     bgPlaceHolder1 = BgPlaceHolder1Light,
@@ -105,11 +108,12 @@ internal val LightPlaneatColorScheme = PlaneatColorScheme(
 
 internal val DarkPlaneatColorScheme = PlaneatColorScheme(
     bg1 = Bg1Dark,
+    bg1Layer = Bg1LayerDark,
     bg2 = Bg2Dark,
+    bg2Layer = Bg2LayerDark,
+    bg2CardStroke = Bg2CardStrokeDark,
+    bg2Card = Bg2CardDark,
     bgRipple1 = BgRipple1Dark,
-    bgCard1 = BgCard1Dark,
-    bgCard2 = BgCard2Dark,
-    bgCard2Stroke = BgCard2StrokeDark,
     bgLine1 = BgLine1Dark,
     bgLine2 = BgLine2Dark,
     bgPlaceHolder1 = BgPlaceHolder1Light,

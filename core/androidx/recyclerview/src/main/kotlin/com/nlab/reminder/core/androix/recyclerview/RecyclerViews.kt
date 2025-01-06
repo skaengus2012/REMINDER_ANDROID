@@ -21,6 +21,7 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -51,6 +52,21 @@ fun RecyclerView.verticalScrollRange(): Flow<Int> = callbackFlow {
     val listener = object : RecyclerView.OnScrollListener() {
         override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
             conflateFlow.value = recyclerView.computeVerticalScrollRange()
+        }
+    }
+    addOnScrollListener(listener)
+    awaitClose { removeOnScrollListener(listener) }
+}
+
+fun RecyclerView.scrollY(): Flow<Int> = callbackFlow {
+    val conflateFlow = MutableStateFlow<Int?>(null)
+    conflateFlow
+        .filterNotNull()
+        .onEach { send(it) }
+        .launchIn(scope = this)
+    val listener = object : RecyclerView.OnScrollListener() {
+        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+            conflateFlow.value = dy
         }
     }
     addOnScrollListener(listener)

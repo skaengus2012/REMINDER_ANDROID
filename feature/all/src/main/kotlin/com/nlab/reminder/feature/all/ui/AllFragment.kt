@@ -25,6 +25,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.nlab.reminder.core.androidx.fragment.compose.ComposableFragment
 import com.nlab.reminder.core.androidx.fragment.compose.ComposableInject
 import com.nlab.reminder.core.androidx.fragment.viewLifecycleScope
+import com.nlab.reminder.core.androix.recyclerview.scrollY
 import com.nlab.reminder.core.androix.recyclerview.verticalScrollRange
 import com.nlab.reminder.core.component.schedule.ui.view.list.ScheduleAdapterItem
 import com.nlab.reminder.core.component.schedule.ui.view.list.ScheduleListAdapter
@@ -41,12 +42,16 @@ import com.nlab.reminder.core.kotlin.toNonNegativeLong
 import com.nlab.reminder.core.translation.StringIds
 import com.nlab.reminder.feature.all.databinding.FragmentAllBinding
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.math.absoluteValue
 
 /**
  * @author Doohyun
@@ -74,11 +79,37 @@ internal class AllFragment : ComposableFragment() {
             layoutManager = linearLayoutManager
         }
 
-        binding.recyclerviewSchedule
+        val verticalScrollRange = binding.recyclerviewSchedule
             .verticalScrollRange()
-            .map { scrollRange -> scrollRange != 0 && linearLayoutManager.findFirstVisibleItemPosition() != 0 }
+            .stateIn(viewLifecycleScope, started = SharingStarted.Lazily, initialValue = 0)
+        combine(
+            verticalScrollRange
+                .map { it > 0 }
+                .distinctUntilChanged(),
+            binding.recyclerviewSchedule
+                .scrollY()
+                .map { linearLayoutManager.findFirstVisibleItemPosition() > 0 }
+                .distinctUntilChanged()
+        ) { hasScrollRange, isHeadlineNotVisible -> hasScrollRange && isHeadlineNotVisible }
             .distinctUntilChanged()
             .onEach { fragmentStateBridge.isToolbarTitleVisible = it }
+            .launchIn(viewLifecycleScope)
+
+        binding.recyclerviewSchedule
+            .scrollY()
+            .map {
+                when (linearLayoutManager.findFirstVisibleItemPosition()) {
+                    0 -> 0f
+                    1 -> {
+                        val itemView = checkNotNull(linearLayoutManager.findViewByPosition(/*position =*/ 1))
+                        itemView.top.absoluteValue.toFloat() / itemView.height
+                    }
+
+                    else -> 1f
+                }
+            }
+            .distinctUntilChanged()
+            .onEach { fragmentStateBridge.toolbarBackgroundAlpha = it }
             .launchIn(viewLifecycleScope)
 
         viewLifecycleScope.launch {
@@ -103,6 +134,7 @@ internal class AllFragment : ComposableFragment() {
 
             buildList {
                 this += ScheduleAdapterItem.Headline(StringIds.label_all)
+                this += ScheduleAdapterItem.HeadlinePadding
                 repeat(times = 10) {
                     this += ScheduleAdapterItem.Content(
                         scheduleDetail = ScheduleDetail(

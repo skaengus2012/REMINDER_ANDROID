@@ -45,9 +45,7 @@ internal fun AllScreen(
     AllScreen(
         modifier = modifier,
         enterTransitionTimeInMillis = enterTransitionTimeInMillis,
-        fragmentStateBridge = rememberAllFragmentStateBridge(
-            isToolbarTitleVisible = false
-        ),
+        fragmentStateBridge = rememberAllFragmentStateBridge(),
         onBackClicked = onBackClicked,
         onMoreClicked = {
             // TODO implements
@@ -105,7 +103,7 @@ private fun AllToolbar(
         isTitleVisible = fragmentStateBridge.isToolbarTitleVisible,
         isMoreVisible = true,
         isCompleteVisible = true,
-        backgroundAlpha = 1.0f,
+        backgroundAlpha = fragmentStateBridge.toolbarBackgroundAlpha,
         onBackClicked = onBackClicked,
         onMenuClicked = onMoreClicked,
         onCompleteClicked = {
@@ -123,7 +121,8 @@ private fun AllScreenPreview() {
         AllScreen(
             enterTransitionTimeInMillis = 0,
             fragmentStateBridge = rememberAllFragmentStateBridge(
-                isToolbarTitleVisible = false
+                isToolbarTitleVisible = true,
+                toolbarBackgroundAlpha = 1.0f
             ),
             onBackClicked = {},
             onMoreClicked = {},

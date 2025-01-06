@@ -21,9 +21,11 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapterItemContentBinding
 import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapterItemHeadlineBinding
+import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapterItemHeadlinePaddingBinding
 
 private const val ITEM_VIEW_TYPE_HEADLINE = 1
-private const val ITEM_VIEW_TYPE_CONTENT = 2
+private const val ITEM_VIEW_TYPE_HEADLINE_PADDING = 2
+private const val ITEM_VIEW_TYPE_CONTENT = 3
 
 /**
  * @author Thalys
@@ -33,6 +35,7 @@ class ScheduleListAdapter(
 ) : ListAdapter<ScheduleAdapterItem, ScheduleAdapterItemViewHolder>(ScheduleAdapterItemDiffCallback()) {
     override fun getItemViewType(position: Int): Int = when (getItem(position)) {
         is ScheduleAdapterItem.Headline -> ITEM_VIEW_TYPE_HEADLINE
+        is ScheduleAdapterItem.HeadlinePadding -> ITEM_VIEW_TYPE_HEADLINE_PADDING
         is ScheduleAdapterItem.Content -> ITEM_VIEW_TYPE_CONTENT
     }
 
@@ -47,6 +50,16 @@ class ScheduleListAdapter(
                         /* attachToParent = */ false
                     ),
                     theme = theme
+                )
+            }
+
+            ITEM_VIEW_TYPE_HEADLINE_PADDING -> {
+                ScheduleHeadlinePaddingViewHolder(
+                    binding = LayoutScheduleAdapterItemHeadlinePaddingBinding.inflate(
+                        layoutInflater,
+                        parent,
+                        /* attachToParent = */ false
+                    ),
                 )
             }
 
@@ -73,6 +86,7 @@ class ScheduleListAdapter(
         when (holder) {
             is ScheduleHeadlineViewHolder -> holder.bind(item as ScheduleAdapterItem.Headline)
             is ScheduleContentViewHolder -> holder.bind(item as ScheduleAdapterItem.Content)
+            is ScheduleHeadlinePaddingViewHolder -> Unit
         }
     }
 }

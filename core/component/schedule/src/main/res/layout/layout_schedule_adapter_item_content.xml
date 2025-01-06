@@ -201,14 +201,14 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/edittext_note"
                 app:layout_constraintWidth_max="500dp"
-                app:strokeColor="?attr/bg_card_2_stroke"
+                app:strokeColor="?bg_2_card_stroke"
                 app:strokeWidth="0.5dp"
                 tools:visibility="visible">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="?bg_card_2"
+                    android:background="?bg_2_card"
                     android:paddingBottom="8dp">
 
                     <ImageView
