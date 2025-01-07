@@ -17,6 +17,7 @@
 package com.nlab.reminder.feature.all.ui
 
 import androidx.compose.runtime.*
+import com.nlab.reminder.core.component.schedule.ui.view.list.SimpleEdit
 
 /**
  * @author Thalys
@@ -24,7 +25,8 @@ import androidx.compose.runtime.*
 @Stable
 internal class AllFragmentStateBridge(
     isToolbarTitleVisible: Boolean,
-    toolbarBackgroundAlpha: Float
+    toolbarBackgroundAlpha: Float,
+    val onSimpleEdited: (SimpleEdit) -> Unit
 ) {
     var isToolbarTitleVisible: Boolean by mutableStateOf(isToolbarTitleVisible)
     var toolbarBackgroundAlpha: Float by mutableFloatStateOf(toolbarBackgroundAlpha)
@@ -32,11 +34,13 @@ internal class AllFragmentStateBridge(
 
 @Composable
 internal fun rememberAllFragmentStateBridge(
-    isToolbarTitleVisible: Boolean = false,
-    toolbarBackgroundAlpha: Float = 0f
-): AllFragmentStateBridge = remember {
+    isToolbarTitleVisible: Boolean,
+    toolbarBackgroundAlpha: Float,
+    onSimpleEdited: (SimpleEdit) -> Unit,
+): AllFragmentStateBridge = remember(onSimpleEdited) {
     AllFragmentStateBridge(
         isToolbarTitleVisible = isToolbarTitleVisible,
-        toolbarBackgroundAlpha = toolbarBackgroundAlpha
+        toolbarBackgroundAlpha = toolbarBackgroundAlpha,
+        onSimpleEdited = onSimpleEdited
     )
 }

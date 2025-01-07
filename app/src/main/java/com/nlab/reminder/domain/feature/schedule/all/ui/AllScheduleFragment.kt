@@ -21,31 +21,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.flowWithLifecycle
-import androidx.recyclerview.widget.ConcatAdapter
-import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_DRAGGING
-import androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_IDLE
-import com.nlab.reminder.R
-import com.nlab.reminder.core.androidx.fragment.viewLifecycle
-import com.nlab.reminder.core.androidx.fragment.viewLifecycleScope
-import com.nlab.reminder.core.androidx.lifecycle.event
-import com.nlab.reminder.core.androidx.lifecycle.filterLifecycleEvent
-import com.nlab.reminder.core.androix.recyclerview.SingleItemAdapter
-import com.nlab.reminder.core.androix.recyclerview.scrollState
-import com.nlab.reminder.core.androix.recyclerview.suspendSubmitList
-import com.nlab.reminder.core.android.view.throttleClicks
-import com.nlab.reminder.core.android.view.touches
-import com.nlab.reminder.core.kotlinx.coroutine.flow.withBefore
-import com.nlab.reminder.core.schedule.ui.*
-import com.nlab.reminder.domain.common.android.view.loadingFlow
-import com.nlab.reminder.domain.feature.schedule.all.*
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.*
 
 /**
  * @author Doohyun

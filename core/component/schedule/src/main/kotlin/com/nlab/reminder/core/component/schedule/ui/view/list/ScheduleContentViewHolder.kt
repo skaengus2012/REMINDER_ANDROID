@@ -36,12 +36,16 @@ import com.nlab.reminder.core.android.widget.bindText
 import com.nlab.reminder.core.android.widget.textChanges
 import com.nlab.reminder.core.component.schedule.R
 import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapterItemContentBinding
+import com.nlab.reminder.core.data.model.ScheduleId
 import com.nlab.reminder.core.designsystem.compose.theme.AttrIds
-import com.nlab.reminder.core.kotlinx.coroutine.flow.combine
-import com.nlab.reminder.core.kotlinx.coroutine.flow.map
+import com.nlab.reminder.core.kotlinx.coroutine.flow.withPrev
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 
 /**
@@ -49,6 +53,7 @@ import kotlinx.coroutines.launch
  */
 internal class ScheduleContentViewHolder(
     private val binding: LayoutScheduleAdapterItemContentBinding,
+    private val onSimpleEditDone: (SimpleEdit) -> Unit,
     theme: ScheduleListTheme
 ) : ScheduleAdapterItemViewHolder(binding.root) {
     private val linkThumbnailPlaceHolderDrawable: Drawable? = with(itemView) {
@@ -65,6 +70,7 @@ internal class ScheduleContentViewHolder(
         ConstraintSet().apply { clone(binding.layoutBody) }
     private val layoutBodySelectionSet: ConstraintSet =
         ConstraintSet().apply { load(itemView.context, R.layout.layout_schedule_adapter_item_content_body_selectable) }
+    private val bindingId = MutableStateFlow<ScheduleId?>(null)
 
     init {
         binding.buttonComplete.setImageResource(
@@ -123,6 +129,22 @@ internal class ScheduleContentViewHolder(
                     .throttleClicks()
                     .collect { binding.buttonComplete.apply { it.isSelected = it.isSelected.not() } }
             }
+            jobs += viewLifecycleCoroutineScope.launch {
+                itemFocusedFlow
+                    .withPrev(initial = false)
+                    .distinctUntilChanged()
+                    .filter { (old, new) -> old && new.not() }
+                    .mapNotNull {
+                        bindingId.value?.let { id ->
+                            SimpleEdit(
+                                id = id,
+                                title = binding.edittextTitle.text?.toString().orEmpty(),
+                                note = binding.edittextNote.text?.toString().orEmpty()
+                            )
+                        }
+                    }
+                    .collect { onSimpleEditDone(it) }
+            }
         }
         itemView.doOnDetach {
             jobs.forEach { it.cancel() }
@@ -130,6 +152,8 @@ internal class ScheduleContentViewHolder(
     }
 
     fun bind(item: ScheduleAdapterItem.Content) {
+        bindingId.value =
+            item.scheduleDetail.schedule.id
         binding.edittextTitle
             .bindText(item.scheduleDetail.schedule.content.title)
         binding.edittextNote

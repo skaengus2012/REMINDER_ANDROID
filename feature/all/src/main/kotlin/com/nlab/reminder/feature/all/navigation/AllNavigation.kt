@@ -36,9 +36,10 @@ fun NavController.navigateToAll(navOptions: NavOptionsBuilder.() -> Unit = {}) =
 
 fun NavGraphBuilder.allScreen(
     enterTransitionTimeInMillis: Int,
-    onBackClicked: () -> Unit,
     provideEnterTransition: EnterTransitionFactory? = null,
-    providePopExitTransition: ExitTransitionFactory? = null
+    providePopExitTransition: ExitTransitionFactory? = null,
+    onBackClicked: () -> Unit,
+    showAppToast: (String) -> Unit,
 ) {
     composable<AllRoute>(
         enterTransition = provideEnterTransition,
@@ -46,7 +47,8 @@ fun NavGraphBuilder.allScreen(
     ) {
         AllScreen(
             enterTransitionTimeInMillis = enterTransitionTimeInMillis,
-            onBackClicked = onBackClicked
+            onBackClicked = onBackClicked,
+            showAppToast = showAppToast
         )
     }
 }

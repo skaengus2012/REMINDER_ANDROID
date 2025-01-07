@@ -40,12 +40,20 @@ import com.nlab.reminder.core.translation.StringIds
 internal fun AllScreen(
     enterTransitionTimeInMillis: Int,
     onBackClicked: () -> Unit,
+    showAppToast: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     AllScreen(
         modifier = modifier,
         enterTransitionTimeInMillis = enterTransitionTimeInMillis,
-        fragmentStateBridge = rememberAllFragmentStateBridge(),
+        fragmentStateBridge = rememberAllFragmentStateBridge(
+            isToolbarTitleVisible = false,
+            toolbarBackgroundAlpha = 0.0f,
+            onSimpleEdited = { simpleEdit ->
+                // TODO implements
+                showAppToast("TODO Simple Edit $simpleEdit")
+            }
+        ),
         onBackClicked = onBackClicked,
         onMoreClicked = {
             // TODO implements
@@ -77,14 +85,21 @@ private fun AllScreen(
             onCompleteClicked = onCompleteClicked
         )
         DelayedContent(delayTimeMillis = enterTransitionTimeInMillis.toLong()) {
-            AndroidFragment<AllFragment>(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .navigationBarsPadding()
-                    .imePadding()
-            ) { it.fragmentStateBridge = fragmentStateBridge }
+            AllScheduleList(fragmentStateBridge = fragmentStateBridge)
         }
     }
+}
+
+@Composable
+private fun AllScheduleList(
+    fragmentStateBridge: AllFragmentStateBridge,
+) {
+    AndroidFragment<AllFragment>(
+        modifier = Modifier
+            .fillMaxSize()
+            .navigationBarsPadding()
+            .imePadding()
+    ) { it.fragmentStateBridge = fragmentStateBridge }
 }
 
 @Composable
@@ -122,7 +137,8 @@ private fun AllScreenPreview() {
             enterTransitionTimeInMillis = 0,
             fragmentStateBridge = rememberAllFragmentStateBridge(
                 isToolbarTitleVisible = true,
-                toolbarBackgroundAlpha = 1.0f
+                toolbarBackgroundAlpha = 1.0f,
+                onSimpleEdited = {}
             ),
             onBackClicked = {},
             onMoreClicked = {},

@@ -74,6 +74,7 @@ fun PlaneatNavHost(
                 enterTransitionTimeInMillis = HOME_TRANSITION_DURATION,
                 provideEnterTransition = enterTransitionFactoryFromHome,
                 providePopExitTransition = popExitTransitionFactoryFromHome,
+                showAppToast = { appState.showApplicationToast(it) },
                 onBackClicked = { navController.popBackStack() }
             )
         }

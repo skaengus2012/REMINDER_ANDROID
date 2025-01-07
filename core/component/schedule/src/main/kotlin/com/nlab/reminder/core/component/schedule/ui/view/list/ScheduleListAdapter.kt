@@ -22,6 +22,10 @@ import androidx.recyclerview.widget.ListAdapter
 import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapterItemContentBinding
 import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapterItemHeadlineBinding
 import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapterItemHeadlinePaddingBinding
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.receiveAsFlow
 
 private const val ITEM_VIEW_TYPE_HEADLINE = 1
 private const val ITEM_VIEW_TYPE_HEADLINE_PADDING = 2
@@ -33,6 +37,11 @@ private const val ITEM_VIEW_TYPE_CONTENT = 3
 class ScheduleListAdapter(
     private val theme: ScheduleListTheme
 ) : ListAdapter<ScheduleAdapterItem, ScheduleAdapterItemViewHolder>(ScheduleAdapterItemDiffCallback()) {
+    private val _simpleEditEvent = Channel<SimpleEdit>(Channel.UNLIMITED)
+    val simpleEditEvent: Flow<SimpleEdit> = _simpleEditEvent
+        .receiveAsFlow()
+        .distinctUntilChanged()
+
     override fun getItemViewType(position: Int): Int = when (getItem(position)) {
         is ScheduleAdapterItem.Headline -> ITEM_VIEW_TYPE_HEADLINE
         is ScheduleAdapterItem.HeadlinePadding -> ITEM_VIEW_TYPE_HEADLINE_PADDING
@@ -70,7 +79,8 @@ class ScheduleListAdapter(
                         parent,
                         /* attachToParent = */ false
                     ),
-                    theme = theme
+                    theme = theme,
+                    onSimpleEditDone = { _simpleEditEvent.trySend(it) }
                 )
             }
 

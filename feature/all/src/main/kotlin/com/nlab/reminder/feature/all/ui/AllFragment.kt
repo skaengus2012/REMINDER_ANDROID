@@ -112,6 +112,11 @@ internal class AllFragment : ComposableFragment() {
             .onEach { fragmentStateBridge.toolbarBackgroundAlpha = it }
             .launchIn(viewLifecycleScope)
 
+        scheduleListAdapter
+            .simpleEditEvent
+            .onEach { fragmentStateBridge.onSimpleEdited(it) }
+            .launchIn(viewLifecycleScope)
+
         viewLifecycleScope.launch {
             val items = withContext(Dispatchers.Default) { testItems }
             scheduleListAdapter.submitList(items)

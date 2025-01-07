@@ -23,5 +23,5 @@ import kotlinx.coroutines.flow.scan
 /**
  * @author thalys
  */
-fun <T> Flow<T>.withBefore(initial: T): Flow<Pair<T, T>> =
+fun <T> Flow<T>.withPrev(initial: T): Flow<Pair<T, T>> =
     scan(Pair<T?, T>(null, initial)) { acc, v -> Pair(acc.second, v) }.mapNotNull { (a, b) -> a?.let { it to b } }
