@@ -45,7 +45,6 @@ internal fun AllScreen(
 ) {
     AllScreen(
         modifier = modifier,
-        enterTransitionTimeInMillis = enterTransitionTimeInMillis,
         fragmentStateBridge = rememberAllFragmentStateBridge(
             isToolbarTitleVisible = false,
             toolbarBackgroundAlpha = 0.0f,
@@ -54,6 +53,7 @@ internal fun AllScreen(
                 showAppToast("TODO Simple Edit $simpleEdit")
             }
         ),
+        scheduleListDisplayDelayTimeMillis = enterTransitionTimeInMillis.toLong(),
         onBackClicked = onBackClicked,
         onMoreClicked = {
             // TODO implements
@@ -66,8 +66,8 @@ internal fun AllScreen(
 
 @Composable
 private fun AllScreen(
-    enterTransitionTimeInMillis: Int,
     fragmentStateBridge: AllFragmentStateBridge,
+    scheduleListDisplayDelayTimeMillis: Long,
     onBackClicked: () -> Unit,
     onMoreClicked: () -> Unit,
     onCompleteClicked: () -> Unit,
@@ -84,7 +84,7 @@ private fun AllScreen(
             onMoreClicked = onMoreClicked,
             onCompleteClicked = onCompleteClicked
         )
-        DelayedContent(delayTimeMillis = enterTransitionTimeInMillis.toLong()) {
+        DelayedContent(delayTimeMillis = scheduleListDisplayDelayTimeMillis) {
             AllScheduleList(fragmentStateBridge = fragmentStateBridge)
         }
     }
@@ -93,9 +93,10 @@ private fun AllScreen(
 @Composable
 private fun AllScheduleList(
     fragmentStateBridge: AllFragmentStateBridge,
+    modifier: Modifier = Modifier,
 ) {
     AndroidFragment<AllFragment>(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .navigationBarsPadding()
             .imePadding()
@@ -134,7 +135,7 @@ private fun AllToolbar(
 private fun AllScreenPreview() {
     PlaneatTheme {
         AllScreen(
-            enterTransitionTimeInMillis = 0,
+            scheduleListDisplayDelayTimeMillis = 0,
             fragmentStateBridge = rememberAllFragmentStateBridge(
                 isToolbarTitleVisible = true,
                 toolbarBackgroundAlpha = 1.0f,

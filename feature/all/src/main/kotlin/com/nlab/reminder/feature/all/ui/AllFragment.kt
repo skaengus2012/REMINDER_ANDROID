@@ -140,7 +140,7 @@ internal class AllFragment : ComposableFragment() {
             buildList {
                 this += ScheduleAdapterItem.Headline(StringIds.label_all)
                 this += ScheduleAdapterItem.HeadlinePadding
-                repeat(times = 10) {
+                repeat(times = 1000) {
                     this += ScheduleAdapterItem.Content(
                         scheduleDetail = ScheduleDetail(
                             schedule = Schedule(
