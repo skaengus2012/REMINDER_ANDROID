@@ -21,7 +21,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -32,6 +32,8 @@ import com.nlab.reminder.core.androidx.fragment.compose.AndroidFragment
 import com.nlab.reminder.core.component.schedule.ui.compose.ScheduleListToolbar
 import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
 import com.nlab.reminder.core.translation.StringIds
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
 
 /**
  * @author Doohyun
@@ -43,9 +45,11 @@ internal fun AllScreen(
     showAppToast: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val testFlow = remember { MutableStateFlow(false) }
     AllScreen(
         modifier = modifier,
         fragmentStateBridge = rememberAllFragmentStateBridge(
+            testFlow = testFlow,
             isToolbarTitleVisible = false,
             toolbarBackgroundAlpha = 0.0f,
             onSimpleEdited = { simpleEdit ->
@@ -56,7 +60,7 @@ internal fun AllScreen(
         scheduleListDisplayDelayTimeMillis = enterTransitionTimeInMillis.toLong(),
         onBackClicked = onBackClicked,
         onMoreClicked = {
-            // TODO implements
+            testFlow.update { it.not() }
         },
         onCompleteClicked = {
             // TODO implements

@@ -19,6 +19,7 @@ dependencies {
     implementation(libs.androidx.constaintlayout)
     implementation(libs.androidx.cardview)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.transition.ktx)
 
     testImplementation(projects.core.dataTest)
 }

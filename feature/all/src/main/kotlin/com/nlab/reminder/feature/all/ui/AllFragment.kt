@@ -20,10 +20,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.flowWithLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.nlab.reminder.core.androidx.fragment.compose.ComposableFragment
 import com.nlab.reminder.core.androidx.fragment.compose.ComposableInject
+import com.nlab.reminder.core.androidx.fragment.viewLifecycle
 import com.nlab.reminder.core.androidx.fragment.viewLifecycleScope
 import com.nlab.reminder.core.androix.recyclerview.scrollY
 import com.nlab.reminder.core.androix.recyclerview.verticalScrollRange
@@ -112,6 +114,11 @@ internal class AllFragment : ComposableFragment() {
             .onEach { fragmentStateBridge.toolbarBackgroundAlpha = it }
             .launchIn(viewLifecycleScope)
 
+        fragmentStateBridge.itemSelectionEnabled
+            .flowWithLifecycle(viewLifecycle)
+            .onEach { scheduleListAdapter.setSelectionEnabled(it) }
+            .launchIn(viewLifecycleScope)
+
         scheduleListAdapter
             .simpleEditEvent
             .onEach { fragmentStateBridge.onSimpleEdited(it) }
@@ -140,7 +147,7 @@ internal class AllFragment : ComposableFragment() {
             buildList {
                 this += ScheduleAdapterItem.Headline(StringIds.label_all)
                 this += ScheduleAdapterItem.HeadlinePadding
-                repeat(times = 1000) {
+                repeat(times = 100) {
                     this += ScheduleAdapterItem.Content(
                         scheduleDetail = ScheduleDetail(
                             schedule = Schedule(

@@ -19,7 +19,8 @@
     <dimen name="schedule_check_size">22dp</dimen>
     <dimen name="schedule_checkbox_padding">15dp</dimen>
     <dimen name="schedule_checkbox_touchable_size">52dp</dimen>
+    <dimen name="schedule_checkbox_touchable_size_negative">-52dp</dimen>
     <dimen name="schedule_clamp_width">60dp</dimen>
     <dimen name="schedule_data_start">57dp</dimen>
-    <dimen name="schedule_data_start_complete_selection">109dp</dimen>
+    <dimen name="schedule_data_start_complete_selection">83dp</dimen> <!-- schedule_data_start + (schedule_checkbox_touchable_size * 0.5f)-->
 </resources>

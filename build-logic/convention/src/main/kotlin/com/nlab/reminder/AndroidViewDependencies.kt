@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 The N's lab Open Source Project
+ * Copyright (C) 2025 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,14 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import com.android.build.gradle.LibraryExtension
-import com.nlab.reminder.configureStdViewDependencies
-import com.nlab.reminder.configureViewBinding
-import org.gradle.kotlin.dsl.apply
 
-apply(plugin = "com.android.library")
+package com.nlab.reminder
 
-extensions.configure<LibraryExtension> {
-    configureViewBinding(this)
+import org.gradle.api.Project
+import org.gradle.kotlin.dsl.dependencies
+import org.gradle.kotlin.dsl.project
+
+/**
+ * @author Doohyun
+ */
+internal fun Project.configureStdViewDependencies() {
+    dependencies {
+        "implementation"(project(":core:android"))
+        "implementation"(project(":core:designsystem"))
+
+        "implementation"(libs.findLibrary("androidx-appcompat").get())
+        "implementation"(libs.findLibrary("androidx-core-ktx").get())
+    }
 }
-configureStdViewDependencies()

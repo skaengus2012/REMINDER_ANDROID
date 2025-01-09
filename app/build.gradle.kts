@@ -64,7 +64,6 @@ dependencies {
     implementation(projects.core.androidx.lifecycle)
     implementation(projects.core.androidx.navigationCompose)
     implementation(projects.core.androidx.recyclerview)
-    implementation(projects.core.androidx.transition)
     implementation(projects.core.annotation)
     implementation(projects.core.component.usermessage)
     implementation(projects.core.component.usermessageHandle)

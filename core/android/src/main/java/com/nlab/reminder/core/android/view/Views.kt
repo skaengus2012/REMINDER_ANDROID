@@ -26,8 +26,12 @@ import kotlinx.coroutines.flow.onStart
  * @author thalys
  */
 
-fun View.setVisible(isVisible: Boolean) {
-    visibility = if (isVisible) View.VISIBLE else View.GONE
+fun View.setVisible(isVisible: Boolean, goneIfNotVisible: Boolean = true) {
+    visibility = when {
+        isVisible -> View.VISIBLE
+        goneIfNotVisible -> View.GONE
+        else -> View.INVISIBLE
+    }
 }
 
 fun View.bindSelected(selected: Boolean): Boolean {
