@@ -40,7 +40,7 @@ class ScheduleListAdapter(
 ) : ListAdapter<ScheduleAdapterItem, ScheduleAdapterItemViewHolder>(ScheduleAdapterItemDiffCallback()) {
     private val selectionEnabled = MutableStateFlow(false)
 
-    private val _simpleEditEvent = Channel<SimpleEdit>(Channel.UNLIMITED)
+    private val _simpleEditEvent = Channel<SimpleEdit>(Channel.BUFFERED)
     val simpleEditEvent: Flow<SimpleEdit> = _simpleEditEvent
         .receiveAsFlow()
         .distinctUntilChanged()
