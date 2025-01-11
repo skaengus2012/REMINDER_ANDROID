@@ -149,6 +149,10 @@ internal class ScheduleContentViewHolder(
                     selectionEnabled,
                     selectionAnimDelegate::awaitReady.asFlow()
                 ) { enabled, _ -> enabled }.collect { enabled ->
+                    binding.buttonComplete.isEnabled = enabled.not()
+                    binding.buttonSelection.isEnabled = enabled
+                    binding.buttonDragHandle.isEnabled = enabled
+
                     selectionAnimDelegate.startAnimation(enabled)
                 }
             }
