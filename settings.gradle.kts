@@ -55,7 +55,6 @@ include(
     ":core:androidx:lifecycle",
     ":core:androidx:navigation-compose",
     ":core:androidx:recyclerview",
-    ":core:androidx:transition",
     ":core:annotation",
     ":core:component:schedule",
     ":core:component:tag",

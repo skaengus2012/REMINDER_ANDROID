@@ -24,6 +24,7 @@ import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapt
 import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapterItemHeadlinePaddingBinding
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.receiveAsFlow
 
@@ -37,6 +38,8 @@ private const val ITEM_VIEW_TYPE_CONTENT = 3
 class ScheduleListAdapter(
     private val theme: ScheduleListTheme
 ) : ListAdapter<ScheduleAdapterItem, ScheduleAdapterItemViewHolder>(ScheduleAdapterItemDiffCallback()) {
+    private val selectionEnabled = MutableStateFlow(false)
+
     private val _simpleEditEvent = Channel<SimpleEdit>(Channel.UNLIMITED)
     val simpleEditEvent: Flow<SimpleEdit> = _simpleEditEvent
         .receiveAsFlow()
@@ -79,8 +82,9 @@ class ScheduleListAdapter(
                         parent,
                         /* attachToParent = */ false
                     ),
+                    selectionEnabled = selectionEnabled,
+                    onSimpleEditDone = { _simpleEditEvent.trySend(it) },
                     theme = theme,
-                    onSimpleEditDone = { _simpleEditEvent.trySend(it) }
                 )
             }
 
@@ -98,5 +102,9 @@ class ScheduleListAdapter(
             is ScheduleContentViewHolder -> holder.bind(item as ScheduleAdapterItem.Content)
             is ScheduleHeadlinePaddingViewHolder -> Unit
         }
+    }
+
+    fun setSelectionEnabled(isEnabled: Boolean) {
+        selectionEnabled.value = isEnabled
     }
 }

@@ -18,27 +18,34 @@ package com.nlab.reminder.feature.all.ui
 
 import androidx.compose.runtime.*
 import com.nlab.reminder.core.component.schedule.ui.view.list.SimpleEdit
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 
 /**
  * @author Thalys
  */
 @Stable
 internal class AllFragmentStateBridge(
+    testFlow: Flow<Boolean> = MutableStateFlow(false), // TODO replace UiState
     isToolbarTitleVisible: Boolean,
     toolbarBackgroundAlpha: Float,
     val onSimpleEdited: (SimpleEdit) -> Unit
 ) {
     var isToolbarTitleVisible: Boolean by mutableStateOf(isToolbarTitleVisible)
     var toolbarBackgroundAlpha: Float by mutableFloatStateOf(toolbarBackgroundAlpha)
+
+    val itemSelectionEnabled: Flow<Boolean> = testFlow
 }
 
 @Composable
 internal fun rememberAllFragmentStateBridge(
+    testFlow: Flow<Boolean> = MutableStateFlow(false),
     isToolbarTitleVisible: Boolean,
     toolbarBackgroundAlpha: Float,
     onSimpleEdited: (SimpleEdit) -> Unit,
-): AllFragmentStateBridge = remember(onSimpleEdited) {
+): AllFragmentStateBridge = remember(testFlow, onSimpleEdited) {
     AllFragmentStateBridge(
+        testFlow = testFlow,
         isToolbarTitleVisible = isToolbarTitleVisible,
         toolbarBackgroundAlpha = toolbarBackgroundAlpha,
         onSimpleEdited = onSimpleEdited

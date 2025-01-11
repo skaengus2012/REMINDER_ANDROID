@@ -20,7 +20,6 @@ import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
 import android.text.InputType
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.view.doOnAttach
 import androidx.core.view.doOnDetach
@@ -40,7 +39,9 @@ import com.nlab.reminder.core.data.model.ScheduleId
 import com.nlab.reminder.core.designsystem.compose.theme.AttrIds
 import com.nlab.reminder.core.kotlinx.coroutine.flow.withPrev
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
@@ -53,6 +54,7 @@ import kotlinx.coroutines.launch
  */
 internal class ScheduleContentViewHolder(
     private val binding: LayoutScheduleAdapterItemContentBinding,
+    private val selectionEnabled: Flow<Boolean>,
     private val onSimpleEditDone: (SimpleEdit) -> Unit,
     theme: ScheduleListTheme
 ) : ScheduleAdapterItemViewHolder(binding.root) {
@@ -66,10 +68,7 @@ internal class ScheduleContentViewHolder(
                 )
             }
     }
-    private val layoutBodyNormalSet: ConstraintSet =
-        ConstraintSet().apply { clone(binding.layoutBody) }
-    private val layoutBodySelectionSet: ConstraintSet =
-        ConstraintSet().apply { load(itemView.context, R.layout.layout_schedule_adapter_item_content_body_selectable) }
+    private val selectionAnimDelegate = ScheduleContentSelectionAnimDelegate(binding)
     private val bindingId = MutableStateFlow<ScheduleId?>(null)
 
     init {
@@ -145,9 +144,18 @@ internal class ScheduleContentViewHolder(
                     }
                     .collect { onSimpleEditDone(it) }
             }
+            jobs += viewLifecycleCoroutineScope.launch {
+                combine(
+                    selectionEnabled,
+                    selectionAnimDelegate::awaitReady.asFlow()
+                ) { enabled, _ -> enabled }.collect { enabled ->
+                    selectionAnimDelegate.startAnimation(enabled)
+                }
+            }
         }
         itemView.doOnDetach {
             jobs.forEach { it.cancel() }
+            selectionAnimDelegate.cancelAnimation()
         }
     }
 

@@ -21,7 +21,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -32,6 +32,8 @@ import com.nlab.reminder.core.androidx.fragment.compose.AndroidFragment
 import com.nlab.reminder.core.component.schedule.ui.compose.ScheduleListToolbar
 import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
 import com.nlab.reminder.core.translation.StringIds
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
 
 /**
  * @author Doohyun
@@ -43,10 +45,11 @@ internal fun AllScreen(
     showAppToast: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val testFlow = remember { MutableStateFlow(false) }
     AllScreen(
         modifier = modifier,
-        enterTransitionTimeInMillis = enterTransitionTimeInMillis,
         fragmentStateBridge = rememberAllFragmentStateBridge(
+            testFlow = testFlow,
             isToolbarTitleVisible = false,
             toolbarBackgroundAlpha = 0.0f,
             onSimpleEdited = { simpleEdit ->
@@ -54,9 +57,10 @@ internal fun AllScreen(
                 showAppToast("TODO Simple Edit $simpleEdit")
             }
         ),
+        scheduleListDisplayDelayTimeMillis = enterTransitionTimeInMillis.toLong(),
         onBackClicked = onBackClicked,
         onMoreClicked = {
-            // TODO implements
+            testFlow.update { it.not() }
         },
         onCompleteClicked = {
             // TODO implements
@@ -66,8 +70,8 @@ internal fun AllScreen(
 
 @Composable
 private fun AllScreen(
-    enterTransitionTimeInMillis: Int,
     fragmentStateBridge: AllFragmentStateBridge,
+    scheduleListDisplayDelayTimeMillis: Long,
     onBackClicked: () -> Unit,
     onMoreClicked: () -> Unit,
     onCompleteClicked: () -> Unit,
@@ -84,7 +88,7 @@ private fun AllScreen(
             onMoreClicked = onMoreClicked,
             onCompleteClicked = onCompleteClicked
         )
-        DelayedContent(delayTimeMillis = enterTransitionTimeInMillis.toLong()) {
+        DelayedContent(delayTimeMillis = scheduleListDisplayDelayTimeMillis) {
             AllScheduleList(fragmentStateBridge = fragmentStateBridge)
         }
     }
@@ -93,9 +97,10 @@ private fun AllScreen(
 @Composable
 private fun AllScheduleList(
     fragmentStateBridge: AllFragmentStateBridge,
+    modifier: Modifier = Modifier,
 ) {
     AndroidFragment<AllFragment>(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .navigationBarsPadding()
             .imePadding()
@@ -134,7 +139,7 @@ private fun AllToolbar(
 private fun AllScreenPreview() {
     PlaneatTheme {
         AllScreen(
-            enterTransitionTimeInMillis = 0,
+            scheduleListDisplayDelayTimeMillis = 0,
             fragmentStateBridge = rememberAllFragmentStateBridge(
                 isToolbarTitleVisible = true,
                 toolbarBackgroundAlpha = 1.0f,
