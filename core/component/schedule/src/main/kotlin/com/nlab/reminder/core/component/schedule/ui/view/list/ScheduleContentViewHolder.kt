@@ -19,17 +19,22 @@ package com.nlab.reminder.core.component.schedule.ui.view.list
 import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
 import android.text.InputType
+import android.view.MotionEvent
+import android.view.View
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.view.doOnAttach
 import androidx.core.view.doOnDetach
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.RecyclerView
 import com.nlab.reminder.core.android.content.getThemeColor
 import com.nlab.reminder.core.android.view.focusState
 import com.nlab.reminder.core.android.view.inputmethod.hideSoftInputFromWindow
+import com.nlab.reminder.core.android.view.isVisible
 import com.nlab.reminder.core.android.view.setVisible
 import com.nlab.reminder.core.android.view.throttleClicks
+import com.nlab.reminder.core.android.view.touches
 import com.nlab.reminder.core.android.widget.bindImageAsync
 import com.nlab.reminder.core.android.widget.bindText
 import com.nlab.reminder.core.android.widget.textChanges
@@ -48,6 +53,7 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
+import kotlin.math.absoluteValue
 
 /**
  * @author Thalys
@@ -56,8 +62,11 @@ internal class ScheduleContentViewHolder(
     private val binding: LayoutScheduleAdapterItemContentBinding,
     private val selectionEnabled: Flow<Boolean>,
     private val onSimpleEditDone: (SimpleEdit) -> Unit,
+    private val onDragHandleTouched: (RecyclerView.ViewHolder) -> Unit,
     theme: ScheduleListTheme
-) : ScheduleAdapterItemViewHolder(binding.root) {
+) : ScheduleAdapterItemViewHolder(binding.root),
+    SwipeSupportable,
+    DraggingSupportable {
     private val linkThumbnailPlaceHolderDrawable: Drawable? = with(itemView) {
         AppCompatResources.getDrawable(context, R.drawable.ic_schedule_link_error)
             ?.let(DrawableCompat::wrap)
@@ -70,6 +79,10 @@ internal class ScheduleContentViewHolder(
     }
     private val selectionAnimDelegate = ScheduleContentSelectionAnimDelegate(binding)
     private val bindingId = MutableStateFlow<ScheduleId?>(null)
+    private val clampAlphaOrigin: Float = binding.layoutClampDim.alpha
+
+    override val swipeView: View get() = binding.layoutContent
+    override val clampWidth: Float get() = binding.buttonDelete.width.toFloat()
 
     init {
         binding.buttonComplete.setImageResource(
@@ -102,9 +115,8 @@ internal class ScheduleContentViewHolder(
             val itemFocusedFlow = MutableStateFlow(false)
             jobs += viewLifecycleCoroutineScope.launch {
                 combine(
-                    binding.edittextTitle.focusState(),
-                    binding.edittextNote.focusState(),
-                    transform = { s1, s2 -> s1 || s2 }
+                    binding.editableViews().map { it.focusState() },
+                    transform = { focuses -> focuses.any { it } }
                 ).collect { itemFocusedFlow.value = it }
             }
             jobs += viewLifecycleCoroutineScope.launch {
@@ -137,8 +149,8 @@ internal class ScheduleContentViewHolder(
                         bindingId.value?.let { id ->
                             SimpleEdit(
                                 id = id,
-                                title = binding.edittextTitle.text?.toString().orEmpty(),
-                                note = binding.edittextNote.text?.toString().orEmpty()
+                                binding.edittextTitle.text?.toString().orEmpty(),
+                                binding.edittextNote.text?.toString().orEmpty()
                             )
                         }
                     }
@@ -156,6 +168,12 @@ internal class ScheduleContentViewHolder(
                     selectionAnimDelegate.startAnimation(enabled)
                 }
             }
+            jobs += viewLifecycleCoroutineScope.launch {
+                binding.buttonDragHandle
+                    .touches()
+                    .filter { event -> event.action == MotionEvent.ACTION_DOWN }
+                    .collect { onDragHandleTouched(this@ScheduleContentViewHolder) }
+            }
         }
         itemView.doOnDetach {
             jobs.forEach { it.cancel() }
@@ -163,9 +181,25 @@ internal class ScheduleContentViewHolder(
         }
     }
 
+    override fun isScaleOnDraggingNeeded(): Boolean = binding.imageviewBgLinkThumbnail.isVisible
+
+    override fun onSwipe(isActive: Boolean, dx: Float) {
+        binding.layoutClampDim.alpha = clampAlphaOrigin - dx.absoluteValue / clampWidth * clampAlphaOrigin
+        binding.editableViews().forEach { v -> v.isEnabled = isActive.not() }
+    }
+
+    override fun onDragging(isActive: Boolean) {
+        itemView.translationZ = if (isActive) 10f else 0f
+        binding.root.alpha = if (isActive) 0.7f else 1f
+        binding.viewLine.alpha = if (isActive) 0f else 1f
+        binding.editableViews().forEach { v -> v.isEnabled = isActive.not() }
+    }
+
     fun bind(item: ScheduleAdapterItem.Content) {
         bindingId.value =
             item.scheduleDetail.schedule.id
+        binding.viewLine
+            .setVisible(isVisible = item.isLineVisible, goneIfNotVisible = false)
         binding.edittextTitle
             .bindText(item.scheduleDetail.schedule.content.title)
         binding.edittextNote
@@ -190,3 +224,8 @@ internal class ScheduleContentViewHolder(
         }
     }
 }
+
+private fun LayoutScheduleAdapterItemContentBinding.editableViews(): Set<View> = setOf(
+    edittextTitle,
+    edittextNote
+)

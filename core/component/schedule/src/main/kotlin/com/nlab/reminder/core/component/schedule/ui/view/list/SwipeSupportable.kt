@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 The N's lab Open Source Project
+ * Copyright (C) 2025 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-plugins {
-    alias(libs.plugins.nlab.android.library)
-}
+package com.nlab.reminder.core.component.schedule.ui.view.list
 
-android {
-    namespace = "com.nlab.reminder.core.androidx.lifecycle"
-}
+import android.view.View
 
-dependencies {
-    api(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.kotlinx.coroutines.android)
+/**
+ * @author Thalys
+ */
+internal interface SwipeSupportable {
+    val swipeView: View
+    val clampWidth: Float
+    fun onSwipe(isActive: Boolean, dx: Float)
 }

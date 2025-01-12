@@ -16,21 +16,13 @@
 
 package com.nlab.reminder.core.component.schedule.ui.view.list
 
-import androidx.annotation.StringRes
-import com.nlab.reminder.core.data.model.ScheduleDetail
+import com.nlab.reminder.core.data.model.ScheduleId
 
 /**
  * @author Doohyun
  */
-sealed class ScheduleAdapterItem private constructor() {
-    data class Headline(
-        @StringRes val textRes: Int
-    ) : ScheduleAdapterItem()
-
-    data object HeadlinePadding : ScheduleAdapterItem()
-
-    data class Content(
-        val scheduleDetail: ScheduleDetail,
-        val isLineVisible: Boolean
-    ) : ScheduleAdapterItem()
-}
+data class SimpleEdit(
+    val id: ScheduleId,
+    val title: String,
+    val note: String
+)

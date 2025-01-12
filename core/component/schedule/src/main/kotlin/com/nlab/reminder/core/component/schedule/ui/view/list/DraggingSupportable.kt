@@ -16,13 +16,10 @@
 
 package com.nlab.reminder.core.component.schedule.ui.view.list
 
-import com.nlab.reminder.core.data.model.ScheduleId
-
 /**
  * @author Thalys
  */
-data class SimpleEdit(
-    val id: ScheduleId,
-    val title: String,
-    val note: String
-)
+internal interface DraggingSupportable {
+    fun isScaleOnDraggingNeeded(): Boolean
+    fun onDragging(isActive: Boolean)
+}

@@ -16,5 +16,5 @@
   -->
 
 <resources>
-    <item name="imageview_async_image_source" type="id" />
+    <item name="tag_imageview_async_image_source" type="id" />
 </resources>

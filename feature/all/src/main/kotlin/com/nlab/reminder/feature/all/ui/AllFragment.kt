@@ -20,18 +20,24 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.eventFlow
 import androidx.lifecycle.flowWithLifecycle
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.nlab.reminder.core.android.view.touches
 import com.nlab.reminder.core.androidx.fragment.compose.ComposableFragment
 import com.nlab.reminder.core.androidx.fragment.compose.ComposableInject
 import com.nlab.reminder.core.androidx.fragment.viewLifecycle
 import com.nlab.reminder.core.androidx.fragment.viewLifecycleScope
+import com.nlab.reminder.core.androix.recyclerview.scrollState
 import com.nlab.reminder.core.androix.recyclerview.scrollY
 import com.nlab.reminder.core.androix.recyclerview.verticalScrollRange
 import com.nlab.reminder.core.component.schedule.ui.view.list.ScheduleAdapterItem
 import com.nlab.reminder.core.component.schedule.ui.view.list.ScheduleListAdapter
 import com.nlab.reminder.core.component.schedule.ui.view.list.ScheduleListAnimator
+import com.nlab.reminder.core.component.schedule.ui.view.list.ScheduleListItemTouchCallback
 import com.nlab.reminder.core.component.schedule.ui.view.list.ScheduleListTheme
 import com.nlab.reminder.core.data.model.Link
 import com.nlab.reminder.core.data.model.LinkMetadata
@@ -41,14 +47,17 @@ import com.nlab.reminder.core.data.model.ScheduleDetail
 import com.nlab.reminder.core.data.model.ScheduleId
 import com.nlab.reminder.core.kotlin.toNonBlankString
 import com.nlab.reminder.core.kotlin.toNonNegativeLong
+import com.nlab.reminder.core.kotlinx.coroutine.flow.withPrev
 import com.nlab.reminder.core.translation.StringIds
 import com.nlab.reminder.feature.all.databinding.FragmentAllBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -75,10 +84,30 @@ internal class AllFragment : ComposableFragment() {
         val scheduleListAdapter = ScheduleListAdapter(theme = ScheduleListTheme.Point3).apply {
             stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
         }
+        val itemTouchCallback = ScheduleListItemTouchCallback(
+            context = requireContext(),
+            itemMoveListener = object : ScheduleListItemTouchCallback.ItemMoveListener {
+                override fun onItemMoved(
+                    fromViewHolder: RecyclerView.ViewHolder,
+                    toViewHolder: RecyclerView.ViewHolder
+                ): Boolean {
+                    return scheduleListAdapter.onItemMoved(
+                        fromViewHolder,
+                        toViewHolder
+                    )
+                }
+
+                override fun onItemMoveEnded() {
+
+                }
+            }
+        )
+        val itemTouchHelper = ItemTouchHelper(itemTouchCallback)
         binding.recyclerviewSchedule.apply {
             adapter = scheduleListAdapter
             itemAnimator = ScheduleListAnimator()
             layoutManager = linearLayoutManager
+            itemTouchHelper.attachToRecyclerView(/* recyclerView=*/ this)
         }
 
         val verticalScrollRange = binding.recyclerviewSchedule
@@ -114,14 +143,46 @@ internal class AllFragment : ComposableFragment() {
             .onEach { fragmentStateBridge.toolbarBackgroundAlpha = it }
             .launchIn(viewLifecycleScope)
 
-        fragmentStateBridge.itemSelectionEnabled
-            .flowWithLifecycle(viewLifecycle)
-            .onEach { scheduleListAdapter.setSelectionEnabled(it) }
+        binding.recyclerviewSchedule.touches()
+            .map { it.x }
+            .distinctUntilChanged()
+            .onEach { itemTouchCallback.setContainerTouchX(it) }
             .launchIn(viewLifecycleScope)
 
-        scheduleListAdapter
-            .simpleEditEvent
+        merge(
+            fragmentStateBridge.itemSelectionEnabled
+                .filter { it }
+                .flowWithLifecycle(viewLifecycle),
+            binding.recyclerviewSchedule
+                .scrollState()
+                .distinctUntilChanged()
+                .withPrev(RecyclerView.SCROLL_STATE_IDLE)
+                .filter { (prev, cur) ->
+                    prev == RecyclerView.SCROLL_STATE_IDLE && cur == RecyclerView.SCROLL_STATE_DRAGGING
+                }
+        ).onEach { itemTouchCallback.removeSwipeClamp(binding.recyclerviewSchedule) }
+            .launchIn(viewLifecycleScope)
+
+        fragmentStateBridge.itemSelectionEnabled
+            .flowWithLifecycle(viewLifecycle)
+            .onEach { enabled ->
+                scheduleListAdapter.setSelectionEnabled(enabled)
+                itemTouchCallback.isItemViewSwipeEnabled = enabled.not()
+                itemTouchCallback.isLongPressDragEnabled = enabled.not()
+            }
+            .launchIn(viewLifecycleScope)
+
+        scheduleListAdapter.editRequest
             .onEach { fragmentStateBridge.onSimpleEdited(it) }
+            .launchIn(viewLifecycleScope)
+
+        scheduleListAdapter.dragHandleTouch
+            .onEach { itemTouchHelper.startDrag(it) }
+            .launchIn(viewLifecycleScope)
+
+        viewLifecycle.eventFlow
+            .filter { event -> event == Lifecycle.Event.ON_DESTROY }
+            .onEach { itemTouchCallback.clearResource() }
             .launchIn(viewLifecycleScope)
 
         viewLifecycleScope.launch {
@@ -169,7 +230,8 @@ internal class AllFragment : ComposableFragment() {
                                     imageUrl = it
                                 )
                             }
-                        )
+                        ),
+                        isLineVisible = true
                     )
                 }
             }

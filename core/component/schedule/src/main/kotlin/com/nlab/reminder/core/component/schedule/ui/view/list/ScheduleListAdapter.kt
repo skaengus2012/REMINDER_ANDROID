@@ -19,14 +19,16 @@ package com.nlab.reminder.core.component.schedule.ui.view.list
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
 import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapterItemContentBinding
 import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapterItemHeadlineBinding
 import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapterItemHeadlinePaddingBinding
-import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.receiveAsFlow
 
 private const val ITEM_VIEW_TYPE_HEADLINE = 1
 private const val ITEM_VIEW_TYPE_HEADLINE_PADDING = 2
@@ -40,10 +42,11 @@ class ScheduleListAdapter(
 ) : ListAdapter<ScheduleAdapterItem, ScheduleAdapterItemViewHolder>(ScheduleAdapterItemDiffCallback()) {
     private val selectionEnabled = MutableStateFlow(false)
 
-    private val _simpleEditEvent = Channel<SimpleEdit>(Channel.BUFFERED)
-    val simpleEditEvent: Flow<SimpleEdit> = _simpleEditEvent
-        .receiveAsFlow()
-        .distinctUntilChanged()
+    private val _editRequest = MutableEventSharedFlow<SimpleEdit>()
+    val editRequest: Flow<SimpleEdit> = _editRequest.distinctUntilChanged()
+
+    private val _dragHandleTouch = MutableEventSharedFlow<RecyclerView.ViewHolder>()
+    val dragHandleTouch: Flow<RecyclerView.ViewHolder> = _dragHandleTouch.conflate()
 
     override fun getItemViewType(position: Int): Int = when (getItem(position)) {
         is ScheduleAdapterItem.Headline -> ITEM_VIEW_TYPE_HEADLINE
@@ -83,7 +86,8 @@ class ScheduleListAdapter(
                         /* attachToParent = */ false
                     ),
                     selectionEnabled = selectionEnabled,
-                    onSimpleEditDone = { _simpleEditEvent.trySend(it) },
+                    onSimpleEditDone = { _editRequest.tryEmit(it) },
+                    onDragHandleTouched = { _dragHandleTouch.tryEmit(it) },
                     theme = theme,
                 )
             }
@@ -107,4 +111,20 @@ class ScheduleListAdapter(
     fun setSelectionEnabled(isEnabled: Boolean) {
         selectionEnabled.value = isEnabled
     }
+
+    fun onItemMoved(fromViewHolder: RecyclerView.ViewHolder, toViewHolder: RecyclerView.ViewHolder): Boolean {
+        // TODO needs to be upgraded
+        return if (fromViewHolder is DraggingSupportable && toViewHolder is DraggingSupportable) {
+            notifyItemMoved(fromViewHolder.bindingAdapterPosition, toViewHolder.bindingAdapterPosition)
+            true
+        } else {
+            false
+        }
+    }
 }
+
+@Suppress("FunctionName")
+private fun <T> MutableEventSharedFlow(): MutableSharedFlow<T> = MutableSharedFlow(
+    extraBufferCapacity = 128,
+    onBufferOverflow = BufferOverflow.DROP_OLDEST
+)
