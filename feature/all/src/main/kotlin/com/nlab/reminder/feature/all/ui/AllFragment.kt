@@ -34,6 +34,7 @@ import com.nlab.reminder.core.androidx.fragment.viewLifecycleScope
 import com.nlab.reminder.core.androix.recyclerview.scrollState
 import com.nlab.reminder.core.androix.recyclerview.scrollY
 import com.nlab.reminder.core.androix.recyclerview.verticalScrollRange
+import com.nlab.reminder.core.component.schedule.ui.view.list.DraggingSupportable
 import com.nlab.reminder.core.component.schedule.ui.view.list.ScheduleAdapterItem
 import com.nlab.reminder.core.component.schedule.ui.view.list.ScheduleListAdapter
 import com.nlab.reminder.core.component.schedule.ui.view.list.ScheduleListAnimator
@@ -87,14 +88,16 @@ internal class AllFragment : ComposableFragment() {
         val itemTouchCallback = ScheduleListItemTouchCallback(
             context = requireContext(),
             itemMoveListener = object : ScheduleListItemTouchCallback.ItemMoveListener {
-                override fun onItemMoved(
-                    fromViewHolder: RecyclerView.ViewHolder,
-                    toViewHolder: RecyclerView.ViewHolder
-                ): Boolean {
-                    return scheduleListAdapter.onItemMoved(
-                        fromViewHolder,
-                        toViewHolder
+                override fun <T> onItemMoved(
+                    fromViewHolder: T,
+                    toViewHolder: T
+                ): Boolean where T : RecyclerView.ViewHolder, T : DraggingSupportable {
+                    // TODO implements upgrade
+                    scheduleListAdapter.notifyItemMoved(
+                        fromViewHolder.bindingAdapterPosition,
+                        toViewHolder.bindingAdapterPosition
                     )
+                    return true
                 }
 
                 override fun onItemMoveEnded() {

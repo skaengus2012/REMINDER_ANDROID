@@ -58,15 +58,15 @@ import kotlin.math.absoluteValue
 /**
  * @author Thalys
  */
-internal class ScheduleContentViewHolder(
+class ScheduleContentViewHolder(
     private val binding: LayoutScheduleAdapterItemContentBinding,
     private val selectionEnabled: Flow<Boolean>,
     private val onSimpleEditDone: (SimpleEdit) -> Unit,
     private val onDragHandleTouched: (RecyclerView.ViewHolder) -> Unit,
     theme: ScheduleListTheme
 ) : ScheduleAdapterItemViewHolder(binding.root),
-    SwipeSupportable,
-    DraggingSupportable {
+    DraggingSupportable,
+    SwipeSupportable {
     private val linkThumbnailPlaceHolderDrawable: Drawable? = with(itemView) {
         AppCompatResources.getDrawable(context, R.drawable.ic_schedule_link_error)
             ?.let(DrawableCompat::wrap)
@@ -81,8 +81,8 @@ internal class ScheduleContentViewHolder(
     private val bindingId = MutableStateFlow<ScheduleId?>(null)
     private val clampAlphaOrigin: Float = binding.layoutClampDim.alpha
 
-    override val swipeView: View get() = binding.layoutContent
-    override val clampWidth: Float get() = binding.buttonDelete.width.toFloat()
+    override val draggingDelegate: DraggingDelegate = DraggingDelegateImpl(binding)
+    override val swipeDelegate: SwipeDelegate = SwipeDelegateImpl(binding)
 
     init {
         binding.buttonComplete.setImageResource(
@@ -181,20 +181,6 @@ internal class ScheduleContentViewHolder(
         }
     }
 
-    override fun isScaleOnDraggingNeeded(): Boolean = binding.imageviewBgLinkThumbnail.isVisible
-
-    override fun onSwipe(isActive: Boolean, dx: Float) {
-        binding.layoutClampDim.alpha = clampAlphaOrigin - dx.absoluteValue / clampWidth * clampAlphaOrigin
-        binding.editableViews().forEach { v -> v.isEnabled = isActive.not() }
-    }
-
-    override fun onDragging(isActive: Boolean) {
-        itemView.translationZ = if (isActive) 10f else 0f
-        binding.root.alpha = if (isActive) 0.7f else 1f
-        binding.viewLine.alpha = if (isActive) 0f else 1f
-        binding.editableViews().forEach { v -> v.isEnabled = isActive.not() }
-    }
-
     fun bind(item: ScheduleAdapterItem.Content) {
         bindingId.value =
             item.scheduleDetail.schedule.id
@@ -229,3 +215,36 @@ private fun LayoutScheduleAdapterItemContentBinding.editableViews(): Set<View> =
     edittextTitle,
     edittextNote
 )
+
+private class DraggingDelegateImpl(
+    private val binding: LayoutScheduleAdapterItemContentBinding
+) : DraggingDelegate() {
+    override fun isScaleOnDraggingNeeded(): Boolean {
+        return binding.imageviewBgLinkThumbnail.isVisible
+    }
+
+    override fun onDragging(isActive: Boolean) {
+        binding.root.translationZ = if (isActive) 10f else 0f
+        binding.root.alpha = if (isActive) 0.7f else 1f
+        binding.viewLine.alpha = if (isActive) 0f else 1f
+        binding.editableViews().forEach { v -> v.isEnabled = isActive.not() }
+    }
+
+    override fun onPreMoving() {
+        binding.editableViews().forEach { v -> v.clearFocus() }
+    }
+}
+
+private class SwipeDelegateImpl(
+    private val binding: LayoutScheduleAdapterItemContentBinding
+) : SwipeDelegate() {
+    private val clampAlphaOrigin: Float = binding.layoutClampDim.alpha
+
+    override val swipeView: View get() = binding.layoutContent
+    override val clampWidth: Float get() = binding.buttonDelete.width.toFloat()
+
+    override fun onSwipe(isActive: Boolean, dx: Float) {
+        binding.layoutClampDim.alpha = clampAlphaOrigin - dx.absoluteValue / clampWidth * clampAlphaOrigin
+        binding.editableViews().forEach { v -> v.isEnabled = isActive.not() }
+    }
+}
