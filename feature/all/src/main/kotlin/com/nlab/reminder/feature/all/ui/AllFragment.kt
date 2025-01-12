@@ -230,7 +230,8 @@ internal class AllFragment : ComposableFragment() {
                                     imageUrl = it
                                 )
                             }
-                        )
+                        ),
+                        isLineVisible = true
                     )
                 }
             }

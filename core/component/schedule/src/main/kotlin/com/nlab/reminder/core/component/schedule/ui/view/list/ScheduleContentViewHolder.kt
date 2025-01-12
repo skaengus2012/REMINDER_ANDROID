@@ -198,6 +198,8 @@ internal class ScheduleContentViewHolder(
     fun bind(item: ScheduleAdapterItem.Content) {
         bindingId.value =
             item.scheduleDetail.schedule.id
+        binding.viewLine
+            .setVisible(isVisible = item.isLineVisible, goneIfNotVisible = false)
         binding.edittextTitle
             .bindText(item.scheduleDetail.schedule.content.title)
         binding.edittextNote

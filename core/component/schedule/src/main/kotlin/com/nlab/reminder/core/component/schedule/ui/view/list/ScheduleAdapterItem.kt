@@ -30,6 +30,7 @@ sealed class ScheduleAdapterItem private constructor() {
     data object HeadlinePadding : ScheduleAdapterItem()
 
     data class Content(
-        val scheduleDetail: ScheduleDetail
+        val scheduleDetail: ScheduleDetail,
+        val isLineVisible: Boolean
     ) : ScheduleAdapterItem()
 }
