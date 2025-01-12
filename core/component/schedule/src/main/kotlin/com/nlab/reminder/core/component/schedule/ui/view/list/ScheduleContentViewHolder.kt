@@ -19,6 +19,7 @@ package com.nlab.reminder.core.component.schedule.ui.view.list
 import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
 import android.text.InputType
+import android.view.View
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.view.doOnAttach
@@ -28,6 +29,7 @@ import androidx.lifecycle.lifecycleScope
 import com.nlab.reminder.core.android.content.getThemeColor
 import com.nlab.reminder.core.android.view.focusState
 import com.nlab.reminder.core.android.view.inputmethod.hideSoftInputFromWindow
+import com.nlab.reminder.core.android.view.isVisible
 import com.nlab.reminder.core.android.view.setVisible
 import com.nlab.reminder.core.android.view.throttleClicks
 import com.nlab.reminder.core.android.widget.bindImageAsync
@@ -48,6 +50,7 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
+import kotlin.math.absoluteValue
 
 /**
  * @author Thalys
@@ -57,7 +60,9 @@ internal class ScheduleContentViewHolder(
     private val selectionEnabled: Flow<Boolean>,
     private val onSimpleEditDone: (SimpleEdit) -> Unit,
     theme: ScheduleListTheme
-) : ScheduleAdapterItemViewHolder(binding.root) {
+) : ScheduleAdapterItemViewHolder(binding.root),
+    SwipeSupportable,
+    DraggingSupportable {
     private val linkThumbnailPlaceHolderDrawable: Drawable? = with(itemView) {
         AppCompatResources.getDrawable(context, R.drawable.ic_schedule_link_error)
             ?.let(DrawableCompat::wrap)
@@ -70,6 +75,10 @@ internal class ScheduleContentViewHolder(
     }
     private val selectionAnimDelegate = ScheduleContentSelectionAnimDelegate(binding)
     private val bindingId = MutableStateFlow<ScheduleId?>(null)
+    private val clampAlphaOrigin: Float = binding.layoutClampDim.alpha
+
+    override val swipeView: View get() = binding.layoutContent
+    override val clampWidth: Float get() = binding.buttonDelete.width.toFloat()
 
     init {
         binding.buttonComplete.setImageResource(
@@ -161,6 +170,21 @@ internal class ScheduleContentViewHolder(
             jobs.forEach { it.cancel() }
             selectionAnimDelegate.cancelAnimation()
         }
+    }
+
+    override fun isScaleOnDraggingNeeded(): Boolean = binding.imageviewBgLinkThumbnail.isVisible
+
+    override fun onSwipe(isSwipe: Boolean, dx: Float) {
+        binding.layoutClampDim.alpha =
+            if (isSwipe) clampAlphaOrigin - dx.absoluteValue / clampWidth * clampAlphaOrigin
+            else clampAlphaOrigin
+    }
+
+    override fun onDragging(isActive: Boolean) {
+        binding.root.alpha = if (isActive) 0.7f else 1f
+        binding.viewLine.alpha = if (isActive) 0f else 1f
+        itemView.translationZ = if (isActive) 10f else 0f
+        itemView.hideSoftInputFromWindow()
     }
 
     fun bind(item: ScheduleAdapterItem.Content) {

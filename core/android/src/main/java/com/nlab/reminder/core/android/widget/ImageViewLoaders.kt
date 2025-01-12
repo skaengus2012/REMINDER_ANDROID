@@ -62,9 +62,9 @@ fun ImageView.bindImageAsync(
 }
 
 private var ImageView.asyncImageSource: AsyncImageSource?
-    get() = getTag(R.id.imageview_async_image_source) as? AsyncImageSource
+    get() = getTag(R.id.tag_imageview_async_image_source) as? AsyncImageSource
     set(value) {
-        setTag(R.id.imageview_async_image_source, value)
+        setTag(R.id.tag_imageview_async_image_source, value)
     }
 
 private data class AsyncImageSource(

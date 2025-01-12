@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<?xml version="1.0" encoding="utf-8"?>
+<!--
   ~ Copyright (C) 2025 The N's lab Open Source Project
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,12 +16,7 @@
   -->
 
 <resources>
-    <dimen name="schedule_check_external_dither">1.5dp</dimen>
-    <dimen name="schedule_check_size">22dp</dimen>
-    <dimen name="schedule_checkbox_padding">15dp</dimen>
-    <dimen name="schedule_checkbox_touchable_size">52dp</dimen>
-    <dimen name="schedule_checkbox_touchable_size_negative">-52dp</dimen>
-    <dimen name="schedule_data_start">57dp</dimen>
-    <dimen name="schedule_data_start_complete_selection">96dp</dimen> <!-- schedule_data_start + (schedule_checkbox_touchable_size * 0.7f) -->
-    <dimen name="schedule_dragging_scale_item_height">120dp</dimen>
+    <item name="tag_schedule_item_touch_callback_is_clamp" type="id" />
+    <item name="tag_schedule_item_touch_callback_clamp_hide_animator" type="id" />
+    <item name="tag_schedule_item_touch_callback_scale_on_dragging" type="id" />
 </resources>
