@@ -31,6 +31,7 @@ import com.nlab.reminder.core.androidx.fragment.compose.ComposableFragment
 import com.nlab.reminder.core.androidx.fragment.compose.ComposableInject
 import com.nlab.reminder.core.androidx.fragment.viewLifecycle
 import com.nlab.reminder.core.androidx.fragment.viewLifecycleScope
+import com.nlab.reminder.core.androix.recyclerview.scrollState
 import com.nlab.reminder.core.androix.recyclerview.scrollY
 import com.nlab.reminder.core.androix.recyclerview.verticalScrollRange
 import com.nlab.reminder.core.component.schedule.ui.view.list.ScheduleAdapterItem
@@ -46,6 +47,7 @@ import com.nlab.reminder.core.data.model.ScheduleDetail
 import com.nlab.reminder.core.data.model.ScheduleId
 import com.nlab.reminder.core.kotlin.toNonBlankString
 import com.nlab.reminder.core.kotlin.toNonNegativeLong
+import com.nlab.reminder.core.kotlinx.coroutine.flow.withPrev
 import com.nlab.reminder.core.translation.StringIds
 import com.nlab.reminder.feature.all.databinding.FragmentAllBinding
 import kotlinx.coroutines.Dispatchers
@@ -144,6 +146,16 @@ internal class AllFragment : ComposableFragment() {
             .map { it.x }
             .distinctUntilChanged()
             .onEach { itemTouchCallback.setContainerTouchX(it) }
+            .launchIn(viewLifecycleScope)
+
+        binding.recyclerviewSchedule
+            .scrollState()
+            .distinctUntilChanged()
+            .withPrev(RecyclerView.SCROLL_STATE_IDLE)
+            .filter { (prev, cur) ->
+                prev == RecyclerView.SCROLL_STATE_IDLE && cur == RecyclerView.SCROLL_STATE_DRAGGING
+            }
+            .onEach { itemTouchCallback.removeSwipeClamp(binding.recyclerviewSchedule) }
             .launchIn(viewLifecycleScope)
 
         fragmentStateBridge.itemSelectionEnabled
