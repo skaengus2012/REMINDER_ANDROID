@@ -61,7 +61,6 @@ dependencies {
     implementation(projects.core.android)
     implementation(projects.core.androidx.compose)
     implementation(projects.core.androidx.fragment)
-    implementation(projects.core.androidx.lifecycle)
     implementation(projects.core.androidx.navigationCompose)
     implementation(projects.core.androidx.recyclerview)
     implementation(projects.core.annotation)

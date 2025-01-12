@@ -52,7 +52,6 @@ include(
     ":core:androidx:compose",
     ":core:androidx:fragment",
     ":core:androidx:fragment-compose",
-    ":core:androidx:lifecycle",
     ":core:androidx:navigation-compose",
     ":core:androidx:recyclerview",
     ":core:annotation",
