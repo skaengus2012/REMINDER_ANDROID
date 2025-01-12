@@ -57,6 +57,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -148,14 +149,18 @@ internal class AllFragment : ComposableFragment() {
             .onEach { itemTouchCallback.setContainerTouchX(it) }
             .launchIn(viewLifecycleScope)
 
-        binding.recyclerviewSchedule
-            .scrollState()
-            .distinctUntilChanged()
-            .withPrev(RecyclerView.SCROLL_STATE_IDLE)
-            .filter { (prev, cur) ->
-                prev == RecyclerView.SCROLL_STATE_IDLE && cur == RecyclerView.SCROLL_STATE_DRAGGING
-            }
-            .onEach { itemTouchCallback.removeSwipeClamp(binding.recyclerviewSchedule) }
+        merge(
+            fragmentStateBridge.itemSelectionEnabled
+                .filter { it }
+                .flowWithLifecycle(viewLifecycle),
+            binding.recyclerviewSchedule
+                .scrollState()
+                .distinctUntilChanged()
+                .withPrev(RecyclerView.SCROLL_STATE_IDLE)
+                .filter { (prev, cur) ->
+                    prev == RecyclerView.SCROLL_STATE_IDLE && cur == RecyclerView.SCROLL_STATE_DRAGGING
+                }
+        ).onEach { itemTouchCallback.removeSwipeClamp(binding.recyclerviewSchedule) }
             .launchIn(viewLifecycleScope)
 
         fragmentStateBridge.itemSelectionEnabled
