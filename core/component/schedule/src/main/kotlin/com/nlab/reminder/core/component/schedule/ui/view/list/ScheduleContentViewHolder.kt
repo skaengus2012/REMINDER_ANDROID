@@ -183,10 +183,9 @@ internal class ScheduleContentViewHolder(
 
     override fun isScaleOnDraggingNeeded(): Boolean = binding.imageviewBgLinkThumbnail.isVisible
 
-    override fun onSwipe(isSwipe: Boolean, dx: Float) {
-        binding.layoutClampDim.alpha =
-            if (isSwipe) clampAlphaOrigin - dx.absoluteValue / clampWidth * clampAlphaOrigin
-            else clampAlphaOrigin
+    override fun onSwipe(isActive: Boolean, dx: Float) {
+        binding.layoutClampDim.alpha = clampAlphaOrigin - dx.absoluteValue / clampWidth * clampAlphaOrigin
+        binding.editableViews().forEach { v -> v.isEnabled = isActive.not() }
     }
 
     override fun onDragging(isActive: Boolean) {

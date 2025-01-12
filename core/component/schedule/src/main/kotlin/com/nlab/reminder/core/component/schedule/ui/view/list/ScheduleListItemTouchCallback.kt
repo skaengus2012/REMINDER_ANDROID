@@ -136,14 +136,13 @@ class ScheduleListItemTouchCallback(
                 viewHolder.swipeView,
                 clampViewPositionHorizontal(viewHolder, dX, isCurrentlyActive).also {
                     curAdjustDX = it
-                    viewHolder.onSwipe(isSwipe = true, it)
+                    viewHolder.onSwipe(isActive = isCurrentlyActive, it)
                 },
                 dY,
                 actionState,
                 isCurrentlyActive
             )
         } else {
-            viewHolder.onSwipe(isSwipe = true, dx = -1f)
             removeSwipeClamp(recyclerView)
             super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
         }
