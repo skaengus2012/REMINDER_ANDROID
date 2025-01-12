@@ -155,9 +155,12 @@ internal class AllFragment : ComposableFragment() {
             }
             .launchIn(viewLifecycleScope)
 
-        scheduleListAdapter
-            .simpleEditEvent
+        scheduleListAdapter.editRequest
             .onEach { fragmentStateBridge.onSimpleEdited(it) }
+            .launchIn(viewLifecycleScope)
+
+        scheduleListAdapter.dragHandleTouch
+            .onEach { itemTouchHelper.startDrag(it) }
             .launchIn(viewLifecycleScope)
 
         viewLifecycle.eventFlow

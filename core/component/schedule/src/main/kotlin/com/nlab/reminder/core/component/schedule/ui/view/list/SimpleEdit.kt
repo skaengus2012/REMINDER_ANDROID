@@ -19,7 +19,7 @@ package com.nlab.reminder.core.component.schedule.ui.view.list
 import com.nlab.reminder.core.data.model.ScheduleId
 
 /**
- * @author Thalys
+ * @author Doohyun
  */
 data class SimpleEdit(
     val id: ScheduleId,
