@@ -34,7 +34,6 @@ import com.nlab.reminder.core.androidx.fragment.viewLifecycleScope
 import com.nlab.reminder.core.androix.recyclerview.scrollState
 import com.nlab.reminder.core.androix.recyclerview.scrollY
 import com.nlab.reminder.core.androix.recyclerview.verticalScrollRange
-import com.nlab.reminder.core.component.schedule.ui.view.list.DraggingSupportable
 import com.nlab.reminder.core.component.schedule.ui.view.list.ScheduleAdapterItem
 import com.nlab.reminder.core.component.schedule.ui.view.list.ScheduleListAdapter
 import com.nlab.reminder.core.component.schedule.ui.view.list.ScheduleListAnimator
@@ -75,7 +74,7 @@ internal class AllFragment : ComposableFragment() {
     @ComposableInject
     lateinit var fragmentStateBridge: AllFragmentStateBridge
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         FragmentAllBinding.inflate(inflater, container, false)
             .also { _binding = it }
             .root
@@ -88,20 +87,16 @@ internal class AllFragment : ComposableFragment() {
         val itemTouchCallback = ScheduleListItemTouchCallback(
             context = requireContext(),
             itemMoveListener = object : ScheduleListItemTouchCallback.ItemMoveListener {
-                override fun <T> onItemMoved(
-                    fromViewHolder: T,
-                    toViewHolder: T
-                ): Boolean where T : RecyclerView.ViewHolder, T : DraggingSupportable {
-                    // TODO implements upgrade
-                    scheduleListAdapter.notifyItemMoved(
-                        fromViewHolder.bindingAdapterPosition,
-                        toViewHolder.bindingAdapterPosition
-                    )
-                    return true
-                }
+                override fun onMove(
+                    fromViewHolder: RecyclerView.ViewHolder,
+                    toViewHolder: RecyclerView.ViewHolder
+                ): Boolean = scheduleListAdapter.submitMoving(
+                    fromPosition = fromViewHolder.bindingAdapterPosition,
+                    toPosition = toViewHolder.bindingAdapterPosition
+                )
 
-                override fun onItemMoveEnded() {
-
+                override fun onMoveEnded() {
+                    scheduleListAdapter.submitMoveDone()
                 }
             }
         )
@@ -189,8 +184,7 @@ internal class AllFragment : ComposableFragment() {
             .launchIn(viewLifecycleScope)
 
         viewLifecycleScope.launch {
-            val items = withContext(Dispatchers.Default) { testItems }
-            scheduleListAdapter.submitList(items)
+            scheduleListAdapter.submitList(withContext(Dispatchers.Default) { testItems })
         }
     }
 

@@ -80,7 +80,7 @@ class ScheduleListItemTouchCallback(
         ) {
             viewHolder.draggingDelegate.onPreMoving()
             target.draggingDelegate.onPreMoving()
-            itemMoveListener.onItemMoved(viewHolder, target)
+            itemMoveListener.onMove(viewHolder, target)
         } else {
             false
         }
@@ -254,7 +254,7 @@ class ScheduleListItemTouchCallback(
             getDefaultUIUtil().clearView(viewHolder.swipeDelegate.swipeView)
         }
 
-        itemMoveListener.onItemMoveEnded()
+        itemMoveListener.onMoveEnded()
     }
 
     override fun onSelectedChanged(
@@ -293,12 +293,8 @@ class ScheduleListItemTouchCallback(
     }
 
     interface ItemMoveListener {
-        fun <T> onItemMoved(
-            fromViewHolder: T,
-            toViewHolder: T
-        ): Boolean where T : RecyclerView.ViewHolder, T : DraggingSupportable
-
-        fun onItemMoveEnded()
+        fun onMove(fromViewHolder: RecyclerView.ViewHolder, toViewHolder: RecyclerView.ViewHolder): Boolean
+        fun onMoveEnded()
     }
 }
 
