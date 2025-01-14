@@ -79,7 +79,6 @@ class ScheduleContentViewHolder(
     }
     private val selectionAnimDelegate = ScheduleContentSelectionAnimDelegate(binding)
     private val bindingId = MutableStateFlow<ScheduleId?>(null)
-    private val clampAlphaOrigin: Float = binding.layoutClampDim.alpha
 
     override val draggingDelegate: DraggingDelegate = DraggingDelegateImpl(binding)
     override val swipeDelegate: SwipeDelegate = SwipeDelegateImpl(binding)
