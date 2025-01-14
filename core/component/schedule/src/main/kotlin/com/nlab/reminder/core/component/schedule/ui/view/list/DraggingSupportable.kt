@@ -19,7 +19,12 @@ package com.nlab.reminder.core.component.schedule.ui.view.list
 /**
  * @author Thalys
  */
-internal interface DraggingSupportable {
-    fun isScaleOnDraggingNeeded(): Boolean
-    fun onDragging(isActive: Boolean)
+sealed interface DraggingSupportable {
+    val draggingDelegate: DraggingDelegate
+}
+
+abstract class DraggingDelegate {
+    internal abstract fun isScaleOnDraggingNeeded(): Boolean
+    internal abstract fun onDragging(isActive: Boolean)
+    internal abstract fun onPreMoving()
 }

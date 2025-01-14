@@ -66,7 +66,7 @@ class ScheduleListItemTouchCallback(
     override fun getSwipeThreshold(viewHolder: RecyclerView.ViewHolder): Float {
         if (viewHolder !is SwipeSupportable) return getSwipeThreshold(viewHolder)
 
-        viewHolder.isClamped = curAdjustDX <= -viewHolder.clampWidth
+        viewHolder.isClamped = curAdjustDX <= -viewHolder.swipeDelegate.clampWidth
         return 2f // Define 2f to prevent swipe delete
     }
 
@@ -78,7 +78,9 @@ class ScheduleListItemTouchCallback(
         return if (viewHolder is DraggingSupportable && target is DraggingSupportable
             && viewHolder.itemViewType == target.itemViewType
         ) {
-            itemMoveListener.onItemMoved(viewHolder, target)
+            viewHolder.draggingDelegate.onPreMoving()
+            target.draggingDelegate.onPreMoving()
+            itemMoveListener.onMove(viewHolder, target)
         } else {
             false
         }
@@ -92,7 +94,6 @@ class ScheduleListItemTouchCallback(
         return if (flag) super.getMovementFlags(recyclerView, viewHolder)
         else ItemTouchHelper.ACTION_STATE_IDLE
     }
-
 
     override fun getDragDirs(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int =
         if (viewHolder is DraggingSupportable) super.getDragDirs(recyclerView, viewHolder)
@@ -133,10 +134,10 @@ class ScheduleListItemTouchCallback(
             getDefaultUIUtil().onDraw(
                 c,
                 recyclerView,
-                viewHolder.swipeView,
+                viewHolder.swipeDelegate.swipeView,
                 clampViewPositionHorizontal(viewHolder, dX, isCurrentlyActive).also {
                     curAdjustDX = it
-                    viewHolder.onSwipe(isActive = isCurrentlyActive, it)
+                    viewHolder.swipeDelegate.onSwipe(isActive = isCurrentlyActive, it)
                 },
                 dY,
                 actionState,
@@ -154,9 +155,9 @@ class ScheduleListItemTouchCallback(
         isCurrentlyActive: Boolean
     ) where T : RecyclerView.ViewHolder, T : DraggingSupportable {
         if (actionState != ItemTouchHelper.ACTION_STATE_DRAG) return
-        viewHolder.onDragging(isActive = isCurrentlyActive)
+        viewHolder.draggingDelegate.onDragging(isActive = isCurrentlyActive)
 
-        if (viewHolder.isScaleOnDraggingNeeded()) {
+        if (viewHolder.draggingDelegate.isScaleOnDraggingNeeded()) {
             viewHolder.itemView.apply {
                 translationX =
                     if (isCurrentlyActive) curContainerTouchX - (width / 2f)
@@ -189,7 +190,7 @@ class ScheduleListItemTouchCallback(
             return
         }
 
-        viewHolder.swipeView.let { view ->
+        viewHolder.swipeDelegate.swipeView.let { view ->
             view.animate()
                 .x(0f)
                 .setDuration(DEFAULT_ANIMATE_DURATION)
@@ -231,7 +232,7 @@ class ScheduleListItemTouchCallback(
         isCurrentlyActive: Boolean
     ): Float where T : RecyclerView.ViewHolder, T : SwipeSupportable {
         val isClamped = viewHolder.isClamped
-        val clampWidth = viewHolder.clampWidth
+        val clampWidth = viewHolder.swipeDelegate.clampWidth
         return min(
             0f,
             if (isClamped)
@@ -250,10 +251,10 @@ class ScheduleListItemTouchCallback(
         if (viewHolder is SwipeSupportable) {
             curAdjustDX = 0f
             prevSelectedAbsolutePosition = viewHolder.absoluteAdapterPosition
-            getDefaultUIUtil().clearView(viewHolder.swipeView)
+            getDefaultUIUtil().clearView(viewHolder.swipeDelegate.swipeView)
         }
 
-        itemMoveListener.onItemMoveEnded()
+        itemMoveListener.onMoveEnded()
     }
 
     override fun onSelectedChanged(
@@ -264,7 +265,7 @@ class ScheduleListItemTouchCallback(
             if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
                 curSelectedAbsolutePosition = viewHolder.absoluteAdapterPosition
             }
-            getDefaultUIUtil().onSelected(/* view=*/ viewHolder.swipeView)
+            getDefaultUIUtil().onSelected(/* view=*/ viewHolder.swipeDelegate.swipeView)
         }
     }
 
@@ -292,8 +293,8 @@ class ScheduleListItemTouchCallback(
     }
 
     interface ItemMoveListener {
-        fun onItemMoved(fromViewHolder: RecyclerView.ViewHolder, toViewHolder: RecyclerView.ViewHolder): Boolean
-        fun onItemMoveEnded()
+        fun onMove(fromViewHolder: RecyclerView.ViewHolder, toViewHolder: RecyclerView.ViewHolder): Boolean
+        fun onMoveEnded()
     }
 }
 

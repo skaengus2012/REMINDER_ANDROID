@@ -18,7 +18,7 @@ package com.nlab.reminder.core.component.schedule.ui.view.list
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.AdapterListUpdateCallback
 import androidx.recyclerview.widget.RecyclerView
 import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapterItemContentBinding
 import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapterItemHeadlineBinding
@@ -39,7 +39,9 @@ private const val ITEM_VIEW_TYPE_CONTENT = 3
  */
 class ScheduleListAdapter(
     private val theme: ScheduleListTheme
-) : ListAdapter<ScheduleAdapterItem, ScheduleAdapterItemViewHolder>(ScheduleAdapterItemDiffCallback()) {
+) : RecyclerView.Adapter<ScheduleAdapterItemViewHolder>() {
+    private val differ = ScheduleListDiffer(listUpdateCallback = AdapterListUpdateCallback(/* adapter = */ this))
+
     private val selectionEnabled = MutableStateFlow(false)
 
     private val _editRequest = MutableEventSharedFlow<SimpleEdit>()
@@ -47,6 +49,12 @@ class ScheduleListAdapter(
 
     private val _dragHandleTouch = MutableEventSharedFlow<RecyclerView.ViewHolder>()
     val dragHandleTouch: Flow<RecyclerView.ViewHolder> = _dragHandleTouch.conflate()
+
+    private fun getItem(position: Int): ScheduleAdapterItem {
+        return differ.getCurrentList()[position]
+    }
+
+    override fun getItemCount(): Int = differ.getCurrentList().size
 
     override fun getItemViewType(position: Int): Int = when (getItem(position)) {
         is ScheduleAdapterItem.Headline -> ITEM_VIEW_TYPE_HEADLINE
@@ -112,14 +120,16 @@ class ScheduleListAdapter(
         selectionEnabled.value = isEnabled
     }
 
-    fun onItemMoved(fromViewHolder: RecyclerView.ViewHolder, toViewHolder: RecyclerView.ViewHolder): Boolean {
-        // TODO needs to be upgraded
-        return if (fromViewHolder is DraggingSupportable && toViewHolder is DraggingSupportable) {
-            notifyItemMoved(fromViewHolder.bindingAdapterPosition, toViewHolder.bindingAdapterPosition)
-            true
-        } else {
-            false
-        }
+    fun submitMoving(fromPosition: Int, toPosition: Int): Boolean {
+        return differ.tryMove(fromPosition, toPosition)
+    }
+
+    fun submitMoveDone() {
+        differ.syncMoving(commitCallback = {})
+    }
+
+    fun submitList(items: List<ScheduleAdapterItem>?) {
+        differ.submitList(items, commitCallback = {})
     }
 }
 

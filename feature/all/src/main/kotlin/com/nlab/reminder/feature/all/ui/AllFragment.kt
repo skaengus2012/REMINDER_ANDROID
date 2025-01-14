@@ -74,7 +74,7 @@ internal class AllFragment : ComposableFragment() {
     @ComposableInject
     lateinit var fragmentStateBridge: AllFragmentStateBridge
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         FragmentAllBinding.inflate(inflater, container, false)
             .also { _binding = it }
             .root
@@ -87,18 +87,16 @@ internal class AllFragment : ComposableFragment() {
         val itemTouchCallback = ScheduleListItemTouchCallback(
             context = requireContext(),
             itemMoveListener = object : ScheduleListItemTouchCallback.ItemMoveListener {
-                override fun onItemMoved(
+                override fun onMove(
                     fromViewHolder: RecyclerView.ViewHolder,
                     toViewHolder: RecyclerView.ViewHolder
-                ): Boolean {
-                    return scheduleListAdapter.onItemMoved(
-                        fromViewHolder,
-                        toViewHolder
-                    )
-                }
+                ): Boolean = scheduleListAdapter.submitMoving(
+                    fromPosition = fromViewHolder.bindingAdapterPosition,
+                    toPosition = toViewHolder.bindingAdapterPosition
+                )
 
-                override fun onItemMoveEnded() {
-
+                override fun onMoveEnded() {
+                    scheduleListAdapter.submitMoveDone()
                 }
             }
         )
@@ -186,8 +184,7 @@ internal class AllFragment : ComposableFragment() {
             .launchIn(viewLifecycleScope)
 
         viewLifecycleScope.launch {
-            val items = withContext(Dispatchers.Default) { testItems }
-            scheduleListAdapter.submitList(items)
+            scheduleListAdapter.submitList(withContext(Dispatchers.Default) { testItems })
         }
     }
 
