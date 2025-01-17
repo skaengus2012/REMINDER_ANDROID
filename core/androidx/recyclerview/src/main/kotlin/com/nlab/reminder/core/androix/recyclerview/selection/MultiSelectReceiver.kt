@@ -21,6 +21,5 @@ package com.nlab.reminder.core.androix.recyclerview.selection
  */
 interface MultiSelectReceiver {
     fun setSelected(index: Int, selected: Boolean)
-    fun isSelected(index: Int): Boolean
     fun isIndexSelectable(index: Int): Boolean
 }

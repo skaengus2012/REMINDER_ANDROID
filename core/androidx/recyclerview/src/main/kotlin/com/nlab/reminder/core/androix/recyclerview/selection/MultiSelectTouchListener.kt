@@ -44,30 +44,24 @@ class MultiSelectTouchListener(
         override fun run() {
             if (inTopHotspot) {
                 recyclerView?.scrollBy(0, -autoScrollVelocity)
-                autoScrollHandler.postDelayed(this, AUTO_SCROLL_DELAY)
+                autoScrollHandler.postDelayed(this, autoScrollDelayTimeInMillis)
             } else if (inBottomHotspot) {
                 recyclerView?.scrollBy(0, autoScrollVelocity)
-                autoScrollHandler.postDelayed(this, AUTO_SCROLL_DELAY)
+                autoScrollHandler.postDelayed(this, autoScrollDelayTimeInMillis)
             }
         }
     }
 
+    var autoScrollDelayTimeInMillis: Long = 25L
     var hotspotHeight: Int = context.getDimension(R.dimen.multi_select_defaultHotspotHeight).toInt()
     var hotspotOffsetTop: Int = 0
     var hotspotOffsetBottom: Int = 0
     var autoScrollListener: AutoScrollListener? = null
 
-    var mode: Mode = Mode.RANGE
-        set(mode) {
-            field = mode
-            // Shouldn't maintain an active state through mode changes
-            setIsActive(false, -1)
-        }
-
     private var recyclerView: RecyclerView? = null
 
     private var lastDraggedIndex = -1
-    private var initialSelection: Int = 0
+    private var initialSelectIndex: Int = 0
     private var dragSelectActive: Boolean = false
     private var minReached: Int = 0
     private var maxReached: Int = 0
@@ -93,11 +87,11 @@ class MultiSelectTouchListener(
      * Initializes drag selection.
      *
      * @param active True if we are starting drag selection, false to terminate it.
-     * @param initialSelection The index of the item which was pressed while starting drag selection.
+     * @param initialSelectIndex The index of the item which was pressed while starting drag selection.
      */
     fun setIsActive(
         active: Boolean,
-        initialSelection: Int
+        initialSelectIndex: Int
     ): Boolean {
         if (active && dragSelectActive) {
             Timber.d("Drag selection is already active.")
@@ -114,26 +108,26 @@ class MultiSelectTouchListener(
 
         if (!active) {
             // Don't do any of the initialization below since we are terminating
-            this.initialSelection = -1
+            this.initialSelectIndex = -1
             return false
         }
 
-        if (!receiver.isIndexSelectable(initialSelection)) {
+        if (receiver.isIndexSelectable(initialSelectIndex).not()) {
             this.dragSelectActive = false
-            this.initialSelection = -1
-            Timber.d("Index $initialSelection is not selectable.")
+            this.initialSelectIndex = -1
+            Timber.d("Index $initialSelectIndex is not selectable.")
             return false
         }
 
         receiver.setSelected(
-            index = initialSelection,
+            index = initialSelectIndex,
             selected = true
         )
         this.dragSelectActive = true
-        this.initialSelection = initialSelection
-        this.lastDraggedIndex = initialSelection
+        this.initialSelectIndex = initialSelectIndex
+        this.lastDraggedIndex = initialSelectIndex
 
-        Timber.d("Drag selection initialized, starting at index $initialSelection.")
+        Timber.d("Drag selection initialized, starting at index $initialSelectIndex.")
         return true
     }
 
@@ -189,7 +183,7 @@ class MultiSelectTouchListener(
                             inTopHotspot = true
                             Timber.d("Now in TOP hotspot")
                             autoScrollHandler.removeCallbacks(autoScrollRunnable)
-                            autoScrollHandler.postDelayed(autoScrollRunnable, AUTO_SCROLL_DELAY.toLong())
+                            autoScrollHandler.postDelayed(autoScrollRunnable, autoScrollDelayTimeInMillis)
                             this.notifyAutoScrollListener(true)
                         }
                         val simulatedFactor = (hotspotTopBoundEnd - hotspotTopBoundStart).toFloat()
@@ -202,7 +196,7 @@ class MultiSelectTouchListener(
                             inBottomHotspot = true
                             Timber.d("Now in BOTTOM hotspot")
                             autoScrollHandler.removeCallbacks(autoScrollRunnable)
-                            autoScrollHandler.postDelayed(autoScrollRunnable, AUTO_SCROLL_DELAY.toLong())
+                            autoScrollHandler.postDelayed(autoScrollRunnable, autoScrollDelayTimeInMillis)
                             this.notifyAutoScrollListener(true)
                         }
                         val simulatedY = y + hotspotBottomBoundEnd
@@ -218,34 +212,19 @@ class MultiSelectTouchListener(
                     }
                 }
 
-                // Drag selection logic
-                if (mode == Mode.PATH && itemPosition != RecyclerView.NO_POSITION) {
-                    // Non-default mode, we select exactly what the user touches over
-                    if (lastDraggedIndex == itemPosition) return
-                    lastDraggedIndex = itemPosition
-                    receiver.setSelected(
-                        index = lastDraggedIndex,
-                        selected = !receiver.isSelected(lastDraggedIndex)
-                    )
-                    return
-                }
-
-                if (mode == Mode.RANGE &&
-                    itemPosition != RecyclerView.NO_POSITION &&
-                    lastDraggedIndex != itemPosition
-                ) {
+                if (itemPosition != RecyclerView.NO_POSITION && lastDraggedIndex != itemPosition) {
                     lastDraggedIndex = itemPosition
                     if (minReached == -1) minReached = lastDraggedIndex
                     if (maxReached == -1) maxReached = lastDraggedIndex
                     if (lastDraggedIndex > maxReached) maxReached = lastDraggedIndex
                     if (lastDraggedIndex < minReached) minReached = lastDraggedIndex
                     selectRange(
-                        from = initialSelection,
+                        from = initialSelectIndex,
                         to = lastDraggedIndex,
                         min = minReached,
                         max = maxReached
                     )
-                    if (initialSelection == lastDraggedIndex) {
+                    if (initialSelectIndex == lastDraggedIndex) {
                         minReached = lastDraggedIndex
                         maxReached = lastDraggedIndex
                     }
@@ -330,8 +309,6 @@ class MultiSelectTouchListener(
     }
 
     companion object {
-        private const val AUTO_SCROLL_DELAY = 25L
-
         fun create(
             context: Context,
             receiver: MultiSelectReceiver,
@@ -352,9 +329,4 @@ class MultiSelectTouchListener(
 private fun RecyclerView.getItemPosition(e: MotionEvent): Int {
     val v = findChildViewUnder(e.x, e.y) ?: return RecyclerView.NO_POSITION
     return getChildAdapterPosition(v)
-}
-
-enum class Mode {
-    RANGE,
-    PATH
 }
