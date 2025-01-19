@@ -6,7 +6,6 @@ targetSdk = "35"
 minSdk = "23"
 
 # library version
-afollestedDragselectRecyclerView = "2.4.0"
 androidGradlePlugin = "8.8.0"
 androidxAnnotation = "1.9.1"
 androidxAppCompat = "1.7.0"
@@ -51,7 +50,6 @@ kotlinVersion = "1.9.0"
 
 
 [libraries]
-afollested-dragselectRecyclerView = { module = "com.afollestad:drag-select-recyclerview", version.ref = "afollestedDragselectRecyclerView" }
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose" }
 androidx-annotation = { group = "androidx.annotation", name = "annotation", version.ref = "androidxAnnotation" }
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "androidxAppCompat" }
