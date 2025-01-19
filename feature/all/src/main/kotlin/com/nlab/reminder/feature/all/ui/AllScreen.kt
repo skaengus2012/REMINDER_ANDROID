@@ -18,12 +18,20 @@ package com.nlab.reminder.feature.all.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
+import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.windowInsetsEndWidth
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import com.nlab.reminder.core.androidx.compose.ui.DelayedContent
@@ -99,9 +107,15 @@ private fun AllScheduleList(
     fragmentStateBridge: AllFragmentStateBridge,
     modifier: Modifier = Modifier,
 ) {
+    val direction = LocalLayoutDirection.current
+    val displayCutoutPaddings = WindowInsets.displayCutout.asPaddingValues()
     AndroidFragment<AllFragment>(
         modifier = modifier
             .fillMaxSize()
+            .padding(
+                start = displayCutoutPaddings.calculateStartPadding(direction),
+                end = displayCutoutPaddings.calculateEndPadding(direction)
+            )
             .navigationBarsPadding()
             .imePadding()
     ) { it.fragmentStateBridge = fragmentStateBridge }
