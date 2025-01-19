@@ -50,6 +50,7 @@ import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
@@ -61,8 +62,10 @@ import kotlin.math.absoluteValue
 class ScheduleContentViewHolder(
     private val binding: LayoutScheduleAdapterItemContentBinding,
     private val selectionEnabled: Flow<Boolean>,
+    private val selectedScheduleIds: Flow<Set<ScheduleId>>,
     private val onSimpleEditDone: (SimpleEdit) -> Unit,
     private val onDragHandleTouched: (RecyclerView.ViewHolder) -> Unit,
+    private val onSelectButtonTouched: (RecyclerView.ViewHolder) -> Unit,
     theme: ScheduleListTheme
 ) : ScheduleAdapterItemViewHolder(binding.root),
     DraggingSupportable,
@@ -79,7 +82,6 @@ class ScheduleContentViewHolder(
     }
     private val selectionAnimDelegate = ScheduleContentSelectionAnimDelegate(binding)
     private val bindingId = MutableStateFlow<ScheduleId?>(null)
-    private val clampAlphaOrigin: Float = binding.layoutClampDim.alpha
 
     override val draggingDelegate: DraggingDelegate = DraggingDelegateImpl(binding)
     override val swipeDelegate: SwipeDelegate = SwipeDelegateImpl(binding)
@@ -173,6 +175,17 @@ class ScheduleContentViewHolder(
                     .touches()
                     .filter { event -> event.action == MotionEvent.ACTION_DOWN }
                     .collect { onDragHandleTouched(this@ScheduleContentViewHolder) }
+            }
+            jobs += viewLifecycleCoroutineScope.launch {
+                binding.buttonSelection
+                    .touches()
+                    .filter { it.action == MotionEvent.ACTION_DOWN }
+                    .collect { onSelectButtonTouched(this@ScheduleContentViewHolder) }
+            }
+            jobs += viewLifecycleCoroutineScope.launch {
+                combine(bindingId.filterNotNull(), selectedScheduleIds) { id, selectedIds -> id in selectedIds }
+                    .distinctUntilChanged()
+                    .collect { binding.buttonSelection.isSelected = it }
             }
         }
         itemView.doOnDetach {

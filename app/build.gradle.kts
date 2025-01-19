@@ -75,7 +75,6 @@ dependencies {
     implementation(projects.feature.all)
     implementation(projects.feature.home)
 
-    implementation(libs.afollested.dragselectRecyclerView)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.cardview)

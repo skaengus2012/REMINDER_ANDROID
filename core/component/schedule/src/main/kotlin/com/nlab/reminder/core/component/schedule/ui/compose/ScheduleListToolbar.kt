@@ -73,9 +73,9 @@ fun ScheduleListToolbar(
         )
         ScheduleListToolbarContent(
             modifier = Modifier
+                .fillMaxWidth()
                 .statusBarsPadding()
                 .displayCutoutPadding()
-                .fillMaxWidth()
                 .toolbarHeight(),
             title = title,
             isTitleVisible = isTitleVisible,

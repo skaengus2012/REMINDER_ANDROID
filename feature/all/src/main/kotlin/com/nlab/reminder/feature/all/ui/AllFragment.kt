@@ -38,6 +38,8 @@ import com.nlab.reminder.core.component.schedule.ui.view.list.ScheduleAdapterIte
 import com.nlab.reminder.core.component.schedule.ui.view.list.ScheduleListAdapter
 import com.nlab.reminder.core.component.schedule.ui.view.list.ScheduleListAnimator
 import com.nlab.reminder.core.component.schedule.ui.view.list.ScheduleListItemTouchCallback
+import com.nlab.reminder.core.component.schedule.ui.view.list.ScheduleListSelectionHelper
+import com.nlab.reminder.core.component.schedule.ui.view.list.ScheduleListSelectionSource
 import com.nlab.reminder.core.component.schedule.ui.view.list.ScheduleListTheme
 import com.nlab.reminder.core.data.model.Link
 import com.nlab.reminder.core.data.model.LinkMetadata
@@ -101,11 +103,18 @@ internal class AllFragment : ComposableFragment() {
             }
         )
         val itemTouchHelper = ItemTouchHelper(itemTouchCallback)
+        val multiSelectionHelper = ScheduleListSelectionHelper(
+            selectionSource = ScheduleListSelectionSource(scheduleListAdapter),
+            onSelectedStateChanged = { scheduleId, selected ->
+                scheduleListAdapter.setSelected(scheduleId, selected)
+            },
+        )
         binding.recyclerviewSchedule.apply {
             adapter = scheduleListAdapter
             itemAnimator = ScheduleListAnimator()
             layoutManager = linearLayoutManager
             itemTouchHelper.attachToRecyclerView(/* recyclerView=*/ this)
+            multiSelectionHelper.attachToRecyclerView(this)
         }
 
         val verticalScrollRange = binding.recyclerviewSchedule
@@ -167,6 +176,10 @@ internal class AllFragment : ComposableFragment() {
                 scheduleListAdapter.setSelectionEnabled(enabled)
                 itemTouchCallback.isItemViewSwipeEnabled = enabled.not()
                 itemTouchCallback.isLongPressDragEnabled = enabled.not()
+
+                if (enabled.not()) {
+                    multiSelectionHelper.disable()
+                }
             }
             .launchIn(viewLifecycleScope)
 
@@ -178,9 +191,16 @@ internal class AllFragment : ComposableFragment() {
             .onEach { itemTouchHelper.startDrag(it) }
             .launchIn(viewLifecycleScope)
 
+        scheduleListAdapter.selectButtonTouch
+            .onEach { multiSelectionHelper.enable(it) }
+            .launchIn(viewLifecycleScope)
+
         viewLifecycle.eventFlow
             .filter { event -> event == Lifecycle.Event.ON_DESTROY }
-            .onEach { itemTouchCallback.clearResource() }
+            .onEach {
+                itemTouchCallback.clearResource()
+                multiSelectionHelper.clearResource()
+            }
             .launchIn(viewLifecycleScope)
 
         viewLifecycleScope.launch {

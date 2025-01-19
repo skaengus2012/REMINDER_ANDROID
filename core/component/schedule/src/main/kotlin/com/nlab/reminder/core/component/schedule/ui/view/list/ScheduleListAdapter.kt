@@ -23,12 +23,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapterItemContentBinding
 import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapterItemHeadlineBinding
 import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapterItemHeadlinePaddingBinding
+import com.nlab.reminder.core.data.model.ScheduleId
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.update
 
 private const val ITEM_VIEW_TYPE_HEADLINE = 1
 private const val ITEM_VIEW_TYPE_HEADLINE_PADDING = 2
@@ -43,12 +45,16 @@ class ScheduleListAdapter(
     private val differ = ScheduleListDiffer(listUpdateCallback = AdapterListUpdateCallback(/* adapter = */ this))
 
     private val selectionEnabled = MutableStateFlow(false)
+    private val selectedScheduleIds = MutableStateFlow<Set<ScheduleId>>(emptySet())
 
     private val _editRequest = MutableEventSharedFlow<SimpleEdit>()
     val editRequest: Flow<SimpleEdit> = _editRequest.distinctUntilChanged()
 
     private val _dragHandleTouch = MutableEventSharedFlow<RecyclerView.ViewHolder>()
     val dragHandleTouch: Flow<RecyclerView.ViewHolder> = _dragHandleTouch.conflate()
+
+    private val _selectButtonTouch = MutableEventSharedFlow<RecyclerView.ViewHolder>()
+    val selectButtonTouch: Flow<RecyclerView.ViewHolder> = _selectButtonTouch.conflate()
 
     private fun getItem(position: Int): ScheduleAdapterItem {
         return differ.getCurrentList()[position]
@@ -94,8 +100,10 @@ class ScheduleListAdapter(
                         /* attachToParent = */ false
                     ),
                     selectionEnabled = selectionEnabled,
+                    selectedScheduleIds = selectedScheduleIds,
                     onSimpleEditDone = { _editRequest.tryEmit(it) },
                     onDragHandleTouched = { _dragHandleTouch.tryEmit(it) },
+                    onSelectButtonTouched = { _selectButtonTouch.tryEmit(it) },
                     theme = theme,
                 )
             }
@@ -120,6 +128,13 @@ class ScheduleListAdapter(
         selectionEnabled.value = isEnabled
     }
 
+    fun setSelected(scheduleId: ScheduleId, selected: Boolean) {
+        selectedScheduleIds.update { old ->
+            if (selected) old + scheduleId
+            else old - scheduleId
+        }
+    }
+
     fun submitMoving(fromPosition: Int, toPosition: Int): Boolean {
         return differ.tryMove(fromPosition, toPosition)
     }
@@ -130,6 +145,14 @@ class ScheduleListAdapter(
 
     fun submitList(items: List<ScheduleAdapterItem>?) {
         differ.submitList(items, commitCallback = {})
+    }
+
+    fun getCurrentList(): List<ScheduleAdapterItem> {
+        return differ.getCurrentList()
+    }
+
+    fun getCurrentSelected(): Set<ScheduleId> {
+        return selectedScheduleIds.value
     }
 }
 
