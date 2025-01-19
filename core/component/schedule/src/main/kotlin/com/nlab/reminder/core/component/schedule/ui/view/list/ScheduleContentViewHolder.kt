@@ -233,6 +233,8 @@ private fun LayoutScheduleAdapterItemContentBinding.editableViews(): Set<View> =
 private class DraggingDelegateImpl(
     private val binding: LayoutScheduleAdapterItemContentBinding
 ) : DraggingDelegate() {
+    override val isUserDraggable: Boolean = true
+
     override fun isScaleOnDraggingNeeded(): Boolean {
         return binding.imageviewBgLinkThumbnail.isVisible
     }

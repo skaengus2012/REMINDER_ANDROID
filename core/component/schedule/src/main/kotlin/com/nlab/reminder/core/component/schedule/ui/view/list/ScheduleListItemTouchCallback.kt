@@ -24,7 +24,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.nlab.reminder.core.android.content.getDimension
 import com.nlab.reminder.core.android.view.setListener
 import com.nlab.reminder.core.component.schedule.R
-import kotlin.math.*
+import kotlin.math.max
+import kotlin.math.min
 
 private const val DEFAULT_ANIMATE_DURATION = 100L
 
@@ -75,9 +76,7 @@ class ScheduleListItemTouchCallback(
         viewHolder: RecyclerView.ViewHolder,
         target: RecyclerView.ViewHolder
     ): Boolean {
-        return if (viewHolder is DraggingSupportable && target is DraggingSupportable
-            && viewHolder.itemViewType == target.itemViewType
-        ) {
+        return if (viewHolder is DraggingSupportable && target is DraggingSupportable) {
             viewHolder.draggingDelegate.onPreMoving()
             target.draggingDelegate.onPreMoving()
             itemMoveListener.onMove(viewHolder, target)
@@ -86,22 +85,18 @@ class ScheduleListItemTouchCallback(
         }
     }
 
-    override fun getMovementFlags(
-        recyclerView: RecyclerView,
-        viewHolder: RecyclerView.ViewHolder
-    ): Int {
-        val flag = true // TODO implement upgrade
-        return if (flag) super.getMovementFlags(recyclerView, viewHolder)
-        else ItemTouchHelper.ACTION_STATE_IDLE
+    override fun getDragDirs(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
+        return if (viewHolder is DraggingSupportable && viewHolder.draggingDelegate.isUserDraggable) {
+            super.getDragDirs(recyclerView, viewHolder)
+        } else {
+            ItemTouchHelper.ACTION_STATE_IDLE
+        }
     }
 
-    override fun getDragDirs(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int =
-        if (viewHolder is DraggingSupportable) super.getDragDirs(recyclerView, viewHolder)
+    override fun getSwipeDirs(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
+        return if (viewHolder is SwipeSupportable) super.getSwipeDirs(recyclerView, viewHolder)
         else ItemTouchHelper.ACTION_STATE_IDLE
-
-    override fun getSwipeDirs(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int =
-        if (viewHolder is SwipeSupportable) super.getSwipeDirs(recyclerView, viewHolder)
-        else ItemTouchHelper.ACTION_STATE_IDLE
+    }
 
     override fun onChildDraw(
         c: Canvas,

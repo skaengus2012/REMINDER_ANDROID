@@ -225,7 +225,34 @@ internal class AllFragment : ComposableFragment() {
             buildList {
                 this += ScheduleAdapterItem.Headline(StringIds.label_all)
                 this += ScheduleAdapterItem.HeadlinePadding
-                repeat(times = 100) {
+                repeat(times = 10) {
+                    this += ScheduleAdapterItem.Content(
+                        scheduleDetail = ScheduleDetail(
+                            schedule = Schedule(
+                                id = ScheduleId(it.toLong()),
+                                content = ScheduleContent(
+                                    title = "Title $it",
+                                    note = "note $it".toNonBlankString(),
+                                    link = Link(
+                                        "https://www.naver.com/".toNonBlankString()
+                                    )
+                                ),
+                                isComplete = true,
+                                visiblePriority = it.toLong().toNonNegativeLong()
+                            ),
+                            tags = emptySet(),
+                            linkMetadata = imageSource.shuffled().first()?.let {
+                                LinkMetadata(
+                                    title = "네이버",
+                                    imageUrl = it
+                                )
+                            }
+                        ),
+                        isLineVisible = true
+                    )
+                }
+                this += ScheduleAdapterItem.Headline(StringIds.label_all)
+                repeat(times = 10) {
                     this += ScheduleAdapterItem.Content(
                         scheduleDetail = ScheduleDetail(
                             schedule = Schedule(
