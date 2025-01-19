@@ -163,9 +163,10 @@ class ScheduleContentViewHolder(
                     selectionEnabled,
                     selectionAnimDelegate::awaitReady.asFlow()
                 ) { enabled, _ -> enabled }.collect { enabled ->
-                    binding.buttonComplete.isEnabled = enabled.not()
                     binding.buttonSelection.isEnabled = enabled
                     binding.buttonDragHandle.isEnabled = enabled
+                    binding.buttonComplete.isEnabled = enabled.not()
+                    binding.editableViews().forEach { it.isEnabled = enabled.not() }
 
                     selectionAnimDelegate.startAnimation(enabled)
                 }
