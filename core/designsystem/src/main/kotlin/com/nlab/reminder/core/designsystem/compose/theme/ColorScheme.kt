@@ -40,6 +40,7 @@ data class PlaneatColorScheme(
     val content2: Color,
     val content2Hint: Color,
     val content3: Color,
+    val content3Hint: Color,
     // Compose Only
     val bgDialogSurface: Color,
     val bgDialogInput: Color,
@@ -71,6 +72,7 @@ internal val LocalPlaneatColorScheme = staticCompositionLocalOf {
         content2 = Color.Unspecified,
         content2Hint = Color.Unspecified,
         content3 = Color.Unspecified,
+        content3Hint = Color.Unspecified,
         // Compose Only
         bgDialogSurface = Color.Unspecified,
         bgDialogInput = Color.Unspecified,
@@ -95,6 +97,7 @@ internal val LightPlaneatColorScheme = PlaneatColorScheme(
     content2 = Content2Light,
     content2Hint = Content2HintLight,
     content3 = Content3Light,
+    content3Hint = Content3HintLight,
     // Compose Only
     bgDialogSurface = BgDialogSurfaceLight,
     bgDialogInput = BgDialogInputLight,
@@ -116,8 +119,9 @@ internal val DarkPlaneatColorScheme = PlaneatColorScheme(
     bgPlaceHolder1 = BgPlaceHolder1Light,
     content1 = Content1Dark,
     content2 = Content2Dark,
-    content2Hint = Content2DarkLight,
+    content2Hint = Content2HintDark,
     content3 = Content3Dark,
+    content3Hint = Content3HintDark,
     point1 = Point1,
     point2 = Point2,
     point3 = Point3,

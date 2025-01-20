@@ -28,6 +28,7 @@
     <attr name="content_2" format="color" />
     <attr name="content_2_hint" format="color" />
     <attr name="content_3" format="color" />
+    <attr name="content_3_hint" format="color" />
     <attr name="point_1" format="color" />
     <attr name="point_2" format="color" />
     <attr name="point_3" format="color" />
