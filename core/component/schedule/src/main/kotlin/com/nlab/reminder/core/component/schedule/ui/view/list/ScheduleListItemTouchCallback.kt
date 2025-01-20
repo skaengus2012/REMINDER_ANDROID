@@ -77,16 +77,19 @@ class ScheduleListItemTouchCallback(
         target: RecyclerView.ViewHolder
     ): Boolean {
         return if (viewHolder is DraggingSupportable && target is DraggingSupportable) {
-            viewHolder.draggingDelegate.onPreMoving()
-            target.draggingDelegate.onPreMoving()
-            itemMoveListener.onMove(viewHolder, target)
+            val ret = itemMoveListener.onMove(viewHolder, target)
+            if (ret) {
+                viewHolder.draggingDelegate.onMoved()
+                target.draggingDelegate.onMoved()
+            }
+            ret
         } else {
             false
         }
     }
 
     override fun getDragDirs(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
-        return if (viewHolder is DraggingSupportable && viewHolder.draggingDelegate.isUserDraggable) {
+        return if (viewHolder is DraggingSupportable && viewHolder.draggingDelegate.userDraggable) {
             super.getDragDirs(recyclerView, viewHolder)
         } else {
             ItemTouchHelper.ACTION_STATE_IDLE

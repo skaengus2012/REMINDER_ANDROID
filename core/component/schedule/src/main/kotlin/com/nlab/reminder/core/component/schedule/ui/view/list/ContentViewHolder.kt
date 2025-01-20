@@ -44,9 +44,10 @@ import com.nlab.reminder.core.data.model.ScheduleId
 import com.nlab.reminder.core.designsystem.compose.theme.AttrIds
 import com.nlab.reminder.core.kotlinx.coroutine.flow.withPrev
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
@@ -59,10 +60,10 @@ import kotlin.math.absoluteValue
 /**
  * @author Thalys
  */
-class ScheduleContentViewHolder(
+class ContentViewHolder internal constructor(
     private val binding: LayoutScheduleAdapterItemContentBinding,
-    private val selectionEnabled: Flow<Boolean>,
-    private val selectedScheduleIds: Flow<Set<ScheduleId>>,
+    private val selectionEnabled: StateFlow<Boolean>,
+    private val selectedScheduleIds: StateFlow<Set<ScheduleId>>,
     private val onSimpleEditDone: (SimpleEdit) -> Unit,
     private val onDragHandleTouched: (RecyclerView.ViewHolder) -> Unit,
     private val onSelectButtonTouched: (RecyclerView.ViewHolder) -> Unit,
@@ -80,11 +81,14 @@ class ScheduleContentViewHolder(
                 )
             }
     }
-    private val selectionAnimDelegate = ScheduleContentSelectionAnimDelegate(binding)
+    private val selectionAnimDelegate = ContentSelectionAnimDelegate(binding)
     private val bindingId = MutableStateFlow<ScheduleId?>(null)
 
-    override val draggingDelegate: DraggingDelegate = DraggingDelegateImpl(binding)
-    override val swipeDelegate: SwipeDelegate = SwipeDelegateImpl(binding)
+    private val _draggingDelegate = DraggingDelegateImpl(binding)
+    override val draggingDelegate: DraggingDelegate = _draggingDelegate
+
+    private val _swipeDelegate = SwipeDelegateImpl(binding)
+    override val swipeDelegate: SwipeDelegate = _swipeDelegate
 
     init {
         binding.buttonComplete.setImageResource(
@@ -95,15 +99,7 @@ class ScheduleContentViewHolder(
             }
         )
         binding.buttonInfo.apply {
-            imageTintList = ColorStateList.valueOf(
-                context.getThemeColor(
-                    when (theme) {
-                        ScheduleListTheme.Point1 -> AttrIds.point_1
-                        ScheduleListTheme.Point2 -> AttrIds.point_2
-                        ScheduleListTheme.Point3 -> AttrIds.point_3
-                    }
-                )
-            )
+            imageTintList = ColorStateList.valueOf(theme.getButtonInfoColor(context))
         }
 
         // Processing for multiline input and actionDone support
@@ -159,29 +155,39 @@ class ScheduleContentViewHolder(
                     .collect { onSimpleEditDone(it) }
             }
             jobs += viewLifecycleCoroutineScope.launch {
-                combine(
-                    selectionEnabled,
-                    selectionAnimDelegate::awaitReady.asFlow()
-                ) { enabled, _ -> enabled }.collect { enabled ->
+                selectionEnabled.collect { enabled ->
                     binding.buttonSelection.isEnabled = enabled
                     binding.buttonDragHandle.isEnabled = enabled
                     binding.buttonComplete.isEnabled = enabled.not()
-                    binding.editableViews().forEach { it.isEnabled = enabled.not() }
-
-                    selectionAnimDelegate.startAnimation(enabled)
                 }
+            }
+            jobs += viewLifecycleCoroutineScope.launch {
+                combine(
+                    selectionEnabled,
+                    selectionAnimDelegate::awaitReady.asFlow()
+                ) { enabled, _ -> enabled }.distinctUntilChanged().collect { selectionAnimDelegate.startAnimation(it) }
+            }
+            jobs += viewLifecycleCoroutineScope.launch {
+                combine(
+                    selectionEnabled,
+                    _draggingDelegate.draggingFlow,
+                    _swipeDelegate.swipeFlow
+                ) { selectionUsable, dragging, swiping -> selectionUsable || dragging || swiping }
+                    .distinctUntilChanged()
+                    .map { it.not() }
+                    .collect { enabled -> binding.editableViews().forEach { v -> v.isEnabled = enabled } }
             }
             jobs += viewLifecycleCoroutineScope.launch {
                 binding.buttonDragHandle
                     .touches()
                     .filter { event -> event.action == MotionEvent.ACTION_DOWN }
-                    .collect { onDragHandleTouched(this@ScheduleContentViewHolder) }
+                    .collect { onDragHandleTouched(this@ContentViewHolder) }
             }
             jobs += viewLifecycleCoroutineScope.launch {
                 binding.buttonSelection
                     .touches()
                     .filter { it.action == MotionEvent.ACTION_DOWN }
-                    .collect { onSelectButtonTouched(this@ScheduleContentViewHolder) }
+                    .collect { onSelectButtonTouched(this@ContentViewHolder) }
             }
             jobs += viewLifecycleCoroutineScope.launch {
                 combine(bindingId.filterNotNull(), selectedScheduleIds) { id, selectedIds -> id in selectedIds }
@@ -233,34 +239,39 @@ private fun LayoutScheduleAdapterItemContentBinding.editableViews(): Set<View> =
 private class DraggingDelegateImpl(
     private val binding: LayoutScheduleAdapterItemContentBinding
 ) : DraggingDelegate() {
-    override val isUserDraggable: Boolean = true
+    private val _draggingFlow = MutableStateFlow(false)
+    val draggingFlow: StateFlow<Boolean> = _draggingFlow.asStateFlow()
+
+    override val userDraggable: Boolean = true
 
     override fun isScaleOnDraggingNeeded(): Boolean {
         return binding.imageviewBgLinkThumbnail.isVisible
     }
 
     override fun onDragging(isActive: Boolean) {
+        _draggingFlow.value = isActive
         binding.root.translationZ = if (isActive) 10f else 0f
         binding.root.alpha = if (isActive) 0.7f else 1f
         binding.viewLine.alpha = if (isActive) 0f else 1f
-        binding.editableViews().forEach { v -> v.isEnabled = isActive.not() }
     }
 
-    override fun onPreMoving() {
+    override fun onMoved() {
         binding.editableViews().forEach { v -> v.clearFocus() }
     }
 }
 
 private class SwipeDelegateImpl(
-    private val binding: LayoutScheduleAdapterItemContentBinding
+    private val binding: LayoutScheduleAdapterItemContentBinding,
 ) : SwipeDelegate() {
     private val clampAlphaOrigin: Float = binding.layoutClampDim.alpha
+    private val _swipeFlow = MutableStateFlow(false)
+    val swipeFlow: StateFlow<Boolean> = _swipeFlow.asStateFlow()
 
     override val swipeView: View get() = binding.layoutContent
     override val clampWidth: Float get() = binding.buttonDelete.width.toFloat()
 
     override fun onSwipe(isActive: Boolean, dx: Float) {
+        _swipeFlow.value = isActive
         binding.layoutClampDim.alpha = clampAlphaOrigin - dx.absoluteValue / clampWidth * clampAlphaOrigin
-        binding.editableViews().forEach { v -> v.isEnabled = isActive.not() }
     }
 }

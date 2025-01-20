@@ -24,8 +24,8 @@ sealed interface DraggingSupportable {
 }
 
 abstract class DraggingDelegate {
-    internal abstract val isUserDraggable: Boolean
+    internal abstract val userDraggable: Boolean
     internal abstract fun isScaleOnDraggingNeeded(): Boolean
     internal abstract fun onDragging(isActive: Boolean)
-    internal abstract fun onPreMoving()
+    internal abstract fun onMoved()
 }

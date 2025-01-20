@@ -23,7 +23,7 @@ import com.nlab.reminder.core.designsystem.compose.theme.AttrIds
 /**
  * @author Doohyun
  */
-class ScheduleHeadlineViewHolder(
+class HeadlineViewHolder internal constructor(
     private val binding: LayoutScheduleAdapterItemHeadlineBinding,
     theme: ScheduleListTheme
 ) : ScheduleAdapterItemViewHolder(binding.root) {

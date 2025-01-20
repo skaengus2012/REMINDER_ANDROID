@@ -16,11 +16,13 @@
 
 package com.nlab.reminder.core.component.schedule.ui.view.list
 
-import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapterItemHeadlinePaddingBinding
+import android.widget.EditText
+import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapterItemAddBinding
 
 /**
  * @author Thalys
  */
-class ScheduleHeadlinePaddingViewHolder(
-    binding: LayoutScheduleAdapterItemHeadlinePaddingBinding
-) : ScheduleAdapterItemViewHolder(binding.root)
+internal fun LayoutScheduleAdapterItemAddBinding.editableViews(): Set<EditText> = setOf(
+    edittextTitle,
+    edittextNote
+)

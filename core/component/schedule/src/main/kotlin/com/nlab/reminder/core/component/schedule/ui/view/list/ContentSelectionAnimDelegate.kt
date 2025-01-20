@@ -31,7 +31,7 @@ import kotlin.coroutines.resume
 /**
  * @author Doohyun
  */
-internal class ScheduleContentSelectionAnimDelegate(
+internal class ContentSelectionAnimDelegate(
     private val binding: LayoutScheduleAdapterItemContentBinding
 ) {
     private var latestAnimators = emptySet<Animator>()

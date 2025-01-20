@@ -20,6 +20,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.AdapterListUpdateCallback
 import androidx.recyclerview.widget.RecyclerView
+import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapterItemAddBinding
 import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapterItemContentBinding
 import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapterItemHeadlineBinding
 import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapterItemHeadlinePaddingBinding
@@ -28,13 +29,15 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.update
 
-private const val ITEM_VIEW_TYPE_HEADLINE = 1
-private const val ITEM_VIEW_TYPE_HEADLINE_PADDING = 2
-private const val ITEM_VIEW_TYPE_CONTENT = 3
+private const val ITEM_VIEW_TYPE_CONTENT = 1
+private const val ITEM_VIEW_TYPE_FOOTER_ADD = 2
+private const val ITEM_VIEW_TYPE_HEADLINE = 3
+private const val ITEM_VIEW_TYPE_HEADLINE_PADDING = 4
 
 /**
  * @author Thalys
@@ -46,6 +49,9 @@ class ScheduleListAdapter(
 
     private val selectionEnabled = MutableStateFlow(false)
     private val selectedScheduleIds = MutableStateFlow<Set<ScheduleId>>(emptySet())
+
+    private val _addRequest = MutableEventSharedFlow<SimpleAdd>()
+    val addRequest: Flow<SimpleAdd> = _addRequest.asSharedFlow()
 
     private val _editRequest = MutableEventSharedFlow<SimpleEdit>()
     val editRequest: Flow<SimpleEdit> = _editRequest.distinctUntilChanged()
@@ -63,37 +69,17 @@ class ScheduleListAdapter(
     override fun getItemCount(): Int = differ.getCurrentList().size
 
     override fun getItemViewType(position: Int): Int = when (getItem(position)) {
+        is ScheduleAdapterItem.Content -> ITEM_VIEW_TYPE_CONTENT
+        is ScheduleAdapterItem.FooterAdd -> ITEM_VIEW_TYPE_FOOTER_ADD
         is ScheduleAdapterItem.Headline -> ITEM_VIEW_TYPE_HEADLINE
         is ScheduleAdapterItem.HeadlinePadding -> ITEM_VIEW_TYPE_HEADLINE_PADDING
-        is ScheduleAdapterItem.Content -> ITEM_VIEW_TYPE_CONTENT
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ScheduleAdapterItemViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
         return when (viewType) {
-            ITEM_VIEW_TYPE_HEADLINE -> {
-                ScheduleHeadlineViewHolder(
-                    binding = LayoutScheduleAdapterItemHeadlineBinding.inflate(
-                        layoutInflater,
-                        parent,
-                        /* attachToParent = */ false
-                    ),
-                    theme = theme
-                )
-            }
-
-            ITEM_VIEW_TYPE_HEADLINE_PADDING -> {
-                ScheduleHeadlinePaddingViewHolder(
-                    binding = LayoutScheduleAdapterItemHeadlinePaddingBinding.inflate(
-                        layoutInflater,
-                        parent,
-                        /* attachToParent = */ false
-                    ),
-                )
-            }
-
             ITEM_VIEW_TYPE_CONTENT -> {
-                ScheduleContentViewHolder(
+                ContentViewHolder(
                     binding = LayoutScheduleAdapterItemContentBinding.inflate(
                         layoutInflater,
                         parent,
@@ -108,6 +94,39 @@ class ScheduleListAdapter(
                 )
             }
 
+            ITEM_VIEW_TYPE_FOOTER_ADD -> {
+                FooterAddViewHolder(
+                    binding = LayoutScheduleAdapterItemAddBinding.inflate(
+                        layoutInflater,
+                        parent,
+                        /* attachToParent = */ false
+                    ),
+                    onSimpleAddDone = { _addRequest.tryEmit(it) },
+                    theme = theme
+                )
+            }
+
+            ITEM_VIEW_TYPE_HEADLINE -> {
+                HeadlineViewHolder(
+                    binding = LayoutScheduleAdapterItemHeadlineBinding.inflate(
+                        layoutInflater,
+                        parent,
+                        /* attachToParent = */ false
+                    ),
+                    theme = theme
+                )
+            }
+
+            ITEM_VIEW_TYPE_HEADLINE_PADDING -> {
+                HeadlinePaddingViewHolder(
+                    binding = LayoutScheduleAdapterItemHeadlinePaddingBinding.inflate(
+                        layoutInflater,
+                        parent,
+                        /* attachToParent = */ false
+                    ),
+                )
+            }
+
             else -> {
                 throw IllegalArgumentException("Unknown view type: $viewType")
             }
@@ -116,11 +135,11 @@ class ScheduleListAdapter(
 
     override fun onBindViewHolder(holder: ScheduleAdapterItemViewHolder, position: Int) {
         val item = getItem(position)
-
         when (holder) {
-            is ScheduleHeadlineViewHolder -> holder.bind(item as ScheduleAdapterItem.Headline)
-            is ScheduleContentViewHolder -> holder.bind(item as ScheduleAdapterItem.Content)
-            is ScheduleHeadlinePaddingViewHolder -> Unit
+            is ContentViewHolder -> holder.bind(item as ScheduleAdapterItem.Content)
+            is HeadlineViewHolder -> holder.bind(item as ScheduleAdapterItem.Headline)
+            is FooterAddViewHolder,
+            is HeadlinePaddingViewHolder -> Unit
         }
     }
 
