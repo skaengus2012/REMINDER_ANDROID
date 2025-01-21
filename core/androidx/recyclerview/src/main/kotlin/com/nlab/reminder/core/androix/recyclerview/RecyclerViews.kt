@@ -28,12 +28,6 @@ import kotlinx.coroutines.flow.onEach
 /**
  * @author thalys
  */
-val RecyclerView.ViewHolder.bindingAdapterOptionalPosition: Int?
-    get() = bindingAdapterPosition.takeUnless { it == RecyclerView.NO_POSITION }
-
-val RecyclerView.ViewHolder.absoluteAdapterOptionalPosition: Int?
-    get() = absoluteAdapterPosition.takeUnless { it == RecyclerView.NO_POSITION }
-
 fun RecyclerView.scrollState(): Flow<Int> = callbackFlow {
     val listener = object : RecyclerView.OnScrollListener() {
         override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {

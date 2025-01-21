@@ -18,17 +18,33 @@ package com.nlab.reminder.core.component.schedule.ui.view.list
 
 import android.content.res.ColorStateList
 import android.text.InputType
+import androidx.core.view.doOnAttach
+import androidx.core.view.doOnDetach
+import androidx.lifecycle.findViewTreeLifecycleOwner
+import androidx.lifecycle.lifecycleScope
+import com.nlab.reminder.core.android.view.focusState
+import com.nlab.reminder.core.android.view.setVisible
+import com.nlab.reminder.core.android.widget.textChanges
 import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapterItemAddBinding
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.launch
 
 /**
  * @author Thalys
  */
 class FooterAddViewHolder internal constructor(
-    binding: LayoutScheduleAdapterItemAddBinding,
+    private val binding: LayoutScheduleAdapterItemAddBinding,
     onSimpleAddDone: (SimpleAdd) -> Unit,
+    onEditFocused: (Boolean) -> Unit,
     theme: ScheduleListTheme,
-    // TODO We may be asked to enter information for additional content.
 ) : ScheduleAdapterItemViewHolder(binding.root) {
+    private val newScheduleSource = MutableStateFlow<Any?>(null) // TODO implements
+
     init {
         binding.buttonInfo.apply {
             imageTintList = ColorStateList.valueOf(theme.getButtonInfoColor(context))
@@ -37,5 +53,81 @@ class FooterAddViewHolder internal constructor(
         // Processing for multiline input and actionDone support
         binding.edittextTitle.setRawInputType(InputType.TYPE_CLASS_TEXT)
         binding.edittextNote.setRawInputType(InputType.TYPE_CLASS_TEXT)
+
+        val jobs = mutableListOf<Job>()
+        itemView.doOnAttach { view ->
+            val viewLifecycleOwner = view.findViewTreeLifecycleOwner() ?: return@doOnAttach
+            val viewLifecycleCoroutineScope = viewLifecycleOwner.lifecycleScope
+            val editFocusedFlow = MutableStateFlow(binding.editableViews().any { it.isFocused })
+            jobs += viewLifecycleCoroutineScope.launch {
+                combine(
+                    binding.editableViews().map { it.focusState() },
+                    transform = { focusedStates -> focusedStates.any { it } }
+                ).distinctUntilChanged().collect { focused ->
+                    onEditFocused(focused)
+                    editFocusedFlow.value = focused
+                }
+            }
+            jobs += viewLifecycleCoroutineScope.launch {
+                combine(
+                    binding.edittextNote.run {
+                        textChanges()
+                            .onStart { emit(text) }
+                            .map { it.isNullOrEmpty() }
+                            .distinctUntilChanged()
+                    },
+                    editFocusedFlow,
+                    transform = { isCurrentNoteEmpty, focused -> isCurrentNoteEmpty.not() || focused }
+                ).collect { // binding.edittextNote.setVisible(it)
+                }
+            }
+            jobs += viewLifecycleCoroutineScope.launch {
+                editFocusedFlow.collect { focused ->
+                    onEditFocused(focused)
+                    binding.buttonInfo.setVisible(focused)
+                }
+            }
+            jobs += viewLifecycleCoroutineScope.launch {
+                /**
+                editFocusedFlow
+                    .mapLatest { focused ->
+                        if (focused) true
+                        else {
+                            delay(100)
+                            false
+                        }
+                    }
+                    .distinctUntilChanged()
+                    .filter { it.not() }
+                    .collect { itemView.hideSoftInputFromWindow() }*/
+            }
+            jobs += viewLifecycleCoroutineScope.launch {
+              /**
+                allEditNotFocusedFlow
+                    .withPrev(initial = false)
+                    .distinctUntilChanged()
+                    .filter { (old, new) -> old && new.not() }
+                    .mapNotNull {
+                        SimpleAdd(
+                            headerKey = null, // TODO implements header key
+                            binding.edittextTitle.text?.toString().orEmpty(),
+                            binding.edittextNote.text?.toString().orEmpty()
+                        )
+                    }
+                    .collect { onSimpleAddDone(it) }*/
+            }
+        }
+
+        itemView.doOnDetach {
+            jobs.forEach { it.cancel() }
+        }
+    }
+
+    fun bind(item: ScheduleAdapterItem.FooterAdd) {
+        newScheduleSource.value = item.newScheduleSource
+        binding.editableViews().forEach {
+            it.setText("")
+            it.clearFocus()
+        }
     }
 }

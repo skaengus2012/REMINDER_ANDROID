@@ -29,9 +29,12 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.update
 
 private const val ITEM_VIEW_TYPE_CONTENT = 1
@@ -62,6 +65,13 @@ class ScheduleListAdapter(
     private val _selectButtonTouch = MutableEventSharedFlow<RecyclerView.ViewHolder>()
     val selectButtonTouch: Flow<RecyclerView.ViewHolder> = _selectButtonTouch.conflate()
 
+    private val compoundEditFocusedFlow = MutableStateFlow<Set<StateFlow<Boolean>>>(emptySet())
+    val editFocused: Flow<Boolean> = compoundEditFocusedFlow
+        .flatMapLatest { childFocusedFlows ->
+            combine(childFocusedFlows, transform = { focuses -> focuses.any { it } })
+        }
+        .distinctUntilChanged()
+
     private fun getItem(position: Int): ScheduleAdapterItem {
         return differ.getCurrentList()[position]
     }
@@ -79,6 +89,8 @@ class ScheduleListAdapter(
         val layoutInflater = LayoutInflater.from(parent.context)
         return when (viewType) {
             ITEM_VIEW_TYPE_CONTENT -> {
+                val editFocusedFlow = MutableStateFlow(false)
+                    .also { compoundEditFocusedFlow.update { cur -> cur + it } }
                 ContentViewHolder(
                     binding = LayoutScheduleAdapterItemContentBinding.inflate(
                         layoutInflater,
@@ -90,11 +102,14 @@ class ScheduleListAdapter(
                     onSimpleEditDone = { _editRequest.tryEmit(it) },
                     onDragHandleTouched = { _dragHandleTouch.tryEmit(it) },
                     onSelectButtonTouched = { _selectButtonTouch.tryEmit(it) },
+                    onEditFocused = { editFocusedFlow.value = it },
                     theme = theme,
                 )
             }
 
             ITEM_VIEW_TYPE_FOOTER_ADD -> {
+                val editFocusedFlow = MutableStateFlow(false)
+                    .also { compoundEditFocusedFlow.update { cur -> cur + it } }
                 FooterAddViewHolder(
                     binding = LayoutScheduleAdapterItemAddBinding.inflate(
                         layoutInflater,
@@ -102,6 +117,7 @@ class ScheduleListAdapter(
                         /* attachToParent = */ false
                     ),
                     onSimpleAddDone = { _addRequest.tryEmit(it) },
+                    onEditFocused = { editFocusedFlow.value = it },
                     theme = theme
                 )
             }
@@ -137,8 +153,8 @@ class ScheduleListAdapter(
         val item = getItem(position)
         when (holder) {
             is ContentViewHolder -> holder.bind(item as ScheduleAdapterItem.Content)
+            is FooterAddViewHolder -> holder.bind(item as ScheduleAdapterItem.FooterAdd)
             is HeadlineViewHolder -> holder.bind(item as ScheduleAdapterItem.Headline)
-            is FooterAddViewHolder,
             is HeadlinePaddingViewHolder -> Unit
         }
     }

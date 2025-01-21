@@ -30,7 +30,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.nlab.reminder.core.android.content.getThemeColor
 import com.nlab.reminder.core.android.view.focusState
-import com.nlab.reminder.core.android.view.inputmethod.hideSoftInputFromWindow
 import com.nlab.reminder.core.android.view.isVisible
 import com.nlab.reminder.core.android.view.setVisible
 import com.nlab.reminder.core.android.view.throttleClicks
@@ -64,9 +63,10 @@ class ContentViewHolder internal constructor(
     private val binding: LayoutScheduleAdapterItemContentBinding,
     private val selectionEnabled: StateFlow<Boolean>,
     private val selectedScheduleIds: StateFlow<Set<ScheduleId>>,
-    private val onSimpleEditDone: (SimpleEdit) -> Unit,
-    private val onDragHandleTouched: (RecyclerView.ViewHolder) -> Unit,
-    private val onSelectButtonTouched: (RecyclerView.ViewHolder) -> Unit,
+    onSimpleEditDone: (SimpleEdit) -> Unit,
+    onDragHandleTouched: (RecyclerView.ViewHolder) -> Unit,
+    onSelectButtonTouched: (RecyclerView.ViewHolder) -> Unit,
+    onEditFocused: (Boolean) -> Unit,
     theme: ScheduleListTheme
 ) : ScheduleAdapterItemViewHolder(binding.root),
     DraggingSupportable,
@@ -110,12 +110,15 @@ class ContentViewHolder internal constructor(
         itemView.doOnAttach { view ->
             val viewLifecycleOwner = view.findViewTreeLifecycleOwner() ?: return@doOnAttach
             val viewLifecycleCoroutineScope = viewLifecycleOwner.lifecycleScope
-            val itemFocusedFlow = MutableStateFlow(false)
+            val editFocusedFlow = MutableStateFlow(false)
             jobs += viewLifecycleCoroutineScope.launch {
                 combine(
                     binding.editableViews().map { it.focusState() },
                     transform = { focuses -> focuses.any { it } }
-                ).collect { itemFocusedFlow.value = it }
+                ).collect {
+                    onEditFocused(it)
+                    editFocusedFlow.value = it
+                }
             }
             jobs += viewLifecycleCoroutineScope.launch {
                 combine(
@@ -123,14 +126,13 @@ class ContentViewHolder internal constructor(
                         .textChanges()
                         .map { it.isNullOrEmpty() }
                         .distinctUntilChanged(),
-                    itemFocusedFlow,
+                    editFocusedFlow,
                     transform = { isCurrentNoteEmpty, focused -> isCurrentNoteEmpty.not() || focused }
                 ).collect { binding.edittextNote.setVisible(it) }
             }
             jobs += viewLifecycleCoroutineScope.launch {
-                itemFocusedFlow.collect { focused ->
+                editFocusedFlow.collect { focused ->
                     binding.buttonInfo.setVisible(focused)
-                    if (focused.not()) itemView.hideSoftInputFromWindow()
                 }
             }
             jobs += viewLifecycleCoroutineScope.launch {
@@ -139,7 +141,7 @@ class ContentViewHolder internal constructor(
                     .collect { binding.buttonComplete.apply { it.isSelected = it.isSelected.not() } }
             }
             jobs += viewLifecycleCoroutineScope.launch {
-                itemFocusedFlow
+                editFocusedFlow
                     .withPrev(initial = false)
                     .distinctUntilChanged()
                     .filter { (old, new) -> old && new.not() }

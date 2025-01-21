@@ -28,7 +28,9 @@ sealed class ScheduleAdapterItem private constructor() {
         val isLineVisible: Boolean
     ) : ScheduleAdapterItem()
 
-    data object FooterAdd : ScheduleAdapterItem()
+    data class FooterAdd(
+        val newScheduleSource: Any? = null // TODO implements
+    ) : ScheduleAdapterItem()
 
     data class Headline(@StringRes val textRes: Int) : ScheduleAdapterItem()
 
