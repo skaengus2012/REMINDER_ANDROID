@@ -27,10 +27,12 @@ import com.nlab.reminder.core.android.view.setVisible
 import com.nlab.reminder.core.android.widget.textChanges
 import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapterItemAddBinding
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 
@@ -77,8 +79,16 @@ class FooterAddViewHolder internal constructor(
                     },
                     editFocusedFlow,
                     transform = { isCurrentNoteEmpty, focused -> isCurrentNoteEmpty.not() || focused }
-                ).collect { // binding.edittextNote.setVisible(it)
-                }
+                ).distinctUntilChanged()
+                    .mapLatest { visible ->
+                        if (visible) true
+                        else {
+                            // Focus momentarily lost, fixing blinking symptoms
+                            delay(100)
+                            false
+                        }
+                    }
+                    .collect { binding.edittextNote.setVisible(it) }
             }
             jobs += viewLifecycleCoroutineScope.launch {
                 editFocusedFlow.collect { focused ->

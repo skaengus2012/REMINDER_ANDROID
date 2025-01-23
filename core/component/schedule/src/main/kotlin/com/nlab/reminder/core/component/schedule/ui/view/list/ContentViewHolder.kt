@@ -43,6 +43,7 @@ import com.nlab.reminder.core.data.model.ScheduleId
 import com.nlab.reminder.core.designsystem.compose.theme.AttrIds
 import com.nlab.reminder.core.kotlinx.coroutine.flow.withPrev
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asFlow
@@ -52,6 +53,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
@@ -127,7 +129,16 @@ class ContentViewHolder internal constructor(
                         .distinctUntilChanged(),
                     editFocusedFlow,
                     transform = { isCurrentNoteEmpty, focused -> isCurrentNoteEmpty.not() || focused }
-                ).collect { binding.edittextNote.setVisible(it) }
+                ).distinctUntilChanged()
+                    .mapLatest { visible ->
+                        if (visible) true
+                        else {
+                            // Focus momentarily lost, fixing blinking symptoms
+                            delay(100)
+                            false
+                        }
+                    }
+                    .collect { binding.edittextNote.setVisible(it) }
             }
             jobs += viewLifecycleCoroutineScope.launch {
                 editFocusedFlow.collect { focused ->
