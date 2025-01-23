@@ -104,7 +104,6 @@ class ContentViewHolder internal constructor(
 
         // Processing for multiline input and actionDone support
         binding.edittextTitle.setRawInputType(InputType.TYPE_CLASS_TEXT)
-        binding.edittextNote.setRawInputType(InputType.TYPE_CLASS_TEXT)
 
         val jobs = mutableListOf<Job>()
         itemView.doOnAttach { view ->
@@ -210,8 +209,12 @@ class ContentViewHolder internal constructor(
             .setVisible(isVisible = item.isLineVisible, goneIfNotVisible = false)
         binding.edittextTitle
             .bindText(item.scheduleDetail.schedule.content.title)
-        binding.edittextNote
-            .bindText(item.scheduleDetail.schedule.content.note?.value)
+        binding.edittextNote.apply {
+            val isChanged = bindText(item.scheduleDetail.schedule.content.note?.value)
+            if (isChanged) {
+                setSelection(text?.length ?: 0)
+            }
+        }
         binding.cardLink
             .setVisible(item.scheduleDetail.schedule.content.link != null)
         binding.textviewLink
