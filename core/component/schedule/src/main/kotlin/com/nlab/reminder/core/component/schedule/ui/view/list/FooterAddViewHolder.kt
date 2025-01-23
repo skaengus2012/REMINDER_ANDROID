@@ -22,6 +22,7 @@ import androidx.core.view.doOnAttach
 import androidx.core.view.doOnDetach
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.RecyclerView
 import com.nlab.reminder.core.android.view.focusState
 import com.nlab.reminder.core.android.view.setVisible
 import com.nlab.reminder.core.android.widget.textChanges
@@ -42,7 +43,8 @@ import kotlinx.coroutines.launch
 class FooterAddViewHolder internal constructor(
     private val binding: LayoutScheduleAdapterItemAddBinding,
     onSimpleAddDone: (SimpleAdd) -> Unit,
-    onEditFocused: (Boolean) -> Unit,
+    onFocusChanged: (RecyclerView.ViewHolder, Boolean) -> Unit,
+    onBottomPaddingVisible: (Boolean) -> Unit,
     theme: ScheduleListTheme,
 ) : ScheduleAdapterItemViewHolder(binding.root) {
     private val newScheduleSource = MutableStateFlow<Any?>(null) // TODO implements
@@ -65,7 +67,7 @@ class FooterAddViewHolder internal constructor(
                     binding.editableViews().map { it.focusState() },
                     transform = { focusedStates -> focusedStates.any { it } }
                 ).distinctUntilChanged().collect { focused ->
-                    onEditFocused(focused)
+                    onFocusChanged(this@FooterAddViewHolder, focused)
                     editFocusedFlow.value = focused
                 }
             }
@@ -91,10 +93,23 @@ class FooterAddViewHolder internal constructor(
                     .collect { binding.edittextNote.setVisible(it) }
             }
             jobs += viewLifecycleCoroutineScope.launch {
-                editFocusedFlow.collect { focused ->
-                    onEditFocused(focused)
-                    binding.buttonInfo.setVisible(focused)
-                }
+                editFocusedFlow
+                    .mapLatest { visible ->
+                        if (visible) true
+                        else {
+                            // Focus momentarily lost, fixing blinking symptoms
+                            delay(100)
+                            false
+                        }
+                    }
+                    .collect { visible ->
+                        binding.viewBottomPadding.setVisible(visible)
+                        delay(100)
+                        onBottomPaddingVisible(visible)
+                    }
+            }
+            jobs += viewLifecycleCoroutineScope.launch {
+                editFocusedFlow.collect { binding.buttonInfo.setVisible(it) }
             }
             jobs += viewLifecycleCoroutineScope.launch {
                 /**

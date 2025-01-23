@@ -16,9 +16,9 @@
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:tools="http://schemas.android.com/tools"
     android:minHeight="@dimen/schedule_checkbox_touchable_size">
 
     <androidx.constraintlayout.widget.Guideline
@@ -101,5 +101,31 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_info" />
+
+    <View
+        android:id="@+id/view_line1"
+        android:layout_width="0dp"
+        android:layout_height="0.5dp"
+        android:layout_marginTop="15dp"
+        android:background="?bg_line_1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/guideline_bodyStart"
+        app:layout_constraintTop_toBottomOf="@id/edittext_note" />
+
+    <View
+        android:id="@+id/view_line2"
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:layout_marginTop="15dp"
+        android:background="?bg_line_1"
+        app:layout_constraintTop_toBottomOf="@id/edittext_note" />
+
+    <View
+        android:id="@+id/view_bottomPadding"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/edittext_note" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

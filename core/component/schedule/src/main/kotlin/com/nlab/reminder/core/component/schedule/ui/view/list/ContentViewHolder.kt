@@ -63,12 +63,12 @@ import kotlin.math.absoluteValue
  */
 class ContentViewHolder internal constructor(
     private val binding: LayoutScheduleAdapterItemContentBinding,
-    private val selectionEnabled: StateFlow<Boolean>,
-    private val selectedScheduleIds: StateFlow<Set<ScheduleId>>,
+    selectionEnabled: StateFlow<Boolean>,
+    selectedScheduleIds: StateFlow<Set<ScheduleId>>,
     onSimpleEditDone: (SimpleEdit) -> Unit,
     onDragHandleTouched: (RecyclerView.ViewHolder) -> Unit,
     onSelectButtonTouched: (RecyclerView.ViewHolder) -> Unit,
-    onEditFocused: (Boolean) -> Unit,
+    onFocusChanged: (RecyclerView.ViewHolder, Boolean) -> Unit,
     theme: ScheduleListTheme
 ) : ScheduleAdapterItemViewHolder(binding.root),
     DraggingSupportable,
@@ -117,7 +117,7 @@ class ContentViewHolder internal constructor(
                     binding.editableViews().map { it.focusState() },
                     transform = { focuses -> focuses.any { it } }
                 ).collect {
-                    onEditFocused(it)
+                    onFocusChanged(this@ContentViewHolder, it)
                     editFocusedFlow.value = it
                 }
             }

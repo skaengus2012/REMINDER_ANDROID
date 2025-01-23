@@ -32,8 +32,8 @@ import com.nlab.reminder.core.androidx.fragment.compose.ComposableFragment
 import com.nlab.reminder.core.androidx.fragment.compose.ComposableInject
 import com.nlab.reminder.core.androidx.fragment.viewLifecycle
 import com.nlab.reminder.core.androidx.fragment.viewLifecycleScope
+import com.nlab.reminder.core.androix.recyclerview.scrollEvent
 import com.nlab.reminder.core.androix.recyclerview.scrollState
-import com.nlab.reminder.core.androix.recyclerview.scrollY
 import com.nlab.reminder.core.androix.recyclerview.verticalScrollRange
 import com.nlab.reminder.core.component.schedule.ui.view.list.ScheduleAdapterItem
 import com.nlab.reminder.core.component.schedule.ui.view.list.ScheduleListAdapter
@@ -65,6 +65,7 @@ import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.math.absoluteValue
@@ -121,29 +122,38 @@ internal class AllFragment : ComposableFragment() {
         }
 
         val scrollStateFlow = binding.recyclerviewSchedule.run {
-            scrollState().shareIn(viewLifecycleScope, started = SharingStarted.Lazily)
+            scrollState().shareIn(viewLifecycleScope, started = SharingStarted.Eagerly)
         }
         val verticalScrollRangeFlow = binding.recyclerviewSchedule.run {
-            verticalScrollRange().shareIn(viewLifecycleScope, started = SharingStarted.Lazily)
+            verticalScrollRange().shareIn(viewLifecycleScope, started = SharingStarted.Eagerly)
         }
-        val scrollYFlow = binding.recyclerviewSchedule.run {
-            scrollY().shareIn(viewLifecycleScope, started = SharingStarted.Lazily)
+        val scrollEventFlow = binding.recyclerviewSchedule.run {
+            scrollEvent().shareIn(viewLifecycleScope, started = SharingStarted.Eagerly)
         }
+        val firstVisiblePositionFlow = scrollEventFlow
+            .map { linearLayoutManager.findFirstVisibleItemPosition() }
+            .distinctUntilChanged()
+            .shareIn(viewLifecycleScope, SharingStarted.Eagerly)
+        val lastVisiblePositionFlow = scrollEventFlow
+            .map { linearLayoutManager.findLastVisibleItemPosition() }
+            .distinctUntilChanged()
+            .shareIn(viewLifecycleScope, SharingStarted.Eagerly)
+
         combine(
             verticalScrollRangeFlow
                 .map { it > 0 }
                 .distinctUntilChanged(),
-            scrollYFlow
-                .map { linearLayoutManager.findFirstVisibleItemPosition() > 0 }
+            firstVisiblePositionFlow
+                .map { it > 0 }
                 .distinctUntilChanged()
         ) { hasScrollRange, isHeadlineNotVisible -> hasScrollRange && isHeadlineNotVisible }
             .distinctUntilChanged()
             .onEach { fragmentStateBridge.isToolbarTitleVisible = it }
             .launchIn(viewLifecycleScope)
 
-        scrollYFlow
-            .map {
-                when (linearLayoutManager.findFirstVisibleItemPosition()) {
+        firstVisiblePositionFlow
+            .map { position ->
+                when (position) {
                     0 -> 0f
                     1 -> {
                         val itemView = checkNotNull(linearLayoutManager.findViewByPosition(/*position =*/ 1))
@@ -194,13 +204,15 @@ internal class AllFragment : ComposableFragment() {
             .launchIn(viewLifecycleScope)
 
         combine(
-            scheduleListAdapter.editFocused,
-            scrollStateFlow,
-        ) { focused, scrollState ->
-            when {
-                focused -> 0 // Just focused
-                scrollState == RecyclerView.SCROLL_STATE_IDLE -> 1 // not focused
-                else -> 2 // not focused, dragging, etc
+            scheduleListAdapter.focusChange
+                .map { it.viewHolder.absoluteAdapterPosition to it.focused },
+            firstVisiblePositionFlow,
+            lastVisiblePositionFlow
+        ) { (viewHolderPosition, focused), firstVisiblePosition, lastVisiblePosition ->
+            when  {
+                focused -> 0 // focused
+                viewHolderPosition in firstVisiblePosition .. lastVisiblePosition -> 1 // not focused
+                else -> 2 // focused by scrolling
             }
         }.distinctUntilChanged()
             .mapLatest { flag ->
@@ -223,6 +235,15 @@ internal class AllFragment : ComposableFragment() {
 
         scheduleListAdapter.selectButtonTouch
             .onEach { multiSelectionHelper.enable(it) }
+            .launchIn(viewLifecycleScope)
+
+        scheduleListAdapter.footerAddBottomPaddingVisible
+            .onEach { focused ->
+                if (focused) {
+                    binding.recyclerviewSchedule
+                        .scrollToPosition(/* position = */scheduleListAdapter.itemCount - 1)
+                }
+            }
             .launchIn(viewLifecycleScope)
 
         viewLifecycle.eventFlow
