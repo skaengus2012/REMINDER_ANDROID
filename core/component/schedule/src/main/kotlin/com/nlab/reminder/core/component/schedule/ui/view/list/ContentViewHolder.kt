@@ -44,6 +44,7 @@ import com.nlab.reminder.core.designsystem.compose.theme.AttrIds
 import com.nlab.reminder.core.kotlinx.coroutine.flow.withPrev
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asFlow
@@ -112,14 +113,14 @@ class ContentViewHolder internal constructor(
         itemView.doOnAttach { view ->
             val viewLifecycleOwner = view.findViewTreeLifecycleOwner() ?: return@doOnAttach
             val viewLifecycleCoroutineScope = viewLifecycleOwner.lifecycleScope
-            val editFocusedFlow = MutableStateFlow(false)
+            val editFocusedFlow = MutableSharedFlow<Boolean>(replay = 1)
             jobs += viewLifecycleCoroutineScope.launch {
                 combine(
                     binding.editableViews().map { it.focusState() },
                     transform = { focuses -> focuses.any { it } }
                 ).collect {
                     onFocusChanged(this@ContentViewHolder, it)
-                    editFocusedFlow.value = it
+                    editFocusedFlow.emit(it)
                 }
             }
             jobs += viewLifecycleCoroutineScope.launch {
@@ -172,7 +173,7 @@ class ContentViewHolder internal constructor(
                             )
                         }
                     }
-                    .collect { onSimpleEditDone(it) }
+                    .collect(onSimpleEditDone)
             }
             jobs += viewLifecycleCoroutineScope.launch {
                 selectionEnabled.collect { enabled ->

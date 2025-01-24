@@ -59,6 +59,9 @@ internal fun AllScreen(
             testFlow = testFlow,
             isToolbarTitleVisible = false,
             toolbarBackgroundAlpha = 0.0f,
+            onSimpleAdd = { simpleAdd ->
+                showAppToast("TODO Simple Add $simpleAdd")
+            },
             onSimpleEdited = { simpleEdit ->
                 // TODO implements
                 showAppToast("TODO Simple Edit $simpleEdit")
@@ -167,6 +170,7 @@ private fun AllScreenPreview() {
             fragmentStateBridge = rememberAllFragmentStateBridge(
                 isToolbarTitleVisible = true,
                 toolbarBackgroundAlpha = 1.0f,
+                onSimpleAdd = {},
                 onSimpleEdited = {}
             ),
             onBackClicked = {},

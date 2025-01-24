@@ -673,7 +673,7 @@ private fun NewPlanButton(
             tint = contentColor
         )
         Text(
-            text = stringResource(StringIds.new_schedule_label),
+            text = stringResource(StringIds.new_plan),
             style = PlaneatTheme.typography.titleMedium,
             color = contentColor
         )

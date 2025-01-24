@@ -17,6 +17,7 @@
 package com.nlab.reminder.feature.all.ui
 
 import androidx.compose.runtime.*
+import com.nlab.reminder.core.component.schedule.ui.view.list.SimpleAdd
 import com.nlab.reminder.core.component.schedule.ui.view.list.SimpleEdit
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,6 +30,7 @@ internal class AllFragmentStateBridge(
     testFlow: Flow<Boolean> = MutableStateFlow(false), // TODO replace UiState
     isToolbarTitleVisible: Boolean,
     toolbarBackgroundAlpha: Float,
+    val onSimpleAdd: (SimpleAdd) -> Unit,
     val onSimpleEdited: (SimpleEdit) -> Unit
 ) {
     var isToolbarTitleVisible: Boolean by mutableStateOf(isToolbarTitleVisible)
@@ -42,12 +44,14 @@ internal fun rememberAllFragmentStateBridge(
     testFlow: Flow<Boolean> = MutableStateFlow(false),
     isToolbarTitleVisible: Boolean,
     toolbarBackgroundAlpha: Float,
+    onSimpleAdd: (SimpleAdd) -> Unit,
     onSimpleEdited: (SimpleEdit) -> Unit,
 ): AllFragmentStateBridge = remember(testFlow, onSimpleEdited) {
     AllFragmentStateBridge(
         testFlow = testFlow,
         isToolbarTitleVisible = isToolbarTitleVisible,
         toolbarBackgroundAlpha = toolbarBackgroundAlpha,
+        onSimpleAdd = onSimpleAdd,
         onSimpleEdited = onSimpleEdited
     )
 }

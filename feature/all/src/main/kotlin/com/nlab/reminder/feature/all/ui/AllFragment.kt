@@ -198,6 +198,10 @@ internal class AllFragment : ComposableFragment() {
             }
             .launchIn(viewLifecycleScope)
 
+        scheduleListAdapter.addRequest
+            .onEach { fragmentStateBridge.onSimpleAdd(it) }
+            .launchIn(viewLifecycleScope)
+
         scheduleListAdapter.editRequest
             .onEach { fragmentStateBridge.onSimpleEdited(it) }
             .launchIn(viewLifecycleScope)
