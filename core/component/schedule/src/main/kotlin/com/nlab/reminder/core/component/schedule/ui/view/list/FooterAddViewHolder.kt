@@ -150,9 +150,22 @@ class FooterAddViewHolder internal constructor(
 
     fun bind(item: ScheduleAdapterItem.FooterAdd) {
         newScheduleSource.value = item.newScheduleSource
-        binding.editableViews().forEach {
-            it.setText("")
-            it.clearFocus()
+        binding.editableViews().forEach { it.setText(""); it.clearFocus() }
+        when (item.line) {
+            ScheduleAdapterItem.FooterAdd.Line.Type1 -> {
+                binding.viewLine1.setVisible(true)
+                binding.viewLine2.setVisible(false)
+            }
+
+            ScheduleAdapterItem.FooterAdd.Line.Type2 -> {
+                binding.viewLine1.setVisible(false)
+                binding.viewLine2.setVisible(true)
+            }
+
+            ScheduleAdapterItem.FooterAdd.Line.None -> {
+                binding.viewLine1.setVisible(false)
+                binding.viewLine2.setVisible(false)
+            }
         }
     }
 }

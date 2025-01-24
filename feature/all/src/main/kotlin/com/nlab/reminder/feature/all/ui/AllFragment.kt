@@ -301,7 +301,10 @@ internal class AllFragment : ComposableFragment() {
                         isLineVisible = true
                     )
                 }
-                this += ScheduleAdapterItem.FooterAdd(newScheduleSource = null)
+                this += ScheduleAdapterItem.FooterAdd(
+                    newScheduleSource = null,
+                    line = ScheduleAdapterItem.FooterAdd.Line.Type1
+                )
             }
         }
     }

@@ -29,8 +29,13 @@ sealed class ScheduleAdapterItem private constructor() {
     ) : ScheduleAdapterItem()
 
     data class FooterAdd(
-        val newScheduleSource: Any? = null // TODO implements
-    ) : ScheduleAdapterItem()
+        val newScheduleSource: Any? = null, // TODO implements
+        val line: Line
+    ) : ScheduleAdapterItem() {
+        enum class Line {
+            Type1, Type2, None
+        }
+    }
 
     data class Headline(@StringRes val textRes: Int) : ScheduleAdapterItem()
 
