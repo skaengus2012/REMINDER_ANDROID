@@ -65,7 +65,6 @@ import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.shareIn
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.math.absoluteValue
@@ -238,8 +237,8 @@ internal class AllFragment : ComposableFragment() {
             .launchIn(viewLifecycleScope)
 
         scheduleListAdapter.footerAddBottomPaddingVisible
-            .onEach { focused ->
-                if (focused) {
+            .onEach { visible ->
+                if (visible) {
                     binding.recyclerviewSchedule
                         .scrollToPosition(/* position = */scheduleListAdapter.itemCount - 1)
                 }

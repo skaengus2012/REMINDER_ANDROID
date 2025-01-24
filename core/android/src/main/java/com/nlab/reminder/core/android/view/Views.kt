@@ -21,6 +21,8 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlin.coroutines.resume
 
 /**
  * @author thalys
@@ -52,3 +54,10 @@ fun View.focusChanges(): Flow<Boolean> = callbackFlow {
 }
 
 fun View.focusState(): Flow<Boolean> = focusChanges().onStart { emit(hasFocus()) }
+
+suspend fun View.awaitPost() = suspendCancellableCoroutine { continuation ->
+    val runnable = Runnable { continuation.resume(Unit) }
+    post(runnable)
+
+    continuation.invokeOnCancellation { removeCallbacks(runnable) }
+}

@@ -23,6 +23,7 @@ import androidx.core.view.doOnDetach
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
+import com.nlab.reminder.core.android.view.awaitPost
 import com.nlab.reminder.core.android.view.focusState
 import com.nlab.reminder.core.android.view.setVisible
 import com.nlab.reminder.core.android.widget.textChanges
@@ -30,6 +31,7 @@ import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapt
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -72,6 +74,7 @@ class FooterAddViewHolder internal constructor(
                 }
             }
             jobs += viewLifecycleCoroutineScope.launch {
+                var needDelayOnHidden = false
                 combine(
                     binding.edittextNote.run {
                         textChanges()
@@ -85,45 +88,43 @@ class FooterAddViewHolder internal constructor(
                     .mapLatest { visible ->
                         if (visible) true
                         else {
-                            // Focus momentarily lost, fixing blinking symptoms
-                            delay(100)
+                            if (needDelayOnHidden) {
+                                // Focus momentarily lost, fixing blinking symptoms
+                                delay(100)
+                            } else {
+                                needDelayOnHidden = true
+                            }
                             false
                         }
                     }
                     .collect { binding.edittextNote.setVisible(it) }
             }
             jobs += viewLifecycleCoroutineScope.launch {
+                var needDelayOnHidden = false
                 editFocusedFlow
                     .mapLatest { visible ->
                         if (visible) true
                         else {
                             // Focus momentarily lost, fixing blinking symptoms
-                            delay(100)
+                            if (needDelayOnHidden) {
+                                // Focus momentarily lost, fixing blinking symptoms
+                                delay(100)
+                            } else {
+                                needDelayOnHidden = true
+                            }
                             false
                         }
                     }
-                    .collect { visible ->
-                        binding.viewBottomPadding.setVisible(visible)
-                        delay(100)
+                    .collectLatest { visible ->
+                        binding.viewBottomPadding.apply {
+                            setVisible(visible)
+                            awaitPost()
+                        }
                         onBottomPaddingVisible(visible)
                     }
             }
             jobs += viewLifecycleCoroutineScope.launch {
                 editFocusedFlow.collect { binding.buttonInfo.setVisible(it) }
-            }
-            jobs += viewLifecycleCoroutineScope.launch {
-                /**
-                editFocusedFlow
-                    .mapLatest { focused ->
-                        if (focused) true
-                        else {
-                            delay(100)
-                            false
-                        }
-                    }
-                    .distinctUntilChanged()
-                    .filter { it.not() }
-                    .collect { itemView.hideSoftInputFromWindow() }*/
             }
             jobs += viewLifecycleCoroutineScope.launch {
               /**
