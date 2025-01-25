@@ -36,8 +36,8 @@ import com.nlab.reminder.core.kotlinx.coroutine.flow.withPrev
 import com.nlab.reminder.core.translation.StringIds
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -45,6 +45,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 
 /**
@@ -71,21 +72,33 @@ class FooterAddViewHolder internal constructor(
         itemView.doOnAttach { view ->
             val viewLifecycleOwner = view.findViewTreeLifecycleOwner() ?: return@doOnAttach
             val viewLifecycleCoroutineScope = viewLifecycleOwner.lifecycleScope
-            val noteFocusedFlow = MutableSharedFlow<Boolean>(replay = 1)
-            val editFocusedFlow = MutableSharedFlow<Boolean>(replay = 1)
+            val titleFocusedFlow = binding.layoutAdd.edittextTitle
+                .focusState(scope = viewLifecycleCoroutineScope, started = SharingStarted.WhileSubscribed())
+            val noteFocusedFlow = binding.layoutAdd.edittextNote
+                .focusState(scope = viewLifecycleCoroutineScope, started = SharingStarted.WhileSubscribed())
+            val editFocusedFlow = combine(
+                titleFocusedFlow,
+                noteFocusedFlow,
+                transform = { titleFocused, notFocused -> titleFocused || notFocused }
+            ).distinctUntilChanged()
+                .shareIn(scope = viewLifecycleCoroutineScope, started = SharingStarted.WhileSubscribed(), replay = 1)
+
             jobs += viewLifecycleCoroutineScope.launch {
-                binding.layoutAdd.edittextNote
-                    .focusState()
-                    .collect(noteFocusedFlow::emit)
+                titleFocusedFlow.collect { focused ->
+                    binding.layoutAdd.edittextTitle.bindCursorVisible(focused)
+                    binding.layoutAdd.edittextNote.bindCursorVisible(focused.not())
+                }
             }
             jobs += viewLifecycleCoroutineScope.launch {
-                combine(
-                    binding.layoutAdd.edittextTitle.focusState(),
-                    noteFocusedFlow,
-                    transform = { titleFocused, noteFocused -> titleFocused || noteFocused }
-                ).distinctUntilChanged().collect { focused ->
+                noteFocusedFlow.collect { focused ->
+                    binding.layoutAdd.edittextTitle.bindCursorVisible(focused.not())
+                    binding.layoutAdd.edittextNote.bindCursorVisible(focused)
+                }
+            }
+            jobs += viewLifecycleCoroutineScope.launch {
+                editFocusedFlow.collect { focused ->
                     onFocusChanged(this@FooterAddViewHolder, focused)
-                    editFocusedFlow.emit(focused)
+                    binding.layoutAdd.buttonInfo.setVisible(focused)
                 }
             }
             jobs += viewLifecycleCoroutineScope.launch {
@@ -137,13 +150,6 @@ class FooterAddViewHolder internal constructor(
                         }
                         onBottomPaddingVisible(visible)
                     }
-            }
-            jobs += viewLifecycleCoroutineScope.launch {
-                editFocusedFlow.collect { focused ->
-                    binding.layoutAdd.edittextTitle.bindCursorVisible(focused)
-                    binding.layoutAdd.edittextNote.bindCursorVisible(focused)
-                    binding.layoutAdd.buttonInfo.setVisible(focused)
-                }
             }
             jobs += viewLifecycleCoroutineScope.launch {
                 noteFocusedFlow.collect { focused ->

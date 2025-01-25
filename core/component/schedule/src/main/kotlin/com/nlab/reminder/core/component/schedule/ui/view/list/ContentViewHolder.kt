@@ -46,8 +46,8 @@ import com.nlab.reminder.core.designsystem.compose.theme.AttrIds
 import com.nlab.reminder.core.kotlinx.coroutine.flow.withPrev
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -59,6 +59,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
 
@@ -115,15 +116,35 @@ class ContentViewHolder internal constructor(
         itemView.doOnAttach { view ->
             val viewLifecycleOwner = view.findViewTreeLifecycleOwner() ?: return@doOnAttach
             val viewLifecycleCoroutineScope = viewLifecycleOwner.lifecycleScope
-            val editFocusedFlow = MutableSharedFlow<Boolean>(replay = 1)
+            val titleFocusedFlow = binding
+                .edittextTitle
+                .focusState(scope = viewLifecycleCoroutineScope, started = SharingStarted.WhileSubscribed())
+            val noteFocusedFlow = binding
+                .edittextNote
+                .focusState(scope = viewLifecycleCoroutineScope, started = SharingStarted.WhileSubscribed())
+            val editFocusedFlow = combine(
+                titleFocusedFlow,
+                noteFocusedFlow,
+                transform = { titleFocused, notFocused -> titleFocused || notFocused }
+            ).distinctUntilChanged()
+                .shareIn(scope = viewLifecycleCoroutineScope, started = SharingStarted.WhileSubscribed(), replay = 1)
+
             jobs += viewLifecycleCoroutineScope.launch {
-                combine(
-                    binding.edittextTitle.focusState(),
-                    binding.edittextNote.focusState(),
-                    transform = { titleFocused, notFocused -> titleFocused || notFocused }
-                ).collect {
-                    onFocusChanged(this@ContentViewHolder, it)
-                    editFocusedFlow.emit(it)
+                titleFocusedFlow.collect { focused ->
+                    binding.edittextTitle.bindCursorVisible(focused)
+                    binding.edittextNote.bindCursorVisible(focused.not())
+                }
+            }
+            jobs += viewLifecycleCoroutineScope.launch {
+                noteFocusedFlow.collect { focused ->
+                    binding.edittextTitle.bindCursorVisible(focused.not())
+                    binding.edittextNote.bindCursorVisible(focused)
+                }
+            }
+            jobs += viewLifecycleCoroutineScope.launch {
+                editFocusedFlow.collect { focused ->
+                    onFocusChanged(this@ContentViewHolder, focused)
+                    binding.buttonInfo.setVisible(focused)
                 }
             }
             jobs += viewLifecycleCoroutineScope.launch {
@@ -151,13 +172,6 @@ class ContentViewHolder internal constructor(
                         }
                     }
                     .collect { binding.edittextNote.setVisible(it) }
-            }
-            jobs += viewLifecycleCoroutineScope.launch {
-                editFocusedFlow.collect { focused ->
-                    binding.edittextTitle.bindCursorVisible(focused)
-                    binding.edittextNote.bindCursorVisible(focused)
-                    binding.buttonInfo.setVisible(focused)
-                }
             }
             jobs += viewLifecycleCoroutineScope.launch {
                 binding.buttonComplete
