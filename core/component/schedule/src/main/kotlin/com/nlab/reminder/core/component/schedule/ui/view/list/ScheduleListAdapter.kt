@@ -20,8 +20,8 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.AdapterListUpdateCallback
 import androidx.recyclerview.widget.RecyclerView
-import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapterItemAddBinding
 import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapterItemContentBinding
+import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapterItemFooterAddBinding
 import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapterItemHeadlineBinding
 import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapterItemHeadlinePaddingBinding
 import com.nlab.reminder.core.data.model.ScheduleId
@@ -105,7 +105,7 @@ class ScheduleListAdapter(
 
             ITEM_VIEW_TYPE_FOOTER_ADD -> {
                 FooterAddViewHolder(
-                    binding = LayoutScheduleAdapterItemAddBinding.inflate(
+                    binding = LayoutScheduleAdapterItemFooterAddBinding.inflate(
                         layoutInflater,
                         parent,
                         /* attachToParent = */ false
