@@ -31,9 +31,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.nlab.reminder.core.android.content.getThemeColor
 import com.nlab.reminder.core.android.view.focusState
 import com.nlab.reminder.core.android.view.isVisible
+import com.nlab.reminder.core.android.view.clearFocusIfNeeded
 import com.nlab.reminder.core.android.view.setVisible
 import com.nlab.reminder.core.android.view.throttleClicks
 import com.nlab.reminder.core.android.view.touches
+import com.nlab.reminder.core.android.widget.bindCursorVisible
 import com.nlab.reminder.core.android.widget.bindImageAsync
 import com.nlab.reminder.core.android.widget.bindText
 import com.nlab.reminder.core.android.widget.textChanges
@@ -116,8 +118,9 @@ class ContentViewHolder internal constructor(
             val editFocusedFlow = MutableSharedFlow<Boolean>(replay = 1)
             jobs += viewLifecycleCoroutineScope.launch {
                 combine(
-                    binding.editableViews().map { it.focusState() },
-                    transform = { focuses -> focuses.any { it } }
+                    binding.edittextTitle.focusState(),
+                    binding.edittextNote.focusState(),
+                    transform = { titleFocused, notFocused -> titleFocused || notFocused }
                 ).collect {
                     onFocusChanged(this@ContentViewHolder, it)
                     editFocusedFlow.emit(it)
@@ -151,6 +154,8 @@ class ContentViewHolder internal constructor(
             }
             jobs += viewLifecycleCoroutineScope.launch {
                 editFocusedFlow.collect { focused ->
+                    binding.edittextTitle.bindCursorVisible(focused)
+                    binding.edittextNote.bindCursorVisible(focused)
                     binding.buttonInfo.setVisible(focused)
                 }
             }
@@ -196,7 +201,10 @@ class ContentViewHolder internal constructor(
                 ) { selectionUsable, dragging, swiping -> selectionUsable || dragging || swiping }
                     .distinctUntilChanged()
                     .map { it.not() }
-                    .collect { enabled -> binding.editableViews().forEach { v -> v.isEnabled = enabled } }
+                    .collect { enabled ->
+                        binding.edittextTitle.isEnabled = enabled
+                        binding.edittextNote.isEnabled = enabled
+                    }
             }
             jobs += viewLifecycleCoroutineScope.launch {
                 binding.buttonDragHandle
@@ -227,13 +235,16 @@ class ContentViewHolder internal constructor(
             item.scheduleDetail.schedule.id
         binding.viewLine
             .setVisible(isVisible = item.isLineVisible, goneIfNotVisible = false)
-        binding.edittextTitle
-            .bindText(item.scheduleDetail.schedule.content.title)
+        binding.edittextTitle.apply {
+            bindText(item.scheduleDetail.schedule.content.title)
+            clearFocusIfNeeded()
+        }
         binding.edittextNote.apply {
             val isChanged = bindText(item.scheduleDetail.schedule.content.note?.value)
             if (isChanged) {
                 setSelection(text?.length ?: 0)
             }
+            clearFocusIfNeeded()
         }
         binding.cardLink
             .setVisible(item.scheduleDetail.schedule.content.link != null)
@@ -256,11 +267,6 @@ class ContentViewHolder internal constructor(
     }
 }
 
-private fun LayoutScheduleAdapterItemContentBinding.editableViews(): Set<View> = setOf(
-    edittextTitle,
-    edittextNote
-)
-
 private class DraggingDelegateImpl(
     private val binding: LayoutScheduleAdapterItemContentBinding
 ) : DraggingDelegate() {
@@ -278,10 +284,6 @@ private class DraggingDelegateImpl(
         binding.root.translationZ = if (isActive) 10f else 0f
         binding.root.alpha = if (isActive) 0.7f else 1f
         binding.viewLine.alpha = if (isActive) 0f else 1f
-    }
-
-    override fun onMoved() {
-        binding.editableViews().forEach { v -> v.clearFocus() }
     }
 }
 

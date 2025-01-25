@@ -77,12 +77,7 @@ class ScheduleListItemTouchCallback(
         target: RecyclerView.ViewHolder
     ): Boolean {
         return if (viewHolder is DraggingSupportable && target is DraggingSupportable) {
-            val ret = itemMoveListener.onMove(viewHolder, target)
-            if (ret) {
-                viewHolder.draggingDelegate.onMoved()
-                target.draggingDelegate.onMoved()
-            }
-            ret
+            itemMoveListener.onMove(viewHolder, target)
         } else {
             false
         }

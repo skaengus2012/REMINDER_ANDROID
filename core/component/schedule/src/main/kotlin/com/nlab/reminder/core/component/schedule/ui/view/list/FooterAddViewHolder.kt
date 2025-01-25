@@ -25,10 +25,12 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.nlab.reminder.core.android.view.awaitPost
 import com.nlab.reminder.core.android.view.focusState
+import com.nlab.reminder.core.android.view.clearFocusIfNeeded
 import com.nlab.reminder.core.android.view.setVisible
+import com.nlab.reminder.core.android.widget.bindCursorVisible
 import com.nlab.reminder.core.android.widget.bindText
 import com.nlab.reminder.core.android.widget.textChanges
-import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapterItemAddComponentBinding
+import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapterItemAddBinding
 import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapterItemFooterAddBinding
 import com.nlab.reminder.core.kotlinx.coroutine.flow.withPrev
 import com.nlab.reminder.core.translation.StringIds
@@ -58,12 +60,12 @@ class FooterAddViewHolder internal constructor(
     private val newScheduleSource = MutableStateFlow<Any?>(null) // TODO implements
 
     init {
-        binding.layoutAddComponent.buttonInfo.apply {
+        binding.layoutAdd.buttonInfo.apply {
             imageTintList = ColorStateList.valueOf(theme.getButtonInfoColor(context))
         }
 
         // Processing for multiline input and actionDone support
-        binding.layoutAddComponent.edittextTitle.setRawInputType(InputType.TYPE_CLASS_TEXT)
+        binding.layoutAdd.edittextTitle.setRawInputType(InputType.TYPE_CLASS_TEXT)
 
         val jobs = mutableListOf<Job>()
         itemView.doOnAttach { view ->
@@ -72,15 +74,15 @@ class FooterAddViewHolder internal constructor(
             val noteFocusedFlow = MutableSharedFlow<Boolean>(replay = 1)
             val editFocusedFlow = MutableSharedFlow<Boolean>(replay = 1)
             jobs += viewLifecycleCoroutineScope.launch {
-                binding.layoutAddComponent.edittextNote
+                binding.layoutAdd.edittextNote
                     .focusState()
                     .collect(noteFocusedFlow::emit)
             }
             jobs += viewLifecycleCoroutineScope.launch {
                 combine(
-                    binding.layoutAddComponent.edittextTitle.focusState(),
+                    binding.layoutAdd.edittextTitle.focusState(),
                     noteFocusedFlow,
-                    transform = { titleFocus, noteFocus -> titleFocus || noteFocus }
+                    transform = { titleFocused, noteFocused -> titleFocused || noteFocused }
                 ).distinctUntilChanged().collect { focused ->
                     onFocusChanged(this@FooterAddViewHolder, focused)
                     editFocusedFlow.emit(focused)
@@ -89,7 +91,7 @@ class FooterAddViewHolder internal constructor(
             jobs += viewLifecycleCoroutineScope.launch {
                 var needDelayOnHidden = false
                 combine(
-                    binding.layoutAddComponent.edittextNote.run {
+                    binding.layoutAdd.edittextNote.run {
                         textChanges()
                             .onStart { emit(text) }
                             .map { it.isNullOrEmpty() }
@@ -110,7 +112,7 @@ class FooterAddViewHolder internal constructor(
                             false
                         }
                     }
-                    .collect { binding.layoutAddComponent.edittextNote.setVisible(it) }
+                    .collect { binding.layoutAdd.edittextNote.setVisible(it) }
             }
             jobs += viewLifecycleCoroutineScope.launch {
                 var needDelayOnHidden = false
@@ -137,12 +139,16 @@ class FooterAddViewHolder internal constructor(
                     }
             }
             jobs += viewLifecycleCoroutineScope.launch {
-                editFocusedFlow.collect { binding.layoutAddComponent.buttonInfo.setVisible(it) }
+                editFocusedFlow.collect { focused ->
+                    binding.layoutAdd.edittextTitle.bindCursorVisible(focused)
+                    binding.layoutAdd.edittextNote.bindCursorVisible(focused)
+                    binding.layoutAdd.buttonInfo.setVisible(focused)
+                }
             }
             jobs += viewLifecycleCoroutineScope.launch {
                 noteFocusedFlow.collect { focused ->
-                    if (focused && binding.layoutAddComponent.edittextTitle.text.isNullOrBlank()) {
-                        binding.layoutAddComponent.edittextTitle.setText(StringIds.new_plan)
+                    if (focused && binding.layoutAdd.edittextTitle.text.isNullOrBlank()) {
+                        binding.layoutAdd.edittextTitle.setText(StringIds.new_plan)
                     }
                 }
             }
@@ -160,17 +166,17 @@ class FooterAddViewHolder internal constructor(
                         if (savable) {
                             SimpleAdd(
                                 headerKey = null, // TODO implements
-                                title = binding.layoutAddComponent.edittextTitle.text?.toString().let { curTitle ->
+                                title = binding.layoutAdd.edittextTitle.text?.toString().let { curTitle ->
                                     if (curTitle.isNullOrBlank()) view.context.getString(StringIds.new_plan)
                                     else curTitle
                                 },
-                                note = binding.layoutAddComponent.edittextNote.text?.toString().orEmpty()
+                                note = binding.layoutAdd.edittextNote.text?.toString().orEmpty()
                             )
                         } else null
                     }
                     .collect { simpleAdd ->
                         onSimpleAddDone(simpleAdd)
-                        binding.layoutAddComponent.clearInput()
+                        binding.layoutAdd.clearInput()
                     }
             }
         }
@@ -182,33 +188,33 @@ class FooterAddViewHolder internal constructor(
 
     fun bind(item: ScheduleAdapterItem.FooterAdd) {
         newScheduleSource.value = item.newScheduleSource
-        binding.layoutAddComponent.clearInput()
+        binding.layoutAdd.clearInput()
         when (item.line) {
             ScheduleAdapterItem.FooterAdd.Line.Type1 -> {
-                binding.layoutAddComponent.viewLine1.setVisible(true)
-                binding.layoutAddComponent.viewLine2.setVisible(false)
+                binding.layoutAdd.viewLine1.setVisible(true)
+                binding.layoutAdd.viewLine2.setVisible(false)
             }
 
             ScheduleAdapterItem.FooterAdd.Line.Type2 -> {
-                binding.layoutAddComponent.viewLine1.setVisible(false)
-                binding.layoutAddComponent.viewLine2.setVisible(true)
+                binding.layoutAdd.viewLine1.setVisible(false)
+                binding.layoutAdd.viewLine2.setVisible(true)
             }
 
             ScheduleAdapterItem.FooterAdd.Line.None -> {
-                binding.layoutAddComponent.viewLine1.setVisible(false)
-                binding.layoutAddComponent.viewLine2.setVisible(false)
+                binding.layoutAdd.viewLine1.setVisible(false)
+                binding.layoutAdd.viewLine2.setVisible(false)
             }
         }
     }
 }
 
-private fun LayoutScheduleAdapterItemAddComponentBinding.clearInput() {
+private fun LayoutScheduleAdapterItemAddBinding.clearInput() {
     edittextTitle.apply {
         bindText("")
-        clearFocus()
+        clearFocusIfNeeded()
     }
     edittextNote.apply {
         bindText("")
-        clearFocus()
+        clearFocusIfNeeded()
     }
 }

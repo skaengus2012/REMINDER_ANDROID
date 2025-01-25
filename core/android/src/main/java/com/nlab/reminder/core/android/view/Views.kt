@@ -16,7 +16,9 @@
 
 package com.nlab.reminder.core.android.view
 
+import android.view.MotionEvent
 import android.view.View
+import com.nlab.reminder.core.kotlinx.coroutine.flow.throttleFirst
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -45,6 +47,35 @@ fun View.bindSelected(selected: Boolean): Boolean {
     return true
 }
 
+fun View.clearFocusIfNeeded(): Boolean {
+    if (isFocused.not()) return false
+    clearFocus()
+    return true
+}
+
+suspend fun View.awaitPost() = suspendCancellableCoroutine { continuation ->
+    val runnable = Runnable { continuation.resume(Unit) }
+    post(runnable)
+
+    continuation.invokeOnCancellation { removeCallbacks(runnable) }
+}
+
+fun View.touches(): Flow<MotionEvent> = callbackFlow {
+    setOnTouchListener { v, event ->
+        trySend(event)
+        v.performClick()
+    }
+
+    awaitClose { setOnTouchListener(null) }
+}
+
+fun View.clicks(): Flow<View> = callbackFlow {
+    setOnClickListener { trySend(it) }
+    awaitClose { setOnClickListener(null) }
+}
+
+fun View.throttleClicks(windowDuration: Long = 500): Flow<View> = clicks().throttleFirst(windowDuration)
+
 fun View.focusChanges(): Flow<Boolean> = callbackFlow {
     val listener = View.OnFocusChangeListener { _, hasFocus ->
         trySend(hasFocus)
@@ -54,10 +85,3 @@ fun View.focusChanges(): Flow<Boolean> = callbackFlow {
 }
 
 fun View.focusState(): Flow<Boolean> = focusChanges().onStart { emit(hasFocus()) }
-
-suspend fun View.awaitPost() = suspendCancellableCoroutine { continuation ->
-    val runnable = Runnable { continuation.resume(Unit) }
-    post(runnable)
-
-    continuation.invokeOnCancellation { removeCallbacks(runnable) }
-}

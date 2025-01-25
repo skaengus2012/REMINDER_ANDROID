@@ -21,15 +21,9 @@
     android:minHeight="@dimen/schedule_checkbox_touchable_size"
     android:orientation="vertical">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <include
-            android:id="@+id/layout_add_component"
-            layout="@layout/layout_schedule_adapter_item_add_component" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    <include
+        android:id="@+id/layout_add"
+        layout="@layout/layout_schedule_adapter_item_add" />
 
     <View
         android:id="@+id/view_bottomPadding"
