@@ -35,6 +35,7 @@ import com.nlab.reminder.core.androidx.fragment.viewLifecycleScope
 import com.nlab.reminder.core.androix.recyclerview.scrollEvent
 import com.nlab.reminder.core.androix.recyclerview.scrollState
 import com.nlab.reminder.core.androix.recyclerview.verticalScrollRange
+import com.nlab.reminder.core.component.schedule.ui.view.list.AddLine
 import com.nlab.reminder.core.component.schedule.ui.view.list.ScheduleAdapterItem
 import com.nlab.reminder.core.component.schedule.ui.view.list.ScheduleListAdapter
 import com.nlab.reminder.core.component.schedule.ui.view.list.ScheduleListAnimator
@@ -307,7 +308,7 @@ internal class AllFragment : ComposableFragment() {
                 }
                 this += ScheduleAdapterItem.FooterAdd(
                     newScheduleSource = null,
-                    line = ScheduleAdapterItem.FooterAdd.Line.Type1
+                    line = AddLine.Type1
                 )
             }
         }

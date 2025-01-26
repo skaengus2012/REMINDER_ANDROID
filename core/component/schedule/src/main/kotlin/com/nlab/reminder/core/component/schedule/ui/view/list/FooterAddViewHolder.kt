@@ -154,17 +154,17 @@ class FooterAddViewHolder internal constructor(
         newScheduleSource.value = item.newScheduleSource
         binding.layoutAdd.clearInput()
         when (item.line) {
-            ScheduleAdapterItem.FooterAdd.Line.Type1 -> {
+            AddLine.Type1 -> {
                 binding.layoutAdd.viewLine1.setVisible(true)
                 binding.layoutAdd.viewLine2.setVisible(false)
             }
 
-            ScheduleAdapterItem.FooterAdd.Line.Type2 -> {
+            AddLine.Type2 -> {
                 binding.layoutAdd.viewLine1.setVisible(false)
                 binding.layoutAdd.viewLine2.setVisible(true)
             }
 
-            ScheduleAdapterItem.FooterAdd.Line.None -> {
+            AddLine.None -> {
                 binding.layoutAdd.viewLine1.setVisible(false)
                 binding.layoutAdd.viewLine2.setVisible(false)
             }

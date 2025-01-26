@@ -16,24 +16,9 @@
 
 package com.nlab.reminder.core.component.schedule.ui.view.list
 
-import androidx.annotation.StringRes
-import com.nlab.reminder.core.data.model.ScheduleDetail
-
 /**
- * @author Doohyun
+ * @author Thalys
  */
-sealed class ScheduleAdapterItem private constructor() {
-    data class Content(
-        val scheduleDetail: ScheduleDetail,
-        val isLineVisible: Boolean
-    ) : ScheduleAdapterItem()
-
-    data class FooterAdd(
-        val newScheduleSource: Any? = null, // TODO implements
-        val line: AddLine
-    ) : ScheduleAdapterItem()
-
-    data class Headline(@StringRes val textRes: Int) : ScheduleAdapterItem()
-
-    data object HeadlinePadding : ScheduleAdapterItem()
+enum class AddLine {
+    Type1, Type2, None
 }
