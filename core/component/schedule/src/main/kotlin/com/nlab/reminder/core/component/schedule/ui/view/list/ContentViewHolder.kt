@@ -38,7 +38,6 @@ import com.nlab.reminder.core.android.view.touches
 import com.nlab.reminder.core.android.widget.bindCursorVisible
 import com.nlab.reminder.core.android.widget.bindImageAsync
 import com.nlab.reminder.core.android.widget.bindText
-import com.nlab.reminder.core.android.widget.textChanges
 import com.nlab.reminder.core.component.schedule.R
 import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapterItemContentBinding
 import com.nlab.reminder.core.data.model.ScheduleId
@@ -56,7 +55,6 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
@@ -146,16 +144,10 @@ class ContentViewHolder internal constructor(
                 }
             }
             jobs += viewLifecycleCoroutineScope.launch {
-                combine(
-                    binding.edittextNote.run {
-                        textChanges()
-                            .onStart { emit(text) }
-                            .map { it.isNullOrEmpty() }
-                            .distinctUntilChanged()
-                    },
-                    editFocusedFlow,
-                    transform = { isCurrentNoteEmpty, focused -> isCurrentNoteEmpty.not() || focused }
-                ).distinctUntilChanged().collectWithHiddenDebounce(binding.edittextNote::setVisible)
+                registerEditNoteVisibility(
+                    edittextNote = binding.edittextNote,
+                    viewHolderEditFocusedFlow = editFocusedFlow
+                )
             }
             jobs += viewLifecycleCoroutineScope.launch {
                 binding.buttonComplete

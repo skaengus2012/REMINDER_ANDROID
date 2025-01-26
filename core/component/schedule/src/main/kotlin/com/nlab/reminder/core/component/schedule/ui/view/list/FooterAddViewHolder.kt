@@ -29,7 +29,6 @@ import com.nlab.reminder.core.android.view.clearFocusIfNeeded
 import com.nlab.reminder.core.android.view.setVisible
 import com.nlab.reminder.core.android.widget.bindCursorVisible
 import com.nlab.reminder.core.android.widget.bindText
-import com.nlab.reminder.core.android.widget.textChanges
 import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapterItemAddBinding
 import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapterItemFooterAddBinding
 import com.nlab.reminder.core.kotlinx.coroutine.flow.withPrev
@@ -40,10 +39,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.mapNotNull
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 
@@ -101,16 +98,10 @@ class FooterAddViewHolder internal constructor(
                 }
             }
             jobs += viewLifecycleCoroutineScope.launch {
-                combine(
-                    binding.layoutAdd.edittextNote.run {
-                        textChanges()
-                            .onStart { emit(text) }
-                            .map { it.isNullOrEmpty() }
-                            .distinctUntilChanged()
-                    },
-                    editFocusedFlow,
-                    transform = { isCurrentNoteEmpty, focused -> isCurrentNoteEmpty.not() || focused }
-                ).distinctUntilChanged().collectWithHiddenDebounce(binding.layoutAdd.edittextNote::setVisible)
+                registerEditNoteVisibility(
+                    edittextNote = binding.layoutAdd.edittextNote,
+                    viewHolderEditFocusedFlow = editFocusedFlow
+                )
             }
             jobs += viewLifecycleCoroutineScope.launch {
                 editFocusedFlow.collectWithHiddenDebounce { visible ->

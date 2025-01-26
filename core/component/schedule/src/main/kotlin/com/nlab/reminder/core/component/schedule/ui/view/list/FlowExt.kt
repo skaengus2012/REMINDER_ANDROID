@@ -16,9 +16,16 @@
 
 package com.nlab.reminder.core.component.schedule.ui.view.list
 
+import android.widget.EditText
+import com.nlab.reminder.core.android.view.setVisible
+import com.nlab.reminder.core.android.widget.textChanges
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 
 /**
  * @author Doohyun
@@ -39,4 +46,20 @@ internal suspend inline fun Flow<Boolean>.collectWithHiddenDebounce(
             collect(false)
         }
     }
+}
+
+internal suspend inline fun registerEditNoteVisibility(
+    edittextNote: EditText,
+    viewHolderEditFocusedFlow: Flow<Boolean>
+) {
+    combine(
+        edittextNote.run {
+            textChanges()
+                .onStart { emit(text) }
+                .map { it.isNullOrEmpty() }
+                .distinctUntilChanged()
+        },
+        viewHolderEditFocusedFlow,
+        transform = { isCurrentNoteEmpty, focused -> isCurrentNoteEmpty.not() || focused }
+    ).distinctUntilChanged().collectWithHiddenDebounce(edittextNote::setVisible)
 }
