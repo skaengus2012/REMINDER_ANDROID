@@ -48,15 +48,19 @@ import com.nlab.reminder.core.component.schedule.ui.view.list.ScheduleListSelect
 import com.nlab.reminder.core.component.schedule.ui.view.list.ScheduleListTheme
 import com.nlab.reminder.core.data.model.Link
 import com.nlab.reminder.core.data.model.LinkMetadata
+import com.nlab.reminder.core.data.model.Repeat
 import com.nlab.reminder.core.data.model.ScheduleId
+import com.nlab.reminder.core.data.model.ScheduleTiming
 import com.nlab.reminder.core.kotlin.toNonBlankString
 import com.nlab.reminder.core.kotlin.toNonNegativeLong
+import com.nlab.reminder.core.kotlin.toPositiveInt
 import com.nlab.reminder.core.kotlin.tryToNonBlankStringOrNull
 import com.nlab.reminder.core.kotlinx.coroutines.flow.withPrev
 import com.nlab.reminder.core.translation.StringIds
 import com.nlab.reminder.feature.all.databinding.FragmentAllBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -69,6 +73,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.datetime.Clock
 import kotlin.math.absoluteValue
 
 /**
@@ -88,7 +93,12 @@ internal class AllFragment : ComposableFragment() {
 
     override fun onViewReady(view: View, savedInstanceState: Bundle?) {
         val linearLayoutManager = LinearLayoutManager(requireContext())
-        val scheduleListAdapter = ScheduleListAdapter(theme = ScheduleListTheme.Point3).apply {
+        val scheduleListAdapter = ScheduleListAdapter(
+            theme = ScheduleListTheme.Point3,  // TODO extract
+            triggerAtFormatPatterns = AllScheduleTriggerAtFormatPatterns(),  // TODO extract
+            timeZone = fragmentStateBridge.timeZoneState,
+            entryAt = MutableStateFlow(Clock.System.now()) // TODO THIS IS FAKE
+        ).apply {
             stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
         }
         val itemTouchCallback = ScheduleListItemTouchCallback(
@@ -304,7 +314,11 @@ internal class AllFragment : ComposableFragment() {
                                         imageUrl = uri.tryToNonBlankStringOrNull()
                                     )
                                 },
-                                timing = null,
+                                timing = ScheduleTiming(
+                                    triggerAt = Clock.System.now(),
+                                    isTriggerAtDateOnly = false,
+                                    repeat = Repeat.Hourly(interval = 5.toPositiveInt())
+                                ),
                                 defaultVisiblePriority = it.toNonNegativeLong(),
                                 isComplete = false,
                                 tags = emptyList()

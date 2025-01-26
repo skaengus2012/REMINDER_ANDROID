@@ -9,6 +9,8 @@ android {
 }
 
 dependencies {
+    api(projects.core.component.displayformat)
+
     implementation(projects.core.android)
     implementation(projects.core.androidx.recyclerview)
     implementation(projects.core.component.toolbar)
