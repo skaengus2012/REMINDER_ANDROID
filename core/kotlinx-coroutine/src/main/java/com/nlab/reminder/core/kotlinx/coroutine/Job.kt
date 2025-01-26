@@ -14,29 +14,14 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.component.schedule.ui.view.list
+package com.nlab.reminder.core.kotlinx.coroutine
 
-import android.content.Context
-import androidx.annotation.ColorInt
-import com.nlab.reminder.core.android.content.getThemeColor
-import com.nlab.reminder.core.designsystem.compose.theme.AttrIds
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
 
 /**
  * @author Thalys
  */
-enum class ScheduleListTheme {
-    Point1,
-    Point2,
-    Point3
+fun Iterable<Job>.cancelAll(cause: CancellationException? = null) {
+    forEach { it.cancel(cause) }
 }
-
-@ColorInt
-internal fun ScheduleListTheme.getButtonInfoColor(
-    context: Context
-): Int = context.getThemeColor(
-    when (this) {
-        ScheduleListTheme.Point1 -> AttrIds.point_1
-        ScheduleListTheme.Point2 -> AttrIds.point_2
-        ScheduleListTheme.Point3 -> AttrIds.point_3
-    }
-)

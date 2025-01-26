@@ -26,6 +26,12 @@ import kotlinx.coroutines.flow.callbackFlow
 /**
  * @author Doohyun
  */
+fun EditText.bindCursorVisible(isVisible: Boolean): Boolean {
+    if (isCursorVisible == isVisible) return false
+    isCursorVisible = isVisible
+    return true
+}
+
 fun EditText.textChanges(): Flow<CharSequence?> = callbackFlow {
     val watcher = object : TextWatcher {
         override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit

@@ -55,6 +55,7 @@ internal val Content1Light = Color(0xFF393939)
 internal val Content2Light = Color(0xFF8A8A8D)
 internal val Content2HintLight = Content2Light.copy(alpha = 0.6f)
 internal val Content3Light = Gray500
+internal val Content3HintLight = Gray500.copy(alpha = 0.7f)
 // light (compose only)
 internal val BgDialogSurfaceLight = Color(0xFFF0F0F0)
 internal val BgDialogInputLight = Color.White
@@ -74,8 +75,9 @@ internal val BgLine1Dark = Gray800
 internal val BgLine2Dark = Gray2
 internal val Content1Dark = Color.White
 internal val Content2Dark = Color(0xFFB7B7B7)
-internal val Content2DarkLight = Content2Dark.copy(alpha = 0.6f)
+internal val Content2HintDark = Content2Dark.copy(alpha = 0.6f)
 internal val Content3Dark = Gray500
+internal val Content3HintDark = Gray500.copy(alpha = 0.7f)
 // dark(compose only)
 internal val BgDialogSurfaceDark = Color(0xFF242525)
 internal val BgDialogInputDark = Color(0xFF1C1C1D)

@@ -16,11 +16,9 @@
 
 package com.nlab.reminder.core.component.schedule.ui.view.list
 
-import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapterItemHeadlinePaddingBinding
-
 /**
  * @author Thalys
  */
-class ScheduleHeadlinePaddingViewHolder(
-    binding: LayoutScheduleAdapterItemHeadlinePaddingBinding
-) : ScheduleAdapterItemViewHolder(binding.root)
+enum class AddLine {
+    Type1, Type2, None
+}

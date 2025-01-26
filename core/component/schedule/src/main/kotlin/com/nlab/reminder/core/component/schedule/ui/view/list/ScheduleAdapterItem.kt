@@ -23,14 +23,22 @@ import com.nlab.reminder.core.data.model.ScheduleDetail
  * @author Doohyun
  */
 sealed class ScheduleAdapterItem private constructor() {
-    data class Headline(
-        @StringRes val textRes: Int
+    data class Add(
+        val newScheduleSource: Any?,
+        val line: AddLine
     ) : ScheduleAdapterItem()
-
-    data object HeadlinePadding : ScheduleAdapterItem()
 
     data class Content(
         val scheduleDetail: ScheduleDetail,
         val isLineVisible: Boolean
     ) : ScheduleAdapterItem()
+
+    data class FooterAdd(
+        val newScheduleSource: Any? = null, // TODO implements
+        val line: AddLine
+    ) : ScheduleAdapterItem()
+
+    data class Headline(@StringRes val textRes: Int) : ScheduleAdapterItem()
+
+    data object HeadlinePadding : ScheduleAdapterItem()
 }

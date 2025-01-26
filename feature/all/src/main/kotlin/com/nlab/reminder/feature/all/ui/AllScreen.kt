@@ -27,7 +27,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.windowInsetsEndWidth
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
@@ -60,6 +59,9 @@ internal fun AllScreen(
             testFlow = testFlow,
             isToolbarTitleVisible = false,
             toolbarBackgroundAlpha = 0.0f,
+            onSimpleAdd = { simpleAdd ->
+                showAppToast("TODO Simple Add $simpleAdd")
+            },
             onSimpleEdited = { simpleEdit ->
                 // TODO implements
                 showAppToast("TODO Simple Edit $simpleEdit")
@@ -99,6 +101,7 @@ private fun AllScreen(
         DelayedContent(delayTimeMillis = scheduleListDisplayDelayTimeMillis) {
             AllScheduleList(fragmentStateBridge = fragmentStateBridge)
         }
+
     }
 }
 
@@ -113,8 +116,12 @@ private fun AllScheduleList(
         modifier = modifier
             .fillMaxSize()
             .padding(
-                start = displayCutoutPaddings.calculateStartPadding(direction),
-                end = displayCutoutPaddings.calculateEndPadding(direction)
+                start = remember(direction, displayCutoutPaddings) {
+                    displayCutoutPaddings.calculateStartPadding(direction)
+                },
+                end = remember(direction, displayCutoutPaddings) {
+                    displayCutoutPaddings.calculateEndPadding(direction)
+                },
             )
             .navigationBarsPadding()
             .imePadding()
@@ -131,6 +138,10 @@ private fun AllToolbar(
 ) {
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
+    val clearInput = {
+        focusManager.clearFocus(force = true)
+        keyboardController?.hide()
+    }
     ScheduleListToolbar(
         modifier = modifier,
         title = stringResource(StringIds.label_all),
@@ -138,11 +149,13 @@ private fun AllToolbar(
         isMoreVisible = true,
         isCompleteVisible = true,
         backgroundAlpha = fragmentStateBridge.toolbarBackgroundAlpha,
-        onBackClicked = onBackClicked,
+        onBackClicked = {
+            clearInput()
+            onBackClicked()
+        },
         onMenuClicked = onMoreClicked,
         onCompleteClicked = {
-            focusManager.clearFocus(force = true)
-            keyboardController?.hide()
+            clearInput()
             onCompleteClicked()
         }
     )
@@ -157,6 +170,7 @@ private fun AllScreenPreview() {
             fragmentStateBridge = rememberAllFragmentStateBridge(
                 isToolbarTitleVisible = true,
                 toolbarBackgroundAlpha = 1.0f,
+                onSimpleAdd = {},
                 onSimpleEdited = {}
             ),
             onBackClicked = {},

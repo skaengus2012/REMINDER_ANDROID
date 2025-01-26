@@ -30,6 +30,7 @@
         <item name="content_2">@color/content_2_dark</item>
         <item name="content_2_hint">@color/content_2_hint_dark</item>
         <item name="content_3">@color/content_3_dark</item>
+        <item name="content_3_hint">@color/content_3_hint_dark</item>
     </style>
 
 </resources>

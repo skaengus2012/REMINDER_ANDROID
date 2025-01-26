@@ -64,4 +64,5 @@
     <color name="content_2_dark">#B7B7B7</color>
     <color name="content_2_hint_dark">#99B7B7B7</color>
     <color name="content_3_dark">@color/gray_500</color>
+    <color name="content_3_hint_dark">@color/gray_500_op_70</color>
 </resources>

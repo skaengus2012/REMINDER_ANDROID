@@ -16,27 +16,30 @@
 
 package com.nlab.reminder.core.component.schedule.ui.view.list
 
-import android.content.Context
-import androidx.annotation.ColorInt
-import com.nlab.reminder.core.android.content.getThemeColor
-import com.nlab.reminder.core.designsystem.compose.theme.AttrIds
+import androidx.recyclerview.widget.RecyclerView
 
 /**
- * @author Thalys
+ * @author Doohyun
  */
-enum class ScheduleListTheme {
-    Point1,
-    Point2,
-    Point3
-}
+class FocusChange internal constructor(
+    val viewHolder: RecyclerView.ViewHolder,
+    val focused: Boolean
+) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
 
-@ColorInt
-internal fun ScheduleListTheme.getButtonInfoColor(
-    context: Context
-): Int = context.getThemeColor(
-    when (this) {
-        ScheduleListTheme.Point1 -> AttrIds.point_1
-        ScheduleListTheme.Point2 -> AttrIds.point_2
-        ScheduleListTheme.Point3 -> AttrIds.point_3
+        other as FocusChange
+
+        if (viewHolder != other.viewHolder) return false
+        if (focused != other.focused) return false
+
+        return true
     }
-)
+
+    override fun hashCode(): Int {
+        var result = viewHolder.hashCode()
+        result = 31 * result + focused.hashCode()
+        return result
+    }
+}
