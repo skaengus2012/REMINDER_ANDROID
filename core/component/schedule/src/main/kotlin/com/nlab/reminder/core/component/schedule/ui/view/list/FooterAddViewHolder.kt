@@ -38,7 +38,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -102,7 +101,6 @@ class FooterAddViewHolder internal constructor(
                 }
             }
             jobs += viewLifecycleCoroutineScope.launch {
-                var needDelayOnHidden = false
                 combine(
                     binding.layoutAdd.edittextNote.run {
                         textChanges()
@@ -112,44 +110,13 @@ class FooterAddViewHolder internal constructor(
                     },
                     editFocusedFlow,
                     transform = { isCurrentNoteEmpty, focused -> isCurrentNoteEmpty.not() || focused }
-                ).distinctUntilChanged()
-                    .mapLatest { visible ->
-                        if (visible) true
-                        else {
-                            if (needDelayOnHidden) {
-                                // Focus momentarily lost, fixing blinking symptoms
-                                delay(100)
-                            } else {
-                                needDelayOnHidden = true
-                            }
-                            false
-                        }
-                    }
-                    .collect { binding.layoutAdd.edittextNote.setVisible(it) }
+                ).distinctUntilChanged().collectWithHiddenDebounce(binding.layoutAdd.edittextNote::setVisible)
             }
             jobs += viewLifecycleCoroutineScope.launch {
-                var needDelayOnHidden = false
-                editFocusedFlow
-                    .mapLatest { visible ->
-                        if (visible) true
-                        else {
-                            // Focus momentarily lost, fixing blinking symptoms
-                            if (needDelayOnHidden) {
-                                // Focus momentarily lost, fixing blinking symptoms
-                                delay(100)
-                            } else {
-                                needDelayOnHidden = true
-                            }
-                            false
-                        }
-                    }
-                    .collectLatest { visible ->
-                        binding.viewBottomPadding.apply {
-                            setVisible(visible)
-                            awaitPost()
-                        }
-                        onBottomPaddingVisible(visible)
-                    }
+                editFocusedFlow.collectWithHiddenDebounce { visible ->
+                    binding.viewBottomPadding.apply { setVisible(visible); awaitPost() }
+                    onBottomPaddingVisible(visible)
+                }
             }
             jobs += viewLifecycleCoroutineScope.launch {
                 noteFocusedFlow.collect { focused ->

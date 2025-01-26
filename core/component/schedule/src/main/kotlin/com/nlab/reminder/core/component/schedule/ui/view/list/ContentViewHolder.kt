@@ -45,7 +45,6 @@ import com.nlab.reminder.core.data.model.ScheduleId
 import com.nlab.reminder.core.designsystem.compose.theme.AttrIds
 import com.nlab.reminder.core.kotlinx.coroutine.flow.withPrev
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -56,7 +55,6 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.shareIn
@@ -148,7 +146,6 @@ class ContentViewHolder internal constructor(
                 }
             }
             jobs += viewLifecycleCoroutineScope.launch {
-                var needDelayOnHidden = false
                 combine(
                     binding.edittextNote.run {
                         textChanges()
@@ -158,20 +155,7 @@ class ContentViewHolder internal constructor(
                     },
                     editFocusedFlow,
                     transform = { isCurrentNoteEmpty, focused -> isCurrentNoteEmpty.not() || focused }
-                ).distinctUntilChanged()
-                    .mapLatest { visible ->
-                        if (visible) true
-                        else {
-                            if (needDelayOnHidden) {
-                                // Focus momentarily lost, fixing blinking symptoms
-                                delay(100)
-                            } else {
-                                needDelayOnHidden = true
-                            }
-                            false
-                        }
-                    }
-                    .collect { binding.edittextNote.setVisible(it) }
+                ).distinctUntilChanged().collectWithHiddenDebounce(binding.edittextNote::setVisible)
             }
             jobs += viewLifecycleCoroutineScope.launch {
                 binding.buttonComplete
