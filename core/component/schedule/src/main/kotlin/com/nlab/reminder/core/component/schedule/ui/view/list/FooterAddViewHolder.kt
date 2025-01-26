@@ -21,7 +21,6 @@ import androidx.core.view.doOnDetach
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
-import com.nlab.reminder.core.android.view.awaitPost
 import com.nlab.reminder.core.android.view.setVisible
 import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapterItemFooterAddBinding
 import com.nlab.reminder.core.kotlinx.coroutine.cancelAll
@@ -40,7 +39,6 @@ class FooterAddViewHolder internal constructor(
     theme: ScheduleListTheme,
     onSimpleAddDone: (SimpleAdd) -> Unit,
     onFocusChanged: (RecyclerView.ViewHolder, Boolean) -> Unit,
-    onBottomPaddingVisible: (Boolean) -> Unit,
 ) : ScheduleAdapterItemViewHolder(binding.root) {
     private val addViewHolderDelegate = AddViewHolderDelegate(binding = binding.layoutAdd)
 
@@ -62,10 +60,7 @@ class FooterAddViewHolder internal constructor(
                 hasInputFocusFlow.collect { focused -> onFocusChanged(this@FooterAddViewHolder, focused) }
             }
             jobs += lifecycleScope.launch {
-                hasInputFocusFlow.collectWithHiddenDebounce { visible ->
-                    binding.viewBottomPadding.apply { setVisible(visible); awaitPost() }
-                    onBottomPaddingVisible(visible)
-                }
+                hasInputFocusFlow.collectWithHiddenDebounce(binding.viewBottomPadding::setVisible)
             }
         }
         itemView.doOnDetach {

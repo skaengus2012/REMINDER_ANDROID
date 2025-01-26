@@ -26,6 +26,7 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.nlab.reminder.core.android.view.awaitPost
 import com.nlab.reminder.core.android.view.inputmethod.hideSoftInputFromWindow
 import com.nlab.reminder.core.android.view.touches
 import com.nlab.reminder.core.androidx.fragment.compose.ComposableFragment
@@ -207,15 +208,28 @@ internal class AllFragment : ComposableFragment() {
             .onEach { fragmentStateBridge.onSimpleEdited(it) }
             .launchIn(viewLifecycleScope)
 
+        scheduleListAdapter.focusChange
+            .onEach { focusChanged ->
+                if (focusChanged.focused) {
+                    val receivedPosition = focusChanged.viewHolder.absoluteAdapterPosition
+                    view.awaitPost()
+                    // Prevents position from changing due to UI size change depending on focus change.
+                    if (receivedPosition == focusChanged.viewHolder.absoluteAdapterPosition) {
+                        binding.recyclerviewSchedule.scrollToPosition(receivedPosition)
+                    }
+                }
+            }
+            .launchIn(viewLifecycleScope)
+
         combine(
             scheduleListAdapter.focusChange
                 .map { it.viewHolder.absoluteAdapterPosition to it.focused },
             firstVisiblePositionFlow,
             lastVisiblePositionFlow
         ) { (viewHolderPosition, focused), firstVisiblePosition, lastVisiblePosition ->
-            when  {
+            when {
                 focused -> 0 // focused
-                viewHolderPosition in firstVisiblePosition .. lastVisiblePosition -> 1 // not focused
+                viewHolderPosition in firstVisiblePosition..lastVisiblePosition -> 1 // not focused
                 else -> 2 // focused by scrolling
             }
         }.distinctUntilChanged()
@@ -229,8 +243,13 @@ internal class AllFragment : ComposableFragment() {
                     false
                 }
             }
-            .filter { it.not() }
-            .onEach { view.hideSoftInputFromWindow() }
+            .withPrev()
+            .distinctUntilChanged()
+            .onEach { (prevFocused, curFocused) ->
+                if (prevFocused && curFocused.not()) {
+                    view.hideSoftInputFromWindow()
+                }
+            }
             .launchIn(viewLifecycleScope)
 
         scheduleListAdapter.dragHandleTouch
@@ -239,15 +258,6 @@ internal class AllFragment : ComposableFragment() {
 
         scheduleListAdapter.selectButtonTouch
             .onEach { multiSelectionHelper.enable(it) }
-            .launchIn(viewLifecycleScope)
-
-        scheduleListAdapter.footerAddBottomPaddingVisible
-            .onEach { visible ->
-                if (visible) {
-                    binding.recyclerviewSchedule
-                        .scrollToPosition(/* position = */scheduleListAdapter.itemCount - 1)
-                }
-            }
             .launchIn(viewLifecycleScope)
 
         viewLifecycle.eventFlow

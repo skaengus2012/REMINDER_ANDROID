@@ -24,4 +24,15 @@ import kotlinx.coroutines.flow.scan
  * @author thalys
  */
 fun <T> Flow<T>.withPrev(initial: T): Flow<Pair<T, T>> =
-    scan(Pair<T?, T>(null, initial)) { acc, v -> Pair(acc.second, v) }.mapNotNull { (a, b) -> a?.let { it to b } }
+    scan(Pair<T?, T>(null, initial)) { acc, v -> Pair(acc.second, v) }.mapNotNull { pair ->
+        @Suppress("UNCHECKED_CAST")
+        if (pair.first != null) pair as Pair<T, T>
+        else null
+    }
+
+fun <T : Any> Flow<T>.withPrev(): Flow<Pair<T, T>> =
+    scan(Pair<T?, T?>(null, null)) { acc, v -> Pair(acc.second, v) }.mapNotNull { pair ->
+        @Suppress("UNCHECKED_CAST")
+        if (pair.first != null && pair.second != null) pair as Pair<T, T>
+        else null
+    }

@@ -69,9 +69,6 @@ class ScheduleListAdapter(
     private val _focusChange = MutableEventSharedFlow<FocusChange>()
     val focusChange: Flow<FocusChange> = _focusChange.asSharedFlow()
 
-    private val _footerAddBottomPaddingVisible = MutableStateFlow(false)
-    val footerAddBottomPaddingVisible: StateFlow<Boolean> = _footerAddBottomPaddingVisible.asStateFlow()
-
     private fun getItem(position: Int): ScheduleAdapterItem {
         return differ.getCurrentList()[position]
     }
@@ -128,7 +125,6 @@ class ScheduleListAdapter(
                     theme = theme,
                     onSimpleAddDone = { _addRequest.tryEmit(it) },
                     onFocusChanged = { viewHolder, focused -> _focusChange.tryEmit(FocusChange(viewHolder, focused)) },
-                    onBottomPaddingVisible = { _footerAddBottomPaddingVisible.value = it }
                 )
             }
 
