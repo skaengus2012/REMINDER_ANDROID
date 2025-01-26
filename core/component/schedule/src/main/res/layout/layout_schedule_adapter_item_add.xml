@@ -53,6 +53,7 @@
 
     <EditText
         android:id="@+id/edittext_title"
+        style="@style/PlaneatTheme.Style.Typography.BodyLarge"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="@null"
@@ -61,7 +62,6 @@
         android:inputType="textMultiLine"
         android:nextFocusDown="@id/edittext_note"
         android:textColor="?content_1"
-        android:textSize="16sp"
         app:layout_constraintBaseline_toBaselineOf="@id/textview_guideTitle"
         app:layout_constraintEnd_toStartOf="@id/button_info"
         app:layout_constraintHeight_min="@dimen/schedule_check_size"
@@ -73,6 +73,7 @@
 
     <EditText
         android:id="@+id/edittext_note"
+        style="@style/PlaneatTheme.Style.Typography.BodyMedium"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="2dp"
@@ -83,7 +84,6 @@
         android:inputType="textMultiLine"
         android:textColor="?content_2"
         android:textColorHint="?content_2_hint"
-        android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="@id/edittext_title"
         app:layout_constraintStart_toStartOf="@id/edittext_title"
         app:layout_constraintTop_toBottomOf="@id/edittext_title"
