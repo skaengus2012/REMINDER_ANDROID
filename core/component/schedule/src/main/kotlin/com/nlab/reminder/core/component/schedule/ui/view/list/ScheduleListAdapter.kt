@@ -20,6 +20,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.AdapterListUpdateCallback
 import androidx.recyclerview.widget.RecyclerView
+import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapterItemAddBinding
 import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapterItemContentBinding
 import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapterItemFooterAddBinding
 import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapterItemHeadlineBinding
@@ -36,10 +37,11 @@ import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.update
 
-private const val ITEM_VIEW_TYPE_CONTENT = 1
-private const val ITEM_VIEW_TYPE_FOOTER_ADD = 2
-private const val ITEM_VIEW_TYPE_HEADLINE = 3
-private const val ITEM_VIEW_TYPE_HEADLINE_PADDING = 4
+private const val ITEM_VIEW_TYPE_ADD = 1
+private const val ITEM_VIEW_TYPE_CONTENT = 2
+private const val ITEM_VIEW_TYPE_FOOTER_ADD = 3
+private const val ITEM_VIEW_TYPE_HEADLINE = 4
+private const val ITEM_VIEW_TYPE_HEADLINE_PADDING = 5
 
 /**
  * @author Thalys
@@ -77,6 +79,7 @@ class ScheduleListAdapter(
     override fun getItemCount(): Int = differ.getCurrentList().size
 
     override fun getItemViewType(position: Int): Int = when (getItem(position)) {
+        is ScheduleAdapterItem.Add -> ITEM_VIEW_TYPE_ADD
         is ScheduleAdapterItem.Content -> ITEM_VIEW_TYPE_CONTENT
         is ScheduleAdapterItem.FooterAdd -> ITEM_VIEW_TYPE_FOOTER_ADD
         is ScheduleAdapterItem.Headline -> ITEM_VIEW_TYPE_HEADLINE
@@ -86,6 +89,18 @@ class ScheduleListAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ScheduleAdapterItemViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
         return when (viewType) {
+            ITEM_VIEW_TYPE_ADD -> {
+                AddViewHolder(
+                    binding = LayoutScheduleAdapterItemAddBinding.inflate(
+                        layoutInflater,
+                        parent,
+                        /* attachToParent = */ false
+                    ),
+                    theme = theme,
+                    onSimpleAddDone = { _addRequest.tryEmit(it) },
+                    onFocusChanged = { viewHolder, focused -> _focusChange.tryEmit(FocusChange(viewHolder, focused)) }
+                )
+            }
             ITEM_VIEW_TYPE_CONTENT -> {
                 ContentViewHolder(
                     binding = LayoutScheduleAdapterItemContentBinding.inflate(
@@ -93,13 +108,13 @@ class ScheduleListAdapter(
                         parent,
                         /* attachToParent = */ false
                     ),
+                    theme = theme,
                     selectionEnabled = selectionEnabled,
                     selectedScheduleIds = selectedScheduleIds,
                     onSimpleEditDone = { _editRequest.tryEmit(it) },
                     onDragHandleTouched = { _dragHandleTouch.tryEmit(it) },
                     onSelectButtonTouched = { _selectButtonTouch.tryEmit(it) },
                     onFocusChanged = { viewHolder, focused -> _focusChange.tryEmit(FocusChange(viewHolder, focused)) },
-                    theme = theme,
                 )
             }
 
@@ -110,10 +125,10 @@ class ScheduleListAdapter(
                         parent,
                         /* attachToParent = */ false
                     ),
+                    theme = theme,
                     onSimpleAddDone = { _addRequest.tryEmit(it) },
                     onFocusChanged = { viewHolder, focused -> _focusChange.tryEmit(FocusChange(viewHolder, focused)) },
-                    onBottomPaddingVisible = { _footerAddBottomPaddingVisible.value = it },
-                    theme = theme
+                    onBottomPaddingVisible = { _footerAddBottomPaddingVisible.value = it }
                 )
             }
 
@@ -147,6 +162,7 @@ class ScheduleListAdapter(
     override fun onBindViewHolder(holder: ScheduleAdapterItemViewHolder, position: Int) {
         val item = getItem(position)
         when (holder) {
+            is AddViewHolder -> holder.bind(item as ScheduleAdapterItem.Add)
             is ContentViewHolder -> holder.bind(item as ScheduleAdapterItem.Content)
             is FooterAddViewHolder -> holder.bind(item as ScheduleAdapterItem.FooterAdd)
             is HeadlineViewHolder -> holder.bind(item as ScheduleAdapterItem.Headline)

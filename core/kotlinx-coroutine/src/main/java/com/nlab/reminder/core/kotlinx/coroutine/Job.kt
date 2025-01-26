@@ -14,23 +14,14 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.component.schedule.ui.view.list
+package com.nlab.reminder.core.kotlinx.coroutine
+
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
 
 /**
  * @author Thalys
  */
-sealed interface DraggingSupportable {
-    val draggingDelegate: DraggingDelegate
-}
-
-abstract class DraggingDelegate {
-    internal abstract val userDraggable: Boolean
-    internal abstract fun isScaleOnDraggingNeeded(): Boolean
-    internal abstract fun onDragging(isActive: Boolean)
-}
-
-internal class NotControllableDraggingDelegate : DraggingDelegate() {
-    override val userDraggable: Boolean = false
-    override fun isScaleOnDraggingNeeded(): Boolean = false
-    override fun onDragging(isActive: Boolean) = Unit
+fun Iterable<Job>.cancelAll(cause: CancellationException? = null) {
+    forEach { it.cancel(cause) }
 }

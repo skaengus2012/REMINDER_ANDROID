@@ -21,10 +21,8 @@ import androidx.core.view.doOnDetach
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
-import com.nlab.reminder.core.android.view.awaitPost
 import com.nlab.reminder.core.android.view.focusState
-import com.nlab.reminder.core.android.view.setVisible
-import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapterItemFooterAddBinding
+import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapterItemAddBinding
 import com.nlab.reminder.core.kotlinx.coroutine.cancelAll
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.SharingStarted
@@ -36,14 +34,16 @@ import kotlinx.coroutines.launch
 /**
  * @author Thalys
  */
-class FooterAddViewHolder internal constructor(
-    private val binding: LayoutScheduleAdapterItemFooterAddBinding,
+class AddViewHolder internal constructor(
+    binding: LayoutScheduleAdapterItemAddBinding,
     theme: ScheduleListTheme,
     onSimpleAddDone: (SimpleAdd) -> Unit,
-    onFocusChanged: (RecyclerView.ViewHolder, Boolean) -> Unit,
-    onBottomPaddingVisible: (Boolean) -> Unit,
-) : ScheduleAdapterItemViewHolder(binding.root) {
-    private val addViewHolderDelegate = AddViewHolderDelegate(binding = binding.layoutAdd)
+    onFocusChanged: (RecyclerView.ViewHolder, Boolean) -> Unit
+) : ScheduleAdapterItemViewHolder(binding.root),
+    DraggingSupportable {
+    private val addViewHolderDelegate = AddViewHolderDelegate(binding)
+
+    override val draggingDelegate: DraggingDelegate = NotControllableDraggingDelegate()
 
     init {
         addViewHolderDelegate.init(theme)
@@ -53,9 +53,9 @@ class FooterAddViewHolder internal constructor(
             val lifecycleScope = view.findViewTreeLifecycleOwner()
                 ?.lifecycleScope
                 ?: return@doOnAttach
-            val titleFocusedFlow = binding.layoutAdd.edittextTitle
+            val titleFocusedFlow = binding.edittextTitle
                 .focusState(scope = lifecycleScope, started = SharingStarted.WhileSubscribed())
-            val noteFocusedFlow = binding.layoutAdd.edittextNote
+            val noteFocusedFlow = binding.edittextNote
                 .focusState(scope = lifecycleScope, started = SharingStarted.WhileSubscribed())
             val editFocusedFlow = combine(
                 titleFocusedFlow,
@@ -71,21 +71,16 @@ class FooterAddViewHolder internal constructor(
                 onSimpleAddDone
             )
             jobs += lifecycleScope.launch {
-                editFocusedFlow.collect { focused -> onFocusChanged(this@FooterAddViewHolder, focused) }
-            }
-            jobs += lifecycleScope.launch {
-                editFocusedFlow.collectWithHiddenDebounce { visible ->
-                    binding.viewBottomPadding.apply { setVisible(visible); awaitPost() }
-                    onBottomPaddingVisible(visible)
-                }
+                editFocusedFlow.collect { focused -> onFocusChanged(this@AddViewHolder, focused) }
             }
         }
         itemView.doOnDetach {
             jobs.cancelAll()
         }
+
     }
 
-    fun bind(item: ScheduleAdapterItem.FooterAdd) {
+    fun bind(item: ScheduleAdapterItem.Add) {
         addViewHolderDelegate.bind(
             newScheduleSource = item.newScheduleSource,
             line = item.line

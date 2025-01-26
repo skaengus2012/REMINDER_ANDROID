@@ -42,6 +42,7 @@ import com.nlab.reminder.core.component.schedule.R
 import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapterItemContentBinding
 import com.nlab.reminder.core.data.model.ScheduleId
 import com.nlab.reminder.core.designsystem.compose.theme.AttrIds
+import com.nlab.reminder.core.kotlinx.coroutine.cancelAll
 import com.nlab.reminder.core.kotlinx.coroutine.flow.withPrev
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -64,13 +65,13 @@ import kotlin.math.absoluteValue
  */
 class ContentViewHolder internal constructor(
     private val binding: LayoutScheduleAdapterItemContentBinding,
+    theme: ScheduleListTheme,
     selectionEnabled: StateFlow<Boolean>,
     selectedScheduleIds: StateFlow<Set<ScheduleId>>,
     onSimpleEditDone: (SimpleEdit) -> Unit,
     onDragHandleTouched: (RecyclerView.ViewHolder) -> Unit,
     onSelectButtonTouched: (RecyclerView.ViewHolder) -> Unit,
     onFocusChanged: (RecyclerView.ViewHolder, Boolean) -> Unit,
-    theme: ScheduleListTheme
 ) : ScheduleAdapterItemViewHolder(binding.root),
     DraggingSupportable,
     SwipeSupportable {
@@ -215,7 +216,7 @@ class ContentViewHolder internal constructor(
             }
         }
         itemView.doOnDetach {
-            jobs.forEach { it.cancel() }
+            jobs.cancelAll()
             selectionAnimDelegate.cancelAnimation()
         }
     }

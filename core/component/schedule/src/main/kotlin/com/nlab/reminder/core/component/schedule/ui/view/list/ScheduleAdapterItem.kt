@@ -23,6 +23,11 @@ import com.nlab.reminder.core.data.model.ScheduleDetail
  * @author Doohyun
  */
 sealed class ScheduleAdapterItem private constructor() {
+    data class Add(
+        val newScheduleSource: Any?,
+        val line: AddLine
+    ) : ScheduleAdapterItem()
+
     data class Content(
         val scheduleDetail: ScheduleDetail,
         val isLineVisible: Boolean
