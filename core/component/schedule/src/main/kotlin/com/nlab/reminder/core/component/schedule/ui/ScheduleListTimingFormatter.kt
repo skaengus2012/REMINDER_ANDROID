@@ -14,20 +14,22 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.component.schedule
+package com.nlab.reminder.core.component.schedule.ui
 
-import com.nlab.reminder.core.data.model.Repeat
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 
 /**
- * @author Doohyun
+ * @author Thalys
  */
-data class ScheduleListTimingResource(
-    val triggerAt: LocalDateTime,
-    val isTriggerAtDateOnly: Boolean,
-    val isTriggeredToday: Boolean,
-    val isTriggeredTomorrow: Boolean,
-    val isOver: Boolean,
-    val showTimeOnly: Boolean,
-    val repeat: Repeat?
-)
+interface ScheduleListTimingFormatter {
+    fun format(
+        entryAt: LocalDateTime,
+        triggerAt: LocalDateTime,
+    ): String
+
+    fun format(
+        entryAt: LocalDateTime,
+        triggerAt: LocalDate
+    ): String
+}

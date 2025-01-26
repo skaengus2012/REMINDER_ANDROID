@@ -189,8 +189,7 @@ class ContentViewHolder internal constructor(
                     .distinctUntilChanged()
                     .map { it.not() }
                     .collect { enabled ->
-                        binding.edittextTitle.isEnabled = enabled
-                        binding.edittextNote.isEnabled = enabled
+                        binding.getAllInputs().forEach { it.isEnabled = enabled }
                     }
             }
             jobs += viewLifecycleCoroutineScope.launch {
@@ -292,7 +291,7 @@ private class ContentSwipeDelegate(
 }
 
 private enum class ContentInputFocus {
-    Title, Note, Nothing
+    Title, Note, Detail, Nothing
 }
 
 private fun LayoutScheduleAdapterItemContentBinding.getAllInputs(): Iterable<EditText> = listOf(
@@ -304,6 +303,7 @@ private fun LayoutScheduleAdapterItemContentBinding.findInput(contentInputFocus:
     return when (contentInputFocus) {
         ContentInputFocus.Title -> edittextTitle
         ContentInputFocus.Note -> edittextNote
+        ContentInputFocus.Detail -> edittextDetail
         ContentInputFocus.Nothing -> null
     }
 }

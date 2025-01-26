@@ -268,6 +268,13 @@ internal class AllFragment : ComposableFragment() {
             }
             .launchIn(viewLifecycleScope)
 
+        fragmentStateBridge.timeZoneState
+            .flowWithLifecycle(viewLifecycle)
+            .onEach { timeZone ->
+                println("Hello $timeZone")
+            }
+            .launchIn(viewLifecycleScope)
+
         viewLifecycleScope.launch {
             scheduleListAdapter.submitList(withContext(Dispatchers.Default) { testItems })
         }
