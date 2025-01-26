@@ -108,6 +108,7 @@ class ContentViewHolder internal constructor(
 
         // Processing for multiline input and actionDone support
         binding.edittextTitle.setRawInputType(InputType.TYPE_CLASS_TEXT)
+        binding.edittextDetail.setRawInputType(InputType.TYPE_CLASS_TEXT)
 
         val jobs = mutableListOf<Job>()
         itemView.doOnAttach { view ->
@@ -119,11 +120,15 @@ class ContentViewHolder internal constructor(
                     .distinctUntilChanged(),
                 binding.edittextNote
                     .focusChanges(emitCurrent = true)
+                    .distinctUntilChanged(),
+                binding.edittextDetail
+                    .focusChanges(emitCurrent = true)
                     .distinctUntilChanged()
-            ) { titleFocused, noteFocused ->
+            ) { titleFocused, noteFocused, detailFocused ->
                 when {
                     titleFocused -> ContentInputFocus.Title
                     noteFocused -> ContentInputFocus.Note
+                    detailFocused -> ContentInputFocus.Detail
                     else -> ContentInputFocus.Nothing
                 }
             }.distinctUntilChanged()
@@ -139,16 +144,25 @@ class ContentViewHolder internal constructor(
                         ContentInputFocus.Title -> with(binding) {
                             edittextTitle.bindCursorVisible(true)
                             edittextNote.bindCursorVisible(false)
+                            edittextDetail.bindCursorVisible(false)
                         }
 
                         ContentInputFocus.Note -> with(binding) {
                             edittextTitle.bindCursorVisible(false)
                             edittextNote.bindCursorVisible(true)
+                            edittextDetail.bindCursorVisible(false)
+                        }
+
+                        ContentInputFocus.Detail -> with(binding) {
+                            edittextTitle.bindCursorVisible(false)
+                            edittextNote.bindCursorVisible(false)
+                            edittextDetail.bindCursorVisible(true)
                         }
 
                         ContentInputFocus.Nothing -> with(binding) {
                             edittextTitle.bindCursorVisible(false)
                             edittextNote.bindCursorVisible(false)
+                            edittextDetail.bindCursorVisible(false)
                         }
                     }
                 }
@@ -210,6 +224,7 @@ class ContentViewHolder internal constructor(
                     .collect { enabled ->
                         binding.edittextTitle.isEnabled = enabled
                         binding.edittextNote.isEnabled = enabled
+                        binding.edittextDetail.isEnabled = enabled
                     }
             }
             jobs += viewLifecycleCoroutineScope.launch {
@@ -273,7 +288,7 @@ class ContentViewHolder internal constructor(
     }
 
     private enum class ContentInputFocus {
-        Title, Note, Nothing
+        Title, Note, Detail, Nothing
     }
 
     private class DraggingDelegateImpl(

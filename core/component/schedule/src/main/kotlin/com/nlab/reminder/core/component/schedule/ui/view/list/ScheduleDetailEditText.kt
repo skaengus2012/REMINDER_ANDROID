@@ -17,18 +17,34 @@
 package com.nlab.reminder.core.component.schedule.ui.view.list
 
 import android.content.Context
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.RectF
 import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatEditText
 
 /**
  * @author Doohyun
  */
-internal class ScheduleDetailEditText @JvmOverloads constructor(
+class ScheduleDetailEditText @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleRes: Int
-) : AppCompatEditText(context, attrs, defStyleRes) {
+    defStyleAttr: Int = androidx.appcompat.R.attr.editTextStyle
+) : AppCompatEditText(context, attrs, defStyleAttr) {
+    private val paint = Paint().apply {
+        style = Paint.Style.FILL
+        textSize = 20f
+    }
+    private val rect = RectF()
+    private var hello = "안뇽"
 
 
-
+    override fun onDraw(canvas: Canvas) {
+        super.onDraw(canvas)
+        var baseline = getLineBounds(i)
+        for (i in 0 until lineCount) {
+            canvas.drawText("asddsaasd " + (i + 1), rect.left, baseline.toFloat(), paint)
+            baseline += lineHeight
+        }
+    }
 }
