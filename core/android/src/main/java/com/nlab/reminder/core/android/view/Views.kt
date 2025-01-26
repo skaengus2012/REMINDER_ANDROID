@@ -25,6 +25,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
@@ -79,12 +80,15 @@ fun View.clicks(): Flow<View> = callbackFlow {
 
 fun View.throttleClicks(windowDuration: Long = 500): Flow<View> = clicks().throttleFirst(windowDuration)
 
-fun View.focusChanges(): Flow<Boolean> = callbackFlow {
-    val listener = View.OnFocusChangeListener { _, hasFocus ->
-        trySend(hasFocus)
+fun View.focusChanges(emitCurrent: Boolean = false): Flow<Boolean> {
+    val result = callbackFlow {
+        val listener = View.OnFocusChangeListener { _, hasFocus ->
+            trySend(hasFocus)
+        }
+        onFocusChangeListener = listener
+        awaitClose { onFocusChangeListener = null }
     }
-    onFocusChangeListener = listener
-    awaitClose { onFocusChangeListener = null }
+    return if (emitCurrent) result.onStart { emit(hasFocus()) } else result
 }
 
 fun View.focusState(

@@ -21,13 +21,12 @@ import androidx.core.view.doOnDetach
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
-import com.nlab.reminder.core.android.view.focusState
 import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapterItemAddBinding
 import com.nlab.reminder.core.kotlinx.coroutine.cancelAll
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 
@@ -53,31 +52,19 @@ class AddViewHolder internal constructor(
             val lifecycleScope = view.findViewTreeLifecycleOwner()
                 ?.lifecycleScope
                 ?: return@doOnAttach
-            val titleFocusedFlow = binding.edittextTitle
-                .focusState(scope = lifecycleScope, started = SharingStarted.WhileSubscribed())
-            val noteFocusedFlow = binding.edittextNote
-                .focusState(scope = lifecycleScope, started = SharingStarted.WhileSubscribed())
-            val editFocusedFlow = combine(
-                titleFocusedFlow,
-                noteFocusedFlow,
-                transform = { titleFocused, notFocused -> titleFocused || notFocused }
-            ).distinctUntilChanged()
+            val inputFocusFlow = binding.addInputFocusSharedFlow(lifecycleScope)
+            val hasInputFocusFlow = inputFocusFlow
+                .map { it != AddInputFocus.Nothing }
+                .distinctUntilChanged()
                 .shareIn(scope = lifecycleScope, started = SharingStarted.WhileSubscribed(), replay = 1)
-            jobs += addViewHolderDelegate.onAttached(
-                view,
-                titleFocusedFlow,
-                noteFocusedFlow,
-                editFocusedFlow,
-                onSimpleAddDone
-            )
+            jobs += addViewHolderDelegate.onAttached(view, inputFocusFlow, hasInputFocusFlow, onSimpleAddDone)
             jobs += lifecycleScope.launch {
-                editFocusedFlow.collect { focused -> onFocusChanged(this@AddViewHolder, focused) }
+                hasInputFocusFlow.collect { focused -> onFocusChanged(this@AddViewHolder, focused) }
             }
         }
         itemView.doOnDetach {
             jobs.cancelAll()
         }
-
     }
 
     fun bind(item: ScheduleAdapterItem.Add) {

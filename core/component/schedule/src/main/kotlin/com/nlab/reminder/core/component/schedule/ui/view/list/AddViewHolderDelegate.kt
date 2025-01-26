@@ -30,10 +30,10 @@ import com.nlab.reminder.core.kotlinx.coroutine.flow.withPrev
 import com.nlab.reminder.core.translation.StringIds
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
@@ -56,9 +56,8 @@ internal class AddViewHolderDelegate(
 
     fun onAttached(
         view: View,
-        titleFocusedFlow: StateFlow<Boolean>,
-        noteFocusedFlow: StateFlow<Boolean>,
-        viewHolderEditFocusedFlow: Flow<Boolean>,
+        addInputFocusFlow: SharedFlow<AddInputFocus>,
+        hasInputFocusFlow: SharedFlow<Boolean>,
         onSimpleAddDone: (SimpleAdd) -> Unit
     ): List<Job> {
         val lifecycleScope = view.findViewTreeLifecycleOwner()
@@ -66,35 +65,45 @@ internal class AddViewHolderDelegate(
             ?: return emptyList()
         val jobs = mutableListOf<Job>()
         jobs += lifecycleScope.launch {
-            titleFocusedFlow.collect { focused ->
-                binding.edittextTitle.bindCursorVisible(focused)
-                binding.edittextNote.bindCursorVisible(focused.not())
+            addInputFocusFlow.collect { inputFocus ->
+                when (inputFocus) {
+                    AddInputFocus.Title -> with(binding) {
+                        edittextTitle.bindCursorVisible(true)
+                        edittextNote.bindCursorVisible(false)
+                    }
+                    AddInputFocus.Note -> with(binding) {
+                        edittextTitle.bindCursorVisible(false)
+                        edittextNote.bindCursorVisible(true)
+                    }
+                    AddInputFocus.Nothing -> with(binding) {
+                        edittextTitle.bindCursorVisible(false)
+                        edittextNote.bindCursorVisible(false)
+                    }
+                }
             }
         }
+
         jobs += lifecycleScope.launch {
-            noteFocusedFlow.collect { focused ->
-                binding.edittextTitle.bindCursorVisible(focused.not())
-                binding.edittextNote.bindCursorVisible(focused)
-            }
-        }
-        jobs += lifecycleScope.launch {
-            viewHolderEditFocusedFlow.collect(binding.buttonInfo::setVisible)
+            hasInputFocusFlow.collect(binding.buttonInfo::setVisible)
         }
         jobs += lifecycleScope.launch {
             registerEditNoteVisibility(
                 edittextNote = binding.edittextNote,
-                viewHolderEditFocusedFlow = viewHolderEditFocusedFlow
+                viewHolderEditFocusedFlow = hasInputFocusFlow
             )
         }
         jobs += lifecycleScope.launch {
-            noteFocusedFlow.collect { focused ->
-                if (focused && binding.edittextTitle.text.isNullOrBlank()) {
-                    binding.edittextTitle.setText(StringIds.new_plan)
+            addInputFocusFlow
+                .map { it == AddInputFocus.Note }
+                .distinctUntilChanged()
+                .collect { focused ->
+                    if (focused && binding.edittextTitle.text.isNullOrBlank()) {
+                        binding.edittextTitle.setText(StringIds.new_plan)
+                    }
                 }
-            }
         }
         jobs += lifecycleScope.launch {
-            viewHolderEditFocusedFlow
+            hasInputFocusFlow
                 .withPrev(initial = false)
                 .distinctUntilChanged()
                 .mapLatest { (old, new) ->
