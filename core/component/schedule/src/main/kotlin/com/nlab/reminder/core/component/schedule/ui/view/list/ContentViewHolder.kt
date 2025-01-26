@@ -41,10 +41,12 @@ import com.nlab.reminder.core.android.widget.bindImageAsync
 import com.nlab.reminder.core.android.widget.bindText
 import com.nlab.reminder.core.component.schedule.R
 import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapterItemContentBinding
+import com.nlab.reminder.core.component.schedule.ui.TriggerAtFormatPatterns
 import com.nlab.reminder.core.data.model.ScheduleId
 import com.nlab.reminder.core.designsystem.compose.theme.AttrIds
 import com.nlab.reminder.core.kotlinx.coroutines.cancelAll
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asFlow
@@ -56,6 +58,8 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
 import kotlin.math.absoluteValue
 
 /**
@@ -64,6 +68,11 @@ import kotlin.math.absoluteValue
 class ContentViewHolder internal constructor(
     private val binding: LayoutScheduleAdapterItemContentBinding,
     theme: ScheduleListTheme,
+    triggerAtFormatPatterns: TriggerAtFormatPatterns,
+    dateTimeFormatPool: DateTimeFormatPool,
+    scheduleTimingDisplayTextPool: ScheduleTimingDisplayTextPool,
+    timeZone: Flow<TimeZone>,
+    entryAt: Flow<Instant>,
     selectionEnabled: StateFlow<Boolean>,
     selectedScheduleIds: StateFlow<Set<ScheduleId>>,
     onSimpleEditDone: (SimpleEdit) -> Unit,
@@ -104,8 +113,15 @@ class ContentViewHolder internal constructor(
             imageTintList = ColorStateList.valueOf(theme.getButtonInfoColor(context))
         }
 
+        binding.edittextDetail.initialize(
+            triggerAtFormatPatterns = triggerAtFormatPatterns,
+            dateTimeFormatPool = dateTimeFormatPool,
+            scheduleTimingDisplayTextPool = scheduleTimingDisplayTextPool
+        )
+
         // Processing for multiline input and actionDone support
         binding.edittextTitle.setRawInputType(InputType.TYPE_CLASS_TEXT)
+        binding.edittextDetail.setRawInputType(InputType.TYPE_CLASS_TEXT)
 
         val jobs = mutableListOf<Job>()
         itemView.doOnAttach { view ->
@@ -189,8 +205,7 @@ class ContentViewHolder internal constructor(
                     .distinctUntilChanged()
                     .map { it.not() }
                     .collect { enabled ->
-                        binding.edittextTitle.isEnabled = enabled
-                        binding.edittextNote.isEnabled = enabled
+                        binding.getAllInputs().forEach { it.isEnabled = enabled }
                     }
             }
             jobs += viewLifecycleCoroutineScope.launch {
@@ -209,6 +224,12 @@ class ContentViewHolder internal constructor(
                 combine(bindingId.filterNotNull(), selectedScheduleIds) { id, selectedIds -> id in selectedIds }
                     .distinctUntilChanged()
                     .collect { binding.buttonSelection.isSelected = it }
+            }
+            jobs += viewLifecycleCoroutineScope.launch {
+                timeZone.collect { binding.edittextDetail.bindTimeZone(it) }
+            }
+            jobs += viewLifecycleCoroutineScope.launch {
+                entryAt.collect { binding.edittextDetail.bindEntryAt(it) }
             }
         }
         itemView.doOnDetach {
@@ -231,6 +252,13 @@ class ContentViewHolder internal constructor(
                 setSelection(text?.length ?: 0)
             }
             clearFocusIfNeeded()
+        }
+        binding.edittextDetail.apply {
+            bindScheduleData(
+                scheduleCompleted = item.schedule.resource.isComplete,
+                scheduleTiming = item.schedule.resource.timing,
+                tags = item.schedule.resource.tags
+            )
         }
         binding.cardLink
             .setVisible(isVisible = item.schedule.resource.link != null)
@@ -292,7 +320,7 @@ private class ContentSwipeDelegate(
 }
 
 private enum class ContentInputFocus {
-    Title, Note, Nothing
+    Title, Note, Detail, Nothing
 }
 
 private fun LayoutScheduleAdapterItemContentBinding.getAllInputs(): Iterable<EditText> = listOf(
@@ -304,6 +332,7 @@ private fun LayoutScheduleAdapterItemContentBinding.findInput(contentInputFocus:
     return when (contentInputFocus) {
         ContentInputFocus.Title -> edittextTitle
         ContentInputFocus.Note -> edittextNote
+        ContentInputFocus.Detail -> edittextDetail
         ContentInputFocus.Nothing -> null
     }
 }

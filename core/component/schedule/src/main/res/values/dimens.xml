@@ -24,4 +24,5 @@
     <dimen name="schedule_data_start_complete_selection">96dp</dimen> <!-- schedule_data_start + (schedule_checkbox_touchable_size * 0.7f) -->
     <dimen name="schedule_dragging_scale_item_height">120dp</dimen>
     <dimen name="schedule_multi_selection_min_hotspot">120dp</dimen>
+    <dimen name="schedule_repeat_symbol_baseline_adjust">-0.5sp</dimen>
 </resources>
