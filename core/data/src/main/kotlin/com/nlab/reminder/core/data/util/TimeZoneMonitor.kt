@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 The N's lab Open Source Project
+ * Copyright (C) 2025 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,13 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-plugins {
-    alias(libs.plugins.nlab.jvm.library)
-}
 
-dependencies {
-    api(projects.core.kotlin)
-    api(projects.core.kotlinxCoroutine)
+package com.nlab.reminder.core.data.util
 
-    api(libs.kotlinx.datetime)
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.datetime.TimeZone
+
+/**
+ * @author Thalys
+ */
+interface TimeZoneMonitor {
+    val currentTimeZone: SharedFlow<TimeZone>
 }
