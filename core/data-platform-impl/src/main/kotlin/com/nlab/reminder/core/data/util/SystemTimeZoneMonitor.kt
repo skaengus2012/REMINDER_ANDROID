@@ -79,5 +79,5 @@ class SystemTimeZoneMonitor(
         .conflate()
         .flowOn(dispatcher)
         // Sharing the callback to prevent multiple BroadcastReceivers being registered
-        .shareIn(coroutineScope, SharingStarted.WhileSubscribed(5_000), replay = 1)
+        .shareIn(coroutineScope, SharingStarted.WhileSubscribed(stopTimeoutMillis = 5_000), replay = 1)
 }
