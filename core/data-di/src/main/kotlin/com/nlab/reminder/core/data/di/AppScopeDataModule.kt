@@ -16,6 +16,7 @@
 
 package com.nlab.reminder.core.data.di
 
+import android.content.Context
 import com.nlab.reminder.core.data.qualifiers.ScheduleData
 import dagger.Module
 import dagger.Provides
@@ -31,13 +32,22 @@ import com.nlab.reminder.core.data.repository.impl.CompletedScheduleShownReposit
 import com.nlab.reminder.core.data.repository.impl.LocalScheduleRepository
 import com.nlab.reminder.core.data.repository.impl.LocalScheduleTagListRepository
 import com.nlab.reminder.core.data.repository.impl.LocalTagRepository
+import com.nlab.reminder.core.data.util.SystemTimeZoneMonitor
 import com.nlab.reminder.core.data.util.SystemTimestampProvider
+import com.nlab.reminder.core.data.util.TimeZoneMonitor
 import com.nlab.reminder.core.data.util.TimestampProvider
+import com.nlab.reminder.core.inject.qualifiers.coroutine.AppScope
+import com.nlab.reminder.core.inject.qualifiers.coroutine.Dispatcher
+import com.nlab.reminder.core.inject.qualifiers.coroutine.DispatcherOption.*
 import com.nlab.reminder.core.local.database.dao.ScheduleDAO
 import com.nlab.reminder.core.local.database.dao.ScheduleTagListDAO
 import com.nlab.reminder.core.local.database.dao.TagRelationDAO
 import com.nlab.reminder.core.local.database.dao.TagDAO
 import com.nlab.reminder.core.local.datastore.PreferenceDataSource
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import javax.inject.Singleton
 
 /**
  * @author Doohyun
@@ -82,4 +92,16 @@ internal class AppScopeDataModule {
     @Provides
     @Reusable
     fun provideTimestampProvider(): TimestampProvider = SystemTimestampProvider()
+
+    @Singleton
+    @Provides
+    fun provideTimeZoneMonitor(
+        @ApplicationContext context: Context,
+        @AppScope coroutineScope: CoroutineScope,
+        @Dispatcher(IO) dispatcher: CoroutineDispatcher
+    ): TimeZoneMonitor = SystemTimeZoneMonitor(
+        context = context,
+        coroutineScope = coroutineScope,
+        dispatcher = dispatcher
+    )
 }
