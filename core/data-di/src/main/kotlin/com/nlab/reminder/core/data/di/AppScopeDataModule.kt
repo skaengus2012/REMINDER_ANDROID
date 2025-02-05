@@ -32,8 +32,10 @@ import com.nlab.reminder.core.data.repository.impl.CompletedScheduleShownReposit
 import com.nlab.reminder.core.data.repository.impl.LocalScheduleRepository
 import com.nlab.reminder.core.data.repository.impl.LocalScheduleTagListRepository
 import com.nlab.reminder.core.data.repository.impl.LocalTagRepository
+import com.nlab.reminder.core.data.util.SystemTimeChangedMonitor
 import com.nlab.reminder.core.data.util.SystemTimeZoneMonitor
 import com.nlab.reminder.core.data.util.SystemTimestampProvider
+import com.nlab.reminder.core.data.util.TimeChangedMonitor
 import com.nlab.reminder.core.data.util.TimeZoneMonitor
 import com.nlab.reminder.core.data.util.TimestampProvider
 import com.nlab.reminder.core.inject.qualifiers.coroutine.AppScope
@@ -100,6 +102,18 @@ internal class AppScopeDataModule {
         @AppScope coroutineScope: CoroutineScope,
         @Dispatcher(IO) dispatcher: CoroutineDispatcher
     ): TimeZoneMonitor = SystemTimeZoneMonitor(
+        context = context,
+        coroutineScope = coroutineScope,
+        dispatcher = dispatcher
+    )
+
+    @Singleton
+    @Provides
+    fun provideTimeChangedMonitor(
+        @ApplicationContext context: Context,
+        @AppScope coroutineScope: CoroutineScope,
+        @Dispatcher(IO) dispatcher: CoroutineDispatcher
+    ): TimeChangedMonitor = SystemTimeChangedMonitor(
         context = context,
         coroutineScope = coroutineScope,
         dispatcher = dispatcher
