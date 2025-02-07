@@ -16,7 +16,12 @@
 
 package com.nlab.reminder.core.data.model
 
+import com.nlab.reminder.core.kotlin.NonBlankString
+
 /**
  * @author thalys
  */
-data class LinkMetadata(val title: String, val imageUrl: String)
+data class LinkMetadata(
+    val title: NonBlankString?,
+    val imageUrl: NonBlankString?
+)

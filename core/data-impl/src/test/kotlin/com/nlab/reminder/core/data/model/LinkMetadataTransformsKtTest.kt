@@ -1,6 +1,6 @@
 package com.nlab.reminder.core.data.model
 
-import com.nlab.testkit.faker.genLongGreaterThanZero
+import com.nlab.reminder.core.local.database.dao.LinkMetadataDTO
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
@@ -18,11 +18,15 @@ internal class LinkMetadataTransformsKtTest {
     }
 
     @Test
-    fun testLinkMetadataToEntity() {
-        val timestamp = genLongGreaterThanZero()
-        val (link, linkMetadata, expectedEntity) = genLinkAndMetadataAndEntity(timestamp = timestamp)
-        val actualEntity = linkMetadata.toLocalEntity(link, timestamp)
+    fun testLinkMetadataToDTO() {
+        val (link, linkMetadata) = genLinkAndMetadataAndEntity()
+        val expectedDTO = LinkMetadataDTO(
+            link = link.rawLink,
+            title = linkMetadata.title,
+            imageUrl = linkMetadata.imageUrl
+        )
+        val actualDTO = linkMetadata.toLocalDTO(link)
 
-        assertThat(actualEntity, equalTo(expectedEntity))
+        assertThat(actualDTO, equalTo(expectedDTO))
     }
 }

@@ -10,12 +10,10 @@ android {
 dependencies {
     implementation(projects.core.annotation)
     implementation(projects.core.data)
-    implementation(projects.core.kotlinxCoroutine)
     implementation(projects.core.local)
     implementation(projects.core.network)
 
     implementation(libs.kotlinx.coroutines.android)
-    implementation(libs.kotlinx.collections.immutable)
 
     testImplementation(projects.testkit)
     testImplementation(projects.core.dataTest)

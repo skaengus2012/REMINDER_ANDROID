@@ -7,7 +7,7 @@ android {
 }
 
 dependencies {
-    implementation(projects.core.kotlin)
+    api(projects.core.kotlin)
     implementation(projects.core.kotlinxCoroutine)
 
     implementation(libs.jsoup)

@@ -21,6 +21,7 @@ plugins {
 dependencies {
     implementation(libs.javafaker)
 
+    api(libs.app.cash.turbine)
     api(libs.junit)
     api(libs.kotlinx.coroutines.test)
     api(libs.mockito.inline)

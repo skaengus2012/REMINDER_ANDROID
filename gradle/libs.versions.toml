@@ -28,6 +28,7 @@ androidxTestEspresso = "3.6.1"
 androidxTestJunit = "1.2.1"
 androidxTestRules = "1.6.1"
 androidxTransition = "1.5.1"
+appCashTurbine = "1.2.0"
 coil = "2.7.0"
 facebookFlipper = "0.273.0"
 facebookSoloader = "0.12.1"
@@ -48,7 +49,6 @@ mockitoKotlin = "5.4.0"
 squareLeakcanary = "2.14"
 squareKotlinpoet = "2.0.0"
 timber = "5.0.1"
-kotlinVersion = "2.1.10"
 
 
 [libraries]
@@ -85,6 +85,7 @@ androidx-test-junit = { module = "androidx.test.ext:junit", version.ref = "andro
 androidx-test-rules = { module = "androidx.test:rules", version.ref = "androidxTestRules" }
 androidx-test-runner = { module = "androidx.test:runner", version.ref = "androidxTestRules" }
 androidx-transition-ktx = { module = "androidx.transition:transition-ktx", version.ref = "androidxTransition" }
+app-cash-turbine = { module = "app.cash.turbine:turbine", version.ref = "appCashTurbine" }
 coil-kt = { module = "io.coil-kt:coil", version.ref = "coil" }
 facebook-flipper = { module = "com.facebook.flipper:flipper", version.ref = "facebookFlipper" }
 facebook-flipper-leakcanary = { module = "com.facebook.flipper:flipper-leakcanary2-plugin", version.ref = "facebookFlipper" }
@@ -137,5 +138,3 @@ nlab-android-library-jacoco = { id = "nlab.android.library.jacoco" }
 nlab-android-library-statekit = { id = "nlab.android.library.statekit" }
 nlab-jvm-library = { id = "nlab.jvm.library" }
 nlab-jvm-library-jacoco = { id = "nlab.jvm.library.jacoco" }
-android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
-jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlinVersion" }
