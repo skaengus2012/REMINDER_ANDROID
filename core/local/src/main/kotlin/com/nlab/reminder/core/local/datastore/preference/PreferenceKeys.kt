@@ -14,24 +14,13 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.local.datastore
+package com.nlab.reminder.core.local.datastore.preference
 
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import com.nlab.reminder.core.kotlin.Result
-import kotlinx.coroutines.flow.Flow
+import androidx.datastore.preferences.core.booleanPreferencesKey
 
 /**
  * @author Doohyun
  */
-class PreferenceDataSource(private val dataStore: DataStore<Preferences>) {
-    fun getAllScheduleCompleteShownAsStream(): Flow<Boolean> = dataStore.getAsStream(
-        key = PreferenceKeys.ALL_SCHEDULE_COMPLETE_SHOWN,
-        defaultValue = false
-    )
-
-    suspend fun setAllScheduleCompleteShown(value: Boolean): Result<Unit> = dataStore.tryEdit(
-        key = PreferenceKeys.ALL_SCHEDULE_COMPLETE_SHOWN,
-        value
-    )
+internal object PreferenceKeys {
+    val ALL_SCHEDULE_COMPLETE_SHOWN = booleanPreferencesKey("all_schedule_complete_shown")
 }
