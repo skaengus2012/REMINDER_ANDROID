@@ -253,17 +253,17 @@ class ContentViewHolder internal constructor(
             clearFocusIfNeeded()
         }
         binding.cardLink
-            .setVisible(item.scheduleDetail.schedule.content.link != null)
+            .setVisible(isVisible = item.scheduleDetail.schedule.content.link != null)
         binding.textviewLink
-            .bindText(item.scheduleDetail.schedule.content.link?.value)
+            .bindText(item.scheduleDetail.schedule.content.link?.rawLink?.value)
         binding.textviewTitleLink.apply {
-            val linkTitle = item.scheduleDetail.linkMetadata?.title
-            setVisible(linkTitle.isNullOrBlank().not())
+            val linkTitle = item.scheduleDetail.linkMetadata?.title?.value
+            setVisible(isVisible = linkTitle != null)
             bindText(linkTitle)
         }
         binding.imageviewBgLinkThumbnail.apply {
-            val linkImageUrl = item.scheduleDetail.linkMetadata?.imageUrl
-            setVisible(linkImageUrl.isNullOrBlank().not())
+            val linkImageUrl = item.scheduleDetail.linkMetadata?.imageUrl?.value
+            setVisible(isVisible = linkImageUrl != null)
             bindImageAsync(
                 url = linkImageUrl,
                 placeHolder = linkThumbnailPlaceHolderDrawable,

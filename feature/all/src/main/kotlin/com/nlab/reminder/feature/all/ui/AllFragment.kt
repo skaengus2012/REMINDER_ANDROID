@@ -308,8 +308,8 @@ internal class AllFragment : ComposableFragment() {
                             tags = emptySet(),
                             linkMetadata = imageSource.shuffled().first()?.let {
                                 LinkMetadata(
-                                    title = "네이버",
-                                    imageUrl = it
+                                    title = "네이버".toNonBlankString(),
+                                    imageUrl = it.toNonBlankString()
                                 )
                             }
                         ),
