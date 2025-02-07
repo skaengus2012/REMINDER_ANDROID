@@ -22,9 +22,13 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
+import com.nlab.reminder.core.kotlin.NonBlankString
+import com.nlab.reminder.core.kotlin.NonNegativeLong
+import com.nlab.reminder.core.kotlin.toNonNegativeLong
 import com.nlab.reminder.core.local.database.model.EMPTY_SCHEDULE_ID
 import com.nlab.reminder.core.local.database.model.ScheduleEntity
 import kotlinx.coroutines.flow.Flow
+import kotlinx.datetime.Instant
 
 /**
  * @author Doohyun
@@ -87,11 +91,9 @@ abstract class ScheduleDAO {
     @Transaction
     open suspend fun insertAndGet(contentDTO: ScheduleContentDTO): ScheduleEntity {
         val entity = ScheduleEntity(
-            title = contentDTO.title,
-            description = contentDTO.description,
-            link = contentDTO.link,
-            visiblePriority = findMaxVisiblePriorityByCompleteOrElse(isComplete = false, defaultValue = { -1 }) + 1,
-            isComplete = false
+            contentDTO = contentDTO,
+            visiblePriority = (findMaxVisiblePriorityByCompleteOrElse(isComplete = false, defaultValue = { -1 }) + 1)
+                .toNonNegativeLong(),
         )
         return checkNotNull(findById(scheduleId = insert(entity)))
     }
@@ -101,7 +103,7 @@ abstract class ScheduleDAO {
         val oldEntity = checkNotNull(findById(scheduleId))
         if (contentDTO.equalsContent(oldEntity)) return oldEntity // No changes
 
-        val newEntity = contentDTO.createEntityWith(oldEntity)
+        val newEntity = ScheduleEntity(oldEntity, contentDTO)
         update(newEntity)
 
         return newEntity
@@ -175,18 +177,44 @@ abstract class ScheduleDAO {
 }
 
 data class ScheduleContentDTO(
-    val title: String,
-    val description: String?,
-    val link: String?
+    val title: NonBlankString,
+    val description: NonBlankString?,
+    val link: NonBlankString?,
+    val triggerTimeDTO: TriggerTimeDTO?,
+)
+
+data class TriggerTimeDTO(
+    val utcTime: Instant,
+    val isDateOnly: Boolean
 )
 
 private fun ScheduleContentDTO.equalsContent(entity: ScheduleEntity): Boolean =
-    title == entity.title
-            && description == entity.description
-            && link == entity.link
+    title.value == entity.title
+            && description?.value == entity.description
+            && link?.value == entity.link
+            && triggerTimeDTO?.utcTime == entity.triggerTimeUtc
+            && triggerTimeDTO?.isDateOnly == entity.isTriggerTimeDateOnly
 
-private fun ScheduleContentDTO.createEntityWith(entity: ScheduleEntity): ScheduleEntity = entity.copy(
-    title = title,
-    description = description,
-    link = link
+private fun ScheduleEntity(
+    contentDTO: ScheduleContentDTO,
+    visiblePriority: NonNegativeLong,
+): ScheduleEntity = ScheduleEntity(
+    title = contentDTO.title.value,
+    description = contentDTO.description?.value,
+    link = contentDTO.link?.value,
+    triggerTimeUtc = contentDTO.triggerTimeDTO?.utcTime,
+    isTriggerTimeDateOnly = contentDTO.triggerTimeDTO?.isDateOnly,
+    visiblePriority = visiblePriority.value,
+    isComplete = false
+)
+
+private fun ScheduleEntity(
+    baseEntity: ScheduleEntity,
+    contentDTO: ScheduleContentDTO
+): ScheduleEntity = baseEntity.copy(
+    title = contentDTO.title.value,
+    description = contentDTO.description?.value,
+    link = contentDTO.link?.value,
+    triggerTimeUtc = contentDTO.triggerTimeDTO?.utcTime,
+    isTriggerTimeDateOnly = contentDTO.triggerTimeDTO?.isDateOnly
 )

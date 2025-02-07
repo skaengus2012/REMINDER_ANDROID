@@ -1,6 +1,8 @@
 package com.nlab.reminder.core.data.model
 
+import com.nlab.reminder.core.kotlin.toNonBlankString
 import com.nlab.reminder.core.local.database.dao.ScheduleContentDTO
+import com.nlab.reminder.core.local.database.dao.TriggerTimeDTO
 import com.nlab.reminder.core.local.database.model.ScheduleEntity
 import com.nlab.testkit.faker.genBlank
 import org.hamcrest.CoreMatchers.equalTo
@@ -30,9 +32,13 @@ internal class ScheduleTransformsKtTest {
     fun testScheduleContentToContentDTO() {
         val (schedule, entity) = genScheduleAndEntity()
         val expectedScheduleContentDTO = ScheduleContentDTO(
-            title = entity.title,
-            description = entity.description,
-            link = entity.link
+            title = entity.title.toNonBlankString(),
+            description = entity.description!!.toNonBlankString(),
+            link = entity.link!!.toNonBlankString(),
+            triggerTimeDTO = TriggerTimeDTO(
+                utcTime = entity.triggerTimeUtc!!,
+                isDateOnly = entity.isTriggerTimeDateOnly!!
+            )
         )
         val actualScheduleContentDTO = schedule.content.toLocalDTO()
         assertThat(actualScheduleContentDTO, equalTo(expectedScheduleContentDTO))

@@ -22,7 +22,8 @@ import com.nlab.reminder.core.kotlin.NonBlankString
  * @author Doohyun
  */
 data class ScheduleContent(
-    val title: String,
+    val title: NonBlankString,
     val note: NonBlankString?,
     val link: Link?,
+    val triggerTime: TriggerTime?
 )

@@ -19,6 +19,7 @@ package com.nlab.reminder.core.local.database.model
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import kotlinx.datetime.Instant
 
 /**
  * @author Doohyun
@@ -33,4 +34,6 @@ data class ScheduleEntity(
     @ColumnInfo(name = "link") val link: String? = null,
     @ColumnInfo(name = "visible_priority") val visiblePriority: Long,
     @ColumnInfo(name = "is_complete") val isComplete: Boolean,
+    @ColumnInfo(name = "trigger_time_utc") val triggerTimeUtc: Instant?,
+    @ColumnInfo(name = "is_trigger_time_date_only") val isTriggerTimeDateOnly: Boolean?,
 )
