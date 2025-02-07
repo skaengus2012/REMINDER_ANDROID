@@ -40,5 +40,5 @@ internal fun ScheduleContent(entity: ScheduleEntity): ScheduleContent = Schedule
 internal fun ScheduleContent.toLocalDTO() = ScheduleContentDTO(
     title = title,
     description = note?.value,
-    link = link?.value
+    link = link?.rawLink?.value
 )

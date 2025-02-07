@@ -25,14 +25,14 @@ import com.nlab.testkit.faker.genLongGreaterThanZero
 fun genLinkAndMetadataAndEntity(
     link: Link = genLink(),
     linkMetadata: LinkMetadata = genLinkMetadata(),
-    timestamp: Long = genLongGreaterThanZero()
+    insertionOrder: Long = genLongGreaterThanZero()
 ): Triple<Link, LinkMetadata, LinkMetadataEntity> = Triple(
     link,
     linkMetadata,
     LinkMetadataEntity(
-        link = link.value,
-        title = linkMetadata.title,
-        imageUrl = linkMetadata.imageUrl,
-        timestamp = timestamp
+        link = link.rawLink.value,
+        title = linkMetadata.title?.value,
+        imageUrl = linkMetadata.imageUrl?.value,
+        insertionOrder = insertionOrder
     )
 )

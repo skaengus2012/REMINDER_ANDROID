@@ -76,6 +76,7 @@ include(
     ":core:local",
     ":core:local-di",
     ":core:network",
+    ":core:network-di",
     ":core:schedule",
     ":core:schedule-ext",
     ":core:schedule-test",

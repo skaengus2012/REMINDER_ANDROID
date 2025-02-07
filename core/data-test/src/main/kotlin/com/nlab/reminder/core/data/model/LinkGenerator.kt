@@ -16,10 +16,11 @@
 
 package com.nlab.reminder.core.data.model
 
+import com.nlab.reminder.core.kotlin.NonBlankString
 import com.nlab.reminder.core.kotlin.toNonBlankString
 import com.nlab.testkit.faker.genBothify
 
 /**
  * @author thalys
  */
-fun genLink(): Link = Link(rawLink = "https://${genBothify()}".toNonBlankString())
+fun genLink(rawLink: NonBlankString = "https://${genBothify()}".toNonBlankString()): Link = Link(rawLink)

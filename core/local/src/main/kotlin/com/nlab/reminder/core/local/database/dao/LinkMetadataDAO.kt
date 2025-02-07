@@ -21,14 +21,19 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import com.nlab.reminder.core.kotlin.NonBlankString
+import com.nlab.reminder.core.kotlin.collections.toSet
 import com.nlab.reminder.core.local.database.model.LinkMetadataEntity
 
-private const val MAX_CACHE_COUNT = 100
+private const val MAX_CACHE_COUNT = 1000
 
 @Dao
 abstract class LinkMetadataDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    protected abstract suspend fun insertInternal(entity: LinkMetadataEntity)
+    protected abstract suspend fun insertOrReplace(entity: LinkMetadataEntity)
+
+    @Query("SELECT insertion_order FROM link_metadata ORDER BY insertion_order DESC LIMIT 1")
+    protected abstract suspend fun getMaxInsertionOrder(): Long?
 
     @Query("SELECT count(*) FROM link_metadata")
     protected abstract suspend fun getTotalCount(): Int
@@ -36,9 +41,9 @@ abstract class LinkMetadataDAO {
     @Query("SELECT * FROM link_metadata WHERE link IN (:links)")
     protected abstract suspend fun findByLinksInternal(links: Set<String>): Array<LinkMetadataEntity>
 
-    suspend fun findByLinks(links: Set<String>): Array<LinkMetadataEntity> =
+    suspend fun findByLinks(links: Set<NonBlankString>): Array<LinkMetadataEntity> =
         if (links.isEmpty()) emptyArray()
-        else findByLinksInternal(links)
+        else findByLinksInternal(links.toSet { it.value })
 
     @Query(
         """
@@ -47,7 +52,7 @@ abstract class LinkMetadataDAO {
         WHERE link IN(
             SELECT link
             FROM link_metadata
-            ORDER BY timestamp
+            ORDER BY insertion_order
             LIMIT :count
         )
         """
@@ -55,12 +60,27 @@ abstract class LinkMetadataDAO {
     protected abstract suspend fun deleteOldestBy(count: Int)
 
     @Transaction
-    open suspend fun insert(entity: LinkMetadataEntity) {
-        insertInternal(entity)
+    open suspend fun insertAndGet(metadataDTO: LinkMetadataDTO): LinkMetadataEntity {
+        val newEntity = LinkMetadataEntity(
+            link = metadataDTO.link.value,
+            title = metadataDTO.title?.value,
+            imageUrl = metadataDTO.imageUrl?.value,
+            insertionOrder = (getMaxInsertionOrder() ?: -1) + 1
+        )
+        insertOrReplace(newEntity)
 
+        // remove oldest entities
         val curCount: Int = getTotalCount()
         if (curCount > MAX_CACHE_COUNT) {
-            deleteOldestBy(count = MAX_CACHE_COUNT - curCount)
+            deleteOldestBy(count = curCount - MAX_CACHE_COUNT)
         }
+
+        return newEntity
     }
 }
+
+data class LinkMetadataDTO(
+    val link: NonBlankString,
+    val title: NonBlankString?,
+    val imageUrl: NonBlankString?
+)

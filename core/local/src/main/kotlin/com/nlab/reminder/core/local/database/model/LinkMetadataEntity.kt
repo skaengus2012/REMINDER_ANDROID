@@ -18,14 +18,19 @@ package com.nlab.reminder.core.local.database.model
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Index
 
 /**
  * @author thalys
  */
-@Entity(tableName = "link_metadata", primaryKeys = ["link"])
+@Entity(
+    tableName = "link_metadata",
+    primaryKeys = ["link"],
+    indices = [Index(value = ["insertion_order"], unique = true)]
+)
 data class LinkMetadataEntity(
     @ColumnInfo(name = "link") val link: String,
-    @ColumnInfo(name = "title") val title: String,
-    @ColumnInfo(name = "imageUrl") val imageUrl: String,
-    @ColumnInfo(name = "timestamp") val timestamp: Long
+    @ColumnInfo(name = "title") val title: String?,
+    @ColumnInfo(name = "imageUrl") val imageUrl: String?,
+    @ColumnInfo(name = "insertion_order") val insertionOrder: Long
 )

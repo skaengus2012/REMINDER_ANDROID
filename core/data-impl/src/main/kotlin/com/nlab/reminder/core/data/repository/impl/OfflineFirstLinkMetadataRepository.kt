@@ -18,9 +18,11 @@ package com.nlab.reminder.core.data.repository.impl
 
 import com.nlab.reminder.core.data.model.Link
 import com.nlab.reminder.core.data.model.LinkMetadata
-import com.nlab.reminder.core.data.model.toLocalEntity
+import com.nlab.reminder.core.data.model.toLocalDTO
 import com.nlab.reminder.core.data.repository.LinkMetadataRepository
-import com.nlab.reminder.core.data.util.TimestampProvider
+import com.nlab.reminder.core.kotlin.collections.toSet
+import com.nlab.reminder.core.kotlin.getOrNull
+import com.nlab.reminder.core.kotlin.map
 import com.nlab.reminder.core.kotlin.onSuccess
 import com.nlab.reminder.core.kotlinx.coroutine.flow.flatMapLatest
 import com.nlab.reminder.core.kotlinx.coroutine.flow.map
@@ -31,9 +33,11 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.updateAndGet
 import kotlinx.coroutines.launch
 
 /**
@@ -42,14 +46,12 @@ import kotlinx.coroutines.launch
 class OfflineFirstLinkMetadataRepository(
     private val linkMetadataDAO: LinkMetadataDAO,
     private val linkThumbnailDataSource: LinkThumbnailDataSource,
-    private val timestampProvider: TimestampProvider,
-    initialCache: Map<Link, LinkMetadata>
+    private val inMemoryCache: InMemoryLinkMetadataCache
 ) : LinkMetadataRepository {
-    private val inMemoryTableFlow = MutableStateFlow(initialCache)
 
     override fun getAsStream(links: Set<Link>): Flow<Map<Link, LinkMetadata>> =
-        flow { emit(sync(links))  }
-            .flatMapLatest { inMemoryTableFlow }
+        flow { emit(sync(links)) }
+            .flatMapLatest { inMemoryCache.tableFlow }
             .distinctUntilChanged()
             .map { table ->
                 buildMap {
@@ -58,46 +60,58 @@ class OfflineFirstLinkMetadataRepository(
             }
 
     private suspend fun sync(links: Set<Link>) {
-        val curCacheTable = inMemoryTableFlow.value
-        val notCachedRawValueToLinks = links
-            .asSequence()
+        val curCacheTable = inMemoryCache.tableFlow.value
+        val notCachedLinks = links
             .filter { it !in curCacheTable }
-            .map { it.value to it }
-            .toMap()
-        if (notCachedRawValueToLinks.isEmpty()) return
+            .toSet()
+        if (notCachedLinks.isEmpty()) return
 
         val scope = CoroutineScope(currentCoroutineContext())
         syncFromRemote(
             scope,
-            rawValueToLinkTable = notCachedRawValueToLinks,
-            localSyncJob = scope.launch { syncFromLocal(notCachedRawValueToLinks) },
+            links = notCachedLinks,
+            localSyncJob = scope.launch { syncFromLocal(notCachedLinks) },
         )
     }
 
-    private suspend fun syncFromLocal(rawValueToLinkTable: Map<String, Link>) {
-        val newCache = linkMetadataDAO
-            .findByLinks(rawValueToLinkTable.keys)
-            .map { entity -> rawValueToLinkTable.getValue(entity.link) to LinkMetadata(entity) }
-        inMemoryTableFlow.update { old -> old + newCache }
+    private suspend fun syncFromLocal(links: Set<Link>) {
+        val rawLinkValueToLink = links.associateBy(keySelector = { it.rawLink.value })
+        inMemoryCache.putAll(
+            newElements = linkMetadataDAO
+                .findByLinks(links = links.toSet { it.rawLink })
+                .associateBy(keySelector = { rawLinkValueToLink.getValue(it.link) }, valueTransform = ::LinkMetadata)
+        )
     }
 
-    private fun syncFromRemote(
-        scope: CoroutineScope,
-        rawValueToLinkTable: Map<String, Link>,
-        localSyncJob: Job
-    ) {
-        rawValueToLinkTable.map { (rawLink, link) ->
+    private fun syncFromRemote(scope: CoroutineScope, links: Set<Link>, localSyncJob: Job) {
+        links.forEach { link ->
             scope.launch {
-                linkThumbnailDataSource.getLinkThumbnailResource(rawLink).onSuccess { resource ->
-                    val linkMetadata = LinkMetadata(
-                        title = resource.title,
-                        imageUrl = resource.image
-                    )
-                    localSyncJob.join()
-                    inMemoryTableFlow.update { old -> old + (link to linkMetadata) }
-                    linkMetadataDAO.insert(linkMetadata.toLocalEntity(link, timestampProvider.now()))
+                val metadata = linkThumbnailDataSource.getLinkThumbnail(link.rawLink)
+                    .map(::LinkMetadata)
+                    .getOrNull()
+                if (metadata != null) {
+                    localSyncJob.join()  // await for local cache sync
+                    val newCache = inMemoryCache.put(link, metadata)
+                    if (newCache[link] == metadata) {
+                        // if cache flush success, insert to local db
+                        linkMetadataDAO.insertAndGet(metadata.toLocalDTO(link))
+                    }
                 }
             }
         }
+    }
+}
+
+class InMemoryLinkMetadataCache(initialCache: Map<Link, LinkMetadata>) {
+    private val _tableFlow = MutableStateFlow(initialCache)
+    val tableFlow: StateFlow<Map<Link, LinkMetadata>> = _tableFlow.asStateFlow()
+
+    fun putAll(newElements: Map<Link, LinkMetadata>): Map<Link, LinkMetadata> {
+        return _tableFlow.updateAndGet { it + newElements }
+    }
+
+    fun put(link: Link, linkMetadata: LinkMetadata): Map<Link, LinkMetadata> {
+        val newElements = link to linkMetadata
+        return _tableFlow.updateAndGet { it + newElements }
     }
 }

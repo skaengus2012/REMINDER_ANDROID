@@ -14,16 +14,13 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.kotlin.collections
+package com.nlab.reminder.core.data.util
+
+import kotlinx.coroutines.flow.SharedFlow
 
 /**
  * @author Thalys
  */
-inline fun <T, U> Iterable<T>.toSet(transform: (T) -> U): Set<U> =
-    buildSet { mapTo(destination = this, transform = transform) }
-
-inline fun <T, U : Any> Iterable<T>.toSetNotNull(transform: (T) -> U?): Set<U> =
-    buildSet { mapNotNullTo(destination = this, transform = transform) }
-
-fun <T, U> Array<T>.toSet(transform: (T) -> U): Set<U> =
-    buildSet { mapTo(destination = this, transform = transform) }
+interface TimeChangedMonitor {
+    val timeChangedEvent: SharedFlow<Unit>
+}

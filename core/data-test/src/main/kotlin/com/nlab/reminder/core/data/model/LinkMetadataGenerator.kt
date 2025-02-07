@@ -16,12 +16,16 @@
 
 package com.nlab.reminder.core.data.model
 
+import com.nlab.reminder.core.kotlin.tryToNonBlankStringOrNull
 import com.nlab.testkit.faker.genBothify
 
 /**
  * @author thalys
  */
 fun genLinkMetadata(
-    title: String = genBothify("Title_${genBothify()}"),
-    imageUrl: String = genBothify("ImageUrl_${genBothify()}")
-): LinkMetadata = LinkMetadata(title, imageUrl)
+    title: String? = "Title_${genBothify()}",
+    imageUrl: String? = "ImageUrl_${genBothify()}"
+): LinkMetadata = LinkMetadata(
+    title = title.tryToNonBlankStringOrNull(),
+    imageUrl = imageUrl.tryToNonBlankStringOrNull()
+)
