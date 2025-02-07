@@ -21,6 +21,4 @@ import com.nlab.reminder.core.kotlin.NonBlankString
 /**
  * @author Doohyun
  */
-data class Link(private val rawLink: NonBlankString) {
-    val value: String get() = rawLink.value
-}
+data class Link(val rawLink: NonBlankString)

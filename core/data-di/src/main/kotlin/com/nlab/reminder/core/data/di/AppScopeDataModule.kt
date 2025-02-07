@@ -34,10 +34,8 @@ import com.nlab.reminder.core.data.repository.impl.LocalScheduleTagListRepositor
 import com.nlab.reminder.core.data.repository.impl.LocalTagRepository
 import com.nlab.reminder.core.data.util.SystemTimeChangedMonitor
 import com.nlab.reminder.core.data.util.SystemTimeZoneMonitor
-import com.nlab.reminder.core.data.util.SystemTimestampProvider
 import com.nlab.reminder.core.data.util.TimeChangedMonitor
 import com.nlab.reminder.core.data.util.TimeZoneMonitor
-import com.nlab.reminder.core.data.util.TimestampProvider
 import com.nlab.reminder.core.inject.qualifiers.coroutine.AppScope
 import com.nlab.reminder.core.inject.qualifiers.coroutine.Dispatcher
 import com.nlab.reminder.core.inject.qualifiers.coroutine.DispatcherOption.*
@@ -90,10 +88,6 @@ internal class AppScopeDataModule {
     ): ScheduleTagListRepository = LocalScheduleTagListRepository(
         scheduleTagListDAO = scheduleTagListDAO,
     )
-
-    @Provides
-    @Reusable
-    fun provideTimestampProvider(): TimestampProvider = SystemTimestampProvider()
 
     @Singleton
     @Provides

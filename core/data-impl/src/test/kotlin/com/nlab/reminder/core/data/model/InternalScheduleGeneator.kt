@@ -27,7 +27,7 @@ internal fun genScheduleAndEntity(schedule: Schedule = genSchedule()): Pair<Sche
         scheduleId = schedule.id.rawId,
         title = schedule.content.title,
         description = schedule.content.note?.value,
-        link = schedule.content.link?.value,
+        link = schedule.content.link?.rawLink?.value,
         visiblePriority = schedule.visiblePriority.value,
         isComplete = schedule.isComplete
     )

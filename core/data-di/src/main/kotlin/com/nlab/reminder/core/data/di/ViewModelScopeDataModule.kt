@@ -20,24 +20,19 @@ import com.nlab.reminder.core.data.repository.LinkMetadataRepository
 import com.nlab.reminder.core.data.repository.ScheduleCompleteMarkRepository
 import com.nlab.reminder.core.data.repository.ScheduleDetailRepository
 import com.nlab.reminder.core.data.repository.ScheduleRepository
-import com.nlab.reminder.core.data.repository.ScheduleSelectedIdRepository
 import com.nlab.reminder.core.data.repository.ScheduleTagListRepository
 import com.nlab.reminder.core.data.repository.TagRepository
 import com.nlab.reminder.core.data.repository.impl.DefaultScheduleDetailRepository
+import com.nlab.reminder.core.data.repository.impl.InMemoryLinkMetadataCache
 import com.nlab.reminder.core.data.repository.impl.InMemoryScheduleCompleteMarkRepository
-import com.nlab.reminder.core.data.repository.impl.InMemoryScheduleSelectedIdRepository
 import com.nlab.reminder.core.data.repository.impl.OfflineFirstLinkMetadataRepository
-import com.nlab.reminder.core.data.util.TimestampProvider
-import com.nlab.reminder.core.inject.qualifiers.coroutine.Dispatcher
-import com.nlab.reminder.core.inject.qualifiers.coroutine.DispatcherOption.*
 import com.nlab.reminder.core.local.database.dao.LinkMetadataDAO
-import com.nlab.reminder.core.network.LinkThumbnailDataSourceImpl
+import com.nlab.reminder.core.network.LinkThumbnailDataSource
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.android.scopes.ViewModelScoped
-import kotlinx.coroutines.CoroutineDispatcher
 
 /**
  * @author Doohyun
@@ -49,13 +44,11 @@ internal class ViewModelScopeDataModule {
     @Provides
     fun provideCachedLinkMetadataTableRepository(
         linkMetadataDAO: LinkMetadataDAO,
-        timestampProvider: TimestampProvider,
-        @Dispatcher(IO) remoteDispatcher: CoroutineDispatcher,
+        linkThumbnailDataSource: LinkThumbnailDataSource
     ): LinkMetadataRepository = OfflineFirstLinkMetadataRepository(
         linkMetadataDAO = linkMetadataDAO,
-        linkThumbnailDataSource = LinkThumbnailDataSourceImpl(remoteDispatcher),
-        timestampProvider = timestampProvider,
-        initialCache = emptyMap()
+        linkThumbnailDataSource = linkThumbnailDataSource,
+        inMemoryCache = InMemoryLinkMetadataCache(initialCache = emptyMap())
     )
 
     @ViewModelScoped
@@ -76,9 +69,4 @@ internal class ViewModelScopeDataModule {
     @ViewModelScoped
     fun provideScheduleCompleteMarkRepository(): ScheduleCompleteMarkRepository =
         InMemoryScheduleCompleteMarkRepository()
-
-    @Provides
-    @ViewModelScoped
-    fun provideScheduleSelectedIdRepository(): ScheduleSelectedIdRepository =
-        InMemoryScheduleSelectedIdRepository()
 }

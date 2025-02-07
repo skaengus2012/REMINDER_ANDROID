@@ -16,6 +16,7 @@
 
 package com.nlab.reminder.core.network
 
+import com.nlab.reminder.core.kotlin.NonBlankString
 import com.nlab.reminder.core.kotlin.Result
 import com.nlab.reminder.core.kotlin.catching
 import kotlinx.coroutines.CoroutineDispatcher
@@ -34,28 +35,25 @@ private fun Element.toProperty(): String = attr("property")
 private fun Element.toContent(): String = attr("content")
 
 interface LinkThumbnailDataSource {
-    suspend fun getLinkThumbnailResource(url: String): Result<LinkThumbnailResource>
+    suspend fun getLinkThumbnail(url: NonBlankString): Result<LinkThumbnailResponse>
 }
 
-class LinkThumbnailDataSourceImpl(
-    private val dispatcher: CoroutineDispatcher
-) : LinkThumbnailDataSource {
-    override suspend fun getLinkThumbnailResource(url: String): Result<LinkThumbnailResource> = catching {
-        require(url.isNotBlank())
+data class LinkThumbnailResponse(val title: String?, val image: String?)
+
+class LinkThumbnailDataSourceImpl(private val dispatcher: CoroutineDispatcher) : LinkThumbnailDataSource {
+    override suspend fun getLinkThumbnail(url: NonBlankString): Result<LinkThumbnailResponse> = catching {
         withContext(dispatcher) {
-            Jsoup.connect(url).execute()
+            val metaTagToValues = Jsoup.connect(url.value).execute()
                 .streamParser()
                 .use { parser ->
                     parser.selectFirst("head")
                         ?.let(::parseMetaTagToValues)
                         ?: emptyMap()
                 }
-                .let { metaTagToValues ->
-                    LinkThumbnailResource(
-                        title = metaTagToValues[OG_TITLE].orEmpty(),
-                        image = metaTagToValues[OG_IMAGE].orEmpty()
-                    )
-                }
+            LinkThumbnailResponse(
+                title = metaTagToValues[OG_TITLE],
+                image = metaTagToValues[OG_IMAGE]
+            )
         }
     }
 
@@ -67,8 +65,3 @@ class LinkThumbnailDataSourceImpl(
         }
     }
 }
-
-data class LinkThumbnailResource(
-    val title: String,
-    val image: String
-)

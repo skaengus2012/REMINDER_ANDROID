@@ -33,3 +33,19 @@ fun <T, R : Comparable<R>> Iterable<T>.minOf(selector: (T) -> R): R {
 fun <K, V> Iterable<K>.associateWith(valueSelector: (K) -> V): Map<K, V> {
     return kotlinAssociateWith(valueSelector)
 }
+
+// transform to List
+inline fun <T, U> Array<T>.toList(
+    transform: (T) -> U
+): List<U> = ArrayList<U>(size).apply { mapTo(destination = this, transform) }
+
+
+// transform to Set
+inline fun <T, U> Iterable<T>.toSet(transform: (T) -> U): Set<U> =
+    buildSet { mapTo(destination = this, transform = transform) }
+
+inline fun <T, U : Any> Iterable<T>.toSetNotNull(transform: (T) -> U?): Set<U> =
+    buildSet { mapNotNullTo(destination = this, transform = transform) }
+
+fun <T, U> Array<T>.toSet(transform: (T) -> U): Set<U> =
+    buildSet { mapTo(destination = this, transform = transform) }
