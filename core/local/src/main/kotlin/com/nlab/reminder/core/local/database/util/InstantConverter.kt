@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 The N's lab Open Source Project
+ * Copyright (C) 2025 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,18 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.data.model
+package com.nlab.reminder.core.local.database.util
+
+import androidx.room.TypeConverter
+import kotlinx.datetime.Instant
 
 /**
- * @author Doohyun
+ * @author Thalys
  */
-@JvmInline
-value class LinkMetadataTable(val value: Map<Link, LinkMetadata>)
+internal class InstantConverter {
+    @TypeConverter
+    fun longToInstant(value: Long?): Instant? = value?.let(Instant::fromEpochMilliseconds)
+
+    @TypeConverter
+    fun instantToLong(instant: Instant?): Long? = instant?.toEpochMilliseconds()
+}

@@ -20,16 +20,19 @@ import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.javafaker.Faker
+import com.nlab.reminder.core.kotlin.toNonBlankString
 import com.nlab.reminder.core.local.database.configuration.ReminderDatabase
 import com.nlab.reminder.core.local.database.dao.ScheduleContentDTO
 import com.nlab.reminder.core.local.database.dao.ScheduleDAO
 import com.nlab.reminder.core.local.database.dao.ScheduleTagListDAO
 import com.nlab.reminder.core.local.database.dao.TagDAO
+import com.nlab.reminder.core.local.database.dao.TriggerTimeDTO
 import com.nlab.reminder.core.local.database.model.ScheduleEntity
 import com.nlab.reminder.core.local.database.model.ScheduleTagListEntity
 import com.nlab.reminder.core.local.database.model.TagEntity
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
+import kotlinx.datetime.Clock
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -59,26 +62,40 @@ class InsertDummyInfoToDatabaseMacro {
     private val inputScheduleContents: List<ScheduleContentDTO> = buildList {
         this += List(300) {
             ScheduleContentDTO(
-                title = "Programming STUDY!",
-                description = "Good to know about [${faker.programmingLanguage().name()}] with ${faker.name().fullName()}",
-                link = "https://github.com/skaengus2012/REMINDER_ANDROID",
+                title = "Programming STUDY!".toNonBlankString(),
+                description = "Good to know about [${faker.programmingLanguage().name()}] with ${faker.name().fullName()}"
+                    .toNonBlankString(),
+                link = "https://github.com/skaengus2012/REMINDER_ANDROID".toNonBlankString(),
+                triggerTimeDTO = TriggerTimeDTO(
+                    utcTime = Clock.System.now(),
+                    isDateOnly = true
+                )
             )
         }
 
         this += List(300) {
             ScheduleContentDTO(
-                title = "Travel ✈️",
-                description = "Go to [${faker.nation().capitalCity()}] with ${faker.name().fullName()}",
-                link = null
+                title = "Travel ✈️".toNonBlankString(),
+                description = "Go to [${faker.nation().capitalCity()}] with ${faker.name().fullName()}"
+                    .toNonBlankString(),
+                link = null,
+                triggerTimeDTO = TriggerTimeDTO(
+                    utcTime = Clock.System.now(),
+                    isDateOnly = true
+                )
             )
         }
 
         this += List(300) {
             val book = faker.book()
             ScheduleContentDTO(
-                title = "Book club",
-                description = "About [${book.title()} of ${book.author()}]",
-                link = null
+                title = "Book club".toNonBlankString(),
+                description = "About [${book.title()} of ${book.author()}]".toNonBlankString(),
+                link = null,
+                triggerTimeDTO = TriggerTimeDTO(
+                    utcTime = Clock.System.now(),
+                    isDateOnly = true
+                )
             )
         }
     }
@@ -119,9 +136,9 @@ class InsertDummyInfoToDatabaseMacro {
             scheduleIds = scheduleDao.getAsStream().first().map { it.scheduleId }.toSet()
         )
 
-        return inputScheduleContents.shuffled().mapIndexed() { index, scheduleContent ->
+        return inputScheduleContents.shuffled().mapIndexed { index, scheduleContent ->
             scheduleDao.insertAndGet(
-                scheduleContent.copy(title = "#$index ${scheduleContent.title}")
+                scheduleContent.copy(title = "#$index ${scheduleContent.title}".toNonBlankString())
             )
         }
     }

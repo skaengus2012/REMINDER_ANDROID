@@ -26,6 +26,7 @@ import com.nlab.reminder.core.local.database.model.LinkMetadataEntity
 import com.nlab.reminder.core.local.database.model.ScheduleEntity
 import com.nlab.reminder.core.local.database.model.ScheduleTagListEntity
 import com.nlab.reminder.core.local.database.model.TagEntity
+import com.nlab.reminder.core.local.database.util.InstantConverter
 
 /**
  * @author Doohyun
@@ -38,6 +39,11 @@ import com.nlab.reminder.core.local.database.model.TagEntity
         TagEntity::class
     ],
     version = 1
+)
+@TypeConverters(
+    value = [
+        InstantConverter::class,
+    ]
 )
 abstract class ReminderDatabase : RoomDatabase() {
     abstract fun scheduleDAO(): ScheduleDAO

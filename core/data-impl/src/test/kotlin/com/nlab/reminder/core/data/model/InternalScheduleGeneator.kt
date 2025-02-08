@@ -25,11 +25,13 @@ import com.nlab.testkit.faker.genInt
 internal fun genScheduleAndEntity(schedule: Schedule = genSchedule()): Pair<Schedule, ScheduleEntity> =
     schedule to ScheduleEntity(
         scheduleId = schedule.id.rawId,
-        title = schedule.content.title,
+        title = schedule.content.title.value,
         description = schedule.content.note?.value,
         link = schedule.content.link?.rawLink?.value,
         visiblePriority = schedule.visiblePriority.value,
-        isComplete = schedule.isComplete
+        isComplete = schedule.isComplete,
+        triggerTimeUtc = schedule.content.triggerTime?.utcTime,
+        isTriggerTimeDateOnly = schedule.content.triggerTime?.isDateOnly
     )
 
 internal fun genScheduleAndEntities(
