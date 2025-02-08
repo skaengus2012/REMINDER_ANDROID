@@ -106,12 +106,12 @@ class InMemoryLinkMetadataCache(initialCache: Map<Link, LinkMetadata>) {
     private val _tableFlow = MutableStateFlow(initialCache)
     val tableFlow: StateFlow<Map<Link, LinkMetadata>> = _tableFlow.asStateFlow()
 
-    fun putAll(newElements: Map<Link, LinkMetadata>): Map<Link, LinkMetadata> {
+    fun put(link: Link, linkMetadata: LinkMetadata): Map<Link, LinkMetadata> {
+        val newElements = link to linkMetadata
         return _tableFlow.updateAndGet { it + newElements }
     }
 
-    fun put(link: Link, linkMetadata: LinkMetadata): Map<Link, LinkMetadata> {
-        val newElements = link to linkMetadata
+    fun putAll(newElements: Map<Link, LinkMetadata>): Map<Link, LinkMetadata> {
         return _tableFlow.updateAndGet { it + newElements }
     }
 }
