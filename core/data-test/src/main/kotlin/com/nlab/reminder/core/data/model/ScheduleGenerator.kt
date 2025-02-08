@@ -35,7 +35,7 @@ fun genScheduleContent(
     title: NonBlankString = genNonBlankString(),
     note: NonBlankString? = genNonBlankString(),
     link: Link? = genLink(),
-    triggerTime: TriggerTime = genTriggerTime()
+    triggerTime: TriggerTime? = genTriggerTime()
 ): ScheduleContent = ScheduleContent(
     title = title,
     note = note,
