@@ -116,12 +116,8 @@ private fun AllScheduleList(
         modifier = modifier
             .fillMaxSize()
             .padding(
-                start = remember(direction, displayCutoutPaddings) {
-                    displayCutoutPaddings.calculateStartPadding(direction)
-                },
-                end = remember(direction, displayCutoutPaddings) {
-                    displayCutoutPaddings.calculateEndPadding(direction)
-                },
+                start = displayCutoutPaddings.calculateStartPadding(direction),
+                end = displayCutoutPaddings.calculateEndPadding(direction),
             )
             .navigationBarsPadding()
             .imePadding()
