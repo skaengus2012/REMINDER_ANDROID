@@ -18,9 +18,12 @@ package com.nlab.reminder.core.component.schedule.ui.view.list
 
 import androidx.core.view.doOnLayout
 import androidx.recyclerview.widget.RecyclerView
+import com.nlab.reminder.core.android.content.getDimension
 import com.nlab.reminder.core.androix.recyclerview.selection.MultiSelectReceiver
 import com.nlab.reminder.core.androix.recyclerview.selection.MultiSelectTouchListener
+import com.nlab.reminder.core.component.schedule.R
 import com.nlab.reminder.core.data.model.ScheduleId
+import kotlin.math.max
 
 /**
  * @author Thalys
@@ -48,8 +51,11 @@ class ScheduleListSelectionHelper(
                 }
             },
             config = {
-                recyclerView.doOnLayout {
-                    hotspotHeight = (it.height * 0.25f).toInt()
+                recyclerView.doOnLayout { v ->
+                    hotspotHeight = max(
+                        v.height * 0.25f,
+                        v.context.getDimension(R.dimen.schedule_multi_selection_min_hotspot)
+                    ).toInt()
                     autoScrollDelayTimeInMillis = 15L
                 }
             }
