@@ -16,17 +16,26 @@
 
 package com.nlab.reminder.core.android.widget
 
+import android.text.Spanned
+import android.text.TextUtils
 import android.widget.TextView
 
 /**
- * @author Doohyun
+ * If [text] is different from the existing value, change it and return whether or not it has changed.
+ *
+ *  @author Doohyun
+ *  @param text value to change
+ *  @return whether to change
  */
-
 fun TextView.bindText(text: CharSequence?): Boolean {
     val oldText: CharSequence? = this.text
     if (text === oldText) return false
     if (text == null && oldText!!.isEmpty()) return false
-    if (text is String && oldText is String && text == oldText) return false
+    if (text is Spanned) {
+        if (text == oldText) return false
+    } else if (TextUtils.equals(text, oldText)) {
+        return false
+    }
 
     setText(text)
     return true

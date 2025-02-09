@@ -103,7 +103,7 @@ private fun TagCardPreview() {
         Box(
             modifier = Modifier
                 .size(150.dp)
-                .background(PlaneatTheme.colors.bgCard1)) {
+                .background(PlaneatTheme.colors.bg1Layer)) {
             TagCard(
                 modifier = Modifier.align(Alignment.Center),
                 text = "Hello TagCard"

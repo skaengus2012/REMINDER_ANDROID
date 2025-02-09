@@ -23,3 +23,5 @@ import com.nlab.reminder.core.designsystem.R
  */
 typealias DrawableIds = R.drawable
 typealias FontIds = R.font
+typealias DimenIds = R.dimen
+typealias AttrIds = R.attr
