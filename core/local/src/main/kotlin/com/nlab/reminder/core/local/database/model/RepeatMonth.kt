@@ -38,7 +38,7 @@ import androidx.annotation.StringDef
     ]
 )
 @Retention(AnnotationRetention.SOURCE)
-annotation class RepeatMonthCode
+annotation class RepeatMonth
 
 const val REPEAT_MONTH_JAN = "REPEAT_MONTH_JAN"
 const val REPEAT_MONTH_FEB = "REPEAT_MONTH_FEB"

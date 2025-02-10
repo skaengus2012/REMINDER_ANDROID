@@ -23,16 +23,22 @@ import androidx.annotation.StringDef
  */
 @StringDef(
     value = [
-        REPEAT_FREQUENCY_DAILY,
-        REPEAT_FREQUENCY_WEEKLY,
-        REPEAT_FREQUENCY_MONTHLY,
-        REPEAT_FREQUENCY_YEARLY
+        REPEAT_WEEK_SUN,
+        REPEAT_WEEK_MON,
+        REPEAT_WEEK_TUE,
+        REPEAT_WEEK_WED,
+        REPEAT_WEEK_THU,
+        REPEAT_WEEK_FRI,
+        REPEAT_WEEK_SAT
     ]
 )
 @Retention(AnnotationRetention.SOURCE)
-annotation class RepeatFrequencyCode
+annotation class RepeatWeek
 
-const val REPEAT_FREQUENCY_DAILY = "REPEAT_FREQUENCY_DAILY"
-const val REPEAT_FREQUENCY_WEEKLY = "REPEAT_FREQUENCY_WEEKLY"
-const val REPEAT_FREQUENCY_MONTHLY = "REPEAT_FREQUENCY_MONTHLY"
-const val REPEAT_FREQUENCY_YEARLY = "REPEAT_FREQUENCY_YEARLY"
+const val REPEAT_WEEK_SUN = "REPEAT_WEEK_SUN"
+const val REPEAT_WEEK_MON = "REPEAT_WEEK_MON"
+const val REPEAT_WEEK_TUE = "REPEAT_WEEK_TUE"
+const val REPEAT_WEEK_WED = "REPEAT_WEEK_WED"
+const val REPEAT_WEEK_THU = "REPEAT_WEEK_THU"
+const val REPEAT_WEEK_FRI = "REPEAT_WEEK_FRI"
+const val REPEAT_WEEK_SAT = "REPEAT_WEEK_SAT"

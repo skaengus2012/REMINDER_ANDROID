@@ -23,22 +23,28 @@ import androidx.annotation.StringDef
  */
 @StringDef(
     value = [
-        REPEAT_WEEK_SUN,
-        REPEAT_WEEK_MON,
-        REPEAT_WEEK_TUE,
-        REPEAT_WEEK_WED,
-        REPEAT_WEEK_THU,
-        REPEAT_WEEK_FRI,
-        REPEAT_WEEK_SAT
+        REPEAT_DAYS_SUN,
+        REPEAT_DAYS_MON,
+        REPEAT_DAYS_TUE,
+        REPEAT_DAYS_WED,
+        REPEAT_DAYS_THU,
+        REPEAT_DAYS_FRI,
+        REPEAT_DAYS_SAT,
+        REPEAT_DAYS_DAY,
+        REPEAT_DAYS_WEEKDAY,
+        REPEAT_DAYS_WEEKEND
     ]
 )
 @Retention(AnnotationRetention.SOURCE)
-annotation class RepeatWeekCode
+annotation class RepeatDays
 
-const val REPEAT_WEEK_SUN = "REPEAT_WEEK_SUN"
-const val REPEAT_WEEK_MON = "REPEAT_WEEK_MON"
-const val REPEAT_WEEK_TUE = "REPEAT_WEEK_TUE"
-const val REPEAT_WEEK_WED = "REPEAT_WEEK_WED"
-const val REPEAT_WEEK_THU = "REPEAT_WEEK_THU"
-const val REPEAT_WEEK_FRI = "REPEAT_WEEK_FRI"
-const val REPEAT_WEEK_SAT = "REPEAT_WEEK_SAT"
+const val REPEAT_DAYS_SUN = "REPEAT_DAYS_SUN"
+const val REPEAT_DAYS_MON = "REPEAT_DAYS_MON"
+const val REPEAT_DAYS_TUE = "REPEAT_DAYS_TUE"
+const val REPEAT_DAYS_WED = "REPEAT_DAYS_WED"
+const val REPEAT_DAYS_THU = "REPEAT_DAYS_THU"
+const val REPEAT_DAYS_FRI = "REPEAT_DAYS_FRI"
+const val REPEAT_DAYS_SAT = "REPEAT_DAYS_SAT"
+const val REPEAT_DAYS_DAY = "REPEAT_DAYS_DAY"
+const val REPEAT_DAYS_WEEKDAY = "REPEAT_DAYS_WEEKDAY"
+const val REPEAT_DAYS_WEEKEND = "REPEAT_DAYS_WEEKEND"
