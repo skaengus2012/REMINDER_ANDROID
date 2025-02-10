@@ -33,7 +33,7 @@ import androidx.annotation.StringDef
     ]
 )
 @Retention(AnnotationRetention.SOURCE)
-annotation class RepeatFrequencySettingCode
+annotation class RepeatFrequencySetting
 
 const val REPEAT_FREQUENCY_SETTING_WEEKLY = "REPEAT_FREQUENCY_SETTING_WEEKLY"
 const val REPEAT_FREQUENCY_SETTING_MONTHLY_DAY = "REPEAT_FREQUENCY_SETTING_MONTHLY_DAY"

@@ -16,6 +16,7 @@
 
 package com.nlab.reminder.core.local.database.model
 
+import androidx.annotation.IntRange
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -24,11 +25,9 @@ import kotlinx.datetime.Instant
 /**
  * @author Doohyun
  */
-internal const val EMPTY_SCHEDULE_ID = 0L
-
 @Entity(tableName = "schedule")
 data class ScheduleEntity(
-    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "schedule_id") val scheduleId: Long = EMPTY_SCHEDULE_ID,
+    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "schedule_id") val scheduleId: Long = EMPTY_GENERATED_ID,
     @ColumnInfo(name = "title") val title: String,
     @ColumnInfo(name = "description") val description: String? = null,
     @ColumnInfo(name = "link") val link: String? = null,
@@ -36,4 +35,6 @@ data class ScheduleEntity(
     @ColumnInfo(name = "is_complete") val isComplete: Boolean,
     @ColumnInfo(name = "trigger_time_utc") val triggerTimeUtc: Instant?,
     @ColumnInfo(name = "is_trigger_time_date_only") val isTriggerTimeDateOnly: Boolean?,
+    @ColumnInfo(name = "repeat_frequency") @RepeatFrequency val repeatFrequency: String?,
+    @ColumnInfo(name = "repeat_frequency_value") @IntRange(from = 1, to = 999) val repeatFrequencyValue: Long?
 )

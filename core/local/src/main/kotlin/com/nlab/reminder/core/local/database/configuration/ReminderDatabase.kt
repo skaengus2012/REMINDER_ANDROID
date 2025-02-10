@@ -23,6 +23,7 @@ import com.nlab.reminder.core.local.database.dao.ScheduleDAO
 import com.nlab.reminder.core.local.database.dao.ScheduleTagListDAO
 import com.nlab.reminder.core.local.database.dao.TagDAO
 import com.nlab.reminder.core.local.database.model.LinkMetadataEntity
+import com.nlab.reminder.core.local.database.model.RepeatDetailEntity
 import com.nlab.reminder.core.local.database.model.ScheduleEntity
 import com.nlab.reminder.core.local.database.model.ScheduleTagListEntity
 import com.nlab.reminder.core.local.database.model.TagEntity
@@ -34,6 +35,7 @@ import com.nlab.reminder.core.local.database.util.InstantConverter
 @Database(
     entities = [
         LinkMetadataEntity::class,
+        RepeatDetailEntity::class,
         ScheduleEntity::class,
         ScheduleTagListEntity::class,
         TagEntity::class

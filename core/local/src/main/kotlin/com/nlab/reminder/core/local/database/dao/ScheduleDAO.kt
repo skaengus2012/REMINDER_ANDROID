@@ -25,7 +25,8 @@ import androidx.room.Update
 import com.nlab.reminder.core.kotlin.NonBlankString
 import com.nlab.reminder.core.kotlin.NonNegativeLong
 import com.nlab.reminder.core.kotlin.toNonNegativeLong
-import com.nlab.reminder.core.local.database.model.EMPTY_SCHEDULE_ID
+import com.nlab.reminder.core.local.database.model.EMPTY_GENERATED_ID
+import com.nlab.reminder.core.local.database.model.RepeatFrequency
 import com.nlab.reminder.core.local.database.model.ScheduleEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.Instant
@@ -129,7 +130,7 @@ abstract class ScheduleDAO {
             entities.sortedBy { it.visiblePriority }.forEachIndexed { index, entity ->
                 insert(
                     entity = entity.copy(
-                        scheduleId = EMPTY_SCHEDULE_ID,
+                        scheduleId = EMPTY_GENERATED_ID,
                         isComplete = isComplete,
                         visiblePriority = maxVisiblePriority + index + 1
                     )
@@ -181,11 +182,17 @@ data class ScheduleContentDTO(
     val description: NonBlankString?,
     val link: NonBlankString?,
     val triggerTimeDTO: TriggerTimeDTO?,
+    val frequencyDTO: RepeatFrequencyDTO?
 )
 
 data class TriggerTimeDTO(
     val utcTime: Instant,
     val isDateOnly: Boolean
+)
+
+data class RepeatFrequencyDTO(
+    @RepeatFrequency val code: String,
+    val value: Long
 )
 
 private fun ScheduleContentDTO.equalsContent(entity: ScheduleEntity): Boolean =
@@ -204,6 +211,8 @@ private fun ScheduleEntity(
     link = contentDTO.link?.value,
     triggerTimeUtc = contentDTO.triggerTimeDTO?.utcTime,
     isTriggerTimeDateOnly = contentDTO.triggerTimeDTO?.isDateOnly,
+    repeatFrequency = contentDTO.frequencyDTO?.code,
+    repeatFrequencyValue = contentDTO.frequencyDTO?.value,
     visiblePriority = visiblePriority.value,
     isComplete = false
 )

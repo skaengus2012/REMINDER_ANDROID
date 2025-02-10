@@ -16,27 +16,7 @@
 
 package com.nlab.reminder.core.local.database.model
 
-import androidx.annotation.StringDef
-
 /**
  * @author Thalys
  */
-@StringDef(
-    value = [
-        REPEAT_DAY_ORDER_FIRST,
-        REPEAT_DAY_ORDER_SECOND,
-        REPEAT_DAY_ORDER_THIRD,
-        REPEAT_DAY_ORDER_FOURTH,
-        REPEAT_DAY_ORDER_FIFTH,
-        REPEAT_DAY_ORDER_LAST
-    ]
-)
-@Retention(AnnotationRetention.SOURCE)
-annotation class RepeatDayOrderCode
-
-const val REPEAT_DAY_ORDER_FIRST = "REPEAT_DAY_ORDER_FIRST"
-const val REPEAT_DAY_ORDER_SECOND = "REPEAT_DAY_ORDER_SECOND"
-const val REPEAT_DAY_ORDER_THIRD = "REPEAT_DAY_ORDER_THIRD"
-const val REPEAT_DAY_ORDER_FOURTH = "REPEAT_DAY_ORDER_FOURTH"
-const val REPEAT_DAY_ORDER_FIFTH = "REPEAT_DAY_ORDER_FIFTH"
-const val REPEAT_DAY_ORDER_LAST = "REPEAT_DAY_ORDER_LAST"
+internal const val EMPTY_GENERATED_ID = 0L
