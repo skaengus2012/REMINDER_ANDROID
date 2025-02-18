@@ -19,13 +19,11 @@ package com.nlab.reminder.core.data.repository.impl
 import com.nlab.reminder.core.data.model.Link
 import com.nlab.reminder.core.data.model.LinkMetadata
 import com.nlab.reminder.core.data.model.Schedule
-import com.nlab.reminder.core.data.model.ScheduleDetail
 import com.nlab.reminder.core.data.model.ScheduleId
 import com.nlab.reminder.core.data.model.Tag
 import com.nlab.reminder.core.data.repository.GetScheduleQuery
 import com.nlab.reminder.core.data.repository.GetTagQuery
 import com.nlab.reminder.core.data.repository.LinkMetadataRepository
-import com.nlab.reminder.core.data.repository.ScheduleDetailRepository
 import com.nlab.reminder.core.data.repository.ScheduleRepository
 import com.nlab.reminder.core.data.repository.ScheduleTagListRepository
 import com.nlab.reminder.core.data.repository.TagRepository

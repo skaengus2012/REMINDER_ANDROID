@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.data.repository
+package com.nlab.reminder.core.data.model
 
-import com.nlab.reminder.core.data.model.ScheduleDetail
-import kotlinx.coroutines.flow.Flow
+import com.nlab.reminder.core.kotlin.NonNegativeLong
 
 /**
- * @author Thalys
+ * @author Doohyun
  */
-interface ScheduleDetailRepository {
-    suspend fun getScheduleDetailsAsStream(query: GetScheduleQuery): Flow<Set<ScheduleDetail>>
-}
+data class Repeat(
+    val type: RepeatFrequencyType,
+    val value: NonNegativeLong
+)

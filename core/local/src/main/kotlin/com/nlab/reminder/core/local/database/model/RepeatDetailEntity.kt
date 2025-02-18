@@ -47,7 +47,7 @@ import androidx.room.PrimaryKey
         )
     ]
 )
-class RepeatDetailEntity(
+data class RepeatDetailEntity(
     @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "repeat_id") val repeatId: Long = EMPTY_GENERATED_ID,
     @ColumnInfo(name = "schedule_id") val scheduleId: Long,
     @ColumnInfo(name = "frequency_setting") @RepeatFrequencySetting val frequencySetting: String,

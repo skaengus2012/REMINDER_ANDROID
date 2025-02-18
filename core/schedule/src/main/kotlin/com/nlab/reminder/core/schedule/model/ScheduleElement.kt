@@ -17,7 +17,6 @@
 package com.nlab.reminder.core.schedule.model
 
 import com.nlab.reminder.core.data.model.LinkMetadata
-import com.nlab.reminder.core.data.model.ScheduleDetail
 
 /**
  * @author thalys
