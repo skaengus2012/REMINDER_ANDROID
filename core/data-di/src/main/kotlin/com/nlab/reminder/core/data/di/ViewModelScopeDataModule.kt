@@ -18,21 +18,22 @@ package com.nlab.reminder.core.data.di
 
 import com.nlab.reminder.core.data.repository.LinkMetadataRepository
 import com.nlab.reminder.core.data.repository.ScheduleCompleteMarkRepository
-import com.nlab.reminder.core.data.repository.ScheduleDetailRepository
-import com.nlab.reminder.core.data.repository.ScheduleRepository
-import com.nlab.reminder.core.data.repository.ScheduleTagListRepository
-import com.nlab.reminder.core.data.repository.TagRepository
-import com.nlab.reminder.core.data.repository.impl.DefaultScheduleDetailRepository
 import com.nlab.reminder.core.data.repository.impl.InMemoryLinkMetadataCache
 import com.nlab.reminder.core.data.repository.impl.InMemoryScheduleCompleteMarkRepository
 import com.nlab.reminder.core.data.repository.impl.OfflineFirstLinkMetadataRepository
+import com.nlab.reminder.core.kotlin.NonBlankString
+import com.nlab.reminder.core.kotlin.Result
+import com.nlab.reminder.core.kotlin.onFailure
+import com.nlab.reminder.core.kotlin.onSuccess
 import com.nlab.reminder.core.local.database.dao.LinkMetadataDAO
-import com.nlab.reminder.core.network.LinkThumbnailDataSource
+import com.nlab.reminder.core.network.datasource.LinkThumbnailDataSource
+import com.nlab.reminder.core.network.datasource.LinkThumbnailResponse
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.android.scopes.ViewModelScoped
+import timber.log.Timber
 
 /**
  * @author Doohyun
@@ -47,22 +48,17 @@ internal class ViewModelScopeDataModule {
         linkThumbnailDataSource: LinkThumbnailDataSource
     ): LinkMetadataRepository = OfflineFirstLinkMetadataRepository(
         linkMetadataDAO = linkMetadataDAO,
-        linkThumbnailDataSource = linkThumbnailDataSource,
-        inMemoryCache = InMemoryLinkMetadataCache(initialCache = emptyMap())
-    )
+        linkThumbnailDataSource = object : LinkThumbnailDataSource {
+            override suspend fun getLinkThumbnail(
+                url: NonBlankString
+            ): Result<LinkThumbnailResponse> = linkThumbnailDataSource.getLinkThumbnail(url)
+                .onSuccess { response ->
+                    Timber.d("The linkMetadata loading success -> [$url : $response]")
+                }
+                .onFailure { e -> Timber.w(e, "The linkMetadata loading failed -> [$url]") }
 
-    @ViewModelScoped
-    @Provides
-    fun provideScheduleDetailRepository(
-        scheduleRepository: ScheduleRepository,
-        tagRepository: TagRepository,
-        scheduleTagListRepository: ScheduleTagListRepository,
-        linkMetadataRepository: LinkMetadataRepository
-    ): ScheduleDetailRepository = DefaultScheduleDetailRepository(
-        scheduleRepository = scheduleRepository,
-        tagRepository = tagRepository,
-        scheduleTagListRepository = scheduleTagListRepository,
-        linkMetadataRepository = linkMetadataRepository
+        },
+        inMemoryCache = InMemoryLinkMetadataCache(initialCache = emptyMap())
     )
 
     @Provides

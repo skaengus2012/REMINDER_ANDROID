@@ -26,9 +26,10 @@ import com.nlab.reminder.core.kotlin.Result
 import com.nlab.reminder.core.kotlin.catching
 import com.nlab.reminder.core.kotlin.collections.toSet
 import com.nlab.reminder.core.kotlin.map
-import com.nlab.reminder.core.local.database.dao.TagRelationDAO
+import com.nlab.reminder.core.kotlin.trim
 import com.nlab.reminder.core.local.database.dao.TagDAO
 import com.nlab.reminder.core.local.database.model.TagEntity
+import com.nlab.reminder.core.local.database.transaction.ReplaceTagTransaction
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 
@@ -37,20 +38,36 @@ import kotlinx.coroutines.flow.distinctUntilChanged
  */
 class LocalTagRepository(
     private val tagDAO: TagDAO,
-    private val tagRelationDAO: TagRelationDAO,
+    private val replaceTag: ReplaceTagTransaction
 ) : TagRepository {
     override suspend fun save(query: SaveTagQuery): Result<Tag> {
         val entityResult = catching {
             when (query) {
                 is SaveTagQuery.Add -> {
-                    tagDAO.insertAndGet(name = query.name.value)
+                    // TODO make trim Test
+                    tagDAO.insertAndGet(name = query.name.trim())
                 }
 
                 is SaveTagQuery.Modify -> {
-                    tagRelationDAO.updateOrReplaceAndGet(
-                        tagId = query.id.rawId,
-                        name = query.name.value
-                    )
+                    // TODO make trim Test
+                    val targetId = query.id.rawId
+                    val updateName = query.name.trim()
+                    val tagEntity = tagDAO.findByName(updateName.value)
+                    when {
+                        tagEntity == null -> {
+                            // case1 : not conflict name, just update
+                            tagDAO.updateAndGet(tagId = targetId, name = updateName)
+                        }
+                        tagEntity.tagId == targetId -> {
+                            // case2 : request same name
+                            tagEntity
+                        }
+                        else -> {
+                            // case3 : conflict name, replace
+                            replaceTag(fromTagId = targetId, toTagId = tagEntity.tagId)
+                            tagEntity
+                        }
+                    }
                 }
             }
         }

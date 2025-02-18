@@ -28,7 +28,7 @@ import kotlinx.coroutines.CoroutineScope
 /**
  * @author Doohyun
  */
-fun ReminderPreferenceDataStore(
+internal fun ReminderPreferenceDataStore(
     context: Context,
     coroutineScope: CoroutineScope
 ): DataStore<Preferences> = PreferenceDataStoreFactory.create(

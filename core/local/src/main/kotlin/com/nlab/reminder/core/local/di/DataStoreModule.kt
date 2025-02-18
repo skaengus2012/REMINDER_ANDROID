@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 The N's lab Open Source Project
+ * Copyright (C) 2025 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,9 @@ package com.nlab.reminder.core.local.di
 import android.content.Context
 import com.nlab.reminder.core.inject.qualifiers.coroutine.AppScope
 import com.nlab.reminder.core.inject.qualifiers.coroutine.Dispatcher
-import com.nlab.reminder.core.inject.qualifiers.coroutine.DispatcherOption.*
-import com.nlab.reminder.core.local.datastore.preference.PreferenceDataSource
+import com.nlab.reminder.core.inject.qualifiers.coroutine.DispatcherOption.IO
 import com.nlab.reminder.core.local.datastore.configuration.ReminderPreferenceDataStore
+import com.nlab.reminder.core.local.datastore.preference.PreferenceDataSource
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -33,7 +33,7 @@ import kotlinx.coroutines.plus
 import javax.inject.Singleton
 
 /**
- * @author Doohyun
+ * @author Thalys
  */
 @Module
 @InstallIn(SingletonComponent::class)

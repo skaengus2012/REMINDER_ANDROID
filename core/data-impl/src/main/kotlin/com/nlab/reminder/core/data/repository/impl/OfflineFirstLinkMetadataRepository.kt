@@ -23,11 +23,10 @@ import com.nlab.reminder.core.data.repository.LinkMetadataRepository
 import com.nlab.reminder.core.kotlin.collections.toSet
 import com.nlab.reminder.core.kotlin.getOrNull
 import com.nlab.reminder.core.kotlin.map
-import com.nlab.reminder.core.kotlin.onSuccess
 import com.nlab.reminder.core.kotlinx.coroutine.flow.flatMapLatest
 import com.nlab.reminder.core.kotlinx.coroutine.flow.map
 import com.nlab.reminder.core.local.database.dao.LinkMetadataDAO
-import com.nlab.reminder.core.network.LinkThumbnailDataSource
+import com.nlab.reminder.core.network.datasource.LinkThumbnailDataSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.currentCoroutineContext

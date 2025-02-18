@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.local.database.util
+package com.nlab.reminder.core.local.database.transaction
 
-import androidx.room.withTransaction
-import com.nlab.reminder.core.local.database.configuration.ReminderDatabase
+import com.nlab.reminder.core.local.database.dao.ScheduleTagListDAO
+import com.nlab.reminder.core.local.database.dao.TagDAO
+import com.nlab.reminder.core.local.database.util.TransactionScope
 import dagger.Reusable
 import javax.inject.Inject
 
@@ -25,6 +26,15 @@ import javax.inject.Inject
  * @author Thalys
  */
 @Reusable
-internal class TransactionScope @Inject constructor(private val reminderDatabase: ReminderDatabase) {
-    suspend fun <R> runIn(block: suspend () -> R): R = reminderDatabase.withTransaction(block)
+class DeleteUnusedTagsTransaction @Inject internal constructor(
+    private val transactionScope: TransactionScope,
+    private val scheduleTagListDAO: ScheduleTagListDAO,
+    private val tagDAO: TagDAO
+) {
+    suspend operator fun invoke() {
+        transactionScope.runIn {
+            val unusedTagIds = scheduleTagListDAO.getTagIds()
+            tagDAO.deleteByNotInIds(tagIds = unusedTagIds.toSet())
+        }
+    }
 }

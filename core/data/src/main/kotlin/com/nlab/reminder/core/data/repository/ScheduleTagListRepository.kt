@@ -26,6 +26,6 @@ import kotlinx.coroutines.flow.Flow
  * @author Thalys
  */
 interface ScheduleTagListRepository {
-    fun getScheduleTagListAsStream(scheduleIds: Set<ScheduleId>): Flow<Map<ScheduleId, Set<TagId>>>
     suspend fun getTagUsageCount(tagId: TagId): Result<NonNegativeLong>
+    fun getScheduleTagListAsStream(scheduleIds: Set<ScheduleId>): Flow<Map<ScheduleId, Set<TagId>>>
 }

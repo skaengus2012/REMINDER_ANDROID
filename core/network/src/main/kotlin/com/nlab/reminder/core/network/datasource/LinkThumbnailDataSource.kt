@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 The N's lab Open Source Project
+ * Copyright (C) 2025 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.network
+package com.nlab.reminder.core.network.datasource
 
+import com.nlab.reminder.core.inject.qualifiers.coroutine.Dispatcher
+import com.nlab.reminder.core.inject.qualifiers.coroutine.DispatcherOption.IO
 import com.nlab.reminder.core.kotlin.NonBlankString
 import com.nlab.reminder.core.kotlin.Result
 import com.nlab.reminder.core.kotlin.catching
@@ -23,6 +25,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
+import javax.inject.Inject
 
 /**
  * @author Doohyun
@@ -34,13 +37,15 @@ private val TAGS_REQUIRED: Set<String> = setOf(OG_TITLE, OG_IMAGE)
 private fun Element.toProperty(): String = attr("property")
 private fun Element.toContent(): String = attr("content")
 
+data class LinkThumbnailResponse(val title: String?, val image: String?)
+
 interface LinkThumbnailDataSource {
     suspend fun getLinkThumbnail(url: NonBlankString): Result<LinkThumbnailResponse>
 }
 
-data class LinkThumbnailResponse(val title: String?, val image: String?)
-
-class LinkThumbnailDataSourceImpl(private val dispatcher: CoroutineDispatcher) : LinkThumbnailDataSource {
+internal class LinkThumbnailDataSourceImpl @Inject constructor(
+    @Dispatcher(IO) private val dispatcher: CoroutineDispatcher
+) : LinkThumbnailDataSource {
     override suspend fun getLinkThumbnail(url: NonBlankString): Result<LinkThumbnailResponse> = catching {
         withContext(dispatcher) {
             val metaTagToValues = Jsoup.connect(url.value).execute()

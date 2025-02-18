@@ -26,6 +26,8 @@ value class NonBlankString internal constructor(val value: String) {
     }
 }
 
+fun NonBlankString.trim(): NonBlankString = NonBlankString(value = value.trim())
+
 fun String.toNonBlankString(): NonBlankString = NonBlankString(value = this)
 
 fun String?.tryToNonBlankStringOrNull(): NonBlankString? =

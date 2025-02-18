@@ -7,9 +7,9 @@ import com.nlab.reminder.core.data.model.genLink
 import com.nlab.reminder.core.data.model.genLinkAndMetadataAndEntity
 import com.nlab.reminder.core.data.model.genLinkMetadata
 import com.nlab.reminder.core.local.database.dao.LinkMetadataDAO
-import com.nlab.reminder.core.network.LinkThumbnailDataSource
+import com.nlab.reminder.core.network.datasource.LinkThumbnailDataSource
 import com.nlab.reminder.core.kotlin.Result
-import com.nlab.reminder.core.network.LinkThumbnailResponse
+import com.nlab.reminder.core.network.datasource.LinkThumbnailResponse
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted

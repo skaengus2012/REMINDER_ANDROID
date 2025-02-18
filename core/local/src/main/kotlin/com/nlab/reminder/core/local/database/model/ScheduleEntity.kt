@@ -20,6 +20,8 @@ import androidx.annotation.IntRange
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.nlab.reminder.core.kotlin.NonBlankString
+import com.nlab.reminder.core.kotlin.NonNegativeLong
 import kotlinx.datetime.Instant
 
 /**
@@ -38,3 +40,54 @@ data class ScheduleEntity(
     @ColumnInfo(name = "repeat_frequency") @RepeatFrequency val repeatFrequency: String?,
     @ColumnInfo(name = "repeat_frequency_value") @IntRange(from = 1, to = 999) val repeatFrequencyValue: Long?
 )
+
+data class ScheduleContentDTO(
+    val title: NonBlankString,
+    val description: NonBlankString?,
+    val link: NonBlankString?,
+    val triggerTimeDTO: TriggerTimeDTO?,
+    val frequencyDTO: RepeatFrequencyDTO?
+)
+
+data class TriggerTimeDTO(
+    val utcTime: Instant,
+    val isDateOnly: Boolean
+)
+
+data class RepeatFrequencyDTO(
+    @RepeatFrequency val code: String,
+    val value: Long
+)
+
+internal fun ScheduleEntity(
+    contentDTO: ScheduleContentDTO,
+    visiblePriority: NonNegativeLong,
+): ScheduleEntity = ScheduleEntity(
+    title = contentDTO.title.value,
+    description = contentDTO.description?.value,
+    link = contentDTO.link?.value,
+    triggerTimeUtc = contentDTO.triggerTimeDTO?.utcTime,
+    isTriggerTimeDateOnly = contentDTO.triggerTimeDTO?.isDateOnly,
+    repeatFrequency = contentDTO.frequencyDTO?.code,
+    repeatFrequencyValue = contentDTO.frequencyDTO?.value,
+    visiblePriority = visiblePriority.value,
+    isComplete = false
+)
+
+internal fun ScheduleEntity(
+    baseEntity: ScheduleEntity,
+    contentDTO: ScheduleContentDTO
+): ScheduleEntity = baseEntity.copy(
+    title = contentDTO.title.value,
+    description = contentDTO.description?.value,
+    link = contentDTO.link?.value,
+    triggerTimeUtc = contentDTO.triggerTimeDTO?.utcTime,
+    isTriggerTimeDateOnly = contentDTO.triggerTimeDTO?.isDateOnly
+)
+
+internal fun ScheduleEntity.equalsContent(contentDTO: ScheduleContentDTO): Boolean =
+    title == contentDTO.title.value
+            && description == contentDTO.description?.value
+            && link == contentDTO.link?.value
+            && triggerTimeUtc == contentDTO.triggerTimeDTO?.utcTime
+            && isTriggerTimeDateOnly == contentDTO.triggerTimeDTO?.isDateOnly

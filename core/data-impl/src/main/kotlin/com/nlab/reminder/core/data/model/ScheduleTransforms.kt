@@ -54,5 +54,6 @@ internal fun ScheduleContent.toLocalDTO() = ScheduleContentDTO(
             utcTime = it.utcTime,
             isDateOnly = it.isDateOnly
         )
-    }
+    },
+    frequencyDTO = null // TODO fill frequency DTO
 )

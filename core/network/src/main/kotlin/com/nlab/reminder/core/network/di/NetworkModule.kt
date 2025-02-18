@@ -14,17 +14,23 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.local.database.util
+package com.nlab.reminder.core.network.di
 
-import androidx.room.withTransaction
-import com.nlab.reminder.core.local.database.configuration.ReminderDatabase
+import com.nlab.reminder.core.network.datasource.LinkThumbnailDataSource
+import com.nlab.reminder.core.network.datasource.LinkThumbnailDataSourceImpl
+import dagger.Binds
+import dagger.Module
 import dagger.Reusable
-import javax.inject.Inject
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
 
 /**
- * @author Thalys
+ * @author Doohyun
  */
-@Reusable
-internal class TransactionScope @Inject constructor(private val reminderDatabase: ReminderDatabase) {
-    suspend fun <R> runIn(block: suspend () -> R): R = reminderDatabase.withTransaction(block)
+@Module
+@InstallIn(SingletonComponent::class)
+internal abstract class NetworkModule {
+    @Reusable
+    @Binds
+    abstract fun bindLinkMetadataSource(impl: LinkThumbnailDataSourceImpl): LinkThumbnailDataSource
 }

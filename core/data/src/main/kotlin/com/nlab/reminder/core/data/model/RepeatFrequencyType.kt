@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 The N's lab Open Source Project
+ * Copyright (C) 2025 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,6 @@ package com.nlab.reminder.core.data.model
 /**
  * @author Doohyun
  */
-data class ScheduleDetail(
-    val schedule: Schedule,
-    val tags: Set<Tag>,
-    val linkMetadata: LinkMetadata?
-)
+enum class RepeatFrequencyType {
+    Hourly, Daily, Weekly, Monthly, Yearly
+}

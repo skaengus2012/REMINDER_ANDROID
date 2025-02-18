@@ -14,17 +14,21 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.local.database.util
+package com.nlab.reminder.core.local.database.dao
 
-import androidx.room.withTransaction
-import com.nlab.reminder.core.local.database.configuration.ReminderDatabase
-import dagger.Reusable
-import javax.inject.Inject
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.Query
+import com.nlab.reminder.core.local.database.model.RepeatDetailEntity
 
 /**
  * @author Thalys
  */
-@Reusable
-internal class TransactionScope @Inject constructor(private val reminderDatabase: ReminderDatabase) {
-    suspend fun <R> runIn(block: suspend () -> R): R = reminderDatabase.withTransaction(block)
+@Dao
+abstract class RepeatDetailDAO {
+    @Insert
+    abstract suspend fun insert(entities: Set<RepeatDetailEntity>)
+
+    @Query("DELETE FROM repeat_detail WHERE schedule_id = :scheduleId")
+    abstract fun deleteByScheduleId(scheduleId: Long)
 }
