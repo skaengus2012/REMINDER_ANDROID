@@ -16,22 +16,20 @@
 
 package com.nlab.reminder.core.local.database.dao
 
+import androidx.room.RoomDatabase
+import androidx.room.withTransaction
 import com.nlab.reminder.core.local.database.model.ScheduleTagListEntity
 import com.nlab.reminder.core.local.database.model.TagEntity
-import com.nlab.reminder.core.local.database.util.TransactionScope
 
 /**
  * @author Doohyun
  */
 class TagRelationDAO(
-    private val transactionScope: TransactionScope,
+    private val database: RoomDatabase,
     private val tagDAO: TagDAO,
     private val scheduleTagListDAO: ScheduleTagListDAO
 ) {
-    suspend fun updateOrReplaceAndGet(
-        tagId: Long,
-        name: String
-    ): TagEntity {
+    suspend fun updateOrReplaceAndGet(tagId: Long, name: String): TagEntity {
         val tagEntity = tagDAO.findByName(name)
         return when {
             tagEntity == null -> {
@@ -44,7 +42,7 @@ class TagRelationDAO(
                 TagEntity(tagId = tagId, name = name)
             }
 
-            else -> transactionScope {
+            else -> database.withTransaction {
                 // case3 : conflict name, replace
                 scheduleTagListDAO.copyScheduleIds(fromTagId = tagId, toTagId = tagEntity.tagId)
                 tagDAO.deleteById(tagId)

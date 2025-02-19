@@ -35,6 +35,12 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 class LocalScheduleTagListRepository(
     private val scheduleTagListDAO: ScheduleTagListDAO,
 ) : ScheduleTagListRepository {
+    override suspend fun getTagUsageCount(tagId: TagId): Result<NonNegativeLong> = catching {
+        scheduleTagListDAO
+            .findTagUsageCount(tagId = tagId.rawId)
+            .toNonNegativeLong()
+    }
+
     override fun getScheduleTagListAsStream(scheduleIds: Set<ScheduleId>): Flow<Map<ScheduleId, Set<TagId>>> =
         scheduleTagListDAO
             .findByScheduleIdsAsStream(scheduleIds.toSet(ScheduleId::rawId))
@@ -44,10 +50,4 @@ class LocalScheduleTagListRepository(
                     .groupBy(keySelector = { ScheduleId(it.scheduleId) }, valueTransform = { TagId(it.tagId) })
                     .mapValues { (_, value) -> value.toSet() }
             }
-
-    override suspend fun getTagUsageCount(tagId: TagId): Result<NonNegativeLong> = catching {
-        scheduleTagListDAO
-            .findTagUsageCount(tagId = tagId.rawId)
-            .toNonNegativeLong()
-    }
 }

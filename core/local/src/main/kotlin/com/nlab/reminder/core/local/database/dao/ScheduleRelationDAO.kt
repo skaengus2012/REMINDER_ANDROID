@@ -14,18 +14,20 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.data.repository
+package com.nlab.reminder.core.local.database.dao
 
-import com.nlab.reminder.core.data.model.ScheduleId
-import com.nlab.reminder.core.data.model.TagId
-import com.nlab.reminder.core.kotlin.NonNegativeLong
-import com.nlab.reminder.core.kotlin.Result
-import kotlinx.coroutines.flow.Flow
+import androidx.room.RoomDatabase
 
 /**
  * @author Thalys
  */
-interface ScheduleTagListRepository {
-    suspend fun getTagUsageCount(tagId: TagId): Result<NonNegativeLong>
-    fun getScheduleTagListAsStream(scheduleIds: Set<ScheduleId>): Flow<Map<ScheduleId, Set<TagId>>>
+class ScheduleRelationDAO(
+    private val database: RoomDatabase,
+    private val scheduleDAO: ScheduleDAO,
+    private val scheduleTagListDAO: ScheduleTagListDAO,
+    private val repeatDetailDAO: RepeatDetailDAO
+) {
+    suspend fun insert() {
+
+    }
 }

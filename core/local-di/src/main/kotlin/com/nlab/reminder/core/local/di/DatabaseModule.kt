@@ -23,10 +23,8 @@ import com.nlab.reminder.core.local.database.dao.ScheduleDAO
 import com.nlab.reminder.core.local.database.dao.ScheduleTagListDAO
 import com.nlab.reminder.core.local.database.dao.TagRelationDAO
 import com.nlab.reminder.core.local.database.dao.TagDAO
-import com.nlab.reminder.core.local.database.util.TransactionScope
 import dagger.Module
 import dagger.Provides
-import dagger.Reusable
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
@@ -43,12 +41,6 @@ internal class DatabaseModule {
     fun provideReminderDatabase(
         @ApplicationContext context: Context
     ): ReminderDatabase = ReminderDatabase.getDatabase(context)
-
-    @Reusable
-    @Provides
-    fun provideTransactionScope(
-        reminderDatabase: ReminderDatabase
-    ): TransactionScope = TransactionScope(reminderDatabase)
 
     @Provides
     fun provideLinkMetadataDAO(
@@ -67,11 +59,11 @@ internal class DatabaseModule {
 
     @Provides
     fun provideTagRelationDAO(
-        transactionScope: TransactionScope,
+        database: ReminderDatabase,
         tagDAO: TagDAO,
         scheduleTagListDAO: ScheduleTagListDAO
     ): TagRelationDAO = TagRelationDAO(
-        transactionScope = transactionScope,
+        database = database,
         tagDAO = tagDAO,
         scheduleTagListDAO = scheduleTagListDAO
     )
