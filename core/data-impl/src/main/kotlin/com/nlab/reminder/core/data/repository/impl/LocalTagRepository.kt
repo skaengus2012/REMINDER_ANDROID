@@ -26,6 +26,7 @@ import com.nlab.reminder.core.kotlin.Result
 import com.nlab.reminder.core.kotlin.catching
 import com.nlab.reminder.core.kotlin.collections.toSet
 import com.nlab.reminder.core.kotlin.map
+import com.nlab.reminder.core.kotlin.trim
 import com.nlab.reminder.core.local.database.dao.TagRelationDAO
 import com.nlab.reminder.core.local.database.dao.TagDAO
 import com.nlab.reminder.core.local.database.model.TagEntity
@@ -43,13 +44,15 @@ class LocalTagRepository(
         val entityResult = catching {
             when (query) {
                 is SaveTagQuery.Add -> {
-                    tagDAO.insertAndGet(name = query.name.value)
+                    // TODO make trim Test
+                    tagDAO.insertAndGet(name = query.name.trim())
                 }
 
                 is SaveTagQuery.Modify -> {
+                    // TODO make trim Test
                     tagRelationDAO.updateOrReplaceAndGet(
                         tagId = query.id.rawId,
-                        name = query.name.value
+                        name = query.name.trim()
                     )
                 }
             }

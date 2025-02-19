@@ -26,5 +26,5 @@ import com.nlab.reminder.core.local.database.model.RepeatDetailEntity
 @Dao
 abstract class RepeatDetailDAO {
     @Insert
-    abstract suspend fun insert(entity: RepeatDetailEntity)
+    abstract suspend fun insert(entities: Set<RepeatDetailEntity>)
 }

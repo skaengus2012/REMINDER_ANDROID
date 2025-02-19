@@ -17,6 +17,13 @@
 package com.nlab.reminder.core.local.database.dao
 
 import androidx.room.RoomDatabase
+import androidx.room.withTransaction
+import com.nlab.reminder.core.kotlin.collections.toSet
+import com.nlab.reminder.core.local.database.model.RepeatDetailContentDTO
+import com.nlab.reminder.core.local.database.model.RepeatDetailEntity
+import com.nlab.reminder.core.local.database.model.ScheduleContentDTO
+import com.nlab.reminder.core.local.database.model.ScheduleEntity
+import com.nlab.reminder.core.local.database.model.ScheduleTagListEntity
 
 /**
  * @author Thalys
@@ -24,10 +31,54 @@ import androidx.room.RoomDatabase
 class ScheduleRelationDAO(
     private val database: RoomDatabase,
     private val scheduleDAO: ScheduleDAO,
+    private val tagDAO: TagDAO,
     private val scheduleTagListDAO: ScheduleTagListDAO,
     private val repeatDetailDAO: RepeatDetailDAO
 ) {
-    suspend fun insert() {
+    suspend fun insertAndGet(
+        contentDTO: ScheduleContentDTO,
+        tagIds: Set<Long>,
+        repeatDetailContentDTOs: Set<RepeatDetailContentDTO>
+    ): ScheduleEntity = database.withTransaction {
+        val scheduleEntity = scheduleDAO.insertAndGet(contentDTO)
+        insertExtras(
+            scheduleId = scheduleEntity.scheduleId,
+            tagIds = tagIds,
+            repeatDetailContentDTOs = repeatDetailContentDTOs
+        )
+        return@withTransaction scheduleEntity
+    }
 
+    suspend fun updateAndGet(
+        scheduleId: Long,
+        contentDTO: ScheduleContentDTO,
+        tagIds: Set<Long>,
+        repeatDetailContentDTOs: Set<RepeatDetailContentDTO>
+    ): ScheduleEntity = database.withTransaction {
+        val scheduleEntity = scheduleDAO.updateAndGet(scheduleId, contentDTO)
+        scheduleTagListDAO.deleteByScheduleId(scheduleId)
+
+        return@withTransaction scheduleEntity
+    }
+
+    private suspend fun insertExtras(
+        scheduleId: Long,
+        tagIds: Set<Long>,
+        repeatDetailContentDTOs: Set<RepeatDetailContentDTO>
+    ) {
+        scheduleTagListDAO.insert(
+            entities = tagIds.toSet { tagId ->
+                ScheduleTagListEntity(scheduleId = scheduleId, tagId = tagId)
+            }
+        )
+        repeatDetailDAO.insert(
+            entities = repeatDetailContentDTOs.toSet { dto ->
+                RepeatDetailEntity(
+                    scheduleId = scheduleId,
+                    frequencySetting = dto.frequencySetting,
+                    value = dto.value
+                )
+            }
+        )
     }
 }

@@ -53,3 +53,8 @@ data class RepeatDetailEntity(
     @ColumnInfo(name = "frequency_setting") @RepeatFrequencySetting val frequencySetting: String,
     @ColumnInfo(name = "value") val value: String
 )
+
+data class RepeatDetailContentDTO(
+    @RepeatFrequencySetting val frequencySetting: String,
+    val value: String
+)

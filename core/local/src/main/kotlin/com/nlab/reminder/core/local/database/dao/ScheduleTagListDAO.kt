@@ -17,7 +17,6 @@
 package com.nlab.reminder.core.local.database.dao
 
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import com.nlab.reminder.core.local.database.model.ScheduleTagListEntity
@@ -27,10 +26,10 @@ import kotlinx.coroutines.flow.flowOf
 @Dao
 abstract class ScheduleTagListDAO {
     @Insert
-    abstract suspend fun insert(entity: ScheduleTagListEntity)
+    abstract suspend fun insert(entities: Set<ScheduleTagListEntity>)
 
-    @Delete
-    abstract suspend fun delete(entity: ScheduleTagListEntity)
+    @Query("SELECT DISTINCT tag_id FROM schedule_tag_list")
+    abstract suspend fun getTagIds(): Array<Long>
 
     @Query("SELECT COUNT(schedule_id) FROM schedule_tag_list WHERE tag_id = :tagId")
     abstract suspend fun findTagUsageCount(tagId: Long): Long
@@ -44,4 +43,7 @@ abstract class ScheduleTagListDAO {
     fun findByScheduleIdsAsStream(scheduleIds: Set<Long>): Flow<Array<ScheduleTagListEntity>> =
         if (scheduleIds.isEmpty()) flowOf(emptyArray())
         else findByScheduleIdsAsStreamInternal(scheduleIds)
+
+    @Query("DELETE FROM schedule_tag_list WHERE schedule_id = :scheduleId")
+    abstract fun deleteByScheduleId(scheduleId: Long)
 }

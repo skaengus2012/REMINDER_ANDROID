@@ -18,6 +18,8 @@ package com.nlab.reminder.core.local.database.dao
 
 import androidx.room.RoomDatabase
 import androidx.room.withTransaction
+import com.nlab.reminder.core.kotlin.NonBlankString
+import com.nlab.reminder.core.kotlin.collections.toSet
 import com.nlab.reminder.core.local.database.model.ScheduleTagListEntity
 import com.nlab.reminder.core.local.database.model.TagEntity
 
@@ -29,8 +31,8 @@ class TagRelationDAO(
     private val tagDAO: TagDAO,
     private val scheduleTagListDAO: ScheduleTagListDAO
 ) {
-    suspend fun updateOrReplaceAndGet(tagId: Long, name: String): TagEntity {
-        val tagEntity = tagDAO.findByName(name)
+    suspend fun updateOrReplaceAndGet(tagId: Long, name: NonBlankString): TagEntity {
+        val tagEntity = tagDAO.findByName(name.value)
         return when {
             tagEntity == null -> {
                 // case1 : not conflict name, just update
@@ -39,7 +41,7 @@ class TagRelationDAO(
 
             tagEntity.tagId == tagId -> {
                 // case2 : request same name
-                TagEntity(tagId = tagId, name = name)
+                TagEntity(tagId = tagId, name = name.value)
             }
 
             else -> database.withTransaction {
@@ -50,13 +52,18 @@ class TagRelationDAO(
             }
         }
     }
+
+    suspend fun deleteUnusedTags() {
+        database.withTransaction {
+            val usedTagIds = scheduleTagListDAO.getTagIds()
+            tagDAO.deleteByNotInIds(tagIds = usedTagIds.toSet())
+        }
+    }
 }
 
 private suspend fun ScheduleTagListDAO.copyScheduleIds(fromTagId: Long, toTagId: Long) {
     val fromScheduleIds = findScheduleIdsByTagId(fromTagId).toSet()
     val toScheduleIds = findScheduleIdsByTagId(toTagId).toSet()
     val targetScheduleIds = fromScheduleIds - toScheduleIds
-    targetScheduleIds.forEach { scheduleId ->
-        insert(ScheduleTagListEntity(scheduleId = scheduleId, tagId = toTagId))
-    }
+    insert(entities = targetScheduleIds.toSet { scheduleId -> ScheduleTagListEntity(scheduleId, toTagId) })
 }
