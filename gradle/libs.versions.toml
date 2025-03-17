@@ -47,7 +47,7 @@ kotlinxCoroutine = "1.10.1"
 mockitoInline = "5.2.0"
 mockitoKotlin = "5.4.0"
 squareLeakcanary = "2.14"
-squareKotlinpoet = "2.0.0"
+squareKotlinpoet = "2.1.0"
 timber = "5.0.1"
 
 
