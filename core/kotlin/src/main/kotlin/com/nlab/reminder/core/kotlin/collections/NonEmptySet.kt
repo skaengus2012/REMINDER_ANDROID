@@ -14,11 +14,27 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.data.model
+package com.nlab.reminder.core.kotlin.collections
+
+import kotlinx.collections.immutable.toImmutableSet
 
 /**
- * @author Doohyun
+ * @author Thalys
  */
-enum class RepeatFrequencyType {
-    Hourly, Daily, Weekly, Monthly, Yearly
+@JvmInline
+value class NonEmptySet<out E> internal constructor(val value: Set<E>) {
+    init {
+        require(value.isNotEmpty()) { "Value should not be empty" }
+    }
 }
+
+fun <T> NonEmptySet(
+    head: T,
+    vararg tails: T
+): NonEmptySet<T> = buildSet { add(head); addAll(tails) }.toNonEmptySet()
+
+fun <T> Iterable<T>.toNonEmptySet(): NonEmptySet<T> = NonEmptySet(value = toImmutableSet())
+
+fun <T> Collection<T>.tryToNonEmptySetOrNull(): NonEmptySet<T>? =
+    if (isEmpty()) null
+    else toNonEmptySet()

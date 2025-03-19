@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 The N's lab Open Source Project
+ * Copyright (C) 2025 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,18 @@
 package com.nlab.reminder.core.data.model
 
 /**
- * Identity of [Schedule].
- *
- * @author Doohyun
+ * @author Thalys
  */
-@JvmInline
-value class ScheduleId(val rawId: Long)
+@RepeatDetailOption
+enum class Days {
+    Sun,
+    Mon,
+    Tue,
+    Wed,
+    Thu,
+    Fri,
+    Sat,
+    Default,
+    Weekday,
+    Weekend
+}

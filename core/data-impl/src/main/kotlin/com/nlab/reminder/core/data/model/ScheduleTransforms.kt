@@ -19,8 +19,6 @@ package com.nlab.reminder.core.data.model
 import com.nlab.reminder.core.kotlin.toNonBlankString
 import com.nlab.reminder.core.kotlin.tryToNonBlankStringOrNull
 import com.nlab.reminder.core.kotlin.tryToNonNegativeLongOrZero
-import com.nlab.reminder.core.local.database.dao.ScheduleContentDTO
-import com.nlab.reminder.core.local.database.dao.TriggerTimeDTO
 import com.nlab.reminder.core.local.database.model.ScheduleEntity
 
 /**
@@ -42,7 +40,8 @@ internal fun ScheduleContent(entity: ScheduleEntity): ScheduleContent = Schedule
             utcTime = utcTime,
             isDateOnly = requireNotNull(entity.isTriggerTimeDateOnly)
         )
-    }
+    },
+    repeat = entity.repeatFrequency
 )
 
 internal fun ScheduleContent.toLocalDTO() = ScheduleContentDTO(

@@ -16,3 +16,7 @@
 plugins {
     alias(libs.plugins.nlab.jvm.library)
 }
+
+dependencies {
+    implementation(libs.kotlinx.collections.immutable)
+}

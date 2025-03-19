@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 The N's lab Open Source Project
+ * Copyright (C) 2025 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,20 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.data.model
+package com.nlab.reminder.core.kotlin
 
 /**
- * Identity of [Schedule].
- *
- * @author Doohyun
+ * @author Thalys
  */
 @JvmInline
-value class ScheduleId(val rawId: Long)
+value class PositiveInt internal constructor(val value: Int) {
+    init {
+        require(value > 0) { "Value that will have a value of 0 or more" }
+    }
+}
+
+fun Int.toPositiveInt(): PositiveInt = PositiveInt(value = this)
+
+fun Int?.tryToPositiveInt(): PositiveInt? =
+    if (this == null || this < 1) null
+    else PositiveInt(value = this)

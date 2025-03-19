@@ -16,12 +16,30 @@
 
 package com.nlab.reminder.core.data.model
 
-import com.nlab.reminder.core.kotlin.NonNegativeLong
+import com.nlab.reminder.core.kotlin.PositiveInt
+import kotlinx.datetime.DayOfWeek
+import kotlinx.datetime.Month
 
 /**
  * @author Doohyun
  */
-data class Repeat(
-    val type: RepeatFrequencyType,
-    val value: NonNegativeLong
-)
+sealed class Repeat {
+    data class Hourly(val frequency: PositiveInt) : Repeat()
+
+    data class Daily(val frequency: PositiveInt) : Repeat()
+
+    data class Weekly(
+        val frequency: PositiveInt,
+        val daysOfWeeks: Set<DayOfWeek>
+    ) : Repeat()
+
+    data class Monthly(
+        val frequency: PositiveInt,
+        val detail: MonthlyRepeatDetail
+    )
+
+    data class Yearly(
+        val month: Month,
+        val daysOfWeek: YearlyDaysOfWeekOption?
+    )
+}
