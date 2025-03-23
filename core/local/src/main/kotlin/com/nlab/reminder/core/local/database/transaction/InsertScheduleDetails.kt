@@ -29,7 +29,7 @@ import javax.inject.Inject
  * @author Thalys
  */
 @Reusable
-internal class InsertScheduleExtra @Inject constructor(
+internal class InsertScheduleDetails @Inject constructor(
     private val scheduleTagListDAO: ScheduleTagListDAO,
     private val repeatDetailDAO: RepeatDetailDAO,
 ) {

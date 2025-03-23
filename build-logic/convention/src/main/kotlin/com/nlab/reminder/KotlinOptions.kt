@@ -20,6 +20,7 @@ import com.android.build.api.dsl.CommonExtension
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
+import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.provideDelegate
 import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -36,6 +37,11 @@ private val selectedJvmTarget: JvmTarget get() = JvmTarget.JVM_17
 internal fun Project.configureKotlinAndroid(commonExtension: CommonExtension<*, *, *, *, *, *>) {
     commonExtension.apply {
         compileOptions {
+            // for kotlinx.datetime
+            // https://github.com/Kotlin/kotlinx-datetime?tab=readme-ov-file#using-in-your-projects
+            // https://developer.android.com/studio/write/java8-support#library-desugaring
+            isCoreLibraryDesugaringEnabled = true
+
             sourceCompatibility = selectedJavaVersion
             targetCompatibility = selectedJavaVersion
         }
@@ -53,6 +59,14 @@ internal fun Project.configureKotlinAndroid(commonExtension: CommonExtension<*, 
             "-opt-in=androidx.compose.material.ExperimentalMaterialApi",
             "-opt-in=androidx.compose.material3.ExperimentalMaterial3Api",
         )
+    }
+
+    dependencies {
+        // for kotlinx.datetime
+        // https://github.com/Kotlin/kotlinx-datetime?tab=readme-ov-file#using-in-your-projects
+        // https://developer.android.com/studio/write/java8-support#library-desugaring
+        val desugarJdkLibs = libs.findLibrary("desugar-jdk-libs").get()
+        "coreLibraryDesugaring"(desugarJdkLibs)
     }
 }
 

@@ -22,6 +22,7 @@ import com.nlab.reminder.core.local.database.dao.LinkMetadataDAO
 import com.nlab.reminder.core.local.database.dao.RepeatDetailDAO
 import com.nlab.reminder.core.local.database.dao.ScheduleDAO
 import com.nlab.reminder.core.local.database.dao.ScheduleTagListDAO
+import com.nlab.reminder.core.local.database.dao.ScheduleWithDetailsDAO
 import com.nlab.reminder.core.local.database.dao.TagDAO
 import com.nlab.reminder.core.local.database.model.LinkMetadataEntity
 import com.nlab.reminder.core.local.database.model.RepeatDetailEntity
@@ -55,6 +56,7 @@ internal abstract class ReminderDatabase : RoomDatabase() {
     abstract fun repeatDetailDAO(): RepeatDetailDAO
     abstract fun scheduleDAO(): ScheduleDAO
     abstract fun scheduleTagListDAO(): ScheduleTagListDAO
+    abstract fun scheduleWithDetailsDAO(): ScheduleWithDetailsDAO
     abstract fun tagDAO(): TagDAO
 }
 

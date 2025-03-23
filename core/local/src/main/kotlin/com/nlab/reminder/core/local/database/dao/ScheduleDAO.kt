@@ -23,10 +23,10 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import com.nlab.reminder.core.kotlin.toNonNegativeLong
-import com.nlab.reminder.core.local.database.model.EMPTY_GENERATED_ID
 import com.nlab.reminder.core.local.database.model.ScheduleContentDTO
 import com.nlab.reminder.core.local.database.model.ScheduleEntity
 import com.nlab.reminder.core.local.database.model.equalsContent
+import com.nlab.reminder.core.local.database.model.EMPTY_GENERATED_ID
 import kotlinx.coroutines.flow.Flow
 
 /**

@@ -28,10 +28,10 @@ import javax.inject.Inject
  * @author Thalys
  */
 @Reusable
-class InsertAndGetScheduleWithExtraTransaction @Inject internal constructor(
+class InsertAndGetScheduleWithDetailsTransaction @Inject internal constructor(
     private val transactionScope: TransactionScope,
     private val scheduleDAO: ScheduleDAO,
-    private val insertScheduleExtra: InsertScheduleExtra
+    private val insertScheduleDetails: InsertScheduleDetails
 ) {
     suspend operator fun invoke(
         contentDTO: ScheduleContentDTO,
@@ -39,7 +39,7 @@ class InsertAndGetScheduleWithExtraTransaction @Inject internal constructor(
         repeatDetailContentDTOs: Set<RepeatDetailContentDTO>
     ): InsertScheduleWithExtraResult = transactionScope.runIn {
         val scheduleEntity = scheduleDAO.insertAndGet(contentDTO)
-        insertScheduleExtra.insert(
+        insertScheduleDetails.insert(
             scheduleId = scheduleEntity.scheduleId,
             tagIds = tagIds,
             repeatDetailContentDTOs = repeatDetailContentDTOs

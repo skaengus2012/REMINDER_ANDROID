@@ -30,6 +30,7 @@ androidxTestRules = "1.6.1"
 androidxTransition = "1.5.1"
 appCashTurbine = "1.2.0"
 coil = "2.7.0"
+desugarJdklibs = "2.0.3"
 facebookFlipper = "0.273.0"
 facebookSoloader = "0.12.1"
 googleHilt = "2.55"
@@ -86,6 +87,7 @@ androidx-test-runner = { module = "androidx.test:runner", version.ref = "android
 androidx-transition-ktx = { module = "androidx.transition:transition-ktx", version.ref = "androidxTransition" }
 app-cash-turbine = { module = "app.cash.turbine:turbine", version.ref = "appCashTurbine" }
 coil-kt = { module = "io.coil-kt:coil", version.ref = "coil" }
+desugar-jdk-libs = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugarJdklibs" }  # use in configureComposeAndroid KotlinOptions.kt
 facebook-flipper = { module = "com.facebook.flipper:flipper", version.ref = "facebookFlipper" }
 facebook-flipper-leakcanary = { module = "com.facebook.flipper:flipper-leakcanary2-plugin", version.ref = "facebookFlipper" }
 facebook-soloader = { module = "com.facebook.soloader:soloader", version.ref = "facebookSoloader" }

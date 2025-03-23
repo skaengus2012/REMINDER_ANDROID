@@ -25,6 +25,13 @@ import com.nlab.reminder.core.kotlin.NonNegativeLong
 import kotlinx.datetime.Instant
 
 /**
+ * The set of the following values has the same life cycle.
+ * - [triggerTimeUtc], [isTriggerTimeDateOnly]
+ * - [repeatFrequency], [repeatFrequencyValue]
+ *
+ * If [RepeatFrequency] is [REPEAT_FREQUENCY_WEEKLY], [REPEAT_FREQUENCY_MONTHLY], [REPEAT_FREQUENCY_YEARLY]
+ * There must be a value in [RepeatDetailEntity].
+ *
  * @author Doohyun
  */
 @Entity(tableName = "schedule")
@@ -38,7 +45,7 @@ data class ScheduleEntity(
     @ColumnInfo(name = "trigger_time_utc") val triggerTimeUtc: Instant?,
     @ColumnInfo(name = "is_trigger_time_date_only") val isTriggerTimeDateOnly: Boolean?,
     @ColumnInfo(name = "repeat_frequency") @RepeatFrequency val repeatFrequency: String?,
-    @ColumnInfo(name = "repeat_frequency_value") @IntRange(from = 1, to = 999) val repeatFrequencyValue: Long?,
+    @ColumnInfo(name = "repeat_frequency_value") @IntRange(from = 1, to = 999) val repeatFrequencyValue: Int?,
 )
 
 data class ScheduleContentDTO(
@@ -49,14 +56,9 @@ data class ScheduleContentDTO(
     val frequencyDTO: RepeatFrequencyDTO?
 )
 
-data class TriggerTimeDTO(
-    val utcTime: Instant,
-    val isDateOnly: Boolean
-)
-
 data class RepeatFrequencyDTO(
     @RepeatFrequency val code: String,
-    val value: Long
+    val value: Int
 )
 
 internal fun ScheduleEntity(
