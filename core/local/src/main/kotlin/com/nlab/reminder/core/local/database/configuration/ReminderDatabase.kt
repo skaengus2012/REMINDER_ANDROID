@@ -47,7 +47,7 @@ private const val DB_NAME = "reminder_common.db"
 )
 @TypeConverters(
     value = [
-        InstantConverter::class,
+        InstantConverter::class
     ]
 )
 internal abstract class ReminderDatabase : RoomDatabase() {

@@ -27,12 +27,22 @@ import androidx.room.PrimaryKey
  *
  * case1. [frequencySetting] is [REPEAT_FREQUENCY_WEEKLY]
  * [value] can be [RepeatWeek].
+ * - [REPEAT_FREQUENCY_SETTING_WEEKLY]
  *
  * case2. [frequencySetting] is [REPEAT_FREQUENCY_MONTHLY]
- * [value] can be number range (1 ~ 31) or [RepeatDayOrder], [RepeatDays] together
+ * [value] can be number range `(1 ~ 31)` or [RepeatDayOrder], [RepeatDays] together
+ * - [REPEAT_FREQUENCY_SETTING_MONTHLY_DAY]
+ * - [REPEAT_FREQUENCY_SETTING_MONTHLY_DAY_ORDER]
+ * - [REPEAT_FREQUENCY_SETTING_MONTHLY_DAY_OF_WEEK]
  *
  * case3. [frequencySetting] is [REPEAT_FREQUENCY_YEARLY]
  * [value] can be [RepeatMonth] and [RepeatDayOrder], [RepeatDays] together optionally.
+ * - [REPEAT_FREQUENCY_SETTING_YEARLY_MONTH]
+ * - [REPEAT_FREQUENCY_SETTING_YEARLY_DAY_ORDER]
+ * - [REPEAT_FREQUENCY_SETTING_YEARLY_DAY_OF_WEEK]
+ *
+ * All cases must have ZoneId together.
+ * - [REPEAT_FREQUENCY_SETTING_ZONE_ID]
  *
  * @author Thalys
  */

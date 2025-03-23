@@ -38,7 +38,7 @@ data class ScheduleEntity(
     @ColumnInfo(name = "trigger_time_utc") val triggerTimeUtc: Instant?,
     @ColumnInfo(name = "is_trigger_time_date_only") val isTriggerTimeDateOnly: Boolean?,
     @ColumnInfo(name = "repeat_frequency") @RepeatFrequency val repeatFrequency: String?,
-    @ColumnInfo(name = "repeat_frequency_value") @IntRange(from = 1, to = 999) val repeatFrequencyValue: Long?
+    @ColumnInfo(name = "repeat_frequency_value") @IntRange(from = 1, to = 999) val repeatFrequencyValue: Long?,
 )
 
 data class ScheduleContentDTO(
