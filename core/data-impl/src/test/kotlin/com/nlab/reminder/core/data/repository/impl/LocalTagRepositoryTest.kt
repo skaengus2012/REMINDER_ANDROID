@@ -19,9 +19,8 @@ package com.nlab.reminder.core.data.repository.impl
 import com.nlab.reminder.core.data.model.*
 import com.nlab.reminder.core.data.repository.*
 import com.nlab.reminder.core.kotlin.getOrThrow
-import com.nlab.reminder.core.kotlin.toNonBlankString
 import com.nlab.reminder.core.local.database.dao.TagDAO
-import com.nlab.reminder.core.local.database.transaction.ReplaceTagTransaction
+import com.nlab.reminder.core.local.database.transaction.UpdateOrReplaceAndGetTagTransaction
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.equalTo
@@ -104,5 +103,5 @@ internal class LocalTagRepositoryTest {
 
 private fun genTagRepository(
     tagDAO: TagDAO = mock(),
-    replaceTag: ReplaceTagTransaction = mock()
+    replaceTag: UpdateOrReplaceAndGetTagTransaction = mock()
 ): TagRepository = LocalTagRepository(tagDAO, replaceTag)

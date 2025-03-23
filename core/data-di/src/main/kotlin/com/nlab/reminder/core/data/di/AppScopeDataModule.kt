@@ -42,7 +42,7 @@ import com.nlab.reminder.core.inject.qualifiers.coroutine.DispatcherOption.*
 import com.nlab.reminder.core.local.database.dao.ScheduleDAO
 import com.nlab.reminder.core.local.database.dao.ScheduleTagListDAO
 import com.nlab.reminder.core.local.database.dao.TagDAO
-import com.nlab.reminder.core.local.database.transaction.ReplaceTagTransaction
+import com.nlab.reminder.core.local.database.transaction.UpdateOrReplaceAndGetTagTransaction
 import com.nlab.reminder.core.local.datastore.preference.PreferenceDataSource
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
@@ -75,8 +75,8 @@ internal class AppScopeDataModule {
     @Reusable
     fun provideTagRepository(
         tagDAO: TagDAO,
-        replaceTag: ReplaceTagTransaction
-    ): TagRepository = LocalTagRepository(tagDAO = tagDAO, replaceTag = replaceTag)
+        updateOrReplaceAndGetTag: UpdateOrReplaceAndGetTagTransaction
+    ): TagRepository = LocalTagRepository(tagDAO = tagDAO, updateOrReplaceAndGetTag = updateOrReplaceAndGetTag)
 
     @Provides
     @Reusable

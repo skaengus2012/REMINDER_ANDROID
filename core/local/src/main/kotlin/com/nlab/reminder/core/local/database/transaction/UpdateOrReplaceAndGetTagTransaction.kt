@@ -15,10 +15,13 @@
  */
 
 package com.nlab.reminder.core.local.database.transaction
+
+import com.nlab.reminder.core.kotlin.NonBlankString
 import com.nlab.reminder.core.kotlin.collections.toSet
 import com.nlab.reminder.core.local.database.dao.ScheduleTagListDAO
 import com.nlab.reminder.core.local.database.dao.TagDAO
 import com.nlab.reminder.core.local.database.model.ScheduleTagListEntity
+import com.nlab.reminder.core.local.database.model.TagEntity
 import com.nlab.reminder.core.local.database.util.TransactionScope
 import dagger.Reusable
 import javax.inject.Inject
@@ -27,18 +30,34 @@ import javax.inject.Inject
  * @author Thalys
  */
 @Reusable
-class ReplaceTagTransaction @Inject internal constructor(
+class UpdateOrReplaceAndGetTagTransaction @Inject internal constructor(
     private val transactionScope: TransactionScope,
     private val tagDAO: TagDAO,
     private val scheduleTagListDAO: ScheduleTagListDAO
 ) {
     suspend operator fun invoke(
-        fromTagId: Long,
-        toTagId: Long,
-    ) {
-        transactionScope.runIn {
-            copyScheduleIds(fromTagId, toTagId)
-            tagDAO.deleteById(toTagId)
+        tagId: Long,
+        name: NonBlankString
+    ): TagEntity = transactionScope.runIn {
+        val tagEntity = tagDAO.findByName(name.value)
+        return@runIn when {
+            tagEntity == null -> {
+                // case1 : not conflict name, just update
+                tagDAO.updateAndGet(tagId, name)
+            }
+
+            tagEntity.tagId == tagId -> {
+                // case2 : request same name
+                tagEntity
+            }
+
+            else -> {
+                // case3 : conflict name, replace
+                copyScheduleIds(fromTagId = tagId, toTagId = tagEntity.tagId)
+                tagDAO.deleteById(tagId)
+                tagEntity
+            }
+
         }
     }
 
