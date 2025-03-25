@@ -23,26 +23,26 @@ import androidx.room.PrimaryKey
 
 /**
  * Details of schedule repetition.
- * Depending on the [frequencySetting], a polymorphic value exists.
+ * Depending on the [propertyCode], a polymorphic value exists.
  *
- * case1. [frequencySetting] is [REPEAT_FREQUENCY_WEEKLY]
+ * case1. [propertyCode] is [REPEAT_WEEKLY]
  * [value] can be [RepeatWeek].
- * - [REPEAT_FREQUENCY_SETTING_WEEKLY]
+ * - [REPEAT_SETTING_PROPERTY_WEEKLY]
  *
- * case2. [frequencySetting] is [REPEAT_FREQUENCY_MONTHLY]
+ * case2. [propertyCode] is [REPEAT_MONTHLY]
  * [value] can be number range `(1 ~ 31)` or [RepeatDayOrder], [RepeatDays] together
- * - [REPEAT_FREQUENCY_SETTING_MONTHLY_DAY]
- * - [REPEAT_FREQUENCY_SETTING_MONTHLY_DAY_ORDER]
- * - [REPEAT_FREQUENCY_SETTING_MONTHLY_DAY_OF_WEEK]
+ * - [REPEAT_SETTING_PROPERTY_MONTHLY_DAY]
+ * - [REPEAT_SETTING_PROPERTY_MONTHLY_DAY_ORDER]
+ * - [REPEAT_SETTING_PROPERTY_MONTHLY_DAY_OF_WEEK]
  *
- * case3. [frequencySetting] is [REPEAT_FREQUENCY_YEARLY]
+ * case3. [propertyCode] is [REPEAT_YEARLY]
  * [value] can be [RepeatMonth] and [RepeatDayOrder], [RepeatDays] together optionally.
- * - [REPEAT_FREQUENCY_SETTING_YEARLY_MONTH]
- * - [REPEAT_FREQUENCY_SETTING_YEARLY_DAY_ORDER]
- * - [REPEAT_FREQUENCY_SETTING_YEARLY_DAY_OF_WEEK]
+ * - [REPEAT_SETTING_PROPERTY_YEARLY_MONTH]
+ * - [REPEAT_SETTING_PROPERTY_YEARLY_DAY_ORDER]
+ * - [REPEAT_SETTING_PROPERTY_YEARLY_DAY_OF_WEEK]
  *
  * All cases must have ZoneId together.
- * - [REPEAT_FREQUENCY_SETTING_ZONE_ID]
+ * - [REPEAT_SETTING_PROPERTY_ZONE_ID]
  *
  * @author Thalys
  */
@@ -60,11 +60,11 @@ import androidx.room.PrimaryKey
 data class RepeatDetailEntity(
     @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "repeat_id") val repeatId: Long = EMPTY_GENERATED_ID,
     @ColumnInfo(name = "schedule_id", index = true) val scheduleId: Long,
-    @ColumnInfo(name = "frequency_setting") @RepeatFrequencySetting val frequencySetting: String,
+    @ColumnInfo(name = "property_code") @RepeatSettingProperty val propertyCode: String,
     @ColumnInfo(name = "value") val value: String
 )
 
 data class RepeatDetailContentDTO(
-    @RepeatFrequencySetting val frequencySetting: String,
+    @RepeatSettingProperty val frequencySetting: String,
     val value: String
 )

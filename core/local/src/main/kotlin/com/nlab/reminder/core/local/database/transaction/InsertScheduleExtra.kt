@@ -29,7 +29,7 @@ import javax.inject.Inject
  * @author Thalys
  */
 @Reusable
-internal class InsertScheduleDetails @Inject constructor(
+internal class InsertScheduleExtra @Inject constructor(
     private val scheduleTagListDAO: ScheduleTagListDAO,
     private val repeatDetailDAO: RepeatDetailDAO,
 ) {
@@ -47,7 +47,7 @@ internal class InsertScheduleDetails @Inject constructor(
             entities = repeatDetailContentDTOs.toSet { dto ->
                 RepeatDetailEntity(
                     scheduleId = scheduleId,
-                    frequencySetting = dto.frequencySetting,
+                    propertyCode = dto.frequencySetting,
                     value = dto.value
                 )
             }

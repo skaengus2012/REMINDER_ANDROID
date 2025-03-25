@@ -30,13 +30,13 @@ import javax.inject.Inject
  * @author Thalys
  */
 @Reusable
-class UpdateAndGetScheduleWithDetailsTransaction @Inject internal constructor(
+class UpdateAndGetScheduleWithExtraTransaction @Inject internal constructor(
     private val transactionScope: TransactionScope,
     private val scheduleDAO: ScheduleDAO,
     private val scheduleTagListDAO: ScheduleTagListDAO,
     private val repeatDetailDAO: RepeatDetailDAO
 ) {
-    private val insertScheduleDetails = InsertScheduleDetails(
+    private val insertScheduleExtra = InsertScheduleExtra(
         scheduleTagListDAO = scheduleTagListDAO,
         repeatDetailDAO = repeatDetailDAO
     )
@@ -53,7 +53,7 @@ class UpdateAndGetScheduleWithDetailsTransaction @Inject internal constructor(
         scheduleTagListDAO.deleteByScheduleId(scheduleId)
         repeatDetailDAO.deleteByScheduleId(scheduleId)
         // add extra
-        insertScheduleDetails.insert(
+        insertScheduleExtra.insert(
             scheduleId,
             tagIds,
             repeatDetailContentDTOs

@@ -23,5 +23,5 @@ import com.nlab.reminder.core.kotlin.collections.NonEmptySet
  */
 sealed class MonthlyRepeatDetail {
     data class Each(val days: NonEmptySet<DaysOfMonth>) : MonthlyRepeatDetail()
-    data class Customize(val order: DaysOfWeekOrder, val day: Days)
+    data class Customize(val order: DaysOfWeekOrder, val day: Days) : MonthlyRepeatDetail()
 }

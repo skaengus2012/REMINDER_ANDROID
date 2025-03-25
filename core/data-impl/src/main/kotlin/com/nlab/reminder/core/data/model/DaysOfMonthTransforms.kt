@@ -16,16 +16,14 @@
 
 package com.nlab.reminder.core.data.model
 
-import com.nlab.reminder.core.kotlin.NonBlankString
+import androidx.annotation.IntRange
 
 /**
- * @author Doohyun
+ * @author Thalys
  */
-data class ScheduleContent(
-    val title: NonBlankString,
-    val note: NonBlankString?,
-    val link: Link?,
-    val triggerTime: TriggerTime?,
-    val repeat: Repeat?,
-    val tagIds: Set<TagId>,
-)
+private val valueToDayOfMonthTable: Map<Int, DaysOfMonth> = DaysOfMonth.entries.associateBy { it.day }
+
+fun DaysOfMonth(@IntRange(from = 1, to = 31) day: Int): DaysOfMonth {
+    require(day in DaysOfMonth.DAY_1.day..DaysOfMonth.DAY_31.day)
+    return valueToDayOfMonthTable.getValue(day)
+}

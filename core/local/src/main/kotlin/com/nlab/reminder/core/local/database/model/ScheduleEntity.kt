@@ -27,9 +27,9 @@ import kotlinx.datetime.Instant
 /**
  * The set of the following values has the same life cycle.
  * - [triggerTimeUtc], [isTriggerTimeDateOnly]
- * - [repeatFrequency], [repeatFrequencyValue]
+ * - [repeatType], [repeatInterval]
  *
- * If [RepeatFrequency] is [REPEAT_FREQUENCY_WEEKLY], [REPEAT_FREQUENCY_MONTHLY], [REPEAT_FREQUENCY_YEARLY]
+ * If [RepeatType] is [REPEAT_WEEKLY], [REPEAT_MONTHLY], [REPEAT_YEARLY]
  * There must be a value in [RepeatDetailEntity].
  *
  * @author Doohyun
@@ -44,8 +44,8 @@ data class ScheduleEntity(
     @ColumnInfo(name = "is_complete") val isComplete: Boolean,
     @ColumnInfo(name = "trigger_time_utc") val triggerTimeUtc: Instant?,
     @ColumnInfo(name = "is_trigger_time_date_only") val isTriggerTimeDateOnly: Boolean?,
-    @ColumnInfo(name = "repeat_frequency") @RepeatFrequency val repeatFrequency: String?,
-    @ColumnInfo(name = "repeat_frequency_value") @IntRange(from = 1, to = 999) val repeatFrequencyValue: Int?,
+    @ColumnInfo(name = "repeat_type") @RepeatType val repeatType: String?,
+    @ColumnInfo(name = "repeat_interval") @IntRange(from = 1, to = 999) val repeatInterval: Int?,
 )
 
 data class ScheduleContentDTO(
@@ -57,7 +57,7 @@ data class ScheduleContentDTO(
 )
 
 data class RepeatFrequencyDTO(
-    @RepeatFrequency val code: String,
+    @RepeatType val code: String,
     val value: Int
 )
 
@@ -70,8 +70,8 @@ internal fun ScheduleEntity(
     link = contentDTO.link?.value,
     triggerTimeUtc = contentDTO.triggerTimeDTO?.utcTime,
     isTriggerTimeDateOnly = contentDTO.triggerTimeDTO?.isDateOnly,
-    repeatFrequency = contentDTO.frequencyDTO?.code,
-    repeatFrequencyValue = contentDTO.frequencyDTO?.value,
+    repeatType = contentDTO.frequencyDTO?.code,
+    repeatInterval = contentDTO.frequencyDTO?.value,
     visiblePriority = visiblePriority.value,
     isComplete = false
 )

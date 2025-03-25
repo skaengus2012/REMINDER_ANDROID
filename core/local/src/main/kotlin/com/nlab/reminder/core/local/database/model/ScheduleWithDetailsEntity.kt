@@ -28,10 +28,5 @@ data class ScheduleWithDetailsEntity(
         parentColumn = "schedule_id",
         entityColumn = "schedule_id"
     )
-    val scheduleTagList: List<ScheduleTagListEntity>,
-    @Relation(
-        parentColumn = "schedule_id",
-        entityColumn = "schedule_id"
-    )
     val repeatDetails: List<RepeatDetailEntity>
 )
