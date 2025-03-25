@@ -23,34 +23,28 @@ import com.nlab.reminder.core.kotlin.faker.genNonNegativeLong
 import com.nlab.testkit.faker.genBoolean
 import com.nlab.testkit.faker.genInt
 import com.nlab.testkit.faker.genLong
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
 
 /**
  * @author thalys
  */
 fun genScheduleId(): ScheduleId = ScheduleId(rawId = genLong())
 
-fun genScheduleContent(
+fun genSchedule(
+    id: ScheduleId = genScheduleId(),
     title: NonBlankString = genNonBlankString(),
     note: NonBlankString? = genNonBlankString(),
     link: Link? = genLink(),
-    triggerTime: TriggerTime? = genTriggerTime()
-): ScheduleContent = ScheduleContent(
-    title = title,
-    note = note,
-    link = link,
-    triggerTime = triggerTime,
-)
-
-fun genSchedule(
-    id: ScheduleId = genScheduleId(),
-    content: ScheduleContent = genScheduleContent(),
+    triggerTime: TriggerTime? = genTriggerTime(),
+    repeat: Repeat? = genRepeat(),
     visiblePriority: NonNegativeLong = genNonNegativeLong(),
     isComplete: Boolean = genBoolean()
 ): Schedule = Schedule(
     id = id,
-    content = content,
+    title = title,
+    note = note,
+    link = link,
+    triggerTime = triggerTime,
+    repeat = repeat,
     visiblePriority = visiblePriority,
     isComplete = isComplete
 )
@@ -58,8 +52,3 @@ fun genSchedule(
 fun genSchedules(count: Int = genInt(min = 5, max = 10)): List<Schedule> = List(count) {
     genSchedule(id = ScheduleId(rawId = it.toLong() + 1))
 }
-
-fun genTriggerTime(
-    utcTime: Instant = Clock.System.now(),
-    isDateOnly: Boolean = genBoolean()
-): TriggerTime = TriggerTime(utcTime, isDateOnly)

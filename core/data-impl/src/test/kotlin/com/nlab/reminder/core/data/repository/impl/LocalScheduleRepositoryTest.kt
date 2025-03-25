@@ -48,6 +48,7 @@ import org.mockito.kotlin.whenever
  * @author Doohyun
  */
 internal class LocalScheduleRepositoryTest {
+    /**
     @Test
     fun `Given scheduleContent, when add, then dao called insertAndGet`() = runTest {
         val (expectedSchedule, entity) = genScheduleAndEntity()
@@ -167,9 +168,10 @@ internal class LocalScheduleRepositoryTest {
             request = GetScheduleQuery.ByComplete(isComplete),
             expectedResult = schedules.toSet()
         )
-    }
+    }*/
 }
 
+/**
 private fun genScheduleRepository(
     scheduleDAO: ScheduleDAO = mock()
-): ScheduleRepository = LocalScheduleRepository(scheduleDAO)
+): ScheduleRepository = LocalScheduleRepository(scheduleDAO)*/

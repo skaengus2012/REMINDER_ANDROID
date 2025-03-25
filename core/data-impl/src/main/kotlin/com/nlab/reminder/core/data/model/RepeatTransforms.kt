@@ -18,7 +18,6 @@ package com.nlab.reminder.core.data.model
 
 import com.nlab.reminder.core.kotlin.PositiveInt
 import com.nlab.reminder.core.kotlin.collections.toNonEmptySet
-import com.nlab.reminder.core.kotlin.collections.toSet
 import com.nlab.reminder.core.kotlin.toPositiveInt
 import com.nlab.reminder.core.local.database.model.REPEAT_DAILY
 import com.nlab.reminder.core.local.database.model.REPEAT_HOURLY
@@ -70,7 +69,8 @@ private fun RepeatWeekly(
         timeZone = settingToValuesTables.getTimeZone(),
         daysOfWeeks = settingToValuesTables
             .getValue(REPEAT_SETTING_PROPERTY_WEEKLY)
-            .toSet(::DayOfWeek)
+            .map(::DayOfWeek)
+            .toNonEmptySet()
     )
 }
 
@@ -96,7 +96,7 @@ private fun RepeatMonthly(
             )
         } else {
             MonthlyRepeatDetail.Customize(
-                order = propertyCodeToValuesTables
+                option = propertyCodeToValuesTables
                     .getValue(REPEAT_SETTING_PROPERTY_MONTHLY_DAY_ORDER)
                     .first()
                     .let(::DaysOfWeekOrder),
@@ -120,11 +120,11 @@ private fun RepeatYearly(
     return Repeat.Yearly(
         interval = interval,
         timeZone = propertyCodeToValuesTables.getTimeZone(),
-        month = propertyCodeToValuesTables
+        months = propertyCodeToValuesTables
             .getValue(REPEAT_SETTING_PROPERTY_YEARLY_MONTH)
             .map { Month(it) }
             .toNonEmptySet(),
-        daysOfWeek = propertyCodeToValuesTables[REPEAT_SETTING_PROPERTY_YEARLY_DAY_ORDER]
+        daysOfWeekOption = propertyCodeToValuesTables[REPEAT_SETTING_PROPERTY_YEARLY_DAY_ORDER]
             ?.first()
             ?.let(::DaysOfWeekOrder)
             ?.let { order ->

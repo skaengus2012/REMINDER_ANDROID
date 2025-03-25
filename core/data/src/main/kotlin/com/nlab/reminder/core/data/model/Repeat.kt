@@ -33,11 +33,11 @@ sealed class Repeat {
     data class Weekly(
         val interval: PositiveInt,
         val timeZone: TimeZone,
-        val daysOfWeeks: Set<DayOfWeek>
+        val daysOfWeeks: NonEmptySet<DayOfWeek>
     ) : Repeat()
 
     data class Monthly(
-        val frequency: PositiveInt,
+        val interval: PositiveInt,
         val timeZone: TimeZone,
         val detail: MonthlyRepeatDetail
     ) : Repeat()
@@ -45,7 +45,7 @@ sealed class Repeat {
     data class Yearly(
         val interval: PositiveInt,
         val timeZone: TimeZone,
-        val month: NonEmptySet<Month>,
-        val daysOfWeek: YearlyDaysOfWeekOption?
+        val months: NonEmptySet<Month>,
+        val daysOfWeekOption: YearlyDaysOfWeekOption?
     ) : Repeat()
 }
