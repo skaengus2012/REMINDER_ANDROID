@@ -18,7 +18,6 @@ package com.nlab.reminder.core.data.model
 
 import com.nlab.reminder.core.kotlin.PositiveInt
 import com.nlab.reminder.core.kotlin.collections.toNonEmptySet
-import com.nlab.reminder.core.kotlin.collections.toSet
 import com.nlab.reminder.core.kotlin.toPositiveInt
 import com.nlab.reminder.core.local.database.model.REPEAT_DAILY
 import com.nlab.reminder.core.local.database.model.REPEAT_HOURLY
@@ -70,7 +69,8 @@ private fun RepeatWeekly(
         timeZone = settingToValuesTables.getTimeZone(),
         daysOfWeeks = settingToValuesTables
             .getValue(REPEAT_SETTING_PROPERTY_WEEKLY)
-            .toSet(::DayOfWeek)
+            .map(::DayOfWeek)
+            .toNonEmptySet()
     )
 }
 

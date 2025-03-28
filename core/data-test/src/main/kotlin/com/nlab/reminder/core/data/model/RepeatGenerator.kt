@@ -16,12 +16,34 @@
 
 package com.nlab.reminder.core.data.model
 
+import com.nlab.reminder.core.kotlin.PositiveInt
+import com.nlab.reminder.core.kotlin.collections.NonEmptySet
+import com.nlab.reminder.core.kotlin.collections.toNonEmptySet
 import com.nlab.reminder.core.kotlin.toPositiveInt
 import com.nlab.testkit.faker.genInt
+import kotlinx.datetime.DayOfWeek
+import kotlinx.datetime.TimeZone
 
 /**
  * @author Doohyun
  */
 fun genRepeatHourly(
-    interval: Int = genInt(min = 1, max = 999)
-): Repeat.Hourly = Repeat.Hourly(interval = interval.toPositiveInt())
+    interval: PositiveInt = genInt(min = 1, max = 999).toPositiveInt()
+): Repeat.Hourly = Repeat.Hourly(interval = interval)
+
+fun genRepeatDaily(
+    interval: PositiveInt = genInt(min = 1, max = 999).toPositiveInt()
+): Repeat.Daily = Repeat.Daily(interval = interval)
+
+fun genRepeatWeekly(
+    interval: PositiveInt = genInt(min = 1, max = 999).toPositiveInt(),
+    timeZone: TimeZone = TimeZone.currentSystemDefault(),
+    daysOfWeeks: NonEmptySet<DayOfWeek> = DayOfWeek.entries
+        .shuffled()
+        .let { dayOfWeeks -> dayOfWeeks.take(genInt(min = 1, max = dayOfWeeks.size)) }
+        .toNonEmptySet()
+): Repeat.Weekly = Repeat.Weekly(
+    interval = interval,
+    timeZone = timeZone,
+    daysOfWeeks = daysOfWeeks
+)

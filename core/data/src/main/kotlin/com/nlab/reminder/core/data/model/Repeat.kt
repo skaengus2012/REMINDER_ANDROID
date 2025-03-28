@@ -33,7 +33,7 @@ sealed class Repeat {
     data class Weekly(
         val interval: PositiveInt,
         val timeZone: TimeZone,
-        val daysOfWeeks: Set<DayOfWeek>
+        val daysOfWeeks: NonEmptySet<DayOfWeek>
     ) : Repeat()
 
     data class Monthly(
