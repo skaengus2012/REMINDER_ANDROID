@@ -47,3 +47,13 @@ fun genRepeatWeekly(
     timeZone = timeZone,
     daysOfWeeks = daysOfWeeks
 )
+
+fun genRepeatMonthly(
+    interval: PositiveInt = genInt(min = 1, max = 999).toPositiveInt(),
+    timeZone: TimeZone = TimeZone.currentSystemDefault(),
+    detail: MonthlyRepeatDetail = genMonthlyRepeatDetail()
+): Repeat.Monthly = Repeat.Monthly(
+    interval = interval,
+    timeZone = timeZone,
+    detail = detail
+)

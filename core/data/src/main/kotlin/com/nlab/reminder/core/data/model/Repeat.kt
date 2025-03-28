@@ -37,7 +37,7 @@ sealed class Repeat {
     ) : Repeat()
 
     data class Monthly(
-        val frequency: PositiveInt,
+        val interval: PositiveInt,
         val timeZone: TimeZone,
         val detail: MonthlyRepeatDetail
     ) : Repeat()
