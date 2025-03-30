@@ -27,8 +27,11 @@ import com.nlab.reminder.core.local.database.model.RepeatDetailEntity
 @Dao
 abstract class RepeatDetailDAO {
     @Insert
-    abstract suspend fun insert(entities: Set<RepeatDetailEntity>)
+    internal abstract suspend fun insert(entities: Set<RepeatDetailEntity>)
+
+    @Query("SELECT * FROM repeat_detail WHERE schedule_id = :scheduleId")
+    internal abstract suspend fun findByScheduleId(scheduleId: Long): Array<RepeatDetailEntity>
 
     @Query("DELETE FROM repeat_detail WHERE schedule_id = :scheduleId")
-    abstract fun deleteByScheduleId(scheduleId: Long)
+    internal abstract suspend fun deleteByScheduleId(scheduleId: Long)
 }

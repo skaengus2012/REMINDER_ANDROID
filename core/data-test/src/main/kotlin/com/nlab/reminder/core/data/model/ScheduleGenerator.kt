@@ -29,22 +29,28 @@ import com.nlab.testkit.faker.genLong
  */
 fun genScheduleId(): ScheduleId = ScheduleId(rawId = genLong())
 
-fun genSchedule(
-    id: ScheduleId = genScheduleId(),
+fun genScheduleContent(
     title: NonBlankString = genNonBlankString(),
     note: NonBlankString? = genNonBlankString(),
     link: Link? = genLink(),
     triggerTime: TriggerTime? = genTriggerTime(),
     repeat: Repeat? = genRepeat(),
-    visiblePriority: NonNegativeLong = genNonNegativeLong(),
-    isComplete: Boolean = genBoolean()
-): Schedule = Schedule(
-    id = id,
+): ScheduleContent = ScheduleContent(
     title = title,
     note = note,
     link = link,
     triggerTime = triggerTime,
-    repeat = repeat,
+    repeat = repeat
+)
+
+fun genSchedule(
+    id: ScheduleId = genScheduleId(),
+    content: ScheduleContent = genScheduleContent(),
+    visiblePriority: NonNegativeLong = genNonNegativeLong(),
+    isComplete: Boolean = genBoolean()
+): Schedule = Schedule(
+    id = id,
+    content = content,
     visiblePriority = visiblePriority,
     isComplete = isComplete
 )

@@ -16,7 +16,6 @@
 
 package com.nlab.reminder.core.data.model
 
-import com.nlab.reminder.core.kotlin.NonBlankString
 import com.nlab.reminder.core.kotlin.NonNegativeLong
 
 /**
@@ -24,11 +23,7 @@ import com.nlab.reminder.core.kotlin.NonNegativeLong
  */
 data class Schedule(
     val id: ScheduleId,
-    val title: NonBlankString,
-    val note: NonBlankString?,
-    val link: Link?,
-    val triggerTime: TriggerTime?,
-    val repeat: Repeat?,
+    val content: ScheduleContent,
     val visiblePriority: NonNegativeLong,
     val isComplete: Boolean
 )

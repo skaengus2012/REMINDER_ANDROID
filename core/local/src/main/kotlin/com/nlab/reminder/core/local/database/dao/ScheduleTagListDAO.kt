@@ -45,5 +45,5 @@ abstract class ScheduleTagListDAO {
         else findByScheduleIdsAsStreamInternal(scheduleIds)
 
     @Query("DELETE FROM schedule_tag_list WHERE schedule_id = :scheduleId")
-    abstract fun deleteByScheduleId(scheduleId: Long)
+    abstract suspend fun deleteByScheduleId(scheduleId: Long)
 }

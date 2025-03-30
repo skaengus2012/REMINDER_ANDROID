@@ -32,6 +32,7 @@ import com.nlab.reminder.core.local.database.model.REPEAT_SETTING_PROPERTY_YEARL
 import com.nlab.reminder.core.local.database.model.REPEAT_SETTING_PROPERTY_ZONE_ID
 import com.nlab.reminder.core.local.database.model.REPEAT_WEEKLY
 import com.nlab.reminder.core.local.database.model.REPEAT_YEARLY
+import com.nlab.reminder.core.local.database.model.RepeatDetailDTO
 import com.nlab.reminder.core.local.database.model.RepeatDetailEntity
 import com.nlab.reminder.core.local.database.model.RepeatType
 import kotlinx.datetime.TimeZone
@@ -96,7 +97,7 @@ private fun RepeatMonthly(
             )
         } else {
             MonthlyRepeatDetail.Customize(
-                option = propertyCodeToValuesTables
+                order = propertyCodeToValuesTables
                     .getValue(REPEAT_SETTING_PROPERTY_MONTHLY_DAY_ORDER)
                     .first()
                     .let(::DaysOfWeekOrder),
@@ -109,6 +110,7 @@ private fun RepeatMonthly(
     )
 }
 
+@Suppress("FunctionName")
 private fun RepeatYearly(
     interval: PositiveInt,
     repeatDetailEntities: Collection<RepeatDetailEntity>,
@@ -141,3 +143,42 @@ private fun RepeatYearly(
 private fun Map<String, List<String>>.getTimeZone(): TimeZone = getValue(REPEAT_SETTING_PROPERTY_ZONE_ID)
     .first()
     .let(TimeZone::of)
+
+@RepeatType
+internal fun Repeat.toRepeatType(): String = when (this) {
+    is Repeat.Hourly -> REPEAT_HOURLY
+    is Repeat.Daily -> REPEAT_DAILY
+    is Repeat.Weekly -> REPEAT_WEEKLY
+    is Repeat.Monthly -> REPEAT_MONTHLY
+    is Repeat.Yearly -> REPEAT_YEARLY
+}
+
+internal fun Repeat.toIntervalAsInt(): Int {
+    val interval = when (this) {
+        is Repeat.Hourly -> interval
+        is Repeat.Daily -> interval
+        is Repeat.Weekly -> interval
+        is Repeat.Monthly -> interval
+        is Repeat.Yearly -> interval
+    }
+    return interval.value
+}
+
+internal fun Repeat.Weekly.getRepeatDetails(): Set<RepeatDetailDTO> = buildSet {
+    this += RepeatDetailEntity(
+        scheduleId = scheduleId.rawId,
+        propertyCode = REPEAT_SETTING_PROPERTY_ZONE_ID,
+        value = timeZone.id
+    )
+    daysOfWeeks.value.forEach { daysOfWeek ->
+        this += RepeatDetailEntity(
+            scheduleId = scheduleId.rawId,
+            propertyCode = REPEAT_SETTING_PROPERTY_WEEKLY,
+            value = daysOfWeek.toRepeatWeek()
+        )
+    }
+}
+
+internal fun Repeat.Monthly.getRepeatDetails(scheduleId: ScheduleId): Set<RepeatDetailEntity> = buildSet {
+
+}

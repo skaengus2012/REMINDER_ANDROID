@@ -17,9 +17,9 @@
 package com.nlab.reminder.core.local.database.transaction
 
 import com.nlab.reminder.core.local.database.dao.ScheduleDAO
-import com.nlab.reminder.core.local.database.model.RepeatDetailContentDTO
 import com.nlab.reminder.core.local.database.model.ScheduleContentDTO
-import com.nlab.reminder.core.local.database.model.ScheduleEntity
+import com.nlab.reminder.core.local.database.model.ScheduleTagListEntity
+import com.nlab.reminder.core.local.database.model.ScheduleWithDetailsEntity
 import com.nlab.reminder.core.local.database.util.TransactionScope
 import dagger.Reusable
 import javax.inject.Inject
@@ -30,30 +30,39 @@ import javax.inject.Inject
 @Reusable
 class InsertAndGetScheduleWithExtraTransaction @Inject internal constructor(
     private val transactionScope: TransactionScope,
+    private val scheduleTransactionValidator: ScheduleTransactionValidator,
     private val scheduleDAO: ScheduleDAO,
-    private val insertScheduleExtra: InsertScheduleExtra
+    private val insertAndGetScheduleExtra: InsertAndGetScheduleExtra,
 ) {
     suspend operator fun invoke(
         contentDTO: ScheduleContentDTO,
         tagIds: Set<Long>,
-        repeatDetailContentDTOs: Set<RepeatDetailContentDTO>
-    ): InsertScheduleWithExtraResult = transactionScope.runIn {
+    ): InsertScheduleWithExtraResult {
+        scheduleTransactionValidator.validate(contentDTO)
+        return transactionScope.runIn { insertAndGetScheduleWithExtra(contentDTO, tagIds) }
+    }
+
+    private suspend fun insertAndGetScheduleWithExtra(
+        contentDTO: ScheduleContentDTO,
+        tagIds: Set<Long>
+    ): InsertScheduleWithExtraResult {
         val scheduleEntity = scheduleDAO.insertAndGet(contentDTO)
-        insertScheduleExtra.insert(
-            scheduleId = scheduleEntity.scheduleId,
-            tagIds = tagIds,
-            repeatDetailContentDTOs = repeatDetailContentDTOs
+        val result = insertAndGetScheduleExtra(
+            scheduleEntity.scheduleId,
+            tagIds,
+            contentDTO.repeatDTO?.details.orEmpty()
         )
-        return@runIn InsertScheduleWithExtraResult(
-            scheduleEntity = scheduleEntity,
-            tagIds = tagIds,
-            repeatDetailContentDTOs = repeatDetailContentDTOs
+        return InsertScheduleWithExtraResult(
+            scheduleWithDetailsEntity = ScheduleWithDetailsEntity(
+                schedule = scheduleEntity,
+                repeatDetails = result.repeatDetailEntities,
+            ),
+            scheduleTagListEntities = result.scheduleTagListEntities,
         )
     }
 }
 
 data class InsertScheduleWithExtraResult(
-    val scheduleEntity: ScheduleEntity,
-    val tagIds: Set<Long>,
-    val repeatDetailContentDTOs: Set<RepeatDetailContentDTO>
+    val scheduleWithDetailsEntity: ScheduleWithDetailsEntity,
+    val scheduleTagListEntities: Set<ScheduleTagListEntity>
 )

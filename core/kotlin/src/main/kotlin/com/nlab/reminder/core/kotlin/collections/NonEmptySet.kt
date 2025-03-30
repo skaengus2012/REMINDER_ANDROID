@@ -16,6 +16,7 @@
 
 package com.nlab.reminder.core.kotlin.collections
 
+import kotlinx.collections.immutable.persistentSetOf
 import kotlinx.collections.immutable.toImmutableSet
 
 /**
@@ -31,7 +32,7 @@ value class NonEmptySet<out E> internal constructor(val value: Set<E>) {
 fun <T> NonEmptySet(
     head: T,
     vararg tails: T
-): NonEmptySet<T> = buildSet { add(head); addAll(tails) }.toNonEmptySet()
+): NonEmptySet<T> = persistentSetOf(head, *tails).toNonEmptySet()
 
 fun <T> Iterable<T>.toNonEmptySet(): NonEmptySet<T> = NonEmptySet(value = toImmutableSet())
 

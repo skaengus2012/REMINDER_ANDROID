@@ -25,7 +25,7 @@ import androidx.room.Update
 import com.nlab.reminder.core.kotlin.toNonNegativeLong
 import com.nlab.reminder.core.local.database.model.ScheduleContentDTO
 import com.nlab.reminder.core.local.database.model.ScheduleEntity
-import com.nlab.reminder.core.local.database.model.equalsContent
+import com.nlab.reminder.core.local.database.model.contentEquals
 import com.nlab.reminder.core.local.database.model.EMPTY_GENERATED_ID
 import kotlinx.coroutines.flow.Flow
 
@@ -100,7 +100,7 @@ abstract class ScheduleDAO {
     @Transaction
     open suspend fun updateAndGet(scheduleId: Long, contentDTO: ScheduleContentDTO): ScheduleEntity {
         val oldEntity = checkNotNull(findById(scheduleId))
-        if (oldEntity.equalsContent(contentDTO)) return oldEntity // No changes
+        if (oldEntity.contentEquals(contentDTO)) return oldEntity // No changes
 
         val newEntity = ScheduleEntity(oldEntity, contentDTO)
         update(newEntity)

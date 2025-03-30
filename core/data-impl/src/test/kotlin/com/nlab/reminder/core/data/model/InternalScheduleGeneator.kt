@@ -17,12 +17,29 @@
 package com.nlab.reminder.core.data.model
 
 import com.nlab.reminder.core.local.database.model.ScheduleEntity
+import com.nlab.reminder.core.local.database.model.ScheduleWithDetailsEntity
 import com.nlab.testkit.faker.genInt
 
 /**
  * @author Doohyun
  */
-internal fun genScheduleAndEntity(schedule: Schedule = genSchedule()): Pair<Schedule, ScheduleEntity> =
+internal fun genScheduleAndEntity(schedule: Schedule = genSchedule()): Pair<Schedule, ScheduleWithDetailsEntity> {
+    val scheduleEntity = ScheduleEntity(
+        scheduleId = schedule.id.rawId,
+        title = schedule.content.title.value,
+        description = schedule.content.note?.value,
+        link = schedule.content.link?.rawLink?.value,
+        visiblePriority = schedule.visiblePriority.value,
+        isComplete = schedule.isComplete,
+        triggerTimeUtc = schedule.content.triggerTime?.utcTime,
+        isTriggerTimeDateOnly = schedule.content.triggerTime?.isDateOnly,
+        repeatType = schedule.content.repeat?.toRepeatType(),
+        repeatInterval = schedule.content.repeat?.toIntervalAsInt()
+    )
+    val repeatDetailEntity =
+
+
+}
     schedule to ScheduleEntity(
         scheduleId = schedule.id.rawId,
         title = schedule.content.title.value,
@@ -31,7 +48,9 @@ internal fun genScheduleAndEntity(schedule: Schedule = genSchedule()): Pair<Sche
         visiblePriority = schedule.visiblePriority.value,
         isComplete = schedule.isComplete,
         triggerTimeUtc = schedule.content.triggerTime?.utcTime,
-        isTriggerTimeDateOnly = schedule.content.triggerTime?.isDateOnly
+        isTriggerTimeDateOnly = schedule.content.triggerTime?.isDateOnly,
+        repeatType = schedule.content.repeat?.toRepeatType(),
+        repeatInterval = schedule.content.repeat?.toIntervalAsInt()
     )
 
 internal fun genScheduleAndEntities(

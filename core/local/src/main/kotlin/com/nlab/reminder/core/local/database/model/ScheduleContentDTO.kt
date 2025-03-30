@@ -16,17 +16,15 @@
 
 package com.nlab.reminder.core.local.database.model
 
-import androidx.room.Embedded
-import androidx.room.Relation
+import com.nlab.reminder.core.kotlin.NonBlankString
 
 /**
- * @author Thalys
+ * @author Doohyun
  */
-data class ScheduleWithDetailsEntity(
-    @Embedded val schedule: ScheduleEntity,
-    @Relation(
-        parentColumn = "schedule_id",
-        entityColumn = "schedule_id"
-    )
-    val repeatDetails: Set<RepeatDetailEntity>
+data class ScheduleContentDTO(
+    val title: NonBlankString,
+    val description: NonBlankString?,
+    val link: NonBlankString?,
+    val triggerTimeDTO: TriggerTimeDTO?,
+    val repeatDTO: RepeatDTO?
 )

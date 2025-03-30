@@ -16,17 +16,11 @@
 
 package com.nlab.reminder.core.local.database.model
 
-import androidx.room.Embedded
-import androidx.room.Relation
-
 /**
- * @author Thalys
+ * @author Doohyun
  */
-data class ScheduleWithDetailsEntity(
-    @Embedded val schedule: ScheduleEntity,
-    @Relation(
-        parentColumn = "schedule_id",
-        entityColumn = "schedule_id"
-    )
-    val repeatDetails: Set<RepeatDetailEntity>
+data class RepeatDTO(
+    @RepeatType val code: String,
+    val value: Int,
+    val details: Set<RepeatDetailDTO>
 )

@@ -26,19 +26,19 @@ import androidx.room.PrimaryKey
  * Depending on the [propertyCode], a polymorphic value exists.
  *
  * case1. [propertyCode] is [REPEAT_WEEKLY]
- * [value] can be [RepeatWeek].
- * - [REPEAT_SETTING_PROPERTY_WEEKLY]
+ * [value] can be [RepeatWeek]
+ * - [REPEAT_SETTING_PROPERTY_WEEKLY] (Multiple, At least one must exist.)
  *
  * case2. [propertyCode] is [REPEAT_MONTHLY]
  * [value] can be number range `(1 ~ 31)` or [RepeatDayOrder], [RepeatDays] together
- * - [REPEAT_SETTING_PROPERTY_MONTHLY_DAY]
- * - [REPEAT_SETTING_PROPERTY_MONTHLY_DAY_ORDER]
+ * - [REPEAT_SETTING_PROPERTY_MONTHLY_DAY] (At least one must exist.)
+ * - [REPEAT_SETTING_PROPERTY_MONTHLY_DAY_ORDER] (It must exist at each setting.)
  * - [REPEAT_SETTING_PROPERTY_MONTHLY_DAY_OF_WEEK]
  *
  * case3. [propertyCode] is [REPEAT_YEARLY]
  * [value] can be [RepeatMonth] and [RepeatDayOrder], [RepeatDays] together optionally.
- * - [REPEAT_SETTING_PROPERTY_YEARLY_MONTH]
- * - [REPEAT_SETTING_PROPERTY_YEARLY_DAY_ORDER]
+ * - [REPEAT_SETTING_PROPERTY_YEARLY_MONTH] (Multiple, At least one must exist.)
+ * - [REPEAT_SETTING_PROPERTY_YEARLY_DAY_ORDER] (If existed, it must exist at each setting)
  * - [REPEAT_SETTING_PROPERTY_YEARLY_DAY_OF_WEEK]
  *
  * All cases must have ZoneId together.
@@ -62,9 +62,4 @@ data class RepeatDetailEntity(
     @ColumnInfo(name = "schedule_id", index = true) val scheduleId: Long,
     @ColumnInfo(name = "property_code") @RepeatSettingProperty val propertyCode: String,
     @ColumnInfo(name = "value") val value: String
-)
-
-data class RepeatDetailContentDTO(
-    @RepeatSettingProperty val frequencySetting: String,
-    val value: String
 )

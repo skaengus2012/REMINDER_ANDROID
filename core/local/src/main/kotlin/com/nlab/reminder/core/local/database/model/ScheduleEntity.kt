@@ -20,16 +20,22 @@ import androidx.annotation.IntRange
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.nlab.reminder.core.kotlin.NonBlankString
 import com.nlab.reminder.core.kotlin.NonNegativeLong
 import kotlinx.datetime.Instant
 
 /**
+ * ScheduleEntity Contracts
+ *
+ * #### Contract 1
  * The set of the following values has the same life cycle.
  * - [triggerTimeUtc], [isTriggerTimeDateOnly]
  * - [repeatType], [repeatInterval]
  *
- * If [RepeatType] is [REPEAT_WEEKLY], [REPEAT_MONTHLY], [REPEAT_YEARLY]
+ * #### Contract 2
+ * [repeatType] can exist when [triggerTimeUtc] exists.
+ *
+ * #### Contract 3
+ * If [RepeatType] is [REPEAT_WEEKLY], [REPEAT_MONTHLY], [REPEAT_YEARLY],
  * There must be a value in [RepeatDetailEntity].
  *
  * @author Doohyun
@@ -48,19 +54,6 @@ data class ScheduleEntity(
     @ColumnInfo(name = "repeat_interval") @IntRange(from = 1, to = 999) val repeatInterval: Int?,
 )
 
-data class ScheduleContentDTO(
-    val title: NonBlankString,
-    val description: NonBlankString?,
-    val link: NonBlankString?,
-    val triggerTimeDTO: TriggerTimeDTO?,
-    val frequencyDTO: RepeatFrequencyDTO?
-)
-
-data class RepeatFrequencyDTO(
-    @RepeatType val code: String,
-    val value: Int
-)
-
 internal fun ScheduleEntity(
     contentDTO: ScheduleContentDTO,
     visiblePriority: NonNegativeLong,
@@ -70,8 +63,8 @@ internal fun ScheduleEntity(
     link = contentDTO.link?.value,
     triggerTimeUtc = contentDTO.triggerTimeDTO?.utcTime,
     isTriggerTimeDateOnly = contentDTO.triggerTimeDTO?.isDateOnly,
-    repeatType = contentDTO.frequencyDTO?.code,
-    repeatInterval = contentDTO.frequencyDTO?.value,
+    repeatType = contentDTO.repeatDTO?.code,
+    repeatInterval = contentDTO.repeatDTO?.value,
     visiblePriority = visiblePriority.value,
     isComplete = false
 )
@@ -87,9 +80,11 @@ internal fun ScheduleEntity(
     isTriggerTimeDateOnly = contentDTO.triggerTimeDTO?.isDateOnly
 )
 
-internal fun ScheduleEntity.equalsContent(contentDTO: ScheduleContentDTO): Boolean =
+internal fun ScheduleEntity.contentEquals(contentDTO: ScheduleContentDTO): Boolean =
     title == contentDTO.title.value
             && description == contentDTO.description?.value
             && link == contentDTO.link?.value
             && triggerTimeUtc == contentDTO.triggerTimeDTO?.utcTime
             && isTriggerTimeDateOnly == contentDTO.triggerTimeDTO?.isDateOnly
+            && repeatType == contentDTO.repeatDTO?.code
+            && repeatInterval == contentDTO.repeatDTO?.value

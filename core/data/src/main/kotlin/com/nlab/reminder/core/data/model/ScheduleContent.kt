@@ -14,19 +14,17 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.local.database.model
+package com.nlab.reminder.core.data.model
 
-import androidx.room.Embedded
-import androidx.room.Relation
+import com.nlab.reminder.core.kotlin.NonBlankString
 
 /**
- * @author Thalys
+ * @author Doohyun
  */
-data class ScheduleWithDetailsEntity(
-    @Embedded val schedule: ScheduleEntity,
-    @Relation(
-        parentColumn = "schedule_id",
-        entityColumn = "schedule_id"
-    )
-    val repeatDetails: Set<RepeatDetailEntity>
+data class ScheduleContent(
+    val title: NonBlankString,
+    val note: NonBlankString?,
+    val link: Link?,
+    val triggerTime: TriggerTime?,
+    val repeat: Repeat?,
 )

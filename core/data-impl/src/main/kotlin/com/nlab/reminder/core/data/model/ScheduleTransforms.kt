@@ -26,6 +26,12 @@ import com.nlab.reminder.core.local.database.model.ScheduleWithDetailsEntity
  */
 internal fun Schedule(entity: ScheduleWithDetailsEntity): Schedule = Schedule(
     id = ScheduleId(entity.schedule.scheduleId),
+    content = ScheduleContent(entity),
+    visiblePriority = entity.schedule.visiblePriority.tryToNonNegativeLongOrZero(),
+    isComplete = entity.schedule.isComplete
+)
+
+internal fun ScheduleContent(entity: ScheduleWithDetailsEntity): ScheduleContent = ScheduleContent(
     title = entity.schedule.title.toNonBlankString(),
     note = entity.schedule.description.tryToNonBlankStringOrNull(),
     link = entity.schedule.link.tryToNonBlankStringOrNull()?.let(::Link),
@@ -41,7 +47,5 @@ internal fun Schedule(entity: ScheduleWithDetailsEntity): Schedule = Schedule(
             interval = requireNotNull(entity.schedule.repeatInterval),
             detailEntities = entity.repeatDetails
         )
-    },
-    visiblePriority = entity.schedule.visiblePriority.tryToNonNegativeLongOrZero(),
-    isComplete = entity.schedule.isComplete
+    }
 )
