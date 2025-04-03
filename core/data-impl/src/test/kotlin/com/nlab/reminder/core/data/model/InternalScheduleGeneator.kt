@@ -16,14 +16,20 @@
 
 package com.nlab.reminder.core.data.model
 
+import com.nlab.reminder.core.local.database.model.RepeatDetailEntity
 import com.nlab.reminder.core.local.database.model.ScheduleEntity
 import com.nlab.reminder.core.local.database.model.ScheduleWithDetailsEntity
 import com.nlab.testkit.faker.genInt
 
+typealias ScheduleAndEntity = Pair<Schedule, ScheduleWithDetailsEntity>
+
 /**
  * @author Doohyun
  */
-internal fun genScheduleAndEntity(schedule: Schedule = genSchedule()): Pair<Schedule, ScheduleWithDetailsEntity> {
+fun genScheduleAndEntity(
+    schedule: Schedule = genSchedule(),
+    lastRepeatId: Long = -1
+): ScheduleAndEntity {
     val scheduleEntity = ScheduleEntity(
         scheduleId = schedule.id.rawId,
         title = schedule.content.title.value,
@@ -36,29 +42,39 @@ internal fun genScheduleAndEntity(schedule: Schedule = genSchedule()): Pair<Sche
         repeatType = schedule.content.repeat?.toRepeatType(),
         repeatInterval = schedule.content.repeat?.toIntervalAsInt()
     )
-    val repeatDetailEntity =
-
-
-}
-    schedule to ScheduleEntity(
-        scheduleId = schedule.id.rawId,
-        title = schedule.content.title.value,
-        description = schedule.content.note?.value,
-        link = schedule.content.link?.rawLink?.value,
-        visiblePriority = schedule.visiblePriority.value,
-        isComplete = schedule.isComplete,
-        triggerTimeUtc = schedule.content.triggerTime?.utcTime,
-        isTriggerTimeDateOnly = schedule.content.triggerTime?.isDateOnly,
-        repeatType = schedule.content.repeat?.toRepeatType(),
-        repeatInterval = schedule.content.repeat?.toIntervalAsInt()
+    val pivotRepeatId = lastRepeatId + 1
+    val repeatDetailEntities = schedule.content.repeat
+        ?.toRepeatDetailDTOs()
+        .orEmpty()
+        .mapIndexed { index, repeatDetailDTO ->
+            RepeatDetailEntity(
+                repeatId = index.toLong() + pivotRepeatId,
+                scheduleId = scheduleEntity.scheduleId,
+                propertyCode = repeatDetailDTO.propertyCode,
+                value = repeatDetailDTO.value
+            )
+        }
+        .toSet()
+    val scheduleWithDetailsEntity = ScheduleWithDetailsEntity(
+        scheduleEntity,
+        repeatDetailEntities
     )
+    return schedule to scheduleWithDetailsEntity
+}
 
-internal fun genScheduleAndEntities(
+fun genScheduleAndEntities(
     count: Int = genInt(min = 5, max = 10)
-): Pair<List<Schedule>, List<ScheduleEntity>> {
-    val tables = genSchedules(count = count)
-        .map { schedule -> genScheduleAndEntity(schedule) }
-        .associateBy(keySelector = { it.first }, valueTransform = { it.second })
-
-    return tables.keys.sortedBy { it.id.rawId } to tables.values.sortedBy { it.scheduleId }
+): List<ScheduleAndEntity> {
+    val acc = genSchedules(count = count).fold(Pair(emptyList<ScheduleAndEntity>(), -1L)) { acc, schedule ->
+        val (prevScheduleAndEntities, prevLastRepeatId) = acc
+        val scheduleAndEntity = genScheduleAndEntity(schedule, prevLastRepeatId)
+        val newScheduleAndEntities = prevScheduleAndEntities + scheduleAndEntity
+        val newLastRepeatId = scheduleAndEntity
+            .second
+            .repeatDetails
+            .maxOfOrNull { it.repeatId }
+            ?: prevLastRepeatId
+        newScheduleAndEntities to newLastRepeatId
+    }
+    return acc.first
 }

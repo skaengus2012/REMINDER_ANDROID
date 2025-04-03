@@ -164,21 +164,85 @@ internal fun Repeat.toIntervalAsInt(): Int {
     return interval.value
 }
 
-internal fun Repeat.Weekly.getRepeatDetails(): Set<RepeatDetailDTO> = buildSet {
-    this += RepeatDetailEntity(
-        scheduleId = scheduleId.rawId,
+internal fun Repeat.toRepeatDetailDTOs(): Set<RepeatDetailDTO> = when (this) {
+    is Repeat.Hourly,
+    is Repeat.Daily -> {
+        emptySet()
+    }
+
+    is Repeat.Weekly -> {
+        convertRepeatDetailDTOsFromWeeklyRepeat(this)
+    }
+
+    is Repeat.Monthly -> {
+        convertRepeatDetailDTOsFromMonthlyRepeat(this)
+    }
+
+    is Repeat.Yearly -> {
+        convertRepeatDetailDTOsFromYearlyRepeat(this)
+    }
+}
+
+private fun convertRepeatDetailDTOsFromWeeklyRepeat(repeat: Repeat.Weekly): Set<RepeatDetailDTO> = buildSet {
+    this += RepeatDetailDTO(
         propertyCode = REPEAT_SETTING_PROPERTY_ZONE_ID,
-        value = timeZone.id
+        value = repeat.timeZone.id
     )
-    daysOfWeeks.value.forEach { daysOfWeek ->
-        this += RepeatDetailEntity(
-            scheduleId = scheduleId.rawId,
+    repeat.daysOfWeeks.value.forEach { daysOfWeek ->
+        this += RepeatDetailDTO(
             propertyCode = REPEAT_SETTING_PROPERTY_WEEKLY,
             value = daysOfWeek.toRepeatWeek()
         )
     }
 }
 
-internal fun Repeat.Monthly.getRepeatDetails(scheduleId: ScheduleId): Set<RepeatDetailEntity> = buildSet {
+private fun convertRepeatDetailDTOsFromMonthlyRepeat(repeat: Repeat.Monthly): Set<RepeatDetailDTO> = buildSet {
+    this += RepeatDetailDTO(
+        propertyCode = REPEAT_SETTING_PROPERTY_ZONE_ID,
+        value = repeat.timeZone.id
+    )
+    when (val typedDetail = repeat.detail) {
+        is MonthlyRepeatDetail.Each -> {
+            typedDetail.days.value.forEach { daysOfMonth ->
+                this += RepeatDetailDTO(
+                    propertyCode = REPEAT_SETTING_PROPERTY_MONTHLY_DAY,
+                    value = daysOfMonth.day.toString()
+                )
+            }
+        }
 
+        is MonthlyRepeatDetail.Customize -> {
+            this += RepeatDetailDTO(
+                propertyCode = REPEAT_SETTING_PROPERTY_MONTHLY_DAY_ORDER,
+                value = typedDetail.order.toRepeatDayOrder()
+            )
+            this += RepeatDetailDTO(
+                propertyCode = REPEAT_SETTING_PROPERTY_MONTHLY_DAY_OF_WEEK,
+                value = typedDetail.day.toRepeatDays()
+            )
+        }
+    }
+}
+
+private fun convertRepeatDetailDTOsFromYearlyRepeat(repeat: Repeat.Yearly): Set<RepeatDetailDTO> = buildSet {
+    this += RepeatDetailDTO(
+        propertyCode = REPEAT_SETTING_PROPERTY_ZONE_ID,
+        value = repeat.timeZone.id
+    )
+    repeat.months.value.forEach { month ->
+        this += RepeatDetailDTO(
+            propertyCode = REPEAT_SETTING_PROPERTY_YEARLY_MONTH,
+            value = month.toRepeatMonth()
+        )
+    }
+    repeat.daysOfWeekOption?.let { option ->
+        this += RepeatDetailDTO(
+            propertyCode = REPEAT_SETTING_PROPERTY_YEARLY_DAY_ORDER,
+            value = option.order.toRepeatDayOrder()
+        )
+        this += RepeatDetailDTO(
+            propertyCode = REPEAT_SETTING_PROPERTY_YEARLY_DAY_OF_WEEK,
+            value = option.day.toRepeatDays()
+        )
+    }
 }

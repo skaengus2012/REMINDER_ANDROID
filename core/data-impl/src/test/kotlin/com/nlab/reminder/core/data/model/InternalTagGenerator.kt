@@ -18,8 +18,9 @@ package com.nlab.reminder.core.data.model
 
 import com.nlab.reminder.core.local.database.model.TagEntity
 
+typealias TagAndEntity = Pair<Tag, TagEntity>
+
 /**
  * @author Doohyun
  */
-internal fun genTagAndEntity(tag: Tag = genTag()): Pair<Tag, TagEntity> =
-    tag to TagEntity(tag.id.rawId, tag.name.value)
+fun genTagAndEntity(tag: Tag = genTag()): TagAndEntity = tag to TagEntity(tag.id.rawId, tag.name.value)

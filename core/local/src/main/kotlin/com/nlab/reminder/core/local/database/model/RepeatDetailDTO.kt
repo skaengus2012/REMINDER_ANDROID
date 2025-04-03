@@ -17,9 +17,11 @@
 package com.nlab.reminder.core.local.database.model
 
 /**
+ * Sub-set of [RepeatDetailEntity]
+ *
  * @author Doohyun
  */
-sealed class RepeatDetailDTO(
+data class RepeatDetailDTO(
     @RepeatSettingProperty val propertyCode: String,
     val value: String
 )
