@@ -16,8 +16,7 @@
 
 package com.nlab.reminder.core.kotlin.collections
 
-import kotlinx.collections.immutable.persistentSetOf
-import kotlinx.collections.immutable.toImmutableSet
+import kotlinx.collections.immutable.*
 
 /**
  * @author Thalys
@@ -55,6 +54,4 @@ fun <T> NonEmptySet(
 
 fun <T> Iterable<T>.toNonEmptySet(): NonEmptySet<T> = NonEmptySet(value = toImmutableSet())
 
-fun <T> Collection<T>.tryToNonEmptySetOrNull(): NonEmptySet<T>? =
-    if (isEmpty()) null
-    else toNonEmptySet()
+fun <T> Iterable<T>.tryToNonEmptySetOrNull(): NonEmptySet<T>? = try { toNonEmptySet() } catch (e: Throwable) { null }
