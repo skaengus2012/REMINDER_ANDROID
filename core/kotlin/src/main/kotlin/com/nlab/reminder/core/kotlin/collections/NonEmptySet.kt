@@ -22,10 +22,29 @@ import kotlinx.collections.immutable.toImmutableSet
 /**
  * @author Thalys
  */
-@JvmInline
-value class NonEmptySet<out E> internal constructor(val value: Set<E>) {
+// Cannot make value class
+// There is inject problem with hilt.
+// issue link : https://github.com/google/dagger/issues/3448#issuecomment-1243857366
+class NonEmptySet<out E> internal constructor(val value: Set<E>) {
     init {
         require(value.isNotEmpty()) { "Value should not be empty" }
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as NonEmptySet<*>
+
+        return value == other.value
+    }
+
+    override fun hashCode(): Int {
+        return value.hashCode()
+    }
+
+    override fun toString(): String {
+        return "NonEmptySet(value=$value)"
     }
 }
 
