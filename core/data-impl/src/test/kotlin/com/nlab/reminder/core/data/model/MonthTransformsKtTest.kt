@@ -18,6 +18,7 @@ package com.nlab.reminder.core.data.model
 
 import com.nlab.reminder.core.local.database.model.*
 import kotlinx.datetime.Month
+import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.sameInstance
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
@@ -43,23 +44,23 @@ class MonthTransformsKtTest {
     }
 
     @Test(expected = IllegalArgumentException::class)
-    fun `Month func should throw Require error for invalid REPEAT_MONTH string`() {
+    fun `Month func should throw required error for invalid REPEAT_MONTH string`() {
         Month("INVALID_MONTH")
     }
 
     @Test
     fun `Should convert Month to REPEAT_MONTH string`() {
-        assertThat(Month.JANUARY.toRepeatMonth(), sameInstance(REPEAT_MONTH_JAN))
-        assertThat(Month.FEBRUARY.toRepeatMonth(), sameInstance(REPEAT_MONTH_FEB))
-        assertThat(Month.MARCH.toRepeatMonth(), sameInstance(REPEAT_MONTH_MAR))
-        assertThat(Month.APRIL.toRepeatMonth(), sameInstance(REPEAT_MONTH_APR))
-        assertThat(Month.MAY.toRepeatMonth(), sameInstance(REPEAT_MONTH_MAY))
-        assertThat(Month.JUNE.toRepeatMonth(), sameInstance(REPEAT_MONTH_JUN))
-        assertThat(Month.JULY.toRepeatMonth(), sameInstance(REPEAT_MONTH_JUL))
-        assertThat(Month.AUGUST.toRepeatMonth(), sameInstance(REPEAT_MONTH_AUG))
-        assertThat(Month.SEPTEMBER.toRepeatMonth(), sameInstance(REPEAT_MONTH_SEP))
-        assertThat(Month.OCTOBER.toRepeatMonth(), sameInstance(REPEAT_MONTH_OCT))
-        assertThat(Month.NOVEMBER.toRepeatMonth(), sameInstance(REPEAT_MONTH_NOV))
-        assertThat(Month.DECEMBER.toRepeatMonth(), sameInstance(REPEAT_MONTH_DEC))
+        assertThat(Month.JANUARY.toRepeatMonth(), equalTo(REPEAT_MONTH_JAN))
+        assertThat(Month.FEBRUARY.toRepeatMonth(), equalTo(REPEAT_MONTH_FEB))
+        assertThat(Month.MARCH.toRepeatMonth(), equalTo(REPEAT_MONTH_MAR))
+        assertThat(Month.APRIL.toRepeatMonth(), equalTo(REPEAT_MONTH_APR))
+        assertThat(Month.MAY.toRepeatMonth(), equalTo(REPEAT_MONTH_MAY))
+        assertThat(Month.JUNE.toRepeatMonth(), equalTo(REPEAT_MONTH_JUN))
+        assertThat(Month.JULY.toRepeatMonth(), equalTo(REPEAT_MONTH_JUL))
+        assertThat(Month.AUGUST.toRepeatMonth(), equalTo(REPEAT_MONTH_AUG))
+        assertThat(Month.SEPTEMBER.toRepeatMonth(), equalTo(REPEAT_MONTH_SEP))
+        assertThat(Month.OCTOBER.toRepeatMonth(), equalTo(REPEAT_MONTH_OCT))
+        assertThat(Month.NOVEMBER.toRepeatMonth(), equalTo(REPEAT_MONTH_NOV))
+        assertThat(Month.DECEMBER.toRepeatMonth(), equalTo(REPEAT_MONTH_DEC))
     }
 }
