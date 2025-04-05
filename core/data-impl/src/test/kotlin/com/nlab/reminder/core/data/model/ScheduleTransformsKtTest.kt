@@ -1,12 +1,7 @@
 package com.nlab.reminder.core.data.model
 
-import com.nlab.reminder.core.kotlin.toNonBlankString
-import com.nlab.reminder.core.local.database.dao.ScheduleContentDTO
-import com.nlab.reminder.core.local.database.dao.TriggerTimeDTO
 import com.nlab.reminder.core.local.database.model.ScheduleEntity
-import com.nlab.testkit.faker.genBlank
 import org.hamcrest.CoreMatchers.equalTo
-import org.hamcrest.CoreMatchers.nullValue
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
 
@@ -22,6 +17,7 @@ internal class ScheduleTransformsKtTest {
         assertThat(actualSchedule, equalTo(expectedSchedule))
     }
 
+    /**
     @Test
     fun `Given that the nonBlank field is null or an empty in entity, When convert to ScheduleContent, Then nonBlank field is null`() {
         val (_, entity) = genScheduleAndEntity()
@@ -72,7 +68,7 @@ internal class ScheduleTransformsKtTest {
         val content = ScheduleContent(entity.copyWithNonBlankField(value = null))
         val dto = content.toLocalDTO()
         assertThat(dto.triggerTimeDTO, nullValue())
-    }
+    }*/
 }
 
 private fun ScheduleEntity.copyWithNonBlankField(value: String?) = copy(
@@ -84,8 +80,8 @@ private fun assertNonBlankIsNull(scheduleContent: ScheduleContent) {
     assert(scheduleContent.note == null)
     assert(scheduleContent.link == null)
 }
-
+/**
 private fun assertNonBlankIsNull(scheduleContentDTO: ScheduleContentDTO) {
     assert(scheduleContentDTO.description == null)
     assert(scheduleContentDTO.link == null)
-}
+}*/

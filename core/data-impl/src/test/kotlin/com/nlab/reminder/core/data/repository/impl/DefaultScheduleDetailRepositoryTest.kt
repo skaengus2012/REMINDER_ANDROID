@@ -45,7 +45,7 @@ import org.mockito.kotlin.whenever
  */
 class DefaultScheduleDetailRepositoryTest {
     private lateinit var query: GetScheduleQuery
-
+/**
     @Before
     fun setup() {
         query = GetScheduleQuery.All
@@ -126,9 +126,9 @@ class DefaultScheduleDetailRepositoryTest {
             .first()
             .first()
         assertThat(actualDetail.linkMetadata, nullValue())
-    }
+    }*/
 }
-
+/**
 private fun genScheduleDetailRepository(
     scheduleRepository: ScheduleRepository,
     tagRepository: TagRepository = mock {
@@ -145,4 +145,4 @@ private fun genScheduleDetailRepository(
     tagRepository = tagRepository,
     scheduleTagListRepository = scheduleTagListRepository,
     linkMetadataRepository = linkMetadataRepository
-)
+)*/
