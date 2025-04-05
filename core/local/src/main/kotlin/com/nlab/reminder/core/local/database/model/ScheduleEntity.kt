@@ -51,7 +51,7 @@ data class ScheduleEntity(
     @ColumnInfo(name = "trigger_time_utc") val triggerTimeUtc: Instant?,
     @ColumnInfo(name = "is_trigger_time_date_only") val isTriggerTimeDateOnly: Boolean?,
     @ColumnInfo(name = "repeat_type") @RepeatType val repeatType: String?,
-    @ColumnInfo(name = "repeat_interval") @IntRange(from = 1, to = 999) val repeatInterval: Int?,
+    @ColumnInfo(name = "repeat_interval") @IntRange(from = 1) val repeatInterval: Int?,
 )
 
 internal fun ScheduleEntity(

@@ -16,6 +16,7 @@
 
 package com.nlab.reminder.core.data.model
 
+import androidx.annotation.IntRange
 import com.nlab.reminder.core.kotlin.PositiveInt
 import com.nlab.reminder.core.kotlin.collections.toNonEmptySet
 import com.nlab.reminder.core.kotlin.toPositiveInt
@@ -42,18 +43,34 @@ import kotlinx.datetime.TimeZone
  */
 internal fun Repeat(
     @RepeatType type: String,
-    interval: Int,
+    @IntRange(from = 1) interval: Int,
     detailEntities: Collection<RepeatDetailEntity>
 ): Repeat {
     val intervalAsPositiveInt = interval.toPositiveInt()
-    return when (type) {
-        REPEAT_HOURLY -> Repeat.Hourly(intervalAsPositiveInt)
-        REPEAT_DAILY -> Repeat.Daily(intervalAsPositiveInt)
-        REPEAT_WEEKLY -> RepeatWeekly(intervalAsPositiveInt, detailEntities)
-        REPEAT_MONTHLY -> RepeatMonthly(intervalAsPositiveInt, detailEntities)
-        REPEAT_YEARLY -> RepeatYearly(intervalAsPositiveInt, detailEntities)
-        else -> throw IllegalArgumentException("Invalid repeat type : $type")
+
+    // When it is tied with {when}, Missed Branch will be created in Jacoco Coverage.
+    // So it was treated with an if-return pattern.
+    if (type == REPEAT_HOURLY) {
+        return Repeat.Hourly(intervalAsPositiveInt)
     }
+
+    if (type == REPEAT_DAILY) {
+        return Repeat.Daily(intervalAsPositiveInt)
+    }
+
+    if (type == REPEAT_WEEKLY) {
+        return RepeatWeekly(intervalAsPositiveInt, detailEntities)
+    }
+
+    if (type == REPEAT_MONTHLY) {
+        return RepeatMonthly(intervalAsPositiveInt, detailEntities)
+    }
+
+    if (type == REPEAT_YEARLY) {
+        return RepeatYearly(intervalAsPositiveInt, detailEntities)
+    }
+
+    throw IllegalArgumentException("Invalid repeat type : $type")
 }
 
 @Suppress("FunctionName")
@@ -119,6 +136,8 @@ private fun RepeatYearly(
         keySelector = { it.propertyCode },
         valueTransform = { it.value }
     )
+    val yearlyDayOrder = propertyCodeToValuesTables[REPEAT_SETTING_PROPERTY_YEARLY_DAY_ORDER]?.firstOrNull()
+    val yearlyDayOfWeeks = propertyCodeToValuesTables[REPEAT_SETTING_PROPERTY_YEARLY_DAY_OF_WEEK]?.firstOrNull()
     return Repeat.Yearly(
         interval = interval,
         timeZone = propertyCodeToValuesTables.getTimeZone(),
@@ -126,17 +145,18 @@ private fun RepeatYearly(
             .getValue(REPEAT_SETTING_PROPERTY_YEARLY_MONTH)
             .map { Month(it) }
             .toNonEmptySet(),
-        daysOfWeekOption = propertyCodeToValuesTables[REPEAT_SETTING_PROPERTY_YEARLY_DAY_ORDER]
-            ?.first()
-            ?.let(::DaysOfWeekOrder)
-            ?.let { order ->
+        daysOfWeekOption = when {
+            yearlyDayOrder == null && yearlyDayOfWeeks == null -> {
+                null
+            }
+            yearlyDayOrder != null && yearlyDayOfWeeks != null -> {
                 YearlyDaysOfWeekOption(
-                    order = order,
-                    day = propertyCodeToValuesTables.getValue(REPEAT_SETTING_PROPERTY_YEARLY_DAY_OF_WEEK)
-                        .first()
-                        .let(::Days)
+                    order = DaysOfWeekOrder(yearlyDayOrder),
+                    day = Days(yearlyDayOfWeeks)
                 )
             }
+            else -> throw IllegalArgumentException("Invalid yearly week option")
+        }
     )
 }
 
@@ -206,7 +226,7 @@ private fun convertRepeatDetailDTOsFromMonthlyRepeat(repeat: Repeat.Monthly): Se
             typedDetail.days.value.forEach { daysOfMonth ->
                 this += RepeatDetailDTO(
                     propertyCode = REPEAT_SETTING_PROPERTY_MONTHLY_DAY,
-                    value = daysOfMonth.day.toString()
+                    value = daysOfMonth.rawValue.toString()
                 )
             }
         }

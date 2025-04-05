@@ -21,6 +21,7 @@ import com.nlab.reminder.core.kotlin.collections.NonEmptySet
 import com.nlab.reminder.core.kotlin.collections.toNonEmptySet
 import com.nlab.reminder.core.kotlin.toPositiveInt
 import com.nlab.testkit.faker.genInt
+import com.nlab.testkit.faker.shuffledSubset
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.Month
 import kotlinx.datetime.TimeZone
@@ -48,8 +49,7 @@ fun genRepeatWeekly(
     interval: PositiveInt = genInt(min = 1, max = 999).toPositiveInt(),
     timeZone: TimeZone = TimeZone.currentSystemDefault(),
     daysOfWeeks: NonEmptySet<DayOfWeek> = DayOfWeek.entries
-        .shuffled()
-        .let { dayOfWeeks -> dayOfWeeks.take(genInt(min = 1, max = dayOfWeeks.size)) }
+        .shuffledSubset()
         .toNonEmptySet()
 ): Repeat.Weekly = Repeat.Weekly(
     interval = interval,
@@ -71,8 +71,7 @@ fun genRepeatYearly(
     interval: PositiveInt = genInt(min = 1, max = 999).toPositiveInt(),
     timeZone: TimeZone = TimeZone.currentSystemDefault(),
     months: NonEmptySet<Month> = Month.entries
-        .shuffled()
-        .let { months -> months.take(genInt(min = 1, max = months.size)) }
+        .shuffledSubset()
         .toNonEmptySet(),
     daysOfWeekOption: YearlyDaysOfWeekOption? = genYearlyDaysOfWeekOption()
 ): Repeat.Yearly = Repeat.Yearly(

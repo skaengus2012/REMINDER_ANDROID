@@ -19,6 +19,7 @@ package com.nlab.reminder.core.data.model
 import com.nlab.reminder.core.kotlin.collections.NonEmptySet
 import com.nlab.reminder.core.kotlin.collections.toNonEmptySet
 import com.nlab.testkit.faker.genInt
+import com.nlab.testkit.faker.shuffledSubset
 
 /**
  * @author Thalys
@@ -29,8 +30,7 @@ fun genMonthlyRepeatDetail(): MonthlyRepeatDetail =
 
 fun genMonthlyRepeatDetailEach(
     days: NonEmptySet<DaysOfMonth> = DaysOfMonth.entries
-        .shuffled()
-        .let { daysOfMonths -> daysOfMonths.take(genInt(min = 1, max = daysOfMonths.size)) }
+        .shuffledSubset()
         .toNonEmptySet()
 ): MonthlyRepeatDetail.Each = MonthlyRepeatDetail.Each(days = days)
 
