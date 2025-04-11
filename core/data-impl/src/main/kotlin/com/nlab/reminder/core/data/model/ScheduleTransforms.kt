@@ -17,8 +17,8 @@
 package com.nlab.reminder.core.data.model
 
 import com.nlab.reminder.core.kotlin.toNonBlankString
+import com.nlab.reminder.core.kotlin.toNonNegativeLong
 import com.nlab.reminder.core.kotlin.tryToNonBlankStringOrNull
-import com.nlab.reminder.core.kotlin.tryToNonNegativeLongOrZero
 import com.nlab.reminder.core.local.database.model.ScheduleWithDetailsEntity
 
 /**
@@ -27,7 +27,7 @@ import com.nlab.reminder.core.local.database.model.ScheduleWithDetailsEntity
 internal fun Schedule(entity: ScheduleWithDetailsEntity): Schedule = Schedule(
     id = ScheduleId(entity.schedule.scheduleId),
     content = ScheduleContent(entity),
-    visiblePriority = entity.schedule.visiblePriority.tryToNonNegativeLongOrZero(),
+    visiblePriority = entity.schedule.visiblePriority.toNonNegativeLong(),
     isComplete = entity.schedule.isComplete
 )
 
@@ -35,17 +35,42 @@ internal fun ScheduleContent(entity: ScheduleWithDetailsEntity): ScheduleContent
     title = entity.schedule.title.toNonBlankString(),
     note = entity.schedule.description.tryToNonBlankStringOrNull(),
     link = entity.schedule.link.tryToNonBlankStringOrNull()?.let(::Link),
-    triggerTime = entity.schedule.triggerTimeUtc?.let { utcTime ->
-        TriggerTime(
-            utcTime = utcTime,
-            isDateOnly = requireNotNull(entity.schedule.isTriggerTimeDateOnly)
-        )
+    triggerTime = with(entity.schedule) {
+        val curTimeUtc = triggerTimeUtc
+        val curTriggerTimeDateOnly = isTriggerTimeDateOnly
+        when {
+            curTimeUtc == null && curTriggerTimeDateOnly == null -> null
+            curTimeUtc != null && curTriggerTimeDateOnly != null -> {
+                TriggerTime(
+                    utcTime = curTimeUtc,
+                    isDateOnly = curTriggerTimeDateOnly
+                )
+            }
+
+            else -> throw IllegalArgumentException("Invalid TriggerTime [$curTimeUtc, $curTriggerTimeDateOnly]")
+        }
     },
-    repeat = entity.schedule.repeatType?.let { type ->
-        Repeat(
-            type = type,
-            interval = requireNotNull(entity.schedule.repeatInterval),
-            detailEntities = entity.repeatDetails
-        )
+    repeat = with(entity) {
+        val curRepeatType = entity.schedule.repeatType
+        val curRepeatInterval = entity.schedule.repeatInterval
+        /**
+         * If RepeatDetails is incorrectly entered, it is not confirmed.
+         * In Repeat function, check if there are appropriate repeatDetails.
+         *
+         * The validity of the repeatDetails should be checked only in the data insertion.
+         * @see [com.nlab.reminder.core.local.database.transaction.ScheduleTransactionValidator]
+         */
+        when {
+            curRepeatType == null && curRepeatInterval == null -> null
+            curRepeatType != null && curRepeatInterval != null -> {
+                Repeat(
+                    type = curRepeatType,
+                    interval = curRepeatInterval,
+                    detailEntities = entity.repeatDetails
+                )
+            }
+
+            else -> throw IllegalArgumentException("Invalid RepeatDetails [$curRepeatType, $curRepeatInterval]")
+        }
     }
 )
