@@ -37,12 +37,19 @@ abstract class ScheduleTagListDAO {
     @Query("SELECT schedule_id FROM schedule_tag_list WHERE tag_id = :tagId")
     abstract suspend fun findScheduleIdsByTagId(tagId: Long): Array<Long>
 
-    @Query("SELECT * FROM schedule_tag_list WHERE tag_id IN (:scheduleIds)")
+    @Query("SELECT * FROM schedule_tag_list WHERE schedule_id IN (:scheduleIds)")
     protected abstract fun findByScheduleIdsAsStreamInternal(scheduleIds: Set<Long>): Flow<Array<ScheduleTagListEntity>>
 
     fun findByScheduleIdsAsStream(scheduleIds: Set<Long>): Flow<Array<ScheduleTagListEntity>> =
         if (scheduleIds.isEmpty()) flowOf(emptyArray())
         else findByScheduleIdsAsStreamInternal(scheduleIds)
+
+    @Query("SELECT * FROM schedule_tag_list WHERE tag_id IN (:tagIds)")
+    protected abstract fun findByTagIdsAsStreamInternal(tagIds: Set<Long>): Flow<Array<ScheduleTagListEntity>>
+
+    fun findByTagIdsAsStream(tagIds: Set<Long>): Flow<Array<ScheduleTagListEntity>> =
+        if (tagIds.isEmpty()) flowOf(emptyArray())
+        else findByTagIdsAsStreamInternal(tagIds)
 
     @Query("DELETE FROM schedule_tag_list WHERE schedule_id = :scheduleId")
     abstract suspend fun deleteByScheduleId(scheduleId: Long)
