@@ -22,12 +22,12 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
+import com.nlab.reminder.core.kotlin.NonNegativeLong
 import com.nlab.reminder.core.kotlin.toNonNegativeLong
 import com.nlab.reminder.core.local.database.model.ScheduleContentDTO
 import com.nlab.reminder.core.local.database.model.ScheduleEntity
 import com.nlab.reminder.core.local.database.model.contentEquals
 import com.nlab.reminder.core.local.database.model.EMPTY_GENERATED_ID
-import kotlinx.coroutines.flow.Flow
 
 /**
  * @author Doohyun
@@ -43,12 +43,6 @@ abstract class ScheduleDAO {
     @Delete
     protected abstract suspend fun delete(entity: ScheduleEntity)
 
-    @Query("SELECT * FROM schedule")
-    abstract fun getAsStream(): Flow<Array<ScheduleEntity>>
-
-    @Query("SELECT * FROM schedule WHERE is_complete = :isComplete")
-    abstract fun findByCompleteAsStream(isComplete: Boolean): Flow<Array<ScheduleEntity>>
-
     @Query("SELECT * FROM schedule WHERE is_complete = :isComplete")
     protected abstract suspend fun findByComplete(isComplete: Boolean): Array<ScheduleEntity>
 
@@ -59,11 +53,11 @@ abstract class ScheduleDAO {
     protected abstract suspend fun findById(scheduleId: Long): ScheduleEntity?
 
     @Query("SELECT * FROM schedule WHERE schedule_id IN (:scheduleIds)")
-    protected abstract suspend fun findByScheduleIdsInternal(scheduleIds: Set<Long>): Array<ScheduleEntity>
+    protected abstract suspend fun findByIdsInternal(scheduleIds: Set<Long>): Array<ScheduleEntity>
 
-    private suspend fun findByScheduleIds(scheduleIds: Set<Long>): Array<ScheduleEntity> =
+    private suspend fun findByIds(scheduleIds: Set<Long>): Array<ScheduleEntity> =
         if (scheduleIds.isEmpty()) emptyArray()
-        else findByScheduleIdsInternal(scheduleIds)
+        else findByIdsInternal(scheduleIds)
 
     @Query(
         """
@@ -74,9 +68,9 @@ abstract class ScheduleDAO {
         LIMIT 1
         """
     )
-    protected abstract fun findMaxVisiblePriorityByComplete(isComplete: Boolean): Long?
+    protected abstract suspend fun findMaxVisiblePriorityByComplete(isComplete: Boolean): Long?
 
-    private inline fun findMaxVisiblePriorityByCompleteOrElse(
+    private suspend inline fun findMaxVisiblePriorityByCompleteOrElse(
         isComplete: Boolean,
         defaultValue: () -> Long
     ): Long = findMaxVisiblePriorityByComplete(isComplete) ?: defaultValue()
@@ -109,14 +103,14 @@ abstract class ScheduleDAO {
     }
 
     @Transaction
-    open suspend fun updateByVisiblePriorities(
-        idToVisiblePriorityTable: Map<Long, Long>,
-        isCompletedRange: Boolean
-    ) {
-        check(idToVisiblePriorityTable.keys == findIdsByComplete(isCompletedRange).toSet())
+    open suspend fun updateByVisiblePriorities(idToVisiblePriorityTable: Map<Long, NonNegativeLong>) {
+        if (idToVisiblePriorityTable.isEmpty()) return
+        val sampleSchedule = findById(scheduleId = idToVisiblePriorityTable.firstNotNullOf { it.key })
+        checkNotNull(sampleSchedule)
+        check(idToVisiblePriorityTable.keys == findIdsByComplete(sampleSchedule.isComplete).toSet())
 
         idToVisiblePriorityTable.forEach { (id, visiblePriority) ->
-            updateVisiblePriorityInternal(scheduleId = id, visiblePriority = visiblePriority)
+            updateVisiblePriorityInternal(scheduleId = id, visiblePriority = visiblePriority.value)
         }
     }
 
@@ -136,7 +130,10 @@ abstract class ScheduleDAO {
             }
         }
 
-        findByScheduleIds(scheduleIds = idToCompleteTable.keys)
+        val entities = findByIds(scheduleIds = idToCompleteTable.keys)
+        if (entities.isEmpty()) return
+
+        entities
             .filter { entity -> entity.isComplete != idToCompleteTable.getValue(entity.scheduleId) }
             .groupBy { it.isComplete }
             .forEach { (isComplete, entities) ->
@@ -146,7 +143,7 @@ abstract class ScheduleDAO {
 
     @Transaction
     open suspend fun deleteByScheduleIds(scheduleIds: Set<Long>) {
-        val entities = findByScheduleIds(scheduleIds = scheduleIds)
+        val entities = findByIds(scheduleIds = scheduleIds)
         if (entities.isEmpty()) return
 
         entities.forEach { delete(it) }

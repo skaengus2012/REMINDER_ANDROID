@@ -27,7 +27,7 @@ import javax.inject.Singleton
  * @author Thalys
  */
 @Singleton
-internal class ScheduleTransactionValidator @Inject constructor() {
+internal class ScheduleContentValidator @Inject constructor() {
     private val allRepeatWeeks = setOf(
         REPEAT_WEEK_SUN,
         REPEAT_WEEK_MON,
@@ -73,19 +73,7 @@ internal class ScheduleTransactionValidator @Inject constructor() {
     )
 
     fun validate(contentDTO: ScheduleContentDTO) {
-        ensureTriggerTimeAndRepeatRelation(contentDTO.triggerTimeDTO, contentDTO.repeatDTO)
-        contentDTO.repeatDTO?.let { ensureRepeatValidation(it) }
-    }
-
-    /**
-     * Checks if the relation between trigger time and repeat is valid.
-     * This rule follows Contract2 of [ScheduleEntity].
-     */
-    private fun ensureTriggerTimeAndRepeatRelation(
-        triggerTime: TriggerTimeDTO?,
-        repeat: RepeatDTO?
-    ) {
-        require(repeat == null || triggerTime != null)
+        contentDTO.timingDTO?.repeatDTO?.let { ensureRepeatValidation(it) }
     }
 
     /**
@@ -93,7 +81,7 @@ internal class ScheduleTransactionValidator @Inject constructor() {
      * This rule follows Contract3 of [ScheduleEntity] and [RepeatDetailEntity] cases.
      */
     private fun ensureRepeatValidation(repeat: RepeatDTO) {
-        when (val repeatCode = repeat.code) {
+        when (val repeatCode = repeat.type) {
             REPEAT_HOURLY,
             REPEAT_DAILY -> {
                 require(repeat.details.isEmpty())

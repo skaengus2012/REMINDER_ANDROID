@@ -61,10 +61,10 @@ internal fun ScheduleEntity(
     title = contentDTO.title.value,
     description = contentDTO.description?.value,
     link = contentDTO.link?.value,
-    triggerTimeUtc = contentDTO.triggerTimeDTO?.utcTime,
-    isTriggerTimeDateOnly = contentDTO.triggerTimeDTO?.isDateOnly,
-    repeatType = contentDTO.repeatDTO?.code,
-    repeatInterval = contentDTO.repeatDTO?.value,
+    triggerTimeUtc = contentDTO.timingDTO?.triggerTimeUtc,
+    isTriggerTimeDateOnly = contentDTO.timingDTO?.isTriggerTimeDateOnly,
+    repeatType = contentDTO.timingDTO?.repeatDTO?.type,
+    repeatInterval = contentDTO.timingDTO?.repeatDTO?.interval?.value,
     visiblePriority = visiblePriority.value,
     isComplete = false
 )
@@ -76,15 +76,15 @@ internal fun ScheduleEntity(
     title = contentDTO.title.value,
     description = contentDTO.description?.value,
     link = contentDTO.link?.value,
-    triggerTimeUtc = contentDTO.triggerTimeDTO?.utcTime,
-    isTriggerTimeDateOnly = contentDTO.triggerTimeDTO?.isDateOnly
+    triggerTimeUtc = contentDTO.timingDTO?.triggerTimeUtc,
+    isTriggerTimeDateOnly = contentDTO.timingDTO?.isTriggerTimeDateOnly
 )
 
 internal fun ScheduleEntity.contentEquals(contentDTO: ScheduleContentDTO): Boolean =
     title == contentDTO.title.value
             && description == contentDTO.description?.value
             && link == contentDTO.link?.value
-            && triggerTimeUtc == contentDTO.triggerTimeDTO?.utcTime
-            && isTriggerTimeDateOnly == contentDTO.triggerTimeDTO?.isDateOnly
-            && repeatType == contentDTO.repeatDTO?.code
-            && repeatInterval == contentDTO.repeatDTO?.value
+            && triggerTimeUtc == contentDTO.timingDTO?.triggerTimeUtc
+            && isTriggerTimeDateOnly == contentDTO.timingDTO?.isTriggerTimeDateOnly
+            && repeatType == contentDTO.timingDTO?.repeatDTO?.type
+            && repeatInterval == contentDTO.timingDTO?.repeatDTO?.interval?.value

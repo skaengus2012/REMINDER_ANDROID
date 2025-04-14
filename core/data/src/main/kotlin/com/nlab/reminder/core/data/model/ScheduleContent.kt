@@ -25,6 +25,6 @@ data class ScheduleContent(
     val title: NonBlankString,
     val note: NonBlankString?,
     val link: Link?,
-    val triggerTime: TriggerTime?,
-    val repeat: Repeat?,
+    val tagIds: Set<TagId>,
+    val timing: ScheduleTiming?,
 )

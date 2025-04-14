@@ -25,6 +25,6 @@ data class ScheduleContentDTO(
     val title: NonBlankString,
     val description: NonBlankString?,
     val link: NonBlankString?,
-    val triggerTimeDTO: TriggerTimeDTO?,
-    val repeatDTO: RepeatDTO?
+    val tagIds: Set<Long>,
+    val timingDTO: ScheduleTimingDTO?,
 )

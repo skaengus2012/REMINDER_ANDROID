@@ -16,11 +16,13 @@
 
 package com.nlab.reminder.core.local.database.model
 
+import com.nlab.reminder.core.kotlin.PositiveInt
+
 /**
  * @author Doohyun
  */
 data class RepeatDTO(
-    @RepeatType val code: String,
-    val value: Int,
+    @RepeatType val type: String,
+    val interval: PositiveInt,
     val details: Set<RepeatDetailDTO>
 )

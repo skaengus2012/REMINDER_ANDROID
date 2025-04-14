@@ -23,6 +23,8 @@ import com.nlab.reminder.core.kotlin.faker.genNonNegativeLong
 import com.nlab.testkit.faker.genBoolean
 import com.nlab.testkit.faker.genInt
 import com.nlab.testkit.faker.genLong
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 
 /**
  * @author thalys
@@ -33,13 +35,23 @@ fun genScheduleContent(
     title: NonBlankString = genNonBlankString(),
     note: NonBlankString? = genNonBlankString(),
     link: Link? = genLink(),
-    triggerTime: TriggerTime? = genTriggerTime(),
-    repeat: Repeat? = genRepeat(),
+    tagIds: Set<TagId> = genTagIds(),
+    timing: ScheduleTiming? = genScheduleTiming(),
 ): ScheduleContent = ScheduleContent(
     title = title,
     note = note,
     link = link,
-    triggerTime = triggerTime,
+    tagIds = tagIds,
+    timing = timing
+)
+
+fun genScheduleTiming(
+    triggerAtUtc: Instant = Clock.System.now(),
+    isTriggerAtDateOnly: Boolean = genBoolean(),
+    repeat: Repeat? = genRepeat()
+): ScheduleTiming = ScheduleTiming(
+    triggerAtUtc = triggerAtUtc,
+    isTriggerAtDateOnly = isTriggerAtDateOnly,
     repeat = repeat
 )
 

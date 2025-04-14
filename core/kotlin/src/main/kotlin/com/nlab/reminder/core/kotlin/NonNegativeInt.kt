@@ -14,16 +14,20 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.data.model
-
-import com.nlab.testkit.faker.genBoolean
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
+package com.nlab.reminder.core.kotlin
 
 /**
  * @author Thalys
  */
-fun genTriggerTime(
-    utcTime: Instant = Clock.System.now(),
-    isDateOnly: Boolean = genBoolean(),
-): TriggerTime = TriggerTime(utcTime = utcTime, isDateOnly = isDateOnly)
+@JvmInline
+value class NonNegativeInt internal constructor(val value: Int) {
+    init {
+        require(value >= 0) { "Value that will have a value of 0 or more" }
+    }
+}
+
+fun Int.toNonNegativeInt(): NonNegativeInt = NonNegativeInt(value = this)
+
+fun Int?.tryToNonNegativeIntOrZero(): NonNegativeInt =
+    if (this == null || this < 0) NonNegativeInt(value = 0)
+    else NonNegativeInt(value = this)

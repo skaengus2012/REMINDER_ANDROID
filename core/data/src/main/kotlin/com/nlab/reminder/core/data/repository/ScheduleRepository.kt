@@ -26,12 +26,13 @@ import kotlinx.coroutines.flow.Flow
  */
 interface ScheduleRepository {
     suspend fun save(query: SaveScheduleQuery): Result<Schedule>
+    suspend fun updateAll(query: UpdateAllScheduleQuery): Result<Unit>
     suspend fun delete(query: DeleteScheduleQuery): Result<Unit>
     fun getSchedulesAsStream(request: GetScheduleQuery): Flow<Set<Schedule>>
     fun getScheduleCountAsStream(query: GetScheduleCountQuery): Flow<NonNegativeLong>
 }
 
-sealed class SaveScheduleQuery {
+sealed class SaveScheduleQuery private constructor() {
     data class Add(
         val content: ScheduleContent,
         val tagIds: Set<TagId>,
@@ -42,14 +43,16 @@ sealed class SaveScheduleQuery {
         val content: ScheduleContent,
         val tagIds: Set<TagId>
     ) : SaveScheduleQuery()
+}
 
-    data class ModifyCompletes(
+sealed class UpdateAllScheduleQuery private constructor() {
+    data class Completes(
         val idToCompleteTable: Map<ScheduleId, Boolean>
-    ) : SaveScheduleQuery()
+    ) : UpdateAllScheduleQuery()
 
-    data class ModifyVisiblePriorities(
+    data class VisiblePriorities(
         val idToVisiblePriorityTable: Map<ScheduleId, NonNegativeLong>
-    ) : SaveScheduleQuery()
+    ) : UpdateAllScheduleQuery()
 }
 
 sealed class DeleteScheduleQuery private constructor() {

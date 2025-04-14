@@ -14,20 +14,15 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.local.database.dao
+package com.nlab.reminder.core.local.database.model
 
-import androidx.room.Dao
-import androidx.room.Query
-import androidx.room.Transaction
-import com.nlab.reminder.core.local.database.model.ScheduleWithDetailsEntity
-import kotlinx.coroutines.flow.Flow
+import kotlinx.datetime.Instant
 
 /**
  * @author Thalys
  */
-@Dao
-abstract class ScheduleWithDetailsDAO {
-    @Transaction
-    @Query("SELECT * FROM schedule WHERE is_complete = :isComplete")
-    abstract fun findByCompleteAsStream(isComplete: Boolean): Flow<Array<ScheduleWithDetailsEntity>>
-}
+data class ScheduleTimingDTO(
+    val triggerTimeUtc: Instant,
+    val isTriggerTimeDateOnly: Boolean,
+    val repeatDTO: RepeatDTO?
+)

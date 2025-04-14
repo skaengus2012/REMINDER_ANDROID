@@ -17,6 +17,7 @@
 package com.nlab.reminder.core.data.model
 
 import com.nlab.reminder.core.kotlin.NonBlankString
+import com.nlab.reminder.core.kotlin.collections.toSet
 import com.nlab.reminder.core.kotlin.faker.genNonBlankString
 import com.nlab.reminder.core.kotlin.toNonBlankString
 import com.nlab.testkit.faker.genInt
@@ -25,11 +26,15 @@ import com.nlab.testkit.faker.genLong
 /**
  * @author Doohyun
  */
-fun genTagId(): TagId = TagId(rawId = genLong())
-
 fun genTag(id: TagId = genTagId(), name: NonBlankString = genNonBlankString()) = Tag(id, name)
 
-fun genTags(count: Int = genInt(min = 5, max = 10)): List<Tag> = List(count) { index ->
-    val rawTagId = index.toLong() + 1
-    genTag(TagId(rawTagId), name = "Tag-$rawTagId".toNonBlankString())
+fun genTags(count: Int = genInt(min = 5, max = 10)): Set<Tag> = (1..count).toSet {
+    Tag(
+        id = TagId(it.toLong()),
+        name = "Tag-${it.toLong()}".toNonBlankString()
+    )
 }
+
+fun genTagId(): TagId = TagId(rawId = genLong())
+
+fun genTagIds(count: Int = genInt(min = 5, max = 10)): Set<TagId> = genTags(count).toSet { it.id }

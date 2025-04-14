@@ -14,19 +14,13 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.local.database.model
+package com.nlab.reminder.core.kotlin.faker
 
-import androidx.room.Embedded
-import androidx.room.Relation
+import com.nlab.reminder.core.kotlin.NonNegativeInt
+import com.nlab.reminder.core.kotlin.toNonNegativeInt
+import com.nlab.testkit.faker.genIntGreaterThanZero
 
 /**
- * @author Thalys
+ * @author Doohyun
  */
-data class ScheduleWithDetailsEntity(
-    @Embedded val schedule: ScheduleEntity,
-    @Relation(
-        parentColumn = "schedule_id",
-        entityColumn = "schedule_id"
-    )
-    val repeatDetails: Set<RepeatDetailEntity>
-)
+fun genNonNegativeInt(): NonNegativeInt = genIntGreaterThanZero().toNonNegativeInt()

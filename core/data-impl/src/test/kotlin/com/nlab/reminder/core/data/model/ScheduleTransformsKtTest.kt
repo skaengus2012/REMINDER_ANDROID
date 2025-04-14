@@ -1,197 +1,261 @@
 package com.nlab.reminder.core.data.model
 
-import com.nlab.reminder.core.kotlin.collections.toSet
 import com.nlab.reminder.core.kotlin.faker.genNonNegativeLong
-import com.nlab.reminder.core.kotlin.faker.genPositiveInt
-import com.nlab.reminder.core.local.database.model.RepeatDetailEntity
-import com.nlab.reminder.core.local.database.model.ScheduleEntity
-import com.nlab.reminder.core.local.database.model.ScheduleWithDetailsEntity
 import com.nlab.testkit.faker.genBlank
 import com.nlab.testkit.faker.genBoolean
 import com.nlab.testkit.faker.genLong
-import kotlinx.datetime.Clock
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.nullValue
 import org.hamcrest.MatcherAssert.assertThat
-import org.junit.Before
 import org.junit.Test
 
 /**
  * @author Doohyun
  */
 class ScheduleTransformsKtTest {
-    private lateinit var generatedEntity: ScheduleWithDetailsEntity
-
-    @Before
-    fun setup() {
-        generatedEntity = genScheduleAndEntity().second
-    }
-
     @Test
-    fun `Given entity with expected Id, When convert to schedule, Then Schedule include expected value`() {
-        val expectedId = genLong()
-        val entity: ScheduleWithDetailsEntity = with(generatedEntity) {
-            copy(schedule = schedule.copy(scheduleId = expectedId))
-        }
+    fun `Given entity and expected filled schedule, When creating schedule, Then return matched value`() {
+        val (expectedSchedule, entity) = genScheduleAndEntity()
         val actualSchedule = Schedule(entity)
-        assertThat(actualSchedule.id.rawId, equalTo(expectedId))
+        assertThat(actualSchedule, equalTo(expectedSchedule))
     }
 
     @Test(expected = IllegalArgumentException::class)
-    fun `Given entity with negative visiblePriority, When convert to schedule, Then throw exception`() {
-        val invalidVisiblePriority = genLong(min = -100, max = -1)
-        val entity: ScheduleWithDetailsEntity = with(generatedEntity) {
-            copy(schedule = schedule.copy(visiblePriority = invalidVisiblePriority))
+    fun `Given title is blank, When creating content, Then throw Error`() {
+        val entity = buildScheduleCompositeEntity {
+            copy(scheduleEntity = scheduleEntity.copy(title = genBlank()))
         }
         Schedule(entity)
     }
 
     @Test
-    fun `Given entity with expected visiblePriority, When convert to schedule, then schedule include expected value`() {
+    fun `Given description is null or blank, When creating content, Then content note is null`() {
+        fun assertScheduleNoteNull(actual: Schedule) {
+            assertThat(actual.content.note, nullValue())
+        }
+
+        val descriptionNullEntity = buildScheduleCompositeEntity {
+            copy(scheduleEntity = scheduleEntity.copy(description = null))
+        }
+        assertScheduleNoteNull(Schedule(descriptionNullEntity))
+
+        val descriptionBlankEntity = buildScheduleCompositeEntity {
+            copy(scheduleEntity = scheduleEntity.copy(description = genBlank()))
+        }
+        assertScheduleNoteNull(Schedule(descriptionBlankEntity))
+    }
+
+    @Test
+    fun `Given link is null or blank, When creating content, Then content link is null`() {
+        fun assertScheduleLinkNull(schedule: Schedule) {
+            assertThat(schedule.content.link, nullValue())
+        }
+
+        val linkNullEntity = buildScheduleCompositeEntity {
+            copy(scheduleEntity = scheduleEntity.copy(link = null))
+        }
+        assertScheduleLinkNull(Schedule(linkNullEntity))
+
+        val linkBlankEntity = buildScheduleCompositeEntity {
+            copy(scheduleEntity = scheduleEntity.copy(link = genBlank()))
+        }
+        assertScheduleLinkNull(Schedule(linkBlankEntity))
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun `Given entity with negative visiblePriority, When creating schedule, Then throw exception`() {
+        val invalidVisiblePriority = genLong(min = -100, max = -1)
+        val entity = buildScheduleCompositeEntity {
+            copy(scheduleEntity = scheduleEntity.copy(visiblePriority = invalidVisiblePriority))
+        }
+        Schedule(entity)
+    }
+
+    @Test
+    fun `Given entity with expected visiblePriority, When creating schedule, then schedule include matched value`() {
         val expectedVisiblePriority = genNonNegativeLong().value
-        val entity: ScheduleWithDetailsEntity = with(generatedEntity) {
-            copy(schedule = schedule.copy(visiblePriority = expectedVisiblePriority))
+        val entity = buildScheduleCompositeEntity {
+            copy(scheduleEntity = scheduleEntity.copy(visiblePriority = expectedVisiblePriority))
         }
         val actualSchedule = Schedule(entity)
         assertThat(actualSchedule.visiblePriority.value, equalTo(expectedVisiblePriority))
     }
 
     @Test
-    fun `Given entity with expected complete, When convert to schedule, Then schedule include expected value`() {
+    fun `Given entity with expected complete, When creating schedule, Then schedule include matched value`() {
         val expectedComplete = genBoolean()
-        val entity: ScheduleWithDetailsEntity = with(generatedEntity) {
-            copy(schedule = schedule.copy(isComplete = expectedComplete))
+        val entity = buildScheduleCompositeEntity {
+            copy(scheduleEntity = scheduleEntity.copy(isComplete = expectedComplete))
         }
         val actualSchedule = Schedule(entity)
         assertThat(actualSchedule.isComplete, equalTo(expectedComplete))
     }
 
-    @Test(expected = IllegalArgumentException::class)
-    fun `Given title is blank, When convert to content, Then throw Error`() {
-        val entity: ScheduleWithDetailsEntity = with(generatedEntity) {
-            copy(schedule = schedule.copy(title = genBlank()))
-        }
-        ScheduleContent(entity)
-    }
-
     @Test
-    fun `Given description is null or blank, When convert to content, Then content note is null`() {
-        fun assertScheduleNoteNull(scheduleContent: ScheduleContent) {
-            assertThat(scheduleContent.note, nullValue())
-        }
-
-        val descriptionNullEntity: ScheduleWithDetailsEntity = with(generatedEntity) {
-            copy(schedule = schedule.copy(description = null))
-        }
-        assertScheduleNoteNull(ScheduleContent(descriptionNullEntity))
-
-        val descriptionBlankEntity: ScheduleWithDetailsEntity = with(generatedEntity) {
-            copy(schedule = schedule.copy(description = genBlank()))
-        }
-        assertScheduleNoteNull(ScheduleContent(descriptionBlankEntity))
-    }
-
-    @Test
-    fun `Given link is null or blank, When convert to content, Then content link is null`() {
-        fun assertScheduleLinkNull(scheduleContent: ScheduleContent) {
-            assertThat(scheduleContent.link, nullValue())
-        }
-
-        val linkNullEntity: ScheduleWithDetailsEntity = with(generatedEntity) {
-            copy(schedule = schedule.copy(link = null))
-        }
-        assertScheduleLinkNull(ScheduleContent(linkNullEntity))
-
-        val linkBlankEntity: ScheduleWithDetailsEntity = with(generatedEntity) {
-            copy(schedule = schedule.copy(link = genBlank()))
-        }
-        assertScheduleLinkNull(ScheduleContent(linkBlankEntity))
-    }
-
-    @Test
-    fun `Given triggerTimeElements is null, When convert to content, Then content triggerTime is null`() {
-        val notExistedTriggerTimeEntity: ScheduleWithDetailsEntity = with(generatedEntity) {
-            copy(schedule = schedule.copy(triggerTimeUtc = null, isTriggerTimeDateOnly = null))
-        }
-        val actualContent = ScheduleContent(notExistedTriggerTimeEntity)
-        assertThat(actualContent.triggerTime, nullValue())
-    }
-
-    @Test
-    fun `Given triggerTimeElements is existed, When convert to content, Then content triggerTime exist`() {
-        val expectedTriggerTime = genTriggerTime()
-        val existedTriggerTimeEntity: ScheduleWithDetailsEntity = with(generatedEntity) {
+    fun `Given entity without trigger and repeat info, When creating Schedule, Then timing is null`() {
+        val entity = buildScheduleCompositeEntity {
             copy(
-                schedule = schedule.copy(
-                    triggerTimeUtc = expectedTriggerTime.utcTime,
-                    isTriggerTimeDateOnly = expectedTriggerTime.isDateOnly
-                )
-            )
-        }
-        val actualContent = ScheduleContent(existedTriggerTimeEntity)
-        assertThat(actualContent.triggerTime, equalTo(expectedTriggerTime))
-    }
-
-    @Test(expected = IllegalArgumentException::class)
-    fun `Given triggerTimeUtc null, isTriggerTimeDateOnly nonnull, When convert to content, Then throw Exception`() {
-        val invalidEntity: ScheduleWithDetailsEntity = with(generatedEntity) {
-            copy(schedule = schedule.copy(triggerTimeUtc = null, isTriggerTimeDateOnly = genBoolean()))
-        }
-        ScheduleContent(invalidEntity)
-    }
-
-    @Test(expected = IllegalArgumentException::class)
-    fun `Given triggerTimeUtc nonnull, isTriggerTimeDateOnly null, When convert to content, Then throw Exception`() {
-        val invalidEntity: ScheduleWithDetailsEntity = with(generatedEntity) {
-            copy(schedule = schedule.copy(triggerTimeUtc = Clock.System.now(), isTriggerTimeDateOnly = null))
-        }
-        ScheduleContent(invalidEntity)
-    }
-
-    @Test
-    fun `Given repeatType and repeatInterval is null, When convert to content, then content repeat is null`() {
-        val notExistedRepeatEntity: ScheduleWithDetailsEntity = with(generatedEntity) {
-            copy(schedule = schedule.copy(repeatType = null, repeatInterval = null))
-        }
-        val actualContent = ScheduleContent(notExistedRepeatEntity)
-        assertThat(actualContent.repeat, nullValue())
-    }
-
-    @Test
-    fun `Given repeatElements is existed, When convert to content, Then content repeat exist`() {
-        val expectedRepeat = genRepeat()
-        val existedTriggerTimeEntity: ScheduleWithDetailsEntity = with(generatedEntity) {
-            copy(
-                schedule = schedule.copy(
-                    repeatType = expectedRepeat.toRepeatType(),
-                    repeatInterval = expectedRepeat.toIntervalAsInt(),
+                scheduleEntity = scheduleEntity.copy(
+                    triggerTimeUtc = null,
+                    isTriggerTimeDateOnly = null,
+                    repeatType = null,
+                    repeatInterval = null
                 ),
-                repeatDetails = expectedRepeat.toRepeatDetailDTOs().toSet { dto ->
-                    RepeatDetailEntity(
-                        scheduleId = schedule.scheduleId,
-                        propertyCode = dto.propertyCode,
-                        value = dto.value
-                    )
-                }
+                repeatDetailEntities = emptySet()
             )
         }
-        val actualContent = ScheduleContent(existedTriggerTimeEntity)
-        assertThat(actualContent.repeat, equalTo(expectedRepeat))
+        val actualSchedule = Schedule(entity)
+        assertThat(actualSchedule.content.timing, nullValue())
     }
 
     @Test(expected = IllegalArgumentException::class)
-    fun `Given repeatType null, repeatInterval nonnull, When convert to repeat, Then throw exception`() {
-        val invalidEntity: ScheduleWithDetailsEntity = with(generatedEntity) {
-            copy(schedule = schedule.copy(repeatType = null, repeatInterval = genPositiveInt().value))
+    fun `Given triggerTime without dateOnly flag, When creating Schedule, Then throw exception`() {
+        val entity = buildScheduleCompositeEntity {
+            copy(
+                scheduleEntity = scheduleEntity.copy(
+                    isTriggerTimeDateOnly = null,
+                    repeatType = null,
+                    repeatInterval = null
+                ),
+                repeatDetailEntities = emptySet()
+            )
         }
-        ScheduleContent(invalidEntity)
+        Schedule(entity)
     }
 
     @Test(expected = IllegalArgumentException::class)
-    fun `Given repeatType nonnull, repeatInterval null, When convert to repeat, Then throw exception`() {
-        val invalidEntity: ScheduleWithDetailsEntity = with(generatedEntity) {
-            copy(schedule = schedule.copy(repeatType = genRepeat().toRepeatType(), repeatInterval = null))
+    fun `Given dateOnly flag without triggerTime, When creating Schedule, Then throw exception`() {
+        val entity = buildScheduleCompositeEntity {
+            copy(
+                scheduleEntity = scheduleEntity.copy(
+                    triggerTimeUtc = null,
+                    repeatType = null,
+                    repeatInterval = null
+                ),
+                repeatDetailEntities = emptySet()
+            )
         }
-        ScheduleContent(invalidEntity)
+        Schedule(entity)
+    }
+
+    @Test
+    fun `Given trigger info without repeat, When creating Schedule, Then timing is set and repeat is null`() {
+        val entity = buildScheduleCompositeEntity {
+            copy(
+                scheduleEntity = scheduleEntity.copy(
+                    repeatType = null,
+                    repeatInterval = null
+                ),
+                repeatDetailEntities = emptySet()
+            )
+        }
+        val actualSchedule = Schedule(entity)
+        assertThat(
+            actualSchedule.content.timing!!.triggerAtUtc,
+            equalTo(entity.scheduleEntity.triggerTimeUtc)
+        )
+        assertThat(
+            actualSchedule.content.timing!!.isTriggerAtDateOnly,
+            equalTo(entity.scheduleEntity.isTriggerTimeDateOnly)
+        )
+        assertThat(actualSchedule.content.timing!!.repeat, nullValue())
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun `Given repeat without trigger, When creating Schedule, Then throws exception`() {
+        val entity = buildScheduleCompositeEntity {
+            copy(scheduleEntity = scheduleEntity.copy(triggerTimeUtc = null, isTriggerTimeDateOnly = null))
+        }
+        Schedule(entity)
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun `Given repeat interval and details without type, When creating Schedule, Then throws exception`() {
+        val entity = buildScheduleCompositeEntity {
+            copy(scheduleEntity = scheduleEntity.copy(repeatType = null))
+        }
+        Schedule(entity)
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun `Given repeat type and details without interval, When creating Schedule, Then throws exception`() {
+        val entity = buildScheduleCompositeEntity {
+            copy(scheduleEntity = scheduleEntity.copy(repeatInterval = null))
+        }
+        Schedule(entity)
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun `Given repeat details without type and interval, When creating Schedule, Then throws exception`() {
+        val entity = buildScheduleCompositeEntity(
+            fixtureSource = genSchedule(
+                content = genScheduleContent(timing = genScheduleTiming(repeat = genRepeatMonthly()))
+            )
+        ) { copy(scheduleEntity = scheduleEntity.copy(repeatType = null, repeatInterval = null)) }
+        Schedule(entity)
+    }
+
+    @Test
+    fun `Given ScheduleTiming, When converting to DTO, Then all fields are correctly mapped`() {
+        val timing = genScheduleTiming()
+        val dto = timing.toDTO()
+
+        assertThat(dto.triggerTimeUtc, equalTo(timing.triggerAtUtc))
+        assertThat(dto.isTriggerTimeDateOnly, equalTo(timing.isTriggerAtDateOnly))
+        assertThat(dto.repeatDTO, equalTo(timing.repeat!!.toDTO()))
+    }
+
+    @Test
+    fun `Given ScheduleTiming without repeat, When converting to DTO, Then repeatDTO is null`() {
+        val timing = genScheduleTiming(repeat = null)
+        val dto = timing.toDTO()
+        assertThat(dto.repeatDTO, nullValue())
+    }
+
+    @Test
+    fun `Given ScheduleContent, When converting to DTO, Then all fields are correctly mapped`() {
+        val scheduleContent = genScheduleContent()
+        val dto = scheduleContent.toDTO()
+
+        assertThat(dto.title, equalTo(scheduleContent.title))
+        assertThat(dto.description, equalTo(scheduleContent.note))
+        assertThat(dto.link, equalTo(scheduleContent.link!!.rawLink))
+        assertThat(dto.timingDTO!!, equalTo(scheduleContent.timing!!.toDTO()))
+    }
+
+    @Test
+    fun `Given ScheduleContent without note, When converting to DTO, Then description is null`() {
+        val scheduleContent = genScheduleContent(note = null)
+        val dto = scheduleContent.toDTO()
+
+        assertThat(dto.description, nullValue())
+    }
+
+    @Test
+    fun `Given ScheduleContent without link, When converting to DTO, Then link is null`() {
+        val scheduleContent = genScheduleContent(link = null)
+        val dto = scheduleContent.toDTO()
+
+        assertThat(dto.link, nullValue())
+    }
+
+    @Test
+    fun `Given ScheduleContent without timing, When converting to DTO, Then timingDTO is null`() {
+        val scheduleContent = genScheduleContent(timing = null)
+        val dto = scheduleContent.toDTO()
+
+        assertThat(dto.timingDTO, nullValue())
     }
 }
+
+private fun buildScheduleCompositeEntity(
+    fixtureSource: Schedule = genSchedule(),
+    block: ScheduleCompositeEntity.() -> ScheduleCompositeEntity
+): ScheduleCompositeEntity = genScheduleAndEntity(fixtureSource).second.block()
+
+@Suppress("TestFunctionName")
+private fun Schedule(compositeEntity: ScheduleCompositeEntity): Schedule = Schedule(
+    scheduleEntity = compositeEntity.scheduleEntity,
+    scheduleTagListEntities = compositeEntity.scheduleTagListEntities,
+    repeatDetailEntities = compositeEntity.repeatDetailEntities
+)

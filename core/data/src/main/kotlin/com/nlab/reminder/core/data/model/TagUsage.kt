@@ -16,12 +16,12 @@
 
 package com.nlab.reminder.core.data.model
 
-import kotlinx.datetime.Instant
+import com.nlab.reminder.core.kotlin.NonNegativeInt
 
 /**
- * @author Doohyun
+ * @author Thalys
  */
-data class TriggerTime(
-    val utcTime: Instant,
-    val isDateOnly: Boolean
+data class TagUsage(
+    val tag: Tag,
+    val usageCount: NonNegativeInt
 )

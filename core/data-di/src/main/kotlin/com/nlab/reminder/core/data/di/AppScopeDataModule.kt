@@ -40,8 +40,11 @@ import com.nlab.reminder.core.inject.qualifiers.coroutine.AppScope
 import com.nlab.reminder.core.inject.qualifiers.coroutine.Dispatcher
 import com.nlab.reminder.core.inject.qualifiers.coroutine.DispatcherOption.*
 import com.nlab.reminder.core.local.database.dao.ScheduleDAO
+import com.nlab.reminder.core.local.database.dao.ScheduleRepeatDetailDAO
 import com.nlab.reminder.core.local.database.dao.ScheduleTagListDAO
 import com.nlab.reminder.core.local.database.dao.TagDAO
+import com.nlab.reminder.core.local.database.transaction.InsertAndGetScheduleWithExtraTransaction
+import com.nlab.reminder.core.local.database.transaction.UpdateAndGetScheduleWithExtraTransaction
 import com.nlab.reminder.core.local.database.transaction.UpdateOrReplaceAndGetTagTransaction
 import com.nlab.reminder.core.local.datastore.preference.PreferenceDataSource
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -69,14 +72,29 @@ internal class AppScopeDataModule {
     @Reusable
     fun provideScheduleRepository(
         scheduleDAO: ScheduleDAO,
-    ): ScheduleRepository = LocalScheduleRepository(scheduleDAO = scheduleDAO)
+        scheduleRepeatDetailDAO: ScheduleRepeatDetailDAO,
+        scheduleTagListDAO: ScheduleTagListDAO,
+        insertAndGetScheduleWithExtraTransaction: InsertAndGetScheduleWithExtraTransaction,
+        updateAndGetScheduleWithExtraTransaction: UpdateAndGetScheduleWithExtraTransaction
+    ): ScheduleRepository = LocalScheduleRepository(
+        scheduleDAO = scheduleDAO,
+        scheduleRepeatDetailDAO = scheduleRepeatDetailDAO,
+        scheduleTagListDAO = scheduleTagListDAO,
+        insertAndGetScheduleWithExtra = insertAndGetScheduleWithExtraTransaction,
+        updateAndGetScheduleWithExtra = updateAndGetScheduleWithExtraTransaction
+    )
 
     @Provides
     @Reusable
     fun provideTagRepository(
         tagDAO: TagDAO,
+        scheduleTagListDAO: ScheduleTagListDAO,
         updateOrReplaceAndGetTag: UpdateOrReplaceAndGetTagTransaction
-    ): TagRepository = LocalTagRepository(tagDAO = tagDAO, updateOrReplaceAndGetTag = updateOrReplaceAndGetTag)
+    ): TagRepository = LocalTagRepository(
+        tagDAO = tagDAO,
+        scheduleTagListDAO = scheduleTagListDAO,
+        updateOrReplaceAndGetTag = updateOrReplaceAndGetTag
+    )
 
     @Provides
     @Reusable

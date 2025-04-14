@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.local.database.model
+package com.nlab.reminder.core.data.model
 
 import kotlinx.datetime.Instant
 
 /**
- * @author Thalys
+ * @author Doohyun
  */
-data class TriggerTimeDTO(
-    val utcTime: Instant,
-    val isDateOnly: Boolean
+data class ScheduleTiming(
+    val triggerAtUtc: Instant,
+    val isTriggerAtDateOnly: Boolean,
+    val repeat: Repeat?
 )
