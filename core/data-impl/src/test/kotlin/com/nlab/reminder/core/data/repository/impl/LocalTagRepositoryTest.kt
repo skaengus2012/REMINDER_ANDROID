@@ -18,117 +18,144 @@ package com.nlab.reminder.core.data.repository.impl
 
 import com.nlab.reminder.core.data.model.*
 import com.nlab.reminder.core.data.repository.*
+import com.nlab.reminder.core.kotlin.collections.toSet
 import com.nlab.reminder.core.kotlin.getOrThrow
+import com.nlab.reminder.core.kotlin.isSuccess
 import com.nlab.reminder.core.kotlin.toNonBlankString
+import com.nlab.reminder.core.kotlin.toNonNegativeInt
 import com.nlab.reminder.core.local.database.dao.ScheduleTagListDAO
 import com.nlab.reminder.core.local.database.dao.TagDAO
+import com.nlab.reminder.core.local.database.model.ScheduleTagListEntity
 import com.nlab.reminder.core.local.database.transaction.UpdateOrReplaceAndGetTagTransaction
 import com.nlab.testkit.faker.genBothify
-import kotlinx.coroutines.flow.*
+import com.nlab.testkit.faker.genInt
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
+import io.mockk.mockk
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
-import org.mockito.kotlin.*
 
 /**
  * @author Doohyun
  */
-internal class LocalTagRepositoryTest {
+class LocalTagRepositoryTest {
     @Test
-    fun `Given add query, When add, Then dao called insertAndGet with trimmed text`() = runTest {
-        val input = genBothify(" ?# ")
-        val expectedDaoInput = input.trim().toNonBlankString()
-        val (expectedTag, entity) = genTagAndEntity(genTag(name = expectedDaoInput))
+    fun `Given add query, When save, Then insert trimmed text and return new tag`() = runTest {
+        // Given
+        val inputName = genBothify(" ?# ")
+        val trimmedName = inputName.trim().toNonBlankString()
+        val (expectedTag, entity) = genTagAndEntity(genTag(name = trimmedName))
+        val query = SaveTagQuery.Add(name = inputName.toNonBlankString())
 
-        val query = SaveTagQuery.Add(name = expectedDaoInput)
-        val tagDAO: TagDAO = mock {
-            whenever(mock.insertAndGet(any())) doAnswer { invocation ->
-                if (invocation.getArgument<String>(0) == expectedDaoInput.value) {
-                    // 이건 좀...
-                    entity
-                } else error("에러")
-            }
+        // When
+        val tagDAO: TagDAO = mockk {
+            coEvery { insertAndGet(trimmedName) } returns entity
         }
         val repository = genTagRepository(tagDAO = tagDAO)
         val actualTag = repository.save(query)
 
-        verify(tagDAO, once()).insertAndGet(expectedDaoInput)
+        // Then
+        coVerify(exactly = 1) { tagDAO.insertAndGet(trimmedName) }
         assertThat(actualTag.getOrThrow(), equalTo(expectedTag))
     }
 
-   /**
     @Test
-    fun `Given non blanked name, When add, Then dao called insertAndGet`() = runTest {
-        val (expectedTag, entity) = genTagAndEntity()
-        val name = entity.name
-        val tagDAO = mock<TagDAO> {
-            whenever(mock.insertAndGet(name = name)) doReturn entity
+    fun `Given modify query, When save, Then updateOrReplace trimmed text and return updated tag`() = runTest {
+        // Given
+        val inputTagId = genTagId()
+        val inputName = genBothify(" ?# ")
+        val trimmedName = inputName.trim().toNonBlankString()
+        val (expectedTag, entity) = genTagAndEntity(genTag(id = inputTagId, name = trimmedName))
+        val query = SaveTagQuery.Modify(id = inputTagId, name = inputName.toNonBlankString())
+
+        // When
+        val updateOrReplaceAndGetTagTransaction: UpdateOrReplaceAndGetTagTransaction = mockk {
+            coEvery { invoke(tagId = inputTagId.rawId, name = trimmedName) } returns entity
         }
-        val actualTag = genTagRepository(tagDAO = tagDAO)
-            .save(SaveTagQuery.Add(name = name.toNonBlankString()))
-            .getOrThrow()
-        assertThat(actualTag, equalTo(expectedTag))
+        val repository = genTagRepository(updateOrReplaceAndGetTag = updateOrReplaceAndGetTagTransaction)
+        val actualTag = repository.save(query)
+
+        // Then
+        coVerify(exactly = 1) { updateOrReplaceAndGetTagTransaction.invoke(inputTagId.rawId, trimmedName) }
+        assertThat(actualTag.getOrThrow(), equalTo(expectedTag))
     }
-*/
-    /**
+
     @Test
-    fun `Given tagId and non blanked name, When modify, Then dao called updateOrReplaceAndGet`() = runTest {
-        val (expectedTag, entity) = genTagAndEntity()
-        val id = entity.tagId
-        val name = entity.name
-        val tagRelationDAO = mock<TagRelationDAO> {
-            whenever(mock.updateOrReplaceAndGet(tagId = id, name = name)) doReturn entity
+    fun `Given tagId, When delete, Then dao call deleteById and return success`() = runTest {
+        // Given
+        val tagId = genTagId()
+
+        // When
+        val tagDAO: TagDAO = mockk(relaxed = true)
+        val repository = genTagRepository(tagDAO = tagDAO)
+        val result = repository.delete(tagId)
+
+        // Then
+        coVerify(exactly = 1) { tagDAO.deleteById(tagId.rawId) }
+        assertThat(result.isSuccess, equalTo(true))
+    }
+
+    @Test
+    fun `Given tagIds based query, When collect tags, Then return all matching tags from dao`() = runTest {
+        // Given
+        val tagAndEntities = genTagAndEntities()
+        val tagIds = tagAndEntities.toSet { (tag) -> tag.id }
+        val rawTagIds = tagAndEntities.toSet { (tag) -> tag.id.rawId }
+        val expectedTags = tagAndEntities.toSet { it.first }
+        val query = GetTagQuery.ByIds(tagIds)
+
+        // When
+        val tagDAO: TagDAO = mockk {
+            val resultEntities = tagAndEntities.map { (_, entity) -> entity }.toTypedArray()
+            every { findByIdsAsStream(rawTagIds) } returns flowOf(resultEntities)
         }
-        val actualTag = genTagRepository(tagRelationDAO = tagRelationDAO)
-            .save(SaveTagQuery.Modify(id = TagId(id), name = name.toNonBlankString()))
-            .getOrThrow()
-        assertThat(actualTag, equalTo(expectedTag))
-    }*/
+        val repository = genTagRepository(tagDAO = tagDAO)
+        val actualTags = repository.getTagsAsStream(query).first()
 
-    @Test
-    fun `Given tagId, When delete, Then dao called delete`() = runTest {
-        val id = genTagId()
-        val tagDAO: TagDAO = mock()
-        genTagRepository(tagDAO = tagDAO)
-            .delete(id)
-            .getOrThrow()
-        verify(tagDAO, once()).deleteById(id.rawId)
+        // Then
+        assertThat(actualTags, equalTo(expectedTags))
     }
 
     @Test
-    fun `Given all getTagQuery, When getTagsAsStream, Then tags found from dao`() = runTest {
-       /**
-        val (expectedTag, entity) = genTagAndEntity()
-        val tagRepository = genTagRepository(
-            tagDAO = mock<TagDAO> { whenever(mock.getAsStream()) doReturn flowOf(arrayOf(entity)) }
-        )
-
-        val actualTag = tagRepository
-            .getTagsAsStream(GetTagQuery.All)
-            .first()
-            .first()
-        assertThat(actualTag, equalTo(expectedTag))*/
-    }
-
-    @Test
-    fun `Given byIds getTagQuery, When getTagsAsStream, Then tags found from dao`() = runTest {
-        val (expectedTag, entity) = genTagAndEntity()
-        val tagRepository = genTagRepository(
-            tagDAO = mock {
-                whenever(mock.findByIdsAsStream(tagIds = setOf(expectedTag.id.rawId))) doReturn flowOf(arrayOf(entity))
+    fun `Given all query, When collect tagUsages, Then return tagUsages from dao`() = runTest {
+        // Given
+        val tagAndEntities = genTagAndEntities()
+        val expectedTagUsages = tagAndEntities.toSet { (tag) ->
+            TagUsage(tag = tag, usageCount = genInt(min = 0, max = 3).toNonNegativeInt())
+        }
+        val scheduleTagListEntities = expectedTagUsages.flatMap { tagUsage ->
+            List(tagUsage.usageCount.value) {
+                ScheduleTagListEntity(
+                    scheduleId = it.toLong() + 1,
+                    tagId = tagUsage.tag.id.rawId,
+                )
             }
-        )
-        val actualTag = tagRepository
-            .getTagsAsStream(GetTagQuery.ByIds(setOf(expectedTag.id)))
-            .first()
-            .first()
-        assertThat(actualTag, equalTo(expectedTag))
+        }
+        val rawTagIds = tagAndEntities.toSet { (tag) -> tag.id.rawId }
+        val query = GetTagUsageQuery.All
+
+        // When
+        val tagDAO: TagDAO = mockk {
+            every { getAsStream() } returns flowOf(tagAndEntities.map { (_, entity) -> entity }.toTypedArray())
+        }
+        val scheduleTagListDAO: ScheduleTagListDAO = mockk {
+            every { findByTagIdsAsStream(rawTagIds) } returns flowOf(scheduleTagListEntities.toTypedArray())
+        }
+        val repository = genTagRepository(tagDAO = tagDAO, scheduleTagListDAO = scheduleTagListDAO)
+        val actualTagUsages = repository.getTagUsagesAsStream(query).first()
+
+        // Then
+        assertThat(actualTagUsages, equalTo(expectedTagUsages))
     }
 }
 
 private fun genTagRepository(
-    tagDAO: TagDAO = mock(),
-    scheduleTagListDAO: ScheduleTagListDAO = mock(),
-    replaceTag: UpdateOrReplaceAndGetTagTransaction = mock()
-): TagRepository = LocalTagRepository(tagDAO, scheduleTagListDAO, replaceTag)
+    tagDAO: TagDAO = mockk(),
+    scheduleTagListDAO: ScheduleTagListDAO = mockk(),
+    updateOrReplaceAndGetTag: UpdateOrReplaceAndGetTagTransaction = mockk()
+): TagRepository = LocalTagRepository(tagDAO, scheduleTagListDAO, updateOrReplaceAndGetTag)

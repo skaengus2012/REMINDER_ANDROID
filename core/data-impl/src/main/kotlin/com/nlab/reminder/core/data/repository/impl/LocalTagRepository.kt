@@ -50,12 +50,10 @@ class LocalTagRepository(
         val entityResult = catching {
             when (query) {
                 is SaveTagQuery.Add -> {
-                    // TODO make trim Test
                     tagDAO.insertAndGet(name = query.name.trim())
                 }
 
                 is SaveTagQuery.Modify -> {
-                    // TODO make trim Test
                     updateOrReplaceAndGetTag(tagId = query.id.rawId, name = query.name.trim())
                 }
             }

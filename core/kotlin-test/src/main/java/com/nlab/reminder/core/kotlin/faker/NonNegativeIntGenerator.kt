@@ -14,20 +14,13 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.kotlin
+package com.nlab.reminder.core.kotlin.faker
+
+import com.nlab.reminder.core.kotlin.NonNegativeInt
+import com.nlab.reminder.core.kotlin.toNonNegativeInt
+import com.nlab.testkit.faker.genIntGreaterThanZero
 
 /**
- * @author Thalys
+ * @author Doohyun
  */
-@JvmInline
-value class NonNegativeInt internal constructor(val value: Int) {
-    init {
-        require(value >= 0) { "Value that will have a value of 0 or more" }
-    }
-}
-
-fun Int.toNonNegativeInt(): NonNegativeInt = NonNegativeInt(value = this)
-
-fun Int?.tryToNonNegativeIntOrZero(): NonNegativeInt =
-    if (this == null || this < 0) NonNegativeInt(value = 0)
-    else NonNegativeInt(value = this)
+fun genNonNegativeInt(): NonNegativeInt = genIntGreaterThanZero().toNonNegativeInt()
