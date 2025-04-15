@@ -75,8 +75,13 @@ internal class AppScopeDataModule {
     @Reusable
     fun provideTagRepository(
         tagDAO: TagDAO,
+        scheduleTagListDAO: ScheduleTagListDAO,
         updateOrReplaceAndGetTag: UpdateOrReplaceAndGetTagTransaction
-    ): TagRepository = LocalTagRepository(tagDAO = tagDAO, updateOrReplaceAndGetTag = updateOrReplaceAndGetTag)
+    ): TagRepository = LocalTagRepository(
+        tagDAO = tagDAO,
+        scheduleTagListDAO = scheduleTagListDAO,
+        updateOrReplaceAndGetTag = updateOrReplaceAndGetTag
+    )
 
     @Provides
     @Reusable

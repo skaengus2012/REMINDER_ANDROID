@@ -81,6 +81,7 @@ class LocalTagRepository(
         return tagEntitiesFlow.distinctUntilChanged().flatMapLatest { tagEntities ->
             scheduleTagListDAO
                 .findByTagIdsAsStream(tagIds = tagEntities.toSet(TagEntity::tagId))
+                .distinctUntilChanged()
                 .map { scheduleTagListEntities -> TagUsages(tagEntities, scheduleTagListEntities) }
         }
     }
