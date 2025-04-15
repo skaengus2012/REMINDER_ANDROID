@@ -16,6 +16,9 @@
 
 package com.nlab.reminder.core.data.model
 
+import com.nlab.reminder.core.kotlin.NonNegativeInt
+import com.nlab.reminder.core.kotlin.collections.toSet
+import com.nlab.reminder.core.kotlin.toNonNegativeInt
 import com.nlab.reminder.core.local.database.model.TagEntity
 import com.nlab.testkit.faker.genInt
 
@@ -28,4 +31,14 @@ fun genTagAndEntity(tag: Tag = genTag()): TagAndEntity = tag to TagEntity(tag.id
 
 fun genTagAndEntities(count: Int = genInt(min = 5, max = 10)): List<TagAndEntity> = List(count) { index ->
     genTagAndEntity(tag = genTag(id = TagId(index.toLong())))
+}
+
+fun genTagUsages(
+    tags: Collection<Tag>,
+    maxUsageCount: NonNegativeInt = 20.toNonNegativeInt()
+): Set<TagUsage> = tags.toSet { tag ->
+    TagUsage(
+        tag = tag,
+        usageCount = genInt(min = 0, max = maxUsageCount.value).toNonNegativeInt()
+    )
 }

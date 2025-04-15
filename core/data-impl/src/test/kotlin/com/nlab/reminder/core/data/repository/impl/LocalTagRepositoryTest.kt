@@ -22,13 +22,10 @@ import com.nlab.reminder.core.kotlin.collections.toSet
 import com.nlab.reminder.core.kotlin.getOrThrow
 import com.nlab.reminder.core.kotlin.isSuccess
 import com.nlab.reminder.core.kotlin.toNonBlankString
-import com.nlab.reminder.core.kotlin.toNonNegativeInt
 import com.nlab.reminder.core.local.database.dao.ScheduleTagListDAO
 import com.nlab.reminder.core.local.database.dao.TagDAO
-import com.nlab.reminder.core.local.database.model.ScheduleTagListEntity
 import com.nlab.reminder.core.local.database.transaction.UpdateOrReplaceAndGetTagTransaction
 import com.nlab.testkit.faker.genBothify
-import com.nlab.testkit.faker.genInt
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -125,17 +122,8 @@ class LocalTagRepositoryTest {
     fun `Given all query, When collect tagUsages, Then return tagUsages from dao`() = runTest {
         // Given
         val tagAndEntities = genTagAndEntities()
-        val expectedTagUsages = tagAndEntities.toSet { (tag) ->
-            TagUsage(tag = tag, usageCount = genInt(min = 0, max = 3).toNonNegativeInt())
-        }
-        val scheduleTagListEntities = expectedTagUsages.flatMap { tagUsage ->
-            List(tagUsage.usageCount.value) {
-                ScheduleTagListEntity(
-                    scheduleId = it.toLong() + 1,
-                    tagId = tagUsage.tag.id.rawId,
-                )
-            }
-        }
+        val expectedTagUsages = genTagUsages(tags = tagAndEntities.map { it.first })
+        val scheduleTagListEntities = genScheduleTagListEntities(tagUsages = expectedTagUsages)
         val rawTagIds = tagAndEntities.toSet { (tag) -> tag.id.rawId }
         val query = GetTagUsageQuery.All
 

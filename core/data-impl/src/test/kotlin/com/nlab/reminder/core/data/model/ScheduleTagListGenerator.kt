@@ -16,26 +16,20 @@
 
 package com.nlab.reminder.core.data.model
 
-import com.nlab.reminder.core.kotlin.collections.toSet
-import com.nlab.reminder.core.kotlin.tryToNonNegativeIntOrZero
 import com.nlab.reminder.core.local.database.model.ScheduleTagListEntity
-import com.nlab.reminder.core.local.database.model.TagEntity
 
 /**
- * @author Thalys
+ * @author Doohyun
  */
-@Suppress("FunctionName")
-internal fun TagUsages(
-    tagEntities: Array<TagEntity>,
-    scheduleTagListEntities: Array<ScheduleTagListEntity>
-): Set<TagUsage> {
-    val tagIdToUsageCountTable = scheduleTagListEntities
-        .groupingBy(ScheduleTagListEntity::tagId)
-        .eachCount()
-    return tagEntities.toSet { tagEntity ->
-        TagUsage(
-            tag = Tag(tagEntity),
-            usageCount = tagIdToUsageCountTable[tagEntity.tagId].tryToNonNegativeIntOrZero()
-        )
+fun genScheduleTagListEntities(
+    tagUsages: Collection<TagUsage> = genTagUsages(genTags())
+): Set<ScheduleTagListEntity> = tagUsages
+    .flatMap { tagUsage ->
+        List(tagUsage.usageCount.value) {
+            ScheduleTagListEntity(
+                scheduleId = it.toLong() + 1,
+                tagId = tagUsage.tag.id.rawId
+            )
+        }
     }
-}
+    .toSet()
