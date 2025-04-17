@@ -74,9 +74,9 @@ abstract class ScheduleDAO {
         LIMIT 1
         """
     )
-    protected abstract fun findMaxVisiblePriorityByComplete(isComplete: Boolean): Long?
+    protected abstract suspend fun findMaxVisiblePriorityByComplete(isComplete: Boolean): Long?
 
-    private inline fun findMaxVisiblePriorityByCompleteOrElse(
+    private suspend inline fun findMaxVisiblePriorityByCompleteOrElse(
         isComplete: Boolean,
         defaultValue: () -> Long
     ): Long = findMaxVisiblePriorityByComplete(isComplete) ?: defaultValue()
