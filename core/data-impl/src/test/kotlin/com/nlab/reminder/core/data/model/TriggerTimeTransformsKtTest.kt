@@ -13,7 +13,7 @@ import org.junit.Test
  */
 class TriggerTimeTransformsKtTest {
     @Test
-    fun `Given utcTime, isDateOnly is null, When create to triggerTime, Then result is null`() {
+    fun `Given utcTime, isDateOnly are null, When create to triggerTime, Then result is null`() {
         val utcTime: Instant? = null
         val isDateOnly: Boolean? = null
         val actualTriggerTime = createTriggerTimeOrNull(utcTime, isDateOnly)
@@ -21,7 +21,7 @@ class TriggerTimeTransformsKtTest {
     }
 
     @Test
-    fun `Given utcTime, isDateOnly is nonnull, When create to triggerTime, Then return matched value`() {
+    fun `Given utcTime, isDateOnly are nonnull, When create to triggerTime, Then return matched value`() {
         val utcTime = Clock.System.now()
         val isDateOnly = genBoolean()
         val actualTriggerTime = checkNotNull(createTriggerTimeOrNull(utcTime, isDateOnly))

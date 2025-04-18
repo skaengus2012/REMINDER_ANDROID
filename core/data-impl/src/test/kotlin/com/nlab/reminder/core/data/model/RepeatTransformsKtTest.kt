@@ -27,6 +27,7 @@ import com.nlab.testkit.faker.shuffledSubset
 import kotlinx.datetime.IllegalTimeZoneException
 import kotlinx.datetime.TimeZone
 import org.hamcrest.CoreMatchers.equalTo
+import org.hamcrest.CoreMatchers.nullValue
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
 
@@ -81,11 +82,22 @@ class RepeatTransformsKtTest {
         REPEAT_MONTH_DEC
     ).shuffledSubset()
 
-    /**
+    @Test
+    fun `Given type, interval are null, When create Repeat, Then return null`() {
+        val type = null
+        val interval = null
+        val actualRepeat = createRepeatOrNull(
+            type = type,
+            interval = interval,
+            detailEntities = emptySet()
+        )
+        assertThat(actualRepeat, nullValue())
+    }
+
     @Test(expected = IllegalArgumentException::class)
-    fun `Given invalid repeat type, When convert Repeat, Then throw required exception`() {
+    fun `Given invalid repeat type, When create Repeat, Then throw exception`() {
         val repeatType = "INVALID_REPEAT_TYPE"
-        Repeat(
+        createRepeatOrNull(
             type = repeatType,
             interval = genInt(min = 1),
             detailEntities = emptySet()
@@ -93,21 +105,44 @@ class RepeatTransformsKtTest {
     }
 
     @Test(expected = IllegalArgumentException::class)
-    fun `Given non positive interval, When convert Repeat, Then throw required exception`() {
+    fun `Given non positive interval, When create Repeat, Then throw exception`() {
         val interval = genInt(min = -9999, max = 0)
-        Repeat(
+        createRepeatOrNull(
             type = REPEAT_HOURLY,
             interval = interval,
             detailEntities = emptySet()
         )
     }
 
+    @Test(expected = IllegalArgumentException::class)
+    fun `Given type is null, positive interval, When create Repeat, Then throw exception`() {
+        val type: String? = null
+        val interval = genPositiveInt().value
+        createRepeatOrNull(
+            type = type,
+            interval = interval,
+            detailEntities = emptySet()
+        )
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun `Given valid type, null interval, When create Repeat, Then throw exception`() {
+        val type = REPEAT_MONTHLY
+        val interval = null
+        createRepeatOrNull(
+            type = type,
+            interval = interval,
+            detailEntities = emptySet()
+        )
+    }
+
+    /**
     @Test
-    fun `Given hourly, positive number, When convert Repeat, Then return Hourly`() {
+    fun `Given hourly, positive number, When create Repeat, Then return Hourly`() {
         val repeatType = REPEAT_HOURLY
         val interval = genInt(min = 1)
         val expectedRepeat = Repeat.Hourly(interval = interval.toPositiveInt())
-        val actualRepeat = Repeat(
+        val actualRepeat = createRepeatOrNull(
             type = repeatType,
             interval = interval,
             detailEntities = emptySet()
