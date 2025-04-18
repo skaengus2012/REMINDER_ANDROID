@@ -93,7 +93,7 @@ internal class ScheduleTransactionValidator @Inject constructor() {
      * This rule follows Contract3 of [ScheduleEntity] and [RepeatDetailEntity] cases.
      */
     private fun ensureRepeatValidation(repeat: RepeatDTO) {
-        when (val repeatCode = repeat.code) {
+        when (val repeatCode = repeat.type) {
             REPEAT_HOURLY,
             REPEAT_DAILY -> {
                 require(repeat.details.isEmpty())

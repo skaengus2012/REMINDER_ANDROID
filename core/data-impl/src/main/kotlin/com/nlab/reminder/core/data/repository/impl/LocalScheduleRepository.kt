@@ -16,13 +16,49 @@
 
 package com.nlab.reminder.core.data.repository.impl
 
+import com.nlab.reminder.core.data.model.Schedule
+import com.nlab.reminder.core.data.repository.DeleteScheduleQuery
+import com.nlab.reminder.core.data.repository.GetScheduleCountQuery
+import com.nlab.reminder.core.data.repository.GetScheduleQuery
+import com.nlab.reminder.core.data.repository.SaveScheduleQuery
+import com.nlab.reminder.core.data.repository.SaveTagQuery
+import com.nlab.reminder.core.data.repository.ScheduleRepository
+import com.nlab.reminder.core.data.repository.UpdateAllScheduleQuery
+import com.nlab.reminder.core.kotlin.NonNegativeLong
+import com.nlab.reminder.core.kotlin.Result
+import com.nlab.reminder.core.local.database.dao.ScheduleDAO
+import com.nlab.reminder.core.local.database.transaction.InsertAndGetScheduleWithExtraTransaction
+import com.nlab.reminder.core.local.database.transaction.UpdateAndGetScheduleWithExtraTransaction
+import kotlinx.coroutines.flow.Flow
+
 /**
  * @author Doohyun
  */
-/**
 class LocalScheduleRepository(
     private val scheduleDAO: ScheduleDAO,
+    private val insertAndGetScheduleWithExtra: InsertAndGetScheduleWithExtraTransaction,
+    private val updateAndGetScheduleWithExtra: UpdateAndGetScheduleWithExtraTransaction
 ) : ScheduleRepository {
+    override suspend fun save(query: SaveScheduleQuery): Result<Schedule> {
+        TODO()
+    }
+
+    override suspend fun updateAll(query: UpdateAllScheduleQuery): Result<Unit> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun delete(query: DeleteScheduleQuery): Result<Unit> {
+        TODO("Not yet implemented")
+    }
+
+    override fun getSchedulesAsStream(request: GetScheduleQuery): Flow<Set<Schedule>> {
+        TODO("Not yet implemented")
+    }
+
+    override fun getScheduleCountAsStream(query: GetScheduleCountQuery): Flow<NonNegativeLong> {
+        TODO("Not yet implemented")
+    }
+    /**
     override suspend fun save(query: SaveScheduleQuery): Result<Schedule> = catching {
         val entity = when (query) {
             is SaveScheduleQuery.Add -> scheduleDAO.insertAndGet(query.content.toLocalDTO())
@@ -83,5 +119,5 @@ class LocalScheduleRepository(
             is GetScheduleCountQuery.All -> FakeScheduleRepositoryDelegate.getAllSchedulesCount()
         }
         return rawCountFlow.map(Long::tryToNonNegativeLongOrZero)
-    }
-}*/
+    }*/
+}

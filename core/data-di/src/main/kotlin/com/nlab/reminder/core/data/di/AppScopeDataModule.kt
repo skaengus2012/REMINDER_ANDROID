@@ -42,6 +42,8 @@ import com.nlab.reminder.core.inject.qualifiers.coroutine.DispatcherOption.*
 import com.nlab.reminder.core.local.database.dao.ScheduleDAO
 import com.nlab.reminder.core.local.database.dao.ScheduleTagListDAO
 import com.nlab.reminder.core.local.database.dao.TagDAO
+import com.nlab.reminder.core.local.database.transaction.InsertAndGetScheduleWithExtraTransaction
+import com.nlab.reminder.core.local.database.transaction.UpdateAndGetScheduleWithExtraTransaction
 import com.nlab.reminder.core.local.database.transaction.UpdateOrReplaceAndGetTagTransaction
 import com.nlab.reminder.core.local.datastore.preference.PreferenceDataSource
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -69,7 +71,13 @@ internal class AppScopeDataModule {
     @Reusable
     fun provideScheduleRepository(
         scheduleDAO: ScheduleDAO,
-    ): ScheduleRepository = LocalScheduleRepository(scheduleDAO = scheduleDAO)
+        insertAndGetScheduleWithExtra: InsertAndGetScheduleWithExtraTransaction,
+        updateAndGetScheduleWithExtra: UpdateAndGetScheduleWithExtraTransaction
+    ): ScheduleRepository = LocalScheduleRepository(
+        scheduleDAO = scheduleDAO,
+        insertAndGetScheduleWithExtra,
+        updateAndGetScheduleWithExtra
+    )
 
     @Provides
     @Reusable

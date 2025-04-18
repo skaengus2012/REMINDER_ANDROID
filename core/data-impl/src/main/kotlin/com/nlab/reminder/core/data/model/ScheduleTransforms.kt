@@ -19,7 +19,10 @@ package com.nlab.reminder.core.data.model
 import com.nlab.reminder.core.kotlin.toNonBlankString
 import com.nlab.reminder.core.kotlin.toNonNegativeLong
 import com.nlab.reminder.core.kotlin.tryToNonBlankStringOrNull
+import com.nlab.reminder.core.local.database.model.RepeatDTO
+import com.nlab.reminder.core.local.database.model.ScheduleContentDTO
 import com.nlab.reminder.core.local.database.model.ScheduleWithDetailsEntity
+import com.nlab.reminder.core.local.database.model.TriggerTimeDTO
 
 /**
  * @author Doohyun
@@ -72,5 +75,24 @@ internal fun ScheduleContent(entity: ScheduleWithDetailsEntity): ScheduleContent
 
             else -> throw IllegalArgumentException("Invalid RepeatDetails [$curRepeatType, $curRepeatInterval]")
         }
+    }
+)
+
+internal fun ScheduleContent.toScheduleContentDTO(): ScheduleContentDTO = ScheduleContentDTO(
+    title = title,
+    description = note,
+    link = link?.rawLink,
+    triggerTimeDTO = triggerTime?.let {
+        TriggerTimeDTO(
+            utcTime = it.utcTime,
+            isDateOnly = it.isDateOnly
+        )
+    },
+    repeatDTO = repeat?.let {
+        RepeatDTO(
+            type = it.repeatType,
+            interval = it.interval,
+            details = it.toRepeatDetailDTOs()
+        )
     }
 )

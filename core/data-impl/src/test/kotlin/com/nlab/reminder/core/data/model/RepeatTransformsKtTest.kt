@@ -469,26 +469,26 @@ class RepeatTransformsKtTest {
     }
 
     @Test
-    fun `Given repeat, When convert to REPEAT_TYPE string, Then return valid repeat type`() {
-        assertThat(genRepeatHourly().toRepeatType(), equalTo(REPEAT_HOURLY))
-        assertThat(genRepeatDaily().toRepeatType(), equalTo(REPEAT_DAILY))
-        assertThat(genRepeatWeekly().toRepeatType(), equalTo(REPEAT_WEEKLY))
-        assertThat(genRepeatMonthly().toRepeatType(), equalTo(REPEAT_MONTHLY))
-        assertThat(genRepeatYearly().toRepeatType(), equalTo(REPEAT_YEARLY))
+    fun `Given repeat, When getting REPEAT_TYPE string, Then return matched value`() {
+        assertThat(genRepeatHourly().repeatType, equalTo(REPEAT_HOURLY))
+        assertThat(genRepeatDaily().repeatType, equalTo(REPEAT_DAILY))
+        assertThat(genRepeatWeekly().repeatType, equalTo(REPEAT_WEEKLY))
+        assertThat(genRepeatMonthly().repeatType, equalTo(REPEAT_MONTHLY))
+        assertThat(genRepeatYearly().repeatType, equalTo(REPEAT_YEARLY))
     }
 
     @Test
-    fun `Given interval and repeat with interval, When convert to interval as int, Then return valid interval`() {
+    fun `Given each repeat with its interval, When getting interval, Then return matched value`() {
         val hourlyInterval = genPositiveInt()
         val dailyInterval = genPositiveInt()
         val weeklyInterval = genPositiveInt()
         val monthlyInterval = genPositiveInt()
         val yearlyInterval = genPositiveInt()
-        assertThat(genRepeatHourly(interval = hourlyInterval).toIntervalAsInt(), equalTo(hourlyInterval.value))
-        assertThat(genRepeatDaily(interval = dailyInterval).toIntervalAsInt(), equalTo(dailyInterval.value))
-        assertThat(genRepeatWeekly(interval = weeklyInterval).toIntervalAsInt(), equalTo(weeklyInterval.value))
-        assertThat(genRepeatMonthly(interval = monthlyInterval).toIntervalAsInt(), equalTo(monthlyInterval.value))
-        assertThat(genRepeatYearly(interval = yearlyInterval).toIntervalAsInt(), equalTo(yearlyInterval.value))
+        assertThat(genRepeatHourly(interval = hourlyInterval).interval, equalTo(hourlyInterval))
+        assertThat(genRepeatDaily(interval = dailyInterval).interval, equalTo(dailyInterval))
+        assertThat(genRepeatWeekly(interval = weeklyInterval).interval, equalTo(weeklyInterval))
+        assertThat(genRepeatMonthly(interval = monthlyInterval).interval, equalTo(monthlyInterval))
+        assertThat(genRepeatYearly(interval = yearlyInterval).interval, equalTo(yearlyInterval))
     }
 
     @Test

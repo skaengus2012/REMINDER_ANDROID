@@ -164,25 +164,24 @@ private fun Map<String, List<String>>.getTimeZone(): TimeZone = getValue(REPEAT_
     .first()
     .let(TimeZone::of)
 
-@RepeatType
-internal fun Repeat.toRepeatType(): String = when (this) {
-    is Repeat.Hourly -> REPEAT_HOURLY
-    is Repeat.Daily -> REPEAT_DAILY
-    is Repeat.Weekly -> REPEAT_WEEKLY
-    is Repeat.Monthly -> REPEAT_MONTHLY
-    is Repeat.Yearly -> REPEAT_YEARLY
-}
+@get:RepeatType
+internal val Repeat.repeatType: String
+    get() = when (this) {
+        is Repeat.Hourly -> REPEAT_HOURLY
+        is Repeat.Daily -> REPEAT_DAILY
+        is Repeat.Weekly -> REPEAT_WEEKLY
+        is Repeat.Monthly -> REPEAT_MONTHLY
+        is Repeat.Yearly -> REPEAT_YEARLY
+    }
 
-internal fun Repeat.toIntervalAsInt(): Int {
-    val interval = when (this) {
+internal val Repeat.interval
+    get(): PositiveInt = when (this) {
         is Repeat.Hourly -> interval
         is Repeat.Daily -> interval
         is Repeat.Weekly -> interval
         is Repeat.Monthly -> interval
         is Repeat.Yearly -> interval
     }
-    return interval.value
-}
 
 internal fun Repeat.toRepeatDetailDTOs(): Set<RepeatDetailDTO> = when (this) {
     is Repeat.Hourly,

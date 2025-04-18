@@ -39,8 +39,8 @@ fun genScheduleAndEntity(
         isComplete = schedule.isComplete,
         triggerTimeUtc = schedule.content.triggerTime?.utcTime,
         isTriggerTimeDateOnly = schedule.content.triggerTime?.isDateOnly,
-        repeatType = schedule.content.repeat?.toRepeatType(),
-        repeatInterval = schedule.content.repeat?.toIntervalAsInt()
+        repeatType = schedule.content.repeat?.repeatType,
+        repeatInterval = schedule.content.repeat?.interval?.value
     )
     val pivotRepeatId = lastRepeatId + 1
     val repeatDetailEntities = schedule.content.repeat
