@@ -33,6 +33,7 @@ import com.nlab.reminder.core.local.database.model.REPEAT_SETTING_PROPERTY_YEARL
 import com.nlab.reminder.core.local.database.model.REPEAT_SETTING_PROPERTY_ZONE_ID
 import com.nlab.reminder.core.local.database.model.REPEAT_WEEKLY
 import com.nlab.reminder.core.local.database.model.REPEAT_YEARLY
+import com.nlab.reminder.core.local.database.model.RepeatDTO
 import com.nlab.reminder.core.local.database.model.RepeatDetailDTO
 import com.nlab.reminder.core.local.database.model.RepeatDetailEntity
 import com.nlab.reminder.core.local.database.model.RepeatType
@@ -41,7 +42,25 @@ import kotlinx.datetime.TimeZone
 /**
  * @author Thalys
  */
-internal fun Repeat(
+
+/**
+ * If RepeatDetails is incorrectly entered, it is not confirmed.
+ * In Repeat function, check if there are appropriate repeatDetails.
+ *
+ * The validity of the repeatDetails should be checked only in the data insertion.
+ * @see [com.nlab.reminder.core.local.database.transaction.ScheduleTransactionValidator]
+ */
+internal fun createRepeatOrNull(
+    @RepeatType type: String?,
+    @IntRange(from = 1) interval: Int?,
+    detailEntities: Collection<RepeatDetailEntity>
+): Repeat? = when {
+    type == null && interval == null -> null
+    type != null && interval != null -> Repeat(type, interval, detailEntities)
+    else -> throw IllegalArgumentException("Invalid RepeatDetails [$type, $detailEntities]")
+}
+
+private fun Repeat(
     @RepeatType type: String,
     @IntRange(from = 1) interval: Int,
     detailEntities: Collection<RepeatDetailEntity>
@@ -164,42 +183,47 @@ private fun Map<String, List<String>>.getTimeZone(): TimeZone = getValue(REPEAT_
     .first()
     .let(TimeZone::of)
 
-@get:RepeatType
-internal val Repeat.repeatType: String
-    get() = when (this) {
-        is Repeat.Hourly -> REPEAT_HOURLY
-        is Repeat.Daily -> REPEAT_DAILY
-        is Repeat.Weekly -> REPEAT_WEEKLY
-        is Repeat.Monthly -> REPEAT_MONTHLY
-        is Repeat.Yearly -> REPEAT_YEARLY
+internal fun Repeat.toDTO(): RepeatDTO = when (this) {
+    is Repeat.Hourly -> {
+        RepeatDTO(
+            type = REPEAT_HOURLY,
+            interval = interval,
+            details = emptySet()
+        )
     }
 
-internal val Repeat.interval
-    get(): PositiveInt = when (this) {
-        is Repeat.Hourly -> interval
-        is Repeat.Daily -> interval
-        is Repeat.Weekly -> interval
-        is Repeat.Monthly -> interval
-        is Repeat.Yearly -> interval
-    }
-
-internal fun Repeat.toRepeatDetailDTOs(): Set<RepeatDetailDTO> = when (this) {
-    is Repeat.Hourly,
     is Repeat.Daily -> {
-        emptySet()
+        RepeatDTO(
+            type = REPEAT_DAILY,
+            interval = interval,
+            details = emptySet()
+        )
     }
 
     is Repeat.Weekly -> {
-        convertRepeatDetailDTOsFromWeeklyRepeat(this)
+        RepeatDTO(
+            type = REPEAT_WEEKLY,
+            interval = interval,
+            details = convertRepeatDetailDTOsFromWeeklyRepeat(repeat = this)
+        )
     }
 
     is Repeat.Monthly -> {
-        convertRepeatDetailDTOsFromMonthlyRepeat(this)
+        RepeatDTO(
+            type = REPEAT_MONTHLY,
+            interval = interval,
+            details = convertRepeatDetailDTOsFromMonthlyRepeat(repeat = this)
+        )
     }
 
     is Repeat.Yearly -> {
-        convertRepeatDetailDTOsFromYearlyRepeat(this)
+        RepeatDTO(
+            type = REPEAT_YEARLY,
+            interval = interval,
+            details = convertRepeatDetailDTOsFromYearlyRepeat(repeat = this)
+        )
     }
+
 }
 
 private fun convertRepeatDetailDTOsFromWeeklyRepeat(repeat: Repeat.Weekly): Set<RepeatDetailDTO> = buildSet {

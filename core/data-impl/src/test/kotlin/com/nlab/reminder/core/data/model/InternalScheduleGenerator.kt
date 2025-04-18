@@ -30,6 +30,7 @@ fun genScheduleAndEntity(
     schedule: Schedule = genSchedule(),
     lastRepeatId: Long = -1
 ): ScheduleAndEntity {
+    val contentDTO = schedule.content.toDTO()
     val scheduleEntity = ScheduleEntity(
         scheduleId = schedule.id.rawId,
         title = schedule.content.title.value,
@@ -39,12 +40,12 @@ fun genScheduleAndEntity(
         isComplete = schedule.isComplete,
         triggerTimeUtc = schedule.content.triggerTime?.utcTime,
         isTriggerTimeDateOnly = schedule.content.triggerTime?.isDateOnly,
-        repeatType = schedule.content.repeat?.repeatType,
-        repeatInterval = schedule.content.repeat?.interval?.value
+        repeatType = contentDTO.repeatDTO?.type,
+        repeatInterval = contentDTO.repeatDTO?.interval?.value
     )
     val pivotRepeatId = lastRepeatId + 1
-    val repeatDetailEntities = schedule.content.repeat
-        ?.toRepeatDetailDTOs()
+    val repeatDetailEntities = contentDTO.repeatDTO
+        ?.details
         .orEmpty()
         .mapIndexed { index, repeatDetailDTO ->
             RepeatDetailEntity(

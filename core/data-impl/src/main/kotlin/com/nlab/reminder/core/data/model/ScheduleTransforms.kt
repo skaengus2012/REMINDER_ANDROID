@@ -19,10 +19,8 @@ package com.nlab.reminder.core.data.model
 import com.nlab.reminder.core.kotlin.toNonBlankString
 import com.nlab.reminder.core.kotlin.toNonNegativeLong
 import com.nlab.reminder.core.kotlin.tryToNonBlankStringOrNull
-import com.nlab.reminder.core.local.database.model.RepeatDTO
 import com.nlab.reminder.core.local.database.model.ScheduleContentDTO
 import com.nlab.reminder.core.local.database.model.ScheduleWithDetailsEntity
-import com.nlab.reminder.core.local.database.model.TriggerTimeDTO
 
 /**
  * @author Doohyun
@@ -38,61 +36,14 @@ internal fun ScheduleContent(entity: ScheduleWithDetailsEntity): ScheduleContent
     title = entity.schedule.title.toNonBlankString(),
     note = entity.schedule.description.tryToNonBlankStringOrNull(),
     link = entity.schedule.link.tryToNonBlankStringOrNull()?.let(::Link),
-    triggerTime = with(entity.schedule) {
-        val curTimeUtc = triggerTimeUtc
-        val curTriggerTimeDateOnly = isTriggerTimeDateOnly
-        when {
-            curTimeUtc == null && curTriggerTimeDateOnly == null -> null
-            curTimeUtc != null && curTriggerTimeDateOnly != null -> {
-                TriggerTime(
-                    utcTime = curTimeUtc,
-                    isDateOnly = curTriggerTimeDateOnly
-                )
-            }
-
-            else -> throw IllegalArgumentException("Invalid TriggerTime [$curTimeUtc, $curTriggerTimeDateOnly]")
-        }
-    },
-    repeat = with(entity) {
-        val curRepeatType = entity.schedule.repeatType
-        val curRepeatInterval = entity.schedule.repeatInterval
-        /**
-         * If RepeatDetails is incorrectly entered, it is not confirmed.
-         * In Repeat function, check if there are appropriate repeatDetails.
-         *
-         * The validity of the repeatDetails should be checked only in the data insertion.
-         * @see [com.nlab.reminder.core.local.database.transaction.ScheduleTransactionValidator]
-         */
-        when {
-            curRepeatType == null && curRepeatInterval == null -> null
-            curRepeatType != null && curRepeatInterval != null -> {
-                Repeat(
-                    type = curRepeatType,
-                    interval = curRepeatInterval,
-                    detailEntities = entity.repeatDetails
-                )
-            }
-
-            else -> throw IllegalArgumentException("Invalid RepeatDetails [$curRepeatType, $curRepeatInterval]")
-        }
-    }
+    triggerTime = with(entity.schedule) { createTriggerTimeOrNull(triggerTimeUtc, isTriggerTimeDateOnly) },
+    repeat = with(entity) { createRepeatOrNull(schedule.repeatType, schedule.repeatInterval, repeatDetails) }
 )
 
-internal fun ScheduleContent.toScheduleContentDTO(): ScheduleContentDTO = ScheduleContentDTO(
+internal fun ScheduleContent.toDTO(): ScheduleContentDTO = ScheduleContentDTO(
     title = title,
     description = note,
     link = link?.rawLink,
-    triggerTimeDTO = triggerTime?.let {
-        TriggerTimeDTO(
-            utcTime = it.utcTime,
-            isDateOnly = it.isDateOnly
-        )
-    },
-    repeatDTO = repeat?.let {
-        RepeatDTO(
-            type = it.repeatType,
-            interval = it.interval,
-            details = it.toRepeatDetailDTOs()
-        )
-    }
+    triggerTimeDTO = triggerTime?.toDTO(),
+    repeatDTO = repeat?.toDTO()
 )

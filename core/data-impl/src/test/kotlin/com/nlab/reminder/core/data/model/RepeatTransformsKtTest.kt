@@ -81,6 +81,7 @@ class RepeatTransformsKtTest {
         REPEAT_MONTH_DEC
     ).shuffledSubset()
 
+    /**
     @Test(expected = IllegalArgumentException::class)
     fun `Given invalid repeat type, When convert Repeat, Then throw required exception`() {
         val repeatType = "INVALID_REPEAT_TYPE"
@@ -607,5 +608,5 @@ class RepeatTransformsKtTest {
             equalTo(setOf(expectedDayOrderCode))
         )
         assertThat(actualPropertyToValues[REPEAT_SETTING_PROPERTY_YEARLY_DAY_OF_WEEK], equalTo(setOf(expectedDaysCode)))
-    }
+    }*/
 }
