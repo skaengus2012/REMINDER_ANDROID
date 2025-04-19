@@ -19,7 +19,6 @@ package com.nlab.reminder.core.data.model
 import com.nlab.reminder.core.kotlin.collections.toNonEmptySet
 import com.nlab.reminder.core.kotlin.collections.toSet
 import com.nlab.reminder.core.kotlin.faker.genPositiveInt
-import com.nlab.reminder.core.kotlin.toPositiveInt
 import com.nlab.reminder.core.local.database.model.*
 import com.nlab.testkit.faker.genInt
 import com.nlab.testkit.faker.requireSample
@@ -136,38 +135,37 @@ class RepeatTransformsKtTest {
         )
     }
 
-    /**
     @Test
     fun `Given hourly, positive number, When create Repeat, Then return Hourly`() {
         val repeatType = REPEAT_HOURLY
-        val interval = genInt(min = 1)
-        val expectedRepeat = Repeat.Hourly(interval = interval.toPositiveInt())
+        val interval = genPositiveInt()
+        val expectedRepeat = Repeat.Hourly(interval = interval)
         val actualRepeat = createRepeatOrNull(
             type = repeatType,
-            interval = interval,
+            interval = interval.value,
             detailEntities = emptySet()
         )
         assertThat(actualRepeat, equalTo(expectedRepeat))
     }
 
     @Test
-    fun `Given daily, positive number, When convert Repeat, Then return Daily`() {
+    fun `Given daily, positive number, When create Repeat, Then return Daily`() {
         val repeatType = REPEAT_DAILY
-        val interval = genInt(min = 1)
-        val expectedRepeat = Repeat.Daily(interval = interval.toPositiveInt())
-        val actualRepeat = Repeat(
+        val interval = genPositiveInt()
+        val expectedRepeat = Repeat.Daily(interval = interval)
+        val actualRepeat = createRepeatOrNull(
             type = repeatType,
-            interval = interval,
+            interval = interval.value,
             detailEntities = emptySet()
         )
         assertThat(actualRepeat, equalTo(expectedRepeat))
     }
 
     @Test(expected = NoSuchElementException::class)
-    fun `Given weekly and empty repeat details, When convert Repeat, Then throw exception`() {
+    fun `Given weekly and empty repeat details, When create Repeat, Then throw exception`() {
         val repeatType = REPEAT_WEEKLY
         val repeatDetailEntities = emptySet<RepeatDetailEntity>()
-        Repeat(
+        createRepeatOrNull(
             type = repeatType,
             interval = genInt(min = 1),
             detailEntities = repeatDetailEntities
@@ -175,10 +173,10 @@ class RepeatTransformsKtTest {
     }
 
     @Test(expected = IllegalTimeZoneException::class)
-    fun `Given weekly and invalid zoneId, When convert Repeat, Then throw exception`() {
+    fun `Given weekly and invalid zoneId, When create Repeat, Then throw exception`() {
         val repeatType = REPEAT_WEEKLY
         val invalidZoneId = "INVALID_ZONE_ID"
-        Repeat(
+        createRepeatOrNull(
             type = repeatType,
             interval = genInt(min = 1),
             detailEntities = setOf(
@@ -192,7 +190,7 @@ class RepeatTransformsKtTest {
     }
 
     @Test
-    fun `Given weekly, timeZone and dayOfWeeks, When convert Repeat, Then return Weekly`() {
+    fun `Given weekly, timeZone and dayOfWeeks, When create Repeat, Then return Weekly`() {
         val repeatType = REPEAT_WEEKLY
         val interval = genPositiveInt()
         val timeZone = TimeZone.currentSystemDefault()
@@ -203,7 +201,7 @@ class RepeatTransformsKtTest {
             daysOfWeeks = dayOfWeeks.toSet(::DayOfWeek).toNonEmptySet()
         )
 
-        val actualRepeat = Repeat(
+        val actualRepeat = createRepeatOrNull(
             type = repeatType,
             interval = interval.value,
             detailEntities = buildSet {
@@ -213,7 +211,7 @@ class RepeatTransformsKtTest {
                     propertyCode = REPEAT_SETTING_PROPERTY_ZONE_ID,
                     value = timeZone.id
                 )
-                this += createRepeatDetailEntities(
+                this += RepeatDetailEntities(
                     codes = dayOfWeeks,
                     scheduleId = scheduleId,
                     propertyCode = REPEAT_SETTING_PROPERTY_WEEKLY
@@ -223,23 +221,11 @@ class RepeatTransformsKtTest {
         assertThat(actualRepeat, equalTo(expectedRepeat))
     }
 
-    private fun createRepeatDetailEntities(
-        codes: Iterable<String>,
-        scheduleId: ScheduleId,
-        propertyCode: String
-    ): List<RepeatDetailEntity> = codes.map { code ->
-        RepeatDetailEntity(
-            scheduleId = scheduleId.rawId,
-            propertyCode = propertyCode,
-            value = code
-        )
-    }
-
     @Test(expected = NoSuchElementException::class)
-    fun `Given monthly and empty repeat details, When convert Repeat, Then throw exception`() {
+    fun `Given monthly and empty repeat details, When create Repeat, Then throw exception`() {
         val repeatType = REPEAT_MONTHLY
         val repeatDetailEntities = emptySet<RepeatDetailEntity>()
-        Repeat(
+        createRepeatOrNull(
             type = repeatType,
             interval = genInt(min = 1),
             detailEntities = repeatDetailEntities
@@ -247,10 +233,10 @@ class RepeatTransformsKtTest {
     }
 
     @Test(expected = IllegalTimeZoneException::class)
-    fun `Given monthly and invalid zoneId, When convert Repeat, Then throw exception`() {
+    fun `Given monthly and invalid zoneId, When create Repeat, Then throw exception`() {
         val repeatType = REPEAT_MONTHLY
         val invalidZoneId = "INVALID_ZONE_ID"
-        Repeat(
+        createRepeatOrNull(
             type = repeatType,
             interval = genInt(min = 1),
             detailEntities = setOf(
@@ -264,7 +250,7 @@ class RepeatTransformsKtTest {
     }
 
     @Test
-    fun `Given monthly, timeZone and monthly days, When convert Repeat, Then return Monthly with Each`() {
+    fun `Given monthly, timeZone and monthly days, When create Repeat, Then return Monthly with Each`() {
         val repeatType = REPEAT_MONTHLY
         val interval = genPositiveInt()
         val timeZone = TimeZone.currentSystemDefault()
@@ -275,7 +261,7 @@ class RepeatTransformsKtTest {
             detail = MonthlyRepeatDetail.Each(monthlyDays.toSet(::DaysOfMonth).toNonEmptySet())
         )
 
-        val actualRepeat = Repeat(
+        val actualRepeat = createRepeatOrNull(
             type = repeatType,
             interval = interval.value,
             detailEntities = buildSet {
@@ -285,7 +271,7 @@ class RepeatTransformsKtTest {
                     propertyCode = REPEAT_SETTING_PROPERTY_ZONE_ID,
                     value = timeZone.id
                 )
-                this += createRepeatDetailEntities(
+                this += RepeatDetailEntities(
                     codes = monthlyDays.map { it.toString() },
                     scheduleId = scheduleId,
                     propertyCode = REPEAT_SETTING_PROPERTY_MONTHLY_DAY
@@ -296,7 +282,7 @@ class RepeatTransformsKtTest {
     }
 
     @Test
-    fun `Given monthly, timeZone, dayOrder and days, When convert Repeat, Then return Monthly with customize`() {
+    fun `Given monthly, timeZone, dayOrder and days, When create Repeat, Then return Monthly with customize`() {
         val repeatType = REPEAT_MONTHLY
         val interval = genPositiveInt()
         val timeZone = TimeZone.currentSystemDefault()
@@ -310,7 +296,7 @@ class RepeatTransformsKtTest {
                 day = Days(days)
             )
         )
-        val actualRepeat = Repeat(
+        val actualRepeat = createRepeatOrNull(
             type = repeatType,
             interval = interval.value,
             detailEntities = buildSet {
@@ -320,12 +306,12 @@ class RepeatTransformsKtTest {
                     propertyCode = REPEAT_SETTING_PROPERTY_ZONE_ID,
                     value = timeZone.id
                 )
-                this += createRepeatDetailEntities(
+                this += RepeatDetailEntities(
                     codes = listOf(dayOrder),
                     scheduleId = scheduleId,
                     propertyCode = REPEAT_SETTING_PROPERTY_MONTHLY_DAY_ORDER
                 )
-                this += createRepeatDetailEntities(
+                this += RepeatDetailEntities(
                     codes = listOf(days),
                     scheduleId = scheduleId,
                     propertyCode = REPEAT_SETTING_PROPERTY_MONTHLY_DAY_OF_WEEK
@@ -336,10 +322,10 @@ class RepeatTransformsKtTest {
     }
 
     @Test(expected = NoSuchElementException::class)
-    fun `Given yearly and empty repeat details, When convert Repeat, Then throw exception`() {
+    fun `Given yearly and empty repeat details, When create Repeat, Then throw exception`() {
         val repeatType = REPEAT_YEARLY
         val repeatDetailEntities = emptySet<RepeatDetailEntity>()
-        Repeat(
+        createRepeatOrNull(
             type = repeatType,
             interval = genInt(min = 1),
             detailEntities = repeatDetailEntities
@@ -347,10 +333,10 @@ class RepeatTransformsKtTest {
     }
 
     @Test(expected = IllegalTimeZoneException::class)
-    fun `Given yearly and invalid zoneId, When convert Repeat, Then throw exception`() {
+    fun `Given yearly and invalid zoneId, When create Repeat, Then throw exception`() {
         val repeatType = REPEAT_YEARLY
         val invalidZoneId = "INVALID_ZONE_ID"
-        Repeat(
+        createRepeatOrNull(
             type = repeatType,
             interval = genInt(min = 1),
             detailEntities = setOf(
@@ -364,7 +350,7 @@ class RepeatTransformsKtTest {
     }
 
     @Test
-    fun `Given yearly, timeZone and repeatMonths, When convert Repeat, Then return Yearly`() {
+    fun `Given yearly, timeZone and repeatMonths, When create Repeat, Then return Yearly`() {
         val repeatType = REPEAT_YEARLY
         val interval = genPositiveInt()
         val timeZone = TimeZone.currentSystemDefault()
@@ -375,7 +361,7 @@ class RepeatTransformsKtTest {
             months = months.toSet(::Month).toNonEmptySet(),
             daysOfWeekOption = null
         )
-        val actualRepeat = Repeat(
+        val actualRepeat = createRepeatOrNull(
             type = repeatType,
             interval = interval.value,
             detailEntities = buildSet {
@@ -385,7 +371,7 @@ class RepeatTransformsKtTest {
                     propertyCode = REPEAT_SETTING_PROPERTY_ZONE_ID,
                     value = timeZone.id
                 )
-                this += createRepeatDetailEntities(
+                this += RepeatDetailEntities(
                     codes = months,
                     scheduleId = scheduleId,
                     propertyCode = REPEAT_SETTING_PROPERTY_YEARLY_MONTH
@@ -396,13 +382,13 @@ class RepeatTransformsKtTest {
     }
 
     @Test(expected = IllegalArgumentException::class)
-    fun `Given yearly, timeZone, month and dayOrder, When convert Repeat, Then throw exception`() {
+    fun `Given yearly, timeZone, month and dayOrder, When create Repeat, Then throw exception`() {
         val repeatType = REPEAT_YEARLY
         val interval = genPositiveInt()
         val timeZone = TimeZone.currentSystemDefault()
         val months = sampleYearlyMonthCodes
         val dayOrder = sampleDayOrderCode
-        Repeat(
+        createRepeatOrNull(
             type = repeatType,
             interval = interval.value,
             detailEntities = buildSet {
@@ -417,7 +403,7 @@ class RepeatTransformsKtTest {
                     propertyCode = REPEAT_SETTING_PROPERTY_YEARLY_DAY_ORDER,
                     value = dayOrder
                 )
-                this += createRepeatDetailEntities(
+                this += RepeatDetailEntities(
                     codes = months,
                     scheduleId = scheduleId,
                     propertyCode = REPEAT_SETTING_PROPERTY_YEARLY_MONTH
@@ -427,13 +413,13 @@ class RepeatTransformsKtTest {
     }
 
     @Test(expected = IllegalArgumentException::class)
-    fun `Given yearly, timeZone, month and days, When convert Repeat, Then throw exception`() {
+    fun `Given yearly, timeZone, month and days, When create Repeat, Then throw exception`() {
         val repeatType = REPEAT_YEARLY
         val interval = genPositiveInt()
         val timeZone = TimeZone.currentSystemDefault()
         val months = sampleYearlyMonthCodes
         val days = sampleDaysCode
-        Repeat(
+        createRepeatOrNull(
             type = repeatType,
             interval = interval.value,
             detailEntities = buildSet {
@@ -448,7 +434,7 @@ class RepeatTransformsKtTest {
                     propertyCode = REPEAT_SETTING_PROPERTY_YEARLY_DAY_OF_WEEK,
                     value = days
                 )
-                this += createRepeatDetailEntities(
+                this += RepeatDetailEntities(
                     codes = months,
                     scheduleId = scheduleId,
                     propertyCode = REPEAT_SETTING_PROPERTY_YEARLY_MONTH
@@ -458,7 +444,7 @@ class RepeatTransformsKtTest {
     }
 
     @Test
-    fun `Given yearly, timeZone, month, dayOrder and days, When convert Repeat, Then return Yearly with option`() {
+    fun `Given yearly, timeZone, month, dayOrder and days, When create Repeat, Then return Yearly with option`() {
         val repeatType = REPEAT_YEARLY
         val interval = genPositiveInt()
         val timeZone = TimeZone.currentSystemDefault()
@@ -474,7 +460,7 @@ class RepeatTransformsKtTest {
                 day = Days(days)
             )
         )
-        val actualRepeat = Repeat(
+        val actualRepeat = createRepeatOrNull(
             type = repeatType,
             interval = interval.value,
             detailEntities = buildSet {
@@ -494,7 +480,7 @@ class RepeatTransformsKtTest {
                     propertyCode = REPEAT_SETTING_PROPERTY_YEARLY_DAY_OF_WEEK,
                     value = days
                 )
-                this += createRepeatDetailEntities(
+                this += RepeatDetailEntities(
                     codes = months,
                     scheduleId = scheduleId,
                     propertyCode = REPEAT_SETTING_PROPERTY_YEARLY_MONTH
@@ -505,43 +491,41 @@ class RepeatTransformsKtTest {
     }
 
     @Test
-    fun `Given repeat, When getting REPEAT_TYPE string, Then return matched value`() {
-        assertThat(genRepeatHourly().repeatType, equalTo(REPEAT_HOURLY))
-        assertThat(genRepeatDaily().repeatType, equalTo(REPEAT_DAILY))
-        assertThat(genRepeatWeekly().repeatType, equalTo(REPEAT_WEEKLY))
-        assertThat(genRepeatMonthly().repeatType, equalTo(REPEAT_MONTHLY))
-        assertThat(genRepeatYearly().repeatType, equalTo(REPEAT_YEARLY))
-    }
-
-    @Test
-    fun `Given each repeat with its interval, When getting interval, Then return matched value`() {
-        val hourlyInterval = genPositiveInt()
-        val dailyInterval = genPositiveInt()
-        val weeklyInterval = genPositiveInt()
-        val monthlyInterval = genPositiveInt()
-        val yearlyInterval = genPositiveInt()
-        assertThat(genRepeatHourly(interval = hourlyInterval).interval, equalTo(hourlyInterval))
-        assertThat(genRepeatDaily(interval = dailyInterval).interval, equalTo(dailyInterval))
-        assertThat(genRepeatWeekly(interval = weeklyInterval).interval, equalTo(weeklyInterval))
-        assertThat(genRepeatMonthly(interval = monthlyInterval).interval, equalTo(monthlyInterval))
-        assertThat(genRepeatYearly(interval = yearlyInterval).interval, equalTo(yearlyInterval))
-    }
-
-    @Test
-    fun `Given repeat hourly, When try convert to dto, Then return empty`() {
+    fun `Given hourly repeat, When convert to dto, Then return matched value`() {
         val repeat = genRepeatHourly()
-        val expectedDTOs = emptySet<RepeatDetailEntity>()
-        val actualDTOs = repeat.toRepeatDetailDTOs()
-        assertThat(actualDTOs, equalTo(expectedDTOs))
+        val dto = repeat.toDTO()
+        assertThat(dto.type, equalTo(REPEAT_HOURLY))
+        assertThat(dto.interval, equalTo(repeat.interval))
+        assertThat(dto.details, equalTo(emptySet()))
     }
 
     @Test
-    fun `Given repeat daily, When try convert to dto, Then return empty`() {
+    fun `Given daily repeat, When convert to dto, Then return matched value`() {
         val repeat = genRepeatDaily()
-        val expectedDTOs = emptySet<RepeatDetailEntity>()
-        val actualDTOs = repeat.toRepeatDetailDTOs()
-        assertThat(actualDTOs, equalTo(expectedDTOs))
+        val dto = repeat.toDTO()
+        assertThat(dto.type, equalTo(REPEAT_DAILY))
+        assertThat(dto.interval, equalTo(repeat.interval))
+        assertThat(dto.details, equalTo(emptySet()))
     }
+
+    @Test
+    fun `Given repeat weekly, When convert to dto, Then return matched value`() {
+        val repeat = genRepeatWeekly()
+        val expectedZoneId = repeat.timeZone.id
+        val expectedDayOfWeeksCodes = repeat.daysOfWeeks.value.toSet { it.toRepeatWeek() }
+        // zoneId + dayOfWeeks.size
+        val expectedDTOSize = 1 + expectedDayOfWeeksCodes.size
+
+        val actualDTO = repeat.toDTO()
+        assertThat(actualDTO.type, equalTo(REPEAT_WEEKLY))
+        assertThat(actualDTO.interval, equalTo(repeat.interval))
+
+        val actualPropertyToValues = convertPropertyCodeToValuesTable(actualRepeatDetailDTOs)
+        assertThat(actualPropertyToValues[REPEAT_SETTING_PROPERTY_ZONE_ID], equalTo(setOf(expectedZoneId)))
+        assertThat(actualPropertyToValues[REPEAT_SETTING_PROPERTY_WEEKLY], equalTo(expectedDayOfWeeksCodes))
+    }
+
+    /**
 
     @Test
     fun `Given repeat weekly, When try convert to dto, Then return valid dto set`() {
@@ -644,4 +628,25 @@ class RepeatTransformsKtTest {
         )
         assertThat(actualPropertyToValues[REPEAT_SETTING_PROPERTY_YEARLY_DAY_OF_WEEK], equalTo(setOf(expectedDaysCode)))
     }*/
+}
+
+@Suppress("TestFunctionName")
+private fun RepeatDetailEntities(
+    codes: Iterable<String>,
+    scheduleId: ScheduleId,
+    propertyCode: String
+): Set<RepeatDetailEntity> = codes.toSet { code ->
+    RepeatDetailEntity(
+        scheduleId = scheduleId.rawId,
+        propertyCode = propertyCode,
+        value = code
+    )
+}
+
+private fun convertPropertyCodeToValuesTable(
+    dto: Set<RepeatDetailDTO>
+): Map<String, Set<String>> = buildMap<String, MutableSet<String>> {
+    dto.forEach { dto ->
+        getOrPut(dto.propertyCode) { mutableSetOf() }.add(dto.value)
+    }
 }

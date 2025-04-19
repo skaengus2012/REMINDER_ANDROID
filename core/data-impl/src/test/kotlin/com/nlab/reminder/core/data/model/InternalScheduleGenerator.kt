@@ -16,6 +16,8 @@
 
 package com.nlab.reminder.core.data.model
 
+import com.nlab.reminder.core.kotlin.collections.toSetIndexed
+import com.nlab.reminder.core.local.database.model.RepeatDetailDTO
 import com.nlab.reminder.core.local.database.model.RepeatDetailEntity
 import com.nlab.reminder.core.local.database.model.ScheduleEntity
 import com.nlab.reminder.core.local.database.model.ScheduleWithDetailsEntity
@@ -43,24 +45,30 @@ fun genScheduleAndEntity(
         repeatType = contentDTO.repeatDTO?.type,
         repeatInterval = contentDTO.repeatDTO?.interval?.value
     )
-    val pivotRepeatId = lastRepeatId + 1
-    val repeatDetailEntities = contentDTO.repeatDTO
-        ?.details
-        .orEmpty()
-        .mapIndexed { index, repeatDetailDTO ->
-            RepeatDetailEntity(
-                repeatId = index.toLong() + pivotRepeatId,
-                scheduleId = scheduleEntity.scheduleId,
-                propertyCode = repeatDetailDTO.propertyCode,
-                value = repeatDetailDTO.value
-            )
-        }
-        .toSet()
-    val scheduleWithDetailsEntity = ScheduleWithDetailsEntity(
-        scheduleEntity,
-        repeatDetailEntities
+    val repeatDetailEntities = RepeatDetailEntities(
+        repeatDetailDTOs = contentDTO.repeatDTO?.details.orEmpty(),
+        scheduleId = scheduleEntity.scheduleId,
+        lastRepeatId = lastRepeatId
     )
+    val scheduleWithDetailsEntity = ScheduleWithDetailsEntity(scheduleEntity, repeatDetailEntities)
     return schedule to scheduleWithDetailsEntity
+}
+
+@Suppress("TestFunctionName")
+private fun RepeatDetailEntities(
+    repeatDetailDTOs: Iterable<RepeatDetailDTO>,
+    scheduleId: Long,
+    lastRepeatId: Long = -1
+): Set<RepeatDetailEntity> {
+    val pivotRepeatId = lastRepeatId + 1
+    return repeatDetailDTOs.toSetIndexed { index, repeatDetailDTO ->
+        RepeatDetailEntity(
+            repeatId = index.toLong() + pivotRepeatId,
+            scheduleId = scheduleId,
+            propertyCode = repeatDetailDTO.propertyCode,
+            value = repeatDetailDTO.value
+        )
+    }
 }
 
 fun genScheduleAndEntities(

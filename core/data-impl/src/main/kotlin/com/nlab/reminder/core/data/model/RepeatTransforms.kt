@@ -47,7 +47,7 @@ import kotlinx.datetime.TimeZone
  * If RepeatDetails is incorrectly entered, it is not confirmed.
  * In Repeat function, check if there are appropriate repeatDetails.
  *
- * The validity of the repeatDetails should be checked only in the data insertion.
+ * The exactly validity of the repeatDetails should be checked only in the data insertion.
  * @see [com.nlab.reminder.core.local.database.transaction.ScheduleTransactionValidator]
  */
 internal fun createRepeatOrNull(
