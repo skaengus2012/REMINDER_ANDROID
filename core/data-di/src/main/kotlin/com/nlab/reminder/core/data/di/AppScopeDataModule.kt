@@ -26,11 +26,9 @@ import dagger.hilt.components.SingletonComponent
 import com.nlab.reminder.core.data.qualifiers.ScheduleDataOption.*
 import com.nlab.reminder.core.data.repository.CompletedScheduleShownRepository
 import com.nlab.reminder.core.data.repository.ScheduleRepository
-import com.nlab.reminder.core.data.repository.ScheduleTagListRepository
 import com.nlab.reminder.core.data.repository.TagRepository
 import com.nlab.reminder.core.data.repository.impl.CompletedScheduleShownRepositoryImpl
 import com.nlab.reminder.core.data.repository.impl.LocalScheduleRepository
-import com.nlab.reminder.core.data.repository.impl.LocalScheduleTagListRepository
 import com.nlab.reminder.core.data.repository.impl.LocalTagRepository
 import com.nlab.reminder.core.data.util.SystemTimeChangedMonitor
 import com.nlab.reminder.core.data.util.SystemTimeZoneMonitor
@@ -94,14 +92,6 @@ internal class AppScopeDataModule {
         tagDAO = tagDAO,
         scheduleTagListDAO = scheduleTagListDAO,
         updateOrReplaceAndGetTag = updateOrReplaceAndGetTag
-    )
-
-    @Provides
-    @Reusable
-    fun provideScheduleTagListRepository(
-        scheduleTagListDAO: ScheduleTagListDAO,
-    ): ScheduleTagListRepository = LocalScheduleTagListRepository(
-        scheduleTagListDAO = scheduleTagListDAO,
     )
 
     @Singleton
