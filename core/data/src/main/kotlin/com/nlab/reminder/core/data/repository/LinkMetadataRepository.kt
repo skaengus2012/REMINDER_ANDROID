@@ -24,5 +24,5 @@ import kotlinx.coroutines.flow.Flow
  * @author thalys
  */
 interface LinkMetadataRepository {
-    fun getAsStream(links: Set<Link>): Flow<Map<Link, LinkMetadata>>
+    fun getLinkToMetadataTableAsStream(links: Set<Link>): Flow<Map<Link, LinkMetadata>>
 }

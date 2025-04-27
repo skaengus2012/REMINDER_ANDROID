@@ -16,24 +16,13 @@
 
 package com.nlab.reminder.core.data.di
 
-import com.nlab.reminder.core.data.repository.LinkMetadataRepository
 import com.nlab.reminder.core.data.repository.ScheduleCompleteMarkRepository
-import com.nlab.reminder.core.data.repository.impl.InMemoryLinkMetadataCache
 import com.nlab.reminder.core.data.repository.impl.InMemoryScheduleCompleteMarkRepository
-import com.nlab.reminder.core.data.repository.impl.OfflineFirstLinkMetadataRepository
-import com.nlab.reminder.core.kotlin.NonBlankString
-import com.nlab.reminder.core.kotlin.Result
-import com.nlab.reminder.core.kotlin.onFailure
-import com.nlab.reminder.core.kotlin.onSuccess
-import com.nlab.reminder.core.local.database.dao.LinkMetadataDAO
-import com.nlab.reminder.core.network.datasource.LinkThumbnailDataSource
-import com.nlab.reminder.core.network.datasource.LinkThumbnailResponse
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.android.scopes.ViewModelScoped
-import timber.log.Timber
 
 /**
  * @author Doohyun
@@ -41,26 +30,6 @@ import timber.log.Timber
 @Module
 @InstallIn(ViewModelComponent::class)
 internal class ViewModelScopeDataModule {
-    @ViewModelScoped
-    @Provides
-    fun provideCachedLinkMetadataTableRepository(
-        linkMetadataDAO: LinkMetadataDAO,
-        linkThumbnailDataSource: LinkThumbnailDataSource
-    ): LinkMetadataRepository = OfflineFirstLinkMetadataRepository(
-        linkMetadataDAO = linkMetadataDAO,
-        linkThumbnailDataSource = object : LinkThumbnailDataSource {
-            override suspend fun getLinkThumbnail(
-                url: NonBlankString
-            ): Result<LinkThumbnailResponse> = linkThumbnailDataSource.getLinkThumbnail(url)
-                .onSuccess { response ->
-                    Timber.d("The linkMetadata loading success -> [$url : $response]")
-                }
-                .onFailure { e -> Timber.w(e, "The linkMetadata loading failed -> [$url]") }
-
-        },
-        inMemoryCache = InMemoryLinkMetadataCache(initialCache = emptyMap())
-    )
-
     @Provides
     @ViewModelScoped
     fun provideScheduleCompleteMarkRepository(): ScheduleCompleteMarkRepository =

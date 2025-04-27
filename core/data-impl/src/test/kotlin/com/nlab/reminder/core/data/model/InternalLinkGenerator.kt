@@ -17,7 +17,7 @@
 package com.nlab.reminder.core.data.model
 
 import com.nlab.reminder.core.local.database.model.LinkMetadataEntity
-import com.nlab.testkit.faker.genLongGreaterThanZero
+import com.nlab.testkit.faker.genIntGreaterThanZero
 
 typealias LinkAndMetadataAndEntity = Triple<Link, LinkMetadata, LinkMetadataEntity>
 
@@ -27,7 +27,7 @@ typealias LinkAndMetadataAndEntity = Triple<Link, LinkMetadata, LinkMetadataEnti
 fun genLinkAndMetadataAndEntity(
     link: Link = genLink(),
     linkMetadata: LinkMetadata = genLinkMetadata(),
-    insertionOrder: Long = genLongGreaterThanZero()
+    insertionOrder: Int = genIntGreaterThanZero()
 ): LinkAndMetadataAndEntity = Triple(
     link,
     linkMetadata,

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 The N's lab Open Source Project
+ * Copyright (C) 2025 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,16 +16,18 @@
 
 package com.nlab.reminder.core.kotlinx.coroutine.flow
 
+import kotlinx.coroutines.channels.ProducerScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.filter as kotlinxCoroutineFilter
-import kotlinx.coroutines.flow.map as kotlinxCoroutineMap
+import kotlin.experimental.ExperimentalTypeInference
+import kotlinx.coroutines.flow.channelFlow as kotlinxChannelFlow
 
 /**
- * There exists coverage that Jacoco does not recognize for Coroutine functions.
- * Therefore, We create simple lambda functions to replace them.
- *
- * @author thalys
+ * @author Thalys
  */
-fun <T> Flow<T>.filter(predicate: (T) -> Boolean): Flow<T> = kotlinxCoroutineFilter(predicate)
+@OptIn(ExperimentalTypeInference::class)
+fun <T> channelFlow(@BuilderInference block: ProducerScope<T>.() -> Unit): Flow<T> = kotlinxChannelFlow(block)
 
-fun <T, R> Flow<T>.map(transform: (value: T) -> R): Flow<R> = kotlinxCoroutineMap(transform)
+@OptIn(ExperimentalTypeInference::class)
+fun <T> channelFlowSuspend(
+    @BuilderInference block: suspend ProducerScope<T>.() -> Unit
+): Flow<T> = kotlinxChannelFlow(block)

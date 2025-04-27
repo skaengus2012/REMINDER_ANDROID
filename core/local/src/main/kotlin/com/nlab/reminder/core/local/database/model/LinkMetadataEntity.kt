@@ -32,5 +32,5 @@ data class LinkMetadataEntity(
     @ColumnInfo(name = "link") val link: String,
     @ColumnInfo(name = "title") val title: String?,
     @ColumnInfo(name = "imageUrl") val imageUrl: String?,
-    @ColumnInfo(name = "insertion_order") val insertionOrder: Long
+    @ColumnInfo(name = "insertion_order") val insertionOrder: Int
 )

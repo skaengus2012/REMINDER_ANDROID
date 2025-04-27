@@ -95,6 +95,7 @@ private inline fun <reified T : KotlinBaseExtension> Project.configureKotlin(
             "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
             "-opt-in=kotlinx.coroutines.FlowPreview",
             "-opt-in=kotlin.Experimental",
+            "-opt-in=kotlin.concurrent.atomics.ExperimentalAtomicApi",
             /**
              * Remove this args after Phase 3.
              * https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-consistent-copy-visibility/#deprecation-timeline

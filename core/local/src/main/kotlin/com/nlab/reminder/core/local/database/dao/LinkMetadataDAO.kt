@@ -32,8 +32,8 @@ abstract class LinkMetadataDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     protected abstract suspend fun insertOrReplace(entity: LinkMetadataEntity)
 
-    @Query("SELECT insertion_order FROM link_metadata ORDER BY insertion_order DESC LIMIT 1")
-    protected abstract suspend fun getMaxInsertionOrder(): Long?
+    @Query("SELECT link FROM link_metadata ORDER BY insertion_order")
+    protected abstract suspend fun getAllSortedLinks(): Array<String>
 
     @Query("SELECT count(*) FROM link_metadata")
     protected abstract suspend fun getTotalCount(): Int
@@ -44,6 +44,9 @@ abstract class LinkMetadataDAO {
     suspend fun findByLinks(links: Set<NonBlankString>): Array<LinkMetadataEntity> =
         if (links.isEmpty()) emptyArray()
         else findByLinksInternal(links.toSet { it.value })
+
+    @Query("UPDATE link_metadata SET insertion_order = :insertionOrder WHERE link = :link")
+    protected abstract suspend fun updateInsertionOrder(link: String, insertionOrder: Int)
 
     @Query(
         """
@@ -61,11 +64,12 @@ abstract class LinkMetadataDAO {
 
     @Transaction
     open suspend fun insertAndGet(metadataDTO: LinkMetadataDTO): LinkMetadataEntity {
+        // insert
         val newEntity = LinkMetadataEntity(
             link = metadataDTO.link.value,
             title = metadataDTO.title?.value,
             imageUrl = metadataDTO.imageUrl?.value,
-            insertionOrder = (getMaxInsertionOrder() ?: -1) + 1
+            insertionOrder = Int.MAX_VALUE
         )
         insertOrReplace(newEntity)
 
@@ -73,6 +77,11 @@ abstract class LinkMetadataDAO {
         val curCount: Int = getTotalCount()
         if (curCount > MAX_CACHE_COUNT) {
             deleteOldestBy(count = curCount - MAX_CACHE_COUNT)
+        }
+
+        // re-order insertion order
+        getAllSortedLinks().forEachIndexed { index, link ->
+            updateInsertionOrder(link = link, insertionOrder = index + 1)
         }
 
         return newEntity
