@@ -20,8 +20,8 @@ import kotlinx.coroutines.flow.Flow
 import com.nlab.reminder.core.kotlin.Result
 import com.nlab.reminder.core.data.model.Tag
 import com.nlab.reminder.core.data.model.TagId
-import com.nlab.reminder.core.data.model.TagUsage
 import com.nlab.reminder.core.kotlin.NonBlankString
+import com.nlab.reminder.core.kotlin.NonNegativeInt
 
 /**
  * @author Doohyun
@@ -29,8 +29,8 @@ import com.nlab.reminder.core.kotlin.NonBlankString
 interface TagRepository {
     suspend fun save(query: SaveTagQuery): Result<Tag>
     suspend fun delete(id: TagId): Result<Unit>
+    suspend fun getUsageCount(tagId: TagId): Result<NonNegativeInt>
     fun getTagsAsStream(query: GetTagQuery): Flow<Set<Tag>>
-    fun getTagUsagesAsStream(query: GetTagUsageQuery): Flow<Set<TagUsage>>
 }
 
 sealed class SaveTagQuery private constructor() {
@@ -39,9 +39,6 @@ sealed class SaveTagQuery private constructor() {
 }
 
 sealed class GetTagQuery private constructor() {
+    data object OnlyUsed : GetTagQuery()
     data class ByIds(val tagIds: Set<TagId>) : GetTagQuery()
-}
-
-sealed class GetTagUsageQuery private constructor() {
-    data object All : GetTagUsageQuery()
 }

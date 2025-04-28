@@ -16,11 +16,8 @@
 
 package com.nlab.reminder.core.data.model
 
-import com.nlab.reminder.core.kotlin.collections.toSet
 import com.nlab.reminder.core.local.database.model.TagEntity
 import com.nlab.reminder.core.kotlin.toNonBlankString
-import com.nlab.reminder.core.kotlin.tryToNonNegativeIntOrZero
-import com.nlab.reminder.core.local.database.model.ScheduleTagListEntity
 
 /**
  * @author Doohyun
@@ -29,19 +26,3 @@ internal fun Tag(entity: TagEntity): Tag = Tag(
     id = TagId(entity.tagId),
     name = entity.name.toNonBlankString()
 )
-
-@Suppress("FunctionName")
-internal fun TagUsages(
-    tagEntities: Array<TagEntity>,
-    scheduleTagListEntities: Array<ScheduleTagListEntity>
-): Set<TagUsage> {
-    val tagIdToUsageCountTable = scheduleTagListEntities
-        .groupingBy(ScheduleTagListEntity::tagId)
-        .eachCount()
-    return tagEntities.toSet { tagEntity ->
-        TagUsage(
-            tag = Tag(tagEntity),
-            usageCount = tagIdToUsageCountTable[tagEntity.tagId].tryToNonNegativeIntOrZero()
-        )
-    }
-}

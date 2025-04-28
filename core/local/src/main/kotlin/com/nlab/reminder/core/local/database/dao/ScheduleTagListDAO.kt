@@ -29,27 +29,23 @@ abstract class ScheduleTagListDAO {
     abstract suspend fun insert(entities: Set<ScheduleTagListEntity>)
 
     @Query("SELECT DISTINCT tag_id FROM schedule_tag_list")
-    abstract suspend fun getTagIds(): Array<Long>
+    abstract suspend fun getAllTagIds(): List<Long>
+
+    @Query("SELECT DISTINCT tag_id FROM schedule_tag_list")
+    abstract fun getAllTagIdsAsStream(): Flow<List<Long>>
 
     @Query("SELECT COUNT(schedule_id) FROM schedule_tag_list WHERE tag_id = :tagId")
-    abstract suspend fun findTagUsageCount(tagId: Long): Long
+    abstract suspend fun findScheduleIdCountByTagId(tagId: Long): Int
 
     @Query("SELECT schedule_id FROM schedule_tag_list WHERE tag_id = :tagId")
-    abstract suspend fun findScheduleIdsByTagId(tagId: Long): Array<Long>
+    abstract suspend fun findScheduleIdsByTagId(tagId: Long): List<Long>
 
     @Query("SELECT * FROM schedule_tag_list WHERE schedule_id IN (:scheduleIds)")
-    protected abstract fun findByScheduleIdsAsStreamInternal(scheduleIds: Set<Long>): Flow<Array<ScheduleTagListEntity>>
+    protected abstract fun findByScheduleIdsAsStreamInternal(scheduleIds: Set<Long>): Flow<List<ScheduleTagListEntity>>
 
-    fun findByScheduleIdsAsStream(scheduleIds: Set<Long>): Flow<Array<ScheduleTagListEntity>> =
-        if (scheduleIds.isEmpty()) flowOf(emptyArray())
+    fun findByScheduleIdsAsStream(scheduleIds: Set<Long>): Flow<List<ScheduleTagListEntity>> =
+        if (scheduleIds.isEmpty()) flowOf(emptyList())
         else findByScheduleIdsAsStreamInternal(scheduleIds)
-
-    @Query("SELECT * FROM schedule_tag_list WHERE tag_id IN (:tagIds)")
-    protected abstract fun findByTagIdsAsStreamInternal(tagIds: Set<Long>): Flow<Array<ScheduleTagListEntity>>
-
-    fun findByTagIdsAsStream(tagIds: Set<Long>): Flow<Array<ScheduleTagListEntity>> =
-        if (tagIds.isEmpty()) flowOf(emptyArray())
-        else findByTagIdsAsStreamInternal(tagIds)
 
     @Query("DELETE FROM schedule_tag_list WHERE schedule_id = :scheduleId")
     abstract suspend fun deleteByScheduleId(scheduleId: Long)

@@ -46,13 +46,13 @@ abstract class TagDAO {
     abstract suspend fun findByName(tagName: String): TagEntity?
 
     @Query("SELECT * FROM tag")
-    abstract fun getAsStream(): Flow<Array<TagEntity>>
+    abstract fun getAsStream(): Flow<List<TagEntity>>
 
     @Query("SELECT * FROM tag WHERE tag_id IN (:tagIds)")
-    protected abstract fun findByIdsAsStreamInternal(tagIds: Set<Long>): Flow<Array<TagEntity>>
+    protected abstract fun findByIdsAsStreamInternal(tagIds: Set<Long>): Flow<List<TagEntity>>
 
-    fun findByIdsAsStream(tagIds: Set<Long>): Flow<Array<TagEntity>> =
-        if (tagIds.isEmpty()) flowOf(emptyArray())
+    fun findByIdsAsStream(tagIds: Set<Long>): Flow<List<TagEntity>> =
+        if (tagIds.isEmpty()) flowOf(emptyList())
         else findByIdsAsStreamInternal(tagIds)
 
     @Update

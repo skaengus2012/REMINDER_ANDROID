@@ -33,8 +33,7 @@ class DeleteUnusedTagsTransaction @Inject internal constructor(
 ) {
     suspend operator fun invoke() {
         transactionScope.runIn {
-            val unusedTagIds = scheduleTagListDAO.getTagIds()
-            tagDAO.deleteByNotInIds(tagIds = unusedTagIds.toSet())
+            tagDAO.deleteByNotInIds(tagIds = scheduleTagListDAO.getAllTagIds().toSet())
         }
     }
 }

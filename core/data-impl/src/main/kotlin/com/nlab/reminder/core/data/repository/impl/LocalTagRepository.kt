@@ -18,19 +18,18 @@ package com.nlab.reminder.core.data.repository.impl
 
 import com.nlab.reminder.core.data.model.Tag
 import com.nlab.reminder.core.data.model.TagId
-import com.nlab.reminder.core.data.model.TagUsage
-import com.nlab.reminder.core.data.model.TagUsages
 import com.nlab.reminder.core.data.repository.GetTagQuery
-import com.nlab.reminder.core.data.repository.GetTagUsageQuery
 import com.nlab.reminder.core.data.repository.SaveTagQuery
 import com.nlab.reminder.core.data.repository.TagRepository
+import com.nlab.reminder.core.kotlin.NonNegativeInt
 import com.nlab.reminder.core.kotlinx.coroutine.flow.map
 import com.nlab.reminder.core.kotlin.Result
 import com.nlab.reminder.core.kotlin.catching
 import com.nlab.reminder.core.kotlin.collections.toSet
 import com.nlab.reminder.core.kotlin.map
+import com.nlab.reminder.core.kotlin.toNonNegativeInt
 import com.nlab.reminder.core.kotlin.trim
-import com.nlab.reminder.core.kotlinx.coroutine.flow.flatMapLatest
+import com.nlab.reminder.core.kotlinx.coroutine.flow.combine
 import com.nlab.reminder.core.local.database.dao.ScheduleTagListDAO
 import com.nlab.reminder.core.local.database.dao.TagDAO
 import com.nlab.reminder.core.local.database.model.TagEntity
@@ -65,24 +64,29 @@ class LocalTagRepository(
         tagDAO.deleteById(id.rawId)
     }
 
-    override fun getTagsAsStream(query: GetTagQuery): Flow<Set<Tag>> {
-        val entitiesFlow: Flow<Array<TagEntity>> = when (query) {
-            is GetTagQuery.ByIds -> {
-                tagDAO.findByIdsAsStream(query.tagIds.toSet(TagId::rawId))
-            }
-        }
-        return entitiesFlow.distinctUntilChanged().map { entities -> entities.toSet(::Tag) }
+    override suspend fun getUsageCount(tagId: TagId): Result<NonNegativeInt> = catching {
+        scheduleTagListDAO
+            .findScheduleIdCountByTagId(tagId = tagId.rawId)
+            .toNonNegativeInt()
     }
 
-    override fun getTagUsagesAsStream(query: GetTagUsageQuery): Flow<Set<TagUsage>> {
-        val tagEntitiesFlow = when (query) {
-            is GetTagUsageQuery.All -> tagDAO.getAsStream()
+    override fun getTagsAsStream(query: GetTagQuery): Flow<Set<Tag>> {
+        val entitiesFlow: Flow<List<TagEntity>> = when (query) {
+            is GetTagQuery.OnlyUsed -> {
+                combine(
+                    tagDAO.getAsStream().distinctUntilChanged(),
+                    scheduleTagListDAO.getAllTagIdsAsStream().distinctUntilChanged(),
+                    transform = { tagEntities, usedTagIds ->
+                        val usedTagIdsSet = usedTagIds.toSet()
+                        tagEntities.filter { it.tagId in usedTagIdsSet }
+                    }
+                ).distinctUntilChanged()
+            }
+
+            is GetTagQuery.ByIds -> {
+                tagDAO.findByIdsAsStream(query.tagIds.toSet(TagId::rawId)).distinctUntilChanged()
+            }
         }
-        return tagEntitiesFlow.distinctUntilChanged().flatMapLatest { tagEntities ->
-            scheduleTagListDAO
-                .findByTagIdsAsStream(tagIds = tagEntities.toSet(TagEntity::tagId))
-                .distinctUntilChanged()
-                .map { scheduleTagListEntities -> TagUsages(tagEntities, scheduleTagListEntities) }
-        }
+        return entitiesFlow.map { entities -> entities.toSet(::Tag) }
     }
 }

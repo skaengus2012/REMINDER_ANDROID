@@ -202,7 +202,7 @@ internal class LocalScheduleRepositoryTest {
             },
             scheduleTagListDAO = mockk {
                 every { findByScheduleIdsAsStream(scheduleIds = setOf(schedule.id.rawId)) } returns flowOf(
-                    entity.scheduleTagListEntities.toTypedArray()
+                    entity.scheduleTagListEntities.toList()
                 )
             }
         )
@@ -230,9 +230,7 @@ internal class LocalScheduleRepositoryTest {
                 every { getAsStream() } returns flowOf(mapOf(entity.scheduleEntity to entity.repeatDetailEntities))
             },
             scheduleTagListDAO = mockk {
-                every { findByScheduleIdsAsStream(scheduleIds = setOf(schedule.id.rawId)) } returns flowOf(
-                    emptyArray()
-                )
+                every { findByScheduleIdsAsStream(scheduleIds = setOf(schedule.id.rawId)) } returns flowOf(emptyList())
             }
         )
         val result = repository
@@ -258,7 +256,7 @@ internal class LocalScheduleRepositoryTest {
             },
             scheduleTagListDAO = mockk {
                 every { findByScheduleIdsAsStream(scheduleIds = setOf(schedule.id.rawId)) } returns flowOf(
-                    entity.scheduleTagListEntities.toTypedArray()
+                    entity.scheduleTagListEntities.toList()
                 )
             }
         )

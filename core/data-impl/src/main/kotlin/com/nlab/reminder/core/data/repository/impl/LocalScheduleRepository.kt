@@ -112,7 +112,7 @@ class LocalScheduleRepository(
     override fun getSchedulesAsStream(request: GetScheduleQuery): Flow<Set<Schedule>> {
         fun transformSchedules(
             scheduleToRepeatDetailEntitiesTable: Map<ScheduleEntity, Set<RepeatDetailEntity>>,
-            scheduleTagListEntities: Array<ScheduleTagListEntity>
+            scheduleTagListEntities: List<ScheduleTagListEntity>
         ): Set<Schedule> {
             val scheduleIdToEntityTable = scheduleTagListEntities.groupBy { it.scheduleId }
             return scheduleToRepeatDetailEntitiesTable.entries.toSet { (scheduleEntity, repeatDetailEntities) ->

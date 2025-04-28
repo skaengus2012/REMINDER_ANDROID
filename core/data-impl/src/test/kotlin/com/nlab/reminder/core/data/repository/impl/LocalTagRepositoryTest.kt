@@ -18,7 +18,9 @@ package com.nlab.reminder.core.data.repository.impl
 
 import com.nlab.reminder.core.data.model.*
 import com.nlab.reminder.core.data.repository.*
+import com.nlab.reminder.core.kotlin.Result
 import com.nlab.reminder.core.kotlin.collections.toSet
+import com.nlab.reminder.core.kotlin.faker.genNonNegativeInt
 import com.nlab.reminder.core.kotlin.getOrThrow
 import com.nlab.reminder.core.kotlin.isSuccess
 import com.nlab.reminder.core.kotlin.toNonBlankString
@@ -98,7 +100,67 @@ class LocalTagRepositoryTest {
     }
 
     @Test
-    fun `Given tagIds based query, When collect tags, Then return all matching tags from dao`() = runTest {
+    fun `Given tagId, When getting usage count, Then returns correct count`() = runTest {
+        // Given
+        val tagId = genTagId()
+        val expectedUsageCount = genNonNegativeInt()
+
+        // When
+        val scheduleTagListDAO: ScheduleTagListDAO = mockk {
+            coEvery { findScheduleIdCountByTagId(tagId.rawId) } returns expectedUsageCount.value
+        }
+        val repository = genLocalTagRepository(scheduleTagListDAO = scheduleTagListDAO)
+        val actualUsageCount = repository.getUsageCount(tagId)
+
+        // Then
+        assertThat(
+            actualUsageCount,
+            equalTo(Result.Success(expectedUsageCount))
+        )
+    }
+
+    @Test
+    fun `Given used tags exist, When querying OnlyUsed, Then only used tags are returned`() = runTest {
+        // Given
+        val tagAndEntities = genTagAndEntities()
+        val query = GetTagQuery.OnlyUsed
+
+        // When
+        val tagDAO: TagDAO = mockk {
+            every { getAsStream() } returns flowOf(tagAndEntities.map { (_, entity) -> entity })
+        }
+        val scheduleTagListDAO: ScheduleTagListDAO = mockk {
+            every { getAllTagIdsAsStream() } returns flowOf(tagAndEntities.map { (tag) -> tag.id.rawId })
+        }
+        val repository = genLocalTagRepository(tagDAO = tagDAO, scheduleTagListDAO = scheduleTagListDAO)
+        val actualTags = repository.getTagsAsStream(query).first()
+
+        // Then
+        assertThat(actualTags, equalTo(tagAndEntities.toSet { it.first }))
+    }
+
+    @Test
+    fun `Given no used tags, When querying OnlyUsed, Then returns empty set`() = runTest {
+        // Given
+        val tagAndEntities = genTagAndEntities()
+        val query = GetTagQuery.OnlyUsed
+
+        // When
+        val tagDAO: TagDAO = mockk {
+            every { getAsStream() } returns flowOf(tagAndEntities.map { (_, entity) -> entity })
+        }
+        val scheduleTagListDAO: ScheduleTagListDAO = mockk {
+            every { getAllTagIdsAsStream() } returns flowOf(emptyList())
+        }
+        val repository = genLocalTagRepository(tagDAO = tagDAO, scheduleTagListDAO = scheduleTagListDAO)
+        val actualTagUsages = repository.getTagsAsStream(query).first()
+
+        // Then
+        assertThat(actualTagUsages, equalTo(emptySet()))
+    }
+
+    @Test
+    fun `Given tagIds and entities, When querying by ids, Then returns matching tags`() = runTest {
         // Given
         val tagAndEntities = genTagAndEntities()
         val tagIds = tagAndEntities.toSet { (tag) -> tag.id }
@@ -108,40 +170,13 @@ class LocalTagRepositoryTest {
 
         // When
         val tagDAO: TagDAO = mockk {
-            val resultEntities = tagAndEntities.map { (_, entity) -> entity }.toTypedArray()
-            every { findByIdsAsStream(rawTagIds) } returns flowOf(resultEntities)
+            every { findByIdsAsStream(rawTagIds) } returns flowOf(tagAndEntities.map { (_, entity) -> entity })
         }
         val repository = genLocalTagRepository(tagDAO = tagDAO)
         val actualTags = repository.getTagsAsStream(query).first()
 
         // Then
         assertThat(actualTags, equalTo(expectedTags))
-    }
-
-    @Test
-    fun `Given all query, When collect tagUsages, Then return tagUsages from dao`() = runTest {
-        // Given
-        val tagAndEntities = genTagAndEntities()
-        val expectedTagUsages = genTagUsages(tags = tagAndEntities.map { it.first })
-        val rawTagIds = tagAndEntities.toSet { (tag) -> tag.id.rawId }
-        val query = GetTagUsageQuery.All
-
-        // When
-        val tagDAO: TagDAO = mockk {
-            every { getAsStream() } returns flowOf(tagAndEntities.map { (_, entity) -> entity }.toTypedArray())
-        }
-        val scheduleTagListDAO: ScheduleTagListDAO = mockk {
-            every { findByTagIdsAsStream(rawTagIds) } returns flowOf(
-                expectedTagUsages
-                    .toScheduleTagListEntities()
-                    .toTypedArray()
-            )
-        }
-        val repository = genLocalTagRepository(tagDAO = tagDAO, scheduleTagListDAO = scheduleTagListDAO)
-        val actualTagUsages = repository.getTagUsagesAsStream(query).first()
-
-        // Then
-        assertThat(actualTagUsages, equalTo(expectedTagUsages))
     }
 }
 
