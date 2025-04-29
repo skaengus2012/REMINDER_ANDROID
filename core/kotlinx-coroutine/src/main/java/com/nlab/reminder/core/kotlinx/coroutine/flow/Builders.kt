@@ -26,8 +26,3 @@ import kotlinx.coroutines.flow.channelFlow as kotlinxChannelFlow
  */
 @OptIn(ExperimentalTypeInference::class)
 fun <T> channelFlow(@BuilderInference block: ProducerScope<T>.() -> Unit): Flow<T> = kotlinxChannelFlow(block)
-
-@OptIn(ExperimentalTypeInference::class)
-fun <T> channelFlowSuspend(
-    @BuilderInference block: suspend ProducerScope<T>.() -> Unit
-): Flow<T> = kotlinxChannelFlow(block)
