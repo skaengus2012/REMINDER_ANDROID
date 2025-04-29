@@ -23,6 +23,7 @@ import androidx.room.Query
 import androidx.room.Transaction
 import com.nlab.reminder.core.kotlin.NonBlankString
 import com.nlab.reminder.core.kotlin.collections.toSet
+import com.nlab.reminder.core.local.database.model.LinkMetadataDTO
 import com.nlab.reminder.core.local.database.model.LinkMetadataEntity
 
 private const val MAX_CACHE_COUNT = 1000
@@ -33,16 +34,16 @@ abstract class LinkMetadataDAO {
     protected abstract suspend fun insertOrReplace(entity: LinkMetadataEntity)
 
     @Query("SELECT link FROM link_metadata ORDER BY insertion_order")
-    protected abstract suspend fun getAllSortedLinks(): Array<String>
+    protected abstract suspend fun getAllSortedLinks(): List<String>
 
     @Query("SELECT count(*) FROM link_metadata")
     protected abstract suspend fun getTotalCount(): Int
 
     @Query("SELECT * FROM link_metadata WHERE link IN (:links)")
-    protected abstract suspend fun findByLinksInternal(links: Set<String>): Array<LinkMetadataEntity>
+    protected abstract suspend fun findByLinksInternal(links: Set<String>): List<LinkMetadataEntity>
 
-    suspend fun findByLinks(links: Set<NonBlankString>): Array<LinkMetadataEntity> =
-        if (links.isEmpty()) emptyArray()
+    suspend fun findByLinks(links: Set<NonBlankString>): List<LinkMetadataEntity> =
+        if (links.isEmpty()) emptyList()
         else findByLinksInternal(links.toSet { it.value })
 
     @Query("UPDATE link_metadata SET insertion_order = :insertionOrder WHERE link = :link")
@@ -87,9 +88,3 @@ abstract class LinkMetadataDAO {
         return newEntity
     }
 }
-
-data class LinkMetadataDTO(
-    val link: NonBlankString,
-    val title: NonBlankString?,
-    val imageUrl: NonBlankString?
-)

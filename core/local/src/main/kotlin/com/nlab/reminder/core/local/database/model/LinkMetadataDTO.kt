@@ -14,24 +14,15 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.local.database.dao
+package com.nlab.reminder.core.local.database.model
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.Query
-import com.nlab.reminder.core.local.database.model.RepeatDetailEntity
+import com.nlab.reminder.core.kotlin.NonBlankString
 
 /**
  * @author Thalys
  */
-@Dao
-abstract class RepeatDetailDAO {
-    @Insert
-    internal abstract suspend fun insert(entities: List<RepeatDetailEntity>)
-
-    @Query("SELECT * FROM repeat_detail WHERE schedule_id = :scheduleId")
-    internal abstract suspend fun findByScheduleId(scheduleId: Long): List<RepeatDetailEntity>
-
-    @Query("DELETE FROM repeat_detail WHERE schedule_id = :scheduleId")
-    internal abstract suspend fun deleteByScheduleId(scheduleId: Long)
-}
+data class LinkMetadataDTO(
+    val link: NonBlankString,
+    val title: NonBlankString?,
+    val imageUrl: NonBlankString?
+)

@@ -70,7 +70,7 @@ internal class InsertAndGetScheduleExtra @Inject constructor(
         if (repeatDetailDTOs.isEmpty()) return emptySet()
 
         repeatDetailDAO.insert(
-            entities = repeatDetailDTOs.toSet { dto ->
+            entities = repeatDetailDTOs.map { dto ->
                 RepeatDetailEntity(
                     scheduleId = scheduleId,
                     propertyCode = dto.propertyCode,

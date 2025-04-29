@@ -1,6 +1,6 @@
 package com.nlab.reminder.core.data.model
 
-import com.nlab.reminder.core.local.database.dao.LinkMetadataDTO
+import com.nlab.reminder.core.local.database.model.LinkMetadataDTO
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test

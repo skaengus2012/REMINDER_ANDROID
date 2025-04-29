@@ -4,7 +4,6 @@ import app.cash.turbine.test
 import com.nlab.reminder.core.data.model.Link
 import com.nlab.reminder.core.data.model.LinkMetadata
 import com.nlab.reminder.core.data.model.genLinkAndMetadataAndEntity
-import com.nlab.reminder.core.data.model.genLinkMetadata
 import com.nlab.reminder.core.local.database.dao.LinkMetadataDAO
 import com.nlab.reminder.core.network.datasource.LinkThumbnailDataSource
 import com.nlab.reminder.core.kotlin.Result
@@ -64,7 +63,7 @@ class OfflineFirstLinkMetadataRepositoryTest {
         val (expectedLink, expectedMetadata, entity) = genLinkAndMetadataAndEntity()
         val linkMetadataRepository = genOfflineFirstLinkMetadataRepository(
             linkMetadataDAO = mockk(relaxed = true) {
-                coEvery { findByLinks(setOf(expectedLink.rawLink)) } returns arrayOf(entity)
+                coEvery { findByLinks(setOf(expectedLink.rawLink)) } returns listOf(entity)
             }
         )
 
@@ -104,7 +103,7 @@ class OfflineFirstLinkMetadataRepositoryTest {
 
 private fun genOfflineFirstLinkMetadataRepository(
     linkMetadataDAO: LinkMetadataDAO = mockk<LinkMetadataDAO>(relaxed = true) {
-        coEvery { findByLinks(any()) } returns emptyArray()
+        coEvery { findByLinks(any()) } returns emptyList()
     },
     remoteDataSource: LinkThumbnailDataSource = mockk<LinkThumbnailDataSource> {
         coEvery { getLinkThumbnail(any()) } returns Result.Failure(RuntimeException())
@@ -116,9 +115,4 @@ private fun genOfflineFirstLinkMetadataRepository(
     linkMetadataDAO = linkMetadataDAO,
     remoteDataSource = remoteDataSource,
     remoteCache = remoteCatch,
-)
-
-private fun genRemoteMetadata(linkMetadata: LinkMetadata): LinkMetadata = genLinkMetadata(
-    title = linkMetadata.title?.value + "_remote",
-    imageUrl = linkMetadata.imageUrl?.value + "_remote"
 )

@@ -17,7 +17,7 @@
 package com.nlab.reminder.core.data.model
 
 import com.nlab.reminder.core.kotlin.tryToNonBlankStringOrNull
-import com.nlab.reminder.core.local.database.dao.LinkMetadataDTO
+import com.nlab.reminder.core.local.database.model.LinkMetadataDTO
 import com.nlab.reminder.core.local.database.model.LinkMetadataEntity
 import com.nlab.reminder.core.network.datasource.LinkThumbnailResponse
 

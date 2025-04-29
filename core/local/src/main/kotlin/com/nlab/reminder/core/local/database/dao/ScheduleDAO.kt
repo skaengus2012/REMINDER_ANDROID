@@ -44,19 +44,19 @@ abstract class ScheduleDAO {
     protected abstract suspend fun delete(entity: ScheduleEntity)
 
     @Query("SELECT * FROM schedule WHERE is_complete = :isComplete")
-    protected abstract suspend fun findByComplete(isComplete: Boolean): Array<ScheduleEntity>
+    protected abstract suspend fun findByComplete(isComplete: Boolean): List<ScheduleEntity>
 
     @Query("SELECT schedule_id FROM schedule WHERE is_complete = :isComplete")
-    protected abstract suspend fun findIdsByComplete(isComplete: Boolean): Array<Long>
+    protected abstract suspend fun findIdsByComplete(isComplete: Boolean): List<Long>
 
     @Query("SELECT * FROM schedule WHERE schedule_id = :scheduleId")
     protected abstract suspend fun findById(scheduleId: Long): ScheduleEntity?
 
     @Query("SELECT * FROM schedule WHERE schedule_id IN (:scheduleIds)")
-    protected abstract suspend fun findByIdsInternal(scheduleIds: Set<Long>): Array<ScheduleEntity>
+    protected abstract suspend fun findByIdsInternal(scheduleIds: Set<Long>): List<ScheduleEntity>
 
-    private suspend fun findByIds(scheduleIds: Set<Long>): Array<ScheduleEntity> =
-        if (scheduleIds.isEmpty()) emptyArray()
+    private suspend fun findByIds(scheduleIds: Set<Long>): List<ScheduleEntity> =
+        if (scheduleIds.isEmpty()) emptyList()
         else findByIdsInternal(scheduleIds)
 
     @Query(
