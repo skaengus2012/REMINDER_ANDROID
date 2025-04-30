@@ -31,7 +31,6 @@ import com.nlab.reminder.core.local.database.dao.LinkMetadataDAO
 import com.nlab.reminder.core.network.datasource.LinkThumbnailDataSource
 import kotlinx.collections.immutable.persistentHashMapOf
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.channelFlow as channelFlowOrigin
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.onStart
@@ -46,9 +45,9 @@ class OfflineFirstLinkMetadataRepository(
     private val remoteDataSource: LinkThumbnailDataSource,
     private val remoteCache: LinkMetadataRemoteCache
 ) : LinkMetadataRepository {
-    override fun getLinkToMetadataTableAsStream(links: Set<Link>): Flow<Map<Link, LinkMetadata>> = channelFlowOrigin {
+    override fun getLinkToMetadataTableAsStream(links: Set<Link>): Flow<Map<Link, LinkMetadata>> = flow {
         val currentSnapshot = remoteCache.snapshot().filterKeys { it in links }
-        send(currentSnapshot)
+        emit(currentSnapshot)
 
         val missingLinks = links - currentSnapshot.keys
         if (missingLinks.isNotEmpty()) {
@@ -58,7 +57,7 @@ class OfflineFirstLinkMetadataRepository(
             ) { local, remote -> local + remote }
                 .distinctUntilChanged()
                 .filter { it.isNotEmpty() }
-                .collect { result -> send(element = currentSnapshot + result) }
+                .collect { result -> emit(currentSnapshot + result) }
         }
     }
 

@@ -3,6 +3,7 @@ package com.nlab.reminder.core.data.repository.impl
 import app.cash.turbine.test
 import com.nlab.reminder.core.data.model.Link
 import com.nlab.reminder.core.data.model.LinkMetadata
+import com.nlab.reminder.core.data.model.genLink
 import com.nlab.reminder.core.data.model.genLinkAndMetadataAndEntity
 import com.nlab.reminder.core.local.database.dao.LinkMetadataDAO
 import com.nlab.reminder.core.network.datasource.LinkThumbnailDataSource
@@ -55,6 +56,27 @@ class OfflineFirstLinkMetadataRepositoryTest {
         )
         coVerify(exactly = 0) { linkMetadataDAO.findByLinks(any()) }
         coVerify(exactly = 0) { remoteDataSource.getLinkThumbnail(any()) }
+    }
+
+    @Test
+    fun `Given no data, When collected stream, Then return emptyMap once`() = runTest {
+        val linkMetadataRepository = genOfflineFirstLinkMetadataRepository(
+            linkMetadataDAO = mockk {
+                coEvery { findByLinks(any()) } returns emptyList()
+            },
+            remoteDataSource = mockk {
+                coEvery { getLinkThumbnail(any()) } returns Result.Failure(RuntimeException())
+            },
+            remoteCatch = mockk {
+                every { snapshot() } returns emptyMap()
+            }
+        )
+
+        linkMetadataRepository.getLinkToMetadataTableAsStream(setOf(genLink())).test {
+            // then
+            assertThat(awaitItem(), equalTo(emptyMap()))
+            awaitComplete()
+        }
     }
 
     @Test
