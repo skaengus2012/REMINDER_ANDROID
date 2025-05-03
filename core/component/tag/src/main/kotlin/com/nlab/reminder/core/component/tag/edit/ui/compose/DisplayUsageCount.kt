@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 The N's lab Open Source Project
+ * Copyright (C) 2025 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.component.tag.ui
+package com.nlab.reminder.core.component.tag.edit.ui.compose
 
-import com.nlab.reminder.core.kotlin.NonNegativeLong
+import com.nlab.reminder.core.kotlin.NonNegativeInt
 
 /**
  * @author Doohyun
@@ -24,9 +24,9 @@ import com.nlab.reminder.core.kotlin.NonNegativeLong
 private const val MAX_PRESENTABLE_USAGE_COUNT = 1_000
 
 internal inline fun getUsageCountLabel(
-    usageCount: NonNegativeLong,
+    usageCount: NonNegativeInt,
     transform: (count: Int) -> String,
     transformWhenOverflow: (count: Int) -> String
 ): String =
-    if (usageCount.value <= MAX_PRESENTABLE_USAGE_COUNT) transform(usageCount.value.toInt())
+    if (usageCount.value <= MAX_PRESENTABLE_USAGE_COUNT) transform(usageCount.value)
     else transformWhenOverflow(MAX_PRESENTABLE_USAGE_COUNT)

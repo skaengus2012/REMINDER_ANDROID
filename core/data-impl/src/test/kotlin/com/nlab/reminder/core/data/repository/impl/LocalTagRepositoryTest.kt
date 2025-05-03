@@ -26,7 +26,7 @@ import com.nlab.reminder.core.kotlin.isSuccess
 import com.nlab.reminder.core.kotlin.toNonBlankString
 import com.nlab.reminder.core.local.database.dao.ScheduleTagListDAO
 import com.nlab.reminder.core.local.database.dao.TagDAO
-import com.nlab.reminder.core.local.database.transaction.UpdateOrReplaceAndGetTagTransaction
+import com.nlab.reminder.core.local.database.transaction.UpdateOrMergeAndGetTagTransaction
 import com.nlab.testkit.faker.genBothify
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -64,23 +64,44 @@ class LocalTagRepositoryTest {
     }
 
     @Test
-    fun `Given modify query, When save, Then updateOrReplace trimmed text and return updated tag`() = runTest {
+    fun `Given modify query with not merge, When save, Then update trimmed text and return updated tag`() = runTest {
         // Given
         val inputTagId = genTagId()
         val inputName = genBothify(" ?# ")
         val trimmedName = inputName.trim().toNonBlankString()
         val (expectedTag, entity) = genTagAndEntity(genTag(id = inputTagId, name = trimmedName))
-        val query = SaveTagQuery.Modify(id = inputTagId, name = inputName.toNonBlankString())
+        val query = SaveTagQuery.Modify(id = inputTagId, name = inputName.toNonBlankString(), shouldMergeIfExists = false)
 
         // When
-        val updateOrReplaceAndGetTagTransaction: UpdateOrReplaceAndGetTagTransaction = mockk {
-            coEvery { invoke(tagId = inputTagId.rawId, name = trimmedName) } returns entity
+        val tagDAO: TagDAO = mockk {
+            coEvery { updateAndGet(inputTagId.rawId, trimmedName) } returns entity
         }
-        val repository = genLocalTagRepository(updateOrReplaceAndGetTag = updateOrReplaceAndGetTagTransaction)
+        val repository = genLocalTagRepository(tagDAO = tagDAO)
         val actualTag = repository.save(query)
 
         // Then
-        coVerify(exactly = 1) { updateOrReplaceAndGetTagTransaction.invoke(inputTagId.rawId, trimmedName) }
+        coVerify(exactly = 1) { tagDAO.updateAndGet(inputTagId.rawId, trimmedName) }
+        assertThat(actualTag.getOrThrow(), equalTo(expectedTag))
+    }
+
+    @Test
+    fun `Given modify query with merge, When save, Then update or merge trimmed text, return updated tag`() = runTest {
+        // Given
+        val inputTagId = genTagId()
+        val inputName = genBothify(" ?# ")
+        val trimmedName = inputName.trim().toNonBlankString()
+        val (expectedTag, entity) = genTagAndEntity(genTag(id = inputTagId, name = trimmedName))
+        val query = SaveTagQuery.Modify(id = inputTagId, name = inputName.toNonBlankString(), shouldMergeIfExists = true)
+
+        // When
+        val updateOrMergeAndGetTagTransaction: UpdateOrMergeAndGetTagTransaction = mockk {
+            coEvery { invoke(tagId = inputTagId.rawId, name = trimmedName) } returns entity
+        }
+        val repository = genLocalTagRepository(updateOrMergeAndGetTag = updateOrMergeAndGetTagTransaction)
+        val actualTag = repository.save(query)
+
+        // Then
+        coVerify(exactly = 1) { updateOrMergeAndGetTagTransaction.invoke(inputTagId.rawId, trimmedName) }
         assertThat(actualTag.getOrThrow(), equalTo(expectedTag))
     }
 
@@ -183,5 +204,5 @@ class LocalTagRepositoryTest {
 private fun genLocalTagRepository(
     tagDAO: TagDAO = mockk(),
     scheduleTagListDAO: ScheduleTagListDAO = mockk(),
-    updateOrReplaceAndGetTag: UpdateOrReplaceAndGetTagTransaction = mockk()
-) = LocalTagRepository(tagDAO, scheduleTagListDAO, updateOrReplaceAndGetTag)
+    updateOrMergeAndGetTag: UpdateOrMergeAndGetTagTransaction = mockk()
+) = LocalTagRepository(tagDAO, scheduleTagListDAO, updateOrMergeAndGetTag)

@@ -43,7 +43,7 @@ internal class HomeViewModel @Inject constructor(
         bootstrap = combineBootstrap(
             StateSyncFlow(environment)
                 .collectAsBootstrap(),
-            environment.tagEditDelegate
+            environment.tagEditStateMachine
                 .state
                 .map(HomeAction::TagEditStateSynced)
                 .collectAsBootstrap(started = DeliveryStarted.Eagerly)

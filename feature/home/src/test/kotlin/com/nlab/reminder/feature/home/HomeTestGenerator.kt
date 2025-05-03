@@ -16,7 +16,7 @@
 
 package com.nlab.reminder.feature.home
 
-import com.nlab.reminder.core.component.tag.edit.TagEditDelegate
+import com.nlab.reminder.core.component.tag.edit.TagEditStateMachine
 import com.nlab.reminder.core.component.tag.edit.genTagEditState
 import com.nlab.reminder.core.data.model.Tag
 import com.nlab.reminder.core.data.model.genTags
@@ -33,11 +33,11 @@ import kotlin.reflect.KClass
  * @author Doohyun
  */
 internal fun genHomeEnvironment(
-    tagEditDelegate: TagEditDelegate = mock(),
+    tagEditStateMachine: TagEditStateMachine = mock(),
     scheduleRepository: ScheduleRepository = mock(),
     tagRepository: TagRepository = mock()
 ) = HomeEnvironment(
-    tagEditDelegate = tagEditDelegate,
+    tagEditStateMachine = tagEditStateMachine,
     scheduleRepository = scheduleRepository,
     tagRepository = tagRepository
 )

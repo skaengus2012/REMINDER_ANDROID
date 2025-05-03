@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 The N's lab Open Source Project
+ * Copyright (C) 2025 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.component.tag.ui.compose
+package com.nlab.reminder.core.component.tag.edit.ui.compose
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -60,14 +60,13 @@ import androidx.compose.ui.unit.dp
 import com.nlab.reminder.core.androidx.compose.ui.rememberDebouncedTextFieldValueState
 import com.nlab.reminder.core.androidx.compose.ui.throttleClick
 import com.nlab.reminder.core.androidx.compose.ui.tooling.preview.Previews
-import com.nlab.reminder.core.component.tag.ui.getUsageCountLabel
 import com.nlab.reminder.core.designsystem.compose.component.PlaneatDialog
 import com.nlab.reminder.core.designsystem.compose.theme.DrawableIds
 import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
 import com.nlab.reminder.core.kotlin.NonBlankString
-import com.nlab.reminder.core.kotlin.NonNegativeLong
+import com.nlab.reminder.core.kotlin.NonNegativeInt
 import com.nlab.reminder.core.kotlin.toNonBlankString
-import com.nlab.reminder.core.kotlin.toNonNegativeLong
+import com.nlab.reminder.core.kotlin.toNonNegativeInt
 import com.nlab.reminder.core.translation.PluralsIds
 import com.nlab.reminder.core.translation.StringIds
 import kotlinx.coroutines.delay
@@ -79,7 +78,7 @@ import kotlinx.coroutines.delay
 internal fun TagRenameDialog(
     value: String,
     tagName: NonBlankString,
-    usageCount: NonNegativeLong,
+    usageCount: NonNegativeInt,
     shouldKeyboardShown: Boolean,
     onTextChanged: (String) -> Unit,
     onCancel: () -> Unit,
@@ -127,7 +126,7 @@ private fun TagRenameTitle(modifier: Modifier = Modifier) {
 @Composable
 private fun TagRenameDescription(
     tagName: NonBlankString,
-    usageCount: NonNegativeLong,
+    usageCount: NonNegativeInt,
     modifier: Modifier = Modifier,
 ) {
     Text(
@@ -265,7 +264,7 @@ private fun TagRenameDialogPreview() {
             TagRenameDialog(
                 value = "Hello, TagRenameDialog!",
                 tagName = "Tag".toNonBlankString(),
-                usageCount = 5L.toNonNegativeLong(),
+                usageCount = 5.toNonNegativeInt(),
                 shouldKeyboardShown = false,
                 onTextChanged = {},
                 onCancel = {},

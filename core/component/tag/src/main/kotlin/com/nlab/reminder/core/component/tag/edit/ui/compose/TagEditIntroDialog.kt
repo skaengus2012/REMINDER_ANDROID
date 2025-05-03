@@ -16,7 +16,6 @@
 
 package com.nlab.reminder.core.component.tag.edit.ui.compose
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
@@ -127,7 +126,6 @@ private fun TagEditIntroDialogButton(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun BoxScope.TagEditIntroDialogButtonBackground(
     onClick: () -> Unit,

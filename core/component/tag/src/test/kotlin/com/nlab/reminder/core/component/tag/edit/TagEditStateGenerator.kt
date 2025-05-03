@@ -18,8 +18,8 @@ package com.nlab.reminder.core.component.tag.edit
 
 import com.nlab.reminder.core.data.model.Tag
 import com.nlab.reminder.core.data.model.genTag
-import com.nlab.reminder.core.kotlin.NonNegativeLong
-import com.nlab.reminder.core.kotlin.faker.genNonNegativeLong
+import com.nlab.reminder.core.kotlin.NonNegativeInt
+import com.nlab.reminder.core.kotlin.faker.genNonNegativeInt
 import com.nlab.testkit.faker.genBoolean
 import com.nlab.testkit.faker.genBothify
 import com.nlab.testkit.faker.genInt
@@ -31,7 +31,8 @@ import com.nlab.testkit.faker.requireSampleExcludeTypeOf
  */
 private val sampleTagEditStates: List<TagEditState>
     get() = listOf(
-        genIntroState(),
+        TagEditState.None,
+        genAwaitTaskSelectionState(),
         genRenameState(),
         genMergeState(),
         genDeleteState(),
@@ -50,22 +51,22 @@ fun genTagEditState(): TagEditState =
 internal inline fun <reified T : TagEditState> genTagEditStateExcludeTypeOf(): TagEditState =
     sampleTagEditStates.requireSampleExcludeTypeOf(listOf(T::class))
 
-fun genIntroState() = TagEditState.Intro(tag = genTag())
+fun genAwaitTaskSelectionState() = TagEditState.AwaitTaskSelection(tag = genTag())
 
 fun genRenameState(
     tag: Tag = genTag(),
-    usageCount: NonNegativeLong = genNonNegativeLong(),
+    usageCount: NonNegativeInt = genNonNegativeInt(),
     renameText: String = genBothify(),
     shouldUserInputReady: Boolean = genBoolean(),
 ) = TagEditState.Rename(tag, usageCount, renameText, shouldUserInputReady)
 
 fun genMergeState(
     from: Tag = genTag(),
-    fromUsageCount: NonNegativeLong = genNonNegativeLong(),
+    fromUsageCount: NonNegativeInt = genNonNegativeInt(),
     to: Tag = genTag(),
 ) = TagEditState.Merge(from, fromUsageCount, to)
 
 fun genDeleteState(
     tag: Tag = genTag(),
-    usageCount: NonNegativeLong = genNonNegativeLong(),
+    usageCount: NonNegativeInt = genNonNegativeInt(),
 ) = TagEditState.Delete(tag, usageCount)

@@ -18,19 +18,22 @@ package com.nlab.reminder.core.component.tag.edit
 
 import com.nlab.reminder.core.annotation.ExcludeFromGeneratedTestReport
 import com.nlab.reminder.core.data.model.Tag
-import com.nlab.reminder.core.kotlin.NonNegativeLong
+import com.nlab.reminder.core.kotlin.NonNegativeInt
 
 /**
  * @author Doohyun
  */
 sealed class TagEditState private constructor() {
     @ExcludeFromGeneratedTestReport
-    data class Intro(val tag: Tag) : TagEditState()
+    data object None : TagEditState()
+
+    @ExcludeFromGeneratedTestReport
+    data class AwaitTaskSelection(val tag: Tag) : TagEditState(), Processable
 
     @ExcludeFromGeneratedTestReport
     data class Rename(
         val tag: Tag,
-        val usageCount: NonNegativeLong,
+        val usageCount: NonNegativeInt,
         val renameText: String,
         val shouldUserInputReady: Boolean,
     ) : TagEditState(), Processable
@@ -38,14 +41,14 @@ sealed class TagEditState private constructor() {
     @ExcludeFromGeneratedTestReport
     data class Merge(
         val from: Tag,
-        val fromUsageCount: NonNegativeLong,
+        val fromUsageCount: NonNegativeInt,
         val to: Tag,
     ) : TagEditState(), Processable
 
     @ExcludeFromGeneratedTestReport
     data class Delete(
         val tag: Tag,
-        val usageCount: NonNegativeLong,
+        val usageCount: NonNegativeInt,
     ) : TagEditState(), Processable
 
     @ExcludeFromGeneratedTestReport

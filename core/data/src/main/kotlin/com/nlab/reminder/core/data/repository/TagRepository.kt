@@ -35,7 +35,7 @@ interface TagRepository {
 
 sealed class SaveTagQuery private constructor() {
     data class Add(val name: NonBlankString) : SaveTagQuery()
-    data class Modify(val id: TagId, val name: NonBlankString) : SaveTagQuery()
+    data class Modify(val id: TagId, val name: NonBlankString, val shouldMergeIfExists: Boolean) : SaveTagQuery()
 }
 
 sealed class GetTagQuery private constructor() {

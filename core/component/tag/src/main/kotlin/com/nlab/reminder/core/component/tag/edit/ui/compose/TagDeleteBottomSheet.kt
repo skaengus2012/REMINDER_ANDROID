@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 The N's lab Open Source Project
+ * Copyright (C) 2025 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.component.tag.ui.compose
+package com.nlab.reminder.core.component.tag.edit.ui.compose
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -39,13 +39,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.nlab.reminder.core.androidx.compose.ui.throttleClick
 import com.nlab.reminder.core.androidx.compose.ui.tooling.preview.Previews
-import com.nlab.reminder.core.component.tag.ui.getUsageCountLabel
 import com.nlab.reminder.core.designsystem.compose.component.PlaneatBottomSheet
 import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
 import com.nlab.reminder.core.kotlin.NonBlankString
-import com.nlab.reminder.core.kotlin.NonNegativeLong
+import com.nlab.reminder.core.kotlin.NonNegativeInt
 import com.nlab.reminder.core.kotlin.toNonBlankString
-import com.nlab.reminder.core.kotlin.toNonNegativeLong
+import com.nlab.reminder.core.kotlin.toNonNegativeInt
 import com.nlab.reminder.core.translation.PluralsIds
 import com.nlab.reminder.core.translation.StringIds
 import kotlinx.coroutines.launch
@@ -56,7 +55,7 @@ import kotlinx.coroutines.launch
 @Composable
 internal fun TagDeleteBottomSheet(
     tagNames: List<NonBlankString>,
-    usageCount: NonNegativeLong,
+    usageCount: NonNegativeInt,
     onConfirm: () -> Unit,
     onCancel: () -> Unit,
 ) {
@@ -88,7 +87,7 @@ internal fun TagDeleteBottomSheet(
 @Composable
 private fun TagDeleteBottomSheetContent(
     tagNames: List<NonBlankString>,
-    usageCount: NonNegativeLong,
+    usageCount: NonNegativeInt,
     onConfirm: () -> Unit,
     onCancel: () -> Unit,
     modifier: Modifier = Modifier
@@ -241,7 +240,7 @@ private fun TagEditDeleteBottomSheetContentPreview() {
         TagDeleteBottomSheetContent(
             modifier = Modifier.background(PlaneatTheme.colors.bgDialogSurface),
             tagNames = listOf("Hello, TagDeleteBottomSheet".toNonBlankString()),
-            usageCount = 5L.toNonNegativeLong(),
+            usageCount = 5.toNonNegativeInt(),
             onConfirm = {},
             onCancel = {},
         )
@@ -258,7 +257,7 @@ private fun TwoSizeTagEditDeleteBottomSheetContentPreview() {
                 "one".toNonBlankString(),
                 "two".toNonBlankString()
             ),
-            usageCount = 5L.toNonNegativeLong(),
+            usageCount = 5.toNonNegativeInt(),
             onConfirm = {},
             onCancel = {},
         )
@@ -278,7 +277,7 @@ private fun OtherSizeTagEditDeleteBottomSheetContentPreview() {
                 "four".toNonBlankString(),
                 "five".toNonBlankString()
             ),
-            usageCount = 5L.toNonNegativeLong(),
+            usageCount = 5.toNonNegativeInt(),
             onConfirm = {},
             onCancel = {},
         )

@@ -16,7 +16,7 @@
 
 package com.nlab.reminder.feature.home
 
-import com.nlab.reminder.core.component.tag.edit.TagEditDelegate
+import com.nlab.reminder.core.component.tag.edit.TagEditStateMachine
 import com.nlab.reminder.core.component.tag.edit.genTagEditState
 import com.nlab.reminder.core.data.model.genTag
 import com.nlab.reminder.core.kotlin.Result
@@ -81,13 +81,13 @@ class HomeReduceKtTest {
             action: HomeAction.TagEditStateSynced,
             mockVerifyMode: VerificationMode
         ) {
-            val tagEditDelegate: TagEditDelegate = mock()
-            genHomeReduce(environment = genHomeEnvironment(tagEditDelegate))
+            val tagEditStateMachine: TagEditStateMachine = mock()
+            genHomeReduce(environment = genHomeEnvironment(tagEditStateMachine))
                 .effectScenario()
                 .initState(HomeUiState.Loading)
                 .action(action)
                 .launchAndJoin()
-            verify(tagEditDelegate, mockVerifyMode).clearState()
+            verify(tagEditStateMachine, mockVerifyMode).clearState()
         }
 
         testTagEditStateSyncedWhenLoading(
@@ -102,13 +102,13 @@ class HomeReduceKtTest {
 
     @Test
     fun `Given loading, When sync tagEditStep as null, Then tagEditDelegate never invoked clearState`() = runTest {
-        val tagEditDelegate: TagEditDelegate = mock()
-        genHomeReduce(environment = genHomeEnvironment(tagEditDelegate))
+        val tagEditStateMachine: TagEditStateMachine = mock()
+        genHomeReduce(environment = genHomeEnvironment(tagEditStateMachine))
             .effectScenario()
             .initState(HomeUiState.Loading)
             .action(HomeAction.TagEditStateSynced(null))
             .launchAndJoin()
-        verify(tagEditDelegate, never()).clearState()
+        verify(tagEditStateMachine, never()).clearState()
     }
 
     @Test
@@ -128,13 +128,13 @@ class HomeReduceKtTest {
     @Test
     fun `Given success with empty or tag edit interaction, When sync exist tagEditStep, Then tagEditDelegate never invoked clearState`() = runTest {
         suspend fun testNeverCallClearState(initInteraction: HomeInteraction) {
-            val tagEditDelegate: TagEditDelegate = mock()
-            genHomeReduce(environment = genHomeEnvironment(tagEditDelegate))
+            val tagEditStateMachine: TagEditStateMachine = mock()
+            genHomeReduce(environment = genHomeEnvironment(tagEditStateMachine))
                 .effectScenario()
                 .initState(genHomeUiStateSuccess(interaction = initInteraction))
                 .action(HomeAction.TagEditStateSynced(genTagEditState()))
                 .launchAndJoin()
-            verify(tagEditDelegate, never()).clearState()
+            verify(tagEditStateMachine, never()).clearState()
         }
 
         testNeverCallClearState(initInteraction = HomeInteraction.Empty)
@@ -161,115 +161,115 @@ class HomeReduceKtTest {
 
     @Test
     fun `Given success with no interaction, When tag long clicked, Then TagEditDelegate invoke startEditing`() = runTest {
-        val tagEditDelegate: TagEditDelegate = mock()
-        genHomeReduce(environment = genHomeEnvironment(tagEditDelegate))
+        val tagEditStateMachine: TagEditStateMachine = mock()
+        genHomeReduce(environment = genHomeEnvironment(tagEditStateMachine))
             .effectScenario()
             .initState(genHomeUiStateSuccess(interaction = HomeInteraction.Empty))
             .action(HomeAction.OnTagLongClicked(genTag()))
             .launchAndJoin {
-                verify(tagEditDelegate, once()).startEditing(action.tag)
+                verify(tagEditStateMachine, once()).startEditing(action.tag)
             }
     }
 
     @Test
     fun `Given success with tagEdit interaction, When tag rename request clicked, Then tagEditDelegate called startRename`() = runTest {
-        val tagEditDelegate: TagEditDelegate = mock {
+        val tagEditStateMachine: TagEditStateMachine = mock {
             whenever(mock.startRename()) doReturn Result.Success(Unit)
         }
-        genHomeReduce(environment = genHomeEnvironment(tagEditDelegate))
+        genHomeReduce(environment = genHomeEnvironment(tagEditStateMachine))
             .effectScenario()
             .initState(genHomeUiStateSuccess(interaction = HomeInteraction.TagEdit(genTagEditState())))
             .action(HomeAction.OnTagRenameRequestClicked)
             .launchAndJoin()
-        verify(tagEditDelegate, once()).startRename()
+        verify(tagEditStateMachine, once()).startRename()
     }
 
     @Test
     fun `Given success with tagEdit interaction, When tag rename input ready, Then tagEditDelegate called readyRenameInput`() = runTest {
-        val tagEditDelegate: TagEditDelegate = mock()
-        genHomeReduce(environment = genHomeEnvironment(tagEditDelegate))
+        val tagEditStateMachine: TagEditStateMachine = mock()
+        genHomeReduce(environment = genHomeEnvironment(tagEditStateMachine))
             .effectScenario()
             .initState(genHomeUiStateSuccess(interaction = HomeInteraction.TagEdit(genTagEditState())))
             .action(HomeAction.OnTagRenameInputReady)
             .launchAndJoin()
-        verify(tagEditDelegate, once()).readyRenameInput()
+        verify(tagEditStateMachine, once()).readyRenameInput()
     }
 
     @Test
     fun `Given success with tagEdit interaction, When tag rename inputted, Then tagEditDelegate called changeRenameText`() = runTest {
-        val tagEditDelegate: TagEditDelegate = mock()
-        genHomeReduce(environment = genHomeEnvironment(tagEditDelegate))
+        val tagEditStateMachine: TagEditStateMachine = mock()
+        genHomeReduce(environment = genHomeEnvironment(tagEditStateMachine))
             .effectScenario()
             .initState(genHomeUiStateSuccess(interaction = HomeInteraction.TagEdit(genTagEditState())))
             .action(HomeAction.OnTagRenameInputted(genBothify()))
             .launchAndJoin {
-                verify(tagEditDelegate, once()).changeRenameText(action.text)
+                verify(tagEditStateMachine, once()).changeRenameText(action.text)
             }
     }
 
     @Test
     fun `Given success with tagEdit interaction, When tag rename confirmed, Then TagEditDelegate invoke tryUpdateTagRename`() = runTest {
-        val tagEditDelegate: TagEditDelegate = mock {
-            whenever(mock.tryUpdateTagName(any())) doReturn Result.Success(Unit)
+        val tagEditStateMachine: TagEditStateMachine = mock {
+            whenever(mock.tryUpdateName(any())) doReturn Result.Success(Unit)
         }
-        genHomeReduce(environment = genHomeEnvironment(tagEditDelegate))
+        genHomeReduce(environment = genHomeEnvironment(tagEditStateMachine))
             .effectScenario()
             .initState( genHomeUiStateSuccess(interaction = HomeInteraction.TagEdit(genTagEditState())))
             .action(HomeAction.OnTagRenameConfirmClicked)
             .launchAndJoin {
-                verify(tagEditDelegate, once()).tryUpdateTagName(initState.tags)
+                verify(tagEditStateMachine, once()).tryUpdateName(initState.tags)
             }
     }
 
     @Test
     fun `Given success with tagEdit interaction, When tag replace confirm clicked, Then TagEditDelegate invoke mergeTag`() = runTest {
-        val tagEditDelegate: TagEditDelegate = mock {
-            whenever(mock.mergeTag()) doReturn Result.Success(Unit)
+        val tagEditStateMachine: TagEditStateMachine = mock {
+            whenever(mock.merge()) doReturn Result.Success(Unit)
         }
-        genHomeReduce(environment = genHomeEnvironment(tagEditDelegate))
+        genHomeReduce(environment = genHomeEnvironment(tagEditStateMachine))
             .effectScenario()
             .initState(genHomeUiStateSuccess(interaction = HomeInteraction.TagEdit(genTagEditState())))
             .action(HomeAction.OnTagReplaceConfirmClicked)
             .launchAndJoin {
-                verify(tagEditDelegate, once()).mergeTag()
+                verify(tagEditStateMachine, once()).merge()
             }
     }
 
     @Test
     fun `Given success with tagEdit interaction, When tag rename cancel clicked, Then tagEditDelegate called cancelRename`() = runTest {
-        val tagEditDelegate: TagEditDelegate = mock()
-        genHomeReduce(environment = genHomeEnvironment(tagEditDelegate))
+        val tagEditStateMachine: TagEditStateMachine = mock()
+        genHomeReduce(environment = genHomeEnvironment(tagEditStateMachine))
             .effectScenario()
             .initState(genHomeUiStateSuccess(interaction = HomeInteraction.TagEdit(genTagEditState())))
             .action(HomeAction.OnTagReplaceCancelClicked)
             .launchAndJoin()
-        verify(tagEditDelegate, once()).cancelMergeTag()
+        verify(tagEditStateMachine, once()).cancelMerge()
     }
 
     @Test
     fun `Given success with tagEdit interaction, When tag delete request clicked, Then tagEditDelegate called startDelete`() = runTest {
-        val tagEditDelegate: TagEditDelegate = mock {
+        val tagEditStateMachine: TagEditStateMachine = mock {
             whenever(mock.startDelete()) doReturn Result.Success(Unit)
         }
-        genHomeReduce(environment = genHomeEnvironment(tagEditDelegate))
+        genHomeReduce(environment = genHomeEnvironment(tagEditStateMachine))
             .effectScenario()
             .initState(genHomeUiStateSuccess(interaction = HomeInteraction.TagEdit(genTagEditState())))
             .action(HomeAction.OnTagDeleteRequestClicked)
             .launchAndJoin()
-        verify(tagEditDelegate, once()).startDelete()
+        verify(tagEditStateMachine, once()).startDelete()
     }
 
     @Test
     fun `Given success with tagEdit interaction, When tag delete confirm clicked, Then TagEditDelegate invoked deleteTag`() = runTest {
-        val tagEditDelegate: TagEditDelegate = mock {
-            whenever(mock.deleteTag()) doReturn Result.Success(Unit)
+        val tagEditStateMachine: TagEditStateMachine = mock {
+            whenever(mock.delete()) doReturn Result.Success(Unit)
         }
-        genHomeReduce(environment = genHomeEnvironment(tagEditDelegate))
+        genHomeReduce(environment = genHomeEnvironment(tagEditStateMachine))
             .effectScenario()
             .initState(genHomeUiStateSuccess(interaction = HomeInteraction.TagEdit(genTagEditState())))
             .action(HomeAction.OnTagDeleteConfirmClicked)
             .launchAndJoin {
-                verify(tagEditDelegate, once()).deleteTag()
+                verify(tagEditStateMachine, once()).delete()
             }
     }
 
@@ -287,26 +287,26 @@ class HomeReduceKtTest {
 
     @Test
     fun `Given success with tagEdit interaction, When interacted, Then tagEditDelegate called clearState`() = runTest {
-        val tagEditDelegate: TagEditDelegate = mock()
-        genHomeReduce(environment = genHomeEnvironment(tagEditDelegate = tagEditDelegate))
+        val tagEditStateMachine: TagEditStateMachine = mock()
+        genHomeReduce(environment = genHomeEnvironment(tagEditStateMachine = tagEditStateMachine))
             .effectScenario()
             .initState(genHomeUiStateSuccess(interaction = HomeInteraction.TagEdit(genTagEditState())))
             .action(HomeAction.Interacted)
             .launchAndJoin()
-        verify(tagEditDelegate, once()).clearState()
+        verify(tagEditStateMachine, once()).clearState()
     }
 
     @Test
     fun `Given success with not tagEdit interaction, When interacted, Then tagEditDelegate never called clearState`() = runTest {
-        val tagEditDelegate: TagEditDelegate = mock()
-        genHomeReduce(environment = genHomeEnvironment(tagEditDelegate = tagEditDelegate))
+        val tagEditStateMachine: TagEditStateMachine = mock()
+        genHomeReduce(environment = genHomeEnvironment(tagEditStateMachine = tagEditStateMachine))
             .effectScenario()
             .initState(genHomeUiStateSuccess(
                 interaction = genHomeInteractionWithExcludeTypes(HomeInteraction.TagEdit::class))
             )
             .action(HomeAction.Interacted)
             .launchAndJoin()
-        verify(tagEditDelegate, never()).clearState()
+        verify(tagEditStateMachine, never()).clearState()
     }
 }
 

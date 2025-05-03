@@ -17,7 +17,7 @@
 package com.nlab.reminder.core.component.tag.edit
 
 import com.nlab.reminder.core.data.model.genTag
-import com.nlab.reminder.core.kotlin.faker.genNonNegativeLong
+import com.nlab.reminder.core.kotlin.faker.genNonNegativeInt
 import com.nlab.testkit.faker.genBoolean
 import com.nlab.testkit.faker.genBothify
 import com.nlab.testkit.faker.genInt
@@ -48,22 +48,22 @@ inline fun <reified T : TagEditState> genTagEditStateExcludeTypeOf(): TagEditSta
 private fun getNullableTagEditStates(): List<TagEditState?> {
     val rename = TagEditState.Rename(
         tag = genTag(),
-        usageCount = genNonNegativeLong(),
+        usageCount = genNonNegativeInt(),
         renameText = genBothify(),
         shouldUserInputReady = genBoolean()
     )
     val merge = TagEditState.Merge(
         from = genTag(),
-        fromUsageCount = genNonNegativeLong(),
+        fromUsageCount = genNonNegativeInt(),
         to = genTag()
     )
     val delete = TagEditState.Delete(
         tag = genTag(),
-        usageCount = genNonNegativeLong()
+        usageCount = genNonNegativeInt()
     )
     return listOf(
         null,
-        TagEditState.Intro(tag = genTag()),
+        TagEditState.AwaitTaskSelection(tag = genTag()),
         rename,
         merge,
         delete,

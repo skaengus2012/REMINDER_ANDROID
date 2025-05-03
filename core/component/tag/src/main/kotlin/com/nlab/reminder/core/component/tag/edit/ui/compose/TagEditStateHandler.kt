@@ -20,9 +20,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.remember
 import com.nlab.reminder.core.component.tag.edit.TagEditState
-import com.nlab.reminder.core.component.tag.ui.compose.TagDeleteBottomSheet
-import com.nlab.reminder.core.component.tag.ui.compose.TagMergeDialog
-import com.nlab.reminder.core.component.tag.ui.compose.TagRenameDialog
 
 /**
  * @author Doohyun
@@ -41,7 +38,11 @@ fun TagEditStateHandler(
     onDeleteConfirmClicked: () -> Unit,
 ) {
     when (state) {
-        is TagEditState.Intro -> {
+        is TagEditState.None -> {
+
+        }
+
+        is TagEditState.AwaitTaskSelection -> {
             TagEditIntroDialog(
                 tagName = state.tag.name,
                 onDismissRequest = onCompleted,

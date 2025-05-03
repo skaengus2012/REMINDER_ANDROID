@@ -71,8 +71,6 @@ include(
     ":core:data-platform-impl",
     ":core:data-test",
     ":core:designsystem",
-    ":core:domain",
-    ":core:domain-di",
     ":core:inject",
     ":core:kotlin",
     ":core:kotlin-test",

@@ -33,7 +33,7 @@ import com.nlab.reminder.core.kotlinx.coroutine.flow.combine
 import com.nlab.reminder.core.local.database.dao.ScheduleTagListDAO
 import com.nlab.reminder.core.local.database.dao.TagDAO
 import com.nlab.reminder.core.local.database.model.TagEntity
-import com.nlab.reminder.core.local.database.transaction.UpdateOrReplaceAndGetTagTransaction
+import com.nlab.reminder.core.local.database.transaction.UpdateOrMergeAndGetTagTransaction
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 
@@ -43,7 +43,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 class LocalTagRepository(
     private val tagDAO: TagDAO,
     private val scheduleTagListDAO: ScheduleTagListDAO,
-    private val updateOrReplaceAndGetTag: UpdateOrReplaceAndGetTagTransaction
+    private val updateOrMergeAndGetTag: UpdateOrMergeAndGetTagTransaction
 ) : TagRepository {
     override suspend fun save(query: SaveTagQuery): Result<Tag> {
         val entityResult = catching {
@@ -53,7 +53,10 @@ class LocalTagRepository(
                 }
 
                 is SaveTagQuery.Modify -> {
-                    updateOrReplaceAndGetTag(tagId = query.id.rawId, name = query.name.trim())
+                    val rawTagId = query.id.rawId
+                    val trimmedName = query.name.trim()
+                    if (query.shouldMergeIfExists) updateOrMergeAndGetTag(tagId = rawTagId, name = trimmedName)
+                    else tagDAO.updateAndGet(rawTagId, trimmedName)
                 }
             }
         }

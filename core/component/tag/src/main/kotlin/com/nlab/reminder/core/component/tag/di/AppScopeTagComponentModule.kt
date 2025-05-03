@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 The N's lab Open Source Project
+ * Copyright (C) 2025 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.domain.di
+package com.nlab.reminder.core.component.tag.di
 
+import com.nlab.reminder.core.component.tag.edit.TagEditStateMachine
 import com.nlab.reminder.core.data.repository.TagRepository
-import com.nlab.reminder.core.domain.TryUpdateTagNameUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.Reusable
@@ -29,12 +29,10 @@ import dagger.hilt.components.SingletonComponent
  */
 @Module
 @InstallIn(SingletonComponent::class)
-class AppScopeDomainModule {
-    @Provides
+internal class AppScopeTagComponentModule {
     @Reusable
-    fun provideUpdateTagNameUseCase(
-        tagRepository: TagRepository,
-    ): TryUpdateTagNameUseCase = TryUpdateTagNameUseCase(
-        tagRepository = tagRepository
-    )
+    @Provides
+    fun provideTagEditStateMachine(
+        tagRepository: TagRepository
+    ): TagEditStateMachine = TagEditStateMachine(tagRepository = tagRepository)
 }

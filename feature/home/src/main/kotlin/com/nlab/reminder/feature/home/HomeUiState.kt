@@ -30,6 +30,6 @@ internal sealed class HomeUiState private constructor() {
         val timetableScheduleCount: NonNegativeLong,
         val allScheduleCount: NonNegativeLong,
         val tags: List<Tag>,
-        val interaction: HomeInteraction,
+        val tagEditStat: HomeInteraction,
     ) : HomeUiState()
 }

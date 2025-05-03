@@ -30,7 +30,7 @@ import javax.inject.Inject
  * @author Thalys
  */
 @Reusable
-class UpdateOrReplaceAndGetTagTransaction @Inject internal constructor(
+class UpdateOrMergeAndGetTagTransaction @Inject internal constructor(
     private val transactionScope: TransactionScope,
     private val tagDAO: TagDAO,
     private val scheduleTagListDAO: ScheduleTagListDAO
@@ -52,7 +52,7 @@ class UpdateOrReplaceAndGetTagTransaction @Inject internal constructor(
             }
 
             else -> {
-                // case3 : conflict name, replace
+                // case3 : conflict name, merge
                 copyScheduleIds(fromTagId = tagId, toTagId = tagEntity.tagId)
                 tagDAO.deleteById(tagId)
                 tagEntity

@@ -52,7 +52,7 @@ import com.nlab.reminder.core.local.database.dao.ScheduleTagListDAO
 import com.nlab.reminder.core.local.database.dao.TagDAO
 import com.nlab.reminder.core.local.database.transaction.InsertAndGetScheduleWithExtraTransaction
 import com.nlab.reminder.core.local.database.transaction.UpdateAndGetScheduleWithExtraTransaction
-import com.nlab.reminder.core.local.database.transaction.UpdateOrReplaceAndGetTagTransaction
+import com.nlab.reminder.core.local.database.transaction.UpdateOrMergeAndGetTagTransaction
 import com.nlab.reminder.core.local.datastore.preference.PreferenceDataSource
 import com.nlab.reminder.core.network.datasource.LinkThumbnailDataSource
 import com.nlab.reminder.core.network.datasource.LinkThumbnailResponse
@@ -99,11 +99,11 @@ internal class AppScopeDataModule {
     fun provideTagRepository(
         tagDAO: TagDAO,
         scheduleTagListDAO: ScheduleTagListDAO,
-        updateOrReplaceAndGetTag: UpdateOrReplaceAndGetTagTransaction
+        updateOrReplaceAndGetTag: UpdateOrMergeAndGetTagTransaction
     ): TagRepository = LocalTagRepository(
         tagDAO = tagDAO,
         scheduleTagListDAO = scheduleTagListDAO,
-        updateOrReplaceAndGetTag = updateOrReplaceAndGetTag
+        updateOrMergeAndGetTag = updateOrReplaceAndGetTag
     )
 
     @Singleton
