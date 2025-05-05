@@ -16,7 +16,10 @@
 
 package com.nlab.reminder.feature.home
 
-import com.nlab.reminder.core.component.usermessage.getOrThrowMessage
+import com.nlab.reminder.core.component.tag.edit.TagEditState
+import com.nlab.reminder.core.component.tag.edit.TagEditTask
+import com.nlab.reminder.core.component.tag.edit.executeTagEditTask
+import com.nlab.reminder.core.component.usermessage.errorMessage
 import com.nlab.statekit.dsl.reduce.DslReduce
 import com.nlab.statekit.reduce.Reduce
 import com.nlab.reminder.feature.home.HomeAction.*
@@ -35,7 +38,7 @@ internal fun HomeReduce(environment: HomeEnvironment): HomeReduce = DslReduce {
                 timetableScheduleCount = action.timetableSchedulesCount,
                 allScheduleCount = action.allSchedulesCount,
                 tags = action.sortedTags,
-                interaction = HomeInteraction.Empty
+                tagEditState = TagEditState.None
             )
         }
         transition<Success> {
@@ -47,71 +50,101 @@ internal fun HomeReduce(environment: HomeEnvironment): HomeReduce = DslReduce {
             )
         }
     }
-    actionScope<TagEditStateSynced> {
-        transition<Success> {
-            when (current.interaction) {
-                is HomeInteraction.Empty,
-                is HomeInteraction.TagEdit -> current.copy(
-                    interaction = action.state?.let(HomeInteraction::TagEdit) ?: HomeInteraction.Empty
-                )
-                // When adding an Interaction type, effect activation is required.
-                // else -> current
-            }
-        }
-        scope(isMatch = { action.state != null }) {
-            effect<Loading> { environment.tagEditStateMachine.clearState() }
-            // When adding an Interaction type, effect activation is required.
-            // effect<Success> {
-            //   when (current.interaction) {
-            //      is HomeInteraction.Empty,
-            //      is HomeInteraction.TagEdit -> {
-            //         do nothing.
-            //      }
-            //      else -> environment.tagEditDelegate.clearState()
-            // }
-        }
-    }
     stateScope<Success> {
-        scope(isMatch = { current.interaction == HomeInteraction.Empty }) {
-            effect<OnTagLongClicked> {
-                environment.tagEditStateMachine.startEditing(tag = action.tag)
-            }
+        transition<CompareAndSetTagEditState> {
+            if (current.tagEditState == action.expectedState) current.copy(tagEditState = action.newState)
+            else current
         }
-        scope(isMatch = { current.interaction is HomeInteraction.TagEdit }) {
-            suspendEffect<OnTagRenameRequestClicked> {
-                environment.tagEditStateMachine
-                    .startRename()
-                    .getOrThrowMessage()
-            }
-            effect<OnTagRenameInputReady> { environment.tagEditStateMachine.readyRenameInput() }
-            effect<OnTagRenameInputted> { environment.tagEditStateMachine.changeRenameText(action.text) }
-            suspendEffect<OnTagRenameConfirmClicked> {
-                environment.tagEditStateMachine
-                    .tryUpdateName(current.tags)
-                    .getOrThrowMessage()
-            }
-            suspendEffect<OnTagReplaceConfirmClicked> {
-                environment.tagEditStateMachine
-                    .merge()
-                    .getOrThrowMessage()
-            }
-            effect<OnTagReplaceCancelClicked> { environment.tagEditStateMachine.cancelMerge() }
-            suspendEffect<OnTagDeleteRequestClicked> {
-                environment.tagEditStateMachine
-                    .startDelete()
-                    .getOrThrowMessage()
-            }
-            suspendEffect<OnTagDeleteConfirmClicked> {
-                environment.tagEditStateMachine
-                    .delete()
-                    .getOrThrowMessage()
-            }
+        transition<OnTagLongClicked> {
+            current.copy(
+                tagEditState = environment
+                    .tagEditStateMachine
+                    .startEditing(current = current.tagEditState, tag = action.tag)
+            )
         }
-        transition<Interacted> { current.copy(interaction = HomeInteraction.Empty) }
-        effect<Interacted> {
-            if (current.interaction is HomeInteraction.TagEdit) {
-                environment.tagEditStateMachine.clearState()
-            }
+        suspendEffect<OnTagRenameRequestClicked> {
+            executeTagEditTask(
+                task = environment
+                    .tagEditStateMachine
+                    .startRename(current.tagEditState),
+                current = current.tagEditState,
+                onTagEditStateUpdated = { dispatch(it) }
+            )
+        }
+        transition<OnTagRenameInputReady> {
+            current.copy(
+                tagEditState = environment
+                    .tagEditStateMachine
+                    .readyRenameInput(current.tagEditState)
+            )
+        }
+        transition<OnTagRenameInputted> {
+            current.copy(
+                tagEditState = environment
+                    .tagEditStateMachine
+                    .changeRenameText(current.tagEditState, action.text)
+            )
+        }
+        suspendEffect<OnTagRenameConfirmClicked> {
+            executeTagEditTask(
+                task = environment
+                    .tagEditStateMachine
+                    .tryUpdateName(
+                        current = current.tagEditState,
+                        compareTags = current.tags
+                    ),
+                current = current.tagEditState,
+                onTagEditStateUpdated = { dispatch(it) }
+            )
+        }
+        suspendEffect<OnTagReplaceConfirmClicked> {
+            executeTagEditTask(
+                task = environment
+                    .tagEditStateMachine
+                    .merge(current = current.tagEditState),
+                current = current.tagEditState,
+                onTagEditStateUpdated = { dispatch(it) }
+            )
+        }
+        transition<OnTagReplaceCancelClicked> {
+            current.copy(
+                tagEditState = environment
+                    .tagEditStateMachine
+                    .cancelMerge(current = current.tagEditState)
+            )
+        }
+        suspendEffect<OnTagDeleteRequestClicked> {
+            executeTagEditTask(
+                task = environment
+                    .tagEditStateMachine
+                    .startDelete(current = current.tagEditState),
+                current = current.tagEditState,
+                onTagEditStateUpdated = { dispatch(it) }
+            )
+        }
+        suspendEffect<OnTagDeleteConfirmClicked> {
+            executeTagEditTask(
+                task = environment
+                    .tagEditStateMachine
+                    .delete(current = current.tagEditState),
+                current = current.tagEditState,
+                onTagEditStateUpdated = { dispatch(it) }
+            )
         }
     }
+}
+
+private suspend fun executeTagEditTask(
+    task: TagEditTask,
+    current: TagEditState,
+    onTagEditStateUpdated: suspend (CompareAndSetTagEditState) -> Unit
+) {
+    executeTagEditTask(
+        task,
+        current,
+        updateState = { expectedState, newState ->
+            onTagEditStateUpdated(CompareAndSetTagEditState(expectedState, newState))
+        },
+        onError = { errorMessage(origin = it) }
+    )
 }

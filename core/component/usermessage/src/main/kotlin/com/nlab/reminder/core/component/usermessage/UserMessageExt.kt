@@ -52,3 +52,18 @@ fun <T> Result<T>.getOrThrowMessage(
         )
     }
 }
+
+@Suppress("NOTHING_TO_INLINE") // Application as an inline due to omission of jacoco coverage
+inline fun errorMessage(
+    message: UiText = UiText(StringIds.unknown_error),
+    priority: FeedbackPriority = FeedbackPriority.LOW,
+    origin: Throwable = IllegalStateException()
+) {
+    throw UserMessageException(
+        userMessage = UserMessage(
+            message = message,
+            priority = priority
+        ),
+        origin = origin
+    )
+}

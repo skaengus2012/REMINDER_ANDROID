@@ -28,51 +28,56 @@ import kotlin.reflect.KClass
 /**
  * @author Thalys
  */
-fun genTagEditStateOrNull(): TagEditState? = getNullableTagEditStates().requireSample()
+private val sampleTagEditStates: List<TagEditState>
+    get() {
+        val rename = TagEditState.Rename(
+            tag = genTag(),
+            usageCount = genNonNegativeInt(),
+            renameText = genBothify(),
+            shouldUserInputReady = genBoolean()
+        )
+        val merge = TagEditState.Merge(
+            from = genTag(),
+            fromUsageCount = genNonNegativeInt(),
+            to = genTag()
+        )
+        val delete = TagEditState.Delete(
+            tag = genTag(),
+            usageCount = genNonNegativeInt()
+        )
+        return listOf(
+            TagEditState.None,
+            TagEditState.AwaitTaskSelection(tag = genTag()),
+            rename,
+            merge,
+            delete,
+            TagEditState.Processing(
+                when (genInt(min = 0, max = 2)) {
+                    0 -> rename
+                    1 -> merge
+                    else -> delete
+                }
+            )
+        )
+    }
 
-fun genTagEditState(): TagEditState = getNullableTagEditStates().filterNotNull().requireSample()
+fun genTagEditState(): TagEditState = sampleTagEditStates.requireSample()
+
+fun genTagEditStateTypeOf(clazz: KClass<out TagEditState>): TagEditState =
+    sampleTagEditStates.find { clazz.isInstance(it) }!!
+
+inline fun <reified T : TagEditState> genTagEditStateTypeOf(): TagEditState = genTagEditStateTypeOf(T::class)
+
+inline fun <reified T : TagEditState> genTagEditStateExcludeTypeOf(): TagEditState = genTagEditStateExcludeTypeOf(
+    firstType = T::class
+)
 
 fun genTagEditStateExcludeTypeOf(
     firstType: KClass<out TagEditState>,
     vararg anotherTypes: KClass<out TagEditState>
-): TagEditState = getNullableTagEditStates().filterNotNull().requireSampleExcludeTypeOf(
+): TagEditState = sampleTagEditStates.requireSampleExcludeTypeOf(
     buildList {
         add(firstType)
         addAll(anotherTypes)
     }
 )
-
-inline fun <reified T : TagEditState> genTagEditStateExcludeTypeOf(): TagEditState =
-    genTagEditStateExcludeTypeOf(T::class)
-
-private fun getNullableTagEditStates(): List<TagEditState?> {
-    val rename = TagEditState.Rename(
-        tag = genTag(),
-        usageCount = genNonNegativeInt(),
-        renameText = genBothify(),
-        shouldUserInputReady = genBoolean()
-    )
-    val merge = TagEditState.Merge(
-        from = genTag(),
-        fromUsageCount = genNonNegativeInt(),
-        to = genTag()
-    )
-    val delete = TagEditState.Delete(
-        tag = genTag(),
-        usageCount = genNonNegativeInt()
-    )
-    return listOf(
-        null,
-        TagEditState.AwaitTaskSelection(tag = genTag()),
-        rename,
-        merge,
-        delete,
-        TagEditState.Processing(
-            when (genInt(min = 0, max = 2)) {
-                0 -> rename
-                1 -> merge
-                else -> delete
-            }
-        )
-    )
-}

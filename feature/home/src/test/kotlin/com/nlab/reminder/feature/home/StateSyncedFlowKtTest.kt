@@ -16,33 +16,36 @@
 
 package com.nlab.reminder.feature.home
 
-import com.nlab.reminder.core.data.model.genTags
+import com.nlab.reminder.core.data.model.TagId
+import com.nlab.reminder.core.data.model.genTag
+import com.nlab.reminder.core.data.repository.GetTagQuery
 import com.nlab.reminder.core.kotlin.faker.genNonNegativeLong
+import com.nlab.reminder.core.kotlin.toNonBlankString
+import io.mockk.every
+import io.mockk.mockk
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
-import org.mockito.kotlin.any
-import org.mockito.kotlin.doReturn
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
 
 /**
  * @author Doohyun
  */
 class StateSyncedFlowKtTest {
     @Test
-    fun `Given scheduleRepository and tagRepository emitting correct values, When collect StateSyncFlow, Then emit correct values`() = runTest {
+    fun `Given valid repositories, When collect StateSyncFlow, Then emit correct StateSynced`() = runTest {
         val expectedScheduleCount = genNonNegativeLong()
-        val expectedTags = genTags().sortedBy { it.name.value }
+        val expectedTags = List(3) {
+            genTag(id = TagId(it.toLong()), name = "tag$it".toNonBlankString())
+        }
         val environment = genHomeEnvironment(
-            scheduleRepository = mock {
-                whenever(mock.getScheduleCountAsStream(any())) doReturn flowOf(expectedScheduleCount)
+            scheduleRepository = mockk {
+                every { getScheduleCountAsStream(any()) } returns flowOf(expectedScheduleCount)
             },
-            tagRepository = mock {
-                whenever(mock.getTagsAsStream(any())) doReturn flowOf(expectedTags.toSet())
+            tagRepository = mockk {
+                every { getTagsAsStream(GetTagQuery.OnlyUsed) } returns flowOf(expectedTags.toSet())
             }
         )
 

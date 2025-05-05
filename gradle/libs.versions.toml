@@ -3,7 +3,7 @@
 # build Environmental
 compileSdk = "35"
 targetSdk = "35"
-minSdk = "23"
+minSdk = "24"
 
 # library version
 afollestedDragselectRecyclerView = "2.4.0"

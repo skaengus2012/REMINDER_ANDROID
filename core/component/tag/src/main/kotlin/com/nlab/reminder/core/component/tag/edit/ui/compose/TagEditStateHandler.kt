@@ -38,9 +38,7 @@ fun TagEditStateHandler(
     onDeleteConfirmClicked: () -> Unit,
 ) {
     when (state) {
-        is TagEditState.None -> {
-
-        }
+        is TagEditState.None -> Unit
 
         is TagEditState.AwaitTaskSelection -> {
             TagEditIntroDialog(
@@ -50,6 +48,7 @@ fun TagEditStateHandler(
                 onDeleteRequestClicked = onDeleteRequestClicked
             )
         }
+
         is TagEditState.Rename -> {
             TagRenameDialog(
                 value = state.renameText,
@@ -64,6 +63,7 @@ fun TagEditStateHandler(
                 SideEffect { onRenameInputReady() }
             }
         }
+
         is TagEditState.Merge -> {
             TagMergeDialog(
                 fromTagName = state.from.name,
@@ -73,6 +73,7 @@ fun TagEditStateHandler(
                 onConfirm = onMergeConfirmClicked
             )
         }
+
         is TagEditState.Delete -> {
             TagDeleteBottomSheet(
                 tagNames = remember(state.tag) { listOf(state.tag.name) },
@@ -81,6 +82,7 @@ fun TagEditStateHandler(
                 onConfirm = onDeleteConfirmClicked
             )
         }
+
         is TagEditState.Processing -> {
             // TODO If necessary, let's work on it.
         }

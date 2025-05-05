@@ -39,7 +39,7 @@ internal fun StateSyncFlow(environment: HomeEnvironment): Flow<HomeAction> = wit
         scheduleRepository
             .getScheduleCountAsStream(GetScheduleCountQuery.All),
         tagRepository
-            .getTagsAsStream(GetTagQuery.All)
+            .getTagsAsStream(GetTagQuery.OnlyUsed)
             .map { tags -> tags.sortedBy { it.name.value } },
         transform = HomeAction::StateSynced
     )
