@@ -36,7 +36,7 @@ import javax.inject.Singleton
  */
 @Module
 @InstallIn(SingletonComponent::class)
-internal abstract class DatabaseModule {
+internal object DatabaseModule {
     @Singleton
     @Provides
     fun provideReminderDatabase(

@@ -67,7 +67,7 @@ import javax.inject.Singleton
  */
 @Module
 @InstallIn(SingletonComponent::class)
-internal class AppScopeDataModule {
+internal object AppScopeDataModule {
     @ScheduleData(All)
     @Reusable
     @Provides

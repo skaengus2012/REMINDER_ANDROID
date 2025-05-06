@@ -29,7 +29,7 @@ import dagger.hilt.android.scopes.ViewModelScoped
  */
 @Module
 @InstallIn(ViewModelComponent::class)
-internal class ViewModelScopeDataModule {
+internal object ViewModelScopeDataModule {
     @Provides
     @ViewModelScoped
     fun provideScheduleCompleteMarkRepository(): ScheduleCompleteMarkRepository =

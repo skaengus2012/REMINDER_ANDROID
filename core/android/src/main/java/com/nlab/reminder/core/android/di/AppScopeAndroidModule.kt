@@ -36,7 +36,7 @@ import javax.inject.Singleton
  */
 @Module
 @InstallIn(SingletonComponent::class)
-internal class AppScopeAndroidModule {
+internal object AppScopeAndroidModule {
     @Singleton
     @Provides
     fun provideToast(

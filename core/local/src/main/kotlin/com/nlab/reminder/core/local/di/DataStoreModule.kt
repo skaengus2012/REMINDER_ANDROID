@@ -37,7 +37,7 @@ import javax.inject.Singleton
  */
 @Module
 @InstallIn(SingletonComponent::class)
-internal class DataStoreModule {
+internal object DataStoreModule {
     @Singleton
     @Provides
     fun providePreferenceDataSource(

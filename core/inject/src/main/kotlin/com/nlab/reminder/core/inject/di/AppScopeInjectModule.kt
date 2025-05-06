@@ -35,7 +35,7 @@ import javax.inject.Singleton
  */
 @Module
 @InstallIn(SingletonComponent::class)
-class AppScopeInjectModule {
+internal object AppScopeInjectModule {
     @Provides
     @Dispatcher(Default)
     fun provideDefaultDispatcher(): CoroutineDispatcher = Dispatchers.Default

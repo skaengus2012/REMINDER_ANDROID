@@ -22,7 +22,7 @@ import com.nlab.reminder.core.data.model.LinkMetadata
  * @author thalys
  */
 data class ScheduleElement(
-    val schedule: ScheduleDetail,
+   // val schedule: ScheduleDetail,
     val isCompleteMarked: Boolean,
     val linkMetadata: LinkMetadata?,
     val isSelected: Boolean

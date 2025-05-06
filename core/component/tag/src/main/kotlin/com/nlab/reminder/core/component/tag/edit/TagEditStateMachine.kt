@@ -21,11 +21,14 @@ import com.nlab.reminder.core.data.repository.SaveTagQuery
 import com.nlab.reminder.core.data.repository.TagRepository
 import com.nlab.reminder.core.kotlin.map
 import com.nlab.reminder.core.kotlin.tryToNonBlankStringOrNull
+import dagger.Reusable
+import javax.inject.Inject
 
 /**
  * @author Doohyun
  */
-class TagEditStateMachine(private val tagRepository: TagRepository) {
+@Reusable
+class TagEditStateMachine @Inject constructor(private val tagRepository: TagRepository) {
     fun startEditing(current: TagEditState, tag: Tag): TagEditState = transformIfTypeOf<TagEditState.None>(
         current,
         transform = { TagEditState.AwaitTaskSelection(tag) }
