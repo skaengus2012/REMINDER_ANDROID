@@ -22,7 +22,7 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import com.nlab.reminder.core.kotlin.NonBlankString
-import com.nlab.reminder.core.local.database.model.TagEntity
+import com.nlab.reminder.core.local.database.entity.TagEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 

@@ -20,23 +20,23 @@ import androidx.annotation.IntRange
 import com.nlab.reminder.core.kotlin.PositiveInt
 import com.nlab.reminder.core.kotlin.collections.toNonEmptySet
 import com.nlab.reminder.core.kotlin.toPositiveInt
-import com.nlab.reminder.core.local.database.model.REPEAT_DAILY
-import com.nlab.reminder.core.local.database.model.REPEAT_HOURLY
-import com.nlab.reminder.core.local.database.model.REPEAT_MONTHLY
-import com.nlab.reminder.core.local.database.model.REPEAT_SETTING_PROPERTY_MONTHLY_DAY
-import com.nlab.reminder.core.local.database.model.REPEAT_SETTING_PROPERTY_MONTHLY_DAY_OF_WEEK
-import com.nlab.reminder.core.local.database.model.REPEAT_SETTING_PROPERTY_MONTHLY_DAY_ORDER
-import com.nlab.reminder.core.local.database.model.REPEAT_SETTING_PROPERTY_WEEKLY
-import com.nlab.reminder.core.local.database.model.REPEAT_SETTING_PROPERTY_YEARLY_DAY_OF_WEEK
-import com.nlab.reminder.core.local.database.model.REPEAT_SETTING_PROPERTY_YEARLY_DAY_ORDER
-import com.nlab.reminder.core.local.database.model.REPEAT_SETTING_PROPERTY_YEARLY_MONTH
-import com.nlab.reminder.core.local.database.model.REPEAT_SETTING_PROPERTY_ZONE_ID
-import com.nlab.reminder.core.local.database.model.REPEAT_WEEKLY
-import com.nlab.reminder.core.local.database.model.REPEAT_YEARLY
-import com.nlab.reminder.core.local.database.model.RepeatDTO
-import com.nlab.reminder.core.local.database.model.RepeatDetailDTO
-import com.nlab.reminder.core.local.database.model.RepeatDetailEntity
-import com.nlab.reminder.core.local.database.model.RepeatType
+import com.nlab.reminder.core.local.database.entity.REPEAT_DAILY
+import com.nlab.reminder.core.local.database.entity.REPEAT_HOURLY
+import com.nlab.reminder.core.local.database.entity.REPEAT_MONTHLY
+import com.nlab.reminder.core.local.database.entity.REPEAT_SETTING_PROPERTY_MONTHLY_DAY
+import com.nlab.reminder.core.local.database.entity.REPEAT_SETTING_PROPERTY_MONTHLY_DAY_OF_WEEK
+import com.nlab.reminder.core.local.database.entity.REPEAT_SETTING_PROPERTY_MONTHLY_DAY_ORDER
+import com.nlab.reminder.core.local.database.entity.REPEAT_SETTING_PROPERTY_WEEKLY
+import com.nlab.reminder.core.local.database.entity.REPEAT_SETTING_PROPERTY_YEARLY_DAY_OF_WEEK
+import com.nlab.reminder.core.local.database.entity.REPEAT_SETTING_PROPERTY_YEARLY_DAY_ORDER
+import com.nlab.reminder.core.local.database.entity.REPEAT_SETTING_PROPERTY_YEARLY_MONTH
+import com.nlab.reminder.core.local.database.entity.REPEAT_SETTING_PROPERTY_ZONE_ID
+import com.nlab.reminder.core.local.database.entity.REPEAT_WEEKLY
+import com.nlab.reminder.core.local.database.entity.REPEAT_YEARLY
+import com.nlab.reminder.core.local.database.entity.RepeatDetailEntity
+import com.nlab.reminder.core.local.database.entity.RepeatType
+import com.nlab.reminder.core.local.database.transaction.ScheduleRepeatDetailAggregate
+import com.nlab.reminder.core.local.database.transaction.ScheduleRepeatAggregate
 import kotlinx.datetime.TimeZone
 
 /**
@@ -165,9 +165,9 @@ private fun Map<String, List<String>>.getTimeZone(): TimeZone = getValue(REPEAT_
     .first()
     .let(TimeZone::of)
 
-internal fun Repeat.toDTO(): RepeatDTO = when (this) {
+internal fun Repeat.toAggregate(): ScheduleRepeatAggregate = when (this) {
     is Repeat.Hourly -> {
-        RepeatDTO(
+        ScheduleRepeatAggregate(
             type = REPEAT_HOURLY,
             interval = interval,
             details = emptySet()
@@ -175,7 +175,7 @@ internal fun Repeat.toDTO(): RepeatDTO = when (this) {
     }
 
     is Repeat.Daily -> {
-        RepeatDTO(
+        ScheduleRepeatAggregate(
             type = REPEAT_DAILY,
             interval = interval,
             details = emptySet()
@@ -183,53 +183,57 @@ internal fun Repeat.toDTO(): RepeatDTO = when (this) {
     }
 
     is Repeat.Weekly -> {
-        RepeatDTO(
+        ScheduleRepeatAggregate(
             type = REPEAT_WEEKLY,
             interval = interval,
-            details = convertRepeatDetailDTOsFromWeeklyRepeat(repeat = this)
+            details = convertRepeatDetailAggregatesFromWeeklyRepeat(repeat = this)
         )
     }
 
     is Repeat.Monthly -> {
-        RepeatDTO(
+        ScheduleRepeatAggregate(
             type = REPEAT_MONTHLY,
             interval = interval,
-            details = convertRepeatDetailDTOsFromMonthlyRepeat(repeat = this)
+            details = convertRepeatDetailAggregatesFromMonthlyRepeat(repeat = this)
         )
     }
 
     is Repeat.Yearly -> {
-        RepeatDTO(
+        ScheduleRepeatAggregate(
             type = REPEAT_YEARLY,
             interval = interval,
-            details = convertRepeatDetailDTOsFromYearlyRepeat(repeat = this)
+            details = convertRepeatDetailAggregatesFromYearlyRepeat(repeat = this)
         )
     }
 
 }
 
-private fun convertRepeatDetailDTOsFromWeeklyRepeat(repeat: Repeat.Weekly): Set<RepeatDetailDTO> = buildSet {
-    this += RepeatDetailDTO(
+private fun convertRepeatDetailAggregatesFromWeeklyRepeat(
+    repeat: Repeat.Weekly
+): Set<ScheduleRepeatDetailAggregate> = buildSet {
+    this += ScheduleRepeatDetailAggregate(
         propertyCode = REPEAT_SETTING_PROPERTY_ZONE_ID,
         value = repeat.timeZone.id
     )
     repeat.daysOfWeeks.value.forEach { daysOfWeek ->
-        this += RepeatDetailDTO(
+        this += ScheduleRepeatDetailAggregate(
             propertyCode = REPEAT_SETTING_PROPERTY_WEEKLY,
             value = daysOfWeek.toRepeatWeek()
         )
     }
 }
 
-private fun convertRepeatDetailDTOsFromMonthlyRepeat(repeat: Repeat.Monthly): Set<RepeatDetailDTO> = buildSet {
-    this += RepeatDetailDTO(
+private fun convertRepeatDetailAggregatesFromMonthlyRepeat(
+    repeat: Repeat.Monthly
+): Set<ScheduleRepeatDetailAggregate> = buildSet {
+    this += ScheduleRepeatDetailAggregate(
         propertyCode = REPEAT_SETTING_PROPERTY_ZONE_ID,
         value = repeat.timeZone.id
     )
     when (val typedDetail = repeat.detail) {
         is MonthlyRepeatDetail.Each -> {
             typedDetail.days.value.forEach { daysOfMonth ->
-                this += RepeatDetailDTO(
+                this += ScheduleRepeatDetailAggregate(
                     propertyCode = REPEAT_SETTING_PROPERTY_MONTHLY_DAY,
                     value = daysOfMonth.rawValue.toString()
                 )
@@ -237,11 +241,11 @@ private fun convertRepeatDetailDTOsFromMonthlyRepeat(repeat: Repeat.Monthly): Se
         }
 
         is MonthlyRepeatDetail.Customize -> {
-            this += RepeatDetailDTO(
+            this += ScheduleRepeatDetailAggregate(
                 propertyCode = REPEAT_SETTING_PROPERTY_MONTHLY_DAY_ORDER,
                 value = typedDetail.order.toRepeatDayOrder()
             )
-            this += RepeatDetailDTO(
+            this += ScheduleRepeatDetailAggregate(
                 propertyCode = REPEAT_SETTING_PROPERTY_MONTHLY_DAY_OF_WEEK,
                 value = typedDetail.day.toRepeatDays()
             )
@@ -249,23 +253,25 @@ private fun convertRepeatDetailDTOsFromMonthlyRepeat(repeat: Repeat.Monthly): Se
     }
 }
 
-private fun convertRepeatDetailDTOsFromYearlyRepeat(repeat: Repeat.Yearly): Set<RepeatDetailDTO> = buildSet {
-    this += RepeatDetailDTO(
+private fun convertRepeatDetailAggregatesFromYearlyRepeat(
+    repeat: Repeat.Yearly
+): Set<ScheduleRepeatDetailAggregate> = buildSet {
+    this += ScheduleRepeatDetailAggregate(
         propertyCode = REPEAT_SETTING_PROPERTY_ZONE_ID,
         value = repeat.timeZone.id
     )
     repeat.months.value.forEach { month ->
-        this += RepeatDetailDTO(
+        this += ScheduleRepeatDetailAggregate(
             propertyCode = REPEAT_SETTING_PROPERTY_YEARLY_MONTH,
             value = month.toRepeatMonth()
         )
     }
     repeat.daysOfWeekOption?.let { option ->
-        this += RepeatDetailDTO(
+        this += ScheduleRepeatDetailAggregate(
             propertyCode = REPEAT_SETTING_PROPERTY_YEARLY_DAY_ORDER,
             value = option.order.toRepeatDayOrder()
         )
-        this += RepeatDetailDTO(
+        this += ScheduleRepeatDetailAggregate(
             propertyCode = REPEAT_SETTING_PROPERTY_YEARLY_DAY_OF_WEEK,
             value = option.day.toRepeatDays()
         )

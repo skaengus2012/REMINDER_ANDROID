@@ -1,6 +1,6 @@
 package com.nlab.reminder.core.data.model
 
-import com.nlab.reminder.core.local.database.model.LinkMetadataDTO
+import com.nlab.reminder.core.local.database.dao.LinkMetadataSaveInput
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
@@ -18,15 +18,15 @@ internal class LinkMetadataTransformsKtTest {
     }
 
     @Test
-    fun testLinkMetadataToDTO() {
+    fun testLinkMetadataToSaveInput() {
         val (link, linkMetadata) = genLinkAndMetadataAndEntity()
-        val expectedDTO = LinkMetadataDTO(
+        val expected = LinkMetadataSaveInput(
             link = link.rawLink,
             title = linkMetadata.title,
             imageUrl = linkMetadata.imageUrl
         )
-        val actualDTO = linkMetadata.toLocalDTO(link)
+        val actual = linkMetadata.toSaveInput(link)
 
-        assertThat(actualDTO, equalTo(expectedDTO))
+        assertThat(actual, equalTo(expected))
     }
 }

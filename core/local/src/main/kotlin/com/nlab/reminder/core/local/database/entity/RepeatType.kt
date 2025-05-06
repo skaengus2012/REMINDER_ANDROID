@@ -14,15 +14,27 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.local.database.model
+package com.nlab.reminder.core.local.database.entity
 
-import com.nlab.reminder.core.kotlin.PositiveInt
+import androidx.annotation.StringDef
 
 /**
- * @author Doohyun
+ * @author Thalys
  */
-data class RepeatDTO(
-    @RepeatType val type: String,
-    val interval: PositiveInt,
-    val details: Set<RepeatDetailDTO>
+@StringDef(
+    value = [
+        REPEAT_HOURLY,
+        REPEAT_DAILY,
+        REPEAT_WEEKLY,
+        REPEAT_MONTHLY,
+        REPEAT_YEARLY
+    ]
 )
+@Retention(AnnotationRetention.SOURCE)
+annotation class RepeatType
+
+const val REPEAT_HOURLY = "REPEAT_HOURLY"
+const val REPEAT_DAILY = "REPEAT_DAILY"
+const val REPEAT_WEEKLY = "REPEAT_WEEKLY"
+const val REPEAT_MONTHLY = "REPEAT_MONTHLY"
+const val REPEAT_YEARLY = "REPEAT_YEARLY"

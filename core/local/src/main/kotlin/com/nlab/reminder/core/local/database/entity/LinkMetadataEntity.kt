@@ -14,15 +14,23 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.local.database.model
+package com.nlab.reminder.core.local.database.entity
 
-import kotlinx.datetime.Instant
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.Index
 
 /**
- * @author Thalys
+ * @author thalys
  */
-data class ScheduleTimingDTO(
-    val triggerTimeUtc: Instant,
-    val isTriggerTimeDateOnly: Boolean,
-    val repeatDTO: RepeatDTO?
+@Entity(
+    tableName = "link_metadata",
+    primaryKeys = ["link"],
+    indices = [Index(value = ["insertion_order"], unique = true)]
+)
+data class LinkMetadataEntity(
+    @ColumnInfo(name = "link") val link: String,
+    @ColumnInfo(name = "title") val title: String?,
+    @ColumnInfo(name = "imageUrl") val imageUrl: String?,
+    @ColumnInfo(name = "insertion_order") val insertionOrder: Int
 )

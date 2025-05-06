@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.local.database.model
+package com.nlab.reminder.core.local.database.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

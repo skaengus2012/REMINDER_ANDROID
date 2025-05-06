@@ -19,7 +19,56 @@ package com.nlab.reminder.core.data.model
 import com.nlab.reminder.core.kotlin.collections.toNonEmptySet
 import com.nlab.reminder.core.kotlin.collections.toSet
 import com.nlab.reminder.core.kotlin.faker.genPositiveInt
-import com.nlab.reminder.core.local.database.model.*
+import com.nlab.reminder.core.local.database.entity.REPEAT_DAILY
+import com.nlab.reminder.core.local.database.entity.REPEAT_HOURLY
+import com.nlab.reminder.core.local.database.entity.REPEAT_MONTHLY
+import com.nlab.reminder.core.local.database.entity.REPEAT_SETTING_PROPERTY_MONTHLY_DAY
+import com.nlab.reminder.core.local.database.entity.REPEAT_SETTING_PROPERTY_MONTHLY_DAY_OF_WEEK
+import com.nlab.reminder.core.local.database.entity.REPEAT_SETTING_PROPERTY_MONTHLY_DAY_ORDER
+import com.nlab.reminder.core.local.database.entity.REPEAT_SETTING_PROPERTY_WEEKLY
+import com.nlab.reminder.core.local.database.entity.REPEAT_SETTING_PROPERTY_YEARLY_DAY_OF_WEEK
+import com.nlab.reminder.core.local.database.entity.REPEAT_SETTING_PROPERTY_YEARLY_DAY_ORDER
+import com.nlab.reminder.core.local.database.entity.REPEAT_SETTING_PROPERTY_YEARLY_MONTH
+import com.nlab.reminder.core.local.database.entity.REPEAT_SETTING_PROPERTY_ZONE_ID
+import com.nlab.reminder.core.local.database.entity.REPEAT_WEEKLY
+import com.nlab.reminder.core.local.database.entity.REPEAT_YEARLY
+import com.nlab.reminder.core.local.database.entity.REPEAT_DAYS_DAY
+import com.nlab.reminder.core.local.database.entity.REPEAT_DAYS_FRI
+import com.nlab.reminder.core.local.database.entity.REPEAT_DAYS_MON
+import com.nlab.reminder.core.local.database.entity.REPEAT_DAYS_SAT
+import com.nlab.reminder.core.local.database.entity.REPEAT_DAYS_SUN
+import com.nlab.reminder.core.local.database.entity.REPEAT_DAYS_THU
+import com.nlab.reminder.core.local.database.entity.REPEAT_DAYS_TUE
+import com.nlab.reminder.core.local.database.entity.REPEAT_DAYS_WED
+import com.nlab.reminder.core.local.database.entity.REPEAT_DAYS_WEEKDAY
+import com.nlab.reminder.core.local.database.entity.REPEAT_DAYS_WEEKEND
+import com.nlab.reminder.core.local.database.entity.REPEAT_DAY_ORDER_FIFTH
+import com.nlab.reminder.core.local.database.entity.REPEAT_DAY_ORDER_FIRST
+import com.nlab.reminder.core.local.database.entity.REPEAT_DAY_ORDER_FOURTH
+import com.nlab.reminder.core.local.database.entity.REPEAT_DAY_ORDER_LAST
+import com.nlab.reminder.core.local.database.entity.REPEAT_DAY_ORDER_SECOND
+import com.nlab.reminder.core.local.database.entity.REPEAT_DAY_ORDER_THIRD
+import com.nlab.reminder.core.local.database.entity.REPEAT_WEEK_FRI
+import com.nlab.reminder.core.local.database.entity.REPEAT_WEEK_MON
+import com.nlab.reminder.core.local.database.entity.REPEAT_WEEK_SAT
+import com.nlab.reminder.core.local.database.entity.REPEAT_WEEK_SUN
+import com.nlab.reminder.core.local.database.entity.REPEAT_WEEK_THU
+import com.nlab.reminder.core.local.database.entity.REPEAT_WEEK_TUE
+import com.nlab.reminder.core.local.database.entity.REPEAT_WEEK_WED
+import com.nlab.reminder.core.local.database.entity.REPEAT_MONTH_APR
+import com.nlab.reminder.core.local.database.entity.REPEAT_MONTH_AUG
+import com.nlab.reminder.core.local.database.entity.REPEAT_MONTH_DEC
+import com.nlab.reminder.core.local.database.entity.REPEAT_MONTH_FEB
+import com.nlab.reminder.core.local.database.entity.REPEAT_MONTH_JAN
+import com.nlab.reminder.core.local.database.entity.REPEAT_MONTH_JUL
+import com.nlab.reminder.core.local.database.entity.REPEAT_MONTH_JUN
+import com.nlab.reminder.core.local.database.entity.REPEAT_MONTH_MAR
+import com.nlab.reminder.core.local.database.entity.REPEAT_MONTH_MAY
+import com.nlab.reminder.core.local.database.entity.REPEAT_MONTH_NOV
+import com.nlab.reminder.core.local.database.entity.REPEAT_MONTH_OCT
+import com.nlab.reminder.core.local.database.entity.REPEAT_MONTH_SEP
+import com.nlab.reminder.core.local.database.entity.RepeatDetailEntity
+import com.nlab.reminder.core.local.database.transaction.ScheduleRepeatDetailAggregate
 import com.nlab.testkit.faker.genInt
 import com.nlab.testkit.faker.requireSample
 import com.nlab.testkit.faker.shuffledSubset
@@ -493,67 +542,67 @@ class RepeatTransformsKtTest {
     }
 
     @Test
-    fun `Given hourly repeat, When convert to dto, Then return matched value`() {
+    fun `Given hourly repeat, When convert to aggregate, Then return matched value`() {
         val repeat = genRepeatHourly()
-        val dto = repeat.toDTO()
-        assertThat(dto.type, equalTo(REPEAT_HOURLY))
-        assertThat(dto.interval, equalTo(repeat.interval))
-        assertThat(dto.details, equalTo(emptySet()))
+        val aggregate = repeat.toAggregate()
+        assertThat(aggregate.type, equalTo(REPEAT_HOURLY))
+        assertThat(aggregate.interval, equalTo(repeat.interval))
+        assertThat(aggregate.details, equalTo(emptySet()))
     }
 
     @Test
-    fun `Given daily repeat, When convert to dto, Then return matched value`() {
+    fun `Given daily repeat, When convert to aggregate, Then return matched value`() {
         val repeat = genRepeatDaily()
-        val dto = repeat.toDTO()
-        assertThat(dto.type, equalTo(REPEAT_DAILY))
-        assertThat(dto.interval, equalTo(repeat.interval))
-        assertThat(dto.details, equalTo(emptySet()))
+        val aggregate = repeat.toAggregate()
+        assertThat(aggregate.type, equalTo(REPEAT_DAILY))
+        assertThat(aggregate.interval, equalTo(repeat.interval))
+        assertThat(aggregate.details, equalTo(emptySet()))
     }
 
     @Test
-    fun `Given repeat weekly, When convert to dto, Then return matched value`() {
+    fun `Given repeat weekly, When convert to aggregate, Then return matched value`() {
         val repeat = genRepeatWeekly()
         val expectedZoneId = repeat.timeZone.id
         val expectedDayOfWeeksCodes = repeat.daysOfWeeks.value.toSet { it.toRepeatWeek() }
         // zoneId + dayOfWeeks.size
-        val expectedDTOSize = 1 + expectedDayOfWeeksCodes.size
+        val expectedaggregateSize = 1 + expectedDayOfWeeksCodes.size
 
-        val actualDTO = repeat.toDTO()
-        assertThat(actualDTO.type, equalTo(REPEAT_WEEKLY))
-        assertThat(actualDTO.interval, equalTo(repeat.interval))
+        val actualaggregate = repeat.toAggregate()
+        assertThat(actualaggregate.type, equalTo(REPEAT_WEEKLY))
+        assertThat(actualaggregate.interval, equalTo(repeat.interval))
 
-        val actualRepeatDetailDTOs = actualDTO.details
-        assertThat(actualRepeatDetailDTOs.size, equalTo(expectedDTOSize))
+        val actualRepeatDetailaggregates = actualaggregate.details
+        assertThat(actualRepeatDetailaggregates.size, equalTo(expectedaggregateSize))
 
-        val actualPropertyToValues = convertPropertyCodeToValuesTable(actualRepeatDetailDTOs)
+        val actualPropertyToValues = convertPropertyCodeToValuesTable(actualRepeatDetailaggregates)
         assertThat(actualPropertyToValues[REPEAT_SETTING_PROPERTY_ZONE_ID], equalTo(setOf(expectedZoneId)))
         assertThat(actualPropertyToValues[REPEAT_SETTING_PROPERTY_WEEKLY], equalTo(expectedDayOfWeeksCodes))
     }
 
     @Test
-    fun `Given repeat monthly with each, When try convert to dto, Then return matched value`() {
+    fun `Given repeat monthly with each, When try convert to aggregate, Then return matched value`() {
         val monthlyRepeatDetail = genMonthlyRepeatDetailEach()
         val repeat = genRepeatMonthly(detail = monthlyRepeatDetail)
 
         val expectedZoneId = repeat.timeZone.id
         val expectedMonthlyDays = monthlyRepeatDetail.days.value.toSet { it.rawValue.toString() }
         // zoneId + dayOfWeeks.size
-        val expectedDTOSize = 1 + expectedMonthlyDays.size
+        val expectedAggregateSize = 1 + expectedMonthlyDays.size
 
-        val actualDTO = repeat.toDTO()
-        assertThat(actualDTO.type, equalTo(REPEAT_MONTHLY))
-        assertThat(actualDTO.interval, equalTo(repeat.interval))
+        val actualAggregate = repeat.toAggregate()
+        assertThat(actualAggregate.type, equalTo(REPEAT_MONTHLY))
+        assertThat(actualAggregate.interval, equalTo(repeat.interval))
 
-        val actualRepeatDetailDTOs = actualDTO.details
-        assertThat(actualRepeatDetailDTOs.size, equalTo(expectedDTOSize))
+        val actualRepeatDetailAggregates = actualAggregate.details
+        assertThat(actualRepeatDetailAggregates.size, equalTo(expectedAggregateSize))
 
-        val actualPropertyToValues = convertPropertyCodeToValuesTable(actualRepeatDetailDTOs)
+        val actualPropertyToValues = convertPropertyCodeToValuesTable(actualRepeatDetailAggregates)
         assertThat(actualPropertyToValues[REPEAT_SETTING_PROPERTY_ZONE_ID], equalTo(setOf(expectedZoneId)))
         assertThat(actualPropertyToValues[REPEAT_SETTING_PROPERTY_MONTHLY_DAY], equalTo(expectedMonthlyDays))
     }
 
     @Test
-    fun `Given repeat monthly with customize, When try convert to dto, Then return matched value`() {
+    fun `Given repeat monthly with customize, When try convert to aggregate, Then return matched value`() {
         val monthlyRepeatDetail = genMonthlyRepeatCustomize()
         val repeat = genRepeatMonthly(detail = monthlyRepeatDetail)
 
@@ -561,43 +610,43 @@ class RepeatTransformsKtTest {
         val expectedOrderCode = monthlyRepeatDetail.order.toRepeatDayOrder()
         val expectedDayCode = monthlyRepeatDetail.day.toRepeatDays()
         // zoneId + order + day
-        val expectedDTOSize = 3
+        val expectedAggregateSize = 3
 
-        val actualDTO = repeat.toDTO()
-        assertThat(actualDTO.type, equalTo(REPEAT_MONTHLY))
-        assertThat(actualDTO.interval, equalTo(repeat.interval))
+        val actualAggregate = repeat.toAggregate()
+        assertThat(actualAggregate.type, equalTo(REPEAT_MONTHLY))
+        assertThat(actualAggregate.interval, equalTo(repeat.interval))
 
-        val actualRepeatDetailDTOs = actualDTO.details
-        assertThat(actualRepeatDetailDTOs.size, equalTo(expectedDTOSize))
+        val actualRepeatDetailAggregates = actualAggregate.details
+        assertThat(actualRepeatDetailAggregates.size, equalTo(expectedAggregateSize))
 
-        val actualPropertyToValues = convertPropertyCodeToValuesTable(actualRepeatDetailDTOs)
+        val actualPropertyToValues = convertPropertyCodeToValuesTable(actualRepeatDetailAggregates)
         assertThat(actualPropertyToValues[REPEAT_SETTING_PROPERTY_ZONE_ID], equalTo(setOf(expectedZoneId)))
         assertThat(actualPropertyToValues[REPEAT_SETTING_PROPERTY_MONTHLY_DAY_ORDER], equalTo(setOf(expectedOrderCode)))
         assertThat(actualPropertyToValues[REPEAT_SETTING_PROPERTY_MONTHLY_DAY_OF_WEEK], equalTo(setOf(expectedDayCode)))
     }
 
     @Test
-    fun `Given repeat yearly without dayOfWeekOption, When try convert to dto, Then return matched value`() {
+    fun `Given repeat yearly without dayOfWeekOption, When try convert to aggregate, Then return matched value`() {
         val repeat = genRepeatYearly(daysOfWeekOption = null)
         val expectedZoneId = repeat.timeZone.id
         val expectedMonthCodes = repeat.months.value.toSet { it.toRepeatMonth() }
         // zoneId + month.size
-        val expectedDTOSize = 1 + expectedMonthCodes.size
+        val expectedAggregateSize = 1 + expectedMonthCodes.size
 
-        val actualDTO = repeat.toDTO()
-        assertThat(actualDTO.type, equalTo(REPEAT_YEARLY))
-        assertThat(actualDTO.interval, equalTo(repeat.interval))
+        val actualAggregate = repeat.toAggregate()
+        assertThat(actualAggregate.type, equalTo(REPEAT_YEARLY))
+        assertThat(actualAggregate.interval, equalTo(repeat.interval))
 
-        val actualRepeatDetailDTOs = actualDTO.details
-        assertThat(actualRepeatDetailDTOs.size, equalTo(expectedDTOSize))
+        val actualRepeatDetailAggregates = actualAggregate.details
+        assertThat(actualRepeatDetailAggregates.size, equalTo(expectedAggregateSize))
 
-        val actualPropertyToValues = convertPropertyCodeToValuesTable(actualRepeatDetailDTOs)
+        val actualPropertyToValues = convertPropertyCodeToValuesTable(actualRepeatDetailAggregates)
         assertThat(actualPropertyToValues[REPEAT_SETTING_PROPERTY_ZONE_ID], equalTo(setOf(expectedZoneId)))
         assertThat(actualPropertyToValues[REPEAT_SETTING_PROPERTY_YEARLY_MONTH], equalTo(expectedMonthCodes))
     }
 
     @Test
-    fun `Given repeat yearly with dayOfWeekOption, When try convert to dto, Then return matched value`() {
+    fun `Given repeat yearly with dayOfWeekOption, When try convert to aggregate, Then return matched value`() {
         val dayOfWeekOption = genYearlyDaysOfWeekOption()
         val repeat = genRepeatYearly(daysOfWeekOption = dayOfWeekOption)
         val expectedZoneId = repeat.timeZone.id
@@ -605,16 +654,16 @@ class RepeatTransformsKtTest {
         val expectedDayOrderCode = dayOfWeekOption.order.toRepeatDayOrder()
         val expectedDaysCode = dayOfWeekOption.day.toRepeatDays()
         // zoneId + months + order + day
-        val expectedDTOSize = 3 + expectedMonthCodes.size
+        val expectedAggregateSize = 3 + expectedMonthCodes.size
 
-        val actualDTO = repeat.toDTO()
-        assertThat(actualDTO.type, equalTo(REPEAT_YEARLY))
-        assertThat(actualDTO.interval, equalTo(repeat.interval))
+        val actualAggregate = repeat.toAggregate()
+        assertThat(actualAggregate.type, equalTo(REPEAT_YEARLY))
+        assertThat(actualAggregate.interval, equalTo(repeat.interval))
 
-        val actualRepeatDetailDTOs = actualDTO.details
-        assertThat(actualRepeatDetailDTOs.size, equalTo(expectedDTOSize))
+        val actualRepeatDetailAggregates = actualAggregate.details
+        assertThat(actualRepeatDetailAggregates.size, equalTo(expectedAggregateSize))
 
-        val actualPropertyToValues = convertPropertyCodeToValuesTable(actualRepeatDetailDTOs)
+        val actualPropertyToValues = convertPropertyCodeToValuesTable(actualRepeatDetailAggregates)
         assertThat(actualPropertyToValues[REPEAT_SETTING_PROPERTY_ZONE_ID], equalTo(setOf(expectedZoneId)))
         assertThat(actualPropertyToValues[REPEAT_SETTING_PROPERTY_YEARLY_MONTH], equalTo(expectedMonthCodes))
         assertThat(
@@ -639,9 +688,9 @@ private fun RepeatDetailEntities(
 }
 
 private fun convertPropertyCodeToValuesTable(
-    dto: Set<RepeatDetailDTO>
+    repeatDetailAggregates: Set<ScheduleRepeatDetailAggregate>
 ): Map<String, Set<String>> = buildMap<String, MutableSet<String>> {
-    dto.forEach { dto ->
-        getOrPut(dto.propertyCode) { mutableSetOf() }.add(dto.value)
+    repeatDetailAggregates.forEach { repeatDetailAggregate ->
+        getOrPut(repeatDetailAggregate.propertyCode) { mutableSetOf() }.add(repeatDetailAggregate.value)
     }
 }

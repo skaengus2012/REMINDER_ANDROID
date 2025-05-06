@@ -14,14 +14,9 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.local.database.model
+package com.nlab.reminder.core.local.database.entity
 
 /**
- * Sub-set of [RepeatDetailEntity]
- *
- * @author Doohyun
+ * @author Thalys
  */
-data class RepeatDetailDTO(
-    @RepeatSettingProperty val propertyCode: String,
-    val value: String
-)
+internal const val EMPTY_GENERATED_ID = 0L

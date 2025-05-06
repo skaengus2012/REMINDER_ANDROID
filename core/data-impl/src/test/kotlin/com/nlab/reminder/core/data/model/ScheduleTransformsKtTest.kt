@@ -1,5 +1,6 @@
 package com.nlab.reminder.core.data.model
 
+import com.nlab.reminder.core.kotlin.collections.toSet
 import com.nlab.reminder.core.kotlin.faker.genNonNegativeLong
 import com.nlab.testkit.faker.genBlank
 import com.nlab.testkit.faker.genBoolean
@@ -196,55 +197,56 @@ class ScheduleTransformsKtTest {
     }
 
     @Test
-    fun `Given ScheduleTiming, When converting to DTO, Then all fields are correctly mapped`() {
+    fun `Given ScheduleTiming, When converting to aggregate, Then all fields are correctly mapped`() {
         val timing = genScheduleTiming()
-        val dto = timing.toDTO()
+        val aggregate = timing.toAggregate()
 
-        assertThat(dto.triggerTimeUtc, equalTo(timing.triggerAtUtc))
-        assertThat(dto.isTriggerTimeDateOnly, equalTo(timing.isTriggerAtDateOnly))
-        assertThat(dto.repeatDTO, equalTo(timing.repeat!!.toDTO()))
+        assertThat(aggregate.triggerTimeUtc, equalTo(timing.triggerAtUtc))
+        assertThat(aggregate.isTriggerTimeDateOnly, equalTo(timing.isTriggerAtDateOnly))
+        assertThat(aggregate.repeat, equalTo(timing.repeat!!.toAggregate()))
     }
 
     @Test
-    fun `Given ScheduleTiming without repeat, When converting to DTO, Then repeatDTO is null`() {
+    fun `Given ScheduleTiming without repeat, When converting to aggregate, Then repeatAggregate is null`() {
         val timing = genScheduleTiming(repeat = null)
-        val dto = timing.toDTO()
-        assertThat(dto.repeatDTO, nullValue())
+        val aggregate = timing.toAggregate()
+        assertThat(aggregate.repeat, nullValue())
     }
 
     @Test
-    fun `Given ScheduleContent, When converting to DTO, Then all fields are correctly mapped`() {
+    fun `Given ScheduleContent, When converting to aggregate, Then all fields are correctly mapped`() {
         val scheduleContent = genScheduleContent()
-        val dto = scheduleContent.toDTO()
+        val aggregate = scheduleContent.toAggregate()
 
-        assertThat(dto.title, equalTo(scheduleContent.title))
-        assertThat(dto.description, equalTo(scheduleContent.note))
-        assertThat(dto.link, equalTo(scheduleContent.link!!.rawLink))
-        assertThat(dto.timingDTO!!, equalTo(scheduleContent.timing!!.toDTO()))
+        assertThat(aggregate.headline.title, equalTo(scheduleContent.title))
+        assertThat(aggregate.headline.description, equalTo(scheduleContent.note))
+        assertThat(aggregate.headline.link, equalTo(scheduleContent.link!!.rawLink))
+        assertThat(aggregate.timing!!, equalTo(scheduleContent.timing!!.toAggregate()))
+        assertThat(aggregate.tagIds, equalTo(scheduleContent.tagIds.toSet { it.rawId }))
     }
 
     @Test
-    fun `Given ScheduleContent without note, When converting to DTO, Then description is null`() {
+    fun `Given ScheduleContent without note, When converting to aggregate, Then description is null`() {
         val scheduleContent = genScheduleContent(note = null)
-        val dto = scheduleContent.toDTO()
+        val aggregate = scheduleContent.toAggregate()
 
-        assertThat(dto.description, nullValue())
+        assertThat(aggregate.headline.description, nullValue())
     }
 
     @Test
-    fun `Given ScheduleContent without link, When converting to DTO, Then link is null`() {
+    fun `Given ScheduleContent without link, When converting to aggregate, Then link is null`() {
         val scheduleContent = genScheduleContent(link = null)
-        val dto = scheduleContent.toDTO()
+        val aggregate = scheduleContent.toAggregate()
 
-        assertThat(dto.link, nullValue())
+        assertThat(aggregate.headline.link, nullValue())
     }
 
     @Test
-    fun `Given ScheduleContent without timing, When converting to DTO, Then timingDTO is null`() {
+    fun `Given ScheduleContent without timing, When converting to aggregate, Then timingAggregate is null`() {
         val scheduleContent = genScheduleContent(timing = null)
-        val dto = scheduleContent.toDTO()
+        val aggregate = scheduleContent.toAggregate()
 
-        assertThat(dto.timingDTO, nullValue())
+        assertThat(aggregate.timing, nullValue())
     }
 }
 

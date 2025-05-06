@@ -19,10 +19,6 @@ package com.nlab.reminder.core.local.database.transaction
 import com.nlab.reminder.core.local.database.dao.RepeatDetailDAO
 import com.nlab.reminder.core.local.database.dao.ScheduleDAO
 import com.nlab.reminder.core.local.database.dao.ScheduleTagListDAO
-import com.nlab.reminder.core.local.database.model.RepeatDetailEntity
-import com.nlab.reminder.core.local.database.model.ScheduleContentDTO
-import com.nlab.reminder.core.local.database.model.ScheduleEntity
-import com.nlab.reminder.core.local.database.model.ScheduleTagListEntity
 import com.nlab.reminder.core.local.database.util.TransactionScope
 import dagger.Reusable
 import javax.inject.Inject
@@ -31,36 +27,43 @@ import javax.inject.Inject
  * @author Thalys
  */
 @Reusable
-class UpdateAndGetScheduleWithExtraTransaction @Inject internal constructor(
+class UpdateAndGetScheduleContentAggregateTransaction @Inject internal constructor(
     private val transactionScope: TransactionScope,
-    private val scheduleContentValidator: ScheduleContentValidator,
+    private val scheduleTimingAggregateValidator: ScheduleTimingAggregateValidator,
     private val scheduleDAO: ScheduleDAO,
     private val scheduleTagListDAO: ScheduleTagListDAO,
     private val repeatDetailDAO: RepeatDetailDAO,
     private val insertAndGetScheduleExtra: InsertAndGetScheduleExtra
 ) {
-    suspend operator fun invoke(scheduleId: Long, contentDTO: ScheduleContentDTO): UpdateScheduleWithExtraResult {
-        scheduleContentValidator.validate(contentDTO)
+    suspend operator fun invoke(
+        scheduleId: Long,
+        scheduleContentAggregate: ScheduleContentAggregate
+    ): ScheduleContentAggregateSavedSnapshot {
+        scheduleContentAggregate.timing?.run(scheduleTimingAggregateValidator::validate)
         return transactionScope.runIn {
-            updateAndGetScheduleWithExtra(scheduleId, contentDTO)
+            updateAndGetScheduleWithExtra(scheduleId, scheduleContentAggregate)
         }
     }
 
     private suspend fun updateAndGetScheduleWithExtra(
         scheduleId: Long,
-        contentDTO: ScheduleContentDTO
-    ): UpdateScheduleWithExtraResult {
+        scheduleContentAggregate: ScheduleContentAggregate
+    ): ScheduleContentAggregateSavedSnapshot {
         clearScheduleExtra(scheduleId)
-        val scheduleEntity = scheduleDAO.updateAndGet(scheduleId, contentDTO)
-        val result = insertAndGetScheduleExtra(
-            scheduleId = scheduleId,
-            tagIds = contentDTO.tagIds,
-            repeatDetailDTOs = contentDTO.timingDTO?.repeatDTO?.details.orEmpty()
+        val scheduleEntity = scheduleDAO.updateAndGet(
+            scheduleId,
+            headline = scheduleContentAggregate.headline,
+            timing = scheduleContentAggregate.timing?.toScheduleTimingSaveInput()
         )
-        return UpdateScheduleWithExtraResult(
+        val snapshot = insertAndGetScheduleExtra(
+            scheduleId = scheduleId,
+            tagIds = scheduleContentAggregate.tagIds,
+            repeatDetailAggregates = scheduleContentAggregate.timing?.repeat?.details.orEmpty()
+        )
+        return ScheduleContentAggregateSavedSnapshot(
             scheduleEntity = scheduleEntity,
-            repeatDetailEntities = result.repeatDetailEntities,
-            scheduleTagListEntities = result.scheduleTagListEntities
+            repeatDetailEntities = snapshot.repeatDetailEntities,
+            scheduleTagListEntities = snapshot.scheduleTagListEntities
         )
     }
 
@@ -69,9 +72,3 @@ class UpdateAndGetScheduleWithExtraTransaction @Inject internal constructor(
         repeatDetailDAO.deleteByScheduleId(scheduleId)
     }
 }
-
-data class UpdateScheduleWithExtraResult(
-    val scheduleEntity: ScheduleEntity,
-    val repeatDetailEntities: Set<RepeatDetailEntity>,
-    val scheduleTagListEntities: Set<ScheduleTagListEntity>
-)

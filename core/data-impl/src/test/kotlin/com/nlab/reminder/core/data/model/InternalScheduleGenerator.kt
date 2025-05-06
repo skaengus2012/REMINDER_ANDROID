@@ -18,10 +18,10 @@ package com.nlab.reminder.core.data.model
 
 import com.nlab.reminder.core.kotlin.collections.toSet
 import com.nlab.reminder.core.kotlin.collections.toSetIndexed
-import com.nlab.reminder.core.local.database.model.RepeatDetailDTO
-import com.nlab.reminder.core.local.database.model.RepeatDetailEntity
-import com.nlab.reminder.core.local.database.model.ScheduleEntity
-import com.nlab.reminder.core.local.database.model.ScheduleTagListEntity
+import com.nlab.reminder.core.local.database.entity.RepeatDetailEntity
+import com.nlab.reminder.core.local.database.entity.ScheduleEntity
+import com.nlab.reminder.core.local.database.entity.ScheduleTagListEntity
+import com.nlab.reminder.core.local.database.transaction.ScheduleRepeatDetailAggregate
 import com.nlab.testkit.faker.genInt
 
 typealias ScheduleAndEntity = Pair<Schedule, ScheduleCompositeEntity>
@@ -39,21 +39,21 @@ fun genScheduleAndEntity(
     schedule: Schedule = genSchedule(),
     lastRepeatId: Long = -1
 ): ScheduleAndEntity {
-    val contentDTO = schedule.content.toDTO()
+    val aggregate = schedule.content.toAggregate()
     val scheduleEntity = ScheduleEntity(
         scheduleId = schedule.id.rawId,
-        title = contentDTO.title.value,
-        description = contentDTO.description?.value,
-        link = contentDTO.link?.value,
+        title = aggregate.headline.title.value,
+        description = aggregate.headline.description?.value,
+        link = aggregate.headline.link?.value,
         visiblePriority = schedule.visiblePriority.value,
         isComplete = schedule.isComplete,
-        triggerTimeUtc = contentDTO.timingDTO?.triggerTimeUtc,
-        isTriggerTimeDateOnly = contentDTO.timingDTO?.isTriggerTimeDateOnly,
-        repeatType = contentDTO.timingDTO?.repeatDTO?.type,
-        repeatInterval = contentDTO.timingDTO?.repeatDTO?.interval?.value
+        triggerTimeUtc = aggregate.timing?.triggerTimeUtc,
+        isTriggerTimeDateOnly = aggregate.timing?.isTriggerTimeDateOnly,
+        repeatType = aggregate.timing?.repeat?.type,
+        repeatInterval = aggregate.timing?.repeat?.interval?.value
     )
     val repeatDetailEntities = RepeatDetailEntities(
-        repeatDetailDTOs = contentDTO.timingDTO?.repeatDTO?.details.orEmpty(),
+        scheduleAggregateRepeatDetailAggregates = aggregate.timing?.repeat?.details.orEmpty(),
         scheduleId = scheduleEntity.scheduleId,
         lastRepeatId = lastRepeatId
     )
@@ -73,17 +73,17 @@ fun genScheduleAndEntity(
 
 @Suppress("TestFunctionName")
 private fun RepeatDetailEntities(
-    repeatDetailDTOs: Iterable<RepeatDetailDTO>,
+    scheduleAggregateRepeatDetailAggregates: Iterable<ScheduleRepeatDetailAggregate>,
     scheduleId: Long,
     lastRepeatId: Long = -1
 ): Set<RepeatDetailEntity> {
     val pivotRepeatId = lastRepeatId + 1
-    return repeatDetailDTOs.toSetIndexed { index, repeatDetailDTO ->
+    return scheduleAggregateRepeatDetailAggregates.toSetIndexed { index, aggregate ->
         RepeatDetailEntity(
             repeatId = index.toLong() + pivotRepeatId,
             scheduleId = scheduleId,
-            propertyCode = repeatDetailDTO.propertyCode,
-            value = repeatDetailDTO.value
+            propertyCode = aggregate.propertyCode,
+            value = aggregate.value
         )
     }
 }

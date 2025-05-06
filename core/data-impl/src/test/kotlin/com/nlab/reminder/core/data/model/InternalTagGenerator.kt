@@ -18,8 +18,8 @@ package com.nlab.reminder.core.data.model
 
 import com.nlab.reminder.core.kotlin.NonNegativeInt
 import com.nlab.reminder.core.kotlin.toNonNegativeInt
-import com.nlab.reminder.core.local.database.model.ScheduleTagListEntity
-import com.nlab.reminder.core.local.database.model.TagEntity
+import com.nlab.reminder.core.local.database.entity.ScheduleTagListEntity
+import com.nlab.reminder.core.local.database.entity.TagEntity
 import com.nlab.testkit.faker.genInt
 
 typealias TagAndEntity = Pair<Tag, TagEntity>

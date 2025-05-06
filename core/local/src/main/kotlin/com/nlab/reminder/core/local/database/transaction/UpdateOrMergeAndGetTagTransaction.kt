@@ -20,8 +20,8 @@ import com.nlab.reminder.core.kotlin.NonBlankString
 import com.nlab.reminder.core.kotlin.collections.toSet
 import com.nlab.reminder.core.local.database.dao.ScheduleTagListDAO
 import com.nlab.reminder.core.local.database.dao.TagDAO
-import com.nlab.reminder.core.local.database.model.ScheduleTagListEntity
-import com.nlab.reminder.core.local.database.model.TagEntity
+import com.nlab.reminder.core.local.database.entity.ScheduleTagListEntity
+import com.nlab.reminder.core.local.database.entity.TagEntity
 import com.nlab.reminder.core.local.database.util.TransactionScope
 import dagger.Reusable
 import javax.inject.Inject

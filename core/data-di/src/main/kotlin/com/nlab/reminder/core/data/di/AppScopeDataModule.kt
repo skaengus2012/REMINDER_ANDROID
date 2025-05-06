@@ -50,8 +50,8 @@ import com.nlab.reminder.core.local.database.dao.ScheduleDAO
 import com.nlab.reminder.core.local.database.dao.ScheduleRepeatDetailDAO
 import com.nlab.reminder.core.local.database.dao.ScheduleTagListDAO
 import com.nlab.reminder.core.local.database.dao.TagDAO
-import com.nlab.reminder.core.local.database.transaction.InsertAndGetScheduleWithExtraTransaction
-import com.nlab.reminder.core.local.database.transaction.UpdateAndGetScheduleWithExtraTransaction
+import com.nlab.reminder.core.local.database.transaction.InsertAndGetScheduleContentAggregateTransaction
+import com.nlab.reminder.core.local.database.transaction.UpdateAndGetScheduleContentAggregateTransaction
 import com.nlab.reminder.core.local.database.transaction.UpdateOrMergeAndGetTagTransaction
 import com.nlab.reminder.core.local.datastore.preference.PreferenceDataSource
 import com.nlab.reminder.core.network.datasource.LinkThumbnailDataSource
@@ -84,14 +84,14 @@ internal object AppScopeDataModule {
         scheduleDAO: ScheduleDAO,
         scheduleRepeatDetailDAO: ScheduleRepeatDetailDAO,
         scheduleTagListDAO: ScheduleTagListDAO,
-        insertAndGetScheduleWithExtraTransaction: InsertAndGetScheduleWithExtraTransaction,
-        updateAndGetScheduleWithExtraTransaction: UpdateAndGetScheduleWithExtraTransaction
+        insertAndGetScheduleContentAggregateTransaction: InsertAndGetScheduleContentAggregateTransaction,
+        updateAndGetScheduleContentAggregateTransaction: UpdateAndGetScheduleContentAggregateTransaction
     ): ScheduleRepository = LocalScheduleRepository(
         scheduleDAO = scheduleDAO,
         scheduleRepeatDetailDAO = scheduleRepeatDetailDAO,
         scheduleTagListDAO = scheduleTagListDAO,
-        insertAndGetScheduleWithExtra = insertAndGetScheduleWithExtraTransaction,
-        updateAndGetScheduleWithExtra = updateAndGetScheduleWithExtraTransaction
+        insertAndGetScheduleContentAggregate = insertAndGetScheduleContentAggregateTransaction,
+        updateAndGetScheduleContentAggregate = updateAndGetScheduleContentAggregateTransaction
     )
 
     @Reusable

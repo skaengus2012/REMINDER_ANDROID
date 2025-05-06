@@ -16,7 +16,13 @@
 
 package com.nlab.reminder.core.data.model
 
-import com.nlab.reminder.core.local.database.model.*
+import com.nlab.reminder.core.local.database.entity.REPEAT_WEEK_FRI
+import com.nlab.reminder.core.local.database.entity.REPEAT_WEEK_MON
+import com.nlab.reminder.core.local.database.entity.REPEAT_WEEK_SAT
+import com.nlab.reminder.core.local.database.entity.REPEAT_WEEK_SUN
+import com.nlab.reminder.core.local.database.entity.REPEAT_WEEK_THU
+import com.nlab.reminder.core.local.database.entity.REPEAT_WEEK_TUE
+import com.nlab.reminder.core.local.database.entity.REPEAT_WEEK_WED
 import org.hamcrest.CoreMatchers.sameInstance
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test

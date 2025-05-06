@@ -18,8 +18,8 @@ package com.nlab.reminder.core.local.database.dao
 
 import androidx.room.Dao
 import androidx.room.Query
-import com.nlab.reminder.core.local.database.model.RepeatDetailEntity
-import com.nlab.reminder.core.local.database.model.ScheduleEntity
+import com.nlab.reminder.core.local.database.entity.RepeatDetailEntity
+import com.nlab.reminder.core.local.database.entity.ScheduleEntity
 import kotlinx.coroutines.flow.Flow
 
 /**

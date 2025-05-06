@@ -27,9 +27,9 @@ import com.nlab.reminder.core.local.database.dao.ScheduleDAO
 import com.nlab.reminder.core.local.database.dao.ScheduleTagListDAO
 import com.nlab.reminder.core.local.database.dao.TagDAO
 import com.nlab.reminder.core.local.database.dao.TriggerTimeDTO
-import com.nlab.reminder.core.local.database.model.ScheduleEntity
-import com.nlab.reminder.core.local.database.model.ScheduleTagListEntity
-import com.nlab.reminder.core.local.database.model.TagEntity
+import com.nlab.reminder.core.local.database.entity.ScheduleEntity
+import com.nlab.reminder.core.local.database.entity.ScheduleTagListEntity
+import com.nlab.reminder.core.local.database.entity.TagEntity
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock

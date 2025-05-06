@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.local.database.model
+package com.nlab.reminder.core.local.database.entity
 
 import androidx.annotation.StringDef
 
@@ -23,18 +23,20 @@ import androidx.annotation.StringDef
  */
 @StringDef(
     value = [
-        REPEAT_HOURLY,
-        REPEAT_DAILY,
-        REPEAT_WEEKLY,
-        REPEAT_MONTHLY,
-        REPEAT_YEARLY
+        REPEAT_DAY_ORDER_FIRST,
+        REPEAT_DAY_ORDER_SECOND,
+        REPEAT_DAY_ORDER_THIRD,
+        REPEAT_DAY_ORDER_FOURTH,
+        REPEAT_DAY_ORDER_FIFTH,
+        REPEAT_DAY_ORDER_LAST
     ]
 )
 @Retention(AnnotationRetention.SOURCE)
-annotation class RepeatType
+annotation class RepeatDayOrder
 
-const val REPEAT_HOURLY = "REPEAT_HOURLY"
-const val REPEAT_DAILY = "REPEAT_DAILY"
-const val REPEAT_WEEKLY = "REPEAT_WEEKLY"
-const val REPEAT_MONTHLY = "REPEAT_MONTHLY"
-const val REPEAT_YEARLY = "REPEAT_YEARLY"
+const val REPEAT_DAY_ORDER_FIRST = "REPEAT_DAY_ORDER_FIRST"
+const val REPEAT_DAY_ORDER_SECOND = "REPEAT_DAY_ORDER_SECOND"
+const val REPEAT_DAY_ORDER_THIRD = "REPEAT_DAY_ORDER_THIRD"
+const val REPEAT_DAY_ORDER_FOURTH = "REPEAT_DAY_ORDER_FOURTH"
+const val REPEAT_DAY_ORDER_FIFTH = "REPEAT_DAY_ORDER_FIFTH"
+const val REPEAT_DAY_ORDER_LAST = "REPEAT_DAY_ORDER_LAST"

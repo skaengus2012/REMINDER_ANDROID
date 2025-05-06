@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 The N's lab Open Source Project
+ * Copyright (C) 2025 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.local.database.model
+package com.nlab.reminder.core.local.database.entity
 
 import androidx.annotation.IntRange
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.nlab.reminder.core.kotlin.NonNegativeLong
 import kotlinx.datetime.Instant
 
 /**
@@ -53,38 +52,3 @@ data class ScheduleEntity(
     @ColumnInfo(name = "repeat_type") @RepeatType val repeatType: String?,
     @ColumnInfo(name = "repeat_interval") @IntRange(from = 1) val repeatInterval: Int?,
 )
-
-internal fun ScheduleEntity(
-    contentDTO: ScheduleContentDTO,
-    visiblePriority: NonNegativeLong,
-): ScheduleEntity = ScheduleEntity(
-    title = contentDTO.title.value,
-    description = contentDTO.description?.value,
-    link = contentDTO.link?.value,
-    triggerTimeUtc = contentDTO.timingDTO?.triggerTimeUtc,
-    isTriggerTimeDateOnly = contentDTO.timingDTO?.isTriggerTimeDateOnly,
-    repeatType = contentDTO.timingDTO?.repeatDTO?.type,
-    repeatInterval = contentDTO.timingDTO?.repeatDTO?.interval?.value,
-    visiblePriority = visiblePriority.value,
-    isComplete = false
-)
-
-internal fun ScheduleEntity(
-    baseEntity: ScheduleEntity,
-    contentDTO: ScheduleContentDTO
-): ScheduleEntity = baseEntity.copy(
-    title = contentDTO.title.value,
-    description = contentDTO.description?.value,
-    link = contentDTO.link?.value,
-    triggerTimeUtc = contentDTO.timingDTO?.triggerTimeUtc,
-    isTriggerTimeDateOnly = contentDTO.timingDTO?.isTriggerTimeDateOnly
-)
-
-internal fun ScheduleEntity.contentEquals(contentDTO: ScheduleContentDTO): Boolean =
-    title == contentDTO.title.value
-            && description == contentDTO.description?.value
-            && link == contentDTO.link?.value
-            && triggerTimeUtc == contentDTO.timingDTO?.triggerTimeUtc
-            && isTriggerTimeDateOnly == contentDTO.timingDTO?.isTriggerTimeDateOnly
-            && repeatType == contentDTO.timingDTO?.repeatDTO?.type
-            && repeatInterval == contentDTO.timingDTO?.repeatDTO?.interval?.value

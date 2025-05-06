@@ -16,13 +16,13 @@
 
 package com.nlab.reminder.core.data.model
 
-import com.nlab.reminder.core.local.database.model.REPEAT_DAY_ORDER_FIFTH
-import com.nlab.reminder.core.local.database.model.REPEAT_DAY_ORDER_FIRST
-import com.nlab.reminder.core.local.database.model.REPEAT_DAY_ORDER_FOURTH
-import com.nlab.reminder.core.local.database.model.REPEAT_DAY_ORDER_LAST
-import com.nlab.reminder.core.local.database.model.REPEAT_DAY_ORDER_SECOND
-import com.nlab.reminder.core.local.database.model.REPEAT_DAY_ORDER_THIRD
-import com.nlab.reminder.core.local.database.model.RepeatDayOrder
+import com.nlab.reminder.core.local.database.entity.REPEAT_DAY_ORDER_FIFTH
+import com.nlab.reminder.core.local.database.entity.REPEAT_DAY_ORDER_FIRST
+import com.nlab.reminder.core.local.database.entity.REPEAT_DAY_ORDER_FOURTH
+import com.nlab.reminder.core.local.database.entity.REPEAT_DAY_ORDER_LAST
+import com.nlab.reminder.core.local.database.entity.REPEAT_DAY_ORDER_SECOND
+import com.nlab.reminder.core.local.database.entity.REPEAT_DAY_ORDER_THIRD
+import com.nlab.reminder.core.local.database.entity.RepeatDayOrder
 
 /**
  * @author Thalys

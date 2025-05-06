@@ -22,7 +22,7 @@ import com.nlab.reminder.core.data.model.genSchedule
 import com.nlab.reminder.core.data.model.genScheduleAndEntities
 import com.nlab.reminder.core.data.model.genScheduleAndEntity
 import com.nlab.reminder.core.data.model.genScheduleContent
-import com.nlab.reminder.core.data.model.toDTO
+import com.nlab.reminder.core.data.model.toAggregate
 import com.nlab.reminder.core.data.repository.DeleteScheduleQuery
 import com.nlab.reminder.core.data.repository.GetScheduleQuery
 import com.nlab.reminder.core.data.repository.SaveScheduleQuery
@@ -33,10 +33,9 @@ import com.nlab.reminder.core.kotlin.toNonNegativeLong
 import com.nlab.reminder.core.local.database.dao.ScheduleDAO
 import com.nlab.reminder.core.local.database.dao.ScheduleRepeatDetailDAO
 import com.nlab.reminder.core.local.database.dao.ScheduleTagListDAO
-import com.nlab.reminder.core.local.database.transaction.InsertAndGetScheduleWithExtraTransaction
-import com.nlab.reminder.core.local.database.transaction.InsertScheduleWithExtraResult
-import com.nlab.reminder.core.local.database.transaction.UpdateAndGetScheduleWithExtraTransaction
-import com.nlab.reminder.core.local.database.transaction.UpdateScheduleWithExtraResult
+import com.nlab.reminder.core.local.database.transaction.InsertAndGetScheduleContentAggregateTransaction
+import com.nlab.reminder.core.local.database.transaction.ScheduleContentAggregateSavedSnapshot
+import com.nlab.reminder.core.local.database.transaction.UpdateAndGetScheduleContentAggregateTransaction
 import com.nlab.testkit.faker.genBoolean
 import com.nlab.testkit.faker.genInt
 import io.mockk.coEvery
@@ -59,16 +58,16 @@ internal class LocalScheduleRepositoryTest {
         // given
         val (schedule, entity) = genScheduleAndEntities(count = 1).first()
         val tagIds = List(size = genInt(min = 2, max = 5)) { TagId(it.toLong()) }
-        val contentDTO = schedule.content.toDTO()
-        val insertAndGetScheduleWithExtra: InsertAndGetScheduleWithExtraTransaction = mockk {
-            coEvery { invoke(contentDTO = contentDTO) } returns InsertScheduleWithExtraResult(
+        val aggregate = schedule.content.toAggregate()
+        val insertAndGetScheduleWithExtra: InsertAndGetScheduleContentAggregateTransaction = mockk {
+            coEvery { invoke(scheduleContentAggregate = aggregate) } returns ScheduleContentAggregateSavedSnapshot(
                 scheduleEntity = entity.scheduleEntity,
                 scheduleTagListEntities = entity.scheduleTagListEntities,
                 repeatDetailEntities = entity.repeatDetailEntities
             )
         }
         val repository = genLocalScheduleRepository(
-            insertAndGetScheduleWithExtra = insertAndGetScheduleWithExtra
+            insertAndGetScheduleContentAggregate = insertAndGetScheduleWithExtra
         )
 
         // when
@@ -76,7 +75,7 @@ internal class LocalScheduleRepositoryTest {
 
         // then
         coVerify(exactly = 1) {
-            insertAndGetScheduleWithExtra(contentDTO)
+            insertAndGetScheduleWithExtra(aggregate)
         }
         assertThat(actual.getOrThrow(), equalTo(schedule))
     }
@@ -87,18 +86,21 @@ internal class LocalScheduleRepositoryTest {
         val (schedule, entity) = genScheduleAndEntities(count = 1).first()
         val tagIds = List(size = genInt(min = 2, max = 5)) { TagId(it.toLong()) }
         val rawScheduleId = schedule.id.rawId
-        val contentDTO = schedule.content.toDTO()
-        val updateAndGetScheduleWithExtra: UpdateAndGetScheduleWithExtraTransaction = mockk {
+        val aggregate = schedule.content.toAggregate()
+        val updateAndGetScheduleWithExtra: UpdateAndGetScheduleContentAggregateTransaction = mockk {
             coEvery {
-                invoke(scheduleId = rawScheduleId, contentDTO = contentDTO)
-            } returns UpdateScheduleWithExtraResult(
+                invoke(
+                    scheduleId = rawScheduleId,
+                    scheduleContentAggregate = aggregate
+                )
+            } returns ScheduleContentAggregateSavedSnapshot(
                 scheduleEntity = entity.scheduleEntity,
                 scheduleTagListEntities = entity.scheduleTagListEntities,
                 repeatDetailEntities = entity.repeatDetailEntities
             )
         }
         val repository = genLocalScheduleRepository(
-            updateAndGetScheduleWithExtra = updateAndGetScheduleWithExtra
+            updateAndGetScheduleContentAggregate = updateAndGetScheduleWithExtra
         )
 
         // when
@@ -106,7 +108,7 @@ internal class LocalScheduleRepositoryTest {
 
         // then
         coVerify(exactly = 1) {
-            updateAndGetScheduleWithExtra(rawScheduleId, contentDTO)
+            updateAndGetScheduleWithExtra(rawScheduleId, aggregate)
         }
         assertThat(actual.getOrThrow(), equalTo(schedule))
     }
@@ -275,12 +277,12 @@ private fun genLocalScheduleRepository(
     scheduleDAO: ScheduleDAO = mockk(),
     scheduleRepeatDetailDAO: ScheduleRepeatDetailDAO = mockk(),
     scheduleTagListDAO: ScheduleTagListDAO = mockk(),
-    insertAndGetScheduleWithExtra: InsertAndGetScheduleWithExtraTransaction = mockk(),
-    updateAndGetScheduleWithExtra: UpdateAndGetScheduleWithExtraTransaction = mockk()
+    insertAndGetScheduleContentAggregate: InsertAndGetScheduleContentAggregateTransaction = mockk(),
+    updateAndGetScheduleContentAggregate: UpdateAndGetScheduleContentAggregateTransaction = mockk()
 ) = LocalScheduleRepository(
     scheduleDAO = scheduleDAO,
     scheduleRepeatDetailDAO = scheduleRepeatDetailDAO,
     scheduleTagListDAO = scheduleTagListDAO,
-    insertAndGetScheduleWithExtra = insertAndGetScheduleWithExtra,
-    updateAndGetScheduleWithExtra = updateAndGetScheduleWithExtra
+    insertAndGetScheduleContentAggregate = insertAndGetScheduleContentAggregate,
+    updateAndGetScheduleContentAggregate = updateAndGetScheduleContentAggregate
 )

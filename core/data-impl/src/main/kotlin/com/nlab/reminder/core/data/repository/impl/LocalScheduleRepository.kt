@@ -18,7 +18,7 @@ package com.nlab.reminder.core.data.repository.impl
 
 import com.nlab.reminder.core.annotation.ExcludeFromGeneratedTestReport
 import com.nlab.reminder.core.data.model.Schedule
-import com.nlab.reminder.core.data.model.toDTO
+import com.nlab.reminder.core.data.model.toAggregate
 import com.nlab.reminder.core.data.repository.DeleteScheduleQuery
 import com.nlab.reminder.core.data.repository.GetScheduleCountQuery
 import com.nlab.reminder.core.data.repository.GetScheduleQuery
@@ -36,11 +36,11 @@ import com.nlab.reminder.core.kotlinx.coroutine.flow.map
 import com.nlab.reminder.core.local.database.dao.ScheduleDAO
 import com.nlab.reminder.core.local.database.dao.ScheduleRepeatDetailDAO
 import com.nlab.reminder.core.local.database.dao.ScheduleTagListDAO
-import com.nlab.reminder.core.local.database.model.RepeatDetailEntity
-import com.nlab.reminder.core.local.database.model.ScheduleEntity
-import com.nlab.reminder.core.local.database.model.ScheduleTagListEntity
-import com.nlab.reminder.core.local.database.transaction.InsertAndGetScheduleWithExtraTransaction
-import com.nlab.reminder.core.local.database.transaction.UpdateAndGetScheduleWithExtraTransaction
+import com.nlab.reminder.core.local.database.entity.RepeatDetailEntity
+import com.nlab.reminder.core.local.database.entity.ScheduleEntity
+import com.nlab.reminder.core.local.database.entity.ScheduleTagListEntity
+import com.nlab.reminder.core.local.database.transaction.InsertAndGetScheduleContentAggregateTransaction
+import com.nlab.reminder.core.local.database.transaction.UpdateAndGetScheduleContentAggregateTransaction
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 
@@ -51,29 +51,31 @@ class LocalScheduleRepository(
     private val scheduleDAO: ScheduleDAO,
     private val scheduleRepeatDetailDAO: ScheduleRepeatDetailDAO,
     private val scheduleTagListDAO: ScheduleTagListDAO,
-    private val insertAndGetScheduleWithExtra: InsertAndGetScheduleWithExtraTransaction,
-    private val updateAndGetScheduleWithExtra: UpdateAndGetScheduleWithExtraTransaction
+    private val insertAndGetScheduleContentAggregate: InsertAndGetScheduleContentAggregateTransaction,
+    private val updateAndGetScheduleContentAggregate: UpdateAndGetScheduleContentAggregateTransaction
 ) : ScheduleRepository {
     override suspend fun save(query: SaveScheduleQuery): Result<Schedule> = catching {
         when (query) {
             is SaveScheduleQuery.Add -> {
-                val insertResult = insertAndGetScheduleWithExtra(contentDTO = query.content.toDTO())
+                val insertedSnapshot = insertAndGetScheduleContentAggregate(
+                    scheduleContentAggregate = query.content.toAggregate()
+                )
                 Schedule(
-                    scheduleEntity = insertResult.scheduleEntity,
-                    scheduleTagListEntities = insertResult.scheduleTagListEntities,
-                    repeatDetailEntities = insertResult.repeatDetailEntities,
+                    scheduleEntity = insertedSnapshot.scheduleEntity,
+                    scheduleTagListEntities = insertedSnapshot.scheduleTagListEntities,
+                    repeatDetailEntities = insertedSnapshot.repeatDetailEntities,
                 )
             }
 
             is SaveScheduleQuery.Modify -> {
-                val updateResult = updateAndGetScheduleWithExtra(
+                val updatedSnapshot = updateAndGetScheduleContentAggregate(
                     scheduleId = query.id.rawId,
-                    contentDTO = query.content.toDTO()
+                    scheduleContentAggregate = query.content.toAggregate()
                 )
                 Schedule(
-                    scheduleEntity = updateResult.scheduleEntity,
-                    scheduleTagListEntities = updateResult.scheduleTagListEntities,
-                    repeatDetailEntities = updateResult.repeatDetailEntities,
+                    scheduleEntity = updatedSnapshot.scheduleEntity,
+                    scheduleTagListEntities = updatedSnapshot.scheduleTagListEntities,
+                    repeatDetailEntities = updatedSnapshot.repeatDetailEntities,
                 )
             }
         }

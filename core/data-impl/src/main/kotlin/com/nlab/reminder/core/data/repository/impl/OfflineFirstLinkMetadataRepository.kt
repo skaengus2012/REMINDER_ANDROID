@@ -18,7 +18,7 @@ package com.nlab.reminder.core.data.repository.impl
 
 import com.nlab.reminder.core.data.model.Link
 import com.nlab.reminder.core.data.model.LinkMetadata
-import com.nlab.reminder.core.data.model.toLocalDTO
+import com.nlab.reminder.core.data.model.toSaveInput
 import com.nlab.reminder.core.data.repository.LinkMetadataRepository
 import com.nlab.reminder.core.kotlin.collections.toSet
 import com.nlab.reminder.core.kotlin.concurrent.atomics.updateAndGet
@@ -77,7 +77,7 @@ class OfflineFirstLinkMetadataRepository(
                     .map(::LinkMetadata)
                     .onSuccess { remoteCache.put(link, it) }
                     .onSuccess { metadata -> send(acc.updateAndGet { it.put(link, metadata) }) }
-                    .onSuccess { metadata -> linkMetadataDAO.insertAndGet(metadata.toLocalDTO(link)) }
+                    .onSuccess { metadata -> linkMetadataDAO.insertAndGet(metadata.toSaveInput(link)) }
             }
         }
     }

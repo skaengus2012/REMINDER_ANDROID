@@ -32,7 +32,7 @@ import com.nlab.reminder.core.kotlin.trim
 import com.nlab.reminder.core.kotlinx.coroutine.flow.combine
 import com.nlab.reminder.core.local.database.dao.ScheduleTagListDAO
 import com.nlab.reminder.core.local.database.dao.TagDAO
-import com.nlab.reminder.core.local.database.model.TagEntity
+import com.nlab.reminder.core.local.database.entity.TagEntity
 import com.nlab.reminder.core.local.database.transaction.UpdateOrMergeAndGetTagTransaction
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged

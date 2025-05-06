@@ -21,12 +21,13 @@ import com.nlab.reminder.core.kotlin.collections.toSet
 import com.nlab.reminder.core.kotlin.toNonBlankString
 import com.nlab.reminder.core.kotlin.toNonNegativeLong
 import com.nlab.reminder.core.kotlin.tryToNonBlankStringOrNull
-import com.nlab.reminder.core.local.database.model.RepeatDetailEntity
-import com.nlab.reminder.core.local.database.model.RepeatType
-import com.nlab.reminder.core.local.database.model.ScheduleContentDTO
-import com.nlab.reminder.core.local.database.model.ScheduleEntity
-import com.nlab.reminder.core.local.database.model.ScheduleTagListEntity
-import com.nlab.reminder.core.local.database.model.ScheduleTimingDTO
+import com.nlab.reminder.core.local.database.dao.ScheduleHeadlineSaveInput
+import com.nlab.reminder.core.local.database.entity.RepeatDetailEntity
+import com.nlab.reminder.core.local.database.entity.RepeatType
+import com.nlab.reminder.core.local.database.entity.ScheduleEntity
+import com.nlab.reminder.core.local.database.entity.ScheduleTagListEntity
+import com.nlab.reminder.core.local.database.transaction.ScheduleContentAggregate
+import com.nlab.reminder.core.local.database.transaction.ScheduleTimingAggregate
 
 /**
  * @author Doohyun
@@ -91,7 +92,7 @@ private fun createScheduleTimingOrNull(
  * In Repeat function, check if there are appropriate repeatDetails.
  *
  * The exactly validity of the repeatDetails should be checked only in the data insertion.
- * @see [com.nlab.reminder.core.local.database.transaction.ScheduleContentValidator]
+ * @see [com.nlab.reminder.core.local.database.transaction.ScheduleTimingAggregateValidator]
  */
 private fun createRepeatOrNull(
     @RepeatType type: String?,
@@ -108,16 +109,20 @@ private fun createRepeatOrNull(
     return if (type == null) null else Repeat(type, interval!!, detailEntities)
 }
 
-internal fun ScheduleContent.toDTO(): ScheduleContentDTO = ScheduleContentDTO(
+internal fun ScheduleContent.toHeadlineSaveInput(): ScheduleHeadlineSaveInput = ScheduleHeadlineSaveInput(
     title = title,
     description = note,
-    link = link?.rawLink,
-    tagIds = tagIds.toSet { it.rawId },
-    timingDTO = timing?.toDTO(),
+    link = link?.rawLink
 )
 
-internal fun ScheduleTiming.toDTO(): ScheduleTimingDTO = ScheduleTimingDTO(
+internal fun ScheduleContent.toAggregate(): ScheduleContentAggregate = ScheduleContentAggregate(
+    headline = toHeadlineSaveInput(),
+    timing = timing?.toAggregate(),
+    tagIds = tagIds.toSet { it.rawId },
+)
+
+internal fun ScheduleTiming.toAggregate(): ScheduleTimingAggregate = ScheduleTimingAggregate(
     triggerTimeUtc = triggerAtUtc,
     isTriggerTimeDateOnly = isTriggerAtDateOnly,
-    repeatDTO = repeat?.toDTO()
+    repeat = repeat?.toAggregate()
 )

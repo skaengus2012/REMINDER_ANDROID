@@ -19,7 +19,7 @@ package com.nlab.reminder.core.local.database.dao
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
-import com.nlab.reminder.core.local.database.model.ScheduleTagListEntity
+import com.nlab.reminder.core.local.database.entity.ScheduleTagListEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 

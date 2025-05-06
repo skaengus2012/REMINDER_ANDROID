@@ -19,9 +19,8 @@ package com.nlab.reminder.core.local.database.transaction
 import com.nlab.reminder.core.kotlin.collections.toSet
 import com.nlab.reminder.core.local.database.dao.RepeatDetailDAO
 import com.nlab.reminder.core.local.database.dao.ScheduleTagListDAO
-import com.nlab.reminder.core.local.database.model.RepeatDetailDTO
-import com.nlab.reminder.core.local.database.model.RepeatDetailEntity
-import com.nlab.reminder.core.local.database.model.ScheduleTagListEntity
+import com.nlab.reminder.core.local.database.entity.RepeatDetailEntity
+import com.nlab.reminder.core.local.database.entity.ScheduleTagListEntity
 import dagger.Reusable
 import javax.inject.Inject
 
@@ -36,15 +35,15 @@ internal class InsertAndGetScheduleExtra @Inject constructor(
     suspend operator fun invoke(
         scheduleId: Long,
         tagIds: Set<Long>,
-        repeatDetailDTOs: Set<RepeatDetailDTO>
-    ): InsertScheduleExtraResult = InsertScheduleExtraResult(
+        repeatDetailAggregates: Set<ScheduleRepeatDetailAggregate>
+    ): InsertScheduleExtraSavedSnapshot = InsertScheduleExtraSavedSnapshot(
         scheduleTagListEntities = insertAndGetScheduleTagListEntities(
             scheduleId = scheduleId,
             tagIds = tagIds
         ),
         repeatDetailEntities = insertAndGetRepeatDetailEntities(
             scheduleId = scheduleId,
-            repeatDetailDTOs = repeatDetailDTOs
+            repeatDetailAggregates = repeatDetailAggregates
         )
     )
 
@@ -65,16 +64,16 @@ internal class InsertAndGetScheduleExtra @Inject constructor(
 
     private suspend fun insertAndGetRepeatDetailEntities(
         scheduleId: Long,
-        repeatDetailDTOs: Set<RepeatDetailDTO>
+        repeatDetailAggregates: Set<ScheduleRepeatDetailAggregate>
     ): Set<RepeatDetailEntity> {
-        if (repeatDetailDTOs.isEmpty()) return emptySet()
+        if (repeatDetailAggregates.isEmpty()) return emptySet()
 
         repeatDetailDAO.insert(
-            entities = repeatDetailDTOs.map { dto ->
+            entities = repeatDetailAggregates.map {
                 RepeatDetailEntity(
                     scheduleId = scheduleId,
-                    propertyCode = dto.propertyCode,
-                    value = dto.value
+                    propertyCode = it.propertyCode,
+                    value = it.value
                 )
             }
         )
@@ -82,7 +81,7 @@ internal class InsertAndGetScheduleExtra @Inject constructor(
     }
 }
 
-internal class InsertScheduleExtraResult(
+internal class InsertScheduleExtraSavedSnapshot(
     val scheduleTagListEntities: Set<ScheduleTagListEntity>,
     val repeatDetailEntities: Set<RepeatDetailEntity>
 )

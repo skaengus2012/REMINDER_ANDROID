@@ -17,8 +17,8 @@
 package com.nlab.reminder.core.data.model
 
 import com.nlab.reminder.core.kotlin.tryToNonBlankStringOrNull
-import com.nlab.reminder.core.local.database.model.LinkMetadataDTO
-import com.nlab.reminder.core.local.database.model.LinkMetadataEntity
+import com.nlab.reminder.core.local.database.dao.LinkMetadataSaveInput
+import com.nlab.reminder.core.local.database.entity.LinkMetadataEntity
 import com.nlab.reminder.core.network.datasource.LinkThumbnailResponse
 
 /**
@@ -34,7 +34,7 @@ internal fun LinkMetadata(response: LinkThumbnailResponse): LinkMetadata = LinkM
     imageUrl = response.image.tryToNonBlankStringOrNull()
 )
 
-internal fun LinkMetadata.toLocalDTO(link: Link): LinkMetadataDTO = LinkMetadataDTO(
+internal fun LinkMetadata.toSaveInput(link: Link): LinkMetadataSaveInput = LinkMetadataSaveInput(
     link = link.rawLink,
     title = title,
     imageUrl = imageUrl

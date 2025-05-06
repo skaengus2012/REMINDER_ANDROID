@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 The N's lab Open Source Project
+ * Copyright (C) 2025 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,17 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.local.database.model
+package com.nlab.reminder.core.local.database.transaction
 
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.Index
-import androidx.room.PrimaryKey
+import com.nlab.reminder.core.local.database.entity.RepeatDetailEntity
+import com.nlab.reminder.core.local.database.entity.ScheduleEntity
+import com.nlab.reminder.core.local.database.entity.ScheduleTagListEntity
 
 /**
  * @author Doohyun
  */
-@Entity(tableName = "tag", indices = [Index(value = ["name"], unique = true)])
-data class TagEntity(
-    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "tag_id") val tagId: Long = EMPTY_GENERATED_ID,
-    @ColumnInfo(name = "name") val name: String
+data class ScheduleContentAggregateSavedSnapshot(
+    val scheduleEntity: ScheduleEntity,
+    val repeatDetailEntities: Set<RepeatDetailEntity>,
+    val scheduleTagListEntities: Set<ScheduleTagListEntity>
 )

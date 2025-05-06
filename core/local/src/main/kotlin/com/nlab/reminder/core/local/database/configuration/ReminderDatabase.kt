@@ -24,11 +24,11 @@ import com.nlab.reminder.core.local.database.dao.ScheduleDAO
 import com.nlab.reminder.core.local.database.dao.ScheduleRepeatDetailDAO
 import com.nlab.reminder.core.local.database.dao.ScheduleTagListDAO
 import com.nlab.reminder.core.local.database.dao.TagDAO
-import com.nlab.reminder.core.local.database.model.LinkMetadataEntity
-import com.nlab.reminder.core.local.database.model.RepeatDetailEntity
-import com.nlab.reminder.core.local.database.model.ScheduleEntity
-import com.nlab.reminder.core.local.database.model.ScheduleTagListEntity
-import com.nlab.reminder.core.local.database.model.TagEntity
+import com.nlab.reminder.core.local.database.entity.LinkMetadataEntity
+import com.nlab.reminder.core.local.database.entity.RepeatDetailEntity
+import com.nlab.reminder.core.local.database.entity.ScheduleEntity
+import com.nlab.reminder.core.local.database.entity.ScheduleTagListEntity
+import com.nlab.reminder.core.local.database.entity.TagEntity
 import com.nlab.reminder.core.local.database.util.InstantConverter
 
 /**
@@ -51,7 +51,7 @@ private const val DB_NAME = "reminder_common.db"
         InstantConverter::class
     ]
 )
-internal abstract class ReminderDatabase : RoomDatabase() {
+abstract class ReminderDatabase : RoomDatabase() {
     abstract fun linkMetadataDAO(): LinkMetadataDAO
     abstract fun repeatDetailDAO(): RepeatDetailDAO
     abstract fun scheduleDAO(): ScheduleDAO
@@ -60,5 +60,5 @@ internal abstract class ReminderDatabase : RoomDatabase() {
     abstract fun tagDAO(): TagDAO
 }
 
-internal fun ReminderDatabase(context: Context): ReminderDatabase =
+fun ReminderDatabase(context: Context): ReminderDatabase =
     Room.databaseBuilder(context, ReminderDatabase::class.java, DB_NAME).build()

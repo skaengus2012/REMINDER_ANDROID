@@ -16,7 +16,7 @@
 
 package com.nlab.reminder.core.data.model
 
-import com.nlab.reminder.core.local.database.model.LinkMetadataEntity
+import com.nlab.reminder.core.local.database.entity.LinkMetadataEntity
 import com.nlab.testkit.faker.genIntGreaterThanZero
 
 typealias LinkAndMetadataAndEntity = Triple<Link, LinkMetadata, LinkMetadataEntity>

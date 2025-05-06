@@ -23,8 +23,7 @@ import androidx.room.Query
 import androidx.room.Transaction
 import com.nlab.reminder.core.kotlin.NonBlankString
 import com.nlab.reminder.core.kotlin.collections.toSet
-import com.nlab.reminder.core.local.database.model.LinkMetadataDTO
-import com.nlab.reminder.core.local.database.model.LinkMetadataEntity
+import com.nlab.reminder.core.local.database.entity.LinkMetadataEntity
 
 private const val MAX_CACHE_COUNT = 1000
 
@@ -64,12 +63,12 @@ abstract class LinkMetadataDAO {
     protected abstract suspend fun deleteOldestBy(count: Int)
 
     @Transaction
-    open suspend fun insertAndGet(metadataDTO: LinkMetadataDTO): LinkMetadataEntity {
+    open suspend fun insertAndGet(input: LinkMetadataSaveInput): LinkMetadataEntity {
         // insert
         val newEntity = LinkMetadataEntity(
-            link = metadataDTO.link.value,
-            title = metadataDTO.title?.value,
-            imageUrl = metadataDTO.imageUrl?.value,
+            link = input.link.value,
+            title = input.title?.value,
+            imageUrl = input.imageUrl?.value,
             insertionOrder = Int.MAX_VALUE
         )
         insertOrReplace(newEntity)
@@ -88,3 +87,9 @@ abstract class LinkMetadataDAO {
         return newEntity
     }
 }
+
+data class LinkMetadataSaveInput(
+    val link: NonBlankString,
+    val title: NonBlankString?,
+    val imageUrl: NonBlankString?
+)

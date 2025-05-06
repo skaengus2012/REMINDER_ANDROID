@@ -14,9 +14,18 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.local.database.model
+package com.nlab.reminder.core.local.database.entity
+
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.Index
+import androidx.room.PrimaryKey
 
 /**
- * @author Thalys
+ * @author Doohyun
  */
-internal const val EMPTY_GENERATED_ID = 0L
+@Entity(tableName = "tag", indices = [Index(value = ["name"], unique = true)])
+data class TagEntity(
+    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "tag_id") val tagId: Long = EMPTY_GENERATED_ID,
+    @ColumnInfo(name = "name") val name: String
+)
