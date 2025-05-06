@@ -80,7 +80,6 @@ import com.nlab.reminder.feature.home.HomeViewModel
 import com.nlab.reminder.feature.home.onTodayCategoryClicked
 import com.nlab.reminder.core.androidx.compose.ui.ColorPressButton
 import com.nlab.reminder.core.androidx.compose.ui.throttleClick
-import com.nlab.reminder.core.component.tag.edit.TagEditState
 import com.nlab.reminder.core.component.tag.edit.ui.compose.TagEditStateHandler
 import com.nlab.reminder.core.component.tag.ui.compose.TagCard
 import com.nlab.reminder.core.designsystem.compose.component.PlaneatLoadingContent
@@ -692,35 +691,26 @@ private fun NewPlanButton(
 
 @Previews
 @Composable
-private fun HomeScreenPopulated() {
+private fun HomeContentsPreview() {
     PlaneatTheme {
-        HomeScreen(
-            uiState = HomeUiState.Success(
-                todayScheduleCount = 10L.toNonNegativeLong(),
-                timetableScheduleCount = 20L.toNonNegativeLong(),
-                allScheduleCount = 30L.toNonNegativeLong(),
+        Box(modifier = Modifier.background(PlaneatTheme.colors.bg1)) {
+            HomeContents(
+                todayCount = 10L.toNonNegativeLong(),
+                timetableCount = 20L.toNonNegativeLong(),
+                allCount = 30L.toNonNegativeLong(),
                 tags = (1L..100).map { index ->
                     Tag(
                         id = TagId(rawId = index),
                         name = "TagName $index".toNonBlankString()
                     )
                 },
-                tagEditState = TagEditState.None
-            ),
-            onTodayCategoryClicked = {},
-            onTimetableCategoryClicked = {},
-            onAllCategoryClicked = {},
-            onTagClicked = {},
-            onTagLongClicked = {},
-            onNewPlanClicked = {},
-            onTagRenameRequestClicked = {},
-            onTagDeleteRequestClicked = {},
-            onTagRenameInputReady = {},
-            onTagRenameInputted = {},
-            onTagRenameConfirmClicked = {},
-            onTagMergeCancelClicked = {},
-            onTagMergeConfirmClicked = {},
-            onTagDeleteConfirmClicked = {},
-        )
+                onTodayCategoryClicked = {},
+                onTimetableCategoryClicked = {},
+                onAllCategoryClicked = {},
+                onTagClicked = {},
+                onTagLongClicked = {},
+                onNewPlanClicked = {}
+            )
+        }
     }
 }
