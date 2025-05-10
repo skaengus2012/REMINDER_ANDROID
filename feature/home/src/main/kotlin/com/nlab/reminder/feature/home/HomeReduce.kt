@@ -145,6 +145,6 @@ private suspend fun executeTagEditTask(
         updateState = { expectedState, newState ->
             onTagEditStateUpdated(CompareAndSetTagEditState(expectedState, newState))
         },
-        onError = { errorMessage(origin = it) }
+        onError = { errorMessage(it) }
     )
 }

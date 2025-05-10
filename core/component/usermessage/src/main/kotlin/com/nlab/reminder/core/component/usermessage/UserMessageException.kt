@@ -17,6 +17,8 @@
 package com.nlab.reminder.core.component.usermessage
 
 import com.nlab.reminder.core.annotation.ExcludeFromGeneratedTestReport
+import com.nlab.reminder.core.text.UiText
+import com.nlab.reminder.core.translation.StringIds
 
 /**
  * @author Doohyun
@@ -26,3 +28,15 @@ class UserMessageException(
     val userMessage: UserMessage,
     val origin: Throwable
 ) : RuntimeException()
+
+internal fun UserMessageException(
+    message: UiText?,
+    priority: FeedbackPriority?,
+    origin: Throwable
+): UserMessageException = UserMessageException(
+    userMessage = UserMessage(
+        message = message ?: UiText(StringIds.unknown_error),
+        priority = priority ?: FeedbackPriority.LOW
+    ),
+    origin = origin
+)

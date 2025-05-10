@@ -19,7 +19,6 @@ package com.nlab.reminder.core.component.usermessage
 import com.nlab.reminder.core.kotlin.Result
 import com.nlab.reminder.core.kotlin.getOrThrow
 import com.nlab.reminder.core.text.UiText
-import com.nlab.reminder.core.translation.StringIds
 
 /**
  * @author Doohyun
@@ -35,35 +34,28 @@ fun <T> Result<T>.getOrThrowMessage(
         else {
             val originUserMessage = e.userMessage
             UserMessageException(
-                userMessage = UserMessage(
-                    message = message ?: originUserMessage.message,
-                    priority = priority ?: originUserMessage.priority
-                ),
+                message = message ?: originUserMessage.message,
+                priority = priority ?: originUserMessage.priority,
                 origin = e.origin
             )
         }
     } catch (e: Throwable) {
-        throw UserMessageException(
-            userMessage = UserMessage(
-                message = message ?: UiText(StringIds.unknown_error),
-                priority = priority ?: FeedbackPriority.LOW
-            ),
-            origin = e
-        )
+        throw UserMessageException(message, priority, e)
     }
 }
 
-@Suppress("NOTHING_TO_INLINE") // Application as an inline due to omission of jacoco coverage
-inline fun errorMessage(
-    message: UiText = UiText(StringIds.unknown_error),
-    priority: FeedbackPriority = FeedbackPriority.LOW,
-    origin: Throwable = IllegalStateException()
+fun errorMessage(
+    message: UiText? = null,
+    priority: FeedbackPriority? = null,
+    throwable: Throwable = IllegalStateException()
 ) {
-    throw UserMessageException(
-        userMessage = UserMessage(
-            message = message,
-            priority = priority
-        ),
-        origin = origin
-    )
+    errorMessageInternal(message, priority, throwable)
+}
+
+internal fun errorMessageInternal(
+    message: UiText?,
+    priority: FeedbackPriority?,
+    throwable: Throwable
+) {
+    throw UserMessageException(message, priority, throwable)
 }
