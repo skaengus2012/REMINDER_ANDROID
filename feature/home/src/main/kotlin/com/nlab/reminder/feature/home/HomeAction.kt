@@ -72,4 +72,7 @@ internal sealed class HomeAction private constructor() {
 
     @UiAction
     data object OnTagDeleteConfirmClicked : HomeAction()
+
+    @UiAction
+    data object OnTagEditCancelClicked : HomeAction()
 }

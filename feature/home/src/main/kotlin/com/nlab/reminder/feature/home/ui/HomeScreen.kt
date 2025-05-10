@@ -130,7 +130,8 @@ internal fun HomeScreen(
         onTagRenameConfirmClicked = { viewModel.onTagRenameConfirmClicked() },
         onTagMergeCancelClicked = { viewModel.onTagReplaceCancelClicked() },
         onTagMergeConfirmClicked = { viewModel.onTagReplaceConfirmClicked() },
-        onTagDeleteConfirmClicked = { viewModel.onTagDeleteConfirmClicked() }
+        onTagDeleteConfirmClicked = { viewModel.onTagDeleteConfirmClicked() },
+        onTagEditCancelClicked = { viewModel.onTagEditCancelClicked() }
     )
 }
 
@@ -151,6 +152,7 @@ private fun HomeScreen(
     onTagMergeCancelClicked: () -> Unit,
     onTagMergeConfirmClicked: () -> Unit,
     onTagDeleteConfirmClicked: () -> Unit,
+    onTagEditCancelClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     when (uiState) {
@@ -178,7 +180,7 @@ private fun HomeScreen(
             }
             TagEditStateHandler(
                 state = uiState.tagEditState,
-                onCompleted = {},
+                onCompleted = onTagEditCancelClicked,
                 onRenameRequestClicked = onTagRenameRequestClicked,
                 onDeleteRequestClicked = onTagDeleteRequestClicked,
                 onRenameInputReady = onTagRenameInputReady,

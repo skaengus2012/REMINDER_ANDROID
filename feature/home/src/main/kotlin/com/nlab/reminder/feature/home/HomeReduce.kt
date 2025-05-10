@@ -139,5 +139,8 @@ internal fun HomeReduce(environment: HomeEnvironment): HomeReduce = DslReduce {
                 }
             )
         }
+        transition<OnTagEditCancelClicked> {
+            current.copy(tagEditState = TagEditState.None)
+        }
     }
 }

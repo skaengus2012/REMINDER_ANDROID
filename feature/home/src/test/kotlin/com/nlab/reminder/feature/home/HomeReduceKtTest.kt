@@ -205,6 +205,20 @@ class HomeReduceKtTest {
             }
         )
     }
+
+    @Test
+    fun `Given success with not none tagEditState, When tag Edit cancel clicked, Then update to none`() = runTest {
+        genHomeReduce()
+            .transitionScenario()
+            .initState(
+                genHomeUiStateSuccess(
+                    tagEditState = genTagEditStateExcludeTypeOf<TagEditState.None>()
+                )
+            )
+            .action(HomeAction.OnTagEditCancelClicked)
+            .expectedStateFromInput { initState.copy(tagEditState = TagEditState.None) }
+            .verify()
+    }
 }
 
 private fun genHomeReduce(environment: HomeEnvironment = genHomeEnvironment()): HomeReduce = HomeReduce(environment)
