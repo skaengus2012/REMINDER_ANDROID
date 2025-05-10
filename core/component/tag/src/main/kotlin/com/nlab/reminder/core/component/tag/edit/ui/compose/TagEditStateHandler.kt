@@ -41,7 +41,7 @@ fun TagEditStateHandler(
         is TagEditState.None -> Unit
 
         is TagEditState.AwaitTaskSelection -> {
-            TagEditIntroDialog(
+            TagEditTaskSelectionDialog(
                 tagName = state.tag.name,
                 onDismissRequest = onCompleted,
                 onRenameRequestClicked = onRenameRequestClicked,

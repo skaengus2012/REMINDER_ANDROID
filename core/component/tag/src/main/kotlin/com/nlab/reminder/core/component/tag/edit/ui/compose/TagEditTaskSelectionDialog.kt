@@ -53,7 +53,7 @@ import com.nlab.reminder.core.translation.StringIds
  * @author Doohyun
  */
 @Composable
-internal fun TagEditIntroDialog(
+internal fun TagEditTaskSelectionDialog(
     tagName: NonBlankString,
     onDismissRequest: () -> Unit,
     onRenameRequestClicked: () -> Unit,
@@ -80,7 +80,7 @@ internal fun TagEditIntroDialog(
                 thickness = 0.5.dp,
                 color = PlaneatTheme.colors.bgLine1,
             )
-            TagEditIntroDialogButton(
+            TagEditTaskSelectionDialogButton(
                 text = stringResource(StringIds.tag_rename),
                 fontColor = PlaneatTheme.colors.content1,
                 onClick = onRenameRequestClicked,
@@ -88,7 +88,7 @@ internal fun TagEditIntroDialog(
                     .fillMaxWidth()
                     .padding(top = 10.dp)
             )
-            TagEditIntroDialogButton(
+            TagEditTaskSelectionDialogButton(
                 text = pluralStringResource(PluralsIds.tag_delete, count = 1, 1),
                 onClick = onDeleteRequestClicked,
                 fontColor = PlaneatTheme.colors.red1,
@@ -101,14 +101,14 @@ internal fun TagEditIntroDialog(
 }
 
 @Composable
-private fun TagEditIntroDialogButton(
+private fun TagEditTaskSelectionDialogButton(
     text: String,
     fontColor: Color,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(modifier = modifier) {
-        TagEditIntroDialogButtonBackground(
+        TagEditTaskSelectionDialogButtonBackground(
             onClick = onClick,
             onClickLabel = text
         )
@@ -127,7 +127,7 @@ private fun TagEditIntroDialogButton(
 }
 
 @Composable
-private fun BoxScope.TagEditIntroDialogButtonBackground(
+private fun BoxScope.TagEditTaskSelectionDialogButtonBackground(
     onClick: () -> Unit,
     onClickLabel: String
 ) {
@@ -146,10 +146,10 @@ private fun BoxScope.TagEditIntroDialogButtonBackground(
 
 @Previews
 @Composable
-private fun TagEditIntroDialogPreview() {
+private fun TagEditTaskSelectionDialogPreview() {
     PlaneatTheme {
         Box(modifier = Modifier.size(300.dp)) {
-            TagEditIntroDialog(
+            TagEditTaskSelectionDialog(
                 tagName = "Hello, tag edit dialog".toNonBlankString(),
                 onDismissRequest = {},
                 onRenameRequestClicked = {},
