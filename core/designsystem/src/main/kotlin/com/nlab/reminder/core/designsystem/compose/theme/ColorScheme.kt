@@ -44,13 +44,15 @@ data class PlaneatColorScheme(
     val bgTag: Color,
     val bgTagRipple: Color,
     val contentTag: Color,
+    val contentTextSelection: Color,
+    val bgTextSelection: Color,
     // Colors that do not change depending on the theme.
     val point1: Color = Point1,
     val point2: Color = Point2,
     val point3: Color = Point3,
     val red1: Color = Red400,
     val white: Color = Color.White,
-    val black: Color = Color.Black
+    val black: Color = Color.Black,
 )
 
 internal val LocalPlaneatColorScheme = staticCompositionLocalOf {
@@ -67,6 +69,8 @@ internal val LocalPlaneatColorScheme = staticCompositionLocalOf {
         content1 = Color.Unspecified,
         content2 = Color.Unspecified,
         content3 = Color.Unspecified,
+        contentTextSelection = Color.Unspecified,
+        bgTextSelection = Color.Unspecified,
         // Compose Only
         bgCard1Ripple = Color.Unspecified,
         bgDialogSurface = Color.Unspecified,
@@ -89,6 +93,8 @@ internal val LightPlaneatColorScheme = PlaneatColorScheme(
     content1 = Content1Light,
     content2 = Content2Light,
     content3 = Content3Light,
+    contentTextSelection = Point1,
+    bgTextSelection = Point1.copy(alpha = 0.4f),
     // Compose Only
     bgCard1Ripple = BgCard1RippleLight,
     bgDialogSurface = BgDialogSurfaceLight,
@@ -110,10 +116,8 @@ internal val DarkPlaneatColorScheme = PlaneatColorScheme(
     content1 = Content1Dark,
     content2 = Content2Dark,
     content3 = Content3Dark,
-    point1 = Point1,
-    point2 = Point2,
-    point3 = Point3,
-    red1 = Red400,
+    contentTextSelection = Point1,
+    bgTextSelection = Point1.copy(alpha = 0.4f),
     // Compose Only
     bgCard1Ripple = BgCard1RippleDark,
     bgDialogSurface = BgDialogSurfaceDark,

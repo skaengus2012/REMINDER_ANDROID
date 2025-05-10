@@ -17,6 +17,8 @@
 package com.nlab.reminder.core.designsystem.compose.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.text.selection.LocalTextSelectionColors
+import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material3.LocalUseFallbackRippleImplementation
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -49,11 +51,19 @@ fun PlaneatTheme(
     isDarkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
-    val reminderColorScheme = if (isDarkTheme) DarkPlaneatColorScheme else LightPlaneatColorScheme
+    val planeatColorScheme = if (isDarkTheme) DarkPlaneatColorScheme else LightPlaneatColorScheme
     CompositionLocalProvider(
-        LocalPlaneatColorScheme provides reminderColorScheme,
-        LocalUseFallbackRippleImplementation provides true
+        LocalPlaneatColorScheme provides planeatColorScheme,
+        LocalUseFallbackRippleImplementation provides true,
     ) {
-        MaterialTheme(content = content)
+        MaterialTheme {
+            val customTextSelectionColors = TextSelectionColors(
+                handleColor = PlaneatTheme.colors.contentTextSelection,
+                backgroundColor = PlaneatTheme.colors.bgTextSelection
+            )
+            CompositionLocalProvider(LocalTextSelectionColors provides customTextSelectionColors) {
+                content()
+            }
+        }
     }
 }
