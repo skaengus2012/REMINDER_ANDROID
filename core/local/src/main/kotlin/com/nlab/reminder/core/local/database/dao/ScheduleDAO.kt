@@ -24,10 +24,10 @@ import androidx.room.Transaction
 import androidx.room.Update
 import com.nlab.reminder.core.kotlin.NonBlankString
 import com.nlab.reminder.core.kotlin.NonNegativeLong
-import com.nlab.reminder.core.kotlin.toNonNegativeLong
-import com.nlab.reminder.core.local.database.model.EMPTY_SCHEDULE_ID
-import com.nlab.reminder.core.local.database.model.ScheduleEntity
-import kotlinx.coroutines.flow.Flow
+import com.nlab.reminder.core.kotlin.PositiveInt
+import com.nlab.reminder.core.local.database.entity.ScheduleEntity
+import com.nlab.reminder.core.local.database.entity.EMPTY_GENERATED_ID
+import com.nlab.reminder.core.local.database.entity.RepeatType
 import kotlinx.datetime.Instant
 
 /**
@@ -44,27 +44,21 @@ abstract class ScheduleDAO {
     @Delete
     protected abstract suspend fun delete(entity: ScheduleEntity)
 
-    @Query("SELECT * FROM schedule")
-    abstract fun getAsStream(): Flow<Array<ScheduleEntity>>
-
     @Query("SELECT * FROM schedule WHERE is_complete = :isComplete")
-    abstract fun findByCompleteAsStream(isComplete: Boolean): Flow<Array<ScheduleEntity>>
-
-    @Query("SELECT * FROM schedule WHERE is_complete = :isComplete")
-    protected abstract suspend fun findByComplete(isComplete: Boolean): Array<ScheduleEntity>
+    protected abstract suspend fun findByComplete(isComplete: Boolean): List<ScheduleEntity>
 
     @Query("SELECT schedule_id FROM schedule WHERE is_complete = :isComplete")
-    protected abstract suspend fun findIdsByComplete(isComplete: Boolean): Array<Long>
+    protected abstract suspend fun findIdsByComplete(isComplete: Boolean): List<Long>
 
     @Query("SELECT * FROM schedule WHERE schedule_id = :scheduleId")
     protected abstract suspend fun findById(scheduleId: Long): ScheduleEntity?
 
     @Query("SELECT * FROM schedule WHERE schedule_id IN (:scheduleIds)")
-    protected abstract suspend fun findByScheduleIdsInternal(scheduleIds: Set<Long>): Array<ScheduleEntity>
+    protected abstract suspend fun findByIdsInternal(scheduleIds: Set<Long>): List<ScheduleEntity>
 
-    private suspend fun findByScheduleIds(scheduleIds: Set<Long>): Array<ScheduleEntity> =
-        if (scheduleIds.isEmpty()) emptyArray()
-        else findByScheduleIdsInternal(scheduleIds)
+    private suspend fun findByIds(scheduleIds: Set<Long>): List<ScheduleEntity> =
+        if (scheduleIds.isEmpty()) emptyList()
+        else findByIdsInternal(scheduleIds)
 
     @Query(
         """
@@ -75,9 +69,9 @@ abstract class ScheduleDAO {
         LIMIT 1
         """
     )
-    protected abstract fun findMaxVisiblePriorityByComplete(isComplete: Boolean): Long?
+    protected abstract suspend fun findMaxVisiblePriorityByComplete(isComplete: Boolean): Long?
 
-    private inline fun findMaxVisiblePriorityByCompleteOrElse(
+    private suspend inline fun findMaxVisiblePriorityByCompleteOrElse(
         isComplete: Boolean,
         defaultValue: () -> Long
     ): Long = findMaxVisiblePriorityByComplete(isComplete) ?: defaultValue()
@@ -89,35 +83,75 @@ abstract class ScheduleDAO {
     protected abstract suspend fun deleteByCompleteInternal(isComplete: Boolean)
 
     @Transaction
-    open suspend fun insertAndGet(contentDTO: ScheduleContentDTO): ScheduleEntity {
+    open suspend fun insertAndGet(
+        headline: ScheduleHeadlineSaveInput,
+        timing: ScheduleTimingSaveInput?
+    ): ScheduleEntity {
+        val currentMaxVisiblePriority = findMaxVisiblePriorityByCompleteOrElse(
+            isComplete = false,
+            defaultValue = { -1 }
+        )
         val entity = ScheduleEntity(
-            contentDTO = contentDTO,
-            visiblePriority = (findMaxVisiblePriorityByCompleteOrElse(isComplete = false, defaultValue = { -1 }) + 1)
-                .toNonNegativeLong(),
+            title = headline.title.value,
+            description = headline.description?.value,
+            link = headline.link?.value,
+            triggerTimeUtc = timing?.triggerTimeUtc,
+            isTriggerTimeDateOnly = timing?.isTriggerTimeDateOnly,
+            repeatType = timing?.repeatInput?.type,
+            repeatInterval = timing?.repeatInput?.interval?.value,
+            visiblePriority = currentMaxVisiblePriority + 1,
+            isComplete = false
         )
         return checkNotNull(findById(scheduleId = insert(entity)))
     }
 
     @Transaction
-    open suspend fun updateAndGet(scheduleId: Long, contentDTO: ScheduleContentDTO): ScheduleEntity {
+    open suspend fun updateAndGet(scheduleId: Long, headline: ScheduleHeadlineSaveInput): ScheduleEntity {
         val oldEntity = checkNotNull(findById(scheduleId))
-        if (contentDTO.equalsContent(oldEntity)) return oldEntity // No changes
+        if (oldEntity.contentEquals(headline)) return oldEntity // No changes
 
-        val newEntity = ScheduleEntity(oldEntity, contentDTO)
+        val newEntity = oldEntity.copy(
+            title = headline.title.value,
+            description = headline.description?.value,
+            link = headline.link?.value,
+        )
         update(newEntity)
 
         return newEntity
     }
 
     @Transaction
-    open suspend fun updateByVisiblePriorities(
-        idToVisiblePriorityTable: Map<Long, Long>,
-        isCompletedRange: Boolean
-    ) {
-        check(idToVisiblePriorityTable.keys == findIdsByComplete(isCompletedRange).toSet())
+    open suspend fun updateAndGet(
+        scheduleId: Long,
+        headline: ScheduleHeadlineSaveInput,
+        timing: ScheduleTimingSaveInput?
+    ): ScheduleEntity {
+        val oldEntity = checkNotNull(findById(scheduleId))
+        if (oldEntity.contentEquals(headline) && oldEntity.contentEquals(timing)) return oldEntity // No changes
+
+        val newEntity = oldEntity.copy(
+            title = headline.title.value,
+            description = headline.description?.value,
+            link = headline.link?.value,
+            triggerTimeUtc = timing?.triggerTimeUtc,
+            isTriggerTimeDateOnly = timing?.isTriggerTimeDateOnly,
+            repeatType = timing?.repeatInput?.type,
+            repeatInterval = timing?.repeatInput?.interval?.value,
+        )
+        update(newEntity)
+
+        return newEntity
+    }
+
+    @Transaction
+    open suspend fun updateByVisiblePriorities(idToVisiblePriorityTable: Map<Long, NonNegativeLong>) {
+        if (idToVisiblePriorityTable.isEmpty()) return
+        val sampleSchedule = findById(scheduleId = idToVisiblePriorityTable.firstNotNullOf { it.key })
+        checkNotNull(sampleSchedule)
+        check(idToVisiblePriorityTable.keys == findIdsByComplete(sampleSchedule.isComplete).toSet())
 
         idToVisiblePriorityTable.forEach { (id, visiblePriority) ->
-            updateVisiblePriorityInternal(scheduleId = id, visiblePriority = visiblePriority)
+            updateVisiblePriorityInternal(scheduleId = id, visiblePriority = visiblePriority.value)
         }
     }
 
@@ -129,7 +163,7 @@ abstract class ScheduleDAO {
             entities.sortedBy { it.visiblePriority }.forEachIndexed { index, entity ->
                 insert(
                     entity = entity.copy(
-                        scheduleId = EMPTY_SCHEDULE_ID,
+                        scheduleId = EMPTY_GENERATED_ID,
                         isComplete = isComplete,
                         visiblePriority = maxVisiblePriority + index + 1
                     )
@@ -137,7 +171,10 @@ abstract class ScheduleDAO {
             }
         }
 
-        findByScheduleIds(scheduleIds = idToCompleteTable.keys)
+        val entities = findByIds(scheduleIds = idToCompleteTable.keys)
+        if (entities.isEmpty()) return
+
+        entities
             .filter { entity -> entity.isComplete != idToCompleteTable.getValue(entity.scheduleId) }
             .groupBy { it.isComplete }
             .forEach { (isComplete, entities) ->
@@ -147,7 +184,7 @@ abstract class ScheduleDAO {
 
     @Transaction
     open suspend fun deleteByScheduleIds(scheduleIds: Set<Long>) {
-        val entities = findByScheduleIds(scheduleIds = scheduleIds)
+        val entities = findByIds(scheduleIds = scheduleIds)
         if (entities.isEmpty()) return
 
         entities.forEach { delete(it) }
@@ -176,45 +213,30 @@ abstract class ScheduleDAO {
     }
 }
 
-data class ScheduleContentDTO(
+data class ScheduleHeadlineSaveInput(
     val title: NonBlankString,
     val description: NonBlankString?,
     val link: NonBlankString?,
-    val triggerTimeDTO: TriggerTimeDTO?,
 )
 
-data class TriggerTimeDTO(
-    val utcTime: Instant,
-    val isDateOnly: Boolean
+data class ScheduleTimingSaveInput(
+    val triggerTimeUtc: Instant,
+    val isTriggerTimeDateOnly: Boolean,
+    val repeatInput: ScheduleRepeatSaveInput?
 )
 
-private fun ScheduleContentDTO.equalsContent(entity: ScheduleEntity): Boolean =
-    title.value == entity.title
-            && description?.value == entity.description
-            && link?.value == entity.link
-            && triggerTimeDTO?.utcTime == entity.triggerTimeUtc
-            && triggerTimeDTO?.isDateOnly == entity.isTriggerTimeDateOnly
-
-private fun ScheduleEntity(
-    contentDTO: ScheduleContentDTO,
-    visiblePriority: NonNegativeLong,
-): ScheduleEntity = ScheduleEntity(
-    title = contentDTO.title.value,
-    description = contentDTO.description?.value,
-    link = contentDTO.link?.value,
-    triggerTimeUtc = contentDTO.triggerTimeDTO?.utcTime,
-    isTriggerTimeDateOnly = contentDTO.triggerTimeDTO?.isDateOnly,
-    visiblePriority = visiblePriority.value,
-    isComplete = false
+data class ScheduleRepeatSaveInput(
+    @RepeatType val type: String,
+    val interval: PositiveInt,
 )
 
-private fun ScheduleEntity(
-    baseEntity: ScheduleEntity,
-    contentDTO: ScheduleContentDTO
-): ScheduleEntity = baseEntity.copy(
-    title = contentDTO.title.value,
-    description = contentDTO.description?.value,
-    link = contentDTO.link?.value,
-    triggerTimeUtc = contentDTO.triggerTimeDTO?.utcTime,
-    isTriggerTimeDateOnly = contentDTO.triggerTimeDTO?.isDateOnly
-)
+private fun ScheduleEntity.contentEquals(headline: ScheduleHeadlineSaveInput): Boolean =
+    title == headline.title.value
+            && description == headline.description?.value
+            && link == headline.link?.value
+
+private fun ScheduleEntity.contentEquals(timing: ScheduleTimingSaveInput?): Boolean =
+    triggerTimeUtc == timing?.triggerTimeUtc
+            && isTriggerTimeDateOnly == timing?.isTriggerTimeDateOnly
+            && repeatType == timing?.repeatInput?.type
+            && repeatInterval == timing?.repeatInput?.interval?.value

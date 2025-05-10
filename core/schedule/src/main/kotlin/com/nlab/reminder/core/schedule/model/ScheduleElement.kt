@@ -17,13 +17,12 @@
 package com.nlab.reminder.core.schedule.model
 
 import com.nlab.reminder.core.data.model.LinkMetadata
-import com.nlab.reminder.core.data.model.ScheduleDetail
 
 /**
  * @author thalys
  */
 data class ScheduleElement(
-    val schedule: ScheduleDetail,
+   // val schedule: ScheduleDetail,
     val isCompleteMarked: Boolean,
     val linkMetadata: LinkMetadata?,
     val isSelected: Boolean

@@ -16,6 +16,7 @@
 
 package com.nlab.reminder.feature.home
 
+import com.nlab.reminder.core.component.tag.edit.TagEditState
 import com.nlab.reminder.core.data.model.Tag
 import com.nlab.reminder.core.kotlin.NonNegativeLong
 
@@ -30,6 +31,6 @@ internal sealed class HomeUiState private constructor() {
         val timetableScheduleCount: NonNegativeLong,
         val allScheduleCount: NonNegativeLong,
         val tags: List<Tag>,
-        val interaction: HomeInteraction,
+        val tagEditState: TagEditState,
     ) : HomeUiState()
 }

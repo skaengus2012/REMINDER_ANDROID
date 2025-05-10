@@ -11,6 +11,8 @@ dependencies {
     api(projects.core.data)
     implementation(projects.core.dataImpl)
     implementation(projects.core.dataPlatformImpl)
-    implementation(projects.core.localDi)
-    implementation(projects.core.networkDi)
+    implementation(projects.core.local)
+    implementation(projects.core.network)
+
+    implementation(libs.timber)
 }

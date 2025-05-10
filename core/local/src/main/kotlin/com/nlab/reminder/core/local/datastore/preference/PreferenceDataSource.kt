@@ -24,7 +24,7 @@ import kotlinx.coroutines.flow.Flow
 /**
  * @author Doohyun
  */
-class PreferenceDataSource(private val dataStore: DataStore<Preferences>) {
+class PreferenceDataSource internal constructor(private val dataStore: DataStore<Preferences>) {
     fun getAllScheduleCompleteShownAsStream(): Flow<Boolean> = dataStore.getAsStream(
         key = PreferenceKeys.ALL_SCHEDULE_COMPLETE_SHOWN,
         defaultValue = false

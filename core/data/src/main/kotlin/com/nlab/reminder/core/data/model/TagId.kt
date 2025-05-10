@@ -22,4 +22,5 @@ package com.nlab.reminder.core.data.model
  *
  * @author Doohyun
  */
-data class TagId(val rawId: Long)
+@JvmInline
+value class TagId(val rawId: Long)

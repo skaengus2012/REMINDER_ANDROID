@@ -17,9 +17,14 @@
 package com.nlab.reminder.core.component.usermessage
 
 import com.nlab.reminder.core.kotlin.Result
-import com.nlab.reminder.core.text.UiText
+import com.nlab.reminder.core.kotlin.catching
 import com.nlab.reminder.core.text.genUiText
-import com.nlab.reminder.core.translation.StringIds
+import io.mockk.Runs
+import io.mockk.every
+import io.mockk.just
+import io.mockk.mockkStatic
+import io.mockk.unmockkStatic
+import io.mockk.verify
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.sameInstance
 import org.hamcrest.MatcherAssert.assertThat
@@ -28,6 +33,7 @@ import org.junit.Test
 /**
  * @author Thalys
  */
+
 class UserMessageExtKtTest {
     @Test
     fun `Given success result, When getOrThrowMessage, Then result return value`() {
@@ -39,93 +45,92 @@ class UserMessageExtKtTest {
     @Test
     fun `Given failed result with user message, When getOrThrowMessage, Then result throw origin`() {
         val throwable = UserMessageException(
-            userMessage = UserMessage(message = genUiText(), FeedbackPriority.HIGH),
+            message = genUiText(),
+            priority = FeedbackPriority.HIGH,
             origin = Throwable()
         )
-        val result = Result.Failure<Any>(throwable)
-        try {
-            result.getOrThrowMessage()
-        } catch (e: UserMessageException) {
-            assertThat(e, sameInstance(throwable))
-        }
+
+        val actual = runAndGetUserMessageException { Result.Failure<Any>(throwable).getOrThrowMessage() }
+        assertThat(actual, sameInstance(throwable))
     }
 
     @Test
-    fun `Given message, priority and failed result with user message, When getOrThrowMessage with message and priority, Then result UserMessageException with message and priority `() {
+    fun `Given result with user message, When getOrThrowMessage with message and priority, Then throw matching exception`() {
+        val throwable = Throwable()
+        val result = Result.Failure<Any>(
+            UserMessageException(
+                message = genUiText(),
+                priority = FeedbackPriority.HIGH,
+                origin = throwable
+            )
+        )
+
         val message = genUiText()
         val priority = FeedbackPriority.URGENT
-        val throwable = Throwable()
-        val result = Result.Failure<Any>(
-            UserMessageException(
-                userMessage = UserMessage(message = genUiText(), FeedbackPriority.HIGH),
-                origin = throwable
-            )
-        )
-        try {
-            result.getOrThrowMessage(
-                message = message,
-                priority = priority
-            )
-        } catch (e: UserMessageException) {
-            assertThat(
-                e.userMessage,
-                equalTo(UserMessage(message = message, priority = priority))
-            )
-            assertThat(
-                e.origin,
-                sameInstance(throwable)
-            )
+        val actual = runAndGetUserMessageException {
+            result.getOrThrowMessage(message = message, priority = priority)
         }
+
+        assertThat(
+            actual.userMessage,
+            equalTo(UserMessage(message = message, priority = priority))
+        )
+        assertThat(
+            actual.origin,
+            sameInstance(throwable)
+        )
     }
 
     @Test
-    fun `Given message and failed result with user message, When getOrThrowMessage with message, Then result throw UserMessageException with message`() {
-        val message = genUiText()
-        val priority = FeedbackPriority.MEDIUM
+    fun `Given result with user message, When getOrThrowMessage with message, Then throw matching exception`() {
         val throwable = Throwable()
+        val priority = FeedbackPriority.URGENT
         val result = Result.Failure<Any>(
             UserMessageException(
-                userMessage = UserMessage(message = genUiText(), priority),
+                message = genUiText(),
+                priority = priority,
                 origin = throwable
             )
         )
-        try {
+
+        val message = genUiText()
+        val actual = runAndGetUserMessageException {
             result.getOrThrowMessage(message = message)
-        } catch (e: UserMessageException) {
-            assertThat(
-                e.userMessage,
-                equalTo(UserMessage(message = message, priority = priority))
-            )
-            assertThat(
-                e.origin,
-                sameInstance(throwable)
-            )
         }
+        assertThat(
+            actual.userMessage,
+            equalTo(UserMessage(message = message, priority = priority))
+        )
+        assertThat(
+            actual.origin,
+            sameInstance(throwable)
+        )
     }
 
     @Test
-    fun `Given priority and failed result with user message, When getOrThrowMessage with message, Then result throw UserMessageException with priority`() {
+    fun `Given result with user message, When getOrThrowMessage with priority, Then throw matching exception`() {
         val message = genUiText()
-        val priority = FeedbackPriority.MEDIUM
         val throwable = Throwable()
         val result = Result.Failure<Any>(
             UserMessageException(
-                userMessage = UserMessage(message = message, FeedbackPriority.HIGH),
+                message = message,
+                priority = FeedbackPriority.HIGH,
                 origin = throwable
             )
         )
-        try {
+
+        val priority = FeedbackPriority.MEDIUM
+        val actual = runAndGetUserMessageException {
             result.getOrThrowMessage(priority = priority)
-        } catch (e: UserMessageException) {
-            assertThat(
-                e.userMessage,
-                equalTo(UserMessage(message = message, priority = priority))
-            )
-            assertThat(
-                e.origin,
-                sameInstance(throwable)
-            )
         }
+        assertThat(
+            actual.userMessage,
+            equalTo(UserMessage(message = message, priority = priority))
+        )
+        assertThat(
+            actual.origin,
+            sameInstance(throwable)
+        )
     }
 
     @Test
@@ -133,29 +138,75 @@ class UserMessageExtKtTest {
         val message = genUiText()
         val priority = FeedbackPriority.MEDIUM
         val result = Result.Failure<Any>(IllegalStateException())
-        try {
-            result.getOrThrowMessage(
-                message = message,
-                priority = priority
-            )
-        } catch (e: UserMessageException) {
-            assertThat(
-                e.userMessage,
-                equalTo(UserMessage(message = message, priority = priority))
-            )
+        val actual = runAndGetUserMessageException {
+            result.getOrThrowMessage(message = message, priority = priority)
         }
+        assertThat(
+            actual.userMessage,
+            equalTo(UserMessage(message = message, priority = priority))
+        )
     }
 
     @Test
     fun `Given failed result, When getOrThrowMessage, Then result throw UserMessageException with default options`() {
+        val expected = UserMessageException(
+            message = null,
+            priority = null,
+            origin = Throwable()
+        )
         val result = Result.Failure<Any>(IllegalStateException())
-        try {
+        val actual = runAndGetUserMessageException {
             result.getOrThrowMessage()
-        } catch (e: UserMessageException) {
-            assertThat(
-                e.userMessage,
-                equalTo(UserMessage(message = UiText(StringIds.unknown_error), priority = FeedbackPriority.LOW))
+        }
+        assertThat(actual.userMessage, equalTo(expected.userMessage))
+    }
+
+    @Test
+    fun `Given message, priority, throwable, When invoke internal errorMessage, Then throw matching exception`() {
+        val message = genUiText()
+        val priority = FeedbackPriority.URGENT
+        val throwable = Throwable()
+        val actual = runAndGetUserMessageException {
+            errorMessageInternal(message, priority, throwable)
+        }
+        assertThat(actual.userMessage.message, equalTo(message))
+        assertThat(actual.userMessage.priority, equalTo(priority))
+        assertThat(actual.origin, sameInstance(throwable))
+    }
+
+    @Test
+    fun `When invoke errorMessage without parameter, Then execute internal errorMessage with matching params`() {
+        mockkStatic(::errorMessageInternal)
+        every { errorMessageInternal(anyNullable(), anyNullable(), any()) } just Runs
+        errorMessage()
+        verify(exactly = 1) {
+            errorMessageInternal(
+                message = isNull(),
+                priority = isNull(),
+                throwable = match { it is IllegalStateException }
             )
         }
+        unmockkStatic(::errorMessageInternal)
     }
+
+    @Test
+    fun `Given uiText, priority, When execute errorMessage, Then throwing matching exception`() {
+        val uiText = genUiText()
+        val priority = FeedbackPriority.URGENT
+        val throwable = Throwable()
+
+        mockkStatic(::errorMessageInternal)
+        every { errorMessageInternal(anyNullable(), anyNullable(), any()) } just Runs
+
+        errorMessage(uiText, priority, throwable)
+        verify(exactly = 1) {
+            errorMessageInternal(message = uiText, priority = priority, throwable = throwable)
+        }
+
+        unmockkStatic(::errorMessageInternal)
+    }
+}
+
+private fun runAndGetUserMessageException(block: () -> Unit): UserMessageException {
+    return (catching(block) as Result.Failure).throwable as UserMessageException
 }

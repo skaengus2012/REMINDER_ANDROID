@@ -23,7 +23,7 @@ package com.nlab.reminder.core.kotlin
  * So, I remastered it in the form of a data class.
  * @author Doohyun
  */
-sealed class Result<T> {
+sealed class Result<out T> {
     data class Failure<T>(val throwable: Throwable) : Result<T>()
     data class Success<T>(val value: T) : Result<T>()
 }

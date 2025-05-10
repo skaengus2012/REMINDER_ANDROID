@@ -21,4 +21,5 @@ package com.nlab.reminder.core.data.model
  *
  * @author Doohyun
  */
-data class ScheduleId(val rawId: Long)
+@JvmInline
+value class ScheduleId(val rawId: Long)

@@ -11,8 +11,8 @@ android {
 
 dependencies {
     implementation(projects.core.annotation)
+    implementation(projects.core.component.usermessage)
     implementation(projects.core.dataDi)
-    implementation(projects.core.domainDi)
     implementation(projects.core.translation)
 
     testImplementation(projects.core.dataTest)

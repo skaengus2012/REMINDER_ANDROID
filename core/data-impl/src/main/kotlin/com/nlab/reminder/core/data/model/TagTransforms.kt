@@ -16,7 +16,7 @@
 
 package com.nlab.reminder.core.data.model
 
-import com.nlab.reminder.core.local.database.model.TagEntity
+import com.nlab.reminder.core.local.database.entity.TagEntity
 import com.nlab.reminder.core.kotlin.toNonBlankString
 
 /**

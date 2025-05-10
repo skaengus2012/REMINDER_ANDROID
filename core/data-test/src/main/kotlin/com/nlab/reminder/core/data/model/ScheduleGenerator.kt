@@ -35,12 +35,24 @@ fun genScheduleContent(
     title: NonBlankString = genNonBlankString(),
     note: NonBlankString? = genNonBlankString(),
     link: Link? = genLink(),
-    triggerTime: TriggerTime? = genTriggerTime()
+    tagIds: Set<TagId> = genTagIds(),
+    timing: ScheduleTiming? = genScheduleTiming(),
 ): ScheduleContent = ScheduleContent(
     title = title,
     note = note,
     link = link,
-    triggerTime = triggerTime,
+    tagIds = tagIds,
+    timing = timing
+)
+
+fun genScheduleTiming(
+    triggerAtUtc: Instant = Clock.System.now(),
+    isTriggerAtDateOnly: Boolean = genBoolean(),
+    repeat: Repeat? = genRepeat()
+): ScheduleTiming = ScheduleTiming(
+    triggerAtUtc = triggerAtUtc,
+    isTriggerAtDateOnly = isTriggerAtDateOnly,
+    repeat = repeat
 )
 
 fun genSchedule(
@@ -58,8 +70,3 @@ fun genSchedule(
 fun genSchedules(count: Int = genInt(min = 5, max = 10)): List<Schedule> = List(count) {
     genSchedule(id = ScheduleId(rawId = it.toLong() + 1))
 }
-
-fun genTriggerTime(
-    utcTime: Instant = Clock.System.now(),
-    isDateOnly: Boolean = genBoolean()
-): TriggerTime = TriggerTime(utcTime, isDateOnly)

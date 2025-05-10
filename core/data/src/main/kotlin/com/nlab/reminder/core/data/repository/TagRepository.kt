@@ -21,6 +21,7 @@ import com.nlab.reminder.core.kotlin.Result
 import com.nlab.reminder.core.data.model.Tag
 import com.nlab.reminder.core.data.model.TagId
 import com.nlab.reminder.core.kotlin.NonBlankString
+import com.nlab.reminder.core.kotlin.NonNegativeInt
 
 /**
  * @author Doohyun
@@ -28,15 +29,16 @@ import com.nlab.reminder.core.kotlin.NonBlankString
 interface TagRepository {
     suspend fun save(query: SaveTagQuery): Result<Tag>
     suspend fun delete(id: TagId): Result<Unit>
+    suspend fun getUsageCount(tagId: TagId): Result<NonNegativeInt>
     fun getTagsAsStream(query: GetTagQuery): Flow<Set<Tag>>
 }
 
 sealed class SaveTagQuery private constructor() {
     data class Add(val name: NonBlankString) : SaveTagQuery()
-    data class Modify(val id: TagId, val name: NonBlankString) : SaveTagQuery()
+    data class Modify(val id: TagId, val name: NonBlankString, val shouldMergeIfExists: Boolean) : SaveTagQuery()
 }
 
 sealed class GetTagQuery private constructor() {
-    data object All : GetTagQuery()
+    data object OnlyUsed : GetTagQuery()
     data class ByIds(val tagIds: Set<TagId>) : GetTagQuery()
 }

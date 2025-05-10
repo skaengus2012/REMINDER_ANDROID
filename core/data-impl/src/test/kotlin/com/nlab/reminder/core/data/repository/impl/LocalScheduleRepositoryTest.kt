@@ -16,160 +16,273 @@
 
 package com.nlab.reminder.core.data.repository.impl
 
-import com.nlab.reminder.core.data.model.Schedule
 import com.nlab.reminder.core.data.model.ScheduleId
+import com.nlab.reminder.core.data.model.TagId
+import com.nlab.reminder.core.data.model.genSchedule
 import com.nlab.reminder.core.data.model.genScheduleAndEntities
 import com.nlab.reminder.core.data.model.genScheduleAndEntity
-import com.nlab.reminder.core.data.model.toLocalDTO
+import com.nlab.reminder.core.data.model.genScheduleContent
+import com.nlab.reminder.core.data.model.toAggregate
 import com.nlab.reminder.core.data.repository.DeleteScheduleQuery
 import com.nlab.reminder.core.data.repository.GetScheduleQuery
 import com.nlab.reminder.core.data.repository.SaveScheduleQuery
-import com.nlab.reminder.core.data.repository.ScheduleRepository
-import com.nlab.reminder.core.data.repository.UpdateSchedulesQuery
-import com.nlab.reminder.core.kotlin.faker.genNonNegativeLong
+import com.nlab.reminder.core.data.repository.UpdateAllScheduleQuery
 import com.nlab.reminder.core.kotlin.getOrThrow
+import com.nlab.reminder.core.kotlin.isSuccess
+import com.nlab.reminder.core.kotlin.toNonNegativeLong
 import com.nlab.reminder.core.local.database.dao.ScheduleDAO
+import com.nlab.reminder.core.local.database.dao.ScheduleRepeatDetailDAO
+import com.nlab.reminder.core.local.database.dao.ScheduleTagListDAO
+import com.nlab.reminder.core.local.database.transaction.InsertAndGetScheduleContentAggregateTransaction
+import com.nlab.reminder.core.local.database.transaction.ScheduleContentAggregateSavedSnapshot
+import com.nlab.reminder.core.local.database.transaction.UpdateAndGetScheduleContentAggregateTransaction
 import com.nlab.testkit.faker.genBoolean
 import com.nlab.testkit.faker.genInt
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
+import io.mockk.mockk
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
-import org.mockito.kotlin.doReturn
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.once
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
 
 /**
  * @author Doohyun
  */
 internal class LocalScheduleRepositoryTest {
     @Test
-    fun `Given scheduleContent, when add, then dao called insertAndGet`() = runTest {
-        val (expectedSchedule, entity) = genScheduleAndEntity()
-        val input = expectedSchedule.content
-        val scheduleDAO = mock<ScheduleDAO> {
-            whenever(mock.insertAndGet(input.toLocalDTO())) doReturn entity
+    fun `Given schedule and tagIds, When save is called, Then it should insert and return the schedule`() = runTest {
+        // given
+        val (schedule, entity) = genScheduleAndEntities(count = 1).first()
+        val tagIds = List(size = genInt(min = 2, max = 5)) { TagId(it.toLong()) }
+        val aggregate = schedule.content.toAggregate()
+        val insertAndGetScheduleWithExtra: InsertAndGetScheduleContentAggregateTransaction = mockk {
+            coEvery { invoke(scheduleContentAggregate = aggregate) } returns ScheduleContentAggregateSavedSnapshot(
+                scheduleEntity = entity.scheduleEntity,
+                scheduleTagListEntities = entity.scheduleTagListEntities,
+                repeatDetailEntities = entity.repeatDetailEntities
+            )
         }
-        val actualSchedule = genScheduleRepository(scheduleDAO)
-            .save(SaveScheduleQuery.Add(input))
-            .getOrThrow()
-        assertThat(actualSchedule, equalTo(expectedSchedule))
-    }
-
-    @Test
-    fun `Given id and scheduleContent, when modify, then dao called updateAndGet`() = runTest {
-        val (expectedSchedule, entity) = genScheduleAndEntity()
-        val inputId = expectedSchedule.id
-        val inputContent = expectedSchedule.content
-        val scheduleDAO = mock<ScheduleDAO> {
-            whenever(mock.updateAndGet(inputId.rawId, inputContent.toLocalDTO())) doReturn entity
-        }
-        val actualSchedule = genScheduleRepository(scheduleDAO)
-            .save(SaveScheduleQuery.Modify(inputId, inputContent))
-            .getOrThrow()
-        assertThat(actualSchedule, equalTo(expectedSchedule))
-    }
-
-    @Test
-    fun `When repository called updateBulk, Then dao also call update`() = runTest {
-        suspend fun <T : UpdateSchedulesQuery> testUpdate(
-            request: T,
-            doVerify: suspend (ScheduleDAO).(T) -> Unit
-        ) {
-            val scheduleDAO = mock<ScheduleDAO>()
-            val scheduleRepository = genScheduleRepository(scheduleDAO = scheduleDAO)
-            scheduleRepository.updateBulk(request)
-            verify(scheduleDAO, once()).doVerify(request)
-        }
-
-        val scheduleIdToComplete = List(genInt(min = 1, max = 10)) { ScheduleId(it.toLong()) }
-            .associateWith { genBoolean() }
-        testUpdate(
-            request = UpdateSchedulesQuery.Completes(scheduleIdToComplete),
-            doVerify = { updateByCompletes(scheduleIdToComplete.mapKeys { (id) -> id.rawId }) }
+        val repository = genLocalScheduleRepository(
+            insertAndGetScheduleContentAggregate = insertAndGetScheduleWithExtra
         )
 
-        val scheduleIdToVisiblePriority = List(genInt(min = 1, max = 10)) { ScheduleId(it.toLong()) }
-            .associateWith { genNonNegativeLong() }
-        val isCompletedRange = genBoolean()
-        testUpdate(
-            request = UpdateSchedulesQuery.VisiblePriorities(scheduleIdToVisiblePriority, isCompletedRange),
-            doVerify = {
-                val idToVisiblePriorities = buildMap {
-                    scheduleIdToVisiblePriority.forEach { (id, visiblePriority) ->
-                        this[id.rawId] = visiblePriority.value
-                    }
-                }
-                updateByVisiblePriorities(idToVisiblePriorities, isCompletedRange)
+        // when
+        val actual = repository.save(query = SaveScheduleQuery.Add(schedule.content, tagIds.toSet()))
+
+        // then
+        coVerify(exactly = 1) {
+            insertAndGetScheduleWithExtra(aggregate)
+        }
+        assertThat(actual.getOrThrow(), equalTo(schedule))
+    }
+
+    @Test
+    fun `Given schedule and tagIds, When modify is called, Then it should update and return the schedule`() = runTest {
+        // given
+        val (schedule, entity) = genScheduleAndEntities(count = 1).first()
+        val tagIds = List(size = genInt(min = 2, max = 5)) { TagId(it.toLong()) }
+        val rawScheduleId = schedule.id.rawId
+        val aggregate = schedule.content.toAggregate()
+        val updateAndGetScheduleWithExtra: UpdateAndGetScheduleContentAggregateTransaction = mockk {
+            coEvery {
+                invoke(
+                    scheduleId = rawScheduleId,
+                    scheduleContentAggregate = aggregate
+                )
+            } returns ScheduleContentAggregateSavedSnapshot(
+                scheduleEntity = entity.scheduleEntity,
+                scheduleTagListEntities = entity.scheduleTagListEntities,
+                repeatDetailEntities = entity.repeatDetailEntities
+            )
+        }
+        val repository = genLocalScheduleRepository(
+            updateAndGetScheduleContentAggregate = updateAndGetScheduleWithExtra
+        )
+
+        // when
+        val actual = repository.save(query = SaveScheduleQuery.Modify(schedule.id, schedule.content, tagIds.toSet()))
+
+        // then
+        coVerify(exactly = 1) {
+            updateAndGetScheduleWithExtra(rawScheduleId, aggregate)
+        }
+        assertThat(actual.getOrThrow(), equalTo(schedule))
+    }
+
+    @Test
+    fun `Given id-complete, When update completes, Then dao called update and return success`() = runTest {
+        // given
+        val sampleSize = genInt(min = 5, max = 10)
+        val ids = List(sampleSize) { ScheduleId(it.toLong()) }
+        val completes = List(sampleSize) { genBoolean() }
+        val idToComplete = ids.zip(completes).toMap()
+        val scheduleDAO: ScheduleDAO = mockk(relaxed = true)
+        val repository = genLocalScheduleRepository(scheduleDAO = scheduleDAO)
+
+        // when
+        val result = repository.updateAll(UpdateAllScheduleQuery.Completes(idToComplete))
+
+        // then
+        coVerify(exactly = 1) {
+            scheduleDAO.updateByCompletes(
+                idToCompleteTable = ids.map { it.rawId }.zip(completes).toMap()
+            )
+        }
+        assertThat(result.isSuccess, equalTo(true))
+    }
+
+    @Test
+    fun `Given id-visiblePriority, When update priorities, Then dao called update and return success`() = runTest {
+        // given
+        val sampleSize = genInt(min = 5, max = 10)
+        val ids = List(sampleSize) { ScheduleId(it.toLong()) }
+        val visiblePriorities = List(sampleSize) { (it + 1).toNonNegativeLong() }
+        val idToPriority = ids.zip(visiblePriorities).toMap()
+        val scheduleDAO: ScheduleDAO = mockk(relaxed = true)
+        val repository = genLocalScheduleRepository(scheduleDAO = scheduleDAO)
+
+        // when
+        val result = repository.updateAll(UpdateAllScheduleQuery.VisiblePriorities(idToPriority))
+
+        // then
+        coVerify(exactly = 1) {
+            scheduleDAO.updateByVisiblePriorities(
+                idToVisiblePriorityTable = ids.map { it.rawId }.zip(visiblePriorities.map { it }).toMap()
+            )
+        }
+        assertThat(result.isSuccess, equalTo(true))
+    }
+
+    @Test
+    fun `Given complete flag, When delete by complete, Then dao deletes by completion and return success`() = runTest {
+        // given
+        val isComplete = genBoolean()
+        val scheduleDAO: ScheduleDAO = mockk(relaxed = true)
+        val repository = genLocalScheduleRepository(scheduleDAO = scheduleDAO)
+
+        // when
+        val result = repository.delete(DeleteScheduleQuery.ByComplete(isComplete))
+
+        // then
+        coVerify(exactly = 1) {
+            scheduleDAO.deleteByComplete(isComplete)
+        }
+        assertThat(result.isSuccess, equalTo(true))
+    }
+
+    @Test
+    fun `Given scheduleIds, When delete by ids, Then dao deletes by scheduleIds and return success`() = runTest {
+        // given
+        val ids = List(genInt(min = 2, max = 5)) { ScheduleId(it.toLong()) }
+        val scheduleDAO: ScheduleDAO = mockk(relaxed = true)
+        val repository = genLocalScheduleRepository(scheduleDAO = scheduleDAO)
+
+        // when
+        val result = repository.delete(DeleteScheduleQuery.ByIds(ids.toSet()))
+
+        // then
+        coVerify(exactly = 1) {
+            scheduleDAO.deleteByScheduleIds(scheduleIds = ids.map { it.rawId }.toSet())
+        }
+        assertThat(result.isSuccess, equalTo(true))
+    }
+
+    @Test
+    fun `Given all query, When collect schedules, Then return schedules from dao`() = runTest {
+        // given
+        val (schedule, entity) = genScheduleAndEntity()
+        val query = GetScheduleQuery.All
+
+        // when
+        val repository = genLocalScheduleRepository(
+            scheduleRepeatDetailDAO = mockk {
+                every { getAsStream() } returns flowOf(mapOf(entity.scheduleEntity to entity.repeatDetailEntities))
+            },
+            scheduleTagListDAO = mockk {
+                every { findByScheduleIdsAsStream(scheduleIds = setOf(schedule.id.rawId)) } returns flowOf(
+                    entity.scheduleTagListEntities.toList()
+                )
             }
         )
+        val result = repository
+            .getSchedulesAsStream(query)
+            .first()
+
+        // then
+        assertThat(result, equalTo(setOf(schedule)))
     }
 
     @Test
-    fun `When repository called delete actions, Then dao also called delete`() = runTest {
-        suspend fun <T : DeleteScheduleQuery> testDelete(
-            request: T,
-            doVerify: suspend (ScheduleDAO).(T) -> Unit
-        ) {
-            val scheduleDAO = mock<ScheduleDAO>()
-            val scheduleRepository = genScheduleRepository(scheduleDAO = scheduleDAO)
-            scheduleRepository.delete(request)
-            verify(scheduleDAO, once()).doVerify(request)
-        }
-
-        val isComplete = genBoolean()
-        val scheduleIds = List(genInt(min = 5, max = 10)) { ScheduleId(it.toLong()) }
-
-        testDelete(
-            request = DeleteScheduleQuery.ByComplete(isComplete),
-            doVerify = { deleteByComplete(isComplete = isComplete) }
+    fun `Given all query, When collect schedules, Then return schedules with no tags from dao`() = runTest {
+        // given
+        val (schedule, entity) = genScheduleAndEntity(
+            schedule = genSchedule(
+                content = genScheduleContent(tagIds = emptySet())
+            )
         )
-        testDelete(
-            request = DeleteScheduleQuery.ByIds(scheduleIds.toSet()),
-            doVerify = { deleteByScheduleIds(scheduleIds.map { it.rawId }.toSet()) }
+        val query = GetScheduleQuery.All
+
+        // when
+        val repository = genLocalScheduleRepository(
+            scheduleRepeatDetailDAO = mockk {
+                every { getAsStream() } returns flowOf(mapOf(entity.scheduleEntity to entity.repeatDetailEntities))
+            },
+            scheduleTagListDAO = mockk {
+                every { findByScheduleIdsAsStream(scheduleIds = setOf(schedule.id.rawId)) } returns flowOf(emptyList())
+            }
+        )
+        val result = repository
+            .getSchedulesAsStream(query)
+            .first()
+
+        // then
+        assertThat(
+            result.first().content.tagIds.isEmpty(),
+            equalTo(true)
         )
     }
 
     @Test
-    fun `Given schedules and entities, When repository called getSchedulesAsStream, Then return schedules`() = runTest {
-        suspend fun testGetScheduleAsStream(
-            scheduleDAO: ScheduleDAO,
-            request: GetScheduleQuery,
-            expectedResult: Set<Schedule>
-        ) {
-            val scheduleRepository = genScheduleRepository(scheduleDAO)
-            val actualSchedules = scheduleRepository.getSchedulesAsStream(request)
-                .take(1)
-                .first()
-
-            assertThat(actualSchedules, equalTo(expectedResult))
-        }
-
-        val (schedules, entities) = genScheduleAndEntities()
-        val isComplete = genBoolean()
-
-        testGetScheduleAsStream(
-            scheduleDAO = mock {
-                whenever(mock.getAsStream()) doReturn flowOf(entities.toTypedArray())
+    fun `Given completion status, When collect schedules, Then return schedules from dao`() = runTest {
+        // given
+        val (schedule, entity) = genScheduleAndEntity()
+        val repository = genLocalScheduleRepository(
+            scheduleRepeatDetailDAO = mockk {
+                every { findByCompleteAsStream(isComplete = schedule.isComplete) } returns flowOf(
+                    mapOf(entity.scheduleEntity to entity.repeatDetailEntities)
+                )
             },
-            request = GetScheduleQuery.All,
-            expectedResult = schedules.toSet()
+            scheduleTagListDAO = mockk {
+                every { findByScheduleIdsAsStream(scheduleIds = setOf(schedule.id.rawId)) } returns flowOf(
+                    entity.scheduleTagListEntities.toList()
+                )
+            }
         )
-        testGetScheduleAsStream(
-            scheduleDAO = mock {
-                whenever(mock.findByCompleteAsStream(isComplete)) doReturn flowOf(entities.toTypedArray())
-            },
-            request = GetScheduleQuery.ByComplete(isComplete),
-            expectedResult = schedules.toSet()
-        )
+
+        // when
+        val result = repository
+            .getSchedulesAsStream(GetScheduleQuery.ByComplete(isComplete = schedule.isComplete))
+            .first()
+
+        // then
+        assertThat(result, equalTo(setOf(schedule)))
     }
 }
 
-private fun genScheduleRepository(
-    scheduleDAO: ScheduleDAO = mock()
-): ScheduleRepository = LocalScheduleRepository(scheduleDAO)
+private fun genLocalScheduleRepository(
+    scheduleDAO: ScheduleDAO = mockk(),
+    scheduleRepeatDetailDAO: ScheduleRepeatDetailDAO = mockk(),
+    scheduleTagListDAO: ScheduleTagListDAO = mockk(),
+    insertAndGetScheduleContentAggregate: InsertAndGetScheduleContentAggregateTransaction = mockk(),
+    updateAndGetScheduleContentAggregate: UpdateAndGetScheduleContentAggregateTransaction = mockk()
+) = LocalScheduleRepository(
+    scheduleDAO = scheduleDAO,
+    scheduleRepeatDetailDAO = scheduleRepeatDetailDAO,
+    scheduleTagListDAO = scheduleTagListDAO,
+    insertAndGetScheduleContentAggregate = insertAndGetScheduleContentAggregate,
+    updateAndGetScheduleContentAggregate = updateAndGetScheduleContentAggregate
+)
