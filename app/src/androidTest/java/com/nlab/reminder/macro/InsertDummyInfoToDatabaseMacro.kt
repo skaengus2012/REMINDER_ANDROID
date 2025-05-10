@@ -22,17 +22,12 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.javafaker.Faker
 import com.nlab.reminder.core.kotlin.toNonBlankString
 import com.nlab.reminder.core.local.database.configuration.ReminderDatabase
-import com.nlab.reminder.core.local.database.dao.ScheduleContentDTO
 import com.nlab.reminder.core.local.database.dao.ScheduleDAO
+import com.nlab.reminder.core.local.database.dao.ScheduleHeadlineSaveInput
 import com.nlab.reminder.core.local.database.dao.ScheduleTagListDAO
 import com.nlab.reminder.core.local.database.dao.TagDAO
-import com.nlab.reminder.core.local.database.dao.TriggerTimeDTO
-import com.nlab.reminder.core.local.database.entity.ScheduleEntity
 import com.nlab.reminder.core.local.database.entity.ScheduleTagListEntity
-import com.nlab.reminder.core.local.database.entity.TagEntity
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
-import kotlinx.datetime.Clock
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -45,7 +40,7 @@ import java.util.*
 @RunWith(AndroidJUnit4::class)
 class InsertDummyInfoToDatabaseMacro {
     private val faker: Faker = Faker(Locale("ko"))
-    private val inputTagTexts: List<String> = listOf(
+    private val tagTextInputs: List<String> = listOf(
         "집안일",
         "약속",
         "건강",
@@ -58,44 +53,32 @@ class InsertDummyInfoToDatabaseMacro {
         "스터디",
         "데이트 장소 알아보기",
         "뭔가 엄청엄청엄청 긴 태그~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-    ) + List(20) { "테스트용 태그 #$it" }
-    private val inputScheduleContents: List<ScheduleContentDTO> = buildList {
+    )
+    private val scheduleHeadlineSaveInputs: List<ScheduleHeadlineSaveInput> = buildList {
         this += List(300) {
-            ScheduleContentDTO(
+            ScheduleHeadlineSaveInput(
                 title = "Programming STUDY!".toNonBlankString(),
                 description = "Good to know about [${faker.programmingLanguage().name()}] with ${faker.name().fullName()}"
                     .toNonBlankString(),
-                link = "https://github.com/skaengus2012/REMINDER_ANDROID".toNonBlankString(),
-                triggerTimeDTO = TriggerTimeDTO(
-                    utcTime = Clock.System.now(),
-                    isDateOnly = true
-                )
+                link = "https://github.com/skaengus2012/REMINDER_ANDROID".toNonBlankString()
             )
         }
 
         this += List(300) {
-            ScheduleContentDTO(
+            ScheduleHeadlineSaveInput(
                 title = "Travel ✈️".toNonBlankString(),
                 description = "Go to [${faker.nation().capitalCity()}] with ${faker.name().fullName()}"
                     .toNonBlankString(),
-                link = null,
-                triggerTimeDTO = TriggerTimeDTO(
-                    utcTime = Clock.System.now(),
-                    isDateOnly = true
-                )
+                link = null
             )
         }
 
         this += List(300) {
             val book = faker.book()
-            ScheduleContentDTO(
+            ScheduleHeadlineSaveInput(
                 title = "Book club".toNonBlankString(),
                 description = "About [${book.title()} of ${book.author()}]".toNonBlankString(),
-                link = null,
-                triggerTimeDTO = TriggerTimeDTO(
-                    utcTime = Clock.System.now(),
-                    isDateOnly = true
-                )
+                link = null
             )
         }
     }
@@ -108,7 +91,7 @@ class InsertDummyInfoToDatabaseMacro {
     @Before
     fun setup() {
         val context: Context = ApplicationProvider.getApplicationContext()
-        database = ReminderDatabase.getDatabase(context)
+        database = ReminderDatabase(context)
         scheduleDao = database.scheduleDAO()
         tagDao = database.tagDAO()
         scheduleTagListDao = database.scheduleTagListDAO()
@@ -121,42 +104,26 @@ class InsertDummyInfoToDatabaseMacro {
 
     @Test
     fun input() = runBlocking {
-        val tagEntities = resetTagEntities()
-        val scheduleEntities = resetScheduleEntities()
-        resetScheduleTagList(scheduleEntities, tagEntities)
-    }
+        database.clearAllTables()
 
-    private suspend fun resetTagEntities(): List<TagEntity> {
-        tagDao.getAsStream().first().forEach { tagDao.deleteById(it.tagId) }
-        return inputTagTexts.map { tagDao.insertAndGet(it) }
-    }
-
-    private suspend fun resetScheduleEntities(): List<ScheduleEntity> {
-        scheduleDao.deleteByScheduleIds(
-            scheduleIds = scheduleDao.getAsStream().first().map { it.scheduleId }.toSet()
-        )
-
-        return inputScheduleContents.shuffled().mapIndexed { index, scheduleContent ->
-            scheduleDao.insertAndGet(
-                scheduleContent.copy(title = "#$index ${scheduleContent.title}".toNonBlankString())
-            )
+        val savedTagEntities = tagTextInputs.map { tagText ->
+            tagDao.insertAndGet(name = tagText.toNonBlankString())
         }
-    }
-
-    private suspend fun resetScheduleTagList(
-        scheduleEntities: List<ScheduleEntity>,
-        tagEntities: List<TagEntity>
-    ) {
-        scheduleEntities
+        val savedScheduleEntities = scheduleHeadlineSaveInputs.map { headlineInput ->
+            scheduleDao.insertAndGet(headline = headlineInput, timing = null)
+        }
+        val scheduleTagListEntities = savedScheduleEntities
             .map { scheduleEntity ->
-                List(faker.number().numberBetween(0, tagEntities.size)) { index ->
+                val shuffledTagEntities = savedTagEntities.shuffled()
+                List(size = (1..shuffledTagEntities.size).random()) { shuffledTagEntities[it] }.map { tagEntity ->
                     ScheduleTagListEntity(
-                        scheduleEntity.scheduleId,
-                        tagEntities[index].tagId
+                        scheduleId = scheduleEntity.scheduleId,
+                        tagId = tagEntity.tagId
                     )
                 }
             }
             .flatten()
-            .forEach { inputEntities -> scheduleTagListDao.insert(inputEntities) }
+            .toSet()
+        scheduleTagListDao.insert(entities = scheduleTagListEntities)
     }
 }
