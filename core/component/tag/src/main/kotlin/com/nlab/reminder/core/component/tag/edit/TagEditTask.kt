@@ -18,8 +18,6 @@ package com.nlab.reminder.core.component.tag.edit
 
 import com.nlab.reminder.core.annotation.ExcludeFromGeneratedTestReport
 import com.nlab.reminder.core.kotlin.Result
-import com.nlab.reminder.core.kotlin.onFailure
-import com.nlab.reminder.core.kotlin.onSuccess
 import kotlin.reflect.KClass
 import kotlin.reflect.safeCast
 
@@ -58,16 +56,4 @@ private fun <T> TagEditTask(
             processAndGet = { processAndGet(currentAsTarget) }
         )
     }
-}
-
-suspend fun executeTagEditTask(
-    task: TagEditTask,
-    current: TagEditState,
-    updateState: suspend (expectedState: TagEditState, newState: TagEditState) -> Unit,
-    onError: (Throwable) -> Unit
-) {
-    updateState(current, task.nextState)
-    task.processAndGet()
-        .onSuccess { updateState(task.nextState, it) }
-        .onFailure(onError)
 }
