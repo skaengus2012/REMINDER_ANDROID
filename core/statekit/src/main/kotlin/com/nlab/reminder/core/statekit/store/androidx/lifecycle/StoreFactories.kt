@@ -48,7 +48,7 @@ fun <A : Any, S : Any> ViewModel.createStore(
 
 fun CoroutineScope.toStoreMaterialScope(): CoroutineScope {
     var ret = this
-    ret += Dispatchers.Default
+    ret += Dispatchers.Default.limitedParallelism(parallelism = 1)
     setupGlobalAndLocalMergedCoroutineExceptionHandler { ret += it }
     return ret
 }

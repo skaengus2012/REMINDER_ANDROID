@@ -37,8 +37,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -57,7 +59,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.nlab.reminder.core.androidx.compose.ui.rememberDebouncedTextFieldValueState
 import com.nlab.reminder.core.androidx.compose.ui.throttleClick
 import com.nlab.reminder.core.androidx.compose.ui.tooling.preview.Previews
 import com.nlab.reminder.core.designsystem.compose.component.PlaneatDialog
@@ -70,6 +71,7 @@ import com.nlab.reminder.core.kotlin.toNonNegativeInt
 import com.nlab.reminder.core.translation.PluralsIds
 import com.nlab.reminder.core.translation.StringIds
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.distinctUntilChangedBy
 
 /**
  * @author Doohyun
@@ -174,12 +176,17 @@ private fun TagRenameInputField(
             .background(PlaneatTheme.colors.bg2),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        var debouncedTextFieldValue by rememberDebouncedTextFieldValueState(
-            value = value,
-            onTextChanged = onTextChanged
-        )
-        val isClearBtnVisible: Boolean by remember {
-            derivedStateOf { debouncedTextFieldValue.text.isNotEmpty() }
+        var textFieldValue by remember {
+            mutableStateOf(TextFieldValue(value, selection = TextRange(value.length)))
+        }
+        LaunchedEffect(onTextChanged) {
+            snapshotFlow { textFieldValue }
+                .distinctUntilChangedBy { it.text }
+                .collect { onTextChanged(it.text) }
+        }
+
+        val isClearBtnVisible by remember {
+            derivedStateOf { textFieldValue.text.isNotEmpty() }
         }
         TagRenameTextField(
             modifier = Modifier
@@ -187,14 +194,12 @@ private fun TagRenameInputField(
                 .weight(1f)
                 .heightIn(min = 30.dp)
                 .focusRequester(focusRequester),
-            value = debouncedTextFieldValue,
-            onValueChange = { debouncedTextFieldValue = it },
+            value = textFieldValue,
+            onValueChange = { textFieldValue = it },
         )
         TagRenameClearButton(
             isVisible = isClearBtnVisible,
-            onClick = {
-                debouncedTextFieldValue = debouncedTextFieldValue.copy("", selection = TextRange.Zero)
-            }
+            onClick = { textFieldValue = textFieldValue.copy("", selection = TextRange.Zero) }
         )
     }
 }
