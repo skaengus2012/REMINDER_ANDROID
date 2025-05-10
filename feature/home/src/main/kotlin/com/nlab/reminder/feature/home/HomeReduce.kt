@@ -17,9 +17,7 @@
 package com.nlab.reminder.feature.home
 
 import com.nlab.reminder.core.component.tag.edit.TagEditState
-import com.nlab.reminder.core.component.tag.edit.TagEditTask
 import com.nlab.reminder.core.component.tag.edit.executeTagEditTask
-import com.nlab.reminder.core.component.usermessage.errorMessage
 import com.nlab.statekit.dsl.reduce.DslReduce
 import com.nlab.statekit.reduce.Reduce
 import com.nlab.reminder.feature.home.HomeAction.*
@@ -68,7 +66,9 @@ internal fun HomeReduce(environment: HomeEnvironment): HomeReduce = DslReduce {
                     .tagEditStateMachine
                     .startRename(current.tagEditState),
                 current = current.tagEditState,
-                onTagEditStateUpdated = { dispatch(it) }
+                updateState = { expectedState, newState ->
+                    dispatch(CompareAndSetTagEditState(expectedState, newState))
+                }
             )
         }
         transition<OnTagRenameInputReady> {
@@ -94,7 +94,9 @@ internal fun HomeReduce(environment: HomeEnvironment): HomeReduce = DslReduce {
                         compareTags = current.tags
                     ),
                 current = current.tagEditState,
-                onTagEditStateUpdated = { dispatch(it) }
+                updateState = { expectedState, newState ->
+                    dispatch(CompareAndSetTagEditState(expectedState, newState))
+                }
             )
         }
         suspendEffect<OnTagReplaceConfirmClicked> {
@@ -103,7 +105,9 @@ internal fun HomeReduce(environment: HomeEnvironment): HomeReduce = DslReduce {
                     .tagEditStateMachine
                     .merge(current = current.tagEditState),
                 current = current.tagEditState,
-                onTagEditStateUpdated = { dispatch(it) }
+                updateState = { expectedState, newState ->
+                    dispatch(CompareAndSetTagEditState(expectedState, newState))
+                }
             )
         }
         transition<OnTagReplaceCancelClicked> {
@@ -119,7 +123,9 @@ internal fun HomeReduce(environment: HomeEnvironment): HomeReduce = DslReduce {
                     .tagEditStateMachine
                     .startDelete(current = current.tagEditState),
                 current = current.tagEditState,
-                onTagEditStateUpdated = { dispatch(it) }
+                updateState = { expectedState, newState ->
+                    dispatch(CompareAndSetTagEditState(expectedState, newState))
+                }
             )
         }
         suspendEffect<OnTagDeleteConfirmClicked> {
@@ -128,23 +134,10 @@ internal fun HomeReduce(environment: HomeEnvironment): HomeReduce = DslReduce {
                     .tagEditStateMachine
                     .delete(current = current.tagEditState),
                 current = current.tagEditState,
-                onTagEditStateUpdated = { dispatch(it) }
+                updateState = { expectedState, newState ->
+                    dispatch(CompareAndSetTagEditState(expectedState, newState))
+                }
             )
         }
     }
-}
-
-private suspend fun executeTagEditTask(
-    task: TagEditTask,
-    current: TagEditState,
-    onTagEditStateUpdated: suspend (CompareAndSetTagEditState) -> Unit
-) {
-    executeTagEditTask(
-        task,
-        current,
-        updateState = { expectedState, newState ->
-            onTagEditStateUpdated(CompareAndSetTagEditState(expectedState, newState))
-        },
-        onError = { errorMessage(it) }
-    )
 }

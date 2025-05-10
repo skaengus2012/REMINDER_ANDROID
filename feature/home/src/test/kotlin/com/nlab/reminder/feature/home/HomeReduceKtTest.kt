@@ -19,10 +19,8 @@ package com.nlab.reminder.feature.home
 import com.nlab.reminder.core.component.tag.edit.TagEditState
 import com.nlab.reminder.core.component.tag.edit.TagEditStateMachine
 import com.nlab.reminder.core.component.tag.edit.TagEditTask
-import com.nlab.reminder.core.component.tag.edit.genTagEditState
 import com.nlab.reminder.core.component.tag.edit.genTagEditStateExcludeTypeOf
 import com.nlab.reminder.core.component.tag.edit.genTagEditStateTypeOf
-import com.nlab.reminder.core.component.usermessage.errorMessage
 import com.nlab.reminder.core.data.model.genTag
 import com.nlab.reminder.core.kotlin.Result
 import com.nlab.statekit.test.reduce.effectScenario
@@ -30,12 +28,8 @@ import com.nlab.statekit.test.reduce.expectedStateToInit
 import com.nlab.statekit.test.reduce.launchAndJoin
 import com.nlab.statekit.test.reduce.transitionScenario
 import com.nlab.testkit.faker.genBothify
-import io.mockk.Runs
 import io.mockk.every
-import io.mockk.just
 import io.mockk.mockk
-import io.mockk.mockkStatic
-import io.mockk.verify
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
@@ -136,16 +130,6 @@ class HomeReduceKtTest {
     }
 
     @Test
-    fun `Given success, rename loading fails, When rename requested, Then throw exception`() = runTest {
-        assertTagEditTaskThrowsErrorWithStateMachine(
-            action = HomeAction.OnTagRenameRequestClicked,
-            buildStateMachine = {
-                mockk { every { startRename(any()) } returns tagEditTaskStub }
-            }
-        )
-    }
-
-    @Test
     fun `Given success, When rename input ready, Then update by stateMachine result`() = runTest {
         assertTagEditStateTransformedByStateMachine(
             action = HomeAction.OnTagRenameInputReady,
@@ -221,7 +205,6 @@ class HomeReduceKtTest {
             }
         )
     }
-
 }
 
 private fun genHomeReduce(environment: HomeEnvironment = genHomeEnvironment()): HomeReduce = HomeReduce(environment)
@@ -290,29 +273,4 @@ private suspend fun assertTagEditTaskDispatchedWithStateMachine(
             )
         )
     )
-}
-
-private suspend fun assertTagEditTaskThrowsErrorWithStateMachine(
-    action: HomeAction,
-    buildStateMachine: TagEditTaskExecutionAssertParam.() -> TagEditStateMachine
-) {
-   mockkStatic(::errorMessage)
-    every { errorMessage(any()) } just Runs
-
-    val initState = genHomeUiStateSuccess()
-    val tagEditStateMachine = buildStateMachine(
-        TagEditTaskExecutionAssertParam(
-            initState,
-            TagEditTask(
-                nextState = genTagEditState(),
-                processAndGet = { Result.Failure(IllegalStateException()) }
-            )
-        )
-    )
-    genHomeReduce(environment = genHomeEnvironment(tagEditStateMachine = tagEditStateMachine))
-        .effectScenario()
-        .initState(initState)
-        .action(action)
-        .launchAndJoin()
-    verify(exactly = 1) { errorMessage(any()) }
 }
