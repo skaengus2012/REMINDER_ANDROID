@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 The N's lab Open Source Project
+ * Copyright (C) 2025 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,12 +18,13 @@ package com.nlab.reminder.core.local.database.util
 
 import androidx.room.withTransaction
 import com.nlab.reminder.core.local.database.configuration.ReminderDatabase
+import dagger.Reusable
+import javax.inject.Inject
 
 /**
- * @author Doohyun
+ * @author Thalys
  */
-class TransactionScope(
-    private val database: ReminderDatabase
-) {
-    internal suspend operator fun <R> invoke(block: suspend () -> R): R = database.withTransaction(block)
+@Reusable
+internal class TransactionScope @Inject constructor(private val reminderDatabase: ReminderDatabase) {
+    suspend fun <R> runIn(block: suspend () -> R): R = reminderDatabase.withTransaction(block)
 }

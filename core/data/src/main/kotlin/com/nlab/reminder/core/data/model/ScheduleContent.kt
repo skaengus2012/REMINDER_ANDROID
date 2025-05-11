@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 The N's lab Open Source Project
+ * Copyright (C) 2025 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,9 @@ import com.nlab.reminder.core.kotlin.NonBlankString
  * @author Doohyun
  */
 data class ScheduleContent(
-    val title: String,
+    val title: NonBlankString,
     val note: NonBlankString?,
     val link: Link?,
+    val tagIds: Set<TagId>,
+    val timing: ScheduleTiming?,
 )

@@ -16,29 +16,113 @@
 
 package com.nlab.reminder.core.data.model
 
+import androidx.annotation.IntRange
+import com.nlab.reminder.core.kotlin.collections.toSet
+import com.nlab.reminder.core.kotlin.toNonBlankString
+import com.nlab.reminder.core.kotlin.toNonNegativeLong
 import com.nlab.reminder.core.kotlin.tryToNonBlankStringOrNull
-import com.nlab.reminder.core.kotlin.tryToNonNegativeLongOrZero
-import com.nlab.reminder.core.local.database.dao.ScheduleContentDTO
-import com.nlab.reminder.core.local.database.model.ScheduleEntity
+import com.nlab.reminder.core.local.database.dao.ScheduleHeadlineSaveInput
+import com.nlab.reminder.core.local.database.entity.RepeatDetailEntity
+import com.nlab.reminder.core.local.database.entity.RepeatType
+import com.nlab.reminder.core.local.database.entity.ScheduleEntity
+import com.nlab.reminder.core.local.database.entity.ScheduleTagListEntity
+import com.nlab.reminder.core.local.database.transaction.ScheduleContentAggregate
+import com.nlab.reminder.core.local.database.transaction.ScheduleTimingAggregate
 
 /**
  * @author Doohyun
  */
-internal fun Schedule(entity: ScheduleEntity): Schedule = Schedule(
-    id = ScheduleId(entity.scheduleId),
-    content = ScheduleContent(entity),
-    visiblePriority = entity.visiblePriority.tryToNonNegativeLongOrZero(),
-    isComplete = entity.isComplete
+internal fun Schedule(
+    scheduleEntity: ScheduleEntity,
+    scheduleTagListEntities: Set<ScheduleTagListEntity>,
+    repeatDetailEntities: Set<RepeatDetailEntity>,
+): Schedule = Schedule(
+    id = ScheduleId(scheduleEntity.scheduleId),
+    content = ScheduleContent(
+        scheduleEntity,
+        scheduleTagListEntities,
+        repeatDetailEntities
+    ),
+    visiblePriority = scheduleEntity.visiblePriority.toNonNegativeLong(),
+    isComplete = scheduleEntity.isComplete
 )
 
-internal fun ScheduleContent(entity: ScheduleEntity): ScheduleContent = ScheduleContent(
-    title = entity.title,
-    note = entity.description.tryToNonBlankStringOrNull(),
-    link = entity.link.tryToNonBlankStringOrNull()?.let(::Link)
+private fun ScheduleContent(
+    scheduleEntity: ScheduleEntity,
+    scheduleTagListEntities: Set<ScheduleTagListEntity>,
+    repeatDetailEntity: Set<RepeatDetailEntity>,
+): ScheduleContent = ScheduleContent(
+    title = scheduleEntity.title.toNonBlankString(),
+    note = scheduleEntity.description.tryToNonBlankStringOrNull(),
+    link = scheduleEntity.link.tryToNonBlankStringOrNull()?.let(::Link),
+    tagIds = scheduleTagListEntities.toSet { TagId(it.tagId) },
+    timing = createScheduleTimingOrNull(scheduleEntity, repeatDetailEntity),
 )
 
-internal fun ScheduleContent.toLocalDTO() = ScheduleContentDTO(
+private fun createScheduleTimingOrNull(
+    scheduleEntity: ScheduleEntity,
+    repeatDetailEntity: Set<RepeatDetailEntity>,
+): ScheduleTiming? {
+    val triggerTimeUtc = scheduleEntity.triggerTimeUtc
+    val isTriggerTimeDateOnly = scheduleEntity.isTriggerTimeDateOnly
+    require((triggerTimeUtc == null) == (isTriggerTimeDateOnly == null)) {
+        "Invalid triggerTime [$triggerTimeUtc, $isTriggerTimeDateOnly]"
+    }
+
+    val repeat = createRepeatOrNull(
+        type = scheduleEntity.repeatType,
+        interval = scheduleEntity.repeatInterval,
+        detailEntities = repeatDetailEntity
+    )
+    require(triggerTimeUtc != null || repeat == null) {
+        "Repeat is defined without triggerTime: repeat=$repeat"
+    }
+
+    return if (triggerTimeUtc == null) null else {
+        ScheduleTiming(
+            triggerAtUtc = triggerTimeUtc,
+            isTriggerAtDateOnly = isTriggerTimeDateOnly!!,
+            repeat = repeat
+        )
+    }
+}
+
+/**
+ * If RepeatDetails is incorrectly entered, it is not confirmed.
+ * In Repeat function, check if there are appropriate repeatDetails.
+ *
+ * The exactly validity of the repeatDetails should be checked only in the data insertion.
+ * @see [com.nlab.reminder.core.local.database.transaction.ScheduleTimingAggregateValidator]
+ */
+private fun createRepeatOrNull(
+    @RepeatType type: String?,
+    @IntRange(from = 1) interval: Int?,
+    detailEntities: Collection<RepeatDetailEntity>
+): Repeat? {
+    require((type == null) == (interval == null)) {
+        "Invalid RepeatDetails [$type, $detailEntities]"
+    }
+    require(type != null || detailEntities.isEmpty()) {
+        "Repeat Detail is defined without repeatType: detailEntities=$detailEntities"
+    }
+
+    return if (type == null) null else Repeat(type, interval!!, detailEntities)
+}
+
+internal fun ScheduleContent.toHeadlineSaveInput(): ScheduleHeadlineSaveInput = ScheduleHeadlineSaveInput(
     title = title,
-    description = note?.value,
-    link = link?.rawLink?.value
+    description = note,
+    link = link?.rawLink
+)
+
+internal fun ScheduleContent.toAggregate(): ScheduleContentAggregate = ScheduleContentAggregate(
+    headline = toHeadlineSaveInput(),
+    timing = timing?.toAggregate(),
+    tagIds = tagIds.toSet { it.rawId },
+)
+
+internal fun ScheduleTiming.toAggregate(): ScheduleTimingAggregate = ScheduleTimingAggregate(
+    triggerTimeUtc = triggerAtUtc,
+    isTriggerTimeDateOnly = isTriggerAtDateOnly,
+    repeat = repeat?.toAggregate()
 )

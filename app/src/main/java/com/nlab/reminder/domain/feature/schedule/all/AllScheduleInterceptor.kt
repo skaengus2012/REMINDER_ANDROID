@@ -16,8 +16,6 @@
 
 package com.nlab.reminder.domain.feature.schedule.all
 
-import com.nlab.reminder.core.domain.*
-
 /**
  * @author thalys
  */

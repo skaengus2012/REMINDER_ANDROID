@@ -19,36 +19,46 @@ package com.nlab.reminder.core.local.database.configuration
 import android.content.Context
 import androidx.room.*
 import com.nlab.reminder.core.local.database.dao.LinkMetadataDAO
+import com.nlab.reminder.core.local.database.dao.RepeatDetailDAO
 import com.nlab.reminder.core.local.database.dao.ScheduleDAO
+import com.nlab.reminder.core.local.database.dao.ScheduleRepeatDetailDAO
 import com.nlab.reminder.core.local.database.dao.ScheduleTagListDAO
 import com.nlab.reminder.core.local.database.dao.TagDAO
-import com.nlab.reminder.core.local.database.model.LinkMetadataEntity
-import com.nlab.reminder.core.local.database.model.ScheduleEntity
-import com.nlab.reminder.core.local.database.model.ScheduleTagListEntity
-import com.nlab.reminder.core.local.database.model.TagEntity
+import com.nlab.reminder.core.local.database.entity.LinkMetadataEntity
+import com.nlab.reminder.core.local.database.entity.RepeatDetailEntity
+import com.nlab.reminder.core.local.database.entity.ScheduleEntity
+import com.nlab.reminder.core.local.database.entity.ScheduleTagListEntity
+import com.nlab.reminder.core.local.database.entity.TagEntity
+import com.nlab.reminder.core.local.database.util.InstantConverter
 
 /**
  * @author Doohyun
  */
+private const val DB_NAME = "reminder_common.db"
+
 @Database(
     entities = [
         LinkMetadataEntity::class,
+        RepeatDetailEntity::class,
         ScheduleEntity::class,
         ScheduleTagListEntity::class,
         TagEntity::class
     ],
     version = 1
 )
+@TypeConverters(
+    value = [
+        InstantConverter::class
+    ]
+)
 abstract class ReminderDatabase : RoomDatabase() {
-    abstract fun scheduleDAO(): ScheduleDAO
-    abstract fun tagDAO(): TagDAO
-    abstract fun scheduleTagListDAO(): ScheduleTagListDAO
     abstract fun linkMetadataDAO(): LinkMetadataDAO
-
-    companion object {
-        private const val DB_NAME = "reminder_common.db"
-
-        fun getDatabase(context: Context): ReminderDatabase =
-            Room.databaseBuilder(context, ReminderDatabase::class.java, DB_NAME).build()
-    }
+    abstract fun repeatDetailDAO(): RepeatDetailDAO
+    abstract fun scheduleDAO(): ScheduleDAO
+    abstract fun scheduleRepeatDetailDAO(): ScheduleRepeatDetailDAO
+    abstract fun scheduleTagListDAO(): ScheduleTagListDAO
+    abstract fun tagDAO(): TagDAO
 }
+
+fun ReminderDatabase(context: Context): ReminderDatabase =
+    Room.databaseBuilder(context, ReminderDatabase::class.java, DB_NAME).build()

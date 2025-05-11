@@ -30,6 +30,15 @@ fun <T> Iterable<T>.shuffleAndGetFirst(
     return target.first()
 }
 
+/**
+ * If iterable is empty, return EmptySet.
+ * If the value exists in the iterable, one or more subSet is output.
+ */
+fun <T> Iterable<T>.shuffledSubset(): Set<T> = shuffled().let { list ->
+    if (list.isEmpty()) emptySet()
+    else list.take(genInt(min = 1, max = list.size)).toSet()
+}
+
 fun <T> Iterable<T>.requireSample(): T = shuffled().first()
 
 fun <T : Any> Iterable<T>.requireSampleExcludeTypeOf(

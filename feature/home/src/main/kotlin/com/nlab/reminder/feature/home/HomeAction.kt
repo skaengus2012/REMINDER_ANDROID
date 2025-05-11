@@ -32,10 +32,10 @@ internal sealed class HomeAction private constructor() {
         val sortedTags: List<Tag>,
     ) : HomeAction()
 
-    data class TagEditStateSynced(val state: TagEditState?) : HomeAction()
-
-    @UiAction
-    data object Interacted : HomeAction()
+    data class CompareAndSetTagEditState(
+        val expectedState: TagEditState,
+        val newState: TagEditState
+    ) : HomeAction()
 
     @UiAction
     data object OnTodayCategoryClicked : HomeAction()
@@ -72,4 +72,7 @@ internal sealed class HomeAction private constructor() {
 
     @UiAction
     data object OnTagDeleteConfirmClicked : HomeAction()
+
+    @UiAction
+    data object OnTagEditCancelClicked : HomeAction()
 }

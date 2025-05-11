@@ -16,18 +16,8 @@
 
 package com.nlab.reminder.core.data.di
 
-import com.nlab.reminder.core.data.repository.LinkMetadataRepository
 import com.nlab.reminder.core.data.repository.ScheduleCompleteMarkRepository
-import com.nlab.reminder.core.data.repository.ScheduleDetailRepository
-import com.nlab.reminder.core.data.repository.ScheduleRepository
-import com.nlab.reminder.core.data.repository.ScheduleTagListRepository
-import com.nlab.reminder.core.data.repository.TagRepository
-import com.nlab.reminder.core.data.repository.impl.DefaultScheduleDetailRepository
-import com.nlab.reminder.core.data.repository.impl.InMemoryLinkMetadataCache
 import com.nlab.reminder.core.data.repository.impl.InMemoryScheduleCompleteMarkRepository
-import com.nlab.reminder.core.data.repository.impl.OfflineFirstLinkMetadataRepository
-import com.nlab.reminder.core.local.database.dao.LinkMetadataDAO
-import com.nlab.reminder.core.network.LinkThumbnailDataSource
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -39,32 +29,7 @@ import dagger.hilt.android.scopes.ViewModelScoped
  */
 @Module
 @InstallIn(ViewModelComponent::class)
-internal class ViewModelScopeDataModule {
-    @ViewModelScoped
-    @Provides
-    fun provideCachedLinkMetadataTableRepository(
-        linkMetadataDAO: LinkMetadataDAO,
-        linkThumbnailDataSource: LinkThumbnailDataSource
-    ): LinkMetadataRepository = OfflineFirstLinkMetadataRepository(
-        linkMetadataDAO = linkMetadataDAO,
-        linkThumbnailDataSource = linkThumbnailDataSource,
-        inMemoryCache = InMemoryLinkMetadataCache(initialCache = emptyMap())
-    )
-
-    @ViewModelScoped
-    @Provides
-    fun provideScheduleDetailRepository(
-        scheduleRepository: ScheduleRepository,
-        tagRepository: TagRepository,
-        scheduleTagListRepository: ScheduleTagListRepository,
-        linkMetadataRepository: LinkMetadataRepository
-    ): ScheduleDetailRepository = DefaultScheduleDetailRepository(
-        scheduleRepository = scheduleRepository,
-        tagRepository = tagRepository,
-        scheduleTagListRepository = scheduleTagListRepository,
-        linkMetadataRepository = linkMetadataRepository
-    )
-
+internal object ViewModelScopeDataModule {
     @Provides
     @ViewModelScoped
     fun provideScheduleCompleteMarkRepository(): ScheduleCompleteMarkRepository =

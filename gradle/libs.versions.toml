@@ -3,51 +3,54 @@
 # build Environmental
 compileSdk = "35"
 targetSdk = "35"
-minSdk = "23"
+minSdk = "24"
 
 # library version
-androidGradlePlugin = "8.8.0"
+androidGradlePlugin = "8.10.0"
 androidxAnnotation = "1.9.1"
 androidxAppCompat = "1.7.0"
 androidxCardview = "1.0.0"
-androidxComposeBom = "2025.01.01"
+androidxComposeBom = "2025.05.00"
 androidxComposeCompiler = "1.5.15"  # use in configureComposeAndroid AndroidCompose.kt
-androidxConstaintLayout = "2.2.0"
-androidxCoreKtx = "1.15.0"
+androidxConstaintLayout = "2.2.1"
+androidxCoreKtx = "1.16.0"
 androidxCoreSplashScreen = "1.0.1"
-androidxDataStore = "1.1.2"
-androidxFragment = "1.8.5"
+androidxDataStore = "1.1.6"
+androidxFragment = "1.8.6"
 androidxHiltNavigationCompose = "1.2.0"
-androidxLifecycle = "2.8.7"
-androidxNavigation = "2.8.6"
+androidxLifecycle = "2.9.0"
+androidxNavigation = "2.9.0"
 androidxRecyclerView = "1.4.0"
-androidxRoom = "2.6.1"
+androidxRoom = "2.7.1"
 androidxStartUp = "1.2.0"
 androidxTestEspresso = "3.6.1"
 androidxTestJunit = "1.2.1"
 androidxTestRules = "1.6.1"
-androidxTransition = "1.5.1"
+androidxTransition = "1.6.0"
 appCashTurbine = "1.2.0"
 coil = "2.7.0"
+desugarJdklibs = "2.1.5"
 facebookFlipper = "0.273.0"
 facebookSoloader = "0.12.1"
-googleHilt = "2.55"
+googleHilt = "2.56.2"
 googleMaterial = "1.12.0"
 jacoco = "0.8.12" # use in configureJacocoToolVersion -> Jacoco.kt
 javafaker = "1.0.2"
-jsoup = "1.18.3"
+jsoup = "1.20.1"
 junit = "4.13.2"
-kotlin = "2.1.10"
-kotlinxDatetime = "0.6.1"
-kotlinxSerializationJson = "1.8.0"
-ksp = "2.1.10-1.0.29"
+kotlin = "2.1.20"
+kotlinxDatetime = "0.6.2"
+kotlinxSerializationJson = "1.8.1"
+ksp = "2.1.20-2.0.1"
 kotlinxCollectionsImmutable = "0.3.7"
-kotlinxCoroutine = "1.10.1"
+kotlinxCoroutine = "1.10.2"
 mockitoInline = "5.2.0"
 mockitoKotlin = "5.4.0"
+mockk = "1.14.0"
 squareLeakcanary = "2.14"
-squareKotlinpoet = "2.0.0"
+squareKotlinpoet = "2.1.0"
 timber = "5.0.1"
+turbine = "1.2.0"
 
 
 [libraries]
@@ -76,15 +79,14 @@ androidx-navigation-compose = { group = "androidx.navigation", name = "navigatio
 androidx-recyclerview = { module = "androidx.recyclerview:recyclerview", version.ref = "androidxRecyclerView" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "androidxRoom" }
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "androidxRoom" }
-androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "androidxRoom" }
 androidx-startup-runtime = { module = "androidx.startup:startup-runtime", version.ref = "androidxStartUp" }
 androidx-test-espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "androidxTestEspresso" }
 androidx-test-junit = { module = "androidx.test.ext:junit", version.ref = "androidxTestJunit" }
 androidx-test-rules = { module = "androidx.test:rules", version.ref = "androidxTestRules" }
 androidx-test-runner = { module = "androidx.test:runner", version.ref = "androidxTestRules" }
 androidx-transition-ktx = { module = "androidx.transition:transition-ktx", version.ref = "androidxTransition" }
-app-cash-turbine = { module = "app.cash.turbine:turbine", version.ref = "appCashTurbine" }
 coil-kt = { module = "io.coil-kt:coil", version.ref = "coil" }
+desugar-jdk-libs = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugarJdklibs" }  # use in configureComposeAndroid KotlinOptions.kt
 facebook-flipper = { module = "com.facebook.flipper:flipper", version.ref = "facebookFlipper" }
 facebook-flipper-leakcanary = { module = "com.facebook.flipper:flipper-leakcanary2-plugin", version.ref = "facebookFlipper" }
 facebook-soloader = { module = "com.facebook.soloader:soloader", version.ref = "facebookSoloader" }
@@ -102,10 +104,12 @@ kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 mockito-inline = { module = "org.mockito:mockito-inline", version.ref = "mockitoInline" }
 mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockitoKotlin" }
+mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 squeare-leakcanary = { module = "com.squareup.leakcanary:leakcanary-android", version.ref = "squareLeakcanary" }
 squeare-kotlinpoet = { module = "com.squareup:kotlinpoet", version.ref = "squareKotlinpoet" }
 squeare-kotlinpoet-metadata = { module = "com.squareup:kotlinpoet-metadata", version.ref = "squareKotlinpoet" }
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
+turbine = { group = "app.cash.turbine", name = "turbine", version.ref = "turbine" }
 
 # Dependencies of the included build-logic
 android-gradle-plugin = { group = "com.android.tools.build", name = "gradle", version.ref = "androidGradlePlugin" }

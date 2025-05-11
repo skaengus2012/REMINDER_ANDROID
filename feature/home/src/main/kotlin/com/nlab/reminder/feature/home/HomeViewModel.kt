@@ -17,13 +17,10 @@
 package com.nlab.reminder.feature.home
 
 import com.nlab.reminder.core.annotation.ExcludeFromGeneratedTestReport
-import com.nlab.reminder.core.kotlinx.coroutine.flow.map
 import com.nlab.reminder.core.statekit.bootstrap.collectAsBootstrap
 import com.nlab.reminder.core.statekit.store.androidx.lifecycle.StoreViewModel
 import com.nlab.reminder.core.statekit.store.androidx.lifecycle.createStore
 import com.nlab.statekit.annotation.UiActionMapping
-import com.nlab.statekit.bootstrap.DeliveryStarted
-import com.nlab.statekit.bootstrap.combineBootstrap
 import com.nlab.statekit.store.Store
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -40,13 +37,6 @@ internal class HomeViewModel @Inject constructor(
     override fun onCreateStore(): Store<HomeAction, HomeUiState> = createStore(
         initState = HomeUiState.Loading,
         reduce = HomeReduce(environment),
-        bootstrap = combineBootstrap(
-            StateSyncFlow(environment)
-                .collectAsBootstrap(),
-            environment.tagEditDelegate
-                .state
-                .map(HomeAction::TagEditStateSynced)
-                .collectAsBootstrap(started = DeliveryStarted.Eagerly)
-        )
+        bootstrap = StateSyncFlow(environment).collectAsBootstrap()
     )
 }

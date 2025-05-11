@@ -16,7 +16,8 @@
 
 package com.nlab.reminder.feature.home
 
-import com.nlab.reminder.core.component.tag.edit.TagEditDelegate
+import com.nlab.reminder.core.component.tag.edit.TagEditState
+import com.nlab.reminder.core.component.tag.edit.TagEditStateMachine
 import com.nlab.reminder.core.component.tag.edit.genTagEditState
 import com.nlab.reminder.core.data.model.Tag
 import com.nlab.reminder.core.data.model.genTags
@@ -24,20 +25,17 @@ import com.nlab.reminder.core.data.repository.ScheduleRepository
 import com.nlab.reminder.core.data.repository.TagRepository
 import com.nlab.reminder.core.kotlin.NonNegativeLong
 import com.nlab.reminder.core.kotlin.faker.genNonNegativeLong
-import com.nlab.testkit.faker.requireSample
-import com.nlab.testkit.faker.requireSampleExcludeTypeOf
 import org.mockito.kotlin.mock
-import kotlin.reflect.KClass
 
 /**
  * @author Doohyun
  */
 internal fun genHomeEnvironment(
-    tagEditDelegate: TagEditDelegate = mock(),
+    tagEditStateMachine: TagEditStateMachine = mock(),
     scheduleRepository: ScheduleRepository = mock(),
     tagRepository: TagRepository = mock()
 ) = HomeEnvironment(
-    tagEditDelegate = tagEditDelegate,
+    tagEditStateMachine = tagEditStateMachine,
     scheduleRepository = scheduleRepository,
     tagRepository = tagRepository
 )
@@ -46,7 +44,7 @@ internal fun genHomeActionStateSynced(
     todaySchedulesCount: NonNegativeLong = genNonNegativeLong(),
     timetableSchedulesCount: NonNegativeLong = genNonNegativeLong(),
     allSchedulesCount: NonNegativeLong = genNonNegativeLong(),
-    tags: List<Tag> = genTags()
+    tags: List<Tag> = genTags().toList()
 ) = HomeAction.StateSynced(
     todaySchedulesCount = todaySchedulesCount,
     timetableSchedulesCount = timetableSchedulesCount,
@@ -58,31 +56,12 @@ internal fun genHomeUiStateSuccess(
     todayScheduleCount: NonNegativeLong = genNonNegativeLong(),
     timetableScheduleCount: NonNegativeLong = genNonNegativeLong(),
     allScheduleCount: NonNegativeLong = genNonNegativeLong(),
-    tags: List<Tag> = genTags(),
-    interaction: HomeInteraction = genHomeInteraction(),
+    tags: List<Tag> = genTags().toList(),
+    tagEditState: TagEditState = genTagEditState(),
 ) = HomeUiState.Success(
     todayScheduleCount = todayScheduleCount,
     timetableScheduleCount = timetableScheduleCount,
     allScheduleCount = allScheduleCount,
     tags = tags,
-    interaction = interaction,
+    tagEditState = tagEditState
 )
-
-private val sampleHomeInteractions get() =  listOf(
-    HomeInteraction.Empty,
-    HomeInteraction.TagEdit(genTagEditState())
-)
-
-internal fun genHomeInteraction(): HomeInteraction =
-    sampleHomeInteractions.requireSample()
-
-internal fun genHomeInteractionWithExcludeTypes(
-    firstType: KClass<out HomeInteraction>,
-    vararg anotherTypes: KClass<out HomeInteraction>
-): HomeInteraction =
-    sampleHomeInteractions.requireSampleExcludeTypeOf(
-        buildList {
-            add(firstType)
-            addAll(anotherTypes)
-        }
-    )

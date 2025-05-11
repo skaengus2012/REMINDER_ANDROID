@@ -28,6 +28,11 @@ value class NonNegativeLong internal constructor(val value: Long) {
 
 fun Long.toNonNegativeLong(): NonNegativeLong = NonNegativeLong(value = this)
 
+fun Int.toNonNegativeLong(): NonNegativeLong = toLong().toNonNegativeLong()
+
 fun Long?.tryToNonNegativeLongOrZero(): NonNegativeLong =
     if (this == null || this < 0) NonNegativeLong(value = 0)
     else NonNegativeLong(value = this)
+
+fun Int?.tryToNonNegativeLongOrZero(): NonNegativeLong =
+    this?.toLong().tryToNonNegativeLongOrZero()

@@ -9,10 +9,9 @@ import org.junit.Test
  */
 internal class TagTransformsKtTest {
     @Test
-    fun testTagEntityToTag() {
+    fun `Given tagEntity, When convert to Tag, Then return matching Tag`() {
         val (expectedTag, entity) = genTagAndEntity()
         val actualTag = Tag(entity)
-
         assertThat(actualTag, equalTo(expectedTag))
     }
 }

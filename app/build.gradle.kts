@@ -55,6 +55,15 @@ android {
             buildType.proguardFile("proguard-rules.pro")
         }
     }
+
+    packaging {
+        resources {
+            merges += listOf(
+                "META-INF/LICENSE.md",
+                "META-INF/LICENSE-notice.md"
+            )
+        }
+    }
 }
 
 dependencies {

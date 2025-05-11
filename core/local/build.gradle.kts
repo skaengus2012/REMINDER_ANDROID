@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.nlab.android.library)
+    alias(libs.plugins.nlab.android.library.di)
     alias(libs.plugins.ksp)
 }
 
@@ -15,7 +16,7 @@ dependencies {
     implementation(projects.core.kotlin)
 
     api(libs.androidx.datastore.preferences)
-    api(libs.androidx.room.runtime)
     api(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
+    api(libs.kotlinx.datetime)
 }
