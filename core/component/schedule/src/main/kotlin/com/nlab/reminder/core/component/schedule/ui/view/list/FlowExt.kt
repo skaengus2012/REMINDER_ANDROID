@@ -19,6 +19,7 @@ package com.nlab.reminder.core.component.schedule.ui.view.list
 import android.widget.EditText
 import com.nlab.reminder.core.android.view.setVisible
 import com.nlab.reminder.core.android.widget.textChanges
+import com.nlab.reminder.core.kotlinx.coroutine.flow.withPrev
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -29,12 +30,15 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 
 /**
  * @author Doohyun
  */
+private const val FOCUS_LOST_CONFIRMATION_DURATION = 100L
+
 internal suspend inline fun Flow<Boolean>.collectWithHiddenDebounce(
     crossinline collect: suspend (Boolean) -> Unit
 ) {
@@ -44,7 +48,7 @@ internal suspend inline fun Flow<Boolean>.collectWithHiddenDebounce(
         else {
             if (needDelayOnHidden) {
                 // Focus momentarily lost, fixing blinking symptoms
-                delay(100)
+                delay(FOCUS_LOST_CONFIRMATION_DURATION)
             } else {
                 needDelayOnHidden = true
             }
@@ -52,6 +56,14 @@ internal suspend inline fun Flow<Boolean>.collectWithHiddenDebounce(
         }
     }
 }
+
+internal fun Flow<Boolean>.focusLostCompletely(): Flow<Boolean> =
+    withPrev(initial = false).distinctUntilChanged().mapLatest { (old, new) ->
+        if (old && new.not()) {
+            delay(FOCUS_LOST_CONFIRMATION_DURATION)
+            true
+        } else false
+    }
 
 internal suspend inline fun registerEditNoteVisibility(
     edittextNote: EditText,

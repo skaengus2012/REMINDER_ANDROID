@@ -26,15 +26,12 @@ import com.nlab.reminder.core.android.view.setVisible
 import com.nlab.reminder.core.android.widget.bindCursorVisible
 import com.nlab.reminder.core.android.widget.bindText
 import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapterItemAddBinding
-import com.nlab.reminder.core.kotlinx.coroutine.flow.withPrev
 import com.nlab.reminder.core.translation.StringIds
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 
@@ -104,14 +101,7 @@ internal class AddViewHolderDelegate(
         }
         jobs += lifecycleScope.launch {
             hasInputFocusFlow
-                .withPrev(initial = false)
-                .distinctUntilChanged()
-                .mapLatest { (old, new) ->
-                    if (old && new.not()) {
-                        delay(100)
-                        true
-                    } else false
-                }
+                .focusLostCompletely()
                 .mapNotNull { savable ->
                     if (savable) {
                         SimpleAdd(

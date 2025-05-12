@@ -43,7 +43,6 @@ import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapt
 import com.nlab.reminder.core.data.model.ScheduleId
 import com.nlab.reminder.core.designsystem.compose.theme.AttrIds
 import com.nlab.reminder.core.kotlinx.coroutine.cancelAll
-import com.nlab.reminder.core.kotlinx.coroutine.flow.withPrev
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -167,17 +166,17 @@ class ContentViewHolder internal constructor(
             }
             jobs += viewLifecycleCoroutineScope.launch {
                 hasInputFocusFlow
-                    .withPrev(initial = false)
-                    .distinctUntilChanged()
-                    .filter { (old, new) -> old && new.not() }
-                    .mapNotNull {
-                        bindingId.value?.let { id ->
-                            SimpleEdit(
-                                id = id,
-                                binding.edittextTitle.text?.toString().orEmpty(),
-                                binding.edittextNote.text?.toString().orEmpty()
-                            )
-                        }
+                    .focusLostCompletely()
+                    .mapNotNull { savable ->
+                        if (savable) {
+                            bindingId.value?.let { id ->
+                                SimpleEdit(
+                                    id = id,
+                                    binding.edittextTitle.text?.toString().orEmpty(),
+                                    binding.edittextNote.text?.toString().orEmpty()
+                                )
+                            }
+                        } else null
                     }
                     .collect(onSimpleEditDone)
             }
