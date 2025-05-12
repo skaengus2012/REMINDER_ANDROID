@@ -20,6 +20,7 @@ import com.nlab.reminder.core.data.model.Link
 import com.nlab.reminder.core.data.model.LinkMetadata
 import com.nlab.reminder.core.data.model.Schedule
 import com.nlab.reminder.core.data.model.ScheduleId
+import com.nlab.reminder.core.data.model.ScheduleTiming
 import com.nlab.reminder.core.data.model.Tag
 import com.nlab.reminder.core.kotlin.NonBlankString
 
@@ -35,4 +36,5 @@ data class UserScheduleListResource(
     val title: NonBlankString get() = schedule.content.title
     val note: NonBlankString? get() = schedule.content.note
     val link: Link? get() = schedule.content.link
+    val timing: ScheduleTiming? get() = schedule.content.timing
 }
