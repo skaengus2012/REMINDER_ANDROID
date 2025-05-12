@@ -57,7 +57,7 @@ internal suspend inline fun Flow<Boolean>.collectWithHiddenDebounce(
     }
 }
 
-internal fun Flow<Boolean>.focusLostCompletely(): Flow<Boolean> =
+internal fun Flow<Boolean>.focusLostCompletelyChanges(): Flow<Boolean> =
     withPrev(initial = false).distinctUntilChanged().mapLatest { (old, new) ->
         if (old && new.not()) {
             delay(FOCUS_LOST_CONFIRMATION_DURATION)

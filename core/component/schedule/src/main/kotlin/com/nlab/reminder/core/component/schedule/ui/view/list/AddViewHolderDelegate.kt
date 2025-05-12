@@ -101,7 +101,7 @@ internal class AddViewHolderDelegate(
         }
         jobs += lifecycleScope.launch {
             hasInputFocusFlow
-                .focusLostCompletely()
+                .focusLostCompletelyChanges()
                 .mapNotNull { savable ->
                     if (savable) {
                         SimpleAdd(

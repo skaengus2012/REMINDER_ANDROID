@@ -146,7 +146,7 @@ class ContentViewHolder internal constructor(
             }
             jobs += viewLifecycleCoroutineScope.launch {
                 hasInputFocusChangesFlow
-                    .focusLostCompletely()
+                    .focusLostCompletelyChanges()
                     .mapNotNull { savable ->
                         if (savable) {
                             bindingId.value?.let { id ->
