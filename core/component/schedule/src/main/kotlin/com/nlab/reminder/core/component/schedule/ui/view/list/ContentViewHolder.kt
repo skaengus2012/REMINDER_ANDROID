@@ -21,6 +21,7 @@ import android.graphics.drawable.Drawable
 import android.text.InputType
 import android.view.MotionEvent
 import android.view.View
+import android.widget.EditText
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.view.doOnAttach
@@ -44,6 +45,7 @@ import com.nlab.reminder.core.data.model.ScheduleId
 import com.nlab.reminder.core.designsystem.compose.theme.AttrIds
 import com.nlab.reminder.core.kotlinx.coroutine.cancelAll
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asFlow
@@ -85,10 +87,10 @@ class ContentViewHolder internal constructor(
     private val selectionAnimDelegate = ContentSelectionAnimDelegate(binding)
     private val bindingId = MutableStateFlow<ScheduleId?>(null)
 
-    private val _draggingDelegate = DraggingDelegateImpl(binding)
+    private val _draggingDelegate = ContentDraggingDelegate(binding)
     override val draggingDelegate: DraggingDelegate = _draggingDelegate
 
-    private val _swipeDelegate = SwipeDelegateImpl(binding)
+    private val _swipeDelegate = ContentSwipeDelegate(binding)
     override val swipeDelegate: SwipeDelegate = _swipeDelegate
 
     init {
@@ -109,63 +111,41 @@ class ContentViewHolder internal constructor(
         val jobs = mutableListOf<Job>()
         itemView.doOnAttach { view ->
             val viewLifecycleOwner = view.findViewTreeLifecycleOwner() ?: return@doOnAttach
-
             val viewLifecycleCoroutineScope = viewLifecycleOwner.lifecycleScope
             val inputFocusFlow = combine(
-                binding.edittextTitle
-                    .focusChanges(emitCurrent = true)
-                    .distinctUntilChanged(),
-                binding.edittextNote
-                    .focusChanges(emitCurrent = true)
-                    .distinctUntilChanged()
-            ) { titleFocused, noteFocused ->
-                when {
-                    titleFocused -> ContentInputFocus.Title
-                    noteFocused -> ContentInputFocus.Note
-                    else -> ContentInputFocus.Nothing
-                }
-            }.distinctUntilChanged()
+                ContentInputFocus.entries
+                    .filter { it != ContentInputFocus.Nothing }
+                    .map { binding.hasInputFocusChanges(contentInputFocus = it) }
+            ) { focuses  -> focuses.find { it != null } ?: ContentInputFocus.Nothing }
+                .distinctUntilChanged()
                 .shareInWithJobCollector(viewLifecycleCoroutineScope, jobs, replay = 1)
-
-            val hasInputFocusFlow = inputFocusFlow
+            val hasInputFocusChangesFlow = inputFocusFlow
                 .map { it != ContentInputFocus.Nothing }
                 .distinctUntilChanged()
                 .shareInWithJobCollector(viewLifecycleCoroutineScope, jobs, replay = 1)
 
             jobs += viewLifecycleCoroutineScope.launch {
                 inputFocusFlow.collect { inputFocus ->
-                    when (inputFocus) {
-                        ContentInputFocus.Title -> with(binding) {
-                            edittextTitle.bindCursorVisible(true)
-                            edittextNote.bindCursorVisible(false)
-                        }
-
-                        ContentInputFocus.Note -> with(binding) {
-                            edittextTitle.bindCursorVisible(false)
-                            edittextNote.bindCursorVisible(true)
-                        }
-
-                        ContentInputFocus.Nothing -> with(binding) {
-                            edittextTitle.bindCursorVisible(false)
-                            edittextNote.bindCursorVisible(false)
-                        }
+                    val focusedEditText = binding.findInput(inputFocus)
+                    binding.getAllInputs().forEach { editText ->
+                        editText.bindCursorVisible(isVisible = editText === focusedEditText)
                     }
                 }
             }
             jobs += viewLifecycleCoroutineScope.launch {
-                hasInputFocusFlow.collect(binding.buttonInfo::setVisible)
+                hasInputFocusChangesFlow.collect(binding.buttonInfo::setVisible)
             }
             jobs += viewLifecycleCoroutineScope.launch {
-                hasInputFocusFlow.collect { focused -> onFocusChanged(this@ContentViewHolder, focused) }
+                hasInputFocusChangesFlow.collect { focused -> onFocusChanged(this@ContentViewHolder, focused) }
             }
             jobs += viewLifecycleCoroutineScope.launch {
                 registerEditNoteVisibility(
                     edittextNote = binding.edittextNote,
-                    viewHolderEditFocusedFlow = hasInputFocusFlow
+                    viewHolderEditFocusedFlow = hasInputFocusChangesFlow
                 )
             }
             jobs += viewLifecycleCoroutineScope.launch {
-                hasInputFocusFlow
+                hasInputFocusChangesFlow
                     .focusLostCompletely()
                     .mapNotNull { savable ->
                         if (savable) {
@@ -270,44 +250,69 @@ class ContentViewHolder internal constructor(
             )
         }
     }
+}
 
-    private enum class ContentInputFocus {
-        Title, Note, Nothing
+private class ContentDraggingDelegate(
+    private val binding: LayoutScheduleAdapterItemContentBinding
+) : DraggingDelegate() {
+    private val _draggingFlow = MutableStateFlow(false)
+    val draggingFlow: StateFlow<Boolean> = _draggingFlow.asStateFlow()
+
+    // Prevent start dragging, when input selection double click!
+    override val userDraggable: Boolean
+        get() = binding.getAllInputs().all { it.hasSelection().not() }
+
+    override fun isScaleOnDraggingNeeded(): Boolean {
+        return binding.imageviewBgLinkThumbnail.isVisible
     }
 
-    private class DraggingDelegateImpl(
-        private val binding: LayoutScheduleAdapterItemContentBinding
-    ) : DraggingDelegate() {
-        private val _draggingFlow = MutableStateFlow(false)
-        val draggingFlow: StateFlow<Boolean> = _draggingFlow.asStateFlow()
-
-        override val userDraggable: Boolean = true
-
-        override fun isScaleOnDraggingNeeded(): Boolean {
-            return binding.imageviewBgLinkThumbnail.isVisible
-        }
-
-        override fun onDragging(isActive: Boolean) {
-            _draggingFlow.value = isActive
-            binding.root.translationZ = if (isActive) 10f else 0f
-            binding.root.alpha = if (isActive) 0.7f else 1f
-            binding.viewLine.alpha = if (isActive) 0f else 1f
-        }
-    }
-
-    private class SwipeDelegateImpl(
-        private val binding: LayoutScheduleAdapterItemContentBinding,
-    ) : SwipeDelegate() {
-        private val clampAlphaOrigin: Float = binding.layoutClampDim.alpha
-        private val _swipeFlow = MutableStateFlow(false)
-        val swipeFlow: StateFlow<Boolean> = _swipeFlow.asStateFlow()
-
-        override val swipeView: View get() = binding.layoutContent
-        override val clampWidth: Float get() = binding.buttonDelete.width.toFloat()
-
-        override fun onSwipe(isActive: Boolean, dx: Float) {
-            _swipeFlow.value = isActive
-            binding.layoutClampDim.alpha = clampAlphaOrigin - dx.absoluteValue / clampWidth * clampAlphaOrigin
-        }
+    override fun onDragging(isActive: Boolean) {
+        _draggingFlow.value = isActive
+        binding.root.translationZ = if (isActive) 10f else 0f
+        binding.root.alpha = if (isActive) 0.7f else 1f
+        binding.viewLine.alpha = if (isActive) 0f else 1f
     }
 }
+
+private class ContentSwipeDelegate(
+    private val binding: LayoutScheduleAdapterItemContentBinding,
+) : SwipeDelegate() {
+    private val clampAlphaOrigin: Float = binding.layoutClampDim.alpha
+    private val _swipeFlow = MutableStateFlow(false)
+    val swipeFlow: StateFlow<Boolean> = _swipeFlow.asStateFlow()
+
+    override val swipeView: View get() = binding.layoutContent
+    override val clampWidth: Float get() = binding.buttonDelete.width.toFloat()
+
+    override fun onSwipe(isActive: Boolean, dx: Float) {
+        _swipeFlow.value = isActive
+        binding.layoutClampDim.alpha = clampAlphaOrigin - dx.absoluteValue / clampWidth * clampAlphaOrigin
+    }
+}
+
+private enum class ContentInputFocus {
+    Title, Note, Nothing
+}
+
+private fun LayoutScheduleAdapterItemContentBinding.getAllInputs(): Iterable<EditText> = listOf(
+    edittextTitle,
+    edittextNote,
+)
+
+private fun LayoutScheduleAdapterItemContentBinding.findInput(contentInputFocus: ContentInputFocus): EditText? {
+    return when (contentInputFocus) {
+        ContentInputFocus.Title -> edittextTitle
+        ContentInputFocus.Note -> edittextNote
+        ContentInputFocus.Nothing -> null
+    }
+}
+
+private fun LayoutScheduleAdapterItemContentBinding.hasInputFocusChanges(
+    contentInputFocus: ContentInputFocus
+): Flow<ContentInputFocus?> = requireNotNull(findInput(contentInputFocus))
+    .focusChanges(emitCurrent = true)
+    .distinctUntilChanged()
+    .map { hasFocus ->
+        if (hasFocus) contentInputFocus
+        else null
+    }
