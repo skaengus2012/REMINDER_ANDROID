@@ -16,6 +16,7 @@
 
 package com.nlab.reminder.core.component.schedule.ui.view.list
 
+import android.widget.EditText
 import com.nlab.reminder.core.android.view.focusChanges
 import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapterItemAddBinding
 import kotlinx.coroutines.CoroutineScope
@@ -23,6 +24,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 
 /**
  * @author Doohyun
@@ -31,22 +33,26 @@ internal enum class AddInputFocus {
     Title, Note, Nothing
 }
 
+internal fun LayoutScheduleAdapterItemAddBinding.findInput(addInputFocus: AddInputFocus): EditText? {
+    return when (addInputFocus) {
+        AddInputFocus.Title -> edittextTitle
+        AddInputFocus.Note -> edittextNote
+        AddInputFocus.Nothing -> null
+    }
+}
+
 internal fun LayoutScheduleAdapterItemAddBinding.addInputFocusSharedFlow(
     scope: CoroutineScope,
     jobCollector: MutableCollection<Job>
 ): SharedFlow<AddInputFocus> {
     return combine(
-        edittextTitle
-            .focusChanges(emitCurrent = true)
-            .distinctUntilChanged(),
-        edittextNote
-            .focusChanges(emitCurrent = true)
-            .distinctUntilChanged(),
-    ) { titleFocused, noteFocused ->
-        when {
-            titleFocused -> AddInputFocus.Title
-            noteFocused -> AddInputFocus.Note
-            else -> AddInputFocus.Nothing
+        AddInputFocus.entries.mapNotNull { addInputFocus ->
+            findInput(addInputFocus)
+                ?.focusChanges(emitCurrent = true)
+                ?.distinctUntilChanged()
+                ?.map { hasFocus -> if (hasFocus) addInputFocus else null }
         }
-    }.distinctUntilChanged().shareInWithJobCollector(scope, jobCollector, replay = 1)
+    ) { focuses -> focuses.find { it != null } ?: AddInputFocus.Nothing }
+        .distinctUntilChanged()
+        .shareInWithJobCollector(scope, jobCollector, replay = 1)
 }

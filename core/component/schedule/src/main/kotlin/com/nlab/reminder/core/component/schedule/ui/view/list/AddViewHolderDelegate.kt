@@ -19,6 +19,7 @@ package com.nlab.reminder.core.component.schedule.ui.view.list
 import android.content.res.ColorStateList
 import android.text.InputType
 import android.view.View
+import android.widget.EditText
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.nlab.reminder.core.android.view.clearFocusIfNeeded
@@ -63,23 +64,12 @@ internal class AddViewHolderDelegate(
         val jobs = mutableListOf<Job>()
         jobs += lifecycleScope.launch {
             addInputFocusFlow.collect { inputFocus ->
-                when (inputFocus) {
-                    AddInputFocus.Title -> with(binding) {
-                        edittextTitle.bindCursorVisible(true)
-                        edittextNote.bindCursorVisible(false)
-                    }
-                    AddInputFocus.Note -> with(binding) {
-                        edittextTitle.bindCursorVisible(false)
-                        edittextNote.bindCursorVisible(true)
-                    }
-                    AddInputFocus.Nothing -> with(binding) {
-                        edittextTitle.bindCursorVisible(false)
-                        edittextNote.bindCursorVisible(false)
-                    }
+                val focusedEditText = binding.findInput(inputFocus)
+                binding.getAllInputs().forEach { editText ->
+                    editText.bindCursorVisible(isVisible = editText === focusedEditText)
                 }
             }
         }
-
         jobs += lifecycleScope.launch {
             hasInputFocusFlow.collect(binding.buttonInfo::setVisible)
         }
@@ -144,7 +134,14 @@ internal class AddViewHolderDelegate(
     }
 }
 
+private fun LayoutScheduleAdapterItemAddBinding.getAllInputs(): Iterable<EditText> = listOf(
+    edittextTitle,
+    edittextNote
+)
+
 private fun LayoutScheduleAdapterItemAddBinding.clearInput() {
-    edittextTitle.apply { bindText(""); clearFocusIfNeeded() }
-    edittextNote.apply { bindText(""); clearFocusIfNeeded() }
+    getAllInputs().forEach { editText ->
+        editText.bindText(text = "")
+        editText.clearFocusIfNeeded()
+    }
 }

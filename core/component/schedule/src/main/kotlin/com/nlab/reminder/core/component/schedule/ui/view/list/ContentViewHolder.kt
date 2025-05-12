@@ -45,7 +45,6 @@ import com.nlab.reminder.core.data.model.ScheduleId
 import com.nlab.reminder.core.designsystem.compose.theme.AttrIds
 import com.nlab.reminder.core.kotlinx.coroutine.cancelAll
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asFlow
@@ -113,10 +112,13 @@ class ContentViewHolder internal constructor(
             val viewLifecycleOwner = view.findViewTreeLifecycleOwner() ?: return@doOnAttach
             val viewLifecycleCoroutineScope = viewLifecycleOwner.lifecycleScope
             val inputFocusFlow = combine(
-                ContentInputFocus.entries
-                    .filter { it != ContentInputFocus.Nothing }
-                    .map { binding.hasInputFocusChanges(contentInputFocus = it) }
-            ) { focuses  -> focuses.find { it != null } ?: ContentInputFocus.Nothing }
+                ContentInputFocus.entries.mapNotNull { contentInputFocus ->
+                    binding.findInput(contentInputFocus)
+                        ?.focusChanges(emitCurrent = true)
+                        ?.distinctUntilChanged()
+                        ?.map { hasFocus -> if (hasFocus) contentInputFocus else null }
+                }
+            ) { focuses -> focuses.find { it != null } ?: ContentInputFocus.Nothing }
                 .distinctUntilChanged()
                 .shareInWithJobCollector(viewLifecycleCoroutineScope, jobs, replay = 1)
             val hasInputFocusChangesFlow = inputFocusFlow
@@ -306,13 +308,3 @@ private fun LayoutScheduleAdapterItemContentBinding.findInput(contentInputFocus:
         ContentInputFocus.Nothing -> null
     }
 }
-
-private fun LayoutScheduleAdapterItemContentBinding.hasInputFocusChanges(
-    contentInputFocus: ContentInputFocus
-): Flow<ContentInputFocus?> = requireNotNull(findInput(contentInputFocus))
-    .focusChanges(emitCurrent = true)
-    .distinctUntilChanged()
-    .map { hasFocus ->
-        if (hasFocus) contentInputFocus
-        else null
-    }
