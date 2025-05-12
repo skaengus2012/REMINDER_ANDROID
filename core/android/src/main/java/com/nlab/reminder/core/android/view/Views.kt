@@ -18,6 +18,7 @@ package com.nlab.reminder.core.android.view
 
 import android.view.MotionEvent
 import android.view.View
+import android.widget.EditText
 import com.nlab.reminder.core.kotlinx.coroutine.flow.throttleFirst
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.awaitClose
@@ -90,8 +91,3 @@ fun View.focusChanges(emitCurrent: Boolean = false): Flow<Boolean> {
     }
     return if (emitCurrent) result.onStart { emit(hasFocus()) } else result
 }
-
-fun View.focusState(
-    scope: CoroutineScope,
-    started: SharingStarted
-): StateFlow<Boolean> = focusChanges().stateIn(scope, started, hasFocus())
