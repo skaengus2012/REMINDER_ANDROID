@@ -17,7 +17,7 @@
 package com.nlab.reminder.core.component.schedule.ui.view.list
 
 import androidx.annotation.StringRes
-import com.nlab.reminder.core.data.model.ScheduleDetail
+import com.nlab.reminder.core.component.schedule.UserScheduleListResource
 
 /**
  * @author Doohyun
@@ -29,7 +29,7 @@ sealed class ScheduleAdapterItem private constructor() {
     ) : ScheduleAdapterItem()
 
     data class Content(
-        val scheduleDetail: ScheduleDetail,
+        val schedule: UserScheduleListResource,
         val isLineVisible: Boolean
     ) : ScheduleAdapterItem()
 

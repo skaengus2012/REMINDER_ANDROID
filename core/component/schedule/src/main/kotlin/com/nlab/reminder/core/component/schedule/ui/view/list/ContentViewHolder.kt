@@ -238,31 +238,31 @@ class ContentViewHolder internal constructor(
 
     fun bind(item: ScheduleAdapterItem.Content) {
         bindingId.value =
-            item.scheduleDetail.schedule.id
+            item.schedule.id
         binding.viewLine
             .setVisible(isVisible = item.isLineVisible, goneIfNotVisible = false)
         binding.edittextTitle.apply {
-            bindText(item.scheduleDetail.schedule.content.title)
+            bindText(item.schedule.title.value)
             clearFocusIfNeeded()
         }
         binding.edittextNote.apply {
-            val isChanged = bindText(item.scheduleDetail.schedule.content.note?.value)
+            val isChanged = bindText(item.schedule.note?.value)
             if (isChanged) {
                 setSelection(text?.length ?: 0)
             }
             clearFocusIfNeeded()
         }
         binding.cardLink
-            .setVisible(isVisible = item.scheduleDetail.schedule.content.link != null)
+            .setVisible(isVisible = item.schedule.link != null)
         binding.textviewLink
-            .bindText(item.scheduleDetail.schedule.content.link?.rawLink?.value)
+            .bindText(item.schedule.link?.rawLink?.value)
         binding.textviewTitleLink.apply {
-            val linkTitle = item.scheduleDetail.linkMetadata?.title?.value
+            val linkTitle = item.schedule.linkMetadata?.title?.value
             setVisible(isVisible = linkTitle != null)
             bindText(linkTitle)
         }
         binding.imageviewBgLinkThumbnail.apply {
-            val linkImageUrl = item.scheduleDetail.linkMetadata?.imageUrl?.value
+            val linkImageUrl = item.schedule.linkMetadata?.imageUrl?.value
             setVisible(isVisible = linkImageUrl != null)
             bindImageAsync(
                 url = linkImageUrl,
