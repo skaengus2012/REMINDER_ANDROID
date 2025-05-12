@@ -24,10 +24,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapterItemAddBinding
 import com.nlab.reminder.core.kotlinx.coroutine.cancelAll
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 
 /**
@@ -52,11 +50,11 @@ class AddViewHolder internal constructor(
             val lifecycleScope = view.findViewTreeLifecycleOwner()
                 ?.lifecycleScope
                 ?: return@doOnAttach
-            val inputFocusFlow = binding.addInputFocusSharedFlow(lifecycleScope)
+            val inputFocusFlow = binding.addInputFocusSharedFlow(lifecycleScope, jobs)
             val hasInputFocusFlow = inputFocusFlow
                 .map { it != AddInputFocus.Nothing }
                 .distinctUntilChanged()
-                .shareIn(scope = lifecycleScope, started = SharingStarted.WhileSubscribed(), replay = 1)
+                .shareInWithJobCollector(lifecycleScope, jobs, replay = 1)
             jobs += addViewHolderDelegate.onAttached(view, inputFocusFlow, hasInputFocusFlow, onSimpleAddDone)
             jobs += lifecycleScope.launch {
                 hasInputFocusFlow.collect { focused -> onFocusChanged(this@AddViewHolder, focused) }

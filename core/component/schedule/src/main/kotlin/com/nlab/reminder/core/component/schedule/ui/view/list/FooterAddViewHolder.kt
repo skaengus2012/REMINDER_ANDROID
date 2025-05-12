@@ -25,10 +25,8 @@ import com.nlab.reminder.core.android.view.setVisible
 import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapterItemFooterAddBinding
 import com.nlab.reminder.core.kotlinx.coroutine.cancelAll
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 
 /**
@@ -50,11 +48,11 @@ class FooterAddViewHolder internal constructor(
             val lifecycleScope = view.findViewTreeLifecycleOwner()
                 ?.lifecycleScope
                 ?: return@doOnAttach
-            val inputFocusFlow = binding.layoutAdd.addInputFocusSharedFlow(lifecycleScope)
+            val inputFocusFlow = binding.layoutAdd.addInputFocusSharedFlow(lifecycleScope, jobs)
             val hasInputFocusFlow = inputFocusFlow
                 .map { it != AddInputFocus.Nothing }
                 .distinctUntilChanged()
-                .shareIn(scope = lifecycleScope, started = SharingStarted.WhileSubscribed(), replay = 1)
+                .shareInWithJobCollector(lifecycleScope, jobs, replay = 1)
             jobs += addViewHolderDelegate.onAttached(view, inputFocusFlow, hasInputFocusFlow, onSimpleAddDone)
             jobs += lifecycleScope.launch {
                 hasInputFocusFlow.collect { focused -> onFocusChanged(this@FooterAddViewHolder, focused) }

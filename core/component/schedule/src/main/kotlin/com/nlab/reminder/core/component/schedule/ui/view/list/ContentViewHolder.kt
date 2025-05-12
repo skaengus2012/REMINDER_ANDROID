@@ -46,7 +46,6 @@ import com.nlab.reminder.core.kotlinx.coroutine.cancelAll
 import com.nlab.reminder.core.kotlinx.coroutine.flow.withPrev
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -56,7 +55,6 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
-import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
 
@@ -112,6 +110,7 @@ class ContentViewHolder internal constructor(
         val jobs = mutableListOf<Job>()
         itemView.doOnAttach { view ->
             val viewLifecycleOwner = view.findViewTreeLifecycleOwner() ?: return@doOnAttach
+
             val viewLifecycleCoroutineScope = viewLifecycleOwner.lifecycleScope
             val inputFocusFlow = combine(
                 binding.edittextTitle
@@ -127,11 +126,12 @@ class ContentViewHolder internal constructor(
                     else -> ContentInputFocus.Nothing
                 }
             }.distinctUntilChanged()
-                .shareIn(scope = viewLifecycleCoroutineScope, started = SharingStarted.WhileSubscribed(), replay = 1)
+                .shareInWithJobCollector(viewLifecycleCoroutineScope, jobs, replay = 1)
+
             val hasInputFocusFlow = inputFocusFlow
                 .map { it != ContentInputFocus.Nothing }
                 .distinctUntilChanged()
-                .shareIn(scope = viewLifecycleCoroutineScope, started = SharingStarted.WhileSubscribed(), replay = 1)
+                .shareInWithJobCollector(viewLifecycleCoroutineScope, jobs, replay = 1)
 
             jobs += viewLifecycleCoroutineScope.launch {
                 inputFocusFlow.collect { inputFocus ->

@@ -19,11 +19,10 @@ package com.nlab.reminder.core.component.schedule.ui.view.list
 import com.nlab.reminder.core.android.view.focusChanges
 import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapterItemAddBinding
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.shareIn
 
 /**
  * @author Doohyun
@@ -33,7 +32,8 @@ internal enum class AddInputFocus {
 }
 
 internal fun LayoutScheduleAdapterItemAddBinding.addInputFocusSharedFlow(
-    scope: CoroutineScope
+    scope: CoroutineScope,
+    jobCollector: MutableCollection<Job>
 ): SharedFlow<AddInputFocus> {
     return combine(
         edittextTitle
@@ -48,5 +48,5 @@ internal fun LayoutScheduleAdapterItemAddBinding.addInputFocusSharedFlow(
             noteFocused -> AddInputFocus.Note
             else -> AddInputFocus.Nothing
         }
-    }.distinctUntilChanged().shareIn(scope = scope, started = SharingStarted.WhileSubscribed(), replay = 1)
+    }.distinctUntilChanged().shareInWithJobCollector(scope, jobCollector, replay = 1)
 }

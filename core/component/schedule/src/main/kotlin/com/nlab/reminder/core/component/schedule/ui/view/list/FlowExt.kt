@@ -19,13 +19,18 @@ package com.nlab.reminder.core.component.schedule.ui.view.list
 import android.widget.EditText
 import com.nlab.reminder.core.android.view.setVisible
 import com.nlab.reminder.core.android.widget.textChanges
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.launch
 
 /**
  * @author Doohyun
@@ -62,4 +67,17 @@ internal suspend inline fun registerEditNoteVisibility(
         viewHolderEditFocusedFlow,
         transform = { isCurrentNoteEmpty, focused -> isCurrentNoteEmpty.not() || focused }
     ).distinctUntilChanged().collectWithHiddenDebounce(edittextNote::setVisible)
+}
+
+internal fun <T> Flow<T>.shareInWithJobCollector(
+    scope: CoroutineScope,
+    jobCollector: MutableCollection<Job>,
+    replay: Int,
+): SharedFlow<T> {
+    val sharedFlow = MutableSharedFlow<T>(replay = replay)
+    jobCollector += scope.launch {
+        collect { value -> sharedFlow.emit(value) }
+    }
+
+    return sharedFlow
 }
