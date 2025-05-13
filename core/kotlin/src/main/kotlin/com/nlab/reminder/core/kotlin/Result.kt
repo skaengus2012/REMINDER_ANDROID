@@ -59,7 +59,7 @@ fun <T> Result<T>.getOrNull(): T? = when (this) {
     is Result.Failure -> null
 }
 
-inline fun <T> Result<T>.getOrElse(defaultValue: (Throwable) -> T): T = when (this) {
+inline fun <R, T : R> Result<T>.getOrElse(defaultValue: (Throwable) -> R): R = when (this) {
     is Result.Success -> value
     is Result.Failure -> defaultValue(throwable)
 }
