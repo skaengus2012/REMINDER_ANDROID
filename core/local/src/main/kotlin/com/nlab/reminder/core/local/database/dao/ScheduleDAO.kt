@@ -95,8 +95,8 @@ abstract class ScheduleDAO {
             title = headline.title.value,
             description = headline.description?.value,
             link = headline.link?.value,
-            triggerTimeUtc = timing?.triggerTimeUtc,
-            isTriggerTimeDateOnly = timing?.isTriggerTimeDateOnly,
+            triggerAt = timing?.triggerAt,
+            isTriggerAtDateOnly = timing?.isTriggerAtDateOnly,
             repeatType = timing?.repeatInput?.type,
             repeatInterval = timing?.repeatInput?.interval?.value,
             visiblePriority = currentMaxVisiblePriority + 1,
@@ -133,8 +133,8 @@ abstract class ScheduleDAO {
             title = headline.title.value,
             description = headline.description?.value,
             link = headline.link?.value,
-            triggerTimeUtc = timing?.triggerTimeUtc,
-            isTriggerTimeDateOnly = timing?.isTriggerTimeDateOnly,
+            triggerAt = timing?.triggerAt,
+            isTriggerAtDateOnly = timing?.isTriggerAtDateOnly,
             repeatType = timing?.repeatInput?.type,
             repeatInterval = timing?.repeatInput?.interval?.value,
         )
@@ -220,8 +220,8 @@ data class ScheduleHeadlineSaveInput(
 )
 
 data class ScheduleTimingSaveInput(
-    val triggerTimeUtc: Instant,
-    val isTriggerTimeDateOnly: Boolean,
+    val triggerAt: Instant,
+    val isTriggerAtDateOnly: Boolean,
     val repeatInput: ScheduleRepeatSaveInput?
 )
 
@@ -236,7 +236,7 @@ private fun ScheduleEntity.contentEquals(headline: ScheduleHeadlineSaveInput): B
             && link == headline.link?.value
 
 private fun ScheduleEntity.contentEquals(timing: ScheduleTimingSaveInput?): Boolean =
-    triggerTimeUtc == timing?.triggerTimeUtc
-            && isTriggerTimeDateOnly == timing?.isTriggerTimeDateOnly
+    triggerAt == timing?.triggerAt
+            && isTriggerAtDateOnly == timing?.isTriggerAtDateOnly
             && repeatType == timing?.repeatInput?.type
             && repeatInterval == timing?.repeatInput?.interval?.value

@@ -22,7 +22,7 @@ import kotlinx.datetime.Instant
  * @author Doohyun
  */
 data class ScheduleTiming(
-    val triggerAtUtc: Instant,
+    val triggerAt: Instant,
     val isTriggerAtDateOnly: Boolean,
     val repeat: Repeat?
 )
