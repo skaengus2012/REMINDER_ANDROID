@@ -50,7 +50,7 @@ fun genScheduleTiming(
     isTriggerAtDateOnly: Boolean = genBoolean(),
     repeat: Repeat? = genRepeat()
 ): ScheduleTiming = ScheduleTiming(
-    triggerAtUtc = triggerAtUtc,
+    triggerAt = triggerAtUtc,
     isTriggerAtDateOnly = isTriggerAtDateOnly,
     repeat = repeat
 )

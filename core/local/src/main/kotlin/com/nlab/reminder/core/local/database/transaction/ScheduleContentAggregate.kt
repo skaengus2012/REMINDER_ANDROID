@@ -34,8 +34,8 @@ data class ScheduleContentAggregate(
 )
 
 data class ScheduleTimingAggregate(
-    val triggerTimeUtc: Instant,
-    val isTriggerTimeDateOnly: Boolean,
+    val triggerAt: Instant,
+    val isTriggerAtDateOnly: Boolean,
     val repeat: ScheduleRepeatAggregate?
 )
 
@@ -51,7 +51,7 @@ data class ScheduleRepeatDetailAggregate(
 )
 
 internal fun ScheduleTimingAggregate.toScheduleTimingSaveInput() = ScheduleTimingSaveInput(
-    triggerTimeUtc = triggerTimeUtc,
-    isTriggerTimeDateOnly = isTriggerTimeDateOnly,
+    triggerAt = triggerAt,
+    isTriggerAtDateOnly = isTriggerAtDateOnly,
     repeatInput = repeat?.let { ScheduleRepeatSaveInput(type = it.type, interval = it.interval) }
 )
