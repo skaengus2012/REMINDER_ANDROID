@@ -47,8 +47,8 @@ fun genScheduleAndEntity(
         link = aggregate.headline.link?.value,
         visiblePriority = schedule.visiblePriority.value,
         isComplete = schedule.isComplete,
-        triggerTimeUtc = aggregate.timing?.triggerTimeUtc,
-        isTriggerTimeDateOnly = aggregate.timing?.isTriggerTimeDateOnly,
+        triggerAt = aggregate.timing?.triggerAt,
+        isTriggerAtDateOnly = aggregate.timing?.isTriggerAtDateOnly,
         repeatType = aggregate.timing?.repeat?.type,
         repeatInterval = aggregate.timing?.repeat?.interval?.value
     )

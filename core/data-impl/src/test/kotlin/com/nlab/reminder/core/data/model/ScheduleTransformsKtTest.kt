@@ -97,8 +97,8 @@ class ScheduleTransformsKtTest {
         val entity = buildScheduleCompositeEntity {
             copy(
                 scheduleEntity = scheduleEntity.copy(
-                    triggerTimeUtc = null,
-                    isTriggerTimeDateOnly = null,
+                    triggerAt = null,
+                    isTriggerAtDateOnly = null,
                     repeatType = null,
                     repeatInterval = null
                 ),
@@ -110,11 +110,11 @@ class ScheduleTransformsKtTest {
     }
 
     @Test(expected = IllegalArgumentException::class)
-    fun `Given triggerTime without dateOnly flag, When creating Schedule, Then throw exception`() {
+    fun `Given triggerAt without dateOnly flag, When creating Schedule, Then throw exception`() {
         val entity = buildScheduleCompositeEntity {
             copy(
                 scheduleEntity = scheduleEntity.copy(
-                    isTriggerTimeDateOnly = null,
+                    isTriggerAtDateOnly = null,
                     repeatType = null,
                     repeatInterval = null
                 ),
@@ -125,11 +125,11 @@ class ScheduleTransformsKtTest {
     }
 
     @Test(expected = IllegalArgumentException::class)
-    fun `Given dateOnly flag without triggerTime, When creating Schedule, Then throw exception`() {
+    fun `Given dateOnly flag without triggerAt, When creating Schedule, Then throw exception`() {
         val entity = buildScheduleCompositeEntity {
             copy(
                 scheduleEntity = scheduleEntity.copy(
-                    triggerTimeUtc = null,
+                    triggerAt = null,
                     repeatType = null,
                     repeatInterval = null
                 ),
@@ -152,12 +152,12 @@ class ScheduleTransformsKtTest {
         }
         val actualSchedule = Schedule(entity)
         assertThat(
-            actualSchedule.content.timing!!.triggerAtUtc,
-            equalTo(entity.scheduleEntity.triggerTimeUtc)
+            actualSchedule.content.timing!!.triggerAt,
+            equalTo(entity.scheduleEntity.triggerAt)
         )
         assertThat(
             actualSchedule.content.timing!!.isTriggerAtDateOnly,
-            equalTo(entity.scheduleEntity.isTriggerTimeDateOnly)
+            equalTo(entity.scheduleEntity.isTriggerAtDateOnly)
         )
         assertThat(actualSchedule.content.timing!!.repeat, nullValue())
     }
@@ -165,7 +165,7 @@ class ScheduleTransformsKtTest {
     @Test(expected = IllegalArgumentException::class)
     fun `Given repeat without trigger, When creating Schedule, Then throws exception`() {
         val entity = buildScheduleCompositeEntity {
-            copy(scheduleEntity = scheduleEntity.copy(triggerTimeUtc = null, isTriggerTimeDateOnly = null))
+            copy(scheduleEntity = scheduleEntity.copy(triggerAt = null, isTriggerAtDateOnly = null))
         }
         Schedule(entity)
     }
@@ -201,8 +201,8 @@ class ScheduleTransformsKtTest {
         val timing = genScheduleTiming()
         val aggregate = timing.toAggregate()
 
-        assertThat(aggregate.triggerTimeUtc, equalTo(timing.triggerAtUtc))
-        assertThat(aggregate.isTriggerTimeDateOnly, equalTo(timing.isTriggerAtDateOnly))
+        assertThat(aggregate.triggerAt, equalTo(timing.triggerAt))
+        assertThat(aggregate.isTriggerAtDateOnly, equalTo(timing.isTriggerAtDateOnly))
         assertThat(aggregate.repeat, equalTo(timing.repeat!!.toAggregate()))
     }
 

@@ -27,11 +27,11 @@ import kotlinx.datetime.Instant
  *
  * #### Contract 1
  * The set of the following values has the same life cycle.
- * - [triggerTimeUtc], [isTriggerTimeDateOnly]
+ * - [triggerAt], [isTriggerAtDateOnly]
  * - [repeatType], [repeatInterval]
  *
  * #### Contract 2
- * [repeatType] can exist when [triggerTimeUtc] exists.
+ * [repeatType] can exist when [triggerAt] exists.
  *
  * #### Contract 3
  * If [RepeatType] is [REPEAT_WEEKLY], [REPEAT_MONTHLY], [REPEAT_YEARLY],
@@ -47,8 +47,8 @@ data class ScheduleEntity(
     @ColumnInfo(name = "link") val link: String? = null,
     @ColumnInfo(name = "visible_priority") val visiblePriority: Long,
     @ColumnInfo(name = "is_complete") val isComplete: Boolean,
-    @ColumnInfo(name = "trigger_time_utc") val triggerTimeUtc: Instant?,
-    @ColumnInfo(name = "is_trigger_time_date_only") val isTriggerTimeDateOnly: Boolean?,
+    @ColumnInfo(name = "trigger_at") val triggerAt: Instant?,
+    @ColumnInfo(name = "is_trigger_at_date_only") val isTriggerAtDateOnly: Boolean?,
     @ColumnInfo(name = "repeat_type") @RepeatType val repeatType: String?,
     @ColumnInfo(name = "repeat_interval") @IntRange(from = 1) val repeatInterval: Int?,
 )

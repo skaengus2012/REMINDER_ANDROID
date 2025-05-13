@@ -63,10 +63,10 @@ private fun createScheduleTimingOrNull(
     scheduleEntity: ScheduleEntity,
     repeatDetailEntity: Set<RepeatDetailEntity>,
 ): ScheduleTiming? {
-    val triggerTimeUtc = scheduleEntity.triggerTimeUtc
-    val isTriggerTimeDateOnly = scheduleEntity.isTriggerTimeDateOnly
-    require((triggerTimeUtc == null) == (isTriggerTimeDateOnly == null)) {
-        "Invalid triggerTime [$triggerTimeUtc, $isTriggerTimeDateOnly]"
+    val triggerAt = scheduleEntity.triggerAt
+    val isTriggerAtDateOnly = scheduleEntity.isTriggerAtDateOnly
+    require((triggerAt == null) == (isTriggerAtDateOnly == null)) {
+        "Invalid triggerAt [$triggerAt, $isTriggerAtDateOnly]"
     }
 
     val repeat = createRepeatOrNull(
@@ -74,14 +74,14 @@ private fun createScheduleTimingOrNull(
         interval = scheduleEntity.repeatInterval,
         detailEntities = repeatDetailEntity
     )
-    require(triggerTimeUtc != null || repeat == null) {
-        "Repeat is defined without triggerTime: repeat=$repeat"
+    require(triggerAt != null || repeat == null) {
+        "Repeat is defined without triggerAt: repeat=$repeat"
     }
 
-    return if (triggerTimeUtc == null) null else {
+    return if (triggerAt == null) null else {
         ScheduleTiming(
-            triggerAtUtc = triggerTimeUtc,
-            isTriggerAtDateOnly = isTriggerTimeDateOnly!!,
+            triggerAt = triggerAt,
+            isTriggerAtDateOnly = isTriggerAtDateOnly!!,
             repeat = repeat
         )
     }
@@ -122,7 +122,7 @@ internal fun ScheduleContent.toAggregate(): ScheduleContentAggregate = ScheduleC
 )
 
 internal fun ScheduleTiming.toAggregate(): ScheduleTimingAggregate = ScheduleTimingAggregate(
-    triggerTimeUtc = triggerAtUtc,
-    isTriggerTimeDateOnly = isTriggerAtDateOnly,
+    triggerAt = triggerAt,
+    isTriggerAtDateOnly = isTriggerAtDateOnly,
     repeat = repeat?.toAggregate()
 )
