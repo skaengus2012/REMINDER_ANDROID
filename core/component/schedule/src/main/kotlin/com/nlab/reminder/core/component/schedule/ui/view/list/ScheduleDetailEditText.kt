@@ -38,16 +38,21 @@ class ScheduleDetailEditText @JvmOverloads constructor(
     private var dateText: CharSequence? = null
     private var isExpired: Boolean? = null
 
+    private var myText: String = "Hello"
+
     init {
         isHapticFeedbackEnabled = false
-        movementMethod = RestrictedMovementMethod()
     }
 
     override fun onSelectionChanged(selStart: Int, selEnd: Int) {
-        if (selStart < 6) {
-            setSelection(7, max(7, selEnd))
-            invalidate()
-        } else {
+        try {
+            if (selStart < myText.length) {
+                setSelection(myText.length, max(myText.length, selEnd))
+            } else {
+                super.onSelectionChanged(selStart, selEnd)
+            }
+        } catch (t: Throwable) {
+            // OnSelectionChanged can be called before class creation.
             super.onSelectionChanged(selStart, selEnd)
         }
     }
@@ -57,39 +62,12 @@ class ScheduleDetailEditText @JvmOverloads constructor(
             android.R.id.selectAll -> {
                 // 사용자가 전체 선택했을 때, 우리가 원하는 범위만 선택
                 val textLength = text?.length ?: 0
-                if (textLength > 7) {
-                    setSelection(7, textLength)
+                if (textLength >  myText.length) {
+                    setSelection( myText.length, textLength)
                 }
                 true // 기본 처리 막기
             }
             else -> super.onTextContextMenuItem(id)
         }
-    }
-}
-
-class RestrictedMovementMethod : ArrowKeyMovementMethod() {
-    override fun onTouchEvent(widget: TextView, buffer: Spannable, event: MotionEvent): Boolean {
-        // 터치 기반 커서 이동 차단
-        val selectionStart = Selection.getSelectionStart(buffer)
-        val selectionEnd = Selection.getSelectionEnd(buffer)
-
-        if (selectionStart < 7 || selectionEnd < 7) {
-            Selection.setSelection(buffer, max(selectionStart, 7), max(selectionEnd, 7))
-            return true
-        }
-
-        return super.onTouchEvent(widget, buffer, event)
-    }
-
-    override fun onKeyDown(widget: TextView?, text: Spannable?, keyCode: Int, event: KeyEvent?): Boolean {
-        val handled = super.onKeyDown(widget, text, keyCode, event)
-        if (text != null) {
-            val selStart = Selection.getSelectionStart(text)
-            val selEnd = Selection.getSelectionEnd(text)
-            if (selStart < 7 || selEnd < 7) {
-                Selection.setSelection(text, max(selStart, 7), max(selEnd, 7))
-            }
-        }
-        return handled
     }
 }
