@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 The N's lab Open Source Project
+ * Copyright (C) 2025 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,9 +25,11 @@ import com.nlab.reminder.core.local.database.configuration.ReminderDatabase
 import com.nlab.reminder.core.local.database.dao.ScheduleDAO
 import com.nlab.reminder.core.local.database.dao.ScheduleHeadlineSaveInput
 import com.nlab.reminder.core.local.database.dao.ScheduleTagListDAO
+import com.nlab.reminder.core.local.database.dao.ScheduleTimingSaveInput
 import com.nlab.reminder.core.local.database.dao.TagDAO
 import com.nlab.reminder.core.local.database.entity.ScheduleTagListEntity
 import kotlinx.coroutines.runBlocking
+import kotlinx.datetime.Clock
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -82,6 +84,11 @@ class InsertDummyInfoToDatabaseMacro {
             )
         }
     }
+    private val scheduleTimingSaveInput: ScheduleTimingSaveInput = ScheduleTimingSaveInput(
+        triggerAt = Clock.System.now(),
+        isTriggerAtDateOnly = false,
+        repeatInput = null
+    )
 
     private lateinit var database: ReminderDatabase
     private lateinit var scheduleDao: ScheduleDAO
@@ -110,7 +117,7 @@ class InsertDummyInfoToDatabaseMacro {
             tagDao.insertAndGet(name = tagText.toNonBlankString())
         }
         val savedScheduleEntities = scheduleHeadlineSaveInputs.map { headlineInput ->
-            scheduleDao.insertAndGet(headline = headlineInput, timing = null)
+            scheduleDao.insertAndGet(headline = headlineInput, timing = scheduleTimingSaveInput)
         }
         val scheduleTagListEntities = savedScheduleEntities
             .map { scheduleEntity ->
