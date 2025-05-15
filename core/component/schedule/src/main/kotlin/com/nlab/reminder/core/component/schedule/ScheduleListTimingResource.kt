@@ -28,5 +28,6 @@ data class ScheduleListTimingResource(
     val isTriggeredToday: Boolean,
     val isTriggeredTomorrow: Boolean,
     val isOver: Boolean,
+    val showTimeOnly: Boolean,
     val repeat: Repeat?
 )
