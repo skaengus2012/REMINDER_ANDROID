@@ -24,8 +24,9 @@ import kotlinx.datetime.LocalDateTime
  */
 data class ScheduleListTimingResource(
     val triggerAt: LocalDateTime,
-    val isTriggerTimeInfoVisible: Boolean,
+    val isTriggerAtDateOnly: Boolean,
     val isTriggeredToday: Boolean,
     val isTriggeredTomorrow: Boolean,
+    val isOver: Boolean,
     val repeat: Repeat?
 )
