@@ -84,6 +84,13 @@
     <string name="content_description_more">더보기</string>
     <string name="content_description_open_link">링크 열기</string>
     <string name="content_description_select">선택 하기</string>
+    <string name="format_trigger_at">yyyy. M. d. a h:mm</string>
+    <string name="format_trigger_at_today">오늘 a h:mm</string>
+    <string name="format_trigger_at_tomorrow">내일 a h:mm</string>
+    <string name="format_trigger_at_date_only">yyyy. M. d.</string>
+    <string name="format_trigger_at_date_only_today">오늘</string>
+    <string name="format_trigger_at_date_only_tomorrow">내일</string>
+    <string name="format_trigger_at_time_only">a h:mm</string>
     <string name="label_complete">완료</string>
     <string name="label_delete">삭제</string>
     <string name="label_lists">목록</string>

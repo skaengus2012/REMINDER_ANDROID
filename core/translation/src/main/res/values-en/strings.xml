@@ -89,6 +89,13 @@
     <string name="content_description_more">see more</string>
     <string name="content_description_open_link">open link</string>
     <string name="content_description_select">select</string>
+    <string name="format_trigger_at">yyyy/MM/dd h:mm a</string>
+    <string name="format_trigger_at_today">Today h:mm a</string>
+    <string name="format_trigger_at_tomorrow">Tomorrow h:mm a</string>
+    <string name="format_trigger_at_date_only">yyyy. M. d.</string>
+    <string name="format_trigger_at_date_only_today">Today</string>
+    <string name="format_trigger_at_date_only_tomorrow">Tomorrow</string>
+    <string name="format_trigger_at_time_only">h:mm a</string>
     <string name="label_all">All</string>
     <string name="label_complete">Done</string>
     <string name="label_delete">Delete</string>
