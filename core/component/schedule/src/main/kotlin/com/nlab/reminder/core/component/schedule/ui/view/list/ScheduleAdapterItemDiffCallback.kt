@@ -24,7 +24,7 @@ import androidx.recyclerview.widget.DiffUtil
 internal class ScheduleAdapterItemDiffCallback : DiffUtil.ItemCallback<ScheduleAdapterItem>() {
     override fun areItemsTheSame(oldItem: ScheduleAdapterItem, newItem: ScheduleAdapterItem): Boolean = when {
         oldItem is ScheduleAdapterItem.Content && newItem is ScheduleAdapterItem.Content -> {
-            oldItem.schedule.id == newItem.schedule.id
+            oldItem.schedule.resource.id == newItem.schedule.resource.id
         }
 
         else -> oldItem === newItem

@@ -16,9 +16,24 @@
 
 package com.nlab.reminder.core.component.schedule
 
+import com.nlab.reminder.core.data.model.Link
+import com.nlab.reminder.core.data.model.LinkMetadata
+import com.nlab.reminder.core.data.model.ScheduleId
+import com.nlab.reminder.core.data.model.Tag
+import com.nlab.reminder.core.kotlin.NonBlankString
+import com.nlab.reminder.core.kotlin.NonNegativeLong
+
 /**
- * @author Thalys
+ * @author Doohyun
  */
-data class UserScheduleListResource(
-    val resource: ScheduleListResource,
+data class ScheduleListResource(
+    val id: ScheduleId,
+    val title: NonBlankString,
+    val note: NonBlankString?,
+    val link: Link?,
+    val linkMetadata: LinkMetadata?,
+    val timing: ScheduleListTimingResource?,
+    val defaultVisiblePriority: NonNegativeLong,
+    val isComplete: Boolean,
+    val tags: List<Tag>
 )

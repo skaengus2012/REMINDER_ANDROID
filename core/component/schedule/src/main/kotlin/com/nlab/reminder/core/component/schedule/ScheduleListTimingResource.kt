@@ -16,9 +16,16 @@
 
 package com.nlab.reminder.core.component.schedule
 
+import com.nlab.reminder.core.data.model.Repeat
+import kotlinx.datetime.LocalDateTime
+
 /**
- * @author Thalys
+ * @author Doohyun
  */
-data class UserScheduleListResource(
-    val resource: ScheduleListResource,
+data class ScheduleListTimingResource(
+    val triggerAt: LocalDateTime,
+    val isTriggerTimeInfoVisible: Boolean,
+    val isTriggeredToday: Boolean,
+    val isTriggeredTomorrow: Boolean,
+    val repeat: Repeat?
 )

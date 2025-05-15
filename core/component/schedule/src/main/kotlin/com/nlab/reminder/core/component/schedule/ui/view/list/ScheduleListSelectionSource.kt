@@ -32,6 +32,7 @@ fun ScheduleListSelectionSource(
     override fun findScheduleId(absolutePosition: Int): ScheduleId? {
         return (adapter.getCurrentList().getOrNull(absolutePosition) as? ScheduleAdapterItem.Content)
             ?.schedule
+            ?.resource
             ?.id
     }
 

@@ -36,6 +36,7 @@ import com.nlab.reminder.core.androidx.fragment.viewLifecycleScope
 import com.nlab.reminder.core.androix.recyclerview.scrollEvent
 import com.nlab.reminder.core.androix.recyclerview.scrollState
 import com.nlab.reminder.core.androix.recyclerview.verticalScrollRange
+import com.nlab.reminder.core.component.schedule.ScheduleListResource
 import com.nlab.reminder.core.component.schedule.UserScheduleListResource
 import com.nlab.reminder.core.component.schedule.ui.view.list.AddLine
 import com.nlab.reminder.core.component.schedule.ui.view.list.ScheduleAdapterItem
@@ -47,8 +48,6 @@ import com.nlab.reminder.core.component.schedule.ui.view.list.ScheduleListSelect
 import com.nlab.reminder.core.component.schedule.ui.view.list.ScheduleListTheme
 import com.nlab.reminder.core.data.model.Link
 import com.nlab.reminder.core.data.model.LinkMetadata
-import com.nlab.reminder.core.data.model.Schedule
-import com.nlab.reminder.core.data.model.ScheduleContent
 import com.nlab.reminder.core.data.model.ScheduleId
 import com.nlab.reminder.core.kotlin.toNonBlankString
 import com.nlab.reminder.core.kotlin.toNonNegativeLong
@@ -294,25 +293,22 @@ internal class AllFragment : ComposableFragment() {
                 repeat(times = 10) {
                     this += ScheduleAdapterItem.Content(
                         schedule = UserScheduleListResource(
-                            schedule = Schedule(
+                            resource = ScheduleListResource(
                                 id = ScheduleId(it.toLong()),
-                                content = ScheduleContent(
-                                    title = "Title $it".toNonBlankString(),
-                                    note = "note $it".toNonBlankString(),
-                                    link = Link("https://www.naver.com/".toNonBlankString()),
-                                    tagIds = emptySet(),
-                                    timing = null
-                                ),
-                                isComplete = true,
-                                visiblePriority = it.toLong().toNonNegativeLong()
-                            ),
-                            tags = emptyList(),
-                            linkMetadata = imageSource.shuffled().first()?.let { uri ->
-                                LinkMetadata(
-                                    title = "네이버".toNonBlankString(),
-                                    imageUrl = uri.tryToNonBlankStringOrNull()
-                                )
-                            }
+                                title = "Title $it".toNonBlankString(),
+                                note = "note $it".toNonBlankString(),
+                                link = Link("https://www.naver.com/".toNonBlankString()),
+                                linkMetadata = imageSource.shuffled().first()?.let { uri ->
+                                    LinkMetadata(
+                                        title = "네이버".toNonBlankString(),
+                                        imageUrl = uri.tryToNonBlankStringOrNull()
+                                    )
+                                },
+                                timing = null,
+                                defaultVisiblePriority = it.toNonNegativeLong(),
+                                isComplete = false,
+                                tags = emptyList()
+                            )
                         ),
                         isLineVisible = true
                     )
