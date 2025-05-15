@@ -56,13 +56,14 @@ include(
     ":core:android",
     ":core:androidx:compose",
     ":core:androidx:fragment",
-    ":core:androidx:lifecycle",
+    ":core:androidx:fragment-compose",
     ":core:androidx:navigation-compose",
     ":core:androidx:recyclerview",
-    ":core:androidx:transition",
     ":core:annotation",
+    ":core:component:schedule",
     ":core:component:tag",
     ":core:component:tag-test",
+    ":core:component:toolbar",
     ":core:component:usermessage",
     ":core:component:usermessage-handle",
     ":core:data",
@@ -86,5 +87,6 @@ include(
     ":core:uitext-test",
 )
 include(
+    ":feature:all",
     ":feature:home"
 )
