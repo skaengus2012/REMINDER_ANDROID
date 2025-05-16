@@ -35,6 +35,7 @@ facebookFlipper = "0.273.0"
 facebookSoloader = "0.12.1"
 googleHilt = "2.56.2"
 googleMaterial = "1.12.0"
+googlePlayServicesTime = "16.0.1"
 jacoco = "0.8.12" # use in configureJacocoToolVersion -> Jacoco.kt
 javafaker = "1.0.2"
 jsoup = "1.20.1"
@@ -95,6 +96,7 @@ facebook-soloader = { module = "com.facebook.soloader:soloader", version.ref = "
 google-hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "googleHilt" }       # use in nlab.android.hilt.gradle.kts
 google-hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "googleHilt" }     # use in nlab.android.hilt.gradle.kts
 google-material = { group = "com.google.android.material", name = "material", version.ref = "googleMaterial" }
+google-play-services-time = { module = "com.google.android.gms:play-services-time", version.ref = "googlePlayServicesTime" }
 javafaker = { module = "com.github.javafaker:javafaker", version.ref = "javafaker" }
 jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
 junit = { module = "junit:junit", version.ref = "junit" }

@@ -95,6 +95,7 @@ dependencies {
     implementation(projects.core.kotlin)
     implementation(projects.core.kotlinxCoroutine)
     implementation(projects.core.statekit)
+    implementation(projects.core.network)
 
     implementation(projects.feature.home)
 
