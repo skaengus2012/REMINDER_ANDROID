@@ -20,8 +20,13 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nlab.reminder.core.android.widget.Toast
+import com.nlab.reminder.core.androidx.compose.ui.LocalTimeZone
+import com.nlab.reminder.core.data.util.TimeZoneMonitor
 import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -34,16 +39,27 @@ class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var appToast: Toast
 
+    @Inject
+    lateinit var timeZoneMonitor: TimeZoneMonitor
+
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             val appState = rememberPlaneatAppState(
+                timeZoneMonitor = timeZoneMonitor,
                 appToast = appToast
             )
-            PlaneatTheme {
-                PlaneatApp(appState = appState)
+
+            val currentTimeZone by appState.currentTimeZone.collectAsStateWithLifecycle()
+
+            CompositionLocalProvider(
+                LocalTimeZone provides currentTimeZone
+            ) {
+                PlaneatTheme {
+                    PlaneatApp(appState = appState)
+                }
             }
         }
     }
