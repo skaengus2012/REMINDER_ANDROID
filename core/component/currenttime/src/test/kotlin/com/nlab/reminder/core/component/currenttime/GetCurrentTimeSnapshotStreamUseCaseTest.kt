@@ -37,10 +37,10 @@ import org.junit.Test
  */
 class GetCurrentTimeSnapshotStreamUseCaseTest {
     @Test
-    fun `Given timeSnapshotStream, When collected, Then emit instant value once`() = runTest {
+    fun `Given now time snapshot stream, When collected, Then emit instant value once`() = runTest {
         val expectedInstant = Clock.System.now()
         val timeSnapshotRepository: TimeSnapshotRepository = mockk {
-            every { getAsStream() } returns flowOf(genTimeSnapshot(value = expectedInstant))
+            every { getNowSnapshotAsStream() } returns flowOf(genTimeSnapshot(value = expectedInstant))
         }
         val useCase = genGetCurrentTimeSnapshotStreamUseCase(timeSnapshotRepository = timeSnapshotRepository)
         useCase().test {
@@ -52,7 +52,7 @@ class GetCurrentTimeSnapshotStreamUseCaseTest {
     @Test
     fun `Given remote snapshot, When collected, Then do not notify systemTimeUsage`() = runTest {
         val timeSnapshotRepository: TimeSnapshotRepository = mockk {
-            every { getAsStream() } returns flowOf(genTimeSnapshot(fromRemote = true))
+            every { getNowSnapshotAsStream() } returns flowOf(genTimeSnapshot(fromRemote = true))
         }
         val systemTimeUsageBroadcast: SystemTimeUsageBroadcast = mockk(relaxed = true)
         val useCase = genGetCurrentTimeSnapshotStreamUseCase(
@@ -70,7 +70,7 @@ class GetCurrentTimeSnapshotStreamUseCaseTest {
     @Test
     fun `Given local snapshot, When collected, Then notify systemTimeUsage once`() = runTest {
         val timeSnapshotRepository: TimeSnapshotRepository = mockk {
-            every { getAsStream() } returns flowOf(genTimeSnapshot(fromRemote = false))
+            every { getNowSnapshotAsStream() } returns flowOf(genTimeSnapshot(fromRemote = false))
         }
         val systemTimeUsageBroadcast: SystemTimeUsageBroadcast = mockk(relaxed = true)
         val useCase = genGetCurrentTimeSnapshotStreamUseCase(

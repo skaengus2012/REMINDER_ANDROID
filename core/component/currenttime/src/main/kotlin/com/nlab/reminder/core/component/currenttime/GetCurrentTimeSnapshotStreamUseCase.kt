@@ -29,7 +29,7 @@ class GetCurrentTimeSnapshotStreamUseCase internal constructor(
     private val timeSnapshotRepository: TimeSnapshotRepository,
     private val systemTimeUsageBroadcast: SystemTimeUsageBroadcast,
 ) {
-    operator fun invoke(): Flow<Instant> = timeSnapshotRepository.getAsStream()
+    operator fun invoke(): Flow<Instant> = timeSnapshotRepository.getNowSnapshotAsStream()
         .onEach { timeSnapshot ->
             if (timeSnapshot.fromRemote.not()) {
                 systemTimeUsageBroadcast.notifyEvent()
