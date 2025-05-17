@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.data.util
+package com.nlab.reminder.core.data.repository
 
-import kotlinx.coroutines.flow.SharedFlow
+import com.nlab.reminder.core.data.model.TimeSnapshot
+import kotlinx.coroutines.flow.Flow
 
 /**
- * @author Thalys
+ * @author Doohyun
  */
-interface TimeChangedMonitor {
-    val timeChangedEvent: SharedFlow<Unit>
+interface TimeSnapshotRepository {
+    fun getAsStream(): Flow<TimeSnapshot>
 }
