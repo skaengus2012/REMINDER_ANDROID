@@ -34,7 +34,7 @@ import org.junit.Test
  */
 class RemoteFirstTimeSnapshotRepositoryTest {
     @Test
-    fun `Given trusted time available, When collecting stream, Then return remote snapshot once`() = runTest {
+    fun `Given trusted time available, When collecting now stream, Then return remote snapshot once`() = runTest {
         val expected = genTimeSnapshot(fromRemote = true)
         val trustedTimeDataSource = mockk<TrustedTimeDataSource> {
             coEvery { getCurrentTime() } returns Result.Success(expected.value)
@@ -42,26 +42,26 @@ class RemoteFirstTimeSnapshotRepositoryTest {
         val timeSnapshotRepository = genRemoteFirstTimeSnapshotRepository(
             trustedTimeDataSource = trustedTimeDataSource
         )
-        timeSnapshotRepository.getAsStream().test {
+        timeSnapshotRepository.getNowSnapshotAsStream().test {
             assertThat(awaitItem(), equalTo(expected))
             awaitComplete()
         }
     }
 
     @Test
-    fun `Given trusted time fails, When collecting stream, Then fallback snapshot is emitted`() = runTest {
+    fun `Given trusted time fails, When collecting now stream, Then fallback snapshot is emitted`() = runTest {
         val expected = genTimeSnapshot(fromRemote = false)
         val trustedTimeDataSource = mockk<TrustedTimeDataSource> {
             coEvery { getCurrentTime() } returns Result.Failure(IllegalStateException())
         }
         val fallbackSnapshotRepository = mockk<TimeSnapshotRepository> {
-            coEvery { getAsStream() } returns flowOf(expected)
+            coEvery { getNowSnapshotAsStream() } returns flowOf(expected)
         }
         val timeSnapshotRepository = genRemoteFirstTimeSnapshotRepository(
             trustedTimeDataSource = trustedTimeDataSource,
             fallbackSnapshotRepository = fallbackSnapshotRepository
         )
-        timeSnapshotRepository.getAsStream().test {
+        timeSnapshotRepository.getNowSnapshotAsStream().test {
             assertThat(awaitItem(), equalTo(expected))
             awaitComplete()
         }

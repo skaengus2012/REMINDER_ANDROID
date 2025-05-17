@@ -23,5 +23,5 @@ import kotlinx.coroutines.flow.Flow
  * @author Doohyun
  */
 interface TimeSnapshotRepository {
-    fun getAsStream(): Flow<TimeSnapshot>
+    fun getNowSnapshotAsStream(): Flow<TimeSnapshot>
 }

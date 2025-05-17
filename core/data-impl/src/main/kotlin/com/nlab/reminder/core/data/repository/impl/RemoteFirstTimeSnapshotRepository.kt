@@ -31,9 +31,9 @@ class RemoteFirstTimeSnapshotRepository(
     private val trustedTimeDataSource: TrustedTimeDataSource,
     private val fallbackSnapshotRepository: TimeSnapshotRepository,
 ) : TimeSnapshotRepository {
-    override fun getAsStream() = flow { emit(trustedTimeDataSource.getCurrentTime()) }.flatMapConcat { result ->
-        val trustedTimeValue = result.getOrNull()
-        if (trustedTimeValue == null) fallbackSnapshotRepository.getAsStream()
+    override fun getNowSnapshotAsStream() = flow { emit(trustedTimeDataSource.getCurrentTime()) }.flatMapConcat { ret ->
+        val trustedTimeValue = ret.getOrNull()
+        if (trustedTimeValue == null) fallbackSnapshotRepository.getNowSnapshotAsStream()
         else flowOf(TimeSnapshot(trustedTimeValue, fromRemote = true))
     }
 }

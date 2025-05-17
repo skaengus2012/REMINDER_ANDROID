@@ -29,7 +29,7 @@ import kotlinx.datetime.Clock
 class SystemTimeSnapshotRepository(
     private val systemTimeChangedMonitor: SystemTimeChangedMonitor
 ) : TimeSnapshotRepository {
-    override fun getAsStream(): Flow<TimeSnapshot> {
+    override fun getNowSnapshotAsStream(): Flow<TimeSnapshot> {
         return systemTimeChangedMonitor
             .timeChangedEvent
             .onStart { emit(Unit) }
