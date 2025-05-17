@@ -19,27 +19,26 @@ package com.nlab.reminder.core.network.datasource
 import android.content.Context
 import com.google.android.gms.time.TrustedTime
 import com.google.android.gms.time.TrustedTimeClient
-import com.nlab.reminder.core.inject.qualifiers.coroutine.AppScope
 import com.nlab.reminder.core.kotlin.Result
 import com.nlab.reminder.core.kotlin.catching
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.datetime.Instant
-import javax.inject.Inject
-import javax.inject.Singleton
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
 /**
  * @author Thalys
  */
-@Singleton
-class TrustedTimeDataSource @Inject constructor(
-    @ApplicationContext context: Context,
-    @AppScope private val coroutineScope: CoroutineScope
-) {
+fun interface TrustedTimeDataSource {
+    suspend fun getCurrentTime(): Result<Instant>
+}
+
+class TrustedTimeDataSourceImpl(
+    context: Context,
+    coroutineScope: CoroutineScope
+) : TrustedTimeDataSource {
     private val trustedTimeClientDeferred = coroutineScope.async {
         suspendCancellableCoroutine<TrustedTimeClient> { continuation ->
             TrustedTime.createClient(context).addOnCompleteListener { task ->
@@ -49,7 +48,7 @@ class TrustedTimeDataSource @Inject constructor(
         }
     }
 
-    suspend fun getTrustedTime(): Result<Instant> = catching {
+    override suspend fun getCurrentTime(): Result<Instant> = catching {
         trustedTimeClientDeferred
             .await()
             .computeCurrentUnixEpochMillis()

@@ -27,21 +27,21 @@ import com.nlab.reminder.core.data.qualifiers.ScheduleDataOption.*
 import com.nlab.reminder.core.data.repository.CompletedScheduleShownRepository
 import com.nlab.reminder.core.data.repository.LinkMetadataRepository
 import com.nlab.reminder.core.data.repository.ScheduleRepository
+import com.nlab.reminder.core.data.repository.SystemTimeSnapshotRepository
 import com.nlab.reminder.core.data.repository.TagRepository
+import com.nlab.reminder.core.data.repository.TimeSnapshotRepository
 import com.nlab.reminder.core.data.repository.impl.CompletedScheduleShownRepositoryImpl
 import com.nlab.reminder.core.data.repository.impl.LinkMetadataRemoteCache
 import com.nlab.reminder.core.data.repository.impl.LocalScheduleRepository
 import com.nlab.reminder.core.data.repository.impl.LocalTagRepository
 import com.nlab.reminder.core.data.repository.impl.OfflineFirstLinkMetadataRepository
+import com.nlab.reminder.core.data.repository.impl.RemoteFirstTimeSnapshotRepository
 import com.nlab.reminder.core.data.util.SystemTimeChangedMonitor
 import com.nlab.reminder.core.data.util.SystemTimeZoneMonitor
-import com.nlab.reminder.core.data.util.TimeChangedMonitor
 import com.nlab.reminder.core.data.util.TimeZoneMonitor
 import com.nlab.reminder.core.inject.qualifiers.coroutine.AppScope
 import com.nlab.reminder.core.inject.qualifiers.coroutine.Dispatcher
 import com.nlab.reminder.core.inject.qualifiers.coroutine.DispatcherOption.*
-import com.nlab.reminder.core.kotlin.NonBlankString
-import com.nlab.reminder.core.kotlin.Result
 import com.nlab.reminder.core.kotlin.onFailure
 import com.nlab.reminder.core.kotlin.onSuccess
 import com.nlab.reminder.core.kotlin.toPositiveInt
@@ -55,10 +55,11 @@ import com.nlab.reminder.core.local.database.transaction.UpdateAndGetScheduleCon
 import com.nlab.reminder.core.local.database.transaction.UpdateOrMergeAndGetTagTransaction
 import com.nlab.reminder.core.local.datastore.preference.PreferenceDataSource
 import com.nlab.reminder.core.network.datasource.LinkThumbnailDataSource
-import com.nlab.reminder.core.network.datasource.LinkThumbnailResponse
+import com.nlab.reminder.core.network.datasource.TrustedTimeDataSource
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+
 import timber.log.Timber
 import javax.inject.Singleton
 
@@ -120,17 +121,42 @@ internal object AppScopeDataModule {
         linkMetadataRemoteCache: LinkMetadataRemoteCache
     ): LinkMetadataRepository = OfflineFirstLinkMetadataRepository(
         linkMetadataDAO = linkMetadataDAO,
-        remoteDataSource = object : LinkThumbnailDataSource {
-            override suspend fun getLinkThumbnail(
-                url: NonBlankString
-            ): Result<LinkThumbnailResponse> = linkThumbnailDataSource.getLinkThumbnail(url)
+        remoteDataSource = { url ->
+            linkThumbnailDataSource.getLinkThumbnail(url)
                 .onSuccess { response ->
-                    Timber.d("The linkMetadata loading success -> [$url : $response]")
+                    Timber.remoteSourceTag().d(message = "The linkMetadata loading success -> [$url : $response]")
                 }
-                .onFailure { e -> Timber.w(e, "The linkMetadata loading failed -> [$url]") }
-
+                .onFailure { e ->
+                    Timber.remoteSourceTag().w(e, message = "The linkMetadata loading failed -> [$url]")
+                }
         },
         remoteCache = linkMetadataRemoteCache
+    )
+
+    @Reusable
+    @Provides
+    fun provideRemoteFirstTimeSnapshotRepository(
+        trustedTimeDataSource: TrustedTimeDataSource,
+        systemTimeChangedMonitor: SystemTimeChangedMonitor,
+    ): TimeSnapshotRepository = RemoteFirstTimeSnapshotRepository(
+        trustedTimeDataSource = {
+            trustedTimeDataSource.getCurrentTime()
+                .onSuccess { instant -> Timber.remoteSourceTag().d("The trusted time success -> [$instant]") }
+                .onFailure { e -> Timber.remoteSourceTag().w(e) }
+        },
+        fallbackSnapshotRepository = SystemTimeSnapshotRepository(systemTimeChangedMonitor = systemTimeChangedMonitor)
+    )
+
+    @Singleton
+    @Provides
+    fun provideSystemTimeChangeMonitor(
+        @ApplicationContext context: Context,
+        @AppScope coroutineScope: CoroutineScope,
+        @Dispatcher(IO) dispatcher: CoroutineDispatcher
+    ) = SystemTimeChangedMonitor(
+        context = context,
+        coroutineScope = coroutineScope,
+        dispatcher = dispatcher
     )
 
     @Singleton
@@ -140,18 +166,6 @@ internal object AppScopeDataModule {
         @AppScope coroutineScope: CoroutineScope,
         @Dispatcher(IO) dispatcher: CoroutineDispatcher
     ): TimeZoneMonitor = SystemTimeZoneMonitor(
-        context = context,
-        coroutineScope = coroutineScope,
-        dispatcher = dispatcher
-    )
-
-    @Singleton
-    @Provides
-    fun provideTimeChangedMonitor(
-        @ApplicationContext context: Context,
-        @AppScope coroutineScope: CoroutineScope,
-        @Dispatcher(IO) dispatcher: CoroutineDispatcher
-    ): TimeChangedMonitor = SystemTimeChangedMonitor(
         context = context,
         coroutineScope = coroutineScope,
         dispatcher = dispatcher

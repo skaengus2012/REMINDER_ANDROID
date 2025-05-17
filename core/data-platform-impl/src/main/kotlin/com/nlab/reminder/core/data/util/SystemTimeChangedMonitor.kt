@@ -30,14 +30,14 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.shareIn
 
 /**
- * @author Thalys
+ * @author Doohyun
  */
 class SystemTimeChangedMonitor(
     context: Context,
     coroutineScope: CoroutineScope,
     dispatcher: CoroutineDispatcher
-) : TimeChangedMonitor {
-    override val timeChangedEvent: SharedFlow<Unit> = callbackFlow {
+) {
+    val timeChangedEvent: SharedFlow<Unit> = callbackFlow {
         val receiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
                 if (intent.action == Intent.ACTION_TIME_CHANGED) {

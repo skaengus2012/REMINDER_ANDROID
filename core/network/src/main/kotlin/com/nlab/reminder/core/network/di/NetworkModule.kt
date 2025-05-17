@@ -16,21 +16,43 @@
 
 package com.nlab.reminder.core.network.di
 
+import android.content.Context
+import com.nlab.reminder.core.inject.qualifiers.coroutine.AppScope
+import com.nlab.reminder.core.inject.qualifiers.coroutine.Dispatcher
+import com.nlab.reminder.core.inject.qualifiers.coroutine.DispatcherOption.IO
 import com.nlab.reminder.core.network.datasource.LinkThumbnailDataSource
 import com.nlab.reminder.core.network.datasource.LinkThumbnailDataSourceImpl
-import dagger.Binds
+import com.nlab.reminder.core.network.datasource.TrustedTimeDataSource
+import com.nlab.reminder.core.network.datasource.TrustedTimeDataSourceImpl
 import dagger.Module
+import dagger.Provides
 import dagger.Reusable
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import javax.inject.Singleton
 
 /**
  * @author Doohyun
  */
 @Module
 @InstallIn(SingletonComponent::class)
-internal abstract class NetworkModule {
+internal object NetworkModule {
     @Reusable
-    @Binds
-    abstract fun bindLinkMetadataSource(impl: LinkThumbnailDataSourceImpl): LinkThumbnailDataSource
+    @Provides
+    fun provideLinkMetadataSource(
+        @Dispatcher(IO) dispatcher: CoroutineDispatcher
+    ): LinkThumbnailDataSource = LinkThumbnailDataSourceImpl(dispatcher)
+
+    @Singleton
+    @Provides
+    fun provideTrustedTimeDataSource(
+        @ApplicationContext context: Context,
+        @AppScope coroutineScope: CoroutineScope
+    ): TrustedTimeDataSource = TrustedTimeDataSourceImpl(
+        context,
+        coroutineScope
+    )
 }
