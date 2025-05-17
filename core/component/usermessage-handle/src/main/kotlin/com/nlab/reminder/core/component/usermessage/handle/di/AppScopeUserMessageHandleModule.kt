@@ -16,6 +16,7 @@
 
 package com.nlab.reminder.core.component.usermessage.handle.di
 
+import com.nlab.reminder.core.component.usermessage.handle.UserMessageBroadcast
 import com.nlab.reminder.core.component.usermessage.handle.UserMessageMonitor
 import com.nlab.reminder.core.component.usermessage.handle.impl.UserMessageBroadcastMonitor
 import dagger.Binds
@@ -32,11 +33,14 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 internal abstract class AppScopeUserMessageHandleModule {
     @Binds
-    abstract fun bindUserMesMessageMonitor(impl: UserMessageBroadcastMonitor): UserMessageMonitor
+    abstract fun bindUserMessageMonitor(impl: UserMessageBroadcastMonitor): UserMessageMonitor
+
+    @Binds
+    abstract fun bindUserMessageBroadcast(impl: UserMessageBroadcastMonitor): UserMessageBroadcast
 
     companion object {
         @Singleton
         @Provides
-        fun provideUserMessageBroadcastMonitor(): UserMessageBroadcastMonitor = UserMessageBroadcastMonitor()
+        fun provideUserMessageBroadcastMonitor() = UserMessageBroadcastMonitor()
     }
 }

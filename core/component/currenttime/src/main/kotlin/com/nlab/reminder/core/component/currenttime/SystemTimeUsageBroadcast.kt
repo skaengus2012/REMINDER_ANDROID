@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 The N's lab Open Source Project
+ * Copyright (C) 2025 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,11 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.component.usermessage.handle
-
-import com.nlab.reminder.core.component.usermessage.UserMessage
-import kotlinx.coroutines.channels.ReceiveChannel
+package com.nlab.reminder.core.component.currenttime
 
 /**
- * @author Thalys
+ * @author Doohyun
  */
-interface UserMessageMonitor {
-    val message: ReceiveChannel<UserMessage>
+internal interface SystemTimeUsageBroadcast {
+    suspend fun notifyEvent()
 }

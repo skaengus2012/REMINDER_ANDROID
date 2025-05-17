@@ -19,9 +19,14 @@ package com.nlab.reminder.core.component.usermessage.handle.impl
 import com.nlab.reminder.core.component.usermessage.FeedbackPriority
 import com.nlab.reminder.core.component.usermessage.UserMessage
 import com.nlab.reminder.core.text.genUiText
+import com.nlab.testkit.faker.shuffleAndGetFirst
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.advanceUntilIdle
-import kotlinx.coroutines.test.assertFlowEmissionsLazy
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.unconfinedTestDispatcher
+import org.hamcrest.CoreMatchers.equalTo
+import org.hamcrest.CoreMatchers.nullValue
+import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
 
 /**
@@ -30,27 +35,43 @@ import org.junit.Test
 class UserMessageBroadcastMonitorTest {
     @Test
     fun `Given user message, When send after subscribe, Then monitor send user message`() = runTest {
+        // given
         val userMessage = UserMessage(
             message = genUiText(),
-            priority = FeedbackPriority.HIGH
+            priority = FeedbackPriority.entries.shuffleAndGetFirst()
         )
-        val userMessageProvider = UserMessageBroadcastMonitor()
-        val assertion = assertFlowEmissionsLazy(userMessageProvider.message, listOf(userMessage))
-        userMessageProvider.send(userMessage)
-        assertion()
+        val broadcastMonitor = UserMessageBroadcastMonitor()
+
+        // when
+        var actualMessage: UserMessage? = null
+        backgroundScope.launch(unconfinedTestDispatcher()) {
+            actualMessage = broadcastMonitor.message.receive()
+        }
+        broadcastMonitor.send(userMessage)
+
+        // then
+        assertThat(actualMessage, equalTo(userMessage))
     }
 
     @Test
-    fun `Given user message, When send before subscribe, Then monitor not send user message`() = runTest {
-        val userMessage = UserMessage(
-            message = genUiText(),
-            priority = FeedbackPriority.URGENT
-        )
-        val userMessageProvider = UserMessageBroadcastMonitor()
-        userMessageProvider.send(userMessage)
+    fun `When send user message before subscribe, Then monitor not send user message`() = runTest {
+        // given
+        val broadcastMonitor = UserMessageBroadcastMonitor()
 
-        val assertion = assertFlowEmissionsLazy(userMessageProvider.message, emptyList())
+        // when
+        broadcastMonitor.send(
+            UserMessage(
+                message = genUiText(),
+                priority = FeedbackPriority.entries.shuffleAndGetFirst()
+            )
+        )
+        var actualMessage: UserMessage? = null
+        backgroundScope.launch(unconfinedTestDispatcher()) {
+            actualMessage = broadcastMonitor.message.receive()
+        }
         advanceUntilIdle()
-        assertion()
+
+        // then
+        assertThat(actualMessage, nullValue())
     }
 }
