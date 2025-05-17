@@ -29,6 +29,7 @@ import com.nlab.statekit.bootstrap.collectAsBootstrap
 import com.nlab.statekit.dsl.reduce.DslReduce
 import com.nlab.statekit.reduce.Reduce
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.receiveAsFlow
 import javax.inject.Inject
 
 typealias UserMessageHandleReduce = Reduce<UserMessageHandleAction, UserMessageUiState>
@@ -68,6 +69,7 @@ class UserMessageHandleViewModel @Inject constructor(
         initState = UserMessageUiState(userMessages = emptyList()),
         reduce = UserMessageHandleReduce(),
         bootstrap = userMessageMonitor.message
+            .receiveAsFlow()
             .map(::UserMessagePosted)
             .collectAsBootstrap(DeliveryStarted.Lazily)
     )

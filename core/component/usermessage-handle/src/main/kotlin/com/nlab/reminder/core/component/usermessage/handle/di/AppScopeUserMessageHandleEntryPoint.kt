@@ -17,7 +17,7 @@
 package com.nlab.reminder.core.component.usermessage.handle.di
 
 import android.content.Context
-import com.nlab.reminder.core.component.usermessage.handle.impl.UserMessageBroadcastMonitor
+import com.nlab.reminder.core.component.usermessage.handle.UserMessageBroadcast
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
@@ -29,10 +29,10 @@ import dagger.hilt.components.SingletonComponent
 @EntryPoint
 @InstallIn(SingletonComponent::class)
 internal interface UserMessageHandleModuleEntryPoint {
-    fun userMessageBroadcastMonitor(): UserMessageBroadcastMonitor
+    fun userMessageBroadcast(): UserMessageBroadcast
 }
 
-fun Context.getUserMessageBroadcastMonitor(): UserMessageBroadcastMonitor =
+fun Context.getUserMessageBroadcast(): UserMessageBroadcast =
     EntryPointAccessors
         .fromApplication(context = this, UserMessageHandleModuleEntryPoint::class.java)
-        .userMessageBroadcastMonitor()
+        .userMessageBroadcast()

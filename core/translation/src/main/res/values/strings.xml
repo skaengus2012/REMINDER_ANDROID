@@ -30,6 +30,7 @@
     <string name="delete">삭제</string>
     <string name="handle_drag">드래그 시작</string>
     <string name="unknown_error">알 수 없는 오류가 발생했습니다.</string>
+    <string name="message_error_remote_time_loading_failed">현재 화면은 기기 시간 기준으로 표시됩니다.</string>
 
     <!-- schedule -->
     <string name="schedule_complete_checkbox_contentDescription" formatted="true">%1$s를 완료합니다.</string>

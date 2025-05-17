@@ -22,8 +22,7 @@ import androidx.startup.Initializer
 import com.nlab.reminder.core.statekit.plugins.StateKitPlugin
 import com.nlab.reminder.apps.startup.EmptyDependencies
 import com.nlab.reminder.core.component.usermessage.UserMessageException
-import com.nlab.reminder.core.component.usermessage.handle.di.getUserMessageBroadcastMonitor
-import com.nlab.reminder.core.component.usermessage.handle.impl.UserMessageBroadcastMonitor
+import com.nlab.reminder.core.component.usermessage.handle.di.getUserMessageBroadcast
 import kotlinx.coroutines.CancellationException
 import timber.log.Timber
 
@@ -33,14 +32,13 @@ import timber.log.Timber
 internal class StateKitPluginInitializer : Initializer<Unit> {
     override fun create(context: Context) {
         val tag = "StateKitGlobalErr"
-        val userMessageBroadcastMonitor: UserMessageBroadcastMonitor =
-            context.getUserMessageBroadcastMonitor()
+        val userMessageBroadcast = context.getUserMessageBroadcast()
 
         StateKitPlugin.addGlobalExceptionHandler { _, throwable ->
             when (throwable) {
                 is UserMessageException -> {
                     Timber.tag(tag).e(throwable.origin)
-                    userMessageBroadcastMonitor.send(userMessage = throwable.userMessage)
+                    userMessageBroadcast.send(userMessage = throwable.userMessage)
                 }
 
                 is CancellationException -> {
