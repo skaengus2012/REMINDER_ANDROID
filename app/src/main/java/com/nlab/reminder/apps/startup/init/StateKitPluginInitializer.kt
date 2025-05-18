@@ -22,7 +22,11 @@ import androidx.startup.Initializer
 import com.nlab.reminder.core.statekit.plugins.StateKitPlugin
 import com.nlab.reminder.apps.startup.EmptyDependencies
 import com.nlab.reminder.core.component.usermessage.UserMessageException
-import com.nlab.reminder.core.component.usermessage.handle.di.getUserMessageBroadcast
+import com.nlab.reminder.core.component.usermessage.handle.UserMessageBroadcast
+import dagger.hilt.EntryPoint
+import dagger.hilt.InstallIn
+import dagger.hilt.android.EntryPointAccessors
+import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CancellationException
 import timber.log.Timber
 
@@ -32,7 +36,8 @@ import timber.log.Timber
 internal class StateKitPluginInitializer : Initializer<Unit> {
     override fun create(context: Context) {
         val tag = "StateKitGlobalErr"
-        val userMessageBroadcast = context.getUserMessageBroadcast()
+        val entryPoint = EntryPointAccessors.fromApplication<StateKitPluginInitEntryPoint>(context)
+        val userMessageBroadcast = entryPoint.userMessageBroadcast()
 
         StateKitPlugin.addGlobalExceptionHandler { _, throwable ->
             when (throwable) {
@@ -53,4 +58,10 @@ internal class StateKitPluginInitializer : Initializer<Unit> {
     }
 
     override fun dependencies() = EmptyDependencies()
+}
+
+@EntryPoint
+@InstallIn(SingletonComponent::class)
+interface StateKitPluginInitEntryPoint {
+    fun userMessageBroadcast(): UserMessageBroadcast
 }
