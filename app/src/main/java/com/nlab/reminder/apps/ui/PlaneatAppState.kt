@@ -59,11 +59,16 @@ fun rememberPlaneatAppState(
     appToast: Toast,
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
     navController: NavHostController = rememberNavController(),
-): PlaneatAppState = remember(navController, appToast) {
+): PlaneatAppState = remember(
+    timeZoneMonitor,
+    appToast,
+    coroutineScope,
+    navController
+) {
     PlaneatAppState(
-        coroutineScope = coroutineScope,
         timeZoneMonitor = timeZoneMonitor,
+        appToast = appToast,
+        coroutineScope = coroutineScope,
         navController = navController,
-        appToast = appToast
     )
 }
