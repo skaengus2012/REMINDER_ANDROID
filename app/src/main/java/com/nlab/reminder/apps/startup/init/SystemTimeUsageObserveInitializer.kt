@@ -48,10 +48,7 @@ class SystemTimeUsageObserveInitializer : Initializer<Unit> {
         coroutineScope.launch {
             systemTimeUsageMonitor.event
                 .receiveAsFlow()
-                .throttleFirst(
-                    // android toast is displayed about 3.5 seconds, so proceed to prevent duplicate notation
-                    windowDuration = 4_000
-                )
+                .throttleFirst(windowDuration = TOAST_DISPLAY_BASE_THROTTLE_WINDOW_MS)
                 .collect {
                     userMessageBroadcast.send(
                         userMessage = UserMessage(
@@ -64,6 +61,11 @@ class SystemTimeUsageObserveInitializer : Initializer<Unit> {
     }
 
     override fun dependencies() = EmptyDependencies()
+
+    companion object {
+        // android toast is displayed about 3.5 seconds, so proceed to prevent duplicate notation
+        private const val TOAST_DISPLAY_BASE_THROTTLE_WINDOW_MS = 4_000L
+    }
 }
 
 @EntryPoint
