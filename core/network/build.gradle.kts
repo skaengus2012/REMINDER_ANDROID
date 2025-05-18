@@ -11,5 +11,7 @@ dependencies {
     api(projects.core.kotlin)
     implementation(projects.core.kotlinxCoroutine)
 
+    api(libs.kotlinx.datetime)
+    implementation(libs.google.play.services.time)
     implementation(libs.jsoup)
 }

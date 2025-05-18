@@ -24,6 +24,7 @@
     <string name="delete">Delete</string>
     <string name="handle_drag">Start drag</string>
     <string name="unknown_error">An unknown error has occurred.</string>
+    <string name="message_error_remote_time_loading_failed">The current screen is displayed based on your device time.</string>
 
     <!-- schedule -->
     <string name="schedule_complete_checkbox_contentDescription" formatted="true">Complete %1$s</string>

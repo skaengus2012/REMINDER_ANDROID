@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.data.util
+package com.nlab.reminder.core.component.usermessage.handle
 
-import kotlinx.coroutines.flow.SharedFlow
+import com.nlab.reminder.core.component.usermessage.UserMessage
 
 /**
- * @author Thalys
+ * @author Doohyun
  */
-interface TimeChangedMonitor {
-    val timeChangedEvent: SharedFlow<Unit>
+interface UserMessageBroadcast {
+    fun send(userMessage: UserMessage)
 }

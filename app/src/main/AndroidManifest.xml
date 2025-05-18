@@ -52,6 +52,9 @@
 			<meta-data
 				android:name="com.nlab.reminder.apps.startup.init.StateKitPluginInitializer"
 				android:value="androidx.startup" />
+			<meta-data
+				android:name="com.nlab.reminder.apps.startup.init.SystemTimeUsageObserveInitializer"
+				android:value="androidx.startup" />
 		</provider>
 
 	</application>

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 The N's lab Open Source Project
+ * Copyright (C) 2025 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,22 +14,21 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.component.usermessage.handle.impl
+package com.nlab.reminder.core.component.currenttime.impl
 
-import com.nlab.reminder.core.component.usermessage.UserMessage
-import com.nlab.reminder.core.component.usermessage.handle.UserMessageBroadcast
-import com.nlab.reminder.core.component.usermessage.handle.UserMessageMonitor
+import com.nlab.reminder.core.component.currenttime.SystemTimeUsageBroadcast
+import com.nlab.reminder.core.component.currenttime.SystemTimeUsageMonitor
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
 
 /**
- * @author Thalys
+ * @author Doohyun
  */
-internal class UserMessageBroadcastMonitor : UserMessageBroadcast, UserMessageMonitor {
-    private val _message = Channel<UserMessage>(Channel.RENDEZVOUS)
-    override val message: ReceiveChannel<UserMessage> = _message
+internal class SystemTimeUsageBroadcastMonitor : SystemTimeUsageMonitor, SystemTimeUsageBroadcast {
+    private val _event = Channel<Unit>(capacity = Channel.BUFFERED)
+    override val event: ReceiveChannel<Unit> = _event
 
-    override fun send(userMessage: UserMessage) {
-        _message.trySend(userMessage)
+    override suspend fun notifyEvent() {
+        _event.send(Unit)
     }
 }

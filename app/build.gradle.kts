@@ -87,13 +87,16 @@ dependencies {
     implementation(projects.core.androidx.recyclerview)
     implementation(projects.core.androidx.transition)
     implementation(projects.core.annotation)
+    implementation(projects.core.component.currenttime)
     implementation(projects.core.component.usermessage)
     implementation(projects.core.component.usermessageHandle)
+    implementation(projects.core.dataDi)
     implementation(projects.core.designsystem)
     implementation(projects.core.inject)
     implementation(projects.core.kotlin)
     implementation(projects.core.kotlinxCoroutine)
     implementation(projects.core.statekit)
+    implementation(projects.core.translation)
 
     implementation(projects.feature.home)
 
