@@ -29,7 +29,7 @@ import org.junit.Test
  */
 class SystemTimeUsageBroadcastMonitorTest {
     @Test
-    fun `Given multiple notify event, When collecting event flow, Then receive same number of events`() = runTest {
+    fun `Given multiple notify events, When collecting event flow, Then receive same number of events`() = runTest {
         val broadcastMonitor = SystemTimeUsageBroadcastMonitor()
         val expectedExecutionCount = genInt(min = 5, max = 10)
 
