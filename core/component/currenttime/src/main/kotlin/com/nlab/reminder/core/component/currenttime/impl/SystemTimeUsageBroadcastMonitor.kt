@@ -25,7 +25,7 @@ import kotlinx.coroutines.channels.ReceiveChannel
  * @author Doohyun
  */
 internal class SystemTimeUsageBroadcastMonitor : SystemTimeUsageMonitor, SystemTimeUsageBroadcast {
-    private val _event = Channel<Unit>(capacity = Channel.RENDEZVOUS)
+    private val _event = Channel<Unit>(capacity = Channel.BUFFERED)
     override val event: ReceiveChannel<Unit> = _event
 
     override suspend fun notifyEvent() {
