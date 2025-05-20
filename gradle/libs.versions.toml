@@ -50,7 +50,7 @@ mockitoInline = "5.2.0"
 mockitoKotlin = "5.4.0"
 mockk = "1.14.2"
 squareLeakcanary = "2.14"
-squareKotlinpoet = "2.1.0"
+squareKotlinpoet = "2.2.0"
 timber = "5.0.1"
 turbine = "1.2.0"
 
