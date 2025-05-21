@@ -17,7 +17,6 @@
 package com.nlab.reminder.core.component.usermessage
 
 import com.nlab.reminder.core.text.UiText
-import com.nlab.reminder.core.text.genUiText
 import com.nlab.reminder.core.translation.StringIds
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.sameInstance
@@ -29,19 +28,17 @@ import org.junit.Test
  */
 class UserMessageExceptionKtTest {
     @Test
-    fun `Given message, priority, throwable, When make userMessageException, Then return matching value`() {
-        val message = genUiText()
-        val priority = FeedbackPriority.MEDIUM
+    fun `Given filled source and throwable, When make userMessageException, Then return matching value`() {
+        val source = genUserMessageExceptionSource()
         val throwable = Throwable()
-
-        val actualUserMessageException = UserMessageException(message, priority, throwable)
+        val actualUserMessageException = UserMessageException(source, throwable)
         assertThat(
             actualUserMessageException.userMessage.message,
-            equalTo(message)
+            equalTo(source.message)
         )
         assertThat(
             actualUserMessageException.userMessage.priority,
-            equalTo(priority)
+            equalTo(source.priority)
         )
         assertThat(
             actualUserMessageException.origin,
@@ -50,12 +47,9 @@ class UserMessageExceptionKtTest {
     }
 
     @Test
-    fun `When make userMessageException without message, Then return exception with default message`() {
-        val actualUserMessageException = UserMessageException(
-            message = null,
-            priority = null,
-            Throwable()
-        )
+    fun `Given source without message, When make userMessageException, Then return exception with default message`() {
+        val source = genUserMessageExceptionSource(message = null)
+        val actualUserMessageException = UserMessageException(source, Throwable())
         assertThat(
             actualUserMessageException.userMessage.message,
             equalTo(UiText(StringIds.unknown_error))
@@ -63,12 +57,9 @@ class UserMessageExceptionKtTest {
     }
 
     @Test
-    fun `When make userMessageException without priority, Then return exception with low priority`() {
-        val actualUserMessageException = UserMessageException(
-            message = null,
-            priority = null,
-            Throwable()
-        )
+    fun `Given source without priority, When make userMessageException, Then return exception with low priority`() {
+        val source = genUserMessageExceptionSource(priority = null)
+        val actualUserMessageException = UserMessageException(source, Throwable())
         assertThat(
             actualUserMessageException.userMessage.priority,
             equalTo(FeedbackPriority.LOW)

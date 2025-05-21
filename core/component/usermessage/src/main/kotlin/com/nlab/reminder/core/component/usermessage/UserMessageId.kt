@@ -14,22 +14,13 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.component.tag.edit
+package com.nlab.reminder.core.component.usermessage
 
-import com.nlab.reminder.core.component.usermessage.errorMessage
-import com.nlab.reminder.core.kotlin.onFailure
-import com.nlab.reminder.core.kotlin.onSuccess
+import com.nlab.reminder.core.annotation.ExcludeFromGeneratedTestReport
 
 /**
  * @author Thalys
  */
-suspend fun executeTagEditTask(
-    task: TagEditTask,
-    current: TagEditState,
-    updateState: suspend (expectedState: TagEditState, newState: TagEditState) -> Unit
-) {
-    updateState(current, task.nextState)
-    task.processAndGet()
-        .onSuccess { updateState(task.nextState, it) }
-        .onFailure { errorMessage(throwable = it) }
-}
+@ExcludeFromGeneratedTestReport
+@JvmInline
+value class UserMessageId(val rawId: Long)
