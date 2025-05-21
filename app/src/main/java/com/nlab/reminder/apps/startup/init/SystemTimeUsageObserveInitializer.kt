@@ -50,12 +50,7 @@ class SystemTimeUsageObserveInitializer : Initializer<Unit> {
                 .receiveAsFlow()
                 .throttleFirst(windowDuration = TOAST_DISPLAY_BASE_THROTTLE_WINDOW_MS)
                 .collect {
-                    userMessageBroadcast.send(
-                        userMessage = UserMessage(
-                            message = UiText(resId = StringIds.message_error_remote_time_loading_failed),
-                            priority = FeedbackPriority.LOW
-                        )
-                    )
+
                 }
         }
     }
