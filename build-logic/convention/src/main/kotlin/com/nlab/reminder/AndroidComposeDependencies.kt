@@ -29,8 +29,5 @@ fun Project.configureStdComposeDependencies() {
 
         "implementation"(libs.findLibrary("androidx-compose-foundation").get())
         "implementation"(libs.findLibrary("androidx-compose-material3").get())
-        "implementation"(libs.findLibrary("androidx-compose-ui").get())
-        "implementation"(libs.findLibrary("androidx-compose-ui-tooling-preview").get())
-        "debugImplementation"(libs.findLibrary("androidx-compose-ui-tooling").get())
     }
 }
