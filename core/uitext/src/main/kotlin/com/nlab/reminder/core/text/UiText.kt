@@ -52,9 +52,7 @@ sealed class UiText private constructor() {
             return result
         }
 
-        override fun toString(): String {
-            return super.toString()
-        }
+// Removed the redundant toString() override.
     }
 
     data class PluralsResId(
