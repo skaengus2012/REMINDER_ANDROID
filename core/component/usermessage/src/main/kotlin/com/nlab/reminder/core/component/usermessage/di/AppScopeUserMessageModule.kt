@@ -34,6 +34,10 @@ internal object AppScopeUserMessageModule {
     @Reusable
     @Provides
     fun provideUserMessageFactory(): UserMessageFactory = UserMessageFactory(
-        generateUserMessageId = { UserMessageId(rawId = UUID.randomUUID().mostSignificantBits) }
+        generateUserMessageId = {
+            // Using the method of creating a uuid in Compose example jetsnack
+            // see https://github.com/android/compose-samples/blob/73b3a51e06a6520efb5b4931e71b771d257bf1dd/Jetsnack/app/src/main/java/com/example/jetsnack/model/SnackbarManager.kt#L39
+            UserMessageId(rawId = UUID.randomUUID().mostSignificantBits)
+        }
     )
 }
