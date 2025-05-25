@@ -18,14 +18,19 @@ package com.nlab.reminder.core.text
 
 import androidx.annotation.PluralsRes
 import androidx.annotation.StringRes
+import androidx.compose.runtime.Immutable
 
 /**
  * @author Thalys
  */
+@Immutable
 sealed class UiText private constructor() {
-    data class Direct(val value: String) : UiText()
+    data class Direct(internal val value: String) : UiText()
 
-    data class ResId(@StringRes val resId: Int, val args: Array<Any>?) : UiText() {
+    data class ResId(
+        @StringRes internal val resId: Int,
+        internal val args: Array<Any>?
+    ) : UiText() {
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
             if (javaClass != other?.javaClass) return false
@@ -48,7 +53,11 @@ sealed class UiText private constructor() {
         }
     }
 
-    data class PluralsResId(@PluralsRes val resId: Int, val count: Int, val args: Array<Any>?) : UiText() {
+    data class PluralsResId(
+        @PluralsRes internal val resId: Int,
+        internal val count: Int,
+        internal val args: Array<Any>?
+    ) : UiText() {
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
             if (javaClass != other?.javaClass) return false
