@@ -22,6 +22,8 @@ import com.nlab.reminder.core.text.UiText
 /**
  * @author Thalys
  */
+// Since it is defined as an internal constructor, it is impossible to use data classes.
+// Declaration is possible, but it is impossible to use functions such as copy.
 @ExcludeFromGeneratedTestReport
 class UserMessageExceptionSource internal constructor(
     val id: UserMessageId,

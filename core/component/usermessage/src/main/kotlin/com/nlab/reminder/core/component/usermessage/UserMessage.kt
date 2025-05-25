@@ -22,6 +22,8 @@ import com.nlab.reminder.core.text.UiText
 /**
  * @author Doohyun
  */
+// Since it is defined as an internal constructor, it is impossible to use data classes.
+// Declaration is possible, but it is impossible to use functions such as copy.
 @ExcludeFromGeneratedTestReport
 class UserMessage internal constructor(
     val id: UserMessageId,
@@ -46,5 +48,9 @@ class UserMessage internal constructor(
         result = 31 * result + message.hashCode()
         result = 31 * result + priority.hashCode()
         return result
+    }
+
+    override fun toString(): String {
+        return "UserMessage(id=$id, message=$message, priority=$priority)"
     }
 }
