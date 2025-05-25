@@ -51,8 +51,6 @@ sealed class UiText private constructor() {
             result = 31 * result + (args?.contentHashCode() ?: 0)
             return result
         }
-
-// Removed the redundant toString() override.
     }
 
     data class PluralsResId(
