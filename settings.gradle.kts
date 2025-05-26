@@ -66,6 +66,7 @@ include(
     ":core:component:tag-test",
     ":core:component:usermessage",
     ":core:component:usermessage-eventbus",
+    ":core:component:usermessage-test",
     ":core:data",
     ":core:data-di",
     ":core:data-impl",
