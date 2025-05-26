@@ -89,7 +89,7 @@ dependencies {
     implementation(projects.core.annotation)
     implementation(projects.core.component.currenttime)
     implementation(projects.core.component.usermessage)
-    implementation(projects.core.component.usermessageHandle)
+    implementation(projects.core.component.usermessageEventbus)
     implementation(projects.core.dataDi)
     implementation(projects.core.designsystem)
     implementation(projects.core.inject)

@@ -21,13 +21,9 @@ import android.content.Context
 import androidx.startup.Initializer
 import com.nlab.reminder.apps.startup.EmptyDependencies
 import com.nlab.reminder.core.component.currenttime.SystemTimeUsageMonitor
-import com.nlab.reminder.core.component.usermessage.FeedbackPriority
-import com.nlab.reminder.core.component.usermessage.UserMessage
-import com.nlab.reminder.core.component.usermessage.handle.UserMessageBroadcast
+import com.nlab.reminder.core.component.usermessage.eventbus.UserMessageBroadcast
 import com.nlab.reminder.core.inject.qualifiers.coroutine.AppScope
 import com.nlab.reminder.core.kotlinx.coroutine.flow.throttleFirst
-import com.nlab.reminder.core.text.UiText
-import com.nlab.reminder.core.translation.StringIds
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors

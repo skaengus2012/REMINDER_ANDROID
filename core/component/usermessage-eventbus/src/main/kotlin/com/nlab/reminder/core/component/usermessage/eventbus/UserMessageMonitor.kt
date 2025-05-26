@@ -14,23 +14,14 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.apps.ui
+package com.nlab.reminder.core.component.usermessage.eventbus
 
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import com.nlab.reminder.core.component.usermessage.eventbus.ui.UserMessageHandler
+import com.nlab.reminder.core.component.usermessage.UserMessage
+import kotlinx.coroutines.channels.ReceiveChannel
 
 /**
  * @author Thalys
  */
-@Composable
-fun PlaneatApp(appState: PlaneatAppState) {
-    PlaneatNavHost(
-        modifier = Modifier.fillMaxSize(),
-        appState = appState
-    )
-    UserMessageHandler(
-        showApplicationToast = { message -> appState.showApplicationToast(message) }
-    )
+interface UserMessageMonitor {
+    val message: ReceiveChannel<UserMessage>
 }
