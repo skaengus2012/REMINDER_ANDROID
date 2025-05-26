@@ -43,6 +43,20 @@ fun UserMessageHandler(
 
 @Composable
 fun UserMessageHandler(
+    userMessages: List<UserMessage>,
+    onUserMessageShown: (UserMessageId) -> Unit,
+    showUserMessage: suspend CoroutineScope.(messageText: String, priority: FeedbackPriority) -> Unit,
+) {
+    val firstMessage = userMessages.firstOrNull() ?: return
+    UserMessageHandler(
+        userMessage = firstMessage,
+        onUserMessageShown = onUserMessageShown,
+        showUserMessage = showUserMessage
+    )
+}
+
+@Composable
+fun UserMessageHandler(
     userMessage: UserMessage?,
     onUserMessageShown: (UserMessageId) -> Unit,
     showUserMessage: suspend CoroutineScope.(messageText: String) -> Unit,
@@ -51,5 +65,19 @@ fun UserMessageHandler(
         userMessage = userMessage,
         onUserMessageShown = onUserMessageShown,
         showUserMessage = { messageText, _ -> showUserMessage(messageText) }
+    )
+}
+
+@Composable
+fun UserMessageHandler(
+    userMessages: List<UserMessage>,
+    onUserMessageShown: (UserMessageId) -> Unit,
+    showUserMessage: suspend CoroutineScope.(messageText: String) -> Unit,
+) {
+    val firstMessage = userMessages.firstOrNull() ?: return
+    UserMessageHandler(
+        userMessage = firstMessage,
+        onUserMessageShown = onUserMessageShown,
+        showUserMessage = showUserMessage
     )
 }

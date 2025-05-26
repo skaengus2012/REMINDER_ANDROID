@@ -18,7 +18,8 @@ package com.nlab.reminder.core.component.usermessage.eventbus
 
 import com.nlab.reminder.core.annotation.ExcludeFromGeneratedTestReport
 import com.nlab.reminder.core.component.usermessage.UserMessage
-import com.nlab.reminder.core.component.usermessage.eventbus.UserMessageHandleAction.*
+import com.nlab.reminder.core.component.usermessage.UserMessageId
+import com.nlab.reminder.core.component.usermessage.eventbus.UserMessageAggregateAction.*
 import com.nlab.reminder.core.kotlinx.coroutine.flow.map
 import com.nlab.reminder.core.statekit.store.androidx.lifecycle.StoreViewModel
 import com.nlab.reminder.core.statekit.store.androidx.lifecycle.createStore
@@ -32,42 +33,40 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.receiveAsFlow
 import javax.inject.Inject
 
-typealias UserMessageHandleReduce = Reduce<UserMessageHandleAction, UserMessageUiState>
+internal typealias UserMessageAggregateReduce = Reduce<UserMessageAggregateAction, UserMessageAggregateUiState>
 
 /**
  * @author Thalys
  */
-fun UserMessageHandleReduce(): UserMessageHandleReduce = DslReduce {
+internal fun UserMessageAggregateReduce(): UserMessageAggregateReduce = DslReduce {
     stateScope {
         transition<UserMessagePosted> {
-            current.copy(userMessages = current.userMessages + action.message)
+            UserMessageAggregateUiState(messages = current.messages + action.message)
         }
         transition<UserMessageShown> {
-            current.copy(userMessages = current.userMessages - action.message)
+            UserMessageAggregateUiState(messages = current.messages.filterNot { it.id == action.shownId })
         }
     }
 }
 
-sealed class UserMessageHandleAction {
-    data class UserMessagePosted(val message: UserMessage) : UserMessageHandleAction()
+sealed class UserMessageAggregateAction {
+    data class UserMessagePosted(val message: UserMessage) : UserMessageAggregateAction()
 
-    @UiAction
-    data class UserMessageShown(val message: UserMessage) : UserMessageHandleAction()
+    @UiAction(isPublic = true)
+    data class UserMessageShown(val shownId: UserMessageId) : UserMessageAggregateAction()
 }
 
-data class UserMessageUiState(
-    val userMessages: List<UserMessage>
-)
+data class UserMessageAggregateUiState(val messages: List<UserMessage>)
 
 @ExcludeFromGeneratedTestReport
-@UiActionMapping(UserMessageHandleAction::class)
+@UiActionMapping(UserMessageAggregateAction::class)
 @HiltViewModel
-class UserMessageHandleViewModel @Inject constructor(
+class UserMessageAggregateViewModel @Inject constructor(
     private val userMessageMonitor: UserMessageMonitor
-) : StoreViewModel<UserMessageHandleAction, UserMessageUiState>() {
+) : StoreViewModel<UserMessageAggregateAction, UserMessageAggregateUiState>() {
     override fun onCreateStore() = createStore(
-        initState = UserMessageUiState(userMessages = emptyList()),
-        reduce = UserMessageHandleReduce(),
+        initState = UserMessageAggregateUiState(messages = emptyList()),
+        reduce = UserMessageAggregateReduce(),
         bootstrap = userMessageMonitor.message
             .receiveAsFlow()
             .map(::UserMessagePosted)

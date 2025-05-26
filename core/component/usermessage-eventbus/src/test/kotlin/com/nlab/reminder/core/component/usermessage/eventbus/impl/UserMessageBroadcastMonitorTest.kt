@@ -16,10 +16,8 @@
 
 package com.nlab.reminder.core.component.usermessage.eventbus.impl
 
-import com.nlab.reminder.core.component.usermessage.FeedbackPriority
 import com.nlab.reminder.core.component.usermessage.UserMessage
-import com.nlab.reminder.core.text.genUiText
-import com.nlab.testkit.faker.shuffleAndGetFirst
+import com.nlab.reminder.core.component.usermessage.genUserMessage
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -36,10 +34,7 @@ class UserMessageBroadcastMonitorTest {
     @Test
     fun `Given user message, When send after subscribe, Then monitor send user message`() = runTest {
         // given
-        val userMessage = UserMessage(
-            message = genUiText(),
-            priority = FeedbackPriority.entries.shuffleAndGetFirst()
-        )
+        val userMessage = genUserMessage()
         val broadcastMonitor = UserMessageBroadcastMonitor()
 
         // when
@@ -59,12 +54,7 @@ class UserMessageBroadcastMonitorTest {
         val broadcastMonitor = UserMessageBroadcastMonitor()
 
         // when
-        broadcastMonitor.send(
-            UserMessage(
-                message = genUiText(),
-                priority = FeedbackPriority.entries.shuffleAndGetFirst()
-            )
-        )
+        broadcastMonitor.send(genUserMessage())
         var actualMessage: UserMessage? = null
         backgroundScope.launch(unconfinedTestDispatcher()) {
             actualMessage = broadcastMonitor.message.receive()

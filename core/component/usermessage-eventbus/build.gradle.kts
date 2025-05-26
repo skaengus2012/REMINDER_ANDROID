@@ -19,6 +19,6 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.navigation.compose)
 
-    testImplementation(projects.core.uitextTest)
+    testImplementation(projects.core.component.usermessageTest)
     testImplementation(projects.testkit)
 }
