@@ -16,11 +16,14 @@
 
 package com.nlab.reminder.core.component.tag.edit
 
+import com.nlab.reminder.core.annotation.ExcludeFromGeneratedTestReport
 import com.nlab.reminder.core.component.usermessage.UserMessageFactory
 import com.nlab.reminder.core.component.usermessage.errorMessage
 import com.nlab.reminder.core.kotlin.onFailure
 import com.nlab.reminder.core.kotlin.onSuccess
 import dagger.Reusable
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 /**
@@ -30,32 +33,16 @@ import javax.inject.Inject
 class TagEditTaskExecutor @Inject constructor(
     private val userMessageFactory: UserMessageFactory
 ) {
-    suspend fun execute(
-        task: TagEditTask,
-        current: TagEditState,
-        updateState: suspend (expectedState: TagEditState, newState: TagEditState) -> Unit
-    ) {
-        userMessageFactory.createExceptionSource()
-
-        updateState(current, task.nextState)
+    fun process(task: TagEditTask, current: TagEditState): Flow<TagEditStateTransition> = flow {
+        emit(TagEditStateTransition(current, task.nextState))
         task.processAndGet()
-            .onSuccess { updateState(task.nextState, it) }
-            .onFailure { throwable ->
-                errorMessage(
-                    exceptionSource = userMessageFactory.createExceptionSource(),
-                    throwable = throwable
-                )
-            }
+            .onSuccess { emit(TagEditStateTransition(task.nextState, it)) }
+            .onFailure { errorMessage(userMessageFactory.createExceptionSource(), it) }
     }
 }
 
-suspend fun executeTagEditTask(
-    task: TagEditTask,
-    current: TagEditState,
-    updateState: suspend (expectedState: TagEditState, newState: TagEditState) -> Unit
-) {
-    updateState(current, task.nextState)
-    task.processAndGet()
-        .onSuccess { updateState(task.nextState, it) }
-        .onFailure {  }
-}
+@ExcludeFromGeneratedTestReport
+data class TagEditStateTransition(
+    val previousState: TagEditState,
+    val updatedState: TagEditState
+)

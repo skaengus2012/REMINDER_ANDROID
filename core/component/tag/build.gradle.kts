@@ -15,6 +15,7 @@ dependencies {
     implementation(projects.core.dataDi)
     implementation(projects.core.translation)
 
+    testImplementation(projects.core.component.usermessageTest)
     testImplementation(projects.core.dataTest)
     testImplementation(projects.core.kotlinTest)
     testImplementation(projects.testkit)
