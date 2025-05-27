@@ -33,7 +33,7 @@ import javax.inject.Inject
 class TagEditTaskExecutor @Inject constructor(
     private val userMessageFactory: UserMessageFactory
 ) {
-    fun process(task: TagEditTask, current: TagEditState): Flow<TagEditStateTransition> = flow {
+    fun processAsFlow(task: TagEditTask, current: TagEditState): Flow<TagEditStateTransition> = flow {
         emit(TagEditStateTransition(current, task.nextState))
         task.processAndGet()
             .onSuccess { emit(TagEditStateTransition(task.nextState, it)) }

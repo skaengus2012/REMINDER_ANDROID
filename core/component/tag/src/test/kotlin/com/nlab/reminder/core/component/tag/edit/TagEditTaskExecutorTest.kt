@@ -46,7 +46,7 @@ class TagEditTaskExecutorTest {
         val tagEditTaskExecutor = genTagEditTaskExecutor()
 
         // when
-        tagEditTaskExecutor.process(task, initialState).test {
+        tagEditTaskExecutor.processAsFlow(task, initialState).test {
             // then
             assertThat(
                 awaitItem(), equalTo(
@@ -78,7 +78,7 @@ class TagEditTaskExecutorTest {
         )
 
         // when
-        tagEditTaskExecutor.process(task, genTagEditState()).test {
+        tagEditTaskExecutor.processAsFlow(task, genTagEditState()).test {
             // then
             skipItems(count = 1) // skip intermediateState
 
