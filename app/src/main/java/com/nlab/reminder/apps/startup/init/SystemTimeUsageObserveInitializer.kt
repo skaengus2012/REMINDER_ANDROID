@@ -21,14 +21,19 @@ import android.content.Context
 import androidx.startup.Initializer
 import com.nlab.reminder.apps.startup.EmptyDependencies
 import com.nlab.reminder.core.component.currenttime.SystemTimeUsageMonitor
+import com.nlab.reminder.core.component.usermessage.FeedbackPriority
+import com.nlab.reminder.core.component.usermessage.UserMessageFactory
 import com.nlab.reminder.core.component.usermessage.eventbus.UserMessageBroadcast
 import com.nlab.reminder.core.inject.qualifiers.coroutine.AppScope
 import com.nlab.reminder.core.kotlinx.coroutine.flow.throttleFirst
+import com.nlab.reminder.core.text.UiText
+import com.nlab.reminder.core.translation.StringIds
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
@@ -40,14 +45,19 @@ class SystemTimeUsageObserveInitializer : Initializer<Unit> {
         val entryPoint = EntryPointAccessors.fromApplication<SystemTimeUsageObserveInitEntryPoint>(context)
         val coroutineScope = entryPoint.appCoroutineScope()
         val systemTimeUsageMonitor = entryPoint.systemTimeUsageMonitor()
+        val userMessageFactory = entryPoint.userMessageFactory()
         val userMessageBroadcast = entryPoint.userMessageBroadcast()
         coroutineScope.launch {
             systemTimeUsageMonitor.event
                 .receiveAsFlow()
                 .throttleFirst(windowDuration = TOAST_DISPLAY_BASE_THROTTLE_WINDOW_MS)
-                .collect {
-
+                .map {
+                    userMessageFactory.createMessage(
+                        message = UiText(resId = StringIds.message_error_remote_time_loading_failed),
+                        priority = FeedbackPriority.LOW
+                    )
                 }
+                .collect(userMessageBroadcast::send)
         }
     }
 
@@ -66,4 +76,5 @@ interface SystemTimeUsageObserveInitEntryPoint {
     fun appCoroutineScope(): CoroutineScope
     fun systemTimeUsageMonitor(): SystemTimeUsageMonitor
     fun userMessageBroadcast(): UserMessageBroadcast
+    fun userMessageFactory(): UserMessageFactory
 }
