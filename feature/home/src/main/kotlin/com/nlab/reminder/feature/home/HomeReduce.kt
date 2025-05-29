@@ -18,6 +18,10 @@ package com.nlab.reminder.feature.home
 
 import com.nlab.reminder.core.component.tag.edit.TagEditState
 import com.nlab.reminder.core.component.tag.edit.TagEditStateTransition
+import com.nlab.reminder.core.component.tag.edit.processAsFlow
+import com.nlab.reminder.core.component.usermessage.UserMessageFactory
+import com.nlab.reminder.core.component.usermessage.getOrThrowMessage
+import com.nlab.reminder.core.kotlin.Result
 import com.nlab.reminder.core.kotlinx.coroutine.flow.map
 import com.nlab.statekit.dsl.reduce.DslReduce
 import com.nlab.statekit.reduce.Reduce
@@ -63,14 +67,10 @@ internal fun HomeReduce(environment: HomeEnvironment): HomeReduce = DslReduce {
             )
         }
         suspendEffect<OnTagRenameRequestClicked> {
-            environment.tagEditTaskExecutor
-                .processAsFlow(
-                    task = environment
-                        .tagEditStateMachine
-                        .startRename(current.tagEditState),
-                    current = current.tagEditState
-                )
-                .mapToAction()
+            environment.tagEditStateMachine
+                .startRename(current.tagEditState)
+                .processAsFlow()
+                .mapOrThrowCompareAndSetTagEditState(environment.userMessageFactory)
                 .collect(::dispatch)
         }
         transition<OnTagRenameInputReady> {
@@ -88,28 +88,17 @@ internal fun HomeReduce(environment: HomeEnvironment): HomeReduce = DslReduce {
             )
         }
         suspendEffect<OnTagRenameConfirmClicked> {
-            environment.tagEditTaskExecutor
-                .processAsFlow(
-                    task = environment
-                        .tagEditStateMachine
-                        .tryUpdateName(
-                            current = current.tagEditState,
-                            compareTags = current.tags
-                        ),
-                    current = current.tagEditState
-                )
-                .mapToAction()
+            environment.tagEditStateMachine
+                .tryUpdateName(current = current.tagEditState, compareTags = current.tags)
+                .processAsFlow()
+                .mapOrThrowCompareAndSetTagEditState(environment.userMessageFactory)
                 .collect(::dispatch)
         }
         suspendEffect<OnTagReplaceConfirmClicked> {
-            environment.tagEditTaskExecutor
-                .processAsFlow(
-                    task = environment
-                        .tagEditStateMachine
-                        .merge(current = current.tagEditState),
-                    current = current.tagEditState
-                )
-                .mapToAction()
+            environment.tagEditStateMachine
+                .merge(current = current.tagEditState)
+                .processAsFlow()
+                .mapOrThrowCompareAndSetTagEditState(environment.userMessageFactory)
                 .collect(::dispatch)
         }
         transition<OnTagReplaceCancelClicked> {
@@ -120,25 +109,17 @@ internal fun HomeReduce(environment: HomeEnvironment): HomeReduce = DslReduce {
             )
         }
         suspendEffect<OnTagDeleteRequestClicked> {
-            environment.tagEditTaskExecutor
-                .processAsFlow(
-                    task = environment
-                        .tagEditStateMachine
-                        .startDelete(current = current.tagEditState),
-                    current = current.tagEditState
-                )
-                .mapToAction()
+            environment.tagEditStateMachine
+                .startDelete(current = current.tagEditState)
+                .processAsFlow()
+                .mapOrThrowCompareAndSetTagEditState(environment.userMessageFactory)
                 .collect(::dispatch)
         }
         suspendEffect<OnTagDeleteConfirmClicked> {
-            environment.tagEditTaskExecutor
-                .processAsFlow(
-                    task = environment
-                        .tagEditStateMachine
-                        .delete(current = current.tagEditState),
-                    current = current.tagEditState,
-                )
-                .mapToAction()
+            environment.tagEditStateMachine
+                .delete(current = current.tagEditState)
+                .processAsFlow()
+                .mapOrThrowCompareAndSetTagEditState(environment.userMessageFactory)
                 .collect(::dispatch)
         }
         transition<OnTagEditCancelClicked> {
@@ -147,9 +128,12 @@ internal fun HomeReduce(environment: HomeEnvironment): HomeReduce = DslReduce {
     }
 }
 
-private fun Flow<TagEditStateTransition>.mapToAction(): Flow<CompareAndSetTagEditState> = map { transition ->
+private fun Flow<Result<TagEditStateTransition>>.mapOrThrowCompareAndSetTagEditState(
+    userMessageFactory: UserMessageFactory
+): Flow<CompareAndSetTagEditState> = map { transitionResult ->
+    val transition = transitionResult.getOrThrowMessage { userMessageFactory.createExceptionSource() }
     CompareAndSetTagEditState(
-        expectedState = transition.previousState,
-        newState = transition.updatedState
+        expectedState = transition.previous,
+        newState = transition.updated
     )
 }

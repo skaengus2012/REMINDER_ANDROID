@@ -20,10 +20,14 @@ import com.nlab.reminder.core.component.tag.edit.TagEditState
 import com.nlab.reminder.core.component.tag.edit.TagEditStateMachine
 import com.nlab.reminder.core.component.tag.edit.TagEditStateTransition
 import com.nlab.reminder.core.component.tag.edit.TagEditTask
-import com.nlab.reminder.core.component.tag.edit.TagEditTaskExecutor
 import com.nlab.reminder.core.component.tag.edit.genTagEditStateExcludeTypeOf
 import com.nlab.reminder.core.component.tag.edit.genTagEditStateTypeOf
+import com.nlab.reminder.core.component.tag.edit.processAsFlow
+import com.nlab.reminder.core.component.usermessage.UserMessageException
+import com.nlab.reminder.core.component.usermessage.UserMessageFactory
+import com.nlab.reminder.core.component.usermessage.genUserMessageExceptionSource
 import com.nlab.reminder.core.data.model.genTag
+import com.nlab.reminder.core.kotlin.Result
 import com.nlab.statekit.test.reduce.effectScenario
 import com.nlab.statekit.test.reduce.expectedStateToInit
 import com.nlab.statekit.test.reduce.launchAndJoin
@@ -31,9 +35,15 @@ import com.nlab.statekit.test.reduce.transitionScenario
 import com.nlab.testkit.faker.genBothify
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.mockkStatic
+import io.mockk.unmockkStatic
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.plus
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.equalTo
+import org.hamcrest.CoreMatchers.sameInstance
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
 
@@ -113,7 +123,7 @@ class HomeReduceKtTest {
     @Test
     fun `Given success, When tag long clicked, Then update by stateMachine result`() = runTest {
         val tag = genTag()
-        assertTagEditStateTransformedByStateMachine(
+        assertTagEditStateTransform(
             action = HomeAction.OnTagLongClicked(tag),
             buildStateMachine = {
                 mockk { every { startEditing(current.tagEditState, tag) } returns nextTagEditState }
@@ -123,9 +133,9 @@ class HomeReduceKtTest {
 
     @Test
     fun `Given success, When rename requested, Then dispatch CAS actions`() = runTest {
-        assertCompareAndSetTagEditTransitionDispatched(
-            inputAction = HomeAction.OnTagRenameRequestClicked,
-            buildStateMachine = {
+        assertTagEditTaskProcess(
+            action = HomeAction.OnTagRenameRequestClicked,
+            buildTagEditStateMachine = {
                 mockk { every { startRename(current.tagEditState) } returns tagEditTaskStub }
             }
         )
@@ -133,7 +143,7 @@ class HomeReduceKtTest {
 
     @Test
     fun `Given success, When rename input ready, Then update by stateMachine result`() = runTest {
-        assertTagEditStateTransformedByStateMachine(
+        assertTagEditStateTransform(
             action = HomeAction.OnTagRenameInputReady,
             buildStateMachine = {
                 mockk { every { readyRenameInput(current.tagEditState) } returns nextTagEditState }
@@ -144,7 +154,7 @@ class HomeReduceKtTest {
     @Test
     fun `Given success, When rename inputted, Then update by stateMachine result`() = runTest {
         val input = genBothify()
-        assertTagEditStateTransformedByStateMachine(
+        assertTagEditStateTransform(
             action = HomeAction.OnTagRenameInputted(input),
             buildStateMachine = {
                 mockk { every { changeRenameText(current.tagEditState, input) } returns nextTagEditState }
@@ -154,9 +164,9 @@ class HomeReduceKtTest {
 
     @Test
     fun `Given success, When rename confirmed, Then dispatch CAS actions`() = runTest {
-        assertCompareAndSetTagEditTransitionDispatched(
-            inputAction = HomeAction.OnTagRenameConfirmClicked,
-            buildStateMachine = {
+        assertTagEditTaskProcess(
+            action = HomeAction.OnTagRenameConfirmClicked,
+            buildTagEditStateMachine = {
                 mockk { every { tryUpdateName(current.tagEditState, current.tags) } returns tagEditTaskStub }
             }
         )
@@ -164,9 +174,9 @@ class HomeReduceKtTest {
 
     @Test
     fun `Given success, When replace confirmed, Then dispatch CAS actions`() = runTest {
-        assertCompareAndSetTagEditTransitionDispatched(
-            inputAction = HomeAction.OnTagReplaceConfirmClicked,
-            buildStateMachine = {
+        assertTagEditTaskProcess(
+            action = HomeAction.OnTagReplaceConfirmClicked,
+            buildTagEditStateMachine = {
                 mockk { every { merge(current.tagEditState) } returns tagEditTaskStub }
             }
         )
@@ -174,7 +184,7 @@ class HomeReduceKtTest {
 
     @Test
     fun `Given success, When replace canceled, Then update by stateMachine result`() = runTest {
-        assertTagEditStateTransformedByStateMachine(
+        assertTagEditStateTransform(
             action = HomeAction.OnTagReplaceCancelClicked,
             buildStateMachine = {
                 mockk { every { cancelMerge(current.tagEditState) } returns nextTagEditState }
@@ -184,9 +194,9 @@ class HomeReduceKtTest {
 
     @Test
     fun `Given success state, When delete requested, Then dispatch CAS actions`() = runTest {
-        assertCompareAndSetTagEditTransitionDispatched(
-            inputAction = HomeAction.OnTagDeleteRequestClicked,
-            buildStateMachine = {
+        assertTagEditTaskProcess(
+            action = HomeAction.OnTagDeleteRequestClicked,
+            buildTagEditStateMachine = {
                 mockk { every { startDelete(current.tagEditState) } returns tagEditTaskStub }
             }
         )
@@ -196,9 +206,9 @@ class HomeReduceKtTest {
 
     @Test
     fun `Given success, When delete confirmed, Then dispatch CAS actions`() = runTest {
-        assertCompareAndSetTagEditTransitionDispatched(
-            inputAction = HomeAction.OnTagDeleteConfirmClicked,
-            buildStateMachine = {
+        assertTagEditTaskProcess(
+            action = HomeAction.OnTagDeleteConfirmClicked,
+            buildTagEditStateMachine = {
                 mockk { every { delete(current.tagEditState) } returns tagEditTaskStub }
             }
         )
@@ -226,7 +236,7 @@ private data class TagEditTransformAssertParam(
     val nextTagEditState: TagEditState
 )
 
-private suspend fun assertTagEditStateTransformedByStateMachine(
+private suspend fun assertTagEditStateTransform(
     action: HomeAction,
     buildStateMachine: TagEditTransformAssertParam.() -> TagEditStateMachine
 ) {
@@ -247,44 +257,98 @@ private suspend fun assertTagEditStateTransformedByStateMachine(
         .verify()
 }
 
-private data class TagEditTaskExecutionAssertParam(
+private data class TagEditTaskProcessAssertParam(
     val current: HomeUiState.Success,
     val tagEditTaskStub: TagEditTask
 )
 
-private suspend fun assertCompareAndSetTagEditTransitionDispatched(
-    inputAction: HomeAction,
-    buildStateMachine: TagEditTaskExecutionAssertParam.() -> TagEditStateMachine
+private suspend fun TestScope.assertTagEditTaskProcess(
+    action: HomeAction,
+    buildTagEditStateMachine: TagEditTaskProcessAssertParam.() -> TagEditStateMachine
 ) {
-    val initialTagEditState = genTagEditStateTypeOf<TagEditState.None>()
+    assertTagEditTaskProcessSuccess(action, buildTagEditStateMachine)
+    assertTagEditTaskProcessFailure(action, buildTagEditStateMachine)
+}
+
+private suspend fun assertTagEditTaskProcessSuccess(
+    action: HomeAction,
+    buildTagEditStateMachine: TagEditTaskProcessAssertParam.() -> TagEditStateMachine
+) {
+    // before
+    mockkStatic(TagEditTask::processAsFlow)
+
+    // test
+    val initState = genHomeUiStateSuccess()
+    val currentTagEditState = genTagEditStateTypeOf<TagEditState.None>()
     val nextTagEditState = genTagEditStateExcludeTypeOf<TagEditState.None>()
-    val initState = genHomeUiStateSuccess(tagEditState = initialTagEditState)
-    val tagEditTaskStub: TagEditTask = mockk()
-    val tagEditStateMachine = buildStateMachine(
-        TagEditTaskExecutionAssertParam(initState, tagEditTaskStub)
-    )
-    val tagEditTaskExecutor: TagEditTaskExecutor = mockk {
-        every { processAsFlow(tagEditTaskStub, initialTagEditState) } returns flowOf(
-            TagEditStateTransition(initialTagEditState, nextTagEditState)
+    val tagEditTaskStub: TagEditTask = mockk {
+        every { processAsFlow() } returns flowOf(
+            Result.Success(TagEditStateTransition(currentTagEditState, nextTagEditState))
         )
     }
-    val actualDispatchedActions = mutableListOf<HomeAction>()
-    val environment = genHomeEnvironment(
-        tagEditStateMachine = tagEditStateMachine,
-        tagEditTaskExecutor = tagEditTaskExecutor
+    val tagEditStateMachine = buildTagEditStateMachine(
+        TagEditTaskProcessAssertParam(initState, tagEditTaskStub)
     )
-    genHomeReduce(environment = environment)
+    val actualDispatchedActions = mutableListOf<HomeAction>()
+    genHomeReduce(environment = genHomeEnvironment(tagEditStateMachine = tagEditStateMachine))
         .effectScenario()
         .initState(initState)
-        .action(inputAction)
-        .hook { actualDispatchedActions += action }
+        .action(action)
+        .hook { actualDispatchedActions += this.action }
         .launchAndJoin()
     assertThat(
         actualDispatchedActions, equalTo(
             listOf(
-                inputAction,
-                HomeAction.CompareAndSetTagEditState(initialTagEditState, nextTagEditState)
+                action,
+                HomeAction.CompareAndSetTagEditState(currentTagEditState, nextTagEditState)
             )
         )
     )
+
+    // after
+    unmockkStatic(TagEditTask::processAsFlow)
+}
+
+private suspend fun TestScope.assertTagEditTaskProcessFailure(
+    action: HomeAction,
+    buildTagEditStateMachine: TagEditTaskProcessAssertParam.() -> TagEditStateMachine
+) {
+    // before
+    mockkStatic(TagEditTask::processAsFlow)
+
+    // test
+    val initState = genHomeUiStateSuccess()
+    val expectedThrowable = Throwable()
+    val userMessageExceptionSourceStub = genUserMessageExceptionSource()
+    val expectedUserMessageException = UserMessageException(
+        origin = expectedThrowable,
+        source = userMessageExceptionSourceStub
+    )
+    val tagEditTaskStub: TagEditTask = mockk {
+        every { processAsFlow() } returns flowOf(Result.Failure(expectedThrowable))
+    }
+    val tagEditStateMachine = buildTagEditStateMachine(
+        TagEditTaskProcessAssertParam(initState, tagEditTaskStub)
+    )
+    val userMessageFactory: UserMessageFactory = mockk {
+        every { createExceptionSource() } returns userMessageExceptionSourceStub
+    }
+    val environment = genHomeEnvironment(
+        tagEditStateMachine = tagEditStateMachine,
+        userMessageFactory = userMessageFactory
+    )
+    lateinit var actualThrowable: UserMessageException
+    genHomeReduce(environment = environment)
+        .effectScenario()
+        .initState(initState)
+        .action(action)
+        .launchIn(coroutineScope = this + CoroutineExceptionHandler { _, t ->
+            actualThrowable = t as UserMessageException
+        })
+        .join()
+    assertThat(actualThrowable.origin, sameInstance(expectedUserMessageException.origin))
+    assertThat(actualThrowable.userMessage, equalTo(expectedUserMessageException.userMessage))
+
+    // after
+    unmockkStatic(TagEditTask::processAsFlow)
 }

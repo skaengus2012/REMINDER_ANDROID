@@ -18,8 +18,8 @@ package com.nlab.reminder.feature.home
 
 import com.nlab.reminder.core.component.tag.edit.TagEditState
 import com.nlab.reminder.core.component.tag.edit.TagEditStateMachine
-import com.nlab.reminder.core.component.tag.edit.TagEditTaskExecutor
 import com.nlab.reminder.core.component.tag.edit.genTagEditState
+import com.nlab.reminder.core.component.usermessage.UserMessageFactory
 import com.nlab.reminder.core.data.model.Tag
 import com.nlab.reminder.core.data.model.genTags
 import com.nlab.reminder.core.data.repository.ScheduleRepository
@@ -35,12 +35,12 @@ internal fun genHomeEnvironment(
     scheduleRepository: ScheduleRepository = mockk(),
     tagRepository: TagRepository = mockk(),
     tagEditStateMachine: TagEditStateMachine = mockk(),
-    tagEditTaskExecutor: TagEditTaskExecutor = mockk(),
+    userMessageFactory: UserMessageFactory = mockk()
 ) = HomeEnvironment(
     scheduleRepository = scheduleRepository,
     tagRepository = tagRepository,
     tagEditStateMachine = tagEditStateMachine,
-    tagEditTaskExecutor = tagEditTaskExecutor
+    userMessageFactory = userMessageFactory
 )
 
 internal fun genHomeActionStateSynced(

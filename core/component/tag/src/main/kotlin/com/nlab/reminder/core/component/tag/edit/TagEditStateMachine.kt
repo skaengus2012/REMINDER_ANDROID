@@ -75,7 +75,8 @@ class TagEditStateMachine @Inject constructor(private val tagRepository: TagRepo
         }
 
         return TagEditTask(
-            nextState = TagEditState.Processing(current),
+            current = current,
+            next = TagEditState.Processing(current),
             processAndGet = {
                 tagRepository
                     .save(SaveTagQuery.Modify(id = current.tag.id, name = newName, shouldMergeIfExists = false))
