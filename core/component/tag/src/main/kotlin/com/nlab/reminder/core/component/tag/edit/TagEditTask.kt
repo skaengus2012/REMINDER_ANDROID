@@ -17,7 +17,9 @@
 package com.nlab.reminder.core.component.tag.edit
 
 import com.nlab.reminder.core.annotation.ExcludeFromGeneratedTestReport
-import com.nlab.reminder.core.kotlin.Result
+import com.nlab.reminder.core.kotlin.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlin.reflect.KClass
 import kotlin.reflect.safeCast
 
@@ -26,23 +28,38 @@ import kotlin.reflect.safeCast
  */
 @ExcludeFromGeneratedTestReport
 class TagEditTask(
-    val nextState: TagEditState,
+    val current: TagEditState,
+    val next: TagEditState,
     val processAndGet: suspend () -> Result<TagEditState>
 )
 
-internal fun TagEditTask(nextState: TagEditState): TagEditTask {
-    val ret = Result.Success(nextState)
+@ExcludeFromGeneratedTestReport
+data class TagEditStateTransition(
+    val previous: TagEditState,
+    val updated: TagEditState
+)
+
+internal fun TagEditTask(current: TagEditState): TagEditTask {
+    val ret = Result.Success(current)
     val processAndGet = {
         // prevent Missing in the Jacoco report by SUSPEND FUNCTION
         ret
     }
-    return TagEditTask(nextState = nextState, processAndGet = processAndGet)
+    return TagEditTask(
+        current = current,
+        next = current,
+        processAndGet = processAndGet
+    )
 }
 
 internal inline fun <reified T> TagEditTask(
     current: TagEditState,
     noinline processAndGet: suspend (T) -> Result<TagEditState>
-): TagEditTask where T : TagEditState, T : Processable = TagEditTask(T::class, current, processAndGet)
+): TagEditTask where T : TagEditState, T : Processable = TagEditTask(
+    targetClazz = T::class,
+    current = current,
+    processAndGet = processAndGet
+)
 
 private fun <T> TagEditTask(
     targetClazz: KClass<T>,
@@ -52,8 +69,36 @@ private fun <T> TagEditTask(
     val currentAsTarget = targetClazz.safeCast(current)
     return if (currentAsTarget == null) TagEditTask(current) else {
         TagEditTask(
-            nextState = TagEditState.Processing(currentAsTarget),
+            current = current,
+            next = TagEditState.Processing(currentAsTarget),
             processAndGet = { processAndGet(currentAsTarget) }
         )
     }
+}
+
+/**
+ * Processes a [TagEditTask] as a flow of [Result] containing [TagEditStateTransition].
+ *
+ * This function emits state transitions as they occur:
+ * - If the current and next states differ, emits a [Result.Success] containing the transition from `current` to `next`.
+ * - Then performs the processing via [TagEditTask.processAndGet], and:
+ *    - If the resulting state is different from `next`, emits another [Result.Success] with the transition.
+ *    - If an error occurs during processing, emits a [Result.Failure] containing the exception.
+ *
+ * @return A cold flow that emits one or two [Result] depending on the state transitions and any errors.
+ */
+fun TagEditTask.processAsFlow(): Flow<Result<TagEditStateTransition>> = flow {
+    if (current != next) {
+        emit(Result.Success(TagEditStateTransition(current, next)))
+    }
+    processAndGet()
+        .onSuccess { updated ->
+            if (updated != next) {
+                emit(Result.Success(TagEditStateTransition(next, updated)))
+            }
+        }
+        .onFailure { t ->
+            val errorResult = Result.Failure<TagEditStateTransition>(t)
+            emit(errorResult)
+        }
 }

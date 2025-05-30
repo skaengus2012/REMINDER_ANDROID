@@ -23,6 +23,7 @@
     <string name="common_tag_empty">스케줄에 지정된 태그가 없습니다.</string>
     <string name="open_link_default_error">실행할 수 없는 링크입니다.</string>
     <string name="unknown_error">알 수 없는 오류가 발생했습니다.</string>
+    <string name="message_error_remote_time_loading_failed">현재 화면은 기기 시간 기준으로 표시됩니다.</string>
 
     <!-- schedule -->
     <string name="schedule_complete_checkbox_contentDescription" formatted="true">%1$s를 완료합니다.</string>

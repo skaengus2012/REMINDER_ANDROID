@@ -19,25 +19,28 @@ package com.nlab.reminder.feature.home
 import com.nlab.reminder.core.component.tag.edit.TagEditState
 import com.nlab.reminder.core.component.tag.edit.TagEditStateMachine
 import com.nlab.reminder.core.component.tag.edit.genTagEditState
+import com.nlab.reminder.core.component.usermessage.UserMessageFactory
 import com.nlab.reminder.core.data.model.Tag
 import com.nlab.reminder.core.data.model.genTags
 import com.nlab.reminder.core.data.repository.ScheduleRepository
 import com.nlab.reminder.core.data.repository.TagRepository
 import com.nlab.reminder.core.kotlin.NonNegativeLong
 import com.nlab.reminder.core.kotlin.faker.genNonNegativeLong
-import org.mockito.kotlin.mock
+import io.mockk.mockk
 
 /**
  * @author Doohyun
  */
 internal fun genHomeEnvironment(
-    tagEditStateMachine: TagEditStateMachine = mock(),
-    scheduleRepository: ScheduleRepository = mock(),
-    tagRepository: TagRepository = mock()
+    scheduleRepository: ScheduleRepository = mockk(),
+    tagRepository: TagRepository = mockk(),
+    tagEditStateMachine: TagEditStateMachine = mockk(),
+    userMessageFactory: UserMessageFactory = mockk()
 ) = HomeEnvironment(
-    tagEditStateMachine = tagEditStateMachine,
     scheduleRepository = scheduleRepository,
-    tagRepository = tagRepository
+    tagRepository = tagRepository,
+    tagEditStateMachine = tagEditStateMachine,
+    userMessageFactory = userMessageFactory
 )
 
 internal fun genHomeActionStateSynced(

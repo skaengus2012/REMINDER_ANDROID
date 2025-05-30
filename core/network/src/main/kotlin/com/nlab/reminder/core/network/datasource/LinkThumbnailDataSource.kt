@@ -16,8 +16,6 @@
 
 package com.nlab.reminder.core.network.datasource
 
-import com.nlab.reminder.core.inject.qualifiers.coroutine.Dispatcher
-import com.nlab.reminder.core.inject.qualifiers.coroutine.DispatcherOption.IO
 import com.nlab.reminder.core.kotlin.NonBlankString
 import com.nlab.reminder.core.kotlin.Result
 import com.nlab.reminder.core.kotlin.catching
@@ -25,7 +23,6 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
-import javax.inject.Inject
 
 /**
  * @author Doohyun
@@ -39,13 +36,11 @@ private fun Element.toContent(): String = attr("content")
 
 data class LinkThumbnailResponse(val title: String?, val image: String?)
 
-interface LinkThumbnailDataSource {
+fun interface LinkThumbnailDataSource {
     suspend fun getLinkThumbnail(url: NonBlankString): Result<LinkThumbnailResponse>
 }
 
-internal class LinkThumbnailDataSourceImpl @Inject constructor(
-    @Dispatcher(IO) private val dispatcher: CoroutineDispatcher
-) : LinkThumbnailDataSource {
+internal class LinkThumbnailDataSourceImpl(private val dispatcher: CoroutineDispatcher) : LinkThumbnailDataSource {
     override suspend fun getLinkThumbnail(url: NonBlankString): Result<LinkThumbnailResponse> = catching {
         withContext(dispatcher) {
             val metaTagToValues = Jsoup.connect(url.value).execute()

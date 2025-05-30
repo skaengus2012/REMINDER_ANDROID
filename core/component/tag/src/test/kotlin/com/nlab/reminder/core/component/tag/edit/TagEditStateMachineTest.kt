@@ -57,7 +57,7 @@ class TagEditStateMachineTest {
             }
         )
         val actualTask = tagEditStateMachine.startRename(current)
-        assertThat(actualTask.nextState, equalTo(TagEditState.Processing(current)))
+        assertThat(actualTask.next, equalTo(TagEditState.Processing(current)))
         assertThat(actualTask.processAndGet(), equalTo(Result.Success(expectedAfterProcessState)))
     }
 
@@ -100,7 +100,7 @@ class TagEditStateMachineTest {
         val current = genTagEditStateExcludeTypeOf<TagEditState.Rename>()
         val tagEditStateMachine = genTagEditStateMachine()
         val actualTask = tagEditStateMachine.tryUpdateName(current, genTags())
-        assertThat(actualTask.nextState, equalTo(current))
+        assertThat(actualTask.next, equalTo(current))
         assertThat(actualTask.processAndGet(), equalTo(Result.Success(current)))
     }
 
@@ -109,7 +109,7 @@ class TagEditStateMachineTest {
         val current = genRenameState(renameText = genBlank())
         val tagEditStateMachine = genTagEditStateMachine()
         val actualTask = tagEditStateMachine.tryUpdateName(current, genTags())
-        assertThat(actualTask.nextState, equalTo(TagEditState.None))
+        assertThat(actualTask.next, equalTo(TagEditState.None))
         assertThat(actualTask.processAndGet(), equalTo(Result.Success(TagEditState.None)))
     }
 
@@ -123,7 +123,7 @@ class TagEditStateMachineTest {
         val compareTags = setOf(tag)
         val tagEditStateMachine = genTagEditStateMachine()
         val actualTask = tagEditStateMachine.tryUpdateName(current, compareTags)
-        assertThat(actualTask.nextState, equalTo(TagEditState.None))
+        assertThat(actualTask.next, equalTo(TagEditState.None))
         assertThat(actualTask.processAndGet(), equalTo(Result.Success(TagEditState.None)))
     }
 
@@ -147,7 +147,7 @@ class TagEditStateMachineTest {
 
         val tagEditStateMachine = genTagEditStateMachine()
         val actualTask = tagEditStateMachine.tryUpdateName(current, compareTags)
-        assertThat(actualTask.nextState, equalTo(expectedState))
+        assertThat(actualTask.next, equalTo(expectedState))
         assertThat(actualTask.processAndGet(), equalTo(Result.Success(expectedState)))
     }
 
@@ -169,7 +169,7 @@ class TagEditStateMachineTest {
         )
         val actualTask = tagEditStateMachine.tryUpdateName(current, compareTags = emptySet())
         assertThat(
-            actualTask.nextState,
+            actualTask.next,
             equalTo(TagEditState.Processing(current))
         )
         assertThat(
@@ -196,7 +196,7 @@ class TagEditStateMachineTest {
         )
         val actualTask = tagEditStateMachine.merge(current)
         assertThat(
-            actualTask.nextState,
+            actualTask.next,
             equalTo(TagEditState.Processing(current))
         )
         assertThat(
@@ -239,7 +239,7 @@ class TagEditStateMachineTest {
             }
         )
         val actualTask = tagEditStateMachine.startDelete(current)
-        assertThat(actualTask.nextState, equalTo(TagEditState.Processing(current)))
+        assertThat(actualTask.next, equalTo(TagEditState.Processing(current)))
         assertThat(actualTask.processAndGet(), equalTo(Result.Success(expectedAfterProcessState)))
     }
 
@@ -252,7 +252,7 @@ class TagEditStateMachineTest {
             }
         )
         val actualTask = tagEditStateMachine.delete(current)
-        assertThat(actualTask.nextState, equalTo(TagEditState.Processing(current)))
+        assertThat(actualTask.next, equalTo(TagEditState.Processing(current)))
         assertThat(actualTask.processAndGet(), equalTo(Result.Success(TagEditState.None)))
     }
 }

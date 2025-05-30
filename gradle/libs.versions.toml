@@ -10,13 +10,13 @@ androidGradlePlugin = "8.10.0"
 androidxAnnotation = "1.9.1"
 androidxAppCompat = "1.7.0"
 androidxCardview = "1.0.0"
-androidxComposeBom = "2025.05.00"
+androidxComposeBom = "2025.05.01"
 androidxComposeCompiler = "1.5.15"  # use in configureComposeAndroid AndroidCompose.kt
 androidxConstaintLayout = "2.2.1"
 androidxCoreKtx = "1.16.0"
 androidxCoreSplashScreen = "1.0.1"
-androidxDataStore = "1.1.6"
-androidxFragment = "1.8.6"
+androidxDataStore = "1.1.7"
+androidxFragment = "1.8.7"
 androidxHiltNavigationCompose = "1.2.0"
 androidxLifecycle = "2.9.0"
 androidxNavigation = "2.9.0"
@@ -34,21 +34,22 @@ facebookFlipper = "0.273.0"
 facebookSoloader = "0.12.1"
 googleHilt = "2.56.2"
 googleMaterial = "1.12.0"
+googlePlayServicesTime = "16.0.1"
 jacoco = "0.8.12" # use in configureJacocoToolVersion -> Jacoco.kt
 javafaker = "1.0.2"
 jsoup = "1.20.1"
 junit = "4.13.2"
-kotlin = "2.1.20"
+kotlin = "2.1.21"
 kotlinxDatetime = "0.6.2"
 kotlinxSerializationJson = "1.8.1"
-ksp = "2.1.20-2.0.1"
+ksp = "2.1.21-2.0.1"
 kotlinxCollectionsImmutable = "0.3.7"
 kotlinxCoroutine = "1.10.2"
 mockitoInline = "5.2.0"
 mockitoKotlin = "5.4.0"
 mockk = "1.14.2"
 squareLeakcanary = "2.14"
-squareKotlinpoet = "2.1.0"
+squareKotlinpoet = "2.2.0"
 timber = "5.0.1"
 turbine = "1.2.0"
 
@@ -93,6 +94,7 @@ facebook-soloader = { module = "com.facebook.soloader:soloader", version.ref = "
 google-hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "googleHilt" }       # use in nlab.android.hilt.gradle.kts
 google-hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "googleHilt" }     # use in nlab.android.hilt.gradle.kts
 google-material = { group = "com.google.android.material", name = "material", version.ref = "googleMaterial" }
+google-play-services-time = { module = "com.google.android.gms:play-services-time", version.ref = "googlePlayServicesTime" }
 javafaker = { module = "com.github.javafaker:javafaker", version.ref = "javafaker" }
 jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
 junit = { module = "junit:junit", version.ref = "junit" }
@@ -135,9 +137,10 @@ nlab-android-library = { id = "nlab.android.library" }
 nlab-android-library-component-compose = { id = "nlab.android.library.component.compose" }
 nlab-android-library-component-view = { id = "nlab.android.library.component.view" }
 nlab-android-library-compose = { id = "nlab.android.library.compose" }
-nlab-android-library-di = { id = "nlab.android.library.di" }
-nlab-android-library-feature-compose = { id = "nlab.android.library.feature.compose" }
+nlab-android-library-compose-component = { id = "nlab.android.library.compose.component" }
+nlab-android-library-compose-feature = { id = "nlab.android.library.compose.feature" }
 nlab-android-library-feature-view = { id = "nlab.android.library.feature.view" }
+nlab-android-library-di = { id = "nlab.android.library.di" }
 nlab-android-library-jacoco = { id = "nlab.android.library.jacoco" }
 nlab-android-library-statekit = { id = "nlab.android.library.statekit" }
 nlab-jvm-library = { id = "nlab.jvm.library" }

@@ -38,6 +38,7 @@ internal fun Project.configureStdFeatureDependencies() {
         "implementation"(libs.findLibrary("timber").get())
 
         "testImplementation"(project(":testkit"))
+        "testImplementation"(project(":core:component:usermessage-test"))
         "testImplementation"(project(":core:kotlin-test"))
     }
 }

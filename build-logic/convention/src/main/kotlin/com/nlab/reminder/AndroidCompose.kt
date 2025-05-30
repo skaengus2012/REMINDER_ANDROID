@@ -43,6 +43,9 @@ internal fun Project.configureComposeAndroid(commonExtension: CommonExtension<*,
         "androidTestImplementation"(platform(bom))
 
         "implementation"(libs.findLibrary("androidx-compose-runtime").get())
+        "implementation"(libs.findLibrary("androidx-compose-ui").get())
+        "implementation"(libs.findLibrary("androidx-compose-ui-tooling-preview").get())
+        "debugImplementation"(libs.findLibrary("androidx-compose-ui-tooling").get())
     }
 
     extensions.configure<ComposeCompilerGradlePluginExtension> {

@@ -22,8 +22,35 @@ import com.nlab.reminder.core.text.UiText
 /**
  * @author Doohyun
  */
+// Since it is defined as an internal constructor, it is impossible to use data classes.
+// Declaration is possible, but it is impossible to use functions such as copy.
 @ExcludeFromGeneratedTestReport
-data class UserMessage(
+class UserMessage internal constructor(
+    val id: UserMessageId,
     val message: UiText,
     val priority: FeedbackPriority
-)
+) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as UserMessage
+
+        if (id != other.id) return false
+        if (message != other.message) return false
+        if (priority != other.priority) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = id.hashCode()
+        result = 31 * result + message.hashCode()
+        result = 31 * result + priority.hashCode()
+        return result
+    }
+
+    override fun toString(): String {
+        return "UserMessage(id=$id, message=$message, priority=$priority)"
+    }
+}
