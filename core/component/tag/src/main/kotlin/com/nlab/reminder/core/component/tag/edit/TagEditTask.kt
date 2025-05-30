@@ -76,6 +76,17 @@ private fun <T> TagEditTask(
     }
 }
 
+/**
+ * Processes a [TagEditTask] as a flow of [Result] containing [TagEditStateTransition].
+ *
+ * This function emits state transitions as they occur:
+ * - If the current and next states differ, emits a [Result.Success] containing the transition from `current` to `next`.
+ * - Then performs the processing via [TagEditTask.processAndGet], and:
+ *    - If the resulting state is different from `next`, emits another [Result.Success] with the transition.
+ *    - If an error occurs during processing, emits a [Result.Failure] containing the exception.
+ *
+ * @return A cold flow that emits one or two [Result] depending on the state transitions and any errors.
+ */
 fun TagEditTask.processAsFlow(): Flow<Result<TagEditStateTransition>> = flow {
     if (current != next) {
         emit(Result.Success(TagEditStateTransition(current, next)))
