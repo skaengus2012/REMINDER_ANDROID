@@ -14,9 +14,21 @@
  * limitations under the License.
  */
 
-import com.nlab.reminder.configureStdComposeDependencies
+import com.android.build.gradle.LibraryExtension
+import com.nlab.reminder.configureViewBinding
+import com.nlab.reminder.libs
+import org.gradle.kotlin.dsl.apply
 
 apply(plugin = "com.android.library")
-apply(plugin = "nlab.android.library.compose")
 
-configureStdComposeDependencies()
+extensions.configure<LibraryExtension> {
+    configureViewBinding(this)
+}
+
+dependencies {
+    "implementation"(project(":core:android"))
+    "implementation"(project(":core:designsystem"))
+
+    "implementation"(libs.findLibrary("androidx-appcompat").get())
+    "implementation"(libs.findLibrary("androidx-core-ktx").get())
+}

@@ -1,7 +1,7 @@
 plugins {
     alias(libs.plugins.nlab.android.library)
     alias(libs.plugins.nlab.android.library.compose.feature)
-    alias(libs.plugins.nlab.android.library.feature.view)
+    alias(libs.plugins.nlab.android.library.view.feature)
 }
 
 android {

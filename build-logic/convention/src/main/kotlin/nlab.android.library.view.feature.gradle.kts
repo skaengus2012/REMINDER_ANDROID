@@ -13,14 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import com.android.build.gradle.LibraryExtension
-import com.nlab.reminder.configureStdViewDependencies
-import com.nlab.reminder.configureViewBinding
+
+import com.nlab.reminder.configureStdFeatureDependencies
+import com.nlab.reminder.libs
 import org.gradle.kotlin.dsl.apply
 
 apply(plugin = "com.android.library")
+apply(plugin = "nlab.android.library.compose")
+apply(plugin = "nlab.android.library.di")
+apply(plugin = "nlab.android.library.jacoco")
+apply(plugin = "nlab.android.library.statekit")
+apply(plugin = "nlab.android.library.view.component")
 
-extensions.configure<LibraryExtension> {
-    configureViewBinding(this)
+configureStdFeatureDependencies()
+
+dependencies {
+    "implementation"(project(":core:androidx:fragment"))
+    "implementation"(project(":core:androidx:fragment-compose"))
+
+    "implementation"(libs.findLibrary("androidx-lifecycle-viewmodel-ktx").get())
 }
-configureStdViewDependencies()

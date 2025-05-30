@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The N's lab Open Source Project
+ * Copyright (C) 2024 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,21 +14,14 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder
+import com.nlab.reminder.libs
 
-import org.gradle.api.Project
-import org.gradle.kotlin.dsl.dependencies
-import org.gradle.kotlin.dsl.project
+apply(plugin = "nlab.android.library.compose")
 
-/**
- * @author Doohyun
- */
-internal fun Project.configureStdViewDependencies() {
-    dependencies {
-        "implementation"(project(":core:android"))
-        "implementation"(project(":core:designsystem"))
+dependencies {
+    "implementation"(project(":core:androidx:compose"))
+    "implementation"(project(":core:designsystem"))
 
-        "implementation"(libs.findLibrary("androidx-appcompat").get())
-        "implementation"(libs.findLibrary("androidx-core-ktx").get())
-    }
+    "implementation"(libs.findLibrary("androidx-compose-foundation").get())
+    "implementation"(libs.findLibrary("androidx-compose-material3").get())
 }
