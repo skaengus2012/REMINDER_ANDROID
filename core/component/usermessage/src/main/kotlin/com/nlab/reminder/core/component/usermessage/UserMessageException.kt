@@ -24,19 +24,19 @@ import com.nlab.reminder.core.translation.StringIds
  * @author Doohyun
  */
 @ExcludeFromGeneratedTestReport
-class UserMessageException(
+class UserMessageException internal constructor(
     val userMessage: UserMessage,
     val origin: Throwable
 ) : RuntimeException()
 
-internal fun UserMessageException(
-    message: UiText?,
-    priority: FeedbackPriority?,
+fun UserMessageException(
+    source: UserMessageExceptionSource,
     origin: Throwable
-): UserMessageException = UserMessageException(
+) = UserMessageException(
     userMessage = UserMessage(
-        message = message ?: UiText(StringIds.unknown_error),
-        priority = priority ?: FeedbackPriority.LOW
+        id = source.id,
+        message = source.message ?: UiText(StringIds.unknown_error),
+        priority = source.priority ?: FeedbackPriority.LOW
     ),
     origin = origin
 )

@@ -19,7 +19,7 @@ package com.nlab.reminder.apps.ui
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.nlab.reminder.core.component.usermessage.handle.ui.UserMessageHandler
+import com.nlab.reminder.core.component.usermessage.eventbus.ui.UserMessageAggregateHandler
 
 /**
  * @author Thalys
@@ -30,7 +30,10 @@ fun PlaneatApp(appState: PlaneatAppState) {
         modifier = Modifier.fillMaxSize(),
         appState = appState
     )
-    UserMessageHandler(
-        showApplicationToast = { message -> appState.showApplicationToast(message) }
+    UserMessageAggregateHandler(
+        showUserMessage = { message, _ ->
+            // TODO show user message with priority
+            appState.showApplicationToast(message)
+        }
     )
 }

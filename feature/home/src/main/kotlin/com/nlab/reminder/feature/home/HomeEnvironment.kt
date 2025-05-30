@@ -17,6 +17,7 @@
 package com.nlab.reminder.feature.home
 
 import com.nlab.reminder.core.component.tag.edit.TagEditStateMachine
+import com.nlab.reminder.core.component.usermessage.UserMessageFactory
 import com.nlab.reminder.core.data.repository.ScheduleRepository
 import com.nlab.reminder.core.data.repository.TagRepository
 import javax.inject.Inject
@@ -25,7 +26,8 @@ import javax.inject.Inject
  * @author Thalys
  */
 internal class HomeEnvironment @Inject constructor(
-    val tagEditStateMachine: TagEditStateMachine,
     val scheduleRepository: ScheduleRepository,
-    val tagRepository: TagRepository
+    val tagRepository: TagRepository,
+    val tagEditStateMachine: TagEditStateMachine,
+    val userMessageFactory: UserMessageFactory
 )

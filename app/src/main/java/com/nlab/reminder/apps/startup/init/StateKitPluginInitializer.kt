@@ -22,7 +22,7 @@ import androidx.startup.Initializer
 import com.nlab.reminder.core.statekit.plugins.StateKitPlugin
 import com.nlab.reminder.apps.startup.EmptyDependencies
 import com.nlab.reminder.core.component.usermessage.UserMessageException
-import com.nlab.reminder.core.component.usermessage.handle.UserMessageBroadcast
+import com.nlab.reminder.core.component.usermessage.eventbus.UserMessageBroadcast
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
