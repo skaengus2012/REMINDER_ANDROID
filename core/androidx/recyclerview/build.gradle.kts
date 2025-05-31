@@ -24,6 +24,8 @@ android {
 dependencies {
     api(libs.androidx.recyclerview)
 
+    implementation(projects.core.android)
+
     implementation(libs.kotlinx.coroutines.core)
-    implementation(libs.androidx.annotation)
+    implementation(libs.timber)
 }
