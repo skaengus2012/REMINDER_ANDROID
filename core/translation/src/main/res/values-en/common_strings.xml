@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (C) 2025 The N's lab Open Source Project
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~        http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+    <string name="april">April</string>
+    <string name="april_short">Apr</string>
+    <string name="august">August</string>
+    <string name="august_short">Aug</string>
+    <plurals name="content_every_days">
+        <item quantity="one">Daily</item>
+        <item quantity="other">Every %1$d days</item>
+    </plurals>
+    <plurals name="content_every_hours">
+        <item quantity="one">Hourly</item>
+        <item quantity="other">Every %1$d hours</item>
+    </plurals>
+    <plurals name="content_every_months">
+        <item quantity="one">Monthly</item>
+        <item quantity="other">Every %1$d months</item>
+    </plurals>
+    <string name="content_every_months_customize_combine" formatted="true">%1$s on the %2$s</string>
+    <string name="content_every_months_days" formatted="true">%1$dth</string>
+    <string name="content_every_months_days_combine" formatted="true">%1$s, each %2$s</string>
+    <string name="content_every_months_days_token" formatted="true">%1$s and %2$s</string>
+    <plurals name="content_every_months_other_day">
+        <item quantity="one">Every month</item>
+        <item quantity="other">Every %1$d months</item>
+    </plurals>
+    <plurals name="content_every_weeks">
+        <item quantity="one">Weekly</item>
+        <item quantity="other">Every %1$d weeks</item>
+    </plurals>
+    <string name="content_every_weeks_combine" formatted="true">%1$s on %2$s</string>
+    <string name="content_every_weeks_token" formatted="true">%1$s and %2$s</string>
+    <plurals name="content_every_years">
+        <item quantity="one">Yearly</item>
+        <item quantity="other">Every %1$d years</item>
+    </plurals>
+    <plurals name="content_every_years_other_month">
+        <item quantity="one">Every year</item>
+        <item quantity="other">Every %1$d years</item>
+    </plurals>
+    <string name="content_every_years_months_combine" formatted="true">%1$s in %2$s</string>
+    <string name="content_every_years_months_token" formatted="true">%1$s and %2$s</string>
+    <string name="content_every_years_ordering_days_months_combine" formatted="true">%1$s on the %2$s of %3$s</string>
+    <string name="content_frequency_daily">Daily</string>
+    <string name="content_frequency_hourly">Hourly</string>
+    <string name="content_frequency_monthly">Monthly</string>
+    <string name="content_frequency_weekly">Weekly</string>
+    <string name="content_frequency_yearly">Yearly</string>
+    <string name="content_ordering_days_combine" formatted="true">%1$s %2$s</string>
+    <string name="day">day</string>
+    <plurals name="days">
+        <item quantity="one">Day</item>
+        <item quantity="other">Days</item>
+    </plurals>
+    <plurals name="days_interval">
+        <item quantity="one">Day</item>
+        <item quantity="other">%1$d days</item>
+    </plurals>
+    <string name="december">December</string>
+    <string name="december_short">Dec</string>
+    <string name="february">February</string>
+    <string name="february_short">Feb</string>
+    <string name="fifth">fifth</string>
+    <string name="first">first</string>
+    <string name="fourth">fourth</string>
+    <string name="friday">Friday</string>
+    <plurals name="hours">
+        <item quantity="one">Hour</item>
+        <item quantity="other">Hours</item>
+    </plurals>
+    <plurals name="hours_interval">
+        <item quantity="one">Hour</item>
+        <item quantity="other">%1$d hours</item>
+    </plurals>
+    <string name="january">January</string>
+    <string name="january_short">Jan</string>
+    <string name="july">July</string>
+    <string name="july_short">Jul</string>
+    <string name="june">June</string>
+    <string name="june_short">Jun</string>
+    <string name="last">last</string>
+    <string name="march">March</string>
+    <string name="march_short">Mar</string>
+    <string name="may">May</string>
+    <string name="may_short">May</string>
+    <string name="monday">Monday</string>
+    <plurals name="months">
+        <item quantity="one">Month</item>
+        <item quantity="other">Months</item>
+    </plurals>
+    <plurals name="months_interval">
+        <item quantity="one">Month</item>
+        <item quantity="other">%1$ months</item>
+    </plurals>
+    <string name="november">November</string>
+    <string name="november_short">Nov</string>
+    <string name="october">October</string>
+    <string name="october_short">Oct</string>
+    <string name="saturday">Saturday</string>
+    <string name="second">second</string>
+    <string name="september">September</string>
+    <string name="september_short">Sep</string>
+    <string name="sunday">Sunday</string>
+    <string name="third">third</string>
+    <string name="thursday">Thursday</string>
+    <string name="tuesday">Tuesday</string>
+    <string name="wednesday">Wednesday</string>
+    <string name="weekday">weekday</string>
+    <string name="weekend_day">weekend day</string>
+    <plurals name="weeks">
+        <item quantity="one">Week</item>
+        <item quantity="other">Weeks</item>
+    </plurals>
+    <plurals name="weeks_interval">
+        <item quantity="one">1 week</item>
+        <item quantity="other">%1$d weeks</item>
+    </plurals>
+    <plurals name="years">
+        <item quantity="one">Year</item>
+        <item quantity="other">Years</item>
+    </plurals>
+    <plurals name="years_interval">
+        <item quantity="one">Year</item>
+        <item quantity="other">%1$d years</item>
+    </plurals>
+</resources>
