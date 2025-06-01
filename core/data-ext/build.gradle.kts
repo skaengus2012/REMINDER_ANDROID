@@ -9,6 +9,7 @@ android {
 dependencies {
     api(projects.core.data)
     api(projects.core.uitext)
+    implementation(projects.core.translation)
 
     testImplementation(projects.core.uitextTest)
 }
