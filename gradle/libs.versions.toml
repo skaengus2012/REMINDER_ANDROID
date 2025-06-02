@@ -31,8 +31,6 @@ androidxTransition = "1.6.0"
 appCashTurbine = "1.2.0"
 coil = "2.7.0"
 desugarJdklibs = "2.1.5"
-facebookFlipper = "0.273.0"
-facebookSoloader = "0.12.1"
 googleHilt = "2.56.2"
 googleMaterial = "1.12.0"
 googlePlayServicesTime = "16.0.1"
@@ -90,9 +88,6 @@ androidx-test-runner = { module = "androidx.test:runner", version.ref = "android
 androidx-transition-ktx = { module = "androidx.transition:transition-ktx", version.ref = "androidxTransition" }
 coil-kt = { module = "io.coil-kt:coil", version.ref = "coil" }
 desugar-jdk-libs = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugarJdklibs" }  # use in configureComposeAndroid KotlinOptions.kt
-facebook-flipper = { module = "com.facebook.flipper:flipper", version.ref = "facebookFlipper" }
-facebook-flipper-leakcanary = { module = "com.facebook.flipper:flipper-leakcanary2-plugin", version.ref = "facebookFlipper" }
-facebook-soloader = { module = "com.facebook.soloader:soloader", version.ref = "facebookSoloader" }
 google-hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "googleHilt" }       # use in nlab.android.hilt.gradle.kts
 google-hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "googleHilt" }     # use in nlab.android.hilt.gradle.kts
 google-material = { group = "com.google.android.material", name = "material", version.ref = "googleMaterial" }

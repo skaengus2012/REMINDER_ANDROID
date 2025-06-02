@@ -116,9 +116,6 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.timber)
 
-    debugImplementation(libs.facebook.flipper)
-    debugImplementation(libs.facebook.flipper.leakcanary)
-    debugImplementation(libs.facebook.soloader)
     debugImplementation(libs.squeare.leakcanary)
 
     testImplementation(projects.testkit)
