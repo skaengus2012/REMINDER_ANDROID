@@ -20,7 +20,6 @@ import com.nlab.reminder.core.kotlin.PositiveInt
 import com.nlab.reminder.core.kotlin.collections.NonEmptySet
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.Month
-import kotlinx.datetime.TimeZone
 
 /**
  * @author Doohyun
@@ -30,21 +29,12 @@ sealed class Repeat {
 
     data class Daily(val interval: PositiveInt) : Repeat()
 
-    data class Weekly(
-        val interval: PositiveInt,
-        val timeZone: TimeZone,
-        val daysOfWeeks: NonEmptySet<DayOfWeek>
-    ) : Repeat()
+    data class Weekly(val interval: PositiveInt, val daysOfWeeks: NonEmptySet<DayOfWeek>) : Repeat()
 
-    data class Monthly(
-        val interval: PositiveInt,
-        val timeZone: TimeZone,
-        val detail: MonthlyRepeatDetail
-    ) : Repeat()
+    data class Monthly(val interval: PositiveInt, val detail: MonthlyRepeatDetail) : Repeat()
 
     data class Yearly(
         val interval: PositiveInt,
-        val timeZone: TimeZone,
         val months: NonEmptySet<Month>,
         val daysOfWeekOption: YearlyDaysOfWeekOption?
     ) : Repeat()
