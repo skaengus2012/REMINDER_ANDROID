@@ -57,37 +57,4 @@ internal fun DaysOfMonth(@IntRange(from = 1, to = 31) day: Int): DaysOfMonth = w
 }
 
 @get:IntRange(from = 1, to = 31)
-internal val DaysOfMonth.rawValue: Int
-    get() = when (this) {
-        DaysOfMonth.DAY_1 -> 1
-        DaysOfMonth.DAY_2 -> 2
-        DaysOfMonth.DAY_3 -> 3
-        DaysOfMonth.DAY_4 -> 4
-        DaysOfMonth.DAY_5 -> 5
-        DaysOfMonth.DAY_6 -> 6
-        DaysOfMonth.DAY_7 -> 7
-        DaysOfMonth.DAY_8 -> 8
-        DaysOfMonth.DAY_9 -> 9
-        DaysOfMonth.DAY_10 -> 10
-        DaysOfMonth.DAY_11 -> 11
-        DaysOfMonth.DAY_12 -> 12
-        DaysOfMonth.DAY_13 -> 13
-        DaysOfMonth.DAY_14 -> 14
-        DaysOfMonth.DAY_15 -> 15
-        DaysOfMonth.DAY_16 -> 16
-        DaysOfMonth.DAY_17 -> 17
-        DaysOfMonth.DAY_18 -> 18
-        DaysOfMonth.DAY_19 -> 19
-        DaysOfMonth.DAY_20 -> 20
-        DaysOfMonth.DAY_21 -> 21
-        DaysOfMonth.DAY_22 -> 22
-        DaysOfMonth.DAY_23 -> 23
-        DaysOfMonth.DAY_24 -> 24
-        DaysOfMonth.DAY_25 -> 25
-        DaysOfMonth.DAY_26 -> 26
-        DaysOfMonth.DAY_27 -> 27
-        DaysOfMonth.DAY_28 -> 28
-        DaysOfMonth.DAY_29 -> 29
-        DaysOfMonth.DAY_30 -> 30
-        DaysOfMonth.DAY_31 -> 31
-    }
+internal val DaysOfMonth.rawValue: Int get() = ordinal + 1
