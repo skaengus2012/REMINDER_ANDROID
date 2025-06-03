@@ -19,7 +19,6 @@ package com.nlab.reminder.core.local.database.transaction
 import com.nlab.reminder.core.kotlin.collections.NonEmptySet
 import com.nlab.reminder.core.kotlin.collections.tryToNonEmptySetOrNull
 import com.nlab.reminder.core.local.database.entity.*
-import kotlinx.datetime.TimeZone
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -105,29 +104,16 @@ internal class ScheduleTimingAggregateValidator @Inject constructor() {
         }
     }
 
-    private fun ensureAndGetValidZoneIdRepeatDetail(
-        repeatDetailAggregates: Set<ScheduleRepeatDetailAggregate>
-    ): ScheduleRepeatDetailAggregate {
-        val zoneIdRepeatDetail = repeatDetailAggregates.find { it.propertyCode == REPEAT_SETTING_PROPERTY_ZONE_ID }
-        requireNotNull(zoneIdRepeatDetail) { "Cannot found timeZone Value" }
-        TimeZone.of(zoneId = zoneIdRepeatDetail.value) // check, zoneId is valid
-        return zoneIdRepeatDetail
-    }
-
     private fun ensureWeeklyRepeatDetails(weeklyRepeatDetailAggregates: Set<ScheduleRepeatDetailAggregate>) {
-        val zoneIdAggregate = ensureAndGetValidZoneIdRepeatDetail(weeklyRepeatDetailAggregates)
-        val weeklyAggregates = weeklyRepeatDetailAggregates - zoneIdAggregate
-        require(weeklyAggregates.isNotEmpty()) { "At least one RepeatWeek must exist" }
-
-        require(weeklyAggregates.all { dto ->
+        require(weeklyRepeatDetailAggregates.isNotEmpty()) { "At least one weekly repeat detail must exist" }
+        require(weeklyRepeatDetailAggregates.all { dto ->
             dto.propertyCode == REPEAT_SETTING_PROPERTY_WEEKLY && dto.value in allRepeatWeeks
         }) { "Invalid repeatWeek inputted" }
     }
 
     private fun ensureMonthlyRepeatDetails(monthlyRepeatDetailAggregates: Set<ScheduleRepeatDetailAggregate>) {
-        val zoneIdAggregate = ensureAndGetValidZoneIdRepeatDetail(monthlyRepeatDetailAggregates)
-        val monthlyAggregates = (monthlyRepeatDetailAggregates - zoneIdAggregate).tryToNonEmptySetOrNull()
-        requireNotNull(monthlyAggregates) { "Monthly repeat detail not existed" }
+        val monthlyAggregates = monthlyRepeatDetailAggregates.tryToNonEmptySetOrNull()
+        requireNotNull(monthlyAggregates) { "Monthly repeat detail does not exist" }
 
         if (monthlyAggregates.value.any { it.propertyCode == REPEAT_SETTING_PROPERTY_MONTHLY_DAY }) {
             ensureMonthlyEachRepeatDetails(monthlyAggregates)
@@ -172,16 +158,14 @@ internal class ScheduleTimingAggregateValidator @Inject constructor() {
     }
 
     private fun ensureYearlyRepeatDetails(yearlyRepeatDetailAggregates: Set<ScheduleRepeatDetailAggregate>) {
-        val zoneIdAggregate = ensureAndGetValidZoneIdRepeatDetail(yearlyRepeatDetailAggregates)
-        val yearlyAggregates = yearlyRepeatDetailAggregates - zoneIdAggregate
-        require(yearlyAggregates.isNotEmpty()) { "Yearly repeat detail not existed" }
-
+        require(yearlyRepeatDetailAggregates.isNotEmpty()) { "Yearly repeat detail does not exist" }
         val yearlyMonthAggregates =
-            yearlyAggregates.filter { it.propertyCode == REPEAT_SETTING_PROPERTY_YEARLY_MONTH }.toSet()
-        require(yearlyMonthAggregates.isNotEmpty()) { "Yearly month repeat detail not existed" }
+            yearlyRepeatDetailAggregates.filter { it.propertyCode == REPEAT_SETTING_PROPERTY_YEARLY_MONTH }.toSet()
+        require(yearlyMonthAggregates.isNotEmpty()) { "Yearly month repeat detail does not exist" }
         require(yearlyMonthAggregates.all { it.value in allRepeatMonths }) { "Invalid yearly month inputted" }
 
-        val yearlyDayOfWeekOptionAggregates = (yearlyAggregates - yearlyMonthAggregates).tryToNonEmptySetOrNull()
+        val yearlyDayOfWeekOptionAggregates =
+            (yearlyRepeatDetailAggregates - yearlyMonthAggregates).tryToNonEmptySetOrNull()
         if (yearlyDayOfWeekOptionAggregates != null) {
             ensureDayOfWeekRepeatDetails(
                 yearlyDayOfWeekOptionAggregates,
