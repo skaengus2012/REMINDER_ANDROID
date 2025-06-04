@@ -19,37 +19,31 @@
     <string name="april_short">Apr</string>
     <string name="august">August</string>
     <string name="august_short">Aug</string>
-    <plurals name="content_every_days">
+    <plurals name="content_every_days_plurals">
         <item quantity="one">Daily</item>
         <item quantity="other">Every %1$d days</item>
     </plurals>
-    <plurals name="content_every_hours">
+    <plurals name="content_every_hours_plurals">
         <item quantity="one">Hourly</item>
         <item quantity="other">Every %1$d hours</item>
     </plurals>
-    <plurals name="content_every_months">
-        <item quantity="one">Monthly</item>
-        <item quantity="other">Every %1$d months</item>
-    </plurals>
+    <string name="content_every_months">Monthly</string>
     <string name="content_every_months_customize_combine" formatted="true">%1$s on the %2$s</string>
     <string name="content_every_months_days" formatted="true">%1$dth</string>
     <string name="content_every_months_days_combine" formatted="true">%1$s, each %2$s</string>
     <string name="content_every_months_days_token" formatted="true">%1$s and %2$s</string>
-    <plurals name="content_every_months_other_day">
+    <plurals name="content_every_months_plurals">
         <item quantity="one">Every month</item>
         <item quantity="other">Every %1$d months</item>
     </plurals>
-    <plurals name="content_every_weeks">
+    <plurals name="content_every_weeks_plurals">
         <item quantity="one">Weekly</item>
         <item quantity="other">Every %1$d weeks</item>
     </plurals>
     <string name="content_every_weeks_combine" formatted="true">%1$s on %2$s</string>
     <string name="content_every_weeks_token" formatted="true">%1$s and %2$s</string>
-    <plurals name="content_every_years">
-        <item quantity="one">Yearly</item>
-        <item quantity="other">Every %1$d years</item>
-    </plurals>
-    <plurals name="content_every_years_other_month">
+    <string name="content_every_years">Yearly</string>
+    <plurals name="content_every_years_plurals">
         <item quantity="one">Every year</item>
         <item quantity="other">Every %1$d years</item>
     </plurals>

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.data.model
+package com.nlab.reminder.core.data.model.ui
 
 import androidx.annotation.StringRes
 import com.nlab.reminder.core.translation.StringIds

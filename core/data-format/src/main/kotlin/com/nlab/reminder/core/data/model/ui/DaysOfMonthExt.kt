@@ -14,9 +14,12 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.data.model
+package com.nlab.reminder.core.data.model.ui
 
 import androidx.annotation.IntRange
+import com.nlab.reminder.core.data.model.DaysOfMonth
+import com.nlab.reminder.core.text.UiText
+import com.nlab.reminder.core.translation.StringIds
 
 /**
  * @author Thalys
