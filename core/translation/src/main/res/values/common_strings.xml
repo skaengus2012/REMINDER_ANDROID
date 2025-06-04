@@ -19,37 +19,31 @@
     <string name="april_short">4월</string>
     <string name="august">8월</string>
     <string name="august_short">8월</string>
-    <plurals name="content_every_days">
+    <plurals name="content_every_days_plurals">
         <item quantity="one">매일</item>
         <item quantity="other">%1$d일마다</item>
     </plurals>
-    <plurals name="content_every_hours">
+    <plurals name="content_every_hours_plurals">
         <item quantity="one">매시간</item>
         <item quantity="other">%1$d시간마다</item>
     </plurals>
-    <plurals name="content_every_months">
-        <item quantity="one">매월</item>
-        <item quantity="other">%1$d개월마다</item>
-    </plurals>
+    <string name="content_every_months">매월</string>
     <string name="content_every_months_customize_combine" formatted="true">%1$s %2$s</string>
     <string name="content_every_months_days" formatted="true">%1$일</string>
     <string name="content_every_months_days_combine" formatted="true">%1$s %2$s마다</string>
     <string name="content_every_months_days_token" formatted="true">%1$s 및 %2$s</string>
-    <plurals name="content_every_months_other_day">
+    <plurals name="content_every_months_plurals">
         <item quantity="one">매월</item>
         <item quantity="other">Every %1$d months</item>
     </plurals>
-    <plurals name="content_every_weeks">
+    <plurals name="content_every_weeks_plurals">
         <item quantity="one">매주</item>
         <item quantity="other">%1$d주마다</item>
     </plurals>
     <string name="content_every_weeks_combine" formatted="true">%1$s %2$s</string>
     <string name="content_every_weeks_token" formatted="true">%1$s 및 %2$s</string>
-    <plurals name="content_every_years">
-        <item quantity="one">매년</item>
-        <item quantity="other">%1$d년마다</item>
-    </plurals>
-    <plurals name="content_every_years_other_month">
+    <string name="content_every_years">매년</string>
+    <plurals name="content_every_years_plurals">
         <item quantity="one">매년</item>
         <item quantity="other">%1$d년마다</item>
     </plurals>

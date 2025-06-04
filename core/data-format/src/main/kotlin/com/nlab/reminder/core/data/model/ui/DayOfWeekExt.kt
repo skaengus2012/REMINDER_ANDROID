@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.data.model
+package com.nlab.reminder.core.data.model.ui
 
 import androidx.annotation.StringRes
 import com.nlab.reminder.core.translation.StringIds
@@ -34,3 +34,26 @@ internal val DayOfWeek.resourceId: Int
         DayOfWeek.FRIDAY -> StringIds.friday
         DayOfWeek.SATURDAY -> StringIds.saturday
     }
+
+internal val sundayFirstComparator = object : Comparator<DayOfWeek> {
+    private val dayOfWeekToOrderTable = mapOf(
+        DayOfWeek.SUNDAY to 1,
+        DayOfWeek.MONDAY to 2,
+        DayOfWeek.TUESDAY to 3,
+        DayOfWeek.WEDNESDAY to 4,
+        DayOfWeek.THURSDAY to 5,
+        DayOfWeek.FRIDAY to 6,
+        DayOfWeek.SATURDAY to 7
+    )
+
+    override fun compare(o1: DayOfWeek?, o2: DayOfWeek?): Int {
+        if (o1 == null && o2 == null) return 0
+        if (o1 == null) return 1   // nulls last
+        if (o2 == null) return -1
+
+        val order1 = dayOfWeekToOrderTable[o1] ?: Int.MAX_VALUE
+        val order2 = dayOfWeekToOrderTable[o2] ?: Int.MAX_VALUE
+
+        return order1.compareTo(order2)
+    }
+}

@@ -14,25 +14,22 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.data.model
+package com.nlab.reminder.core.data.model.ui
 
 import androidx.annotation.StringRes
+import com.nlab.reminder.core.data.model.DaysOfWeekOrder
 import com.nlab.reminder.core.translation.StringIds
 
 /**
- * @author Doohyun
+ * @author Thalys
  */
 @get:StringRes
-internal val Days.resourceId: Int
+internal val DaysOfWeekOrder.resourceId: Int
     get() = when (this) {
-        Days.Sun -> StringIds.sunday
-        Days.Mon -> StringIds.monday
-        Days.Tue -> StringIds.tuesday
-        Days.Wed -> StringIds.wednesday
-        Days.Thu -> StringIds.thursday
-        Days.Fri -> StringIds.friday
-        Days.Sat -> StringIds.saturday
-        Days.Default -> StringIds.day
-        Days.Weekday -> StringIds.weekday
-        Days.Weekend -> StringIds.weekend_day
+        DaysOfWeekOrder.First -> StringIds.first
+        DaysOfWeekOrder.Second -> StringIds.second
+        DaysOfWeekOrder.Third -> StringIds.third
+        DaysOfWeekOrder.Fourth -> StringIds.fourth
+        DaysOfWeekOrder.Fifth -> StringIds.fifth
+        DaysOfWeekOrder.Last -> StringIds.last
     }
