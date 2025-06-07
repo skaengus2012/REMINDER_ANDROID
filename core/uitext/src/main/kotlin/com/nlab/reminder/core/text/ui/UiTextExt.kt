@@ -68,7 +68,7 @@ internal inline fun convertToText(
     )
     return when (nodeOrValue) {
         is String -> nodeOrValue
-        else -> getString(
+        else -> resolveUiTextNode(
             node = (nodeOrValue as UiTextDisplayNode).apply {
                 resolveArgs(
                     initialNode = this,
@@ -149,7 +149,7 @@ private inline fun resolveArgs(
             val parentNode = currentNode.parent
             if (parentNode != null) {
                 parentNode.resolveArgWith(
-                    getString(
+                    resolveUiTextNode(
                         node = currentNode,
                         getString = getString,
                         getQuantityString = getQuantityString
@@ -161,7 +161,7 @@ private inline fun resolveArgs(
     }
 }
 
-private inline fun getString(
+private inline fun resolveUiTextNode(
     node: UiTextDisplayNode,
     getString: (Int, Array<Any>?) -> String,
     getQuantityString: (Int, Int, Array<Any>?) -> String
