@@ -66,53 +66,20 @@ internal inline fun convertToText(
         getString = getString,
         getQuantityString = getQuantityString
     )
-    if (nodeOrValue is String) return nodeOrValue
-
-    var result = ""
-    var currentNode = nodeOrValue as UiTextDisplayNode
-    while (currentNode.isProcessing()) {
-        val arg = currentNode.resolvedArgs[currentNode.processedIndex]
-        if (arg is UiText) {
-            val childNodeOrValue = createUiTextDisplayNodeOrValue(
-                uiText = arg,
-                head = currentNode,
-                getString = getString,
-                getQuantityString = getQuantityString
-            )
-            when (childNodeOrValue) {
-                is String -> {
-                    currentNode.resolveArgWith(childNodeOrValue)
-                }
-                is UiTextDisplayNode -> {
-                    currentNode = childNodeOrValue
-                }
-            }
-        } else {
-            ++currentNode.processedIndex
-        }
-
-        if (currentNode.isProcessing().not()) {
-            val value = when (val currentUiState = currentNode.current) {
-                is UiText.ResId -> {
-                    getString(currentUiState.resId, currentNode.resolvedArgs)
-                }
-                is UiText.PluralsResId -> {
-                    getQuantityString(currentUiState.resId, currentUiState.count, currentNode.resolvedArgs)
-                }
-                is UiText.Direct -> {
-                    error("UiText.Direct should be resolved immediately and never passed into node stack")
-                }
-            }
-            val headNode = currentNode.parent
-            if (headNode == null) {
-                result = value
-            } else {
-                headNode.resolveArgWith(value)
-                currentNode = headNode
-            }
-        }
+    return when (nodeOrValue) {
+        is String -> nodeOrValue
+        else -> resolveUiTextNode(
+            node = (nodeOrValue as UiTextDisplayNode).apply {
+                resolveArgs(
+                    initialNode = this,
+                    getString,
+                    getQuantityString
+                )
+            },
+            getString,
+            getQuantityString
+        )
     }
-    return result
 }
 
 private inline fun createUiTextDisplayNodeOrValue(
@@ -149,6 +116,64 @@ private inline fun createUiTextDisplayNodeOrValue(
         } else {
             getQuantityString(uiText.resId, uiText.count, uiText.args)
         }
+    }
+}
+
+private inline fun resolveArgs(
+    initialNode: UiTextDisplayNode,
+    getString: (Int, Array<Any>?) -> String,
+    getQuantityString: (Int, Int, Array<Any>?) -> String
+) {
+    var currentNode = initialNode
+    while (currentNode.isProcessing()) {
+        val arg = currentNode.resolvedArgs[currentNode.processedIndex]
+        if (arg is UiText) {
+            val childNodeOrValue = createUiTextDisplayNodeOrValue(
+                uiText = arg,
+                head = currentNode,
+                getString = getString,
+                getQuantityString = getQuantityString
+            )
+            when (childNodeOrValue) {
+                is String -> {
+                    currentNode.resolveArgWith(childNodeOrValue)
+                }
+                is UiTextDisplayNode -> {
+                    currentNode = childNodeOrValue
+                }
+            }
+        } else {
+            ++currentNode.processedIndex
+        }
+        if (currentNode.isProcessing().not()) {
+            val parentNode = currentNode.parent
+            if (parentNode != null) {
+                parentNode.resolveArgWith(
+                    resolveUiTextNode(
+                        node = currentNode,
+                        getString = getString,
+                        getQuantityString = getQuantityString
+                    )
+                )
+                currentNode = parentNode
+            }
+        }
+    }
+}
+
+private inline fun resolveUiTextNode(
+    node: UiTextDisplayNode,
+    getString: (Int, Array<Any>?) -> String,
+    getQuantityString: (Int, Int, Array<Any>?) -> String
+): String = when (val currentUiText = node.current) {
+    is UiText.ResId -> {
+        getString(currentUiText.resId, node.resolvedArgs)
+    }
+    is UiText.PluralsResId -> {
+        getQuantityString(currentUiText.resId, currentUiText.count, node.resolvedArgs)
+    }
+    is UiText.Direct -> {
+        error("UiText.Direct should be resolved immediately and never passed into node stack")
     }
 }
 
