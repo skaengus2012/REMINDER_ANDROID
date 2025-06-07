@@ -26,6 +26,14 @@ import org.junit.Test
  */
 class JoinKtTest {
     @Test
+    fun `Given number, When joining to uiText with separator, Then return correct value`() {
+        val number = genInt()
+        val expected = UiText(value = number.toString())
+        val actual = listOf(number).joinToUiText(separatorRes = genInt())
+        assertThat(actual, equalTo(expected))
+    }
+
+    @Test
     fun `Given numbers, When joining to uiText with separator, Then return correct value`() {
         val numbers = List(size = 3) { it }
         val separatorRes = genInt()
