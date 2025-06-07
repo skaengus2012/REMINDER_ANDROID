@@ -42,7 +42,7 @@ fun UiText.toText(resources: Resources): String = convertToText(
 
 internal class UiTextDisplayNode(
     val current: UiText,
-    val head: UiTextDisplayNode?,
+    val parent: UiTextDisplayNode?,
     val resolvedArgs: Array<Any>,
     @IntRange(from = 0) var processedIndex: Int,
 ) {
@@ -103,7 +103,7 @@ internal inline fun convertToText(
                     error("UiText.Direct should be resolved immediately and never passed into node stack")
                 }
             }
-            val headNode = currentNode.head
+            val headNode = currentNode.parent
             if (headNode == null) {
                 result = value
             } else {
@@ -129,7 +129,7 @@ private inline fun createUiTextDisplayNodeOrValue(
         if (uiText.args.containsUiText()) {
             UiTextDisplayNode(
                 current = uiText,
-                head = head,
+                parent = head,
                 resolvedArgs = uiText.args.copyOf(),
                 processedIndex = 0
             )
@@ -142,7 +142,7 @@ private inline fun createUiTextDisplayNodeOrValue(
         if (uiText.args.containsUiText()) {
             UiTextDisplayNode(
                 current = uiText,
-                head = head,
+                parent = head,
                 resolvedArgs = uiText.args.copyOf(),
                 processedIndex = 0
             )
