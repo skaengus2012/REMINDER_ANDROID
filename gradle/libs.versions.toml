@@ -6,7 +6,6 @@ targetSdk = "35"
 minSdk = "24"
 
 # library version
-afollestedDragselectRecyclerView = "2.4.0"
 androidGradlePlugin = "8.10.1"
 androidxAnnotation = "1.9.1"
 androidxAppCompat = "1.7.0"
@@ -54,7 +53,6 @@ turbine = "1.2.0"
 
 
 [libraries]
-afollested-dragselectRecyclerView = { module = "com.afollestad:drag-select-recyclerview", version.ref = "afollestedDragselectRecyclerView" }
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose" }
 androidx-annotation = { group = "androidx.annotation", name = "annotation", version.ref = "androidxAnnotation" }
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "androidxAppCompat" }
@@ -70,12 +68,12 @@ androidx-constaintlayout = { module = "androidx.constraintlayout:constraintlayou
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidxCoreKtx" }
 androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "androidxCoreSplashScreen" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "androidxDataStore" }
-androidx-fragment = { module = "androidx.fragment:fragment", version.ref = "androidxFragment" }
+androidx-fragment-ktx = { module = "androidx.fragment:fragment-ktx", version.ref = "androidxFragment" }
 androidx-fragment-compose = { module = "androidx.fragment:fragment-compose", version.ref = "androidxFragment"  }
 androidx-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "androidxHiltNavigationCompose" }
 androidx-lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "androidxLifecycle" }
 androidx-lifecycle-runtime-compose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "androidxLifecycle" }
-androidx-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "androidxLifecycle" }
+androidx-lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "androidxLifecycle" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "androidxNavigation" }
 androidx-recyclerview = { module = "androidx.recyclerview:recyclerview", version.ref = "androidxRecyclerView" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "androidxRoom" }
@@ -137,5 +135,7 @@ nlab-android-library-compose-feature = { id = "nlab.android.library.compose.feat
 nlab-android-library-di = { id = "nlab.android.library.di" }
 nlab-android-library-jacoco = { id = "nlab.android.library.jacoco" }
 nlab-android-library-statekit = { id = "nlab.android.library.statekit" }
+nlab-android-library-view-component = { id = "nlab.android.library.view.component" }
+nlab-android-library-view-feature = { id = "nlab.android.library.view.feature" }
 nlab-jvm-library = { id = "nlab.jvm.library" }
 nlab-jvm-library-jacoco = { id = "nlab.jvm.library.jacoco" }

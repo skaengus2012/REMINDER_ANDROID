@@ -18,7 +18,6 @@ plugins {
     alias(libs.plugins.nlab.android.application.compose)
     alias(libs.plugins.nlab.android.application.jacoco)
     alias(libs.plugins.nlab.android.hilt)
-    alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
     id("kotlin-parcelize")
     kotlin("kapt")
@@ -57,17 +56,6 @@ android {
         }
     }
 
-    sourceSets {
-        getByName("release") {
-            java.srcDirs("src/release/java")
-            res.srcDirs("src/release/res")
-        }
-    }
-
-    buildFeatures {
-        viewBinding = true
-    }
-
     packaging {
         resources {
             merges += listOf(
@@ -82,10 +70,8 @@ dependencies {
     implementation(projects.core.android)
     implementation(projects.core.androidx.compose)
     implementation(projects.core.androidx.fragment)
-    implementation(projects.core.androidx.lifecycle)
     implementation(projects.core.androidx.navigationCompose)
     implementation(projects.core.androidx.recyclerview)
-    implementation(projects.core.androidx.transition)
     implementation(projects.core.annotation)
     implementation(projects.core.component.currenttime)
     implementation(projects.core.component.usermessage)
@@ -98,22 +84,20 @@ dependencies {
     implementation(projects.core.statekit)
     implementation(projects.core.translation)
 
+    implementation(projects.feature.all)
     implementation(projects.feature.home)
 
-    implementation(libs.afollested.dragselectRecyclerView)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.cardview)
     implementation(libs.androidx.constaintlayout)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.core.splashscreen)
-    implementation(libs.androidx.fragment.compose)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.startup.runtime)
     implementation(libs.coil.kt)
     implementation(libs.google.material)
-    implementation(libs.kotlinx.serialization.json)
     implementation(libs.timber)
 
     debugImplementation(libs.squeare.leakcanary)

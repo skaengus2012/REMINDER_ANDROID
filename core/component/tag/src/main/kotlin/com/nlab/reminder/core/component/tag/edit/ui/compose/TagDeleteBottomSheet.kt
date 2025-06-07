@@ -189,7 +189,7 @@ private fun TagDeleteBottomSheetContent(
             color = PlaneatTheme.colors.bgLine1,
         )
         TagEditDeleteButton(
-            text = stringResource(id = StringIds.delete),
+            text = stringResource(id = StringIds.label_delete),
             fontColor = PlaneatTheme.colors.red1,
             onClick = onConfirm
         )
