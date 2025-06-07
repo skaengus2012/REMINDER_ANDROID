@@ -68,7 +68,7 @@ internal inline fun convertToText(
     )
     if (nodeOrValue is String) return nodeOrValue
 
-    lateinit var result: String
+    var result = ""
     var currentNode = nodeOrValue as UiTextDisplayNode
     while (currentNode.isProcessing()) {
         val arg = currentNode.resolvedArgs[currentNode.processedIndex]
