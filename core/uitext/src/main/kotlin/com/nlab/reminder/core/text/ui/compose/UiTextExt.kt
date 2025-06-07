@@ -21,21 +21,21 @@ import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import com.nlab.reminder.core.text.UiText
+import com.nlab.reminder.core.text.ui.convertToText
 
 /**
  * @author Thalys
  */
 @ReadOnlyComposable
 @Composable
-fun UiText.toText(): String = when (this) {
-    is UiText.Direct -> value
-    is UiText.ResId -> {
+fun UiText.toText(): String = convertToText(
+    initialUiText = this,
+    getString = { resId, args ->
         if (args == null) stringResource(resId)
         else stringResource(resId, *args)
-    }
-
-    is UiText.PluralsResId -> {
+    },
+    getQuantityString = { resId, count, args ->
         if (args == null) pluralStringResource(resId, count)
         else pluralStringResource(resId, count, *args)
     }
-}
+)
