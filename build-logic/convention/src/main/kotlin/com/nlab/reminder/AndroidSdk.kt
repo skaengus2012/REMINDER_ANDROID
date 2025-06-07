@@ -25,4 +25,15 @@ import org.gradle.api.Project
 internal fun Project.configureAndroidSdk(commonExtension: CommonExtension<*, *, *, *, *, *>) = with(commonExtension) {
     compileSdk = libs.findVersion("compileSdk").get().toString().toInt()
     defaultConfig.minSdk = libs.findVersion("minSdk").get().toString().toInt()
+
+    // for android Instrumentation test
+    defaultConfig.testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    packaging {
+        resources {
+            merges += listOf(
+                "META-INF/LICENSE.md",
+                "META-INF/LICENSE-notice.md"
+            )
+        }
+    }
 }
