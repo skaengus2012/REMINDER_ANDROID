@@ -42,7 +42,7 @@ class UiTextKtTest {
     }
 
     @Test
-    fun `Given resId and twice arguments, When creating UiText, Then return correct value`() {
+    fun `Given resId and two arguments, When creating UiText, Then return correct value`() {
         val resId = genInt()
         val firstArgument = genBothify()
         val secondArgument = genBothify()
@@ -94,7 +94,7 @@ class UiTextKtTest {
     }
 
     @Test
-    fun `Given resId, count and twice arguments, When creating PluralsUiText, Then return correct value`() {
+    fun `Given resId, count and two arguments, When creating PluralsUiText, Then return correct value`() {
         val resId = genInt()
         val count = genInt()
         val firstArgument = genBothify()
