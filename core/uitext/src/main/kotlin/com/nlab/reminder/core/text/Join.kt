@@ -44,7 +44,7 @@ import androidx.annotation.StringRes
  *      UiText.Res(
  *         resId = R.string.comma_separator,
  *         UiText.Direct("B"),
- *         UiText.Direct"C")
+ *         UiText.Direct("C")
  *      )
  *   )
  * )
