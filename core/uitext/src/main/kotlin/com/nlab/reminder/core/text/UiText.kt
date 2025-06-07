@@ -14,19 +14,24 @@
  * limitations under the License.
  */
 
+@file:Suppress("FunctionName")
+
 package com.nlab.reminder.core.text
 
 import androidx.annotation.PluralsRes
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Immutable
+import com.nlab.reminder.core.annotation.ExcludeFromGeneratedTestReport
 
 /**
  * @author Thalys
  */
 @Immutable
 sealed class UiText private constructor() {
+    @ExcludeFromGeneratedTestReport
     data class Direct(internal val value: String) : UiText()
 
+    @ExcludeFromGeneratedTestReport
     data class ResId(
         @StringRes internal val resId: Int,
         internal val args: Array<Any>?
@@ -53,6 +58,7 @@ sealed class UiText private constructor() {
         }
     }
 
+    @ExcludeFromGeneratedTestReport
     data class PluralsResId(
         @PluralsRes internal val resId: Int,
         internal val count: Int,
@@ -97,7 +103,7 @@ fun UiText(
     firstArg: Any,
     secondArg: Any,
     vararg etcArgs: Any,
-): UiText = UiText.ResId(resId, mergeArgs(firstArg, secondArg, etcArgs))
+): UiText = UiText.ResId(resId, mergeArgs(firstArg, secondArg, etcArgs.size, etcArgs::get))
 
 fun PluralsUiText(
     @PluralsRes resId: Int,
@@ -116,16 +122,20 @@ fun PluralsUiText(
     firstArg: Any,
     secondArg: Any,
     vararg etcArgs: Any,
-): UiText = UiText.PluralsResId(resId, count, mergeArgs(firstArg, secondArg, etcArgs))
+): UiText = UiText.PluralsResId(resId, count, mergeArgs(firstArg, secondArg, etcArgs.size, etcArgs::get))
 
-private fun mergeArgs(
+fun EmptyUiText(): UiText = UiText("")
+
+@ExcludeFromGeneratedTestReport
+private inline fun mergeArgs(
     firstArg: Any,
     secondArg: Any,
-    vararg etcArgs: Any
-): Array<Any> = Array(size = etcArgs.size + 2) { index ->
+    etcSize: Int,
+    getEtcArg: (Int) -> Any
+): Array<Any> = Array(size = etcSize + 2) { index ->
     when (index) {
         0 -> firstArg
         1 -> secondArg
-        else -> etcArgs[index - 2]
+        else -> getEtcArg(index - 2)
     }
 }
