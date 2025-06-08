@@ -15,9 +15,10 @@
   -->
 
 <resources>
-    <string name="twice_text_combine">simple combine [%1$s, %2$s]</string>
-    <plurals name="twice_text_combine_plurals">
-        <item quantity="one">plurals-one combine [%1$s, %2$s]</item>
-        <item quantity="other">plurals-other combine [%1$s, %2$s]</item>
+    <string name="three_text_combine">three text combine [%1$s, %2$s, %3$s]</string>
+    <string name="two_text_combine">two text combine [%1$s, %2$s]</string>
+    <plurals name="two_text_combine_plurals">
+        <item quantity="one">plurals-one two text combine [%1$s, %2$s]</item>
+        <item quantity="other">plurals-other two text combine [%1$s, %2$s]</item>
     </plurals>
 </resources>

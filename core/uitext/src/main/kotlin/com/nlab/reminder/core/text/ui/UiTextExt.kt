@@ -18,7 +18,6 @@ package com.nlab.reminder.core.text.ui
 
 import android.content.Context
 import android.content.res.Resources
-import androidx.annotation.IntRange
 import com.nlab.reminder.core.text.UiText
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
@@ -44,14 +43,23 @@ internal class UiTextDisplayNode(
     val current: UiText,
     val parent: UiTextDisplayNode?,
     val resolvedArgs: Array<Any>,
-    @IntRange(from = 0) var processedIndex: Int,
 ) {
-    fun isProcessing(): Boolean {
-        return processedIndex < resolvedArgs.size
+    private var currentIndex: Int = 0
+
+    fun isArgResolveNeeded(): Boolean {
+        return currentIndex < resolvedArgs.size
     }
 
     fun resolveArgWith(args: String) {
-        resolvedArgs[processedIndex++] = args
+        resolvedArgs[currentIndex++] = args
+    }
+
+    fun resolveArg() {
+        ++currentIndex
+    }
+
+    fun currentArg(): Any {
+        return resolvedArgs[currentIndex]
     }
 }
 
@@ -98,7 +106,6 @@ private inline fun createUiTextDisplayNodeOrValue(
                 current = uiText,
                 parent = head,
                 resolvedArgs = uiText.args.copyOf(),
-                processedIndex = 0
             )
         } else {
             getString(uiText.resId, uiText.args)
@@ -110,8 +117,7 @@ private inline fun createUiTextDisplayNodeOrValue(
             UiTextDisplayNode(
                 current = uiText,
                 parent = head,
-                resolvedArgs = uiText.args.copyOf(),
-                processedIndex = 0
+                resolvedArgs = uiText.args.copyOf()
             )
         } else {
             getQuantityString(uiText.resId, uiText.count, uiText.args)
@@ -125,27 +131,28 @@ private inline fun resolveArgs(
     getQuantityString: (Int, Int, Array<Any>?) -> String
 ) {
     var currentNode = initialNode
-    while (currentNode.isProcessing()) {
-        val arg = currentNode.resolvedArgs[currentNode.processedIndex]
-        if (arg is UiText) {
-            val childNodeOrValue = createUiTextDisplayNodeOrValue(
-                uiText = arg,
-                head = currentNode,
-                getString = getString,
-                getQuantityString = getQuantityString
-            )
-            when (childNodeOrValue) {
-                is String -> {
-                    currentNode.resolveArgWith(childNodeOrValue)
+    do {
+        if (currentNode.isArgResolveNeeded()) {
+            val arg = currentNode.currentArg()
+            if (arg is UiText) {
+                val childNodeOrValue = createUiTextDisplayNodeOrValue(
+                    uiText = arg,
+                    head = currentNode,
+                    getString = getString,
+                    getQuantityString = getQuantityString
+                )
+                when (childNodeOrValue) {
+                    is String -> {
+                        currentNode.resolveArgWith(childNodeOrValue)
+                    }
+                    is UiTextDisplayNode -> {
+                        currentNode = childNodeOrValue
+                    }
                 }
-                is UiTextDisplayNode -> {
-                    currentNode = childNodeOrValue
-                }
+            } else {
+                currentNode.resolveArg()
             }
         } else {
-            ++currentNode.processedIndex
-        }
-        if (currentNode.isProcessing().not()) {
             val parentNode = currentNode.parent
             if (parentNode != null) {
                 parentNode.resolveArgWith(
@@ -158,7 +165,7 @@ private inline fun resolveArgs(
                 currentNode = parentNode
             }
         }
-    }
+    } while (currentNode.parent != null || currentNode.isArgResolveNeeded())
 }
 
 private inline fun resolveUiTextNode(
