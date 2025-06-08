@@ -46,7 +46,7 @@ internal class UiTextDisplayNode(
 ) {
     private var currentIndex: Int = 0
 
-    fun isArgResolveNeeded(): Boolean {
+    fun hasUnresolvedArgs(): Boolean {
         return currentIndex < resolvedArgs.size
     }
 
@@ -132,7 +132,7 @@ private inline fun resolveArgs(
 ) {
     var currentNode = initialNode
     do {
-        if (currentNode.isArgResolveNeeded()) {
+        if (currentNode.hasUnresolvedArgs()) {
             val arg = currentNode.currentArg()
             if (arg is UiText) {
                 val childNodeOrValue = createUiTextDisplayNodeOrValue(
@@ -166,7 +166,7 @@ private inline fun resolveArgs(
             }
         }
         // The loop continues as long as the current node has a parent or requires argument resolution.
-    } while (currentNode.parent != null || currentNode.isArgResolveNeeded())
+    } while (currentNode.parent != null || currentNode.hasUnresolvedArgs())
 }
 
 private inline fun resolveUiTextNode(
