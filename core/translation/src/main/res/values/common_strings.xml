@@ -19,6 +19,7 @@
     <string name="april_short">4월</string>
     <string name="august">8월</string>
     <string name="august_short">8월</string>
+    <string name="comma_combine" formatted="true">%1$s, %2$s</string>
     <plurals name="content_every_days_plurals">
         <item quantity="one">매일</item>
         <item quantity="other">%1$d일마다</item>

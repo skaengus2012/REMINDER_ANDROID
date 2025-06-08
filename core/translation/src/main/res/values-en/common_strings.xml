@@ -19,6 +19,7 @@
     <string name="april_short">Apr</string>
     <string name="august">August</string>
     <string name="august_short">Aug</string>
+    <string name="comma_combine" formatted="true">%1$s, %2$s</string>
     <plurals name="content_every_days_plurals">
         <item quantity="one">Daily</item>
         <item quantity="other">Every %1$d days</item>
