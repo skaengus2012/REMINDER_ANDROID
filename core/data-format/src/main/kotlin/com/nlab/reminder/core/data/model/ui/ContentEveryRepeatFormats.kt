@@ -35,31 +35,26 @@ import kotlinx.datetime.Month
  * @author Doohyun
  */
 internal fun contentEveryHours(interval: PositiveInt): UiText =
-    PluralsUiText(
-        resId = PluralsIds.content_every_hours_plurals,
-        count = interval.value,
-        interval.value
-    )
+    if (interval.value == 1) UiText(resId = StringIds.content_every_hours_fixed)
+    else UiText(resId = StringIds.content_every_hours_interval, interval.value)
 
 internal fun contentEveryDays(interval: PositiveInt): UiText =
-    PluralsUiText(
-        resId = PluralsIds.content_every_days_plurals,
-        count = interval.value,
-        interval.value
-    )
+    if (interval.value == 1) UiText(resId = StringIds.content_every_days_fixed)
+    else UiText(resId = StringIds.content_every_days_interval, interval.value)
 
 internal fun contentEveryWeeks(
     interval: PositiveInt,
     dayOfWeeks: NonEmptySet<DayOfWeek>,
     isSameDayOfWeek: Boolean
 ): UiText {
-    val contentEveryPlurals = PluralsUiText(
-        resId = PluralsIds.content_every_weeks_plurals,
-        count = interval.value,
-        interval.value
-    )
-    if (isSameDayOfWeek) {
-        return contentEveryPlurals
+    if (isSameDayOfWeek) return UiText(resId = StringIds.content_every_weeks_fixed)
+    val contentEveryWeeks: UiText
+    if (interval.value == 1) {
+        if (dayOfWeeks.isExactlyWeekday()) return UiText(StringIds.content_every_weeks_weekdays)
+        if (dayOfWeeks.isExactlyWeekend()) return UiText(StringIds.content_every_weeks_weekends)
+        contentEveryWeeks = UiText(resId = StringIds.content_every_weeks_fixed)
+    } else {
+        contentEveryWeeks = UiText(resId = StringIds.content_every_weeks_interval, interval.value)
     }
     val dayOfWeeksText = if (dayOfWeeks.value.size == 1) {
         contentDayOfWeekUiText(dayOfWeeks.value.first())
@@ -75,7 +70,7 @@ internal fun contentEveryWeeks(
     }
     return UiText(
         resId = StringIds.content_every_weeks_combine,
-        contentEveryPlurals,
+        contentEveryWeeks,
         dayOfWeeksText
     )
 }
@@ -85,13 +80,7 @@ internal fun contentEveryMonthsWithEachOption(
     option: MonthlyRepeatDetail.Each,
     isSameDay: Boolean,
 ): UiText {
-    if (isSameDay) return UiText(resId = StringIds.content_every_months)
-
-    val contentEveryPlurals = PluralsUiText(
-        resId = PluralsIds.content_every_months_plurals,
-        count = interval.value,
-        interval.value
-    )
+    if (isSameDay) return UiText(resId = StringIds.content_every_months_fixed)
     val daysText: UiText = if (option.days.value.size == 1) {
         contentEveryMonthsDaysUiText(option.days.value.first())
     } else {
@@ -104,11 +93,19 @@ internal fun contentEveryMonthsWithEachOption(
             contentEveryMonthsDaysUiText(sortedDays.last())
         )
     }
-    return UiText(
-        resId = StringIds.content_every_months_days_combine,
-        contentEveryPlurals,
-        daysText
-    )
+    return if (interval.value == 1) {
+        UiText(
+            resId = StringIds.content_every_months_days_combine_fixed,
+            UiText(resId = StringIds.content_every_months_fixed_other_day),
+            daysText
+        )
+    } else {
+        UiText(
+            resId = StringIds.content_every_months_days_combine_interval,
+            UiText(resId = StringIds.content_every_months_interval, interval.value),
+            daysText
+        )
+    }
 }
 
 internal fun contentEveryMonthsWithCustomizeOption(
@@ -116,11 +113,8 @@ internal fun contentEveryMonthsWithCustomizeOption(
     option: MonthlyRepeatDetail.Customize
 ): UiText = UiText(
     resId = StringIds.content_every_months_customize_combine,
-    PluralsUiText(
-        resId = PluralsIds.content_every_months_plurals,
-        count = interval.value,
-        interval.value
-    ),
+    if (interval.value == 1) UiText(resId = StringIds.content_every_months_fixed_other_day)
+    else UiText(resId = StringIds.content_every_months_interval, interval.value),
     contentOrderingDaysCombineUiText(
         order = option.order,
         day = option.day
@@ -133,13 +127,10 @@ internal fun convertEveryYears(
     daysOfWeekOption: YearlyDaysOfWeekOption?,
     isSameMonth: Boolean,
 ): UiText {
-    if (isSameMonth && daysOfWeekOption == null) return UiText(resId = StringIds.content_every_years)
-
-    val contentEveryPlurals = PluralsUiText(
-        resId = PluralsIds.content_every_years_plurals,
-        count = interval.value,
-        interval.value
-    )
+    if (isSameMonth && daysOfWeekOption == null) return UiText(resId = StringIds.content_every_years_fixed)
+    val contentEveryYears: UiText =
+        if (interval.value == 1) UiText(resId = StringIds.content_every_years_fixed_other_month)
+        else UiText(resId = StringIds.content_every_years_interval, interval.value)
     val monthsText = if (months.value.size == 1) contentMonthUiText(months.value.first())
     else {
         val sortedMonths = months.value.sorted()
@@ -155,13 +146,13 @@ internal fun convertEveryYears(
     return if (daysOfWeekOption == null) {
         UiText(
             resId = StringIds.content_every_years_months_combine,
-            contentEveryPlurals,
+            contentEveryYears,
             monthsText
         )
     } else {
         UiText(
             resId = StringIds.content_every_years_ordering_days_months_combine,
-            contentEveryPlurals,
+            contentEveryYears,
             contentOrderingDaysCombineUiText(
                 order = daysOfWeekOption.order,
                 day = daysOfWeekOption.day
@@ -183,4 +174,8 @@ private fun contentMonthUiText(month: Month): UiText =
 private fun contentOrderingDaysCombineUiText(
     order: DaysOfWeekOrder,
     day: Days
-): UiText = UiText(resId = StringIds.content_ordering_days_combine, order.resourceId, day.resourceId)
+): UiText = UiText(
+    resId = StringIds.content_ordering_days_combine,
+    UiText(resId = order.resourceId),
+    UiText(resId = day.resourceId)
+)

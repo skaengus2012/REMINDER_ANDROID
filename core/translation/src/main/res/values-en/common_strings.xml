@@ -20,34 +20,27 @@
     <string name="august">August</string>
     <string name="august_short">Aug</string>
     <string name="comma_combine" formatted="true">%1$s, %2$s</string>
-    <plurals name="content_every_days_plurals">
-        <item quantity="one">Daily</item>
-        <item quantity="other">Every %1$d days</item>
-    </plurals>
-    <plurals name="content_every_hours_plurals">
-        <item quantity="one">Hourly</item>
-        <item quantity="other">Every %1$d hours</item>
-    </plurals>
-    <string name="content_every_months">Monthly</string>
+    <string name="content_every_days_fixed">Daily</string>
+    <string name="content_every_days_interval" formatted="true">Every %1$d days</string>
+    <string name="content_every_hours_fixed">Hourly</string>
+    <string name="content_every_hours_interval" formatted="true">Every %1$d hours</string>
     <string name="content_every_months_customize_combine" formatted="true">%1$s on the %2$s</string>
     <string name="content_every_months_days" formatted="true">%1$dth</string>
-    <string name="content_every_months_days_combine" formatted="true">%1$s, each %2$s</string>
+    <string name="content_every_months_days_combine_fixed" formatted="true">%1$s, each %2$s</string>
+    <string name="content_every_months_days_combine_interval" formatted="true">%1$s, each %2$s</string>
     <string name="content_every_months_days_token" formatted="true">%1$s and %2$s</string>
-    <plurals name="content_every_months_plurals">
-        <item quantity="one">Every month</item>
-        <item quantity="other">Every %1$d months</item>
-    </plurals>
-    <plurals name="content_every_weeks_plurals">
-        <item quantity="one">Weekly</item>
-        <item quantity="other">Every %1$d weeks</item>
-    </plurals>
+    <string name="content_every_months_fixed">Monthly</string>
+    <string name="content_every_months_fixed_other_day">Every month</string>
+    <string name="content_every_months_interval" formatted="true">Every %1$d months</string>
     <string name="content_every_weeks_combine" formatted="true">%1$s on %2$s</string>
+    <string name="content_every_weeks_fixed">Weekly</string>
+    <string name="content_every_weeks_interval" formatted="true">Every %1$d weeks</string>
     <string name="content_every_weeks_token" formatted="true">%1$s and %2$s</string>
-    <string name="content_every_years">Yearly</string>
-    <plurals name="content_every_years_plurals">
-        <item quantity="one">Every year</item>
-        <item quantity="other">Every %1$d years</item>
-    </plurals>
+    <string name="content_every_weeks_weekdays">Weekdays</string>
+    <string name="content_every_weeks_weekends">Weekends</string>
+    <string name="content_every_years_fixed">Yearly</string>
+    <string name="content_every_years_fixed_other_month">Every year</string>
+    <string name="content_every_years_interval" formatted="true">Every %1$d years</string>
     <string name="content_every_years_months_combine" formatted="true">%1$s in %2$s</string>
     <string name="content_every_years_months_token" formatted="true">%1$s and %2$s</string>
     <string name="content_every_years_ordering_days_months_combine" formatted="true">%1$s on the %2$s of %3$s</string>
