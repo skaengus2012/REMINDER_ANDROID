@@ -132,9 +132,11 @@ private inline fun resolveArgs(
 ) {
     var currentNode = initialNode
     do {
+        // Check if the current node has unresolved arguments.
         if (currentNode.hasUnresolvedArgs()) {
             val arg = currentNode.currentArg()
             if (arg is UiText) {
+                // If the argument is a UiText, create a child node or resolve its value.
                 val childNodeOrValue = createUiTextDisplayNodeOrValue(
                     uiText = arg,
                     head = currentNode,
