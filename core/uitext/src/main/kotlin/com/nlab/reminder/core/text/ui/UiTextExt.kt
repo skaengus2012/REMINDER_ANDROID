@@ -165,6 +165,7 @@ private inline fun resolveArgs(
                 currentNode = parentNode
             }
         }
+        // The loop continues as long as the current node has a parent or requires argument resolution.
     } while (currentNode.parent != null || currentNode.isArgResolveNeeded())
 }
 
