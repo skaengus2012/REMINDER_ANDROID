@@ -46,7 +46,7 @@ internal class UiTextDisplayNode(
 ) {
     private var currentIndex: Int = 0
 
-    fun isArgResolveNeeded(): Boolean {
+    fun hasNextArg(): Boolean {
         return currentIndex < resolvedArgs.size
     }
 
