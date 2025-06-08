@@ -43,44 +43,84 @@ class UiTextExtKtTest {
     }
 
     @Test
-    fun givenFourDepthNestedUiText_whenToText_thenReturnsCorrectString() {
+    fun givenThreeParamUiText_whenToText_thenReturnsCorrectString() {
+        val first = genBothify()
+        val second = genBothify()
+        val third = genBothify()
+        val expected = context.getString(R.string.three_text_combine, first, second, third)
+        val uiText = UiText(R.string.three_text_combine, first, second, third)
+        val actual = uiText.toText(context)
+        assertThat(actual, equalTo(expected))
+    }
+
+    @Test
+    fun givenThreeParamTwoDepthNestedUiText_whenToText_thenReturnsCorrectString() {
+        val first = genBothify()
+        val second = genBothify()
+        val third = genBothify()
+        val expected = context.getString(R.string.three_text_combine, first, second, third)
+        val uiText = UiText(
+            R.string.three_text_combine,
+            UiText(first),
+            UiText(second),
+            UiText(third)
+        )
+        val actual = uiText.toText(context)
+        assertThat(actual, equalTo(expected))
+    }
+
+    @Test
+    fun givenFiveDepthNestedUiText_whenToText_thenReturnsCorrectString() {
         val text1 = genBothify()
         val text2 = genBothify()
         val text3 = genBothify()
         val text4 = genBothify()
         val text5 = genBothify()
+        val text6 = genBothify()
         val singleQuantity = 1
         val otherQuantity = genInt(min = 2, max = 10)
         val expected = context.getString(
-            R.string.twice_text_combine,
+            R.string.two_text_combine,
             text1,
             context.resources.getQuantityString(
-                R.plurals.twice_text_combine_plurals,
+                R.plurals.two_text_combine_plurals,
                 singleQuantity,
                 text2,
                 context.resources.getQuantityString(
-                    R.plurals.twice_text_combine_plurals,
+                    R.plurals.two_text_combine_plurals,
                     otherQuantity,
                     text3,
-                    context.getString(R.string.twice_text_combine, text4, text5)
+                    context.getString(
+                        R.string.two_text_combine,
+                        text4,
+                        context.getString(
+                            R.string.two_text_combine,
+                            text5,
+                            text6
+                        )
+                    )
                 )
             )
         )
         val uiText = UiText(
-            resId = R.string.twice_text_combine,
+            resId = R.string.two_text_combine,
             text1,
             PluralsUiText(
-                resId = R.plurals.twice_text_combine_plurals,
+                resId = R.plurals.two_text_combine_plurals,
                 count = singleQuantity,
                 text2,
                 PluralsUiText(
-                    resId = R.plurals.twice_text_combine_plurals,
+                    resId = R.plurals.two_text_combine_plurals,
                     count = otherQuantity,
                     text3,
                     UiText(
-                        resId = R.string.twice_text_combine,
+                        resId = R.string.two_text_combine,
                         text4,
-                        text5
+                        UiText(
+                            resId = R.string.two_text_combine,
+                            text5,
+                            text6
+                        )
                     )
                 )
             )
