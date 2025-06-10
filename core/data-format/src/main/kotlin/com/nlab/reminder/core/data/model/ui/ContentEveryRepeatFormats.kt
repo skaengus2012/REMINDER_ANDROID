@@ -23,10 +23,8 @@ import com.nlab.reminder.core.data.model.MonthlyRepeatDetail
 import com.nlab.reminder.core.data.model.YearlyDaysOfWeekOption
 import com.nlab.reminder.core.kotlin.PositiveInt
 import com.nlab.reminder.core.kotlin.collections.NonEmptySet
-import com.nlab.reminder.core.text.PluralsUiText
 import com.nlab.reminder.core.text.UiText
 import com.nlab.reminder.core.text.joinToUiText
-import com.nlab.reminder.core.translation.PluralsIds
 import com.nlab.reminder.core.translation.StringIds
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.Month
@@ -121,7 +119,7 @@ internal fun contentEveryMonthsWithCustomizeOption(
     )
 )
 
-internal fun convertEveryYears(
+internal fun contentEveryYears(
     interval: PositiveInt,
     months: NonEmptySet<Month>,
     daysOfWeekOption: YearlyDaysOfWeekOption?,

@@ -236,7 +236,7 @@ class ContentEveryRepeatFormatsKtPrint {
         println("• Print yearly")
         println(
             "  ◦ ${
-                convertEveryYears(
+                contentEveryYears(
                     interval = 1.toPositiveInt(),
                     months = NonEmptySet(Month.entries.random()),
                     daysOfWeekOption = null,
@@ -246,7 +246,7 @@ class ContentEveryRepeatFormatsKtPrint {
         )
         println(
             "  ◦ ${
-                convertEveryYears(
+                contentEveryYears(
                     interval = 1.toPositiveInt(),
                     months = NonEmptySet(Month.entries.random()),
                     daysOfWeekOption = null,
@@ -256,7 +256,7 @@ class ContentEveryRepeatFormatsKtPrint {
         )
         println(
             "  ◦ ${
-                convertEveryYears(
+                contentEveryYears(
                     interval = genInt(min = 2, max = 10).toPositiveInt(),
                     months = NonEmptySet(Month.entries.random()),
                     daysOfWeekOption = null,
@@ -266,7 +266,7 @@ class ContentEveryRepeatFormatsKtPrint {
         )
         println(
             "  ◦ ${
-                convertEveryYears(
+                contentEveryYears(
                     interval = 1.toPositiveInt(),
                     months = Month.entries
                         .shuffledSubset(generateMinSize = 2)
@@ -278,7 +278,7 @@ class ContentEveryRepeatFormatsKtPrint {
         )
         println(
             "  ◦ ${
-                convertEveryYears(
+                contentEveryYears(
                     interval = genInt(min = 2, max = 10).toPositiveInt(),
                     months = Month.entries
                         .shuffledSubset(generateMinSize = 2)
