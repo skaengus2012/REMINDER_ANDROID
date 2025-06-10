@@ -69,6 +69,7 @@ include(
     ":core:component:usermessage-test",
     ":core:data",
     ":core:data-di",
+    ":core:data-format",
     ":core:data-impl",
     ":core:data-platform-impl",
     ":core:data-test",

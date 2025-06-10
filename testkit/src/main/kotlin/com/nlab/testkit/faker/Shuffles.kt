@@ -16,6 +16,7 @@
 
 package com.nlab.testkit.faker
 
+import kotlin.math.max
 import kotlin.reflect.KClass
 
 /**
@@ -33,10 +34,15 @@ fun <T> Iterable<T>.shuffleAndGetFirst(
 /**
  * If iterable is empty, return EmptySet.
  * If the value exists in the iterable, one or more subSet is output.
+ *
+ * @param generateMinSize Minimum size of the subset. It should be at least 1.
  */
-fun <T> Iterable<T>.shuffledSubset(): Set<T> = shuffled().let { list ->
+fun <T> Iterable<T>.shuffledSubset(generateMinSize: Int = 1): Set<T> = shuffled().let { list ->
     if (list.isEmpty()) emptySet()
-    else list.take(genInt(min = 1, max = list.size)).toSet()
+    else {
+        require(generateMinSize >= 1) { "generateMinSize must be at least 1" }
+        list.take(genInt(min = generateMinSize, max = max(generateMinSize, list.size))).toSet()
+    }
 }
 
 fun <T> Iterable<T>.requireSample(): T = shuffled().first()
