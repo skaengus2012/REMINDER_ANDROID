@@ -46,13 +46,13 @@ internal fun contentEveryWeeks(
     isSameDayOfWeek: Boolean
 ): UiText {
     if (isSameDayOfWeek) return UiText(resId = StringIds.content_every_weeks_fixed)
-    val contentEveryWeeks: UiText
+    val intervalText: UiText
     if (interval.value == 1) {
         if (dayOfWeeks.isExactlyWeekday()) return UiText(StringIds.content_every_weeks_weekdays)
         if (dayOfWeeks.isExactlyWeekend()) return UiText(StringIds.content_every_weeks_weekends)
-        contentEveryWeeks = UiText(resId = StringIds.content_every_weeks_fixed)
+        intervalText = UiText(resId = StringIds.content_every_weeks_fixed)
     } else {
-        contentEveryWeeks = UiText(resId = StringIds.content_every_weeks_interval, interval.value)
+        intervalText = UiText(resId = StringIds.content_every_weeks_interval, interval.value)
     }
     val dayOfWeeksText = if (dayOfWeeks.value.size == 1) {
         contentDayOfWeekUiText(dayOfWeeks.value.first())
@@ -68,7 +68,7 @@ internal fun contentEveryWeeks(
     }
     return UiText(
         resId = StringIds.content_every_weeks_combine,
-        contentEveryWeeks,
+        intervalText,
         dayOfWeeksText
     )
 }
@@ -126,7 +126,7 @@ internal fun contentEveryYears(
     isSameMonth: Boolean,
 ): UiText {
     if (isSameMonth && daysOfWeekOption == null) return UiText(resId = StringIds.content_every_years_fixed)
-    val contentEveryYears: UiText =
+    val intervalText: UiText =
         if (interval.value == 1) UiText(resId = StringIds.content_every_years_fixed_other_month)
         else UiText(resId = StringIds.content_every_years_interval, interval.value)
     val monthsText = if (months.value.size == 1) contentMonthUiText(months.value.first())
@@ -144,13 +144,13 @@ internal fun contentEveryYears(
     return if (daysOfWeekOption == null) {
         UiText(
             resId = StringIds.content_every_years_months_combine,
-            contentEveryYears,
+            intervalText,
             monthsText
         )
     } else {
         UiText(
             resId = StringIds.content_every_years_ordering_days_months_combine,
-            contentEveryYears,
+            intervalText,
             contentOrderingDaysCombineUiText(
                 order = daysOfWeekOption.order,
                 day = daysOfWeekOption.day
