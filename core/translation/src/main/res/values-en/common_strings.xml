@@ -93,7 +93,7 @@
     </plurals>
     <plurals name="months_interval">
         <item quantity="one">Month</item>
-        <item quantity="other">%1$ months</item>
+        <item quantity="other">%1$d months</item>
     </plurals>
     <string name="november">November</string>
     <string name="november_short">Nov</string>
