@@ -87,7 +87,7 @@
         <item quantity="other">개월</item>
     </plurals>
     <plurals name="months_interval">
-        <item quantity="other">%1$개월</item>
+        <item quantity="other">%1$d개월</item>
     </plurals>
     <string name="november">11월</string>
     <string name="november_short">11월</string>
