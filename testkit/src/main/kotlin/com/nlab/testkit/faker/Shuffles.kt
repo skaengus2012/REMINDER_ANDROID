@@ -40,7 +40,7 @@ fun <T> Iterable<T>.shuffleAndGetFirst(
 fun <T> Iterable<T>.shuffledSubset(generateMinSize: Int = 1): Set<T> = shuffled().let { list ->
     if (list.isEmpty()) emptySet()
     else {
-        require(generateMinSize >= 1)
+        require(generateMinSize >= 1) { "generateMinSize must be at least 1" }
         list.take(genInt(min = generateMinSize, max = max(generateMinSize, list.size))).toSet()
     }
 }
