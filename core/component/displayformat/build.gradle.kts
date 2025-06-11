@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    namespace = "com.nlab.reminder.core.data.format"
+    namespace = "com.nlab.reminder.core.component.displayformat"
 }
 
 dependencies {

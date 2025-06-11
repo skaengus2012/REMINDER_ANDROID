@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.data.model.ui
+package com.nlab.reminder.core.component.displayformat.ui
 
 import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4

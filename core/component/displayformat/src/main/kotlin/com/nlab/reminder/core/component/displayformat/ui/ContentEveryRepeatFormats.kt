@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.data.model.ui
+package com.nlab.reminder.core.component.displayformat.ui
 
 import com.nlab.reminder.core.data.model.Days
 import com.nlab.reminder.core.data.model.DaysOfMonth

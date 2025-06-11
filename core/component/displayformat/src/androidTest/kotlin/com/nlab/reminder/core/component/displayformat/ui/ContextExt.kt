@@ -14,22 +14,17 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.data.model.ui
+package com.nlab.reminder.core.component.displayformat.ui
 
-import androidx.annotation.StringRes
-import com.nlab.reminder.core.data.model.DaysOfWeekOrder
-import com.nlab.reminder.core.translation.StringIds
+import android.content.Context
+import java.util.Locale
 
 /**
- * @author Thalys
+ * @author Doohyun
  */
-@get:StringRes
-internal val DaysOfWeekOrder.resourceId: Int
-    get() = when (this) {
-        DaysOfWeekOrder.First -> StringIds.first
-        DaysOfWeekOrder.Second -> StringIds.second
-        DaysOfWeekOrder.Third -> StringIds.third
-        DaysOfWeekOrder.Fourth -> StringIds.fourth
-        DaysOfWeekOrder.Fifth -> StringIds.fifth
-        DaysOfWeekOrder.Last -> StringIds.last
-    }
+fun Context.setLocale(locale: Locale): Context {
+    return createConfigurationContext(resources.configuration.apply { setLocale(locale) })
+}
+
+val Context.currentLocale: Locale get() =
+    resources.configuration.locales[0]
