@@ -80,6 +80,7 @@ include(
     ":core:kotlin-test",
     ":core:kotlinx:coroutine",
     ":core:kotlinx:coroutine-android",
+    ":core:kotlinx:datetime",
     ":core:local",
     ":core:network",
     ":core:schedule",
