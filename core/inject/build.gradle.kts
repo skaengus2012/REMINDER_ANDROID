@@ -6,3 +6,7 @@ plugins {
 android {
     namespace = "com.nlab.reminder.core.inject"
 }
+
+dependencies {
+    implementation(projects.core.kotlinx.coroutine)
+}

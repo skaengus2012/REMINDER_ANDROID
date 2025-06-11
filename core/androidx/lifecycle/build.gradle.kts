@@ -23,6 +23,6 @@ android {
 }
 
 dependencies {
+    api(projects.core.kotlinx.coroutineAndroid)
     api(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.kotlinx.coroutines.android)
 }

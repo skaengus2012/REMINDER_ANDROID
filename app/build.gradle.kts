@@ -83,7 +83,7 @@ dependencies {
     implementation(projects.core.designsystem)
     implementation(projects.core.inject)
     implementation(projects.core.kotlin)
-    implementation(projects.core.kotlinxCoroutine)
+    implementation(projects.core.kotlinx.coroutineAndroid)
     implementation(projects.core.statekit)
     implementation(projects.core.translation)
 

@@ -9,7 +9,7 @@ android {
 
 dependencies {
     api(projects.core.kotlin)
-    implementation(projects.core.kotlinxCoroutine)
+    implementation(projects.core.kotlinx.coroutine)
 
     api(libs.kotlinx.datetime)
     implementation(libs.google.play.services.time)

@@ -19,7 +19,7 @@ plugins {
 
 dependencies {
     api(projects.core.kotlin)
-    api(projects.core.kotlinxCoroutine)
+    api(projects.core.kotlinx.coroutine)
 
     api(libs.kotlinx.datetime)
 }

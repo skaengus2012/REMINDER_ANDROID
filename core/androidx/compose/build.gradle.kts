@@ -9,7 +9,7 @@ android {
 
 dependencies {
     implementation(projects.core.designsystem)
-    implementation(projects.core.kotlinxCoroutine)
+    implementation(projects.core.kotlinx.coroutine)
 
     implementation(libs.androidx.compose.material3)
     implementation(libs.kotlinx.datetime)
