@@ -16,35 +16,6 @@
 
 package com.nlab.reminder.core.schedule.ui
 
-import android.content.Context
-import android.graphics.drawable.Drawable
-import android.view.MotionEvent
-import android.view.View
-import android.widget.ImageView
-import androidx.appcompat.content.res.AppCompatResources
-import androidx.constraintlayout.widget.ConstraintSet
-import androidx.core.graphics.drawable.DrawableCompat
-import androidx.lifecycle.flowWithLifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.transition.AutoTransition
-import androidx.transition.TransitionManager
-import coil.load
-import com.nlab.reminder.R
-import com.nlab.reminder.core.android.content.getThemeColor
-import com.nlab.reminder.core.androix.recyclerview.absoluteAdapterOptionalPosition
-import com.nlab.reminder.core.androix.recyclerview.bindingAdapterOptionalPosition
-import com.nlab.reminder.core.androidx.transition.transitionListenerOf
-import com.nlab.reminder.core.android.view.initWithLifecycleOwner
-import com.nlab.reminder.core.android.view.throttleClicks
-import com.nlab.reminder.core.android.view.touches
-import com.nlab.reminder.core.android.view.bindSelected
-import com.nlab.reminder.core.android.widget.bindText
-import com.nlab.reminder.databinding.ViewItemScheduleElementBinding
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.mapNotNull
-import kotlinx.coroutines.flow.onEach
 
 /**
  * @author Doohyun
