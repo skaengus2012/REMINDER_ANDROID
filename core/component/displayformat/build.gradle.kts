@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.nlab.android.library)
+    alias(libs.plugins.nlab.android.library.compose.component)
 }
 
 android {
@@ -9,7 +10,6 @@ android {
 dependencies {
     api(projects.core.data)
     implementation(projects.core.dataExt)
-    implementation(projects.core.uitext)
     implementation(projects.core.translation)
 
     implementation(libs.androidx.annotation)
