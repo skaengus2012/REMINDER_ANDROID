@@ -1,0 +1,292 @@
+/*
+ * Copyright (C) 2025 The N's lab Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.nlab.reminder.core.component.displayformat.ui
+
+import android.content.Context
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
+import com.nlab.reminder.core.data.model.Days
+import com.nlab.reminder.core.data.model.DaysOfMonth
+import com.nlab.reminder.core.data.model.DaysOfWeekOrder
+import com.nlab.reminder.core.data.model.MonthlyRepeatDetail
+import com.nlab.reminder.core.kotlin.collections.NonEmptySet
+import com.nlab.reminder.core.kotlin.collections.toNonEmptySet
+import com.nlab.reminder.core.kotlin.toPositiveInt
+import com.nlab.reminder.core.text.ui.toText
+import com.nlab.testkit.faker.genInt
+import com.nlab.testkit.faker.shuffleAndGetFirst
+import com.nlab.testkit.faker.shuffledSubset
+import kotlinx.datetime.DayOfWeek
+import kotlinx.datetime.Month
+import org.junit.After
+import org.junit.Before
+import org.junit.Test
+import org.junit.runner.RunWith
+import java.util.Locale
+
+/**
+ * @author Doohyun
+ */
+@RunWith(AndroidJUnit4::class)
+class ContentEveryRepeatFormatsKtPrint {
+    private lateinit var context: Context
+    private lateinit var initialLocale: Locale
+
+    @Before
+    fun setup() {
+        context = InstrumentationRegistry.getInstrumentation().targetContext
+        initialLocale = context.currentLocale
+    }
+
+    @After
+    fun teardown() {
+        context = context.setLocale(initialLocale)
+    }
+
+    @Test
+    fun printWithLocaleKorean() {
+        context = context.setLocale(Locale.KOREAN)
+        printContentEveryRepeats()
+    }
+
+    @Test
+    fun printWithLocaleEnglish() {
+        context = context.setLocale(Locale.ENGLISH)
+        printContentEveryRepeats()
+    }
+
+    private fun printContentEveryRepeats() {
+        println("---- Print content every repeat ----")
+        println("• Print hourly")
+        println("  ◦ ${contentEveryHours(interval = 1.toPositiveInt()).toText(context)}")
+        println("  ◦ ${contentEveryHours(interval = 2.toPositiveInt()).toText(context)}")
+        println("• Print daily")
+        println("  ◦ ${contentEveryDays(interval = 1.toPositiveInt()).toText(context)}")
+        println("  ◦ ${contentEveryDays(interval = 2.toPositiveInt()).toText(context)}")
+        println("• Print weekly")
+        println(
+            "  ◦ ${
+                contentEveryWeeks(
+                    interval = 1.toPositiveInt(),
+                    dayOfWeeks = NonEmptySet(DayOfWeek.entries.random()),
+                    isSameDayOfWeek = true
+                ).toText(context)
+            }"
+        )
+        println(
+            "  ◦ ${
+                contentEveryWeeks(
+                    interval = 2.toPositiveInt(),
+                    dayOfWeeks = NonEmptySet(DayOfWeek.entries.random()),
+                    isSameDayOfWeek = true
+                ).toText(context)
+            }"
+        )
+        println(
+            "  ◦ ${
+                contentEveryWeeks(
+                    interval = 1.toPositiveInt(),
+                    dayOfWeeks = NonEmptySet(DayOfWeek.entries.random()),
+                    isSameDayOfWeek = false
+                ).toText(context)
+            }"
+        )
+        println(
+            "  ◦ ${
+                contentEveryWeeks(
+                    interval = 1.toPositiveInt(),
+                    dayOfWeeks = NonEmptySet(DayOfWeek.SUNDAY, DayOfWeek.MONDAY),
+                    isSameDayOfWeek = false
+                ).toText(context)
+            }"
+        )
+        println(
+            "  ◦ ${
+                contentEveryWeeks(
+                    interval = 1.toPositiveInt(),
+                    dayOfWeeks = NonEmptySet(DayOfWeek.SUNDAY, DayOfWeek.SATURDAY),
+                    isSameDayOfWeek = false
+                ).toText(context)
+            }"
+        )
+        println(
+            "  ◦ ${
+                contentEveryWeeks(
+                    interval = 1.toPositiveInt(),
+                    dayOfWeeks = NonEmptySet(
+                        DayOfWeek.MONDAY, 
+                        DayOfWeek.TUESDAY,
+                        DayOfWeek.WEDNESDAY,
+                        DayOfWeek.THURSDAY,
+                        DayOfWeek.FRIDAY
+                    ),
+                    isSameDayOfWeek = false
+                ).toText(context)
+            }"
+        )
+        println(
+            "  ◦ ${
+                contentEveryWeeks(
+                    interval = genInt(min = 2, max = 10).toPositiveInt(),
+                    dayOfWeeks = DayOfWeek.entries.toNonEmptySet(),
+                    isSameDayOfWeek = false
+                ).toText(context)
+            }"
+        )
+        println(
+            "  ◦ ${
+                contentEveryWeeks(
+                    interval = genInt(min = 2, max = 10).toPositiveInt(),
+                    dayOfWeeks = NonEmptySet(DayOfWeek.SUNDAY, DayOfWeek.SATURDAY),
+                    isSameDayOfWeek = false
+                ).toText(context)
+            }"
+        )
+        println(
+            "  ◦ ${
+                contentEveryWeeks(
+                    interval = genInt(min = 2, max = 10).toPositiveInt(),
+                    dayOfWeeks = NonEmptySet(
+                        DayOfWeek.MONDAY,
+                        DayOfWeek.TUESDAY,
+                        DayOfWeek.WEDNESDAY,
+                        DayOfWeek.THURSDAY,
+                        DayOfWeek.FRIDAY
+                    ),
+                    isSameDayOfWeek = false
+                ).toText(context)
+            }"
+        )
+        println("• Print monthly")
+        println(
+            "  ◦ ${
+                contentEveryMonthsWithEachOption(
+                    interval = 1.toPositiveInt(),
+                    option = MonthlyRepeatDetail.Each(
+                        days = NonEmptySet(
+                            DaysOfMonth.entries.shuffleAndGetFirst()
+                        )
+                    ),
+                    isSameDay = true
+                ).toText(context)
+            }"
+        )
+        println(
+            "  ◦ ${
+                contentEveryMonthsWithEachOption(
+                    interval = 1.toPositiveInt(),
+                    option = MonthlyRepeatDetail.Each(
+                        days = NonEmptySet(
+                            DaysOfMonth.entries.shuffleAndGetFirst()
+                        )
+                    ),
+                    isSameDay = false
+                ).toText(context)
+            }"
+        )
+        println(
+            "  ◦ ${
+                contentEveryMonthsWithEachOption(
+                    interval = genInt(min = 2, max = 10).toPositiveInt(),
+                    option = MonthlyRepeatDetail.Each(
+                        days = DaysOfMonth.entries
+                            .shuffledSubset(generateMinSize = 2)
+                            .toNonEmptySet()
+                    ),
+                    isSameDay = false
+                ).toText(context)
+            }"
+        )
+        println(
+            "  ◦ ${
+                contentEveryMonthsWithCustomizeOption(
+                    interval = 1.toPositiveInt(),
+                    option = MonthlyRepeatDetail.Customize(
+                        order = DaysOfWeekOrder.entries.random(),
+                        day = Days.entries.random()
+                    )
+                ).toText(context)
+            }"
+        )
+        println(
+            "  ◦ ${
+                contentEveryMonthsWithCustomizeOption(
+                    interval = genInt(min = 2, max = 10).toPositiveInt(),
+                    option = MonthlyRepeatDetail.Customize(
+                        order = DaysOfWeekOrder.entries.random(),
+                        day = Days.entries.random()
+                    )
+                ).toText(context)
+            }"
+        )
+        println("• Print yearly")
+        println(
+            "  ◦ ${
+                contentEveryYears(
+                    interval = 1.toPositiveInt(),
+                    months = NonEmptySet(Month.entries.random()),
+                    daysOfWeekOption = null,
+                    isSameMonth = true,
+                ).toText(context)
+            }"
+        )
+        println(
+            "  ◦ ${
+                contentEveryYears(
+                    interval = 1.toPositiveInt(),
+                    months = NonEmptySet(Month.entries.random()),
+                    daysOfWeekOption = null,
+                    isSameMonth = false,
+                ).toText(context)
+            }"
+        )
+        println(
+            "  ◦ ${
+                contentEveryYears(
+                    interval = genInt(min = 2, max = 10).toPositiveInt(),
+                    months = NonEmptySet(Month.entries.random()),
+                    daysOfWeekOption = null,
+                    isSameMonth = false,
+                ).toText(context)
+            }"
+        )
+        println(
+            "  ◦ ${
+                contentEveryYears(
+                    interval = 1.toPositiveInt(),
+                    months = Month.entries
+                        .shuffledSubset(generateMinSize = 2)
+                        .toNonEmptySet(),
+                    daysOfWeekOption = null,
+                    isSameMonth = false,
+                ).toText(context)
+            }"
+        )
+        println(
+            "  ◦ ${
+                contentEveryYears(
+                    interval = genInt(min = 2, max = 10).toPositiveInt(),
+                    months = Month.entries
+                        .shuffledSubset(generateMinSize = 2)
+                        .toNonEmptySet(),
+                    daysOfWeekOption = null,
+                    isSameMonth = false,
+                ).toText(context)
+            }"
+        )
+    }
+}

@@ -15,12 +15,10 @@
  */
 plugins {
     alias(libs.plugins.nlab.jvm.library)
-    alias(libs.plugins.nlab.jvm.library.jacoco)
 }
 
 dependencies {
     api(projects.core.kotlin)
-    api(projects.core.kotlinxCoroutine)
-
-    api(libs.kotlinx.datetime)
+    api(projects.core.kotlinx.coroutine)
+    api(projects.core.kotlinx.datetime)
 }

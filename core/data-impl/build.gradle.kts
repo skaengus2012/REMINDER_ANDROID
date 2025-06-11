@@ -9,12 +9,12 @@ android {
 
 dependencies {
     implementation(projects.core.annotation)
-    implementation(projects.core.data)
+    implementation(projects.core.dataExt)
     implementation(projects.core.local)
+    implementation(projects.core.kotlinx.coroutine)
     implementation(projects.core.network)
 
     implementation(libs.kotlinx.collections.immutable)
-    implementation(libs.kotlinx.coroutines.android)
 
     testImplementation(projects.testkit)
     testImplementation(projects.core.dataTest)

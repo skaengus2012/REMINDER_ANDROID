@@ -13,10 +13,11 @@ android {
 }
 
 dependencies {
-    implementation(projects.core.kotlin)
+    api(projects.core.kotlinx.datetime)
 
     api(libs.androidx.datastore.preferences)
     api(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
-    api(libs.kotlinx.datetime)
+
+    implementation(projects.core.kotlin)
 }
