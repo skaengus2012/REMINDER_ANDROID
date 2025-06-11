@@ -8,9 +8,10 @@ android {
 }
 
 dependencies {
+    api(projects.core.kotlinx.datetime)
+
     implementation(projects.core.designsystem)
-    implementation(projects.core.kotlinx.coroutine)
+    implementation(projects.core.kotlinx.coroutineAndroid)
 
     implementation(libs.androidx.compose.material3)
-    implementation(libs.kotlinx.datetime)
 }

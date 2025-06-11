@@ -24,6 +24,8 @@ import com.nlab.reminder.core.data.model.YearlyDaysOfWeekOption
 import com.nlab.reminder.core.data.model.rawValue
 import com.nlab.reminder.core.kotlin.PositiveInt
 import com.nlab.reminder.core.kotlin.collections.NonEmptySet
+import com.nlab.reminder.core.kotlinx.datetime.isExactlyWeekdays
+import com.nlab.reminder.core.kotlinx.datetime.isExactlyWeekend
 import com.nlab.reminder.core.text.UiText
 import com.nlab.reminder.core.text.joinToUiText
 import com.nlab.reminder.core.translation.StringIds
@@ -49,8 +51,8 @@ internal fun contentEveryWeeks(
     if (isSameDayOfWeek) return UiText(resId = StringIds.content_every_weeks_fixed)
     val intervalText: UiText
     if (interval.value == 1) {
-        if (dayOfWeeks.isExactlyWeekday()) return UiText(StringIds.content_every_weeks_weekdays)
-        if (dayOfWeeks.isExactlyWeekend()) return UiText(StringIds.content_every_weeks_weekends)
+        if (dayOfWeeks.value.isExactlyWeekdays()) return UiText(StringIds.content_every_weeks_weekdays)
+        if (dayOfWeeks.value.isExactlyWeekend()) return UiText(StringIds.content_every_weeks_weekends)
         intervalText = UiText(resId = StringIds.content_every_weeks_fixed)
     } else {
         intervalText = UiText(resId = StringIds.content_every_weeks_interval, interval.value)

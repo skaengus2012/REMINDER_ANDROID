@@ -17,26 +17,12 @@
 package com.nlab.reminder.core.data.model.ui
 
 import androidx.annotation.StringRes
-import com.nlab.reminder.core.kotlin.collections.NonEmptySet
 import com.nlab.reminder.core.translation.StringIds
 import kotlinx.datetime.DayOfWeek
 
 /**
  * @author Doohyun
  */
-private val weekdays = setOf(
-    DayOfWeek.MONDAY,
-    DayOfWeek.TUESDAY,
-    DayOfWeek.WEDNESDAY,
-    DayOfWeek.THURSDAY,
-    DayOfWeek.FRIDAY
-)
-
-private val weekends = setOf(
-    DayOfWeek.SUNDAY,
-    DayOfWeek.SATURDAY
-)
-
 @get:StringRes
 internal val DayOfWeek.resourceId: Int
     get() = when (this) {
@@ -70,12 +56,4 @@ internal val sundayFirstComparator = object : Comparator<DayOfWeek> {
 
         return order1.compareTo(order2)
     }
-}
-
-internal fun NonEmptySet<DayOfWeek>.isExactlyWeekday(): Boolean {
-    return value == weekdays
-}
-
-internal fun NonEmptySet<DayOfWeek>.isExactlyWeekend(): Boolean {
-    return value == weekends
 }
