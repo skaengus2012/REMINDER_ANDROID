@@ -9,7 +9,7 @@ android {
 
 dependencies {
     implementation(projects.core.annotation)
-    implementation(projects.core.data)
+    implementation(projects.core.dataExt)
     implementation(projects.core.local)
     implementation(projects.core.network)
 

@@ -8,6 +8,7 @@ android {
 
 dependencies {
     api(projects.core.data)
+    implementation(projects.core.dataExt)
     implementation(projects.core.uitext)
     implementation(projects.core.translation)
 
