@@ -41,7 +41,7 @@ import java.util.Locale
  * @author Doohyun
  */
 @RunWith(AndroidJUnit4::class)
-class RepeatDisplayFormatsKtPrint {
+class RepeatDisplayFormatsPrinter {
     private lateinit var context: Context
     private lateinit var initialLocale: Locale
 
