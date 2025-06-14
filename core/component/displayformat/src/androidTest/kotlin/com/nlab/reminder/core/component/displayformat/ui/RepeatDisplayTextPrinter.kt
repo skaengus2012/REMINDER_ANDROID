@@ -3,11 +3,13 @@ package com.nlab.reminder.core.component.displayformat.ui
 import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.nlab.reminder.core.data.model.Repeat
 import com.nlab.reminder.core.data.model.genScheduleTiming
 import com.nlab.testkit.faker.genInt
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.plus
 import org.junit.After
@@ -57,12 +59,32 @@ class RepeatDisplayTextPrinter {
             scheduleTiming = genScheduleTiming(
                 triggerAt = Clock.System.now()
                     .plus(genInt(min = 0, max = 2), DateTimeUnit.DAY, timeZone)
-                    .plus(genInt(min = 0, max = 2), DateTimeUnit.HOUR, timeZone),
+                    .plus(genInt(min = 0, max = 5), DateTimeUnit.HOUR, timeZone)
+                    .plus(genInt(min = 0, max = 60), DateTimeUnit.MINUTE, timeZone),
             ),
             timeZone = timeZone,
             entryAt = now
         )
-        println(scheduleTimingDisplayResource.toRepeatDisplayText(context.resources))
+        val repeat: Repeat?
+        val triggerAt: LocalDate
+        when (scheduleTimingDisplayResource) {
+            is ScheduleTimingDisplayResource.DateOnly -> {
+                repeat = scheduleTimingDisplayResource.repeat
+                triggerAt = scheduleTimingDisplayResource.triggerAt
+            }
+            is ScheduleTimingDisplayResource.Datetime -> {
+                repeat = scheduleTimingDisplayResource.repeat
+                triggerAt = scheduleTimingDisplayResource.triggerAt.date
+            }
+        }
+        val result = if (repeat == null) ""
+        else {
+            repeatDisplayText(
+                resources = context.resources,
+                repeat = repeat,
+                triggerAt = triggerAt
+            )
+        }
+        println(result)
     }
-
 }
