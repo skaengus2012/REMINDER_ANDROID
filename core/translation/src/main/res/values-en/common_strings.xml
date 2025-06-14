@@ -19,7 +19,6 @@
     <string name="april_short">Apr</string>
     <string name="august">August</string>
     <string name="august_short">Aug</string>
-    <string name="comma_combine" formatted="true">%1$s, %2$s</string>
     <string name="content_every_days_fixed">Daily</string>
     <string name="content_every_days_interval" formatted="true">Every %1$d days</string>
     <string name="content_every_hours_fixed">Hourly</string>

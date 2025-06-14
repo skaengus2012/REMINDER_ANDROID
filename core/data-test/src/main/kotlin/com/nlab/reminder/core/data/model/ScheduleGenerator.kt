@@ -46,11 +46,11 @@ fun genScheduleContent(
 )
 
 fun genScheduleTiming(
-    triggerAtUtc: Instant = Clock.System.now(),
+    triggerAt: Instant = Clock.System.now(),
     isTriggerAtDateOnly: Boolean = genBoolean(),
     repeat: Repeat? = genRepeat()
 ): ScheduleTiming = ScheduleTiming(
-    triggerAt = triggerAtUtc,
+    triggerAt = triggerAt,
     isTriggerAtDateOnly = isTriggerAtDateOnly,
     repeat = repeat
 )

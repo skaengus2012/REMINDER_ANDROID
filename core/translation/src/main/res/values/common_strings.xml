@@ -19,7 +19,6 @@
     <string name="april_short">4월</string>
     <string name="august">8월</string>
     <string name="august_short">8월</string>
-    <string name="comma_combine" formatted="true">%1$s, %2$s</string>
     <string name="content_every_days_fixed">매일</string>
     <string name="content_every_days_interval">%1$d일마다</string>
     <string name="content_every_hours_fixed">매시간</string>
