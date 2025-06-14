@@ -40,7 +40,7 @@ class RepeatDisplayTextPrinter {
     }
 
     @Test
-    fun printToRepeatTextWithLocaleKorean() {
+    fun printWithLocaleKorean() {
         context = context.setLocale(Locale.KOREAN)
         printRepeatDisplayText()
     }
