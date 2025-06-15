@@ -12,7 +12,6 @@ import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.plus
-import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -23,37 +22,28 @@ import java.util.Locale
  */
 @RunWith(AndroidJUnit4::class)
 class RepeatDisplayTextPrinter {
-    private lateinit var context: Context
-    private lateinit var initialLocale: Locale
+    private lateinit var appContext: Context
     private lateinit var now: Instant
     private lateinit var timeZone: TimeZone
 
     @Before
     fun setup() {
-        context = InstrumentationRegistry.getInstrumentation().targetContext
-        initialLocale = context.currentLocale
+        appContext = InstrumentationRegistry.getInstrumentation().targetContext
         now = Clock.System.now()
         timeZone = TimeZone.currentSystemDefault()
     }
 
-    @After
-    fun teardown() {
-        context = context.setLocale(initialLocale)
-    }
-
     @Test
     fun printWithLocaleKorean() {
-        context = context.setLocale(Locale.KOREAN)
-        printRepeatDisplayText()
+        printRepeatDisplayText(context = appContext.setLocale(Locale.KOREAN))
     }
 
     @Test
     fun printWithLocaleEnglish() {
-        context = context.setLocale(Locale.ENGLISH)
-        printRepeatDisplayText()
+        printRepeatDisplayText(context = appContext.setLocale(Locale.ENGLISH))
     }
 
-    private fun printRepeatDisplayText() {
+    private fun printRepeatDisplayText(context: Context) {
         println("---- Print repeat display text ----")
         val scheduleTimingDisplayResource = ScheduleTimingDisplayResource(
             scheduleTiming = genScheduleTiming(

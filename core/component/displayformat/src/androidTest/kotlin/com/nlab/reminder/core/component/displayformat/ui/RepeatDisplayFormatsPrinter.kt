@@ -31,7 +31,6 @@ import com.nlab.testkit.faker.shuffleAndGetFirst
 import com.nlab.testkit.faker.shuffledSubset
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.Month
-import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -42,33 +41,24 @@ import java.util.Locale
  */
 @RunWith(AndroidJUnit4::class)
 class RepeatDisplayFormatsPrinter {
-    private lateinit var context: Context
-    private lateinit var initialLocale: Locale
+    private lateinit var appContext: Context
 
     @Before
     fun setup() {
-        context = InstrumentationRegistry.getInstrumentation().targetContext
-        initialLocale = context.currentLocale
-    }
-
-    @After
-    fun teardown() {
-        context = context.setLocale(initialLocale)
+        appContext = InstrumentationRegistry.getInstrumentation().targetContext
     }
 
     @Test
     fun printWithLocaleKorean() {
-        context = context.setLocale(Locale.KOREAN)
-        printContentEveryRepeats()
+        printContentEveryRepeats(context = appContext.setLocale(Locale.KOREAN))
     }
 
     @Test
     fun printWithLocaleEnglish() {
-        context = context.setLocale(Locale.ENGLISH)
-        printContentEveryRepeats()
+        printContentEveryRepeats(context = appContext.setLocale(Locale.ENGLISH))
     }
 
-    private fun printContentEveryRepeats() {
+    private fun printContentEveryRepeats(context: Context) {
         println("---- Print content every repeat ----")
         println("• Print hourly")
         println("  ◦ ${contentEveryHours(resources = context.resources, interval = 1.toPositiveInt())}")

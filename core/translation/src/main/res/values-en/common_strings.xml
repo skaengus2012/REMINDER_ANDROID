@@ -51,14 +51,14 @@
     <string name="content_ordering_days_combine" formatted="true">%1$s %2$s</string>
     <string name="datetime_format_list_date_only_default">yyyy/MM/dd</string>
     <string name="datetime_format_list_date_only_the_day_after_tomorrow">yyyy/MM/dd</string>
-    <string name="datetime_format_list_date_only_today">Today</string>
-    <string name="datetime_format_list_date_only_tomorrow">Tomorrow</string>
-    <string name="datetime_format_list_date_only_yesterday">Yesterday</string>
+    <string name="datetime_format_list_date_only_today">\'Today\'</string>
+    <string name="datetime_format_list_date_only_tomorrow">\'Tomorrow\'</string>
+    <string name="datetime_format_list_date_only_yesterday">\'Yesterday\'</string>
     <string name="datetime_format_list_default">yyyy/MM/dd h:mm a</string>
     <string name="datetime_format_list_the_day_after_tomorrow">yyyy/MM/dd h:mm a</string>
-    <string name="datetime_format_list_today">Today h:mm a</string>
-    <string name="datetime_format_list_tomorrow">Tomorrow h:mm a</string>
-    <string name="datetime_format_list_yesterday">Yesterday h:mm a</string>
+    <string name="datetime_format_list_today">\'Today\' h:mm a</string>
+    <string name="datetime_format_list_tomorrow">\'Tomorrow\' h:mm a</string>
+    <string name="datetime_format_list_yesterday">\'Yesterday\' h:mm a</string>
     <string name="day">day</string>
     <plurals name="days">
         <item quantity="one">Day</item>
