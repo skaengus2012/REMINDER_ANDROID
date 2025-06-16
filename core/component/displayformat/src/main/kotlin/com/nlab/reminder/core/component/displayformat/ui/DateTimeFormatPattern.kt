@@ -16,12 +16,16 @@
 
 package com.nlab.reminder.core.component.displayformat.ui
 
-import android.content.Context
+import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 /**
  * @author Doohyun
  */
-fun Context.setLocale(locale: Locale): Context {
-    return createConfigurationContext(resources.configuration.apply { setLocale(locale) })
+@JvmInline
+value class DateTimeFormatPattern internal constructor(private val value: String) {
+    fun toJavaDateTimeFormat(locale: Locale): DateTimeFormatter = DateTimeFormatter.ofPattern(
+        /* pattern =*/ value,
+        /* locale = */ locale
+    )
 }

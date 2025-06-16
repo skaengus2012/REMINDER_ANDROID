@@ -29,33 +29,37 @@ fun triggerAtDateTimeFormatPatternForList(
     resources: Resources,
     triggerAt: LocalDate,
     entryAt: LocalDate,
-): String = triggerAtDateTimeFormatPattern(
-    resources = resources,
-    triggerAt = triggerAt,
-    entryAt = entryAt,
-    onYesterday = { StringIds.datetime_format_list_date_only_yesterday },
-    onToday = { StringIds.datetime_format_list_date_only_today },
-    onTomorrow = { StringIds.datetime_format_list_date_only_tomorrow },
-    onDayAfterTomorrow = { StringIds.datetime_format_list_date_only_the_day_after_tomorrow },
-    onElse = { StringIds.datetime_format_list_date_only_default }
+): DateTimeFormatPattern = DateTimeFormatPattern(
+    value = triggerAtDateTimeFormatPatternSource(
+        resources = resources,
+        triggerAt = triggerAt,
+        entryAt = entryAt,
+        onYesterday = { StringIds.datetime_format_list_date_only_yesterday },
+        onToday = { StringIds.datetime_format_list_date_only_today },
+        onTomorrow = { StringIds.datetime_format_list_date_only_tomorrow },
+        onDayAfterTomorrow = { StringIds.datetime_format_list_date_only_the_day_after_tomorrow },
+        onElse = { StringIds.datetime_format_list_date_only_default }
+    )
 )
 
 fun triggerAtDateTimeFormatPatternForList(
     resources: Resources,
     triggerAt: LocalDateTime,
     entryAt: LocalDateTime,
-) = triggerAtDateTimeFormatPattern(
-    resources = resources,
-    triggerAt = triggerAt.date,
-    entryAt = entryAt.date,
-    onYesterday = { StringIds.datetime_format_list_yesterday },
-    onToday = { StringIds.datetime_format_list_today },
-    onTomorrow = { StringIds.datetime_format_list_tomorrow },
-    onDayAfterTomorrow = { StringIds.datetime_format_list_the_day_after_tomorrow },
-    onElse = { StringIds.datetime_format_list_default }
+): DateTimeFormatPattern = DateTimeFormatPattern(
+    value = triggerAtDateTimeFormatPatternSource(
+        resources = resources,
+        triggerAt = triggerAt.date,
+        entryAt = entryAt.date,
+        onYesterday = { StringIds.datetime_format_list_yesterday },
+        onToday = { StringIds.datetime_format_list_today },
+        onTomorrow = { StringIds.datetime_format_list_tomorrow },
+        onDayAfterTomorrow = { StringIds.datetime_format_list_the_day_after_tomorrow },
+        onElse = { StringIds.datetime_format_list_default }
+    )
 )
 
-private inline fun triggerAtDateTimeFormatPattern(
+private inline fun triggerAtDateTimeFormatPatternSource(
     resources: Resources,
     triggerAt: LocalDate,
     entryAt: LocalDate,

@@ -19,6 +19,7 @@ package com.nlab.reminder.core.component.displayformat.ui
 import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.nlab.reminder.core.android.content.firstLocale
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
@@ -32,7 +33,6 @@ import kotlinx.datetime.toLocalDateTime
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 /**
@@ -93,14 +93,11 @@ class DateTimeFormatPatternsPrinter {
             triggerAt: LocalDateTime,
             entryAt: LocalDateTime,
         ): String = triggerAt.toJavaLocalDateTime().format(
-            DateTimeFormatter.ofPattern(
-                triggerAtDateTimeFormatPatternForList(
-                    context.resources,
-                    triggerAt = triggerAt,
-                    entryAt = entryAt
-                ),
-                context.currentLocale
-            )
+            triggerAtDateTimeFormatPatternForList(
+                context.resources,
+                triggerAt = triggerAt,
+                entryAt = entryAt
+            ).toJavaDateTimeFormat(locale = context.firstLocale)
         )
 
         println("---- Print triggerAt----")
@@ -123,14 +120,11 @@ class DateTimeFormatPatternsPrinter {
             triggerAt: LocalDate,
             entryAt: LocalDate,
         ): String = triggerAt.toJavaLocalDate().format(
-            DateTimeFormatter.ofPattern(
-                triggerAtDateTimeFormatPatternForList(
-                    context.resources,
-                    triggerAt = triggerAt,
-                    entryAt = entryAt
-                ),
-                context.currentLocale
-            )
+            triggerAtDateTimeFormatPatternForList(
+                context.resources,
+                triggerAt = triggerAt,
+                entryAt = entryAt
+            ).toJavaDateTimeFormat(context.firstLocale)
         )
 
         println("---- Print triggerAt as date only ----")
