@@ -30,14 +30,12 @@ import com.nlab.reminder.core.local.database.entity.REPEAT_SETTING_PROPERTY_WEEK
 import com.nlab.reminder.core.local.database.entity.REPEAT_SETTING_PROPERTY_YEARLY_DAY_OF_WEEK
 import com.nlab.reminder.core.local.database.entity.REPEAT_SETTING_PROPERTY_YEARLY_DAY_ORDER
 import com.nlab.reminder.core.local.database.entity.REPEAT_SETTING_PROPERTY_YEARLY_MONTH
-import com.nlab.reminder.core.local.database.entity.REPEAT_SETTING_PROPERTY_ZONE_ID
 import com.nlab.reminder.core.local.database.entity.REPEAT_WEEKLY
 import com.nlab.reminder.core.local.database.entity.REPEAT_YEARLY
 import com.nlab.reminder.core.local.database.entity.RepeatDetailEntity
 import com.nlab.reminder.core.local.database.entity.RepeatType
 import com.nlab.reminder.core.local.database.transaction.ScheduleRepeatDetailAggregate
 import com.nlab.reminder.core.local.database.transaction.ScheduleRepeatAggregate
-import kotlinx.datetime.TimeZone
 
 /**
  * @author Thalys
@@ -85,7 +83,6 @@ private fun RepeatWeekly(
     )
     return Repeat.Weekly(
         interval,
-        timeZone = settingToValuesTables.getTimeZone(),
         daysOfWeeks = settingToValuesTables
             .getValue(REPEAT_SETTING_PROPERTY_WEEKLY)
             .map(::DayOfWeek)
@@ -105,7 +102,6 @@ private fun RepeatMonthly(
     val hasDaysOfMonth = REPEAT_SETTING_PROPERTY_MONTHLY_DAY in propertyCodeToValuesTables
     return Repeat.Monthly(
         interval,
-        timeZone = propertyCodeToValuesTables.getTimeZone(),
         detail = if (hasDaysOfMonth) {
             MonthlyRepeatDetail.Each(
                 days = propertyCodeToValuesTables
@@ -141,7 +137,6 @@ private fun RepeatYearly(
     val yearlyDayOfWeeks = propertyCodeToValuesTables[REPEAT_SETTING_PROPERTY_YEARLY_DAY_OF_WEEK]?.firstOrNull()
     return Repeat.Yearly(
         interval = interval,
-        timeZone = propertyCodeToValuesTables.getTimeZone(),
         months = propertyCodeToValuesTables
             .getValue(REPEAT_SETTING_PROPERTY_YEARLY_MONTH)
             .map { Month(it) }
@@ -160,10 +155,6 @@ private fun RepeatYearly(
         }
     )
 }
-
-private fun Map<String, List<String>>.getTimeZone(): TimeZone = getValue(REPEAT_SETTING_PROPERTY_ZONE_ID)
-    .first()
-    .let(TimeZone::of)
 
 internal fun Repeat.toAggregate(): ScheduleRepeatAggregate = when (this) {
     is Repeat.Hourly -> {
@@ -211,10 +202,6 @@ internal fun Repeat.toAggregate(): ScheduleRepeatAggregate = when (this) {
 private fun convertRepeatDetailAggregatesFromWeeklyRepeat(
     repeat: Repeat.Weekly
 ): Set<ScheduleRepeatDetailAggregate> = buildSet {
-    this += ScheduleRepeatDetailAggregate(
-        propertyCode = REPEAT_SETTING_PROPERTY_ZONE_ID,
-        value = repeat.timeZone.id
-    )
     repeat.daysOfWeeks.value.forEach { daysOfWeek ->
         this += ScheduleRepeatDetailAggregate(
             propertyCode = REPEAT_SETTING_PROPERTY_WEEKLY,
@@ -226,10 +213,6 @@ private fun convertRepeatDetailAggregatesFromWeeklyRepeat(
 private fun convertRepeatDetailAggregatesFromMonthlyRepeat(
     repeat: Repeat.Monthly
 ): Set<ScheduleRepeatDetailAggregate> = buildSet {
-    this += ScheduleRepeatDetailAggregate(
-        propertyCode = REPEAT_SETTING_PROPERTY_ZONE_ID,
-        value = repeat.timeZone.id
-    )
     when (val typedDetail = repeat.detail) {
         is MonthlyRepeatDetail.Each -> {
             typedDetail.days.value.forEach { daysOfMonth ->
@@ -256,10 +239,6 @@ private fun convertRepeatDetailAggregatesFromMonthlyRepeat(
 private fun convertRepeatDetailAggregatesFromYearlyRepeat(
     repeat: Repeat.Yearly
 ): Set<ScheduleRepeatDetailAggregate> = buildSet {
-    this += ScheduleRepeatDetailAggregate(
-        propertyCode = REPEAT_SETTING_PROPERTY_ZONE_ID,
-        value = repeat.timeZone.id
-    )
     repeat.months.value.forEach { month ->
         this += ScheduleRepeatDetailAggregate(
             propertyCode = REPEAT_SETTING_PROPERTY_YEARLY_MONTH,

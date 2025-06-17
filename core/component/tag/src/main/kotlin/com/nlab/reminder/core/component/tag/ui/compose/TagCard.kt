@@ -16,7 +16,6 @@
 
 package com.nlab.reminder.core.component.tag.ui.compose
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -71,7 +70,6 @@ fun TagCard(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun BoxScope.TagTextBackground(
     onClickLabel: String? = null,

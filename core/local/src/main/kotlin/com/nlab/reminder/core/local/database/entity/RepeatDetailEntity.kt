@@ -41,9 +41,6 @@ import androidx.room.PrimaryKey
  * - [REPEAT_SETTING_PROPERTY_YEARLY_DAY_ORDER] (If existed, it must exist at each setting)
  * - [REPEAT_SETTING_PROPERTY_YEARLY_DAY_OF_WEEK]
  *
- * All cases must have ZoneId together.
- * - [REPEAT_SETTING_PROPERTY_ZONE_ID]
- *
  * @author Thalys
  */
 @Entity(

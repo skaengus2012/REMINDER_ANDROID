@@ -22,10 +22,11 @@ android {
 }
 
 dependencies {
+    api(projects.core.kotlinx.coroutineAndroid)
+
     api(libs.androidx.recyclerview)
 
     implementation(projects.core.android)
 
-    implementation(libs.kotlinx.coroutines.core)
     implementation(libs.timber)
 }

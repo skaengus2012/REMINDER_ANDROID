@@ -30,8 +30,6 @@ android {
         applicationId = namespace
         versionCode = 1
         versionName = "1.0.0"
-
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
@@ -55,15 +53,6 @@ android {
             buildType.proguardFile("proguard-rules.pro")
         }
     }
-
-    packaging {
-        resources {
-            merges += listOf(
-                "META-INF/LICENSE.md",
-                "META-INF/LICENSE-notice.md"
-            )
-        }
-    }
 }
 
 dependencies {
@@ -80,7 +69,7 @@ dependencies {
     implementation(projects.core.designsystem)
     implementation(projects.core.inject)
     implementation(projects.core.kotlin)
-    implementation(projects.core.kotlinxCoroutine)
+    implementation(projects.core.kotlinx.coroutineAndroid)
     implementation(projects.core.statekit)
     implementation(projects.core.translation)
 
@@ -100,9 +89,6 @@ dependencies {
     implementation(libs.google.material)
     implementation(libs.timber)
 
-    debugImplementation(libs.facebook.flipper)
-    debugImplementation(libs.facebook.flipper.leakcanary)
-    debugImplementation(libs.facebook.soloader)
     debugImplementation(libs.squeare.leakcanary)
 
     testImplementation(projects.testkit)

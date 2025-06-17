@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (C) 2025 The N's lab Open Source Project
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~        http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+    <string name="april">4월</string>
+    <string name="april_short">4월</string>
+    <string name="august">8월</string>
+    <string name="august_short">8월</string>
+    <string name="content_every_days_fixed">매일</string>
+    <string name="content_every_days_interval">%1$d일마다</string>
+    <string name="content_every_hours_fixed">매시간</string>
+    <string name="content_every_hours_interval">%1$d시간마다</string>
+    <string name="content_every_months_customize_combine" formatted="true">%1$s %2$s</string>
+    <string name="content_every_months_days" formatted="true">%1$d일</string>
+    <string name="content_every_months_days_combine_fixed" formatted="true">%1$s %2$s마다</string>
+    <string name="content_every_months_days_combine_interval" formatted="true">%1$s %2$s</string>
+    <string name="content_every_months_days_token" formatted="true">%1$s 및 %2$s</string>
+    <string name="content_every_months_fixed">매월</string>
+    <string name="content_every_months_fixed_other_day">매월</string>
+    <string name="content_every_months_interval" formatted="true">%1$d개월마다</string>
+    <string name="content_every_weeks_combine" formatted="true">%1$s %2$s</string>
+    <string name="content_every_weeks_fixed">매주</string>
+    <string name="content_every_weeks_interval" formatted="true">%1$d주마다</string>
+    <string name="content_every_weeks_token" formatted="true">%1$s 및 %2$s</string>
+    <string name="content_every_weeks_weekdays">평일</string>
+    <string name="content_every_weeks_weekends">주말</string>
+    <string name="content_every_years_fixed">매년</string>
+    <string name="content_every_years_fixed_other_month">매년</string>
+    <string name="content_every_years_interval" formatted="true">%1$d년마다</string>
+    <string name="content_every_years_months_combine" formatted="true">%1$s %2$s</string>
+    <string name="content_every_years_months_token" formatted="true">%1$s 및 %2$s</string>
+    <string name="content_every_years_ordering_days_months_combine" formatted="true">%1$s %3$s %2$s</string>
+    <string name="content_frequency_daily">매일</string>
+    <string name="content_frequency_hourly">매시간</string>
+    <string name="content_frequency_monthly">매월</string>
+    <string name="content_frequency_weekly">매주</string>
+    <string name="content_frequency_yearly">매년</string>
+    <string name="content_ordering_days_combine" formatted="true">%1$s %2$s</string>
+    <string name="datetime_format_list_date_only_default">yyyy. M. dd.</string>
+    <string name="datetime_format_list_date_only_the_day_after_tomorrow">\'모레\'</string>
+    <string name="datetime_format_list_date_only_today">\'오늘\'</string>
+    <string name="datetime_format_list_date_only_tomorrow">\'내일\'</string>
+    <string name="datetime_format_list_date_only_yesterday">\'어제\'</string>
+    <string name="datetime_format_list_default">yyyy. M. dd. a h:mm</string>
+    <string name="datetime_format_list_the_day_after_tomorrow">\'모레\' a h:mm</string>
+    <string name="datetime_format_list_today">\'오늘\' a h:mm</string>
+    <string name="datetime_format_list_tomorrow">\'내일\' a h:mm</string>
+    <string name="datetime_format_list_yesterday">\'어제\' a h:mm</string>
+    <string name="day">날</string>
+    <plurals name="days">
+        <item quantity="other">일</item>
+    </plurals>
+    <plurals name="days_interval">
+        <item quantity="other">%1$d일</item>
+    </plurals>
+    <string name="december">12월</string>
+    <string name="december_short">12월</string>
+    <string name="february">2월</string>
+    <string name="february_short">2월</string>
+    <string name="fifth">다섯 번째</string>
+    <string name="first">첫 번째</string>
+    <string name="fourth">네 번째</string>
+    <string name="friday">금요일</string>
+    <plurals name="hours">
+        <item quantity="other">시간</item>
+    </plurals>
+    <plurals name="hours_interval">
+        <item quantity="other">%1$d시간</item>
+    </plurals>
+    <string name="january">1월</string>
+    <string name="january_short">1월</string>
+    <string name="july">7월</string>
+    <string name="july_short">7월</string>
+    <string name="june">6월</string>
+    <string name="june_short">6월</string>
+    <string name="last">마지막</string>
+    <string name="march">3월</string>
+    <string name="march_short">3월</string>
+    <string name="may">5월</string>
+    <string name="may_short">5월</string>
+    <string name="monday">월요일</string>
+    <plurals name="months">
+        <item quantity="other">개월</item>
+    </plurals>
+    <plurals name="months_interval">
+        <item quantity="other">%1$d개월</item>
+    </plurals>
+    <string name="november">11월</string>
+    <string name="november_short">11월</string>
+    <string name="october">10월</string>
+    <string name="october_short">10월</string>
+    <string name="saturday">토요일</string>
+    <string name="second">두 번째</string>
+    <string name="september">9월</string>
+    <string name="september_short">9월</string>
+    <string name="sunday">일요일</string>
+    <string name="third">세 번째</string>
+    <string name="thursday">목요일</string>
+    <string name="tuesday">화요일</string>
+    <string name="wednesday">수요일</string>
+    <string name="weekday">평일</string>
+    <string name="weekend_day">주말</string>
+    <plurals name="weeks">
+        <item quantity="other">주</item>
+    </plurals>
+    <plurals name="weeks_interval">
+        <item quantity="other">%1$d주</item>
+    </plurals>
+    <plurals name="years">
+        <item quantity="other">년</item>
+    </plurals>
+    <plurals name="years_interval">
+        <item quantity="other">%1$d년</item>
+    </plurals>
+</resources>
