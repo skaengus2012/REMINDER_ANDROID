@@ -14,6 +14,7 @@ dependencies {
 
     implementation(libs.androidx.annotation)
 
+    androidTestImplementation(projects.core.android)
     androidTestImplementation(projects.core.dataTest)
     androidTestImplementation(projects.testkit)
     androidTestImplementation(libs.androidx.test.junit)

@@ -19,17 +19,26 @@ package com.nlab.reminder.core.component.displayformat.ui.compose
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
 import com.nlab.reminder.core.androidx.compose.ui.res.resources
-import com.nlab.reminder.core.component.displayformat.ui.ScheduleTimingDisplayResource
-import com.nlab.reminder.core.component.displayformat.ui.toRepeatDisplayText
+import com.nlab.reminder.core.data.model.Repeat
+import kotlinx.datetime.LocalDate
+import com.nlab.reminder.core.component.displayformat.ui.repeatDisplayText as repeatDisplayTextOrigin
 
 /**
+ * Generates a localized display string for a given [Repeat] on Compose.
+ *
  * @author Doohyun
+ * @see [com.nlab.reminder.core.component.displayformat.ui.repeatDisplayText]
  */
 @ReadOnlyComposable
 @Composable
 fun repeatDisplayText(
-    scheduleTimingDisplayResource: ScheduleTimingDisplayResource
+    repeat: Repeat,
+    triggerAt: LocalDate
 ): String {
     val resources = resources()
-    return scheduleTimingDisplayResource.toRepeatDisplayText(resources)
+    return repeatDisplayTextOrigin(
+        resources = resources,
+        repeat = repeat,
+        triggerAt = triggerAt
+    )
 }

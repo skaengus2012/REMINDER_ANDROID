@@ -49,6 +49,16 @@
     <string name="content_frequency_weekly">매주</string>
     <string name="content_frequency_yearly">매년</string>
     <string name="content_ordering_days_combine" formatted="true">%1$s %2$s</string>
+    <string name="datetime_format_list_date_only_default">yyyy. M. dd.</string>
+    <string name="datetime_format_list_date_only_the_day_after_tomorrow">\'모레\'</string>
+    <string name="datetime_format_list_date_only_today">\'오늘\'</string>
+    <string name="datetime_format_list_date_only_tomorrow">\'내일\'</string>
+    <string name="datetime_format_list_date_only_yesterday">\'어제\'</string>
+    <string name="datetime_format_list_default">yyyy. M. dd. a h:mm</string>
+    <string name="datetime_format_list_the_day_after_tomorrow">\'모레\' a h:mm</string>
+    <string name="datetime_format_list_today">\'오늘\' a h:mm</string>
+    <string name="datetime_format_list_tomorrow">\'내일\' a h:mm</string>
+    <string name="datetime_format_list_yesterday">\'어제\' a h:mm</string>
     <string name="day">날</string>
     <plurals name="days">
         <item quantity="other">일</item>
