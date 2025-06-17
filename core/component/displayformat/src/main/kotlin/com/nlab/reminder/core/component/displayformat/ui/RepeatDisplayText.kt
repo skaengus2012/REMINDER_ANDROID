@@ -41,7 +41,7 @@ import kotlinx.datetime.LocalDate
  *          triggerAt = scheduleTimingDisplayResource.triggerAt
  *     }
  *
- *     is ScheduleTimingDisplayResource.Datetime -> {
+ *     is ScheduleTimingDisplayResource.DateTime -> {
  *          repeat = scheduleTimingDisplayResource.repeat
  *          triggerAt = scheduleTimingDisplayResource.triggerAt.date
  *     }

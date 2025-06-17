@@ -16,8 +16,13 @@
 
 package com.nlab.reminder.core.component.displayformat.ui
 
+import java.time.format.DateTimeFormatter
+import java.util.Locale
+
 /**
  * @author Doohyun
  */
-@JvmInline
-value class DateTimeFormatPattern internal constructor(val value: String)
+fun DateTimeFormatPattern.toJavaDateTimeFormat(locale: Locale): DateTimeFormatter = DateTimeFormatter.ofPattern(
+    /* pattern =*/ value,
+    /* locale = */ locale
+)
