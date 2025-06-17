@@ -50,7 +50,7 @@ class RepeatDisplayTextPrinter {
                 triggerAt = Clock.System.now()
                     .plus(genInt(min = 0, max = 2), DateTimeUnit.DAY, timeZone)
                     .plus(genInt(min = 0, max = 5), DateTimeUnit.HOUR, timeZone)
-                    .plus(genInt(min = 0, max = 60), DateTimeUnit.MINUTE, timeZone),
+                    .plus(genInt(min = 0, max = 59), DateTimeUnit.MINUTE, timeZone),
             ),
             timeZone = timeZone,
             entryAt = now
