@@ -3,6 +3,7 @@ package com.nlab.reminder.core.component.displayformat.ui
 import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.nlab.reminder.core.component.displayformat.ScheduleTimingDisplayResource
 import com.nlab.reminder.core.data.model.Repeat
 import com.nlab.reminder.core.data.model.genScheduleTiming
 import com.nlab.testkit.faker.genInt
@@ -62,7 +63,7 @@ class RepeatDisplayTextPrinter {
                 repeat = scheduleTimingDisplayResource.repeat
                 triggerAt = scheduleTimingDisplayResource.triggerAt
             }
-            is ScheduleTimingDisplayResource.Datetime -> {
+            is ScheduleTimingDisplayResource.DateTime -> {
                 repeat = scheduleTimingDisplayResource.repeat
                 triggerAt = scheduleTimingDisplayResource.triggerAt.date
             }

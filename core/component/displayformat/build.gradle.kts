@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.nlab.android.library)
     alias(libs.plugins.nlab.android.library.compose.component)
+    alias(libs.plugins.nlab.android.library.jacoco)
 }
 
 android {
@@ -9,10 +10,14 @@ android {
 
 dependencies {
     api(projects.core.data)
+    implementation(projects.core.annotation)
     implementation(projects.core.dataExt)
     implementation(projects.core.translation)
 
     implementation(libs.androidx.annotation)
+
+    testImplementation(projects.testkit)
+    testImplementation(projects.core.dataTest)
 
     androidTestImplementation(projects.core.android)
     androidTestImplementation(projects.core.dataTest)

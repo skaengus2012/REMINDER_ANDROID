@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.component.displayformat.ui
+package com.nlab.reminder.core.component.displayformat
 
+import com.nlab.reminder.core.annotation.ExcludeFromGeneratedTestReport
 import com.nlab.reminder.core.data.model.Repeat
 import com.nlab.reminder.core.data.model.ScheduleTiming
 import kotlinx.datetime.Instant
@@ -28,12 +29,14 @@ import kotlinx.datetime.toLocalDateTime
  * @author Doohyun
  */
 sealed class ScheduleTimingDisplayResource {
-    data class Datetime(
+    @ExcludeFromGeneratedTestReport
+    data class DateTime(
         val triggerAt: LocalDateTime,
         val entryAt: LocalDateTime,
         val repeat: Repeat?
     ) : ScheduleTimingDisplayResource()
 
+    @ExcludeFromGeneratedTestReport
     data class DateOnly(
         val triggerAt: LocalDate,
         val entryAt: LocalDateTime,
@@ -56,7 +59,7 @@ fun ScheduleTimingDisplayResource(
             repeat = scheduleTiming.repeat
         )
     } else {
-        ScheduleTimingDisplayResource.Datetime(
+        ScheduleTimingDisplayResource.DateTime(
             triggerAt = scheduleTiming.triggerAt.toLocalDateTime(timeZone),
             entryAt = entryAtLocalDateTime,
             repeat = scheduleTiming.repeat
