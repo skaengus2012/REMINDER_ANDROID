@@ -41,7 +41,7 @@ junit = "4.13.2"
 kotlin = "2.1.21"
 kotlinxDatetime = "0.6.2"
 kotlinxSerializationJson = "1.8.1"
-ksp = "2.1.21-2.0.1"
+ksp = "2.1.21-2.0.2"
 kotlinxCollectionsImmutable = "0.3.7"
 kotlinxCoroutine = "1.10.2"
 mockitoInline = "5.2.0"
@@ -50,7 +50,7 @@ mockk = "1.14.2"
 squareLeakcanary = "2.14"
 squareKotlinpoet = "2.2.0"
 timber = "5.0.1"
-turbine = "1.2.0"
+turbine = "1.2.1"
 
 
 [libraries]
