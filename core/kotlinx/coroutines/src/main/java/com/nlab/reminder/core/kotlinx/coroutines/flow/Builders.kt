@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 The N's lab Open Source Project
+ * Copyright (C) 2025 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,15 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.feature.all
+package com.nlab.reminder.core.kotlinx.coroutines.flow
 
-import androidx.lifecycle.ViewModel
+import kotlinx.coroutines.channels.ProducerScope
+import kotlinx.coroutines.flow.Flow
+import kotlin.experimental.ExperimentalTypeInference
+import kotlinx.coroutines.flow.channelFlow as kotlinxChannelFlow
 
 /**
- * @author Doohyun
+ * @author Thalys
  */
-class AllViewModel : ViewModel(){
-}
+@OptIn(ExperimentalTypeInference::class)
+fun <T> channelFlow(@BuilderInference block: ProducerScope<T>.() -> Unit): Flow<T> = kotlinxChannelFlow(block)

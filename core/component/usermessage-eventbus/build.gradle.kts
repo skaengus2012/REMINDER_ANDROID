@@ -13,7 +13,7 @@ android {
 dependencies {
     implementation(projects.core.annotation)
     implementation(projects.core.component.usermessage)
-    implementation(projects.core.kotlinx.coroutine)
+    implementation(projects.core.kotlinx.coroutines)
 
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.androidx.lifecycle.runtime.compose)

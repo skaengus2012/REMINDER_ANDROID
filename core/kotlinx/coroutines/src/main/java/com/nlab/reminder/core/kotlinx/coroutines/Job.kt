@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.kotlinx.coroutine
+package com.nlab.reminder.core.kotlinx.coroutines
 
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job

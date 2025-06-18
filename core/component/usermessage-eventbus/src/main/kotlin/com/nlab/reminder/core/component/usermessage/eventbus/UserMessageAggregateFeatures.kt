@@ -20,7 +20,7 @@ import com.nlab.reminder.core.annotation.ExcludeFromGeneratedTestReport
 import com.nlab.reminder.core.component.usermessage.UserMessage
 import com.nlab.reminder.core.component.usermessage.UserMessageId
 import com.nlab.reminder.core.component.usermessage.eventbus.UserMessageAggregateAction.*
-import com.nlab.reminder.core.kotlinx.coroutine.flow.map
+import com.nlab.reminder.core.kotlinx.coroutines.flow.map
 import com.nlab.reminder.core.statekit.store.androidx.lifecycle.StoreViewModel
 import com.nlab.reminder.core.statekit.store.androidx.lifecycle.createStore
 import com.nlab.statekit.annotation.UiAction

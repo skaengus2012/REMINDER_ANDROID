@@ -23,7 +23,7 @@ android {
 }
 
 dependencies {
-    api(projects.core.kotlinx.coroutineAndroid)
+    api(projects.core.kotlinx.coroutinesAndroid)
 
     implementation(libs.androidx.annotation)
     implementation(libs.androidx.lifecycle.runtime.ktx)

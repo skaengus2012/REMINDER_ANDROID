@@ -18,7 +18,7 @@ package com.nlab.reminder.core.android.view
 
 import android.view.MotionEvent
 import android.view.View
-import com.nlab.reminder.core.kotlinx.coroutine.flow.throttleFirst
+import com.nlab.reminder.core.kotlinx.coroutines.flow.throttleFirst
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow

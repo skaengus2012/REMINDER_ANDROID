@@ -22,7 +22,7 @@ import com.nlab.reminder.core.component.tag.edit.processAsFlow
 import com.nlab.reminder.core.component.usermessage.UserMessageFactory
 import com.nlab.reminder.core.component.usermessage.getOrThrowMessage
 import com.nlab.reminder.core.kotlin.Result
-import com.nlab.reminder.core.kotlinx.coroutine.flow.map
+import com.nlab.reminder.core.kotlinx.coroutines.flow.map
 import com.nlab.statekit.dsl.reduce.DslReduce
 import com.nlab.statekit.reduce.Reduce
 import com.nlab.reminder.feature.home.HomeAction.*

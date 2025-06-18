@@ -22,7 +22,7 @@ android {
 }
 
 dependencies {
-    api(projects.core.kotlinx.coroutineAndroid)
+    api(projects.core.kotlinx.coroutinesAndroid)
 
     api(libs.androidx.recyclerview)
 

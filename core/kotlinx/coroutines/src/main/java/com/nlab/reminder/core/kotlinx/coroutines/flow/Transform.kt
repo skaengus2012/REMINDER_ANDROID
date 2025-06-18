@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.kotlinx.coroutine.flow
+package com.nlab.reminder.core.kotlinx.coroutines.flow
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter as kotlinxCoroutineFilter

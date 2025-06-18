@@ -13,7 +13,7 @@ dependencies {
     implementation(projects.core.androidx.recyclerview)
     implementation(projects.core.component.toolbar)
     implementation(projects.core.dataDi)
-    implementation(projects.core.kotlinx.coroutineAndroid)
+    implementation(projects.core.kotlinx.coroutinesAndroid)
     implementation(projects.core.translation)
 
     implementation(libs.androidx.constaintlayout)
