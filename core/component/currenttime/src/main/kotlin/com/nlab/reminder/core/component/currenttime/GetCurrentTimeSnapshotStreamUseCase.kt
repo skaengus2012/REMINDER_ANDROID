@@ -17,7 +17,7 @@
 package com.nlab.reminder.core.component.currenttime
 
 import com.nlab.reminder.core.data.repository.TimeSnapshotRepository
-import com.nlab.reminder.core.kotlinx.coroutine.flow.map
+import com.nlab.reminder.core.kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.onEach
 import kotlinx.datetime.Instant

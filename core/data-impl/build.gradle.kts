@@ -11,7 +11,7 @@ dependencies {
     implementation(projects.core.annotation)
     implementation(projects.core.dataExt)
     implementation(projects.core.local)
-    implementation(projects.core.kotlinx.coroutine)
+    implementation(projects.core.kotlinx.coroutines)
     implementation(projects.core.network)
 
     implementation(libs.kotlinx.collections.immutable)

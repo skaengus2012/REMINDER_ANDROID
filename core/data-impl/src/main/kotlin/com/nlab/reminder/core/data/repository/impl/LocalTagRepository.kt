@@ -22,14 +22,14 @@ import com.nlab.reminder.core.data.repository.GetTagQuery
 import com.nlab.reminder.core.data.repository.SaveTagQuery
 import com.nlab.reminder.core.data.repository.TagRepository
 import com.nlab.reminder.core.kotlin.NonNegativeInt
-import com.nlab.reminder.core.kotlinx.coroutine.flow.map
+import com.nlab.reminder.core.kotlinx.coroutines.flow.map
 import com.nlab.reminder.core.kotlin.Result
 import com.nlab.reminder.core.kotlin.catching
 import com.nlab.reminder.core.kotlin.collections.toSet
 import com.nlab.reminder.core.kotlin.map
 import com.nlab.reminder.core.kotlin.toNonNegativeInt
 import com.nlab.reminder.core.kotlin.trim
-import com.nlab.reminder.core.kotlinx.coroutine.flow.combine
+import com.nlab.reminder.core.kotlinx.coroutines.flow.combine
 import com.nlab.reminder.core.local.database.dao.ScheduleTagListDAO
 import com.nlab.reminder.core.local.database.dao.TagDAO
 import com.nlab.reminder.core.local.database.entity.TagEntity

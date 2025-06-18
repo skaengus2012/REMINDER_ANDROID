@@ -31,7 +31,7 @@ internal fun Project.configureStdFeatureDependencies() {
         "implementation"(project(":core:annotation"))
         "implementation"(project(":core:component:usermessage"))
         "implementation"(project(":core:kotlin"))
-        "implementation"(project(":core:kotlinx:coroutine-android"))
+        "implementation"(project(":core:kotlinx:coroutines-android"))
         "implementation"(project(":core:translation"))
 
         "implementation"(libs.findLibrary("kotlinx.serialization.json").get())

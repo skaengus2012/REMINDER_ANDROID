@@ -18,7 +18,7 @@ package com.nlab.reminder.feature.home
 
 import com.nlab.reminder.core.data.repository.GetScheduleCountQuery
 import com.nlab.reminder.core.data.repository.GetTagQuery
-import com.nlab.reminder.core.kotlinx.coroutine.flow.map
+import com.nlab.reminder.core.kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 
