@@ -11,7 +11,7 @@ dependencies {
     api(projects.statekit.core)
     api(projects.statekit.dsl)
 
-    implementation(projects.core.kotlinx.coroutineAndroid)
+    implementation(projects.core.kotlinx.coroutinesAndroid)
 
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
 

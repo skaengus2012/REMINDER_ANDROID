@@ -25,7 +25,7 @@ import com.nlab.reminder.core.component.usermessage.FeedbackPriority
 import com.nlab.reminder.core.component.usermessage.UserMessageFactory
 import com.nlab.reminder.core.component.usermessage.eventbus.UserMessageBroadcast
 import com.nlab.reminder.core.inject.qualifiers.coroutine.AppScope
-import com.nlab.reminder.core.kotlinx.coroutine.flow.throttleFirst
+import com.nlab.reminder.core.kotlinx.coroutines.flow.throttleFirst
 import com.nlab.reminder.core.text.UiText
 import com.nlab.reminder.core.translation.StringIds
 import dagger.hilt.EntryPoint

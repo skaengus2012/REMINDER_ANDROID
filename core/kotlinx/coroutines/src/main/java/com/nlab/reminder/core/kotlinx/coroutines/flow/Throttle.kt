@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The N's lab Open Source Project
+ * Copyright (C) 2024 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,23 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.kotlinx.coroutine.flow
+package com.nlab.reminder.core.kotlinx.coroutines.flow
 
-import kotlinx.coroutines.channels.ProducerScope
 import kotlinx.coroutines.flow.Flow
-import kotlin.experimental.ExperimentalTypeInference
-import kotlinx.coroutines.flow.channelFlow as kotlinxChannelFlow
+import kotlinx.coroutines.flow.flow
 
 /**
- * @author Thalys
+ * @author Doohyun
  */
-@OptIn(ExperimentalTypeInference::class)
-fun <T> channelFlow(@BuilderInference block: ProducerScope<T>.() -> Unit): Flow<T> = kotlinxChannelFlow(block)
+fun <T> Flow<T>.throttleFirst(windowDuration: Long): Flow<T> = flow {
+    var lastEmissionTime = 0L
+    collect { upstream ->
+        val currentTime = System.currentTimeMillis()
+        val mayEmit = currentTime - lastEmissionTime > windowDuration
+        if (mayEmit)
+        {
+            lastEmissionTime = currentTime
+            emit(upstream)
+        }
+    }
+}

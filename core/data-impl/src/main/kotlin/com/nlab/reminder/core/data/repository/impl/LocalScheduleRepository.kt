@@ -31,8 +31,8 @@ import com.nlab.reminder.core.kotlin.Result
 import com.nlab.reminder.core.kotlin.catching
 import com.nlab.reminder.core.kotlin.collections.toSet
 import com.nlab.reminder.core.kotlin.tryToNonNegativeLongOrZero
-import com.nlab.reminder.core.kotlinx.coroutine.flow.flatMapLatest
-import com.nlab.reminder.core.kotlinx.coroutine.flow.map
+import com.nlab.reminder.core.kotlinx.coroutines.flow.flatMapLatest
+import com.nlab.reminder.core.kotlinx.coroutines.flow.map
 import com.nlab.reminder.core.local.database.dao.ScheduleDAO
 import com.nlab.reminder.core.local.database.dao.ScheduleRepeatDetailDAO
 import com.nlab.reminder.core.local.database.dao.ScheduleTagListDAO

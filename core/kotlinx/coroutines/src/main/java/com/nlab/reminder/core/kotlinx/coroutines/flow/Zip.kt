@@ -14,14 +14,16 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.kotlinx.coroutine.flow
+package com.nlab.reminder.core.kotlinx.coroutines.flow
 
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.mapNotNull
-import kotlinx.coroutines.flow.scan
+import kotlinx.coroutines.flow.combine as kotlinCombine
 
 /**
  * @author thalys
  */
-fun <T> Flow<T>.withBefore(initial: T): Flow<Pair<T, T>> =
-    scan(Pair<T?, T>(null, initial)) { acc, v -> Pair(acc.second, v) }.mapNotNull { (a, b) -> a?.let { it to b } }
+fun <T1, T2, R> combine(
+    flow: Flow<T1>,
+    flow2: Flow<T2>,
+    transform: (a: T1, b: T2) -> R
+): Flow<R> = kotlinCombine(flow, flow2, transform)

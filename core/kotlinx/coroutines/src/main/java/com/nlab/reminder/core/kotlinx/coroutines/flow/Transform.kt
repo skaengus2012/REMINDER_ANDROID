@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 The N's lab Open Source Project
+ * Copyright (C) 2024 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,18 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.kotlinx.coroutine.flow
+package com.nlab.reminder.core.kotlinx.coroutines.flow
 
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.combine as kotlinCombine
+import kotlinx.coroutines.flow.filter as kotlinxCoroutineFilter
+import kotlinx.coroutines.flow.map as kotlinxCoroutineMap
 
 /**
+ * There exists coverage that Jacoco does not recognize for Coroutine functions.
+ * Therefore, We create simple lambda functions to replace them.
+ *
  * @author thalys
  */
-fun <T1, T2, R> combine(
-    flow: Flow<T1>,
-    flow2: Flow<T2>,
-    transform: (a: T1, b: T2) -> R
-): Flow<R> = kotlinCombine(flow, flow2, transform)
+fun <T> Flow<T>.filter(predicate: (T) -> Boolean): Flow<T> = kotlinxCoroutineFilter(predicate)
+
+fun <T, R> Flow<T>.map(transform: (value: T) -> R): Flow<R> = kotlinxCoroutineMap(transform)

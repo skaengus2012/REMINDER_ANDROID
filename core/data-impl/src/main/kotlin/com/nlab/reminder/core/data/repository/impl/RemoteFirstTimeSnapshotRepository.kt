@@ -19,7 +19,7 @@ package com.nlab.reminder.core.data.repository.impl
 import com.nlab.reminder.core.data.model.TimeSnapshot
 import com.nlab.reminder.core.data.repository.TimeSnapshotRepository
 import com.nlab.reminder.core.kotlin.getOrNull
-import com.nlab.reminder.core.kotlinx.coroutine.flow.flatMapConcat
+import com.nlab.reminder.core.kotlinx.coroutines.flow.flatMapConcat
 import com.nlab.reminder.core.network.datasource.TrustedTimeDataSource
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
