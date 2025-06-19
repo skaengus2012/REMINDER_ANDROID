@@ -19,7 +19,7 @@ package com.nlab.reminder.core.component.schedule.ui.view.list
 import android.widget.EditText
 import com.nlab.reminder.core.android.view.setVisible
 import com.nlab.reminder.core.android.widget.textChanges
-import com.nlab.reminder.core.kotlinx.coroutine.flow.withPrev
+import com.nlab.reminder.core.kotlinx.coroutines.flow.withPrev
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay

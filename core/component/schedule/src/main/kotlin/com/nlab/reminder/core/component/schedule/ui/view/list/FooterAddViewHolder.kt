@@ -23,7 +23,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.nlab.reminder.core.android.view.setVisible
 import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapterItemFooterAddBinding
-import com.nlab.reminder.core.kotlinx.coroutine.cancelAll
+import com.nlab.reminder.core.kotlinx.coroutines.cancelAll
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
