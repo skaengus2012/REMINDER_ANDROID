@@ -19,12 +19,11 @@ package com.nlab.statekit.dsl.reduce
 import com.nlab.statekit.dsl.TestAction
 import com.nlab.statekit.dsl.TestState
 import com.nlab.statekit.reduce.ActionDispatcher
+import io.mockk.coVerify
+import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
-import org.mockito.Mockito.mock
-import org.mockito.kotlin.never
-import org.mockito.kotlin.once
-import org.mockito.kotlin.verify
 
 /**
  * @author Doohyun
@@ -60,7 +59,7 @@ class StateScopeReduceBuilderTest {
     fun `Given matched input and runner, When launch effect form builder, Then runner invoked`() = runTest {
         val inputAction = TestAction.Action1
         val inputState = TestState.State1
-        val runner: () -> Unit = mock()
+        val runner: () -> Unit = mockk(relaxed = true)
         val reduceBuilder = TestStateScopeReduceBuilder {
             effect {
                 if (action == inputAction && current == inputState) {
@@ -70,7 +69,7 @@ class StateScopeReduceBuilderTest {
         }
         val effect = checkNotNull(reduceBuilder.delegate.buildEffect())
         effect.launchAndJoinForTest(inputAction, inputState)
-        verify(runner, once()).invoke()
+        verify(exactly = 1) { runner.invoke() }
     }
 
     @Test
@@ -86,13 +85,13 @@ class StateScopeReduceBuilderTest {
             effect.launchAndJoinForTest(inputAction, TestState.genState())
         }
 
-        val runnerWithAction1: () -> Unit = mock()
-        val runnerWithAction2: () -> Unit = mock()
+        val runnerWithAction1: () -> Unit = mockk(relaxed = true)
+        val runnerWithAction2: () -> Unit = mockk(relaxed = true)
         invokeWhenStateTypeIsAction1(inputAction = TestAction.Action1, runnerWithAction1)
         invokeWhenStateTypeIsAction1(inputAction = TestAction.Action2, runnerWithAction2)
 
-        verify(runnerWithAction1, once()).invoke()
-        verify(runnerWithAction2, never()).invoke()
+        verify(exactly = 1) { runnerWithAction1.invoke() }
+        verify(inverse = true) { runnerWithAction2.invoke() }
     }
 
     @Test
@@ -100,7 +99,7 @@ class StateScopeReduceBuilderTest {
         val inputAction = TestAction.Action1
         val inputState = TestState.State1
         val expectedAction = TestAction.Action2
-        val actionDispatcher: ActionDispatcher<TestAction> = mock()
+        val actionDispatcher: ActionDispatcher<TestAction> = mockk(relaxed = true)
         val reduceBuilder = TestStateScopeReduceBuilder {
             suspendEffect {
                 if (action == inputAction && current == inputState) dispatch(expectedAction)
@@ -108,7 +107,7 @@ class StateScopeReduceBuilderTest {
         }
         val effect = checkNotNull(reduceBuilder.delegate.buildEffect())
         effect.launchAndJoinForTest(inputAction, inputState, actionDispatcher)
-        verify(actionDispatcher, once()).dispatch(expectedAction)
+        coVerify(exactly = 1) { actionDispatcher.dispatch(expectedAction) }
     }
 
     @Test
@@ -116,7 +115,7 @@ class StateScopeReduceBuilderTest {
         val inputAction = TestAction.Action1
         val inputState = TestState.State1
         val expectedAction = TestAction.Action2
-        val actionDispatcher: ActionDispatcher<TestAction> = mock()
+        val actionDispatcher: ActionDispatcher<TestAction> = mockk(relaxed = true)
         val reduceBuilder = TestStateScopeReduceBuilder {
             suspendEffect<TestAction.Action1> {
                 if (current == inputState) dispatch(expectedAction)
@@ -124,7 +123,7 @@ class StateScopeReduceBuilderTest {
         }
         val effect = checkNotNull(reduceBuilder.delegate.buildEffect())
         effect.launchAndJoinForTest(inputAction, inputState, actionDispatcher)
-        verify(actionDispatcher, once()).dispatch(expectedAction)
+        coVerify(exactly = 1) { actionDispatcher.dispatch(expectedAction) }
     }
 
     @Test
@@ -146,7 +145,7 @@ class StateScopeReduceBuilderTest {
         val inputAction = TestAction.Action1
         val inputState = TestState.State1
         val expectedAction = TestAction.Action2
-        val actionDispatcher: ActionDispatcher<TestAction> = mock()
+        val actionDispatcher: ActionDispatcher<TestAction> = mockk(relaxed = true)
         val reduceBuilder = TestStateScopeReduceBuilder {
             scope(transformSource = {
                 if (action == inputAction && current == inputState) UpdateSource(action = 1, current = current)
@@ -163,7 +162,7 @@ class StateScopeReduceBuilderTest {
         }
         val effect = checkNotNull(reduceBuilder.delegate.buildEffect())
         effect.launchAndJoinForTest(inputAction, inputState, actionDispatcher)
-        verify(actionDispatcher, once()).dispatch(expectedAction)
+        coVerify(exactly = 1) { actionDispatcher.dispatch(expectedAction) }
     }
 
     @Test
@@ -171,7 +170,7 @@ class StateScopeReduceBuilderTest {
         val inputAction = TestAction.Action1
         val inputState = TestState.State1
         val expectedAction = TestAction.Action2
-        val actionDispatcher: ActionDispatcher<TestAction> = mock()
+        val actionDispatcher: ActionDispatcher<TestAction> = mockk(relaxed = true)
         val reduceBuilder = TestStateScopeReduceBuilder {
             scope<TestState.State1> {
                 suspendEffect {
@@ -181,7 +180,9 @@ class StateScopeReduceBuilderTest {
         }
         val effect = checkNotNull(reduceBuilder.delegate.buildEffect())
         effect.launchAndJoinForTest(inputAction, inputState, actionDispatcher)
-        verify(actionDispatcher, once()).dispatch(expectedAction)
+        coVerify(exactly = 1) {
+            actionDispatcher.dispatch(expectedAction)
+        }
     }
 }
 
