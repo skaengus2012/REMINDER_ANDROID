@@ -27,4 +27,5 @@ dependencies {
 
     implementation(libs.androidx.annotation)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.coil.kt)
 }
