@@ -207,6 +207,7 @@
                     android:background="@null"
                     android:imeOptions="actionDone"
                     android:inputType="textMultiLine"
+                    android:textColor="?content_2"
                     app:layout_constraintEnd_toEndOf="@id/edittext_title"
                     app:layout_constraintStart_toStartOf="@id/edittext_title"
                     app:layout_constraintTop_toBottomOf="@id/edittext_note" />

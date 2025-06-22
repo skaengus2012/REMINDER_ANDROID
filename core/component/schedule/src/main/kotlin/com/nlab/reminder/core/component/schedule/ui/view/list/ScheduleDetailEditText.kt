@@ -22,16 +22,17 @@ import android.text.Editable
 import android.text.TextPaint
 import android.text.TextUtils
 import android.text.TextWatcher
+import android.text.style.ForegroundColorSpan
 import android.text.style.MetricAffectingSpan
 import android.text.style.StyleSpan
 import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.core.text.buildSpannedString
-import androidx.core.text.color
 import androidx.core.text.inSpans
 import com.nlab.reminder.core.android.content.getThemeColor
 import com.nlab.reminder.core.component.displayformat.ScheduleTimingDisplayResource
 import com.nlab.reminder.core.component.displayformat.ui.repeatDisplayText
+import com.nlab.reminder.core.component.displayformat.ui.tagDisplayText
 import com.nlab.reminder.core.component.schedule.ui.TriggerAtFormatPatterns
 import com.nlab.reminder.core.component.schedule.R
 import com.nlab.reminder.core.data.model.ScheduleTiming
@@ -60,9 +61,13 @@ class ScheduleDetailEditText @JvmOverloads constructor(
             tp.baselineShift += shiftPx
         }
     }
+    private val expiredColorSpan = ForegroundColorSpan(context.getThemeColor(AttrIds.red1))
+    private val tagTextColorSpan = ForegroundColorSpan(context.getThemeColor(AttrIds.point_4))
+    private val tagDisplayTextTransformer = ::tagDisplayText
+
     private lateinit var triggerAtFormatPatterns: TriggerAtFormatPatterns
     private lateinit var dateTimeFormatPool: DateTimeFormatPool
-    private lateinit var scheduleTimingDisplayTextPool: ScheduleTimingDisplayTextPool
+    private lateinit var displayTextPool: DisplayTextPool
 
     private var scheduleTiming: ScheduleTiming? = null
     private var scheduleCompleted: Boolean = false
@@ -70,6 +75,7 @@ class ScheduleDetailEditText @JvmOverloads constructor(
     private var entryAt: Instant? = null
 
     private var displayTimingText: CharSequence = ""
+    private var displayTagsText: CharSequence = ""
 
     init {
         addTextChangedListener(object : TextWatcher {
@@ -89,11 +95,11 @@ class ScheduleDetailEditText @JvmOverloads constructor(
     internal fun initialize(
         triggerAtFormatPatterns: TriggerAtFormatPatterns,
         dateTimeFormatPool: DateTimeFormatPool,
-        scheduleTimingDisplayTextPool: ScheduleTimingDisplayTextPool
+        displayTextPool: DisplayTextPool
     ) {
         this.triggerAtFormatPatterns = triggerAtFormatPatterns
         this.dateTimeFormatPool = dateTimeFormatPool
-        this.scheduleTimingDisplayTextPool = scheduleTimingDisplayTextPool
+        this.displayTextPool = displayTextPool
     }
 
     override fun onSelectionChanged(selStart: Int, selEnd: Int) {
@@ -148,14 +154,14 @@ class ScheduleDetailEditText @JvmOverloads constructor(
             displayTimingText = getScheduleTimingDisplayText()
         }
 
-        setText(displayTimingText)
-        setSelection(displayTimingText.length) // TODO check tag states
+        displayTagsText = getTagsDisplayText(tags)
+
+        setTextAndSelection(getScheduleTimingAndTagsDisplayText())
     }
 
     private fun invalidateScheduleTimingDisplayText() {
         displayTimingText = getScheduleTimingDisplayText()
-        setText(displayTimingText)
-        setSelection(displayTimingText.length) // TODO check tag states
+        setTextAndSelection(getScheduleTimingAndTagsDisplayText())
     }
 
     private fun getScheduleTimingDisplayText(): CharSequence {
@@ -164,15 +170,9 @@ class ScheduleDetailEditText @JvmOverloads constructor(
         val curEntryAt = entryAt
         if (curScheduleTiming == null || curTimeZone == null || curEntryAt == null) return ""
 
-        return scheduleTimingDisplayTextPool.getOrPut(
-            scheduleTiming = curScheduleTiming,
-            scheduleCompleted = scheduleCompleted,
-            timeZone = curTimeZone,
-            entryAt = curEntryAt,
-            provideNewDisplayText = {
-                getScheduleTimingDisplayText(curScheduleTiming, scheduleCompleted, curTimeZone, curEntryAt)
-            }
-        )
+        return displayTextPool.getOrPut(curScheduleTiming) {
+            getScheduleTimingDisplayText(curScheduleTiming, scheduleCompleted, curTimeZone, curEntryAt)
+        }
     }
 
     private fun getScheduleTimingDisplayText(
@@ -245,9 +245,7 @@ class ScheduleDetailEditText @JvmOverloads constructor(
             )
         return if (scheduleCompleted || isTriggerAtAfterEntry) dateTimeDisplayTextWithRepeatSymbol
         else buildSpannedString {
-            color(context.getThemeColor(AttrIds.red1)) {
-                append(dateTimeDisplayTextWithRepeatSymbol)
-            }
+            inSpans(expiredColorSpan) { append(dateTimeDisplayTextWithRepeatSymbol) }
         }
     }
 
@@ -257,5 +255,24 @@ class ScheduleDetailEditText @JvmOverloads constructor(
         append(" ")
         append(repeatDetailText)
         append(" ")
+    }
+
+    private fun getTagsDisplayText(tags: List<Tag>): CharSequence {
+        return displayTextPool.getOrPut(tags) {
+            buildSpannedString {
+                inSpans(StyleSpan(Typeface.BOLD), tagTextColorSpan) {
+                    append(tags.joinToString(separator = " ", transform = tagDisplayTextTransformer))
+                }
+            }
+        }
+    }
+
+    private fun getScheduleTimingAndTagsDisplayText(): CharSequence {
+        return TextUtils.concat(displayTimingText, " ", displayTagsText)
+    }
+
+    private fun setTextAndSelection(text: CharSequence) {
+        setText(text)
+        setSelection(text.length)
     }
 }

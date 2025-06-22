@@ -51,6 +51,8 @@ import com.nlab.reminder.core.data.model.LinkMetadata
 import com.nlab.reminder.core.data.model.Repeat
 import com.nlab.reminder.core.data.model.ScheduleId
 import com.nlab.reminder.core.data.model.ScheduleTiming
+import com.nlab.reminder.core.data.model.Tag
+import com.nlab.reminder.core.data.model.TagId
 import com.nlab.reminder.core.kotlin.toNonBlankString
 import com.nlab.reminder.core.kotlin.toNonNegativeLong
 import com.nlab.reminder.core.kotlin.toPositiveInt
@@ -321,7 +323,16 @@ internal class AllFragment : ComposableFragment() {
                                 ),
                                 defaultVisiblePriority = it.toNonNegativeLong(),
                                 isComplete = false,
-                                tags = emptyList()
+                                tags = listOf(
+                                    Tag(
+                                        id = TagId(1),
+                                        name = "여행".toNonBlankString()
+                                    ),
+                                    Tag(
+                                        id = TagId(1),
+                                        name = "공부".toNonBlankString()
+                                    ),
+                                )
                             )
                         ),
                         isLineVisible = true

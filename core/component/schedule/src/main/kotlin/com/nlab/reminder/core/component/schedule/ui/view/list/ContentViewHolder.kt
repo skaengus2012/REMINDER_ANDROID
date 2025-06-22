@@ -70,7 +70,7 @@ class ContentViewHolder internal constructor(
     theme: ScheduleListTheme,
     triggerAtFormatPatterns: TriggerAtFormatPatterns,
     dateTimeFormatPool: DateTimeFormatPool,
-    scheduleTimingDisplayTextPool: ScheduleTimingDisplayTextPool,
+    displayTextPool: DisplayTextPool,
     timeZone: Flow<TimeZone>,
     entryAt: Flow<Instant>,
     selectionEnabled: StateFlow<Boolean>,
@@ -116,7 +116,7 @@ class ContentViewHolder internal constructor(
         binding.edittextDetail.initialize(
             triggerAtFormatPatterns = triggerAtFormatPatterns,
             dateTimeFormatPool = dateTimeFormatPool,
-            scheduleTimingDisplayTextPool = scheduleTimingDisplayTextPool
+            displayTextPool = displayTextPool
         )
 
         // Processing for multiline input and actionDone support

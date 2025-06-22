@@ -52,6 +52,7 @@ data class PlaneatColorScheme(
     val point1: Color = Point1,
     val point2: Color = Point2,
     val point3: Color = Point3,
+    val point4: Color = Point4,
     val red1: Color = Red400,
     val white: Color = Color.White,
     val black: Color = Color.Black,

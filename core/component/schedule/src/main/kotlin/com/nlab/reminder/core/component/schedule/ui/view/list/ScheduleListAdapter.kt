@@ -54,7 +54,7 @@ class ScheduleListAdapter(
     private val entryAt: Flow<Instant>
 ) : RecyclerView.Adapter<ScheduleAdapterItemViewHolder>() {
     private val dateTimeFormatPool = DateTimeFormatPool()
-    private val scheduleTimingDisplayTextPool = ScheduleTimingDisplayTextPool()
+    private val displayTextPool = DisplayTextPool()
     private val differ = ScheduleListDiffer(listUpdateCallback = AdapterListUpdateCallback(/* adapter = */ this))
 
     private val selectionEnabled = MutableStateFlow(false)
@@ -114,7 +114,7 @@ class ScheduleListAdapter(
                     theme = theme,
                     triggerAtFormatPatterns = triggerAtFormatPatterns,
                     dateTimeFormatPool = dateTimeFormatPool,
-                    scheduleTimingDisplayTextPool = scheduleTimingDisplayTextPool,
+                    displayTextPool = displayTextPool,
                     timeZone = timeZone,
                     entryAt = entryAt,
                     selectionEnabled = selectionEnabled,
@@ -197,6 +197,7 @@ class ScheduleListAdapter(
     }
 
     fun submitList(items: List<ScheduleAdapterItem>?) {
+        displayTextPool.invalidate()
         differ.submitList(items, commitCallback = {})
     }
 

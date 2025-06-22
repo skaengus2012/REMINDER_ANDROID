@@ -39,6 +39,7 @@ internal val Red400 = Color(0xFFFF1744)
 internal val Point1 = Color(0xFF1CCF98)
 internal val Point2 = Color(0xFFBE94F3)
 internal val Point3 = Color(0xFFFFB631)
+internal val Point4 = Color(0xFF5E9BFF)
 
 // light
 internal val Bg1Light = Color(0xFFF2F2F6)
