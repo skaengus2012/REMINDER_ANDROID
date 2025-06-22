@@ -21,7 +21,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.nlab.reminder.databinding.FragmentAllScheduleBinding
 import dagger.hilt.android.AndroidEntryPoint
 
 /**
@@ -29,19 +28,20 @@ import dagger.hilt.android.AndroidEntryPoint
  */
 @AndroidEntryPoint
 class AllScheduleFragment : Fragment() {
-    private var _binding: FragmentAllScheduleBinding? = null
-    private val binding: FragmentAllScheduleBinding get() = checkNotNull(_binding)
+  //  private var _binding: FragmentAllScheduleBinding? = null
+  //  private val binding: FragmentAllScheduleBinding get() = checkNotNull(_binding)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
        // postponeEnterTransition()
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? = null
+        /**
         FragmentAllScheduleBinding.inflate(inflater, container, false)
             .also { _binding = it }
             .root
-
+*/
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         /**
@@ -222,6 +222,6 @@ class AllScheduleFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        _binding = null
+    //    _binding = null
     }
 }
