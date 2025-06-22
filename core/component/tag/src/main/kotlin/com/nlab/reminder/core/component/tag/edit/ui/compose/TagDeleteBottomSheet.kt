@@ -39,9 +39,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.nlab.reminder.core.androidx.compose.ui.throttleClick
 import com.nlab.reminder.core.androidx.compose.ui.tooling.preview.Previews
+import com.nlab.reminder.core.component.displayformat.ui.tagDisplayText
+import com.nlab.reminder.core.data.model.Tag
+import com.nlab.reminder.core.data.model.TagId
 import com.nlab.reminder.core.designsystem.compose.component.PlaneatBottomSheet
 import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
-import com.nlab.reminder.core.kotlin.NonBlankString
 import com.nlab.reminder.core.kotlin.NonNegativeInt
 import com.nlab.reminder.core.kotlin.toNonBlankString
 import com.nlab.reminder.core.kotlin.toNonNegativeInt
@@ -54,7 +56,7 @@ import kotlinx.coroutines.launch
  */
 @Composable
 internal fun TagDeleteBottomSheet(
-    tagNames: List<NonBlankString>,
+    tags: List<Tag>,
     usageCount: NonNegativeInt,
     onConfirm: () -> Unit,
     onCancel: () -> Unit,
@@ -66,7 +68,7 @@ internal fun TagDeleteBottomSheet(
         sheetState = sheetState
     ) {
         TagDeleteBottomSheetContent(
-            tagNames = tagNames,
+            tags = tags,
             usageCount = usageCount,
             onConfirm = {
                 coroutineScope.launch {
@@ -86,14 +88,14 @@ internal fun TagDeleteBottomSheet(
 
 @Composable
 private fun TagDeleteBottomSheetContent(
-    tagNames: List<NonBlankString>,
+    tags: List<Tag>,
     usageCount: NonNegativeInt,
     onConfirm: () -> Unit,
     onCancel: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
-        val tagNameSize = tagNames.size
+        val tagNameSize = tags.size
         Text(
             modifier = Modifier.fillMaxWidth(),
             text = pluralStringResource(id = PluralsIds.tag_delete, count = tagNameSize, tagNameSize),
@@ -109,14 +111,14 @@ private fun TagDeleteBottomSheetContent(
             text = when (tagNameSize) {
                 0 -> ""
                 1 -> {
-                    val firstName = tagNames.first().value
+                    val firstTagDisplayText = tagDisplayText(tags.first())
                     getUsageCountLabel(
                         usageCount = usageCount,
                         transform = { count ->
                             pluralStringResource(
                                 id = PluralsIds.tag_delete_dialog_description_size_1,
                                 count = count,
-                                firstName,
+                                firstTagDisplayText,
                                 count
                             )
                         },
@@ -124,23 +126,23 @@ private fun TagDeleteBottomSheetContent(
                             pluralStringResource(
                                 id = PluralsIds.tag_delete_dialog_description_size_1_overflow,
                                 count = count,
-                                firstName,
+                                firstTagDisplayText,
                                 count
                             )
                         }
                     )
                 }
                 2 -> {
-                    val firstName = tagNames.first().value
-                    val secondName = tagNames.last().value
+                    val firstTagDisplayText = tagDisplayText(tags.first())
+                    val lastTagDisplayText = tagDisplayText(tags.last())
                     getUsageCountLabel(
                         usageCount = usageCount,
                         transform = { count ->
                             pluralStringResource(
                                 id = PluralsIds.tag_delete_dialog_description_size_2,
                                 count = count,
-                                firstName,
-                                secondName,
+                                firstTagDisplayText,
+                                lastTagDisplayText,
                                 count
                             )
                         },
@@ -148,15 +150,15 @@ private fun TagDeleteBottomSheetContent(
                             pluralStringResource(
                                 id = PluralsIds.tag_delete_dialog_description_size_2_overflow,
                                 count = count,
-                                firstName,
-                                secondName,
+                                firstTagDisplayText,
+                                lastTagDisplayText,
                                 count
                             )
                         }
                     )
                 }
                 else -> {
-                    val firstName = tagNames.first().value
+                    val firstTagDisplayText = tagDisplayText(tags.first())
                     val extraSize = tagNameSize - 1
                     getUsageCountLabel(
                         usageCount = usageCount,
@@ -164,7 +166,7 @@ private fun TagDeleteBottomSheetContent(
                             pluralStringResource(
                                 id = PluralsIds.tag_delete_dialog_description_size_other,
                                 count = count,
-                                firstName,
+                                firstTagDisplayText,
                                 extraSize,
                                 count
                             )
@@ -173,7 +175,7 @@ private fun TagDeleteBottomSheetContent(
                             pluralStringResource(
                                 id = PluralsIds.tag_delete_dialog_description_size_other_overflow,
                                 count = count,
-                                firstName,
+                                firstTagDisplayText,
                                 extraSize,
                                 count
                             )
@@ -239,7 +241,12 @@ private fun TagEditDeleteBottomSheetContentPreview() {
     PlaneatTheme {
         TagDeleteBottomSheetContent(
             modifier = Modifier.background(PlaneatTheme.colors.bgDialogSurface),
-            tagNames = listOf("Hello, TagDeleteBottomSheet".toNonBlankString()),
+            tags = listOf(
+                Tag(
+                    id = TagId(rawId = 1),
+                    name = "SingleTag".toNonBlankString()
+                )
+            ),
             usageCount = 5.toNonNegativeInt(),
             onConfirm = {},
             onCancel = {},
@@ -253,9 +260,15 @@ private fun TwoSizeTagEditDeleteBottomSheetContentPreview() {
     PlaneatTheme {
         TagDeleteBottomSheetContent(
             modifier = Modifier.background(PlaneatTheme.colors.bgDialogSurface),
-            tagNames = listOf(
-                "one".toNonBlankString(),
-                "two".toNonBlankString()
+            tags = listOf(
+                Tag(
+                    id = TagId(rawId = 1),
+                    name = "one".toNonBlankString()
+                ),
+                Tag(
+                    id = TagId(rawId = 2),
+                    name = "two".toNonBlankString()
+                )
             ),
             usageCount = 5.toNonNegativeInt(),
             onConfirm = {},
@@ -270,12 +283,27 @@ private fun OtherSizeTagEditDeleteBottomSheetContentPreview() {
     PlaneatTheme {
         TagDeleteBottomSheetContent(
             modifier = Modifier.background(PlaneatTheme.colors.bgDialogSurface),
-            tagNames = listOf(
-                "one".toNonBlankString(),
-                "two".toNonBlankString(),
-                "three".toNonBlankString(),
-                "four".toNonBlankString(),
-                "five".toNonBlankString()
+            tags = listOf(
+                Tag(
+                    id = TagId(rawId = 1),
+                    name = "one".toNonBlankString()
+                ),
+                Tag(
+                    id = TagId(rawId = 1),
+                    name = "two".toNonBlankString()
+                ),
+                Tag(
+                    id = TagId(rawId = 1),
+                    name = "three".toNonBlankString()
+                ),
+                Tag(
+                    id = TagId(rawId = 1),
+                    name = "four".toNonBlankString()
+                ),
+                Tag(
+                    id = TagId(rawId = 1),
+                    name = "five".toNonBlankString()
+                ),
             ),
             usageCount = 5.toNonNegativeInt(),
             onConfirm = {},

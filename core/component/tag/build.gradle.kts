@@ -11,6 +11,7 @@ android {
 
 dependencies {
     implementation(projects.core.annotation)
+    implementation(projects.core.component.displayformat)
     implementation(projects.core.dataDi)
     implementation(projects.core.translation)
 
