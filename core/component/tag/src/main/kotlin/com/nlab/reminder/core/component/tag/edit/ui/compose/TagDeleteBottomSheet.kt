@@ -289,19 +289,19 @@ private fun OtherSizeTagEditDeleteBottomSheetContentPreview() {
                     name = "one".toNonBlankString()
                 ),
                 Tag(
-                    id = TagId(rawId = 1),
+                    id = TagId(rawId = 2),
                     name = "two".toNonBlankString()
                 ),
                 Tag(
-                    id = TagId(rawId = 1),
+                    id = TagId(rawId = 3),
                     name = "three".toNonBlankString()
                 ),
                 Tag(
-                    id = TagId(rawId = 1),
+                    id = TagId(rawId = 4),
                     name = "four".toNonBlankString()
                 ),
                 Tag(
-                    id = TagId(rawId = 1),
+                    id = TagId(rawId = 5),
                     name = "five".toNonBlankString()
                 ),
             ),
