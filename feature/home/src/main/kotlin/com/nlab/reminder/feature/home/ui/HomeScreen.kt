@@ -530,7 +530,7 @@ private fun TagCards(
                 tags.forEach { tag ->
                     key(tag.id) {
                         TagCard(
-                            text = tag.name.value,
+                            tag = tag,
                             modifier = Modifier.padding(vertical = 6.5.dp),
                             onClick = { onTagClicked(tag) },
                             onLongClick = { onTagLongClicked(tag) }

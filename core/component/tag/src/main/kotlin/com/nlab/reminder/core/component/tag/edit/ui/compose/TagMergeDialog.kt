@@ -30,9 +30,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.nlab.reminder.core.androidx.compose.ui.tooling.preview.Previews
+import com.nlab.reminder.core.component.displayformat.ui.tagDisplayText
+import com.nlab.reminder.core.data.model.Tag
+import com.nlab.reminder.core.data.model.TagId
 import com.nlab.reminder.core.designsystem.compose.component.PlaneatDialog
 import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
-import com.nlab.reminder.core.kotlin.NonBlankString
 import com.nlab.reminder.core.kotlin.toNonBlankString
 import com.nlab.reminder.core.translation.StringIds
 
@@ -41,8 +43,8 @@ import com.nlab.reminder.core.translation.StringIds
  */
 @Composable
 internal fun TagMergeDialog(
-    fromTagName: NonBlankString,
-    toTagName: NonBlankString,
+    fromTag: Tag,
+    toTag: Tag,
     onDismissRequested: () -> Unit,
     onCancel: () -> Unit,
     onConfirm: () -> Unit
@@ -54,7 +56,7 @@ internal fun TagMergeDialog(
         ) {
             Text(
                 modifier = Modifier.padding(start = 15.dp, top = 15.dp, end = 15.dp),
-                text = stringResource(StringIds.tag_merge),
+                text = stringResource(StringIds.title_tag_merge_dialog),
                 style = PlaneatTheme.typography
                     .bodyLarge
                     .copy(fontWeight = FontWeight.Bold),
@@ -63,9 +65,9 @@ internal fun TagMergeDialog(
             Text(
                 modifier = Modifier.padding(start = 15.dp, top = 2.5.dp, end = 15.dp, bottom = 15.dp),
                 text = stringResource(
-                    StringIds.tag_merge_dialog_description,
-                    fromTagName.value,
-                    toTagName.value
+                    StringIds.content_tag_merge_dialog,
+                    tagDisplayText(fromTag),
+                    tagDisplayText(toTag)
                 ),
                 style = PlaneatTheme.typography.bodySmall,
                 color = PlaneatTheme.colors.content1,
@@ -85,8 +87,14 @@ private fun TagMergeDialogPreview() {
     PlaneatTheme {
         Box(modifier = Modifier.size(300.dp)) {
             TagMergeDialog(
-                fromTagName = "A".toNonBlankString(),
-                toTagName = "B".toNonBlankString(),
+                fromTag = Tag(
+                    id = TagId(rawId = 1),
+                    name = "A".toNonBlankString()
+                ),
+                toTag = Tag(
+                    id = TagId(rawId = 2),
+                    name = "B".toNonBlankString()
+                ),
                 onDismissRequested = {},
                 onCancel = {},
                 onConfirm = {}

@@ -32,20 +32,22 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.nlab.reminder.core.androidx.compose.ui.tooling.preview.Previews
 import com.nlab.reminder.core.androidx.compose.ui.throttleClick
+import com.nlab.reminder.core.component.displayformat.ui.tagDisplayText
+import com.nlab.reminder.core.data.model.Tag
+import com.nlab.reminder.core.data.model.TagId
 import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
-import com.nlab.reminder.core.translation.StringIds
+import com.nlab.reminder.core.kotlin.toNonBlankString
 
 /**
  * @author Thalys
  */
 @Composable
 fun TagCard(
-    text: String,
+    tag: Tag,
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
     onClickLabel: String? = null,
@@ -60,7 +62,7 @@ fun TagCard(
             onLongClickLabel = onLongClickLabel
         )
         Text(
-            text = stringResource(StringIds.format_tag, text),
+            text = tagDisplayText(tag),
             style = PlaneatTheme.typography.bodyMedium,
             color = PlaneatTheme.colors.contentTag,
             modifier = Modifier.padding(horizontal = 12.dp, vertical = 5.dp),
@@ -104,7 +106,10 @@ private fun TagCardPreview() {
                 .background(PlaneatTheme.colors.bgCard1)) {
             TagCard(
                 modifier = Modifier.align(Alignment.Center),
-                text = "Hello TagCard"
+                tag = Tag(
+                    id = TagId(rawId = 1),
+                    name = "HelloTagCard".toNonBlankString()
+                )
             )
         }
     }
