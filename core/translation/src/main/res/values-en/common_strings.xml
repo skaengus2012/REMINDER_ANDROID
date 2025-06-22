@@ -48,6 +48,36 @@
     <string name="content_frequency_monthly">Monthly</string>
     <string name="content_frequency_weekly">Weekly</string>
     <string name="content_frequency_yearly">Yearly</string>
+    <plurals name="content_tag_delete_dialog_double">
+        <item quantity="one">%1$s and %2$s are being used in %3$d notification.</item>
+        <item quantity="other">%1$s and %2$s are being used in %3$d notifications.</item>
+    </plurals>
+    <plurals name="content_tag_delete_dialog_double_overflow">
+        <item quantity="one">%1$s and %2$s are being used in %3$d(+) notification.</item>
+        <item quantity="other">%1$s and %2$s are being used in %3$d(+) notifications.</item>
+    </plurals>
+    <plurals name="content_tag_delete_dialog_other">
+        <item quantity="one">In addition to %1$s, %2$d tags are used in %3$d notification.</item>
+        <item quantity="other">In addition to %1$s, %2$d tags are used in %3$d notifications.</item>
+    </plurals>
+    <plurals name="content_tag_delete_dialog_other_overflow">
+        <item quantity="one">In addition to %1$s, %2$d tags are used in %3$d(+) notification.</item>
+        <item quantity="other">In addition to %1$s, %2$d tags are used in %3$d(+) notifications.</item>
+    </plurals>
+    <plurals name="content_tag_delete_dialog_single">
+        <item quantity="one">%1$s is being used in %2$d notification.</item>
+        <item quantity="other">%1$s is being used in %2$d notifications.</item>
+    </plurals>
+    <plurals name="content_tag_delete_dialog_single_overflow">
+        <item quantity="one">%1$s is being used in %2$d(+) notification.</item>
+        <item quantity="other">%1$s is being used in %2$d(+) notifications.</item>
+    </plurals>
+    <string name="content_tag_merge_dialog">Do you want to replace %1$s with %2$s in all of your schedules?</string>
+    <plurals name="content_tag_rename_dialog">
+        <item quantity="one">%1$s will be updated in %2$d reminder.</item>
+        <item quantity="other">%1$s will be updated in %2$d reminders.</item>
+    </plurals>
+    <string name="content_tag_rename_dialog_overflow">%1$s will be updated in %2$d(+) reminders.</string>
     <string name="content_ordering_days_combine" formatted="true">%1$s %2$s</string>
     <string name="datetime_format_list_date_only_default">yyyy/MM/dd</string>
     <string name="datetime_format_list_date_only_the_day_after_tomorrow">yyyy/MM/dd</string>
@@ -115,6 +145,12 @@
     <string name="sunday">Sunday</string>
     <string name="third">third</string>
     <string name="thursday">Thursday</string>
+    <plurals name="title_tag_delete_dialog">
+        <item quantity="one">Delete Tag</item>
+        <item quantity="other">Delete %1$d Tags</item>
+    </plurals>
+    <string name="title_tag_merge_dialog">Tag Already Exists</string>
+    <string name="title_tag_rename_dialog">Rename Tag</string>
     <string name="tuesday">Tuesday</string>
     <string name="wednesday">Wednesday</string>
     <string name="weekday">weekday</string>

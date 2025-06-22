@@ -118,7 +118,7 @@ internal fun TagRenameDialog(
 private fun TagRenameTitle(modifier: Modifier = Modifier) {
     Text(
         modifier = modifier,
-        text = stringResource(StringIds.tag_rename),
+        text = stringResource(StringIds.title_tag_rename_dialog),
         style = PlaneatTheme.typography
             .bodyLarge
             .copy(fontWeight = FontWeight.Bold),
@@ -138,7 +138,7 @@ private fun TagRenameDescription(
             usageCount = usageCount,
             transform = { count ->
                 pluralStringResource(
-                    PluralsIds.tag_rename_dialog_description,
+                    PluralsIds.content_tag_rename_dialog,
                     count,
                     tagDisplayText(tag),
                     count
@@ -146,7 +146,7 @@ private fun TagRenameDescription(
             },
             transformWhenOverflow = { count ->
                 stringResource(
-                    StringIds.tag_rename_dialog_description_overflow,
+                    StringIds.content_tag_rename_dialog_overflow,
                     tagDisplayText(tag),
                     count
                 )

@@ -48,6 +48,29 @@
     <string name="content_frequency_monthly">매월</string>
     <string name="content_frequency_weekly">매주</string>
     <string name="content_frequency_yearly">매년</string>
+    <plurals name="content_tag_delete_dialog_double">
+        <item quantity="other">%1$s 및 %2$s이(가) %3$d개의 알림에서 사용되고 있습니다.</item>
+    </plurals>
+    <plurals name="content_tag_delete_dialog_double_overflow">
+        <item quantity="other">%1$s 및 %2$s이(가) %3$d(+)개의 알림에서 사용되고 있습니다.</item>
+    </plurals>
+    <plurals name="content_tag_delete_dialog_other">
+        <item quantity="other">%1$s 외 %2$d개의 태그가 %3$d개의 알림에서 사용되고 있습니다.</item>
+    </plurals>
+    <plurals name="content_tag_delete_dialog_other_overflow">
+        <item quantity="other">%1$s 외 %2$d개의 태그가 %3$d(+)개의 알림에서 사용되고 있습니다.</item>
+    </plurals>
+    <plurals name="content_tag_delete_dialog_single">
+        <item quantity="other">%1$s이(가) %2$d개의 알림에서 사용되고 있습니다.</item>
+    </plurals>
+    <plurals name="content_tag_delete_dialog_single_overflow">
+        <item quantity="other">%1$s이(가) %2$d(+)개의 알림에서 사용되고 있습니다.</item>
+    </plurals>
+    <string name="content_tag_merge_dialog">사용자의 모든 스케줄에서 %1$s을(를) %2$s(으)로 대치하겠습니까?</string>
+    <plurals name="content_tag_rename_dialog">
+        <item quantity="other">%1$s이(가) %2$d개의 알림에서 업데이트됩니다.</item>
+    </plurals>
+    <string name="content_tag_rename_dialog_overflow">%1$s이(가) %2$d(+)개의 알림에서 업데이트됩니다.</string>
     <string name="content_ordering_days_combine" formatted="true">%1$s %2$s</string>
     <string name="datetime_format_list_date_only_default">yyyy. M. dd.</string>
     <string name="datetime_format_list_date_only_the_day_after_tomorrow">\'모레\'</string>
@@ -109,6 +132,11 @@
     <string name="sunday">일요일</string>
     <string name="third">세 번째</string>
     <string name="thursday">목요일</string>
+    <plurals name="title_tag_delete_dialog">
+        <item quantity="other">%1$d개의 태그 삭제</item>
+    </plurals>
+    <string name="title_tag_merge_dialog">태그가 이미 존재함</string>
+    <string name="title_tag_rename_dialog">태그 이름 변경</string>
     <string name="tuesday">화요일</string>
     <string name="wednesday">수요일</string>
     <string name="weekday">평일</string>

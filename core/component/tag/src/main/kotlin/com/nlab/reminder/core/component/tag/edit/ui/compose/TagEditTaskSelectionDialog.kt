@@ -83,7 +83,7 @@ internal fun TagEditTaskSelectionDialog(
                 color = PlaneatTheme.colors.bgLine1,
             )
             TagEditTaskSelectionDialogButton(
-                text = stringResource(StringIds.tag_rename),
+                text = stringResource(StringIds.title_tag_rename_dialog),
                 fontColor = PlaneatTheme.colors.content1,
                 onClick = onRenameRequestClicked,
                 modifier = Modifier
@@ -91,7 +91,7 @@ internal fun TagEditTaskSelectionDialog(
                     .padding(top = 10.dp)
             )
             TagEditTaskSelectionDialogButton(
-                text = pluralStringResource(PluralsIds.tag_delete, count = 1, 1),
+                text = pluralStringResource(PluralsIds.title_tag_delete_dialog, count = 1, 1),
                 onClick = onDeleteRequestClicked,
                 fontColor = PlaneatTheme.colors.red1,
                 modifier = Modifier

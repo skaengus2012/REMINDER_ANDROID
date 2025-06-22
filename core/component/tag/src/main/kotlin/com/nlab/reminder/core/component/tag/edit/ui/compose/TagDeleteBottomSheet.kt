@@ -98,7 +98,7 @@ private fun TagDeleteBottomSheetContent(
         val tagNameSize = tags.size
         Text(
             modifier = Modifier.fillMaxWidth(),
-            text = pluralStringResource(id = PluralsIds.tag_delete, count = tagNameSize, tagNameSize),
+            text = pluralStringResource(id = PluralsIds.title_tag_delete_dialog, count = tagNameSize, tagNameSize),
             style = PlaneatTheme.typography.bodySmall,
             color = PlaneatTheme.colors.content1,
             textAlign = TextAlign.Center
@@ -116,7 +116,7 @@ private fun TagDeleteBottomSheetContent(
                         usageCount = usageCount,
                         transform = { count ->
                             pluralStringResource(
-                                id = PluralsIds.tag_delete_dialog_description_size_1,
+                                id = PluralsIds.content_tag_delete_dialog_single,
                                 count = count,
                                 firstTagDisplayText,
                                 count
@@ -124,7 +124,7 @@ private fun TagDeleteBottomSheetContent(
                         },
                         transformWhenOverflow = { count ->
                             pluralStringResource(
-                                id = PluralsIds.tag_delete_dialog_description_size_1_overflow,
+                                id = PluralsIds.content_tag_delete_dialog_single_overflow,
                                 count = count,
                                 firstTagDisplayText,
                                 count
@@ -139,7 +139,7 @@ private fun TagDeleteBottomSheetContent(
                         usageCount = usageCount,
                         transform = { count ->
                             pluralStringResource(
-                                id = PluralsIds.tag_delete_dialog_description_size_2,
+                                id = PluralsIds.content_tag_delete_dialog_double,
                                 count = count,
                                 firstTagDisplayText,
                                 lastTagDisplayText,
@@ -148,7 +148,7 @@ private fun TagDeleteBottomSheetContent(
                         },
                         transformWhenOverflow = { count ->
                             pluralStringResource(
-                                id = PluralsIds.tag_delete_dialog_description_size_2_overflow,
+                                id = PluralsIds.content_tag_delete_dialog_double_overflow,
                                 count = count,
                                 firstTagDisplayText,
                                 lastTagDisplayText,
@@ -164,7 +164,7 @@ private fun TagDeleteBottomSheetContent(
                         usageCount = usageCount,
                         transform = { count ->
                             pluralStringResource(
-                                id = PluralsIds.tag_delete_dialog_description_size_other,
+                                id = PluralsIds.content_tag_delete_dialog_other,
                                 count = count,
                                 firstTagDisplayText,
                                 extraSize,
@@ -173,7 +173,7 @@ private fun TagDeleteBottomSheetContent(
                         },
                         transformWhenOverflow = { count ->
                             pluralStringResource(
-                                id = PluralsIds.tag_delete_dialog_description_size_other_overflow,
+                                id = PluralsIds.content_tag_delete_dialog_other_overflow,
                                 count = count,
                                 firstTagDisplayText,
                                 extraSize,

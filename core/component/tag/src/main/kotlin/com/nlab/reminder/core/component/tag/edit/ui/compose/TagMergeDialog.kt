@@ -56,7 +56,7 @@ internal fun TagMergeDialog(
         ) {
             Text(
                 modifier = Modifier.padding(start = 15.dp, top = 15.dp, end = 15.dp),
-                text = stringResource(StringIds.tag_merge),
+                text = stringResource(StringIds.title_tag_merge_dialog),
                 style = PlaneatTheme.typography
                     .bodyLarge
                     .copy(fontWeight = FontWeight.Bold),
@@ -65,7 +65,7 @@ internal fun TagMergeDialog(
             Text(
                 modifier = Modifier.padding(start = 15.dp, top = 2.5.dp, end = 15.dp, bottom = 15.dp),
                 text = stringResource(
-                    StringIds.tag_merge_dialog_description,
+                    StringIds.content_tag_merge_dialog,
                     tagDisplayText(fromTag),
                     tagDisplayText(toTag)
                 ),
