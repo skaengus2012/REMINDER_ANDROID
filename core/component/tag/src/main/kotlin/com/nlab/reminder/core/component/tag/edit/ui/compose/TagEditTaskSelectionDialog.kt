@@ -37,9 +37,11 @@ import androidx.compose.ui.unit.dp
 import com.nlab.reminder.core.androidx.compose.ui.ButtonBackground
 import com.nlab.reminder.core.androidx.compose.ui.throttleClick
 import com.nlab.reminder.core.androidx.compose.ui.tooling.preview.Previews
+import com.nlab.reminder.core.component.displayformat.ui.tagDisplayText
+import com.nlab.reminder.core.data.model.Tag
+import com.nlab.reminder.core.data.model.TagId
 import com.nlab.reminder.core.designsystem.compose.component.PlaneatDialog
 import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
-import com.nlab.reminder.core.kotlin.NonBlankString
 import com.nlab.reminder.core.kotlin.toNonBlankString
 import com.nlab.reminder.core.translation.PluralsIds
 import com.nlab.reminder.core.translation.StringIds
@@ -49,7 +51,7 @@ import com.nlab.reminder.core.translation.StringIds
  */
 @Composable
 internal fun TagEditTaskSelectionDialog(
-    tagName: NonBlankString,
+    tag: Tag,
     onDismissRequest: () -> Unit,
     onRenameRequestClicked: () -> Unit,
     onDeleteRequestClicked: () -> Unit
@@ -65,7 +67,7 @@ internal fun TagEditTaskSelectionDialog(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 20.dp),
-                text = stringResource(StringIds.format_tag, tagName.value),
+                text = tagDisplayText(tag),
                 style = PlaneatTheme.typography.titleSmall,
                 color = PlaneatTheme.colors.content1,
                 textAlign = TextAlign.Center
@@ -76,7 +78,7 @@ internal fun TagEditTaskSelectionDialog(
                 color = PlaneatTheme.colors.bgLine1,
             )
             TagEditTaskSelectionDialogButton(
-                text = stringResource(StringIds.tag_rename),
+                text = stringResource(StringIds.title_tag_rename_dialog),
                 fontColor = PlaneatTheme.colors.content1,
                 onClick = onRenameRequestClicked,
                 modifier = Modifier
@@ -84,7 +86,7 @@ internal fun TagEditTaskSelectionDialog(
                     .padding(top = 10.dp)
             )
             TagEditTaskSelectionDialogButton(
-                text = pluralStringResource(PluralsIds.tag_delete, count = 1, 1),
+                text = pluralStringResource(PluralsIds.title_tag_delete_dialog, count = 1, 1),
                 onClick = onDeleteRequestClicked,
                 fontColor = PlaneatTheme.colors.red1,
                 modifier = Modifier
@@ -128,7 +130,10 @@ private fun TagEditIntroDialogPreview() {
     PlaneatTheme {
         Box(modifier = Modifier.size(300.dp)) {
             TagEditTaskSelectionDialog(
-                tagName = "Hello, tag edit dialog".toNonBlankString(),
+                tag = Tag(
+                    id = TagId(rawId = 1),
+                    name = "HelloTagEditDialog".toNonBlankString()
+                ),
                 onDismissRequest = {},
                 onRenameRequestClicked = {},
                 onDeleteRequestClicked = {}

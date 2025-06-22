@@ -42,7 +42,7 @@ fun TagEditStateHandler(
 
         is TagEditState.AwaitTaskSelection -> {
             TagEditTaskSelectionDialog(
-                tagName = state.tag.name,
+                tag = state.tag,
                 onDismissRequest = onCompleted,
                 onRenameRequestClicked = onRenameRequestClicked,
                 onDeleteRequestClicked = onDeleteRequestClicked
@@ -51,8 +51,8 @@ fun TagEditStateHandler(
 
         is TagEditState.Rename -> {
             TagRenameDialog(
-                value = state.renameText,
-                tagName = state.tag.name,
+                tag = state.tag,
+                renameText = state.renameText,
                 usageCount = state.usageCount,
                 shouldKeyboardShown = state.shouldUserInputReady,
                 onTextChanged = onRenameInputted,
@@ -66,8 +66,8 @@ fun TagEditStateHandler(
 
         is TagEditState.Merge -> {
             TagMergeDialog(
-                fromTagName = state.from.name,
-                toTagName = state.to.name,
+                fromTag = state.from,
+                toTag = state.to,
                 onDismissRequested = onCompleted,
                 onCancel = onMergeCancelClicked,
                 onConfirm = onMergeConfirmClicked
@@ -76,7 +76,7 @@ fun TagEditStateHandler(
 
         is TagEditState.Delete -> {
             TagDeleteBottomSheet(
-                tagNames = remember(state.tag) { listOf(state.tag.name) },
+                tags = remember(state.tag) { listOf(state.tag) },
                 usageCount = state.usageCount,
                 onCancel = onCompleted,
                 onConfirm = onDeleteConfirmClicked

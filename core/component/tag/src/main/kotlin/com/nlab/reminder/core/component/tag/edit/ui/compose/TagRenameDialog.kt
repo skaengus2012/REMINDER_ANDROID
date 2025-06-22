@@ -59,11 +59,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.nlab.reminder.core.androidx.compose.ui.throttleClick
 import com.nlab.reminder.core.androidx.compose.ui.tooling.preview.Previews
+import com.nlab.reminder.core.component.displayformat.ui.tagDisplayText
+import com.nlab.reminder.core.data.model.Tag
+import com.nlab.reminder.core.data.model.TagId
 import com.nlab.reminder.core.designsystem.compose.component.PlaneatDialog
 import com.nlab.reminder.core.designsystem.compose.component.PlaneatTextField
 import com.nlab.reminder.core.designsystem.compose.theme.DrawableIds
 import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
-import com.nlab.reminder.core.kotlin.NonBlankString
 import com.nlab.reminder.core.kotlin.NonNegativeInt
 import com.nlab.reminder.core.kotlin.toNonBlankString
 import com.nlab.reminder.core.kotlin.toNonNegativeInt
@@ -77,8 +79,8 @@ import kotlinx.coroutines.flow.distinctUntilChangedBy
  */
 @Composable
 internal fun TagRenameDialog(
-    value: String,
-    tagName: NonBlankString,
+    tag: Tag,
+    renameText: String,
     usageCount: NonNegativeInt,
     shouldKeyboardShown: Boolean,
     onTextChanged: (String) -> Unit,
@@ -95,12 +97,12 @@ internal fun TagRenameDialog(
             )
             TagRenameDescription(
                 modifier = Modifier.padding(start = 35.dp, top = 2.5.dp, end = 35.dp, bottom = 15.dp),
-                tagName = tagName,
+                tag = tag,
                 usageCount = usageCount
             )
             TagRenameInputField(
                 modifier = Modifier.padding(start = 15.dp, end = 15.dp, bottom = 10.dp),
-                value = value,
+                renameText = renameText,
                 shouldKeyboardShown = shouldKeyboardShown,
                 onTextChanged = onTextChanged
             )
@@ -116,7 +118,7 @@ internal fun TagRenameDialog(
 private fun TagRenameTitle(modifier: Modifier = Modifier) {
     Text(
         modifier = modifier,
-        text = stringResource(StringIds.tag_rename),
+        text = stringResource(StringIds.title_tag_rename_dialog),
         style = PlaneatTheme.typography
             .bodyLarge
             .copy(fontWeight = FontWeight.Bold),
@@ -126,7 +128,7 @@ private fun TagRenameTitle(modifier: Modifier = Modifier) {
 
 @Composable
 private fun TagRenameDescription(
-    tagName: NonBlankString,
+    tag: Tag,
     usageCount: NonNegativeInt,
     modifier: Modifier = Modifier,
 ) {
@@ -135,10 +137,19 @@ private fun TagRenameDescription(
         text = getUsageCountLabel(
             usageCount = usageCount,
             transform = { count ->
-                pluralStringResource(PluralsIds.tag_rename_dialog_description, count, tagName.value, count)
+                pluralStringResource(
+                    PluralsIds.content_tag_rename_dialog,
+                    count,
+                    tagDisplayText(tag),
+                    count
+                )
             },
             transformWhenOverflow = { count ->
-                stringResource(StringIds.tag_rename_dialog_description_overflow, tagName.value, count)
+                stringResource(
+                    StringIds.content_tag_rename_dialog_overflow,
+                    tagDisplayText(tag),
+                    count
+                )
             }
         ),
         style = PlaneatTheme.typography.bodySmall,
@@ -149,7 +160,7 @@ private fun TagRenameDescription(
 
 @Composable
 private fun TagRenameInputField(
-    value: String,
+    renameText: String,
     shouldKeyboardShown: Boolean,
     onTextChanged: (String) -> Unit,
     modifier: Modifier = Modifier
@@ -176,7 +187,7 @@ private fun TagRenameInputField(
         verticalAlignment = Alignment.CenterVertically
     ) {
         var textFieldValue by remember {
-            mutableStateOf(TextFieldValue(value, selection = TextRange(value.length)))
+            mutableStateOf(TextFieldValue(renameText, selection = TextRange(renameText.length)))
         }
         LaunchedEffect(onTextChanged) {
             snapshotFlow { textFieldValue }
@@ -265,8 +276,11 @@ private fun TagRenameDialogPreview() {
     PlaneatTheme {
         Box(modifier = Modifier.size(300.dp)) {
             TagRenameDialog(
-                value = "Hello, TagRenameDialog!",
-                tagName = "Tag".toNonBlankString(),
+                renameText = "Hello, TagRenameDialog!",
+                tag = Tag(
+                    id = TagId(rawId = 1),
+                    name = "Tag".toNonBlankString()
+                ),
                 usageCount = 5.toNonNegativeInt(),
                 shouldKeyboardShown = false,
                 onTextChanged = {},
