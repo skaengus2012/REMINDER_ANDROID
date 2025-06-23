@@ -198,7 +198,7 @@
                     app:layout_constraintTop_toTopOf="parent"
                     app:srcCompat="@drawable/ic_info" />
 
-                <com.nlab.reminder.core.component.schedule.ui.view.list.ScheduleDetailEditText
+                <com.nlab.reminder.core.component.schedule.ui.view.list.ScheduleDetailsEditText
                     android:id="@+id/edittext_detail"
                     style="@style/PlaneatTheme.Style.Typography.BodySmall"
                     android:layout_width="0dp"

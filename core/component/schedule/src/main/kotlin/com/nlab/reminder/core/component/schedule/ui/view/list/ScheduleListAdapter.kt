@@ -49,13 +49,16 @@ private const val ITEM_VIEW_TYPE_HEADLINE_PADDING = 5
  */
 class ScheduleListAdapter(
     private val theme: ScheduleListTheme,
-    private val triggerAtFormatPatterns: TriggerAtFormatPatterns,
     private val timeZone: Flow<TimeZone>,
-    private val entryAt: Flow<Instant>
+    private val entryAt: Flow<Instant>,
+    triggerAtFormatPatterns: TriggerAtFormatPatterns,
 ) : RecyclerView.Adapter<ScheduleAdapterItemViewHolder>() {
-    private val dateTimeFormatPool = DateTimeFormatPool()
-    private val displayTextPool = DisplayTextPool()
     private val differ = ScheduleListDiffer(listUpdateCallback = AdapterListUpdateCallback(/* adapter = */ this))
+    private val scheduleTimingDisplayFormatter = ScheduleTimingDisplayFormatter(
+        triggerAtFormatPatterns = triggerAtFormatPatterns,
+        dateTimeFormatPool = DateTimeFormatPool()
+    )
+    private val tagsDisplayFormatter = TagsDisplayFormatter()
 
     private val selectionEnabled = MutableStateFlow(false)
     private val selectedScheduleIds = MutableStateFlow<Set<ScheduleId>>(emptySet())
@@ -112,9 +115,8 @@ class ScheduleListAdapter(
                         /* attachToParent = */ false
                     ),
                     theme = theme,
-                    triggerAtFormatPatterns = triggerAtFormatPatterns,
-                    dateTimeFormatPool = dateTimeFormatPool,
-                    displayTextPool = displayTextPool,
+                    scheduleTimingDisplayFormatter = scheduleTimingDisplayFormatter,
+                    tagsDisplayFormatter = tagsDisplayFormatter,
                     timeZone = timeZone,
                     entryAt = entryAt,
                     selectionEnabled = selectionEnabled,
@@ -197,7 +199,8 @@ class ScheduleListAdapter(
     }
 
     fun submitList(items: List<ScheduleAdapterItem>?) {
-        displayTextPool.invalidate()
+        scheduleTimingDisplayFormatter.releaseCache()
+        tagsDisplayFormatter.releaseCache()
         differ.submitList(items, commitCallback = {})
     }
 

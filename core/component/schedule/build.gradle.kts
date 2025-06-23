@@ -22,6 +22,7 @@ dependencies {
     implementation(libs.androidx.cardview)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.transition.ktx)
+    implementation(libs.timber)
 
     testImplementation(projects.core.dataTest)
 }
