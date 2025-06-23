@@ -41,7 +41,6 @@ import com.nlab.reminder.core.android.widget.bindImageAsync
 import com.nlab.reminder.core.android.widget.bindText
 import com.nlab.reminder.core.component.schedule.R
 import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapterItemContentBinding
-import com.nlab.reminder.core.component.schedule.ui.TriggerAtFormatPatterns
 import com.nlab.reminder.core.data.model.ScheduleId
 import com.nlab.reminder.core.designsystem.compose.theme.AttrIds
 import com.nlab.reminder.core.kotlinx.coroutines.cancelAll
@@ -68,9 +67,8 @@ import kotlin.math.absoluteValue
 class ContentViewHolder internal constructor(
     private val binding: LayoutScheduleAdapterItemContentBinding,
     theme: ScheduleListTheme,
-    triggerAtFormatPatterns: TriggerAtFormatPatterns,
-    dateTimeFormatPool: DateTimeFormatPool,
-    displayTextPool: DisplayTextPool,
+    scheduleTimingDisplayFormatter: ScheduleTimingDisplayFormatter,
+    tagsDisplayFormatter: TagsDisplayFormatter,
     timeZone: Flow<TimeZone>,
     entryAt: Flow<Instant>,
     selectionEnabled: StateFlow<Boolean>,
@@ -114,9 +112,8 @@ class ContentViewHolder internal constructor(
         }
 
         binding.edittextDetail.initialize(
-            triggerAtFormatPatterns = triggerAtFormatPatterns,
-            dateTimeFormatPool = dateTimeFormatPool,
-            displayTextPool = displayTextPool
+            scheduleTimingDisplayFormatter = scheduleTimingDisplayFormatter,
+            tagsDisplayFormatter = tagsDisplayFormatter
         )
 
         // Processing for multiline input and actionDone support

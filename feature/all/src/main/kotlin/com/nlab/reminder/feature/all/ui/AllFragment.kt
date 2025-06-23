@@ -97,9 +97,9 @@ internal class AllFragment : ComposableFragment() {
         val linearLayoutManager = LinearLayoutManager(requireContext())
         val scheduleListAdapter = ScheduleListAdapter(
             theme = ScheduleListTheme.Point3,  // TODO extract
-            triggerAtFormatPatterns = AllScheduleTriggerAtFormatPatterns(),  // TODO extract
             timeZone = fragmentStateBridge.timeZoneState,
-            entryAt = MutableStateFlow(Clock.System.now()) // TODO THIS IS FAKE
+            entryAt = MutableStateFlow(Clock.System.now()), // TODO THIS IS FAKE
+            triggerAtFormatPatterns = AllScheduleTriggerAtFormatPatterns(),  // TODO extract
         ).apply {
             stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
         }
