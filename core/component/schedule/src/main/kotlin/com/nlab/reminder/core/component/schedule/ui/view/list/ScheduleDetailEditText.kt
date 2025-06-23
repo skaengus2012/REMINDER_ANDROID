@@ -63,7 +63,6 @@ class ScheduleDetailEditText @JvmOverloads constructor(
     }
     private val expiredColorSpan = ForegroundColorSpan(context.getThemeColor(AttrIds.red1))
     private val tagTextColorSpan = ForegroundColorSpan(context.getThemeColor(AttrIds.point_4))
-    private val tagDisplayTextTransformer = ::tagDisplayText
 
     private lateinit var triggerAtFormatPatterns: TriggerAtFormatPatterns
     private lateinit var dateTimeFormatPool: DateTimeFormatPool
@@ -104,6 +103,7 @@ class ScheduleDetailEditText @JvmOverloads constructor(
 
     override fun onSelectionChanged(selStart: Int, selEnd: Int) {
         try {
+            println("Hello onSelectionChanged $selStart $selEnd")
             if (selStart < displayTimingText.length) {
                 setSelection(displayTimingText.length, max(displayTimingText.length, selEnd))
             } else {
@@ -114,6 +114,8 @@ class ScheduleDetailEditText @JvmOverloads constructor(
             super.onSelectionChanged(selStart, selEnd)
         }
     }
+
+
 
     override fun onTextContextMenuItem(id: Int): Boolean {
         return when (id) {
@@ -261,7 +263,12 @@ class ScheduleDetailEditText @JvmOverloads constructor(
         return displayTextPool.getOrPut(tags) {
             buildSpannedString {
                 inSpans(StyleSpan(Typeface.BOLD), tagTextColorSpan) {
-                    append(tags.joinToString(separator = " ", transform = tagDisplayTextTransformer))
+                    append(buildString {
+                        tags.forEach { tag ->
+                            append(tagDisplayText(tag))
+                            append(" ")
+                        }
+                    })
                 }
             }
         }
