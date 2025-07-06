@@ -49,6 +49,8 @@ data class PlaneatColorScheme(
     val contentTag: Color,
 
     // Colors that do not change depending on the theme.
+    val contentTextSelection: Color = Point1,
+    val bgTextSelection: Color = Point1.copy(alpha = 0.4f),
     val point1: Color = Point1,
     val point2: Color = Point2,
     val point3: Color = Point3,
@@ -56,9 +58,6 @@ data class PlaneatColorScheme(
     val red1: Color = Red400,
     val white: Color = Color.White,
     val black: Color = Color.Black,
-    // Compose Only
-    val contentTextSelection: Color = Point1,
-    val bgTextSelection: Color = Point1.copy(alpha = 0.4f),
 )
 
 internal val LocalPlaneatColorScheme = staticCompositionLocalOf {

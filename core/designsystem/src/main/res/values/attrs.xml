@@ -24,11 +24,14 @@
     <attr name="bg_line_1" format="color" />
     <attr name="bg_line_2" format="color" />
     <attr name="bg_placeholder_1" format="color" />
+    <attr name="bg_placeholder_2" format="color" />
+    <attr name="bg_text_selection" format="color" />
     <attr name="content_1" format="color" />
     <attr name="content_2" format="color" />
     <attr name="content_2_hint" format="color" />
     <attr name="content_3" format="color" />
     <attr name="content_3_hint" format="color" />
+    <attr name="content_text_selection" format="color" />
     <attr name="point_1" format="color" />
     <attr name="point_2" format="color" />
     <attr name="point_3" format="color" />
