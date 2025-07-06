@@ -134,9 +134,10 @@ internal class ScheduleDetailsEditText @JvmOverloads constructor(
     }
 
     override fun onSelectionChanged(selStart: Int, selEnd: Int) {
+        super.onSelectionChanged(selStart, selEnd)
+
         if (isFullyInitialized.not()) {
             // Executes the default implementation when called from the parent constructor
-            super.onSelectionChanged(selStart, selEnd)
             return
         }
 
@@ -161,17 +162,12 @@ internal class ScheduleDetailsEditText @JvmOverloads constructor(
             return
         }
 
-        val isAdjustsSelectionToTagBounds = tagSelectionAdjustHelper.adjustSelectionToTagBounds(
+        tagSelectionAdjustHelper.adjustSelectionToTagBounds(
             currentText,
             selStart,
             selEnd,
             invokeWhenNewSelectionNeeded = { newSelStart, newSelEnd -> setSelection(newSelStart, newSelEnd) }
         )
-        if (isAdjustsSelectionToTagBounds) {
-            return
-        }
-
-        super.onSelectionChanged(selStart, selEnd)
     }
 
     internal fun initialize(
@@ -204,6 +200,7 @@ internal class ScheduleDetailsEditText @JvmOverloads constructor(
                 }
                 true // prevent default behavior
             }
+
             else -> super.onTextContextMenuItem(id)
         }
     }

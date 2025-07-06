@@ -158,8 +158,8 @@ internal class TagSelectionAdjustHelper {
         selStart: Int,
         selEnd: Int,
         invokeWhenNewSelectionNeeded: (newSelStart: Int, newSelEnd: Int) -> Unit
-    ): Boolean {
-        if (text !is Spanned) return false
+    ) {
+        if (text !is Spanned) return
 
         tagStyleParser.findAppliedTagStyleRange(
             text,
@@ -173,9 +173,8 @@ internal class TagSelectionAdjustHelper {
             || tagEnd == -1
             || (selStart == tagStart && selEnd == tagEnd)
             || (selStart !in tagStart..<tagEnd && selEnd !in tagStart..<tagEnd)
-        ) return false
+        ) return
 
         invokeWhenNewSelectionNeeded(min(selStart, tagStart), max(selEnd, tagEnd))
-        return true
     }
 }
