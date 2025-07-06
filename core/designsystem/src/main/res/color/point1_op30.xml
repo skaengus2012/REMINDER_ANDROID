@@ -15,5 +15,5 @@
   -->
 
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:alpha="0.4" android:color="@color/point_1" />
+    <item android:alpha="0.3" android:color="@color/point_1" />
 </selector>

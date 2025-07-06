@@ -29,6 +29,7 @@ internal val Gray2 = Color(0xFF838387)
 internal val Gray400 = Color(0xFFBDBDBD)
 internal val Gray500 = Color(0xFF9E9E9E)
 internal val Gray600 = Color(0xFF757575)
+internal val Gray700 = Color(0xFF616161)
 internal val Gray800 = Color(0xFF424242)
 
 // red
@@ -37,6 +38,7 @@ internal val Red400 = Color(0xFFFF1744)
 
 // point
 internal val Point1 = Color(0xFF1CCF98)
+internal val Point1Sub = Color(0xFF7FD4AE)
 internal val Point2 = Color(0xFFBE94F3)
 internal val Point3 = Color(0xFFFFB631)
 internal val Point4 = Color(0xFF5E9BFF)
@@ -52,6 +54,7 @@ internal val Bg2CardStrokeLight = Color(0xFFD3D3D3)
 internal val BgLine1Light = Gray400
 internal val BgLine2Light = Gray2
 internal val BgPlaceHolder1Light = Color(0xFFD3D3D3)
+internal val BgTextSelectionLight = Point1.copy(alpha = 0.2f)
 internal val Content1Light = Color(0xFF393939)
 internal val Content2Light = Color(0xFF8A8A8D)
 internal val Content2HintLight = Content2Light.copy(alpha = 0.6f)
@@ -74,6 +77,8 @@ internal val Bg2CardStrokeDark = Color(0xFFEEEEEE)
 internal val BgRipple1Dark = Color(0xFF49494C)
 internal val BgLine1Dark = Gray800
 internal val BgLine2Dark = Gray2
+internal val BgPlaceHolder1Dark = Gray700
+internal val BgTextSelectionDark = Point1.copy(alpha = 0.3f)
 internal val Content1Dark = Color.White
 internal val Content2Dark = Color(0xFFB7B7B7)
 internal val Content2HintDark = Content2Dark.copy(alpha = 0.6f)

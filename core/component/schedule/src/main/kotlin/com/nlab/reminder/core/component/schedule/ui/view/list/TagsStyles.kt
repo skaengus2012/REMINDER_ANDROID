@@ -41,7 +41,7 @@ import kotlin.math.min
 internal class TagStyleSpan(
     context: Context
 ) : CharacterStyle(), UpdateAppearance {
-    private val color: Int = context.getThemeColor(AttrIds.point_4)
+    private val color: Int = context.getThemeColor(AttrIds.point_1_sub)
     override fun updateDrawState(tp: TextPaint) {
         tp.typeface = Typeface.create(tp.typeface, Typeface.BOLD)
         tp.color = color

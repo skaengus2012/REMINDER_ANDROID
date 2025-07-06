@@ -26,6 +26,7 @@
         <item name="bg_line_1">@color/bg_line_1_dark</item>
         <item name="bg_line_2">@color/bg_line_2_dark</item>
         <item name="bg_placeholder_1">@color/bg_placeholder_1_dark</item>
+        <item name="bg_text_selection">@color/point1_op30</item>
         <item name="content_1">@color/content_1_dark</item>
         <item name="content_2">@color/content_2_dark</item>
         <item name="content_2_hint">@color/content_2_hint_dark</item>
