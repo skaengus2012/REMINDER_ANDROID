@@ -30,5 +30,4 @@ dependencies {
     "implementation"(project(":core:designsystem"))
 
     "implementation"(libs.findLibrary("androidx-appcompat").get())
-    "implementation"(libs.findLibrary("androidx-core-ktx").get())
 }

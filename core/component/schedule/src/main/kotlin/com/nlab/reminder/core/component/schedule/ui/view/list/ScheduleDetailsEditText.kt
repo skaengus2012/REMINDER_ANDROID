@@ -24,9 +24,11 @@ import android.text.TextWatcher
 import android.util.AttributeSet
 import android.view.MotionEvent
 import androidx.appcompat.widget.AppCompatEditText
+import androidx.core.view.doOnDetach
 import com.nlab.reminder.core.android.view.setVisible
 import com.nlab.reminder.core.data.model.ScheduleTiming
 import com.nlab.reminder.core.data.model.Tag
+import kotlinx.coroutines.Runnable
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import timber.log.Timber
@@ -41,7 +43,7 @@ internal class ScheduleDetailsEditText @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyleAttr: Int = androidx.appcompat.R.attr.editTextStyle
 ) : AppCompatEditText(context, attrs, defStyleAttr) {
-    private val tagSelectionAdjustHelper = TagSelectionAdjustHelper()
+    private val tagSelectionAdjustRunnable: Runnable
 
     private lateinit var scheduleTimingDisplayFormatter: ScheduleTimingDisplayFormatter
     private lateinit var tagsDisplayFormatter: TagsDisplayFormatter
@@ -60,6 +62,30 @@ internal class ScheduleDetailsEditText @JvmOverloads constructor(
     init {
         post {
             isFullyInitialized = true
+        }
+
+        tagSelectionAdjustRunnable = object : Runnable {
+            private val tagSelectionAdjustHelper = TagSelectionAdjustHelper()
+
+            override fun run() {
+                tagSelectionAdjustHelper.adjustSelectionToTagBounds(
+                    text,
+                    selectionStart,
+                    selectionEnd,
+                    invokeWhenNewSelectionNeeded = { newSelStart, newSelEnd ->
+                        // During drag,
+                        // the position of the drag handle becomes awkward when changing the selection,
+                        // so remove the focus and re-enter it.
+                        clearFocus()
+                        setSelection(newSelStart, newSelEnd)
+                        requestFocus()
+                    }
+                )
+            }
+        }
+        doOnDetach {
+            // If the view is removed from the window, the reserved runner is removed.
+            removeCallbacks(tagSelectionAdjustRunnable)
         }
 
         addTextChangedListener(object : TextWatcher {
@@ -107,11 +133,7 @@ internal class ScheduleDetailsEditText @JvmOverloads constructor(
                 }
 
                 if (start >= 0 && after > 0) {
-                    tagStyleRemover.remove(
-                        text = s,
-                        start = start,
-                        end = start + after
-                    )
+                    tagStyleRemover.remove(text = s, start = start, end = start + after)
                     return
                 }
             }
@@ -122,11 +144,15 @@ internal class ScheduleDetailsEditText @JvmOverloads constructor(
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent): Boolean {
-        if (event.action == MotionEvent.ACTION_DOWN && scheduleTimingText.isNotEmpty()) {
-            val offset = getOffsetForPosition(event.x, event.y)
-            if (offset < scheduleTimingText.length) {
-                // If the touch occurs within the displayTimingText area, it is ignored.
-                return false
+        when (event.action) {
+            MotionEvent.ACTION_DOWN -> {
+                if (scheduleTimingText.isNotEmpty()) {
+                    val offset = getOffsetForPosition(event.x, event.y)
+                    if (offset < scheduleTimingText.length) {
+                        // If the touch occurs within the displayTimingText area, it is ignored.
+                        return false
+                    }
+                }
             }
         }
 
@@ -135,11 +161,13 @@ internal class ScheduleDetailsEditText @JvmOverloads constructor(
 
     override fun onSelectionChanged(selStart: Int, selEnd: Int) {
         super.onSelectionChanged(selStart, selEnd)
-
         if (isFullyInitialized.not()) {
             // Executes the default implementation when called from the parent constructor
             return
         }
+
+        removeCallbacks(tagSelectionAdjustRunnable)
+        postDelayed(tagSelectionAdjustRunnable, TAG_SELECTION_ADJUST_DEBOUNCE_MS)
 
         val currentText = text
         val textLength = currentText?.length ?: 0
@@ -161,13 +189,6 @@ internal class ScheduleDetailsEditText @JvmOverloads constructor(
             setSelection(newStart, max(newStart, selEnd))
             return
         }
-
-        tagSelectionAdjustHelper.adjustSelectionToTagBounds(
-            currentText,
-            selStart,
-            selEnd,
-            invokeWhenNewSelectionNeeded = { newSelStart, newSelEnd -> setSelection(newSelStart, newSelEnd) }
-        )
     }
 
     internal fun initialize(
@@ -292,5 +313,9 @@ internal class ScheduleDetailsEditText @JvmOverloads constructor(
     private fun setInputAvailable(available: Boolean) {
         isFocusable = available
         isFocusableInTouchMode = available
+    }
+
+    companion object {
+        private const val TAG_SELECTION_ADJUST_DEBOUNCE_MS = 500L
     }
 }
