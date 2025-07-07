@@ -323,6 +323,7 @@ private enum class ContentInputFocus {
 private fun LayoutScheduleAdapterItemContentBinding.getAllInputs(): Iterable<EditText> = listOf(
     edittextTitle,
     edittextNote,
+    edittextDetail
 )
 
 private fun LayoutScheduleAdapterItemContentBinding.findInput(contentInputFocus: ContentInputFocus): EditText? {
