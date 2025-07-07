@@ -9,6 +9,8 @@ android {
 }
 
 dependencies {
+    api(projects.core.component.displayformat)
+
     implementation(projects.core.android)
     implementation(projects.core.androidx.recyclerview)
     implementation(projects.core.component.toolbar)
@@ -20,6 +22,7 @@ dependencies {
     implementation(libs.androidx.cardview)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.transition.ktx)
+    implementation(libs.timber)
 
     testImplementation(projects.core.dataTest)
 }

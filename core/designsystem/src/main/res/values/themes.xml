@@ -20,8 +20,14 @@
         <item name="android:statusBarColor">?bg_1</item>
         <item name="android:windowBackground">?bg_1</item>
         <item name="colorControlHighlight">?bg_ripple_1</item>
+        <!-- Cursor handle for EditText -->
+        <item name="colorControlActivated">?content_text_selection</item>
+        <!-- Selection for EditText -->
+        <item name="android:textColorHighlight">?bg_text_selection</item>
 
+        <item name="content_text_selection">@color/point_1</item>
         <item name="point_1">@color/point_1</item>
+        <item name="point_1_sub">@color/point_1_sub</item>
         <item name="point_2">@color/point_2</item>
         <item name="point_3">@color/point_3</item>
         <item name="white">@android:color/white</item>
@@ -42,6 +48,7 @@
         <item name="bg_line_1">@color/bg_line_1_light</item>
         <item name="bg_line_2">@color/bg_line_2_light</item>
         <item name="bg_placeholder_1">@color/bg_placeholder_1_light</item>
+        <item name="bg_text_selection">@color/point1_op20</item>
         <item name="content_1">@color/content_1_light</item>
         <item name="content_2">@color/content_2_light</item>
         <item name="content_2_hint">@color/content_2_hint_light</item>

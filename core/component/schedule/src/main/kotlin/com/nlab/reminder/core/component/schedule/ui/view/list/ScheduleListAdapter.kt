@@ -25,17 +25,18 @@ import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapt
 import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapterItemFooterAddBinding
 import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapterItemHeadlineBinding
 import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapterItemHeadlinePaddingBinding
+import com.nlab.reminder.core.component.schedule.ui.TriggerAtFormatPatterns
 import com.nlab.reminder.core.data.model.ScheduleId
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.update
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
 
 private const val ITEM_VIEW_TYPE_ADD = 1
 private const val ITEM_VIEW_TYPE_CONTENT = 2
@@ -47,9 +48,17 @@ private const val ITEM_VIEW_TYPE_HEADLINE_PADDING = 5
  * @author Thalys
  */
 class ScheduleListAdapter(
-    private val theme: ScheduleListTheme
+    private val theme: ScheduleListTheme,
+    private val timeZone: Flow<TimeZone>,
+    private val entryAt: Flow<Instant>,
+    triggerAtFormatPatterns: TriggerAtFormatPatterns,
 ) : RecyclerView.Adapter<ScheduleAdapterItemViewHolder>() {
     private val differ = ScheduleListDiffer(listUpdateCallback = AdapterListUpdateCallback(/* adapter = */ this))
+    private val scheduleTimingDisplayFormatter = ScheduleTimingDisplayFormatter(
+        triggerAtFormatPatterns = triggerAtFormatPatterns,
+        dateTimeFormatPool = DateTimeFormatPool()
+    )
+    private val tagsDisplayFormatter = TagsDisplayFormatter()
 
     private val selectionEnabled = MutableStateFlow(false)
     private val selectedScheduleIds = MutableStateFlow<Set<ScheduleId>>(emptySet())
@@ -106,6 +115,10 @@ class ScheduleListAdapter(
                         /* attachToParent = */ false
                     ),
                     theme = theme,
+                    scheduleTimingDisplayFormatter = scheduleTimingDisplayFormatter,
+                    tagsDisplayFormatter = tagsDisplayFormatter,
+                    timeZone = timeZone,
+                    entryAt = entryAt,
                     selectionEnabled = selectionEnabled,
                     selectedScheduleIds = selectedScheduleIds,
                     onSimpleEditDone = { _editRequest.tryEmit(it) },
@@ -186,6 +199,8 @@ class ScheduleListAdapter(
     }
 
     fun submitList(items: List<ScheduleAdapterItem>?) {
+        scheduleTimingDisplayFormatter.releaseCache()
+        tagsDisplayFormatter.releaseCache()
         differ.submitList(items, commitCallback = {})
     }
 

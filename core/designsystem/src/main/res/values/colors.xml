@@ -31,6 +31,7 @@
 
     <!-- point -->
     <color name="point_1">#1CCF98</color>
+    <color name="point_1_sub">#7FD4AE</color>
     <color name="point_2">#BE94F3</color>
     <color name="point_3">#FFB631</color>
 

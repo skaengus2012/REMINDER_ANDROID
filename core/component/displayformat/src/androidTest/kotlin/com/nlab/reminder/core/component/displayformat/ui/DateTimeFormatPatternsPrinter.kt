@@ -19,7 +19,7 @@ package com.nlab.reminder.core.component.displayformat.ui
 import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.nlab.reminder.core.android.content.firstLocale
+import com.nlab.reminder.core.android.content.res.primaryLocale
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
@@ -97,7 +97,7 @@ class DateTimeFormatPatternsPrinter {
                 context.resources,
                 triggerAt = triggerAt,
                 entryAt = entryAt
-            ).toJavaDateTimeFormat(locale = context.firstLocale)
+            ).toJavaDateTimeFormat(locale = context.resources.primaryLocale)
         )
 
         println("---- Print triggerAt----")
@@ -124,7 +124,7 @@ class DateTimeFormatPatternsPrinter {
                 context.resources,
                 triggerAt = triggerAt,
                 entryAt = entryAt
-            ).toJavaDateTimeFormat(context.firstLocale)
+            ).toJavaDateTimeFormat(context.resources.primaryLocale)
         )
 
         println("---- Print triggerAt as date only ----")
