@@ -172,7 +172,7 @@ internal class TagSelectionAdjustHelper {
         if (tagStart == -1
             || tagEnd == -1
             || (selStart == tagStart && selEnd == tagEnd)
-            || (selStart !in tagStart..<tagEnd && selEnd !in tagStart..<tagEnd)
+            || ((tagStart >= selStart || selStart >= tagEnd) && (tagStart >= selEnd || selEnd >= tagEnd))
         ) return
 
         invokeWhenNewSelectionNeeded(min(selStart, tagStart), max(selEnd, tagEnd))

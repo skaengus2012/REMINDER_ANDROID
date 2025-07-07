@@ -329,8 +329,12 @@ internal class AllFragment : ComposableFragment() {
                                         name = "여행".toNonBlankString()
                                     ),
                                     Tag(
-                                        id = TagId(1),
+                                        id = TagId(2),
                                         name = "공부".toNonBlankString()
+                                    ),
+                                    Tag(
+                                        id = TagId(3),
+                                        name = "이것은태그입니다만".toNonBlankString()
                                     ),
                                 )
                             )

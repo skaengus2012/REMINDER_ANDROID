@@ -68,18 +68,14 @@ internal class ScheduleDetailsEditText @JvmOverloads constructor(
             private val tagSelectionAdjustHelper = TagSelectionAdjustHelper()
 
             override fun run() {
+                // FIXME dragging, processing modification required
+                // When holding a drag, the cursor is always positioned in front of the tag text.
+                // The movements are not awkward, so I keep the present for now.
                 tagSelectionAdjustHelper.adjustSelectionToTagBounds(
                     text,
                     selectionStart,
                     selectionEnd,
-                    invokeWhenNewSelectionNeeded = { newSelStart, newSelEnd ->
-                        // During drag,
-                        // the position of the drag handle becomes awkward when changing the selection,
-                        // so remove the focus and re-enter it.
-                        clearFocus()
-                        setSelection(newSelStart, newSelEnd)
-                        requestFocus()
-                    }
+                    invokeWhenNewSelectionNeeded = { newSelStart, newSelEnd -> setSelection(newSelStart, newSelEnd) }
                 )
             }
         }
@@ -161,6 +157,7 @@ internal class ScheduleDetailsEditText @JvmOverloads constructor(
 
     override fun onSelectionChanged(selStart: Int, selEnd: Int) {
         super.onSelectionChanged(selStart, selEnd)
+
         if (isFullyInitialized.not()) {
             // Executes the default implementation when called from the parent constructor
             return
