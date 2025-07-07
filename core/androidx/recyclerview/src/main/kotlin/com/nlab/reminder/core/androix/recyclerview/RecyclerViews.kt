@@ -19,21 +19,43 @@ package com.nlab.reminder.core.androix.recyclerview
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 /**
  * @author thalys
  */
-val RecyclerView.ViewHolder.bindingAdapterOptionalPosition: Int?
-    get() = bindingAdapterPosition.takeUnless { it == RecyclerView.NO_POSITION }
-
-val RecyclerView.ViewHolder.absoluteAdapterOptionalPosition: Int?
-    get() = absoluteAdapterPosition.takeUnless { it == RecyclerView.NO_POSITION }
-
 fun RecyclerView.scrollState(): Flow<Int> = callbackFlow {
     val listener = object : RecyclerView.OnScrollListener() {
         override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
             trySend(newState)
+        }
+    }
+    addOnScrollListener(listener)
+    awaitClose { removeOnScrollListener(listener) }
+}
+
+fun RecyclerView.verticalScrollRange(): Flow<Int> = callbackFlow {
+    val conflateFlow = MutableStateFlow(computeVerticalScrollRange())
+    conflateFlow
+        .onEach { send(it) }
+        .launchIn(scope = this)
+    val listener = object : RecyclerView.OnScrollListener() {
+        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+            conflateFlow.value = recyclerView.computeVerticalScrollRange()
+        }
+    }
+    addOnScrollListener(listener)
+    awaitClose { removeOnScrollListener(listener) }
+}
+
+data object ScrollEvent
+fun RecyclerView.scrollEvent(): Flow<ScrollEvent> = callbackFlow {
+    val listener = object : RecyclerView.OnScrollListener() {
+        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+            trySend(ScrollEvent)
         }
     }
     addOnScrollListener(listener)
