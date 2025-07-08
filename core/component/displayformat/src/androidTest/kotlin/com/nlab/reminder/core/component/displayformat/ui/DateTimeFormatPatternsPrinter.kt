@@ -20,7 +20,6 @@ import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.nlab.reminder.core.android.content.firstLocale
-import kotlinx.datetime.Clock
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
@@ -34,6 +33,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.Locale
+import kotlin.time.Clock
 
 /**
  * @author Doohyun
@@ -52,6 +52,7 @@ class DateTimeFormatPatternsPrinter {
     fun setup() {
         appContext = InstrumentationRegistry.getInstrumentation().targetContext
         timeZone = TimeZone.currentSystemDefault()
+
         val now = Clock.System.now()
         today = now.toLocalDateTime(timeZone)
         yesterday = now

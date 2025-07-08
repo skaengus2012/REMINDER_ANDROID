@@ -17,6 +17,7 @@
 package com.nlab.reminder.core.component.displayformat.ui
 
 import android.content.res.Resources
+import com.nlab.reminder.core.component.displayformat.ScheduleTimingDisplayResource
 import com.nlab.reminder.core.data.model.MonthlyRepeatDetail
 import com.nlab.reminder.core.data.model.Repeat
 import com.nlab.reminder.core.data.model.rawValue

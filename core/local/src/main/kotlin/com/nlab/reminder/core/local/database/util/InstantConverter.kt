@@ -17,7 +17,7 @@
 package com.nlab.reminder.core.local.database.util
 
 import androidx.room.TypeConverter
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 /**
  * @author Thalys

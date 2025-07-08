@@ -22,7 +22,7 @@ import com.nlab.reminder.core.local.database.dao.ScheduleRepeatSaveInput
 import com.nlab.reminder.core.local.database.dao.ScheduleTimingSaveInput
 import com.nlab.reminder.core.local.database.entity.RepeatSettingProperty
 import com.nlab.reminder.core.local.database.entity.RepeatType
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 /**
  * @author Doohyun

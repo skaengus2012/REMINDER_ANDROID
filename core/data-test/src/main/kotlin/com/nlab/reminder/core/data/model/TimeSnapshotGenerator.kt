@@ -17,8 +17,8 @@
 package com.nlab.reminder.core.data.model
 
 import com.nlab.testkit.faker.genBoolean
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
+import kotlin.time.Clock
+import kotlin.time.Instant
 
 /**
  * @author Doohyun
