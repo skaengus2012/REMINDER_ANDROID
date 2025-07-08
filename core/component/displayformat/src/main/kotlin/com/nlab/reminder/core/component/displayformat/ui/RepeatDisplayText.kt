@@ -89,7 +89,7 @@ fun repeatDisplayText(
                     repeat.interval,
                     repeatDetail,
                     isSameDay = repeatDetail.days.value.let {
-                        it.size == 1 && it.first().rawValue == triggerAt.dayOfMonth
+                        it.size == 1 && it.first().rawValue == triggerAt.day
                     },
                 )
             }
