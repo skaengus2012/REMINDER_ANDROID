@@ -17,6 +17,7 @@
 package com.nlab.reminder.core.component.displayformat.ui
 
 import android.content.res.Resources
+import com.nlab.reminder.core.component.displayformat.ScheduleTimingDisplayResource
 import com.nlab.reminder.core.data.model.MonthlyRepeatDetail
 import com.nlab.reminder.core.data.model.Repeat
 import com.nlab.reminder.core.data.model.rawValue
@@ -88,7 +89,7 @@ fun repeatDisplayText(
                     repeat.interval,
                     repeatDetail,
                     isSameDay = repeatDetail.days.value.let {
-                        it.size == 1 && it.first().rawValue == triggerAt.dayOfMonth
+                        it.size == 1 && it.first().rawValue == triggerAt.day
                     },
                 )
             }

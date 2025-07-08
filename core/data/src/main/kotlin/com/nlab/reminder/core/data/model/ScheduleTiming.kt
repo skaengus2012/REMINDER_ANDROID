@@ -16,7 +16,7 @@
 
 package com.nlab.reminder.core.data.model
 
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 /**
  * @author Doohyun

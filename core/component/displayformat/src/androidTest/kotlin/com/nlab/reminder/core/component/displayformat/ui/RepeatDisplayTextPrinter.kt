@@ -7,9 +7,7 @@ import com.nlab.reminder.core.component.displayformat.ScheduleTimingDisplayResou
 import com.nlab.reminder.core.data.model.Repeat
 import com.nlab.reminder.core.data.model.genScheduleTiming
 import com.nlab.testkit.faker.genInt
-import kotlinx.datetime.Clock
 import kotlinx.datetime.DateTimeUnit
-import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.plus
@@ -17,6 +15,8 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.Locale
+import kotlin.time.Clock
+import kotlin.time.Instant
 
 /**
  * @author Doohyun

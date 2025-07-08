@@ -20,7 +20,7 @@ import androidx.annotation.IntRange
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 /**
  * ScheduleEntity Contracts

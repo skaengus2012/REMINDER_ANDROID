@@ -24,9 +24,9 @@ import com.nlab.reminder.core.kotlin.catching
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.datetime.Instant
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
+import kotlin.time.Instant
 
 /**
  * @author Thalys
