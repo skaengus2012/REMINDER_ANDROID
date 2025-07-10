@@ -17,6 +17,7 @@
 package com.nlab.statekit.dsl.reduce
 
 import com.nlab.statekit.dsl.annotation.DslReduceMarker
+import com.nlab.statekit.dsl.internal.ExcludeFromGeneratedTestReport
 import kotlin.reflect.KClass
 
 /**
@@ -47,6 +48,11 @@ class StateScopeReduceBuilder<RA : Any, RS : Any, A : Any, S : RS> internal cons
         }
     }
 
+    // TODO remove Generated annotation after deploy below issue
+    // https://github.com/jacoco/jacoco/issues/1873
+    // In Jacoco 0.8.13, inline functions are included in test scope
+    // However, the jacoco maven plugin fails to read the code, coverage is not filled.
+    @ExcludeFromGeneratedTestReport
     @JvmName(name = "transitionWithActionType")
     inline fun <reified T : A> transition(noinline block: DslTransitionScope<T, S>.() -> RS) {
         transition(actionType = T::class, block = block)
@@ -69,6 +75,11 @@ class StateScopeReduceBuilder<RA : Any, RS : Any, A : Any, S : RS> internal cons
         }
     }
 
+    // TODO remove Generated annotation after deploy below issue
+    // https://github.com/jacoco/jacoco/issues/1873
+    // In Jacoco 0.8.13, inline functions are included in test scope
+    // However, the jacoco maven plugin fails to read the code, coverage is not filled.
+    @ExcludeFromGeneratedTestReport
     @JvmName(name = "effectWithActionType")
     inline fun <reified T : A> effect(noinline block: DslEffectScope<T, S>.() -> Unit) {
         effect(actionType = T::class, block)
@@ -88,6 +99,11 @@ class StateScopeReduceBuilder<RA : Any, RS : Any, A : Any, S : RS> internal cons
         )
     }
 
+    // TODO remove Generated annotation after deploy below issue
+    // https://github.com/jacoco/jacoco/issues/1873
+    // In Jacoco 0.8.13, inline functions are included in test scope
+    // However, the jacoco maven plugin fails to read the code, coverage is not filled.
+    @ExcludeFromGeneratedTestReport
     @JvmName(name = "suspendEffectWithActionType")
     inline fun <reified T : A> suspendEffect(noinline block: suspend DslSuspendEffectScope<RA, T, S>.() -> Unit) {
         suspendEffect(actionType = T::class, block)
@@ -133,6 +149,11 @@ class StateScopeReduceBuilder<RA : Any, RS : Any, A : Any, S : RS> internal cons
         )
     }
 
+    // TODO remove Generated annotation after deploy below issue
+    // https://github.com/jacoco/jacoco/issues/1873
+    // In Jacoco 0.8.13, inline functions are included in test scope
+    // However, the jacoco maven plugin fails to read the code, coverage is not filled.
+    @ExcludeFromGeneratedTestReport
     @JvmName(name = "scopeWithStateType")
     inline fun <reified T : S> scope(noinline block: StateScopeReduceBuilder<RA, RS, A, T>.() -> Unit) {
         scope(stateType = T::class, block)

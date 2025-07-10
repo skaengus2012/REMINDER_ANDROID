@@ -16,8 +16,6 @@
 
 package com.nlab.statekit.dsl.reduce
 
-import com.nlab.statekit.dsl.internal.ExcludeFromGeneratedTestReport
-
 /**
  * @author Doohyun
  */
@@ -40,10 +38,6 @@ internal class ReduceBuilderDelegate(
         effectBuilder.addSuspendNode(block)
     }
 
-    // Test OK @see {com.nlab.statekit.dsl.reduce.ReduceBuilderDelegateTest}
-    // TODO remove Generated annotation after deploy below issue
-    // https://github.com/jacoco/jacoco/pull/1670
-    @ExcludeFromGeneratedTestReport
     private inline fun addScopeInternal(
         from: ReduceBuilderDelegate,
         addTransition: (DslTransition) -> Unit,
@@ -72,10 +66,6 @@ internal class ReduceBuilderDelegate(
         )
     }
 
-    // Test OK @see {com.nlab.statekit.dsl.reduce.ReduceBuilderDelegateTest}
-    // TODO remove Generated annotation after deploy below issue
-    // https://github.com/jacoco/jacoco/pull/1670
-    @ExcludeFromGeneratedTestReport
     inline fun <RS : Any, A : Any, S : RS, T : Any, U : RS> addTransformSourceScope(
         noinline transformSource: UpdateSource<A, S>.() -> UpdateSource<T, U>?,
         crossinline from: (subScope: Any) -> ReduceBuilderDelegate,
