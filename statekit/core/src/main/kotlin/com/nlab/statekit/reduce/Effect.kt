@@ -19,7 +19,6 @@ package com.nlab.statekit.reduce
 import com.nlab.statekit.dispatch.ActionDispatcher
 import kotlinx.coroutines.launch
 
-
 /**
  * @author Doohyun
  */
