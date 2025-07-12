@@ -16,14 +16,12 @@
 
 package com.nlab.statekit.reduce
 
-import com.nlab.statekit.internal.ExcludeFromGeneratedTestReport
-
 /**
  * @author Doohyun
  */
 interface AccumulatorPool {
     fun <T : Any> request(): Accumulator<T>
-    fun release(pool: Accumulator<out Any>)
+    fun release(acc: Accumulator<out Any>)
 }
 
 fun AccumulatorPool(): AccumulatorPool = ThreadLocalsAccumulatorPoolProxy()
@@ -38,8 +36,8 @@ private class DefaultAccumulatorPool : AccumulatorPool {
         return ret as Accumulator<T>
     }
 
-    override fun release(pool: Accumulator<out Any>) {
-        pool.release()
+    override fun release(acc: Accumulator<out Any>) {
+        acc.release()
     }
 }
 
@@ -52,15 +50,11 @@ private class ThreadLocalsAccumulatorPoolProxy : AccumulatorPool {
         return localsPool.request()
     }
 
-    override fun release(pool: Accumulator<out Any>) {
-        localsPool.release(pool)
+    override fun release(acc: Accumulator<out Any>) {
+        localsPool.release(acc)
     }
 }
 
-// Test OK @see {com.nlab.statekit.reduce.AccumulatorPoolKtTest}
-// TODO remove Generated annotation after deploy below issue
-// https://github.com/jacoco/jacoco/pull/1670
-@ExcludeFromGeneratedTestReport
 inline fun <T : Any, R> AccumulatorPool.use(block: (Accumulator<T>) -> R): R {
     val acc = request<T>()
     val ret = block.invoke(acc)
