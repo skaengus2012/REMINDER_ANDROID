@@ -17,7 +17,7 @@
 package com.nlab.statekit.bootstrap
 
 import com.nlab.statekit.TestAction
-import com.nlab.statekit.reduce.ActionDispatcher
+import com.nlab.statekit.dispatch.ActionDispatcher
 import com.nlab.testkit.faker.genInt
 import io.mockk.coVerify
 import io.mockk.mockk
@@ -27,7 +27,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.unconfinedBackgroundScope
+import kotlinx.coroutines.test.backgroundUnconfinedScope
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.sameInstance
 import org.hamcrest.MatcherAssert.assertThat
@@ -45,7 +45,7 @@ class BootstrapFactoriesKtTest {
         val subscriptionCount = MutableStateFlow(0)
         val actionDispatcher: ActionDispatcher<TestAction> = mockk(relaxed = true)
         bootstrap.fetch(
-            coroutineScope = unconfinedBackgroundScope,
+            coroutineScope = backgroundUnconfinedScope,
             actionDispatcher = actionDispatcher,
             stateSubscriptionCount = subscriptionCount
         )
@@ -69,7 +69,7 @@ class BootstrapFactoriesKtTest {
         val bootstrap = Bootstrap(action, isPendingBootUntilSubscribed = false)
         val actionDispatcher: ActionDispatcher<TestAction> = mockk(relaxed = true)
         bootstrap.fetch(
-            coroutineScope = unconfinedBackgroundScope,
+            coroutineScope = backgroundUnconfinedScope,
             actionDispatcher = actionDispatcher,
             stateSubscriptionCount = MutableStateFlow(0)
         )
@@ -92,7 +92,7 @@ class BootstrapFactoriesKtTest {
             }
         }
         bootstrap.fetch(
-            coroutineScope = unconfinedBackgroundScope,
+            coroutineScope = backgroundUnconfinedScope,
             actionDispatcher = actionDispatcher,
             stateSubscriptionCount = MutableStateFlow(0)
         )

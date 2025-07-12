@@ -19,9 +19,6 @@ package com.nlab.statekit.reduce
 import com.nlab.statekit.TestAction
 import com.nlab.statekit.TestState
 import io.mockk.mockk
-import io.mockk.verify
-import kotlinx.coroutines.test.advanceUntilIdle
-import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.nullValue
 import org.hamcrest.CoreMatchers.sameInstance
@@ -36,15 +33,15 @@ class ReduceKtTest {
     @Test
     fun `When create reduce without transition, effect, Then reduce has no transition and effect`() {
         val reduce = TestReduce()
-        assert(reduce.transition == null)
-        assert(reduce.effect == null)
+        assertThat(reduce.transition, nullValue())
+        assertThat(reduce.effect, nullValue())
     }
 
     @Test
     fun `When create empty transition, Then reduce has no transition and effect`() {
         val reduce = EmptyReduce<TestAction, TestState>()
-        assert(reduce.transition == null)
-        assert(reduce.effect == null)
+        assertThat(reduce.transition, nullValue())
+        assertThat(reduce.effect, nullValue())
     }
 
     @Test
@@ -73,51 +70,35 @@ class ReduceKtTest {
     }
 
     @Test
-    fun `Given multiple transitions, When transition from composeReduce, Then return expected value`() {
-        val inputAction = TestAction.Action1
-        val inputState = TestState.State1
-        val expectedState = TestState.State2
-        val wrongState = TestState.State3
-        val notMatchedTransition = TestTransitionNode { action, current ->
-            if (action != inputAction && current != inputState) wrongState
-            else current
-        }
-        val matchedTransition = TestTransitionNode { action, current ->
-            if (action == inputAction && current == inputState) expectedState
-            else current
-        }
-        val wrongMatchedTransition = TestTransitionNode { action, current ->
-            if (action == inputAction && current == inputState) wrongState
-            else current
-        }
-        val reduce =  composeReduce(
+    fun `Given multiple transitions, When composed as reduce, Then result has all transitions`() {
+        val firstTransition: TestTransition = mockk()
+        val secondTransition: TestTransition = mockk()
+        val thirdTransition: TestTransition = mockk()
+
+        val reduce = composeReduce(
             TestReduce(),
-            TestReduce(transition = notMatchedTransition),
-            TestReduce(transition = matchedTransition),
-            TestReduce(transition = wrongMatchedTransition),
+            TestReduce(transition = firstTransition),
+            TestReduce(transition = secondTransition),
+            TestReduce(transition = thirdTransition),
         )
-        val actualState = reduce.transition!!.transitionTo(inputAction, inputState, AccumulatorPool())
-        assertThat(actualState, equalTo(expectedState))
+
+        val actual = reduce.transition as TestTransitionComposite
+        assertThat(actual.head, sameInstance(firstTransition))
+        assertThat(actual.tails, equalTo(listOf(secondTransition, thirdTransition)))
     }
 
     @Test
-    fun `Given multiple effects, When launch effect from composeReduce, Then all effect invoked`() = runTest {
-        val runner: () -> Unit = mockk(relaxed = true)
-        val firstEffect = TestEffectSuspendNode { _, _, _ -> runner() }
-        val secondEffect = TestEffectSuspendNode { _, _, _ -> runner() }
+    fun `Given 2 effects, When composed as reduce, Then result has all effects`() {
+        val firstEffect: TestEffect = mockk()
+        val secondEffect: TestEffect = mockk()
 
         val reduce = composeReduce(
             TestReduce(effect = firstEffect),
-            TestReduce(effect = secondEffect),
+            TestReduce(effect = secondEffect)
         )
-        reduce.effect!!.launch(
-            action = TestAction.genAction(),
-            current = TestState.genState(),
-            actionDispatcher = mockk(relaxed = true),
-            accPool = AccumulatorPool(),
-            coroutineScope = this
-        )
-        advanceUntilIdle()
-        verify(exactly = 2) { runner() }
+
+        val actual = reduce.effect as TestEffectComposite
+        assertThat(actual.head, sameInstance(firstEffect))
+        assertThat(actual.tails, equalTo(listOf(secondEffect)))
     }
 }

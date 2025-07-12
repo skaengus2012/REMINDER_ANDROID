@@ -16,32 +16,27 @@
 
 package com.nlab.statekit.reduce
 
-import org.hamcrest.CoreMatchers.sameInstance
+import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
 
 /**
- * @author Doohyun
+ * @author Thalys
  */
-class AccumulatorPoolTest {
+class NodeStackKtTest {
     @Test
-    fun `When request after release, Then return same instance`() {
-        val pool = AccumulatorPool()
+    fun `Given ordered number list, When collect numbers using addAllReversed, Then nodeStack has reversed list`() {
+        val orderedList = listOf(1, 2, 3, 4, 5)
+        val nodeStack = NodeStack<Int>()
+        nodeStack.addAllReversed(orderedList)
 
-        val firstTimePool = pool.request<Int>()
-        pool.release(firstTimePool)
-
-        val secondTimePool = pool.request<String>()
-        assertThat(secondTimePool, sameInstance(firstTimePool))
-    }
-
-    @Test
-    fun `When request while pool acc used all, Then pool make new instance`() {
-        val pool = AccumulatorPool()
-
-        val firstTimePool = pool.request<Int>()
-        val secondTimePool = pool.request<Int>()
-
-        assert(secondTimePool !== firstTimePool)
+        val actual = buildList {
+            while (true) {
+                val element = nodeStack.removeLastOrNull()
+                if (element == null) break
+                else add(element)
+            }
+        }
+        assertThat(actual, equalTo(orderedList))
     }
 }

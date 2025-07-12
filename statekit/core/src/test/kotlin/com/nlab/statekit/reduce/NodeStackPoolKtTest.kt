@@ -16,27 +16,21 @@
 
 package com.nlab.statekit.reduce
 
-import org.hamcrest.CoreMatchers.equalTo
+import org.hamcrest.CoreMatchers.not
 import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.trueValue
 import org.junit.Test
 
 /**
- * @author Thalys
+ * @author Doohyun
  */
-class AccumulatorsKtTest {
+class NodeStackPoolKtTest {
     @Test
-    fun `Given ordered number list, When collect numbers using addAllReversed, Then acc has reversed list`() {
-        val orderedList = listOf(1, 2, 3, 4, 5)
-        val acc = Accumulator<Int>()
-        acc.addAllReversed(orderedList)
+    fun `Given nodeStackPool, When use, Then acc released`() {
+        val nodeStackPool = NodeStackPool()
+        lateinit var closureNodeStack: NodeStack<Int>
+        nodeStackPool.use { acc -> closureNodeStack = acc }
 
-        val actual = buildList {
-            while (true) {
-                val element = acc.removeLastOrNull()
-                if (element == null) break
-                else add(element)
-            }
-        }
-        assertThat(actual, equalTo(orderedList))
+        assertThat(closureNodeStack.isReady, not(trueValue()))
     }
 }

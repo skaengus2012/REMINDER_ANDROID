@@ -16,14 +16,34 @@
 
 package com.nlab.statekit.reduce
 
-import com.nlab.statekit.TestAction
-import com.nlab.statekit.TestState
-
 /**
  * @author Doohyun
  */
-typealias TestEffect = Effect<TestAction, TestState>
-typealias TestEffectNode = Effect.Node<TestAction, TestState>
-typealias TestEffectSuspendNode = Effect.SuspendNode<TestAction, TestState>
-typealias TestEffectLifecycleNode = Effect.LifecycleNode<TestAction, TestState>
-typealias TestEffectComposite = Effect.Composite<TestAction, TestState>
+class NodeStack<T : Any> internal constructor() {
+    private val acc = ArrayDeque<Any>()
+    internal var isReady: Boolean = false
+        private set
+
+    internal fun ready() {
+        isReady = true
+    }
+
+    internal fun release() {
+        isReady = false
+        acc.clear()
+    }
+
+    fun add(value: T) {
+        acc.add(value)
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    fun removeLastOrNull(): T? = acc.removeLastOrNull() as? T
+
+    @Suppress("UNCHECKED_CAST")
+    fun removeLast(): T = acc.removeLast() as T
+}
+
+internal fun <T : Any> NodeStack<T>.addAllReversed(elements: List<T>) {
+    for (index in elements.size - 1 downTo 0) add(elements[index])
+}

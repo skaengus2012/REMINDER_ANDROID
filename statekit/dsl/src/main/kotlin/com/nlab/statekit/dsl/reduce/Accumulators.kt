@@ -16,13 +16,13 @@
 
 package com.nlab.statekit.dsl.reduce
 
-import com.nlab.statekit.reduce.Accumulator
+import com.nlab.statekit.reduce.NodeStack
 
 /**
  * @author Thalys
  */
-internal fun <T : Any> Accumulator<T>.addAllReversedWithoutHead(
+internal fun <T : Any> NodeStack<T>.addAllReversedWithoutHead(
     elements: List<T>
-): Accumulator<T> = apply {
+): NodeStack<T> = apply {
     for (index in elements.size - 1 downTo 1) add(elements[index])
 }

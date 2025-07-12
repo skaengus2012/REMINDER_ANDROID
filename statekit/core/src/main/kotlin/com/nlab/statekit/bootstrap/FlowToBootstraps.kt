@@ -17,7 +17,7 @@
 package com.nlab.statekit.bootstrap
 
 import com.nlab.statekit.internal.infra.collectWhileSubscribed
-import com.nlab.statekit.reduce.ActionDispatcher
+import com.nlab.statekit.dispatch.ActionDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Job

@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.unconfinedBackgroundScope
+import kotlinx.coroutines.test.backgroundUnconfinedScope
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
@@ -42,7 +42,7 @@ class OfflineFirstLinkMetadataRepositoryTest {
 
         // when
         val collected = mutableListOf<Map<Link, LinkMetadata>>()
-        unconfinedBackgroundScope.launch {
+        backgroundUnconfinedScope.launch {
             linkMetadataRepository
                 .getLinkToMetadataTableAsStream(setOf(expectedLink))
                 .toList(destination = collected)

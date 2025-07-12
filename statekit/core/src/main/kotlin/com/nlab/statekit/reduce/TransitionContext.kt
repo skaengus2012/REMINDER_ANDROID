@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 The N's lab Open Source Project
+ * Copyright (C) 2025 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,17 +16,8 @@
 
 package com.nlab.statekit.reduce
 
-import org.junit.Test
-
 /**
  * @author Doohyun
  */
-class AccumulatorPoolKtTest {
-    @Test
-    fun `When use, Then acc released`() {
-        val accumulatorPool = AccumulatorPool()
-        var closureAcc: Accumulator<Int>? = null
-        accumulatorPool.use { acc -> closureAcc = acc }
-        assert(closureAcc?.isReady?.not() == true)
-    }
-}
+@JvmInline
+value class TransitionContext internal constructor(val nodeStackPool: NodeStackPool)
