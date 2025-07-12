@@ -19,6 +19,8 @@ package com.nlab.statekit.bootstrap
 import com.nlab.statekit.TestAction
 import com.nlab.statekit.reduce.ActionDispatcher
 import com.nlab.testkit.faker.genInt
+import io.mockk.coVerify
+import io.mockk.mockk
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -31,10 +33,6 @@ import org.hamcrest.CoreMatchers.sameInstance
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.instanceOf
 import org.junit.Test
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.never
-import org.mockito.kotlin.once
-import org.mockito.kotlin.verify
 
 /**
  * @author Doohyun
@@ -45,18 +43,19 @@ class BootstrapFactoriesKtTest {
         val action = TestAction.genAction()
         val bootstrap = Bootstrap(action)
         val subscriptionCount = MutableStateFlow(0)
-        val actionDispatcher: ActionDispatcher<TestAction> = mock()
+        val actionDispatcher: ActionDispatcher<TestAction> = mockk(relaxed = true)
         bootstrap.fetch(
             coroutineScope = unconfinedBackgroundScope,
             actionDispatcher = actionDispatcher,
             stateSubscriptionCount = subscriptionCount
         )
+
         advanceUntilIdle()
-        verify(actionDispatcher, never()).dispatch(action)
+        coVerify(inverse = true) { actionDispatcher.dispatch(action) }
 
         subscriptionCount.update { it + 1 }
         advanceUntilIdle()
-        verify(actionDispatcher, once()).dispatch(action)
+        coVerify(exactly = 1) { actionDispatcher.dispatch(action) }
     }
 
     @Test
@@ -68,14 +67,14 @@ class BootstrapFactoriesKtTest {
     fun `Given action and none pendingBootUntilSubscribed, When fetch from with single action, Then action invoked`() = runTest {
         val action = TestAction.genAction()
         val bootstrap = Bootstrap(action, isPendingBootUntilSubscribed = false)
-        val actionDispatcher: ActionDispatcher<TestAction> = mock()
+        val actionDispatcher: ActionDispatcher<TestAction> = mockk(relaxed = true)
         bootstrap.fetch(
             coroutineScope = unconfinedBackgroundScope,
             actionDispatcher = actionDispatcher,
             stateSubscriptionCount = MutableStateFlow(0)
         )
         advanceUntilIdle()
-        verify(actionDispatcher, once()).dispatch(action)
+        coVerify(exactly = 1) { actionDispatcher.dispatch(action) }
     }
 
     @Test
