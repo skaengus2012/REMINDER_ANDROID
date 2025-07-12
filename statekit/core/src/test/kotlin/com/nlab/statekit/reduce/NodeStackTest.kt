@@ -19,10 +19,8 @@ package com.nlab.statekit.reduce
 import com.nlab.testkit.faker.genBoolean
 import com.nlab.testkit.faker.genBothify
 import com.nlab.testkit.faker.genInt
-import org.hamcrest.CoreMatchers.equalTo
-import org.hamcrest.CoreMatchers.nullValue
+import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.falseValue
 import org.hamcrest.trueValue
 import org.junit.Test
 
@@ -33,14 +31,14 @@ import org.junit.Test
 class NodeStackTest {
     @Test
     fun `When created, Then has not ready state`() {
-        assertThat(NodeStack<String>().isReady, falseValue())
+        assertThat(NodeStack<String>().isReady, not(trueValue()))
     }
 
     @Test
     fun `Given nodeStack, When ready, Then has ready state`() {
-        val acc = NodeStack<String>()
-        acc.ready()
-        assertThat(acc.isReady, trueValue())
+        val nodeStack = NodeStack<String>()
+        nodeStack.ready()
+        assertThat(nodeStack.isReady, trueValue())
     }
 
     @Test
@@ -50,7 +48,7 @@ class NodeStackTest {
         nodeStack.add(genInt())
         nodeStack.release()
 
-        assertThat(nodeStack.isReady, falseValue())
+        assertThat(nodeStack.isReady, not(trueValue()))
         assertThat(nodeStack.removeLastOrNull(), nullValue())
     }
 

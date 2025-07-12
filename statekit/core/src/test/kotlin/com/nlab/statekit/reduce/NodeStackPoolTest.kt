@@ -16,14 +16,14 @@
 
 package com.nlab.statekit.reduce
 
-import org.hamcrest.CoreMatchers.sameInstance
+import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
 
 /**
  * @author Doohyun
  */
-class AccumulatorPoolTest {
+class NodeStackPoolTest {
     @Test
     fun `When request after release, Then return same instance`() {
         val pool = NodeStackPool()
@@ -42,6 +42,6 @@ class AccumulatorPoolTest {
         val firstTimePool = pool.request<Int>()
         val secondTimePool = pool.request<Int>()
 
-        assert(secondTimePool !== firstTimePool)
+        assertThat(secondTimePool, not(sameInstance(firstTimePool)))
     }
 }

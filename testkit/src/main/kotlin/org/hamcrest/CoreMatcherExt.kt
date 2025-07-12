@@ -24,5 +24,3 @@ import kotlin.reflect.KClass
 fun <T> instanceOf(clazz: KClass<*>): Matcher<T> = CoreMatchers.instanceOf(clazz.java)
 
 fun trueValue(): Matcher<Boolean> = CoreMatchers.equalTo(true)
-
-fun falseValue(): Matcher<Boolean> = CoreMatchers.equalTo(false)
