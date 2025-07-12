@@ -103,26 +103,26 @@ class BootstrapFactoriesKtTest {
     }
 
     @Test
-    fun `Given 3 Bootstraps, When called combineBootstrap, Then return merge bootstrap`() {
+    fun `Given 3 Bootstraps, When called composeBootstrap, Then return merge bootstrap`() {
         val boot1 = TestBootstrap()
         val boot2 = TestBootstrap()
         val boot3 = TestBootstrap()
-        val bootstrap = combineBootstrap(boot1, boot2, boot3)
+        val bootstrap = composeBootstrap(boot1, boot2, boot3)
         assertThat(bootstrap, instanceOf(CompositeBootstrap::class))
     }
 
     @Test
-    fun `Given bootstrap list, When called combineBootstrap, Then return valid bootstrap`() {
+    fun `Given bootstrap list, When called composeBootstrap, Then return valid bootstrap`() {
         // empty case
-        assertThat(combineBootstrap<TestAction>(emptyList()), instanceOf(EmptyBootstrap::class))
+        assertThat(composeBootstrap<TestAction>(emptyList()), instanceOf(EmptyBootstrap::class))
 
         // single case
         val singleBootstrap = TestBootstrap()
-        assertThat(combineBootstrap(listOf(singleBootstrap)), sameInstance(singleBootstrap))
+        assertThat(composeBootstrap(listOf(singleBootstrap)), sameInstance(singleBootstrap))
 
         // multiple cases
         val multipleBootstraps = List(genInt(min = 2, max = 5)) { TestBootstrap() }
-        assertThat(combineBootstrap(multipleBootstraps), instanceOf(CompositeBootstrap::class))
+        assertThat(composeBootstrap(multipleBootstraps), instanceOf(CompositeBootstrap::class))
     }
 
     @Test
