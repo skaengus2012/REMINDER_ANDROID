@@ -55,6 +55,8 @@ private class ThreadLocalsNodeStackPoolProxy : NodeStackPool {
     }
 }
 
+// FIXME Coverage increases only if there is actual code to execute.
+//  Since it is already used internally, no annotations are added.
 inline fun <T : Any, R> NodeStackPool.use(block: (NodeStack<T>) -> R): R {
     val acc = request<T>()
     val ret = block.invoke(acc)

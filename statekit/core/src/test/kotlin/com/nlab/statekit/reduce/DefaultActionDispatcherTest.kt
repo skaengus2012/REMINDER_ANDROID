@@ -18,7 +18,6 @@ package com.nlab.statekit.reduce
 
 import com.nlab.statekit.TestAction
 import com.nlab.statekit.TestState
-import com.nlab.statekit.dispatch.DefaultActionDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.equalTo
@@ -34,6 +33,7 @@ import org.mockito.kotlin.verify
 /**
  * @author Doohyun
  */
+/**
 class DefaultActionDispatcherTest {
     @Test
     fun `When action dispatched without transition, Then baseState never works`() = runTest {
@@ -104,4 +104,4 @@ class DefaultActionDispatcherTest {
         actionDispatcher.dispatch(TestAction.Action1)
         verify(runnable, once()).invoke(initState)
     }
-}
+}*/

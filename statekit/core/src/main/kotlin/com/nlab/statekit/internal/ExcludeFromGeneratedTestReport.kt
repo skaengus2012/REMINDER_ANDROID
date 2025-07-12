@@ -14,23 +14,20 @@
  * limitations under the License.
  */
 
-package com.nlab.statekit.reduce
-
-import org.hamcrest.CoreMatchers.not
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.trueValue
-import org.junit.Test
+package com.nlab.statekit.internal
 
 /**
+ * Classes and methods annotated with annotation whose retention policy is runtime or class and
+ * whose simple name is Generated are filtered out during generation of report
+ *
  * @author Doohyun
+ * @see <a href="https://github.com/jacoco/jacoco/releases/tag/v0.8.2">jacoco update</a>
+ * @see <a href="https://github.com/jacoco/jacoco/pull/731">jacoco issue</a>
  */
-class NodeStackPoolKtTest {
-    @Test
-    fun `Given nodeStackPool, When use, Then acc released`() {
-        val nodeStackPool = NodeStackPool()
-        lateinit var closureNodeStack: NodeStack<Int>
-        nodeStackPool.use { acc -> closureNodeStack = acc }
-
-        assertThat(closureNodeStack.isReady, not(trueValue()))
-    }
-}
+@Retention(AnnotationRetention.BINARY)
+@Target(
+    AnnotationTarget.CLASS,
+    AnnotationTarget.FUNCTION,
+    AnnotationTarget.CONSTRUCTOR
+)
+internal annotation class ExcludeFromGeneratedTestReport

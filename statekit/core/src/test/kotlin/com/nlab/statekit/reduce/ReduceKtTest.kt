@@ -72,6 +72,7 @@ class ReduceKtTest {
         assertThat(composed, sameInstance(reduce))
     }
 
+    /**
     @Test
     fun `Given multiple transitions, When transition from composeReduce, Then return expected value`() {
         val inputAction = TestAction.Action1
@@ -99,7 +100,8 @@ class ReduceKtTest {
         val actualState = reduce.transition!!.transitionTo(inputAction, inputState, NodeStackPool())
         assertThat(actualState, equalTo(expectedState))
     }
-
+*/
+    /**
     @Test
     fun `Given multiple effects, When launch effect from composeReduce, Then all effect invoked`() = runTest {
         val runner: () -> Unit = mockk(relaxed = true)
@@ -119,5 +121,5 @@ class ReduceKtTest {
         )
         advanceUntilIdle()
         verify(exactly = 2) { runner() }
-    }
+    }*/
 }

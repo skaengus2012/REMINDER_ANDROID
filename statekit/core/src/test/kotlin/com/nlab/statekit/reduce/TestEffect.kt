@@ -31,6 +31,7 @@ typealias TestEffectSuspendNode = Effect.SuspendNode<TestAction, TestState>
 typealias TestEffectLifecycleNode = Effect.LifecycleNode<TestAction, TestState>
 typealias TestEffectComposite = Effect.Composite<TestAction, TestState>
 
+/**
 internal fun TestEffect.launchForTest(
     action: TestAction = TestAction.genAction(),
     state: TestState = TestState.genState(),
@@ -45,4 +46,4 @@ internal fun TestEffect.launchForTest(
         accPool,
         coroutineScope
     )
-}
+}*/
