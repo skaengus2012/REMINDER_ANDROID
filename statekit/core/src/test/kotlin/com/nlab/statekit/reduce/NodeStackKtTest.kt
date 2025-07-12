@@ -16,11 +16,27 @@
 
 package com.nlab.statekit.reduce
 
+import org.hamcrest.CoreMatchers.equalTo
+import org.hamcrest.MatcherAssert.assertThat
+import org.junit.Test
+
 /**
  * @author Thalys
  */
-internal fun <T : Any> Accumulator<T>.addAllReversed(
-    elements: List<T>
-): Accumulator<T> = apply {
-    for (index in elements.size - 1 downTo 0) add(elements[index])
+class NodeStackKtTest {
+    @Test
+    fun `Given ordered number list, When collect numbers using addAllReversed, Then nodeStack has reversed list`() {
+        val orderedList = listOf(1, 2, 3, 4, 5)
+        val nodeStack = NodeStack<Int>()
+        nodeStack.addAllReversed(orderedList)
+
+        val actual = buildList {
+            while (true) {
+                val element = nodeStack.removeLastOrNull()
+                if (element == null) break
+                else add(element)
+            }
+        }
+        assertThat(actual, equalTo(orderedList))
+    }
 }

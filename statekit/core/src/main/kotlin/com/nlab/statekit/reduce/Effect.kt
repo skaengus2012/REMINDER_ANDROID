@@ -38,7 +38,7 @@ sealed interface Effect<A : Any, S : Any> {
             action: A,
             current: S,
             actionDispatcher: ActionDispatcher<A>,
-            accPool: AccumulatorPool,
+            accPool: NodeStackPool,
             coroutineScope: CoroutineScope,
         )
     }
@@ -60,62 +60,9 @@ fun <A : Any, S : Any> Effect<A, S>.launch(
     action: A,
     current: S,
     actionDispatcher: ActionDispatcher<A>,
-    accPool: AccumulatorPool,
+    accPool: NodeStackPool,
     coroutineScope: CoroutineScope,
 ) {
-    tailrec fun <A : Any, S : Any> launchInternal(
-        action: A,
-        current: S,
-        node: Effect<A, S>?,
-        actionDispatcher: ActionDispatcher<A>,
-        acc: Accumulator<Effect<A, S>>,
-        accPool: AccumulatorPool,
-        coroutineScope: CoroutineScope,
-    ) {
-        if (node == null) return
-
-        val nextNode = when (node) {
-            is Effect.Node -> {
-                try {
-                    node.invoke(action, current)
-                } catch (t: Throwable) {
-                    coroutineScope.handleThrowable(t)
-                }
-                acc.removeLastOrNull()
-            }
-
-            is Effect.SuspendNode -> {
-                coroutineScope.launch {
-                    try {
-                        node.invoke(action, current, actionDispatcher)
-                    } catch (t: Throwable) {
-                        handleThrowable(t)
-                    }
-                }
-                acc.removeLastOrNull()
-            }
-
-            is Effect.LifecycleNode -> {
-                node.invoke(action, current, actionDispatcher, accPool, coroutineScope)
-                acc.removeLastOrNull()
-            }
-
-            is Effect.Composite -> {
-                acc.addAllReversed(node.tails)
-                node.head
-            }
-        }
-        launchInternal(
-            action,
-            current,
-            nextNode,
-            actionDispatcher,
-            acc,
-            accPool,
-            coroutineScope,
-        )
-    }
-
     accPool.use { acc ->
         launchInternal(
             action,
@@ -127,6 +74,59 @@ fun <A : Any, S : Any> Effect<A, S>.launch(
             coroutineScope,
         )
     }
+}
+
+private tailrec fun <A : Any, S : Any> launchInternal(
+    action: A,
+    current: S,
+    node: Effect<A, S>?,
+    actionDispatcher: ActionDispatcher<A>,
+    acc: NodeStack<Effect<A, S>>,
+    accPool: NodeStackPool,
+    coroutineScope: CoroutineScope,
+) {
+    if (node == null) return
+
+    val nextNode = when (node) {
+        is Effect.Node -> {
+            try {
+                node.invoke(action, current)
+            } catch (t: Throwable) {
+                coroutineScope.handleThrowable(t)
+            }
+            acc.removeLastOrNull()
+        }
+
+        is Effect.SuspendNode -> {
+            coroutineScope.launch {
+                try {
+                    node.invoke(action, current, actionDispatcher)
+                } catch (t: Throwable) {
+                    handleThrowable(t)
+                }
+            }
+            acc.removeLastOrNull()
+        }
+
+        is Effect.LifecycleNode -> {
+            node.invoke(action, current, actionDispatcher, accPool, coroutineScope)
+            acc.removeLastOrNull()
+        }
+
+        is Effect.Composite -> {
+            acc.addAllReversed(node.tails)
+            node.head
+        }
+    }
+    launchInternal(
+        action,
+        current,
+        nextNode,
+        actionDispatcher,
+        acc,
+        accPool,
+        coroutineScope,
+    )
 }
 
 private fun CoroutineScope.handleThrowable(throwable: Throwable) {

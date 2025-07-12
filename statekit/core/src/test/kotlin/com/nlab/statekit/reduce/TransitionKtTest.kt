@@ -48,7 +48,7 @@ class TransitionKtTest {
             val actualState = TestTransitionComposite(changeable, nonChangeable).transitionTo(
                 inputAction,
                 inputState,
-                AccumulatorPool()
+                NodeStackPool()
             )
 
             assertThat(actualState, equalTo(expectedState))
@@ -72,7 +72,7 @@ class TransitionKtTest {
         class Input(
             val action: TestAction,
             val state: TestState,
-            val accumulatorPool: AccumulatorPool
+            val nodeStackPool: NodeStackPool
         )
 
         fun <T : TestTransition> testAllTransitionInvokedWhenEnded(
@@ -82,7 +82,7 @@ class TransitionKtTest {
             val inputAction = TestAction.genAction()
             val inputState = TestState.State1
             val expectedState = TestState.State3
-            val accumulatorPool = AccumulatorPool()
+            val accumulatorPool = NodeStackPool()
             val input = Input(inputAction, inputState, accumulatorPool)
             val nonChangeable = nonChangeableTransitionMock(input)
             val changeable = mock<TestTransitionNode> {
@@ -114,11 +114,11 @@ class TransitionKtTest {
         testAllTransitionInvokedWhenEnded(
             nonChangeableTransitionMock = { input ->
                 mock<TestTransitionLifecycleNode> {
-                    whenever(mock.next(input.action, input.state, input.accumulatorPool)) doReturn input.state
+                    whenever(mock.next(input.action, input.state, input.nodeStackPool)) doReturn input.state
                 }
             },
             verifyNonChangeableTransition = { mock, input ->
-                verify(mock, once()).next(input.action, input.state, input.accumulatorPool)
+                verify(mock, once()).next(input.action, input.state, input.nodeStackPool)
             }
         )
     }
@@ -136,7 +136,7 @@ class TransitionKtTest {
         val actualState = TestTransitionComposite(nonChangeable1, nonChangeable2).transitionTo(
             inputAction,
             inputState,
-            AccumulatorPool()
+            NodeStackPool()
         )
 
         assertThat(actualState, equalTo(inputState))

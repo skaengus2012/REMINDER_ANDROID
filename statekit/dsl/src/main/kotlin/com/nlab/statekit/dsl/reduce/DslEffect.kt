@@ -16,7 +16,7 @@
 
 package com.nlab.statekit.dsl.reduce
 
-import com.nlab.statekit.reduce.Accumulator
+import com.nlab.statekit.reduce.NodeStack
 import com.nlab.statekit.reduce.Effect
 import com.nlab.statekit.reduce.use
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -65,9 +65,9 @@ internal sealed interface DslEffect {
 internal fun <A : Any, S : Any> effectOf(
     dslEffect: DslEffect
 ): Effect<A, S> = Effect.LifecycleNode { action, current, actionDispatcher, accPool, coroutineScope ->
-    accPool.use { accEffect: Accumulator<DslEffect> ->
-        accPool.use { accScope: Accumulator<Any> ->
-            accPool.use { accDslEffectScope: Accumulator<DslSuspendEffectScope<A, Any, Any>> ->
+    accPool.use { accEffect: NodeStack<DslEffect> ->
+        accPool.use { accScope: NodeStack<Any> ->
+            accPool.use { accDslEffectScope: NodeStack<DslSuspendEffectScope<A, Any, Any>> ->
                 launch(
                     node = dslEffect,
                     scope = dslEffect.scope,
@@ -89,9 +89,9 @@ private tailrec fun <A : Any> launch(
     node: DslEffect?,
     scope: Any,
     dslEffectScope: DslSuspendEffectScope<A, Any, Any>,
-    accEffect: Accumulator<DslEffect>,
-    accScope: Accumulator<Any>,
-    accDslEffectScope: Accumulator<DslSuspendEffectScope<A, Any, Any>>,
+    accEffect: NodeStack<DslEffect>,
+    accScope: NodeStack<Any>,
+    accDslEffectScope: NodeStack<DslSuspendEffectScope<A, Any, Any>>,
     coroutineScope: CoroutineScope
 ) {
     if (node == null) return

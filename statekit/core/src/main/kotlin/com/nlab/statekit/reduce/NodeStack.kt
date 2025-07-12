@@ -16,17 +16,36 @@
 
 package com.nlab.statekit.reduce
 
-import org.junit.Test
-
 /**
  * @author Doohyun
  */
-class AccumulatorPoolKtTest {
-    @Test
-    fun `When use, Then acc released`() {
-        val accumulatorPool = AccumulatorPool()
-        var closureAcc: Accumulator<Int>? = null
-        accumulatorPool.use { acc -> closureAcc = acc }
-        assert(closureAcc?.isReady?.not() == true)
+class NodeStack<T : Any> internal constructor() {
+    private val acc = ArrayDeque<Any>()
+    internal var isReady: Boolean = false
+        private set
+
+    internal fun ready() {
+        isReady = true
     }
+
+    internal fun release() {
+        isReady = false
+        acc.clear()
+    }
+
+    fun add(value: T) {
+        acc.add(value)
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    fun removeLastOrNull(): T? = acc.removeLastOrNull() as? T
+
+    @Suppress("UNCHECKED_CAST")
+    fun removeLast(): T = acc.removeLast() as T
+}
+
+internal fun <T : Any> NodeStack<T>.addAllReversed(
+    elements: List<T>
+): NodeStack<T> = apply {
+    for (index in elements.size - 1 downTo 0) add(elements[index])
 }

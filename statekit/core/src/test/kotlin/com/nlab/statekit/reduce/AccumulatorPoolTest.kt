@@ -26,7 +26,7 @@ import org.junit.Test
 class AccumulatorPoolTest {
     @Test
     fun `When request after release, Then return same instance`() {
-        val pool = AccumulatorPool()
+        val pool = NodeStackPool()
 
         val firstTimePool = pool.request<Int>()
         pool.release(firstTimePool)
@@ -37,7 +37,7 @@ class AccumulatorPoolTest {
 
     @Test
     fun `When request while pool acc used all, Then pool make new instance`() {
-        val pool = AccumulatorPool()
+        val pool = NodeStackPool()
 
         val firstTimePool = pool.request<Int>()
         val secondTimePool = pool.request<Int>()

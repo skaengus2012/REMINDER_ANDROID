@@ -34,7 +34,7 @@ internal fun TestEffect.launchForTest(
     action: TestAction = TestAction.genAction(),
     state: TestState = TestState.genState(),
     actionDispatcher: ActionDispatcher<TestAction> = mock(),
-    accPool: AccumulatorPool = AccumulatorPool(),
+    accPool: NodeStackPool = NodeStackPool(),
     coroutineScope: CoroutineScope
 ) {
     launch(

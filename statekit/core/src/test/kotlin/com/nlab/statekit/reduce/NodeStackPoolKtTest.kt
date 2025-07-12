@@ -14,11 +14,23 @@
  * limitations under the License.
  */
 
-package org.hamcrest
+package com.nlab.statekit.reduce
 
-import kotlin.reflect.KClass
+import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.trueValue
+import org.junit.Test
 
 /**
  * @author Doohyun
  */
-fun <T> instanceOf(clazz: KClass<*>): Matcher<T> = CoreMatchers.instanceOf(clazz.java)
+class NodeStackPoolKtTest {
+    @Test
+    fun `Given nodeStackPool, When use, Then acc released`() {
+        val nodeStackPool = NodeStackPool()
+
+        var closureNodeStack: NodeStack<Int>? = null
+        nodeStackPool.use { acc -> closureNodeStack = acc }
+
+        assertThat(closureNodeStack?.isReady?.not(), trueValue())
+    }
+}

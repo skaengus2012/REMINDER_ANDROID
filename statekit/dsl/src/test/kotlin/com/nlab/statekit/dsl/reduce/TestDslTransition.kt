@@ -18,7 +18,7 @@ package com.nlab.statekit.dsl.reduce
 
 import com.nlab.statekit.dsl.TestAction
 import com.nlab.statekit.dsl.TestState
-import com.nlab.statekit.reduce.AccumulatorPool
+import com.nlab.statekit.reduce.NodeStackPool
 import com.nlab.statekit.reduce.transitionTo
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
@@ -46,7 +46,7 @@ internal fun DslTransition.assert(
 ) {
     val transition = transitionOf<TestAction, TestState>(dslTransition = this)
     assertThat(
-        transition.transitionTo(inputAction, inputState, AccumulatorPool()),
+        transition.transitionTo(inputAction, inputState, NodeStackPool()),
         equalTo(expectedState)
     )
 }

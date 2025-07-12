@@ -17,7 +17,7 @@
 package com.nlab.statekit.store
 
 import com.nlab.statekit.bootstrap.Bootstrap
-import com.nlab.statekit.reduce.AccumulatorPool
+import com.nlab.statekit.reduce.NodeStackPool
 import com.nlab.statekit.reduce.ActionDispatcher
 import com.nlab.statekit.reduce.DefaultActionDispatcher
 import com.nlab.statekit.reduce.Reduce
@@ -46,7 +46,7 @@ internal class StoreImpl<A : Any, S : Any>(
 }
 
 internal class StoreFactory(
-    private val accPool: AccumulatorPool
+    private val nodeStackPool: NodeStackPool
 ) {
     fun <A : Any, S : Any> create(
         coroutineScope: CoroutineScope,
@@ -55,7 +55,7 @@ internal class StoreFactory(
         bootstrap: Bootstrap<A>
     ): Store<A, S> {
         val baseState = MutableStateFlow(initState)
-        val actionDispatcher = DefaultActionDispatcher(reduce, baseState, accPool)
+        val actionDispatcher = DefaultActionDispatcher(reduce, baseState, nodeStackPool)
         return StoreImpl(
             baseState.asStateFlow(),
             coroutineScope,

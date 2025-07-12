@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 The N's lab Open Source Project
+ * Copyright (C) 2025 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,27 +19,11 @@ package com.nlab.statekit.reduce
 /**
  * @author Doohyun
  */
-class Accumulator<T : Any> internal constructor() {
-    private val acc = ArrayDeque<Any>()
-    internal var isReady: Boolean = false
-        private set
-
-    internal fun ready() {
-        isReady = true
+@JvmInline
+value class ThrowableCollector(private val list: MutableList<Throwable>) {
+    fun collect(throwable: Throwable) {
+        list += throwable
     }
 
-    internal fun release() {
-        isReady = false
-        acc.clear()
-    }
-
-    fun add(value: T) {
-        acc.add(value)
-    }
-
-    @Suppress("UNCHECKED_CAST")
-    fun removeLastOrNull(): T? = acc.removeLastOrNull() as? T
-
-    @Suppress("UNCHECKED_CAST")
-    fun removeLast(): T = acc.removeLast() as T
+    fun snapshot(): List<Throwable> = list
 }

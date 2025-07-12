@@ -24,7 +24,7 @@ sealed interface Transition<A : Any, S : Any> {
     }
 
     fun interface LifecycleNode<A : Any, S : Any> : Transition<A, S> {
-        fun next(action: A, current: S, accumulatorPool: AccumulatorPool): S
+        fun next(action: A, current: S, nodeStackPool: NodeStackPool): S
     }
 
     class Composite<A : Any, S : Any>(
@@ -43,39 +43,37 @@ sealed interface Transition<A : Any, S : Any> {
 fun <A : Any, S : Any> Transition<A, S>.transitionTo(
     action: A,
     current: S,
-    accumulatorPool: AccumulatorPool
-): S {
-    tailrec fun <A : Any, S : Any> transitionInternal(
-        action: A,
-        current: S,
-        node: Transition<A, S>?,
-        acc: Accumulator<Transition<A, S>>,
-        accPool: AccumulatorPool,
-    ): S? = if (node == null) null else when (node) {
-        is Transition.Node -> {
-            val next = node.next(action, current)
-            if (next != current) next
-            else transitionInternal(action, current, acc.removeLastOrNull(), acc, accPool)
-        }
+    nodeStackPool: NodeStackPool
+): S = nodeStackPool.use { nodeStack ->
+    transitionInternal(action, current, node = this, nodeStack, nodeStackPool) ?: current
+}
 
-        is Transition.LifecycleNode -> {
-            val next = node.next(action, current, accPool)
-            if (next != current) next
-            else transitionInternal(action, current, acc.removeLastOrNull(), acc, accPool)
-        }
-
-        is Transition.Composite -> {
-            transitionInternal(
-                action,
-                current,
-                node.head,
-                acc.addAllReversed(node.tails),
-                accPool
-            )
-        }
+private tailrec fun <A : Any, S : Any> transitionInternal(
+    action: A,
+    current: S,
+    node: Transition<A, S>?,
+    nodeStack: NodeStack<Transition<A, S>>,
+    nodeStackPool: NodeStackPool,
+): S? = if (node == null) null else when (node) {
+    is Transition.Node -> {
+        val next = node.next(action, current)
+        if (next != current) next
+        else transitionInternal(action, current, node = nodeStack.removeLastOrNull(), nodeStack, nodeStackPool)
     }
 
-    return accumulatorPool.use { acc ->
-        transitionInternal(action, current, node = this, acc, accumulatorPool) ?: current
+    is Transition.LifecycleNode -> {
+        val next = node.next(action, current, nodeStackPool)
+        if (next != current) next
+        else transitionInternal(action, current, node = nodeStack.removeLastOrNull(), nodeStack, nodeStackPool)
+    }
+
+    is Transition.Composite -> {
+        transitionInternal(
+            action,
+            current,
+            node.head,
+            nodeStack.addAllReversed(node.tails),
+            nodeStackPool
+        )
     }
 }

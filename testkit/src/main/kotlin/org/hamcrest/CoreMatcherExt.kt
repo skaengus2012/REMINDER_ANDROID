@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package com.nlab.statekit.dsl.reduce
+package org.hamcrest
 
-import com.nlab.statekit.reduce.NodeStack
+import kotlin.reflect.KClass
 
 /**
- * @author Thalys
+ * @author Doohyun
  */
-internal fun <T : Any> NodeStack<T>.addAllReversedWithoutHead(
-    elements: List<T>
-): NodeStack<T> = apply {
-    for (index in elements.size - 1 downTo 1) add(elements[index])
-}
+fun <T> instanceOf(clazz: KClass<*>): Matcher<T> = CoreMatchers.instanceOf(clazz.java)
+
+fun trueValue(): Matcher<Boolean> = CoreMatchers.equalTo(true)
+
+fun falseValue(): Matcher<Boolean> = CoreMatchers.equalTo(false)

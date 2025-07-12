@@ -41,7 +41,7 @@ class DefaultActionDispatcherTest {
         val actionDispatcher = DefaultActionDispatcher(
             TestReduce(transition = null),
             baseState,
-            AccumulatorPool()
+            NodeStackPool()
         )
 
         actionDispatcher.dispatch(TestAction.genAction())
@@ -57,7 +57,7 @@ class DefaultActionDispatcherTest {
         val actionDispatcher = DefaultActionDispatcher(
             TestReduce(transition = TestTransitionNode { _, _ -> expectedState }),
             baseState,
-            AccumulatorPool()
+            NodeStackPool()
         )
         actionDispatcher.dispatch(TestAction.genAction())
         assertThat(baseState.value, equalTo(expectedState))
@@ -72,7 +72,7 @@ class DefaultActionDispatcherTest {
                 effect = TestEffectSuspendNode { _, current, _ -> runnable(current) },
             ),
             MutableStateFlow(initState),
-            AccumulatorPool()
+            NodeStackPool()
         )
         actionDispatcher.dispatch(TestAction.genAction())
         verify(runnable, once()).invoke(initState)
@@ -98,7 +98,7 @@ class DefaultActionDispatcherTest {
                 }
             ),
             MutableStateFlow(initState),
-            AccumulatorPool()
+            NodeStackPool()
         )
         actionDispatcher.dispatch(TestAction.Action1)
         verify(runnable, once()).invoke(initState)

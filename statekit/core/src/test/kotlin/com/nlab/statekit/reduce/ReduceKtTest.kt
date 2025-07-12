@@ -96,7 +96,7 @@ class ReduceKtTest {
             TestReduce(transition = matchedTransition),
             TestReduce(transition = wrongMatchedTransition),
         )
-        val actualState = reduce.transition!!.transitionTo(inputAction, inputState, AccumulatorPool())
+        val actualState = reduce.transition!!.transitionTo(inputAction, inputState, NodeStackPool())
         assertThat(actualState, equalTo(expectedState))
     }
 
@@ -114,7 +114,7 @@ class ReduceKtTest {
             action = TestAction.genAction(),
             current = TestState.genState(),
             actionDispatcher = mockk(relaxed = true),
-            accPool = AccumulatorPool(),
+            accPool = NodeStackPool(),
             coroutineScope = this
         )
         advanceUntilIdle()

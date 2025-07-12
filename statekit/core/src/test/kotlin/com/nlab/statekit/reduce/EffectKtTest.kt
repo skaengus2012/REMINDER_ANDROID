@@ -52,7 +52,7 @@ class EffectKtTest {
             override val coroutineContext: CoroutineContext
                 get() = error("Fake coroutine scope does not have a coroutine context.")
         }
-        val accPool = AccumulatorPool()
+        val accPool = NodeStackPool()
         TestEffectComposite(firstEffect, secondEffect, thirdEffect, fourthEffect).launch(
             inputAction,
             inputState,

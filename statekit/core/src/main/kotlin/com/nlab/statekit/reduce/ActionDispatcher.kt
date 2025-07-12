@@ -31,26 +31,21 @@ interface ActionDispatcher<in A : Any> {
 internal class DefaultActionDispatcher<A : Any, S : Any>(
     private val reduce: Reduce<A, S>,
     private val baseState: MutableStateFlow<S>,
-    private val accPool: AccumulatorPool
+    private val nodeStackPool: NodeStackPool
 ) : ActionDispatcher<A> {
     override suspend fun dispatch(action: A) {
         val transition = reduce.transition
-        val current = baseState.getAndTransitionTo(action, transition, accPool)
+        val current = baseState.getAndTransition(action, transition, nodeStackPool)
         reduce.effect?.let { effect ->
             val block = { coroutineScope: CoroutineScope ->
-                effect.launch(
-                    action,
-                    current,
-                    actionDispatcher = ChildActionDispatcher(
-                        baseState,
-                        transition,
-                        effect,
-                        coroutineScope,
-                        accPool
-                    ),
-                    coroutineScope = coroutineScope,
-                    accPool = accPool,
+                val nextActionDispatcher = ChildActionDispatcher(
+                    baseState,
+                    transition,
+                    effect,
+                    coroutineScope,
+                    nodeStackPool
                 )
+                effect.launch(action, current, nextActionDispatcher, nodeStackPool, coroutineScope)
             }
             coroutineScope(block)
         } ?: Unit
@@ -62,10 +57,10 @@ private class ChildActionDispatcher<A : Any, S : Any>(
     private val transition: Transition<A, S>?,
     private val effect: Effect<A, S>,
     private val coroutineScope: CoroutineScope,
-    private val accPool: AccumulatorPool,
+    private val accPool: NodeStackPool,
 ) : ActionDispatcher<A> {
     override suspend fun dispatch(action: A) {
-        val current = state.getAndTransitionTo(action, transition, accPool)
+        val current = state.getAndTransition(action, transition, accPool)
         effect.launch(
             action,
             current,
@@ -76,11 +71,11 @@ private class ChildActionDispatcher<A : Any, S : Any>(
     }
 }
 
-private fun <A : Any, S : Any> MutableStateFlow<S>.getAndTransitionTo(
+private fun <A : Any, S : Any> MutableStateFlow<S>.getAndTransition(
     action: A,
     transition: Transition<A, S>?,
-    accumulatorPool: AccumulatorPool,
+    nodeStackPool: NodeStackPool,
 ): S = when (transition) {
     null -> value
-    else -> getAndUpdate { old -> transition.transitionTo(action, old, accumulatorPool) }
+    else -> getAndUpdate { current -> transition.transitionTo(action, current, nodeStackPool) }
 }
