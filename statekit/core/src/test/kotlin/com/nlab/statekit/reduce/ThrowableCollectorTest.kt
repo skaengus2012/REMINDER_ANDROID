@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 The N's lab Open Source Project
+ * Copyright (C) 2025 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,22 @@
 
 package com.nlab.statekit.reduce
 
-import com.nlab.statekit.TestAction
-import com.nlab.statekit.TestState
+import org.hamcrest.CoreMatchers.sameInstance
+import org.hamcrest.MatcherAssert.assertThat
+import org.junit.Test
 
 /**
  * @author Thalys
  */
-typealias TestReduce = Reduce<TestAction, TestState>
+class ThrowableCollectorTest {
+    @Test
+    fun `Given exception, When collect and get snapshot, Then result includes exception`() {
+        val throwableCollector = ThrowableCollector()
+        val exception = RuntimeException()
+
+        throwableCollector.collect(exception)
+
+        val actual = throwableCollector.snapshot()
+        assertThat(actual.first(), sameInstance(exception))
+    }
+}

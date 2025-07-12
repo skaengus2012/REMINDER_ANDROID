@@ -17,7 +17,7 @@
 package com.nlab.statekit.bootstrap
 
 import com.nlab.statekit.TestAction
-import com.nlab.statekit.reduce.ActionDispatcher
+import com.nlab.statekit.dispatch.ActionDispatcher
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.channels.Channel
@@ -28,7 +28,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.unconfinedBackgroundScope
+import kotlinx.coroutines.test.backgroundUnconfinedScope
 import org.junit.Test
 import org.mockito.Mockito.mock
 import org.mockito.kotlin.never
@@ -44,8 +44,10 @@ class FlowBootstrapTest {
         val action = TestAction.genAction()
         val started = DeliveryStarted.Eagerly
         val actionDispatcher = mock<ActionDispatcher<TestAction>>()
+
+
         FlowBootstrap(flowOf(action), started).fetch(
-            coroutineScope = unconfinedBackgroundScope,
+            coroutineScope = backgroundUnconfinedScope,
             actionDispatcher = actionDispatcher,
             stateSubscriptionCount = MutableStateFlow(value = 0)
         )
@@ -62,7 +64,7 @@ class FlowBootstrapTest {
         val stateSubscriptionCount = MutableStateFlow(value = 0)
 
         FlowBootstrap(flowOf(action), started).fetch(
-            coroutineScope = unconfinedBackgroundScope,
+            coroutineScope = backgroundUnconfinedScope,
             actionDispatcher = actionDispatcher,
             stateSubscriptionCount = stateSubscriptionCount
         )
@@ -82,7 +84,7 @@ class FlowBootstrapTest {
         val stateSubscriptionCount = MutableStateFlow(value = 0)
 
         FlowBootstrap(flowOf(action), started).fetch(
-            coroutineScope = unconfinedBackgroundScope,
+            coroutineScope = backgroundUnconfinedScope,
             actionDispatcher = actionDispatcher,
             stateSubscriptionCount = stateSubscriptionCount
         )

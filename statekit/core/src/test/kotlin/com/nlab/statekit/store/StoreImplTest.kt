@@ -2,7 +2,7 @@ package com.nlab.statekit.store
 
 import com.nlab.statekit.TestAction
 import com.nlab.statekit.TestState
-import com.nlab.statekit.reduce.ActionDispatcher
+import com.nlab.statekit.dispatch.ActionDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.equalTo

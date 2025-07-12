@@ -18,7 +18,7 @@ package com.nlab.statekit.dsl.reduce
 
 import com.nlab.statekit.dsl.TestAction
 import com.nlab.statekit.dsl.TestState
-import com.nlab.statekit.reduce.ActionDispatcher
+import com.nlab.statekit.dispatch.ActionDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import org.mockito.Mockito.mock

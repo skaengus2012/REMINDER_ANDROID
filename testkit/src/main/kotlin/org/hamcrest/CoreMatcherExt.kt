@@ -14,32 +14,13 @@
  * limitations under the License.
  */
 
-package com.nlab.statekit.reduce
+package org.hamcrest
+
+import kotlin.reflect.KClass
 
 /**
  * @author Doohyun
  */
-class Accumulator<T : Any> internal constructor() {
-    private val acc = ArrayDeque<Any>()
-    internal var isReady: Boolean = false
-        private set
+fun <T> instanceOf(clazz: KClass<*>): Matcher<T> = CoreMatchers.instanceOf(clazz.java)
 
-    internal fun ready() {
-        isReady = true
-    }
-
-    internal fun release() {
-        isReady = false
-        acc.clear()
-    }
-
-    fun add(value: T) {
-        acc.add(value)
-    }
-
-    @Suppress("UNCHECKED_CAST")
-    fun removeLastOrNull(): T? = acc.removeLastOrNull() as? T
-
-    @Suppress("UNCHECKED_CAST")
-    fun removeLast(): T = acc.removeLast() as T
-}
+fun trueValue(): Matcher<Boolean> = CoreMatchers.equalTo(true)

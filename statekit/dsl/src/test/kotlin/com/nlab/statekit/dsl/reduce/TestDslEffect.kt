@@ -18,8 +18,8 @@ package com.nlab.statekit.dsl.reduce
 
 import com.nlab.statekit.dsl.TestAction
 import com.nlab.statekit.dsl.TestState
-import com.nlab.statekit.reduce.AccumulatorPool
-import com.nlab.statekit.reduce.ActionDispatcher
+import com.nlab.statekit.reduce.NodeStackPool
+import com.nlab.statekit.dispatch.ActionDispatcher
 import com.nlab.statekit.reduce.launch
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.coroutineScope
@@ -52,7 +52,7 @@ internal suspend fun DslEffect.launchAndJoinForTest(
     action: TestAction = TestAction.genAction(),
     state: TestState = TestState.genState(),
     actionDispatcher: ActionDispatcher<TestAction> = mock(),
-    accPool: AccumulatorPool = AccumulatorPool(),
+    accPool: NodeStackPool = NodeStackPool(),
 ) {
     coroutineScope {
         effectOf<TestAction, TestState>(dslEffect = this@launchAndJoinForTest).launch(
@@ -69,7 +69,7 @@ internal fun DslEffect.launchForTest(
     action: TestAction = TestAction.genAction(),
     state: TestState = TestState.genState(),
     actionDispatcher: ActionDispatcher<TestAction> = mock(),
-    accPool: AccumulatorPool = AccumulatorPool(),
+    accPool: NodeStackPool = NodeStackPool(),
     coroutineScope: CoroutineScope
 ) {
     effectOf<TestAction, TestState>(dslEffect = this@launchForTest).launch(

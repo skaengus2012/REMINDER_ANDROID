@@ -16,7 +16,7 @@
 
 package com.nlab.statekit.dsl.reduce
 
-import com.nlab.statekit.reduce.AccumulatorPool
+import com.nlab.statekit.reduce.NodeStackPool
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
@@ -29,7 +29,7 @@ class AccumulatorsKtTest {
     fun `Given ordered number list, When collect numbers using addAllReversedWithoutHead, Then acc has reversed list without first element`() {
         val orderedList = listOf(1, 2, 3, 4, 5)
         val expectedList = orderedList.subList(1, orderedList.size)
-        val acc = AccumulatorPool().request<Int>()
+        val acc = NodeStackPool().request<Int>()
         acc.addAllReversedWithoutHead(orderedList)
 
         val actual = buildList {

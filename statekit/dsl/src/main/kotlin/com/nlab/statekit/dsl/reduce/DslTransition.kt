@@ -16,7 +16,7 @@
 
 package com.nlab.statekit.dsl.reduce
 
-import com.nlab.statekit.reduce.Accumulator
+import com.nlab.statekit.reduce.NodeStack
 import com.nlab.statekit.reduce.Transition
 import com.nlab.statekit.reduce.use
 
@@ -58,9 +58,9 @@ internal sealed interface DslTransition {
 internal fun <A : Any, S : Any> transitionOf(
     dslTransition: DslTransition,
 ): Transition<A, S> = Transition.LifecycleNode { action, current, accumulatorPool ->
-    val newValue = accumulatorPool.use { accTransition: Accumulator<DslTransition> ->
-        accumulatorPool.use { accScope: Accumulator<Any> ->
-            accumulatorPool.use { accDslTransitionScope: Accumulator<DslTransitionScope<Any, Any>> ->
+    val newValue = accumulatorPool.use { accTransition: NodeStack<DslTransition> ->
+        accumulatorPool.use { accScope: NodeStack<Any> ->
+            accumulatorPool.use { accDslTransitionScope: NodeStack<DslTransitionScope<Any, Any>> ->
                 transition(
                     node = dslTransition,
                     scope = dslTransition.scope,
@@ -80,9 +80,9 @@ private tailrec fun transition(
     node: DslTransition?,
     scope: Any,
     dslTransitionScope: DslTransitionScope<Any, Any>,
-    accTransition: Accumulator<DslTransition>,
-    accScope: Accumulator<Any>,
-    accDslTransitionScope: Accumulator<DslTransitionScope<Any, Any>>,
+    accTransition: NodeStack<DslTransition>,
+    accScope: NodeStack<Any>,
+    accDslTransitionScope: NodeStack<DslTransitionScope<Any, Any>>,
 ): Any? {
     node ?: return null
 

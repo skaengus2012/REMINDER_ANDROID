@@ -18,149 +18,157 @@ package com.nlab.statekit.reduce
 
 import com.nlab.statekit.TestAction
 import com.nlab.statekit.TestState
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
+import com.nlab.statekit.dispatch.ActionDispatcher
+import io.mockk.coVerify
+import io.mockk.mockk
+import io.mockk.verify
+import io.mockk.verifyOrder
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.plus
 import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
-import org.mockito.kotlin.inOrder
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.once
-import org.mockito.kotlin.verify
-import kotlin.coroutines.CoroutineContext
 
 /**
  * @author Thalys
  */
 class EffectKtTest {
     @Test
-    fun `Given 4 syncable nodes, When launch, Then effect invoked all in order`() {
-        val firstEffect: TestEffectNode = mock()
-        val secondEffect: TestEffectLifecycleNode = mock()
-        val thirdEffect: TestEffectLifecycleNode = mock()
-        val fourthEffect: TestEffectNode = mock()
-        val inputAction = TestAction.genAction()
-        val inputState = TestState.genState()
-        val fakeActionDispatcher: ActionDispatcher<TestAction> = object : ActionDispatcher<TestAction> {
-            override suspend fun dispatch(action: TestAction) = Unit
-        }
-        val fakeCoroutineScope: CoroutineScope = object : CoroutineScope {
-            override val coroutineContext: CoroutineContext
-                get() = error("Fake coroutine scope does not have a coroutine context.")
-        }
-        val accPool = AccumulatorPool()
-        TestEffectComposite(firstEffect, secondEffect, thirdEffect, fourthEffect).launch(
-            inputAction,
-            inputState,
-            actionDispatcher = fakeActionDispatcher,
-            accPool = accPool,
-            coroutineScope = fakeCoroutineScope,
+    fun `Given 4 syncable composite nodes, When launch, Then effect invoked all in order`() {
+        val firstEffect: TestEffectNode = mockk(relaxed = true)
+        val secondEffect: TestEffectLifecycleNode = mockk(relaxed = true)
+        val thirdEffect: TestEffectLifecycleNode = mockk(relaxed = true)
+        val fourthEffect: TestEffectNode = mockk(relaxed = true)
+        val compositeEffect = TestEffectComposite(
+            head = firstEffect,
+            tails = listOf(secondEffect, thirdEffect, fourthEffect)
         )
 
-        inOrder(firstEffect, secondEffect, thirdEffect, fourthEffect) {
-            verify(firstEffect, once()).invoke(
-                inputAction,
-                inputState
+        val inputAction = TestAction.genAction()
+        val inputState = TestState.genState()
+        val effectContext = EffectContext(
+            coroutineScope = mockk(),
+            nodeStackPool = NodeStackPool(),
+            throwableCollector = mockk()
+        )
+        val actionDispatcher: ActionDispatcher<TestAction> = mockk(relaxed = true)
+
+        compositeEffect.launch(
+            action = inputAction,
+            current = inputState,
+            context = effectContext,
+            actionDispatcher = actionDispatcher
+        )
+
+        verifyOrder {
+            firstEffect.invoke(action = inputAction, current = inputState)
+            secondEffect.invoke(
+                action = inputAction,
+                current = inputState,
+                context = effectContext,
+                actionDispatcher = actionDispatcher
             )
-            verify(secondEffect, once()).invoke(
-                inputAction,
-                inputState,
-                fakeActionDispatcher,
-                accPool,
-                fakeCoroutineScope
+            thirdEffect.invoke(
+                action = inputAction,
+                current = inputState,
+                context = effectContext,
+                actionDispatcher = actionDispatcher
             )
-            verify(thirdEffect, once()).invoke(
-                inputAction,
-                inputState,
-                fakeActionDispatcher,
-                accPool,
-                fakeCoroutineScope
-            )
-            verify(fourthEffect, once()).invoke(
-                inputAction,
-                inputState
-            )
+            fourthEffect.invoke(action = inputAction, current = inputState)
         }
     }
 
     @Test
-    fun `Given suspend node effects, when launch, Then effect invoked all asynchronously`() = runTest {
-        val runners: List<() -> Unit> = List(5) { mock() }
-        val effect = TestEffectComposite(
-            TestEffectComposite(
-                TestEffectSuspendNode { _, _, _ ->
+    fun `Given suspend composite nodes, When launch, Then effect invoked all asynchronously`() = runTest {
+        val runners: List<suspend () -> Unit> = List(5) { mockk(relaxed = true) }
+        val compositeEffect = TestEffectComposite(
+            head = TestEffectComposite(
+                head = TestEffectSuspendNode { _, _, _ ->
                     delay(1000)
                     runners[0].invoke()
                 },
-                TestEffectSuspendNode { _, _, _ ->
-                    delay(1500)
-                    runners[1].invoke()
-                },
-                TestEffectSuspendNode { _, _, _ ->
-                    delay(500)
-                    runners[2].invoke()
-                }
+                tails = listOf(
+                    TestEffectSuspendNode { _, _, _ ->
+                        delay(1500)
+                        runners[1].invoke()
+                    },
+                    TestEffectSuspendNode { _, _, _ ->
+                        delay(500)
+                        runners[2].invoke()
+                    }
+                ),
             ),
-            TestEffectComposite(
-                TestEffectSuspendNode { _, _, _ ->
-                    delay(800)
-                    runners[3].invoke()
-                }
-            ),
-            TestEffectSuspendNode { _, _, _ ->
-                delay(900)
-                runners[4].invoke()
-            }
+            tails = listOf(
+                TestEffectComposite(
+                    head = TestEffectSuspendNode { _, _, _ ->
+                        delay(800)
+                        runners[3].invoke()
+                    },
+                    tails = listOf(
+                        TestEffectSuspendNode { _, _, _ ->
+                            delay(900)
+                            runners[4].invoke()
+                        }
+                    )
+                )
+            )
         )
-        effect.launchForTest(coroutineScope = this)
+
+        compositeEffect.launch(
+            action = TestAction.genAction(),
+            current = TestState.genState(),
+            context = EffectContext(
+                coroutineScope = this,
+                nodeStackPool = NodeStackPool(),
+                throwableCollector = mockk()
+            ),
+            actionDispatcher = mockk()
+        )
         advanceTimeBy(2000)
-        runners.forEach { verify(it, once()).invoke() }
-    }
 
-    @Test(expected = RuntimeException::class)
-    fun `Given throwable effect nodes, When effect launched, Then exception be thrown`() {
-        val effect = TestEffectNode { _, _ -> throw RuntimeException() }
-        effect.launchForTest(
-            coroutineScope = CoroutineScope(Dispatchers.Unconfined),
-        )
+        runners.forEach { runner ->
+            coVerify(exactly = 1) { runner.invoke() }
+        }
     }
 
     @Test
-    fun `Given throwable effect nodes and exceptionHandler, When effect launched, Then exception be thrown to exceptionHandler`() {
-        val exceptionBlock: () -> Unit = mock()
-        val effect = TestEffectNode { _, _ -> throw RuntimeException() }
-        effect.launchForTest(
-            coroutineScope = CoroutineScope(Dispatchers.Unconfined) + CoroutineExceptionHandler { _, _ ->
-                exceptionBlock()
-            }
-        )
-        verify(exceptionBlock, once()).invoke()
-    }
+    fun `Given throwable effect node, When effect launched, Then exception collected`() {
+        val throwable = RuntimeException()
+        val errorEffect = TestEffectNode { _, _ -> throw throwable }
+        val throwableCollector: ThrowableCollector = mockk(relaxed = true)
 
-    @Test(expected = RuntimeException::class)
-    fun `Given throwable suspend effect nodes, When effect launched, Then exception be thrown`() = runTest {
-        val effect = TestEffectSuspendNode { _, _, _ -> throw RuntimeException() }
-        effect.launchForTest(
-            coroutineScope = CoroutineScope(Dispatchers.Unconfined),
+        errorEffect.launch(
+            action = TestAction.genAction(),
+            current = TestState.genState(),
+            context = EffectContext(
+                coroutineScope = mockk(),
+                nodeStackPool = NodeStackPool(),
+                throwableCollector = throwableCollector
+            ),
+            actionDispatcher = mockk()
         )
+
+        verify(exactly = 1) { throwableCollector.collect(throwable) }
     }
 
     @Test
-    fun `Given throwable suspend effect nodes and exceptionHandler, When effect launched, Then exception be thrown to exceptionHandler`() = runTest {
-        val effect = TestEffectSuspendNode { _, _, _ -> throw RuntimeException() }
-        val exceptionBlock: () -> Unit = mock()
-        val superJob = SupervisorJob()
-        effect.launchForTest(
-            coroutineScope = CoroutineScope(Dispatchers.Unconfined) + superJob + CoroutineExceptionHandler { _, _ ->
-                exceptionBlock()
-                superJob.cancel()
-            }
+    fun `Given throwable suspend effect node, When effect launched, Then exception collected`() = runTest {
+        val throwable = RuntimeException()
+        val effect = TestEffectSuspendNode { _, _, _ -> throw throwable }
+        val throwableCollector: ThrowableCollector = mockk(relaxed = true)
+
+        effect.launch(
+            action = TestAction.genAction(),
+            current = TestState.genState(),
+            context = EffectContext(
+                coroutineScope = this,
+                nodeStackPool = NodeStackPool(),
+                throwableCollector = throwableCollector
+            ),
+            actionDispatcher = mockk()
         )
-        superJob.join()
-        verify(exceptionBlock, once()).invoke()
+        advanceUntilIdle()
+
+        verify(exactly = 1) { throwableCollector.collect(throwable) }
     }
 }

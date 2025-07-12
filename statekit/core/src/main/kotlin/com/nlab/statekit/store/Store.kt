@@ -17,9 +17,8 @@
 package com.nlab.statekit.store
 
 import com.nlab.statekit.bootstrap.Bootstrap
-import com.nlab.statekit.reduce.AccumulatorPool
-import com.nlab.statekit.reduce.ActionDispatcher
-import com.nlab.statekit.reduce.DefaultActionDispatcher
+import com.nlab.statekit.reduce.NodeStackPool
+import com.nlab.statekit.dispatch.ActionDispatcher
 import com.nlab.statekit.reduce.Reduce
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -31,9 +30,9 @@ import kotlinx.coroutines.launch
 /**
  * @author Thalys
  */
-abstract class Store<A : Any, S : Any> internal constructor() {
-    abstract val state: StateFlow<S>
-    abstract fun dispatch(action: A): Job
+interface Store<A : Any, S : Any> {
+    val state: StateFlow<S>
+    fun dispatch(action: A): Job
 }
 
 internal class StoreImpl<A : Any, S : Any>(
@@ -41,13 +40,11 @@ internal class StoreImpl<A : Any, S : Any>(
     private val coroutineScope: CoroutineScope,
     private val actionDispatcher: ActionDispatcher<A>,
     @Suppress("unused") private val initJobs: Collection<Job>  // for strong reference
-) : Store<A, S>() {
+) : Store<A, S> {
     override fun dispatch(action: A): Job = coroutineScope.launch { actionDispatcher.dispatch(action) }
 }
 
-internal class StoreFactory(
-    private val accPool: AccumulatorPool
-) {
+internal class StoreFactory(private val nodeStackPool: NodeStackPool) {
     fun <A : Any, S : Any> create(
         coroutineScope: CoroutineScope,
         initState: S,
@@ -55,12 +52,16 @@ internal class StoreFactory(
         bootstrap: Bootstrap<A>
     ): Store<A, S> {
         val baseState = MutableStateFlow(initState)
-        val actionDispatcher = DefaultActionDispatcher(reduce, baseState, accPool)
+        val actionDispatcher = RootActionDispatcher(reduce, baseState, nodeStackPool)
         return StoreImpl(
-            baseState.asStateFlow(),
-            coroutineScope,
-            actionDispatcher,
-            initJobs = bootstrap.fetch(coroutineScope, actionDispatcher, baseState.subscriptionCount)
+            state = baseState.asStateFlow(),
+            coroutineScope = coroutineScope,
+            actionDispatcher = actionDispatcher,
+            initJobs = bootstrap.fetch(
+                coroutineScope,
+                actionDispatcher,
+                stateSubscriptionCount = baseState.subscriptionCount
+            )
         )
     }
 }
