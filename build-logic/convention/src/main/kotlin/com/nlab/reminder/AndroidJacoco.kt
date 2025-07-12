@@ -32,7 +32,7 @@ import org.gradle.testing.jacoco.tasks.JacocoReport
  * @author Doohyun
  */
 internal fun Project.configureJacocoAndroid(extension: AndroidComponentsExtension<*, *, *>) {
-    val jacocoTestReport = tasks.create("jacocoTestReport")
+    val jacocoTestReport = tasks.register("jacocoTestReport")
 
     extension.onVariants { variant ->
         val testTaskName = "test${variant.name.capitalized()}UnitTest"
@@ -48,7 +48,9 @@ internal fun Project.configureJacocoAndroid(extension: AndroidComponentsExtensio
             executionData.setFrom(file("${layout.buildDirectory.get()}/jacoco/$testTaskName.exec"))
         }
 
-        jacocoTestReport.dependsOn(reportTask)
+        jacocoTestReport.configure {
+            dependsOn(reportTask)
+        }
 
         tasks.withType<Test>().configureEach {
             configure<JacocoTaskExtension> {
