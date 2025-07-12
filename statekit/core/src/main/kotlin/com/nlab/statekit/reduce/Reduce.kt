@@ -16,8 +16,6 @@
 
 package com.nlab.statekit.reduce
 
-import com.nlab.statekit.internal.merge
-
 /**
  * @author Doohyun
  */
@@ -29,12 +27,35 @@ class Reduce<A : Any, S : Any>(
 @Suppress("FunctionName")
 fun <A : Any, S : Any> EmptyReduce(): Reduce<A, S> = Reduce()
 
-fun <A : Any, S : Any> composeReduce(
-    reduces: List<Reduce<A, S>>
-): Reduce<A, S> = Reduce(
-    transition = reduces.compositeTransitions,
-    effect = reduces.compositeEffects
-)
+fun <A : Any, S : Any> composeReduce(reduces: List<Reduce<A, S>>): Reduce<A, S> {
+    if (reduces.isEmpty()) return Reduce()
+    if (reduces.size == 1) return reduces.first()
+
+    var transitionHead: Transition<A, S>? = null
+    val transitionTails = mutableListOf<Transition<A, S>>()
+    var effectHead: Effect<A, S>? = null
+    val effectTails = mutableListOf<Effect<A, S>>()
+    for (reduce in reduces) {
+        reduce.transition?.let {
+            if (transitionHead == null) {
+                transitionHead = it
+            } else {
+                transitionTails += it
+            }
+        }
+        reduce.effect?.let {
+            if (effectHead == null) {
+                effectHead = it
+            } else {
+                effectTails += it
+            }
+        }
+    }
+    return Reduce(
+        transition = transitionHead?.let { Transition.Composite(head = it, tails = transitionTails) },
+        effect = effectHead?.let { Effect.Composite(head = it, tails = effectTails) }
+    )
+}
 
 fun <A : Any, S : Any> composeReduce(
     first: Reduce<A, S>,
@@ -45,9 +66,3 @@ fun <A : Any, S : Any> composeReduce(
     add(second)
     if (etc.isNotEmpty()) addAll(etc)
 })
-
-private val <A : Any, S : Any> List<Reduce<A, S>>.compositeTransitions: Transition<A, S>?
-    get() = mapNotNull { it.transition }.merge { head, tails -> Transition.Composite(head, tails) }
-
-private val <A : Any, S : Any> List<Reduce<A, S>>.compositeEffects: Effect<A, S>?
-    get() = mapNotNull { it.effect }.merge { head, tails -> Effect.Composite(head, tails) }

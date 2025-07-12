@@ -23,6 +23,7 @@ import io.mockk.verify
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.equalTo
+import org.hamcrest.CoreMatchers.nullValue
 import org.hamcrest.CoreMatchers.sameInstance
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
@@ -57,6 +58,21 @@ class ReduceKtTest {
     }
 
     @Test
+    fun `Given empty reduces, When compose reduces, Then return empty reduce`() {
+        val reduces = emptyList<Reduce<TestAction, TestState>>()
+        val composed = composeReduce(reduces)
+        assertThat(composed.transition, nullValue())
+        assertThat(composed.effect, nullValue())
+    }
+
+    @Test
+    fun `Given single reduces, When compose reduces, Then return self`() {
+        val reduce = EmptyReduce<TestAction, TestState>()
+        val composed = composeReduce(listOf(reduce))
+        assertThat(composed, sameInstance(reduce))
+    }
+
+    @Test
     fun `Given multiple transitions, When transition from composeReduce, Then return expected value`() {
         val inputAction = TestAction.Action1
         val inputState = TestState.State1
@@ -74,7 +90,7 @@ class ReduceKtTest {
             if (action == inputAction && current == inputState) wrongState
             else current
         }
-        val reduce = composeReduce(
+        val reduce =  composeReduce(
             TestReduce(),
             TestReduce(transition = notMatchedTransition),
             TestReduce(transition = matchedTransition),
