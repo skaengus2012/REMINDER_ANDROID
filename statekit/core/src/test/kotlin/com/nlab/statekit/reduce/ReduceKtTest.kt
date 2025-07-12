@@ -18,21 +18,20 @@ package com.nlab.statekit.reduce
 
 import com.nlab.statekit.TestAction
 import com.nlab.statekit.TestState
+import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.sameInstance
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.times
-import org.mockito.kotlin.verify
 
 
 /**
  * @author Thalys
  */
-class ReduceFactoriesKtTest {
+class ReduceKtTest {
     @Test
     fun `When create reduce without transition, effect, Then reduce has no transition and effect`() {
         val reduce = TestReduce()
@@ -58,7 +57,7 @@ class ReduceFactoriesKtTest {
     }
 
     @Test
-    fun `Given multiple transitions, When transition from combineReduce, Then return expected value`() {
+    fun `Given multiple transitions, When transition from composeReduce, Then return expected value`() {
         val inputAction = TestAction.Action1
         val inputState = TestState.State1
         val expectedState = TestState.State2
@@ -75,7 +74,7 @@ class ReduceFactoriesKtTest {
             if (action == inputAction && current == inputState) wrongState
             else current
         }
-        val reduce = combineReduce(
+        val reduce = composeReduce(
             TestReduce(),
             TestReduce(transition = notMatchedTransition),
             TestReduce(transition = matchedTransition),
@@ -86,23 +85,23 @@ class ReduceFactoriesKtTest {
     }
 
     @Test
-    fun `Given multiple effects, When launch effect from combineReduce, Then all effect invoked`() = runTest {
-        val runner: () -> Unit = mock()
+    fun `Given multiple effects, When launch effect from composeReduce, Then all effect invoked`() = runTest {
+        val runner: () -> Unit = mockk(relaxed = true)
         val firstEffect = TestEffectSuspendNode { _, _, _ -> runner() }
         val secondEffect = TestEffectSuspendNode { _, _, _ -> runner() }
 
-        val reduce = combineReduce(
+        val reduce = composeReduce(
             TestReduce(effect = firstEffect),
             TestReduce(effect = secondEffect),
         )
         reduce.effect!!.launch(
-            TestAction.genAction(),
-            TestState.genState(),
-            actionDispatcher = mock(),
-            AccumulatorPool(),
+            action = TestAction.genAction(),
+            current = TestState.genState(),
+            actionDispatcher = mockk(relaxed = true),
+            accPool = AccumulatorPool(),
             coroutineScope = this
         )
         advanceUntilIdle()
-        verify(runner, times(2)).invoke()
+        verify(exactly = 2) { runner() }
     }
 }

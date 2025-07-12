@@ -16,7 +16,38 @@
 
 package com.nlab.statekit.reduce
 
+import com.nlab.statekit.internal.merge
+
 /**
  * @author Doohyun
  */
-sealed interface Reduce<A : Any, S : Any> : TransitionOwner<A, S>, EffectOwner<A, S>
+class Reduce<A : Any, S : Any>(
+    val transition: Transition<A, S>? = null,
+    val effect: Effect<A, S>? = null
+)
+
+@Suppress("FunctionName")
+fun <A : Any, S : Any> EmptyReduce(): Reduce<A, S> = Reduce()
+
+fun <A : Any, S : Any> composeReduce(
+    reduces: List<Reduce<A, S>>
+): Reduce<A, S> = Reduce(
+    transition = reduces.compositeTransitions,
+    effect = reduces.compositeEffects
+)
+
+fun <A : Any, S : Any> composeReduce(
+    first: Reduce<A, S>,
+    second: Reduce<A, S>,
+    vararg etc: Reduce<A, S>
+): Reduce<A, S> = composeReduce(buildList {
+    add(first)
+    add(second)
+    if (etc.isNotEmpty()) addAll(etc)
+})
+
+private val <A : Any, S : Any> List<Reduce<A, S>>.compositeTransitions: Transition<A, S>?
+    get() = mapNotNull { it.transition }.merge { head, tails -> Transition.Composite(head, tails) }
+
+private val <A : Any, S : Any> List<Reduce<A, S>>.compositeEffects: Effect<A, S>?
+    get() = mapNotNull { it.effect }.merge { head, tails -> Effect.Composite(head, tails) }
