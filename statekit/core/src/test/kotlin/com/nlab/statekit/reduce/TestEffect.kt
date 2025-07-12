@@ -18,6 +18,7 @@ package com.nlab.statekit.reduce
 
 import com.nlab.statekit.TestAction
 import com.nlab.statekit.TestState
+import com.nlab.statekit.dispatch.ActionDispatcher
 import kotlinx.coroutines.CoroutineScope
 import org.mockito.kotlin.mock
 

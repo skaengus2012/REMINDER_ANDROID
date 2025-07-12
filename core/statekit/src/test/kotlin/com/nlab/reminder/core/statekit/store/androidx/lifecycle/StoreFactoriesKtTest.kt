@@ -27,7 +27,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.plus
 
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.unconfinedBackgroundScope
+import kotlinx.coroutines.test.backgroundUnconfinedScope
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
@@ -76,7 +76,7 @@ class StoreFactoriesKtTest {
         StateKitPlugin.addGlobalExceptionHandler(firstGlobalHandler)
         StateKitPlugin.addGlobalExceptionHandler(secondGlobalHandler)
 
-        val baseCoroutineScope = unconfinedBackgroundScope + SupervisorJob() + CoroutineExceptionHandler(localHandler)
+        val baseCoroutineScope = backgroundUnconfinedScope + SupervisorJob() + CoroutineExceptionHandler(localHandler)
         val store = createStore<TestAction, TestState>(
             coroutineScope = baseCoroutineScope.toStoreMaterialScope(),
             initState = TestState,

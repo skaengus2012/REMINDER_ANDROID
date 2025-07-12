@@ -19,7 +19,7 @@ package com.nlab.statekit.dsl.reduce
 import com.nlab.statekit.dsl.TestAction
 import com.nlab.statekit.dsl.TestState
 import com.nlab.statekit.reduce.NodeStackPool
-import com.nlab.statekit.reduce.ActionDispatcher
+import com.nlab.statekit.dispatch.ActionDispatcher
 import com.nlab.statekit.reduce.launch
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.coroutineScope

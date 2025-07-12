@@ -24,56 +24,53 @@ sealed interface Transition<A : Any, S : Any> {
     }
 
     fun interface LifecycleNode<A : Any, S : Any> : Transition<A, S> {
-        fun next(action: A, current: S, nodeStackPool: NodeStackPool): S
+        fun next(action: A, current: S, context: TransitionContext): S
     }
 
     class Composite<A : Any, S : Any>(
         val head: Transition<A, S>,
         val tails: List<Transition<A, S>>
-    ) : Transition<A, S> {
-        companion object {
-            operator fun <A : Any, S : Any> invoke(
-                head: Transition<A, S>,
-                vararg tails: Transition<A, S>
-            ): Composite<A, S> = Composite(head, tails.toList())
-        }
-    }
+    ) : Transition<A, S>
 }
 
 fun <A : Any, S : Any> Transition<A, S>.transitionTo(
     action: A,
     current: S,
-    nodeStackPool: NodeStackPool
-): S = nodeStackPool.use { nodeStack ->
-    transitionInternal(action, current, node = this, nodeStack, nodeStackPool) ?: current
+    context: TransitionContext
+): S = context.nodeStackPool.use { nodeStack ->
+    transitionInternal(node = this, action, current, context, nodeStack) ?: current
 }
 
 private tailrec fun <A : Any, S : Any> transitionInternal(
+    node: Transition<A, S>?,
     action: A,
     current: S,
-    node: Transition<A, S>?,
-    nodeStack: NodeStack<Transition<A, S>>,
-    nodeStackPool: NodeStackPool,
-): S? = if (node == null) null else when (node) {
-    is Transition.Node -> {
-        val next = node.next(action, current)
-        if (next != current) next
-        else transitionInternal(action, current, node = nodeStack.removeLastOrNull(), nodeStack, nodeStackPool)
-    }
+    context: TransitionContext,
+    nodeStack: NodeStack<Transition<A, S>>
+): S? {
+    if (node == null) return null
 
-    is Transition.LifecycleNode -> {
-        val next = node.next(action, current, nodeStackPool)
-        if (next != current) next
-        else transitionInternal(action, current, node = nodeStack.removeLastOrNull(), nodeStack, nodeStackPool)
-    }
+    return when (node) {
+        is Transition.Node -> {
+            val next = node.next(action, current)
+            if (next != current) next
+            else transitionInternal(node = nodeStack.removeLastOrNull(), action, current, context, nodeStack)
+        }
 
-    is Transition.Composite -> {
-        transitionInternal(
-            action,
-            current,
-            node.head,
-            nodeStack.addAllReversed(node.tails),
-            nodeStackPool
-        )
+        is Transition.LifecycleNode -> {
+            val next = node.next(action, current, context)
+            if (next != current) next
+            else transitionInternal(node = nodeStack.removeLastOrNull(), action, current, context, nodeStack)
+        }
+
+        is Transition.Composite -> {
+            transitionInternal(
+                node = node.head,
+                action,
+                current,
+                context,
+                nodeStack = nodeStack.apply { addAllReversed(node.tails) },
+            )
+        }
     }
 }

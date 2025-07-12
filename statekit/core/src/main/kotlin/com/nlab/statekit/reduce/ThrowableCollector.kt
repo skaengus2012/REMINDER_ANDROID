@@ -19,11 +19,12 @@ package com.nlab.statekit.reduce
 /**
  * @author Doohyun
  */
-@JvmInline
-value class ThrowableCollector(private val list: MutableList<Throwable>) {
+class ThrowableCollector internal constructor() {
+    private val list = mutableListOf<Throwable>()
+
+    internal fun snapshot(): List<Throwable> = list
+
     fun collect(throwable: Throwable) {
         list += throwable
     }
-
-    fun snapshot(): List<Throwable> = list
 }

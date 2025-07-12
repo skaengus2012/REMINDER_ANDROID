@@ -44,8 +44,6 @@ class NodeStack<T : Any> internal constructor() {
     fun removeLast(): T = acc.removeLast() as T
 }
 
-internal fun <T : Any> NodeStack<T>.addAllReversed(
-    elements: List<T>
-): NodeStack<T> = apply {
+internal fun <T : Any> NodeStack<T>.addAllReversed(elements: List<T>) {
     for (index in elements.size - 1 downTo 0) add(elements[index])
 }

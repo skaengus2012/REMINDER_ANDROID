@@ -16,8 +16,7 @@
 
 package com.nlab.statekit.reduce
 
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.CoroutineScope
+import com.nlab.statekit.dispatch.ActionDispatcher
 import kotlinx.coroutines.launch
 
 
@@ -37,100 +36,67 @@ sealed interface Effect<A : Any, S : Any> {
         fun invoke(
             action: A,
             current: S,
+            context: EffectContext,
             actionDispatcher: ActionDispatcher<A>,
-            accPool: NodeStackPool,
-            coroutineScope: CoroutineScope,
         )
     }
 
     class Composite<A : Any, S : Any>(
         val head: Effect<A, S>,
         val tails: List<Effect<A, S>>
-    ) : Effect<A, S> {
-        companion object {
-            operator fun <A : Any, S : Any> invoke(
-                head: Effect<A, S>,
-                vararg tails: Effect<A, S>
-            ): Composite<A, S> = Composite(head, tails.toList())
-        }
-    }
+    ) : Effect<A, S>
 }
 
 fun <A : Any, S : Any> Effect<A, S>.launch(
     action: A,
     current: S,
-    actionDispatcher: ActionDispatcher<A>,
-    accPool: NodeStackPool,
-    coroutineScope: CoroutineScope,
+    context: EffectContext,
+    actionDispatcher: ActionDispatcher<A>
 ) {
-    accPool.use { acc ->
-        launchInternal(
-            action,
-            current,
-            node = this,
-            actionDispatcher,
-            acc,
-            accPool,
-            coroutineScope,
-        )
+    context.nodeStackPool.use { nodeStack ->
+        launchInternal(node = this, action, current, context, actionDispatcher, nodeStack)
     }
 }
 
 private tailrec fun <A : Any, S : Any> launchInternal(
+    node: Effect<A, S>?,
     action: A,
     current: S,
-    node: Effect<A, S>?,
+    context: EffectContext,
     actionDispatcher: ActionDispatcher<A>,
-    acc: NodeStack<Effect<A, S>>,
-    accPool: NodeStackPool,
-    coroutineScope: CoroutineScope,
+    nodeStack: NodeStack<Effect<A, S>>,
 ) {
     if (node == null) return
-
     val nextNode = when (node) {
         is Effect.Node -> {
             try {
                 node.invoke(action, current)
             } catch (t: Throwable) {
-                coroutineScope.handleThrowable(t)
+                context.throwableCollector.collect(t)
             }
-            acc.removeLastOrNull()
+            nodeStack.removeLastOrNull()
         }
 
         is Effect.SuspendNode -> {
-            coroutineScope.launch {
+            context.coroutineScope.launch {
                 try {
                     node.invoke(action, current, actionDispatcher)
                 } catch (t: Throwable) {
-                    handleThrowable(t)
+                    context.throwableCollector.collect(t)
                 }
             }
-            acc.removeLastOrNull()
+            nodeStack.removeLastOrNull()
         }
 
         is Effect.LifecycleNode -> {
-            node.invoke(action, current, actionDispatcher, accPool, coroutineScope)
-            acc.removeLastOrNull()
+            node.invoke(action, current, context, actionDispatcher)
+            nodeStack.removeLastOrNull()
         }
 
         is Effect.Composite -> {
-            acc.addAllReversed(node.tails)
+            nodeStack.addAllReversed(node.tails)
             node.head
         }
     }
-    launchInternal(
-        action,
-        current,
-        nextNode,
-        actionDispatcher,
-        acc,
-        accPool,
-        coroutineScope,
-    )
-}
-
-private fun CoroutineScope.handleThrowable(throwable: Throwable) {
-    val exceptionHandler = coroutineContext[CoroutineExceptionHandler]
-    if (exceptionHandler == null) throw throwable
-    else exceptionHandler.handleException(coroutineContext, throwable)
+    launchInternal(nextNode, action, current, context, actionDispatcher, nodeStack)
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 The N's lab Open Source Project
+ * Copyright (C) 2025 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package kotlinx.coroutines.test
+package com.nlab.statekit.reduce
 
-import kotlinx.coroutines.plus
+import kotlinx.coroutines.CoroutineScope
 
 /**
  * @author Doohyun
  */
-fun TestScope.unconfinedTestDispatcher() = UnconfinedTestDispatcher(testScheduler)
-
-val TestScope.unconfinedTestDispatcher get() = UnconfinedTestDispatcher(testScheduler)
-
-val TestScope.backgroundUnconfinedScope get() = backgroundScope + unconfinedTestDispatcher
+class EffectContext internal constructor(
+    val coroutineScope: CoroutineScope,
+    val nodeStackPool: NodeStackPool,
+    val throwableCollector: ThrowableCollector
+)
