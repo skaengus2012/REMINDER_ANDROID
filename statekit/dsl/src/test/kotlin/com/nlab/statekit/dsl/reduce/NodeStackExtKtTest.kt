@@ -24,17 +24,17 @@ import org.junit.Test
 /**
  * @author Thalys
  */
-class AccumulatorsKtTest {
+class NodeStackExtKtTest {
     @Test
-    fun `Given ordered number list, When collect numbers using addAllReversedWithoutHead, Then acc has reversed list without first element`() {
+    fun `Given ordered numbers, When addAllReversedWithoutHead, Then nodeStack has reversed list without first`() {
         val orderedList = listOf(1, 2, 3, 4, 5)
         val expectedList = orderedList.subList(1, orderedList.size)
-        val acc = NodeStackPool().request<Int>()
-        acc.addAllReversedWithoutHead(orderedList)
+        val nodeStack = NodeStackPool().request<Int>()
+        nodeStack.addAllReversedWithoutHead(orderedList)
 
         val actual = buildList {
             while (true) {
-                val element = acc.removeLastOrNull()
+                val element = nodeStack.removeLastOrNull()
                 if (element == null) break
                 else add(element)
             }
