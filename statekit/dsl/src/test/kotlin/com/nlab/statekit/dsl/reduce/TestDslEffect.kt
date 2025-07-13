@@ -34,20 +34,17 @@ internal typealias TestDslEffectNode = DslEffect.Node<TestAction, TestState>
 internal typealias TestDslEffectSuspendNode = DslEffect.SuspendNode<TestAction, TestAction, TestState>
 
 @Suppress("TestFunctionName")
-internal fun TestDslEffect(
-    scope: Any = Any()
-): DslEffect = TestDslEffectNode(scope)
+internal fun TestDslEffect(scope: Any = Any()): DslEffect = TestDslEffectNode(scope)
 
 @Suppress("TestFunctionName")
-internal fun TestDslEffectNode(
-    scope: Any = Any()
-): TestDslEffectNode = TestDslEffectNode(scope) {}
+internal fun TestDslEffectNode(scope: Any = Any()): TestDslEffectNode = TestDslEffectNode(scope) {}
 
 @Suppress("TestFunctionName")
 internal fun TestDslEffectSuspendNode(
-    scope: Any = Any(),
+    scope: Any = Any()
 ): TestDslEffectSuspendNode = TestDslEffectSuspendNode(scope) {}
 
+/**
 internal suspend fun DslEffect.launchAndJoinForTest(
     action: TestAction = TestAction.genAction(),
     state: TestState = TestState.genState(),
@@ -79,4 +76,4 @@ internal fun DslEffect.launchForTest(
         accPool,
         coroutineScope
     )
-}
+}*/

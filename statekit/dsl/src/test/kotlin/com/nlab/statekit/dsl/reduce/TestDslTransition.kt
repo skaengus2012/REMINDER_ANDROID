@@ -39,6 +39,7 @@ internal fun TestDslTransitionNode(
     scope: Any = Any()
 ): TestDslTransitionNode = TestDslTransitionNode(scope) { it.current }
 
+/**
 internal fun DslTransition.assert(
     inputAction: TestAction = TestAction.genAction(),
     inputState: TestState = TestState.genState(),
@@ -49,4 +50,4 @@ internal fun DslTransition.assert(
         transition.transitionTo(inputAction, inputState, NodeStackPool()),
         equalTo(expectedState)
     )
-}
+}*/

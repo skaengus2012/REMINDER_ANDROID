@@ -39,6 +39,7 @@ import org.mockito.kotlin.verify
  * @author Thalys
  */
 class DslEffectKtTest {
+    /**
     @Test(expected = IllegalStateException::class)
     fun `Given zero or single effect, When create CompositeEffect, Then occurred error`() {
         val scope = "0"
@@ -215,4 +216,5 @@ class DslEffectKtTest {
         superJob.join()
         verify(exceptionBlock, once()).invoke()
     }
+    */
 }

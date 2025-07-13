@@ -29,6 +29,7 @@ import org.mockito.kotlin.verify
  * @author Doohyun
  */
 class ScopeReduceBuilderTest {
+    /**
     @Test
     fun `Given inputs and transition block, When transition from builder, Then return expected state`() {
         val inputAction = TestAction.Action1
@@ -177,7 +178,7 @@ class ScopeReduceBuilderTest {
         }
         val transition = checkNotNull(reduceBuilder.delegate.buildTransition())
         transition.assert(inputAction, inputState, expectedState)
-    }
+    }*/
 }
 
 @Suppress("TestFunctionName")

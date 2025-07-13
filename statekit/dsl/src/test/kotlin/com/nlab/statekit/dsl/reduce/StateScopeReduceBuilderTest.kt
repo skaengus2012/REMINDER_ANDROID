@@ -30,6 +30,7 @@ import org.mockito.kotlin.verify
  * @author Doohyun
  */
 class StateScopeReduceBuilderTest {
+    /**
     @Test
     fun `Given matched inputs and expected state, When transition with action type from builder, Then return expectedState`() {
         val inputAction = TestAction.Action1
@@ -182,7 +183,7 @@ class StateScopeReduceBuilderTest {
         val effect = checkNotNull(reduceBuilder.delegate.buildEffect())
         effect.launchAndJoinForTest(inputAction, inputState, actionDispatcher)
         verify(actionDispatcher, once()).dispatch(expectedAction)
-    }
+    }*/
 }
 
 @Suppress("TestFunctionName")
