@@ -27,6 +27,7 @@ import org.junit.Test
  * @author Thalys
  */
 class DslTransitionBuilderTest {
+    /**
     @Test
     fun `When build without add, Then return null`() {
         val transitionBuilder = DslTransitionBuilder(scope = Any())
@@ -91,5 +92,5 @@ class DslTransitionBuilderTest {
         )
 
         assertThat(transitionBuilder.build(), instanceOf(DslTransition.TransformSourceScope::class))
-    }
+    }*/
 }

@@ -18,12 +18,14 @@ package com.nlab.statekit.dsl.reduce
 
 import com.nlab.statekit.dsl.TestAction
 import com.nlab.statekit.dsl.TestState
-import com.nlab.statekit.reduce.NodeStackPool
-import com.nlab.statekit.dispatch.ActionDispatcher
-import com.nlab.statekit.reduce.launch
+import com.nlab.statekit.reduce.Effect
+import com.nlab.statekit.reduce.Reduce
+import com.nlab.statekit.reduce.composeReduce
+import com.nlab.statekit.store.createStore
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.coroutineScope
-import org.mockito.kotlin.mock
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.advanceUntilIdle
 
 /**
  * @author Doohyun
@@ -33,16 +35,28 @@ typealias TestDslSuspendEffectScope = DslSuspendEffectScope<TestAction, TestActi
 internal typealias TestDslEffectNode = DslEffect.Node<TestAction, TestState>
 internal typealias TestDslEffectSuspendNode = DslEffect.SuspendNode<TestAction, TestAction, TestState>
 
-@Suppress("TestFunctionName")
-internal fun TestDslEffect(scope: Any = Any()): DslEffect = TestDslEffectNode(scope)
+context(testScope: TestScope)
+internal fun DslEffect.launchAndAwaitUntilIdle(
+    initState: TestState = TestState.genState(),
+    dispatchAction: TestAction = TestAction.genAction(),
+    coroutineScope: CoroutineScope = testScope
+) {
+    val reduce: Reduce<TestAction, TestState> = Reduce(effect = effectOf(dslEffect = this))
+    val store = createStore(
+        coroutineScope = coroutineScope,
+        initState = initState,
+        reduce = reduce,
+    )
+    store.dispatch(dispatchAction)
+    testScope.advanceUntilIdle()
+}
 
-@Suppress("TestFunctionName")
-internal fun TestDslEffectNode(scope: Any = Any()): TestDslEffectNode = TestDslEffectNode(scope) {}
+sealed class DslEffectLaunchEvent {
+    data object Done : DslEffectLaunchEvent()
+    data class Error(val throwable: Throwable) : DslEffectLaunchEvent()
+    data class ActionDispatched(val action: TestAction, val current: TestState) : DslEffectLaunchEvent()
+}
 
-@Suppress("TestFunctionName")
-internal fun TestDslEffectSuspendNode(
-    scope: Any = Any()
-): TestDslEffectSuspendNode = TestDslEffectSuspendNode(scope) {}
 
 /**
 internal suspend fun DslEffect.launchAndJoinForTest(

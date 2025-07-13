@@ -25,7 +25,11 @@ internal class DslEffectBuilder(private val scope: Any) {
     fun build(): DslEffect? = when (effects.size) {
         0 -> null
         1 -> effects.first()
-        else -> DslEffect.Composite(scope, effects)
+        else -> DslEffect.Composite(
+            scope = scope,
+            head = effects.first(),
+            tails = effects.drop(1)
+        )
     }
 
     fun addEffect(effect: DslEffect) {

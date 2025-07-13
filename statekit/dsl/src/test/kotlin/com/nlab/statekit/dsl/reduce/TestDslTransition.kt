@@ -18,36 +18,22 @@ package com.nlab.statekit.dsl.reduce
 
 import com.nlab.statekit.dsl.TestAction
 import com.nlab.statekit.dsl.TestState
-import com.nlab.statekit.reduce.NodeStackPool
-import com.nlab.statekit.reduce.transitionTo
-import org.hamcrest.CoreMatchers.equalTo
-import org.hamcrest.MatcherAssert.assertThat
+import com.nlab.statekit.reduce.Reduce
+import com.nlab.statekit.test.reduce.ReduceTestBuilder
+import com.nlab.statekit.test.reduce.test
 
 /**
  * @author Doohyun
  */
-typealias TestDslTransitionScope = DslTransitionScope<TestAction, TestState>
-internal typealias TestDslTransitionNode = DslTransition.Node<TestState, TestAction, TestState>
+typealias TestDslTransitionScope =
+        DslTransitionScope<TestAction, TestState>
+internal typealias TestDslTransitionNode =
+        DslTransition.Node<TestState, TestAction, TestState>
+internal typealias TestDslTransitionPredicateScope =
+        DslTransition.PredicateScope<TestAction, TestState>
+internal typealias TestDslTransitionTransformScope<T, U> =
+        DslTransition.TransformSourceScope<TestAction, TestState, T, U>
 
-@Suppress("TestFunctionName")
-internal fun TestDslTransition(
-    scope: Any = Any()
-): DslTransition = TestDslTransitionNode(scope)
-
-@Suppress("TestFunctionName")
-internal fun TestDslTransitionNode(
-    scope: Any = Any()
-): TestDslTransitionNode = TestDslTransitionNode(scope) { it.current }
-
-/**
-internal fun DslTransition.assert(
-    inputAction: TestAction = TestAction.genAction(),
-    inputState: TestState = TestState.genState(),
-    expectedState: TestState
-) {
-    val transition = transitionOf<TestAction, TestState>(dslTransition = this)
-    assertThat(
-        transition.transitionTo(inputAction, inputState, NodeStackPool()),
-        equalTo(expectedState)
-    )
-}*/
+internal fun DslTransition.toReduceTestBuilder(): ReduceTestBuilder<TestAction, TestState> =
+    Reduce<TestAction, TestState>(transition = transitionOf(dslTransition = this))
+        .test()

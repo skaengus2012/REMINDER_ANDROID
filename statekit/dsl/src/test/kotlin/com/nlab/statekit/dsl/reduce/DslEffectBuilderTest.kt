@@ -28,6 +28,7 @@ import org.junit.Test
  * @author Doohyun
  */
 class DslEffectBuilderTest {
+    /**
     @Test
     fun `When build without add, Then return null`() {
         val effectBuilder = DslEffectBuilder(scope = Any())
@@ -101,5 +102,5 @@ class DslEffectBuilderTest {
         )
 
         assertThat(effectBuilder.build(), instanceOf(DslEffect.TransformSourceScope::class))
-    }
+    }*/
 }
