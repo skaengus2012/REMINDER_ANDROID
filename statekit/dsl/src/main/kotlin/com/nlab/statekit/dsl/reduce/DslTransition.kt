@@ -57,10 +57,11 @@ internal sealed interface DslTransition {
 @Suppress("UNCHECKED_CAST")
 internal fun <A : Any, S : Any> transitionOf(
     dslTransition: DslTransition,
-): Transition<A, S> = Transition.LifecycleNode { action, current, accumulatorPool ->
-    val newValue = accumulatorPool.use { accTransition: NodeStack<DslTransition> ->
-        accumulatorPool.use { accScope: NodeStack<Any> ->
-            accumulatorPool.use { accDslTransitionScope: NodeStack<DslTransitionScope<Any, Any>> ->
+): Transition<A, S> = Transition.LifecycleNode { action, current, context ->
+    val nodeStackPool = context.nodeStackPool
+    val newValue = nodeStackPool.use { accTransition: NodeStack<DslTransition> ->
+        nodeStackPool.use { accScope: NodeStack<Any> ->
+            nodeStackPool.use { accDslTransitionScope: NodeStack<DslTransitionScope<Any, Any>> ->
                 transition(
                     node = dslTransition,
                     scope = dslTransition.scope,
