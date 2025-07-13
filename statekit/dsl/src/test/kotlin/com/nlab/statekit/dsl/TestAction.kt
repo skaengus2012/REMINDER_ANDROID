@@ -22,7 +22,7 @@ import com.nlab.testkit.faker.genInt
 /**
  * @author thalys
  */
-sealed class TestAction private constructor() {
+sealed class TestAction {
     data object Action1 : TestAction()
     data object Action2 : TestAction()
 
