@@ -27,7 +27,11 @@ internal class DslTransitionBuilder(
     fun build(): DslTransition? = when (transitions.size) {
         0 -> null
         1 -> transitions.first()
-        else -> DslTransition.Composite(scope, transitions)
+        else -> DslTransition.Composite(
+            scope,
+            head = transitions.first(),
+            tails = transitions.drop(1)
+        )
     }
 
     fun addTransition(transition: DslTransition) {

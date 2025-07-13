@@ -41,12 +41,9 @@ internal sealed interface DslEffect {
 
     class Composite(
         override val scope: Any,
-        val effects: List<DslEffect>
-    ) : DslEffect {
-        init {
-            check(effects.size >= 2)
-        }
-    }
+        val head: DslEffect,
+        val tails: List<DslEffect>
+    ) : DslEffect
 
     class PredicateScope<out A : Any, out S : Any>(
         override val scope: Any,
@@ -141,9 +138,8 @@ private tailrec fun <A : Any> launch(
         }
 
         is DslEffect.Composite -> {
-            val childEffects = node.effects
-            accEffect.addAllReversedWithoutHead(childEffects)
-            nextNode = childEffects.first()
+            accEffect.addAllReversed(node.tails)
+            nextNode = node.head
             nextScope = scope
             nextDslEffectScope = dslEffectScope
         }

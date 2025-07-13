@@ -21,8 +21,6 @@ import com.nlab.statekit.reduce.NodeStack
 /**
  * @author Thalys
  */
-internal fun <T : Any> NodeStack<T>.addAllReversedWithoutHead(
-    elements: List<T>
-): NodeStack<T> = apply {
-    for (index in elements.size - 1 downTo 1) add(elements[index])
+internal fun <T : Any> NodeStack<T>.addAllReversed(elements: List<T>) {
+    for (index in elements.size - 1 downTo 0) add(elements[index])
 }

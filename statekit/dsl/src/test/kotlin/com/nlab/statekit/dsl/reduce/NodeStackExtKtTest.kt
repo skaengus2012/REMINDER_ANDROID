@@ -26,11 +26,10 @@ import org.junit.Test
  */
 class NodeStackExtKtTest {
     @Test
-    fun `Given ordered numbers, When addAllReversedWithoutHead, Then nodeStack has reversed list without first`() {
+    fun `Given ordered number list, When collect numbers using addAllReversed, Then nodeStack has reversed list`() {
         val orderedList = listOf(1, 2, 3, 4, 5)
-        val expectedList = orderedList.subList(1, orderedList.size)
         val nodeStack = NodeStackPool().request<Int>()
-        nodeStack.addAllReversedWithoutHead(orderedList)
+        nodeStack.addAllReversed(orderedList)
 
         val actual = buildList {
             while (true) {
@@ -39,6 +38,6 @@ class NodeStackExtKtTest {
                 else add(element)
             }
         }
-        assertThat(actual, equalTo(expectedList))
+        assertThat(actual, equalTo(orderedList))
     }
 }

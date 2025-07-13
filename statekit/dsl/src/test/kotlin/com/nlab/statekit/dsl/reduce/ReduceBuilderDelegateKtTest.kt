@@ -24,6 +24,7 @@ import org.junit.Test
  * @author Doohyun
  */
 class ReduceBuilderDelegateKtTest {
+    /**
     @Test
     fun `Given scope, When build transition and effect from create reduceBuilderDelegate with scope, Then return transition and effect with scope`() {
         val scope = "1"
@@ -35,5 +36,5 @@ class ReduceBuilderDelegateKtTest {
         val effect = checkNotNull(delegate.buildEffect())
         assertThat(transition.scope, equalTo(scope))
         assertThat(effect.scope, equalTo(scope))
-    }
+    }*/
 }

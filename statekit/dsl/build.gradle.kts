@@ -6,6 +6,7 @@ plugins {
 dependencies {
     implementation(projects.statekit.core)
     implementation(libs.kotlinx.coroutines.core)
-    
+
+    testImplementation(projects.statekit.test)
     testImplementation(projects.testkit)
 }

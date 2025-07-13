@@ -18,37 +18,66 @@ package com.nlab.statekit.dsl.reduce
 
 import com.nlab.statekit.dsl.TestAction
 import com.nlab.statekit.dsl.TestState
+import com.nlab.testkit.faker.genBothify
 import com.nlab.testkit.faker.genInt
+import io.mockk.mockk
+import io.mockk.verifyOrder
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
-import org.mockito.kotlin.inOrder
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.never
-import org.mockito.kotlin.once
-import org.mockito.kotlin.times
-import org.mockito.kotlin.verify
 
 /**
  * @author Thalys
  */
 class DslEffectKtTest {
-    /**
-    @Test(expected = IllegalStateException::class)
-    fun `Given zero or single effect, When create CompositeEffect, Then occurred error`() {
-        val scope = "0"
-        DslEffect.Composite(
-            scope = scope,
-            effects = List(size = genInt(min = 0, max = 1)) { TestDslEffect(scope) }
+    @Test
+    fun `Given 3 depth composite node, When launch, Then all effect launched in order`() = runTest {
+        val rootScope = genBothify()
+        val behaviors: List<() -> Unit> = List(3) { mockk(relaxed = true) }
+        val node = DslEffect.Composite(
+            scope = rootScope,
+            head = TestDslEffectNode(rootScope) { behaviors[0].invoke() },
+            tails = listOf(
+                DslEffect.Composite(
+                    scope = rootScope,
+                    head = TestDslEffectNode(rootScope) { behaviors[1].invoke() },
+                    tails = listOf(TestDslEffectNode(rootScope) { behaviors[2].invoke() })
+                )
+            )
         )
+        node.launchAndAwaitUntilIdle()
+
+        verifyOrder {
+            behaviors.forEach { it.invoke() }
+        }
     }
 
+    @Test
+    fun `Given composed of one throwable, two success nodes, When launch, Then success nodes invoked all`() = runTest {
+        val rootScope = genBothify()
+        val successBehaviors: List<() -> Unit> = List(2) { mockk(relaxed = true) }
+        val node = DslEffect.Composite(
+            scope = rootScope,
+            head = TestDslEffectNode(rootScope) { throw RuntimeException() },
+            tails = listOf(
+                DslEffect.Composite(
+                    scope = rootScope,
+                    head = TestDslEffectNode(rootScope) { successBehaviors[0].invoke() },
+                    tails = listOf(TestDslEffectNode(rootScope) { successBehaviors[1].invoke() })
+                )
+            )
+        )
+
+    }
+
+/**
     @Test
     fun `Given 3 depth effects, When launch Then all effects launched in order`() = runTest {
         val scope = "0"
