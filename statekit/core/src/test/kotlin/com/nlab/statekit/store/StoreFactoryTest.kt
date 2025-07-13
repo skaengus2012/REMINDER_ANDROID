@@ -6,16 +6,14 @@ import com.nlab.statekit.bootstrap.Bootstrap
 import com.nlab.statekit.bootstrap.EmptyBootstrap
 import com.nlab.statekit.reduce.NodeStackPool
 import com.nlab.statekit.reduce.Reduce
+import io.mockk.coVerify
+import io.mockk.mockk
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
-import org.mockito.kotlin.any
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.once
-import org.mockito.kotlin.verify
 
 /**
  * @author Doohyun
@@ -32,10 +30,11 @@ class StoreFactoryTest {
     @Test
     fun `When create store, Then bootstrap fetched`() = runTest {
         val initState = TestState.genState()
-        val bootstrap: Bootstrap<TestAction> = mock()
+        val bootstrap: Bootstrap<TestAction> = mockk(relaxed = true)
         createStoreFromStoreFactory(initState = initState, bootstrap = bootstrap)
-
-        verify(bootstrap, once()).fetch(any(), any(), any())
+        coVerify(exactly = 1) {
+            bootstrap.fetch(any(), any(), any())
+        }
     }
 }
 

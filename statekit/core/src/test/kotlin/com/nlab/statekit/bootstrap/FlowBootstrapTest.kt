@@ -18,6 +18,9 @@ package com.nlab.statekit.bootstrap
 
 import com.nlab.statekit.TestAction
 import com.nlab.statekit.dispatch.ActionDispatcher
+import io.mockk.coVerify
+import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.channels.Channel
@@ -30,10 +33,6 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.backgroundUnconfinedScope
 import org.junit.Test
-import org.mockito.Mockito.mock
-import org.mockito.kotlin.never
-import org.mockito.kotlin.once
-import org.mockito.kotlin.verify
 
 /**
  * @author Doohyun
@@ -43,8 +42,7 @@ class FlowBootstrapTest {
     fun `Given action and early started, When fetched with zero subscription count, Then action stream collected`() = runTest {
         val action = TestAction.genAction()
         val started = DeliveryStarted.Eagerly
-        val actionDispatcher = mock<ActionDispatcher<TestAction>>()
-
+        val actionDispatcher = mockk<ActionDispatcher<TestAction>>(relaxed = true)
 
         FlowBootstrap(flowOf(action), started).fetch(
             coroutineScope = backgroundUnconfinedScope,
@@ -53,14 +51,14 @@ class FlowBootstrapTest {
         )
         advanceUntilIdle()
 
-        verify(actionDispatcher, once()).dispatch(action)
+        coVerify(exactly = 1) { actionDispatcher.dispatch(action) }
     }
 
     @Test
     fun `Given action and lazy started, When fetched, Then action stream collected after subscription count increased`() = runTest {
         val action = TestAction.genAction()
         val started = DeliveryStarted.Lazily
-        val actionDispatcher = mock<ActionDispatcher<TestAction>>()
+        val actionDispatcher = mockk<ActionDispatcher<TestAction>>(relaxed = true)
         val stateSubscriptionCount = MutableStateFlow(value = 0)
 
         FlowBootstrap(flowOf(action), started).fetch(
@@ -69,18 +67,18 @@ class FlowBootstrapTest {
             stateSubscriptionCount = stateSubscriptionCount
         )
         advanceUntilIdle()
-        verify(actionDispatcher, never()).dispatch(action)
+        coVerify(inverse = true) { actionDispatcher.dispatch(action) }
 
         stateSubscriptionCount.update { it + 1 }
         advanceUntilIdle()
-        verify(actionDispatcher, once()).dispatch(action)
+        coVerify(exactly = 1) { actionDispatcher.dispatch(action) }
     }
 
     @Test
     fun `Given action and While subscribed started, When fetched, Then action stream collected after subscription count increased`() = runTest {
         val action = TestAction.genAction()
         val started = DeliveryStarted.WhileSubscribed()
-        val actionDispatcher = mock<ActionDispatcher<TestAction>>()
+        val actionDispatcher = mockk<ActionDispatcher<TestAction>>(relaxed = true)
         val stateSubscriptionCount = MutableStateFlow(value = 0)
 
         FlowBootstrap(flowOf(action), started).fetch(
@@ -89,26 +87,26 @@ class FlowBootstrapTest {
             stateSubscriptionCount = stateSubscriptionCount
         )
         advanceUntilIdle()
-        verify(actionDispatcher, never()).dispatch(action)
+        coVerify(inverse = true) { actionDispatcher.dispatch(action) }
 
         stateSubscriptionCount.update { it + 1 }
         advanceUntilIdle()
-        verify(actionDispatcher, once()).dispatch(action)
+        coVerify(exactly = 1) { actionDispatcher.dispatch(action) }
     }
 
     @Test
     fun `Given action flow and While subscribed started with 2 stopTimeoutSeconds, When fetched, Then actionStream is canceled 2_5 seconds after the number of subscribers reaches 0`() = runTest {
         val actionPublisher = Channel<TestAction>(Channel.UNLIMITED)
-        val errorHandler: () -> Unit = mock()
+        val cancelledExceptionHandler: () -> Unit = mockk(relaxed = true)
         val actionFlow = flow {
             try {
                 for (action in actionPublisher) emit(action)
-            } catch (e: CancellationException) {
-                errorHandler.invoke()
+            } catch (_: CancellationException) {
+                cancelledExceptionHandler.invoke()
             }
         }
         val started = DeliveryStarted.WhileSubscribed(stopTimeoutMillis = 2_000)
-        val actionDispatcher = mock<ActionDispatcher<TestAction>>()
+        val actionDispatcher = mockk<ActionDispatcher<TestAction>>(relaxed = true)
         val stateSubscriptionCount = MutableStateFlow(value = 1)
 
         val jobs = FlowBootstrap(actionFlow, started).fetch(
@@ -120,7 +118,7 @@ class FlowBootstrapTest {
         stateSubscriptionCount.update { 0 }
 
         advanceTimeBy(2_500)
-        verify(errorHandler, once()).invoke()
+        verify(exactly = 1) { cancelledExceptionHandler.invoke() }
 
         jobs.forEach { it.cancelAndJoin() }
     }
