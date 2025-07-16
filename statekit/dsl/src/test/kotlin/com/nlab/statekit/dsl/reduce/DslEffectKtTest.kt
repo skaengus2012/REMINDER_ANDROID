@@ -18,18 +18,13 @@ package com.nlab.statekit.dsl.reduce
 
 import com.nlab.statekit.dsl.TestAction
 import com.nlab.statekit.dsl.TestState
+import com.nlab.statekit.test.reduce.Advance
 import com.nlab.testkit.faker.genBothify
-import com.nlab.testkit.faker.genInt
+import com.nlab.testkit.faker.genLong
 import io.mockk.mockk
+import io.mockk.verify
 import io.mockk.verifyOrder
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.plus
-import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 
@@ -52,7 +47,11 @@ class DslEffectKtTest {
                 )
             )
         )
-        node.launchAndAwaitUntilIdle()
+        node.toReduceTestBuilder()
+            .givenCurrent(TestState.genState())
+            .actionToDispatch(TestAction.genAction())
+            .effectScenario()
+            .launchAndGetTrace()
 
         verifyOrder {
             behaviors.forEach { it.invoke() }
@@ -74,7 +73,84 @@ class DslEffectKtTest {
                 )
             )
         )
+        node.toReduceTestBuilder()
+            .givenCurrent(TestState.genState())
+            .actionToDispatch(TestAction.genAction())
+            .effectScenario()
+            .launchAndGetTrace()
 
+        successBehaviors.forEach { behavior ->
+            verify(exactly = 1) {
+                behavior.invoke()
+            }
+        }
+    }
+
+    @Test
+    fun `Given 3 times suspend effects, When launch, Then all effects launched asynchronously`() = runTest {
+        val rootScope = genBothify()
+        val delayTimeMillis = genLong(min = 2_000, max = 3_000)
+        val behaviors: List<() -> Unit> = List(3) { mockk(relaxed = true) }
+        val node = DslEffect.Composite(
+            scope = rootScope,
+            head = TestDslEffectSuspendNode(rootScope) {
+                delay(delayTimeMillis)
+                behaviors[0].invoke()
+            },
+            tails = listOf(
+                TestDslEffectSuspendNode(rootScope) {
+                    delay(delayTimeMillis)
+                    behaviors[1].invoke()
+                },
+                TestDslEffectSuspendNode(rootScope) {
+                    delay(delayTimeMillis)
+                    behaviors[2].invoke()
+                }
+            )
+        )
+        node.toReduceTestBuilder()
+            .givenCurrent(TestState.genState())
+            .actionToDispatch(TestAction.genAction())
+            .effectScenario()
+            .launchAndGetTrace(
+                advance = Advance.TimeBy(
+                    delayTimeMillis = delayTimeMillis + 100 // with some buffer time
+                )
+            )
+        behaviors.forEach { behavior ->
+            verify(exactly = 1) {
+                behavior.invoke()
+            }
+        }
+    }
+
+    @Test
+    fun `Given composed with delayed throwable first, When launch, Then success node invoked`() = runTest {
+        val rootScope = genBothify()
+        val delayThrowableTimeMillis = genLong(min = 2_000, max = 3_000)
+        val successBehavior: () -> Unit = mockk(relaxed = true)
+        val node = DslEffect.Composite(
+            scope = rootScope,
+            head = TestDslEffectSuspendNode(rootScope) {
+                delay(delayThrowableTimeMillis)
+                throw RuntimeException()
+            },
+            tails = listOf(
+                TestDslEffectSuspendNode(rootScope) {
+                    delay(delayThrowableTimeMillis * 2)
+                    successBehavior()
+                }
+            )
+        )
+        node.toReduceTestBuilder()
+            .givenCurrent(TestState.genState())
+            .actionToDispatch(TestAction.genAction())
+            .effectScenario()
+            .launchAndGetTrace()
+
+        verify(exactly = 1) {
+            successBehavior.invoke()
+        }
     }
 
 /**
