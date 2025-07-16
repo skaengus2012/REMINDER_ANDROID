@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 The N's lab Open Source Project
+ * Copyright (C) 2025 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,9 @@ import com.nlab.statekit.reduce.Reduce
 /**
  * @author Doohyun
  */
-fun <A : Any, S : Any> Reduce<A, S>.transitionScenario() = TransitionScenarioInitSetup(this)
-
-fun <A : Any, S : Any> Reduce<A, S>.effectScenario() = EffectScenarioInitSetup(this)
+class ActionToDispatchBuilder <A : Any, S : Any, IS : S> internal constructor(
+    private val reduce: Reduce<A, S>,
+    private val current: IS
+) {
+    fun <T : A> actionToDispatch(action: T) = TestScenarioSelectionBuilder(reduce, current, actionToDispatch = action)
+}
