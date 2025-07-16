@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 The N's lab Open Source Project
+ * Copyright (C) 2025 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,11 @@
 
 package com.nlab.statekit.test.reduce
 
+import com.nlab.statekit.reduce.Reduce
+
 /**
  * @author Doohyun
  */
-class ScenarioInput<A : Any, S : Any> internal constructor(
-    val action: A,
-    val current: S
-)
+typealias ReduceTestBuilder<A, S> = GivenCurrentBuilder<A, S>
+
+fun <A : Any, S : Any> Reduce<A, S>.test() = ReduceTestBuilder(reduce = this)
