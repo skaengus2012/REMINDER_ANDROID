@@ -18,14 +18,9 @@ package com.nlab.statekit.dsl.reduce
 
 import com.nlab.statekit.dsl.TestAction
 import com.nlab.statekit.dsl.TestState
-import com.nlab.statekit.reduce.Effect
 import com.nlab.statekit.reduce.Reduce
-import com.nlab.statekit.reduce.composeReduce
-import com.nlab.statekit.store.createStore
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.test.TestScope
-import kotlinx.coroutines.test.advanceUntilIdle
+import com.nlab.statekit.test.reduce.ReduceTestBuilder
+import com.nlab.statekit.test.reduce.test
 
 /**
  * @author Doohyun
@@ -34,60 +29,9 @@ typealias TestDslEffectScope = DslEffectScope<TestAction, TestAction>
 typealias TestDslSuspendEffectScope = DslSuspendEffectScope<TestAction, TestAction, TestState>
 internal typealias TestDslEffectNode = DslEffect.Node<TestAction, TestState>
 internal typealias TestDslEffectSuspendNode = DslEffect.SuspendNode<TestAction, TestAction, TestState>
+internal typealias TestDslEffectPredicateScope = DslEffect.PredicateScope<TestAction, TestState>
+internal typealias TestDslEffectTransformScope<T, U> = DslEffect.TransformSourceScope<TestAction, TestState, T, U>
 
-context(testScope: TestScope)
-internal fun DslEffect.launchAndAwaitUntilIdle(
-    initState: TestState = TestState.genState(),
-    dispatchAction: TestAction = TestAction.genAction(),
-    coroutineScope: CoroutineScope = testScope
-) {
-    val reduce: Reduce<TestAction, TestState> = Reduce(effect = effectOf(dslEffect = this))
-    val store = createStore(
-        coroutineScope = coroutineScope,
-        initState = initState,
-        reduce = reduce,
-    )
-    store.dispatch(dispatchAction)
-    testScope.advanceUntilIdle()
-}
-
-sealed class DslEffectLaunchEvent {
-    data object Done : DslEffectLaunchEvent()
-    data class Error(val throwable: Throwable) : DslEffectLaunchEvent()
-    data class ActionDispatched(val action: TestAction, val current: TestState) : DslEffectLaunchEvent()
-}
-
-
-/**
-internal suspend fun DslEffect.launchAndJoinForTest(
-    action: TestAction = TestAction.genAction(),
-    state: TestState = TestState.genState(),
-    actionDispatcher: ActionDispatcher<TestAction> = mock(),
-    accPool: NodeStackPool = NodeStackPool(),
-) {
-    coroutineScope {
-        effectOf<TestAction, TestState>(dslEffect = this@launchAndJoinForTest).launch(
-            action,
-            state,
-            actionDispatcher,
-            accPool,
-            coroutineScope = this
-        )
-    }
-}
-
-internal fun DslEffect.launchForTest(
-    action: TestAction = TestAction.genAction(),
-    state: TestState = TestState.genState(),
-    actionDispatcher: ActionDispatcher<TestAction> = mock(),
-    accPool: NodeStackPool = NodeStackPool(),
-    coroutineScope: CoroutineScope
-) {
-    effectOf<TestAction, TestState>(dslEffect = this@launchForTest).launch(
-        action,
-        state,
-        actionDispatcher,
-        accPool,
-        coroutineScope
-    )
-}*/
+internal fun DslEffect.toReduceTestBuilder(): ReduceTestBuilder<TestAction, TestState> =
+    Reduce<TestAction, TestState>(effect = effectOf(dslEffect = this))
+        .test()

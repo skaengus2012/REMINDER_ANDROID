@@ -18,18 +18,13 @@ package com.nlab.statekit.dsl.reduce
 
 import com.nlab.statekit.dsl.TestAction
 import com.nlab.statekit.dsl.TestState
+import com.nlab.statekit.test.reduce.Advance
 import com.nlab.testkit.faker.genBothify
-import com.nlab.testkit.faker.genInt
+import com.nlab.testkit.faker.genLong
 import io.mockk.mockk
+import io.mockk.verify
 import io.mockk.verifyOrder
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.plus
-import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 
@@ -52,7 +47,11 @@ class DslEffectKtTest {
                 )
             )
         )
-        node.launchAndAwaitUntilIdle()
+        node.toReduceTestBuilder()
+            .givenCurrent(TestState.genState())
+            .actionToDispatch(TestAction.genAction())
+            .effectScenario()
+            .launchAndGetTrace()
 
         verifyOrder {
             behaviors.forEach { it.invoke() }
@@ -74,176 +73,203 @@ class DslEffectKtTest {
                 )
             )
         )
+        node.toReduceTestBuilder()
+            .givenCurrent(TestState.genState())
+            .actionToDispatch(TestAction.genAction())
+            .effectScenario()
+            .launchAndGetTrace()
 
-    }
-
-/**
-    @Test
-    fun `Given 3 depth effects, When launch Then all effects launched in order`() = runTest {
-        val scope = "0"
-        val firstBehavior: () -> Unit = mock()
-        val secondBehavior: () -> Unit = mock()
-        val thirdBehavior: () -> Unit = mock()
-        val nodEffect = DslEffect.Composite(
-            scope = scope,
-            effects = listOf(
-                TestDslEffectNode(scope) { firstBehavior.invoke() },
-                DslEffect.Composite(
-                    scope = scope,
-                    effects = listOf(
-                        TestDslEffectNode(scope) { secondBehavior.invoke() },
-                        DslEffect.Composite(
-                            scope = scope,
-                            effects = listOf(
-                                TestDslEffectNode(scope) { thirdBehavior.invoke() },
-                                TestDslEffectNode(scope) { thirdBehavior.invoke() },
-                            )
-                        )
-                    )
-                )
-            )
-        )
-        nodEffect.launchAndJoinForTest()
-        inOrder(firstBehavior, secondBehavior, thirdBehavior) {
-            verify(firstBehavior, once()).invoke()
-            verify(secondBehavior, once()).invoke()
-            verify(thirdBehavior, times(2)).invoke()
+        successBehaviors.forEach { behavior ->
+            verify(exactly = 1) {
+                behavior.invoke()
+            }
         }
     }
 
     @Test
     fun `Given 3 times suspend effects, When launch, Then all effects launched asynchronously`() = runTest {
-        val scope = "0"
-        val firstBehavior: () -> Unit = mock()
-        val secondBehavior: () -> Unit = mock()
-        val thirdBehavior: () -> Unit = mock()
-        val nodEffect = DslEffect.Composite(
-            scope = scope,
-            effects = listOf(
-                TestDslEffectSuspendNode(scope) {
-                    delay(5_000)
-                    firstBehavior.invoke()
+        val rootScope = genBothify()
+        val delayTimeMillis = genLong(min = 2_000, max = 3_000)
+        val behaviors: List<() -> Unit> = List(3) { mockk(relaxed = true) }
+        val node = DslEffect.Composite(
+            scope = rootScope,
+            head = TestDslEffectSuspendNode(rootScope) {
+                delay(delayTimeMillis)
+                behaviors[0].invoke()
+            },
+            tails = listOf(
+                TestDslEffectSuspendNode(rootScope) {
+                    delay(delayTimeMillis)
+                    behaviors[1].invoke()
                 },
-                TestDslEffectSuspendNode(scope) {
-                    delay(3_000)
-                    secondBehavior.invoke()
-                },
-                TestDslEffectSuspendNode(scope) {
-                    delay(1_500)
-                    thirdBehavior.invoke()
+                TestDslEffectSuspendNode(rootScope) {
+                    delay(delayTimeMillis)
+                    behaviors[2].invoke()
                 }
             )
         )
-        nodEffect.launchAndJoinForTest()
-        advanceTimeBy(5_500)
-        verify(firstBehavior, once()).invoke()
-        verify(secondBehavior, once()).invoke()
-        verify(thirdBehavior, once()).invoke()
+        node.toReduceTestBuilder()
+            .givenCurrent(TestState.genState())
+            .actionToDispatch(TestAction.genAction())
+            .effectScenario()
+            .launchAndGetTrace(
+                advance = Advance.TimeBy(
+                    delayTimeMillis = delayTimeMillis + 100 // with some buffer time
+                )
+            )
+        behaviors.forEach { behavior ->
+            verify(exactly = 1) {
+                behavior.invoke()
+            }
+        }
     }
 
     @Test
-    fun `Given matched predicate scopes, When launch, Then child effect invoked`() = runTest {
-        val scope = "0"
-        val runner: () -> Unit = mock()
-        val nodeEffect = TestDslEffectSuspendNode(scope) { runner.invoke() }
-        val effect = DslEffect.PredicateScope<TestAction, TestState>(
-            scope = scope,
-            isMatch = { true },
-            effect = nodeEffect
-        )
-        effect.launchAndJoinForTest()
-        verify(runner, once()).invoke()
-    }
-
-    @Test
-    fun `Given not matched predicate scopes, When launch, Then child effect never invoked`() = runTest {
-        val scope = "0"
-        val runner: () -> Unit = mock()
-        val nodeEffect = TestDslEffectSuspendNode(scope) { runner.invoke() }
-        val effect = DslEffect.PredicateScope<TestAction, TestState>(
-            scope = scope,
-            isMatch = { false },
-            effect = nodeEffect
-        )
-        effect.launchAndJoinForTest()
-        verify(runner, never()).invoke()
-    }
-
-    @Test
-    fun `Given transform source scopes, When launch, Then child effect invoked`() = runTest {
-        val scope = "0"
-        val subScope = "1"
-        val runner: () -> Unit = mock()
-        val nodeEffect = TestDslEffectSuspendNode(scope) { runner.invoke() }
-        val effect = DslEffect.TransformSourceScope<TestAction, TestState, Int, TestState>(
-            scope = scope,
-            subScope = subScope,
-            transformSource = { source -> UpdateSource(action = 1, source.current) },
-            effect = nodeEffect
-        )
-        effect.launchAndJoinForTest()
-        verify(runner, once()).invoke()
-    }
-
-    @Test
-    fun `Given not matched transform source scopes, When launch, Then child effect never invoked`() = runTest {
-        val scope = "0"
-        val subScope = "1"
-        val twoDepthSubScope = "2"
-        val runner: () -> Unit = mock()
-        val nodeEffect = TestDslEffectSuspendNode(scope) { runner.invoke() }
-        val effect = DslEffect.TransformSourceScope<TestAction, TestState, Int, TestState>(
-            scope = scope,
-            subScope = subScope,
-            transformSource = { null },
-            effect = DslEffect.TransformSourceScope<TestAction, TestState, String, TestState>(
-                scope = subScope,
-                subScope = twoDepthSubScope,
-                transformSource = { null },
-                effect = nodeEffect
+    fun `Given composed with delayed throwable first, When launch, Then success node invoked`() = runTest {
+        val rootScope = genBothify()
+        val delayThrowableTimeMillis = genLong(min = 2_000, max = 3_000)
+        val successBehavior: () -> Unit = mockk(relaxed = true)
+        val node = DslEffect.Composite(
+            scope = rootScope,
+            head = TestDslEffectSuspendNode(rootScope) {
+                delay(delayThrowableTimeMillis)
+                throw RuntimeException()
+            },
+            tails = listOf(
+                TestDslEffectSuspendNode(rootScope) {
+                    delay(delayThrowableTimeMillis * 2)
+                    successBehavior()
+                }
             )
         )
-        effect.launchAndJoinForTest()
-        verify(runner, never()).invoke()
-    }
+        node.toReduceTestBuilder()
+            .givenCurrent(TestState.genState())
+            .actionToDispatch(TestAction.genAction())
+            .effectScenario()
+            .launchAndGetTrace()
 
-    @Test(expected = RuntimeException::class)
-    fun `Given throwable effect nodes, When effect launched, Then exception be thrown`() {
-        val effect = TestDslEffectNode(scope = "1") { throw RuntimeException() }
-        effect.launchForTest(coroutineScope = CoroutineScope(Dispatchers.Unconfined))
-    }
-
-    @Test
-    fun `Given throwable effect nodes and exceptionHandler, When effect launched, Then exception be thrown to exceptionHandler`() {
-        val effect = TestDslEffectNode(scope = "1") { throw RuntimeException() }
-        val exceptionBlock: () -> Unit = mock()
-        effect.launchForTest(
-            coroutineScope = CoroutineScope(Dispatchers.Unconfined) + CoroutineExceptionHandler { _, _ ->
-                exceptionBlock()
-            }
-        )
-        verify(exceptionBlock, once()).invoke()
-    }
-
-    @Test(expected = RuntimeException::class)
-    fun `Given throwable suspend effect nodes, When effect launched, Then exception be thrown`() = runTest {
-        val effect = TestDslEffectSuspendNode(scope = "1") { throw RuntimeException() }
-        effect.launchForTest(coroutineScope = CoroutineScope(Dispatchers.Unconfined))
+        verify(exactly = 1) {
+            successBehavior.invoke()
+        }
     }
 
     @Test
-    fun `Given throwable suspend effect nodes and exceptionHandler, When effect launched, Then exception be thrown to exceptionHandler`() = runTest {
-        val effect = TestDslEffectSuspendNode(scope = "1") { throw RuntimeException() }
-        val exceptionBlock: () -> Unit = mock()
-        val superJob = SupervisorJob()
-        effect.launchForTest(
-            coroutineScope = CoroutineScope(Dispatchers.Unconfined) + superJob + CoroutineExceptionHandler { _, _ ->
-                exceptionBlock()
-                superJob.cancel()
-            }
+    fun `Given node in matched predicate scopes, When launch, Then child effect invoked`() = runTest {
+        val rootScope = genBothify()
+        val runner: () -> Unit = mockk(relaxed = true)
+        val node = TestDslEffectPredicateScope(
+            scope = rootScope,
+            isMatch = { true },
+            effect = TestDslEffectSuspendNode(rootScope) { runner.invoke() }
         )
-        superJob.join()
-        verify(exceptionBlock, once()).invoke()
+        node.toReduceTestBuilder()
+            .givenCurrent(TestState.genState())
+            .actionToDispatch(TestAction.genAction())
+            .effectScenario()
+            .launchAndGetTrace()
+        verify(exactly = 1) {
+            runner.invoke()
+        }
     }
-    */
+
+    @Test
+    fun `Given node in not matched predicate scopes, When launch, Then child effect never invoked`() = runTest {
+        val rootScope = genBothify()
+        val runner: () -> Unit = mockk(relaxed = true)
+        val node = TestDslEffectPredicateScope(
+            scope = rootScope,
+            isMatch = { false },
+            effect = TestDslEffectSuspendNode(rootScope) { runner.invoke() }
+        )
+        node.toReduceTestBuilder()
+            .givenCurrent(TestState.genState())
+            .actionToDispatch(TestAction.genAction())
+            .effectScenario()
+            .launchAndGetTrace()
+        verify(inverse = true) {
+            runner.invoke()
+        }
+    }
+
+    @Test
+    fun `Given node in transformable scope, When launch, Then child effect invoked`() = runTest {
+        val rootScope = "0"
+        val subScope = "1"
+        val runner: () -> Unit = mockk(relaxed = true)
+        val node = TestDslEffectTransformScope(
+            scope = rootScope,
+            subScope = subScope,
+            transformSource = { source ->
+                UpdateSource(action = 1, current = source.current)
+            },
+            effect = DslEffect.Node<Int, TestState>(
+                scope = subScope,
+                invoke = { runner() }
+            )
+        )
+        node.toReduceTestBuilder()
+            .givenCurrent(TestState.genState())
+            .actionToDispatch(TestAction.genAction())
+            .effectScenario()
+            .launchAndGetTrace()
+        verify(exactly = 1) {
+            runner.invoke()
+        }
+    }
+
+    @Test
+    fun `Given node in not matched transform scopes, When launch, Then child effect never invoked`() = runTest {
+        val rootScope = "0"
+        val subScope = "1"
+        val runner: () -> Unit = mockk()
+        val node = TestDslEffectTransformScope<Int, TestState>(
+            scope = rootScope,
+            subScope = subScope,
+            transformSource = { null },
+            effect = TestDslEffectSuspendNode(subScope) { runner.invoke() }
+        )
+        node.toReduceTestBuilder()
+            .givenCurrent(TestState.genState())
+            .actionToDispatch(TestAction.genAction())
+            .effectScenario()
+            .launchAndGetTrace()
+        verify(inverse = true) {
+            runner.invoke()
+        }
+    }
+
+    @Test
+    fun `Given composed that head is not transformable scope, When launch, Then tail effect launched`() = runTest {
+        val rootScope = "0"
+        val subScope = "1"
+        val twoDepthSubScope = "2"
+        val runner: () -> Unit = mockk(relaxed = true)
+        val node = DslEffect.Composite(
+            scope = rootScope,
+            head = TestDslEffectTransformScope(
+                scope = rootScope,
+                subScope = subScope,
+                transformSource = { source -> UpdateSource(action = 1, current = source.current) },
+                effect = TestDslEffectTransformScope<String, TestState>(
+                    scope = subScope,
+                    subScope = twoDepthSubScope,
+                    transformSource = { null },
+                    effect = mockk()
+                )
+            ),
+            tails = listOf(
+                TestDslEffectNode(scope = rootScope) {
+                    runner.invoke()
+                }
+            )
+        )
+        node.toReduceTestBuilder()
+            .givenCurrent(TestState.genState())
+            .actionToDispatch(TestAction.genAction())
+            .effectScenario()
+            .launchAndGetTrace()
+        verify(exactly = 1) {
+            runner.invoke()
+        }
+    }
 }
