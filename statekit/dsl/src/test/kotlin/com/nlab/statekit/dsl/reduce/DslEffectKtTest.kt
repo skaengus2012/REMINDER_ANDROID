@@ -33,10 +33,10 @@ import org.junit.Test
  */
 class DslEffectKtTest {
     @Test
-    fun `Given 3 depth composite node, When launch, Then all effect launched in order`() = runTest {
+    fun `Given 3 depth composite, When launch, Then all effect launched in order`() = runTest {
         val rootScope = genBothify()
         val behaviors: List<() -> Unit> = List(3) { mockk(relaxed = true) }
-        val node = DslEffect.Composite(
+        val composite = DslEffect.Composite(
             scope = rootScope,
             head = TestDslEffectNode(rootScope) { behaviors[0].invoke() },
             tails = listOf(
@@ -47,7 +47,7 @@ class DslEffectKtTest {
                 )
             )
         )
-        node.toReduceTestBuilder()
+        composite.toReduceTestBuilder()
             .givenCurrent(TestState.genState())
             .actionToDispatch(TestAction.genAction())
             .effectScenario()
@@ -59,10 +59,10 @@ class DslEffectKtTest {
     }
 
     @Test
-    fun `Given composed of one throwable, two success nodes, When launch, Then success nodes invoked all`() = runTest {
+    fun `Given composite of one throwable, two success nodes, When launch, Then success nodes invoked all`() = runTest {
         val rootScope = genBothify()
         val successBehaviors: List<() -> Unit> = List(2) { mockk(relaxed = true) }
-        val node = DslEffect.Composite(
+        val composite = DslEffect.Composite(
             scope = rootScope,
             head = TestDslEffectNode(rootScope) { throw RuntimeException() },
             tails = listOf(
@@ -73,7 +73,7 @@ class DslEffectKtTest {
                 )
             )
         )
-        node.toReduceTestBuilder()
+        composite.toReduceTestBuilder()
             .givenCurrent(TestState.genState())
             .actionToDispatch(TestAction.genAction())
             .effectScenario()
@@ -87,11 +87,11 @@ class DslEffectKtTest {
     }
 
     @Test
-    fun `Given 3 times suspend effects, When launch, Then all effects launched asynchronously`() = runTest {
+    fun `Given composite with 3 times suspend node, When launch, Then all effects launched asynchronously`() = runTest {
         val rootScope = genBothify()
         val delayTimeMillis = genLong(min = 2_000, max = 3_000)
         val behaviors: List<() -> Unit> = List(3) { mockk(relaxed = true) }
-        val node = DslEffect.Composite(
+        val composite = DslEffect.Composite(
             scope = rootScope,
             head = TestDslEffectSuspendNode(rootScope) {
                 delay(delayTimeMillis)
@@ -108,7 +108,7 @@ class DslEffectKtTest {
                 }
             )
         )
-        node.toReduceTestBuilder()
+        composite.toReduceTestBuilder()
             .givenCurrent(TestState.genState())
             .actionToDispatch(TestAction.genAction())
             .effectScenario()
@@ -125,11 +125,11 @@ class DslEffectKtTest {
     }
 
     @Test
-    fun `Given composed with delayed throwable first, When launch, Then success node invoked`() = runTest {
+    fun `Given composite with delayed throwable first, When launch, Then success node invoked`() = runTest {
         val rootScope = genBothify()
         val delayThrowableTimeMillis = genLong(min = 2_000, max = 3_000)
         val successBehavior: () -> Unit = mockk(relaxed = true)
-        val node = DslEffect.Composite(
+        val composite = DslEffect.Composite(
             scope = rootScope,
             head = TestDslEffectSuspendNode(rootScope) {
                 delay(delayThrowableTimeMillis)
@@ -142,7 +142,7 @@ class DslEffectKtTest {
                 }
             )
         )
-        node.toReduceTestBuilder()
+        composite.toReduceTestBuilder()
             .givenCurrent(TestState.genState())
             .actionToDispatch(TestAction.genAction())
             .effectScenario()
@@ -154,15 +154,15 @@ class DslEffectKtTest {
     }
 
     @Test
-    fun `Given node in matched predicate scopes, When launch, Then child effect invoked`() = runTest {
+    fun `Given matched predicate scopes, When launch, Then child effect invoked`() = runTest {
         val rootScope = genBothify()
         val runner: () -> Unit = mockk(relaxed = true)
-        val node = TestDslEffectPredicateScope(
+        val predicateScope = TestDslEffectPredicateScope(
             scope = rootScope,
             isMatch = { true },
             effect = TestDslEffectSuspendNode(rootScope) { runner.invoke() }
         )
-        node.toReduceTestBuilder()
+        predicateScope.toReduceTestBuilder()
             .givenCurrent(TestState.genState())
             .actionToDispatch(TestAction.genAction())
             .effectScenario()
@@ -173,15 +173,15 @@ class DslEffectKtTest {
     }
 
     @Test
-    fun `Given node in not matched predicate scopes, When launch, Then child effect never invoked`() = runTest {
+    fun `Given unmatched predicate scope, When launch, Then child effect never invoked`() = runTest {
         val rootScope = genBothify()
         val runner: () -> Unit = mockk(relaxed = true)
-        val node = TestDslEffectPredicateScope(
+        val predicateScope = TestDslEffectPredicateScope(
             scope = rootScope,
             isMatch = { false },
             effect = TestDslEffectSuspendNode(rootScope) { runner.invoke() }
         )
-        node.toReduceTestBuilder()
+        predicateScope.toReduceTestBuilder()
             .givenCurrent(TestState.genState())
             .actionToDispatch(TestAction.genAction())
             .effectScenario()
@@ -192,11 +192,11 @@ class DslEffectKtTest {
     }
 
     @Test
-    fun `Given node in transformable scope, When launch, Then child effect invoked`() = runTest {
+    fun `Given transformable scope, When launch, Then child effect invoked`() = runTest {
         val rootScope = "0"
         val subScope = "1"
         val runner: () -> Unit = mockk(relaxed = true)
-        val node = TestDslEffectTransformScope(
+        val transformScope = TestDslEffectTransformScope(
             scope = rootScope,
             subScope = subScope,
             transformSource = { source ->
@@ -207,7 +207,7 @@ class DslEffectKtTest {
                 invoke = { runner() }
             )
         )
-        node.toReduceTestBuilder()
+        transformScope.toReduceTestBuilder()
             .givenCurrent(TestState.genState())
             .actionToDispatch(TestAction.genAction())
             .effectScenario()
@@ -218,17 +218,17 @@ class DslEffectKtTest {
     }
 
     @Test
-    fun `Given node in not matched transform scopes, When launch, Then child effect never invoked`() = runTest {
+    fun `Given not matched transform scopes, When launch, Then child effect never invoked`() = runTest {
         val rootScope = "0"
         val subScope = "1"
         val runner: () -> Unit = mockk()
-        val node = TestDslEffectTransformScope<Int, TestState>(
+        val transformScope = TestDslEffectTransformScope<Int, TestState>(
             scope = rootScope,
             subScope = subScope,
             transformSource = { null },
             effect = TestDslEffectSuspendNode(subScope) { runner.invoke() }
         )
-        node.toReduceTestBuilder()
+        transformScope.toReduceTestBuilder()
             .givenCurrent(TestState.genState())
             .actionToDispatch(TestAction.genAction())
             .effectScenario()
@@ -239,12 +239,12 @@ class DslEffectKtTest {
     }
 
     @Test
-    fun `Given composed that head is not transformable scope, When launch, Then tail effect launched`() = runTest {
+    fun `Given composite that head is not transformable scope, When launch, Then tail effect launched`() = runTest {
         val rootScope = "0"
         val subScope = "1"
         val twoDepthSubScope = "2"
         val runner: () -> Unit = mockk(relaxed = true)
-        val node = DslEffect.Composite(
+        val composite = DslEffect.Composite(
             scope = rootScope,
             head = TestDslEffectTransformScope(
                 scope = rootScope,
@@ -263,7 +263,7 @@ class DslEffectKtTest {
                 }
             )
         )
-        node.toReduceTestBuilder()
+        composite.toReduceTestBuilder()
             .givenCurrent(TestState.genState())
             .actionToDispatch(TestAction.genAction())
             .effectScenario()

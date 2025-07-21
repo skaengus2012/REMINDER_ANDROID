@@ -39,8 +39,8 @@ internal class DslTransitionBuilder(
     }
 
     fun <R : Any, A : Any, S : R> addNode(block: (DslTransitionScope<A, S>) -> R) {
-        transitions.add(
-            DslTransition.Node(
+        addTransition(
+            transition = DslTransition.Node(
                 scope = scope,
                 next = block
             )
@@ -51,8 +51,8 @@ internal class DslTransitionBuilder(
         isMatch: (UpdateSource<A, S>) -> Boolean,
         transition: DslTransition
     ) {
-        transitions.add(
-            DslTransition.PredicateScope(
+        addTransition(
+            transition = DslTransition.PredicateScope(
                 scope = scope,
                 isMatch = isMatch,
                 transition = transition,
@@ -65,8 +65,8 @@ internal class DslTransitionBuilder(
         transformSource: (UpdateSource<A, S>) -> UpdateSource<T, U>?,
         transition: DslTransition
     ) {
-        transitions.add(
-            DslTransition.TransformSourceScope(
+        addTransition(
+            transition = DslTransition.TransformSourceScope(
                 scope = scope,
                 subScope = subScope,
                 transformSource = transformSource,
