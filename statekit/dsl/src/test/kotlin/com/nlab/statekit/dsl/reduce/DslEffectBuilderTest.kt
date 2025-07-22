@@ -16,19 +16,19 @@
 
 package com.nlab.statekit.dsl.reduce
 
+import com.nlab.testkit.faker.genBoolean
+import com.nlab.testkit.faker.genBothify
 import com.nlab.testkit.faker.genInt
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.nullValue
 import org.hamcrest.CoreMatchers.sameInstance
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.instanceOf
 import org.junit.Test
 
 /**
  * @author Doohyun
  */
 class DslEffectBuilderTest {
-    /**
     @Test
     fun `When build without add, Then return null`() {
         val effectBuilder = DslEffectBuilder(scope = Any())
@@ -38,69 +38,95 @@ class DslEffectBuilderTest {
 
     @Test
     fun `Given effect, When build after addEffect, Then return added effect`() {
-        val scope = "1"
-        val expectedEffect = TestDslEffect(scope = scope)
-        val effectBuilder = DslEffectBuilder(scope = Any())
+        val rootScope = genBothify()
+        val expectedEffect = TestDslEffectNode(scope = rootScope) {}
+        val effectBuilder = DslEffectBuilder(scope = rootScope)
         effectBuilder.addEffect(expectedEffect)
 
         assertThat(effectBuilder.build(), sameInstance(expectedEffect))
     }
 
     @Test
-    fun `Given 2 or more effects, When build after add all, Then return composite`() {
-        val scope = Any()
-        val expectedEffects = List(genInt(min = 2, max = 5)) { TestDslEffect(scope = scope) }
-        val effectBuilder = DslEffectBuilder(scope)
+    fun `Given 2 or more effects, When build after add all, Then return correct composite`() {
+        val rootScope = genBothify()
+        val expectedEffects = List(genInt(min = 2, max = 5)) {
+            TestDslEffectNode(scope = rootScope) {}
+        }
+        val effectBuilder = DslEffectBuilder(rootScope)
         expectedEffects.forEach { effectBuilder.addEffect(it) }
 
-        val actualTransition = effectBuilder.build() as DslEffect.Composite
-        assertThat(actualTransition.effects, equalTo(expectedEffects))
+        val actualEffects = buildList {
+            val composite = effectBuilder.build() as DslEffect.Composite
+            add(composite.head)
+            addAll(composite.tails)
+        }
+        assertThat(actualEffects, equalTo(expectedEffects))
     }
 
     @Test
-    fun `Given scope to result block, When build after addNode, Then return node`() {
+    fun `Given scope to result block, When build after addNode, Then return correct effect`() {
+        val rootScope = genBothify()
         val block: (TestDslEffectScope) -> Unit = {}
-        val effectBuilder = DslEffectBuilder(scope = Any())
+        val effectBuilder = DslEffectBuilder(scope = rootScope)
         effectBuilder.addNode(block)
 
-        assertThat(effectBuilder.build(), instanceOf(DslEffect.Node::class))
+        val actual = effectBuilder.build()
+        val actualNode = actual as DslEffect.Node<*, *>
+
+        assertThat(actualNode.scope, equalTo(rootScope))
+        assertThat(actualNode.invoke, sameInstance(block))
     }
 
     @Test
-    fun `Given scope to result block, When build after addSuspendNode, Then return suspend node`() {
-        val block: (TestDslSuspendEffectScope) -> Unit = {}
-        val effectBuilder = DslEffectBuilder(scope = Any())
+    fun `Given scope to result block, When build after addSuspendNode, Then return correct effect`() {
+        val rootScope = genBothify()
+        val block: suspend (TestDslSuspendEffectScope) -> Unit = {}
+        val effectBuilder = DslEffectBuilder(scope = rootScope)
         effectBuilder.addSuspendNode(block)
 
-        assertThat(effectBuilder.build(), instanceOf(DslEffect.SuspendNode::class))
+        val actual = effectBuilder.build()
+        val actualNode = actual as DslEffect.SuspendNode<*, *, *>
+
+        assertThat(actualNode.scope, equalTo(rootScope))
+        assertThat(actualNode.invoke, sameInstance(block))
     }
 
     @Test
-    fun `Given predicate and effect, When build after addPredicateScope, Then return predicateScope`() {
-        val scope = Any()
-        val isMatch: (TestUpdateSource) -> Boolean = { false }
-        val effect = TestDslEffect(scope)
+    fun `Given predicate and effect, When build after addPredicateScope, Then return correct effect`() {
+        val rootScope = genBothify()
+        val isMatch: (TestUpdateSource) -> Boolean = { genBoolean() }
+        val childEffect = TestDslEffectNode(rootScope) {}
 
-        val effectBuilder = DslEffectBuilder(scope)
-        effectBuilder.addPredicateScope(isMatch, effect)
+        val effectBuilder = DslEffectBuilder(rootScope)
+        effectBuilder.addPredicateScope(isMatch, childEffect)
 
-        assertThat(effectBuilder.build(), instanceOf(DslEffect.PredicateScope::class))
+        val actual = effectBuilder.build()
+        val actualPredicateScope = actual as DslEffect.PredicateScope<*, *>
+
+        assertThat(actualPredicateScope.scope, equalTo(rootScope))
+        assertThat(actualPredicateScope.effect, sameInstance(childEffect))
     }
 
     @Test
-    fun `Given subScope, transformSource block and effect, When build after addTransformSourceScope, Then return TransformSourceScope`() {
-        val scope = Any()
-        val subScope = Any()
+    fun `Given subScope, transformSource block and effect, When build after addTransformSourceScope, Then return correct effect`() {
+        val rootScope = "1"
+        val subScope = "2"
         val transformSource: (TestUpdateSource) -> TestUpdateSource = { it }
-        val effect = TestDslEffect(subScope)
+        val childEffect = TestDslEffectNode(subScope) {}
 
-        val effectBuilder = DslEffectBuilder(scope)
+        val effectBuilder = DslEffectBuilder(rootScope)
         effectBuilder.addTransformSourceScope(
             subScope,
             transformSource,
-            effect
+            childEffect
         )
 
-        assertThat(effectBuilder.build(), instanceOf(DslEffect.TransformSourceScope::class))
-    }*/
+        val actual = effectBuilder.build()
+        val actualEffectScope = actual as DslEffect.TransformSourceScope<*, *, *, *>
+
+        assertThat(actualEffectScope.scope, equalTo(rootScope))
+        assertThat(actualEffectScope.subScope, equalTo(subScope))
+        assertThat(actualEffectScope.transformSource, sameInstance(transformSource))
+        assertThat(actualEffectScope.effect, sameInstance(childEffect))
+    }
 }

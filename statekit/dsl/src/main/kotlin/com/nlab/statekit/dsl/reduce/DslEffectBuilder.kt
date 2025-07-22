@@ -37,8 +37,8 @@ internal class DslEffectBuilder(private val scope: Any) {
     }
 
     fun <A : Any, S : Any> addNode(block: (DslEffectScope<A, S>) -> Unit) {
-        effects.add(
-            DslEffect.Node(
+        addEffect(
+            effect = DslEffect.Node(
                 scope = scope,
                 invoke = block
             )
@@ -46,8 +46,8 @@ internal class DslEffectBuilder(private val scope: Any) {
     }
 
     fun <R : Any, A : Any, S : Any> addSuspendNode(block: suspend (DslSuspendEffectScope<R, A, S>) -> Unit) {
-        effects.add(
-            DslEffect.SuspendNode(
+        addEffect(
+            effect = DslEffect.SuspendNode(
                 scope = scope,
                 invoke = block
             )
@@ -58,8 +58,8 @@ internal class DslEffectBuilder(private val scope: Any) {
         isMatch: (UpdateSource<A, S>) -> Boolean,
         effect: DslEffect
     ) {
-        effects.add(
-            DslEffect.PredicateScope(
+        addEffect(
+            effect = DslEffect.PredicateScope(
                 scope = scope,
                 isMatch = isMatch,
                 effect = effect
@@ -72,8 +72,8 @@ internal class DslEffectBuilder(private val scope: Any) {
         transformSource: (UpdateSource<A, S>) -> UpdateSource<T, U>?,
         effect: DslEffect
     ) {
-        effects.add(
-            DslEffect.TransformSourceScope(
+        addEffect(
+            effect = DslEffect.TransformSourceScope(
                 scope = scope,
                 subScope = subScope,
                 transformSource = transformSource,
