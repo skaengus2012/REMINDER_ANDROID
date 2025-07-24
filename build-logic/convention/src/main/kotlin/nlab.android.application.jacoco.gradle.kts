@@ -13,13 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import com.android.build.api.variant.ApplicationAndroidComponentsExtension
-import com.nlab.reminder.configureJacocoAndroid
-import com.nlab.reminder.configureJacocoToolVersion
-import org.gradle.kotlin.dsl.getByType
+import com.nlab.reminder.configureKoverAndroid
 
-apply(plugin = "org.gradle.jacoco")
 apply(plugin = "com.android.application")
+apply(plugin = "org.jetbrains.kotlinx.kover")
 
-configureJacocoToolVersion()
-configureJacocoAndroid(extensions.getByType<ApplicationAndroidComponentsExtension>())
+configureKoverAndroid()

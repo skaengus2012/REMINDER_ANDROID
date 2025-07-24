@@ -13,32 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import com.nlab.reminder.configureJacocoToolVersion
+
 import com.nlab.reminder.jacocoExcludePatterns
-import org.gradle.api.plugins.JavaPlugin
-import org.gradle.api.tasks.testing.Test
-import org.gradle.kotlin.dsl.invoke
-import org.gradle.kotlin.dsl.named
-import org.gradle.testing.jacoco.tasks.JacocoReport
+import kotlinx.kover.gradle.plugin.dsl.KoverProjectExtension
 
-apply(plugin = "org.gradle.jacoco")
 apply(plugin = "org.jetbrains.kotlin.jvm")
+apply(plugin = "org.jetbrains.kotlinx.kover")
 
-configureJacocoToolVersion()
-
-val test = tasks.named<Test>(JavaPlugin.TEST_TASK_NAME)
-val jacocoTestReport = tasks.named<JacocoReport>("jacocoTestReport")
-
-test { finalizedBy(jacocoTestReport) }
-
-jacocoTestReport {
-    dependsOn(test)
+extensions.configure<KoverProjectExtension> {
     reports {
-        html.required.set(true)
-        xml.required.set(true)
-        csv.required.set(false)
+        filters {
+            excludes {
+                classes(jacocoExcludePatterns)
+            }
+        }
+
+        total {
+            xml {
+                onCheck.set(true)
+            }
+        }
     }
-    classDirectories.setFrom(files(classDirectories.map { dir ->
-        fileTree(dir) { exclude(jacocoExcludePatterns) }
-    }))
 }
