@@ -22,7 +22,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Generate jacocoTestReport
-        run: ./gradlew jacocoTestReport
+        run: ./gradlew koverXmlReport
 
       - name: Upload jacocoTestReport to Codecov
         uses: codecov/codecov-action@v4
