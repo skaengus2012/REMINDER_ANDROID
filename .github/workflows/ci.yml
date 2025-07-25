@@ -1,4 +1,4 @@
-name: Test CI (v3)
+name: Test CI (v4)
 
 on:
   push:
@@ -6,10 +6,17 @@ on:
   pull_request:
     branches: [ master ]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   test:
     name: Build check
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        buildType: [ "debug", "release" ]
     steps:
       - uses: actions/checkout@v4
       - name: Set up JDK 17
@@ -21,10 +28,16 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Generate jacocoTestReport
-        run: ./gradlew koverXmlReport
+      - name: Run Ci Task for ${{ matrix.buildType }}
+        run: |
+          if [ "${{ matrix.buildType }}" == "debug" ]; then
+            ./gradlew assembleDebug
+          elif [ "${{ matrix.buildType }}" == "release" ]; then
+            ./gradlew koverXmlReportRelease
+          fi
 
-      - name: Upload jacocoTestReport to Codecov
+      - name: Upload testReport to Codecov
+        if: ${{ matrix.buildType == 'release' }}
         uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
