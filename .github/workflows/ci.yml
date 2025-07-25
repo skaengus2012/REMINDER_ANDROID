@@ -28,7 +28,7 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Run Ci Task for ${{ matrix.buildType }}
+      - name: Run ci task for ${{ matrix.buildType }}
         run: |
           if [ "${{ matrix.buildType }}" == "debug" ]; then
             ./gradlew assembleDebug
@@ -36,7 +36,7 @@ jobs:
             ./gradlew koverXmlReportRelease
           fi
 
-      - name: Upload testReport to Codecov
+      - name: Upload test report to codecov
         if: ${{ matrix.buildType == 'release' }}
         uses: codecov/codecov-action@v4
         with:
@@ -45,7 +45,7 @@ jobs:
           fail_ci_if_error: true
           directory: /home/runner/work/REMINDER_ANDROID/REMINDER_ANDROID/
 
-      - name: action-slack
+      - name: Send ci result to slack channel
         uses: 8398a7/action-slack@v3
         with:
           status: custom
