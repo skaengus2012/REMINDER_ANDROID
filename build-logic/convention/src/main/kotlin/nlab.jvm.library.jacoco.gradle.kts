@@ -16,7 +16,7 @@
 
 import com.nlab.reminder.configureJacocoToolVersion
 import com.nlab.reminder.jacocoExcludePatterns
-import com.nlab.reminder.jacocoTestRepostTaskDefaultName
+import com.nlab.reminder.jacocoTestReportTaskDefaultName
 import com.nlab.reminder.registerJacocoTestReportTask
 import org.gradle.api.plugins.JavaPlugin
 
