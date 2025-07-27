@@ -17,7 +17,6 @@
 package com.nlab.statekit.dsl.reduce
 
 import com.nlab.statekit.dsl.annotation.DslReduceMarker
-import com.nlab.statekit.dsl.internal.ExcludeFromGeneratedTestReport
 import kotlin.reflect.KClass
 
 /**
@@ -52,7 +51,6 @@ class ActionScopeReduceBuilder<RA : Any, RS : Any, A : Any, S : RS> internal con
     // https://github.com/jacoco/jacoco/issues/1873
     // In Jacoco 0.8.13, inline functions are included in test scope
     // However, the jacoco maven plugin fails to read the code, coverage is not filled.
-    @ExcludeFromGeneratedTestReport
     @JvmName(name = "transitionWithStateType")
     inline fun <reified T : S> transition(noinline block: DslTransitionScope<A, T>.() -> RS) {
         transition(stateType = T::class, block = block)
@@ -79,7 +77,6 @@ class ActionScopeReduceBuilder<RA : Any, RS : Any, A : Any, S : RS> internal con
     // https://github.com/jacoco/jacoco/issues/1873
     // In Jacoco 0.8.13, inline functions are included in test scope
     // However, the jacoco maven plugin fails to read the code, coverage is not filled.
-    @ExcludeFromGeneratedTestReport
     @JvmName(name = "effectWithStateType")
     inline fun <reified T : S> effect(noinline block: DslEffectScope<A, T>.() -> Unit) {
         effect(stateType = T::class, block)
@@ -103,7 +100,6 @@ class ActionScopeReduceBuilder<RA : Any, RS : Any, A : Any, S : RS> internal con
     // https://github.com/jacoco/jacoco/issues/1873
     // In Jacoco 0.8.13, inline functions are included in test scope
     // However, the jacoco maven plugin fails to read the code, coverage is not filled.
-    @ExcludeFromGeneratedTestReport
     @JvmName(name = "suspendEffectWithStateType")
     inline fun <reified T : S> suspendEffect(noinline block: suspend DslSuspendEffectScope<RA, A, T>.() -> Unit) {
         suspendEffect(stateType = T::class, block)
@@ -153,7 +149,6 @@ class ActionScopeReduceBuilder<RA : Any, RS : Any, A : Any, S : RS> internal con
     // https://github.com/jacoco/jacoco/issues/1873
     // In Jacoco 0.8.13, inline functions are included in test scope
     // However, the jacoco maven plugin fails to read the code, coverage is not filled.
-    @ExcludeFromGeneratedTestReport
     @JvmName(name = "scopeWithActionType")
     inline fun <reified T : A> scope(noinline block: ActionScopeReduceBuilder<RA, RS, T, S>.() -> Unit) {
         scope(actionType = T::class, block)
