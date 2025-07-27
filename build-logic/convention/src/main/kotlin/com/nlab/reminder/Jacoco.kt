@@ -50,4 +50,4 @@ internal fun Project.registerJacocoTestReportTask(
 
 internal val jacocoExcludePatterns = setOf("**/infra/**")
 
-internal const val jacocoTestRepostTaskDefaultName = "jacocoTestReport"
+internal const val jacocoTestReportTaskDefaultName = "jacocoTestReport"
