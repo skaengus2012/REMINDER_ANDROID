@@ -1,3 +1,7 @@
+import com.android.build.api.variant.ApplicationAndroidComponentsExtension
+import com.nlab.reminder.configureJacocoAndroid
+import org.gradle.kotlin.dsl.getByType
+
 /*
  * Copyright (C) 2023 The N's lab Open Source Project
  *
@@ -13,9 +17,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import com.nlab.reminder.configureKoverAndroid
 
 apply(plugin = "com.android.application")
-apply(plugin = "org.jetbrains.kotlinx.kover")
+apply(plugin = "jacoco")
 
-configureKoverAndroid()
+configureJacocoAndroid(extensions.getByType<ApplicationAndroidComponentsExtension>())

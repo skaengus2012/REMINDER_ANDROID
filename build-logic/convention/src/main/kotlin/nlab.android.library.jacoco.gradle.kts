@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import com.nlab.reminder.configureKoverAndroid
+import com.android.build.api.variant.LibraryAndroidComponentsExtension
+import com.nlab.reminder.configureJacocoAndroid
 
 apply(plugin = "com.android.library")
-apply(plugin = "org.jetbrains.kotlinx.kover")
+apply(plugin = "jacoco")
 
-configureKoverAndroid()
+configureJacocoAndroid(extensions.getByType<LibraryAndroidComponentsExtension>())

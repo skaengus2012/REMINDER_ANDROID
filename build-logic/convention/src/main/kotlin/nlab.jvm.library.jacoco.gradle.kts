@@ -14,18 +14,26 @@
  * limitations under the License.
  */
 
-import com.nlab.reminder.koverExcludePackagePatterns
-import kotlinx.kover.gradle.plugin.dsl.KoverProjectExtension
+import com.nlab.reminder.configureJacocoToolVersion
+import com.nlab.reminder.jacocoExcludePatterns
+import com.nlab.reminder.jacocoTestRepostTaskDefaultName
+import com.nlab.reminder.registerJacocoTestReportTask
+import org.gradle.api.plugins.JavaPlugin
 
+apply(plugin = "jacoco")
 apply(plugin = "org.jetbrains.kotlin.jvm")
-apply(plugin = "org.jetbrains.kotlinx.kover")
 
-extensions.configure<KoverProjectExtension> {
-    reports {
-        filters {
-            excludes {
-                packages(koverExcludePackagePatterns)
-            }
-        }
-    }
+configureJacocoToolVersion()
+
+val jacocoTestReportJvmTask = registerJacocoTestReportTask(
+    name = "jacocoTestReportJvm",
+    testTaskName = JavaPlugin.TEST_TASK_NAME
+) {
+    classDirectories.setFrom(files(classDirectories.map { dir ->
+        fileTree(dir) { exclude(jacocoExcludePatterns) }
+    }))
+}
+
+tasks.named(jacocoTestRepostTaskDefaultName) {
+    finalizedBy(jacocoTestReportJvmTask)
 }
