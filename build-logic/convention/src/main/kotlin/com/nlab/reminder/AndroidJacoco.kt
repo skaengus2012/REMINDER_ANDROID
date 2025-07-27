@@ -31,7 +31,7 @@ import org.gradle.testing.jacoco.plugins.JacocoTaskExtension
  */
 internal fun Project.configureJacocoAndroid(extension: AndroidComponentsExtension<*, *, *>) {
     configureJacocoToolVersion()
-    val jacocoReportTaskStub = tasks.register(jacocoTestRepostTaskDefaultName) {
+    val jacocoReportTaskStub = tasks.register(jacocoTestReportTaskDefaultName) {
         group = "verification"
     }
     extension.onVariants { variant ->
