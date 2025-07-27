@@ -33,19 +33,9 @@ jobs:
           if [ "${{ matrix.buildType }}" == "debug" ]; then
             ./gradlew assembleDebug
           elif [ "${{ matrix.buildType }}" == "release" ]; then
-            ./gradlew koverXmlReportJvm 
-            ./gradlew koverXmlReportRelease
+            ./gradlew jacocoTestReportJvm 
+            ./gradlew jacocoTestReportRelease
           fi
-
-      - name: Rename test-reports to report.xml per module
-        run: |
-          find . -type f -path "*/build/reports/kover/reportJvm.xml" | while read -r file; do
-            cp "$file" "$(dirname "$file")/report.xml"
-          done
-
-          find . -type f -path "*/build/reports/kover/reportRelease.xml" | while read -r file; do
-            cp "$file" "$(dirname "$file")/report.xml"
-          done
 
       - name: Upload test report to codecov
         if: ${{ matrix.buildType == 'release' }}
