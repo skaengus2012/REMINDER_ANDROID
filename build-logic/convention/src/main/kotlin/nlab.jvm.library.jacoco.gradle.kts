@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import com.nlab.reminder.jacocoExcludePatterns
+import com.nlab.reminder.koverExcludePackagePatterns
 import kotlinx.kover.gradle.plugin.dsl.KoverProjectExtension
 
 apply(plugin = "org.jetbrains.kotlin.jvm")
@@ -24,13 +24,7 @@ extensions.configure<KoverProjectExtension> {
     reports {
         filters {
             excludes {
-                classes(jacocoExcludePatterns)
-            }
-        }
-
-        total {
-            xml {
-                onCheck.set(true)
+                packages(koverExcludePackagePatterns)
             }
         }
     }

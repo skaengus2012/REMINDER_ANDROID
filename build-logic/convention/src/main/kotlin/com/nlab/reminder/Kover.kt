@@ -16,18 +16,11 @@
 
 package com.nlab.reminder
 
-import org.gradle.api.Project
-import org.gradle.kotlin.dsl.configure
-import org.gradle.testing.jacoco.plugins.JacocoPluginExtension
-
 /**
  * @author Doohyun
  */
-internal fun Project.configureJacocoToolVersion() {
-    configure<JacocoPluginExtension> {
-        toolVersion = libs.findVersion("jacoco").get().toString()
-    }
-}
-
 internal val jacocoExcludePatterns: Set<String>
     get() = setOf("**/infra/**")
+
+internal val koverExcludePackagePatterns: Set<String>
+    get() = setOf("*.infra")
