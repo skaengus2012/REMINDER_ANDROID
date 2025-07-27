@@ -13,32 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 import com.nlab.reminder.configureJacocoToolVersion
 import com.nlab.reminder.jacocoExcludePatterns
+import com.nlab.reminder.jacocoTestReportTaskDefaultName
+import com.nlab.reminder.registerJacocoTestReportTask
 import org.gradle.api.plugins.JavaPlugin
-import org.gradle.api.tasks.testing.Test
-import org.gradle.kotlin.dsl.invoke
-import org.gradle.kotlin.dsl.named
-import org.gradle.testing.jacoco.tasks.JacocoReport
 
-apply(plugin = "org.gradle.jacoco")
+apply(plugin = "jacoco")
 apply(plugin = "org.jetbrains.kotlin.jvm")
 
 configureJacocoToolVersion()
 
-val test = tasks.named<Test>(JavaPlugin.TEST_TASK_NAME)
-val jacocoTestReport = tasks.named<JacocoReport>("jacocoTestReport")
-
-test { finalizedBy(jacocoTestReport) }
-
-jacocoTestReport {
-    dependsOn(test)
-    reports {
-        html.required.set(true)
-        xml.required.set(true)
-        csv.required.set(false)
-    }
+val jacocoTestReportJvmTask = registerJacocoTestReportTask(
+    name = "jacocoTestReportJvm",
+    testTaskName = JavaPlugin.TEST_TASK_NAME
+) {
     classDirectories.setFrom(files(classDirectories.map { dir ->
         fileTree(dir) { exclude(jacocoExcludePatterns) }
     }))
+}
+
+tasks.named(jacocoTestReportTaskDefaultName) {
+    finalizedBy(jacocoTestReportJvmTask)
 }

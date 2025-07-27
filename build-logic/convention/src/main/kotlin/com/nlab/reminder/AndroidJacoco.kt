@@ -23,37 +23,33 @@ import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.ConfigurableFileTree
 import org.gradle.api.tasks.testing.Test
 import org.gradle.kotlin.dsl.configure
-import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.withType
 import org.gradle.testing.jacoco.plugins.JacocoTaskExtension
-import org.gradle.testing.jacoco.tasks.JacocoReport
 
 /**
  * @author Doohyun
  */
 internal fun Project.configureJacocoAndroid(extension: AndroidComponentsExtension<*, *, *>) {
-    val jacocoTestReport = tasks.register("jacocoTestReport")
-
+    configureJacocoToolVersion()
+    val jacocoReportTaskStub = tasks.register(jacocoTestReportTaskDefaultName) {
+        group = "verification"
+    }
     extension.onVariants { variant ->
-        val testTaskName = "test${variant.name.capitalized()}UnitTest"
-        val reportTask = tasks.register("jacoco${testTaskName.capitalized()}Report", JacocoReport::class) {
-            dependsOn(testTaskName)
-            reports {
-                xml.required.set(true)
-                html.required.set(true)
-            }
-
+        val jacocoTestReportForVariant = registerJacocoTestReportTask(
+            name = "jacocoTestReport${variant.name.capitalized()}",
+            testTaskName = "test${variant.name.capitalized()}UnitTest",
+        ) {
             sourceDirectories.setFrom(androidJacocoSourcesDirectories(variant))
             classDirectories.setFrom(androidJacocoClassDirectories(variant))
-            executionData.setFrom(file("${layout.buildDirectory.get()}/jacoco/$testTaskName.exec"))
         }
-
-        jacocoTestReport.configure {
-            dependsOn(reportTask)
+        jacocoReportTaskStub.configure {
+            finalizedBy(jacocoTestReportForVariant)
         }
 
         tasks.withType<Test>().configureEach {
             configure<JacocoTaskExtension> {
+                // Required for JaCoCo + Robolectric
+                // https://github.com/robolectric/robolectric/issues/2230
                 isIncludeNoLocationClasses = false
 
                 // Required for JDK 11 with the above

@@ -15,11 +15,8 @@
  */
 import com.android.build.api.variant.LibraryAndroidComponentsExtension
 import com.nlab.reminder.configureJacocoAndroid
-import com.nlab.reminder.configureJacocoToolVersion
-import org.gradle.kotlin.dsl.getByType
 
 apply(plugin = "com.android.library")
-apply(plugin = "org.gradle.jacoco")
+apply(plugin = "jacoco")
 
-configureJacocoToolVersion()
 configureJacocoAndroid(extensions.getByType<LibraryAndroidComponentsExtension>())

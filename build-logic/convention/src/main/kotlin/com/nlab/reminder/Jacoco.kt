@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 The N's lab Open Source Project
+ * Copyright (C) 2025 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,12 @@
 package com.nlab.reminder
 
 import org.gradle.api.Project
+import org.gradle.api.tasks.TaskProvider
+import org.gradle.kotlin.dsl.assign
 import org.gradle.kotlin.dsl.configure
+import org.gradle.kotlin.dsl.register
 import org.gradle.testing.jacoco.plugins.JacocoPluginExtension
+import org.gradle.testing.jacoco.tasks.JacocoReport
 
 /**
  * @author Doohyun
@@ -29,5 +33,21 @@ internal fun Project.configureJacocoToolVersion() {
     }
 }
 
-internal val jacocoExcludePatterns: Set<String>
-    get() = setOf("**/infra/**")
+internal fun Project.registerJacocoTestReportTask(
+    name: String,
+    testTaskName: String,
+    configuration: JacocoReport.() -> Unit
+): TaskProvider<JacocoReport> = tasks.register<JacocoReport>(name) {
+    group = "verification"
+    reports {
+        xml.required = true
+        html.required = true
+    }
+    dependsOn(testTaskName)
+    executionData.setFrom(file("${layout.buildDirectory.get()}/jacoco/$testTaskName.exec"))
+    configuration()
+}
+
+internal val jacocoExcludePatterns = setOf("**/infra/**")
+
+internal const val jacocoTestReportTaskDefaultName = "jacocoTestReport"

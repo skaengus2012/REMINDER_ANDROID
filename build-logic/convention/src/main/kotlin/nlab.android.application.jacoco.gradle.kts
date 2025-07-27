@@ -1,3 +1,7 @@
+import com.android.build.api.variant.ApplicationAndroidComponentsExtension
+import com.nlab.reminder.configureJacocoAndroid
+import org.gradle.kotlin.dsl.getByType
+
 /*
  * Copyright (C) 2023 The N's lab Open Source Project
  *
@@ -13,13 +17,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import com.android.build.api.variant.ApplicationAndroidComponentsExtension
-import com.nlab.reminder.configureJacocoAndroid
-import com.nlab.reminder.configureJacocoToolVersion
-import org.gradle.kotlin.dsl.getByType
 
-apply(plugin = "org.gradle.jacoco")
 apply(plugin = "com.android.application")
+apply(plugin = "jacoco")
 
-configureJacocoToolVersion()
 configureJacocoAndroid(extensions.getByType<ApplicationAndroidComponentsExtension>())
