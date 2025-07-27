@@ -34,6 +34,6 @@ val jacocoTestReportJvmTask = registerJacocoTestReportTask(
     }))
 }
 
-tasks.named(jacocoTestRepostTaskDefaultName) {
+tasks.named(jacocoTestReportTaskDefaultName) {
     finalizedBy(jacocoTestReportJvmTask)
 }
