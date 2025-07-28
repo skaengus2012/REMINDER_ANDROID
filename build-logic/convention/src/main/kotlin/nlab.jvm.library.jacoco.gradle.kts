@@ -25,15 +25,22 @@ apply(plugin = "org.jetbrains.kotlin.jvm")
 
 configureJacocoToolVersion()
 
-val jacocoTestReportJvmTask = registerJacocoTestReportTask(
+private val jacocoTestReportJvmTask = registerJacocoTestReportTask(
     name = "jacocoTestReportJvm",
     testTaskName = JavaPlugin.TEST_TASK_NAME
 ) {
-    classDirectories.setFrom(files(classDirectories.map { dir ->
-        fileTree(dir) { exclude(jacocoExcludePatterns) }
-    }))
+    val buildDir = layout.buildDirectory.get()
+    classDirectories.setFrom(
+        files(
+            listOf(
+                fileTree("${buildDir}/classes/java/main"),
+                fileTree("${buildDir}/classes/kotlin/main")
+            ).map { dir ->
+                dir.exclude(jacocoExcludePatterns)
+            }
+        )
+    )
 }
-
 tasks.named(jacocoTestReportTaskDefaultName) {
     finalizedBy(jacocoTestReportJvmTask)
 }
