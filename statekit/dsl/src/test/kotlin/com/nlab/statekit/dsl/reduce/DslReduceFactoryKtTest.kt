@@ -19,19 +19,18 @@ package com.nlab.statekit.dsl.reduce
 import com.nlab.statekit.dsl.TestAction
 import com.nlab.statekit.dsl.TestState
 import com.nlab.statekit.store.createStore
+import io.mockk.mockk
+import io.mockk.verify
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
-import org.mockito.Mockito.mock
-import org.mockito.kotlin.once
-import org.mockito.kotlin.verify
 
 /**
  * @author Thalys
  */
 class DslReduceFactoryKtTest {
-    /**
     @Test
     fun `Given inputs and expected state, When transition store with dslReduce, Then return expected state`() = runTest {
         val inputAction = TestAction.genAction()
@@ -47,7 +46,9 @@ class DslReduceFactoryKtTest {
                 }
             }
         )
-        store.dispatch(inputAction).join()
+        store.dispatch(inputAction)
+        advanceUntilIdle()
+
         val actualState = store.state.value
         assertThat(actualState, equalTo(expectedState))
     }
@@ -56,17 +57,21 @@ class DslReduceFactoryKtTest {
     fun `Given inputs and runner, When effect from store with dslReduce, Then runner invoked`() = runTest {
         val inputAction = TestAction.genAction()
         val inputState = TestState.genState()
-        val runnable: () -> Unit = mock()
+        val runner: () -> Unit = mockk(relaxed = true)
         val store = createStore(
             coroutineScope = this,
             initState = inputState,
             reduce = DslReduce<TestAction, TestState> {
                 effect {
-                    if (action == inputAction && current == inputState) runnable.invoke()
+                    if (action == inputAction && current == inputState) runner.invoke()
                 }
             }
         )
-        store.dispatch(inputAction).join()
-        verify(runnable, once()).invoke()
-    }*/
+        store.dispatch(inputAction)
+        advanceUntilIdle()
+
+        verify(exactly = 1) {
+            runner.invoke()
+        }
+    }
 }
