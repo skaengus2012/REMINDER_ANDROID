@@ -6,6 +6,7 @@ import com.nlab.statekit.dispatch.ActionDispatcher
 import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
@@ -25,7 +26,10 @@ class StoreImplTest {
             actionDispatcher = actionDispatcher,
             initJobs = emptySet()
         )
-        store.dispatch(input).join()
+
+        store.dispatch(input)
+        advanceUntilIdle()
+
         coVerify(exactly = 1) { actionDispatcher.dispatch(input) }
     }
 
