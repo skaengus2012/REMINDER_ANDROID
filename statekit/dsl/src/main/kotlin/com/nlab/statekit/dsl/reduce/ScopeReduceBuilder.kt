@@ -16,6 +16,7 @@
 package com.nlab.statekit.dsl.reduce
 
 import com.nlab.statekit.dsl.annotation.DslReduceMarker
+import com.nlab.statekit.dsl.internal.ExcludeFromGeneratedTestReport
 import kotlin.reflect.KClass
 
 /**
@@ -76,6 +77,11 @@ class ScopeReduceBuilder<RA : Any, RS : Any, A : Any, S : RS> internal construct
         )
     }
 
+    // TODO remove Generated annotation after deploy below issue
+    // https://github.com/jacoco/jacoco/issues/1873
+    // In Jacoco 0.8.13, inline functions are included in test scope
+    // However, the jacoco maven plugin fails to read the code, coverage is not filled.
+    @ExcludeFromGeneratedTestReport
     @JvmName(name = "actionScopeWithActionType")
     inline fun <reified T : A> actionScope(noinline block: ActionScopeReduceBuilder<RA, RS, T, S>.() -> Unit) {
         actionScope(actionType = T::class, block)
@@ -103,6 +109,11 @@ class ScopeReduceBuilder<RA : Any, RS : Any, A : Any, S : RS> internal construct
         )
     }
 
+    // TODO remove Generated annotation after deploy below issue
+    // https://github.com/jacoco/jacoco/issues/1873
+    // In Jacoco 0.8.13, inline functions are included in test scope
+    // However, the jacoco maven plugin fails to read the code, coverage is not filled.
+    @ExcludeFromGeneratedTestReport
     @JvmName(name = "stateScopeWithStateType")
     inline fun <reified T : S> stateScope(noinline block: StateScopeReduceBuilder<RA, RS, A, T>.() -> Unit) {
         stateScope(T::class, block)

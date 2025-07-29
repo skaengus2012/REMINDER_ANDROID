@@ -28,7 +28,6 @@ import org.junit.Test
  * @author Doohyun
  */
 class ScopeReduceBuilderTest {
-    /**
     @Test
     fun `Given inputs and predicated block, When transition from predicate scope builder, Then return expected state`() = runTest {
         val inputAction = TestAction.Action1
@@ -150,7 +149,7 @@ class ScopeReduceBuilderTest {
             .actionToDispatch(inputAction)
             .transitionScenario()
             .expectedNextState(expectedState)
-    }*/
+    }
 }
 
 @Suppress("TestFunctionName")
