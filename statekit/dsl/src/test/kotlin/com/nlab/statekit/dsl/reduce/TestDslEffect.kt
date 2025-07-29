@@ -25,7 +25,7 @@ import com.nlab.statekit.test.reduce.test
 /**
  * @author Doohyun
  */
-typealias TestDslEffectScope = DslEffectScope<TestAction, TestAction>
+typealias TestDslEffectScope = DslEffectScope<TestAction, TestState>
 typealias TestDslSuspendEffectScope = DslSuspendEffectScope<TestAction, TestAction, TestState>
 internal typealias TestDslEffectNode = DslEffect.Node<TestAction, TestState>
 internal typealias TestDslEffectSuspendNode = DslEffect.SuspendNode<TestAction, TestAction, TestState>
