@@ -29,6 +29,13 @@ private val jacocoTestReportJvmTask = registerJacocoTestReportTask(
     name = "jacocoTestReportJvm",
     testTaskName = JavaPlugin.TEST_TASK_NAME
 ) {
+    sourceDirectories.setFrom(
+        files(
+            "src/main/java",
+            "src/main/kotlin",
+        )
+    )
+
     val buildDir = layout.buildDirectory.get()
     classDirectories.setFrom(
         files(
