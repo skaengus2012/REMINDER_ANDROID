@@ -16,7 +16,6 @@
 package com.nlab.statekit.dsl.reduce
 
 import com.nlab.statekit.dsl.annotation.DslReduceMarker
-import com.nlab.statekit.dsl.internal.ExcludeFromGeneratedTestReport
 import kotlin.reflect.KClass
 
 /**
@@ -25,29 +24,16 @@ import kotlin.reflect.KClass
 @DslReduceMarker
 class ScopeReduceBuilder<RA : Any, RS : Any, A : Any, S : RS> internal constructor(
     private val scope: Any,
-) {
     internal val delegate: ReduceBuilderDelegate = ReduceBuilderDelegate(scope)
-
-    fun transition(block: DslTransitionScope<A, S>.() -> RS) {
-        delegate.addTransitionNode(block)
-    }
-
-    fun effect(block: DslEffectScope<A, S>.() -> Unit) {
-        delegate.addEffectNode(block)
-    }
-
-    fun suspendEffect(block: suspend DslSuspendEffectScope<RA, A, S>.()-> Unit) {
-        delegate.addSuspendEffectNode(block)
-    }
-
+) : NodeReduceBuilder<RA, RS, A, S> by InternalNodeReduceBuilder(reduceBuilderDelegate = delegate) {
     @JvmName(name = "scopeWithPredicate")
     fun scope(
         isMatch: UpdateSource<A, S>.() -> Boolean,
         block: ScopeReduceBuilder<RA, RS, A, S>.() -> Unit
     ) {
         delegate.addPredicateScope(
-            isMatch,
-            from = ScopeReduceBuilder<RA, RS, A, S>(scope)
+            isMatch = isMatch,
+            child = ScopeReduceBuilder<RA, RS, A, S>(scope)
                 .apply(block)
                 .delegate
         )
@@ -60,7 +46,7 @@ class ScopeReduceBuilder<RA : Any, RS : Any, A : Any, S : RS> internal construct
     ) {
         delegate.addTransformSourceScope(
             transformSource,
-            from = { subScope ->
+            child = { subScope ->
                 ScopeReduceBuilder<RA, RS, T, U>(subScope)
                     .apply(block)
                     .delegate
@@ -72,7 +58,7 @@ class ScopeReduceBuilder<RA : Any, RS : Any, A : Any, S : RS> internal construct
         block: ActionScopeReduceBuilder<RA, RS, A, S>.() -> Unit
     ) {
         delegate.addScope(
-            from = ActionScopeReduceBuilder<RA, RS, A, S>(scope)
+            child = ActionScopeReduceBuilder<RA, RS, A, S>(scope)
                 .apply(block)
                 .delegate
         )
@@ -84,17 +70,12 @@ class ScopeReduceBuilder<RA : Any, RS : Any, A : Any, S : RS> internal construct
     ) {
         delegate.addPredicateScope<A, S>(
             isMatch = { actionType.isInstance(action) },
-            from = ActionScopeReduceBuilder<RA, RS, T, S>(scope)
+            child = ActionScopeReduceBuilder<RA, RS, T, S>(scope)
                 .apply(block)
                 .delegate
         )
     }
 
-    // TODO remove Generated annotation after deploy below issue
-    // https://github.com/jacoco/jacoco/issues/1873
-    // In Jacoco 0.8.13, inline functions are included in test scope
-    // However, the jacoco maven plugin fails to read the code, coverage is not filled.
-    @ExcludeFromGeneratedTestReport
     @JvmName(name = "actionScopeWithActionType")
     inline fun <reified T : A> actionScope(noinline block: ActionScopeReduceBuilder<RA, RS, T, S>.() -> Unit) {
         actionScope(actionType = T::class, block)
@@ -104,7 +85,7 @@ class ScopeReduceBuilder<RA : Any, RS : Any, A : Any, S : RS> internal construct
         block: StateScopeReduceBuilder<RA, RS, A, S>.() -> Unit
     ) {
         delegate.addScope(
-            from = StateScopeReduceBuilder<RA, RS, A, S>(scope)
+            child = StateScopeReduceBuilder<RA, RS, A, S>(scope)
                 .apply(block)
                 .delegate
         )
@@ -116,17 +97,12 @@ class ScopeReduceBuilder<RA : Any, RS : Any, A : Any, S : RS> internal construct
     ) {
         delegate.addPredicateScope<A, S>(
             isMatch = { stateType.isInstance(current) },
-            from = StateScopeReduceBuilder<RA, RS, A, T>(scope)
+            child = StateScopeReduceBuilder<RA, RS, A, T>(scope)
                 .apply(block)
                 .delegate
         )
     }
 
-    // TODO remove Generated annotation after deploy below issue
-    // https://github.com/jacoco/jacoco/issues/1873
-    // In Jacoco 0.8.13, inline functions are included in test scope
-    // However, the jacoco maven plugin fails to read the code, coverage is not filled.
-    @ExcludeFromGeneratedTestReport
     @JvmName(name = "stateScopeWithStateType")
     inline fun <reified T : S> stateScope(noinline block: StateScopeReduceBuilder<RA, RS, A, T>.() -> Unit) {
         stateScope(T::class, block)
