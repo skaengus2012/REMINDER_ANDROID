@@ -25,6 +25,9 @@ android {
 dependencies {
     api(projects.core.kotlinx.coroutinesAndroid)
 
+    api(libs.androidx.core.ktx)
+
     implementation(libs.androidx.annotation)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.coil.kt)
 }
