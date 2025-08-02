@@ -17,13 +17,11 @@
 package com.nlab.reminder.core.statekit.plugins
 
 import com.nlab.reminder.core.statekit.store.androidx.lifecycle.globalExceptionHandlers
+import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Test
-import org.mockito.kotlin.any
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.once
-import org.mockito.kotlin.verify
 import kotlin.coroutines.CoroutineContext
 
 /**
@@ -32,11 +30,14 @@ import kotlin.coroutines.CoroutineContext
 class StateKitPluginTest {
     @Test
     fun `Given exception handle block, When invoke globalExceptionHandlers after addGlobalExceptionHandler, Then exception handler invoked`() = runTest {
-        val exceptionHandler: (CoroutineContext, Throwable) -> Unit = mock()
+        val exceptionHandler: (CoroutineContext, Throwable) -> Unit = mockk(relaxed = true)
         StateKitPlugin.addGlobalExceptionHandler(exceptionHandler)
 
         globalExceptionHandlers.first().handleException(coroutineContext, RuntimeException())
-        verify(exceptionHandler, once()).invoke(any(), any())
+        verify(exactly = 1) {
+            exceptionHandler.invoke(any(), any())
+
+        }
     }
 
     @After

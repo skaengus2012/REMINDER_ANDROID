@@ -19,10 +19,10 @@ package com.nlab.statekit.dsl.reduce
 import com.nlab.statekit.dsl.TestAction
 import com.nlab.statekit.dsl.TestState
 import com.nlab.statekit.dispatch.ActionDispatcher
+import io.mockk.mockk
 import org.hamcrest.CoreMatchers.sameInstance
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
-import org.mockito.kotlin.mock
 
 /**
  * @author Thalys
@@ -32,7 +32,7 @@ class DslSuspendEffectScopeTest {
     fun successCreateDslEffectScope() {
         DslSuspendEffectScope(
             UpdateSource(TestAction.genAction(), TestState.genState()),
-            actionDispatcher = mock<ActionDispatcher<TestAction>>()
+            actionDispatcher = mockk<ActionDispatcher<TestAction>>()
         )
     }
 
