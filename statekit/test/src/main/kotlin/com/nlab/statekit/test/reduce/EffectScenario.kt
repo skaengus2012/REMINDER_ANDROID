@@ -81,7 +81,7 @@ sealed class LaunchedTrace<out A : Any, out S : Any, out IA : A, out IS : S> {
 }
 
 sealed class Advance {
-    data object UntilIdle : Advance()
+    object UntilIdle : Advance()
     class TimeBy(val delayTime: Duration) : Advance()
 
     companion object {
