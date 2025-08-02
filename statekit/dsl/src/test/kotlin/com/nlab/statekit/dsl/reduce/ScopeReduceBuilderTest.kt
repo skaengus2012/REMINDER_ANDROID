@@ -18,74 +18,18 @@ package com.nlab.statekit.dsl.reduce
 
 import com.nlab.statekit.dsl.TestAction
 import com.nlab.statekit.dsl.TestState
-import com.nlab.statekit.reduce.ActionDispatcher
+import com.nlab.statekit.test.reduce.expectedNextState
+import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.once
-import org.mockito.kotlin.verify
 
 /**
  * @author Doohyun
  */
 class ScopeReduceBuilderTest {
     @Test
-    fun `Given inputs and transition block, When transition from builder, Then return expected state`() {
-        val inputAction = TestAction.Action1
-        val inputState = TestState.State1
-        val expectedState = TestState.State2
-
-        val reduceBuilder = TestScopeReduceBuilder {
-            transition {
-                if (action == inputAction && current == inputState) expectedState
-                else current
-            }
-        }
-        val transition = checkNotNull(reduceBuilder.delegate.buildTransition())
-        transition.assert(
-            inputAction,
-            inputState,
-            expectedState
-        )
-    }
-
-    @Test
-    fun `Given inputs, When launch effect from builder, Then runner invoked`() = runTest {
-        val inputAction = TestAction.Action1
-        val inputState = TestState.State1
-        val runner: () -> Unit = mock()
-        val reduceBuilder = TestScopeReduceBuilder {
-            effect {
-                if (action == inputAction && current == inputState) {
-                    runner()
-                }
-            }
-        }
-        val effect = checkNotNull(reduceBuilder.delegate.buildEffect())
-        effect.launchAndJoinForTest(inputAction, inputState)
-        verify(runner, once()).invoke()
-    }
-
-    @Test
-    fun `Given inputs and actionDispatcher, When launch suspend effect from builder, Then actionDispatcher invoked`() = runTest {
-        val inputAction = TestAction.Action1
-        val inputState = TestState.State1
-        val expectedAction = TestAction.Action2
-        val actionDispatcher: ActionDispatcher<TestAction> = mock()
-        val reduceBuilder = TestScopeReduceBuilder {
-            suspendEffect {
-                if (action == inputAction && current == inputState) {
-                    dispatch(expectedAction)
-                }
-            }
-        }
-        val effect = checkNotNull(reduceBuilder.delegate.buildEffect())
-        effect.launchAndJoinForTest(inputAction, inputState, actionDispatcher)
-        verify(actionDispatcher, once()).dispatch(expectedAction)
-    }
-
-    @Test
-    fun `Given inputs and predicated block, When transition from predicate scope builder, Then return expected state`() {
+    fun `Given inputs and predicated block, When transition from predicate scope builder, Then return expected state`() = runTest {
         val inputAction = TestAction.Action1
         val inputState = TestState.State1
         val expectedState = TestState.State2
@@ -95,11 +39,15 @@ class ScopeReduceBuilderTest {
             }
         }
         val transition = checkNotNull(reduceBuilder.delegate.buildTransition())
-        transition.assert(inputAction, inputState, expectedState)
+        transition.toReduceTestBuilder()
+            .givenCurrent(inputState)
+            .actionToDispatch(inputAction)
+            .transitionScenario()
+            .expectedNextState(expectedState)
     }
 
     @Test
-    fun `Given inputs and transform source block, When transition from transformSource scope builder, Then return expected state`() {
+    fun `Given inputs and transform source block, When transition from transformSource scope builder, Then return expected state`() = runTest {
         val inputAction = TestAction.Action1
         val inputState = TestState.State1
         val expectedState = TestState.State2
@@ -114,14 +62,18 @@ class ScopeReduceBuilderTest {
             }
         }
         val transition = checkNotNull(reduceBuilder.delegate.buildTransition())
-        transition.assert(inputAction, inputState, expectedState)
+        transition.toReduceTestBuilder()
+            .givenCurrent(inputState)
+            .actionToDispatch(inputAction)
+            .transitionScenario()
+            .expectedNextState(expectedState)
     }
 
     @Test
     fun `Given inputs and runner, When launch effect from action scope builder, Then runner invoked`() = runTest {
         val inputAction = TestAction.Action1
         val inputState = TestState.State1
-        val runner: () -> Unit = mock()
+        val runner: () -> Unit = mockk(relaxed = true)
         val reduceBuilder = TestScopeReduceBuilder {
             actionScope {
                 scope(isMatch = { action == inputAction }) {
@@ -130,12 +82,18 @@ class ScopeReduceBuilderTest {
             }
         }
         val effect = checkNotNull(reduceBuilder.delegate.buildEffect())
-        effect.launchAndJoinForTest(inputAction, inputState)
-        verify(runner, once()).invoke()
+        effect.toReduceTestBuilder()
+            .givenCurrent(inputState)
+            .actionToDispatch(inputAction)
+            .effectScenario()
+            .launchAndGetTrace()
+        verify(exactly = 1) {
+            runner.invoke()
+        }
     }
 
     @Test
-    fun `Given inputs and actionType, When transition from action scope builder, Then return expected state`() {
+    fun `Given inputs and actionType, When transition from action scope builder, Then return expected state`() = runTest {
         val inputAction = TestAction.Action1
         val inputState = TestState.State1
         val expectedState = TestState.State2
@@ -145,28 +103,38 @@ class ScopeReduceBuilderTest {
             }
         }
         val transition = checkNotNull(reduceBuilder.delegate.buildTransition())
-        transition.assert(inputAction, inputState, expectedState)
+        transition.toReduceTestBuilder()
+            .givenCurrent(inputState)
+            .actionToDispatch(inputAction)
+            .transitionScenario()
+            .expectedNextState(expectedState)
     }
 
     @Test
     fun `Given inputs and runner, When launch effect from state scope builder, Then runner invoked`() = runTest {
         val inputAction = TestAction.Action1
         val inputState = TestState.State1
-        val runner: () -> Unit = mock()
+        val runner: () -> Unit = mockk(relaxed = true)
         val reduceBuilder = TestScopeReduceBuilder {
-            stateScope {
+            this.stateScope {
                 scope(isMatch = { current == inputState }) {
                     effect<TestAction.Action1> { runner() }
                 }
             }
         }
         val effect = checkNotNull(reduceBuilder.delegate.buildEffect())
-        effect.launchAndJoinForTest(inputAction, inputState)
-        verify(runner, once()).invoke()
+        effect.toReduceTestBuilder()
+            .givenCurrent(inputState)
+            .actionToDispatch(inputAction)
+            .effectScenario()
+            .launchAndGetTrace()
+        verify(exactly = 1) {
+            runner.invoke()
+        }
     }
 
     @Test
-    fun `Given inputs and actionType, When transition from state scope builder, Then return expected state`() {
+    fun `Given inputs and actionType, When transition from state scope builder, Then return expected state`() = runTest {
         val inputAction = TestAction.Action1
         val inputState = TestState.State1
         val expectedState = TestState.State2
@@ -176,11 +144,15 @@ class ScopeReduceBuilderTest {
             }
         }
         val transition = checkNotNull(reduceBuilder.delegate.buildTransition())
-        transition.assert(inputAction, inputState, expectedState)
+        transition.toReduceTestBuilder()
+            .givenCurrent(inputState)
+            .actionToDispatch(inputAction)
+            .transitionScenario()
+            .expectedNextState(expectedState)
     }
 }
 
 @Suppress("TestFunctionName")
 private fun TestScopeReduceBuilder(
-    buildDSL: ScopeReduceBuilder<TestAction, TestState, TestAction, TestState>.() -> Unit
-) = ScopeReduceBuilder<TestAction, TestState, TestAction, TestState>(scope = Any()).apply(buildDSL)
+    buildDSL: RootScopeReduceBuilder<TestAction, TestState>.() -> Unit
+) = RootScopeReduceBuilder<TestAction, TestState>(scope = Any()).apply(buildDSL)

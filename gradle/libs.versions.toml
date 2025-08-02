@@ -44,14 +44,11 @@ kotlinxSerializationJson = "1.9.0"
 ksp = "2.1.21-2.0.2"
 kotlinxCollectionsImmutable = "0.4.0"
 kotlinxCoroutine = "1.10.2"
-mockitoInline = "5.2.0"
-mockitoKotlin = "5.4.0"
 mockk = "1.14.5"
 squareLeakcanary = "2.14"
 squareKotlinpoet = "2.2.0"
 timber = "5.0.1"
 turbine = "1.2.1"
-
 
 [libraries]
 afollested-dragselectRecyclerView = { module = "com.afollestad:drag-select-recyclerview", version.ref = "afollestedDragselectRecyclerView" }
@@ -101,8 +98,6 @@ kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-c
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutine" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
-mockito-inline = { module = "org.mockito:mockito-inline", version.ref = "mockitoInline" }
-mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockitoKotlin" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 squeare-leakcanary = { module = "com.squareup.leakcanary:leakcanary-android", version.ref = "squareLeakcanary" }
 squeare-kotlinpoet = { module = "com.squareup:kotlinpoet", version.ref = "squareKotlinpoet" }

@@ -18,159 +18,199 @@ package com.nlab.statekit.dsl.reduce
 
 import com.nlab.statekit.dsl.TestAction
 import com.nlab.statekit.dsl.TestState
+import com.nlab.statekit.test.reduce.expectedNextState
+import com.nlab.statekit.test.reduce.expectedNotChanged
+import com.nlab.testkit.faker.genBothify
 import com.nlab.testkit.faker.genInt
+import io.mockk.mockk
+import io.mockk.verify
+import kotlinx.coroutines.test.runTest
 import org.junit.Test
-import org.mockito.kotlin.any
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.never
-import org.mockito.kotlin.verify
 
 /**
  * @author Doohyun
  */
 class DslTransitionKtTest {
     @Test
-    fun `Given changeable node, When transitionTo, Then return next node`() {
-        val inputState = TestState.State1
+    fun `Given changeable node, When transition, Then return next node`() = runTest {
+        val initState = TestState.State1
         val expectedState = TestState.State3
-        val node = TestDslTransitionNode(scope = Any()) { expectedState }
-        node.assert(inputState = inputState, expectedState = expectedState)
+        val node = TestDslTransitionNode(scope = genBothify()) { expectedState }
+
+        node.toReduceTestBuilder()
+            .givenCurrent(initState)
+            .actionToDispatch(TestAction.genAction())
+            .transitionScenario()
+            .expectedNextState(expectedState)
     }
 
     @Test
-    fun `Given not changed node transition, When transitionTo, Then return input state`() {
-        val inputState = TestState.State1
-        TestDslTransitionNode().assert(inputState = inputState, expectedState = inputState)
-    }
+    fun `Given non-changeable node, When transition, Then return initState`() = runTest {
+        val initState = TestState.State1
+        val node = TestDslTransitionNode(scope = genBothify()) { transitionScope -> transitionScope.current }
 
-    @Test(expected = IllegalStateException::class)
-    fun `Given zero or single transition, When create CompositeTransition, Then occurred error`() {
-        val transitions = List(size = genInt(min = 0, max = 1)) { TestDslTransition() }
-        DslTransition.Composite(Any(), transitions)
-    }
-
-    @Test
-    fun `Given 2 or more transitions, When create CompositeTransition, Then success`() {
-        val transitions = List(size = genInt(min = 2, max = 10)) { TestDslTransition() }
-        DslTransition.Composite(Any(), transitions)
+        node.toReduceTestBuilder()
+            .givenCurrent(initState)
+            .actionToDispatch(TestAction.genAction())
+            .transitionScenario()
+            .expectedNotChanged()
     }
 
     @Test
-    fun `Given multi depth composites, When transitionTo, Then return next node`() {
-        val inputState = TestState.State1
+    fun `Given multi depth composite, When transition, Then return correct state`() = runTest {
+        val initState = TestState.State1
         val expectedState = TestState.State3
-        val scope = "0"
-        val goalTransition = TestDslTransitionNode(scope) { expectedState }
-        var transition: DslTransition = DslTransition.Composite(
-            scope = scope,
-            transitions = listOf(
-                TestDslTransitionNode(scope),
-                goalTransition
-            )
+        val rootScope = genBothify()
+        var composite = DslTransition.Composite(
+            scope = rootScope,
+            head = TestDslTransitionNode(rootScope) { it.current },
+            tails = listOf(TestDslTransitionNode(rootScope) { expectedState })
         )
         repeat(times = genInt(min = 2, max = 5)) {
-            transition = DslTransition.Composite(
-                scope,
-                listOf(TestDslTransitionNode(scope), transition)
+            composite = DslTransition.Composite(
+                scope = rootScope,
+                head = TestDslTransitionNode(rootScope) { it.current },
+                tails = listOf(composite)
             )
         }
-        transition.assert(inputState = inputState, expectedState = expectedState)
+
+        composite.toReduceTestBuilder()
+            .givenCurrent(initState)
+            .actionToDispatch(TestAction.genAction())
+            .transitionScenario()
+            .expectedNextState(expectedState)
     }
 
     @Test
-    fun `Given goal and identity transition, When transitionTo, Then identity transition never works`() {
-        val inputState = TestState.State1
+    fun `Given identity, changed, mock composite, When transition, Then mock never works`() = runTest {
+        val initState = TestState.State1
         val changedState = TestState.State3
-        val scope = "0"
-        val neverWorksTransition: (TestDslTransitionScope) -> TestState = mock()
-        val transition = DslTransition.Composite(
-            scope,
-            listOf(
-                TestDslTransitionNode(scope),
-                TestDslTransitionNode(scope) { changedState },
-                TestDslTransitionNode(scope, neverWorksTransition)
+        val rootScope = genBothify()
+        val neverWorksTransitionNode: TestDslTransitionNode = mockk()
+        val composite = DslTransition.Composite(
+            rootScope,
+            head = TestDslTransitionNode(rootScope) { it.current },
+            tails = listOf(
+                TestDslTransitionNode(rootScope) { changedState },
+                neverWorksTransitionNode
             )
         )
-        transition.assert(inputState = inputState, expectedState = changedState)
-        verify(neverWorksTransition, never()).invoke(any())
+
+        composite.toReduceTestBuilder()
+            .givenCurrent(initState)
+            .actionToDispatch(TestAction.genAction())
+            .transitionScenario()
+            .getTransitionResult()
+
+        verify(inverse = true) { neverWorksTransitionNode.next.invoke(any()) }
     }
 
     @Test
-    fun `Given multi depth predicate scopes, When transitionTo, Then return next node`() {
-        val inputState = TestState.State1
+    fun `Given fully matched nested predicate scopes, When transition, Then return correct state`() = runTest {
+        val initState = TestState.State1
         val expectedState = TestState.State3
-        val scope = "0"
-        var transition: DslTransition = TestDslTransitionNode(scope) { expectedState }
+        val rootScope = genBothify()
+        var dslTransition: DslTransition = TestDslTransitionNode(rootScope) { expectedState }
         repeat(times = genInt(min = 2, max = 5)) {
-            transition = DslTransition.PredicateScope<TestAction, TestState>(
-                scope = scope,
+            dslTransition = TestDslTransitionPredicateScope(
+                scope = rootScope,
                 isMatch = { true },
-                transition
+                dslTransition
             )
         }
-        transition.assert(inputState = inputState, expectedState = expectedState)
+
+        dslTransition.toReduceTestBuilder()
+            .givenCurrent(initState)
+            .actionToDispatch(TestAction.genAction())
+            .transitionScenario()
+            .expectedNextState(expectedState)
     }
 
     @Test
-    fun `Given not matched predicate scope and child transition, When transitionTo, Then child node never works`() {
-        val inputState = TestState.State1
-        val scope = "0"
-        val neverWorksTransition: (TestDslTransitionScope) -> TestState = mock()
-        val transition = DslTransition.PredicateScope<TestAction, TestState>(
-            scope = scope,
+    fun `Given unmatched predicate scope, When transition, Then return initState`() = runTest {
+        val initState = TestState.State1
+        val rootScope = genBothify()
+        val predicatedScope = TestDslTransitionPredicateScope(
+            scope = rootScope,
             isMatch = { false },
-            TestDslTransitionNode(scope, neverWorksTransition)
+            transition = mockk()
         )
-        transition.assert(inputState = inputState, expectedState = inputState)
-        verify(neverWorksTransition, never()).invoke(any())
+
+        predicatedScope.toReduceTestBuilder()
+            .givenCurrent(initState)
+            .actionToDispatch(TestAction.genAction())
+            .transitionScenario()
+            .expectedNotChanged()
     }
 
     @Test
-    fun `Given transform source scope, When transitionTo, Then return next node`() {
-        val inputState = TestState.State1
+    fun `Given transformable scope, When transition, Then return correct state`() = runTest {
+        val initState = TestState.State1
         val expectedState = TestState.State3
-        val scope = "0"
+        val rootScope = "0"
         val subScope = "1"
-        val transition = DslTransition.TransformSourceScope<TestAction, TestState, Int, TestState>(
-            scope = scope,
+        val transformScope = TestDslTransitionTransformScope(
+            scope = rootScope,
             subScope = subScope,
             transformSource = { source -> UpdateSource(action = 1, source.current) },
             transition = DslTransition.Node<TestState, Int, TestState>(subScope) { expectedState }
         )
-        transition.assert(inputState = inputState, expectedState = expectedState)
+
+        transformScope.toReduceTestBuilder()
+            .givenCurrent(initState)
+            .actionToDispatch(TestAction.genAction())
+            .transitionScenario()
+            .expectedNextState(expectedState)
     }
 
     @Test
-    fun `Given not matched transform source scopes, When transitionTo, Then child node transition never works`() {
-        val inputState = TestState.State1
+    fun `Given not matched transform scope, When transition, Then return initState`() = runTest {
+        val initState = TestState.State1
+        val rootScope = "0"
+        val subScope = "1"
+        val transformScope = TestDslTransitionTransformScope<Int, TestState>(
+            scope = rootScope,
+            subScope = subScope,
+            transformSource = { source -> null },
+            transition = DslTransition.Node<TestState, Int, TestState>(scope = subScope, next = mockk())
+        )
+
+        transformScope.toReduceTestBuilder()
+            .givenCurrent(initState)
+            .actionToDispatch(TestAction.genAction())
+            .transitionScenario()
+            .expectedNotChanged()
+    }
+
+    @Test
+    fun `Given composite that head is not transformable scope, When transition, Then return correct state`() = runTest {
+        val initState = TestState.State1
         val expectedState = TestState.State3
-        val scope = "0"
+        val rootScope = "0"
         val subScope = "1"
         val twoDepthSubScope = "2"
-        val transition = DslTransition.Composite(
-            scope = scope,
-            listOf(
-                TestDslTransitionNode(scope),
-                DslTransition.TransformSourceScope<TestAction, TestState, Int, TestState>(
-                    scope = scope,
-                    subScope = subScope,
-                    transformSource = { source -> UpdateSource(action = 1, source.current) },
-                    transition = DslTransition.TransformSourceScope<TestAction, TestState, String, TestState>(
-                        scope = subScope,
-                        subScope = twoDepthSubScope,
-                        transformSource = { null },
-                        transition = DslTransition.Node<TestState, Int, TestState>(twoDepthSubScope) {
-                            TestState.State2
-                        }
-                    )
-                ),
-                DslTransition.PredicateScope<TestAction, TestState>(
-                    scope,
-                    { true },
-                    DslTransition.Node<TestState, Int, TestState>(scope) { expectedState }
+        val composite = DslTransition.Composite(
+            scope = rootScope,
+            head = TestDslTransitionTransformScope(
+                scope = rootScope,
+                subScope = subScope,
+                transformSource = { source -> UpdateSource(action = 1, current = source.current) },
+                transition = TestDslTransitionTransformScope<String, TestState>(
+                    scope = subScope,
+                    subScope = twoDepthSubScope,
+                    transformSource = { null },
+                    transition = mockk()
                 )
+            ),
+            tails = listOf(
+                TestDslTransitionNode(rootScope) { expectedState }
             )
         )
-        transition.assert(inputState = inputState, expectedState = expectedState)
+
+        composite.toReduceTestBuilder()
+            .givenCurrent(initState)
+            .actionToDispatch(TestAction.genAction())
+            .transitionScenario()
+            .expectedNextState(expectedState)
     }
 }

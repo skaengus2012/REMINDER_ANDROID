@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 The N's lab Open Source Project
+ * Copyright (C) 2025 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,13 @@
 
 package com.nlab.statekit.reduce
 
+import kotlinx.coroutines.CoroutineScope
+
 /**
- * @author Thalys
+ * @author Doohyun
  */
-internal fun <T : Any> Accumulator<T>.addAllReversed(
-    elements: List<T>
-): Accumulator<T> = apply {
-    for (index in elements.size - 1 downTo 0) add(elements[index])
-}
+class EffectContext internal constructor(
+    val coroutineScope: CoroutineScope,
+    val nodeStackPool: NodeStackPool,
+    val throwableCollector: ThrowableCollector
+)

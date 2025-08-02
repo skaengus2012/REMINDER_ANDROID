@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 The N's lab Open Source Project
+ * Copyright (C) 2025 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,17 @@
  * limitations under the License.
  */
 
-package com.nlab.statekit.internal
+package com.nlab.statekit.reduce
 
 /**
- * @author Thalys
+ * @author Doohyun
  */
+class ThrowableCollector internal constructor() {
+    private val list = mutableListOf<Throwable>()
 
-// Test OK @see {com.nlab.statekit.internal.MergeHelpersKtTest}
-// TODO remove Generated annotation after deploy below issue
-// https://github.com/jacoco/jacoco/pull/1670
-@ExcludeFromGeneratedTestReport
-internal inline fun <T : Any> List<T>.merge(
-    onMerge: (head: T, tails: List<T>) -> T,
-): T? =  when (size) {
-    0 -> null
-    1 -> first()
-    else -> onMerge(first(), drop(1))
+    internal fun snapshot(): List<Throwable> = list
+
+    fun collect(throwable: Throwable) {
+        list += throwable
+    }
 }

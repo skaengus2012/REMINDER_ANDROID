@@ -17,7 +17,7 @@
 package com.nlab.reminder.core.component.usermessage.eventbus
 
 import com.nlab.reminder.core.component.usermessage.genUserMessage
-import com.nlab.statekit.test.reduce.transitionScenario
+import com.nlab.statekit.test.reduce.test
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 
@@ -27,24 +27,20 @@ import org.junit.Test
 class UserMessageAggregateReduceTest {
     @Test
     fun `Given empty messages state, When userMessage posted, Then userMessage added`() = runTest {
-        UserMessageAggregateReduce()
+        UserMessageAggregateReduce().test()
+            .givenCurrent(UserMessageAggregateUiState(messages = emptyList()))
+            .actionToDispatch(UserMessageAggregateAction.UserMessagePosted(genUserMessage()))
             .transitionScenario()
-            .initState(UserMessageAggregateUiState(messages = emptyList()))
-            .action(UserMessageAggregateAction.UserMessagePosted(genUserMessage()))
-            .expectedStateFromInput {
-                initState.copy(messages = listOf(action.message))
-            }
-            .verify()
+            .expectedNextState { current.copy(messages = listOf(action.message)) }
     }
 
     @Test
     fun `Given single message state, When userMessage shown, Then userMessage removed`() = runTest {
         val userMessage = genUserMessage()
-        UserMessageAggregateReduce()
+        UserMessageAggregateReduce().test()
+            .givenCurrent(UserMessageAggregateUiState(listOf(userMessage)))
+            .actionToDispatch(UserMessageAggregateAction.UserMessageShown(userMessage.id))
             .transitionScenario()
-            .initState(UserMessageAggregateUiState(listOf(userMessage)))
-            .action(UserMessageAggregateAction.UserMessageShown(userMessage.id))
-            .expectedStateFromInput { initState.copy(messages = emptyList()) }
-            .verify()
+            .expectedNextState { current.copy(messages = emptyList()) }
     }
 }

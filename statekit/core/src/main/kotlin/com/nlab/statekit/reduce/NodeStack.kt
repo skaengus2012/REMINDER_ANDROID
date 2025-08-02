@@ -19,7 +19,7 @@ package com.nlab.statekit.reduce
 /**
  * @author Doohyun
  */
-class Accumulator<T : Any> internal constructor() {
+class NodeStack<T : Any> internal constructor() {
     private val acc = ArrayDeque<Any>()
     internal var isReady: Boolean = false
         private set
@@ -42,4 +42,8 @@ class Accumulator<T : Any> internal constructor() {
 
     @Suppress("UNCHECKED_CAST")
     fun removeLast(): T = acc.removeLast() as T
+}
+
+internal fun <T : Any> NodeStack<T>.addAllReversed(elements: List<T>) {
+    for (index in elements.size - 1 downTo 0) add(elements[index])
 }

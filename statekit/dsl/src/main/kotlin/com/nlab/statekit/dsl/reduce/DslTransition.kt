@@ -16,7 +16,7 @@
 
 package com.nlab.statekit.dsl.reduce
 
-import com.nlab.statekit.reduce.Accumulator
+import com.nlab.statekit.reduce.NodeStack
 import com.nlab.statekit.reduce.Transition
 import com.nlab.statekit.reduce.use
 
@@ -33,12 +33,9 @@ internal sealed interface DslTransition {
 
     class Composite(
         override val scope: Any,
-        val transitions: List<DslTransition>,
-    ) : DslTransition {
-        init {
-            check(transitions.size >= 2)
-        }
-    }
+        val head: DslTransition,
+        val tails: List<DslTransition>,
+    ) : DslTransition
 
     class PredicateScope<out A : Any, out S : Any>(
         override val scope: Any,
@@ -54,13 +51,13 @@ internal sealed interface DslTransition {
     ) : DslTransition
 }
 
-@Suppress("UNCHECKED_CAST")
 internal fun <A : Any, S : Any> transitionOf(
     dslTransition: DslTransition,
-): Transition<A, S> = Transition.LifecycleNode { action, current, accumulatorPool ->
-    val newValue = accumulatorPool.use { accTransition: Accumulator<DslTransition> ->
-        accumulatorPool.use { accScope: Accumulator<Any> ->
-            accumulatorPool.use { accDslTransitionScope: Accumulator<DslTransitionScope<Any, Any>> ->
+): Transition<A, S> = Transition.LifecycleNode { action, current, context ->
+    val nodeStackPool = context.nodeStackPool
+    val newValue = nodeStackPool.use { accTransition: NodeStack<DslTransition> ->
+        nodeStackPool.use { accScope: NodeStack<Any> ->
+            nodeStackPool.use { accDslTransitionScope: NodeStack<DslTransitionScope<Any, Any>> ->
                 transition(
                     node = dslTransition,
                     scope = dslTransition.scope,
@@ -73,6 +70,7 @@ internal fun <A : Any, S : Any> transitionOf(
         }
     }
 
+    @Suppress("UNCHECKED_CAST")
     newValue?.let { it as S } ?: current
 }
 
@@ -80,20 +78,20 @@ private tailrec fun transition(
     node: DslTransition?,
     scope: Any,
     dslTransitionScope: DslTransitionScope<Any, Any>,
-    accTransition: Accumulator<DslTransition>,
-    accScope: Accumulator<Any>,
-    accDslTransitionScope: Accumulator<DslTransitionScope<Any, Any>>,
+    accTransition: NodeStack<DslTransition>,
+    accScope: NodeStack<Any>,
+    accDslTransitionScope: NodeStack<DslTransitionScope<Any, Any>>,
 ): Any? {
     node ?: return null
 
     if (scope !== node.scope) {
         return transition(
-            node,
-            accScope.removeLast(),
-            accDslTransitionScope.removeLast(),
-            accTransition,
-            accScope,
-            accDslTransitionScope
+            node = node,
+            scope = accScope.removeLast(),
+            dslTransitionScope = accDslTransitionScope.removeLast(),
+            accTransition = accTransition,
+            accScope = accScope,
+            accDslTransitionScope = accDslTransitionScope
         )
     }
 
@@ -102,61 +100,59 @@ private tailrec fun transition(
             val next = node.next(dslTransitionScope)
             if (next != dslTransitionScope.current) next
             else transition(
-                accTransition.removeLastOrNull(),
-                scope,
-                dslTransitionScope,
-                accTransition,
-                accScope,
-                accDslTransitionScope
+                node = accTransition.removeLastOrNull(),
+                scope = scope,
+                dslTransitionScope = dslTransitionScope,
+                accTransition = accTransition,
+                accScope = accScope,
+                accDslTransitionScope = accDslTransitionScope
             )
         }
 
         is DslTransition.Composite -> {
-            val childTransitions = node.transitions
             transition(
-                node = childTransitions.first(),
-                scope,
-                dslTransitionScope,
-                accTransition.addAllReversedWithoutHead(childTransitions),
-                accScope,
-                accDslTransitionScope
+                node = node.head,
+                scope = scope,
+                dslTransitionScope = dslTransitionScope,
+                accTransition = accTransition.apply { addAllReversed(node.tails) },
+                accScope = accScope,
+                accDslTransitionScope = accDslTransitionScope
             )
         }
 
         is DslTransition.PredicateScope<Any, Any> -> {
             val nextNode = if (node.isMatch(dslTransitionScope)) node.transition else accTransition.removeLastOrNull()
             transition(
-                nextNode,
-                scope,
-                dslTransitionScope,
-                accTransition,
-                accScope,
-                accDslTransitionScope
+                node = nextNode,
+                scope = scope,
+                dslTransitionScope = dslTransitionScope,
+                accTransition = accTransition,
+                accScope = accScope,
+                accDslTransitionScope = accDslTransitionScope
             )
         }
 
         is DslTransition.TransformSourceScope<Any, Any, Any, Any> -> {
             val newSource = node.transformSource(dslTransitionScope)
             if (newSource == null) {
-                val nextNode = accTransition.removeLastOrNull()
                 transition(
-                    nextNode,
-                    scope,
-                    dslTransitionScope,
-                    accTransition,
-                    accScope,
-                    accDslTransitionScope
+                    node = accTransition.removeLastOrNull(),
+                    scope = scope,
+                    dslTransitionScope = dslTransitionScope,
+                    accTransition = accTransition,
+                    accScope = accScope,
+                    accDslTransitionScope = accDslTransitionScope
                 )
             } else {
                 accScope.add(scope)
                 accDslTransitionScope.add(dslTransitionScope)
                 transition(
-                    node.transition,
-                    node.subScope,
-                    DslTransitionScope(newSource),
-                    accTransition,
-                    accScope,
-                    accDslTransitionScope
+                    node = node.transition,
+                    scope = node.subScope,
+                    dslTransitionScope = DslTransitionScope(updateSource = newSource),
+                    accTransition = accTransition,
+                    accScope = accScope,
+                    accDslTransitionScope = accDslTransitionScope
                 )
             }
         }

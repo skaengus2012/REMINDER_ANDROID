@@ -21,7 +21,7 @@ import com.nlab.testkit.faker.genInt
 /**
  * @author thalys
  */
-sealed class TestState private constructor() {
+sealed class TestState {
     data object State1 : TestState()
     data object State2 : TestState()
     data object State3 : TestState()

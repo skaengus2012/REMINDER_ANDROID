@@ -19,63 +19,63 @@ package com.nlab.statekit.reduce
 import com.nlab.testkit.faker.genBoolean
 import com.nlab.testkit.faker.genBothify
 import com.nlab.testkit.faker.genInt
-import com.nlab.testkit.faker.genLong
-import org.hamcrest.CoreMatchers.equalTo
+import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.trueValue
 import org.junit.Test
 
 
 /**
  * @author Doohyun
  */
-class AccumulatorTest {
+class NodeStackTest {
     @Test
     fun `When created, Then has not ready state`() {
-        assert(Accumulator<String>().isReady.not())
+        assertThat(NodeStack<String>().isReady, not(trueValue()))
     }
 
     @Test
-    fun `Given accumulator, When ready, Then has ready state`() {
-        val acc = Accumulator<String>()
-        acc.ready()
-        assert(acc.isReady)
+    fun `Given nodeStack, When ready, Then has ready state`() {
+        val nodeStack = NodeStack<String>()
+        nodeStack.ready()
+        assertThat(nodeStack.isReady, trueValue())
     }
 
     @Test
-    fun `Given used accumulator, When released, Then has not ready state and empty data`() {
-        val acc = Accumulator<Int>()
-        acc.ready()
-        acc.add(genInt())
-        acc.release()
+    fun `Given used nodeStack, When released, Then has not ready state and empty data`() {
+        val nodeStack = NodeStack<Int>()
+        nodeStack.ready()
+        nodeStack.add(genInt())
+        nodeStack.release()
 
-        assert(acc.isReady.not())
-        assert(acc.removeLastOrNull() == null)
+        assertThat(nodeStack.isReady, not(trueValue()))
+        assertThat(nodeStack.removeLastOrNull(), nullValue())
     }
 
     @Test
     fun `Given data, When add and removeLastOrNull, Then return inputted data`() {
         val value = genBothify()
-        val acc = Accumulator<String>()
-        acc.add(value)
-        assertThat(acc.removeLastOrNull(), equalTo(value))
+        val nodeStack = NodeStack<String>()
+        nodeStack.add(value)
+        assertThat(nodeStack.removeLastOrNull(), equalTo(value))
     }
 
     @Test
     fun `Given no data, When removeLastOrNull, Then return null`() {
-        val data = Accumulator<Long>().removeLastOrNull()
+        val data = NodeStack<Long>().removeLastOrNull()
         assert(data == null)
     }
 
     @Test
     fun `Given data, When removeLast, Then return inputted data`() {
         val value = genBoolean()
-        val acc = Accumulator<Boolean>()
-        acc.add(value)
-        assertThat(acc.removeLast(), equalTo(value))
+        val nodeStack = NodeStack<Boolean>()
+        nodeStack.add(value)
+        assertThat(nodeStack.removeLast(), equalTo(value))
     }
 
     @Test(expected = NoSuchElementException::class)
     fun `Given no data, When removeLast, Then throw NoSuchElementException`() {
-        Accumulator<Long>().removeLast()
+        NodeStack<Long>().removeLast()
     }
 }

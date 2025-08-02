@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 The N's lab Open Source Project
+ * Copyright (C) 2025 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,15 @@
  * limitations under the License.
  */
 
-package com.nlab.statekit.reduce
+package com.nlab.statekit.test.reduce
+
+import com.nlab.statekit.reduce.Reduce
 
 /**
  * @author Doohyun
  */
-sealed interface EffectOwner<A : Any, S : Any> {
-    val effect: Effect<A, S>?
+class GivenCurrentBuilder<A : Any, S : Any> internal constructor(
+    private val reduce: Reduce<A, S>,
+) {
+    fun <T : S> givenCurrent(state: T) = ActionToDispatchBuilder(reduce, current = state)
 }

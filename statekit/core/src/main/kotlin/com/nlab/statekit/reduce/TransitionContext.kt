@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 The N's lab Open Source Project
+ * Copyright (C) 2025 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,10 @@
  * limitations under the License.
  */
 
-package com.nlab.statekit.dsl.reduce
-
-import com.nlab.statekit.reduce.Accumulator
+package com.nlab.statekit.reduce
 
 /**
- * @author Thalys
+ * @author Doohyun
  */
-internal fun <T : Any> Accumulator<T>.addAllReversedWithoutHead(
-    elements: List<T>
-): Accumulator<T> = apply {
-    for (index in elements.size - 1 downTo 1) add(elements[index])
-}
+@JvmInline
+value class TransitionContext internal constructor(val nodeStackPool: NodeStackPool)

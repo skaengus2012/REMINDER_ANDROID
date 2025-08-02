@@ -18,7 +18,7 @@ package com.nlab.statekit.store
 
 import com.nlab.statekit.bootstrap.Bootstrap
 import com.nlab.statekit.bootstrap.EmptyBootstrap
-import com.nlab.statekit.reduce.AccumulatorPool
+import com.nlab.statekit.reduce.NodeStackPool
 import com.nlab.statekit.reduce.EmptyReduce
 import com.nlab.statekit.reduce.Reduce
 import kotlinx.coroutines.CoroutineScope
@@ -26,8 +26,8 @@ import kotlinx.coroutines.CoroutineScope
 /**
  * @author Thalys
  */
-private val accPool = AccumulatorPool()
-private val storeFactory = StoreFactory(accPool)
+private val nodeStackPool = NodeStackPool()
+private val storeFactory = StoreFactory(nodeStackPool)
 
 fun <A : Any, S : Any> createStore(
     coroutineScope: CoroutineScope,

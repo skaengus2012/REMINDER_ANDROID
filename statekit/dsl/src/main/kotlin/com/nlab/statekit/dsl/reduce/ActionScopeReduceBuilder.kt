@@ -25,14 +25,9 @@ import kotlin.reflect.KClass
  */
 @DslReduceMarker
 class ActionScopeReduceBuilder<RA : Any, RS : Any, A : Any, S : RS> internal constructor(
-    private val scope: Any
-) {
+    private val scope: Any,
     internal val delegate: ReduceBuilderDelegate = ReduceBuilderDelegate(scope)
-
-    fun transition(block: DslTransitionScope<A, S>.() -> RS) {
-        delegate.addTransitionNode(block)
-    }
-
+) : NodeReduceBuilder<RA, RS, A, S> by InternalNodeReduceBuilder(reduceBuilderDelegate = delegate) {
     fun <T : S> transition(
         stateType: KClass<T>,
         block: DslTransitionScope<A, T>.() -> RS
@@ -58,10 +53,6 @@ class ActionScopeReduceBuilder<RA : Any, RS : Any, A : Any, S : RS> internal con
         transition(stateType = T::class, block = block)
     }
 
-    fun effect(block: DslEffectScope<A, S>.() -> Unit) {
-        delegate.addEffectNode(block)
-    }
-
     fun <T : S> effect(
         stateType: KClass<T>,
         block: DslEffectScope<A, T>.() -> Unit
@@ -85,17 +76,13 @@ class ActionScopeReduceBuilder<RA : Any, RS : Any, A : Any, S : RS> internal con
         effect(stateType = T::class, block)
     }
 
-    fun suspendEffect(block: suspend DslSuspendEffectScope<RA, A, S>.() -> Unit) {
-        delegate.addSuspendEffectNode(block)
-    }
-
     fun <T : S> suspendEffect(
         stateType: KClass<T>,
         block: suspend DslSuspendEffectScope<RA, A, T>.() -> Unit
     ) {
         delegate.addPredicateScope<A, S>(
             isMatch = { stateType.isInstance(current) },
-            from = ReduceBuilderDelegate(scope).apply { addSuspendEffectNode(block) }
+            child = ReduceBuilderDelegate(scope).apply { addSuspendEffectNode(block) }
         )
     }
 
@@ -116,7 +103,7 @@ class ActionScopeReduceBuilder<RA : Any, RS : Any, A : Any, S : RS> internal con
     ) {
         delegate.addPredicateScope(
             isMatch,
-            from = ActionScopeReduceBuilder<RA, RS, A, S>(scope)
+            child = ActionScopeReduceBuilder<RA, RS, A, S>(scope)
                 .apply(block)
                 .delegate
         )
@@ -129,7 +116,7 @@ class ActionScopeReduceBuilder<RA : Any, RS : Any, A : Any, S : RS> internal con
     ) {
         delegate.addTransformSourceScope(
             transformSource,
-            from = { subScope ->
+            child = { subScope ->
                 ActionScopeReduceBuilder<RA, RS, T, U>(subScope)
                     .apply(block)
                     .delegate
@@ -143,7 +130,7 @@ class ActionScopeReduceBuilder<RA : Any, RS : Any, A : Any, S : RS> internal con
     ) {
         delegate.addPredicateScope<A, S>(
             isMatch = { actionType.isInstance(action) },
-            from = ActionScopeReduceBuilder<RA, RS, T, S>(scope)
+            child = ActionScopeReduceBuilder<RA, RS, T, S>(scope)
                 .apply(block)
                 .delegate
         )

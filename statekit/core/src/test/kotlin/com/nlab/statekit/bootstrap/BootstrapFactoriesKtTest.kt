@@ -17,24 +17,22 @@
 package com.nlab.statekit.bootstrap
 
 import com.nlab.statekit.TestAction
-import com.nlab.statekit.reduce.ActionDispatcher
+import com.nlab.statekit.dispatch.ActionDispatcher
 import com.nlab.testkit.faker.genInt
+import io.mockk.coVerify
+import io.mockk.mockk
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.unconfinedBackgroundScope
+import kotlinx.coroutines.test.backgroundUnconfinedScope
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.sameInstance
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.instanceOf
 import org.junit.Test
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.never
-import org.mockito.kotlin.once
-import org.mockito.kotlin.verify
 
 /**
  * @author Doohyun
@@ -45,18 +43,19 @@ class BootstrapFactoriesKtTest {
         val action = TestAction.genAction()
         val bootstrap = Bootstrap(action)
         val subscriptionCount = MutableStateFlow(0)
-        val actionDispatcher: ActionDispatcher<TestAction> = mock()
+        val actionDispatcher: ActionDispatcher<TestAction> = mockk(relaxed = true)
         bootstrap.fetch(
-            coroutineScope = unconfinedBackgroundScope,
+            coroutineScope = backgroundUnconfinedScope,
             actionDispatcher = actionDispatcher,
             stateSubscriptionCount = subscriptionCount
         )
+
         advanceUntilIdle()
-        verify(actionDispatcher, never()).dispatch(action)
+        coVerify(inverse = true) { actionDispatcher.dispatch(action) }
 
         subscriptionCount.update { it + 1 }
         advanceUntilIdle()
-        verify(actionDispatcher, once()).dispatch(action)
+        coVerify(exactly = 1) { actionDispatcher.dispatch(action) }
     }
 
     @Test
@@ -68,14 +67,14 @@ class BootstrapFactoriesKtTest {
     fun `Given action and none pendingBootUntilSubscribed, When fetch from with single action, Then action invoked`() = runTest {
         val action = TestAction.genAction()
         val bootstrap = Bootstrap(action, isPendingBootUntilSubscribed = false)
-        val actionDispatcher: ActionDispatcher<TestAction> = mock()
+        val actionDispatcher: ActionDispatcher<TestAction> = mockk(relaxed = true)
         bootstrap.fetch(
-            coroutineScope = unconfinedBackgroundScope,
+            coroutineScope = backgroundUnconfinedScope,
             actionDispatcher = actionDispatcher,
             stateSubscriptionCount = MutableStateFlow(0)
         )
         advanceUntilIdle()
-        verify(actionDispatcher, once()).dispatch(action)
+        coVerify(exactly = 1) { actionDispatcher.dispatch(action) }
     }
 
     @Test
@@ -93,7 +92,7 @@ class BootstrapFactoriesKtTest {
             }
         }
         bootstrap.fetch(
-            coroutineScope = unconfinedBackgroundScope,
+            coroutineScope = backgroundUnconfinedScope,
             actionDispatcher = actionDispatcher,
             stateSubscriptionCount = MutableStateFlow(0)
         )
@@ -103,26 +102,26 @@ class BootstrapFactoriesKtTest {
     }
 
     @Test
-    fun `Given 3 Bootstraps, When called combineBootstrap, Then return merge bootstrap`() {
+    fun `Given 3 Bootstraps, When called composeBootstrap, Then return merge bootstrap`() {
         val boot1 = TestBootstrap()
         val boot2 = TestBootstrap()
         val boot3 = TestBootstrap()
-        val bootstrap = combineBootstrap(boot1, boot2, boot3)
+        val bootstrap = composeBootstrap(boot1, boot2, boot3)
         assertThat(bootstrap, instanceOf(CompositeBootstrap::class))
     }
 
     @Test
-    fun `Given bootstrap list, When called combineBootstrap, Then return valid bootstrap`() {
+    fun `Given bootstrap list, When called composeBootstrap, Then return valid bootstrap`() {
         // empty case
-        assertThat(combineBootstrap<TestAction>(emptyList()), instanceOf(EmptyBootstrap::class))
+        assertThat(composeBootstrap<TestAction>(emptyList()), instanceOf(EmptyBootstrap::class))
 
         // single case
         val singleBootstrap = TestBootstrap()
-        assertThat(combineBootstrap(listOf(singleBootstrap)), sameInstance(singleBootstrap))
+        assertThat(composeBootstrap(listOf(singleBootstrap)), sameInstance(singleBootstrap))
 
         // multiple cases
         val multipleBootstraps = List(genInt(min = 2, max = 5)) { TestBootstrap() }
-        assertThat(combineBootstrap(multipleBootstraps), instanceOf(CompositeBootstrap::class))
+        assertThat(composeBootstrap(multipleBootstraps), instanceOf(CompositeBootstrap::class))
     }
 
     @Test
