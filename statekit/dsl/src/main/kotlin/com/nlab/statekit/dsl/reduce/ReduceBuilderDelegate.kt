@@ -66,10 +66,11 @@ internal class ReduceBuilderDelegate(
         )
     }
 
-    // https://github.com/jacoco/jacoco/issues/1873
-    // In Jacoco 0.8.13, inline functions are included in test scope
-    // However, the jacoco maven plugin fails to read the code, coverage is not filled.
-    // This method is used internally, it is possible to fill it with coverage.
+    // Workaround for https://github.com/jacoco/jacoco/issues/1873
+    // In Jacoco < 0.8.13, inline functions are included in test scope,
+    // but the Jacoco Maven plugin fails to read the code, so coverage is not filled.
+    // This method is used internally, so it is possible to fill it with coverage.
+    // Remove this workaround when Jacoco >= 0.8.13 is used.
     inline fun <RS : Any, A : Any, S : RS, T : Any, U : RS> addTransformSourceScope(
         noinline transformSource: UpdateSource<A, S>.() -> UpdateSource<T, U>?,
         crossinline child: (subScope: Any) -> ReduceBuilderDelegate,
