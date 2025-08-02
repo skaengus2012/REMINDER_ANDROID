@@ -19,11 +19,11 @@ package com.nlab.reminder.core.component.displayformat
 import com.nlab.reminder.core.annotation.ExcludeFromGeneratedTestReport
 import com.nlab.reminder.core.data.model.Repeat
 import com.nlab.reminder.core.data.model.ScheduleTiming
-import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Instant
 
 /**
  * @author Doohyun

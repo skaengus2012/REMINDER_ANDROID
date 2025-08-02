@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 The N's lab Open Source Project
+ * Copyright (C) 2025 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package org.mockito.kotlin
+package com.nlab.statekit.test.reduce
 
-import org.mockito.verification.VerificationMode
+import com.nlab.statekit.reduce.Reduce
 
 /**
  * @author Doohyun
  */
+typealias ReduceTestBuilder<A, S> = GivenCurrentBuilder<A, S>
 
-fun once(): VerificationMode = times(1)
+fun <A : Any, S : Any> Reduce<A, S>.test() = ReduceTestBuilder(reduce = this)

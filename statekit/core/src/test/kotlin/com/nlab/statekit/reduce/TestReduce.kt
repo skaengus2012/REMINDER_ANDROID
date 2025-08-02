@@ -22,8 +22,4 @@ import com.nlab.statekit.TestState
 /**
  * @author Thalys
  */
-@Suppress("TestFunctionName")
-fun TestReduce(
-    transition: Transition<TestAction, TestState>? = null,
-    effect: Effect<TestAction, TestState>? = null
-): Reduce<TestAction, TestState> = Reduce(transition, effect)
+typealias TestReduce = Reduce<TestAction, TestState>

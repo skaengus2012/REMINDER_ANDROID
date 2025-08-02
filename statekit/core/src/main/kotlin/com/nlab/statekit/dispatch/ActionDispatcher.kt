@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 The N's lab Open Source Project
+ * Copyright (C) 2025 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,11 @@
  * limitations under the License.
  */
 
-package com.nlab.statekit.test.reduce
-
-import com.nlab.statekit.reduce.Reduce
+package com.nlab.statekit.dispatch
 
 /**
  * @author Doohyun
  */
-fun <A : Any, S : Any> Reduce<A, S>.transitionScenario() = TransitionScenarioInitSetup(this)
-
-fun <A : Any, S : Any> Reduce<A, S>.effectScenario() = EffectScenarioInitSetup(this)
+interface ActionDispatcher<in A : Any> {
+    suspend fun dispatch(action: A)
+}

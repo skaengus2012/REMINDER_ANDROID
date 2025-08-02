@@ -21,5 +21,5 @@ package com.nlab.statekit.test.reduce
  */
 class ScenarioInput<A : Any, S : Any> internal constructor(
     val action: A,
-    val initState: S
+    val current: S
 )

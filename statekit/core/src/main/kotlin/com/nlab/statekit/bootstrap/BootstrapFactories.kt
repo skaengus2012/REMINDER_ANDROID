@@ -16,7 +16,6 @@
 
 package com.nlab.statekit.bootstrap
 
-import com.nlab.statekit.internal.merge
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 
@@ -37,7 +36,7 @@ fun <A : Any> EmptyBootstrap(): Bootstrap<A> = EmptyBootstrap
 fun <A : Any> Flow<A>.collectAsBootstrap(started: DeliveryStarted): Bootstrap<A> =
     FlowBootstrap(actionStream = this, started = started)
 
-fun <A : Any> combineBootstrap(
+fun <A : Any> composeBootstrap(
     first: Bootstrap<A>,
     second: Bootstrap<A>,
     vararg etc: Bootstrap<A>
@@ -49,9 +48,11 @@ fun <A : Any> combineBootstrap(
     }
 )
 
-fun <A : Any> combineBootstrap(
-    bootstraps: List<Bootstrap<A>>
-): Bootstrap<A> = bootstraps.merge(::CompositeBootstrap) ?: EmptyBootstrap()
+fun <A : Any> composeBootstrap(bootstraps: List<Bootstrap<A>>): Bootstrap<A> {
+    if (bootstraps.isEmpty()) return EmptyBootstrap()
+    if (bootstraps.size == 1) return bootstraps.first()
+    return CompositeBootstrap(head = bootstraps.first(), tails = bootstraps.drop(1))
+}
 
 operator fun <A : Any> Bootstrap<A>.plus(other: Bootstrap<A>): Bootstrap<A> =
-    combineBootstrap(first = this, second = other)
+    composeBootstrap(first = this, second = other)

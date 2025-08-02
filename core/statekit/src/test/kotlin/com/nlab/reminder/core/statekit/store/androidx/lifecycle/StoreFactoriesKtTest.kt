@@ -22,17 +22,14 @@ import com.nlab.reminder.core.statekit.TestState
 import com.nlab.reminder.core.statekit.plugins.StateKitPlugin
 import com.nlab.statekit.dsl.reduce.DslReduce
 import com.nlab.statekit.store.createStore
+import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.plus
-
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.unconfinedBackgroundScope
+import kotlinx.coroutines.test.backgroundUnconfinedScope
 import org.junit.Test
-import org.mockito.kotlin.any
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.once
-import org.mockito.kotlin.verify
 import kotlin.coroutines.CoroutineContext
 
 /**
@@ -60,23 +57,27 @@ class StoreFactoriesKtTest {
                 }
             )
             store.dispatch(TestAction).join()
-            mockExceptionHandlers.forEach { verify(it, once()).invoke(any(), any()) }
+            mockExceptionHandlers.forEach { exceptionHandler ->
+                verify(exactly = 1) {
+                    exceptionHandler.invoke(any(), any())
+                }
+            }
             globalExceptionHandlers = emptyList()
         }
 
-        testOnlyGlobalExceptionHandle(mock())
-        testOnlyGlobalExceptionHandle(mock(), mock())
+        testOnlyGlobalExceptionHandle(mockk(relaxed = true))
+        testOnlyGlobalExceptionHandle(mockk(relaxed = true), mockk(relaxed = true))
     }
 
     @Test
     fun `Given global exception Handlers and local handler, When occur exception in reduce, Then all error handlers occurred`() = runTest {
-        val firstGlobalHandler: (CoroutineContext, Throwable) -> Unit = mock()
-        val secondGlobalHandler: (CoroutineContext, Throwable) -> Unit = mock()
-        val localHandler: (CoroutineContext, Throwable) -> Unit = mock()
+        val firstGlobalHandler: (CoroutineContext, Throwable) -> Unit = mockk(relaxed = true)
+        val secondGlobalHandler: (CoroutineContext, Throwable) -> Unit = mockk(relaxed = true)
+        val localHandler: (CoroutineContext, Throwable) -> Unit = mockk(relaxed = true)
         StateKitPlugin.addGlobalExceptionHandler(firstGlobalHandler)
         StateKitPlugin.addGlobalExceptionHandler(secondGlobalHandler)
 
-        val baseCoroutineScope = unconfinedBackgroundScope + SupervisorJob() + CoroutineExceptionHandler(localHandler)
+        val baseCoroutineScope = backgroundUnconfinedScope + SupervisorJob() + CoroutineExceptionHandler(localHandler)
         val store = createStore<TestAction, TestState>(
             coroutineScope = baseCoroutineScope.toStoreMaterialScope(),
             initState = TestState,
@@ -85,10 +86,15 @@ class StoreFactoriesKtTest {
             }
         )
         store.dispatch(TestAction).join()
-        verify(firstGlobalHandler, once()).invoke(any(), any())
-        verify(secondGlobalHandler, once()).invoke(any(), any())
-        verify(localHandler, once()).invoke(any(), any())
-
+        verify(exactly = 1) {
+            firstGlobalHandler.invoke(any(), any())
+        }
+        verify(exactly = 1) {
+            secondGlobalHandler.invoke(any(), any())
+        }
+        verify(exactly = 1) {
+            localHandler.invoke(any(), any())
+        }
         globalExceptionHandlers = emptyList()
     }
 }

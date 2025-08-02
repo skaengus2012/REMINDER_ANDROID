@@ -16,10 +16,10 @@
 
 package com.nlab.statekit.dsl.reduce
 
-import com.nlab.statekit.reduce.Accumulator
+import com.nlab.statekit.reduce.NodeStack
 import com.nlab.statekit.reduce.Effect
+import com.nlab.statekit.reduce.ThrowableCollector
 import com.nlab.statekit.reduce.use
-import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -41,12 +41,9 @@ internal sealed interface DslEffect {
 
     class Composite(
         override val scope: Any,
-        val effects: List<DslEffect>
-    ) : DslEffect {
-        init {
-            check(effects.size >= 2)
-        }
-    }
+        val head: DslEffect,
+        val tails: List<DslEffect>
+    ) : DslEffect
 
     class PredicateScope<out A : Any, out S : Any>(
         override val scope: Any,
@@ -64,21 +61,20 @@ internal sealed interface DslEffect {
 
 internal fun <A : Any, S : Any> effectOf(
     dslEffect: DslEffect
-): Effect<A, S> = Effect.LifecycleNode { action, current, actionDispatcher, accPool, coroutineScope ->
-    accPool.use { accEffect: Accumulator<DslEffect> ->
-        accPool.use { accScope: Accumulator<Any> ->
-            accPool.use { accDslEffectScope: Accumulator<DslSuspendEffectScope<A, Any, Any>> ->
+): Effect<A, S> = Effect.LifecycleNode { action, current, context, actionDispatcher ->
+    val nodeStackPool = context.nodeStackPool
+    nodeStackPool.use { accEffect: NodeStack<DslEffect> ->
+        nodeStackPool.use { accScope: NodeStack<Any> ->
+            nodeStackPool.use { accDslEffectScope: NodeStack<DslSuspendEffectScope<A, Any, Any>> ->
                 launch(
                     node = dslEffect,
                     scope = dslEffect.scope,
-                    dslEffectScope = DslSuspendEffectScope(
-                        UpdateSource(action, current),
-                        actionDispatcher
-                    ),
+                    dslEffectScope = DslSuspendEffectScope(UpdateSource(action, current), actionDispatcher),
                     accEffect = accEffect,
                     accScope = accScope,
                     accDslEffectScope = accDslEffectScope,
-                    coroutineScope = coroutineScope
+                    coroutineScope = context.coroutineScope,
+                    throwableCollector = context.throwableCollector
                 )
             }
         }
@@ -89,22 +85,24 @@ private tailrec fun <A : Any> launch(
     node: DslEffect?,
     scope: Any,
     dslEffectScope: DslSuspendEffectScope<A, Any, Any>,
-    accEffect: Accumulator<DslEffect>,
-    accScope: Accumulator<Any>,
-    accDslEffectScope: Accumulator<DslSuspendEffectScope<A, Any, Any>>,
-    coroutineScope: CoroutineScope
+    accEffect: NodeStack<DslEffect>,
+    accScope: NodeStack<Any>,
+    accDslEffectScope: NodeStack<DslSuspendEffectScope<A, Any, Any>>,
+    coroutineScope: CoroutineScope,
+    throwableCollector: ThrowableCollector
 ) {
     if (node == null) return
 
     if (scope !== node.scope) {
         launch(
-            node,
-            accScope.removeLast(),
-            accDslEffectScope.removeLast(),
-            accEffect,
-            accScope,
-            accDslEffectScope,
-            coroutineScope
+            node = node,
+            scope = accScope.removeLast(),
+            dslEffectScope = accDslEffectScope.removeLast(),
+            accEffect = accEffect,
+            accScope = accScope,
+            accDslEffectScope = accDslEffectScope,
+            coroutineScope = coroutineScope,
+            throwableCollector = throwableCollector
         )
         return
     }
@@ -115,9 +113,9 @@ private tailrec fun <A : Any> launch(
     when (node) {
         is DslEffect.Node<*, *> -> {
             try {
-                (node as DslEffect.Node<Any, Any>).invoke(dslEffectScope)
+                node.invoke(dslEffectScope)
             } catch (t: Throwable) {
-                coroutineScope.handleThrowable(t)
+                throwableCollector.collect(t)
             }
 
             nextNode = accEffect.removeLastOrNull()
@@ -131,25 +129,27 @@ private tailrec fun <A : Any> launch(
                     @Suppress("UNCHECKED_CAST")
                     (node as DslEffect.SuspendNode<A, Any, Any>).invoke(dslEffectScope)
                 } catch (t: Throwable) {
-                    coroutineScope.handleThrowable(t)
+                    throwableCollector.collect(t)
                 }
             }
             nextNode = accEffect.removeLastOrNull()
             nextScope = scope
             nextDslEffectScope = dslEffectScope
         }
+
         is DslEffect.Composite -> {
-            val childEffects = node.effects
-            accEffect.addAllReversedWithoutHead(childEffects)
-            nextNode = childEffects.first()
+            accEffect.addAllReversed(node.tails)
+            nextNode = node.head
             nextScope = scope
             nextDslEffectScope = dslEffectScope
         }
+
         is DslEffect.PredicateScope<Any, Any> -> {
             nextNode = if (node.isMatch(dslEffectScope)) node.effect else accEffect.removeLastOrNull()
             nextScope = scope
             nextDslEffectScope = dslEffectScope
         }
+
         is DslEffect.TransformSourceScope<Any, Any, Any, Any> -> {
             val newSource = node.transformSource(dslEffectScope)
             if (newSource == null) {
@@ -170,15 +170,10 @@ private tailrec fun <A : Any> launch(
         node = nextNode,
         scope = nextScope,
         dslEffectScope = nextDslEffectScope,
-        accEffect,
-        accScope.apply { add(scope) },
-        accDslEffectScope.apply { add(dslEffectScope) },
-        coroutineScope
+        accEffect = accEffect,
+        accScope = accScope.apply { add(scope) },
+        accDslEffectScope = accDslEffectScope.apply { add(dslEffectScope) },
+        coroutineScope = coroutineScope,
+        throwableCollector = throwableCollector
     )
-}
-
-private fun CoroutineScope.handleThrowable(throwable: Throwable) {
-    val exceptionHandler = coroutineContext[CoroutineExceptionHandler]
-    if (exceptionHandler == null) throw throwable
-    else exceptionHandler.handleException(coroutineContext, throwable)
 }

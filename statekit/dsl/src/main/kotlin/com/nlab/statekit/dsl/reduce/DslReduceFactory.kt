@@ -22,11 +22,9 @@ import com.nlab.statekit.reduce.Reduce
  */
 typealias RootScopeReduceBuilder<A, S> = ScopeReduceBuilder<A, S, A, S>
 
-private const val DefaultScopeReduceScope = "RootScope"
-
 @Suppress("FunctionName")
 fun <A : Any, S : Any> DslReduce(defineDSL: RootScopeReduceBuilder<A, S>.() -> Unit): Reduce<A, S> =
-    RootScopeReduceBuilder<A, S>(scope = DefaultScopeReduceScope)
+    RootScopeReduceBuilder<A, S>(scope = Any())
         .apply(defineDSL)
         .let(::dslReduceOf)
 

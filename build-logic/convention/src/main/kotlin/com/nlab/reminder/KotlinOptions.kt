@@ -95,6 +95,7 @@ private inline fun <reified T : KotlinBaseExtension> Project.configureKotlin(
             "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
             "-opt-in=kotlinx.coroutines.FlowPreview",
             "-opt-in=kotlin.Experimental",
+            "-opt-in=kotlin.time.ExperimentalTime",
             "-opt-in=kotlin.concurrent.atomics.ExperimentalAtomicApi",
             /**
              * Remove this args after Phase 3.
@@ -107,7 +108,8 @@ private inline fun <reified T : KotlinBaseExtension> Project.configureKotlin(
              * The binary signature changes. The error on the declaration is no longer reported.
              * '-Xconsistent-data-class-copy-visibility' compiler flag and ConsistentCopyVisibility annotation are now unnecessary.
              */
-            "-Xconsistent-data-class-copy-visibility"
+            "-Xconsistent-data-class-copy-visibility",
+            "-Xcontext-parameters"
         )
         block()
     }

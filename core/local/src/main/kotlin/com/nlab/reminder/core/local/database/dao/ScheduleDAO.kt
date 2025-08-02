@@ -28,7 +28,7 @@ import com.nlab.reminder.core.kotlin.PositiveInt
 import com.nlab.reminder.core.local.database.entity.ScheduleEntity
 import com.nlab.reminder.core.local.database.entity.EMPTY_GENERATED_ID
 import com.nlab.reminder.core.local.database.entity.RepeatType
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 /**
  * @author Doohyun

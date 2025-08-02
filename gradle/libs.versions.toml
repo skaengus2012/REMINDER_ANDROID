@@ -6,11 +6,11 @@ targetSdk = "35"
 minSdk = "24"
 
 # library version
-androidGradlePlugin = "8.10.1"
+androidGradlePlugin = "8.12.0"
 androidxAnnotation = "1.9.1"
 androidxAppCompat = "1.7.1"
 androidxCardview = "1.0.0"
-androidxComposeBom = "2025.06.00"
+androidxComposeBom = "2025.07.00"
 androidxComposeCompiler = "1.5.15"  # use in configureComposeAndroid AndroidCompose.kt
 androidxConstaintLayout = "2.2.1"
 androidxCoreKtx = "1.16.0"
@@ -18,10 +18,10 @@ androidxCoreSplashScreen = "1.0.1"
 androidxDataStore = "1.1.7"
 androidxFragment = "1.8.8"
 androidxHiltNavigationCompose = "1.2.0"
-androidxLifecycle = "2.9.1"
-androidxNavigation = "2.9.0"
+androidxLifecycle = "2.9.2"
+androidxNavigation = "2.9.2"
 androidxRecyclerView = "1.4.0"
-androidxRoom = "2.7.1"
+androidxRoom = "2.7.2"
 androidxStartUp = "1.2.0"
 androidxTestEspresso = "3.6.1"
 androidxTestJunit = "1.2.1"
@@ -30,27 +30,24 @@ androidxTransition = "1.6.0"
 appCashTurbine = "1.2.0"
 coil = "2.7.0"
 desugarJdklibs = "2.1.5"
-googleHilt = "2.56.2"
+googleHilt = "2.57"
 googleMaterial = "1.12.0"
 googlePlayServicesTime = "16.0.1"
-jacoco = "0.8.12" # use in configureJacocoToolVersion -> Jacoco.kt
+jacoco = "0.8.13" # use in configureJacocoToolVersion -> Jacoco.kt
 javafaker = "1.0.2"
-jsoup = "1.20.1"
+jsoup = "1.21.1"
 junit = "4.13.2"
 kotlin = "2.1.21"
-kotlinxDatetime = "0.6.2"
-kotlinxSerializationJson = "1.8.1"
+kotlinxDatetime = "0.7.1"
+kotlinxSerializationJson = "1.9.0"
 ksp = "2.1.21-2.0.2"
-kotlinxCollectionsImmutable = "0.3.7"
+kotlinxCollectionsImmutable = "0.4.0"
 kotlinxCoroutine = "1.10.2"
-mockitoInline = "5.2.0"
-mockitoKotlin = "5.4.0"
-mockk = "1.14.2"
+mockk = "1.14.5"
 squareLeakcanary = "2.14"
 squareKotlinpoet = "2.2.0"
 timber = "5.0.1"
 turbine = "1.2.1"
-
 
 [libraries]
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose" }
@@ -99,8 +96,6 @@ kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-c
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutine" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
-mockito-inline = { module = "org.mockito:mockito-inline", version.ref = "mockitoInline" }
-mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockitoKotlin" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 squeare-leakcanary = { module = "com.squareup.leakcanary:leakcanary-android", version.ref = "squareLeakcanary" }
 squeare-kotlinpoet = { module = "com.squareup:kotlinpoet", version.ref = "squareKotlinpoet" }

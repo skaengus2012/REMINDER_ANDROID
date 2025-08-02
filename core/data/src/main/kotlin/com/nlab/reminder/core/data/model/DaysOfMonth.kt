@@ -19,6 +19,7 @@ package com.nlab.reminder.core.data.model
 /**
  * @author Thalys
  */
+// TODO consider rename to `Days`, and current Days changed to something.
 @RepeatDetailOption
 enum class DaysOfMonth {
     DAY_1,

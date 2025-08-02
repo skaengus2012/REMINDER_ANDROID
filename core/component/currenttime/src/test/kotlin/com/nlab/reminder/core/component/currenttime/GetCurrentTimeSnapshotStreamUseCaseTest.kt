@@ -27,10 +27,10 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.unconfinedTestDispatcher
-import kotlinx.datetime.Clock
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
+import kotlin.time.Clock
 
 /**
  * @author Doohyun

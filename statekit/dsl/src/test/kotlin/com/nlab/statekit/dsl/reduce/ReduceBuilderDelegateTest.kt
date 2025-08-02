@@ -16,141 +16,172 @@
 
 package com.nlab.statekit.dsl.reduce
 
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
 import org.hamcrest.CoreMatchers.sameInstance
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
-import org.mockito.kotlin.any
-import org.mockito.kotlin.doReturn
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.never
-import org.mockito.kotlin.once
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
-
 
 /**
  * @author Doohyun
  */
 class ReduceBuilderDelegateTest {
     @Test
-    fun `Given transition builder, When build transition, Then return dsl transition from transition builder`() {
-        val dslTransition = TestDslTransition()
-        val transitionBuilder: DslTransitionBuilder = mock {
-            whenever(mock.build()) doReturn dslTransition
+    fun `Given transition builder, When build transition, Then return correct transition from builder`() {
+        val expectedTransition: TestDslTransitionNode = mockk()
+        val transitionBuilder: DslTransitionBuilder = mockk {
+            every { build() } returns expectedTransition
         }
-        val delegate = ReduceBuilderDelegate(transitionBuilder = transitionBuilder, effectBuilder = mock())
-        assertThat(delegate.buildTransition(), sameInstance(dslTransition))
+        val delegate = ReduceBuilderDelegate(transitionBuilder = transitionBuilder, effectBuilder = mockk())
+        val actualTransition = delegate.buildTransition()
+
+        assertThat(actualTransition, sameInstance(expectedTransition))
     }
 
     @Test
     fun `Given effect builder, When build effect, Then return dsl effect from effect builder`() {
-        val dslEffect = TestDslEffect()
-        val effectBuilder: DslEffectBuilder = mock {
-            whenever(mock.build()) doReturn dslEffect
+        val expectedEffect: TestDslEffectNode = mockk()
+        val effectBuilder: DslEffectBuilder = mockk {
+            every { build() } returns expectedEffect
         }
-        val delegate = ReduceBuilderDelegate(transitionBuilder = mock(), effectBuilder = effectBuilder)
-        assertThat(delegate.buildEffect(), sameInstance(dslEffect))
+        val delegate = ReduceBuilderDelegate(transitionBuilder = mockk(), effectBuilder = effectBuilder)
+        val actualEffect = delegate.buildEffect()
+
+        assertThat(actualEffect, sameInstance(expectedEffect))
     }
 
     @Test
-    fun `Given transition builder and block, When add transition node, Then block added to transition builder`() {
+    fun `Given transition block, When add transition node, Then block added to transition builder`() {
         val block = { scope: TestDslTransitionScope -> scope.current }
-        val transitionBuilder: DslTransitionBuilder = mock()
-        val delegate = ReduceBuilderDelegate(transitionBuilder = transitionBuilder, effectBuilder = mock())
-
+        val transitionBuilder: DslTransitionBuilder = mockk(relaxed = true)
+        val delegate = ReduceBuilderDelegate(transitionBuilder = transitionBuilder, effectBuilder = mockk())
         delegate.addTransitionNode(block)
-        verify(transitionBuilder, once()).addNode(block)
+        verify(exactly = 1) {
+            transitionBuilder.addNode(block)
+        }
     }
 
     @Test
-    fun `Given effect builder and block, When add effect node, Then block added to effect builder`() {
-        val block: (TestDslEffectScope) -> Unit = {}
-        val effectBuilder: DslEffectBuilder = mock()
-        val delegate = ReduceBuilderDelegate(transitionBuilder = mock(), effectBuilder = effectBuilder)
-
+    fun `Given effect block, When add effect node, Then block added to effect builder`() {
+        val block = { scope: TestDslEffectScope -> }
+        val effectBuilder: DslEffectBuilder = mockk(relaxed = true)
+        val delegate = ReduceBuilderDelegate(transitionBuilder = mockk(), effectBuilder = effectBuilder)
         delegate.addEffectNode(block)
-        verify(effectBuilder, once()).addNode(block)
+        verify(exactly = 1) {
+            effectBuilder.addNode(block)
+        }
     }
 
     @Test
-    fun `Given suspend effect builder and block, When add suspend effect node, Then block added to effect builder`() {
+    fun `Given suspend effect block, When add suspend effect node, Then block added to effect builder`() {
         val block: suspend (TestDslSuspendEffectScope) -> Unit = {}
-        val effectBuilder: DslEffectBuilder = mock()
-        val delegate = ReduceBuilderDelegate(transitionBuilder = mock(), effectBuilder = effectBuilder)
-
+        val effectBuilder: DslEffectBuilder = mockk(relaxed = true)
+        val delegate = ReduceBuilderDelegate(transitionBuilder = mockk(), effectBuilder = effectBuilder)
         delegate.addSuspendEffectNode(block)
-        verify(effectBuilder, once()).addSuspendNode(block)
+        verify(exactly = 1) {
+            effectBuilder.addSuspendNode(block)
+        }
     }
 
     @Test
-    fun `Given transition, effect, delegate that return transition and effect, transition builder and effect builder, When add scope, Then transition, builder added to builder`() {
-        val dslTransition = TestDslTransition()
-        val dslEffect = TestDslEffect()
-        val from: ReduceBuilderDelegate = mock {
-            whenever(mock.buildTransition()) doReturn dslTransition
-            whenever(mock.buildEffect()) doReturn dslEffect
+    fun `Given delegate already set up, When add scope, Then delegate properties added to builders`() {
+        val expectedTransition: TestDslTransitionNode = mockk()
+        val expectedEffect: TestDslEffectNode = mockk()
+        val childDelegate: ReduceBuilderDelegate = mockk {
+            every { buildTransition() } returns expectedTransition
+            every { buildEffect() } returns expectedEffect
         }
-        val transitionBuilder: DslTransitionBuilder = mock()
-        val effectBuilder: DslEffectBuilder = mock()
-        val delegate = ReduceBuilderDelegate(transitionBuilder, effectBuilder)
-        delegate.addScope(from)
 
-        verify(transitionBuilder, once()).addTransition(dslTransition)
-        verify(effectBuilder, once()).addEffect(dslEffect)
+        val transitionBuilder: DslTransitionBuilder = mockk(relaxed = true)
+        val effectBuilder: DslEffectBuilder = mockk(relaxed = true)
+        val delegate = ReduceBuilderDelegate(transitionBuilder = transitionBuilder, effectBuilder = effectBuilder)
+        delegate.addScope(childDelegate)
+
+        verify(exactly = 1) {
+            transitionBuilder.addTransition(expectedTransition)
+        }
+        verify(exactly = 1) {
+            effectBuilder.addEffect(expectedEffect)
+        }
     }
 
     @Test
-    fun `Given delegate that return null transition and effect transition builder and effect builder, When add scope, Then builders never called`() {
-        val from: ReduceBuilderDelegate = mock {
-            whenever(mock.buildTransition()) doReturn null
-            whenever(mock.buildEffect()) doReturn null
+    fun `Given empty delegate, When add scope, Then builders never added anything`() {
+        val childDelegate: ReduceBuilderDelegate = mockk {
+            every { buildTransition() } returns null
+            every { buildEffect() } returns null
         }
-        val transitionBuilder: DslTransitionBuilder = mock()
-        val effectBuilder: DslEffectBuilder = mock()
-        val delegate = ReduceBuilderDelegate(transitionBuilder, effectBuilder)
-        delegate.addScope(from)
 
-        verify(transitionBuilder, never()).addTransition(any())
-        verify(effectBuilder, never()).addEffect(any())
+        val transitionBuilder: DslTransitionBuilder = mockk(relaxed = true)
+        val effectBuilder: DslEffectBuilder = mockk(relaxed = true)
+        val delegate = ReduceBuilderDelegate(transitionBuilder = transitionBuilder, effectBuilder = effectBuilder)
+        delegate.addScope(childDelegate)
+
+        verify(inverse = true) {
+            transitionBuilder.addTransition(any())
+        }
+        verify(inverse = true) {
+            effectBuilder.addEffect(any())
+        }
     }
 
     @Test
-    fun `Given transition, effect, delegate that return transition and effect, predicate, transition builder and effect builder, When add predicate scope, Then transition, builder added to builder`() {
-        val dslTransition = TestDslTransition()
-        val dslEffect = TestDslEffect()
-        val from: ReduceBuilderDelegate = mock {
-            whenever(mock.buildTransition()) doReturn dslTransition
-            whenever(mock.buildEffect()) doReturn dslEffect
+    fun `Given delegate and predicate, When add predicate scope, Then builders add as predicateScope`() {
+        val expectedTransition: TestDslTransitionNode = mockk()
+        val expectedEffect: TestDslEffectNode = mockk()
+        val childDelegate: ReduceBuilderDelegate = mockk {
+            every { buildTransition() } returns expectedTransition
+            every { buildEffect() } returns expectedEffect
         }
-        val predicate = { _: TestUpdateSource -> false }
-        val transitionBuilder: DslTransitionBuilder = mock()
-        val effectBuilder: DslEffectBuilder = mock()
-        val delegate = ReduceBuilderDelegate(transitionBuilder, effectBuilder)
-        delegate.addPredicateScope(isMatch = predicate, from = from)
+        val predicate: (TestUpdateSource) -> Boolean = mockk()
 
-        verify(transitionBuilder, once()).addPredicateScope(predicate, dslTransition)
-        verify(effectBuilder, once()).addPredicateScope(predicate, dslEffect)
+        val transitionBuilder: DslTransitionBuilder = mockk(relaxed = true)
+        val effectBuilder: DslEffectBuilder = mockk(relaxed = true)
+        val delegate = ReduceBuilderDelegate(transitionBuilder = transitionBuilder, effectBuilder = effectBuilder)
+        delegate.addPredicateScope(isMatch = predicate, child = childDelegate)
+
+        verify(exactly = 1) {
+            transitionBuilder.addPredicateScope(isMatch = predicate, transition = expectedTransition)
+        }
+        verify(exactly = 1) {
+            effectBuilder.addPredicateScope(isMatch = predicate, effect = expectedEffect)
+        }
     }
 
     @Test
-    fun `Given transition, effect, delegate that return transition and effect, transform source function, transition builder and effect builder, When add transform scope, Then transition, builder added to builder`() {
-        val dslTransition = TestDslTransition()
-        val dslEffect = TestDslEffect()
-        val from: ReduceBuilderDelegate = mock {
-            whenever(mock.buildTransition()) doReturn dslTransition
-            whenever(mock.buildEffect()) doReturn dslEffect
+    fun `Given delegate and transformer, When add transform scope, Then builders add as transformSourceScope`() {
+        val expectedTransition: TestDslTransitionNode = mockk()
+        val expectedEffect: TestDslEffectNode = mockk()
+        val childDelegate: ReduceBuilderDelegate = mockk {
+            every { buildTransition() } returns expectedTransition
+            every { buildEffect() } returns expectedEffect
         }
-        val transformSource: (TestUpdateSource) -> TestUpdateSource = { it }
-        val transitionBuilder: DslTransitionBuilder = mock()
-        val effectBuilder: DslEffectBuilder = mock()
-        val delegate = ReduceBuilderDelegate(transitionBuilder, effectBuilder)
-        lateinit var subScope: Any
-        delegate.addTransformSourceScope(transformSource) {
-            subScope = it
-            from
-        }
+        val transformer: (TestUpdateSource) -> TestUpdateSource = mockk()
 
-        verify(transitionBuilder, once()).addTransformSourceScope(subScope, transformSource, dslTransition)
-        verify(effectBuilder, once()).addTransformSourceScope(subScope, transformSource, dslEffect)
+        val transitionBuilder: DslTransitionBuilder = mockk(relaxed = true)
+        val effectBuilder: DslEffectBuilder = mockk(relaxed = true)
+        val delegate = ReduceBuilderDelegate(transitionBuilder = transitionBuilder, effectBuilder = effectBuilder)
+
+        lateinit var generatedSubScope: Any
+        delegate.addTransformSourceScope(transformSource = transformer, child = { subScope ->
+            generatedSubScope = subScope
+            childDelegate
+        })
+
+        verify(exactly = 1) {
+            transitionBuilder.addTransformSourceScope(
+                subScope = generatedSubScope,
+                transformSource = transformer,
+                transition = expectedTransition
+            )
+        }
+        verify(exactly = 1) {
+            effectBuilder.addTransformSourceScope(
+                subScope = generatedSubScope,
+                transformSource = transformer,
+                effect = expectedEffect
+            )
+        }
     }
 }

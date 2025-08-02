@@ -20,13 +20,12 @@ import com.nlab.reminder.core.statekit.TestAction
 import com.nlab.reminder.core.statekit.TestState
 import com.nlab.statekit.dsl.reduce.DslReduce
 import com.nlab.statekit.store.Store
+import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.once
-import org.mockito.kotlin.verify
 
 /**
  * @author Doohyun
@@ -44,7 +43,7 @@ class StoreViewModelTest {
     @Test
     fun `Given action and reduce with effect, When dispatch, Then effect occurred`() = runTest {
         val action = TestAction
-        val runner: () -> Unit = mock()
+        val runner: () -> Unit = mockk(relaxed = true)
         val reduce = DslReduce<TestAction, TestState> {
             effect { runner.invoke() }
         }
@@ -55,6 +54,8 @@ class StoreViewModelTest {
             )
         }
         viewModel.dispatch(action).join()
-        verify(runner, once()).invoke()
+        verify(exactly = 1) {
+            runner.invoke()
+        }
     }
 }

@@ -16,8 +16,6 @@
 
 package com.nlab.statekit.dsl.reduce
 
-import com.nlab.statekit.dsl.internal.ExcludeFromGeneratedTestReport
-
 /**
  * @author Doohyun
  */
@@ -40,22 +38,18 @@ internal class ReduceBuilderDelegate(
         effectBuilder.addSuspendNode(block)
     }
 
-    // Test OK @see {com.nlab.statekit.dsl.reduce.ReduceBuilderDelegateTest}
-    // TODO remove Generated annotation after deploy below issue
-    // https://github.com/jacoco/jacoco/pull/1670
-    @ExcludeFromGeneratedTestReport
     private inline fun addScopeInternal(
-        from: ReduceBuilderDelegate,
+        child: ReduceBuilderDelegate,
         addTransition: (DslTransition) -> Unit,
         addEffect: (DslEffect) -> Unit
     ) {
-        from.buildTransition()?.let(addTransition)
-        from.buildEffect()?.let(addEffect)
+        child.buildTransition()?.let(addTransition)
+        child.buildEffect()?.let(addEffect)
     }
 
-    fun addScope(from: ReduceBuilderDelegate) {
+    fun addScope(child: ReduceBuilderDelegate) {
         addScopeInternal(
-            from,
+            child,
             addTransition = transitionBuilder::addTransition,
             addEffect = effectBuilder::addEffect
         )
@@ -63,33 +57,34 @@ internal class ReduceBuilderDelegate(
 
     fun <A : Any, S : Any> addPredicateScope(
         isMatch: UpdateSource<A, S>.() -> Boolean,
-        from: ReduceBuilderDelegate
+        child: ReduceBuilderDelegate
     ) {
         addScopeInternal(
-            from,
-            addTransition = { transitionBuilder.addPredicateScope(isMatch, it) },
-            addEffect = { effectBuilder.addPredicateScope(isMatch, it) }
+            child,
+            addTransition = { transitionBuilder.addPredicateScope(isMatch, transition = it) },
+            addEffect = { effectBuilder.addPredicateScope(isMatch, effect = it) }
         )
     }
 
-    // Test OK @see {com.nlab.statekit.dsl.reduce.ReduceBuilderDelegateTest}
-    // TODO remove Generated annotation after deploy below issue
-    // https://github.com/jacoco/jacoco/pull/1670
-    @ExcludeFromGeneratedTestReport
+    // Workaround for https://github.com/jacoco/jacoco/issues/1873
+    // In Jacoco < 0.8.13, inline functions are included in test scope,
+    // but the Jacoco Maven plugin fails to read the code, so coverage is not filled.
+    // This method is used internally, so it is possible to fill it with coverage.
+    // Remove this workaround when Jacoco >= 0.8.13 is used.
     inline fun <RS : Any, A : Any, S : RS, T : Any, U : RS> addTransformSourceScope(
         noinline transformSource: UpdateSource<A, S>.() -> UpdateSource<T, U>?,
-        crossinline from: (subScope: Any) -> ReduceBuilderDelegate,
+        crossinline child: (subScope: Any) -> ReduceBuilderDelegate,
     ) {
         val subScope = Any()
         addScopeInternal(
-            from(subScope),
-            addTransition = { transitionBuilder.addTransformSourceScope(subScope, transformSource, it) },
-            addEffect = { effectBuilder.addTransformSourceScope(subScope, transformSource, it) }
+            child = child(subScope),
+            addTransition = { transitionBuilder.addTransformSourceScope(subScope, transformSource, transition = it) },
+            addEffect = { effectBuilder.addTransformSourceScope(subScope, transformSource, effect = it) }
         )
     }
 }
 
 internal fun ReduceBuilderDelegate(scope: Any) = ReduceBuilderDelegate(
-    DslTransitionBuilder(scope),
-    DslEffectBuilder(scope)
+    transitionBuilder = DslTransitionBuilder(scope),
+    effectBuilder = DslEffectBuilder(scope)
 )

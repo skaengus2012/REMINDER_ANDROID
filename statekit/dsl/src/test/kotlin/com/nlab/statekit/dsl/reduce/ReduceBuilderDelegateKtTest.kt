@@ -16,6 +16,7 @@
 
 package com.nlab.statekit.dsl.reduce
 
+import com.nlab.testkit.faker.genBothify
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
@@ -25,8 +26,8 @@ import org.junit.Test
  */
 class ReduceBuilderDelegateKtTest {
     @Test
-    fun `Given scope, When build transition and effect from create reduceBuilderDelegate with scope, Then return transition and effect with scope`() {
-        val scope = "1"
+    fun `Given scope, When build from delegate with scope, Then transition, effect has a scope`() {
+        val scope = genBothify()
         val delegate = ReduceBuilderDelegate(scope)
         delegate.addTransitionNode { dslTransitionScope: TestDslTransitionScope -> dslTransitionScope.current }
         delegate.addSuspendEffectNode { _: TestDslSuspendEffectScope -> }
