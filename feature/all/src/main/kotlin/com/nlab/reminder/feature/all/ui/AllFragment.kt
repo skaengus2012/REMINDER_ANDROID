@@ -75,8 +75,8 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlinx.datetime.Clock
 import kotlin.math.absoluteValue
+import kotlin.time.Clock
 
 /**
  * @author Doohyun
