@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 The N's lab Open Source Project
+ * Copyright (C) 2025 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,35 +18,34 @@ package com.nlab.reminder.core.statekit.store.androidx.lifecycle
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nlab.statekit.bootstrap.Bootstrap
-import com.nlab.statekit.bootstrap.EmptyBootstrap
-import com.nlab.statekit.reduce.EmptyReduce
-import com.nlab.statekit.reduce.Reduce
-import com.nlab.statekit.store.Store
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.plus
 import kotlin.coroutines.CoroutineContext
-import com.nlab.statekit.store.createStore as createStoreOrigin
 
 /**
  * @author Doohyun
  */
 internal var globalExceptionHandlers: List<CoroutineExceptionHandler> = emptyList()
 
-fun <A : Any, S : Any> ViewModel.createStore(
-    initState: S,
-    reduce: Reduce<A, S> = EmptyReduce(),
-    bootstrap: Bootstrap<A> = EmptyBootstrap()
-): Store<A, S> = createStoreOrigin(
-    coroutineScope = viewModelScope.toStoreMaterialScope(),
-    initState = initState,
-    reduce = reduce,
-    bootstrap = bootstrap
+class RetainedScope internal constructor(
+    val coroutineScope: CoroutineScope
 )
 
-fun CoroutineScope.toStoreMaterialScope(): CoroutineScope {
+internal class RetainedScopeViewModel : ViewModel() {
+    private val retainScope = RetainedScope(
+        coroutineScope = viewModelScope.toStoreMaterialScope()
+    )
+    private var retainedObjectsTable = mutableMapOf<Any, Any>()
+
+    fun <T : Any> getOrPut(key: Any, block: (RetainedScope) -> T): T {
+        @Suppress("UNCHECKED_CAST")
+        return retainedObjectsTable.getOrPut(key) { block(retainScope) } as T
+    }
+}
+
+private fun CoroutineScope.toStoreMaterialScope(): CoroutineScope {
     var ret = this
     ret += Dispatchers.Default.limitedParallelism(parallelism = 1)
     setupGlobalAndLocalMergedCoroutineExceptionHandler { ret += it }

@@ -86,6 +86,7 @@ import com.nlab.reminder.core.designsystem.compose.component.PlaneatLoadingConte
 import com.nlab.reminder.core.designsystem.compose.icon.PlaneatIcons
 import com.nlab.reminder.core.designsystem.compose.theme.DrawableIds
 import com.nlab.reminder.core.kotlin.NonNegativeLong
+import com.nlab.reminder.core.statekit.store.androidx.lifecycle.ui.compose.rememberRetained
 import com.nlab.reminder.core.translation.StringIds
 import com.nlab.reminder.feature.home.*
 
@@ -101,6 +102,16 @@ internal fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState: HomeUiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val hello1 = rememberRetained {
+        println("Hello 생성됨? !")
+        A()
+    }
+    val hello2 = rememberRetained {
+        println("Hello 생성됨? !!")
+        A()
+    }
+    println("Hello ${hello1.hashCode()} ${hello2.hashCode()}")
+
     HomeScreen(
         uiState = uiState,
         modifier = modifier,
@@ -134,6 +145,11 @@ internal fun HomeScreen(
         onTagEditCancelClicked = { viewModel.onTagEditCancelClicked() }
     )
 }
+
+class A {
+
+}
+
 
 @Composable
 private fun HomeScreen(
