@@ -22,7 +22,6 @@ import android.graphics.Color
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
 import androidx.annotation.DimenRes
-import java.util.Locale
 
 /**
  * @author thalys
@@ -46,5 +45,3 @@ fun Context.getThemeColor(@AttrRes attrRes: Int, @ColorInt defaultColor: Int = C
 fun Context.getDimension(@DimenRes id: Int): Float {
     return resources.getDimension(id)
 }
-
-val Context.firstLocale: Locale get() = resources.configuration.locales[0]
