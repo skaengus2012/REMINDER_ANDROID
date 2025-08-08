@@ -16,7 +16,7 @@
 
 package com.nlab.reminder.core.statekit.plugins
 
-import com.nlab.reminder.core.statekit.store.androidx.lifecycle.globalExceptionHandlers
+import com.nlab.reminder.core.statekit.store.globalExceptionHandlers
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlin.coroutines.CoroutineContext
 

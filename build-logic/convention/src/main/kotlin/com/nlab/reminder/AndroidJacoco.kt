@@ -77,6 +77,7 @@ private fun Project.androidJacocoClassDirectories(variant: Variant): Configurabl
                 "**/BuildConfig.*",
                 "**/Manifest*.*",
                 "**/android/**",
+                "**/androidx/lifecycle/compose/**",
                 "**/di/**",
                 "**/fake/**",
                 "**/navigation/**",

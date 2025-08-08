@@ -101,6 +101,9 @@ internal fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState: HomeUiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    println("Hello ${hello1.hashCode()} ${hello2.hashCode()}")
+
     HomeScreen(
         uiState = uiState,
         modifier = modifier,
@@ -134,6 +137,11 @@ internal fun HomeScreen(
         onTagEditCancelClicked = { viewModel.onTagEditCancelClicked() }
     )
 }
+
+class A {
+
+}
+
 
 @Composable
 private fun HomeScreen(
