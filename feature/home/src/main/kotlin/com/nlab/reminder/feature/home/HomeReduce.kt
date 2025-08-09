@@ -59,70 +59,70 @@ internal fun HomeReduce(environment: HomeEnvironment): HomeReduce = DslReduce {
             if (current.tagEditState == action.expectedState) current.copy(tagEditState = action.newState)
             else current
         }
-        transition<OnTagLongClicked> {
+        transition<TagLongClicked> {
             current.copy(
                 tagEditState = environment
                     .tagEditStateMachine
                     .startEditing(current = current.tagEditState, tag = action.tag)
             )
         }
-        suspendEffect<OnTagRenameRequestClicked> {
+        suspendEffect<TagRenameRequestClicked> {
             environment.tagEditStateMachine
                 .startRename(current.tagEditState)
                 .processAsFlow()
                 .mapOrThrowCompareAndSetTagEditState(environment.userMessageFactory)
                 .collect(::dispatch)
         }
-        transition<OnTagRenameInputReady> {
+        transition<TagRenameInputReady> {
             current.copy(
                 tagEditState = environment
                     .tagEditStateMachine
                     .readyRenameInput(current.tagEditState)
             )
         }
-        transition<OnTagRenameInputted> {
+        transition<TagRenameInputted> {
             current.copy(
                 tagEditState = environment
                     .tagEditStateMachine
                     .changeRenameText(current.tagEditState, action.text)
             )
         }
-        suspendEffect<OnTagRenameConfirmClicked> {
+        suspendEffect<TagRenameConfirmClicked> {
             environment.tagEditStateMachine
                 .tryUpdateName(current = current.tagEditState, compareTags = current.tags)
                 .processAsFlow()
                 .mapOrThrowCompareAndSetTagEditState(environment.userMessageFactory)
                 .collect(::dispatch)
         }
-        suspendEffect<OnTagReplaceConfirmClicked> {
+        suspendEffect<TagReplaceConfirmClicked> {
             environment.tagEditStateMachine
                 .merge(current = current.tagEditState)
                 .processAsFlow()
                 .mapOrThrowCompareAndSetTagEditState(environment.userMessageFactory)
                 .collect(::dispatch)
         }
-        transition<OnTagReplaceCancelClicked> {
+        transition<TagReplaceCancelClicked> {
             current.copy(
                 tagEditState = environment
                     .tagEditStateMachine
                     .cancelMerge(current = current.tagEditState)
             )
         }
-        suspendEffect<OnTagDeleteRequestClicked> {
+        suspendEffect<TagDeleteRequestClicked> {
             environment.tagEditStateMachine
                 .startDelete(current = current.tagEditState)
                 .processAsFlow()
                 .mapOrThrowCompareAndSetTagEditState(environment.userMessageFactory)
                 .collect(::dispatch)
         }
-        suspendEffect<OnTagDeleteConfirmClicked> {
+        suspendEffect<TagDeleteConfirmClicked> {
             environment.tagEditStateMachine
                 .delete(current = current.tagEditState)
                 .processAsFlow()
                 .mapOrThrowCompareAndSetTagEditState(environment.userMessageFactory)
                 .collect(::dispatch)
         }
-        transition<OnTagEditCancelClicked> {
+        transition<TagEditCancelClicked> {
             current.copy(tagEditState = TagEditState.None)
         }
     }
