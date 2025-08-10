@@ -29,9 +29,9 @@ import com.nlab.reminder.core.component.usermessage.eventbus.UserMessageAggregat
 import com.nlab.reminder.core.component.usermessage.eventbus.UserMessagePostedFlow
 import com.nlab.reminder.core.component.usermessage.ui.compose.UserMessageHandler
 import com.nlab.reminder.core.statekit.store.androidx.lifecycle.compose.retainedStore
+import com.nlab.reminder.core.statekit.store.androidx.lifecycle.createStore
 import com.nlab.statekit.bootstrap.DeliveryStarted
 import com.nlab.statekit.bootstrap.collectAsBootstrap
-import com.nlab.statekit.store.createStore
 import kotlinx.coroutines.CoroutineScope
 
 
@@ -45,7 +45,6 @@ fun UserMessageAggregateHandler(
 ) {
     val store = retainedStore {
         createStore(
-            coroutineScope = storeMaterialScope,
             initState = UserMessageAggregateUiState(messages = emptyList()),
             reduce = UserMessageAggregateReduce(),
             bootstrap = UserMessagePostedFlow(userMessageMonitor = environment.userMessageMonitor)

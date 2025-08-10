@@ -84,6 +84,7 @@ import com.nlab.reminder.core.designsystem.compose.icon.PlaneatIcons
 import com.nlab.reminder.core.designsystem.compose.theme.DrawableIds
 import com.nlab.reminder.core.kotlin.NonNegativeLong
 import com.nlab.reminder.core.statekit.store.androidx.lifecycle.compose.retainedStore
+import com.nlab.reminder.core.statekit.store.androidx.lifecycle.createStore
 import com.nlab.reminder.core.translation.StringIds
 import com.nlab.reminder.feature.home.HomeAction
 import com.nlab.reminder.feature.home.HomeEnvironment
@@ -92,7 +93,6 @@ import com.nlab.reminder.feature.home.HomeUiState
 import com.nlab.reminder.feature.home.StateSyncFlow
 import com.nlab.statekit.bootstrap.DeliveryStarted
 import com.nlab.statekit.bootstrap.collectAsBootstrap
-import com.nlab.statekit.store.createStore
 
 /**
  * @author Doohyun
@@ -107,7 +107,6 @@ internal fun HomeScreen(
 ) {
     val store = retainedStore {
         createStore(
-            coroutineScope = storeMaterialScope,
             initState = HomeUiState.Loading,
             reduce = HomeReduce(environment = homeEnvironment),
             bootstrap = StateSyncFlow(homeEnvironment).collectAsBootstrap(
