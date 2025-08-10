@@ -18,25 +18,18 @@ package com.nlab.reminder.core.statekit.store.androidx.lifecycle
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nlab.reminder.core.statekit.store.toStoreMaterialScope
+import com.nlab.reminder.core.statekit.store.StoreMaterialScope
 import com.nlab.statekit.store.Store
-import kotlinx.coroutines.CoroutineScope
 
 /**
  * @author Doohyun
  */
 internal class RetainedStoreFactoryViewModel : ViewModel() {
-    private val retainScope = RetainedStoreScope(
-        storeMaterialScope = viewModelScope.toStoreMaterialScope()
-    )
+    private val retainScope = StoreMaterialScope(baseCoroutineScope = viewModelScope)
     private var retainedObjectsTable = mutableMapOf<Any, Store<*, *>>()
 
-    fun <A : Any, S : Any> getOrPut(key: Any, block: (RetainedStoreScope) -> Store<A, S>): Store<A, S> {
+    fun <A : Any, S : Any> getOrPut(key: Any, block: (StoreMaterialScope) -> Store<A, S>): Store<A, S> {
         @Suppress("UNCHECKED_CAST")
         return retainedObjectsTable.getOrPut(key) { block(retainScope) } as Store<A, S>
     }
 }
-
-class RetainedStoreScope internal constructor(
-    val storeMaterialScope: CoroutineScope
-)

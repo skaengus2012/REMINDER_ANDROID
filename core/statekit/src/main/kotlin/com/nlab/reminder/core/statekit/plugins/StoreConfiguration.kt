@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 The N's lab Open Source Project
+ * Copyright (C) 2025 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,15 @@
 
 package com.nlab.reminder.core.statekit.plugins
 
-import com.nlab.reminder.core.statekit.store.globalExceptionHandlers
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlin.coroutines.CoroutineContext
 
 /**
- * @author Doohyun
+ * @author Thalys
  */
-object StateKitPlugin {
-    fun addGlobalExceptionHandler(block: (CoroutineContext, Throwable) -> Unit) {
-        globalExceptionHandlers += CoroutineExceptionHandler(block)
-    }
-}
+data class StoreConfiguration(
+    val preferredCoroutineDispatcher: CoroutineDispatcher? = null,
+    val defaultCoroutineExceptionHandler: CoroutineExceptionHandler? = null,
+    val defaultEffects: List<GlobalEffect> = emptyList(),
+    val defaultSuspendEffects: List<GlobalSuspendEffect> = emptyList(),
+)

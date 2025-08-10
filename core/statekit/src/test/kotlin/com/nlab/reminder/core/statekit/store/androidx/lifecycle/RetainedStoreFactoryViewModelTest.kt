@@ -18,14 +18,10 @@ package com.nlab.reminder.core.statekit.store.androidx.lifecycle
 
 import com.nlab.reminder.core.statekit.TestAction
 import com.nlab.reminder.core.statekit.TestState
-import com.nlab.reminder.core.statekit.store.globalExceptionHandlers
-import com.nlab.statekit.reduce.Effect
-import com.nlab.statekit.reduce.Reduce
-import com.nlab.statekit.store.createStore
+import com.nlab.statekit.store.Store
+import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.test.runTest
 import org.junit.Test
 
 /**
@@ -33,29 +29,18 @@ import org.junit.Test
  */
 class RetainedStoreFactoryViewModelTest {
     @Test
-    fun `Given global handler, When launch on store material scope, Then handler invoked`() = runTest {
-        val globalHandler: (Throwable) -> Unit = mockk(relaxed = true)
-        globalExceptionHandlers = listOf(
-            CoroutineExceptionHandler { _, t -> globalHandler.invoke(t) }
-        )
+    fun `Given key and factory function, When getOrPut 2 times, Then store created just once`() {
+        val key = Any()
+        val fakeStore: Store<TestAction, TestState> = mockk()
+        val factoryFunc: () -> Store<TestAction, TestState> = mockk {
+            every { this@mockk() } returns fakeStore
+        }
         val viewModel = RetainedStoreFactoryViewModel()
-        val store = viewModel.getOrPut(key = Any()) { scope ->
-            createStore(
-                coroutineScope = scope.storeMaterialScope,
-                initState = TestState,
-                reduce = Reduce(
-                    effect = Effect.Node { action, state ->
-                        throw IllegalStateException()
-                    }
-                )
-            )
-        }
-        store.dispatch(TestAction)
-            .join()
 
-        verify(exactly = 1) {
-            globalHandler.invoke(any())
+        repeat(times = 2) {
+            viewModel.getOrPut(key, { factoryFunc.invoke() })
         }
-        globalExceptionHandlers = emptyList()
+
+        verify(exactly = 1) { factoryFunc.invoke() }
     }
 }

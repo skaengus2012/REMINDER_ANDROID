@@ -20,7 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.nlab.reminder.core.statekit.store.androidx.lifecycle.RetainedStoreScope
+import com.nlab.reminder.core.statekit.store.StoreMaterialScope
 import com.nlab.reminder.core.statekit.store.androidx.lifecycle.RetainedStoreFactoryViewModel
 import com.nlab.statekit.store.Store
 import kotlin.uuid.Uuid
@@ -31,7 +31,7 @@ import kotlin.uuid.Uuid
 @Composable
 fun <A : Any, S : Any> retainedStore(
     key: Any,
-    block: RetainedStoreScope.() -> Store<A, S>
+    block: StoreMaterialScope.() -> Store<A, S>
 ): Store<A, S> {
     val viewModel: RetainedStoreFactoryViewModel = viewModel()
     val result = remember(key) {
@@ -41,7 +41,7 @@ fun <A : Any, S : Any> retainedStore(
 }
 
 @Composable
-fun <A : Any, S : Any> retainedStore(block: RetainedStoreScope.() -> Store<A, S>): Store<A, S> {
+fun <A : Any, S : Any> retainedStore(block: StoreMaterialScope.() -> Store<A, S>): Store<A, S> {
     val uniqueId = rememberSaveable { Uuid.random() }
     return retainedStore(key = uniqueId, block = block)
 }

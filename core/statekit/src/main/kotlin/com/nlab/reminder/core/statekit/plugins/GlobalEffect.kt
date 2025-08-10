@@ -14,21 +14,11 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.statekit.store
-
-import com.nlab.reminder.core.statekit.plugins.StateKitAndroidPlugin
-import com.nlab.reminder.core.statekit.plugins.StoreConfiguration
-import kotlinx.coroutines.CoroutineScope
+package com.nlab.reminder.core.statekit.plugins
 
 /**
  * @author Thalys
  */
-class StoreMaterialScope internal constructor(
-    internal val baseCoroutineScope: CoroutineScope,
-    val configuration: StoreConfiguration = StateKitAndroidPlugin.globalStoreConfiguration
-) {
-    fun with(configuration: StoreConfiguration): StoreMaterialScope = StoreMaterialScope(
-        baseCoroutineScope = baseCoroutineScope,
-        configuration = configuration
-    )
+fun interface GlobalEffect {
+    fun invoke(action: Any, current: Any)
 }

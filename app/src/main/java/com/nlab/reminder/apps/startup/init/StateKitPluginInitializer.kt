@@ -19,7 +19,7 @@ package com.nlab.reminder.apps.startup.init
 
 import android.content.Context
 import androidx.startup.Initializer
-import com.nlab.reminder.core.statekit.plugins.StateKitPlugin
+import com.nlab.reminder.core.statekit.plugins.StateKitAndroidPlugin
 import com.nlab.reminder.apps.startup.EmptyDependencies
 import com.nlab.reminder.core.component.usermessage.UserMessageException
 import com.nlab.reminder.core.component.usermessage.eventbus.UserMessageBroadcast
@@ -39,7 +39,7 @@ internal class StateKitPluginInitializer : Initializer<Unit> {
         val entryPoint = EntryPointAccessors.fromApplication<StateKitPluginInitEntryPoint>(context)
         val userMessageBroadcast = entryPoint.userMessageBroadcast()
 
-        StateKitPlugin.addGlobalExceptionHandler { _, throwable ->
+        StateKitAndroidPlugin.setGlobalExceptionHandler { _, throwable ->
             when (throwable) {
                 is UserMessageException -> {
                     Timber.tag(tag).e(throwable.origin)

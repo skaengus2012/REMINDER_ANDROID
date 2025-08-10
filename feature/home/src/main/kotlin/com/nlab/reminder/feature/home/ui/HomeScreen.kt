@@ -84,7 +84,7 @@ import com.nlab.reminder.core.designsystem.compose.icon.PlaneatIcons
 import com.nlab.reminder.core.designsystem.compose.theme.DrawableIds
 import com.nlab.reminder.core.kotlin.NonNegativeLong
 import com.nlab.reminder.core.statekit.store.androidx.lifecycle.compose.retainedStore
-import com.nlab.reminder.core.statekit.store.androidx.lifecycle.createStore
+import com.nlab.reminder.core.statekit.store.createStore
 import com.nlab.reminder.core.translation.StringIds
 import com.nlab.reminder.feature.home.HomeAction
 import com.nlab.reminder.feature.home.HomeEnvironment
