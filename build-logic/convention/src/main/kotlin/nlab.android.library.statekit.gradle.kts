@@ -16,11 +16,8 @@
 import org.gradle.kotlin.dsl.apply
 
 apply(plugin = "com.android.library")
-apply(plugin = "kotlin-kapt")
 
 dependencies {
     "implementation"(project(":core:statekit"))
-    "kapt"(project(":statekit:compiler"))
-
     "testImplementation"(project(":statekit:test"))
 }

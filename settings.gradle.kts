@@ -42,7 +42,6 @@ gradle.startParameter.excludedTaskNames.addAll(listOf(":build-logic:convention:t
 
 // nlab-kits.
 include(
-    ":statekit:compiler",
     ":statekit:core",
     ":statekit:dsl",
     ":statekit:test",
