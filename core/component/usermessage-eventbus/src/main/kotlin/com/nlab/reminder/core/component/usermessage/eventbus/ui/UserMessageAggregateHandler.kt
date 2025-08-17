@@ -28,10 +28,10 @@ import com.nlab.reminder.core.component.usermessage.eventbus.UserMessageAggregat
 import com.nlab.reminder.core.component.usermessage.eventbus.UserMessageAggregateUiState
 import com.nlab.reminder.core.component.usermessage.eventbus.UserMessagePostedFlow
 import com.nlab.reminder.core.component.usermessage.ui.compose.UserMessageHandler
-import com.nlab.reminder.core.statekit.store.androidx.lifecycle.compose.retainedStore
-import com.nlab.reminder.core.statekit.store.createStore
+import com.nlab.statekit.androidx.lifecycle.store.compose.retainedStore
 import com.nlab.statekit.bootstrap.DeliveryStarted
 import com.nlab.statekit.bootstrap.collectAsBootstrap
+import com.nlab.statekit.foundation.store.createStore
 import kotlinx.coroutines.CoroutineScope
 
 

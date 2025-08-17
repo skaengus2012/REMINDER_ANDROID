@@ -18,6 +18,8 @@ import org.gradle.kotlin.dsl.apply
 apply(plugin = "com.android.library")
 
 dependencies {
-    "implementation"(project(":core:statekit"))
+    "implementation"(project(":statekit:androidx-lifecycle"))
+    "implementation"(project(":statekit:dsl"))
+
     "testImplementation"(project(":statekit:test"))
 }

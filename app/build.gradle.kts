@@ -85,6 +85,7 @@ dependencies {
     implementation(projects.core.kotlin)
     implementation(projects.core.kotlinx.coroutinesAndroid)
     implementation(projects.core.translation)
+    implementation(projects.statekit.foundation)
 
     implementation(projects.feature.home)
 
