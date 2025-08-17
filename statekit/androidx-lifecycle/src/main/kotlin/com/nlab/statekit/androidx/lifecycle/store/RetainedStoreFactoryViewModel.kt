@@ -30,6 +30,8 @@ internal class RetainedStoreFactoryViewModel : ViewModel() {
 
     fun <A : Any, S : Any> getOrPut(key: Any, block: (StoreMaterialScope) -> Store<A, S>): Store<A, S> {
         @Suppress("UNCHECKED_CAST")
-        return retainedObjectsTable.getOrPut(key) { block(retainScope) } as Store<A, S>
+    fun <A : Any, S : Any> getOrPut(key: Any, block: StoreMaterialScope.() -> Store<A, S>): Store<A, S> {
+        @Suppress("UNCHECKED_CAST")
+        return retainedObjectsTable.getOrPut(key) { retainScope.block() } as Store<A, S>
     }
 }
