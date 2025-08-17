@@ -28,8 +28,6 @@ internal class RetainedStoreFactoryViewModel : ViewModel() {
     private val retainScope = StoreMaterialScope(baseCoroutineScope = viewModelScope)
     private var retainedObjectsTable = mutableMapOf<Any, Store<*, *>>()
 
-    fun <A : Any, S : Any> getOrPut(key: Any, block: (StoreMaterialScope) -> Store<A, S>): Store<A, S> {
-        @Suppress("UNCHECKED_CAST")
     fun <A : Any, S : Any> getOrPut(key: Any, block: StoreMaterialScope.() -> Store<A, S>): Store<A, S> {
         @Suppress("UNCHECKED_CAST")
         return retainedObjectsTable.getOrPut(key) { retainScope.block() } as Store<A, S>
