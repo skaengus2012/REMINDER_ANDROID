@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 The N's lab Open Source Project
+ * Copyright (C) 2025 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,17 @@
  * limitations under the License.
  */
 
-plugins {
-    alias(libs.plugins.android.application) apply false
-    alias(libs.plugins.compose) apply false
-    alias(libs.plugins.google.hilt) apply false
-    alias(libs.plugins.kotlin.jvm) apply false
-    alias(libs.plugins.kotlin.serialization) apply false
-    alias(libs.plugins.ksp) apply false
-    alias(libs.plugins.android.library) apply false
-    alias(libs.plugins.kotlin.android) apply false
-}
+package com.nlab.statekit.foundation.plugins
+
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineExceptionHandler
+
+/**
+ * @author Thalys
+ */
+data class StoreConfiguration(
+    val preferredCoroutineDispatcher: CoroutineDispatcher? = null,
+    val defaultCoroutineExceptionHandler: CoroutineExceptionHandler? = null,
+    val defaultEffects: List<GlobalEffect> = emptyList(),
+    val defaultSuspendEffects: List<GlobalSuspendEffect> = emptyList(),
+)
