@@ -30,6 +30,7 @@ import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.Dispatchers
 import timber.log.Timber
 
 /**
@@ -43,6 +44,7 @@ internal class StateKitPluginInitializer : Initializer<Unit> {
 
         StateKitPlugin.setGlobalStoreConfiguration(
             configuration = StoreConfiguration(
+                preferredCoroutineDispatcher = Dispatchers.Default,
                 defaultCoroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
                     when (throwable) {
                         is UserMessageException -> {
