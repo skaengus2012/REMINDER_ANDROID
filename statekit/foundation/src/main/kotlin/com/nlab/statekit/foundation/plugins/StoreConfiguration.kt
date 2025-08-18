@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 The N's lab Open Source Project
+ * Copyright (C) 2025 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,13 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import org.gradle.kotlin.dsl.apply
 
-apply(plugin = "com.android.library")
+package com.nlab.statekit.foundation.plugins
 
-dependencies {
-    "implementation"(project(":statekit:androidx-lifecycle"))
-    "implementation"(project(":statekit:dsl"))
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineExceptionHandler
 
-    "testImplementation"(project(":statekit:test"))
-}
+/**
+ * @author Thalys
+ */
+data class StoreConfiguration(
+    val preferredCoroutineDispatcher: CoroutineDispatcher? = null,
+    val defaultCoroutineExceptionHandler: CoroutineExceptionHandler? = null,
+    val defaultEffects: List<GlobalEffect> = emptyList(),
+    val defaultSuspendEffects: List<GlobalSuspendEffect> = emptyList(),
+)

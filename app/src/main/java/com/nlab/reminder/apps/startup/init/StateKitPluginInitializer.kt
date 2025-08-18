@@ -19,15 +19,17 @@ package com.nlab.reminder.apps.startup.init
 
 import android.content.Context
 import androidx.startup.Initializer
-import com.nlab.reminder.core.statekit.plugins.StateKitPlugin
 import com.nlab.reminder.apps.startup.EmptyDependencies
 import com.nlab.reminder.core.component.usermessage.UserMessageException
 import com.nlab.reminder.core.component.usermessage.eventbus.UserMessageBroadcast
+import com.nlab.statekit.foundation.plugins.StateKitPlugin
+import com.nlab.statekit.foundation.plugins.StoreConfiguration
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineExceptionHandler
 import timber.log.Timber
 
 /**
@@ -39,22 +41,26 @@ internal class StateKitPluginInitializer : Initializer<Unit> {
         val entryPoint = EntryPointAccessors.fromApplication<StateKitPluginInitEntryPoint>(context)
         val userMessageBroadcast = entryPoint.userMessageBroadcast()
 
-        StateKitPlugin.addGlobalExceptionHandler { _, throwable ->
-            when (throwable) {
-                is UserMessageException -> {
-                    Timber.tag(tag).e(throwable.origin)
-                    userMessageBroadcast.send(userMessage = throwable.userMessage)
-                }
+        StateKitPlugin.setGlobalStoreConfiguration(
+            configuration = StoreConfiguration(
+                defaultCoroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
+                    when (throwable) {
+                        is UserMessageException -> {
+                            Timber.tag(tag).e(throwable.origin)
+                            userMessageBroadcast.send(userMessage = throwable.userMessage)
+                        }
 
-                is CancellationException -> {
-                    // do nothing
-                }
+                        is CancellationException -> {
+                            // do nothing
+                        }
 
-                else -> {
-                    Timber.tag(tag).e(throwable)
+                        else -> {
+                            Timber.tag(tag).e(throwable)
+                        }
+                    }
                 }
-            }
-        }
+            )
+        )
     }
 
     override fun dependencies() = EmptyDependencies()

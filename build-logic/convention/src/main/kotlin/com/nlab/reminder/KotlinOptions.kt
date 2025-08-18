@@ -92,11 +92,12 @@ private inline fun <reified T : KotlinBaseExtension> Project.configureKotlin(
         jvmTarget.set(selectedJvmTarget)
         allWarningsAsErrors.set(warningsAsErrors.toBoolean())
         freeCompilerArgs.addAll(
+            "-opt-in=kotlin.Experimental",
+            "-opt-in=kotlin.concurrent.atomics.ExperimentalAtomicApi",
+            "-opt-in=kotlin.time.ExperimentalTime",
+            "-opt-in=kotlin.uuid.ExperimentalUuidApi",
             "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
             "-opt-in=kotlinx.coroutines.FlowPreview",
-            "-opt-in=kotlin.Experimental",
-            "-opt-in=kotlin.time.ExperimentalTime",
-            "-opt-in=kotlin.concurrent.atomics.ExperimentalAtomicApi",
             /**
              * Remove this args after Phase 3.
              * https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-consistent-copy-visibility/#deprecation-timeline

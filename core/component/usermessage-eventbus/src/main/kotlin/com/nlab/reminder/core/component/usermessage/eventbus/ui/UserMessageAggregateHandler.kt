@@ -22,10 +22,16 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nlab.reminder.core.component.usermessage.FeedbackPriority
 import com.nlab.reminder.core.component.usermessage.UserMessageId
+import com.nlab.reminder.core.component.usermessage.eventbus.UserMessageAggregateAction
+import com.nlab.reminder.core.component.usermessage.eventbus.UserMessageAggregateEnvironment
+import com.nlab.reminder.core.component.usermessage.eventbus.UserMessageAggregateReduce
 import com.nlab.reminder.core.component.usermessage.eventbus.UserMessageAggregateUiState
-import com.nlab.reminder.core.component.usermessage.eventbus.UserMessageAggregateViewModel
-import com.nlab.reminder.core.component.usermessage.eventbus.userMessageShown
+import com.nlab.reminder.core.component.usermessage.eventbus.UserMessagePostedFlow
 import com.nlab.reminder.core.component.usermessage.ui.compose.UserMessageHandler
+import com.nlab.statekit.androidx.lifecycle.store.compose.retainedStore
+import com.nlab.statekit.bootstrap.DeliveryStarted
+import com.nlab.statekit.bootstrap.collectAsBootstrap
+import com.nlab.statekit.foundation.store.createStore
 import kotlinx.coroutines.CoroutineScope
 
 
@@ -35,12 +41,23 @@ import kotlinx.coroutines.CoroutineScope
 @Composable
 fun UserMessageAggregateHandler(
     showUserMessage: suspend CoroutineScope.(messageText: String, priority: FeedbackPriority) -> Unit,
-    viewModel: UserMessageAggregateViewModel = hiltViewModel()
+    environment: UserMessageAggregateEnvironment = hiltViewModel()
 ) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val store = retainedStore {
+        createStore(
+            initState = UserMessageAggregateUiState(messages = emptyList()),
+            reduce = UserMessageAggregateReduce(),
+            bootstrap = UserMessagePostedFlow(userMessageMonitor = environment.userMessageMonitor)
+                .collectAsBootstrap(started = DeliveryStarted.Lazily)
+        )
+    }
+
+    val uiState by store.state.collectAsStateWithLifecycle()
     UserMessageAggregateHandler(
         uiState = uiState,
-        userMessageShown = viewModel::userMessageShown,
+        userMessageShown = { shownId ->
+            store.dispatch(UserMessageAggregateAction.UserMessageShown(shownId))
+        },
         showUserMessage = showUserMessage
     )
 }

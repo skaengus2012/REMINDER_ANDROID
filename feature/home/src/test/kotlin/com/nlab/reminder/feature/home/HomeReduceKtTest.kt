@@ -123,7 +123,7 @@ class HomeReduceKtTest {
             })
         ).test()
             .givenCurrent(genHomeUiStateSuccess(tagEditState = genTagEditStateTypeOf<TagEditState.None>()))
-            .actionToDispatch(HomeAction.OnTagLongClicked(tag))
+            .actionToDispatch(HomeAction.TagLongClicked(tag))
             .transitionScenario()
             .expectedNextState { current.copy(tagEditState = nextTagEditState) }
     }
@@ -140,7 +140,7 @@ class HomeReduceKtTest {
             })
         ).test()
             .givenCurrent(genHomeUiStateSuccess(tagEditState = currentTagEditState))
-            .actionToDispatch(HomeAction.OnTagRenameRequestClicked)
+            .actionToDispatch(HomeAction.TagRenameRequestClicked)
             .transitionScenario(dispatchWithEffect = true)
             .expectedNextState { current.copy(tagEditState = nextTagEditState) }
     }
@@ -165,7 +165,7 @@ class HomeReduceKtTest {
             ))
             .test()
             .givenCurrent(genHomeUiStateSuccess())
-            .actionToDispatch(HomeAction.OnTagRenameRequestClicked)
+            .actionToDispatch(HomeAction.TagRenameRequestClicked)
             .effectScenario()
             .launchAndGetTrace()
 
@@ -191,7 +191,7 @@ class HomeReduceKtTest {
             })
         ).test()
             .givenCurrent(genHomeUiStateSuccess(tagEditState = currentTagEditState))
-            .actionToDispatch(HomeAction.OnTagRenameInputReady)
+            .actionToDispatch(HomeAction.TagRenameInputReady)
             .transitionScenario()
             .expectedNextState { current.copy(tagEditState = nextTagEditState) }
     }
@@ -205,7 +205,7 @@ class HomeReduceKtTest {
         }
         genHomeReduce(environment = genHomeEnvironment(tagEditStateMachine = tagEditStateMachine)).test()
             .givenCurrent(genHomeUiStateSuccess(tagEditState = currentTagEditState))
-            .actionToDispatch(HomeAction.OnTagRenameInputted(input))
+            .actionToDispatch(HomeAction.TagRenameInputted(input))
             .transitionScenario()
             .expectedNextState { current.copy(tagEditState = nextTagEditState) }
     }
@@ -223,7 +223,7 @@ class HomeReduceKtTest {
             })
         ).test()
             .givenCurrent(genHomeUiStateSuccess(tags = compareTags, tagEditState = currentTagEditState))
-            .actionToDispatch(HomeAction.OnTagRenameConfirmClicked)
+            .actionToDispatch(HomeAction.TagRenameConfirmClicked)
             .transitionScenario(dispatchWithEffect = true)
             .expectedNextState { current.copy(tagEditState = nextTagEditState) }
     }
@@ -248,7 +248,7 @@ class HomeReduceKtTest {
             ))
             .test()
             .givenCurrent(genHomeUiStateSuccess())
-            .actionToDispatch(HomeAction.OnTagRenameConfirmClicked)
+            .actionToDispatch(HomeAction.TagRenameConfirmClicked)
             .effectScenario()
             .launchAndGetTrace()
         assertUserMessageException(
@@ -269,7 +269,7 @@ class HomeReduceKtTest {
             })
         ).test()
             .givenCurrent(genHomeUiStateSuccess(tagEditState = currentTagEditState))
-            .actionToDispatch(HomeAction.OnTagReplaceConfirmClicked)
+            .actionToDispatch(HomeAction.TagReplaceConfirmClicked)
             .transitionScenario(dispatchWithEffect = true)
             .expectedNextState { current.copy(tagEditState = nextTagEditState) }
     }
@@ -294,7 +294,7 @@ class HomeReduceKtTest {
             ))
             .test()
             .givenCurrent(genHomeUiStateSuccess())
-            .actionToDispatch(HomeAction.OnTagReplaceConfirmClicked)
+            .actionToDispatch(HomeAction.TagReplaceConfirmClicked)
             .effectScenario()
             .launchAndGetTrace()
         assertUserMessageException(
@@ -311,7 +311,7 @@ class HomeReduceKtTest {
         }
         genHomeReduce(environment = genHomeEnvironment(tagEditStateMachine = tagEditStateMachine)).test()
             .givenCurrent(genHomeUiStateSuccess(tagEditState = currentTagEditState))
-            .actionToDispatch(HomeAction.OnTagReplaceCancelClicked)
+            .actionToDispatch(HomeAction.TagReplaceCancelClicked)
             .transitionScenario()
             .expectedNextState { current.copy(tagEditState = nextTagEditState) }
     }
@@ -328,7 +328,7 @@ class HomeReduceKtTest {
             })
         ).test()
             .givenCurrent(genHomeUiStateSuccess(tagEditState = currentTagEditState))
-            .actionToDispatch(HomeAction.OnTagDeleteRequestClicked)
+            .actionToDispatch(HomeAction.TagDeleteRequestClicked)
             .transitionScenario(dispatchWithEffect = true)
             .expectedNextState { current.copy(tagEditState = nextTagEditState) }
     }
@@ -353,7 +353,7 @@ class HomeReduceKtTest {
             ))
             .test()
             .givenCurrent(genHomeUiStateSuccess())
-            .actionToDispatch(HomeAction.OnTagDeleteRequestClicked)
+            .actionToDispatch(HomeAction.TagDeleteRequestClicked)
             .effectScenario()
             .launchAndGetTrace()
         assertUserMessageException(
@@ -374,7 +374,7 @@ class HomeReduceKtTest {
             })
         ).test()
             .givenCurrent(genHomeUiStateSuccess(tagEditState = currentTagEditState))
-            .actionToDispatch(HomeAction.OnTagDeleteConfirmClicked)
+            .actionToDispatch(HomeAction.TagDeleteConfirmClicked)
             .transitionScenario(dispatchWithEffect = true)
             .expectedNextState { current.copy(tagEditState = nextTagEditState) }
     }
@@ -399,7 +399,7 @@ class HomeReduceKtTest {
             ))
             .test()
             .givenCurrent(genHomeUiStateSuccess())
-            .actionToDispatch(HomeAction.OnTagDeleteConfirmClicked)
+            .actionToDispatch(HomeAction.TagDeleteConfirmClicked)
             .effectScenario()
             .launchAndGetTrace()
         assertUserMessageException(
@@ -416,7 +416,7 @@ class HomeReduceKtTest {
                     tagEditState = genTagEditStateExcludeTypeOf<TagEditState.None>()
                 )
             )
-            .actionToDispatch(HomeAction.OnTagEditCancelClicked)
+            .actionToDispatch(HomeAction.TagEditCancelClicked)
             .transitionScenario()
             .expectedNextState { current.copy(tagEditState = TagEditState.None) }
     }

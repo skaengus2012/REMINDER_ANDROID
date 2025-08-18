@@ -13,13 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import org.gradle.kotlin.dsl.apply
 
-apply(plugin = "com.android.library")
+package com.nlab.statekit.foundation
 
-dependencies {
-    "implementation"(project(":statekit:androidx-lifecycle"))
-    "implementation"(project(":statekit:dsl"))
-
-    "testImplementation"(project(":statekit:test"))
-}
+/**
+ * @author Doohyun
+ */
+data object TestAction

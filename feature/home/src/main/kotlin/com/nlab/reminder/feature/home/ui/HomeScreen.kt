@@ -75,9 +75,6 @@ import com.nlab.reminder.core.data.model.TagId
 import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
 import com.nlab.reminder.core.kotlin.toNonBlankString
 import com.nlab.reminder.core.kotlin.toNonNegativeLong
-import com.nlab.reminder.feature.home.HomeUiState
-import com.nlab.reminder.feature.home.HomeViewModel
-import com.nlab.reminder.feature.home.onTodayCategoryClicked
 import com.nlab.reminder.core.androidx.compose.ui.ColorPressButton
 import com.nlab.reminder.core.androidx.compose.ui.throttleClick
 import com.nlab.reminder.core.component.tag.edit.ui.compose.TagEditStateHandler
@@ -87,7 +84,15 @@ import com.nlab.reminder.core.designsystem.compose.icon.PlaneatIcons
 import com.nlab.reminder.core.designsystem.compose.theme.DrawableIds
 import com.nlab.reminder.core.kotlin.NonNegativeLong
 import com.nlab.reminder.core.translation.StringIds
-import com.nlab.reminder.feature.home.*
+import com.nlab.reminder.feature.home.HomeAction
+import com.nlab.reminder.feature.home.HomeEnvironment
+import com.nlab.reminder.feature.home.HomeReduce
+import com.nlab.reminder.feature.home.HomeUiState
+import com.nlab.reminder.feature.home.StateSyncFlow
+import com.nlab.statekit.androidx.lifecycle.store.compose.retainedStore
+import com.nlab.statekit.bootstrap.DeliveryStarted
+import com.nlab.statekit.bootstrap.collectAsBootstrap
+import com.nlab.statekit.foundation.store.createStore
 
 /**
  * @author Doohyun
@@ -98,40 +103,49 @@ internal fun HomeScreen(
     onTimetableCategoryClicked: () -> Unit,
     onAllCategoryClicked: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: HomeViewModel = hiltViewModel()
+    homeEnvironment: HomeEnvironment = hiltViewModel()
 ) {
-    val uiState: HomeUiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val store = retainedStore {
+        createStore(
+            initState = HomeUiState.Loading,
+            reduce = HomeReduce(environment = homeEnvironment),
+            bootstrap = StateSyncFlow(homeEnvironment).collectAsBootstrap(
+                started = DeliveryStarted.WhileSubscribed(stopTimeoutMillis = 5_000)
+            )
+        )
+    }
+    val uiState: HomeUiState by store.state.collectAsStateWithLifecycle()
     HomeScreen(
         uiState = uiState,
         modifier = modifier,
         onTodayCategoryClicked = {
-            viewModel.onTodayCategoryClicked()
+            store.dispatch(HomeAction.TodayCategoryClicked)
             onTodayCategoryClicked()
         },
         onTimetableCategoryClicked = {
-            viewModel.onTimetableCategoryClicked()
+            store.dispatch(HomeAction.TimetableCategoryClicked)
             onTimetableCategoryClicked()
         },
         onAllCategoryClicked = {
-            viewModel.onAllCategoryClicked()
+            store.dispatch(HomeAction.AllCategoryClicked)
             onAllCategoryClicked()
         },
         onTagClicked = {
             // TODO implements
         },
-        onTagLongClicked = { tag -> viewModel.onTagLongClicked(tag) },
+        onTagLongClicked = { tag -> store.dispatch(HomeAction.TagLongClicked(tag)) },
         onNewPlanClicked = {
             // TODO implements
         },
-        onTagRenameRequestClicked = { viewModel.onTagRenameRequestClicked() },
-        onTagDeleteRequestClicked = { viewModel.onTagDeleteRequestClicked() },
-        onTagRenameInputReady = { viewModel.onTagRenameInputReady() },
-        onTagRenameInputted = { input -> viewModel.onTagRenameInputted(input) },
-        onTagRenameConfirmClicked = { viewModel.onTagRenameConfirmClicked() },
-        onTagMergeCancelClicked = { viewModel.onTagReplaceCancelClicked() },
-        onTagMergeConfirmClicked = { viewModel.onTagReplaceConfirmClicked() },
-        onTagDeleteConfirmClicked = { viewModel.onTagDeleteConfirmClicked() },
-        onTagEditCancelClicked = { viewModel.onTagEditCancelClicked() }
+        onTagRenameRequestClicked = { store.dispatch(HomeAction.TagRenameRequestClicked) },
+        onTagDeleteRequestClicked = { store.dispatch(HomeAction.TagDeleteRequestClicked) },
+        onTagRenameInputReady = { store.dispatch(HomeAction.TagRenameInputReady) },
+        onTagRenameInputted = { input -> store.dispatch(HomeAction.TagRenameInputted(text = input)) },
+        onTagRenameConfirmClicked = { store.dispatch(HomeAction.TagRenameConfirmClicked) },
+        onTagMergeCancelClicked = { store.dispatch(HomeAction.TagReplaceCancelClicked) },
+        onTagMergeConfirmClicked = { store.dispatch(HomeAction.TagReplaceConfirmClicked) },
+        onTagDeleteConfirmClicked = { store.dispatch(HomeAction.TagDeleteConfirmClicked) },
+        onTagEditCancelClicked = { store.dispatch(HomeAction.TagEditCancelClicked) }
     )
 }
 
