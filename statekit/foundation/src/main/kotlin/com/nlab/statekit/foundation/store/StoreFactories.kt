@@ -89,8 +89,8 @@ private fun composeCoroutineExceptionHandler(
 
 private fun <A : Any, S : Any> createStoreMaterialReduce(
     reduce: Reduce<A, S>,
-    defaultEffects: List<GlobalEffect>,
-    defaultSuspendEffects: List<GlobalSuspendEffect>
+    defaultEffects: Collection<GlobalEffect>,
+    defaultSuspendEffects: Collection<GlobalSuspendEffect>
 ): Reduce<A, S> {
     if (defaultEffects.isEmpty() && defaultSuspendEffects.isEmpty()) return reduce
 

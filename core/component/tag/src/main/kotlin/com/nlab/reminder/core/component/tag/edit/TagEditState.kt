@@ -66,6 +66,10 @@ sealed class TagEditState private constructor() {
             return state.hashCode()
         }
 
+        override fun toString(): String {
+            return "Processing(state=$state)"
+        }
+
         companion object {
             operator fun <T> invoke(
                 state: T

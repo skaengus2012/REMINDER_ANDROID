@@ -23,7 +23,7 @@ object StateKitPlugin {
     internal var globalStoreConfiguration: StoreConfiguration = StoreConfiguration()
         private set
 
-    fun setGlobalStoreConfiguration(configuration: StoreConfiguration) {
-        globalStoreConfiguration = configuration
+    fun configGlobalStore(block: (current: StoreConfiguration) -> StoreConfiguration) {
+        globalStoreConfiguration = block(globalStoreConfiguration)
     }
 }

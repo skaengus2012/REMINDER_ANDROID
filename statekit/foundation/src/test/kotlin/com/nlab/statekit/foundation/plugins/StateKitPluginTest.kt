@@ -33,7 +33,7 @@ class StateKitPluginTest {
     }
 
     @Test
-    fun `Given custom configuration, When set configuration, Then return custom configuration`() {
+    fun `Given custom configuration, When config global store, Then return custom configuration`() {
         // before
         val defaultConfiguration = StateKitPlugin.globalStoreConfiguration
 
@@ -44,12 +44,12 @@ class StateKitPluginTest {
             defaultEffects = mockk(),
             defaultSuspendEffects = mockk()
         )
-        StateKitPlugin.setGlobalStoreConfiguration(configuration)
+        StateKitPlugin.configGlobalStore { configuration }
 
         val actualConfiguration = StateKitPlugin.globalStoreConfiguration
         assertThat(actualConfiguration, sameInstance(configuration))
 
         // after
-        StateKitPlugin.setGlobalStoreConfiguration(defaultConfiguration)
+        StateKitPlugin.configGlobalStore { defaultConfiguration }
     }
 }
