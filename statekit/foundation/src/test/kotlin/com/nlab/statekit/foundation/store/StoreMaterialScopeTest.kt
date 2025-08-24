@@ -30,19 +30,19 @@ import org.junit.Test
  */
 class StoreMaterialScopeTest {
     @Test
-    fun `Given coroutineScope, custom global configuration, When create, Then object has correct properties`() {
+    fun `Given coroutineScope, custom global config, When create, Then object has correct properties`() {
         val coroutineScope: CoroutineScope = mockk()
         val defaultConfiguration = StateKitPlugin.globalStoreConfiguration
         val customConfiguration = StoreConfiguration(
             preferredCoroutineDispatcher = Dispatchers.IO
         )
-        StateKitPlugin.setGlobalStoreConfiguration(customConfiguration)
+        StateKitPlugin.configGlobalStore { customConfiguration }
 
         val storeMaterialScope = StoreMaterialScope(baseCoroutineScope = coroutineScope)
         assertThat(storeMaterialScope.configuration, sameInstance(customConfiguration))
         assertThat(storeMaterialScope.baseCoroutineScope, sameInstance(coroutineScope))
 
-        StateKitPlugin.setGlobalStoreConfiguration(defaultConfiguration)
+        StateKitPlugin.configGlobalStore { defaultConfiguration }
     }
 
     @Test

@@ -25,6 +25,9 @@
             android:exported="false"
             tools:node="merge">
             <meta-data
+                android:name="com.nlab.reminder.apps.startup.init.StateKitPluginDebugBuildInitializer"
+                android:value="androidx.startup" />
+            <meta-data
                 android:name="com.nlab.reminder.apps.startup.init.TimberInitializer"
                 android:value="androidx.startup" />
         </provider>

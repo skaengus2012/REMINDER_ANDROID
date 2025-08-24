@@ -25,6 +25,6 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 data class StoreConfiguration(
     val preferredCoroutineDispatcher: CoroutineDispatcher? = null,
     val defaultCoroutineExceptionHandler: CoroutineExceptionHandler? = null,
-    val defaultEffects: List<GlobalEffect> = emptyList(),
-    val defaultSuspendEffects: List<GlobalSuspendEffect> = emptyList(),
+    val defaultEffects: Collection<GlobalEffect> = emptyList(),
+    val defaultSuspendEffects: Collection<GlobalSuspendEffect> = emptyList(),
 )

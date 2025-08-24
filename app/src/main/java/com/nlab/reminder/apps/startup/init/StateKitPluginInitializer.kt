@@ -23,7 +23,6 @@ import com.nlab.reminder.apps.startup.EmptyDependencies
 import com.nlab.reminder.core.component.usermessage.UserMessageException
 import com.nlab.reminder.core.component.usermessage.eventbus.UserMessageBroadcast
 import com.nlab.statekit.foundation.plugins.StateKitPlugin
-import com.nlab.statekit.foundation.plugins.StoreConfiguration
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
@@ -38,17 +37,17 @@ import timber.log.Timber
  */
 internal class StateKitPluginInitializer : Initializer<Unit> {
     override fun create(context: Context) {
-        val tag = "StateKitGlobalErr"
         val entryPoint = EntryPointAccessors.fromApplication<StateKitPluginInitEntryPoint>(context)
         val userMessageBroadcast = entryPoint.userMessageBroadcast()
 
-        StateKitPlugin.setGlobalStoreConfiguration(
-            configuration = StoreConfiguration(
+        StateKitPlugin.configGlobalStore { currentConfiguration ->
+            val globalErrTagName = "reduce.globalErr"
+            currentConfiguration.copy(
                 preferredCoroutineDispatcher = Dispatchers.Default,
                 defaultCoroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
                     when (throwable) {
                         is UserMessageException -> {
-                            Timber.tag(tag).e(throwable.origin)
+                            Timber.tag(tag = globalErrTagName).e(throwable.origin)
                             userMessageBroadcast.send(userMessage = throwable.userMessage)
                         }
 
@@ -57,12 +56,12 @@ internal class StateKitPluginInitializer : Initializer<Unit> {
                         }
 
                         else -> {
-                            Timber.tag(tag).e(throwable)
+                            Timber.tag(tag = globalErrTagName).e(throwable)
                         }
                     }
                 }
             )
-        )
+        }
     }
 
     override fun dependencies() = EmptyDependencies()

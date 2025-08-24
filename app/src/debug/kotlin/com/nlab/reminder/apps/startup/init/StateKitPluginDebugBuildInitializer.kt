@@ -1,12 +1,12 @@
 /*
- * Copyright (C) 2024 The N's lab Open Source Project
- *
+ * Copyright (C) 2025 The N's lab Open Source Project
+ *  
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ *  
  *        http://www.apache.org/licenses/LICENSE-2.0
- *
+ *  
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,16 +18,25 @@ package com.nlab.reminder.apps.startup.init
 
 import android.content.Context
 import androidx.startup.Initializer
-import com.nlab.reminder.apps.startup.EmptyDependencies
+import com.nlab.statekit.foundation.plugins.GlobalEffect
+import com.nlab.statekit.foundation.plugins.StateKitPlugin
 import timber.log.Timber
 
 /**
- * @author thalys
+ * @author Doohyun
  */
-class TimberInitializer : Initializer<Unit> {
+internal class StateKitPluginDebugBuildInitializer : Initializer<Unit> {
     override fun create(context: Context) {
-        Timber.plant(Timber.DebugTree())
+        StateKitPlugin.configGlobalStore { currentConfiguration ->
+            currentConfiguration.copy(defaultEffects = listOf(GlobalEffect { action, current ->
+                Timber.tag(tag = "reduce.trace").d(
+                    message = "action: ${action::class.qualifiedName}, current: ${current::class.qualifiedName}"
+                )
+            }))
+        }
     }
 
-    override fun dependencies() = EmptyDependencies()
+    override fun dependencies() = listOf(
+        StateKitPluginInitializer::class.java
+    )
 }
