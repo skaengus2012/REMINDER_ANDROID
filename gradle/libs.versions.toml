@@ -1,7 +1,7 @@
 [versions]
 
 # build Environmental
-compileSdk = "35"
+compileSdk = "36"
 targetSdk = "35"
 minSdk = "24"
 
