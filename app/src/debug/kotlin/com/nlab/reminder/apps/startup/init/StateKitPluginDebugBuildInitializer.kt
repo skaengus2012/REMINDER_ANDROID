@@ -28,11 +28,11 @@ import timber.log.Timber
 internal class StateKitPluginDebugBuildInitializer : Initializer<Unit> {
     override fun create(context: Context) {
         StateKitPlugin.configGlobalStore { currentConfiguration ->
-            currentConfiguration.copy(defaultEffects = listOf(GlobalEffect { action, current ->
+            currentConfiguration.copy(defaultEffects = currentConfiguration.defaultEffects + GlobalEffect { action, current ->
                 Timber.tag(tag = "reduce.trace").d(
                     message = "action: ${action::class.qualifiedName}, current: ${current::class.qualifiedName}"
                 )
-            }))
+            })
         }
     }
 
