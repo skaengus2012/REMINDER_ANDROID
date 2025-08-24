@@ -16,18 +16,21 @@
 
 package com.nlab.reminder.feature.home
 
+import androidx.lifecycle.ViewModel
 import com.nlab.reminder.core.component.tag.edit.TagEditStateMachine
 import com.nlab.reminder.core.component.usermessage.UserMessageFactory
 import com.nlab.reminder.core.data.repository.ScheduleRepository
 import com.nlab.reminder.core.data.repository.TagRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 /**
  * @author Thalys
  */
+@HiltViewModel
 internal class HomeEnvironment @Inject constructor(
     val scheduleRepository: ScheduleRepository,
     val tagRepository: TagRepository,
     val tagEditStateMachine: TagEditStateMachine,
     val userMessageFactory: UserMessageFactory
-)
+) : ViewModel()

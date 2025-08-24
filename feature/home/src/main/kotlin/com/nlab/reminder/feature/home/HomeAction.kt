@@ -19,12 +19,11 @@ package com.nlab.reminder.feature.home
 import com.nlab.reminder.core.component.tag.edit.TagEditState
 import com.nlab.reminder.core.data.model.Tag
 import com.nlab.reminder.core.kotlin.NonNegativeLong
-import com.nlab.statekit.annotation.UiAction
 
 /**
  * @author Doohyun
  */
-internal sealed class HomeAction private constructor() {
+internal sealed class HomeAction {
     data class StateSynced(
         val todaySchedulesCount: NonNegativeLong,
         val timetableSchedulesCount: NonNegativeLong,
@@ -37,42 +36,29 @@ internal sealed class HomeAction private constructor() {
         val newState: TagEditState
     ) : HomeAction()
 
-    @UiAction
-    data object OnTodayCategoryClicked : HomeAction()
+    data object TodayCategoryClicked : HomeAction()
 
-    @UiAction
-    data object OnTimetableCategoryClicked : HomeAction()
+    data object TimetableCategoryClicked : HomeAction()
 
-    @UiAction
-    data object OnAllCategoryClicked : HomeAction()
+    data object AllCategoryClicked : HomeAction()
 
-    @UiAction
-    data class OnTagLongClicked(val tag: Tag) : HomeAction()
+    data class TagLongClicked(val tag: Tag) : HomeAction()
 
-    @UiAction
-    data object OnTagRenameRequestClicked : HomeAction()
+    data object TagRenameRequestClicked : HomeAction()
 
-    @UiAction
-    data object OnTagRenameInputReady : HomeAction()
+    data object TagRenameInputReady : HomeAction()
 
-    @UiAction
-    data class OnTagRenameInputted(val text: String) : HomeAction()
+    data class TagRenameInputted(val text: String) : HomeAction()
 
-    @UiAction
-    data object OnTagRenameConfirmClicked : HomeAction()
+    data object TagRenameConfirmClicked : HomeAction()
 
-    @UiAction
-    data object OnTagReplaceConfirmClicked : HomeAction()
+    data object TagReplaceConfirmClicked : HomeAction()
 
-    @UiAction
-    data object OnTagReplaceCancelClicked : HomeAction()
+    data object TagReplaceCancelClicked : HomeAction()
 
-    @UiAction
-    data object OnTagDeleteRequestClicked : HomeAction()
+    data object TagDeleteRequestClicked : HomeAction()
 
-    @UiAction
-    data object OnTagDeleteConfirmClicked : HomeAction()
+    data object TagDeleteConfirmClicked : HomeAction()
 
-    @UiAction
-    data object OnTagEditCancelClicked : HomeAction()
+    data object TagEditCancelClicked : HomeAction()
 }

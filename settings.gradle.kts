@@ -42,9 +42,10 @@ gradle.startParameter.excludedTaskNames.addAll(listOf(":build-logic:convention:t
 
 // nlab-kits.
 include(
-    ":statekit:compiler",
+    ":statekit:androidx-lifecycle",
     ":statekit:core",
     ":statekit:dsl",
+    ":statekit:foundation",
     ":statekit:test",
     ":testkit"
 )
@@ -87,7 +88,6 @@ include(
     ":core:schedule",
     ":core:schedule-ext",
     ":core:schedule-test",
-    ":core:statekit",
     ":core:translation",
     ":core:uitext",
     ":core:uitext-test",

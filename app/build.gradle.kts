@@ -70,8 +70,8 @@ dependencies {
     implementation(projects.core.inject)
     implementation(projects.core.kotlin)
     implementation(projects.core.kotlinx.coroutinesAndroid)
-    implementation(projects.core.statekit)
     implementation(projects.core.translation)
+    implementation(projects.statekit.foundation)
 
     implementation(projects.feature.all)
     implementation(projects.feature.home)

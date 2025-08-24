@@ -24,7 +24,6 @@ import timber.log.Timber
 /**
  * @author thalys
  */
-@Suppress("unused")
 class TimberInitializer : Initializer<Unit> {
     override fun create(context: Context) {
         Timber.plant(Timber.DebugTree())

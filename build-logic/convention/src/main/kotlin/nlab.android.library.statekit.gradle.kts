@@ -16,11 +16,10 @@
 import org.gradle.kotlin.dsl.apply
 
 apply(plugin = "com.android.library")
-apply(plugin = "kotlin-kapt")
 
 dependencies {
-    "implementation"(project(":core:statekit"))
-    "kapt"(project(":statekit:compiler"))
+    "implementation"(project(":statekit:androidx-lifecycle"))
+    "implementation"(project(":statekit:dsl"))
 
     "testImplementation"(project(":statekit:test"))
 }

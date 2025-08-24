@@ -23,7 +23,7 @@ import com.nlab.reminder.core.kotlin.NonNegativeLong
 /**
  * @author Doohyun
  */
-internal sealed class HomeUiState private constructor() {
+internal sealed class HomeUiState {
     data object Loading : HomeUiState()
 
     data class Success(
