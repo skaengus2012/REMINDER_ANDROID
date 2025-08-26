@@ -16,14 +16,12 @@
 
 package com.nlab.reminder.core.androidx.compose.ui
 
-import androidx.compose.foundation.Indication
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
@@ -44,19 +42,16 @@ fun IconButton(
     contentDescription: String?,
     modifier: Modifier = Modifier,
     tint: Color = LocalContentColor.current,
-    indication: Indication? = null,
 ) {
-    Box(modifier = modifier.size(dimensionResource(DimenIds.icon_button_size))) {
-        ButtonBackground(
-            onClick = onClick,
-            onClickLabel = contentDescription,
-            indication = indication
-        )
-
+    ColorPressButton(
+        modifier = modifier.size(dimensionResource(DimenIds.icon_button_size)),
+        onClick = onClick,
+        onClickLabel = contentDescription,
+        contentColor = tint,
+    ) { color ->
         Icon(
-            modifier = Modifier.align(Alignment.Center),
             painter = painter,
-            tint = tint,
+            tint = color,
             contentDescription = null
         )
     }
