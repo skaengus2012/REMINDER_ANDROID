@@ -16,6 +16,7 @@
 
 package com.nlab.reminder.core.component.tag.edit.ui.compose
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -25,16 +26,15 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
-import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.nlab.reminder.core.androidx.compose.ui.ButtonBackground
 import com.nlab.reminder.core.androidx.compose.ui.throttleClick
 import com.nlab.reminder.core.androidx.compose.ui.tooling.preview.Previews
 import com.nlab.reminder.core.component.displayformat.ui.tagDisplayText
@@ -104,24 +104,22 @@ private fun TagEditTaskSelectionDialogButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Box(modifier = modifier) {
-        ButtonBackground(
-            onClick = throttleClick(onClick = onClick),
-            onClickLabel = text,
-            indication = ripple(color = PlaneatTheme.colors.bgRipple1),
-        )
-        Text(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 15.dp, vertical = 7.5.dp),
-            text = text,
-            style = PlaneatTheme.typography.bodyMedium,
-            color = fontColor,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            textAlign = TextAlign.Center
-        )
-    }
+    Text(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable(
+                onClick = throttleClick(onClick = onClick),
+                onClickLabel = text,
+                role = Role.Button
+            )
+            .padding(horizontal = 15.dp, vertical = 7.5.dp),
+        text = text,
+        style = PlaneatTheme.typography.bodyMedium,
+        color = fontColor,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+        textAlign = TextAlign.Center
+    )
 }
 
 @Previews

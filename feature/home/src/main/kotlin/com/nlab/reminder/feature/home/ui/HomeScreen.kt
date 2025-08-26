@@ -465,22 +465,22 @@ private fun BasicCategoryCard(
 
 @Composable
 private fun CategoryCardBackground(
-    onClick: () -> Unit = {},
-    onClickLabel: String? = null
+    onClick: () -> Unit,
+    onClickLabel: String?
 ) {
     Spacer(
         modifier = Modifier
             .aspectRatio(1 / 1.625f)
             .fillMaxWidth()
             .clip(RoundedCornerShape(8.dp))
+            .background(PlaneatTheme.colors.bg1Layer)
             .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = ripple(color = PlaneatTheme.colors.bgRipple1),
                 onClick = onClick,
                 onClickLabel = onClickLabel,
+                interactionSource = remember { MutableInteractionSource() },
+                indication = ripple(color = PlaneatTheme.colors.bg1LayerRipple),
                 role = Role.Tab
             )
-            .background(PlaneatTheme.colors.bg1Layer)
     )
 }
 

@@ -18,7 +18,6 @@ package com.nlab.reminder.core.component.tag.edit.ui.compose
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -26,9 +25,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
-import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -217,8 +214,6 @@ private fun TagEditDeleteButton(
             .clickable(
                 onClick = throttleClick(onClick = onClick),
                 onClickLabel = text,
-                interactionSource = remember { MutableInteractionSource() },
-                indication = ripple(color = PlaneatTheme.colors.bgRipple1),
                 role = Role.Button
             ),
         color = Color.Transparent

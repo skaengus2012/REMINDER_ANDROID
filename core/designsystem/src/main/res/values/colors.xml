@@ -37,14 +37,15 @@
 
     <!-- light -->
     <color name="bg_1_light">#F2F2F6</color>
-    <color name="bg_1_light_layer">@android:color/white</color>
+    <color name="bg_1_layer_light">@android:color/white</color>
+    <color name="bg_1_layer_ripple_light">#D3D3D3</color>
     <color name="bg_2_light">@android:color/white</color>
     <color name="bg_2_card_light">#EEEEEE</color>
     <color name="bg_2_card_stroke_light">#D3D3D3</color>
-    <color name="bg_ripple_1_light">#DFDFDF</color>
     <color name="bg_line_1_light">@color/gray_400</color>
     <color name="bg_line_2_light">@color/gray_2</color>
     <color name="bg_placeholder_1_light">#D3D3D3</color>
+    <color name="bg_ripple_light">@color/black_op12</color>
     <color name="content_1_light">#393939</color>
     <color name="content_2_light">#8A8A8D</color>
     <color name="content_2_hint_light">#998A8A8D</color>
@@ -54,13 +55,14 @@
     <!-- dark -->
     <color name="bg_1_dark">@android:color/black</color>
     <color name="bg_1_dark_layer">#1C1C1C</color>
+    <color name="bg_1_dark_layer_ripple">@color/white_op16</color>
     <color name="bg_2_dark">@android:color/black</color>
     <color name="bg_2_card_dark">@color/gray_800</color>
     <color name="bg_2_card_stroke_dark">#EEEEEE</color>
-    <color name="bg_ripple_1_dark">#49494C</color>
     <color name="bg_line_1_dark">@color/gray_800</color>
     <color name="bg_line_2_dark">@color/gray_2</color>
     <color name="bg_placeholder_1_dark">@color/gray_700</color>
+    <color name="bg_ripple_dark">@color/white_op16</color>
     <color name="content_1_dark">@android:color/white</color>
     <color name="content_2_dark">#B7B7B7</color>
     <color name="content_2_hint_dark">#99B7B7B7</color>
