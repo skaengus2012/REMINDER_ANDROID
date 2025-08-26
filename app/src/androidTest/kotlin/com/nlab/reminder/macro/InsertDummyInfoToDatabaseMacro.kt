@@ -29,12 +29,12 @@ import com.nlab.reminder.core.local.database.dao.ScheduleTimingSaveInput
 import com.nlab.reminder.core.local.database.dao.TagDAO
 import com.nlab.reminder.core.local.database.entity.ScheduleTagListEntity
 import kotlinx.coroutines.runBlocking
-import kotlinx.datetime.Clock
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.*
+import kotlin.time.Clock
 
 /**
  * @author Doohyun
