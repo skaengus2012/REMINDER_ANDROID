@@ -48,6 +48,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -85,7 +86,8 @@ internal fun TagRenameDialog(
     shouldKeyboardShown: Boolean,
     onTextChanged: (String) -> Unit,
     onCancel: () -> Unit,
-    onConfirm: () -> Unit
+    onConfirm: () -> Unit,
+    onKeyboardInitiallyDisplayed: () -> Unit,
 ) {
     PlaneatDialog(onDismissRequest = onCancel) {
         Column(
@@ -104,7 +106,8 @@ internal fun TagRenameDialog(
                 modifier = Modifier.padding(start = 15.dp, end = 15.dp, bottom = 10.dp),
                 renameText = renameText,
                 shouldKeyboardShown = shouldKeyboardShown,
-                onTextChanged = onTextChanged
+                onTextChanged = onTextChanged,
+                onKeyboardInitiallyDisplayed = onKeyboardInitiallyDisplayed,
             )
             TagDialogButtons(
                 onCancel = onCancel,
@@ -163,15 +166,18 @@ private fun TagRenameInputField(
     renameText: String,
     shouldKeyboardShown: Boolean,
     onTextChanged: (String) -> Unit,
+    onKeyboardInitiallyDisplayed: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val focusRequester = remember { FocusRequester() }
     if (shouldKeyboardShown) {
         val keyboardController = LocalSoftwareKeyboardController.current
-        LaunchedEffect(focusRequester) {
+        LaunchedEffect(Unit) {
+            // After entering the screen, there is a slight delay, and then the keyboard is raised
+            delay(100)
             focusRequester.requestFocus()
-            delay(100) // Make sure you have delay here
             keyboardController?.show()
+            onKeyboardInitiallyDisplayed()
         }
     }
 
@@ -285,7 +291,8 @@ private fun TagRenameDialogPreview() {
                 shouldKeyboardShown = false,
                 onTextChanged = {},
                 onCancel = {},
-                onConfirm = {}
+                onConfirm = {},
+                onKeyboardInitiallyDisplayed = {}
             )
         }
     }
