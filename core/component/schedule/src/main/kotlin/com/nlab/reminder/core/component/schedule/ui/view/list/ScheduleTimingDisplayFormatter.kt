@@ -33,9 +33,9 @@ import com.nlab.reminder.core.component.schedule.R
 import com.nlab.reminder.core.component.schedule.ui.TriggerAtFormatPatterns
 import com.nlab.reminder.core.data.model.ScheduleTiming
 import com.nlab.reminder.core.designsystem.compose.theme.AttrIds
-import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import java.util.IdentityHashMap
+import kotlin.time.Instant
 
 /**
  * @author Doohyun
@@ -56,7 +56,10 @@ internal class ScheduleTimingDisplayFormatter(
         val cachedValue = cache[scheduleTiming]
         if (cachedValue == null) {
             val scheduleTimingResource = ScheduleTimingDisplayResource(scheduleTiming, timeZone, entryAt)
-            val originDisplayText = getDisplayText(context.resources, scheduleTimingResource)
+            val originDisplayText = getDisplayText(
+                context.resources,
+                scheduleTimingResource
+            )
             val finalDisplayText = decorateWithCompleted(
                 context,
                 originDisplayText,
