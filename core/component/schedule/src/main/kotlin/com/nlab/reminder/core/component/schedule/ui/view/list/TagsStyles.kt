@@ -136,16 +136,32 @@ internal class PartialTagDeletionCapture {
 internal class TagStyleRemover {
     private val tagStyleParser = TagStyleParser
 
-    fun remove(text: CharSequence?, start: Int, end: Int) {
-        if (text !is Editable) return
+    fun remove(text: CharSequence?, start: Int, addedSize: Int): Result {
+        if (text !is Editable) return Result.NotFound
 
+        val end = start + addedSize
         for (style in tagStyleParser.findAppliedTagStyles(text, start, end)) {
+            val spanStart = text.getSpanStart(style)
             val spanEnd = text.getSpanEnd(style)
             text.removeSpan(style)
+            if (spanStart + addedSize != end) {
+                return Result.InvalidStyle(
+                    styleStart = spanStart,
+                    styleEnd = spanEnd
+                )
+            }
             if (spanEnd > end) {
                 text.setSpan(style, end, spanEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                return Result.StyleRemoved
             }
         }
+        return Result.NotFound
+    }
+
+    sealed class Result {
+        data object StyleRemoved : Result()
+        data object NotFound : Result()
+        data class InvalidStyle(val styleStart: Int, val styleEnd: Int) : Result()
     }
 }
 
