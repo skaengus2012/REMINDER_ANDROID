@@ -29,11 +29,11 @@ import com.nlab.reminder.core.android.view.setVisible
 import com.nlab.reminder.core.data.model.ScheduleTiming
 import com.nlab.reminder.core.data.model.Tag
 import kotlinx.coroutines.Runnable
-import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import timber.log.Timber
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.time.Instant
 
 /**
  * @author Doohyun

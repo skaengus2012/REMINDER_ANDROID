@@ -35,8 +35,8 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.update
-import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
+import kotlin.time.Instant
 
 private const val ITEM_VIEW_TYPE_ADD = 1
 private const val ITEM_VIEW_TYPE_CONTENT = 2
