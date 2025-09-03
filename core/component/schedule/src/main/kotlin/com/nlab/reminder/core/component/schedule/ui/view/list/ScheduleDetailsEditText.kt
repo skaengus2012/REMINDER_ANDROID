@@ -143,7 +143,14 @@ internal class ScheduleDetailsEditText @JvmOverloads constructor(
                         s.delete(result.styleStart, result.styleEnd)
                         s.insert(result.styleStart, newText)
                         runWithDetailsTextUpdate { setText(s) }
-                        setSelection(result.styleStart, newText.length)
+                        val newSelEnd = result.styleStart + newText.length
+
+                        // If the number of characters entered is one,
+                        // the cursor is sent behind the input character.
+                        setSelection(
+                            /*start= */ if (newText.length > 1) result.styleStart else newSelEnd,
+                            /*stop= */newSelEnd
+                        )
                     }
 
                     return
