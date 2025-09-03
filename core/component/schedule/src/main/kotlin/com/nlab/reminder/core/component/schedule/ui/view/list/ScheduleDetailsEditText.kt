@@ -129,7 +129,23 @@ internal class ScheduleDetailsEditText @JvmOverloads constructor(
                 }
 
                 if (start >= 0 && after > 0) {
-                    tagStyleRemover.remove(text = s, start = start, end = start + after)
+                    val result = tagStyleRemover.remove(
+                        text = s,
+                        start = start,
+                        addedSize = after
+                    )
+                    if (result is TagStyleRemover.Result.InvalidStyle) {
+                        // https://github.com/skaengus2012/REMINDER_ANDROID/issues/556
+                        // When input is performed while a tag is attached to the cursor,
+                        // remove the tag and replace it with the new text.
+                        s as Editable
+                        val newText = s.subSequence(start, start + after)
+                        s.delete(result.styleStart, result.styleEnd)
+                        s.insert(result.styleStart, newText)
+                        runWithDetailsTextUpdate { setText(s) }
+                        setSelection(result.styleStart, newText.length)
+                    }
+
                     return
                 }
             }
