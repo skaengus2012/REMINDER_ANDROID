@@ -156,7 +156,12 @@ internal class ScheduleDetailsEditText @JvmOverloads constructor(
     }
 
     override fun onSelectionChanged(selStart: Int, selEnd: Int) {
-        super.onSelectionChanged(selStart, selEnd)
+        // https://github.com/skaengus2012/REMINDER_ANDROID/issues/554
+        // When expanding the drag area without the cursor handle, selStart and selEnd are reversed.
+        val safeSelStart = min(selStart, selEnd)
+        val safeSelEnd = max(selStart, selEnd)
+
+        super.onSelectionChanged(safeSelStart, safeSelEnd)
 
         if (isFullyInitialized.not()) {
             // Executes the default implementation when called from the parent constructor
@@ -168,22 +173,22 @@ internal class ScheduleDetailsEditText @JvmOverloads constructor(
 
         val currentText = text
         val textLength = currentText?.length ?: 0
-        if (selStart > textLength || selEnd > textLength) {
+        if (safeSelStart > textLength || safeSelEnd > textLength) {
             // check out of bounds
             return
         }
 
         val timingTextLength = scheduleTimingText.length
-        val needHapticFeedback = selStart > timingTextLength
+        val needHapticFeedback = safeSelStart > timingTextLength
         if (isHapticFeedbackEnabled != needHapticFeedback) {
             // Since selStart cannot be ahead of Timing, it also invalidates feedback.
             isHapticFeedbackEnabled = needHapticFeedback
         }
 
-        if (selStart < timingTextLength) {
+        if (safeSelStart < timingTextLength) {
             // Selected the part of the text entered after detailsText
             val newStart = min(timingTextLength, textLength)
-            setSelection(newStart, max(newStart, selEnd))
+            setSelection(newStart, max(newStart, safeSelEnd))
             return
         }
     }
