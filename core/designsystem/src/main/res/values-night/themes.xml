@@ -18,17 +18,21 @@
 
     <style name="Theme.Reminder.App" parent="Base.Theme.Reminder">
         <item name="bg_1">@color/bg_1_dark</item>
+        <item name="bg_1_layer">@color/bg_1_dark_layer</item>
+        <item name="bg_1_layer_ripple">@color/bg_1_dark_layer_ripple</item>
         <item name="bg_2">@color/bg_2_dark</item>
-        <item name="bg_ripple_1">@color/bg_ripple_1_dark</item>
-        <item name="bg_card_1">@color/bg_card_1_dark</item>
-        <item name="bg_card_2">@color/bg_card_2_dark</item>
-        <item name="bg_card_stroke_1">@color/bg_card_stroke_1_dark</item>
+        <item name="bg_2_card">@color/bg_2_card_dark</item>
+        <item name="bg_2_card_stroke">@color/bg_2_card_stroke_dark</item>
         <item name="bg_line_1">@color/bg_line_1_dark</item>
         <item name="bg_line_2">@color/bg_line_2_dark</item>
         <item name="bg_placeholder_1">@color/bg_placeholder_1_dark</item>
+        <item name="bg_ripple">@color/bg_ripple_dark</item>
+        <item name="bg_text_selection">@color/point1_op30</item>
         <item name="content_1">@color/content_1_dark</item>
         <item name="content_2">@color/content_2_dark</item>
+        <item name="content_2_hint">@color/content_2_hint_dark</item>
         <item name="content_3">@color/content_3_dark</item>
+        <item name="content_3_hint">@color/content_3_hint_dark</item>
     </style>
 
 </resources>

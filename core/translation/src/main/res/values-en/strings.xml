@@ -19,10 +19,7 @@
     <string name="cancel">Cancel</string>
     <string name="ok">OK</string>
     <string name="common_tag_empty">No tags assigned to the schedule.</string>
-    <string name="open_link">Open link</string>
     <string name="open_link_default_error">This link is not executable.</string>
-    <string name="delete">Delete</string>
-    <string name="handle_drag">Start drag</string>
     <string name="unknown_error">An unknown error has occurred.</string>
     <string name="message_error_remote_time_loading_failed">The current screen is displayed based on your device time.</string>
 
@@ -43,7 +40,26 @@
     <string name="home_category_header">My Todo</string>
     <string name="home_category_today">Today</string>
     <string name="home_category_timetable">Scheduled</string>
-    <string name="home_category_all">All</string>
     <string name="home_tag_header">My Tags</string>
-    <string name="new_schedule_label">New Plan</string>
+
+    <string name="add_note">add note</string>
+    <string name="content_description_back">go back</string>
+    <string name="content_description_complete_toggle">check whether to complete</string>
+    <string name="content_description_drag">dragging</string>
+    <string name="content_description_info">information</string>
+    <string name="content_description_more">see more</string>
+    <string name="content_description_open_link">open link</string>
+    <string name="content_description_select">select</string>
+    <string name="format_trigger_at">yyyy/MM/dd h:mm a</string>
+    <string name="format_trigger_at_today">Today h:mm a</string>
+    <string name="format_trigger_at_tomorrow">Tomorrow h:mm a</string>
+    <string name="format_trigger_at_date_only">yyyy. M. d.</string>
+    <string name="format_trigger_at_date_only_today">Today</string>
+    <string name="format_trigger_at_date_only_tomorrow">Tomorrow</string>
+    <string name="format_trigger_at_time_only">h:mm a</string>
+    <string name="label_all">All</string>
+    <string name="label_complete">Done</string>
+    <string name="label_delete">Delete</string>
+    <string name="label_lists">Lists</string>
+    <string name="new_plan">New Plan</string>
 </resources>
