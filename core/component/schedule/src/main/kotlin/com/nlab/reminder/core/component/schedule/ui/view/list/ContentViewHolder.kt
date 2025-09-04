@@ -285,8 +285,7 @@ private class ContentDraggingDelegate(
     val draggingFlow: StateFlow<Boolean> = _draggingFlow.asStateFlow()
 
     // Prevent start dragging, when input selection double click!
-    override val userDraggable: Boolean
-        get() = binding.getAllInputs().all { it.hasSelection().not() }
+    override val userDraggable: Boolean get() = binding.isInteractable()
 
     override fun isScaleOnDraggingNeeded(): Boolean {
         return binding.imageviewBgLinkThumbnail.isVisible
@@ -307,6 +306,7 @@ private class ContentSwipeDelegate(
     private val _swipeFlow = MutableStateFlow(false)
     val swipeFlow: StateFlow<Boolean> = _swipeFlow.asStateFlow()
 
+    override val userSwipeable: Boolean get() = binding.isInteractable()
     override val swipeView: View get() = binding.layoutContent
     override val clampWidth: Float get() = binding.buttonDelete.width.toFloat()
 
@@ -325,6 +325,14 @@ private fun LayoutScheduleAdapterItemContentBinding.getAllInputs(): Iterable<Edi
     edittextNote,
     edittextDetail
 )
+
+private fun LayoutScheduleAdapterItemContentBinding.isInteractable(): Boolean {
+    return edittextTitle.hasSelection().not()
+            && edittextNote.hasSelection().not()
+            // Tag interactions often conflict with drag or swipe events
+            // Should block interactions when focus is present
+            && edittextDetail.hasFocus().not()
+}
 
 private fun LayoutScheduleAdapterItemContentBinding.findInput(contentInputFocus: ContentInputFocus): EditText? {
     return when (contentInputFocus) {

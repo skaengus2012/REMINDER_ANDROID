@@ -92,8 +92,11 @@ class ScheduleListItemTouchCallback(
     }
 
     override fun getSwipeDirs(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
-        return if (viewHolder is SwipeSupportable) super.getSwipeDirs(recyclerView, viewHolder)
-        else ItemTouchHelper.ACTION_STATE_IDLE
+        return if (viewHolder is SwipeSupportable && viewHolder.swipeDelegate.userSwipeable) {
+            super.getSwipeDirs(recyclerView, viewHolder)
+        } else {
+            ItemTouchHelper.ACTION_STATE_IDLE
+        }
     }
 
     override fun onChildDraw(
