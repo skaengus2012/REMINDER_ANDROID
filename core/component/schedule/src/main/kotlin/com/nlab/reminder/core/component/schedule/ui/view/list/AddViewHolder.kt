@@ -34,8 +34,9 @@ import kotlinx.coroutines.launch
 class AddViewHolder internal constructor(
     binding: LayoutScheduleAdapterItemAddBinding,
     theme: ScheduleListTheme,
+    onItemViewTouched: (RecyclerView.ViewHolder) -> Unit,
     onSimpleAddDone: (SimpleAdd) -> Unit,
-    onFocusChanged: (RecyclerView.ViewHolder, Boolean) -> Unit
+    onFocusChanged: (RecyclerView.ViewHolder, Boolean) -> Unit,
 ) : ScheduleAdapterItemViewHolder(binding.root),
     DraggingSupportable {
     private val addViewHolderDelegate = AddViewHolderDelegate(binding)
@@ -47,16 +48,21 @@ class AddViewHolder internal constructor(
 
         val jobs = mutableListOf<Job>()
         itemView.doOnAttach { view ->
-            val lifecycleScope = view.findViewTreeLifecycleOwner()
+            val viewLifecycleScope = view.findViewTreeLifecycleOwner()
                 ?.lifecycleScope
                 ?: return@doOnAttach
-            val inputFocusFlow = binding.addInputFocusSharedFlow(lifecycleScope, jobs)
+            val inputFocusFlow = binding.addInputFocusSharedFlow(viewLifecycleScope, jobs)
             val hasInputFocusFlow = inputFocusFlow
                 .map { it != AddInputFocus.Nothing }
                 .distinctUntilChanged()
-                .shareInWithJobCollector(lifecycleScope, jobs, replay = 1)
-            jobs += addViewHolderDelegate.onAttached(view, inputFocusFlow, hasInputFocusFlow, onSimpleAddDone)
-            jobs += lifecycleScope.launch {
+                .shareInWithJobCollector(viewLifecycleScope, jobs, replay = 1)
+            jobs += addViewHolderDelegate.onAttached(
+                addInputFocusFlow = inputFocusFlow,
+                hasInputFocusFlow = hasInputFocusFlow,
+                onSimpleAddDone = onSimpleAddDone,
+                onItemViewTouched = { onItemViewTouched(this) }
+            )
+            jobs += viewLifecycleScope.launch {
                 hasInputFocusFlow.collect { focused -> onFocusChanged(this@AddViewHolder, focused) }
             }
         }

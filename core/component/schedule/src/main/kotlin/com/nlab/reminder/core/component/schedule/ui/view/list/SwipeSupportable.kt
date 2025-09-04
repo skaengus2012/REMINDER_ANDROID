@@ -26,6 +26,7 @@ sealed interface SwipeSupportable {
 }
 
 abstract class SwipeDelegate {
+    internal abstract val userSwipeable: Boolean
     internal abstract val swipeView: View
     internal abstract val clampWidth: Float
     internal abstract fun onSwipe(isActive: Boolean, dx: Float)

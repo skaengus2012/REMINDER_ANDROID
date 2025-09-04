@@ -27,7 +27,7 @@ import com.nlab.reminder.core.component.schedule.R
 import kotlin.math.max
 import kotlin.math.min
 
-private const val DEFAULT_ANIMATE_DURATION = 100L
+private const val DEFAULT_ANIMATE_DURATION = 250L
 
 /**
  * Implementation of Drag-n-drop, swipe policy for [ScheduleAdapterItem].
@@ -92,8 +92,11 @@ class ScheduleListItemTouchCallback(
     }
 
     override fun getSwipeDirs(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
-        return if (viewHolder is SwipeSupportable) super.getSwipeDirs(recyclerView, viewHolder)
-        else ItemTouchHelper.ACTION_STATE_IDLE
+        return if (viewHolder is SwipeSupportable && viewHolder.swipeDelegate.userSwipeable) {
+            super.getSwipeDirs(recyclerView, viewHolder)
+        } else {
+            ItemTouchHelper.ACTION_STATE_IDLE
+        }
     }
 
     override fun onChildDraw(
