@@ -187,6 +187,7 @@ internal class AllFragment : ComposableFragment() {
             .launchIn(viewLifecycleScope)
 
         merge(
+            scheduleListAdapter.itemViewTouch,
             fragmentStateBridge.itemSelectionEnabled
                 .filter { it }
                 .flowWithLifecycle(viewLifecycle),
@@ -195,7 +196,7 @@ internal class AllFragment : ComposableFragment() {
                 .withPrev(RecyclerView.SCROLL_STATE_IDLE)
                 .filter { (prev, cur) ->
                     prev == RecyclerView.SCROLL_STATE_IDLE && cur == RecyclerView.SCROLL_STATE_DRAGGING
-                }
+                },
         ).onEach { itemTouchCallback.removeSwipeClamp(binding.recyclerviewSchedule) }
             .launchIn(viewLifecycleScope)
 

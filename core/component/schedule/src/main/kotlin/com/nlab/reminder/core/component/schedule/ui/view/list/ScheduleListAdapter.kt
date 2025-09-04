@@ -78,6 +78,9 @@ class ScheduleListAdapter(
     private val _focusChange = MutableEventSharedFlow<FocusChange>()
     val focusChange: Flow<FocusChange> = _focusChange.asSharedFlow()
 
+    private val _itemViewTouch = MutableEventSharedFlow<RecyclerView.ViewHolder>()
+    val itemViewTouch: Flow<RecyclerView.ViewHolder> = _itemViewTouch.asSharedFlow()
+
     private fun getItem(position: Int): ScheduleAdapterItem {
         return differ.getCurrentList()[position]
     }
@@ -103,6 +106,7 @@ class ScheduleListAdapter(
                         /* attachToParent = */ false
                     ),
                     theme = theme,
+                    onItemViewTouched = { _itemViewTouch.tryEmit(it) },
                     onSimpleAddDone = { _addRequest.tryEmit(it) },
                     onFocusChanged = { viewHolder, focused -> _focusChange.tryEmit(FocusChange(viewHolder, focused)) }
                 )
@@ -121,6 +125,7 @@ class ScheduleListAdapter(
                     entryAt = entryAt,
                     selectionEnabled = selectionEnabled,
                     selectedScheduleIds = selectedScheduleIds,
+                    onItemViewTouched = { _itemViewTouch.tryEmit(it) },
                     onSimpleEditDone = { _editRequest.tryEmit(it) },
                     onDragHandleTouched = { _dragHandleTouch.tryEmit(it) },
                     onSelectButtonTouched = { _selectButtonTouch.tryEmit(it) },
@@ -136,6 +141,7 @@ class ScheduleListAdapter(
                         /* attachToParent = */ false
                     ),
                     theme = theme,
+                    onItemViewTouched = { _itemViewTouch.tryEmit(it) },
                     onSimpleAddDone = { _addRequest.tryEmit(it) },
                     onFocusChanged = { viewHolder, focused -> _focusChange.tryEmit(FocusChange(viewHolder, focused)) },
                 )

@@ -35,6 +35,7 @@ import kotlinx.coroutines.launch
 class FooterAddViewHolder internal constructor(
     private val binding: LayoutScheduleAdapterItemFooterAddBinding,
     theme: ScheduleListTheme,
+    onItemViewTouched: (RecyclerView.ViewHolder) -> Unit,
     onSimpleAddDone: (SimpleAdd) -> Unit,
     onFocusChanged: (RecyclerView.ViewHolder, Boolean) -> Unit,
 ) : ScheduleAdapterItemViewHolder(binding.root) {
@@ -53,7 +54,12 @@ class FooterAddViewHolder internal constructor(
                 .map { it != AddInputFocus.Nothing }
                 .distinctUntilChanged()
                 .shareInWithJobCollector(lifecycleScope, jobs, replay = 1)
-            jobs += addViewHolderDelegate.onAttached(view, inputFocusFlow, hasInputFocusFlow, onSimpleAddDone)
+            jobs += addViewHolderDelegate.onAttached(
+                addInputFocusFlow = inputFocusFlow,
+                hasInputFocusFlow = hasInputFocusFlow,
+                onSimpleAddDone = onSimpleAddDone,
+                onItemViewTouched = { onItemViewTouched(this) }
+            )
             jobs += lifecycleScope.launch {
                 hasInputFocusFlow.collect { focused -> onFocusChanged(this@FooterAddViewHolder, focused) }
             }

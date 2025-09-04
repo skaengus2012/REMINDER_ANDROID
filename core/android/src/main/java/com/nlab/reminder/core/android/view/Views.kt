@@ -18,6 +18,7 @@ package com.nlab.reminder.core.android.view
 
 import android.view.MotionEvent
 import android.view.View
+import com.nlab.reminder.core.kotlinx.coroutines.flow.filter
 import com.nlab.reminder.core.kotlinx.coroutines.flow.throttleFirst
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -68,6 +69,9 @@ fun View.touches(): Flow<MotionEvent> = callbackFlow {
 
     awaitClose { setOnTouchListener(null) }
 }
+
+fun Flow<MotionEvent>.filterActionDone(): Flow<MotionEvent> =
+    filter { event -> event.action == MotionEvent.ACTION_DOWN }
 
 fun View.clicks(): Flow<View> = callbackFlow {
     setOnClickListener { trySend(it) }

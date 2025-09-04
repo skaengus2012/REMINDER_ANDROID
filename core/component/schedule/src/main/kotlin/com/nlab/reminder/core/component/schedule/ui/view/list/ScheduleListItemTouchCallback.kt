@@ -27,7 +27,7 @@ import com.nlab.reminder.core.component.schedule.R
 import kotlin.math.max
 import kotlin.math.min
 
-private const val DEFAULT_ANIMATE_DURATION = 100L
+private const val DEFAULT_ANIMATE_DURATION = 250L
 
 /**
  * Implementation of Drag-n-drop, swipe policy for [ScheduleAdapterItem].

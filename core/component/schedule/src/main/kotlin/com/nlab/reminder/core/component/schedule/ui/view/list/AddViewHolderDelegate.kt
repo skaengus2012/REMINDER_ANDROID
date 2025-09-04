@@ -18,12 +18,13 @@ package com.nlab.reminder.core.component.schedule.ui.view.list
 
 import android.content.res.ColorStateList
 import android.text.InputType
-import android.view.View
 import android.widget.EditText
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.nlab.reminder.core.android.view.clearFocusIfNeeded
+import com.nlab.reminder.core.android.view.filterActionDone
 import com.nlab.reminder.core.android.view.setVisible
+import com.nlab.reminder.core.android.view.touches
 import com.nlab.reminder.core.android.widget.bindCursorVisible
 import com.nlab.reminder.core.android.widget.bindText
 import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapterItemAddBinding
@@ -34,6 +35,7 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.launch
 
 /**
@@ -53,16 +55,24 @@ internal class AddViewHolderDelegate(
     }
 
     fun onAttached(
-        view: View,
         addInputFocusFlow: SharedFlow<AddInputFocus>,
         hasInputFocusFlow: SharedFlow<Boolean>,
-        onSimpleAddDone: (SimpleAdd) -> Unit
+        onSimpleAddDone: (SimpleAdd) -> Unit,
+        onItemViewTouched: () -> Unit,
     ): List<Job> {
-        val lifecycleScope = view.findViewTreeLifecycleOwner()
+        val itemView = binding.root
+        val viewLifecycleScope = itemView.findViewTreeLifecycleOwner()
             ?.lifecycleScope
             ?: return emptyList()
         val jobs = mutableListOf<Job>()
-        jobs += lifecycleScope.launch {
+
+        jobs += viewLifecycleScope.launch {
+            val touchEvents = binding.getAllInputs().map { it.touches() } + itemView.touches()
+            touchEvents.merge()
+                .filterActionDone()
+                .collect { onItemViewTouched() }
+        }
+        jobs += viewLifecycleScope.launch {
             addInputFocusFlow.collect { inputFocus ->
                 val focusedEditText = binding.findInput(inputFocus)
                 binding.getAllInputs().forEach { editText ->
@@ -70,16 +80,16 @@ internal class AddViewHolderDelegate(
                 }
             }
         }
-        jobs += lifecycleScope.launch {
+        jobs += viewLifecycleScope.launch {
             hasInputFocusFlow.collect(binding.buttonInfo::setVisible)
         }
-        jobs += lifecycleScope.launch {
+        jobs += viewLifecycleScope.launch {
             registerEditNoteVisibility(
                 edittextNote = binding.edittextNote,
                 viewHolderEditFocusedFlow = hasInputFocusFlow
             )
         }
-        jobs += lifecycleScope.launch {
+        jobs += viewLifecycleScope.launch {
             addInputFocusFlow
                 .map { it == AddInputFocus.Note }
                 .distinctUntilChanged()
@@ -89,7 +99,7 @@ internal class AddViewHolderDelegate(
                     }
                 }
         }
-        jobs += lifecycleScope.launch {
+        jobs += viewLifecycleScope.launch {
             hasInputFocusFlow
                 .focusLostCompletelyChanges()
                 .mapNotNull { savable ->
@@ -97,7 +107,7 @@ internal class AddViewHolderDelegate(
                         SimpleAdd(
                             headerKey = null, // TODO implements
                             title = binding.edittextTitle.text?.toString().let { curTitle ->
-                                if (curTitle.isNullOrBlank()) view.context.getString(StringIds.new_plan)
+                                if (curTitle.isNullOrBlank()) itemView.context.getString(StringIds.new_plan)
                                 else curTitle
                             },
                             note = binding.edittextNote.text?.toString().orEmpty()

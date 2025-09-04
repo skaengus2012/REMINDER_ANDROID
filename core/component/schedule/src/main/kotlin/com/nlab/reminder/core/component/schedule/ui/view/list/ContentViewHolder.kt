@@ -32,6 +32,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.nlab.reminder.core.android.content.getThemeColor
 import com.nlab.reminder.core.android.view.isVisible
 import com.nlab.reminder.core.android.view.clearFocusIfNeeded
+import com.nlab.reminder.core.android.view.filterActionDone
 import com.nlab.reminder.core.android.view.focusChanges
 import com.nlab.reminder.core.android.view.setVisible
 import com.nlab.reminder.core.android.view.throttleClicks
@@ -45,6 +46,7 @@ import com.nlab.reminder.core.data.model.ScheduleId
 import com.nlab.reminder.core.designsystem.compose.theme.AttrIds
 import com.nlab.reminder.core.kotlinx.coroutines.cancelAll
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -55,7 +57,10 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.launch
 import kotlinx.datetime.TimeZone
 import kotlin.math.absoluteValue
@@ -73,6 +78,7 @@ class ContentViewHolder internal constructor(
     entryAt: Flow<Instant>,
     selectionEnabled: StateFlow<Boolean>,
     selectedScheduleIds: StateFlow<Set<ScheduleId>>,
+    onItemViewTouched: (RecyclerView.ViewHolder) -> Unit,
     onSimpleEditDone: (SimpleEdit) -> Unit,
     onDragHandleTouched: (RecyclerView.ViewHolder) -> Unit,
     onSelectButtonTouched: (RecyclerView.ViewHolder) -> Unit,
@@ -123,7 +129,7 @@ class ContentViewHolder internal constructor(
         val jobs = mutableListOf<Job>()
         itemView.doOnAttach { view ->
             val viewLifecycleOwner = view.findViewTreeLifecycleOwner() ?: return@doOnAttach
-            val viewLifecycleCoroutineScope = viewLifecycleOwner.lifecycleScope
+            val viewLifecycleScope = viewLifecycleOwner.lifecycleScope
             val inputFocusFlow = combine(
                 ContentInputFocus.entries.mapNotNull { contentInputFocus ->
                     binding.findInput(contentInputFocus)
@@ -133,13 +139,19 @@ class ContentViewHolder internal constructor(
                 }
             ) { focuses -> focuses.find { it != null } ?: ContentInputFocus.Nothing }
                 .distinctUntilChanged()
-                .shareInWithJobCollector(viewLifecycleCoroutineScope, jobs, replay = 1)
+                .shareInWithJobCollector(viewLifecycleScope, jobs, replay = 1)
             val hasInputFocusChangesFlow = inputFocusFlow
                 .map { it != ContentInputFocus.Nothing }
                 .distinctUntilChanged()
-                .shareInWithJobCollector(viewLifecycleCoroutineScope, jobs, replay = 1)
+                .shareInWithJobCollector(viewLifecycleScope, jobs, replay = 1)
 
-            jobs += viewLifecycleCoroutineScope.launch {
+            jobs += viewLifecycleScope.launch {
+                val touchEvents = binding.getAllInputs().map { it.touches() } + binding.layoutContent.touches()
+                touchEvents.merge()
+                    .filterActionDone()
+                    .collect { onItemViewTouched(this@ContentViewHolder) }
+            }
+            jobs += viewLifecycleScope.launch {
                 inputFocusFlow.collect { inputFocus ->
                     val focusedEditText = binding.findInput(inputFocus)
                     binding.getAllInputs().forEach { editText ->
@@ -147,19 +159,19 @@ class ContentViewHolder internal constructor(
                     }
                 }
             }
-            jobs += viewLifecycleCoroutineScope.launch {
+            jobs += viewLifecycleScope.launch {
                 hasInputFocusChangesFlow.collect(binding.buttonInfo::setVisible)
             }
-            jobs += viewLifecycleCoroutineScope.launch {
+            jobs += viewLifecycleScope.launch {
                 hasInputFocusChangesFlow.collect { focused -> onFocusChanged(this@ContentViewHolder, focused) }
             }
-            jobs += viewLifecycleCoroutineScope.launch {
+            jobs += viewLifecycleScope.launch {
                 registerEditNoteVisibility(
                     edittextNote = binding.edittextNote,
                     viewHolderEditFocusedFlow = hasInputFocusChangesFlow
                 )
             }
-            jobs += viewLifecycleCoroutineScope.launch {
+            jobs += viewLifecycleScope.launch {
                 hasInputFocusChangesFlow
                     .focusLostCompletelyChanges()
                     .mapNotNull { savable ->
@@ -175,25 +187,25 @@ class ContentViewHolder internal constructor(
                     }
                     .collect(onSimpleEditDone)
             }
-            jobs += viewLifecycleCoroutineScope.launch {
+            jobs += viewLifecycleScope.launch {
                 binding.buttonComplete
                     .throttleClicks()
                     .collect { binding.buttonComplete.apply { it.isSelected = it.isSelected.not() } }
             }
-            jobs += viewLifecycleCoroutineScope.launch {
+            jobs += viewLifecycleScope.launch {
                 selectionEnabled.collect { enabled ->
                     binding.buttonSelection.isEnabled = enabled
                     binding.buttonDragHandle.isEnabled = enabled
                     binding.buttonComplete.isEnabled = enabled.not()
                 }
             }
-            jobs += viewLifecycleCoroutineScope.launch {
+            jobs += viewLifecycleScope.launch {
                 combine(
                     selectionEnabled,
                     selectionAnimDelegate::awaitReady.asFlow()
                 ) { enabled, _ -> enabled }.distinctUntilChanged().collect { selectionAnimDelegate.startAnimation(it) }
             }
-            jobs += viewLifecycleCoroutineScope.launch {
+            jobs += viewLifecycleScope.launch {
                 combine(
                     selectionEnabled,
                     _draggingDelegate.draggingFlow,
@@ -205,27 +217,27 @@ class ContentViewHolder internal constructor(
                         binding.getAllInputs().forEach { it.isEnabled = enabled }
                     }
             }
-            jobs += viewLifecycleCoroutineScope.launch {
+            jobs += viewLifecycleScope.launch {
                 binding.buttonDragHandle
                     .touches()
-                    .filter { event -> event.action == MotionEvent.ACTION_DOWN }
+                    .filterActionDone()
                     .collect { onDragHandleTouched(this@ContentViewHolder) }
             }
-            jobs += viewLifecycleCoroutineScope.launch {
+            jobs += viewLifecycleScope.launch {
                 binding.buttonSelection
                     .touches()
                     .filter { it.action == MotionEvent.ACTION_DOWN }
                     .collect { onSelectButtonTouched(this@ContentViewHolder) }
             }
-            jobs += viewLifecycleCoroutineScope.launch {
+            jobs += viewLifecycleScope.launch {
                 combine(bindingId.filterNotNull(), selectedScheduleIds) { id, selectedIds -> id in selectedIds }
                     .distinctUntilChanged()
                     .collect { binding.buttonSelection.isSelected = it }
             }
-            jobs += viewLifecycleCoroutineScope.launch {
+            jobs += viewLifecycleScope.launch {
                 timeZone.collect { binding.edittextDetail.bindTimeZone(it) }
             }
-            jobs += viewLifecycleCoroutineScope.launch {
+            jobs += viewLifecycleScope.launch {
                 entryAt.collect { binding.edittextDetail.bindEntryAt(it) }
             }
         }
