@@ -21,6 +21,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
@@ -45,12 +46,16 @@ fun ColorPressButton(
     contentColor: Color,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    onClickLabel: String? = null,
+    enabled: Boolean = true,
     pressedContentColor: Color = contentColor.copy(alpha = 0.5f),
     content: @Composable RowScope.(Color) -> Unit
 ) {
     InternalColorPressButton(
         modifier = modifier,
         onClick = onClick,
+        onClickLabel = onClickLabel,
+        enabled = enabled,
     ) { interactionSource ->
         val isPressed by interactionSource.collectIsPressedAsState()
         content(if (isPressed) pressedContentColor else contentColor)
@@ -59,20 +64,24 @@ fun ColorPressButton(
 
 @Composable
 private fun InternalColorPressButton(
+    onClick: () -> Unit,
+    onClickLabel: String?,
+    enabled: Boolean,
     modifier: Modifier = Modifier,
-    onClick: () -> Unit = {},
     content: @Composable RowScope.(InteractionSource) -> Unit
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     Row(
-        modifier = modifier
-            .clickable(
-                interactionSource = interactionSource,
-                indication = null,
-                onClick = onClick,
-                role = Role.Button
-            ),
-        verticalAlignment = Alignment.CenterVertically
+        modifier = modifier.clickable(
+            interactionSource = interactionSource,
+            indication = null,
+            onClickLabel = onClickLabel,
+            enabled = enabled,
+            role = Role.Button,
+            onClick = onClick,
+        ),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
     ) { content(interactionSource) }
 }
 

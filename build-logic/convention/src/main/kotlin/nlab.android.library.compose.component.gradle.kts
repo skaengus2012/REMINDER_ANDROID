@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-import com.android.build.gradle.LibraryExtension
-import com.nlab.reminder.configureComposeAndroid
-import com.nlab.reminder.configureStdComposeDependencies
-import org.gradle.kotlin.dsl.configure
+import com.nlab.reminder.libs
 
-apply(plugin = "com.android.library")
-apply(plugin = "org.jetbrains.kotlin.plugin.compose")
+apply(plugin = "nlab.android.library.compose")
 
-extensions.configure<LibraryExtension> {
-    configureComposeAndroid(this)
-    configureStdComposeDependencies()
+dependencies {
+    "implementation"(project(":core:androidx:compose"))
+    "implementation"(project(":core:designsystem"))
+
+    "implementation"(libs.findLibrary("androidx-compose-foundation").get())
+    "implementation"(libs.findLibrary("androidx-compose-material3").get())
 }
