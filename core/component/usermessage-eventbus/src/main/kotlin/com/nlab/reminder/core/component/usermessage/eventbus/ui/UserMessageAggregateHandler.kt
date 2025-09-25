@@ -18,7 +18,7 @@ package com.nlab.reminder.core.component.usermessage.eventbus.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nlab.reminder.core.component.usermessage.FeedbackPriority
 import com.nlab.reminder.core.component.usermessage.UserMessageId
