@@ -22,7 +22,7 @@ import com.nlab.reminder.core.component.schedule.UserScheduleListResource
 /**
  * @author Doohyun
  */
-sealed class ScheduleAdapterItem private constructor() {
+sealed class ScheduleAdapterItem {
     data class Add(
         val newScheduleSource: Any?,
         val line: AddLine
@@ -41,4 +41,13 @@ sealed class ScheduleAdapterItem private constructor() {
     data class Headline(@StringRes val textRes: Int) : ScheduleAdapterItem()
 
     data object HeadlinePadding : ScheduleAdapterItem()
+
+    data class GroupHeader(
+        val title: String,
+        val subTitle: CharSequence,
+    ) : ScheduleAdapterItem(), StickyHeadAdapterItem
+
+    data class SubGroupHeader(
+        val title: CharSequence
+    ) : ScheduleAdapterItem(), StickyHeadAdapterItem
 }
