@@ -63,6 +63,7 @@ dependencies {
     implementation(projects.core.androidx.recyclerview)
     implementation(projects.core.annotation)
     implementation(projects.core.component.currenttime)
+    implementation(projects.core.component.schedule)
     implementation(projects.core.component.usermessage)
     implementation(projects.core.component.usermessageEventbus)
     implementation(projects.core.dataDi)

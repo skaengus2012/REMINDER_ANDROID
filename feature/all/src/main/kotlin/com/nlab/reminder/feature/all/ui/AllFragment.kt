@@ -20,6 +20,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.eventFlow
 import androidx.lifecycle.flowWithLifecycle
@@ -28,6 +29,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.nlab.reminder.core.android.view.awaitPost
 import com.nlab.reminder.core.android.view.inputmethod.hideSoftInputFromWindow
+import com.nlab.reminder.core.android.view.setVisible
 import com.nlab.reminder.core.android.view.touches
 import com.nlab.reminder.core.androidx.fragment.compose.ComposableFragment
 import com.nlab.reminder.core.androidx.fragment.compose.ComposableInject
@@ -43,6 +45,7 @@ import com.nlab.reminder.core.component.schedule.ui.view.list.AddLine
 import com.nlab.reminder.core.component.schedule.ui.view.list.ScheduleAdapterItem
 import com.nlab.reminder.core.component.schedule.ui.view.list.ScheduleListAdapter
 import com.nlab.reminder.core.component.schedule.ui.view.list.ScheduleListAnimator
+import com.nlab.reminder.core.component.schedule.ui.view.list.ScheduleListHolderActivity
 import com.nlab.reminder.core.component.schedule.ui.view.list.ScheduleListItemTouchCallback
 import com.nlab.reminder.core.component.schedule.ui.view.list.ScheduleListSelectionHelper
 import com.nlab.reminder.core.component.schedule.ui.view.list.ScheduleListSelectionSource
@@ -72,6 +75,7 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.shareIn
@@ -86,6 +90,15 @@ import kotlin.time.Clock
 internal class AllFragment : ComposableFragment() {
     private var _binding: FragmentAllBinding? = null
     private val binding: FragmentAllBinding get() = checkNotNull(_binding)
+
+    private val scheduleListDragAnchorOverlay: FrameLayout
+        get() {
+            val activity = requireActivity()
+            check(activity is ScheduleListHolderActivity) {
+                "The hosting Activity is expected to be a ScheduleListHolderActivity but it's not."
+            }
+            return activity.requireScheduleListDragAnchorOverlay()
+        }
 
     @ComposableInject
     lateinit var fragmentStateBridge: AllFragmentStateBridge
@@ -281,6 +294,17 @@ internal class AllFragment : ComposableFragment() {
 
         scheduleListAdapter.selectButtonTouch
             .onEach { multiSelectionHelper.enable(it) }
+            .launchIn(viewLifecycleScope)
+
+        viewLifecycle.eventFlow
+            .mapNotNull { event ->
+                when (event) {
+                    Lifecycle.Event.ON_START -> true
+                    Lifecycle.Event.ON_STOP -> false
+                    else -> null
+                }
+            }
+            .onEach { isVisible -> scheduleListDragAnchorOverlay.setVisible(isVisible) }
             .launchIn(viewLifecycleScope)
 
         viewLifecycle.eventFlow
