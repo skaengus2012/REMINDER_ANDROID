@@ -25,6 +25,8 @@ import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapt
 import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapterItemFooterAddBinding
 import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapterItemHeadlineBinding
 import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapterItemHeadlinePaddingBinding
+import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapterListGroupHeaderDefaultBinding
+import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapterListGroupHeaderSubDefaultBinding
 import com.nlab.reminder.core.component.schedule.ui.TriggerAtFormatPatterns
 import com.nlab.reminder.core.data.model.ScheduleId
 import kotlinx.coroutines.channels.BufferOverflow
@@ -43,6 +45,8 @@ private const val ITEM_VIEW_TYPE_CONTENT = 2
 private const val ITEM_VIEW_TYPE_FOOTER_ADD = 3
 private const val ITEM_VIEW_TYPE_HEADLINE = 4
 private const val ITEM_VIEW_TYPE_HEADLINE_PADDING = 5
+private const val ITEM_VIEW_TYPE_GROUP_HEADER = 6
+private const val ITEM_VIEW_TYPE_SUB_GROUP_HEADER = 7
 
 /**
  * @author Thalys
@@ -93,6 +97,8 @@ class ScheduleListAdapter(
         is ScheduleAdapterItem.FooterAdd -> ITEM_VIEW_TYPE_FOOTER_ADD
         is ScheduleAdapterItem.Headline -> ITEM_VIEW_TYPE_HEADLINE
         is ScheduleAdapterItem.HeadlinePadding -> ITEM_VIEW_TYPE_HEADLINE_PADDING
+        is ScheduleAdapterItem.GroupHeader -> ITEM_VIEW_TYPE_GROUP_HEADER
+        is ScheduleAdapterItem.SubGroupHeader -> ITEM_VIEW_TYPE_SUB_GROUP_HEADER
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ScheduleAdapterItemViewHolder {
@@ -168,6 +174,26 @@ class ScheduleListAdapter(
                 )
             }
 
+            ITEM_VIEW_TYPE_GROUP_HEADER -> {
+                GroupHeaderViewHolder(
+                    binding = LayoutScheduleAdapterListGroupHeaderDefaultBinding.inflate(
+                        layoutInflater,
+                        parent,
+                        /* attachToParent = */ false
+                    )
+                )
+            }
+
+            ITEM_VIEW_TYPE_SUB_GROUP_HEADER -> {
+                SubGroupHeaderViewHolder(
+                    binding = LayoutScheduleAdapterListGroupHeaderSubDefaultBinding.inflate(
+                        layoutInflater,
+                        parent,
+                        /* attachToParent = */ false
+                    )
+                )
+            }
+
             else -> {
                 throw IllegalArgumentException("Unknown view type: $viewType")
             }
@@ -181,6 +207,8 @@ class ScheduleListAdapter(
             is ContentViewHolder -> holder.bind(item as ScheduleAdapterItem.Content)
             is FooterAddViewHolder -> holder.bind(item as ScheduleAdapterItem.FooterAdd)
             is HeadlineViewHolder -> holder.bind(item as ScheduleAdapterItem.Headline)
+            is GroupHeaderViewHolder -> holder.bind(item as ScheduleAdapterItem.GroupHeader)
+            is SubGroupHeaderViewHolder -> holder.bind(item as ScheduleAdapterItem.SubGroupHeader)
             is HeadlinePaddingViewHolder -> Unit
         }
     }
