@@ -16,21 +16,30 @@
 
 package com.nlab.reminder.core.component.schedule.ui.view.list
 
+import androidx.recyclerview.widget.RecyclerView
+
 /**
  * @author Thalys
  */
-sealed interface DraggingSupportable {
-    val draggingDelegate: DraggingDelegate
-}
+class ScrollGuard : RecyclerView.OnScrollListener() {
+    private var block = false
+    private var selfAdjust = false
 
-abstract class DraggingDelegate {
-    internal abstract val userDraggable: Boolean
-    internal abstract fun isScaleOnDraggingNeeded(): Boolean
-    internal abstract fun onDragging(isActive: Boolean)
-}
+    fun setBlocked(block: Boolean) {
+        this.block = block
+    }
 
-internal class NotControllableDraggingDelegate : DraggingDelegate() {
-    override val userDraggable: Boolean = false
-    override fun isScaleOnDraggingNeeded(): Boolean = false
-    override fun onDragging(isActive: Boolean) = Unit
+    override fun onScrolled(
+        recyclerView: RecyclerView,
+        dx: Int,
+        dy: Int
+    ) {
+        if (recyclerView.isLaidOut.not()) return
+        if (block.not() || dy == 0) return
+        if (selfAdjust) return
+        // Instantly offset auto-scrolling/user scrolling, keeping it 'at rest'
+        selfAdjust = true
+        recyclerView.scrollBy(0, -dy)
+        selfAdjust = false
+    }
 }

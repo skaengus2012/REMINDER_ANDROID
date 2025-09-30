@@ -19,8 +19,11 @@ package com.nlab.reminder.core.component.schedule.ui.view.list
 import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
 import android.text.InputType
+import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewGroup
+import android.view.ViewParent
 import android.widget.EditText
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.graphics.drawable.DrawableCompat
@@ -46,7 +49,6 @@ import com.nlab.reminder.core.data.model.ScheduleId
 import com.nlab.reminder.core.designsystem.compose.theme.AttrIds
 import com.nlab.reminder.core.kotlinx.coroutines.cancelAll
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -57,10 +59,8 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.merge
-import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.launch
 import kotlinx.datetime.TimeZone
 import kotlin.math.absoluteValue
@@ -84,7 +84,7 @@ class ContentViewHolder internal constructor(
     onSelectButtonTouched: (RecyclerView.ViewHolder) -> Unit,
     onFocusChanged: (RecyclerView.ViewHolder, Boolean) -> Unit,
 ) : ScheduleAdapterItemViewHolder(binding.root),
-    DraggingSupportable,
+    DraggableViewHolder,
     SwipeSupportable {
     private val linkThumbnailPlaceHolderDrawable: Drawable? = with(itemView) {
         AppCompatResources.getDrawable(context, R.drawable.ic_schedule_link_error)
@@ -297,7 +297,9 @@ private class ContentDraggingDelegate(
     val draggingFlow: StateFlow<Boolean> = _draggingFlow.asStateFlow()
 
     // Prevent start dragging, when input selection double click!
-    override val userDraggable: Boolean get() = binding.isInteractable()
+    override fun userDraggable(): Boolean {
+        return binding.isInteractable()
+    }
 
     override fun isScaleOnDraggingNeeded(): Boolean {
         return binding.imageviewBgLinkThumbnail.isVisible
@@ -308,6 +310,24 @@ private class ContentDraggingDelegate(
         binding.root.translationZ = if (isActive) 10f else 0f
         binding.root.alpha = if (isActive) 0.7f else 1f
         binding.viewLine.alpha = if (isActive) 0f else 1f
+    }
+
+    override fun mirrorView(
+        parent: ViewGroup,
+        viewBindingPool: DraggingMirrorViewBindingPool
+    ): View {
+        val binding = viewBindingPool.getOrPut(key = ContentViewHolder::class) {
+            LayoutScheduleAdapterItemContentBinding
+                .inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false
+                )
+
+        }
+
+        // TODO 캡쳐뷰
+        return binding.root
     }
 }
 

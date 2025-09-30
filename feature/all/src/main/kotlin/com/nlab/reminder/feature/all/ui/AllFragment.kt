@@ -20,7 +20,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
+import androidx.core.util.TypedValueCompat.dpToPx
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.eventFlow
 import androidx.lifecycle.flowWithLifecycle
@@ -51,6 +51,7 @@ import com.nlab.reminder.core.component.schedule.ui.view.list.ScheduleListSelect
 import com.nlab.reminder.core.component.schedule.ui.view.list.ScheduleListSelectionSource
 import com.nlab.reminder.core.component.schedule.ui.view.list.ScheduleListStickyHeaderAdapter
 import com.nlab.reminder.core.component.schedule.ui.view.list.ScheduleListTheme
+import com.nlab.reminder.core.component.schedule.ui.view.list.ScrollGuard
 import com.nlab.reminder.core.data.model.Link
 import com.nlab.reminder.core.data.model.LinkMetadata
 import com.nlab.reminder.core.data.model.Repeat
@@ -91,15 +92,6 @@ internal class AllFragment : ComposableFragment() {
     private var _binding: FragmentAllBinding? = null
     private val binding: FragmentAllBinding get() = checkNotNull(_binding)
 
-    private val scheduleListDragAnchorOverlay: FrameLayout
-        get() {
-            val activity = requireActivity()
-            check(activity is ScheduleListHolderActivity) {
-                "The hosting Activity is expected to be a ScheduleListHolderActivity but it's not."
-            }
-            return activity.requireScheduleListDragAnchorOverlay()
-        }
-
     @ComposableInject
     lateinit var fragmentStateBridge: AllFragmentStateBridge
 
@@ -118,9 +110,23 @@ internal class AllFragment : ComposableFragment() {
         ).apply {
             stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
         }
+        val scrollGuard = ScrollGuard()
+            .also { binding.recyclerviewSchedule.addOnScrollListener(/*listener=*/ it) }
+        val stickyHeaderAdapter = ScheduleListStickyHeaderAdapter(getCurrentList = scheduleListAdapter::getCurrentList)
+            .also { scheduleListAdapter.registerAdapterDataObserver(it) }
+        val scheduleListDragAnchorOverlay = run {
+            val scheduleListHolderActivity = checkNotNull(activity as? ScheduleListHolderActivity) {
+                "The hosting Activity is expected to be a ScheduleListHolderActivity but it's not."
+            }
+            scheduleListHolderActivity.requireScheduleListDragAnchorOverlay()
+        }
         val stickyHeaderHelper = StickyHeaderHelper()
         val itemTouchCallback = ScheduleListItemTouchCallback(
-            context = requireContext(),
+            scrollGuard = scrollGuard,
+            scrollGuardMargin = dpToPx(/* dpValue =*/ 24f, resources.displayMetrics),
+            dragAnchorOverlay = scheduleListDragAnchorOverlay,
+            dragToScaleTargetHeight = dpToPx(/* dpValue =*/ 150f, resources.displayMetrics),
+            animateDuration = 100L,
             itemMoveListener = object : ScheduleListItemTouchCallback.ItemMoveListener {
                 override fun onMove(
                     fromViewHolder: RecyclerView.ViewHolder,
@@ -149,9 +155,7 @@ internal class AllFragment : ComposableFragment() {
             stickyHeaderHelper.attach(
                 recyclerView = this,
                 stickyHeaderContainer = binding.containerStickyHeader,
-                stickyHeaderAdapter = ScheduleListStickyHeaderAdapter(
-                    getCurrentList = scheduleListAdapter::getCurrentList
-                ).also { scheduleListAdapter.registerAdapterDataObserver(it) }
+                stickyHeaderAdapter = stickyHeaderAdapter
             )
             itemTouchHelper.attachToRecyclerView(/* recyclerView=*/ this)
             multiSelectionHelper.attachToRecyclerView(recyclerView = this)

@@ -16,18 +16,17 @@
 
 package com.nlab.reminder.core.component.schedule.ui.view.list
 
-import android.content.Context
 import android.graphics.Canvas
+import android.view.View
 import android.view.ViewPropertyAnimator
+import android.widget.FrameLayout
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
-import com.nlab.reminder.core.android.content.getDimension
 import com.nlab.reminder.core.android.view.setListener
+import com.nlab.reminder.core.android.view.setVisible
 import com.nlab.reminder.core.component.schedule.R
 import kotlin.math.max
 import kotlin.math.min
-
-private const val DEFAULT_ANIMATE_DURATION = 250L
 
 /**
  * Implementation of Drag-n-drop, swipe policy for [ScheduleAdapterItem].
@@ -38,18 +37,39 @@ private const val DEFAULT_ANIMATE_DURATION = 250L
  * @author Thalys
  */
 class ScheduleListItemTouchCallback(
-    private val draggedWhenScaleViewHeight: Float,
-    private val itemMoveListener: ItemMoveListener
+    private val scrollGuard: ScrollGuard,
+    /**
+     * If the user progresses to that critical point, it blocks scrolling.
+     */
+    private val scrollGuardMargin: Float,
+    private val dragAnchorOverlay: FrameLayout,
+    /**
+     * When dragging, if the item needs to be retracted, the height value
+     */
+    private val dragToScaleTargetHeight: Float,
+    private val animateDuration: Long,
+    private val itemMoveListener: ItemMoveListener,
 ) : ItemTouchHelper.SimpleCallback(
     /* dragDirs=*/ ItemTouchHelper.UP or ItemTouchHelper.DOWN,
     /* swipeDirs=*/ ItemTouchHelper.START or ItemTouchHelper.END
 ) {
+    // Drag item properties
+    private val outLocation = IntArray(2)
+    private val mirrorViewBindingPool = DraggingMirrorViewBindingPool()
+    private var dragAnchorMirrorView: View? = null
+    private var draggingViewHolder: RecyclerView.ViewHolder? = null
+    private var startDragOriginX = 0f
+    private var startDragOriginY = 0f
+
+    // Swipe item properties
     private val disposeSwipeClearedAnimators = mutableSetOf<ViewPropertyAnimator>()
     private var disposeDragScaleAnimator: ViewPropertyAnimator? = null
     private var isItemViewSwipeEnabled: Boolean = false
     private var isLongPressDragEnabled: Boolean = false
     private var curAdjustDX: Float = 0f
     private var curContainerTouchX: Float = 0f
+
+    // TODO all position can be bindingAdapterPosition, because RecyclerView only has single adapter.
     private var curSelectedAbsolutePosition: Int? = null
     private var prevSelectedAbsolutePosition: Int? = null
 
@@ -76,7 +96,7 @@ class ScheduleListItemTouchCallback(
         viewHolder: RecyclerView.ViewHolder,
         target: RecyclerView.ViewHolder
     ): Boolean {
-        return if (viewHolder is DraggingSupportable && target is DraggingSupportable) {
+        return if (viewHolder is MovableViewHolder && target is MovableViewHolder) {
             itemMoveListener.onMove(viewHolder, target)
         } else {
             false
@@ -84,7 +104,7 @@ class ScheduleListItemTouchCallback(
     }
 
     override fun getDragDirs(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
-        return if (viewHolder is DraggingSupportable && viewHolder.draggingDelegate.userDraggable) {
+        return if (viewHolder is DraggableViewHolder && viewHolder.draggingDelegate.userDraggable()) {
             super.getDragDirs(recyclerView, viewHolder)
         } else {
             ItemTouchHelper.ACTION_STATE_IDLE
@@ -111,8 +131,8 @@ class ScheduleListItemTouchCallback(
         if (viewHolder is SwipeSupportable) {
             onChildDrawIfSwipeSupportable(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
         }
-        if (viewHolder is DraggingSupportable) {
-            onChildDrawIfDraggingSupportable(viewHolder, actionState, isCurrentlyActive)
+        if (actionState == ItemTouchHelper.ACTION_STATE_DRAG && viewHolder is DraggableViewHolder) {
+            onChildDrawIfDraggableViewHolder(recyclerView, viewHolder, dX, dY, isCurrentlyActive)
         }
     }
 
@@ -145,38 +165,35 @@ class ScheduleListItemTouchCallback(
         }
     }
 
-    private fun <T> onChildDrawIfDraggingSupportable(
+    private fun <T> onChildDrawIfDraggableViewHolder(
+        recyclerView: RecyclerView,
         viewHolder: T,
-        actionState: Int,
+        dX: Float,
+        dY: Float,
         isCurrentlyActive: Boolean
-    ) where T : RecyclerView.ViewHolder, T : DraggingSupportable {
-        if (actionState != ItemTouchHelper.ACTION_STATE_DRAG) return
-        viewHolder.draggingDelegate.onDragging(isActive = isCurrentlyActive)
-
-        if (viewHolder.draggingDelegate.isScaleOnDraggingNeeded()) {
-            viewHolder.itemView.apply {
-                translationX =
-                    if (isCurrentlyActive) curContainerTouchX - (width / 2f)
-                    else 0f
-            }
-            val scaleP: Float =
-                if (isCurrentlyActive.not()) 1f
-                else (draggedWhenScaleViewHeight / viewHolder.itemView.height).coerceAtMost(1f)
-            if (scaleP != viewHolder.scaleOnDragging) {
-                disposeDragScaleAnimator?.cancel()
-                viewHolder.scaleOnDragging = scaleP
-                viewHolder.itemView.animate()
-                    .scaleX(scaleP)
-                    .scaleY(scaleP)
-                    .setDuration(DEFAULT_ANIMATE_DURATION)
-                    .setListener(doOnCancel = {
-                        disposeDragScaleAnimator = null
-                        viewHolder.itemView.apply { scaleX = 1f; scaleY = 1f }
-                    })
-                    .also { disposeDragScaleAnimator = it }
-                    .start()
-            }
+    ) where T : RecyclerView.ViewHolder, T : DraggableViewHolder {
+        val mirrorView = dragAnchorMirrorView ?: return
+        if (mirrorView.isAttachedToWindow.not() || mirrorView.parent !== dragAnchorOverlay) {
+            // Parental status check
+            return
         }
+
+        viewHolder.itemView.getLocationInWindow(outLocation)
+        val baseX = outLocation[0].toFloat() - dX
+        val baseY = outLocation[1].toFloat() - dY
+        mirrorView.apply {
+            x = baseX + dX
+            y = baseY + dY
+            translationX = if (isCurrentlyActive) curContainerTouchX - (width / 2f) else 0f
+        }
+
+        // Scroll guard judgment: If the pointer (=mirror-centered Y) is outside the RV boundary + offset, scroll 'freezes'
+        val pointerY = mirrorView.y + mirrorView.height / 2f
+        recyclerView.getLocationInWindow(outLocation)
+        val rvTop = outLocation[1].toFloat()
+        val rvBottom = rvTop + recyclerView.height
+        val outside = (pointerY < rvTop - scrollGuardMargin) || (pointerY > rvBottom + scrollGuardMargin)
+        scrollGuard.setBlocked(outside)
     }
 
     private fun <T> removeSwipeClampInternal(viewHolder: T) where T : RecyclerView.ViewHolder, T : SwipeSupportable {
@@ -189,7 +206,7 @@ class ScheduleListItemTouchCallback(
         viewHolder.swipeDelegate.swipeView.let { view ->
             view.animate()
                 .x(0f)
-                .setDuration(DEFAULT_ANIMATE_DURATION)
+                .setDuration(animateDuration)
                 .setListener(doOnCancel = {
                     // todo check if doOnEnd needed
                     view.x = 0f
@@ -250,22 +267,121 @@ class ScheduleListItemTouchCallback(
             getDefaultUIUtil().clearView(viewHolder.swipeDelegate.swipeView)
         }
 
+        if (viewHolder is DraggableViewHolder) {
+            disposeDragScaleAnimator?.cancel()
+            disposeDragScaleAnimator = null
+            dragAnchorMirrorView?.let { v ->
+                v.scaleX = 1f
+                v.scaleY = 1f
+                v.pivotX = 0f
+                v.pivotY = 0f
+            }
+        }
+
         itemMoveListener.onMoveEnded()
     }
 
-    override fun onSelectedChanged(
-        viewHolder: RecyclerView.ViewHolder?,
-        actionState: Int
-    ) {
-        if (viewHolder is SwipeSupportable) {
-            if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
+    override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
+        when (actionState) {
+            ItemTouchHelper.ACTION_STATE_SWIPE -> {
+                if (viewHolder !is SwipeSupportable) return
                 curSelectedAbsolutePosition = viewHolder.absoluteAdapterPosition
+                getDefaultUIUtil().onSelected(/* view=*/ viewHolder.swipeDelegate.swipeView)
             }
-            getDefaultUIUtil().onSelected(/* view=*/ viewHolder.swipeDelegate.swipeView)
+
+            ItemTouchHelper.ACTION_STATE_DRAG -> {
+                super.onSelectedChanged(viewHolder, actionState)
+                if (viewHolder !is DraggableViewHolder) return
+
+                draggingViewHolder = viewHolder
+
+                // Original Pipeline Participation
+                // If it contains a ViewHolder image, it cannot be processed as alpha.
+                // Therefore, treat it as an invisible state
+                viewHolder.itemView.setVisible(isVisible = false, goneIfNotVisible = false)
+                viewHolder.itemView.getLocationInWindow(outLocation)
+                startDragOriginX = outLocation[0].toFloat()
+                startDragOriginY = outLocation[1].toFloat()
+
+                // Mirror Creation & Binding
+                val mirrorView = viewHolder.draggingDelegate
+                    .mirrorView(parent = dragAnchorOverlay, viewBindingPool = mirrorViewBindingPool)
+                    .also { v ->
+                        if (v.parent == null) {
+                            dragAnchorOverlay.addView(v)
+                        }
+                    }
+                    .apply {
+                        x = startDragOriginX
+                        y = startDragOriginY
+                        scaleX = 1f
+                        scaleY = 1f
+                        pivotX = 0f
+                        pivotY = 0f
+                        scaleOnDragging = null
+                    }
+                if (viewHolder.draggingDelegate.isScaleOnDraggingNeeded()) {
+                    mirrorView.pivotX = mirrorView.width / 2f
+                    mirrorView.pivotY = mirrorView.height / 2f
+                    val scaleP = (dragToScaleTargetHeight / viewHolder.itemView.height).coerceAtMost(1f)
+                    if (scaleP != mirrorView.scaleOnDragging) {
+                        disposeDragScaleAnimator?.cancel()
+                        mirrorView.scaleOnDragging = scaleP
+                        mirrorView.animate()
+                            .scaleX(scaleP)
+                            .scaleY(scaleP)
+                            .setDuration(animateDuration)
+                            .setListener(
+                                doOnEnd = { disposeDragScaleAnimator = null },
+                                doOnCancel = { disposeDragScaleAnimator = null }
+                            )
+                            .also { disposeDragScaleAnimator = it }
+                            .start()
+                    }
+                }
+
+                dragAnchorMirrorView = mirrorView
+
+                // At the start of dragging, release guard
+                scrollGuard.setBlocked(false)
+
+                // FIXME Sticky update may be required. from GPT
+            }
+
+            ItemTouchHelper.ACTION_STATE_IDLE -> {
+                super.onSelectedChanged(viewHolder, actionState)
+                // clear dragAnchorMirrorView
+                dragAnchorMirrorView?.let { v ->
+                    if (v.isAttachedToWindow && v.parent === dragAnchorOverlay) {
+                        dragAnchorOverlay.run {
+                            // According to GPT's explanation, ItemTouchHelper's onSelectedChange and clearView
+                            // can be triggered during the middle of a layout pass.
+                            // If we remove it immediately at this moment, an IllegalStateException may occur.
+                            post { removeView(v) }
+                        }
+                    }
+                }
+                dragAnchorMirrorView = null
+
+                disposeDragScaleAnimator?.cancel()
+                disposeDragScaleAnimator = null
+
+                // clear draggingViewHolder
+                draggingViewHolder?.let { viewHolder ->
+                    viewHolder.setIsRecyclable(true)
+                    viewHolder.itemView.setVisible(isVisible = true)
+                }
+                draggingViewHolder = null
+
+                scrollGuard.setBlocked(false)
+
+                // FIXME Sticky update may be required. from GPT
+            }
         }
     }
 
     fun clearResource() {
+        mirrorViewBindingPool.clear()
         disposeSwipeClearedAnimators.forEach { it.cancel() }
         disposeSwipeClearedAnimators.clear()
         disposeDragScaleAnimator?.cancel()
@@ -294,14 +410,6 @@ class ScheduleListItemTouchCallback(
     }
 }
 
-fun ScheduleListItemTouchCallback(
-    context: Context,
-    itemMoveListener: ScheduleListItemTouchCallback.ItemMoveListener
-): ScheduleListItemTouchCallback = ScheduleListItemTouchCallback(
-    draggedWhenScaleViewHeight = context.getDimension(R.dimen.schedule_dragging_scale_item_height),
-    itemMoveListener = itemMoveListener
-)
-
 private var RecyclerView.ViewHolder.isClamped: Boolean
     get() = itemView.getTag(R.id.tag_schedule_item_touch_callback_is_clamp) as? Boolean ?: false
     set(value) {
@@ -314,8 +422,8 @@ private var RecyclerView.ViewHolder.clampHideAnimator: ViewPropertyAnimator?
         itemView.setTag(R.id.tag_schedule_item_touch_callback_clamp_hide_animator, value)
     }
 
-private var RecyclerView.ViewHolder.scaleOnDragging: Float?
-    get() = itemView.getTag(R.id.tag_schedule_item_touch_callback_scale_on_dragging) as? Float
+private var View.scaleOnDragging: Float?
+    get() = getTag(R.id.tag_schedule_item_touch_callback_scale_on_dragging) as? Float
     set(value) {
-        itemView.setTag(R.id.tag_schedule_item_touch_callback_scale_on_dragging, value)
+        setTag(R.id.tag_schedule_item_touch_callback_scale_on_dragging, value)
     }
