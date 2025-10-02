@@ -16,6 +16,7 @@
 
 package com.nlab.reminder.core.androix.recyclerview
 
+import android.view.MotionEvent
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -60,4 +61,21 @@ fun RecyclerView.scrollEvent(): Flow<ScrollEvent> = callbackFlow {
     }
     addOnScrollListener(listener)
     awaitClose { removeOnScrollListener(listener) }
+}
+
+fun RecyclerView.itemTouches(): Flow<MotionEvent> = callbackFlow {
+    val listener = object : RecyclerView.OnItemTouchListener {
+        override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
+            trySend(e)
+            return false
+        }
+        override fun onTouchEvent(rv: RecyclerView, e: MotionEvent) = Unit
+        override fun onRequestDisallowInterceptTouchEvent(disallowIntercept: Boolean) = Unit
+    }
+
+    addOnItemTouchListener(listener)
+
+    awaitClose {
+        removeOnItemTouchListener(listener)
+    }
 }

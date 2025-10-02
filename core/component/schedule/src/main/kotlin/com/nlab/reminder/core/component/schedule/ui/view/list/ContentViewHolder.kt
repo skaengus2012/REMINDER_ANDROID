@@ -23,12 +23,12 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewParent
 import android.widget.EditText
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.view.doOnAttach
 import androidx.core.view.doOnDetach
+import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
@@ -45,7 +45,10 @@ import com.nlab.reminder.core.android.widget.bindImageAsync
 import com.nlab.reminder.core.android.widget.bindText
 import com.nlab.reminder.core.component.schedule.R
 import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapterItemContentBinding
+import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapterItemContentMirrorBinding
 import com.nlab.reminder.core.data.model.ScheduleId
+import com.nlab.reminder.core.data.model.ScheduleTiming
+import com.nlab.reminder.core.data.model.Tag
 import com.nlab.reminder.core.designsystem.compose.theme.AttrIds
 import com.nlab.reminder.core.kotlinx.coroutines.cancelAll
 import kotlinx.coroutines.Job
@@ -268,6 +271,7 @@ class ContentViewHolder internal constructor(
                 scheduleTiming = item.schedule.resource.timing,
                 tags = item.schedule.resource.tags
             )
+            clearFocusIfNeeded()
         }
         binding.cardLink
             .setVisible(isVisible = item.schedule.resource.link != null)
@@ -291,7 +295,7 @@ class ContentViewHolder internal constructor(
 }
 
 private class ContentDraggingDelegate(
-    private val binding: LayoutScheduleAdapterItemContentBinding
+    private val binding: LayoutScheduleAdapterItemContentBinding,
 ) : DraggingDelegate() {
     private val _draggingFlow = MutableStateFlow(false)
     val draggingFlow: StateFlow<Boolean> = _draggingFlow.asStateFlow()
@@ -305,29 +309,65 @@ private class ContentDraggingDelegate(
         return binding.imageviewBgLinkThumbnail.isVisible
     }
 
-    override fun onDragging(isActive: Boolean) {
+    override fun onDragStateChanged(isActive: Boolean) {
         _draggingFlow.value = isActive
-        binding.root.translationZ = if (isActive) 10f else 0f
-        binding.root.alpha = if (isActive) 0.7f else 1f
-        binding.viewLine.alpha = if (isActive) 0f else 1f
     }
 
     override fun mirrorView(
         parent: ViewGroup,
-        viewBindingPool: DraggingMirrorViewBindingPool
+        viewPool: DraggingMirrorViewPool
     ): View {
-        val binding = viewBindingPool.getOrPut(key = ContentViewHolder::class) {
-            LayoutScheduleAdapterItemContentBinding
-                .inflate(
-                    LayoutInflater.from(parent.context),
-                    parent,
-                    false
-                )
+        val key = ContentViewHolder::class
+        val mirrorBinding = viewPool.get(key)
+            ?.let { LayoutScheduleAdapterItemContentMirrorBinding.bind(it) }
+            ?: run {
+                LayoutScheduleAdapterItemContentMirrorBinding
+                    .inflate(
+                        /*inflater = */ LayoutInflater.from(parent.context),
+                        /*parent = */ parent,
+                        /*attachToParent = */ false
+                    )
+                    .apply {
+                        root.alpha = 0.75f
+                        buttonComplete.setImageDrawable(binding.buttonComplete.drawable)
+                    }
+                    .also { viewPool.put(key, it.root) }
+            }
+        mirrorBinding.apply {
+            textviewTitle.bindText(binding.edittextTitle.text)
 
+            textviewNote.bindText(binding.edittextNote.text)
+            textviewNote.visibility = binding.edittextNote.visibility
+
+            textviewDetail.bindText(binding.edittextDetail.text)
+
+            cardLink.visibility = binding.cardLink.visibility
+            textviewLink.bindText(binding.textviewLink.text)
+
+            textviewTitleLink.bindText(binding.textviewTitleLink.text)
+            textviewTitleLink.visibility = binding.textviewTitleLink.visibility
+
+            imageviewBgLinkThumbnail.visibility = binding.imageviewBgLinkThumbnail.visibility
+            imageviewBgLinkThumbnail.setImageDrawable(binding.imageviewBgLinkThumbnail.drawable)
+
+            // TODO migrate animation
+            buttonComplete.apply {
+                isSelected = binding.buttonComplete.isSelected
+                alpha = binding.buttonComplete.alpha
+                translationX = binding.buttonComplete.translationX
+            }
+            buttonSelection.apply {
+                isSelected = binding.buttonSelection.isSelected
+                alpha = binding.buttonSelection.alpha
+                translationX = binding.buttonSelection.translationX
+            }
+            buttonDragHandle.apply {
+                alpha = binding.buttonDragHandle.alpha
+                translationX = binding.buttonDragHandle.translationX
+            }
+            layoutData.updateLayoutParams { width = binding.layoutData.width }
         }
-
-        // TODO 캡쳐뷰
-        return binding.root
+        return mirrorBinding.root
     }
 }
 
@@ -344,6 +384,7 @@ private class ContentSwipeDelegate(
 
     override fun onSwipe(isActive: Boolean, dx: Float) {
         _swipeFlow.value = isActive
+        binding.layoutClamp.setVisible(isVisible = isActive, goneIfNotVisible = false)
         binding.layoutClampDim.alpha = clampAlphaOrigin - dx.absoluteValue / clampWidth * clampAlphaOrigin
     }
 }

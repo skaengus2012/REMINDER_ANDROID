@@ -18,7 +18,6 @@ package com.nlab.reminder.core.component.schedule.ui.view.list
 
 import android.view.View
 import android.view.ViewGroup
-import androidx.viewbinding.ViewBinding
 import kotlin.reflect.KClass
 
 /**
@@ -31,29 +30,22 @@ sealed interface DraggableViewHolder : MovableViewHolder {
 abstract class DraggingDelegate {
     internal abstract fun userDraggable(): Boolean
     internal abstract fun isScaleOnDraggingNeeded(): Boolean
-    internal abstract fun onDragging(isActive: Boolean)
-    internal abstract fun mirrorView(parent: ViewGroup, viewBindingPool: DraggingMirrorViewBindingPool): View
+    internal abstract fun onDragStateChanged(isActive: Boolean)
+    internal abstract fun mirrorView(parent: ViewGroup, viewPool: DraggingMirrorViewPool): View
 }
 
-internal class DraggingMirrorViewBindingPool {
-    private val cache = hashMapOf<KClass<out DraggableViewHolder>, ViewBinding>()
+internal class DraggingMirrorViewPool {
+    private val cache = hashMapOf<KClass<out DraggableViewHolder>, View>()
 
-    fun get(key: KClass<out DraggableViewHolder>): ViewBinding? {
+    fun get(key: KClass<out DraggableViewHolder>): View? {
         return cache[key]
     }
 
-    fun put(key: KClass<out DraggableViewHolder>, view: ViewBinding) {
+    fun put(key: KClass<out DraggableViewHolder>, view: View) {
         cache[key] = view
     }
 
     fun clear() {
         cache.clear()
     }
-}
-
-internal inline fun <T : ViewBinding> DraggingMirrorViewBindingPool.getOrPut(
-    key: KClass<out DraggableViewHolder>,
-    default: () -> T
-): ViewBinding {
-    return get(key) ?: default().also { put(key, view = it) }
 }

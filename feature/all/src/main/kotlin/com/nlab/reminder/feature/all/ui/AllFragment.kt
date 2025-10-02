@@ -35,6 +35,7 @@ import com.nlab.reminder.core.androidx.fragment.compose.ComposableFragment
 import com.nlab.reminder.core.androidx.fragment.compose.ComposableInject
 import com.nlab.reminder.core.androidx.fragment.viewLifecycle
 import com.nlab.reminder.core.androidx.fragment.viewLifecycleScope
+import com.nlab.reminder.core.androix.recyclerview.itemTouches
 import com.nlab.reminder.core.androix.recyclerview.scrollEvent
 import com.nlab.reminder.core.androix.recyclerview.scrollState
 import com.nlab.reminder.core.androix.recyclerview.stickyheader.StickyHeaderHelper
@@ -207,12 +208,6 @@ internal class AllFragment : ComposableFragment() {
             .onEach { fragmentStateBridge.toolbarBackgroundAlpha = it }
             .launchIn(viewLifecycleScope)
 
-        binding.recyclerviewSchedule.touches()
-            .map { it.x }
-            .distinctUntilChanged()
-            .onEach { itemTouchCallback.setContainerTouchX(it) }
-            .launchIn(viewLifecycleScope)
-
         merge(
             scheduleListAdapter.itemViewTouch,
             fragmentStateBridge.itemSelectionEnabled
@@ -225,6 +220,15 @@ internal class AllFragment : ComposableFragment() {
                     prev == RecyclerView.SCROLL_STATE_IDLE && cur == RecyclerView.SCROLL_STATE_DRAGGING
                 },
         ).onEach { itemTouchCallback.removeSwipeClamp(binding.recyclerviewSchedule) }
+            .launchIn(viewLifecycleScope)
+
+        merge(
+            // When ItemTouchHelper doesn't work, feed x from itemTouches
+            binding.recyclerviewSchedule.itemTouches().map { it.x },
+            // When ItemTouchHelper is in drag operation, the touches are supplied from x
+            binding.recyclerviewSchedule.touches().map { it.x },
+        ).distinctUntilChanged()
+            .onEach { itemTouchCallback.setContainerTouchX(it) }
             .launchIn(viewLifecycleScope)
 
         fragmentStateBridge.itemSelectionEnabled

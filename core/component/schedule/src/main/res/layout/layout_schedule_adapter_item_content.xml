@@ -25,7 +25,7 @@
         android:id="@+id/layout_clamp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:visibility="invisible">
 
         <FrameLayout
             android:layout_width="match_parent"
@@ -310,7 +310,7 @@
             android:layout_centerVertical="true"
             android:layout_marginEnd="@dimen/schedule_checkbox_touchable_size"
             android:layout_toEndOf="@id/view_guideLayoutDataSelectedEnd"
-            android:background="?selectableItemBackgroundBorderless"
+            android:background="@android:color/transparent"
             android:contentDescription="@string/content_description_drag"
             android:padding="13dp"
             android:scaleType="fitXY"
