@@ -96,11 +96,14 @@ class ScheduleListItemTouchCallback(
         viewHolder: RecyclerView.ViewHolder,
         target: RecyclerView.ViewHolder
     ): Boolean {
-        return if (viewHolder is MovableViewHolder && target is MovableViewHolder) {
-            itemMoveListener.onMove(viewHolder, target)
-        } else {
-            false
+        if (viewHolder !is MovableViewHolder || target !is MovableViewHolder) return false
+        val fromBindingAdapterPosition = viewHolder.bindingAdapterPosition
+        val toBindingAdapterPosition = target.bindingAdapterPosition
+        if (fromBindingAdapterPosition == RecyclerView.NO_POSITION || toBindingAdapterPosition == RecyclerView.NO_POSITION) {
+            return false
         }
+
+        return itemMoveListener.onMove(fromBindingAdapterPosition, toBindingAdapterPosition)
     }
 
     override fun getDragDirs(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
@@ -405,7 +408,7 @@ class ScheduleListItemTouchCallback(
     }
 
     interface ItemMoveListener {
-        fun onMove(fromViewHolder: RecyclerView.ViewHolder, toViewHolder: RecyclerView.ViewHolder): Boolean
+        fun onMove(fromBindingAdapterPosition: Int, toBindingAdapterPosition: Int): Boolean
         fun onMoveEnded()
     }
 }

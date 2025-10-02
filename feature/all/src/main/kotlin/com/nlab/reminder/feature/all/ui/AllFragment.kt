@@ -129,11 +129,11 @@ internal class AllFragment : ComposableFragment() {
             animateDuration = 100L,
             itemMoveListener = object : ScheduleListItemTouchCallback.ItemMoveListener {
                 override fun onMove(
-                    fromViewHolder: RecyclerView.ViewHolder,
-                    toViewHolder: RecyclerView.ViewHolder
+                    fromBindingAdapterPosition: Int,
+                    toBindingAdapterPosition: Int
                 ): Boolean = scheduleListAdapter.submitMoving(
-                    fromPosition = fromViewHolder.bindingAdapterPosition,
-                    toPosition = toViewHolder.bindingAdapterPosition
+                    fromPosition = fromBindingAdapterPosition,
+                    toPosition = toBindingAdapterPosition
                 )
 
                 override fun onMoveEnded() {
