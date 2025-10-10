@@ -21,6 +21,7 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import timber.log.Timber
 
 /**
  * @author Doohyun
@@ -91,8 +92,12 @@ class StickyHeaderHelper {
     }
 
     fun invalidate() {
-        val currentStickyHeaderContext = checkNotNull(stickyHeaderContext) {
-            "StickyHeaderHelper has not been attached or has already been detached."
+        val currentStickyHeaderContext = stickyHeaderContext
+        if (currentStickyHeaderContext == null) {
+            Timber.tag("StickyHeaderHelper").w(
+                "StickyHeaderHelper has not been attached or has already been detached."
+            )
+            return
         }
         currentStickyHeaderContext.invalidate()
     }

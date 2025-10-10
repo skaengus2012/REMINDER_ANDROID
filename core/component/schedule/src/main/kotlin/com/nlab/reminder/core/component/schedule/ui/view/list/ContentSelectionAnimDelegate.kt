@@ -32,7 +32,7 @@ import kotlin.coroutines.resume
  * @author Doohyun
  */
 internal class ContentSelectionAnimDelegate(
-    private val binding: LayoutScheduleAdapterItemContentBinding
+    private val binding: LayoutScheduleAdapterItemContentBinding,
 ) {
     private var latestAnimators = emptySet<Animator>()
     private var selectedDataLayoutWidth: Int = 0
@@ -117,68 +117,85 @@ internal class ContentSelectionAnimDelegate(
     }
 
     private fun createCompleteButtonTranslateAnimator(selectable: Boolean, duration: Long): Animator {
-        val animator = ObjectAnimator.ofFloat(
-            binding.buttonComplete,
-            "translationX",
+        val targetView = binding.buttonComplete
+        val animator = ValueAnimator.ofFloat(
+            targetView.translationX,
             if (selectable) selectedCompleteButtonTranslationX
             else 0f
         )
         animator.duration = duration
+        animator.addUpdateListener { value ->
+            targetView.translationX = value.animatedValue as Float
+        }
         return animator
     }
 
     private fun createCompleteButtonAlphaAnimator(selectable: Boolean, duration: Long): Animator {
-        val animator = ObjectAnimator.ofFloat(
-            binding.buttonComplete,
-            "alpha",
-            if (selectable) 0f
-            else 1f
+        val targetView = binding.buttonComplete
+        val animator = ValueAnimator.ofFloat(
+            targetView.alpha,
+            if (selectable) 0f else 1f
         )
         animator.duration = duration
+        animator.addUpdateListener { value ->
+            targetView.alpha = value.animatedValue as Float
+        }
         return animator
     }
 
     private fun createSelectionButtonTranslateAnimator(selectable: Boolean, duration: Long): Animator {
-        val animator = ObjectAnimator.ofFloat(
-            binding.buttonSelection,
-            "translationX",
+        val targetView = binding.buttonSelection
+        val animator = ValueAnimator.ofFloat(
+            targetView.translationX,
             if (selectable) selectedSelectionButtonTranslationX
             else 0f
         )
         animator.duration = duration
+        animator.addUpdateListener { value ->
+            targetView.translationX = value.animatedValue as Float
+        }
         return animator
     }
 
     private fun createSelectionButtonAlphaAnimator(selectable: Boolean, duration: Long): Animator {
-        val animator = ObjectAnimator.ofFloat(
-            binding.buttonSelection,
-            "alpha",
+        val targetView = binding.buttonSelection
+        val animator = ValueAnimator.ofFloat(
+            targetView.alpha,
             if (selectable) 1f
             else 0f
         )
         animator.duration = duration
+        animator.addUpdateListener { value ->
+            targetView.alpha = value.animatedValue as Float
+        }
         return animator
     }
 
     private fun createDragButtonTranslateAnimator(selectable: Boolean, duration: Long): Animator {
-        val animator = ObjectAnimator.ofFloat(
-            binding.buttonDragHandle,
-            "translationX",
+        val targetView = binding.buttonDragHandle
+        val animator = ValueAnimator.ofFloat(
+            targetView.translationX,
             if (selectable) selectedDragButtonTransitionX
             else 0f
         )
         animator.duration = duration
+        animator.addUpdateListener { value ->
+            targetView.translationX = value.animatedValue as Float
+        }
         return animator
     }
 
     private fun createDragButtonAlphaAnimator(selectable: Boolean, duration: Long): Animator {
-        val animator = ObjectAnimator.ofFloat(
-            binding.buttonDragHandle,
-            "alpha",
+        val targetView = binding.buttonDragHandle
+        val animator = ValueAnimator.ofFloat(
+            targetView.alpha,
             if (selectable) 1f
             else 0f
         )
         animator.duration = duration
+        animator.addUpdateListener { value ->
+            targetView.alpha = value.animatedValue as Float
+        }
         return animator
     }
 }

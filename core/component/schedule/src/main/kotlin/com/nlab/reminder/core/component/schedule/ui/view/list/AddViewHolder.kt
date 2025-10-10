@@ -38,10 +38,8 @@ class AddViewHolder internal constructor(
     onSimpleAddDone: (SimpleAdd) -> Unit,
     onFocusChanged: (RecyclerView.ViewHolder, Boolean) -> Unit,
 ) : ScheduleAdapterItemViewHolder(binding.root),
-    DraggingSupportable {
+    MovableViewHolder {
     private val addViewHolderDelegate = AddViewHolderDelegate(binding)
-
-    override val draggingDelegate: DraggingDelegate = NotControllableDraggingDelegate()
 
     init {
         addViewHolderDelegate.init(theme)

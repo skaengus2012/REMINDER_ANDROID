@@ -20,6 +20,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.util.TypedValueCompat.dpToPx
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.eventFlow
 import androidx.lifecycle.flowWithLifecycle
@@ -28,11 +29,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.nlab.reminder.core.android.view.awaitPost
 import com.nlab.reminder.core.android.view.inputmethod.hideSoftInputFromWindow
+import com.nlab.reminder.core.android.view.setVisible
 import com.nlab.reminder.core.android.view.touches
 import com.nlab.reminder.core.androidx.fragment.compose.ComposableFragment
 import com.nlab.reminder.core.androidx.fragment.compose.ComposableInject
 import com.nlab.reminder.core.androidx.fragment.viewLifecycle
 import com.nlab.reminder.core.androidx.fragment.viewLifecycleScope
+import com.nlab.reminder.core.androix.recyclerview.itemTouches
 import com.nlab.reminder.core.androix.recyclerview.scrollEvent
 import com.nlab.reminder.core.androix.recyclerview.scrollState
 import com.nlab.reminder.core.androix.recyclerview.stickyheader.StickyHeaderHelper
@@ -43,11 +46,13 @@ import com.nlab.reminder.core.component.schedule.ui.view.list.AddLine
 import com.nlab.reminder.core.component.schedule.ui.view.list.ScheduleAdapterItem
 import com.nlab.reminder.core.component.schedule.ui.view.list.ScheduleListAdapter
 import com.nlab.reminder.core.component.schedule.ui.view.list.ScheduleListAnimator
+import com.nlab.reminder.core.component.schedule.ui.view.list.ScheduleListHolderActivity
 import com.nlab.reminder.core.component.schedule.ui.view.list.ScheduleListItemTouchCallback
 import com.nlab.reminder.core.component.schedule.ui.view.list.ScheduleListSelectionHelper
 import com.nlab.reminder.core.component.schedule.ui.view.list.ScheduleListSelectionSource
 import com.nlab.reminder.core.component.schedule.ui.view.list.ScheduleListStickyHeaderAdapter
 import com.nlab.reminder.core.component.schedule.ui.view.list.ScheduleListTheme
+import com.nlab.reminder.core.component.schedule.ui.view.list.ScrollGuard
 import com.nlab.reminder.core.data.model.Link
 import com.nlab.reminder.core.data.model.LinkMetadata
 import com.nlab.reminder.core.data.model.Repeat
@@ -72,6 +77,7 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.shareIn
@@ -105,16 +111,30 @@ internal class AllFragment : ComposableFragment() {
         ).apply {
             stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
         }
+        val scrollGuard = ScrollGuard()
+            .also { binding.recyclerviewSchedule.addOnScrollListener(/*listener=*/ it) }
+        val stickyHeaderAdapter = ScheduleListStickyHeaderAdapter(getCurrentList = scheduleListAdapter::getCurrentList)
+            .also { scheduleListAdapter.registerAdapterDataObserver(it) }
+        val scheduleListDragAnchorOverlay = run {
+            val scheduleListHolderActivity = checkNotNull(activity as? ScheduleListHolderActivity) {
+                "The hosting Activity is expected to be a ScheduleListHolderActivity but it's not."
+            }
+            scheduleListHolderActivity.requireScheduleListDragAnchorOverlay()
+        }
         val stickyHeaderHelper = StickyHeaderHelper()
         val itemTouchCallback = ScheduleListItemTouchCallback(
-            context = requireContext(),
+            scrollGuard = scrollGuard,
+            scrollGuardMargin = dpToPx(/* dpValue =*/ 24f, resources.displayMetrics),
+            dragAnchorOverlay = scheduleListDragAnchorOverlay,
+            dragToScaleTargetHeight = dpToPx(/* dpValue =*/ 150f, resources.displayMetrics),
+            animateDuration = 100L,
             itemMoveListener = object : ScheduleListItemTouchCallback.ItemMoveListener {
                 override fun onMove(
-                    fromViewHolder: RecyclerView.ViewHolder,
-                    toViewHolder: RecyclerView.ViewHolder
+                    fromBindingAdapterPosition: Int,
+                    toBindingAdapterPosition: Int
                 ): Boolean = scheduleListAdapter.submitMoving(
-                    fromPosition = fromViewHolder.bindingAdapterPosition,
-                    toPosition = toViewHolder.bindingAdapterPosition
+                    fromPosition = fromBindingAdapterPosition,
+                    toPosition = toBindingAdapterPosition
                 )
 
                 override fun onMoveEnded() {
@@ -136,9 +156,7 @@ internal class AllFragment : ComposableFragment() {
             stickyHeaderHelper.attach(
                 recyclerView = this,
                 stickyHeaderContainer = binding.containerStickyHeader,
-                stickyHeaderAdapter = ScheduleListStickyHeaderAdapter(
-                    getCurrentList = scheduleListAdapter::getCurrentList
-                ).also { scheduleListAdapter.registerAdapterDataObserver(it) }
+                stickyHeaderAdapter = stickyHeaderAdapter
             )
             itemTouchHelper.attachToRecyclerView(/* recyclerView=*/ this)
             multiSelectionHelper.attachToRecyclerView(recyclerView = this)
@@ -190,12 +208,6 @@ internal class AllFragment : ComposableFragment() {
             .onEach { fragmentStateBridge.toolbarBackgroundAlpha = it }
             .launchIn(viewLifecycleScope)
 
-        binding.recyclerviewSchedule.touches()
-            .map { it.x }
-            .distinctUntilChanged()
-            .onEach { itemTouchCallback.setContainerTouchX(it) }
-            .launchIn(viewLifecycleScope)
-
         merge(
             scheduleListAdapter.itemViewTouch,
             fragmentStateBridge.itemSelectionEnabled
@@ -208,6 +220,15 @@ internal class AllFragment : ComposableFragment() {
                     prev == RecyclerView.SCROLL_STATE_IDLE && cur == RecyclerView.SCROLL_STATE_DRAGGING
                 },
         ).onEach { itemTouchCallback.removeSwipeClamp(binding.recyclerviewSchedule) }
+            .launchIn(viewLifecycleScope)
+
+        merge(
+            // When ItemTouchHelper doesn't work, feed x from itemTouches
+            binding.recyclerviewSchedule.itemTouches().map { it.x },
+            // When ItemTouchHelper is in drag operation, the touches are supplied from x
+            binding.recyclerviewSchedule.touches().map { it.x },
+        ).distinctUntilChanged()
+            .onEach { itemTouchCallback.setContainerTouchX(it) }
             .launchIn(viewLifecycleScope)
 
         fragmentStateBridge.itemSelectionEnabled
@@ -281,6 +302,17 @@ internal class AllFragment : ComposableFragment() {
 
         scheduleListAdapter.selectButtonTouch
             .onEach { multiSelectionHelper.enable(it) }
+            .launchIn(viewLifecycleScope)
+
+        viewLifecycle.eventFlow
+            .mapNotNull { event ->
+                when (event) {
+                    Lifecycle.Event.ON_START -> true
+                    Lifecycle.Event.ON_STOP -> false
+                    else -> null
+                }
+            }
+            .onEach { isVisible -> scheduleListDragAnchorOverlay.setVisible(isVisible) }
             .launchIn(viewLifecycleScope)
 
         viewLifecycle.eventFlow

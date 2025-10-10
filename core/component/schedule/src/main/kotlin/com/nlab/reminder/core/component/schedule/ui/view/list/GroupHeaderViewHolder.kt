@@ -25,9 +25,7 @@ import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapt
 class GroupHeaderViewHolder internal constructor(
     private val binding: LayoutScheduleAdapterListGroupHeaderDefaultBinding
 ) : ScheduleAdapterItemViewHolder(binding.root),
-    DraggingSupportable {
-    override val draggingDelegate: DraggingDelegate = NotControllableDraggingDelegate()
-
+    MovableViewHolder {
     fun bind(item: ScheduleAdapterItem.GroupHeader) {
         binding.textviewTitle.bindText(text = item.title)
         binding.textviewTitleSub.bindText(text = item.subTitle)

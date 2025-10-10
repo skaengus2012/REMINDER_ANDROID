@@ -14,52 +14,17 @@
   ~ limitations under the License.
   -->
 
-<FrameLayout
+
+<androidx.cardview.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layout_content"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
-
-    <FrameLayout
-        android:id="@+id/layout_clamp"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="invisible">
-
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="?red1" />
-
-        <FrameLayout
-            android:id="@+id/layout_clamp_dim"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:alpha="0.5"
-            android:background="?black" />
-
-        <!-- clamp should ltr -->
-        <Button
-            android:id="@+id/button_delete"
-            style="@style/PlaneatTheme.Style.Typography.BodySmall"
-            android:layout_width="60dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="right|center_vertical"
-            android:layout_marginTop="1dp"
-            android:background="@android:color/transparent"
-            android:minWidth="0dp"
-            android:minHeight="0dp"
-            android:padding="0dp"
-            android:text="@string/label_delete"
-            android:textColor="?white"
-            app:drawableTint="?white"
-            app:drawableTopCompat="@drawable/ic_trash_24" />
-
-    </FrameLayout>
+    android:layout_height="wrap_content"
+    app:cardElevation="8dp">
 
     <RelativeLayout
-        android:id="@+id/layout_content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?bg_2">
@@ -152,18 +117,17 @@
                     style="@style/PlaneatTheme.Style.Typography.BodyLarge"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/horizontal_padding_medium"
                     android:background="@null"
+                    android:enabled="false"
                     android:gravity="center_vertical"
-                    android:imeOptions="actionNext"
-                    android:inputType="textMultiLine"
                     android:nextFocusDown="@id/edittext_note"
                     android:textColor="?content_1"
                     app:layout_constraintBaseline_toBaselineOf="@id/textview_guideTitle"
-                    app:layout_constraintEnd_toStartOf="@id/button_info"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHeight_min="@dimen/schedule_check_size"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_goneMarginEnd="@dimen/horizontal_padding_medium"
                     tools:ignore="Autofill,LabelFor,TextFields"
                     tools:text="@tools:sample/lorem" />
 
@@ -174,9 +138,9 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
                     android:background="@null"
+                    android:enabled="false"
                     android:gravity="center_vertical"
                     android:hint="@string/add_note"
-                    android:imeOptions="actionDone"
                     android:inputType="textMultiLine"
                     android:textColor="?content_2"
                     android:textColorHint="?content_2_hint"
@@ -186,26 +150,14 @@
                     tools:ignore="Autofill,LabelFor,TextFields"
                     tools:text="@tools:sample/lorem" />
 
-                <ImageButton
-                    android:id="@+id/button_info"
-                    android:layout_width="@dimen/schedule_checkbox_touchable_size"
-                    android:layout_height="@dimen/schedule_checkbox_touchable_size"
-                    android:background="?selectableItemBackgroundBorderless"
-                    android:contentDescription="@string/content_description_info"
-                    android:padding="11.5dp"
-                    android:scaleType="fitXY"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:srcCompat="@drawable/ic_info" />
-
-                <com.nlab.reminder.core.component.schedule.ui.view.list.ScheduleDetailsEditText
+                <EditText
                     android:id="@+id/edittext_detail"
                     style="@style/PlaneatTheme.Style.Typography.BodySmall"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
                     android:background="@null"
-                    android:imeOptions="actionDone"
+                    android:enabled="false"
                     android:inputType="textMultiLine"
                     android:textColor="?content_2"
                     app:layout_constraintEnd_toEndOf="@id/edittext_title"
@@ -310,7 +262,7 @@
             android:layout_centerVertical="true"
             android:layout_marginEnd="@dimen/schedule_checkbox_touchable_size"
             android:layout_toEndOf="@id/view_guideLayoutDataSelectedEnd"
-            android:background="@android:color/transparent"
+            android:background="@null"
             android:contentDescription="@string/content_description_drag"
             android:padding="13dp"
             android:scaleType="fitXY"
@@ -325,8 +277,9 @@
             android:layout_alignParentEnd="true"
             android:layout_marginTop="15dp"
             android:layout_toEndOf="@id/view_guideBodyStart"
-            android:background="?bg_line_1" />
+            android:background="?bg_line_1"
+            android:visibility="invisible" />
 
     </RelativeLayout>
 
-</FrameLayout>
+</androidx.cardview.widget.CardView>

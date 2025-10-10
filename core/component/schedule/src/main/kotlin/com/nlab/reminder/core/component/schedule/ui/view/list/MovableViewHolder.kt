@@ -16,17 +16,7 @@
 
 package com.nlab.reminder.core.component.schedule.ui.view.list
 
-import com.nlab.reminder.core.android.widget.bindText
-import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapterListGroupHeaderSubDefaultBinding
-
 /**
  * @author Doohyun
  */
-class SubGroupHeaderViewHolder internal constructor(
-    private val binding: LayoutScheduleAdapterListGroupHeaderSubDefaultBinding
-) : ScheduleAdapterItemViewHolder(binding.root),
-    MovableViewHolder {
-    fun bind(item: ScheduleAdapterItem.SubGroupHeader) {
-        binding.textviewTitle.bindText(text = item.title)
-    }
-}
+sealed interface MovableViewHolder
