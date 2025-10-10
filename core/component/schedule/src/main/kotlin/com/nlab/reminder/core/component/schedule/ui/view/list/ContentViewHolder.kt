@@ -47,8 +47,6 @@ import com.nlab.reminder.core.component.schedule.R
 import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapterItemContentBinding
 import com.nlab.reminder.core.component.schedule.databinding.LayoutScheduleAdapterItemContentMirrorBinding
 import com.nlab.reminder.core.data.model.ScheduleId
-import com.nlab.reminder.core.data.model.ScheduleTiming
-import com.nlab.reminder.core.data.model.Tag
 import com.nlab.reminder.core.designsystem.compose.theme.AttrIds
 import com.nlab.reminder.core.kotlinx.coroutines.cancelAll
 import kotlinx.coroutines.Job
@@ -328,18 +326,18 @@ private class ContentDraggingDelegate(
                         /*attachToParent = */ false
                     )
                     .apply {
-                        root.alpha = 0.75f
+                        root.alpha = 0.9f
                         buttonComplete.setImageDrawable(binding.buttonComplete.drawable)
                     }
                     .also { viewPool.put(key, it.root) }
             }
         mirrorBinding.apply {
-            textviewTitle.bindText(binding.edittextTitle.text)
+            edittextTitle.bindText(binding.edittextTitle.text)
 
-            textviewNote.bindText(binding.edittextNote.text)
-            textviewNote.visibility = binding.edittextNote.visibility
+            edittextNote.bindText(binding.edittextNote.text)
+            edittextNote.visibility = binding.edittextNote.visibility
 
-            textviewDetail.bindText(binding.edittextDetail.text)
+            edittextDetail.bindText(binding.edittextDetail.text)
 
             cardLink.visibility = binding.cardLink.visibility
             textviewLink.bindText(binding.textviewLink.text)
