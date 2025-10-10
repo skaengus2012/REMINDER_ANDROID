@@ -69,7 +69,9 @@ class ScheduleListItemTouchCallback(
     private var isLongPressDragEnabled: Boolean = false
     private var curAdjustDX: Float = 0f
 
-    // TODO all position can be bindingAdapterPosition, because RecyclerView only has single adapter.
+    // TODO: Refactor all usages of absolute adapter position (e.g., curSelectedAbsolutePosition, prevSelectedAbsolutePosition)
+    // to use bindingAdapterPosition instead, since RecyclerView currently only has a single adapter.
+    // Perform this refactor when updating position handling logic or if adapter structure changes.
     private var curSelectedAbsolutePosition: Int? = null
     private var prevSelectedAbsolutePosition: Int? = null
 
