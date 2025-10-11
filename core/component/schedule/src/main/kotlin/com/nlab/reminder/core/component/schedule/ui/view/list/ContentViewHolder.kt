@@ -380,7 +380,8 @@ private class ContentSwipeDelegate(
     override val swipeView: View get() = binding.layoutContent
     override val clampWidth: Float get() = binding.buttonDelete.width.toFloat()
 
-    override fun onSwipe(isActive: Boolean, dx: Float) {
+    override fun onSwipe(dx: Float) {
+        val isActive = dx.absoluteValue != 0f
         _swipeFlow.value = isActive
         binding.layoutClamp.setVisible(isVisible = isActive, goneIfNotVisible = false)
         binding.layoutClampDim.alpha = clampAlphaOrigin - dx.absoluteValue / clampWidth * clampAlphaOrigin
