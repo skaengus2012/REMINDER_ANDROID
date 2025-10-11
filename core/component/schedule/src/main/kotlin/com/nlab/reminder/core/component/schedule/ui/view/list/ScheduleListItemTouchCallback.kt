@@ -54,6 +54,8 @@ class ScheduleListItemTouchCallback(
     /* dragDirs=*/ ItemTouchHelper.UP or ItemTouchHelper.DOWN,
     /* swipeDirs=*/ ItemTouchHelper.START or ItemTouchHelper.END
 ) {
+    private var selectedActionState: Int = ItemTouchHelper.ACTION_STATE_IDLE
+
     // Drag item properties
     private val outLocation = IntArray(2)
     private val mirrorViewBindingPool = DraggingMirrorViewPool()
@@ -74,8 +76,6 @@ class ScheduleListItemTouchCallback(
     // Perform this refactor when updating position handling logic or if adapter structure changes.
     private var curSelectedAbsolutePosition: Int? = null
     private var prevSelectedAbsolutePosition: Int? = null
-
-    private var selectedActionState: Int = ItemTouchHelper.ACTION_STATE_IDLE
 
     override fun isItemViewSwipeEnabled(): Boolean = isItemViewSwipeEnabled
     override fun isLongPressDragEnabled(): Boolean = isLongPressDragEnabled
@@ -160,7 +160,7 @@ class ScheduleListItemTouchCallback(
                 viewHolder.swipeDelegate.swipeView,
                 clampViewPositionHorizontal(viewHolder, dX, isCurrentlyActive).also {
                     curAdjustDX = it
-                    viewHolder.swipeDelegate.onSwipe(isActive = isCurrentlyActive, it)
+                    viewHolder.swipeDelegate.onSwipe(dx = it)
                 },
                 dY,
                 actionState,
