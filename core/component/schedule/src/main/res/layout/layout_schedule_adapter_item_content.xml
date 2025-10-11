@@ -39,13 +39,12 @@
             android:alpha="0.5"
             android:background="?black" />
 
-        <!-- clamp should ltr -->
         <Button
             android:id="@+id/button_delete"
             style="@style/PlaneatTheme.Style.Typography.BodySmall"
             android:layout_width="60dp"
             android:layout_height="wrap_content"
-            android:layout_gravity="right|center_vertical"
+            android:layout_gravity="end|center_vertical"
             android:layout_marginTop="1dp"
             android:background="@android:color/transparent"
             android:minWidth="0dp"
