@@ -22,15 +22,15 @@ import com.nlab.reminder.core.data.model.ScheduleId
  * @author Doohyun
  */
 interface ScheduleListSelectionSource {
-    fun findScheduleId(absolutePosition: Int): ScheduleId?
+    fun findScheduleId(position: Int): ScheduleId?
     fun findSelected(scheduleId: ScheduleId): Boolean
 }
 
 fun ScheduleListSelectionSource(
     adapter: ScheduleListAdapter
 ): ScheduleListSelectionSource = object : ScheduleListSelectionSource {
-    override fun findScheduleId(absolutePosition: Int): ScheduleId? {
-        return (adapter.getCurrentList().getOrNull(absolutePosition) as? ScheduleAdapterItem.Content)
+    override fun findScheduleId(position: Int): ScheduleId? {
+        return (adapter.getCurrentList().getOrNull(position) as? ScheduleAdapterItem.Content)
             ?.schedule
             ?.resource
             ?.id

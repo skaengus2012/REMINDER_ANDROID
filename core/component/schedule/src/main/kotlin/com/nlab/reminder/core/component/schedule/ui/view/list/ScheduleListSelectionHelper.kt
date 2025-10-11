@@ -16,12 +16,11 @@
 
 package com.nlab.reminder.core.component.schedule.ui.view.list
 
+import androidx.core.util.TypedValueCompat.dpToPx
 import androidx.core.view.doOnLayout
 import androidx.recyclerview.widget.RecyclerView
-import com.nlab.reminder.core.android.content.getDimension
 import com.nlab.reminder.core.androix.recyclerview.selection.MultiSelectReceiver
 import com.nlab.reminder.core.androix.recyclerview.selection.MultiSelectTouchListener
-import com.nlab.reminder.core.component.schedule.R
 import com.nlab.reminder.core.data.model.ScheduleId
 import kotlin.math.max
 
@@ -54,7 +53,7 @@ class ScheduleListSelectionHelper(
                 recyclerView.doOnLayout { v ->
                     hotspotHeight = max(
                         v.height * 0.25f,
-                        v.context.getDimension(R.dimen.schedule_multi_selection_min_hotspot)
+                        dpToPx(/*dpValue = */ 120f, v.resources.displayMetrics)
                     ).toInt()
                     autoScrollDelayTimeInMillis = 15L
                 }
@@ -66,11 +65,11 @@ class ScheduleListSelectionHelper(
 
     fun enable(viewHolder: RecyclerView.ViewHolder) {
         val listener = checkNotNull(attachedListener) { "It's not attached to RecyclerView." }
-        val scheduleId = selectionSource.findScheduleId(viewHolder.absoluteAdapterPosition) ?: return
+        val scheduleId = selectionSource.findScheduleId(viewHolder.bindingAdapterPosition) ?: return
         dragSelected = selectionSource.findSelected(scheduleId).not()
         listener.setIsActive(
             active = true,
-            initialSelectIndex = viewHolder.absoluteAdapterPosition
+            initialSelectIndex = viewHolder.bindingAdapterPosition
         )
     }
 

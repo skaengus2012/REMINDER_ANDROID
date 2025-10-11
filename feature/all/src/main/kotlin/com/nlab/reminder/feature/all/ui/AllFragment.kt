@@ -255,10 +255,10 @@ internal class AllFragment : ComposableFragment() {
         scheduleListAdapter.focusChange
             .onEach { focusChanged ->
                 if (focusChanged.focused) {
-                    val receivedPosition = focusChanged.viewHolder.absoluteAdapterPosition
+                    val receivedPosition = focusChanged.viewHolder.bindingAdapterPosition
                     view.awaitPost()
                     // Prevents position from changing due to UI size change depending on focus change.
-                    if (receivedPosition == focusChanged.viewHolder.absoluteAdapterPosition) {
+                    if (receivedPosition == focusChanged.viewHolder.bindingAdapterPosition) {
                         binding.recyclerviewSchedule.scrollToPosition(receivedPosition)
                     }
                 }
@@ -267,7 +267,7 @@ internal class AllFragment : ComposableFragment() {
 
         combine(
             scheduleListAdapter.focusChange
-                .map { it.viewHolder.absoluteAdapterPosition to it.focused },
+                .map { it.viewHolder.bindingAdapterPosition to it.focused },
             firstVisiblePositionFlow,
             lastVisiblePositionFlow
         ) { (viewHolderPosition, focused), firstVisiblePosition, lastVisiblePosition ->
