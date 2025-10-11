@@ -55,10 +55,13 @@ class ScheduleListItemTouchCallback(
     /* swipeDirs=*/ ItemTouchHelper.START or ItemTouchHelper.END
 ) {
     private var selectedActionState: Int = ItemTouchHelper.ACTION_STATE_IDLE
+    private var isItemViewSwipeEnabled: Boolean = false
+    private var isLongPressDragEnabled: Boolean = false
 
     // Drag item properties
     private val outLocation = IntArray(2)
     private val mirrorViewBindingPool = DraggingMirrorViewPool()
+    private var disposeDragScaleAnimator: ViewPropertyAnimator? = null
     private var draggingViewHolder: RecyclerView.ViewHolder? = null
     private var dragAnchorMirrorView: View? = null
     private var dragXOffset = -1f
@@ -66,16 +69,9 @@ class ScheduleListItemTouchCallback(
 
     // Swipe item properties
     private val disposeSwipeClearedAnimators = mutableSetOf<ViewPropertyAnimator>()
-    private var disposeDragScaleAnimator: ViewPropertyAnimator? = null
-    private var isItemViewSwipeEnabled: Boolean = false
-    private var isLongPressDragEnabled: Boolean = false
-    private var curAdjustDX: Float = 0f
-
-    // TODO: Refactor all usages of absolute adapter position (e.g., curSelectedAbsolutePosition, prevSelectedAbsolutePosition)
-    // to use bindingAdapterPosition instead, since RecyclerView currently only has a single adapter.
-    // Perform this refactor when updating position handling logic or if adapter structure changes.
-    private var curSelectedAbsolutePosition: Int? = null
-    private var prevSelectedAbsolutePosition: Int? = null
+    private var curSwipingClampDx: Float = 0f
+    private var curSwipingPosition: Int? = null
+    private var prevSwipingPosition: Int? = null
 
     override fun isItemViewSwipeEnabled(): Boolean = isItemViewSwipeEnabled
     override fun isLongPressDragEnabled(): Boolean = isLongPressDragEnabled
@@ -91,7 +87,7 @@ class ScheduleListItemTouchCallback(
     override fun getSwipeThreshold(viewHolder: RecyclerView.ViewHolder): Float {
         if (viewHolder !is SwipeSupportable) return getSwipeThreshold(viewHolder)
 
-        viewHolder.isClamped = curAdjustDX <= -viewHolder.swipeDelegate.clampWidth
+        viewHolder.isClamped = curSwipingClampDx <= -viewHolder.swipeDelegate.clampWidth
         return 2f // Define 2f to prevent swipe delete
     }
 
@@ -159,7 +155,7 @@ class ScheduleListItemTouchCallback(
                 recyclerView,
                 viewHolder.swipeDelegate.swipeView,
                 clampViewPositionHorizontal(viewHolder, dX, isCurrentlyActive).also {
-                    curAdjustDX = it
+                    curSwipingClampDx = it
                     viewHolder.swipeDelegate.onSwipe(dx = it)
                 },
                 dY,
@@ -242,16 +238,16 @@ class ScheduleListItemTouchCallback(
     }
 
     private fun removePreviousSwipeClamp(recyclerView: RecyclerView) {
-        if (curSelectedAbsolutePosition == prevSelectedAbsolutePosition) return
-        prevSelectedAbsolutePosition?.let { removeSwipeClampInternal(recyclerView, it) }
-        prevSelectedAbsolutePosition = null
+        if (curSwipingPosition == prevSwipingPosition) return
+        prevSwipingPosition?.let { removeSwipeClampInternal(recyclerView, it) }
+        prevSwipingPosition = null
     }
 
     fun removeSwipeClamp(recyclerView: RecyclerView) {
-        prevSelectedAbsolutePosition?.let { removeSwipeClampInternal(recyclerView, it) }
-        curSelectedAbsolutePosition?.let { removeSwipeClampInternal(recyclerView, it) }
-        prevSelectedAbsolutePosition = null
-        curSelectedAbsolutePosition = null
+        prevSwipingPosition?.let { removeSwipeClampInternal(recyclerView, it) }
+        curSwipingPosition?.let { removeSwipeClampInternal(recyclerView, it) }
+        prevSwipingPosition = null
+        curSwipingPosition = null
     }
 
     private fun <T> clampViewPositionHorizontal(
@@ -277,8 +273,8 @@ class ScheduleListItemTouchCallback(
         viewHolder: RecyclerView.ViewHolder
     ) {
         if (viewHolder is SwipeSupportable) {
-            curAdjustDX = 0f
-            prevSelectedAbsolutePosition = viewHolder.absoluteAdapterPosition
+            curSwipingClampDx = 0f
+            prevSwipingPosition = viewHolder.bindingAdapterPosition
             getDefaultUIUtil().clearView(viewHolder.swipeDelegate.swipeView)
         }
     }
@@ -291,7 +287,7 @@ class ScheduleListItemTouchCallback(
             ItemTouchHelper.ACTION_STATE_SWIPE -> {
                 if (viewHolder !is SwipeSupportable) return
 
-                curSelectedAbsolutePosition = viewHolder.absoluteAdapterPosition
+                curSwipingPosition = viewHolder.bindingAdapterPosition
                 getDefaultUIUtil().onSelected(/* view=*/ viewHolder.swipeDelegate.swipeView)
             }
 
@@ -414,10 +410,10 @@ class ScheduleListItemTouchCallback(
         disposeSwipeClearedAnimators.clear()
         disposeDragScaleAnimator?.cancel()
         disposeDragScaleAnimator = null
-        prevSelectedAbsolutePosition = null
-        curSelectedAbsolutePosition = null
+        prevSwipingPosition = null
+        curSwipingPosition = null
         curContainerTouchX = 0f
-        curAdjustDX = 0f
+        curSwipingClampDx = 0f
     }
 
     fun setLongPressDragEnabled(isEnable: Boolean) {
