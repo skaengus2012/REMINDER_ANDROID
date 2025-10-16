@@ -63,7 +63,7 @@ include(
     ":core:annotation",
     ":core:component:currenttime",
     ":core:component:displayformat",
-    ":core:component:schedule",
+    ":core:component:schedulelist",
     ":core:component:tag",
     ":core:component:tag-test",
     ":core:component:toolbar",
