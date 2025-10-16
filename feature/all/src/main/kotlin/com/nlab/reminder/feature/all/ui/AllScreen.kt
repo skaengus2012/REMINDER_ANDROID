@@ -36,7 +36,7 @@ import androidx.compose.ui.res.stringResource
 import com.nlab.reminder.core.androidx.compose.ui.DelayedContent
 import com.nlab.reminder.core.androidx.compose.ui.tooling.preview.Previews
 import com.nlab.reminder.core.androidx.fragment.compose.AndroidFragment
-import com.nlab.reminder.core.component.schedulelist.ui.compose.ScheduleListToolbar
+import com.nlab.reminder.core.component.schedulelist.ui.ScheduleListToolbar
 import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
 import com.nlab.reminder.core.translation.StringIds
 import kotlinx.coroutines.flow.MutableStateFlow

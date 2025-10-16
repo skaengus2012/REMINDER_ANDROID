@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 The N's lab Open Source Project
+ * Copyright (C) 2025 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.component.schedulelist.ui.compose
+package com.nlab.reminder.core.component.schedulelist.ui
 
 import androidx.annotation.FloatRange
 import androidx.compose.animation.AnimatedVisibility
@@ -64,8 +64,7 @@ fun ScheduleListToolbar(
 ) {
     Box(modifier) {
         HeadBlurLayer(
-            modifier = Modifier
-                .matchParentSize(),
+            modifier = Modifier.matchParentSize(),
             alpha = backgroundAlpha,
             containerColor = PlaneatTheme.colors.bg2Layer,
         )
