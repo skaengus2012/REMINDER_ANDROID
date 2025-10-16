@@ -30,6 +30,7 @@ import kotlin.coroutines.resume
 /**
  * @author thalys
  */
+val View.isLayoutRtl get() = layoutDirection == View.LAYOUT_DIRECTION_RTL
 
 fun View.setVisible(isVisible: Boolean, goneIfNotVisible: Boolean = true) {
     visibility = when {
@@ -38,9 +39,6 @@ fun View.setVisible(isVisible: Boolean, goneIfNotVisible: Boolean = true) {
         else -> View.INVISIBLE
     }
 }
-
-val View.isVisible: Boolean
-    get() = visibility == View.VISIBLE
 
 fun View.bindSelected(selected: Boolean): Boolean {
     if (this.isSelected == selected) return false

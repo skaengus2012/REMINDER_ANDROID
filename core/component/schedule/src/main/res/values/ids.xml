@@ -16,7 +16,8 @@
   -->
 
 <resources>
-    <item name="tag_schedule_item_touch_callback_is_clamp" type="id" />
-    <item name="tag_schedule_item_touch_callback_clamp_hide_animator" type="id" />
+    <item name="tag_schedule_item_touch_callback_user_swiping_dx" type="id" />
+    <item name="tag_schedule_item_touch_callback_swiping_pivot_x" type="id" />
+    <item name="tag_schedule_item_touch_callback_clamp_animator" type="id" />
     <item name="tag_schedule_item_touch_callback_scale_on_dragging" type="id" />
 </resources>

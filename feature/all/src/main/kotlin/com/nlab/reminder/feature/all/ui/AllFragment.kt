@@ -127,14 +127,13 @@ internal class AllFragment : ComposableFragment() {
             scrollGuardMargin = dpToPx(/* dpValue =*/ 24f, resources.displayMetrics),
             dragAnchorOverlay = scheduleListDragAnchorOverlay,
             dragToScaleTargetHeight = dpToPx(/* dpValue =*/ 150f, resources.displayMetrics),
-            animateDuration = 100L,
+            animateDuration = 250L,
+            clampSwipeThreshold = 0.5f,
+            maxClampSwipeWidthMultiplier = 1.75f,
             itemMoveListener = object : ScheduleListItemTouchCallback.ItemMoveListener {
-                override fun onMove(
-                    fromBindingAdapterPosition: Int,
-                    toBindingAdapterPosition: Int
-                ): Boolean = scheduleListAdapter.submitMoving(
-                    fromPosition = fromBindingAdapterPosition,
-                    toPosition = toBindingAdapterPosition
+                override fun onMove(fromPosition: Int, toPosition: Int): Boolean = scheduleListAdapter.submitMoving(
+                    fromPosition = fromPosition,
+                    toPosition = toPosition
                 )
 
                 override fun onMoveEnded() {
@@ -170,6 +169,9 @@ internal class AllFragment : ComposableFragment() {
         }
         val scrollEventFlow = binding.recyclerviewSchedule.run {
             scrollEvent().shareIn(viewLifecycleScope, started = SharingStarted.Eagerly)
+        }
+        val recyclerViewItemTouchesFlow = binding.recyclerviewSchedule.run {
+            itemTouches().shareIn(viewLifecycleScope, SharingStarted.Eagerly)
         }
         val firstVisiblePositionFlow = scrollEventFlow
             .map { linearLayoutManager.findFirstVisibleItemPosition() }
@@ -209,7 +211,16 @@ internal class AllFragment : ComposableFragment() {
             .launchIn(viewLifecycleScope)
 
         merge(
-            scheduleListAdapter.itemViewTouch,
+            // When ItemTouchHelper doesn't work, feed x from itemTouches
+            recyclerViewItemTouchesFlow.map { it.x },
+            // When ItemTouchHelper is in drag operation, the touches are supplied from x
+            binding.recyclerviewSchedule.touches().map { it.x }
+        ).distinctUntilChanged()
+            .onEach { itemTouchCallback.setContainerTouchX(it) }
+            .launchIn(viewLifecycleScope)
+
+        merge(
+            recyclerViewItemTouchesFlow,
             fragmentStateBridge.itemSelectionEnabled
                 .filter { it }
                 .flowWithLifecycle(viewLifecycle),
@@ -220,15 +231,6 @@ internal class AllFragment : ComposableFragment() {
                     prev == RecyclerView.SCROLL_STATE_IDLE && cur == RecyclerView.SCROLL_STATE_DRAGGING
                 },
         ).onEach { itemTouchCallback.removeSwipeClamp(binding.recyclerviewSchedule) }
-            .launchIn(viewLifecycleScope)
-
-        merge(
-            // When ItemTouchHelper doesn't work, feed x from itemTouches
-            binding.recyclerviewSchedule.itemTouches().map { it.x },
-            // When ItemTouchHelper is in drag operation, the touches are supplied from x
-            binding.recyclerviewSchedule.touches().map { it.x },
-        ).distinctUntilChanged()
-            .onEach { itemTouchCallback.setContainerTouchX(it) }
             .launchIn(viewLifecycleScope)
 
         fragmentStateBridge.itemSelectionEnabled

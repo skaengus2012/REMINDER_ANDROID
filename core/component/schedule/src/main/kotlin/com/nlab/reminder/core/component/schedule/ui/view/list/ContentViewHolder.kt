@@ -28,12 +28,12 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.view.doOnAttach
 import androidx.core.view.doOnDetach
+import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.nlab.reminder.core.android.content.getThemeColor
-import com.nlab.reminder.core.android.view.isVisible
 import com.nlab.reminder.core.android.view.clearFocusIfNeeded
 import com.nlab.reminder.core.android.view.filterActionDone
 import com.nlab.reminder.core.android.view.focusChanges
@@ -378,13 +378,13 @@ private class ContentSwipeDelegate(
 
     override val userSwipeable: Boolean get() = binding.isInteractable()
     override val swipeView: View get() = binding.layoutContent
-    override val clampWidth: Float get() = binding.buttonDelete.width.toFloat()
+    override val clampView: View get() = binding.buttonDelete
 
     override fun onSwipe(dx: Float) {
         val isActive = dx.absoluteValue != 0f
         _swipeFlow.value = isActive
-        binding.layoutClamp.setVisible(isVisible = isActive, goneIfNotVisible = false)
-        binding.layoutClampDim.alpha = clampAlphaOrigin - dx.absoluteValue / clampWidth * clampAlphaOrigin
+        binding.layoutClamp.setVisible(isVisible = true, goneIfNotVisible = false)
+        binding.layoutClampDim.alpha = clampAlphaOrigin - dx.absoluteValue / clampView.width * clampAlphaOrigin
     }
 }
 
