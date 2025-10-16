@@ -12,6 +12,8 @@ dependencies {
     api(projects.core.component.displayformat)
 
     implementation(projects.core.android)
+    implementation(projects.core.androidx.fragment)
+    implementation(projects.core.androidx.fragmentCompose)
     implementation(projects.core.androidx.recyclerview)
     implementation(projects.core.component.toolbar)
     implementation(projects.core.dataDi)

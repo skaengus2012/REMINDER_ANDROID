@@ -42,5 +42,5 @@ abstract class ComposableFragment : Fragment() {
         isComposeCompleteJob.complete(Unit)
     }
 
-    protected abstract fun onViewReady(view: View, savedInstanceState: Bundle?)
+    protected open fun onViewReady(view: View, savedInstanceState: Bundle?) = Unit
 }
