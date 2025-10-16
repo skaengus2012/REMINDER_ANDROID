@@ -14,24 +14,26 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.feature.all.ui
+package com.nlab.reminder.core.component.schedulelist.ui
 
 import android.content.res.Resources
 import com.nlab.reminder.core.component.displayformat.ui.DateTimeFormatPattern
-import com.nlab.reminder.core.component.displayformat.ui.triggerAtDateTimeFormatPatternForList
-import com.nlab.reminder.core.component.schedulelist.ui.TriggerAtFormatPatterns
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 
 /**
- * @author Doohyun
+ * @author Thalys
  */
-class AllScheduleTriggerAtFormatPatterns : TriggerAtFormatPatterns {
-    override fun get(resources: Resources, triggerAt: LocalDateTime, entryAt: LocalDateTime): DateTimeFormatPattern {
-        return triggerAtDateTimeFormatPatternForList(resources, triggerAt, entryAt)
-    }
+interface TriggerAtFormatPatterns {
+    fun get(
+        resources: Resources,
+        triggerAt: LocalDateTime,
+        entryAt: LocalDateTime,
+    ): DateTimeFormatPattern
 
-    override fun get(resources: Resources, triggerAt: LocalDate, entryAt: LocalDateTime): DateTimeFormatPattern {
-        return triggerAtDateTimeFormatPatternForList(resources, triggerAt, entryAt.date)
-    }
+    fun get(
+        resources: Resources,
+        triggerAt: LocalDate,
+        entryAt: LocalDateTime,
+    ): DateTimeFormatPattern
 }

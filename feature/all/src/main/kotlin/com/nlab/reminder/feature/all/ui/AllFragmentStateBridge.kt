@@ -18,8 +18,8 @@ package com.nlab.reminder.feature.all.ui
 
 import androidx.compose.runtime.*
 import com.nlab.reminder.core.androidx.compose.ui.LocalTimeZone
-import com.nlab.reminder.core.component.schedule.ui.view.list.SimpleAdd
-import com.nlab.reminder.core.component.schedule.ui.view.list.SimpleEdit
+import com.nlab.reminder.core.component.schedulelist.ui.view.list.SimpleAdd
+import com.nlab.reminder.core.component.schedulelist.ui.view.list.SimpleEdit
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

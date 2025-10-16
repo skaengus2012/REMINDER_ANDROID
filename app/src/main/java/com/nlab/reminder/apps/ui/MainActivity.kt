@@ -28,7 +28,7 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nlab.reminder.core.android.widget.Toast
 import com.nlab.reminder.core.androidx.compose.ui.LocalTimeZone
-import com.nlab.reminder.core.component.schedule.ui.view.list.ScheduleListHolderActivity
+import com.nlab.reminder.core.component.schedulelist.ui.view.list.ScheduleListHolderActivity
 import com.nlab.reminder.core.data.util.TimeZoneMonitor
 import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
 import dagger.hilt.android.AndroidEntryPoint
