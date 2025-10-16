@@ -101,7 +101,7 @@ class ScheduleListItemTouchCallback(
     override fun getSwipeEscapeVelocity(defaultValue: Float): Float = defaultValue * 10f
 
     override fun getSwipeThreshold(viewHolder: RecyclerView.ViewHolder): Float {
-        if (viewHolder !is SwipeSupportable) return getSwipeThreshold(viewHolder)
+        if (viewHolder !is SwipeSupportable) return super.getSwipeThreshold(viewHolder)
         return 2f // Define 2f to prevent swipe delete
     }
 
