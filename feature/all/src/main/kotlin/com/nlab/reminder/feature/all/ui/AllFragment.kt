@@ -40,19 +40,19 @@ import com.nlab.reminder.core.androix.recyclerview.scrollEvent
 import com.nlab.reminder.core.androix.recyclerview.scrollState
 import com.nlab.reminder.core.androix.recyclerview.stickyheader.StickyHeaderHelper
 import com.nlab.reminder.core.androix.recyclerview.verticalScrollRange
-import com.nlab.reminder.core.component.schedulelist.ScheduleListResource
-import com.nlab.reminder.core.component.schedulelist.UserScheduleListResource
-import com.nlab.reminder.core.component.schedulelist.internal.ui.AddLine
-import com.nlab.reminder.core.component.schedulelist.internal.ui.ScheduleAdapterItem
-import com.nlab.reminder.core.component.schedulelist.internal.ui.ScheduleListAdapter
-import com.nlab.reminder.core.component.schedulelist.internal.ui.ScheduleListAnimator
-import com.nlab.reminder.core.component.schedulelist.internal.ui.ScheduleListHolderActivity
-import com.nlab.reminder.core.component.schedulelist.internal.ui.ScheduleListItemTouchCallback
-import com.nlab.reminder.core.component.schedulelist.internal.ui.ScheduleListSelectionHelper
-import com.nlab.reminder.core.component.schedulelist.internal.ui.ScheduleListSelectionSource
-import com.nlab.reminder.core.component.schedulelist.internal.ui.ScheduleListStickyHeaderAdapter
-import com.nlab.reminder.core.component.schedulelist.internal.ui.ScheduleListTheme
-import com.nlab.reminder.core.component.schedulelist.internal.ui.ScrollGuard
+import com.nlab.reminder.core.component.schedulelist.content.ScheduleListResource
+import com.nlab.reminder.core.component.schedulelist.content.UserScheduleListResource
+import com.nlab.reminder.core.component.schedulelist.content.ui.AddLine
+import com.nlab.reminder.core.component.schedulelist.content.ui.ScheduleListItem
+import com.nlab.reminder.core.component.schedulelist.content.ui.ScheduleListAdapter
+import com.nlab.reminder.core.component.schedulelist.content.ui.ScheduleListAnimator
+import com.nlab.reminder.core.component.schedulelist.content.ui.ScheduleListHolderActivity
+import com.nlab.reminder.core.component.schedulelist.content.ui.ScheduleListItemTouchCallback
+import com.nlab.reminder.core.component.schedulelist.content.ui.ScheduleListSelectionHelper
+import com.nlab.reminder.core.component.schedulelist.content.ui.ScheduleListSelectionSource
+import com.nlab.reminder.core.component.schedulelist.content.ui.ScheduleListStickyHeaderAdapter
+import com.nlab.reminder.core.component.schedulelist.content.ui.ScheduleListTheme
+import com.nlab.reminder.core.component.schedulelist.content.ui.ScrollGuard
 import com.nlab.reminder.core.data.model.Link
 import com.nlab.reminder.core.data.model.LinkMetadata
 import com.nlab.reminder.core.data.model.Repeat
@@ -337,7 +337,7 @@ internal class AllFragment : ComposableFragment() {
     }
 
     companion object {
-        private val testItems: List<ScheduleAdapterItem> by lazy {
+        private val testItems: List<ScheduleListItem> by lazy {
             val imageSource = listOf(
                 "https://i.namu.wiki/i/RyUyEbJKhi1iuG8y26lKjvMqjX8VzFUsk82z-9gqjV3KuIGg0krkOtcoZ69nvFREm9cuPbqQA7LSTt-LEfRjKA.webp",
                 "https://img.kbs.co.kr/kbs/620/news.kbs.co.kr/data/fckeditor/new/image/2023/01/13/299931673597441715.png",
@@ -346,14 +346,14 @@ internal class AllFragment : ComposableFragment() {
             )
 
             buildList {
-                this += ScheduleAdapterItem.Headline(StringIds.label_all)
-                this += ScheduleAdapterItem.HeadlinePadding
-                this += ScheduleAdapterItem.GroupHeader(
+                this += ScheduleListItem.Headline(StringIds.label_all)
+                this += ScheduleListItem.HeadlinePadding
+                this += ScheduleListItem.GroupHeader(
                     title = "어제",
                     subTitle = "Hello 어제"
                 )
                 repeat(times = 10) {
-                    this += ScheduleAdapterItem.Content(
+                    this += ScheduleListItem.Content(
                         schedule = UserScheduleListResource(
                             resource = ScheduleListResource(
                                 id = ScheduleId(it.toLong()),
@@ -392,11 +392,11 @@ internal class AllFragment : ComposableFragment() {
                         isLineVisible = true
                     )
                 }
-                this += ScheduleAdapterItem.SubGroupHeader(
+                this += ScheduleListItem.SubGroupHeader(
                     title = "오늘"
                 )
                 repeat(times = 10) {
-                    this += ScheduleAdapterItem.Content(
+                    this += ScheduleListItem.Content(
                         schedule = UserScheduleListResource(
                             resource = ScheduleListResource(
                                 id = ScheduleId(it.toLong()),
@@ -435,7 +435,7 @@ internal class AllFragment : ComposableFragment() {
                         isLineVisible = true
                     )
                 }
-                this += ScheduleAdapterItem.FooterAdd(
+                this += ScheduleListItem.FooterAdd(
                     newScheduleSource = null,
                     line = AddLine.Type1
                 )
