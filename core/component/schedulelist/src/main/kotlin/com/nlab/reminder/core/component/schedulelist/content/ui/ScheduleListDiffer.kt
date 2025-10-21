@@ -23,7 +23,7 @@ import androidx.recyclerview.widget.ListUpdateCallback
 /**
  * @author Thalys
  */
-class ScheduleListDiffer(listUpdateCallback: ListUpdateCallback) {
+internal class ScheduleListDiffer(listUpdateCallback: ListUpdateCallback) {
     private val listUpdateCallbackProxy = ListUpdateCallbackProxy(listUpdateCallback)
     private val differ = AsyncListDiffer(
         listUpdateCallbackProxy,

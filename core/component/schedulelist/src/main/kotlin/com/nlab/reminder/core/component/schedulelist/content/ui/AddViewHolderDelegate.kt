@@ -22,9 +22,7 @@ import android.widget.EditText
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.nlab.reminder.core.android.view.clearFocusIfNeeded
-import com.nlab.reminder.core.android.view.filterActionDone
 import com.nlab.reminder.core.android.view.setVisible
-import com.nlab.reminder.core.android.view.touches
 import com.nlab.reminder.core.android.widget.bindCursorVisible
 import com.nlab.reminder.core.android.widget.bindText
 import com.nlab.reminder.core.component.schedulelist.databinding.LayoutScheduleAdapterItemAddBinding
@@ -36,7 +34,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
-import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.launch
 
 /**
@@ -57,7 +54,6 @@ internal class AddViewHolderDelegate(
         addInputFocus: SharedFlow<AddInputFocus>,
         hasInputFocus: SharedFlow<Boolean>,
         onSimpleAddDone: (SimpleAdd) -> Unit,
-        onItemViewTouched: () -> Unit,
     ): List<Job> {
         val itemView = binding.root
         val viewLifecycleScope = itemView.findViewTreeLifecycleOwner()
@@ -71,12 +67,6 @@ internal class AddViewHolderDelegate(
                     /*color = */ theme.getButtonInfoColor(context = itemView.context)
                 )
             }
-        }
-        jobs += viewLifecycleScope.launch {
-            val touchEvents = binding.getAllInputs().map { it.touches() } + itemView.touches()
-            touchEvents.merge()
-                .filterActionDone()
-                .collect { onItemViewTouched() }
         }
         jobs += viewLifecycleScope.launch {
             addInputFocus.collect { inputFocus ->

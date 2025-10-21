@@ -22,7 +22,7 @@ import com.nlab.reminder.core.androix.recyclerview.stickyheader.StickyHeaderAdap
 /**
  * @author Doohyun
  */
-class ScheduleListStickyHeaderAdapter(
+internal class ScheduleListStickyHeaderAdapter(
     private val getCurrentList: () -> List<ScheduleListItem>,
 ) : RecyclerView.AdapterDataObserver(),
     StickyHeaderAdapter {

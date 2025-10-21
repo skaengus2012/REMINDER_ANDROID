@@ -49,7 +49,7 @@ import kotlin.math.min
  * @see <a href="https://min-wachya.tistory.com/171">docs2</a>
  * @author Thalys
  */
-class ScheduleListItemTouchCallback(
+internal class ScheduleListItemTouchCallback(
     private val scrollGuard: ScrollGuard,
     /**
      * If the user progresses to that critical point, it blocks scrolling.

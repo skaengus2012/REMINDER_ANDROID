@@ -21,7 +21,7 @@ import androidx.recyclerview.widget.RecyclerView
 /**
  * @author Thalys
  */
-class ScrollGuard : RecyclerView.OnScrollListener() {
+internal class ScrollGuard : RecyclerView.OnScrollListener() {
     private var block = false
     private var selfAdjust = false
 

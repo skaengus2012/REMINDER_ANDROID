@@ -19,4 +19,4 @@ package com.nlab.reminder.core.component.schedulelist.content.ui
 /**
  * @author Doohyun
  */
-sealed interface MovableViewHolder
+internal interface MovableViewHolder

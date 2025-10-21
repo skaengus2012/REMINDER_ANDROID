@@ -60,7 +60,6 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
-import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.launch
 import kotlinx.datetime.TimeZone
 import kotlin.math.absoluteValue
@@ -78,7 +77,6 @@ internal class ContentViewHolder(
     scheduleTimingDisplayFormatterState: StateFlow<ScheduleTimingDisplayFormatter?>,
     selectionEnabled: StateFlow<Boolean>,
     selectedScheduleIds: StateFlow<Set<ScheduleId>>,
-    onItemViewTouched: (RecyclerView.ViewHolder) -> Unit,
     onSimpleEditDone: (SimpleEdit) -> Unit,
     onDragHandleTouched: (RecyclerView.ViewHolder) -> Unit,
     onSelectButtonTouched: (RecyclerView.ViewHolder) -> Unit,
@@ -148,12 +146,6 @@ internal class ContentViewHolder(
                         imageTintList = ColorStateList.valueOf(theme.getButtonInfoColor(context))
                     }
                 }
-            }
-            jobs += viewLifecycleScope.launch {
-                val touchEvents = binding.getAllInputs().map { it.touches() } + binding.layoutContent.touches()
-                touchEvents.merge()
-                    .filterActionDone()
-                    .collect { onItemViewTouched(this@ContentViewHolder) }
             }
             jobs += viewLifecycleScope.launch {
                 inputFocusFlow.collect { inputFocus ->

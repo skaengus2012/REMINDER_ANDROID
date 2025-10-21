@@ -23,7 +23,7 @@ import kotlin.reflect.KClass
 /**
  * @author Thalys
  */
-sealed interface DraggableViewHolder : MovableViewHolder {
+interface DraggableViewHolder : MovableViewHolder {
     val draggingDelegate: DraggingDelegate
 }
 

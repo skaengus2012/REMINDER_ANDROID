@@ -27,7 +27,7 @@ import kotlin.math.max
 /**
  * @author Thalys
  */
-class ScheduleListSelectionHelper(
+internal class ScheduleListSelectionHelper(
     private val selectionSource: ScheduleListSelectionSource,
     private val onSelectedStateChanged: (id: ScheduleId, selected: Boolean) -> Unit
 ) {
@@ -82,4 +82,9 @@ class ScheduleListSelectionHelper(
         dragSelected = null
         attachedListener?.clearResource()
     }
+}
+
+internal interface ScheduleListSelectionSource {
+    fun findScheduleId(position: Int): ScheduleId?
+    fun findSelected(scheduleId: ScheduleId): Boolean
 }

@@ -35,7 +35,6 @@ import kotlinx.coroutines.launch
 internal class AddViewHolder(
     binding: LayoutScheduleAdapterItemAddBinding,
     themeState: StateFlow<ScheduleListTheme>,
-    onItemViewTouched: (RecyclerView.ViewHolder) -> Unit,
     onSimpleAddDone: (SimpleAdd) -> Unit,
     onFocusChanged: (RecyclerView.ViewHolder, Boolean) -> Unit,
 ) : ScheduleAdapterItemViewHolder(binding.root),
@@ -59,8 +58,7 @@ internal class AddViewHolder(
                 themeState = themeState,
                 addInputFocus = inputFocusFlow,
                 hasInputFocus = hasInputFocusFlow,
-                onSimpleAddDone = onSimpleAddDone,
-                onItemViewTouched = { onItemViewTouched(this) }
+                onSimpleAddDone = onSimpleAddDone
             )
             jobs += viewLifecycleScope.launch {
                 hasInputFocusFlow.collect { focused -> onFocusChanged(this@AddViewHolder, focused) }

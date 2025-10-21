@@ -21,7 +21,7 @@ import androidx.recyclerview.widget.RecyclerView
 /**
  * @author Doohyun
  */
-class FocusChange internal constructor(
+internal class FocusChange(
     val viewHolder: RecyclerView.ViewHolder,
     val focused: Boolean
 ) {

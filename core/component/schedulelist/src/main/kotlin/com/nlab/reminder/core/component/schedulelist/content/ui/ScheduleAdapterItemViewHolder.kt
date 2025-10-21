@@ -22,4 +22,4 @@ import androidx.recyclerview.widget.RecyclerView
 /**
  * @author Thalys
  */
-sealed class ScheduleAdapterItemViewHolder(view: View) : RecyclerView.ViewHolder(view)
+internal sealed class ScheduleAdapterItemViewHolder(view: View) : RecyclerView.ViewHolder(view)

@@ -32,10 +32,9 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.conflate
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.getAndUpdate
 import kotlinx.coroutines.flow.update
 import kotlinx.datetime.TimeZone
 import kotlin.time.Instant
@@ -62,23 +61,20 @@ internal class ScheduleListAdapter : RecyclerView.Adapter<ScheduleAdapterItemVie
     private val selectionEnabled = MutableStateFlow(false)
     private val selectedScheduleIds = MutableStateFlow<Set<ScheduleId>>(emptySet())
 
-    private val _addRequest = MutableEventSharedFlow<SimpleAdd>()
-    val addRequest: Flow<SimpleAdd> = _addRequest.asSharedFlow()
+    private val _addRequests = MutableEventSharedFlow<SimpleAdd>()
+    val addRequests: SharedFlow<SimpleAdd> = _addRequests.asSharedFlow()
 
-    private val _editRequest = MutableEventSharedFlow<SimpleEdit>()
-    val editRequest: Flow<SimpleEdit> = _editRequest.distinctUntilChanged()
+    private val _editRequests = MutableEventSharedFlow<SimpleEdit>()
+    val editRequests: SharedFlow<SimpleEdit> = _editRequests.asSharedFlow()
 
-    private val _dragHandleTouch = MutableEventSharedFlow<RecyclerView.ViewHolder>()
-    val dragHandleTouch: Flow<RecyclerView.ViewHolder> = _dragHandleTouch.conflate()
+    private val _dragHandleTouches = MutableEventSharedFlow<RecyclerView.ViewHolder>()
+    val dragHandleTouches: Flow<RecyclerView.ViewHolder> = _dragHandleTouches.conflate()
 
-    private val _selectButtonTouch = MutableEventSharedFlow<RecyclerView.ViewHolder>()
-    val selectButtonTouch: Flow<RecyclerView.ViewHolder> = _selectButtonTouch.conflate()
+    private val _selectButtonTouches = MutableEventSharedFlow<RecyclerView.ViewHolder>()
+    val selectButtonTouches: Flow<RecyclerView.ViewHolder> = _selectButtonTouches.conflate()
 
-    private val _focusChange = MutableEventSharedFlow<FocusChange>()
-    val focusChange: Flow<FocusChange> = _focusChange.asSharedFlow()
-
-    private val _itemViewTouch = MutableEventSharedFlow<RecyclerView.ViewHolder>()
-    val itemViewTouch: Flow<RecyclerView.ViewHolder> = _itemViewTouch.asSharedFlow()
+    private val _focusChanges = MutableEventSharedFlow<FocusChange>()
+    val focusChanges: SharedFlow<FocusChange> = _focusChanges.asSharedFlow()
 
     private fun getItem(position: Int): ScheduleListItem {
         return differ.getCurrentList()[position]
@@ -107,9 +103,8 @@ internal class ScheduleListAdapter : RecyclerView.Adapter<ScheduleAdapterItemVie
                         /* attachToParent = */ false
                     ),
                     themeState = themeState,
-                    onItemViewTouched = { _itemViewTouch.tryEmit(it) },
-                    onSimpleAddDone = { _addRequest.tryEmit(it) },
-                    onFocusChanged = { viewHolder, focused -> _focusChange.tryEmit(FocusChange(viewHolder, focused)) }
+                    onSimpleAddDone = { _addRequests.tryEmit(it) },
+                    onFocusChanged = { viewHolder, focused -> _focusChanges.tryEmit(FocusChange(viewHolder, focused)) }
                 )
             }
             ITEM_VIEW_TYPE_CONTENT -> {
@@ -119,18 +114,17 @@ internal class ScheduleListAdapter : RecyclerView.Adapter<ScheduleAdapterItemVie
                         parent,
                         /* attachToParent = */ false
                     ),
-                    scheduleTimingDisplayFormatter = scheduleTimingDisplayFormatter,
                     tagsDisplayFormatter = tagsDisplayFormatter,
                     themeState = themeState,
                     timeZoneState = timeZoneState,
                     entryAtState = entryAtState,
+                    scheduleTimingDisplayFormatterState = scheduleTimingDisplayFormatterState,
                     selectionEnabled = selectionEnabled,
                     selectedScheduleIds = selectedScheduleIds,
-                    onItemViewTouched = { _itemViewTouch.tryEmit(it) },
-                    onSimpleEditDone = { _editRequest.tryEmit(it) },
-                    onDragHandleTouched = { _dragHandleTouch.tryEmit(it) },
-                    onSelectButtonTouched = { _selectButtonTouch.tryEmit(it) },
-                    onFocusChanged = { viewHolder, focused -> _focusChange.tryEmit(FocusChange(viewHolder, focused)) },
+                    onSimpleEditDone = { _editRequests.tryEmit(it) },
+                    onDragHandleTouched = { _dragHandleTouches.tryEmit(it) },
+                    onSelectButtonTouched = { _selectButtonTouches.tryEmit(it) },
+                    onFocusChanged = { viewHolder, focused -> _focusChanges.tryEmit(FocusChange(viewHolder, focused)) },
                 )
             }
 
@@ -142,9 +136,8 @@ internal class ScheduleListAdapter : RecyclerView.Adapter<ScheduleAdapterItemVie
                         /* attachToParent = */ false
                     ),
                     themeState = themeState,
-                    onItemViewTouched = { _itemViewTouch.tryEmit(it) },
-                    onSimpleAddDone = { _addRequest.tryEmit(it) },
-                    onFocusChanged = { viewHolder, focused -> _focusChange.tryEmit(FocusChange(viewHolder, focused)) },
+                    onSimpleAddDone = { _addRequests.tryEmit(it) },
+                    onFocusChanged = { viewHolder, focused -> _focusChanges.tryEmit(FocusChange(viewHolder, focused)) },
                 )
             }
 
