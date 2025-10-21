@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (C) 2025 The N's lab Open Source Project
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~        http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+    <dimen name="schedule_check_external_dither">1.5dp</dimen>
+    <dimen name="schedule_check_size">22dp</dimen>
+    <dimen name="schedule_checkbox_padding">15dp</dimen>
+    <dimen name="schedule_checkbox_touchable_size">52dp</dimen>
+    <dimen name="schedule_checkbox_touchable_size_negative">-52dp</dimen>
+    <dimen name="schedule_data_start">57dp</dimen>
+    <dimen name="schedule_data_start_complete_selection">96dp</dimen> <!-- schedule_data_start + (schedule_checkbox_touchable_size * 0.7f) -->
+    <dimen name="schedule_repeat_symbol_baseline_adjust">-0.5sp</dimen>
+</resources>

@@ -16,13 +16,75 @@
 
 package com.nlab.reminder.core.android.view
 
+import android.view.MotionEvent
 import android.view.View
+import com.nlab.reminder.core.kotlinx.coroutines.flow.filter
+import com.nlab.reminder.core.kotlinx.coroutines.flow.throttleFirst
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlin.coroutines.resume
 
 /**
  * @author thalys
  */
+val View.isLayoutRtl get() = layoutDirection == View.LAYOUT_DIRECTION_RTL
+
+fun View.setVisible(isVisible: Boolean, goneIfNotVisible: Boolean = true) {
+    visibility = when {
+        isVisible -> View.VISIBLE
+        goneIfNotVisible -> View.GONE
+        else -> View.INVISIBLE
+    }
+}
+
 fun View.bindSelected(selected: Boolean): Boolean {
     if (this.isSelected == selected) return false
     this.isSelected = selected
     return true
+}
+
+fun View.clearFocusIfNeeded(): Boolean {
+    if (isFocused.not()) return false
+    clearFocus()
+    return true
+}
+
+suspend fun View.awaitPost() = suspendCancellableCoroutine { continuation ->
+    val runnable = Runnable { continuation.resume(Unit) }
+    post(runnable)
+
+    continuation.invokeOnCancellation { removeCallbacks(runnable) }
+}
+
+fun View.touches(): Flow<MotionEvent> = callbackFlow {
+    setOnTouchListener { v, event ->
+        trySend(event)
+        v.performClick()
+    }
+
+    awaitClose { setOnTouchListener(null) }
+}
+
+fun Flow<MotionEvent>.filterActionDone(): Flow<MotionEvent> =
+    filter { event -> event.action == MotionEvent.ACTION_DOWN }
+
+fun View.clicks(): Flow<View> = callbackFlow {
+    setOnClickListener { trySend(it) }
+    awaitClose { setOnClickListener(null) }
+}
+
+fun View.throttleClicks(windowDuration: Long = 500): Flow<View> = clicks().throttleFirst(windowDuration)
+
+fun View.focusChanges(emitCurrent: Boolean = false): Flow<Boolean> {
+    val result = callbackFlow {
+        val listener = View.OnFocusChangeListener { _, hasFocus ->
+            trySend(hasFocus)
+        }
+        onFocusChangeListener = listener
+        awaitClose { onFocusChangeListener = null }
+    }
+    return if (emitCurrent) result.onStart { emit(hasFocus()) } else result
 }
