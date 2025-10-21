@@ -44,15 +44,6 @@ import com.nlab.reminder.core.component.schedulelist.content.ScheduleListResourc
 import com.nlab.reminder.core.component.schedulelist.content.UserScheduleListResource
 import com.nlab.reminder.core.component.schedulelist.content.ui.AddLine
 import com.nlab.reminder.core.component.schedulelist.content.ui.ScheduleListItem
-import com.nlab.reminder.core.component.schedulelist.content.ui.ScheduleListAdapter
-import com.nlab.reminder.core.component.schedulelist.content.ui.ScheduleListAnimator
-import com.nlab.reminder.core.component.schedulelist.content.ui.ScheduleListHolderActivity
-import com.nlab.reminder.core.component.schedulelist.content.ui.ScheduleListItemTouchCallback
-import com.nlab.reminder.core.component.schedulelist.content.ui.ScheduleListSelectionHelper
-import com.nlab.reminder.core.component.schedulelist.content.ui.ScheduleListSelectionSource
-import com.nlab.reminder.core.component.schedulelist.content.ui.ScheduleListStickyHeaderAdapter
-import com.nlab.reminder.core.component.schedulelist.content.ui.ScheduleListTheme
-import com.nlab.reminder.core.component.schedulelist.content.ui.ScrollGuard
 import com.nlab.reminder.core.data.model.Link
 import com.nlab.reminder.core.data.model.LinkMetadata
 import com.nlab.reminder.core.data.model.Repeat

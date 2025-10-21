@@ -50,7 +50,6 @@ import com.nlab.reminder.core.data.model.ScheduleId
 import com.nlab.reminder.core.designsystem.compose.theme.AttrIds
 import com.nlab.reminder.core.kotlinx.coroutines.cancelAllAndClear
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asFlow
@@ -72,11 +71,11 @@ import kotlin.time.Instant
  */
 internal class ContentViewHolder(
     private val binding: LayoutScheduleAdapterItemContentBinding,
-    themeState: StateFlow<ScheduleListTheme>,
-    scheduleTimingDisplayFormatter: ScheduleTimingDisplayFormatter,
     tagsDisplayFormatter: TagsDisplayFormatter,
-    timeZone: Flow<TimeZone>,
-    entryAt: Flow<Instant>,
+    themeState: StateFlow<ScheduleListTheme>,
+    timeZoneState: StateFlow<TimeZone?>,
+    entryAtState: StateFlow<Instant?>,
+    scheduleTimingDisplayFormatterState: StateFlow<ScheduleTimingDisplayFormatter?>,
     selectionEnabled: StateFlow<Boolean>,
     selectedScheduleIds: StateFlow<Set<ScheduleId>>,
     onItemViewTouched: (RecyclerView.ViewHolder) -> Unit,
@@ -107,10 +106,7 @@ internal class ContentViewHolder(
     override val swipeDelegate: SwipeDelegate = _swipeDelegate
 
     init {
-        binding.edittextDetail.initialize(
-            scheduleTimingDisplayFormatter = scheduleTimingDisplayFormatter,
-            tagsDisplayFormatter = tagsDisplayFormatter
-        )
+        binding.edittextDetail.initialize(tagsDisplayFormatter = tagsDisplayFormatter)
 
         // Processing for multiline input and actionDone support
         binding.edittextTitle.setRawInputType(InputType.TYPE_CLASS_TEXT)
@@ -243,10 +239,22 @@ internal class ContentViewHolder(
                     .collect { binding.buttonSelection.isSelected = it }
             }
             jobs += viewLifecycleScope.launch {
-                timeZone.collect { binding.edittextDetail.bindTimeZone(it) }
+                timeZoneState.collect { timeZone ->
+                    if (timeZone == null) return@collect
+                    binding.edittextDetail.bindTimeZone(timeZone)
+                }
             }
             jobs += viewLifecycleScope.launch {
-                entryAt.collect { binding.edittextDetail.bindEntryAt(it) }
+                entryAtState.collect { entryAt ->
+                    if (entryAt == null) return@collect
+                    binding.edittextDetail.bindEntryAt(entryAt)
+                }
+            }
+            jobs += viewLifecycleScope.launch {
+                scheduleTimingDisplayFormatterState.collect { formatter ->
+                    if (formatter == null) return@collect
+                    binding.edittextDetail.bindScheduleTimingDisplayFormatter(formatter)
+                }
             }
         }
         itemView.doOnDetach {

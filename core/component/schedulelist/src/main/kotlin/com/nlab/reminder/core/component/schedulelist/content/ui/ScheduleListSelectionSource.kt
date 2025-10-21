@@ -26,6 +26,7 @@ interface ScheduleListSelectionSource {
     fun findSelected(scheduleId: ScheduleId): Boolean
 }
 
+/**
 fun ScheduleListSelectionSource(
     adapter: ScheduleListAdapter
 ): ScheduleListSelectionSource = object : ScheduleListSelectionSource {
@@ -39,4 +40,4 @@ fun ScheduleListSelectionSource(
     override fun findSelected(scheduleId: ScheduleId): Boolean {
         return scheduleId in adapter.getCurrentSelected()
     }
-}
+}*/

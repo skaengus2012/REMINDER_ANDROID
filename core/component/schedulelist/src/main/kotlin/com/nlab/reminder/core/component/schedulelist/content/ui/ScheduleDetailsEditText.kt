@@ -45,13 +45,14 @@ internal class ScheduleDetailsEditText @JvmOverloads constructor(
     defStyleAttr: Int = R.attr.editTextStyle
 ) : AppCompatEditText(context, attrs, defStyleAttr) {
     private val tagSelectionAdjustRunnable: Runnable
-
-    private lateinit var scheduleTimingDisplayFormatter: ScheduleTimingDisplayFormatter
     private lateinit var tagsDisplayFormatter: TagsDisplayFormatter
 
+    private var scheduleTimingText: CharSequence = ""
+
+    // Material for ScheduleTimingText
+    private var scheduleTimingDisplayFormatter: ScheduleTimingDisplayFormatter? = null
     private var scheduleTiming: ScheduleTiming? = null
     private var scheduleCompleted: Boolean = false
-    private var scheduleTimingText: CharSequence = ""
     private var timeZone: TimeZone? = null
     private var entryAt: Instant? = null
     private var tags: List<Tag>? = null
@@ -217,11 +218,7 @@ internal class ScheduleDetailsEditText @JvmOverloads constructor(
         }
     }
 
-    internal fun initialize(
-        scheduleTimingDisplayFormatter: ScheduleTimingDisplayFormatter,
-        tagsDisplayFormatter: TagsDisplayFormatter
-    ) {
-        this.scheduleTimingDisplayFormatter = scheduleTimingDisplayFormatter
+    internal fun initialize(tagsDisplayFormatter: TagsDisplayFormatter) {
         this.tagsDisplayFormatter = tagsDisplayFormatter
     }
 
@@ -252,13 +249,12 @@ internal class ScheduleDetailsEditText @JvmOverloads constructor(
         }
     }
 
-    fun bindTimeZone(timeZone: TimeZone) {
-        if (this.timeZone == timeZone) return
+    fun bindScheduleTimingDisplayFormatter(formatter: ScheduleTimingDisplayFormatter) {
+        if (this.scheduleTimingDisplayFormatter === formatter) return
+        this.scheduleTimingDisplayFormatter = formatter
 
         val currentExtraText = findExtraText()
-
-        this.timeZone = timeZone
-        this.scheduleTimingText = scheduleTimingDisplayFormatter.format(
+        scheduleTimingText = formatter.format(
             context = context,
             scheduleTiming = scheduleTiming,
             timeZone = timeZone,
@@ -268,20 +264,42 @@ internal class ScheduleDetailsEditText @JvmOverloads constructor(
         setDetailsTextAndSelection(extraText = currentExtraText ?: "")
     }
 
+    fun bindTimeZone(timeZone: TimeZone) {
+        if (this.timeZone == timeZone) return
+        this.timeZone = timeZone
+
+        val currentFormatter = scheduleTimingDisplayFormatter
+        if (currentFormatter != null) {
+            val currentExtraText = findExtraText()
+
+            scheduleTimingText = currentFormatter.format(
+                context = context,
+                scheduleTiming = scheduleTiming,
+                timeZone = timeZone,
+                entryAt = entryAt,
+                completed = scheduleCompleted
+            )
+            setDetailsTextAndSelection(extraText = currentExtraText ?: "")
+        }
+    }
+
     fun bindEntryAt(entryAt: Instant) {
         if (this.entryAt == entryAt) return
-
-        val currentExtraText = findExtraText()
-
         this.entryAt = entryAt
-        this.scheduleTimingText = scheduleTimingDisplayFormatter.format(
-            context = context,
-            scheduleTiming = scheduleTiming,
-            timeZone = timeZone,
-            entryAt = entryAt,
-            completed = scheduleCompleted
-        )
-        setDetailsTextAndSelection(extraText = currentExtraText ?: "")
+
+        val currentFormatter = scheduleTimingDisplayFormatter
+        if (currentFormatter != null) {
+            val currentExtraText = findExtraText()
+
+            scheduleTimingText = currentFormatter.format(
+                context = context,
+                scheduleTiming = scheduleTiming,
+                timeZone = timeZone,
+                entryAt = entryAt,
+                completed = scheduleCompleted
+            )
+            setDetailsTextAndSelection(extraText = currentExtraText ?: "")
+        }
     }
 
     fun bindScheduleData(scheduleTiming: ScheduleTiming?, scheduleCompleted: Boolean, tags: List<Tag>) {
@@ -298,25 +316,29 @@ internal class ScheduleDetailsEditText @JvmOverloads constructor(
             return
         }
 
-        if (needScheduleTimingDisplayTextUpdate) {
-            this.scheduleCompleted = scheduleCompleted
-            this.scheduleTiming = scheduleTiming
-            this.scheduleTimingText = scheduleTimingDisplayFormatter.format(
-                context = context,
-                scheduleTiming = scheduleTiming,
-                timeZone = timeZone,
-                entryAt = entryAt,
-                completed = scheduleCompleted
-            )
-        }
+        setVisible(isVisible = scheduleTiming != null || tags.isNotEmpty())
 
         if (needTagsDisplayTextUpdate) {
             this.tags = tags
             setInputAvailable(available = tags.isNotEmpty())
         }
 
-        setDetailsTextAndSelection(extraText = tagsDisplayFormatter.format(context, tags = tags))
-        setVisible(isVisible = scheduleTiming != null || tags.isNotEmpty())
+        if (needScheduleTimingDisplayTextUpdate) {
+            this.scheduleCompleted = scheduleCompleted
+            this.scheduleTiming = scheduleTiming
+
+            val currentFormatter = scheduleTimingDisplayFormatter
+            if (currentFormatter != null) {
+                this.scheduleTimingText = currentFormatter.format(
+                    context = context,
+                    scheduleTiming = scheduleTiming,
+                    timeZone = timeZone,
+                    entryAt = entryAt,
+                    completed = scheduleCompleted
+                )
+                setDetailsTextAndSelection(extraText = tagsDisplayFormatter.format(context, tags = tags))
+            }
+        }
     }
 
     private fun createDetailsText(extraText: CharSequence): CharSequence {

@@ -35,6 +35,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.getAndUpdate
 import kotlinx.coroutines.flow.update
 import kotlinx.datetime.TimeZone
 import kotlin.time.Instant
@@ -50,18 +51,14 @@ private const val ITEM_VIEW_TYPE_SUB_GROUP_HEADER = 7
 /**
  * @author Thalys
  */
-internal class ScheduleListAdapter(
-    private val timeZone: Flow<TimeZone>,
-    private val entryAt: Flow<Instant>,
-    triggerAtFormatPatterns: TriggerAtFormatPatterns,
-) : RecyclerView.Adapter<ScheduleAdapterItemViewHolder>() {
+internal class ScheduleListAdapter : RecyclerView.Adapter<ScheduleAdapterItemViewHolder>() {
     private val differ = ScheduleListDiffer(listUpdateCallback = AdapterListUpdateCallback(/* adapter = */ this))
-    private val scheduleTimingDisplayFormatter = ScheduleTimingDisplayFormatter(
-        triggerAtFormatPatterns = triggerAtFormatPatterns,
-        dateTimeFormatPool = DateTimeFormatPool()
-    )
+    private val dateTimeFormatPool = DateTimeFormatPool()
     private val tagsDisplayFormatter = TagsDisplayFormatter()
     private val themeState = MutableStateFlow(ScheduleListTheme.Point1)
+    private val timeZoneState = MutableStateFlow<TimeZone?>(null)
+    private val entryAtState = MutableStateFlow<Instant?>(null)
+    private val scheduleTimingDisplayFormatterState = MutableStateFlow<ScheduleTimingDisplayFormatter?>(null)
     private val selectionEnabled = MutableStateFlow(false)
     private val selectedScheduleIds = MutableStateFlow<Set<ScheduleId>>(emptySet())
 
@@ -122,11 +119,11 @@ internal class ScheduleListAdapter(
                         parent,
                         /* attachToParent = */ false
                     ),
-                    themeState = themeState,
                     scheduleTimingDisplayFormatter = scheduleTimingDisplayFormatter,
                     tagsDisplayFormatter = tagsDisplayFormatter,
-                    timeZone = timeZone,
-                    entryAt = entryAt,
+                    themeState = themeState,
+                    timeZoneState = timeZoneState,
+                    entryAtState = entryAtState,
                     selectionEnabled = selectionEnabled,
                     selectedScheduleIds = selectedScheduleIds,
                     onItemViewTouched = { _itemViewTouch.tryEmit(it) },
@@ -231,7 +228,7 @@ internal class ScheduleListAdapter(
     }
 
     fun submitList(items: List<ScheduleListItem>?) {
-        scheduleTimingDisplayFormatter.releaseCache()
+        scheduleTimingDisplayFormatterState.value?.releaseCache()
         tagsDisplayFormatter.releaseCache()
         differ.submitList(items, commitCallback = {})
     }
@@ -246,6 +243,22 @@ internal class ScheduleListAdapter(
 
     fun updateTheme(theme: ScheduleListTheme) {
         themeState.value = theme
+    }
+
+    fun updateTimeZone(timeZone: TimeZone) {
+        timeZoneState.value = timeZone
+    }
+
+    fun updateEntryAt(entryAt: Instant) {
+        entryAtState.value =  entryAt
+    }
+
+    fun updateTriggerAtFormatPatterns(patterns: TriggerAtFormatPatterns) {
+        scheduleTimingDisplayFormatterState.value?.releaseCache()
+        scheduleTimingDisplayFormatterState.value = ScheduleTimingDisplayFormatter(
+            triggerAtFormatPatterns = patterns,
+            dateTimeFormatPool = dateTimeFormatPool
+        )
     }
 }
 
