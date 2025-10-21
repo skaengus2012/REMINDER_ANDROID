@@ -220,10 +220,10 @@ internal class ScheduleListAdapter : RecyclerView.Adapter<ScheduleAdapterItemVie
         differ.syncMoving(commitCallback = {})
     }
 
-    fun submitList(items: List<ScheduleListItem>?) {
+    fun submitList(items: List<ScheduleListItem>?, commitCallback: CommitCallback) {
         scheduleTimingDisplayFormatterState.value?.releaseCache()
         tagsDisplayFormatter.releaseCache()
-        differ.submitList(items, commitCallback = {})
+        differ.submitList(items, commitCallback)
     }
 
     fun getCurrentList(): List<ScheduleListItem> {

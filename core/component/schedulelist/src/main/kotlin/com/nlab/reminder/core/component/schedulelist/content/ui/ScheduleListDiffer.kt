@@ -79,7 +79,7 @@ internal class ScheduleListDiffer(listUpdateCallback: ListUpdateCallback) {
         }
     }
 
-    fun submitList(items: List<ScheduleListItem>?, commitCallback: (isImmediatelySubmitted: Boolean) -> Unit) {
+    fun submitList(items: List<ScheduleListItem>?, commitCallback: CommitCallback) {
         val default = when (val current = state) {
             is ScheduleListDifferState.Default -> {
                 current
@@ -87,22 +87,26 @@ internal class ScheduleListDiffer(listUpdateCallback: ListUpdateCallback) {
 
             is ScheduleListDifferState.Move -> {
                 current.pendingSubmit = PendingSubmit(items)
-                commitCallback(false)
+                commitCallback(isImmediatelySubmitted = false)
                 return
             }
 
             is ScheduleListDifferState.Sync -> {
                 current.pendingSubmit = PendingSubmit(items)
-                commitCallback(false)
+                commitCallback(isImmediatelySubmitted = false)
                 return
             }
         }
         default.notifySubmitting()
         differ.submitList(items) {
             default.notifySubmitDone()
-            commitCallback(true)
+            commitCallback(isImmediatelySubmitted = true)
         }
     }
+}
+
+internal fun interface CommitCallback {
+    operator fun invoke(isImmediatelySubmitted: Boolean)
 }
 
 private class ListUpdateCallbackProxy(
@@ -135,7 +139,7 @@ private class ListUpdateCallbackProxy(
     }
 }
 
-private sealed class ScheduleListDifferState private constructor() {
+private sealed class ScheduleListDifferState {
     class Default : ScheduleListDifferState() {
         private var submittingCount: Int = 0
 
