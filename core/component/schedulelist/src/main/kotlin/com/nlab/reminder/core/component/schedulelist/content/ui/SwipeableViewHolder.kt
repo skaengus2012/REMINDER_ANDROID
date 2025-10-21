@@ -21,13 +21,10 @@ import android.view.View
 /**
  * @author Thalys
  */
-sealed interface SwipeSupportable {
-    val swipeDelegate: SwipeDelegate
-}
+internal interface SwipeableViewHolder {
+    val swipeView: View
+    val clampView: View
 
-abstract class SwipeDelegate {
-    internal abstract val userSwipeable: Boolean
-    internal abstract val swipeView: View
-    internal abstract val clampView: View
-    internal abstract fun onSwipe(dx: Float)
+    fun userSwipeable(): Boolean
+    fun onSwipe(dx: Float)
 }

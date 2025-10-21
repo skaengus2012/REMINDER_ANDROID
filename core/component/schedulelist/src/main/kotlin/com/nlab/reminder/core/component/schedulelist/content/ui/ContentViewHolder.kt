@@ -83,7 +83,7 @@ internal class ContentViewHolder(
     onFocusChanged: (RecyclerView.ViewHolder, Boolean) -> Unit,
 ) : ScheduleAdapterItemViewHolder(binding.root),
     DraggableViewHolder,
-    SwipeSupportable {
+    SwipeableViewHolder {
     private val linkThumbnailPlaceHolderDrawable: Drawable? = with(itemView) {
         AppCompatResources.getDrawable(context, R.drawable.ic_schedule_link_error)
             ?.let(DrawableCompat::wrap)
@@ -95,12 +95,12 @@ internal class ContentViewHolder(
             }
     }
     private val selectionAnimDelegate = ContentSelectionAnimDelegate(binding)
+    private val draggableViewHolderDelegate = DraggableViewHolderDelegate(binding)
+    private val swipeableViewHolderDelegate = SwipeableViewHolderDelegate(binding)
     private val bindingId = MutableStateFlow<ScheduleId?>(null)
 
-    private val draggingState = MutableStateFlow(false)
-
-    private val _swipeDelegate = ContentSwipeDelegate(binding)
-    override val swipeDelegate: SwipeDelegate = _swipeDelegate
+    override val swipeView: View get() = swipeableViewHolderDelegate.swipeView
+    override val clampView: View get() = swipeableViewHolderDelegate.clampView
 
     init {
         binding.edittextDetail.initialize(tagsDisplayFormatter = tagsDisplayFormatter)
@@ -203,8 +203,8 @@ internal class ContentViewHolder(
             jobs += viewLifecycleScope.launch {
                 combine(
                     selectionEnabled,
-                    draggingState,
-                    _swipeDelegate.swipeFlow
+                    draggableViewHolderDelegate.draggingState,
+                    swipeableViewHolderDelegate.swipingState
                 ) { selectionUsable, dragging, swiping -> selectionUsable || dragging || swiping }
                     .distinctUntilChanged()
                     .map { it.not() }
@@ -298,6 +298,37 @@ internal class ContentViewHolder(
     }
 
     override fun userDraggable(): Boolean {
+        return draggableViewHolderDelegate.userDraggable()
+    }
+
+    override fun isScaleOnDraggingNeeded(): Boolean {
+        return draggableViewHolderDelegate.isScaleOnDraggingNeeded()
+    }
+
+    override fun onDragStateChanged(isActive: Boolean) {
+        draggableViewHolderDelegate.onDragStateChanged(isActive)
+    }
+
+    override fun mirrorView(parent: ViewGroup, viewPool: DraggingMirrorViewPool): View {
+        return draggableViewHolderDelegate.mirrorView(parent, viewPool)
+    }
+
+    override fun userSwipeable(): Boolean {
+        return swipeableViewHolderDelegate.userSwipeable()
+    }
+
+    override fun onSwipe(dx: Float) {
+        swipeableViewHolderDelegate.onSwipe(dx)
+    }
+}
+
+private class DraggableViewHolderDelegate(
+    private val binding: LayoutScheduleAdapterItemContentBinding
+) : DraggableViewHolder {
+    private val _draggingState = MutableStateFlow(false)
+    val draggingState: StateFlow<Boolean> = _draggingState.asStateFlow()
+
+    override fun userDraggable(): Boolean {
         return binding.isInteractable()
     }
 
@@ -306,10 +337,13 @@ internal class ContentViewHolder(
     }
 
     override fun onDragStateChanged(isActive: Boolean) {
-        draggingState.value = isActive
+        _draggingState.value = isActive
     }
 
-    override fun mirrorView(parent: ViewGroup, viewPool: DraggingMirrorViewPool): View {
+    override fun mirrorView(
+        parent: ViewGroup,
+        viewPool: DraggingMirrorViewPool
+    ): View {
         val key = ContentViewHolder::class
         val mirrorBinding = viewPool.get(key)
             ?.let { LayoutScheduleAdapterItemContentMirrorBinding.bind(it) }
@@ -364,20 +398,24 @@ internal class ContentViewHolder(
     }
 }
 
-private class ContentSwipeDelegate(
+private class SwipeableViewHolderDelegate(
     private val binding: LayoutScheduleAdapterItemContentBinding,
-) : SwipeDelegate() {
+) : SwipeableViewHolder {
     private val clampAlphaOrigin: Float = binding.layoutClampDim.alpha
-    private val _swipeFlow = MutableStateFlow(false)
-    val swipeFlow: StateFlow<Boolean> = _swipeFlow.asStateFlow()
 
-    override val userSwipeable: Boolean get() = binding.isInteractable()
-    override val swipeView: View get() = binding.layoutContent
-    override val clampView: View get() = binding.buttonDelete
+    private val _swipingState = MutableStateFlow(false)
+    val swipingState: StateFlow<Boolean> = _swipingState.asStateFlow()
+
+    override val swipeView: View = binding.layoutContent
+    override val clampView: View = binding.buttonDelete
+
+    override fun userSwipeable(): Boolean {
+        return binding.isInteractable()
+    }
 
     override fun onSwipe(dx: Float) {
         val isActive = dx.absoluteValue != 0f
-        _swipeFlow.value = isActive
+        _swipingState.value = isActive
         binding.layoutClamp.setVisible(isVisible = true, goneIfNotVisible = false)
         binding.layoutClampDim.alpha = clampAlphaOrigin - dx.absoluteValue / clampView.width * clampAlphaOrigin
     }

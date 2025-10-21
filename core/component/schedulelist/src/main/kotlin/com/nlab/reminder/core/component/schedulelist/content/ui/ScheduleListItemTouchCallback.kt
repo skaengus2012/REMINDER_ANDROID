@@ -101,7 +101,7 @@ internal class ScheduleListItemTouchCallback(
     override fun getSwipeEscapeVelocity(defaultValue: Float): Float = defaultValue * 10f
 
     override fun getSwipeThreshold(viewHolder: RecyclerView.ViewHolder): Float {
-        if (viewHolder !is SwipeSupportable) return super.getSwipeThreshold(viewHolder)
+        if (viewHolder !is SwipeableViewHolder) return super.getSwipeThreshold(viewHolder)
         return 2f // Define 2f to prevent swipe delete
     }
 
@@ -129,7 +129,7 @@ internal class ScheduleListItemTouchCallback(
     }
 
     override fun getSwipeDirs(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
-        return if (viewHolder is SwipeSupportable && viewHolder.swipeDelegate.userSwipeable) {
+        return if (viewHolder is SwipeableViewHolder && viewHolder.userSwipeable()) {
             super.getSwipeDirs(recyclerView, viewHolder)
         } else {
             ItemTouchHelper.ACTION_STATE_IDLE
@@ -145,7 +145,7 @@ internal class ScheduleListItemTouchCallback(
         actionState: Int,
         isCurrentlyActive: Boolean
     ) {
-        if (viewHolder is SwipeSupportable) {
+        if (viewHolder is SwipeableViewHolder) {
             onChildDrawIfSwipeSupportable(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
         }
         if (actionState == ItemTouchHelper.ACTION_STATE_DRAG && viewHolder is DraggableViewHolder) {
@@ -161,15 +161,15 @@ internal class ScheduleListItemTouchCallback(
         dY: Float,
         actionState: Int,
         isCurrentlyActive: Boolean
-    ) where T : RecyclerView.ViewHolder, T : SwipeSupportable {
+    ) where T : RecyclerView.ViewHolder, T : SwipeableViewHolder {
         if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
             removePreviousSwipeClamp(recyclerView)
             getDefaultUIUtil().onDraw(
                 c,
                 recyclerView,
-                viewHolder.swipeDelegate.swipeView,
+                viewHolder.swipeView,
                 /* dX= */ if (isCurrentlyActive) {
-                    calculateAndSetSwipingClampX(viewHolder, dX).also { viewHolder.swipeDelegate.onSwipe(dx = it) }
+                    calculateAndSetSwipingClampX(viewHolder, dX).also { viewHolder.onSwipe(dx = it) }
                 } else {
                     viewHolder.userSwipingDX ?: 0f
                 },
@@ -225,7 +225,7 @@ internal class ScheduleListItemTouchCallback(
     private fun <T> registerSwipeClampAnimator(
         viewHolder: T,
         @SwipingClampAnimationType animationType: Int
-    ) where T : RecyclerView.ViewHolder, T : SwipeSupportable {
+    ) where T : RecyclerView.ViewHolder, T : SwipeableViewHolder {
         val curAnimatorState = viewHolder.swipingClampAnimatorState
         if (curAnimatorState != null && curAnimatorState.animationType == animationType) {
             return
@@ -234,7 +234,7 @@ internal class ScheduleListItemTouchCallback(
 
         val goalX = when (animationType) {
             SWIPING_CLAMP_ANIMATION_SHOW -> {
-                val clampWidth = viewHolder.swipeDelegate.clampView.width.toFloat()
+                val clampWidth = viewHolder.clampView.width.toFloat()
                 if (viewHolder.itemView.isLayoutRtl) clampWidth
                 else -clampWidth
             }
@@ -260,8 +260,8 @@ internal class ScheduleListItemTouchCallback(
                 addUpdateListener { valueAnimator ->
                     val animateDx = valueAnimator.animatedValue as Float
                     viewHolder.userSwipingDX = animateDx
-                    viewHolder.swipeDelegate.onSwipe(dx = animateDx)
-                    viewHolder.swipeDelegate.swipeView.translationX = animateDx
+                    viewHolder.onSwipe(dx = animateDx)
+                    viewHolder.swipeView.translationX = animateDx
                 }
                 var isAnimationCancelled = false
                 doOnCancel { isAnimationCancelled = true }
@@ -269,7 +269,7 @@ internal class ScheduleListItemTouchCallback(
                     if (isAnimationCancelled) return@doOnEnd
 
                     viewHolder.swipingClampAnimatorState = null
-                    viewHolder.swipeDelegate.onSwipe(dx = goalX)
+                    viewHolder.onSwipe(dx = goalX)
                     viewHolder.userSwipingDX = if (animationType == SWIPING_CLAMP_ANIMATION_HIDE) {
                         null
                     } else {
@@ -289,7 +289,7 @@ internal class ScheduleListItemTouchCallback(
 
     private fun removeSwipeClampInternal(recyclerView: RecyclerView, position: Int) {
         val viewHolder = recyclerView.findViewHolderForAdapterPosition(position) ?: return
-        if (viewHolder !is SwipeSupportable) return
+        if (viewHolder !is SwipeableViewHolder) return
         registerSwipeClampAnimator(
             viewHolder = viewHolder,
             animationType = SWIPING_CLAMP_ANIMATION_HIDE
@@ -312,10 +312,10 @@ internal class ScheduleListItemTouchCallback(
     private fun <T> calculateAndSetSwipingClampX(
         viewHolder: T,
         dX: Float
-    ): Float where T : RecyclerView.ViewHolder, T : SwipeSupportable {
+    ): Float where T : RecyclerView.ViewHolder, T : SwipeableViewHolder {
         val pivotX = viewHolder.swipingPivotX ?: 0f
         val prevDX = viewHolder.userSwipingDX
-        val maxClampWidth = viewHolder.swipeDelegate.clampView.width * maxClampSwipeWidthMultiplier
+        val maxClampWidth = viewHolder.clampView.width * maxClampSwipeWidthMultiplier
 
         val adjustDX = dX / 2 + pivotX
         val newDX = if (viewHolder.itemView.isLayoutRtl) {
@@ -329,8 +329,8 @@ internal class ScheduleListItemTouchCallback(
     }
 
     override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
-        if (viewHolder is SwipeSupportable) {
-            val clampView = viewHolder.swipeDelegate.clampView
+        if (viewHolder is SwipeableViewHolder) {
+            val clampView = viewHolder.clampView
             val userSwipingDX = viewHolder.userSwipingDX
             if (userSwipingDX != null) {
                 viewHolder.itemView.post {
@@ -344,7 +344,7 @@ internal class ScheduleListItemTouchCallback(
                 }
             }
             prevSwipingPosition = viewHolder.bindingAdapterPosition
-            getDefaultUIUtil().clearView(viewHolder.swipeDelegate.swipeView)
+            getDefaultUIUtil().clearView(viewHolder.swipeView)
         }
     }
 
@@ -354,7 +354,7 @@ internal class ScheduleListItemTouchCallback(
 
         when (actionState) {
             ItemTouchHelper.ACTION_STATE_SWIPE -> {
-                if (viewHolder !is SwipeSupportable) return
+                if (viewHolder !is SwipeableViewHolder) return
 
                 curSwipingPosition = viewHolder.bindingAdapterPosition
                 viewHolder.swipingPivotX = viewHolder.userSwipingDX
@@ -364,7 +364,7 @@ internal class ScheduleListItemTouchCallback(
                         animator.cancel()
                         viewHolder.swipingClampAnimatorState = null
                     }
-                getDefaultUIUtil().onSelected(/* view=*/ viewHolder.swipeDelegate.swipeView)
+                getDefaultUIUtil().onSelected(/* view=*/ viewHolder.swipeView)
             }
 
             ItemTouchHelper.ACTION_STATE_DRAG -> {
