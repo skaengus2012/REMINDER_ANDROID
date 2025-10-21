@@ -97,8 +97,7 @@ internal class ContentViewHolder(
     private val selectionAnimDelegate = ContentSelectionAnimDelegate(binding)
     private val bindingId = MutableStateFlow<ScheduleId?>(null)
 
-    private val _draggingDelegate = ContentDraggingDelegate(binding)
-    override val draggingDelegate: DraggingDelegate = _draggingDelegate
+    private val draggingState = MutableStateFlow(false)
 
     private val _swipeDelegate = ContentSwipeDelegate(binding)
     override val swipeDelegate: SwipeDelegate = _swipeDelegate
@@ -114,7 +113,7 @@ internal class ContentViewHolder(
         itemView.doOnAttach { view ->
             val viewLifecycleOwner = view.findViewTreeLifecycleOwner() ?: return@doOnAttach
             val viewLifecycleScope = viewLifecycleOwner.lifecycleScope
-            val inputFocusFlow = combine(
+            val inputFocuses = combine(
                 ContentInputFocus.entries.mapNotNull { contentInputFocus ->
                     binding.findInput(contentInputFocus)
                         ?.focusChanges(emitCurrent = true)
@@ -124,7 +123,7 @@ internal class ContentViewHolder(
             ) { focuses -> focuses.find { it != null } ?: ContentInputFocus.Nothing }
                 .distinctUntilChanged()
                 .shareInWithJobCollector(viewLifecycleScope, jobs, replay = 1)
-            val hasInputFocusChangesFlow = inputFocusFlow
+            val hasInputFocusChanges = inputFocuses
                 .map { it != ContentInputFocus.Nothing }
                 .distinctUntilChanged()
                 .shareInWithJobCollector(viewLifecycleScope, jobs, replay = 1)
@@ -148,7 +147,7 @@ internal class ContentViewHolder(
                 }
             }
             jobs += viewLifecycleScope.launch {
-                inputFocusFlow.collect { inputFocus ->
+                inputFocuses.collect { inputFocus ->
                     val focusedEditText = binding.findInput(inputFocus)
                     binding.getAllInputs().forEach { editText ->
                         editText.bindCursorVisible(isVisible = editText === focusedEditText)
@@ -156,19 +155,19 @@ internal class ContentViewHolder(
                 }
             }
             jobs += viewLifecycleScope.launch {
-                hasInputFocusChangesFlow.collect(binding.buttonInfo::setVisible)
+                hasInputFocusChanges.collect(binding.buttonInfo::setVisible)
             }
             jobs += viewLifecycleScope.launch {
-                hasInputFocusChangesFlow.collect { focused -> onFocusChanged(this@ContentViewHolder, focused) }
+                hasInputFocusChanges.collect { focused -> onFocusChanged(this@ContentViewHolder, focused) }
             }
             jobs += viewLifecycleScope.launch {
                 registerEditNoteVisibility(
                     edittextNote = binding.edittextNote,
-                    viewHolderEditFocusedFlow = hasInputFocusChangesFlow
+                    viewHolderEditFocusedFlow = hasInputFocusChanges
                 )
             }
             jobs += viewLifecycleScope.launch {
-                hasInputFocusChangesFlow
+                hasInputFocusChanges
                     .focusLostCompletelyChanges()
                     .mapNotNull { savable ->
                         if (savable) {
@@ -204,7 +203,7 @@ internal class ContentViewHolder(
             jobs += viewLifecycleScope.launch {
                 combine(
                     selectionEnabled,
-                    _draggingDelegate.draggingFlow,
+                    draggingState,
                     _swipeDelegate.swipeFlow
                 ) { selectionUsable, dragging, swiping -> selectionUsable || dragging || swiping }
                     .distinctUntilChanged()
@@ -297,15 +296,7 @@ internal class ContentViewHolder(
             )
         }
     }
-}
 
-private class ContentDraggingDelegate(
-    private val binding: LayoutScheduleAdapterItemContentBinding,
-) : DraggingDelegate() {
-    private val _draggingFlow = MutableStateFlow(false)
-    val draggingFlow: StateFlow<Boolean> = _draggingFlow.asStateFlow()
-
-    // Prevent start dragging, when input selection double click!
     override fun userDraggable(): Boolean {
         return binding.isInteractable()
     }
@@ -315,13 +306,10 @@ private class ContentDraggingDelegate(
     }
 
     override fun onDragStateChanged(isActive: Boolean) {
-        _draggingFlow.value = isActive
+        draggingState.value = isActive
     }
 
-    override fun mirrorView(
-        parent: ViewGroup,
-        viewPool: DraggingMirrorViewPool
-    ): View {
+    override fun mirrorView(parent: ViewGroup, viewPool: DraggingMirrorViewPool): View {
         val key = ContentViewHolder::class
         val mirrorBinding = viewPool.get(key)
             ?.let { LayoutScheduleAdapterItemContentMirrorBinding.bind(it) }

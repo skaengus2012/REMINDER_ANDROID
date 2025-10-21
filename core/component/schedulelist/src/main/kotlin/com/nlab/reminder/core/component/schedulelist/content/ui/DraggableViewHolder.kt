@@ -23,15 +23,11 @@ import kotlin.reflect.KClass
 /**
  * @author Thalys
  */
-interface DraggableViewHolder : MovableViewHolder {
-    val draggingDelegate: DraggingDelegate
-}
-
-abstract class DraggingDelegate {
-    internal abstract fun userDraggable(): Boolean
-    internal abstract fun isScaleOnDraggingNeeded(): Boolean
-    internal abstract fun onDragStateChanged(isActive: Boolean)
-    internal abstract fun mirrorView(parent: ViewGroup, viewPool: DraggingMirrorViewPool): View
+internal interface DraggableViewHolder : MovableViewHolder {
+    fun userDraggable(): Boolean
+    fun isScaleOnDraggingNeeded(): Boolean
+    fun onDragStateChanged(isActive: Boolean)
+    fun mirrorView(parent: ViewGroup, viewPool: DraggingMirrorViewPool): View
 }
 
 internal class DraggingMirrorViewPool {

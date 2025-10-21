@@ -121,7 +121,7 @@ internal class ScheduleListItemTouchCallback(
     }
 
     override fun getDragDirs(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
-        return if (viewHolder is DraggableViewHolder && viewHolder.draggingDelegate.userDraggable()) {
+        return if (viewHolder is DraggableViewHolder && viewHolder.userDraggable()) {
             super.getDragDirs(recyclerView, viewHolder)
         } else {
             ItemTouchHelper.ACTION_STATE_IDLE
@@ -206,7 +206,7 @@ internal class ScheduleListItemTouchCallback(
         viewHolder.itemView.getLocationInWindow(outLocation)
         mirrorView.apply {
             translationX = curContainerTouchX - dragXOffset
-            translationY = if (viewHolder.draggingDelegate.isScaleOnDraggingNeeded()) {
+            translationY = if (viewHolder.isScaleOnDraggingNeeded()) {
                 outLocation[1].toFloat() - height / 4f
             } else {
                 outLocation[1].toFloat()
@@ -372,7 +372,7 @@ internal class ScheduleListItemTouchCallback(
                 if (viewHolder !is DraggableViewHolder) return
 
                 viewHolder.setIsRecyclable(false)
-                viewHolder.draggingDelegate.onDragStateChanged(isActive = true)
+                viewHolder.onDragStateChanged(isActive = true)
 
                 // Original Pipeline Participation
                 // If it contains a ViewHolder image, it cannot be processed as alpha.
@@ -380,7 +380,7 @@ internal class ScheduleListItemTouchCallback(
                 viewHolder.itemView.setVisible(isVisible = false, goneIfNotVisible = false)
 
                 // Mirror Creation & Binding
-                val mirrorView = viewHolder.draggingDelegate
+                val mirrorView = viewHolder
                     .mirrorView(parent = dragAnchorOverlay, viewPool = mirrorViewBindingPool)
                     .also { v ->
                         if (v.parent == null) {
@@ -397,7 +397,7 @@ internal class ScheduleListItemTouchCallback(
                         scaleY = 1f
                         scaleOnDragging = null
                     }
-                if (viewHolder.draggingDelegate.isScaleOnDraggingNeeded()) {
+                if (viewHolder.isScaleOnDraggingNeeded()) {
                     val scaleP = (dragToScaleTargetHeight / viewHolder.itemView.height).coerceAtMost(1f)
                     viewHolder.itemView.apply {
                         scaleX = scaleP
@@ -444,9 +444,7 @@ internal class ScheduleListItemTouchCallback(
                             viewHolder.setIsRecyclable(true)
                             viewHolder.itemView.setVisible(isVisible = true)
 
-                            (viewHolder as? DraggableViewHolder)
-                                ?.draggingDelegate
-                                ?.onDragStateChanged(isActive = false)
+                            (viewHolder as? DraggableViewHolder)?.onDragStateChanged(isActive = false)
 
                             disposeDragScaleAnimator?.cancel()
                             disposeDragScaleAnimator = postDragScaleAnimator(
