@@ -18,114 +18,129 @@ package com.nlab.reminder.feature.all.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
-import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import com.nlab.reminder.core.androidx.compose.ui.DelayedContent
 import com.nlab.reminder.core.androidx.compose.ui.tooling.preview.Previews
-import com.nlab.reminder.core.androidx.fragment.compose.AndroidFragment
+import com.nlab.reminder.core.component.schedulelist.content.ui.ScheduleListContent
+import com.nlab.reminder.core.component.schedulelist.content.ui.ScheduleListItem
+import com.nlab.reminder.core.component.schedulelist.content.ui.ScheduleListTheme
+import com.nlab.reminder.core.component.schedulelist.content.ui.SimpleAdd
+import com.nlab.reminder.core.component.schedulelist.content.ui.SimpleEdit
 import com.nlab.reminder.core.component.schedulelist.toolbar.ui.ScheduleListToolbar
 import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
+import com.nlab.reminder.core.kotlin.collections.toNonEmptyList
 import com.nlab.reminder.core.translation.StringIds
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import kotlin.time.Clock
+import kotlin.time.Instant
 
 /**
  * @author Doohyun
  */
 @Composable
 internal fun AllScreen(
-    enterTransitionTimeInMillis: Int,
+    enterTransitionTimeInMillis: Long,
     onBackClicked: () -> Unit,
     showAppToast: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val testFlow = remember { MutableStateFlow(false) }
+    val entryAt = remember { Clock.System.now() }
+    var itemSelectionEnabled by remember { mutableStateOf(false) }
+    var items: List<ScheduleListItem> by remember {
+        mutableStateOf(emptyList())
+    }
+
+    if (items.isEmpty()) {
+        LaunchedEffect(Unit) {
+            val newItems = withContext(Dispatchers.Default) {
+                FakeData.testItems
+            }
+            items = newItems
+        }
+    }
+
     AllScreen(
         modifier = modifier,
-        fragmentStateBridge = rememberAllFragmentStateBridge(
-            testFlow = testFlow,
-            isToolbarTitleVisible = false,
-            toolbarBackgroundAlpha = 0.0f,
-            onSimpleAdd = { simpleAdd ->
-                showAppToast("TODO Simple Add $simpleAdd")
-            },
-            onSimpleEdited = { simpleEdit ->
-                // TODO implements
-                showAppToast("TODO Simple Edit $simpleEdit")
-            }
-        ),
-        scheduleListDisplayDelayTimeMillis = enterTransitionTimeInMillis.toLong(),
+        scheduleListDisplayDelayTimeMillis = enterTransitionTimeInMillis,
+        items = items,
+        itemSelectionEnabled = itemSelectionEnabled,
+        entryAt = entryAt,
         onBackClicked = onBackClicked,
         onMoreClicked = {
-            testFlow.update { it.not() }
+            // TODO implements
+            itemSelectionEnabled = itemSelectionEnabled.not()
         },
         onCompleteClicked = {
             // TODO implements
+        },
+        onSimpleAdd = { simpleAdd ->
+            // TODO implements
+            showAppToast("TODO Simple Add $simpleAdd")
+        },
+        onSimpleEdit = { simpleEdit ->
+            // TODO implements
+            showAppToast("TODO Simple Edit $simpleEdit")
         }
     )
 }
 
 @Composable
 private fun AllScreen(
-    fragmentStateBridge: AllFragmentStateBridge,
     scheduleListDisplayDelayTimeMillis: Long,
+    items: List<ScheduleListItem>,
+    itemSelectionEnabled: Boolean,
+    entryAt: Instant,
     onBackClicked: () -> Unit,
     onMoreClicked: () -> Unit,
     onCompleteClicked: () -> Unit,
+    onSimpleAdd: (SimpleAdd) -> Unit,
+    onSimpleEdit: (SimpleEdit) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
         modifier = modifier
-            .background(PlaneatTheme.colors.bg2)
+            .background(color = PlaneatTheme.colors.bg2)
             .fillMaxSize()
     ) {
+        var isTitleVisible by remember { mutableStateOf(false) }
+        var titleBackgroundAlpha by remember { mutableFloatStateOf(0f) }
+
         AllToolbar(
-            fragmentStateBridge = fragmentStateBridge,
+            isTitleVisible = isTitleVisible,
+            backgroundAlpha = titleBackgroundAlpha,
             onBackClicked = onBackClicked,
             onMoreClicked = onMoreClicked,
             onCompleteClicked = onCompleteClicked
         )
-        DelayedContent(delayTimeMillis = scheduleListDisplayDelayTimeMillis) {
-            AllScheduleList(fragmentStateBridge = fragmentStateBridge)
+        if (items.isNotEmpty()) {
+            DelayedContent(delayTimeMillis = scheduleListDisplayDelayTimeMillis) {
+                val triggerAtFormatPatterns = remember { AllScheduleTriggerAtFormatPatterns() }
+                ScheduleListContent(
+                    items = items.toNonEmptyList(),
+                    entryAt = entryAt,
+                    itemSelectionEnabled = itemSelectionEnabled,
+                    triggerAtFormatPatterns = triggerAtFormatPatterns,
+                    theme = ScheduleListTheme.Point1,
+                    onToolbarVisibleChanged = { isTitleVisible = it },
+                    onToolbarBackgroundAlphaChanged = { titleBackgroundAlpha = it },
+                    onSimpleAdd = onSimpleAdd,
+                    onSimpleEdit = onSimpleEdit,
+                )
+            }
         }
     }
 }
 
 @Composable
-private fun AllScheduleList(
-    fragmentStateBridge: AllFragmentStateBridge,
-    modifier: Modifier = Modifier,
-) {
-    val direction = LocalLayoutDirection.current
-    val displayCutoutPaddings = WindowInsets.displayCutout.asPaddingValues()
-    AndroidFragment<AllFragment>(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(
-                start = displayCutoutPaddings.calculateStartPadding(direction),
-                end = displayCutoutPaddings.calculateEndPadding(direction),
-            )
-            .navigationBarsPadding()
-            .imePadding()
-    ) { it.fragmentStateBridge = fragmentStateBridge }
-}
-
-@Composable
 private fun AllToolbar(
-    fragmentStateBridge: AllFragmentStateBridge,
+    isTitleVisible: Boolean,
+    backgroundAlpha: Float,
     onBackClicked: () -> Unit,
     onMoreClicked: () -> Unit,
     onCompleteClicked: () -> Unit,
@@ -140,10 +155,10 @@ private fun AllToolbar(
     ScheduleListToolbar(
         modifier = modifier,
         title = stringResource(StringIds.label_all),
-        isTitleVisible = fragmentStateBridge.isToolbarTitleVisible,
+        isTitleVisible = isTitleVisible,
         isMoreVisible = true,
         isCompleteVisible = true,
-        backgroundAlpha = fragmentStateBridge.toolbarBackgroundAlpha,
+        backgroundAlpha = backgroundAlpha,
         onBackClicked = {
             clearInput()
             onBackClicked()
@@ -162,15 +177,14 @@ private fun AllScreenPreview() {
     PlaneatTheme {
         AllScreen(
             scheduleListDisplayDelayTimeMillis = 0,
-            fragmentStateBridge = rememberAllFragmentStateBridge(
-                isToolbarTitleVisible = true,
-                toolbarBackgroundAlpha = 1.0f,
-                onSimpleAdd = {},
-                onSimpleEdited = {}
-            ),
+            items = emptyList(),
+            itemSelectionEnabled = true,
+            entryAt = Clock.System.now(),
             onBackClicked = {},
             onMoreClicked = {},
-            onCompleteClicked = {}
+            onCompleteClicked = {},
+            onSimpleAdd = {},
+            onSimpleEdit = {}
         )
     }
 }
