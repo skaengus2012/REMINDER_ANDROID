@@ -29,7 +29,6 @@ import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.view.doOnAttach
 import androidx.core.view.doOnDetach
 import androidx.core.view.isVisible
-import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
@@ -95,7 +94,7 @@ internal class ContentViewHolder(
             }
     }
     private val selectionAnimDelegate = ContentSelectionAnimDelegate(binding)
-    private val draggableViewHolderDelegate = DraggableViewHolderDelegate(binding)
+    private val draggableViewHolderDelegate = DraggableViewHolderDelegate(binding, selectionAnimDelegate)
     private val swipeableViewHolderDelegate = SwipeableViewHolderDelegate(binding)
     private val bindingId = MutableStateFlow<ScheduleId?>(null)
 
@@ -323,7 +322,8 @@ internal class ContentViewHolder(
 }
 
 private class DraggableViewHolderDelegate(
-    private val binding: LayoutScheduleAdapterItemContentBinding
+    private val binding: LayoutScheduleAdapterItemContentBinding,
+    private val selectionAnimDelegate: ContentSelectionAnimDelegate
 ) : DraggableViewHolder {
     private val _draggingState = MutableStateFlow(false)
     val draggingState: StateFlow<Boolean> = _draggingState.asStateFlow()
@@ -360,7 +360,7 @@ private class DraggableViewHolderDelegate(
                     }
                     .also { viewPool.put(key, it.root) }
             }
-        mirrorBinding.apply {
+        with(mirrorBinding) {
             edittextTitle.bindText(binding.edittextTitle.text)
 
             edittextNote.bindText(binding.edittextNote.text)
@@ -377,22 +377,12 @@ private class DraggableViewHolderDelegate(
             imageviewBgLinkThumbnail.visibility = binding.imageviewBgLinkThumbnail.visibility
             imageviewBgLinkThumbnail.setImageDrawable(binding.imageviewBgLinkThumbnail.drawable)
 
-            // TODO migrate animation
-            buttonComplete.apply {
-                isSelected = binding.buttonComplete.isSelected
-                alpha = binding.buttonComplete.alpha
-                translationX = binding.buttonComplete.translationX
-            }
-            buttonSelection.apply {
-                isSelected = binding.buttonSelection.isSelected
-                alpha = binding.buttonSelection.alpha
-                translationX = binding.buttonSelection.translationX
-            }
-            buttonDragHandle.apply {
-                alpha = binding.buttonDragHandle.alpha
-                translationX = binding.buttonDragHandle.translationX
-            }
-            layoutData.updateLayoutParams { width = binding.layoutData.width }
+            selectionAnimDelegate.applyStateTo(
+                layoutData,
+                buttonComplete,
+                buttonSelection,
+                buttonDragHandle
+            )
         }
         return mirrorBinding.root
     }

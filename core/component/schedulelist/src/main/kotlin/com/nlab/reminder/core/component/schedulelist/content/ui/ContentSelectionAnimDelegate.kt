@@ -20,6 +20,7 @@ import android.animation.Animator
 import android.animation.ValueAnimator
 import android.view.View
 import android.view.ViewGroup.LayoutParams
+import android.widget.ImageButton
 import androidx.core.view.doOnLayout
 import androidx.core.view.updateLayoutParams
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
@@ -196,5 +197,28 @@ internal class ContentSelectionAnimDelegate(
             targetView.alpha = value.animatedValue as Float
         }
         return animator
+    }
+
+    fun applyStateTo(
+        layoutData: View,
+        buttonComplete: ImageButton,
+        buttonSelection: ImageButton,
+        buttonDragHandle: ImageButton
+    ) {
+        buttonComplete.apply {
+            isSelected = binding.buttonComplete.isSelected
+            alpha = binding.buttonComplete.alpha
+            translationX = binding.buttonComplete.translationX
+        }
+        buttonSelection.apply {
+            isSelected = binding.buttonSelection.isSelected
+            alpha = binding.buttonSelection.alpha
+            translationX = binding.buttonSelection.translationX
+        }
+        buttonDragHandle.apply {
+            alpha = binding.buttonDragHandle.alpha
+            translationX = binding.buttonDragHandle.translationX
+        }
+        layoutData.updateLayoutParams { width = binding.layoutData.width }
     }
 }
