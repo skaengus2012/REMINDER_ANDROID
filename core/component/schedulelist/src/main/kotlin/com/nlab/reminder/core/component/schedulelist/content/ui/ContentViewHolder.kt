@@ -48,7 +48,7 @@ import com.nlab.reminder.core.component.schedulelist.databinding.LayoutScheduleA
 import com.nlab.reminder.core.component.schedulelist.databinding.LayoutScheduleAdapterItemContentMirrorBinding
 import com.nlab.reminder.core.data.model.ScheduleId
 import com.nlab.reminder.core.designsystem.compose.theme.AttrIds
-import com.nlab.reminder.core.kotlinx.coroutines.cancelAll
+import com.nlab.reminder.core.kotlinx.coroutines.cancelAllAndClear
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -70,9 +70,9 @@ import kotlin.time.Instant
 /**
  * @author Thalys
  */
-class ContentViewHolder internal constructor(
+internal class ContentViewHolder(
     private val binding: LayoutScheduleAdapterItemContentBinding,
-    theme: ScheduleListTheme,
+    themeState: StateFlow<ScheduleListTheme>,
     scheduleTimingDisplayFormatter: ScheduleTimingDisplayFormatter,
     tagsDisplayFormatter: TagsDisplayFormatter,
     timeZone: Flow<TimeZone>,
@@ -107,17 +107,6 @@ class ContentViewHolder internal constructor(
     override val swipeDelegate: SwipeDelegate = _swipeDelegate
 
     init {
-        binding.buttonComplete.setImageResource(
-            when (theme) {
-                ScheduleListTheme.Point1 -> R.drawable.checkbox_schedule_check_selector_point1
-                ScheduleListTheme.Point2 -> R.drawable.checkbox_schedule_check_selector_point2
-                ScheduleListTheme.Point3 -> R.drawable.checkbox_schedule_check_selector_point3
-            }
-        )
-        binding.buttonInfo.apply {
-            imageTintList = ColorStateList.valueOf(theme.getButtonInfoColor(context))
-        }
-
         binding.edittextDetail.initialize(
             scheduleTimingDisplayFormatter = scheduleTimingDisplayFormatter,
             tagsDisplayFormatter = tagsDisplayFormatter
@@ -146,6 +135,24 @@ class ContentViewHolder internal constructor(
                 .distinctUntilChanged()
                 .shareInWithJobCollector(viewLifecycleScope, jobs, replay = 1)
 
+            jobs += viewLifecycleScope.launch {
+                themeState.collect { theme ->
+                    binding.buttonComplete.setImageResource(
+                        when (theme) {
+                            ScheduleListTheme.Point1 -> R.drawable.checkbox_schedule_check_selector_point1
+                            ScheduleListTheme.Point2 -> R.drawable.checkbox_schedule_check_selector_point2
+                            ScheduleListTheme.Point3 -> R.drawable.checkbox_schedule_check_selector_point3
+                        }
+                    )
+                }
+            }
+            jobs += viewLifecycleScope.launch {
+                themeState.collect { theme ->
+                    binding.buttonInfo.apply {
+                        imageTintList = ColorStateList.valueOf(theme.getButtonInfoColor(context))
+                    }
+                }
+            }
             jobs += viewLifecycleScope.launch {
                 val touchEvents = binding.getAllInputs().map { it.touches() } + binding.layoutContent.touches()
                 touchEvents.merge()
@@ -243,7 +250,7 @@ class ContentViewHolder internal constructor(
             }
         }
         itemView.doOnDetach {
-            jobs.cancelAll()
+            jobs.cancelAllAndClear()
             selectionAnimDelegate.cancelAnimation()
         }
     }
@@ -264,7 +271,7 @@ class ContentViewHolder internal constructor(
             clearFocusIfNeeded()
         }
         binding.edittextDetail.apply {
-            ScheduleDetailsEditText.bindScheduleData(
+            bindScheduleData(
                 scheduleCompleted = item.schedule.resource.isComplete,
                 scheduleTiming = item.schedule.resource.timing,
                 tags = item.schedule.resource.tags

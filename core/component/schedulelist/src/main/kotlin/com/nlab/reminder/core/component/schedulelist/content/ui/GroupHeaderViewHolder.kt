@@ -22,7 +22,7 @@ import com.nlab.reminder.core.component.schedulelist.databinding.LayoutScheduleA
 /**
  * @author Doohyun
  */
-class GroupHeaderViewHolder internal constructor(
+internal class GroupHeaderViewHolder(
     private val binding: LayoutScheduleAdapterListGroupHeaderDefaultBinding
 ) : ScheduleAdapterItemViewHolder(binding.root),
     MovableViewHolder {

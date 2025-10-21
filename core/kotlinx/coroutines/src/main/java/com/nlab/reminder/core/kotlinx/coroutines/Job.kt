@@ -25,3 +25,8 @@ import kotlinx.coroutines.Job
 fun Iterable<Job>.cancelAll(cause: CancellationException? = null) {
     forEach { it.cancel(cause) }
 }
+
+fun MutableList<Job>.cancelAllAndClear(cause: CancellationException? = null) {
+    cancelAll(cause)
+    clear()
+}

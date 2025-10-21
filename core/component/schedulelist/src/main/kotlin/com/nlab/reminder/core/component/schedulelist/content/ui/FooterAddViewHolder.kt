@@ -23,8 +23,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.nlab.reminder.core.android.view.setVisible
 import com.nlab.reminder.core.component.schedulelist.databinding.LayoutScheduleAdapterItemFooterAddBinding
-import com.nlab.reminder.core.kotlinx.coroutines.cancelAll
+import com.nlab.reminder.core.kotlinx.coroutines.cancelAllAndClear
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -32,9 +33,9 @@ import kotlinx.coroutines.launch
 /**
  * @author Thalys
  */
-class FooterAddViewHolder internal constructor(
+internal class FooterAddViewHolder(
     private val binding: LayoutScheduleAdapterItemFooterAddBinding,
-    theme: ScheduleListTheme,
+    themeState: StateFlow<ScheduleListTheme>,
     onItemViewTouched: (RecyclerView.ViewHolder) -> Unit,
     onSimpleAddDone: (SimpleAdd) -> Unit,
     onFocusChanged: (RecyclerView.ViewHolder, Boolean) -> Unit,
@@ -42,7 +43,7 @@ class FooterAddViewHolder internal constructor(
     private val addViewHolderDelegate = AddViewHolderDelegate(binding = binding.layoutAdd)
 
     init {
-        addViewHolderDelegate.init(theme)
+        addViewHolderDelegate.init()
 
         val jobs = mutableListOf<Job>()
         itemView.doOnAttach { view ->
@@ -55,8 +56,9 @@ class FooterAddViewHolder internal constructor(
                 .distinctUntilChanged()
                 .shareInWithJobCollector(lifecycleScope, jobs, replay = 1)
             jobs += addViewHolderDelegate.onAttached(
-                addInputFocusFlow = inputFocusFlow,
-                hasInputFocusFlow = hasInputFocusFlow,
+                themeState = themeState,
+                addInputFocus = inputFocusFlow,
+                hasInputFocus = hasInputFocusFlow,
                 onSimpleAddDone = onSimpleAddDone,
                 onItemViewTouched = { onItemViewTouched(this) }
             )
@@ -68,7 +70,7 @@ class FooterAddViewHolder internal constructor(
             }
         }
         itemView.doOnDetach {
-            jobs.cancelAll()
+            jobs.cancelAllAndClear()
         }
     }
 

@@ -101,7 +101,6 @@ private fun AllScreen(
         DelayedContent(delayTimeMillis = scheduleListDisplayDelayTimeMillis) {
             AllScheduleList(fragmentStateBridge = fragmentStateBridge)
         }
-
     }
 }
 

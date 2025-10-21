@@ -22,8 +22,9 @@ import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.nlab.reminder.core.component.schedulelist.databinding.LayoutScheduleAdapterItemAddBinding
-import com.nlab.reminder.core.kotlinx.coroutines.cancelAll
+import com.nlab.reminder.core.kotlinx.coroutines.cancelAllAndClear
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -31,9 +32,9 @@ import kotlinx.coroutines.launch
 /**
  * @author Thalys
  */
-class AddViewHolder internal constructor(
+internal class AddViewHolder(
     binding: LayoutScheduleAdapterItemAddBinding,
-    theme: ScheduleListTheme,
+    themeState: StateFlow<ScheduleListTheme>,
     onItemViewTouched: (RecyclerView.ViewHolder) -> Unit,
     onSimpleAddDone: (SimpleAdd) -> Unit,
     onFocusChanged: (RecyclerView.ViewHolder, Boolean) -> Unit,
@@ -42,7 +43,7 @@ class AddViewHolder internal constructor(
     private val addViewHolderDelegate = AddViewHolderDelegate(binding)
 
     init {
-        addViewHolderDelegate.init(theme)
+        addViewHolderDelegate.init()
 
         val jobs = mutableListOf<Job>()
         itemView.doOnAttach { view ->
@@ -55,8 +56,9 @@ class AddViewHolder internal constructor(
                 .distinctUntilChanged()
                 .shareInWithJobCollector(viewLifecycleScope, jobs, replay = 1)
             jobs += addViewHolderDelegate.onAttached(
-                addInputFocusFlow = inputFocusFlow,
-                hasInputFocusFlow = hasInputFocusFlow,
+                themeState = themeState,
+                addInputFocus = inputFocusFlow,
+                hasInputFocus = hasInputFocusFlow,
                 onSimpleAddDone = onSimpleAddDone,
                 onItemViewTouched = { onItemViewTouched(this) }
             )
@@ -65,7 +67,7 @@ class AddViewHolder internal constructor(
             }
         }
         itemView.doOnDetach {
-            jobs.cancelAll()
+            jobs.cancelAllAndClear()
         }
     }
 

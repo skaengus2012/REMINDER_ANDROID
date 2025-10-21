@@ -20,15 +20,26 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.nlab.reminder.core.androidx.fragment.compose.ComposableFragment
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.flowWithLifecycle
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.nlab.reminder.core.androidx.fragment.viewLifecycle
+import com.nlab.reminder.core.androidx.fragment.viewLifecycleScope
 import com.nlab.reminder.core.component.schedulelist.databinding.FragmentScheduleListBinding
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.onEach
 
 /**
  * @author Thalys
  */
-internal class ScheduleListFragment : ComposableFragment() {
+internal class ScheduleListFragment : Fragment() {
     private var _binding: FragmentScheduleListBinding? = null
     private val binding: FragmentScheduleListBinding get() = checkNotNull(_binding)
+
+    private var uiState = MutableStateFlow<ScheduleListContentUiState?>(null)
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -43,7 +54,21 @@ internal class ScheduleListFragment : ComposableFragment() {
         _binding = null
     }
 
-    override fun onViewReady(view: View, savedInstanceState: Bundle?) {
-        TODO("Not yet implemented")
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        val linearLayoutManager = LinearLayoutManager(requireContext())
+
+
+
+        uiState.mapNotNull { it?.theme }
+            .distinctUntilChanged()
+            .flowWithLifecycle(viewLifecycle)
+            .onEach { theme ->
+            }
+            .launchIn(viewLifecycleScope)
+    }
+
+    fun onUiStateUpdated(uiState: ScheduleListContentUiState) {
+        this.uiState.value = uiState
     }
 }

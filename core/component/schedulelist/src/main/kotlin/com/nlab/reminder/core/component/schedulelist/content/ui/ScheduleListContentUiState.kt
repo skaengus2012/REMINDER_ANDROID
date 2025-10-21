@@ -16,11 +16,12 @@
 
 package com.nlab.reminder.core.component.schedulelist.content.ui
 
-import com.nlab.reminder.core.component.schedulelist.databinding.LayoutScheduleAdapterItemHeadlinePaddingBinding
+import androidx.compose.runtime.Immutable
 
 /**
- * @author Thalys
+ * @author Doohyun
  */
-internal class HeadlinePaddingViewHolder(
-    binding: LayoutScheduleAdapterItemHeadlinePaddingBinding
-) : ScheduleAdapterItemViewHolder(binding.root)
+@Immutable
+data class ScheduleListContentUiState(
+    val theme: ScheduleListTheme,
+)

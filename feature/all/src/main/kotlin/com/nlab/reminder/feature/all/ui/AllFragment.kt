@@ -102,6 +102,7 @@ internal class AllFragment : ComposableFragment() {
             .root
 
     override fun onViewReady(view: View, savedInstanceState: Bundle?) {
+/**
         val linearLayoutManager = LinearLayoutManager(requireContext())
         val scheduleListAdapter = ScheduleListAdapter(
             theme = ScheduleListTheme.Point3,  // TODO extract
@@ -328,7 +329,7 @@ internal class AllFragment : ComposableFragment() {
 
         viewLifecycleScope.launch {
             scheduleListAdapter.submitList(withContext(Dispatchers.Default) { testItems })
-        }
+        }*/
     }
 
     override fun onDestroyView() {

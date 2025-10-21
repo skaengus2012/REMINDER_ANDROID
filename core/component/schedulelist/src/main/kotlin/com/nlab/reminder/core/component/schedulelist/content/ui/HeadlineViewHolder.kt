@@ -16,24 +16,46 @@
 
 package com.nlab.reminder.core.component.schedulelist.content.ui
 
+import androidx.core.view.doOnAttach
+import androidx.core.view.doOnDetach
+import androidx.lifecycle.findViewTreeLifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import com.nlab.reminder.core.android.content.getThemeColor
 import com.nlab.reminder.core.component.schedulelist.databinding.LayoutScheduleAdapterItemHeadlineBinding
 import com.nlab.reminder.core.designsystem.compose.theme.AttrIds
+import com.nlab.reminder.core.kotlinx.coroutines.cancelAllAndClear
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 
 /**
  * @author Doohyun
  */
-class HeadlineViewHolder internal constructor(
+internal class HeadlineViewHolder(
     private val binding: LayoutScheduleAdapterItemHeadlineBinding,
-    theme: ScheduleListTheme
+    themeState: StateFlow<ScheduleListTheme>
 ) : ScheduleAdapterItemViewHolder(binding.root) {
     init {
-        val textColorAttrRes = when (theme) {
-            ScheduleListTheme.Point1 -> AttrIds.point_1
-            ScheduleListTheme.Point2 -> AttrIds.point_2
-            ScheduleListTheme.Point3 -> AttrIds.point_3
+        val jobs = mutableListOf<Job>()
+        itemView.doOnAttach { view ->
+            val viewLifecycleScope = view.findViewTreeLifecycleOwner()
+                ?.lifecycleScope
+                ?: return@doOnAttach
+            jobs += viewLifecycleScope.launch {
+                themeState.collect { theme ->
+                    val textColorAttrRes = when (theme) {
+                        ScheduleListTheme.Point1 -> AttrIds.point_1
+                        ScheduleListTheme.Point2 -> AttrIds.point_2
+                        ScheduleListTheme.Point3 -> AttrIds.point_3
+                    }
+                    binding.textviewTitle.setTextColor(itemView.context.getThemeColor(textColorAttrRes))
+                }
+            }
         }
-        binding.textviewTitle.setTextColor(itemView.context.getThemeColor(textColorAttrRes))
+        itemView.doOnDetach {
+            jobs.cancelAllAndClear()
+        }
+
     }
 
     fun bind(item: ScheduleListItem.Headline) {

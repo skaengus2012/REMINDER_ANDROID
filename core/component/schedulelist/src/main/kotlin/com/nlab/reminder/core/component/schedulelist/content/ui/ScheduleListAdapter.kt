@@ -50,8 +50,7 @@ private const val ITEM_VIEW_TYPE_SUB_GROUP_HEADER = 7
 /**
  * @author Thalys
  */
-class ScheduleListAdapter(
-    private val theme: ScheduleListTheme,
+internal class ScheduleListAdapter(
     private val timeZone: Flow<TimeZone>,
     private val entryAt: Flow<Instant>,
     triggerAtFormatPatterns: TriggerAtFormatPatterns,
@@ -62,7 +61,7 @@ class ScheduleListAdapter(
         dateTimeFormatPool = DateTimeFormatPool()
     )
     private val tagsDisplayFormatter = TagsDisplayFormatter()
-
+    private val themeState = MutableStateFlow(ScheduleListTheme.Point1)
     private val selectionEnabled = MutableStateFlow(false)
     private val selectedScheduleIds = MutableStateFlow<Set<ScheduleId>>(emptySet())
 
@@ -110,7 +109,7 @@ class ScheduleListAdapter(
                         parent,
                         /* attachToParent = */ false
                     ),
-                    theme = theme,
+                    themeState = themeState,
                     onItemViewTouched = { _itemViewTouch.tryEmit(it) },
                     onSimpleAddDone = { _addRequest.tryEmit(it) },
                     onFocusChanged = { viewHolder, focused -> _focusChange.tryEmit(FocusChange(viewHolder, focused)) }
@@ -123,7 +122,7 @@ class ScheduleListAdapter(
                         parent,
                         /* attachToParent = */ false
                     ),
-                    theme = theme,
+                    themeState = themeState,
                     scheduleTimingDisplayFormatter = scheduleTimingDisplayFormatter,
                     tagsDisplayFormatter = tagsDisplayFormatter,
                     timeZone = timeZone,
@@ -145,7 +144,7 @@ class ScheduleListAdapter(
                         parent,
                         /* attachToParent = */ false
                     ),
-                    theme = theme,
+                    themeState = themeState,
                     onItemViewTouched = { _itemViewTouch.tryEmit(it) },
                     onSimpleAddDone = { _addRequest.tryEmit(it) },
                     onFocusChanged = { viewHolder, focused -> _focusChange.tryEmit(FocusChange(viewHolder, focused)) },
@@ -159,7 +158,7 @@ class ScheduleListAdapter(
                         parent,
                         /* attachToParent = */ false
                     ),
-                    theme = theme
+                    themeState = themeState
                 )
             }
 
@@ -243,6 +242,10 @@ class ScheduleListAdapter(
 
     fun getCurrentSelected(): Set<ScheduleId> {
         return selectedScheduleIds.value
+    }
+
+    fun updateTheme(theme: ScheduleListTheme) {
+        themeState.value = theme
     }
 }
 
