@@ -207,19 +207,23 @@ internal class ScheduleListFragment : Fragment() {
             }
         }
 
-        val toolbarBackgroundAlphaState = firstVisiblePositions
-            .map { position ->
-                when (position) {
+        val toolbarBackgroundAlphaState = combine(
+            firstVisiblePositions.map { pos ->
+                when (pos) {
                     0 -> 0f
-                    1 -> {
-                        val itemView = checkNotNull(linearLayoutManager.findViewByPosition(/*position =*/ 1))
-                        itemView.top.absoluteValue.toFloat() / itemView.height
-                    }
-
+                    // This is for HeadlinePadding
+                    1 -> checkNotNull(linearLayoutManager.findViewByPosition(/*position =*/ 1))
                     else -> 1f
                 }
+            }.distinctUntilChanged(),
+            scrollEvents
+        ) { params, _ ->
+            if (params is Float) params
+            else {
+                val itemView = params as View
+                itemView.top.absoluteValue.toFloat() / itemView.height
             }
-            .stateIn(scope = viewLifecycleScope, started = SharingStarted.Eagerly, initialValue = null)
+        }.stateIn(scope = viewLifecycleScope, started = SharingStarted.Eagerly, null)
         viewLifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 toolbarBackgroundAlphaObserverState.filterNotNull().collectLatest { observer ->
