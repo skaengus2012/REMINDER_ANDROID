@@ -26,6 +26,11 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.fragment.compose.AndroidFragment
@@ -49,7 +54,8 @@ fun ScheduleListContent(
     onSimpleEdit: (SimpleEdit) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val timeZone = LocalTimeZone.current
+    var fragmentRef by remember { mutableStateOf<ScheduleListFragment?>(null) }
+
     val layoutDirection = LocalLayoutDirection.current
     val displayCutoutPaddings = WindowInsets.displayCutout.asPaddingValues()
     AndroidFragment<ScheduleListFragment>(
@@ -61,16 +67,21 @@ fun ScheduleListContent(
             )
             .navigationBarsPadding()
             .imePadding()
-    ) { fragment ->
-        fragment.onScheduleListItemUpdated(items)
-        fragment.onItemSelectionEnabledChanged(itemSelectionEnabled)
-        fragment.onTriggerAtFormatPatternsUpdated(triggerAtFormatPatterns)
-        fragment.onThemeUpdated(theme)
-        fragment.onTimeZoneUpdated(timeZone)
-        fragment.onEntryAtUpdated(entryAt)
-        fragment.onToolbarVisibleChangedObserverChanged(observer = onToolbarVisibleChanged)
-        fragment.onToolbarBackgroundAlphaChangedObserverChanged(observer = onToolbarBackgroundAlphaChanged)
-        fragment.onSimpleAddCommandObserverChanged(observer = onSimpleAdd)
-        fragment.onSimpleEditCommandObserverChanged(observer = onSimpleEdit)
+    ) { fragment -> fragmentRef = fragment }
+
+    fragmentRef?.let { fragment ->
+        val timeZone = LocalTimeZone.current
+        SideEffect {
+            fragment.onScheduleListItemUpdated(items)
+            fragment.onItemSelectionEnabledChanged(itemSelectionEnabled)
+            fragment.onTriggerAtFormatPatternsUpdated(triggerAtFormatPatterns)
+            fragment.onThemeUpdated(theme)
+            fragment.onTimeZoneUpdated(timeZone)
+            fragment.onEntryAtUpdated(entryAt)
+            fragment.onToolbarVisibleChangedObserverChanged(observer = onToolbarVisibleChanged)
+            fragment.onToolbarBackgroundAlphaChangedObserverChanged(observer = onToolbarBackgroundAlphaChanged)
+            fragment.onSimpleAddCommandObserverChanged(observer = onSimpleAdd)
+            fragment.onSimpleEditCommandObserverChanged(observer = onSimpleEdit)
+        }
     }
 }
