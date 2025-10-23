@@ -406,7 +406,7 @@ private class SwipeableViewHolderDelegate(
     override fun onSwipe(dx: Float) {
         val isActive = dx.absoluteValue != 0f
         _swipingState.value = isActive
-        binding.layoutClamp.setVisible(isVisible = true, goneIfNotVisible = false)
+        binding.layoutClamp.setVisible(isVisible = isActive, goneIfNotVisible = false)
         binding.layoutClampDim.alpha = clampAlphaOrigin - dx.absoluteValue / clampView.width * clampAlphaOrigin
     }
 }
