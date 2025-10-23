@@ -127,7 +127,7 @@ private fun AllScreen(
                     entryAt = entryAt,
                     itemSelectionEnabled = itemSelectionEnabled,
                     triggerAtFormatPatterns = triggerAtFormatPatterns,
-                    theme = ScheduleListTheme.Point1,
+                    theme = ScheduleListTheme.Point3,
                     onSimpleAdd = onSimpleAdd,
                     onSimpleEdit = onSimpleEdit,
                 )
