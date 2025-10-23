@@ -21,8 +21,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import com.nlab.reminder.core.androidx.compose.ui.DelayedContent
 import com.nlab.reminder.core.androidx.compose.ui.tooling.preview.Previews
@@ -32,6 +30,7 @@ import com.nlab.reminder.core.component.schedulelist.content.ui.ScheduleListThem
 import com.nlab.reminder.core.component.schedulelist.content.ui.SimpleAdd
 import com.nlab.reminder.core.component.schedulelist.content.ui.SimpleEdit
 import com.nlab.reminder.core.component.schedulelist.toolbar.ui.ScheduleListToolbar
+import com.nlab.reminder.core.component.schedulelist.toolbar.ui.rememberScheduleListToolbarRenderState
 import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
 import com.nlab.reminder.core.kotlin.collections.toNonEmptyList
 import com.nlab.reminder.core.translation.StringIds
@@ -108,67 +107,33 @@ private fun AllScreen(
             .background(color = PlaneatTheme.colors.bg2)
             .fillMaxSize()
     ) {
-        var isTitleVisible by remember { mutableStateOf(false) }
-        var titleBackgroundAlpha by remember { mutableFloatStateOf(0f) }
-
-        AllToolbar(
-            isTitleVisible = isTitleVisible,
-            backgroundAlpha = titleBackgroundAlpha,
+        val toolbarRenderState = rememberScheduleListToolbarRenderState()
+        ScheduleListToolbar(
+            modifier = modifier,
+            renderState = toolbarRenderState,
+            title = stringResource(StringIds.label_all),
+            isMoreVisible = true,
+            isCompleteVisible = true,
             onBackClicked = onBackClicked,
-            onMoreClicked = onMoreClicked,
+            onMenuClicked = onMoreClicked,
             onCompleteClicked = onCompleteClicked
         )
         if (items.isNotEmpty()) {
             DelayedContent(delayTimeMillis = scheduleListDisplayDelayTimeMillis) {
                 val triggerAtFormatPatterns = remember { AllScheduleTriggerAtFormatPatterns() }
                 ScheduleListContent(
+                    toolbarRenderState = toolbarRenderState,
                     items = items.toNonEmptyList(),
                     entryAt = entryAt,
                     itemSelectionEnabled = itemSelectionEnabled,
                     triggerAtFormatPatterns = triggerAtFormatPatterns,
                     theme = ScheduleListTheme.Point1,
-                    onToolbarVisibleChanged = { isTitleVisible = it },
-                    onToolbarBackgroundAlphaChanged = { titleBackgroundAlpha = it },
                     onSimpleAdd = onSimpleAdd,
                     onSimpleEdit = onSimpleEdit,
                 )
             }
         }
     }
-}
-
-@Composable
-private fun AllToolbar(
-    isTitleVisible: Boolean,
-    backgroundAlpha: Float,
-    onBackClicked: () -> Unit,
-    onMoreClicked: () -> Unit,
-    onCompleteClicked: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val focusManager = LocalFocusManager.current
-    val keyboardController = LocalSoftwareKeyboardController.current
-    val clearInput = {
-        focusManager.clearFocus(force = true)
-        keyboardController?.hide()
-    }
-    ScheduleListToolbar(
-        modifier = modifier,
-        title = stringResource(StringIds.label_all),
-        isTitleVisible = isTitleVisible,
-        isMoreVisible = true,
-        isCompleteVisible = true,
-        backgroundAlpha = backgroundAlpha,
-        onBackClicked = {
-            clearInput()
-            onBackClicked()
-        },
-        onMenuClicked = onMoreClicked,
-        onCompleteClicked = {
-            clearInput()
-            onCompleteClicked()
-        }
-    )
 }
 
 @Previews

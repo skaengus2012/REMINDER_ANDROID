@@ -35,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.fragment.compose.AndroidFragment
 import com.nlab.reminder.core.androidx.compose.ui.LocalTimeZone
+import com.nlab.reminder.core.component.schedulelist.toolbar.ui.ScheduleListToolbarRenderState
 import com.nlab.reminder.core.kotlin.collections.NonEmptyList
 import kotlin.time.Instant
 
@@ -48,11 +49,10 @@ fun ScheduleListContent(
     itemSelectionEnabled: Boolean,
     triggerAtFormatPatterns: TriggerAtFormatPatterns,
     theme: ScheduleListTheme,
-    onToolbarVisibleChanged: (Boolean) -> Unit,
-    onToolbarBackgroundAlphaChanged: (Float) -> Unit,
     onSimpleAdd: (SimpleAdd) -> Unit,
     onSimpleEdit: (SimpleEdit) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    toolbarRenderState: ScheduleListToolbarRenderState? = null,
 ) {
     var fragmentRef by remember { mutableStateOf<ScheduleListFragment?>(null) }
 
@@ -78,8 +78,7 @@ fun ScheduleListContent(
             fragment.onThemeUpdated(theme)
             fragment.onTimeZoneUpdated(timeZone)
             fragment.onEntryAtUpdated(entryAt)
-            fragment.onToolbarVisibleChangedObserverChanged(observer = onToolbarVisibleChanged)
-            fragment.onToolbarBackgroundAlphaChangedObserverChanged(observer = onToolbarBackgroundAlphaChanged)
+            fragment.onToolbarRenderStateUpdated(toolbarRenderState)
             fragment.onSimpleAddCommandObserverChanged(observer = onSimpleAdd)
             fragment.onSimpleEditCommandObserverChanged(observer = onSimpleEdit)
         }

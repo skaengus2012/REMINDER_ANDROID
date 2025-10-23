@@ -41,6 +41,7 @@ import com.nlab.reminder.core.androix.recyclerview.scrollState
 import com.nlab.reminder.core.androix.recyclerview.stickyheader.StickyHeaderHelper
 import com.nlab.reminder.core.androix.recyclerview.verticalScrollRange
 import com.nlab.reminder.core.component.schedulelist.databinding.FragmentScheduleListBinding
+import com.nlab.reminder.core.component.schedulelist.toolbar.ui.ScheduleListToolbarRenderState
 import com.nlab.reminder.core.data.model.ScheduleId
 import com.nlab.reminder.core.kotlin.collections.NonEmptyList
 import com.nlab.reminder.core.kotlinx.coroutines.flow.map
@@ -49,6 +50,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.conflate
@@ -84,8 +86,7 @@ internal class ScheduleListFragment : Fragment() {
     private val themeState = MutableStateFlow<ScheduleListTheme?>(null)
     private val timeZoneState = MutableStateFlow<TimeZone?>(null)
     private val entryAtState = MutableStateFlow<Instant?>(null)
-    private val toolbarVisibleChangedObserverState = MutableStateFlow<((Boolean) -> Unit)?>(null)
-    private val toolbarBackgroundAlphaObserverState = MutableStateFlow<((Float) -> Unit)?>(null)
+    private val toolbarRenderValuesState = MutableStateFlow<ScheduleListToolbarRenderState?>(null)
     private val simpleAddCommandObserverState = MutableStateFlow<((SimpleAdd) -> Unit)?>(null)
     private val simpleEditCommandObserverState = MutableStateFlow<((SimpleEdit) -> Unit)?>(null)
 
@@ -201,8 +202,13 @@ internal class ScheduleListFragment : Fragment() {
             .stateIn(scope = viewLifecycleScope, started = SharingStarted.Eagerly, initialValue = null)
         viewLifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                toolbarVisibleChangedObserverState.filterNotNull().collectLatest { observer ->
-                    toolbarVisibilityState.filterNotNull().collect(collector = observer)
+                toolbarRenderValuesState.collectLatest { toolbarRenderState ->
+                    if (toolbarRenderState == null) return@collectLatest
+                    toolbarVisibilityState.collect { titleVisible ->
+                        if (titleVisible != null) {
+                            toolbarRenderState.titleVisible = titleVisible
+                        }
+                    }
                 }
             }
         }
@@ -226,8 +232,13 @@ internal class ScheduleListFragment : Fragment() {
         }.stateIn(scope = viewLifecycleScope, started = SharingStarted.Eagerly, null)
         viewLifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                toolbarBackgroundAlphaObserverState.filterNotNull().collectLatest { observer ->
-                    toolbarBackgroundAlphaState.filterNotNull().collect(collector = observer)
+                toolbarRenderValuesState.collectLatest { toolbarRenderState ->
+                    if (toolbarRenderState == null) return@collectLatest
+                    toolbarBackgroundAlphaState.collect { backgroundAlpha ->
+                        if (backgroundAlpha != null) {
+                            toolbarRenderState.backgroundAlpha = backgroundAlpha
+                        }
+                    }
                 }
             }
         }
@@ -445,12 +456,8 @@ internal class ScheduleListFragment : Fragment() {
         entryAtState.value = entryAt
     }
 
-    fun onToolbarVisibleChangedObserverChanged(observer: (Boolean) -> Unit) {
-        toolbarVisibleChangedObserverState.value = observer
-    }
-
-    fun onToolbarBackgroundAlphaChangedObserverChanged(observer: (Float) -> Unit) {
-        toolbarBackgroundAlphaObserverState.value = observer
+    fun onToolbarRenderStateUpdated(toolbarRenderState: ScheduleListToolbarRenderState?) {
+        toolbarRenderValuesState.value = toolbarRenderState
     }
 
     fun onSimpleAddCommandObserverChanged(observer: (SimpleAdd) -> Unit) {

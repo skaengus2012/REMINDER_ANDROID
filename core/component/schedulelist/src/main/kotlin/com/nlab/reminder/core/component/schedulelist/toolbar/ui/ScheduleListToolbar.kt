@@ -16,11 +16,11 @@
 
 package com.nlab.reminder.core.component.schedulelist.toolbar.ui
 
-import androidx.annotation.FloatRange
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.displayCutoutPadding
@@ -32,6 +32,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -53,19 +55,24 @@ import com.nlab.reminder.core.translation.StringIds
 @Composable
 fun ScheduleListToolbar(
     title: String,
-    isTitleVisible: Boolean,
     isMoreVisible: Boolean,
     isCompleteVisible: Boolean,
-    @FloatRange(from = 0.0, to = 1.0) backgroundAlpha: Float,
     onBackClicked: () -> Unit,
     onMenuClicked: () -> Unit,
     onCompleteClicked: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    renderState: ScheduleListToolbarRenderState = rememberScheduleListToolbarRenderState()
 ) {
+    val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val clearInput = {
+        focusManager.clearFocus(force = true)
+        keyboardController?.hide()
+    }
     Box(modifier) {
         HeadBlurLayer(
             modifier = Modifier.matchParentSize(),
-            alpha = backgroundAlpha,
+            alpha = renderState.backgroundAlpha,
             containerColor = PlaneatTheme.colors.bg2Layer,
         )
         ScheduleListToolbarContent(
@@ -75,12 +82,18 @@ fun ScheduleListToolbar(
                 .displayCutoutPadding()
                 .toolbarHeight(),
             title = title,
-            isTitleVisible = isTitleVisible,
+            isTitleVisible = renderState.titleVisible,
             isMoreVisible = isMoreVisible,
             isCompleteVisible = isCompleteVisible,
-            onBackClicked = onBackClicked,
+            onBackClicked = {
+                clearInput()
+                onBackClicked()
+            },
             onMenuClicked = onMenuClicked,
-            onCompleteClicked = onCompleteClicked,
+            onCompleteClicked = {
+                clearInput()
+                onCompleteClicked()
+            },
         )
     }
 }
@@ -177,16 +190,38 @@ private fun BackButton(
 @Composable
 private fun ScheduleListToolbarPreview() {
     PlaneatTheme {
-        ScheduleListToolbar(
-            title = "Today",
-            isTitleVisible = true,
-            isMoreVisible = true,
-            isCompleteVisible = true,
-            backgroundAlpha = 1.0f,
-            onBackClicked = {},
-            onMenuClicked = {},
-            onCompleteClicked = {},
-            modifier = Modifier.fillMaxWidth()
-        )
+        Box(modifier = Modifier.background(PlaneatTheme.colors.bg1)) {
+            ScheduleListToolbar(
+                title = "Today",
+                isMoreVisible = true,
+                isCompleteVisible = true,
+                onBackClicked = {},
+                onMenuClicked = {},
+                onCompleteClicked = {},
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+    }
+}
+
+@Previews
+@Composable
+private fun ScheduleListToolbarWithTitlePreview() {
+    PlaneatTheme {
+        Box(modifier = Modifier.background(PlaneatTheme.colors.bg1)) {
+            ScheduleListToolbar(
+                title = "Today",
+                isMoreVisible = true,
+                isCompleteVisible = true,
+                onBackClicked = {},
+                onMenuClicked = {},
+                onCompleteClicked = {},
+                modifier = Modifier.fillMaxWidth(),
+                renderState = rememberScheduleListToolbarRenderState(
+                    initialTitleVisible = true,
+                    initialBackgroundAlpha = 1f
+                )
+            )
+        }
     }
 }
