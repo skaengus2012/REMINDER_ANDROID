@@ -29,12 +29,10 @@ import com.nlab.reminder.core.component.schedulelist.databinding.LayoutScheduleA
 import com.nlab.reminder.core.component.schedulelist.databinding.LayoutScheduleAdapterListGroupHeaderSubDefaultBinding
 import com.nlab.reminder.core.data.model.ScheduleId
 import kotlinx.coroutines.channels.BufferOverflow
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.update
 import kotlinx.datetime.TimeZone
 import kotlin.time.Instant
@@ -68,10 +66,10 @@ internal class ScheduleListAdapter : RecyclerView.Adapter<ScheduleAdapterItemVie
     val editRequests: SharedFlow<SimpleEdit> = _editRequests.asSharedFlow()
 
     private val _dragHandleTouches = MutableEventSharedFlow<RecyclerView.ViewHolder>()
-    val dragHandleTouches: Flow<RecyclerView.ViewHolder> = _dragHandleTouches.conflate()
+    val dragHandleTouches: SharedFlow<RecyclerView.ViewHolder> = _dragHandleTouches.asSharedFlow()
 
     private val _selectButtonTouches = MutableEventSharedFlow<RecyclerView.ViewHolder>()
-    val selectButtonTouches: Flow<RecyclerView.ViewHolder> = _selectButtonTouches.conflate()
+    val selectButtonTouches: SharedFlow<RecyclerView.ViewHolder> = _selectButtonTouches.asSharedFlow()
 
     private val _focusChanges = MutableEventSharedFlow<FocusChange>()
     val focusChanges: SharedFlow<FocusChange> = _focusChanges.asSharedFlow()

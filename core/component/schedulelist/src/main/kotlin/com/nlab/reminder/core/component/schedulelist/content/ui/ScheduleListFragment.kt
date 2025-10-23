@@ -364,10 +364,12 @@ internal class ScheduleListFragment : Fragment() {
             .launchIn(viewLifecycleScope)
 
         scheduleListAdapter.dragHandleTouches
+            .conflate()
             .onEach { itemTouchHelper.startDrag(it) }
             .launchIn(viewLifecycleScope)
 
         scheduleListAdapter.selectButtonTouches
+            .conflate()
             .onEach { multiSelectionHelper.enable(it) }
             .launchIn(viewLifecycleScope)
 
