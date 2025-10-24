@@ -23,5 +23,5 @@ import androidx.compose.runtime.Immutable
  */
 @Immutable
 data class UserScheduleListResource(
-    val resource: ScheduleListResource,
+    val schedule: ScheduleListResource,
 )

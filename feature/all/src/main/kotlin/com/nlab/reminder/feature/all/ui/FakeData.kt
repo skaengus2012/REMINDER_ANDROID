@@ -55,8 +55,8 @@ object FakeData {
             )
             repeat(times = 10) {
                 this += ScheduleListItem.Content(
-                    schedule = UserScheduleListResource(
-                        resource = ScheduleListResource(
+                    resource = UserScheduleListResource(
+                        schedule = ScheduleListResource(
                             id = ScheduleId(it.toLong()),
                             title = "Title $it".toNonBlankString(),
                             note = "note $it".toNonBlankString(),
@@ -98,8 +98,8 @@ object FakeData {
             )
             repeat(times = 10) {
                 this += ScheduleListItem.Content(
-                    schedule = UserScheduleListResource(
-                        resource = ScheduleListResource(
+                    resource = UserScheduleListResource(
+                        schedule = ScheduleListResource(
                             id = ScheduleId(it.toLong()),
                             title = "Title $it".toNonBlankString(),
                             note = "note $it".toNonBlankString(),

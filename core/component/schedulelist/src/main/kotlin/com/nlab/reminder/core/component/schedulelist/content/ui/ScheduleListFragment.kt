@@ -50,7 +50,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.conflate
@@ -144,7 +143,7 @@ internal class ScheduleListFragment : Fragment() {
                     val item = scheduleListAdapter.getCurrentList().getOrNull(position)
                     if (item !is ScheduleListItem.Content) return null
 
-                    return item.schedule.resource.id
+                    return item.resource.schedule.id
                 }
 
                 override fun findSelected(scheduleId: ScheduleId): Boolean {

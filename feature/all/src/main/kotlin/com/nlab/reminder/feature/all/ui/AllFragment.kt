@@ -20,26 +20,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.util.TypedValueCompat.dpToPx
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.eventFlow
-import androidx.lifecycle.flowWithLifecycle
-import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.nlab.reminder.core.android.view.awaitPost
-import com.nlab.reminder.core.android.view.inputmethod.hideSoftInputFromWindow
-import com.nlab.reminder.core.android.view.setVisible
-import com.nlab.reminder.core.android.view.touches
 import com.nlab.reminder.core.androidx.fragment.compose.ComposableFragment
 import com.nlab.reminder.core.androidx.fragment.compose.ComposableInject
-import com.nlab.reminder.core.androidx.fragment.viewLifecycle
-import com.nlab.reminder.core.androidx.fragment.viewLifecycleScope
-import com.nlab.reminder.core.androix.recyclerview.itemTouches
-import com.nlab.reminder.core.androix.recyclerview.scrollEvent
-import com.nlab.reminder.core.androix.recyclerview.scrollState
-import com.nlab.reminder.core.androix.recyclerview.stickyheader.StickyHeaderHelper
-import com.nlab.reminder.core.androix.recyclerview.verticalScrollRange
 import com.nlab.reminder.core.component.schedulelist.content.ScheduleListResource
 import com.nlab.reminder.core.component.schedulelist.content.UserScheduleListResource
 import com.nlab.reminder.core.component.schedulelist.content.ui.AddLine
@@ -55,26 +37,8 @@ import com.nlab.reminder.core.kotlin.toNonBlankString
 import com.nlab.reminder.core.kotlin.toNonNegativeLong
 import com.nlab.reminder.core.kotlin.toPositiveInt
 import com.nlab.reminder.core.kotlin.tryToNonBlankStringOrNull
-import com.nlab.reminder.core.kotlinx.coroutines.flow.withPrev
 import com.nlab.reminder.core.translation.StringIds
 import com.nlab.reminder.feature.all.databinding.FragmentAllBinding
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.mapLatest
-import kotlinx.coroutines.flow.mapNotNull
-import kotlinx.coroutines.flow.merge
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.shareIn
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import kotlin.math.absoluteValue
 import kotlin.time.Clock
 
 /**
@@ -346,8 +310,8 @@ internal class AllFragment : ComposableFragment() {
                 )
                 repeat(times = 10) {
                     this += ScheduleListItem.Content(
-                        schedule = UserScheduleListResource(
-                            resource = ScheduleListResource(
+                        resource = UserScheduleListResource(
+                            schedule = ScheduleListResource(
                                 id = ScheduleId(it.toLong()),
                                 title = "Title $it".toNonBlankString(),
                                 note = "note $it".toNonBlankString(),
@@ -389,8 +353,8 @@ internal class AllFragment : ComposableFragment() {
                 )
                 repeat(times = 10) {
                     this += ScheduleListItem.Content(
-                        schedule = UserScheduleListResource(
-                            resource = ScheduleListResource(
+                        resource = UserScheduleListResource(
+                            schedule = ScheduleListResource(
                                 id = ScheduleId(it.toLong()),
                                 title = "Title $it".toNonBlankString(),
                                 note = "note $it".toNonBlankString(),

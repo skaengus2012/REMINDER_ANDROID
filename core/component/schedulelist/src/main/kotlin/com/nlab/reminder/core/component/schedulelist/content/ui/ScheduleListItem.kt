@@ -31,7 +31,7 @@ sealed class ScheduleListItem {
     ) : ScheduleListItem()
 
     data class Content(
-        val schedule: UserScheduleListResource,
+        val resource: UserScheduleListResource,
         val isLineVisible: Boolean
     ) : ScheduleListItem()
 

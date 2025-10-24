@@ -254,15 +254,15 @@ internal class ContentViewHolder(
     }
 
     fun bind(item: ScheduleListItem.Content) {
-        bindingId.value = item.schedule.resource.id
+        bindingId.value = item.resource.schedule.id
         binding.viewLine
             .setVisible(isVisible = item.isLineVisible, goneIfNotVisible = false)
         binding.edittextTitle.apply {
-            bindText(item.schedule.resource.title.value)
+            bindText(item.resource.schedule.title.value)
             clearFocusIfNeeded()
         }
         binding.edittextNote.apply {
-            val isChanged = bindText(item.schedule.resource.note?.value)
+            val isChanged = bindText(item.resource.schedule.note?.value)
             if (isChanged) {
                 setSelection(text?.length ?: 0)
             }
@@ -270,23 +270,23 @@ internal class ContentViewHolder(
         }
         binding.edittextDetail.apply {
             bindScheduleData(
-                scheduleCompleted = item.schedule.resource.isComplete,
-                scheduleTiming = item.schedule.resource.timing,
-                tags = item.schedule.resource.tags
+                scheduleCompleted = item.resource.schedule.isComplete,
+                scheduleTiming = item.resource.schedule.timing,
+                tags = item.resource.schedule.tags
             )
             clearFocusIfNeeded()
         }
         binding.cardLink
-            .setVisible(isVisible = item.schedule.resource.link != null)
+            .setVisible(isVisible = item.resource.schedule.link != null)
         binding.textviewLink
-            .bindText(item.schedule.resource.link?.rawLink?.value)
+            .bindText(item.resource.schedule.link?.rawLink?.value)
         binding.textviewTitleLink.apply {
-            val linkTitle = item.schedule.resource.linkMetadata?.title?.value
+            val linkTitle = item.resource.schedule.linkMetadata?.title?.value
             setVisible(isVisible = linkTitle != null)
             bindText(linkTitle)
         }
         binding.imageviewBgLinkThumbnail.apply {
-            val linkImageUrl = item.schedule.resource.linkMetadata?.imageUrl?.value
+            val linkImageUrl = item.resource.schedule.linkMetadata?.imageUrl?.value
             setVisible(isVisible = linkImageUrl != null)
             bindImageAsync(
                 url = linkImageUrl,
