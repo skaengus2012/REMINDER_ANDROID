@@ -19,6 +19,8 @@ package com.nlab.reminder.core.component.schedulelist.content
 /**
  * @author Thalys
  */
-data class UserScheduleListResource(
-    val schedule: ScheduleListResource,
-) : ScheduleListObject
+data class ScheduleListGroup(
+    val groupId: ScheduleListGroupId,
+    val content: ScheduleListGroupContent,
+    val objects: List<ScheduleListObject>
+) : ScheduleListElement

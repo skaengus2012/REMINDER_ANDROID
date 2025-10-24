@@ -14,11 +14,9 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.component.schedulelist.content
+package com.nlab.reminder.core.kotlin
 
 /**
- * @author Thalys
+ * @author Doohyun
  */
-data class UserScheduleListResource(
-    val schedule: ScheduleListResource,
-) : ScheduleListObject
+fun identityHashCodeOf(obj: Any?): Int = System.identityHashCode(obj)

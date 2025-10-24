@@ -16,7 +16,6 @@
 
 package com.nlab.reminder.core.component.schedulelist.content.ui
 
-import androidx.annotation.StringRes
 import androidx.compose.runtime.Immutable
 import com.nlab.reminder.core.component.schedulelist.content.UserScheduleListResource
 
@@ -27,7 +26,7 @@ import com.nlab.reminder.core.component.schedulelist.content.UserScheduleListRes
 sealed class ScheduleListItem {
     data class Add(
         val newScheduleSource: Any?,
-        val line: AddLine
+        val line: Line
     ) : ScheduleListItem()
 
     data class Content(
@@ -35,14 +34,14 @@ sealed class ScheduleListItem {
         val isLineVisible: Boolean
     ) : ScheduleListItem()
 
-    data class FooterAdd(
+    internal data class FooterAdd(
         val newScheduleSource: Any? = null, // TODO implements
-        val line: AddLine
+        val line: Line
     ) : ScheduleListItem()
 
-    data class Headline(@StringRes val textRes: Int) : ScheduleListItem()
+    internal data class Headline(val text: String) : ScheduleListItem()
 
-    data object HeadlinePadding : ScheduleListItem()
+    internal data object HeadlinePadding : ScheduleListItem()
 
     data class GroupHeader(
         val title: String,

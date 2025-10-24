@@ -24,15 +24,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.nlab.reminder.core.androidx.compose.ui.DelayedContent
 import com.nlab.reminder.core.androidx.compose.ui.tooling.preview.Previews
+import com.nlab.reminder.core.component.schedulelist.content.UserScheduleListResource
 import com.nlab.reminder.core.component.schedulelist.content.ui.ScheduleListContent
-import com.nlab.reminder.core.component.schedulelist.content.ui.ScheduleListItem
+import com.nlab.reminder.core.component.schedulelist.content.ui.ScheduleListSnapshot
 import com.nlab.reminder.core.component.schedulelist.content.ui.ScheduleListTheme
 import com.nlab.reminder.core.component.schedulelist.content.ui.SimpleAdd
 import com.nlab.reminder.core.component.schedulelist.content.ui.SimpleEdit
+import com.nlab.reminder.core.component.schedulelist.content.ui.rememberScheduleListItemAdaptableState
 import com.nlab.reminder.core.component.schedulelist.toolbar.ui.ScheduleListToolbar
+import com.nlab.reminder.core.component.schedulelist.toolbar.ui.ScheduleListToolbarRenderState
 import com.nlab.reminder.core.component.schedulelist.toolbar.ui.rememberScheduleListToolbarRenderState
 import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
-import com.nlab.reminder.core.kotlin.collections.toNonEmptyList
 import com.nlab.reminder.core.translation.StringIds
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -51,7 +53,7 @@ internal fun AllScreen(
 ) {
     val entryAt = remember { Clock.System.now() }
     var itemSelectionEnabled by remember { mutableStateOf(false) }
-    var items: List<ScheduleListItem> by remember {
+    var items: List<UserScheduleListResource> by remember {
         mutableStateOf(emptyList())
     }
 
@@ -67,7 +69,7 @@ internal fun AllScreen(
     AllScreen(
         modifier = modifier,
         scheduleListDisplayDelayTimeMillis = enterTransitionTimeInMillis,
-        items = items,
+        scheduleListSnapshot = ScheduleListSnapshot(items),
         itemSelectionEnabled = itemSelectionEnabled,
         entryAt = entryAt,
         onBackClicked = onBackClicked,
@@ -92,7 +94,7 @@ internal fun AllScreen(
 @Composable
 private fun AllScreen(
     scheduleListDisplayDelayTimeMillis: Long,
-    items: List<ScheduleListItem>,
+    scheduleListSnapshot: ScheduleListSnapshot<UserScheduleListResource>,
     itemSelectionEnabled: Boolean,
     entryAt: Instant,
     onBackClicked: () -> Unit,
@@ -108,32 +110,72 @@ private fun AllScreen(
             .fillMaxSize()
     ) {
         val toolbarRenderState = rememberScheduleListToolbarRenderState()
-        ScheduleListToolbar(
-            modifier = modifier,
-            renderState = toolbarRenderState,
-            title = stringResource(StringIds.label_all),
-            isMoreVisible = true,
-            isCompleteVisible = true,
+        AllScheduleListToolbar(
+            toolbarRenderState = toolbarRenderState,
             onBackClicked = onBackClicked,
-            onMenuClicked = onMoreClicked,
+            onMoreClicked = onMoreClicked,
             onCompleteClicked = onCompleteClicked
         )
-        if (items.isNotEmpty()) {
-            DelayedContent(delayTimeMillis = scheduleListDisplayDelayTimeMillis) {
-                val triggerAtFormatPatterns = remember { AllScheduleTriggerAtFormatPatterns() }
-                ScheduleListContent(
-                    toolbarRenderState = toolbarRenderState,
-                    items = items.toNonEmptyList(),
-                    entryAt = entryAt,
-                    itemSelectionEnabled = itemSelectionEnabled,
-                    triggerAtFormatPatterns = triggerAtFormatPatterns,
-                    theme = ScheduleListTheme.Point3,
-                    onSimpleAdd = onSimpleAdd,
-                    onSimpleEdit = onSimpleEdit,
-                )
-            }
+        DelayedContent(delayTimeMillis = scheduleListDisplayDelayTimeMillis) {
+            AllScheduleListContent(
+                toolbarRenderState = toolbarRenderState,
+                scheduleListSnapshot = scheduleListSnapshot,
+                entryAt = entryAt,
+                itemSelectionEnabled = itemSelectionEnabled,
+                onSimpleAdd = onSimpleAdd,
+                onSimpleEdit = onSimpleEdit
+            )
         }
     }
+}
+
+@Composable
+private fun AllScheduleListToolbar(
+    toolbarRenderState: ScheduleListToolbarRenderState,
+    onBackClicked: () -> Unit,
+    onMoreClicked: () -> Unit,
+    onCompleteClicked: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    ScheduleListToolbar(
+        modifier = modifier,
+        renderState = toolbarRenderState,
+        title = stringResource(StringIds.label_all),
+        isMoreVisible = true,
+        isCompleteVisible = true,
+        onBackClicked = onBackClicked,
+        onMenuClicked = onMoreClicked,
+        onCompleteClicked = onCompleteClicked
+    )
+}
+
+@Composable
+private fun AllScheduleListContent(
+    toolbarRenderState: ScheduleListToolbarRenderState,
+    scheduleListSnapshot: ScheduleListSnapshot<UserScheduleListResource>,
+    entryAt: Instant,
+    itemSelectionEnabled: Boolean,
+    onSimpleAdd: (SimpleAdd) -> Unit,
+    onSimpleEdit: (SimpleEdit) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    ScheduleListContent(
+        modifier = modifier,
+        itemState = rememberScheduleListItemAdaptableState(
+            headline = stringResource(StringIds.label_all),
+            snapshot = scheduleListSnapshot,
+            buildBodyItems = { elements ->
+                TODO()
+            }
+        ),
+        toolbarRenderState = toolbarRenderState,
+        entryAt = entryAt,
+        itemSelectionEnabled = itemSelectionEnabled,
+        triggerAtFormatPatterns = remember { AllScheduleTriggerAtFormatPatterns() },
+        theme = ScheduleListTheme.Point3,
+        onSimpleAdd = onSimpleAdd,
+        onSimpleEdit = onSimpleEdit,
+    )
 }
 
 @Previews
@@ -142,7 +184,7 @@ private fun AllScreenPreview() {
     PlaneatTheme {
         AllScreen(
             scheduleListDisplayDelayTimeMillis = 0,
-            items = emptyList(),
+            scheduleListSnapshot = ScheduleListSnapshot(emptyList()),
             itemSelectionEnabled = true,
             entryAt = Clock.System.now(),
             onBackClicked = {},

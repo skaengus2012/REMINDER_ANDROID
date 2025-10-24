@@ -36,7 +36,7 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.fragment.compose.AndroidFragment
 import com.nlab.reminder.core.androidx.compose.ui.LocalTimeZone
 import com.nlab.reminder.core.component.schedulelist.toolbar.ui.ScheduleListToolbarRenderState
-import com.nlab.reminder.core.kotlin.collections.NonEmptyList
+import com.nlab.reminder.core.kotlin.collections.toNonEmptyList
 import kotlin.time.Instant
 
 /**
@@ -44,7 +44,7 @@ import kotlin.time.Instant
  */
 @Composable
 fun ScheduleListContent(
-    items: NonEmptyList<ScheduleListItem>,
+    itemState: ScheduleListItemAdaptableState,
     entryAt: Instant,
     itemSelectionEnabled: Boolean,
     triggerAtFormatPatterns: TriggerAtFormatPatterns,
@@ -54,33 +54,38 @@ fun ScheduleListContent(
     modifier: Modifier = Modifier,
     toolbarRenderState: ScheduleListToolbarRenderState? = null,
 ) {
-    var fragmentRef by remember { mutableStateOf<ScheduleListFragment?>(null) }
+    val items = itemState.value
+    if (items.isEmpty()) {
+        // TODO implement empty ui
+    } else {
+        val layoutDirection = LocalLayoutDirection.current
+        val displayCutoutPaddings = WindowInsets.displayCutout.asPaddingValues()
 
-    val layoutDirection = LocalLayoutDirection.current
-    val displayCutoutPaddings = WindowInsets.displayCutout.asPaddingValues()
-    AndroidFragment<ScheduleListFragment>(
-        modifier =  modifier
-            .fillMaxSize()
-            .padding(
-                start = displayCutoutPaddings.calculateStartPadding(layoutDirection),
-                end = displayCutoutPaddings.calculateEndPadding(layoutDirection),
-            )
-            .navigationBarsPadding()
-            .imePadding()
-    ) { fragment -> fragmentRef = fragment }
+        var fragmentRef by remember { mutableStateOf<ScheduleListFragment?>(null) }
+        AndroidFragment<ScheduleListFragment>(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(
+                    start = displayCutoutPaddings.calculateStartPadding(layoutDirection),
+                    end = displayCutoutPaddings.calculateEndPadding(layoutDirection),
+                )
+                .navigationBarsPadding()
+                .imePadding()
+        ) { fragment -> fragmentRef = fragment }
 
-    fragmentRef?.let { fragment ->
-        val timeZone = LocalTimeZone.current
-        SideEffect {
-            fragment.onScheduleListItemUpdated(items)
-            fragment.onItemSelectionEnabledChanged(itemSelectionEnabled)
-            fragment.onTriggerAtFormatPatternsUpdated(triggerAtFormatPatterns)
-            fragment.onThemeUpdated(theme)
-            fragment.onTimeZoneUpdated(timeZone)
-            fragment.onEntryAtUpdated(entryAt)
-            fragment.onToolbarRenderStateUpdated(toolbarRenderState)
-            fragment.onSimpleAddCommandObserverChanged(observer = onSimpleAdd)
-            fragment.onSimpleEditCommandObserverChanged(observer = onSimpleEdit)
+        fragmentRef?.let { fragment ->
+            val timeZone = LocalTimeZone.current
+            SideEffect {
+                fragment.onScheduleListItemUpdated(items = items.toNonEmptyList())
+                fragment.onItemSelectionEnabledChanged(itemSelectionEnabled)
+                fragment.onTriggerAtFormatPatternsUpdated(triggerAtFormatPatterns)
+                fragment.onThemeUpdated(theme)
+                fragment.onTimeZoneUpdated(timeZone)
+                fragment.onEntryAtUpdated(entryAt)
+                fragment.onToolbarRenderStateUpdated(toolbarRenderState)
+                fragment.onSimpleAddCommandObserverChanged(observer = onSimpleAdd)
+                fragment.onSimpleEditCommandObserverChanged(observer = onSimpleEdit)
+            }
         }
     }
 }

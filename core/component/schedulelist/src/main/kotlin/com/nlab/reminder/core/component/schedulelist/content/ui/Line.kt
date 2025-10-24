@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.component.schedulelist.content
+package com.nlab.reminder.core.component.schedulelist.content.ui
 
 /**
  * @author Thalys
  */
-data class UserScheduleListResource(
-    val schedule: ScheduleListResource,
-) : ScheduleListObject
+enum class Line {
+    Type1, Type2, None
+}

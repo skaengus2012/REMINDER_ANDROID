@@ -21,6 +21,7 @@ import androidx.core.view.doOnDetach
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.nlab.reminder.core.android.content.getThemeColor
+import com.nlab.reminder.core.android.widget.bindText
 import com.nlab.reminder.core.component.schedulelist.databinding.LayoutScheduleAdapterItemHeadlineBinding
 import com.nlab.reminder.core.designsystem.compose.theme.AttrIds
 import com.nlab.reminder.core.kotlinx.coroutines.cancelAllAndClear
@@ -59,6 +60,6 @@ internal class HeadlineViewHolder(
     }
 
     fun bind(item: ScheduleListItem.Headline) {
-        binding.textviewTitle.setText(item.textRes)
+        binding.textviewTitle.bindText(item.text)
     }
 }

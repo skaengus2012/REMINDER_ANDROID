@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.component.schedulelist.content.ui
+package com.nlab.reminder.core.component.schedulelist.content
+
+import androidx.compose.runtime.Immutable
 
 /**
  * @author Thalys
  */
-enum class AddLine {
-    Type1, Type2, None
-}
+@Immutable
+sealed interface ScheduleListElement

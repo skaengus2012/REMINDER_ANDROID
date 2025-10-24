@@ -16,9 +16,10 @@
 
 package com.nlab.reminder.core.component.schedulelist.content
 
+import androidx.compose.runtime.Immutable
+
 /**
  * @author Thalys
  */
-data class UserScheduleListResource(
-    val schedule: ScheduleListResource,
-) : ScheduleListObject
+@Immutable
+data class ScheduleListGroupContent(val name: String)

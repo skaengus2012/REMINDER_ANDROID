@@ -25,6 +25,7 @@ import com.nlab.reminder.core.android.view.clearFocusIfNeeded
 import com.nlab.reminder.core.android.view.setVisible
 import com.nlab.reminder.core.android.widget.bindCursorVisible
 import com.nlab.reminder.core.android.widget.bindText
+import com.nlab.reminder.core.component.schedulelist.content.ui.Line
 import com.nlab.reminder.core.component.schedulelist.databinding.LayoutScheduleAdapterItemAddBinding
 import com.nlab.reminder.core.translation.StringIds
 import kotlinx.coroutines.Job
@@ -118,22 +119,22 @@ internal class AddViewHolderDelegate(
 
     fun bind(
         newScheduleSource: Any?,
-        line: AddLine
+        line: Line
     ) {
         binding.clearInput()
         bindingNewScheduleSource.value = newScheduleSource
         when (line) {
-            AddLine.Type1 -> {
+            Line.Type1 -> {
                 binding.viewLine1.setVisible(true)
                 binding.viewLine2.setVisible(false)
             }
 
-            AddLine.Type2 -> {
+            Line.Type2 -> {
                 binding.viewLine1.setVisible(false)
                 binding.viewLine2.setVisible(true)
             }
 
-            AddLine.None -> {
+            Line.None -> {
                 binding.viewLine1.setVisible(false)
                 binding.viewLine2.setVisible(false)
             }
