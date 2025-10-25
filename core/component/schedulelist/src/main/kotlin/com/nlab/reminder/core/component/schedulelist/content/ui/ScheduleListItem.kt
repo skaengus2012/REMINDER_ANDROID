@@ -24,19 +24,19 @@ import com.nlab.reminder.core.component.schedulelist.content.UserScheduleListRes
  */
 @Immutable
 sealed class ScheduleListItem {
-    data class Add(
-        val newScheduleSource: Any?,
-        val line: Line
-    ) : ScheduleListItem()
-
     data class Content(
         val resource: UserScheduleListResource,
         val isLineVisible: Boolean
     ) : ScheduleListItem()
 
-    internal data class FooterAdd(
+    data class FooterForm(
         val newScheduleSource: Any? = null, // TODO implements
-        val line: Line
+        val formBottomLine: FormBottomLine
+    ) : ScheduleListItem()
+
+    data class Form(
+        val newScheduleSource: Any?,
+        val formBottomLine: FormBottomLine
     ) : ScheduleListItem()
 
     internal data class Headline(val text: String) : ScheduleListItem()

@@ -18,7 +18,7 @@ package com.nlab.reminder.core.component.schedulelist.content.ui
 
 import android.widget.EditText
 import com.nlab.reminder.core.android.view.focusChanges
-import com.nlab.reminder.core.component.schedulelist.databinding.LayoutScheduleAdapterItemAddBinding
+import com.nlab.reminder.core.component.schedulelist.databinding.LayoutScheduleAdapterItemFormBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.SharedFlow
@@ -29,30 +29,30 @@ import kotlinx.coroutines.flow.map
 /**
  * @author Doohyun
  */
-internal enum class AddInputFocus {
+internal enum class FormInputFocus {
     Title, Note, Nothing
 }
 
-internal fun LayoutScheduleAdapterItemAddBinding.findInput(addInputFocus: AddInputFocus): EditText? {
-    return when (addInputFocus) {
-        AddInputFocus.Title -> edittextTitle
-        AddInputFocus.Note -> edittextNote
-        AddInputFocus.Nothing -> null
+internal fun LayoutScheduleAdapterItemFormBinding.findInput(formInputFocus: FormInputFocus): EditText? {
+    return when (formInputFocus) {
+        FormInputFocus.Title -> edittextTitle
+        FormInputFocus.Note -> edittextNote
+        FormInputFocus.Nothing -> null
     }
 }
 
-internal fun LayoutScheduleAdapterItemAddBinding.addInputFocusSharedFlow(
+internal fun LayoutScheduleAdapterItemFormBinding.formInputFocusSharedFlow(
     scope: CoroutineScope,
     jobCollector: MutableCollection<Job>
-): SharedFlow<AddInputFocus> {
+): SharedFlow<FormInputFocus> {
     return combine(
-        AddInputFocus.entries.mapNotNull { addInputFocus ->
+        FormInputFocus.entries.mapNotNull { addInputFocus ->
             findInput(addInputFocus)
                 ?.focusChanges(emitCurrent = true)
                 ?.distinctUntilChanged()
                 ?.map { hasFocus -> if (hasFocus) addInputFocus else null }
         }
-    ) { focuses -> focuses.find { it != null } ?: AddInputFocus.Nothing }
+    ) { focuses -> focuses.find { it != null } ?: FormInputFocus.Nothing }
         .distinctUntilChanged()
         .shareInWithJobCollector(scope, jobCollector, replay = 1)
 }

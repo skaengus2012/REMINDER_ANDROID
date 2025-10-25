@@ -19,6 +19,6 @@ package com.nlab.reminder.core.component.schedulelist.content.ui
 /**
  * @author Thalys
  */
-enum class Line {
+enum class FormBottomLine {
     Type1, Type2, None
 }

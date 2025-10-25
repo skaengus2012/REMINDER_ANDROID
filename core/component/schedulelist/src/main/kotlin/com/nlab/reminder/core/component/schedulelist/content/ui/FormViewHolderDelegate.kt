@@ -25,8 +25,7 @@ import com.nlab.reminder.core.android.view.clearFocusIfNeeded
 import com.nlab.reminder.core.android.view.setVisible
 import com.nlab.reminder.core.android.widget.bindCursorVisible
 import com.nlab.reminder.core.android.widget.bindText
-import com.nlab.reminder.core.component.schedulelist.content.ui.Line
-import com.nlab.reminder.core.component.schedulelist.databinding.LayoutScheduleAdapterItemAddBinding
+import com.nlab.reminder.core.component.schedulelist.databinding.LayoutScheduleAdapterItemFormBinding
 import com.nlab.reminder.core.translation.StringIds
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -40,8 +39,8 @@ import kotlinx.coroutines.launch
 /**
  * @author Thalys
  */
-internal class AddViewHolderDelegate(
-    private val binding: LayoutScheduleAdapterItemAddBinding
+internal class FormViewHolderDelegate(
+    private val binding: LayoutScheduleAdapterItemFormBinding
 ) {
     private val bindingNewScheduleSource = MutableStateFlow<Any?>(null) // TODO implements
 
@@ -52,7 +51,7 @@ internal class AddViewHolderDelegate(
 
     fun onAttached(
         themeState: StateFlow<ScheduleListTheme>,
-        addInputFocus: SharedFlow<AddInputFocus>,
+        formInputFocus: SharedFlow<FormInputFocus>,
         hasInputFocus: SharedFlow<Boolean>,
         onSimpleAddDone: (SimpleAdd) -> Unit,
     ): List<Job> {
@@ -70,7 +69,7 @@ internal class AddViewHolderDelegate(
             }
         }
         jobs += viewLifecycleScope.launch {
-            addInputFocus.collect { inputFocus ->
+            formInputFocus.collect { inputFocus ->
                 val focusedEditText = binding.findInput(inputFocus)
                 binding.getAllInputs().forEach { editText ->
                     editText.bindCursorVisible(isVisible = editText === focusedEditText)
@@ -87,8 +86,8 @@ internal class AddViewHolderDelegate(
             )
         }
         jobs += viewLifecycleScope.launch {
-            addInputFocus
-                .map { it == AddInputFocus.Note }
+            formInputFocus
+                .map { it == FormInputFocus.Note }
                 .distinctUntilChanged()
                 .collect { focused ->
                     if (focused && binding.edittextTitle.text.isNullOrBlank()) {
@@ -119,22 +118,22 @@ internal class AddViewHolderDelegate(
 
     fun bind(
         newScheduleSource: Any?,
-        line: Line
+        formBottomLine: FormBottomLine
     ) {
         binding.clearInput()
         bindingNewScheduleSource.value = newScheduleSource
-        when (line) {
-            Line.Type1 -> {
+        when (formBottomLine) {
+            FormBottomLine.Type1 -> {
                 binding.viewLine1.setVisible(true)
                 binding.viewLine2.setVisible(false)
             }
 
-            Line.Type2 -> {
+            FormBottomLine.Type2 -> {
                 binding.viewLine1.setVisible(false)
                 binding.viewLine2.setVisible(true)
             }
 
-            Line.None -> {
+            FormBottomLine.None -> {
                 binding.viewLine1.setVisible(false)
                 binding.viewLine2.setVisible(false)
             }
@@ -142,12 +141,12 @@ internal class AddViewHolderDelegate(
     }
 }
 
-private fun LayoutScheduleAdapterItemAddBinding.getAllInputs(): Iterable<EditText> = listOf(
+private fun LayoutScheduleAdapterItemFormBinding.getAllInputs(): Iterable<EditText> = listOf(
     edittextTitle,
     edittextNote
 )
 
-private fun LayoutScheduleAdapterItemAddBinding.clearInput() {
+private fun LayoutScheduleAdapterItemFormBinding.clearInput() {
     getAllInputs().forEach { editText ->
         editText.bindText(text = "")
         editText.clearFocusIfNeeded()

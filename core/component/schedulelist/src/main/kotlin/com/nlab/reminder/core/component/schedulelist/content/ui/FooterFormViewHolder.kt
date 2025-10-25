@@ -21,7 +21,8 @@ import androidx.core.view.doOnDetach
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
-import com.nlab.reminder.core.component.schedulelist.databinding.LayoutScheduleAdapterItemAddBinding
+import com.nlab.reminder.core.android.view.setVisible
+import com.nlab.reminder.core.component.schedulelist.databinding.LayoutScheduleAdapterItemFooterFormBinding
 import com.nlab.reminder.core.kotlinx.coroutines.cancelAllAndClear
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.StateFlow
@@ -32,36 +33,38 @@ import kotlinx.coroutines.launch
 /**
  * @author Thalys
  */
-internal class AddViewHolder(
-    binding: LayoutScheduleAdapterItemAddBinding,
+internal class FooterFormViewHolder(
+    private val binding: LayoutScheduleAdapterItemFooterFormBinding,
     themeState: StateFlow<ScheduleListTheme>,
     onSimpleAddDone: (SimpleAdd) -> Unit,
     onFocusChanged: (RecyclerView.ViewHolder, Boolean) -> Unit,
-) : ScheduleAdapterItemViewHolder(binding.root),
-    MovableViewHolder {
-    private val addViewHolderDelegate = AddViewHolderDelegate(binding)
+) : ScheduleAdapterItemViewHolder(binding.root) {
+    private val formViewHolderDelegate = FormViewHolderDelegate(binding = binding.layoutForm)
 
     init {
-        addViewHolderDelegate.init()
+        formViewHolderDelegate.init()
 
         val jobs = mutableListOf<Job>()
         itemView.doOnAttach { view ->
-            val viewLifecycleScope = view.findViewTreeLifecycleOwner()
+            val lifecycleScope = view.findViewTreeLifecycleOwner()
                 ?.lifecycleScope
                 ?: return@doOnAttach
-            val inputFocusFlow = binding.addInputFocusSharedFlow(viewLifecycleScope, jobs)
+            val inputFocusFlow = binding.layoutForm.formInputFocusSharedFlow(lifecycleScope, jobs)
             val hasInputFocusFlow = inputFocusFlow
-                .map { it != AddInputFocus.Nothing }
+                .map { it != FormInputFocus.Nothing }
                 .distinctUntilChanged()
-                .shareInWithJobCollector(viewLifecycleScope, jobs, replay = 1)
-            jobs += addViewHolderDelegate.onAttached(
+                .shareInWithJobCollector(lifecycleScope, jobs, replay = 1)
+            jobs += formViewHolderDelegate.onAttached(
                 themeState = themeState,
-                addInputFocus = inputFocusFlow,
+                formInputFocus = inputFocusFlow,
                 hasInputFocus = hasInputFocusFlow,
                 onSimpleAddDone = onSimpleAddDone
             )
-            jobs += viewLifecycleScope.launch {
-                hasInputFocusFlow.collect { focused -> onFocusChanged(this@AddViewHolder, focused) }
+            jobs += lifecycleScope.launch {
+                hasInputFocusFlow.collect { focused -> onFocusChanged(this@FooterFormViewHolder, focused) }
+            }
+            jobs += lifecycleScope.launch {
+                hasInputFocusFlow.collectWithHiddenDebounce(binding.viewBottomPadding::setVisible)
             }
         }
         itemView.doOnDetach {
@@ -69,10 +72,10 @@ internal class AddViewHolder(
         }
     }
 
-    fun bind(item: ScheduleListItem.Add) {
-        addViewHolderDelegate.bind(
+    fun bind(item: ScheduleListItem.FooterForm) {
+        formViewHolderDelegate.bind(
             newScheduleSource = item.newScheduleSource,
-            line = item.line
+            formBottomLine = item.formBottomLine
         )
     }
 }

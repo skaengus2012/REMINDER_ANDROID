@@ -25,7 +25,9 @@ import androidx.compose.ui.res.stringResource
 import com.nlab.reminder.core.androidx.compose.ui.DelayedContent
 import com.nlab.reminder.core.androidx.compose.ui.tooling.preview.Previews
 import com.nlab.reminder.core.component.schedulelist.content.UserScheduleListResource
+import com.nlab.reminder.core.component.schedulelist.content.ui.FormBottomLine
 import com.nlab.reminder.core.component.schedulelist.content.ui.ScheduleListContent
+import com.nlab.reminder.core.component.schedulelist.content.ui.ScheduleListItem
 import com.nlab.reminder.core.component.schedulelist.content.ui.ScheduleListSnapshot
 import com.nlab.reminder.core.component.schedulelist.content.ui.ScheduleListTheme
 import com.nlab.reminder.core.component.schedulelist.content.ui.SimpleAdd
@@ -159,13 +161,22 @@ private fun AllScheduleListContent(
     onSimpleEdit: (SimpleEdit) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val footerForm = remember { ScheduleListItem.FooterForm(formBottomLine = FormBottomLine.Type1) }
     ScheduleListContent(
         modifier = modifier,
         itemState = rememberScheduleListItemAdaptableState(
             headline = stringResource(StringIds.label_all),
             snapshot = scheduleListSnapshot,
             buildBodyItems = { elements ->
-                TODO()
+                buildList {
+                    elements.forEach { resource ->
+                        this += ScheduleListItem.Content(
+                            resource = resource,
+                            isLineVisible = true
+                        )
+                    }
+                    this += footerForm
+                }
             }
         ),
         toolbarRenderState = toolbarRenderState,

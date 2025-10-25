@@ -20,9 +20,9 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.AdapterListUpdateCallback
 import androidx.recyclerview.widget.RecyclerView
-import com.nlab.reminder.core.component.schedulelist.databinding.LayoutScheduleAdapterItemAddBinding
 import com.nlab.reminder.core.component.schedulelist.databinding.LayoutScheduleAdapterItemContentBinding
-import com.nlab.reminder.core.component.schedulelist.databinding.LayoutScheduleAdapterItemFooterAddBinding
+import com.nlab.reminder.core.component.schedulelist.databinding.LayoutScheduleAdapterItemFooterFormBinding
+import com.nlab.reminder.core.component.schedulelist.databinding.LayoutScheduleAdapterItemFormBinding
 import com.nlab.reminder.core.component.schedulelist.databinding.LayoutScheduleAdapterItemHeadlineBinding
 import com.nlab.reminder.core.component.schedulelist.databinding.LayoutScheduleAdapterItemHeadlinePaddingBinding
 import com.nlab.reminder.core.component.schedulelist.databinding.LayoutScheduleAdapterListGroupHeaderDefaultBinding
@@ -37,9 +37,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.datetime.TimeZone
 import kotlin.time.Instant
 
-private const val ITEM_VIEW_TYPE_ADD = 1
-private const val ITEM_VIEW_TYPE_CONTENT = 2
-private const val ITEM_VIEW_TYPE_FOOTER_ADD = 3
+private const val ITEM_VIEW_TYPE_CONTENT = 1
+private const val ITEM_VIEW_TYPE_FOOTER_FORM = 2
+private const val ITEM_VIEW_TYPE_FORM = 3
 private const val ITEM_VIEW_TYPE_HEADLINE = 4
 private const val ITEM_VIEW_TYPE_HEADLINE_PADDING = 5
 private const val ITEM_VIEW_TYPE_GROUP_HEADER = 6
@@ -81,9 +81,9 @@ internal class ScheduleListAdapter : RecyclerView.Adapter<ScheduleAdapterItemVie
     override fun getItemCount(): Int = differ.getCurrentList().size
 
     override fun getItemViewType(position: Int): Int = when (getItem(position)) {
-        is ScheduleListItem.Add -> ITEM_VIEW_TYPE_ADD
+        is ScheduleListItem.Form -> ITEM_VIEW_TYPE_FORM
         is ScheduleListItem.Content -> ITEM_VIEW_TYPE_CONTENT
-        is ScheduleListItem.FooterAdd -> ITEM_VIEW_TYPE_FOOTER_ADD
+        is ScheduleListItem.FooterForm -> ITEM_VIEW_TYPE_FOOTER_FORM
         is ScheduleListItem.Headline -> ITEM_VIEW_TYPE_HEADLINE
         is ScheduleListItem.HeadlinePadding -> ITEM_VIEW_TYPE_HEADLINE_PADDING
         is ScheduleListItem.GroupHeader -> ITEM_VIEW_TYPE_GROUP_HEADER
@@ -93,18 +93,6 @@ internal class ScheduleListAdapter : RecyclerView.Adapter<ScheduleAdapterItemVie
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ScheduleAdapterItemViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
         return when (viewType) {
-            ITEM_VIEW_TYPE_ADD -> {
-                AddViewHolder(
-                    binding = LayoutScheduleAdapterItemAddBinding.inflate(
-                        layoutInflater,
-                        parent,
-                        /* attachToParent = */ false
-                    ),
-                    themeState = themeState,
-                    onSimpleAddDone = { _addRequests.tryEmit(it) },
-                    onFocusChanged = { viewHolder, focused -> _focusChanges.tryEmit(FocusChange(viewHolder, focused)) }
-                )
-            }
             ITEM_VIEW_TYPE_CONTENT -> {
                 ContentViewHolder(
                     binding = LayoutScheduleAdapterItemContentBinding.inflate(
@@ -126,9 +114,9 @@ internal class ScheduleListAdapter : RecyclerView.Adapter<ScheduleAdapterItemVie
                 )
             }
 
-            ITEM_VIEW_TYPE_FOOTER_ADD -> {
-                FooterAddViewHolder(
-                    binding = LayoutScheduleAdapterItemFooterAddBinding.inflate(
+            ITEM_VIEW_TYPE_FOOTER_FORM -> {
+                FooterFormViewHolder(
+                    binding = LayoutScheduleAdapterItemFooterFormBinding.inflate(
                         layoutInflater,
                         parent,
                         /* attachToParent = */ false
@@ -136,6 +124,19 @@ internal class ScheduleListAdapter : RecyclerView.Adapter<ScheduleAdapterItemVie
                     themeState = themeState,
                     onSimpleAddDone = { _addRequests.tryEmit(it) },
                     onFocusChanged = { viewHolder, focused -> _focusChanges.tryEmit(FocusChange(viewHolder, focused)) },
+                )
+            }
+
+            ITEM_VIEW_TYPE_FORM -> {
+                FormViewHolder(
+                    binding = LayoutScheduleAdapterItemFormBinding.inflate(
+                        layoutInflater,
+                        parent,
+                        /* attachToParent = */ false
+                    ),
+                    themeState = themeState,
+                    onSimpleAddDone = { _addRequests.tryEmit(it) },
+                    onFocusChanged = { viewHolder, focused -> _focusChanges.tryEmit(FocusChange(viewHolder, focused)) }
                 )
             }
 
@@ -189,9 +190,9 @@ internal class ScheduleListAdapter : RecyclerView.Adapter<ScheduleAdapterItemVie
     override fun onBindViewHolder(holder: ScheduleAdapterItemViewHolder, position: Int) {
         val item = getItem(position)
         when (holder) {
-            is AddViewHolder -> holder.bind(item as ScheduleListItem.Add)
+            is FormViewHolder -> holder.bind(item as ScheduleListItem.Form)
             is ContentViewHolder -> holder.bind(item as ScheduleListItem.Content)
-            is FooterAddViewHolder -> holder.bind(item as ScheduleListItem.FooterAdd)
+            is FooterFormViewHolder -> holder.bind(item as ScheduleListItem.FooterForm)
             is HeadlineViewHolder -> holder.bind(item as ScheduleListItem.Headline)
             is GroupHeaderViewHolder -> holder.bind(item as ScheduleListItem.GroupHeader)
             is SubGroupHeaderViewHolder -> holder.bind(item as ScheduleListItem.SubGroupHeader)

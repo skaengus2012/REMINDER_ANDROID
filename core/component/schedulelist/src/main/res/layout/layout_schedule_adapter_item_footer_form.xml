@@ -22,8 +22,8 @@
     android:orientation="vertical">
 
     <include
-        android:id="@+id/layout_add"
-        layout="@layout/layout_schedule_adapter_item_add" />
+        android:id="@+id/layout_form"
+        layout="@layout/layout_schedule_adapter_item_form" />
 
     <View
         android:id="@+id/view_bottomPadding"
