@@ -14,28 +14,31 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.component.schedulelist.content.ui
+package com.nlab.reminder.core.androidx.compose.runtime
 
 import androidx.compose.runtime.Immutable
-import com.nlab.reminder.core.component.schedulelist.content.ScheduleListElement
 import com.nlab.reminder.core.kotlin.identityHashCodeOf
 
 /**
  * @author Doohyun
  */
 @Immutable
-class ScheduleListSnapshot<T : ScheduleListElement>(internal val elements: List<T>) {
+class IdentityList<out E> internal constructor(val value: List<E>) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other !is ScheduleListSnapshot<T>) return false
+        if (other !is IdentityList<E>) return false
 
         // Using identity comparison for the 'elements' list optimizes recomposition in Jetpack Compose.
         // It ensures that recomposition is triggered only when a new list instance is provided,
         // not just when its content changes.
-        return elements === other.elements
+        return value === other.value
     }
 
     override fun hashCode(): Int {
-        return identityHashCodeOf(elements)
+        return identityHashCodeOf(value)
     }
 }
+
+fun <T> IdentityList(): IdentityList<T> = IdentityList(emptyList())
+
+fun <T> List<T>.toIdentityList(): IdentityList<T> = IdentityList(value = this)

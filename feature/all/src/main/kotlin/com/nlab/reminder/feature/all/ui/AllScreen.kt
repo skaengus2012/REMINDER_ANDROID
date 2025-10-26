@@ -28,7 +28,6 @@ import com.nlab.reminder.core.component.schedulelist.content.UserScheduleListRes
 import com.nlab.reminder.core.component.schedulelist.content.ui.FormBottomLine
 import com.nlab.reminder.core.component.schedulelist.content.ui.ScheduleListContent
 import com.nlab.reminder.core.component.schedulelist.content.ui.ScheduleListItem
-import com.nlab.reminder.core.component.schedulelist.content.ui.ScheduleListSnapshot
 import com.nlab.reminder.core.component.schedulelist.content.ui.ScheduleListTheme
 import com.nlab.reminder.core.component.schedulelist.content.ui.SimpleAdd
 import com.nlab.reminder.core.component.schedulelist.content.ui.SimpleEdit
@@ -37,6 +36,8 @@ import com.nlab.reminder.core.component.schedulelist.toolbar.ui.ScheduleListTool
 import com.nlab.reminder.core.component.schedulelist.toolbar.ui.ScheduleListToolbarRenderState
 import com.nlab.reminder.core.component.schedulelist.toolbar.ui.rememberScheduleListToolbarRenderState
 import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
+import com.nlab.reminder.core.androidx.compose.runtime.IdentityList
+import com.nlab.reminder.core.androidx.compose.runtime.toIdentityList
 import com.nlab.reminder.core.translation.StringIds
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -59,20 +60,18 @@ internal fun AllScreen(
         mutableStateOf(emptyList())
     }
 
-    if (items.isEmpty()) {
-        LaunchedEffect(Unit) {
-            val newItems = withContext(Dispatchers.Default) {
-                FakeData.testItems
-            }
-            items = newItems
+    LaunchedEffect(Unit) {
+        val newItems = withContext(Dispatchers.Default) {
+            FakeData.testItems
         }
+        items = newItems
     }
 
     AllScreen(
         modifier = modifier,
-        scheduleListDisplayDelayTimeMillis = enterTransitionTimeInMillis,
-        scheduleListSnapshot = ScheduleListSnapshot(items),
+        scheduleListResources = items.toIdentityList(),
         itemSelectionEnabled = itemSelectionEnabled,
+        contentDelayTimeMillis = enterTransitionTimeInMillis,
         entryAt = entryAt,
         onBackClicked = onBackClicked,
         onMoreClicked = {
@@ -95,9 +94,9 @@ internal fun AllScreen(
 
 @Composable
 private fun AllScreen(
-    scheduleListDisplayDelayTimeMillis: Long,
-    scheduleListSnapshot: ScheduleListSnapshot<UserScheduleListResource>,
+    scheduleListResources: IdentityList<UserScheduleListResource>,
     itemSelectionEnabled: Boolean,
+    contentDelayTimeMillis: Long,
     entryAt: Instant,
     onBackClicked: () -> Unit,
     onMoreClicked: () -> Unit,
@@ -118,10 +117,10 @@ private fun AllScreen(
             onMoreClicked = onMoreClicked,
             onCompleteClicked = onCompleteClicked
         )
-        DelayedContent(delayTimeMillis = scheduleListDisplayDelayTimeMillis) {
+        DelayedContent(delayTimeMillis = contentDelayTimeMillis) {
             AllScheduleListContent(
                 toolbarRenderState = toolbarRenderState,
-                scheduleListSnapshot = scheduleListSnapshot,
+                scheduleListResources = scheduleListResources,
                 entryAt = entryAt,
                 itemSelectionEnabled = itemSelectionEnabled,
                 onSimpleAdd = onSimpleAdd,
@@ -154,7 +153,7 @@ private fun AllScheduleListToolbar(
 @Composable
 private fun AllScheduleListContent(
     toolbarRenderState: ScheduleListToolbarRenderState,
-    scheduleListSnapshot: ScheduleListSnapshot<UserScheduleListResource>,
+    scheduleListResources: IdentityList<UserScheduleListResource>,
     entryAt: Instant,
     itemSelectionEnabled: Boolean,
     onSimpleAdd: (SimpleAdd) -> Unit,
@@ -166,7 +165,7 @@ private fun AllScheduleListContent(
         modifier = modifier,
         itemState = rememberScheduleListItemAdaptableState(
             headline = stringResource(StringIds.label_all),
-            snapshot = scheduleListSnapshot,
+            elements = scheduleListResources,
             buildBodyItems = { elements ->
                 buildList {
                     elements.forEach { resource ->
@@ -194,8 +193,8 @@ private fun AllScheduleListContent(
 private fun AllScreenPreview() {
     PlaneatTheme {
         AllScreen(
-            scheduleListDisplayDelayTimeMillis = 0,
-            scheduleListSnapshot = ScheduleListSnapshot(emptyList()),
+            scheduleListResources = IdentityList(),
+            contentDelayTimeMillis = 0,
             itemSelectionEnabled = true,
             entryAt = Clock.System.now(),
             onBackClicked = {},

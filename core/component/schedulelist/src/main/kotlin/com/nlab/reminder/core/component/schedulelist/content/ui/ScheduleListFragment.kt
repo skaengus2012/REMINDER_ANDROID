@@ -33,6 +33,7 @@ import com.nlab.reminder.core.android.view.awaitPost
 import com.nlab.reminder.core.android.view.inputmethod.hideSoftInputFromWindow
 import com.nlab.reminder.core.android.view.setVisible
 import com.nlab.reminder.core.android.view.touches
+import com.nlab.reminder.core.androidx.compose.runtime.IdentityList
 import com.nlab.reminder.core.androidx.fragment.viewLifecycle
 import com.nlab.reminder.core.androidx.fragment.viewLifecycleScope
 import com.nlab.reminder.core.androix.recyclerview.itemTouches
@@ -43,7 +44,6 @@ import com.nlab.reminder.core.androix.recyclerview.verticalScrollRange
 import com.nlab.reminder.core.component.schedulelist.databinding.FragmentScheduleListBinding
 import com.nlab.reminder.core.component.schedulelist.toolbar.ui.ScheduleListToolbarRenderState
 import com.nlab.reminder.core.data.model.ScheduleId
-import com.nlab.reminder.core.kotlin.collections.NonEmptyList
 import com.nlab.reminder.core.kotlinx.coroutines.flow.map
 import com.nlab.reminder.core.kotlinx.coroutines.flow.withPrev
 import kotlinx.coroutines.Dispatchers
@@ -54,6 +54,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flowOn
@@ -79,7 +80,7 @@ internal class ScheduleListFragment : Fragment() {
     private var _binding: FragmentScheduleListBinding? = null
     private val binding: FragmentScheduleListBinding get() = checkNotNull(_binding)
 
-    private val scheduleListItemsState = MutableStateFlow<NonEmptyList<ScheduleListItem>?>(null)
+    private val scheduleListItemsState = MutableStateFlow<IdentityList<ScheduleListItem>>(IdentityList())
     private val itemSelectionEnabledState = MutableStateFlow<Boolean?>(null)
     private val triggerAtFormatPatternsState = MutableStateFlow<TriggerAtFormatPatterns?>(null)
     private val themeState = MutableStateFlow<ScheduleListTheme?>(null)
@@ -384,7 +385,8 @@ internal class ScheduleListFragment : Fragment() {
             .onEach { isVisible -> scheduleListDragAnchorOverlay.setVisible(isVisible) }
             .launchIn(viewLifecycleScope)
 
-        scheduleListItemsState.filterNotNull()
+        scheduleListItemsState
+            .map { it.value }
             .distinctUntilChanged()
             .flowOn(Dispatchers.Default)
             .conflate()
@@ -392,7 +394,7 @@ internal class ScheduleListFragment : Fragment() {
             .onEach { items ->
                 // For the conflate effect, wait to make it into a suspend function
                 suspendCancellableCoroutine { cons ->
-                    scheduleListAdapter.submitList(items = items.value) {
+                    scheduleListAdapter.submitList(items = items) {
                         cons.resume(Unit)
                     }
                 }
@@ -433,7 +435,7 @@ internal class ScheduleListFragment : Fragment() {
             .launchIn(viewLifecycleScope)
     }
 
-    fun onScheduleListItemUpdated(items: NonEmptyList<ScheduleListItem>) {
+    fun onScheduleListItemUpdated(items: IdentityList<ScheduleListItem>) {
         scheduleListItemsState.value = items
     }
 
