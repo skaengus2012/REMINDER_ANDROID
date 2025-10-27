@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (C) 2025 The N's lab Open Source Project
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~        http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_bodyStart"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        app:layout_constraintGuide_begin="@dimen/schedule_data_start" />
+
+    <ImageView
+        android:id="@+id/image_completeDeco"
+        android:layout_width="@dimen/schedule_checkbox_touchable_size"
+        android:layout_height="@dimen/schedule_checkbox_touchable_size"
+        android:importantForAccessibility="no"
+        android:padding="@dimen/schedule_checkbox_padding"
+        android:scaleType="fitXY"
+        app:layout_constraintEnd_toEndOf="@id/guideline_bodyStart"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/checkbox_schedule_add" />
+
+    <Button
+        android:id="@+id/textview_guideTitle"
+        android:layout_width="@dimen/schedule_checkbox_touchable_size"
+        android:layout_height="@dimen/schedule_checkbox_touchable_size"
+        android:background="@android:color/transparent"
+        android:clickable="false"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        android:inputType="none"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/edittext_title"
+        style="@style/PlaneatTheme.Style.Typography.BodyLarge"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@null"
+        android:gravity="center_vertical"
+        android:imeOptions="actionNext"
+        android:inputType="textMultiLine"
+        android:nextFocusDown="@id/edittext_note"
+        android:textColor="?content_1"
+        app:layout_constraintBaseline_toBaselineOf="@id/textview_guideTitle"
+        app:layout_constraintEnd_toStartOf="@id/button_info"
+        app:layout_constraintHeight_min="@dimen/schedule_check_size"
+        app:layout_constraintStart_toStartOf="@id/guideline_bodyStart"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_goneMarginEnd="@dimen/horizontal_padding_medium"
+        tools:ignore="Autofill,LabelFor,TextFields"
+        tools:text="@tools:sample/lorem" />
+
+    <EditText
+        android:id="@+id/edittext_note"
+        style="@style/PlaneatTheme.Style.Typography.BodyMedium"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:background="@null"
+        android:gravity="center_vertical"
+        android:hint="@string/add_note"
+        android:imeOptions="actionDone"
+        android:inputType="textMultiLine"
+        android:textColor="?content_2"
+        android:textColorHint="?content_2_hint"
+        app:layout_constraintEnd_toEndOf="@id/edittext_title"
+        app:layout_constraintStart_toStartOf="@id/edittext_title"
+        app:layout_constraintTop_toBottomOf="@id/edittext_title"
+        tools:ignore="Autofill,LabelFor,TextFields"
+        tools:text="@tools:sample/lorem" />
+
+    <ImageButton
+        android:id="@+id/button_info"
+        android:layout_width="@dimen/schedule_checkbox_touchable_size"
+        android:layout_height="@dimen/schedule_checkbox_touchable_size"
+        android:background="?selectableItemBackgroundBorderless"
+        android:contentDescription="@string/content_description_info"
+        android:padding="11.5dp"
+        android:scaleType="fitXY"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_info" />
+
+    <View
+        android:id="@+id/view_line1"
+        android:layout_width="0dp"
+        android:layout_height="0.5dp"
+        android:layout_marginTop="15dp"
+        android:background="?bg_line_1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/guideline_bodyStart"
+        app:layout_constraintTop_toBottomOf="@id/edittext_note" />
+
+    <View
+        android:id="@+id/view_line2"
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:layout_marginTop="15dp"
+        android:background="?bg_line_1"
+        app:layout_constraintTop_toBottomOf="@id/edittext_note" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

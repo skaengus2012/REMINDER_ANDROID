@@ -23,5 +23,5 @@ android {
 }
 
 dependencies {
-    api(libs.androidx.fragment)
+    api(libs.androidx.fragment.ktx)
 }
