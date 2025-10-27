@@ -1,11 +1,14 @@
 plugins {
     alias(libs.plugins.nlab.android.library)
     alias(libs.plugins.nlab.android.library.compose.component)
-    alias(libs.plugins.nlab.android.library.view.component)
 }
 
 android {
     namespace = "com.nlab.reminder.core.component.schedulelist"
+
+    buildFeatures {
+        viewBinding = true
+    }
 }
 
 dependencies {
@@ -19,6 +22,7 @@ dependencies {
     implementation(projects.core.kotlinx.coroutinesAndroid)
     implementation(projects.core.translation)
 
+    implementation(libs.androidx.appcompat)
     implementation(libs.androidx.constaintlayout)
     implementation(libs.androidx.cardview)
     implementation(libs.androidx.fragment.compose)
