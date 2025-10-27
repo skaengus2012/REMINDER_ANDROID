@@ -30,6 +30,7 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -56,6 +57,7 @@ fun ScheduleListContent(
     val layoutDirection = LocalLayoutDirection.current
     val displayCutoutPaddings = WindowInsets.displayCutout.asPaddingValues()
 
+    // Save fragment references in Compose state
     var fragmentRef by remember { mutableStateOf<ScheduleListFragment?>(null) }
     AndroidFragment<ScheduleListFragment>(
         modifier = modifier
@@ -68,7 +70,9 @@ fun ScheduleListContent(
             .imePadding()
     ) { fragment -> fragmentRef = fragment }
 
-    fragmentRef?.let { fragment ->
+    // rememberUpdatedState to always get the latest fragment reference
+    val currentFragmentRef by rememberUpdatedState(fragmentRef)
+    currentFragmentRef?.let { fragment ->
         val timeZone = LocalTimeZone.current
         val items = itemState.value
         SideEffect {
