@@ -1,0 +1,34 @@
+plugins {
+    alias(libs.plugins.nlab.android.library)
+    alias(libs.plugins.nlab.android.library.component)
+}
+
+android {
+    namespace = "com.nlab.reminder.core.component.schedulelist"
+
+    buildFeatures {
+        viewBinding = true
+    }
+}
+
+dependencies {
+    api(projects.core.component.displayformat)
+
+    implementation(projects.core.android)
+    implementation(projects.core.androidx.fragment)
+    implementation(projects.core.androidx.recyclerview)
+    implementation(projects.core.component.toolbar)
+    implementation(projects.core.dataDi)
+    implementation(projects.core.kotlinx.coroutinesAndroid)
+    implementation(projects.core.translation)
+
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.constaintlayout)
+    implementation(libs.androidx.cardview)
+    implementation(libs.androidx.fragment.compose)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.transition.ktx)
+    implementation(libs.timber)
+
+    testImplementation(projects.core.dataTest)
+}

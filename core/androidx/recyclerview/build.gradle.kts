@@ -26,5 +26,7 @@ dependencies {
 
     api(libs.androidx.recyclerview)
 
-    implementation(libs.androidx.annotation)
+    implementation(projects.core.android)
+
+    implementation(libs.timber)
 }

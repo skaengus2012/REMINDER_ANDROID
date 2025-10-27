@@ -19,8 +19,10 @@ package com.nlab.reminder.core.designsystem.compose.theme
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.foundation.text.selection.TextSelectionColors
-import androidx.compose.material3.LocalUseFallbackRippleImplementation
+import androidx.compose.material3.LocalRippleConfiguration
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RippleConfiguration
+import androidx.compose.material3.RippleDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
@@ -51,17 +53,23 @@ fun PlaneatTheme(
     isDarkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
-    val planeatColorScheme = if (isDarkTheme) DarkPlaneatColorScheme else LightPlaneatColorScheme
-    CompositionLocalProvider(
-        LocalPlaneatColorScheme provides planeatColorScheme,
-        LocalUseFallbackRippleImplementation provides true,
-    ) {
+    val planeatColorScheme =
+        if (isDarkTheme) DarkPlaneatColorScheme
+        else LightPlaneatColorScheme
+    CompositionLocalProvider(LocalPlaneatColorScheme provides planeatColorScheme) {
         MaterialTheme {
             val customTextSelectionColors = TextSelectionColors(
                 handleColor = PlaneatTheme.colors.contentTextSelection,
                 backgroundColor = PlaneatTheme.colors.bgTextSelection
             )
-            CompositionLocalProvider(LocalTextSelectionColors provides customTextSelectionColors) {
+            val customRippleConfiguration = RippleConfiguration(
+                color = PlaneatTheme.colors.bgRipple,
+                rippleAlpha = RippleDefaults.RippleAlpha
+            )
+            CompositionLocalProvider(
+                LocalTextSelectionColors provides customTextSelectionColors,
+                LocalRippleConfiguration provides customRippleConfiguration
+            ) {
                 content()
             }
         }
