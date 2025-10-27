@@ -1,6 +1,6 @@
 plugins {
     alias(libs.plugins.nlab.android.library)
-    alias(libs.plugins.nlab.android.library.compose.component)
+    alias(libs.plugins.nlab.android.library.component)
     alias(libs.plugins.nlab.android.library.jacoco)
 }
 

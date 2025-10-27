@@ -19,7 +19,7 @@ import com.nlab.reminder.libs
 import org.gradle.kotlin.dsl.apply
 
 apply(plugin = "com.android.library")
-apply(plugin = "nlab.android.library.compose.component")
+apply(plugin = "nlab.android.library.component")
 apply(plugin = "nlab.android.library.di")
 apply(plugin = "nlab.android.library.jacoco")
 apply(plugin = "nlab.android.library.statekit")
