@@ -242,7 +242,7 @@ internal class ScheduleListAdapter : RecyclerView.Adapter<ScheduleAdapterItemVie
     }
 
     fun updateEntryAt(entryAt: Instant) {
-        entryAtState.value =  entryAt
+        entryAtState.value = entryAt
     }
 
     fun updateTriggerAtFormatPatterns(patterns: TriggerAtFormatPatterns) {
