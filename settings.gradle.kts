@@ -57,7 +57,6 @@ include(
     ":core:android",
     ":core:androidx:compose",
     ":core:androidx:fragment",
-    ":core:androidx:fragment-compose",
     ":core:androidx:navigation-compose",
     ":core:androidx:recyclerview",
     ":core:annotation",
