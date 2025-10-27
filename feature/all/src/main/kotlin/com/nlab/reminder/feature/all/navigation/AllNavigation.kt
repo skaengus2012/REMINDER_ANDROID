@@ -46,7 +46,7 @@ fun NavGraphBuilder.allScreen(
         popExitTransition = providePopExitTransition
     ) {
         AllScreen(
-            enterTransitionTimeInMillis = enterTransitionTimeInMillis,
+            enterTransitionTimeInMillis = enterTransitionTimeInMillis.toLong(),
             onBackClicked = onBackClicked,
             showAppToast = showAppToast
         )
