@@ -163,7 +163,7 @@ class RepeatTransformsKtTest {
     fun `Given hourly, positive number, When creating Repeat, Then return Hourly`() {
         val repeatType = REPEAT_HOURLY
         val interval = genPositiveInt()
-        val expectedRepeat = Repeat.Hourly(interval = interval)
+        val expectedRepeat = HourlyRepeat(interval = interval)
         val actualRepeat = Repeat(
             type = repeatType,
             interval = interval.value,
@@ -176,7 +176,7 @@ class RepeatTransformsKtTest {
     fun `Given daily, positive number, When creating Repeat, Then return Daily`() {
         val repeatType = REPEAT_DAILY
         val interval = genPositiveInt()
-        val expectedRepeat = Repeat.Daily(interval = interval)
+        val expectedRepeat = DailyRepeat(interval = interval)
         val actualRepeat = Repeat(
             type = repeatType,
             interval = interval.value,
@@ -201,7 +201,7 @@ class RepeatTransformsKtTest {
         val repeatType = REPEAT_WEEKLY
         val interval = genPositiveInt()
         val dayOfWeeks = sampleDaysOfWeekCodes
-        val expectedRepeat = Repeat.Weekly(
+        val expectedRepeat = WeeklyRepeat(
             interval = interval,
             daysOfWeeks = dayOfWeeks.toSet(::DayOfWeek).toNonEmptySet()
         )
@@ -235,7 +235,7 @@ class RepeatTransformsKtTest {
         val repeatType = REPEAT_MONTHLY
         val interval = genPositiveInt()
         val monthlyDays = (1..31).shuffledSubset()
-        val expectedRepeat = Repeat.Monthly(
+        val expectedRepeat = MonthlyRepeat(
             interval = interval,
             detail = MonthlyRepeatDetail.Each(monthlyDays.toSet(::DaysOfMonth).toNonEmptySet())
         )
@@ -259,7 +259,7 @@ class RepeatTransformsKtTest {
         val interval = genPositiveInt()
         val dayOrder = sampleDayOrderCode
         val days = sampleDaysCode
-        val expectedRepeat = Repeat.Monthly(
+        val expectedRepeat = MonthlyRepeat(
             interval = interval,
             detail = MonthlyRepeatDetail.Customize(
                 order = DaysOfWeekOrder(dayOrder),
@@ -302,7 +302,7 @@ class RepeatTransformsKtTest {
         val repeatType = REPEAT_YEARLY
         val interval = genPositiveInt()
         val months = sampleYearlyMonthCodes
-        val expectedRepeat = Repeat.Yearly(
+        val expectedRepeat = YearlyRepeat(
             interval = interval,
             months = months.toSet(::Month).toNonEmptySet(),
             daysOfWeekOption = null
@@ -378,7 +378,7 @@ class RepeatTransformsKtTest {
         val dayOrder = sampleDayOrderCode
         val days = sampleDaysCode
         val months = sampleYearlyMonthCodes
-        val expectedRepeat = Repeat.Yearly(
+        val expectedRepeat = YearlyRepeat(
             interval = interval,
             months = months.toSet(::Month).toNonEmptySet(),
             daysOfWeekOption = YearlyDaysOfWeekOption(
@@ -413,7 +413,7 @@ class RepeatTransformsKtTest {
 
     @Test
     fun `Given hourly repeat, When convert to aggregate, Then return matched value`() {
-        val repeat = genRepeatHourly()
+        val repeat = genHourlyRepeat()
         val aggregate = repeat.toAggregate()
         assertThat(aggregate.type, equalTo(REPEAT_HOURLY))
         assertThat(aggregate.interval, equalTo(repeat.interval))
@@ -422,7 +422,7 @@ class RepeatTransformsKtTest {
 
     @Test
     fun `Given daily repeat, When convert to aggregate, Then return matched value`() {
-        val repeat = genRepeatDaily()
+        val repeat = genDailyRepeat()
         val aggregate = repeat.toAggregate()
         assertThat(aggregate.type, equalTo(REPEAT_DAILY))
         assertThat(aggregate.interval, equalTo(repeat.interval))
@@ -431,7 +431,7 @@ class RepeatTransformsKtTest {
 
     @Test
     fun `Given repeat weekly, When convert to aggregate, Then return matched value`() {
-        val repeat = genRepeatWeekly()
+        val repeat = genWeeklyRepeat()
         val expectedDayOfWeeksCodes = repeat.daysOfWeeks.value.toSet { it.toRepeatWeek() }
 
         val actualAggregate = repeat.toAggregate()
@@ -448,7 +448,7 @@ class RepeatTransformsKtTest {
     @Test
     fun `Given repeat monthly with each, When try convert to aggregate, Then return matched value`() {
         val monthlyRepeatDetail = genMonthlyRepeatDetailEach()
-        val repeat = genRepeatMonthly(detail = monthlyRepeatDetail)
+        val repeat = genMonthlyRepeat(detail = monthlyRepeatDetail)
 
         val expectedMonthlyDays = monthlyRepeatDetail.days.value.toSet { it.rawValue.toString() }
 
@@ -466,7 +466,7 @@ class RepeatTransformsKtTest {
     @Test
     fun `Given repeat monthly with customize, When try convert to aggregate, Then return matched value`() {
         val monthlyRepeatDetail = genMonthlyRepeatCustomize()
-        val repeat = genRepeatMonthly(detail = monthlyRepeatDetail)
+        val repeat = genMonthlyRepeat(detail = monthlyRepeatDetail)
 
         val expectedOrderCode = monthlyRepeatDetail.order.toRepeatDayOrder()
         val expectedDayCode = monthlyRepeatDetail.day.toRepeatDays()
@@ -487,7 +487,7 @@ class RepeatTransformsKtTest {
 
     @Test
     fun `Given repeat yearly without dayOfWeekOption, When try convert to aggregate, Then return matched value`() {
-        val repeat = genRepeatYearly(daysOfWeekOption = null)
+        val repeat = genYearlyRepeat(daysOfWeekOption = null)
         val expectedMonthCodes = repeat.months.value.toSet { it.toRepeatMonth() }
 
         val actualAggregate = repeat.toAggregate()
@@ -504,7 +504,7 @@ class RepeatTransformsKtTest {
     @Test
     fun `Given repeat yearly with dayOfWeekOption, When try convert to aggregate, Then return matched value`() {
         val dayOfWeekOption = genYearlyDaysOfWeekOption()
-        val repeat = genRepeatYearly(daysOfWeekOption = dayOfWeekOption)
+        val repeat = genYearlyRepeat(daysOfWeekOption = dayOfWeekOption)
         val expectedMonthCodes = repeat.months.value.toSet { it.toRepeatMonth() }
         val expectedDayOrderCode = dayOfWeekOption.order.toRepeatDayOrder()
         val expectedDaysCode = dayOfWeekOption.day.toRepeatDays()

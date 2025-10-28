@@ -74,16 +74,24 @@ private fun createScheduleTimingOrNull(
         interval = scheduleEntity.repeatInterval,
         detailEntities = repeatDetailEntity
     )
-    require(triggerAt != null || repeat == null) {
+    require(isTriggerAtDateOnly != null || repeat == null) {
         "Repeat is defined without triggerAt: repeat=$repeat"
     }
-
     return if (triggerAt == null) null else {
-        ScheduleTiming(
-            triggerAt = triggerAt,
-            isTriggerAtDateOnly = isTriggerAtDateOnly!!,
-            repeat = repeat
-        )
+        if (isTriggerAtDateOnly!!) {
+            require(repeat == null || repeat is DateOnlyRepeat) {
+                "Repeat is not DateOnlyRepeat: repeat=$repeat, but trigger is dateOnly"
+            }
+            ScheduleTiming.Date(
+                triggerAt = triggerAt,
+                dateOnlyRepeat = repeat
+            )
+        } else {
+            ScheduleTiming.DateTime(
+                triggerAt = triggerAt,
+                repeat = repeat
+            )
+        }
     }
 }
 
@@ -121,8 +129,22 @@ internal fun ScheduleContent.toAggregate(): ScheduleContentAggregate = ScheduleC
     tagIds = tagIds.toSet { it.rawId },
 )
 
-internal fun ScheduleTiming.toAggregate(): ScheduleTimingAggregate = ScheduleTimingAggregate(
-    triggerAt = triggerAt,
-    isTriggerAtDateOnly = isTriggerAtDateOnly,
-    repeat = repeat?.toAggregate()
-)
+internal fun ScheduleTiming.toAggregate(): ScheduleTimingAggregate {
+    val isTriggerAtDateOnly: Boolean
+    val repeatData: Repeat?
+    when (this) {
+        is ScheduleTiming.Date -> {
+            isTriggerAtDateOnly = true
+            repeatData = dateOnlyRepeat
+        }
+        is ScheduleTiming.DateTime -> {
+            isTriggerAtDateOnly = false
+            repeatData = repeat
+        }
+    }
+    return ScheduleTimingAggregate(
+        triggerAt = triggerAt,
+        isTriggerAtDateOnly = isTriggerAtDateOnly,
+        repeat = repeatData?.toAggregate()
+    )
+}

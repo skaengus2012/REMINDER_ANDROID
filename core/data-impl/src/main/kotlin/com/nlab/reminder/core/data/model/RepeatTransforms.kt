@@ -50,38 +50,37 @@ internal fun Repeat(
     // When it is tied with {when}, Missed Branch will be created in Jacoco Coverage.
     // So it was treated with an if-return pattern.
     if (type == REPEAT_HOURLY) {
-        return Repeat.Hourly(intervalAsPositiveInt)
+        return HourlyRepeat(intervalAsPositiveInt)
     }
 
     if (type == REPEAT_DAILY) {
-        return Repeat.Daily(intervalAsPositiveInt)
+        return DailyRepeat(intervalAsPositiveInt)
     }
 
     if (type == REPEAT_WEEKLY) {
-        return RepeatWeekly(intervalAsPositiveInt, detailEntities)
+        return WeeklyRepeat(intervalAsPositiveInt, detailEntities)
     }
 
     if (type == REPEAT_MONTHLY) {
-        return RepeatMonthly(intervalAsPositiveInt, detailEntities)
+        return MonthlyRepeat(intervalAsPositiveInt, detailEntities)
     }
 
     if (type == REPEAT_YEARLY) {
-        return RepeatYearly(intervalAsPositiveInt, detailEntities)
+        return YearlyRepeat(intervalAsPositiveInt, detailEntities)
     }
 
     throw IllegalArgumentException("Invalid repeat type : $type")
 }
 
-@Suppress("FunctionName")
-private fun RepeatWeekly(
+private fun WeeklyRepeat(
     interval: PositiveInt,
     repeatDetailEntities: Collection<RepeatDetailEntity>,
-): Repeat.Weekly {
+): WeeklyRepeat {
     val settingToValuesTables = repeatDetailEntities.groupBy(
         keySelector = { it.propertyCode },
         valueTransform = { it.value }
     )
-    return Repeat.Weekly(
+    return WeeklyRepeat(
         interval,
         daysOfWeeks = settingToValuesTables
             .getValue(REPEAT_SETTING_PROPERTY_WEEKLY)
@@ -90,17 +89,16 @@ private fun RepeatWeekly(
     )
 }
 
-@Suppress("FunctionName")
-private fun RepeatMonthly(
+private fun MonthlyRepeat(
     interval: PositiveInt,
     repeatDetailEntities: Collection<RepeatDetailEntity>,
-): Repeat.Monthly {
+): MonthlyRepeat {
     val propertyCodeToValuesTables = repeatDetailEntities.groupBy(
         keySelector = { it.propertyCode },
         valueTransform = { it.value }
     )
     val hasDaysOfMonth = REPEAT_SETTING_PROPERTY_MONTHLY_DAY in propertyCodeToValuesTables
-    return Repeat.Monthly(
+    return MonthlyRepeat(
         interval,
         detail = if (hasDaysOfMonth) {
             MonthlyRepeatDetail.Each(
@@ -124,18 +122,17 @@ private fun RepeatMonthly(
     )
 }
 
-@Suppress("FunctionName")
-private fun RepeatYearly(
+private fun YearlyRepeat(
     interval: PositiveInt,
     repeatDetailEntities: Collection<RepeatDetailEntity>,
-): Repeat.Yearly {
+): YearlyRepeat {
     val propertyCodeToValuesTables = repeatDetailEntities.groupBy(
         keySelector = { it.propertyCode },
         valueTransform = { it.value }
     )
     val yearlyDayOrder = propertyCodeToValuesTables[REPEAT_SETTING_PROPERTY_YEARLY_DAY_ORDER]?.firstOrNull()
     val yearlyDayOfWeeks = propertyCodeToValuesTables[REPEAT_SETTING_PROPERTY_YEARLY_DAY_OF_WEEK]?.firstOrNull()
-    return Repeat.Yearly(
+    return YearlyRepeat(
         interval = interval,
         months = propertyCodeToValuesTables
             .getValue(REPEAT_SETTING_PROPERTY_YEARLY_MONTH)
@@ -145,19 +142,21 @@ private fun RepeatYearly(
             yearlyDayOrder == null && yearlyDayOfWeeks == null -> {
                 null
             }
+
             yearlyDayOrder != null && yearlyDayOfWeeks != null -> {
                 YearlyDaysOfWeekOption(
                     order = DaysOfWeekOrder(yearlyDayOrder),
                     day = Days(yearlyDayOfWeeks)
                 )
             }
+
             else -> throw IllegalArgumentException("Invalid yearly week option")
         }
     )
 }
 
 internal fun Repeat.toAggregate(): ScheduleRepeatAggregate = when (this) {
-    is Repeat.Hourly -> {
+    is HourlyRepeat -> {
         ScheduleRepeatAggregate(
             type = REPEAT_HOURLY,
             interval = interval,
@@ -165,7 +164,7 @@ internal fun Repeat.toAggregate(): ScheduleRepeatAggregate = when (this) {
         )
     }
 
-    is Repeat.Daily -> {
+    is DailyRepeat -> {
         ScheduleRepeatAggregate(
             type = REPEAT_DAILY,
             interval = interval,
@@ -173,7 +172,7 @@ internal fun Repeat.toAggregate(): ScheduleRepeatAggregate = when (this) {
         )
     }
 
-    is Repeat.Weekly -> {
+    is WeeklyRepeat -> {
         ScheduleRepeatAggregate(
             type = REPEAT_WEEKLY,
             interval = interval,
@@ -181,7 +180,7 @@ internal fun Repeat.toAggregate(): ScheduleRepeatAggregate = when (this) {
         )
     }
 
-    is Repeat.Monthly -> {
+    is MonthlyRepeat -> {
         ScheduleRepeatAggregate(
             type = REPEAT_MONTHLY,
             interval = interval,
@@ -189,7 +188,7 @@ internal fun Repeat.toAggregate(): ScheduleRepeatAggregate = when (this) {
         )
     }
 
-    is Repeat.Yearly -> {
+    is YearlyRepeat -> {
         ScheduleRepeatAggregate(
             type = REPEAT_YEARLY,
             interval = interval,
@@ -200,7 +199,7 @@ internal fun Repeat.toAggregate(): ScheduleRepeatAggregate = when (this) {
 }
 
 private fun convertRepeatDetailAggregatesFromWeeklyRepeat(
-    repeat: Repeat.Weekly
+    repeat: WeeklyRepeat
 ): Set<ScheduleRepeatDetailAggregate> = buildSet {
     repeat.daysOfWeeks.value.forEach { daysOfWeek ->
         this += ScheduleRepeatDetailAggregate(
@@ -211,7 +210,7 @@ private fun convertRepeatDetailAggregatesFromWeeklyRepeat(
 }
 
 private fun convertRepeatDetailAggregatesFromMonthlyRepeat(
-    repeat: Repeat.Monthly
+    repeat: MonthlyRepeat
 ): Set<ScheduleRepeatDetailAggregate> = buildSet {
     when (val typedDetail = repeat.detail) {
         is MonthlyRepeatDetail.Each -> {
@@ -237,7 +236,7 @@ private fun convertRepeatDetailAggregatesFromMonthlyRepeat(
 }
 
 private fun convertRepeatDetailAggregatesFromYearlyRepeat(
-    repeat: Repeat.Yearly
+    repeat: YearlyRepeat
 ): Set<ScheduleRepeatDetailAggregate> = buildSet {
     repeat.months.value.forEach { month ->
         this += ScheduleRepeatDetailAggregate(

@@ -47,11 +47,24 @@ fun genScheduleContent(
 
 fun genScheduleTiming(
     triggerAt: Instant = Clock.System.now(),
-    isTriggerAtDateOnly: Boolean = genBoolean(),
-    repeat: Repeat? = genRepeat()
-): ScheduleTiming = ScheduleTiming(
+    isTriggerAtDateOnly: Boolean = genBoolean()
+): ScheduleTiming =
+    if (isTriggerAtDateOnly) genScheduleTimingDateType(triggerAt)
+    else genScheduleTimingDateTimeType(triggerAt)
+
+fun genScheduleTimingDateType(
+    triggerAt: Instant = Clock.System.now(),
+    dateOnlyRepeat: DateOnlyRepeat? = genDateOnlyRepeat()
+): ScheduleTiming.Date = ScheduleTiming.Date(
     triggerAt = triggerAt,
-    isTriggerAtDateOnly = isTriggerAtDateOnly,
+    dateOnlyRepeat = dateOnlyRepeat
+)
+
+fun genScheduleTimingDateTimeType(
+    triggerAt: Instant = Clock.System.now(),
+    repeat: Repeat? = genRepeat()
+): ScheduleTiming.DateTime = ScheduleTiming.DateTime(
+    triggerAt = triggerAt,
     repeat = repeat
 )
 
