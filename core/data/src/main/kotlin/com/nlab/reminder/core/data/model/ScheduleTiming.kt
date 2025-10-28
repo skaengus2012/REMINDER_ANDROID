@@ -21,8 +21,16 @@ import kotlin.time.Instant
 /**
  * @author Doohyun
  */
-data class ScheduleTiming(
-    val triggerAt: Instant,
-    val isTriggerAtDateOnly: Boolean,
-    val repeat: Repeat?
-)
+sealed class ScheduleTiming {
+    abstract val triggerAt: Instant
+
+    data class Date(
+        override val triggerAt: Instant,
+        val dateOnlyRepeat: DateOnlyRepeat?
+    ) : ScheduleTiming()
+
+    data class DateTime(
+        override val triggerAt: Instant,
+        val repeat: Repeat?
+    ) : ScheduleTiming()
+}

@@ -24,18 +24,19 @@ import kotlinx.datetime.Month
 /**
  * @author Doohyun
  */
-sealed class Repeat {
-    data class Hourly(val interval: PositiveInt) : Repeat()
+sealed class Repeat
+sealed class DateOnlyRepeat : Repeat()
 
-    data class Daily(val interval: PositiveInt) : Repeat()
+data class HourlyRepeat(val interval: PositiveInt) : Repeat()
 
-    data class Weekly(val interval: PositiveInt, val daysOfWeeks: NonEmptySet<DayOfWeek>) : Repeat()
+data class DailyRepeat(val interval: PositiveInt) : DateOnlyRepeat()
 
-    data class Monthly(val interval: PositiveInt, val detail: MonthlyRepeatDetail) : Repeat()
+data class WeeklyRepeat(val interval: PositiveInt, val daysOfWeeks: NonEmptySet<DayOfWeek>) : DateOnlyRepeat()
 
-    data class Yearly(
-        val interval: PositiveInt,
-        val months: NonEmptySet<Month>,
-        val daysOfWeekOption: YearlyDaysOfWeekOption?
-    ) : Repeat()
-}
+data class MonthlyRepeat(val interval: PositiveInt, val detail: MonthlyRepeatDetail) : DateOnlyRepeat()
+
+data class YearlyRepeat(
+    val interval: PositiveInt,
+    val months: NonEmptySet<Month>,
+    val daysOfWeekOption: YearlyDaysOfWeekOption?
+) : DateOnlyRepeat()
