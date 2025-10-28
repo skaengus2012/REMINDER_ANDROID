@@ -37,7 +37,7 @@ sealed class ScheduleTimingDisplayResource {
     ) : ScheduleTimingDisplayResource()
 
     @ExcludeFromGeneratedTestReport
-    data class DateOnly(
+    data class Date(
         val triggerAt: LocalDate,
         val entryAt: LocalDateTime,
         val repeat: Repeat?
@@ -50,19 +50,23 @@ fun ScheduleTimingDisplayResource(
     entryAt: Instant,
 ): ScheduleTimingDisplayResource {
     val entryAtLocalDateTime = entryAt.toLocalDateTime(timeZone)
-    return if (scheduleTiming.isTriggerAtDateOnly) {
-        ScheduleTimingDisplayResource.DateOnly(
-            triggerAt = scheduleTiming.triggerAt
-                .toLocalDateTime(TimeZone.UTC)
-                .date,
-            entryAt = entryAtLocalDateTime,
-            repeat = scheduleTiming.repeat
-        )
-    } else {
-        ScheduleTimingDisplayResource.DateTime(
-            triggerAt = scheduleTiming.triggerAt.toLocalDateTime(timeZone),
-            entryAt = entryAtLocalDateTime,
-            repeat = scheduleTiming.repeat
-        )
+    return when (scheduleTiming) {
+        is ScheduleTiming.Date -> {
+            ScheduleTimingDisplayResource.Date(
+                triggerAt = scheduleTiming.triggerAt
+                    .toLocalDateTime(TimeZone.UTC)
+                    .date,
+                entryAt = entryAtLocalDateTime,
+                repeat = scheduleTiming.dateOnlyRepeat
+            )
+        }
+
+        is ScheduleTiming.DateTime -> {
+            ScheduleTimingDisplayResource.DateTime(
+                triggerAt = scheduleTiming.triggerAt.toLocalDateTime(timeZone),
+                entryAt = entryAtLocalDateTime,
+                repeat = scheduleTiming.repeat
+            )
+        }
     }
 }

@@ -59,7 +59,7 @@ class RepeatDisplayTextPrinter {
         val repeat: Repeat?
         val triggerAt: LocalDate
         when (scheduleTimingDisplayResource) {
-            is ScheduleTimingDisplayResource.DateOnly -> {
+            is ScheduleTimingDisplayResource.Date -> {
                 repeat = scheduleTimingDisplayResource.repeat
                 triggerAt = scheduleTimingDisplayResource.triggerAt
             }
