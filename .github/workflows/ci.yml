@@ -1,4 +1,4 @@
-name: Test CI (v4)
+name: Test CI (v5)
 
 on:
   push:
@@ -37,7 +37,7 @@ jobs:
             ./gradlew jacocoTestReportRelease
           fi
 
-      - name: Upload test report to codecov
+      - name: Upload coverage to codecov
         if: ${{ matrix.buildType == 'release' }}
         uses: codecov/codecov-action@v5
         with:
@@ -45,6 +45,12 @@ jobs:
           flags: unittests
           fail_ci_if_error: true
           directory: /home/runner/work/REMINDER_ANDROID/REMINDER_ANDROID/
+
+      - name: Upload test report to codecov
+        if: ${{ matrix.buildType == 'release' && !cancelled() }}
+        uses: codecov/test-results-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Send ci result to slack channel
         uses: 8398a7/action-slack@v3
