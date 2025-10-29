@@ -75,7 +75,7 @@ private fun createScheduleTimingOrNull(
         detailEntities = repeatDetailEntity
     )
     require(isTriggerAtDateOnly != null || repeat == null) {
-        "Repeat is defined without triggerAt: repeat=$repeat"
+        "Repeat is defined without isTriggerAtDateOnly: repeat=$repeat, isTriggerAtDateOnly=$isTriggerAtDateOnly"
     }
     return if (triggerAt == null) null else {
         if (isTriggerAtDateOnly!!) {
