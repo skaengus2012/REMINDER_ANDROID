@@ -2,6 +2,7 @@ package com.nlab.reminder.core.data.model
 
 import com.nlab.reminder.core.kotlin.collections.toSet
 import com.nlab.reminder.core.kotlin.faker.genNonNegativeLong
+import com.nlab.reminder.core.local.database.transaction.ScheduleRepeatAggregate
 import com.nlab.testkit.faker.genBlank
 import com.nlab.testkit.faker.genBoolean
 import com.nlab.testkit.faker.genLong
@@ -9,6 +10,7 @@ import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.nullValue
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
+import kotlin.time.Instant
 
 /**
  * @author Doohyun
@@ -139,27 +141,89 @@ class ScheduleTransformsKtTest {
         Schedule(entity)
     }
 
-    @Test
-    fun `Given trigger info without repeat, When creating Schedule, Then timing is set and repeat is null`() {
-        val entity = buildScheduleCompositeEntity {
+    @Test(expected = IllegalArgumentException::class)
+    fun `Given dateOnly with hourly repeat, When creating Schedule, Then throw exception`() {
+        val entity = buildScheduleCompositeEntity(
+            fixtureSource = genSchedule(
+                content = genScheduleContent(
+                    timing = genScheduleTimingDateTimeType(repeat = genHourlyRepeat())
+                )
+            )
+        ) {
             copy(
                 scheduleEntity = scheduleEntity.copy(
-                    repeatType = null,
-                    repeatInterval = null
+                    isTriggerAtDateOnly = true
                 ),
                 repeatDetailEntities = emptySet()
             )
         }
-        val actualSchedule = Schedule(entity)
+        Schedule(entity)
+    }
+
+    @Test
+    fun `Given triggerAt without repeat, When creating Schedule, Then timing is set and repeat is null`() {
+        fun whenCreatingScheduleWithTriggerOnly(
+            isTriggerAtDateOnly: Boolean,
+            block: (convertedTiming: ScheduleTiming, entityTiming: Instant?) -> Unit) {
+            val entity = buildScheduleCompositeEntity {
+                copy(
+                    scheduleEntity = scheduleEntity.copy(
+                        repeatType = null,
+                        repeatInterval = null,
+                        isTriggerAtDateOnly = isTriggerAtDateOnly
+                    ),
+                    repeatDetailEntities = emptySet()
+                )
+            }
+            val actualSchedule = Schedule(entity)
+            block(actualSchedule.content.timing!!, entity.scheduleEntity.triggerAt)
+        }
+
+        whenCreatingScheduleWithTriggerOnly(isTriggerAtDateOnly = true) { convertedTiming, entityTiming ->
+            convertedTiming as ScheduleTiming.Date
+            assertThat(
+                convertedTiming.triggerAt,
+                equalTo(entityTiming)
+            )
+            assertThat(
+                convertedTiming.dateOnlyRepeat,
+                nullValue()
+            )
+        }
+        whenCreatingScheduleWithTriggerOnly(isTriggerAtDateOnly = false) { convertedTiming, entityTiming ->
+            convertedTiming as ScheduleTiming.DateTime
+            assertThat(
+                convertedTiming.triggerAt,
+                equalTo(entityTiming)
+            )
+            assertThat(
+                convertedTiming.repeat,
+                nullValue()
+            )
+        }
+    }
+
+    @Test
+    fun `Given date time trigger without repeat, When creating Schedule, Then timing is set and repeat is null`() {
+        val entity = buildScheduleCompositeEntity {
+            copy(
+                scheduleEntity = scheduleEntity.copy(
+                    repeatType = null,
+                    repeatInterval = null,
+                    isTriggerAtDateOnly = false
+                ),
+                repeatDetailEntities = emptySet()
+            )
+        }
+        val actualScheduleTiming = Schedule(entity).content.timing as ScheduleTiming.DateTime
         assertThat(
-            actualSchedule.content.timing!!.triggerAt,
+            actualScheduleTiming.triggerAt,
             equalTo(entity.scheduleEntity.triggerAt)
         )
         assertThat(
-            actualSchedule.content.timing!!.isTriggerAtDateOnly,
-            equalTo(entity.scheduleEntity.isTriggerAtDateOnly)
+            actualScheduleTiming.repeat,
+            nullValue()
         )
-        assertThat(actualSchedule.content.timing!!.repeat, nullValue())
     }
 
     @Test(expected = IllegalArgumentException::class)
@@ -190,7 +254,7 @@ class ScheduleTransformsKtTest {
     fun `Given repeat details without type and interval, When creating Schedule, Then throws exception`() {
         val entity = buildScheduleCompositeEntity(
             fixtureSource = genSchedule(
-                content = genScheduleContent(timing = genScheduleTiming(repeat = genRepeatMonthly()))
+                content = genScheduleContent(timing = genScheduleTimingDateTimeType(repeat = genMonthlyRepeat()))
             )
         ) { copy(scheduleEntity = scheduleEntity.copy(repeatType = null, repeatInterval = null)) }
         Schedule(entity)
@@ -198,19 +262,37 @@ class ScheduleTransformsKtTest {
 
     @Test
     fun `Given ScheduleTiming, When converting to aggregate, Then all fields are correctly mapped`() {
-        val timing = genScheduleTiming()
-        val aggregate = timing.toAggregate()
-
-        assertThat(aggregate.triggerAt, equalTo(timing.triggerAt))
-        assertThat(aggregate.isTriggerAtDateOnly, equalTo(timing.isTriggerAtDateOnly))
-        assertThat(aggregate.repeat, equalTo(timing.repeat!!.toAggregate()))
+        fun <T : ScheduleTiming> verifyTimingToAggregate(
+            timing: T,
+            isTriggerAtDateOnly: Boolean,
+            transformToAggregate: (T) -> ScheduleRepeatAggregate
+        ) {
+            val aggregate = timing.toAggregate()
+            assertThat(aggregate.isTriggerAtDateOnly, equalTo(isTriggerAtDateOnly))
+            assertThat(aggregate.triggerAt, equalTo(timing.triggerAt))
+            assertThat(aggregate.repeat, equalTo(transformToAggregate(timing)))
+        }
+        verifyTimingToAggregate(
+            timing = genScheduleTimingDateType(),
+            isTriggerAtDateOnly = true,
+            transformToAggregate = { it.dateOnlyRepeat!!.toAggregate() }
+        )
+        verifyTimingToAggregate(
+            timing = genScheduleTimingDateTimeType(),
+            isTriggerAtDateOnly = false,
+            transformToAggregate = { it.repeat!!.toAggregate() }
+        )
     }
 
     @Test
     fun `Given ScheduleTiming without repeat, When converting to aggregate, Then repeatAggregate is null`() {
-        val timing = genScheduleTiming(repeat = null)
-        val aggregate = timing.toAggregate()
-        assertThat(aggregate.repeat, nullValue())
+        fun assertRepeatOfAggregateIsNull(timing: ScheduleTiming) {
+            val aggregate = timing.toAggregate()
+            assertThat(aggregate.repeat, nullValue())
+        }
+
+        assertRepeatOfAggregateIsNull(genScheduleTimingDateType(dateOnlyRepeat = null))
+        assertRepeatOfAggregateIsNull(genScheduleTimingDateTimeType(repeat = null))
     }
 
     @Test

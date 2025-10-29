@@ -18,8 +18,13 @@ package com.nlab.reminder.core.component.displayformat.ui
 
 import android.content.res.Resources
 import com.nlab.reminder.core.component.displayformat.ScheduleTimingDisplayResource
+import com.nlab.reminder.core.data.model.DailyRepeat
+import com.nlab.reminder.core.data.model.HourlyRepeat
+import com.nlab.reminder.core.data.model.MonthlyRepeat
 import com.nlab.reminder.core.data.model.MonthlyRepeatDetail
 import com.nlab.reminder.core.data.model.Repeat
+import com.nlab.reminder.core.data.model.WeeklyRepeat
+import com.nlab.reminder.core.data.model.YearlyRepeat
 import com.nlab.reminder.core.data.model.rawValue
 import kotlinx.datetime.LocalDate
 
@@ -64,30 +69,30 @@ fun repeatDisplayText(
     repeat: Repeat,
     triggerAt: LocalDate
 ): String = when (repeat) {
-    is Repeat.Hourly -> {
-        contentEveryHours(resources, repeat.interval)
+    is HourlyRepeat -> {
+        contentEveryHours(resources, interval = repeat.interval)
     }
 
-    is Repeat.Daily -> {
-        contentEveryDays(resources, repeat.interval)
+    is DailyRepeat -> {
+        contentEveryDays(resources, interval = repeat.interval)
     }
 
-    is Repeat.Weekly -> {
+    is WeeklyRepeat -> {
         contentEveryWeeks(
             resources,
-            repeat.interval,
-            repeat.daysOfWeeks,
+            interval = repeat.interval,
+            dayOfWeeks = repeat.daysOfWeeks,
             isSameDayOfWeek = repeat.daysOfWeeks.value.let { it.size == 1 && it.first() == triggerAt.dayOfWeek }
         )
     }
 
-    is Repeat.Monthly -> {
+    is MonthlyRepeat -> {
         when (val repeatDetail = repeat.detail) {
             is MonthlyRepeatDetail.Each -> {
                 contentEveryMonthsWithEachOption(
                     resources,
-                    repeat.interval,
-                    repeatDetail,
+                    interval = repeat.interval,
+                    option = repeatDetail,
                     isSameDay = repeatDetail.days.value.let {
                         it.size == 1 && it.first().rawValue == triggerAt.day
                     },
@@ -97,19 +102,19 @@ fun repeatDisplayText(
             is MonthlyRepeatDetail.Customize -> {
                 contentEveryMonthsWithCustomizeOption(
                     resources,
-                    repeat.interval,
-                    repeatDetail
+                    interval = repeat.interval,
+                    option = repeatDetail
                 )
             }
         }
     }
 
-    is Repeat.Yearly -> {
+    is YearlyRepeat -> {
         contentEveryYears(
             resources,
-            repeat.interval,
-            repeat.months,
-            repeat.daysOfWeekOption,
+            interval = repeat.interval,
+            months = repeat.months,
+            daysOfWeekOption = repeat.daysOfWeekOption,
             isSameMonth = repeat.months.value.let { it.size == 1 && it.first() == triggerAt.month },
         )
     }

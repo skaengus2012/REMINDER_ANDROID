@@ -146,7 +146,7 @@ internal class ScheduleTimingDisplayFormatter(
                     }
                     .orEmpty()
             }
-            is ScheduleTimingDisplayResource.DateOnly -> {
+            is ScheduleTimingDisplayResource.Date -> {
                 dateTimeDisplayText = dateTimeFormatPool
                     .getOrPut(
                         resources,
@@ -187,7 +187,7 @@ internal class ScheduleTimingDisplayFormatter(
             is ScheduleTimingDisplayResource.DateTime -> {
                 displayResource.triggerAt >= displayResource.entryAt
             }
-            is ScheduleTimingDisplayResource.DateOnly -> {
+            is ScheduleTimingDisplayResource.Date -> {
                 displayResource.triggerAt >= displayResource.entryAt.date
             }
         }
