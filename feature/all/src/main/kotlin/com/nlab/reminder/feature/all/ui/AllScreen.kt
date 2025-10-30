@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.nlab.reminder.core.androidx.compose.ui.DelayedContent
 import com.nlab.reminder.core.androidx.compose.ui.tooling.preview.Previews
 import com.nlab.reminder.core.component.schedulelist.content.UserScheduleListResource
@@ -39,6 +40,7 @@ import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
 import com.nlab.reminder.core.androidx.compose.runtime.IdentityList
 import com.nlab.reminder.core.androidx.compose.runtime.toIdentityList
 import com.nlab.reminder.core.translation.StringIds
+import com.nlab.reminder.feature.all.AllEnvironment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlin.time.Clock
@@ -52,7 +54,8 @@ internal fun AllScreen(
     enterTransitionTimeInMillis: Long,
     onBackClicked: () -> Unit,
     showAppToast: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    environment: AllEnvironment = hiltViewModel()
 ) {
     val entryAt = remember { Clock.System.now() }
     var itemSelectionEnabled by remember { mutableStateOf(false) }
