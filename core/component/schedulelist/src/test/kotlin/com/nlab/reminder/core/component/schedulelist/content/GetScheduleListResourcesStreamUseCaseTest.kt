@@ -90,6 +90,22 @@ class GetScheduleListResourcesStreamUseCaseTest {
     }
 
     @Test
+    fun `Given schedule without tags, When collect, Then emit resource with empty tags`() = runTest {
+        val schedule = genSchedule(
+            content = genScheduleContent(tagIds = emptySet())
+        )
+        val useCase = genGetScheduleListResourcesStreamUseCase()
+        useCase.invoke(schedulesStream = flowOf(listOf(schedule))).test {
+            val actualResources = awaitItem()
+            actualResources.forEachIndexed { index, resource ->
+                assertThat(resource.tags, equalTo(emptyList()))
+            }
+
+            awaitComplete()
+        }
+    }
+
+    @Test
     fun `Given schedules with links, When collect, Then emit resources with matching link metadata`() = runTest {
         val schedules = genSchedules()
         val links = schedules.mapNotNull { it.content.link }.toSet()
@@ -118,11 +134,7 @@ class GetScheduleListResourcesStreamUseCaseTest {
         val schedule = genSchedule(
             content = genScheduleContent(link = null)
         )
-        val useCase = genGetScheduleListResourcesStreamUseCase(
-            linkMetadataRepository = mockk {
-                every { getLinkToMetadataTableAsStream(any()) } returns flowOf(emptyMap())
-            }
-        )
+        val useCase = genGetScheduleListResourcesStreamUseCase()
         useCase.invoke(schedulesStream = flowOf(listOf(schedule))).test {
             val actualResource = awaitItem().first()
             assertThat(actualResource.linkMetadata, nullValue())
