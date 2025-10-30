@@ -16,13 +16,17 @@
 
 package com.nlab.reminder.feature.all
 
-import kotlin.time.Instant
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 /**
  * @author Thalys
  */
-internal sealed interface AllAction {
-    data class StateSynced(
-        val entryAt: Instant
-    ) : AllAction
+@Suppress("FunctionName")
+internal fun AllUiStateSyncedFlow(environment: AllEnvironment): Flow<AllAction.StateSynced> {
+    return environment.getCurrentTimeSnapshot().map { entryAt ->
+        AllAction.StateSynced(
+            entryAt = entryAt
+        )
+    }
 }
