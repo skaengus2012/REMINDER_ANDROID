@@ -79,6 +79,7 @@ class GetScheduleListResourcesStreamUseCaseTest {
             val actualResources = awaitItem()
             actualResources.forEachIndexed { index, resource ->
                 val expectedTags = schedules[index].content.tagIds
+                    // It's valid because it was named rawId,
                     .sortedBy { it.rawId }
                     .map { tagId -> tags.find { it.id == tagId } }
 
