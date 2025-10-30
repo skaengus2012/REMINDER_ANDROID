@@ -8,6 +8,7 @@ android {
 }
 
 dependencies {
+    implementation(projects.core.component.currenttime)
     implementation(projects.core.component.schedulelist)
     implementation(projects.core.dataDi)
 }
