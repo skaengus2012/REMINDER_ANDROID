@@ -44,7 +44,7 @@ class GetScheduleListResourcesStreamUseCaseTest {
     fun `Given schedules, When collect, Then emit resources with identical content mapping`() = runTest {
         val schedules = genSchedules()
         val useCase = genGetScheduleListResourcesStreamUseCase()
-        useCase.invoke(flowOf(schedules)).test {
+        useCase.invoke(schedulesStream = flowOf(schedules)).test {
             val actualResources = awaitItem()
             actualResources.forEachIndexed { index, resource ->
                 val schedule = schedules[index]
@@ -75,7 +75,7 @@ class GetScheduleListResourcesStreamUseCaseTest {
                 every { getTagsAsStream(GetTagQuery.ByIds(tagIds)) } returns flowOf(tags)
             }
         )
-        useCase.invoke(flowOf(schedules)).test {
+        useCase.invoke(schedulesStream = flowOf(schedules)).test {
             val actualResources = awaitItem()
             actualResources.forEachIndexed { index, resource ->
                 val expectedTags = schedules[index].content.tagIds
@@ -99,7 +99,7 @@ class GetScheduleListResourcesStreamUseCaseTest {
                 every { getLinkToMetadataTableAsStream(links) } returns flowOf(linkToMetadataTable)
             }
         )
-        useCase.invoke(flowOf(schedules)).test {
+        useCase.invoke(schedulesStream = flowOf(schedules)).test {
             val actualResources = awaitItem()
             actualResources.forEachIndexed { index, resource ->
                 val expectedMetadata = schedules[index]
@@ -123,7 +123,7 @@ class GetScheduleListResourcesStreamUseCaseTest {
                 every { getLinkToMetadataTableAsStream(any()) } returns flowOf(emptyMap())
             }
         )
-        useCase.invoke(flowOf(listOf(schedule))).test {
+        useCase.invoke(schedulesStream = flowOf(listOf(schedule))).test {
             val actualResource = awaitItem().first()
             assertThat(actualResource.linkMetadata, nullValue())
 

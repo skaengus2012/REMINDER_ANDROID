@@ -35,8 +35,8 @@ class GetScheduleListResourcesStreamUseCase(
     private val linkMetadataRepository: LinkMetadataRepository
 ) {
     operator fun invoke(
-        schedulesFlow: Flow<List<Schedule>>
-    ): Flow<List<ScheduleListResource>> = schedulesFlow.flatMapLatest { schedules ->
+        schedulesStream: Flow<List<Schedule>>
+    ): Flow<List<ScheduleListResource>> = schedulesStream.flatMapLatest { schedules ->
         val tagIds = mutableSetOf<TagId>()
         val links = mutableSetOf<Link>()
         schedules.forEach { schedule ->
