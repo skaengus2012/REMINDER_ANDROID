@@ -23,6 +23,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nlab.reminder.core.androidx.compose.ui.DelayedContent
 import com.nlab.reminder.core.androidx.compose.ui.tooling.preview.Previews
 import com.nlab.reminder.core.component.schedulelist.content.UserScheduleListResource
@@ -41,6 +42,13 @@ import com.nlab.reminder.core.androidx.compose.runtime.IdentityList
 import com.nlab.reminder.core.androidx.compose.runtime.toIdentityList
 import com.nlab.reminder.core.translation.StringIds
 import com.nlab.reminder.feature.all.AllEnvironment
+import com.nlab.reminder.feature.all.AllReduce
+import com.nlab.reminder.feature.all.AllUiState
+import com.nlab.reminder.feature.all.AllUiStateSyncedFlow
+import com.nlab.statekit.androidx.lifecycle.store.compose.retainedStore
+import com.nlab.statekit.bootstrap.DeliveryStarted
+import com.nlab.statekit.bootstrap.collectAsBootstrap
+import com.nlab.statekit.foundation.store.createStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlin.time.Clock
@@ -57,7 +65,16 @@ internal fun AllScreen(
     modifier: Modifier = Modifier,
     environment: AllEnvironment = hiltViewModel()
 ) {
-    val entryAt = remember { Clock.System.now() }
+    val store = retainedStore {
+        createStore(
+            initState = AllUiState.Loading,
+            reduce = AllReduce(environment),
+            bootstrap = AllUiStateSyncedFlow(environment).collectAsBootstrap(
+                started = DeliveryStarted.WhileSubscribed(stopTimeoutMillis = 5_000)
+            )
+        )
+    }
+    val uiState: AllUiState by store.state.collectAsStateWithLifecycle()
     var itemSelectionEnabled by remember { mutableStateOf(false) }
     var items: List<UserScheduleListResource> by remember {
         mutableStateOf(emptyList())
@@ -75,7 +92,7 @@ internal fun AllScreen(
         scheduleListResources = items.toIdentityList(),
         itemSelectionEnabled = itemSelectionEnabled,
         contentDelayTimeMillis = enterTransitionTimeInMillis,
-        entryAt = entryAt,
+        uiState = uiState,
         onBackClicked = onBackClicked,
         onMoreClicked = {
             // TODO implements
@@ -100,7 +117,7 @@ private fun AllScreen(
     scheduleListResources: IdentityList<UserScheduleListResource>,
     itemSelectionEnabled: Boolean,
     contentDelayTimeMillis: Long,
-    entryAt: Instant,
+    uiState: AllUiState,
     onBackClicked: () -> Unit,
     onMoreClicked: () -> Unit,
     onCompleteClicked: () -> Unit,
@@ -121,14 +138,21 @@ private fun AllScreen(
             onCompleteClicked = onCompleteClicked
         )
         DelayedContent(delayTimeMillis = contentDelayTimeMillis) {
-            AllScheduleListContent(
-                toolbarRenderState = toolbarRenderState,
-                scheduleListResources = scheduleListResources,
-                entryAt = entryAt,
-                itemSelectionEnabled = itemSelectionEnabled,
-                onSimpleAdd = onSimpleAdd,
-                onSimpleEdit = onSimpleEdit
-            )
+            when (uiState) {
+                is AllUiState.Loading -> {
+                    // todo make loading.
+                }
+                is AllUiState.Success -> {
+                    AllScheduleListContent(
+                        toolbarRenderState = toolbarRenderState,
+                        scheduleListResources = scheduleListResources,
+                        entryAt = uiState.entryAt,
+                        itemSelectionEnabled = itemSelectionEnabled,
+                        onSimpleAdd = onSimpleAdd,
+                        onSimpleEdit = onSimpleEdit
+                    )
+                }
+            }
         }
     }
 }
@@ -198,8 +222,10 @@ private fun AllScreenPreview() {
         AllScreen(
             scheduleListResources = IdentityList(),
             contentDelayTimeMillis = 0,
+            uiState = AllUiState.Success(
+                entryAt = Clock.System.now()
+            ),
             itemSelectionEnabled = true,
-            entryAt = Clock.System.now(),
             onBackClicked = {},
             onMoreClicked = {},
             onCompleteClicked = {},
