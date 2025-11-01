@@ -99,10 +99,8 @@ class GetScheduleListResourcesStreamUseCaseTest {
         )
         val useCase = genGetScheduleListResourcesStreamUseCase()
         useCase.invoke(schedulesStream = flowOf(listOf(schedule))).test {
-            val actualResources = awaitItem()
-            actualResources.forEachIndexed { index, resource ->
-                assertThat(resource.tags, equalTo(emptyList()))
-            }
+            val actualResource = awaitItem().first()
+            assertThat(actualResource.tags, equalTo(emptyList()))
 
             cancelAndIgnoreRemainingEvents()
         }
