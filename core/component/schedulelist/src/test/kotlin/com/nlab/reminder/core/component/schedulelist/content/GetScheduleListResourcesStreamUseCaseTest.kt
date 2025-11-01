@@ -29,6 +29,7 @@ import com.nlab.reminder.core.kotlin.collections.toSet
 import com.nlab.reminder.core.kotlin.toNonBlankString
 import io.mockk.every
 import io.mockk.mockk
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.equalTo
@@ -44,7 +45,8 @@ class GetScheduleListResourcesStreamUseCaseTest {
     fun `Given schedules, When collect, Then emit resources with identical content mapping`() = runTest {
         val schedules = genSchedules()
         val useCase = genGetScheduleListResourcesStreamUseCase()
-        useCase.invoke(schedulesStream = flowOf(schedules)).test {
+        val flow = MutableStateFlow(schedules)
+        useCase.invoke(schedulesStream = flow).test {
             val actualResources = awaitItem()
             actualResources.forEachIndexed { index, resource ->
                 val schedule = schedules[index]
@@ -56,7 +58,7 @@ class GetScheduleListResourcesStreamUseCaseTest {
                 assertThat(resource.isComplete, equalTo(schedule.isComplete))
             }
 
-            awaitComplete()
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -86,7 +88,7 @@ class GetScheduleListResourcesStreamUseCaseTest {
                 assertThat(resource.tags, equalTo(expectedTags))
             }
 
-            awaitComplete()
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -102,7 +104,7 @@ class GetScheduleListResourcesStreamUseCaseTest {
                 assertThat(resource.tags, equalTo(emptyList()))
             }
 
-            awaitComplete()
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -126,7 +128,7 @@ class GetScheduleListResourcesStreamUseCaseTest {
                 assertThat(resource.linkMetadata, equalTo(expectedMetadata))
             }
 
-            awaitComplete()
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -140,7 +142,7 @@ class GetScheduleListResourcesStreamUseCaseTest {
             val actualResource = awaitItem().first()
             assertThat(actualResource.linkMetadata, nullValue())
 
-            awaitComplete()
+            cancelAndIgnoreRemainingEvents()
         }
     }
 }
