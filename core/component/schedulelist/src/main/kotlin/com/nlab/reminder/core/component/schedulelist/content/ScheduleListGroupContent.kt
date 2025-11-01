@@ -17,9 +17,11 @@
 package com.nlab.reminder.core.component.schedulelist.content
 
 import androidx.compose.runtime.Immutable
+import com.nlab.reminder.core.annotation.ExcludeFromGeneratedTestReport
 
 /**
  * @author Thalys
  */
+@ExcludeFromGeneratedTestReport
 @Immutable
 data class ScheduleListGroupContent(val name: String)

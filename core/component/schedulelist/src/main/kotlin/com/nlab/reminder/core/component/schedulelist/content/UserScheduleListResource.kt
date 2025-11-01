@@ -16,9 +16,12 @@
 
 package com.nlab.reminder.core.component.schedulelist.content
 
+import com.nlab.reminder.core.annotation.ExcludeFromGeneratedTestReport
+
 /**
  * @author Thalys
  */
+@ExcludeFromGeneratedTestReport
 data class UserScheduleListResource(
     val schedule: ScheduleListResource,
 ) : ScheduleListObject

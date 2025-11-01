@@ -26,7 +26,6 @@ import com.nlab.reminder.core.data.model.ScheduleTiming
 import com.nlab.reminder.core.data.model.Tag
 import com.nlab.reminder.core.data.model.TagId
 import com.nlab.reminder.core.kotlin.toNonBlankString
-import com.nlab.reminder.core.kotlin.toNonNegativeLong
 import com.nlab.reminder.core.kotlin.toPositiveInt
 import com.nlab.reminder.core.kotlin.tryToNonBlankStringOrNull
 import kotlin.time.Clock
@@ -61,7 +60,6 @@ object FakeData {
                             triggerAt = Clock.System.now(),
                             repeat = HourlyRepeat(interval = 5.toPositiveInt())
                         ),
-                        defaultVisiblePriority = it.toNonNegativeLong(),
                         isComplete = false,
                         tags = listOf(
                             Tag(
