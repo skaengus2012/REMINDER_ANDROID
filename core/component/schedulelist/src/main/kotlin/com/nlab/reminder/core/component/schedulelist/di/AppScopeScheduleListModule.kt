@@ -37,7 +37,7 @@ internal object AppScopeScheduleListModule {
         tagRepository: TagRepository,
         linkMetadataRepository: LinkMetadataRepository
     ): GetScheduleListResourcesStreamUseCase = GetScheduleListResourcesStreamUseCase(
-        tagRepository,
-        linkMetadataRepository
+        tagRepository = tagRepository,
+        linkMetadataRepository = linkMetadataRepository
     )
 }
