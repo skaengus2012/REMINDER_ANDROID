@@ -17,72 +17,69 @@
 package com.nlab.reminder.core.component.schedulelist.content.ui
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.Stable
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
+import androidx.compose.runtime.produceState
 import com.nlab.reminder.core.component.schedulelist.content.ScheduleListElement
-import com.nlab.reminder.core.androidx.compose.runtime.IdentityList
-import com.nlab.reminder.core.androidx.compose.runtime.toIdentityList
+import com.nlab.reminder.core.kotlin.collections.toIdentityList
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.distinctUntilChangedBy
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 
 /**
  * @author Doohyun
  */
-@Stable
-class ScheduleListItemAdaptableState internal constructor() {
-    internal var value: IdentityList<ScheduleListItem> by mutableStateOf(IdentityList())
+@Immutable
+sealed class ScheduleListItemsAdaptation {
+    internal data object Absent : ScheduleListItemsAdaptation()
+    internal data class Exist(val items: List<ScheduleListItem>) : ScheduleListItemsAdaptation()
 }
 
 @Composable
-fun <T : ScheduleListElement> rememberScheduleListItemAdaptableState(
+fun <T : ScheduleListElement> rememberScheduleListItemsAdaptationState(
     headline: String,
-    elements: IdentityList<T>,
-    buildBodyItems: (List<T>) -> List<ScheduleListItem>,
-    onEmpty: () -> List<ScheduleListItem> = { emptyList() },
-): ScheduleListItemAdaptableState {
-    val headlineState = rememberUpdatedState(headline)
-    val elementsState = rememberUpdatedState(elements)
-    val buildBodyItemsState = rememberUpdatedState(buildBodyItems)
-    val result = remember { ScheduleListItemAdaptableState() }
-    LaunchedEffect(Unit) {
-        combine(
-            snapshotFlow { headlineState.value }
-                .distinctUntilChanged()
-                .map(ScheduleListItem::Headline),
-            snapshotFlow { elementsState.value }
-                .distinctUntilChangedBy { it.value }
-                .combine(snapshotFlow { buildBodyItemsState.value }) { elementsValue, buildBodyItemsValue ->
-                    val isElementEmpty = elementsValue.value.isEmpty()
-                    BodyItemTransformResult(
-                        isElementEmpty = isElementEmpty,
-                        items = if (isElementEmpty) onEmpty() else buildBodyItemsValue(elementsValue.value)
-                    )
-                }
-        ) { headlineItem, bodyItemTransformResult ->
-            val newItems = if (bodyItemTransformResult.isElementEmpty) {
-                bodyItemTransformResult.items
-            } else buildList {
-                add(headlineItem)
-                add(ScheduleListItem.HeadlinePadding)
-                addAll(bodyItemTransformResult.items)
-            }
-            newItems.toIdentityList()
-        }.flowOn(Dispatchers.Default).collect { result.value = it }
+    elements: List<T>,
+    buildBodyItemsIfNotEmpty: (List<T>) -> List<ScheduleListItem>,
+): State<ScheduleListItemsAdaptation> {
+    val headlineItem by produceState<ScheduleListItem.Headline?>(
+        initialValue = null,
+        key1 = headline
+    ) { value = ScheduleListItem.Headline(text = headline) }
+    val bodyItems by produceState<List<ScheduleListItem>?>(
+        initialValue = null,
+        key1 = elements,
+        key2 = buildBodyItemsIfNotEmpty
+    ) {
+        value = if (elements.isEmpty()) {
+            emptyList()
+        } else {
+            withContext(Dispatchers.Default) { buildBodyItemsIfNotEmpty(elements) }
+        }
     }
-    return result
-}
+    return produceState<ScheduleListItemsAdaptation>(
+        initialValue = ScheduleListItemsAdaptation.Absent,
+        key1 = headlineItem,
+        key2 = bodyItems
+    ) {
+        val currentHeadlineItem = headlineItem
+        val currentBodyItems = bodyItems
+        if (currentHeadlineItem == null || currentBodyItems == null) {
+            value = ScheduleListItemsAdaptation.Absent
+            return@produceState
+        }
+        value = withContext(Dispatchers.Default) {
+            val totalItems = buildList {
+                // add headline
+                add(currentHeadlineItem)
+                add(ScheduleListItem.HeadlinePadding)
 
-private data class BodyItemTransformResult(
-    val isElementEmpty: Boolean,
-    val items: List<ScheduleListItem>
-)
+                if (currentBodyItems.isEmpty()) {
+                    // TODO add empty ui
+                } else {
+                    addAll(currentBodyItems)
+                }
+            }
+            ScheduleListItemsAdaptation.Exist(items = totalItems.toIdentityList())
+        }
+    }
+}

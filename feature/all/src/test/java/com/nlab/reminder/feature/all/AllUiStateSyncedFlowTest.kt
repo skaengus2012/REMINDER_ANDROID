@@ -16,15 +16,11 @@
 
 package com.nlab.reminder.feature.all
 
-import com.nlab.reminder.core.component.schedulelist.content.UserScheduleListResource
-import kotlin.time.Instant
+import org.junit.Assert.*
 
 /**
- * @author Thalys
+ * @author Doohyun
  */
-internal sealed interface AllAction {
-    data class StateSynced(
-        val entryAt: Instant,
-        val scheduleResources: List<UserScheduleListResource>
-    ) : AllAction
+class AllUiStateSyncedFlowTest {
+
 }
