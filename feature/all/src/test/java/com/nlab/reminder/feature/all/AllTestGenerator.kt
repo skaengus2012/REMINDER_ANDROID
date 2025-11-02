@@ -16,15 +16,13 @@
 
 package com.nlab.reminder.feature.all
 
-import com.nlab.reminder.core.component.schedulelist.content.UserScheduleListResource
-import kotlin.time.Instant
+import com.nlab.reminder.core.data.repository.ScheduleRepository
+import io.mockk.mockk
 
 /**
- * @author Thalys
+ * @author Doohyun
  */
-internal sealed interface AllAction {
-    data class StateSynced(
-        val entryAt: Instant,
-        val scheduleResources: List<UserScheduleListResource>
-    ) : AllAction
-}
+internal fun genAllEnvironment(
+    scheduleRepository: ScheduleRepository = mockk(),
+
+): AllEnvironment =

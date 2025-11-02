@@ -16,6 +16,7 @@
 
 package com.nlab.reminder.feature.all
 
+import com.nlab.reminder.core.component.schedulelist.content.UserScheduleListResource
 import kotlin.time.Instant
 
 /**
@@ -23,7 +24,10 @@ import kotlin.time.Instant
  */
 internal sealed class AllUiState {
     data object Loading : AllUiState()
+
     data class Success(
-        val entryAt: Instant
+        val entryAt: Instant,
+        val scheduleListResources: List<UserScheduleListResource>,
+        val multiSelectionEnabled: Boolean,
     ) : AllUiState()
 }

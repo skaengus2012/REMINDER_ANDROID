@@ -55,13 +55,13 @@ import com.nlab.reminder.core.translation.StringIds
 @Composable
 fun ScheduleListToolbar(
     title: String,
+    toolbarState: ScheduleListToolbarState,
     isMoreVisible: Boolean,
     isCompleteVisible: Boolean,
     onBackClicked: () -> Unit,
     onMenuClicked: () -> Unit,
     onCompleteClicked: () -> Unit,
     modifier: Modifier = Modifier,
-    renderState: ScheduleListToolbarRenderState = rememberScheduleListToolbarRenderState()
 ) {
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -72,7 +72,7 @@ fun ScheduleListToolbar(
     Box(modifier) {
         HeadBlurLayer(
             modifier = Modifier.matchParentSize(),
-            alpha = renderState.backgroundAlpha,
+            alpha = toolbarState.backgroundAlpha,
             containerColor = PlaneatTheme.colors.bg2Layer,
         )
         ScheduleListToolbarContent(
@@ -82,7 +82,7 @@ fun ScheduleListToolbar(
                 .displayCutoutPadding()
                 .toolbarHeight(),
             title = title,
-            isTitleVisible = renderState.titleVisible,
+            isTitleVisible = toolbarState.titleVisible,
             isMoreVisible = isMoreVisible,
             isCompleteVisible = isCompleteVisible,
             onBackClicked = {
@@ -192,13 +192,14 @@ private fun ScheduleListToolbarPreview() {
     PlaneatTheme {
         Box(modifier = Modifier.background(PlaneatTheme.colors.bg1)) {
             ScheduleListToolbar(
+                modifier = Modifier.fillMaxWidth(),
                 title = "Today",
+                toolbarState = rememberScheduleListToolbarState(),
                 isMoreVisible = true,
                 isCompleteVisible = true,
                 onBackClicked = {},
                 onMenuClicked = {},
-                onCompleteClicked = {},
-                modifier = Modifier.fillMaxWidth()
+                onCompleteClicked = {}
             )
         }
     }
@@ -210,17 +211,17 @@ private fun ScheduleListToolbarWithTitlePreview() {
     PlaneatTheme {
         Box(modifier = Modifier.background(PlaneatTheme.colors.bg1)) {
             ScheduleListToolbar(
+                modifier = Modifier.fillMaxWidth(),
                 title = "Today",
+                toolbarState = rememberScheduleListToolbarState(
+                    initialTitleVisible = true,
+                    initialBackgroundAlpha = 1f
+                ),
                 isMoreVisible = true,
                 isCompleteVisible = true,
                 onBackClicked = {},
                 onMenuClicked = {},
-                onCompleteClicked = {},
-                modifier = Modifier.fillMaxWidth(),
-                renderState = rememberScheduleListToolbarRenderState(
-                    initialTitleVisible = true,
-                    initialBackgroundAlpha = 1f
-                )
+                onCompleteClicked = {}
             )
         }
     }
