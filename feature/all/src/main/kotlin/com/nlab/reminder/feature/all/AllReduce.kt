@@ -18,6 +18,8 @@ package com.nlab.reminder.feature.all
 
 import com.nlab.statekit.dsl.reduce.DslReduce
 import com.nlab.statekit.reduce.Reduce
+import com.nlab.reminder.feature.all.AllAction.*
+import com.nlab.reminder.feature.all.AllUiState.*
 
 internal typealias AllReduce = Reduce<AllAction, AllUiState>
 
@@ -25,5 +27,19 @@ internal typealias AllReduce = Reduce<AllAction, AllUiState>
  * @author Thalys
  */
 internal fun AllReduce(environment: AllEnvironment): AllReduce = DslReduce {
-
+    actionScope<StateSynced> {
+        transition<Loading> {
+            Success(
+                scheduleListResources = action.scheduleResources,
+                entryAt = action.entryAt,
+                multiSelectionEnabled = false
+            )
+        }
+        transition<Success> {
+            current.copy(
+                scheduleListResources = action.scheduleResources,
+                entryAt = action.entryAt
+            )
+        }
+    }
 }
