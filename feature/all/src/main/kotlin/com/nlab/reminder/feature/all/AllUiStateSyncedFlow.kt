@@ -16,17 +16,27 @@
 
 package com.nlab.reminder.feature.all
 
+import com.nlab.reminder.core.component.schedulelist.content.UserScheduleListResource
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 
 /**
  * @author Thalys
  */
 @Suppress("FunctionName")
-internal fun AllUiStateSyncedFlow(environment: AllEnvironment): Flow<AllAction.StateSynced> {
-    return environment.getCurrentTimeSnapshot().map { entryAt ->
+internal fun AllUiStateSyncedFlow(
+    environment: AllEnvironment
+): Flow<AllAction.StateSynced> = with(environment) {
+    combine(
+        getCurrentTimeSnapshot(),
+        getScheduleListResourcesStream().map { scheduleListResources ->
+            scheduleListResources.map { UserScheduleListResource(it) }
+        }
+    ) { entryAt, schedulesResources ->
         AllAction.StateSynced(
-            entryAt = entryAt
+            entryAt = entryAt,
+            scheduleResources = schedulesResources
         )
     }
 }

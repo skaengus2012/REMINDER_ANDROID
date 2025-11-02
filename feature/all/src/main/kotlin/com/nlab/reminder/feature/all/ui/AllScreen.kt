@@ -33,13 +33,14 @@ import com.nlab.reminder.core.component.schedulelist.content.ui.ScheduleListItem
 import com.nlab.reminder.core.component.schedulelist.content.ui.ScheduleListTheme
 import com.nlab.reminder.core.component.schedulelist.content.ui.SimpleAdd
 import com.nlab.reminder.core.component.schedulelist.content.ui.SimpleEdit
-import com.nlab.reminder.core.component.schedulelist.content.ui.rememberScheduleListItemAdaptableState
+import com.nlab.reminder.core.component.schedulelist.content.ui.rememberScheduleListItemsAdaptationState
 import com.nlab.reminder.core.component.schedulelist.toolbar.ui.ScheduleListToolbar
-import com.nlab.reminder.core.component.schedulelist.toolbar.ui.ScheduleListToolbarRenderState
-import com.nlab.reminder.core.component.schedulelist.toolbar.ui.rememberScheduleListToolbarRenderState
+import com.nlab.reminder.core.component.schedulelist.toolbar.ui.ScheduleListToolbarState
+import com.nlab.reminder.core.component.schedulelist.toolbar.ui.rememberScheduleListToolbarState
 import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
-import com.nlab.reminder.core.androidx.compose.runtime.IdentityList
-import com.nlab.reminder.core.androidx.compose.runtime.toIdentityList
+import com.nlab.reminder.core.kotlin.collections.IdentityList
+import com.nlab.reminder.core.androidx.compose.runtime.rememberAccumulatedStateStream
+import com.nlab.reminder.core.kotlin.collections.toIdentityList
 import com.nlab.reminder.core.translation.StringIds
 import com.nlab.reminder.feature.all.AllEnvironment
 import com.nlab.reminder.feature.all.AllReduce
@@ -49,9 +50,6 @@ import com.nlab.statekit.androidx.lifecycle.store.compose.retainedStore
 import com.nlab.statekit.bootstrap.DeliveryStarted
 import com.nlab.statekit.bootstrap.collectAsBootstrap
 import com.nlab.statekit.foundation.store.createStore
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import kotlin.time.Clock
 import kotlin.time.Instant
 
 /**
@@ -74,29 +72,22 @@ internal fun AllScreen(
             )
         )
     }
-    val uiState: AllUiState by store.state.collectAsStateWithLifecycle()
-    var itemSelectionEnabled by remember { mutableStateOf(false) }
-    var items: List<UserScheduleListResource> by remember {
-        mutableStateOf(emptyList())
-    }
-
-    LaunchedEffect(Unit) {
-        val newItems = withContext(Dispatchers.Default) {
-            FakeData.testItems
-        }
-        items = newItems
-    }
-
+    val uiState by store.state
+        .rememberAccumulatedStateStream(
+            accumulator = { prev, next ->
+                if (prev !is AllUiState.Success || next !is AllUiState.Success) convertToOptimizedState(uiState = next)
+                else reuseScheduleListIfUnchanged(prev = prev, next = next)
+            },
+            initialValueTransform = ::convertToOptimizedState
+        )
+        .collectAsStateWithLifecycle()
     AllScreen(
         modifier = modifier,
-        scheduleListResources = items.toIdentityList(),
-        itemSelectionEnabled = itemSelectionEnabled,
-        contentDelayTimeMillis = enterTransitionTimeInMillis,
         uiState = uiState,
+        contentDelayTimeMillis = enterTransitionTimeInMillis,
         onBackClicked = onBackClicked,
         onMoreClicked = {
             // TODO implements
-            itemSelectionEnabled = itemSelectionEnabled.not()
         },
         onCompleteClicked = {
             // TODO implements
@@ -112,29 +103,45 @@ internal fun AllScreen(
     )
 }
 
+private fun convertToOptimizedState(uiState: AllUiState): AllUiState =
+    if (uiState !is AllUiState.Success) uiState
+    else uiState.copy(scheduleListResources = uiState.scheduleListResources.toIdentityList())
+
+private fun reuseScheduleListIfUnchanged(prev: AllUiState.Success, next: AllUiState.Success): AllUiState {
+    if (prev.scheduleListResources !is IdentityList
+        || prev.scheduleListResources.value != next.scheduleListResources
+    ) {
+        return convertToOptimizedState(uiState = next)
+    }
+    return next.copy(scheduleListResources = prev.scheduleListResources)
+}
+
 @Composable
 private fun AllScreen(
-    scheduleListResources: IdentityList<UserScheduleListResource>,
-    itemSelectionEnabled: Boolean,
-    contentDelayTimeMillis: Long,
     uiState: AllUiState,
+    contentDelayTimeMillis: Long,
     onBackClicked: () -> Unit,
     onMoreClicked: () -> Unit,
     onCompleteClicked: () -> Unit,
     onSimpleAdd: (SimpleAdd) -> Unit,
     onSimpleEdit: (SimpleEdit) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier
             .background(color = PlaneatTheme.colors.bg2)
             .fillMaxSize()
     ) {
-        val toolbarRenderState = rememberScheduleListToolbarRenderState()
-        AllScheduleListToolbar(
-            toolbarRenderState = toolbarRenderState,
+        val title = stringResource(StringIds.label_all)
+        val toolbarState = rememberScheduleListToolbarState()
+        ScheduleListToolbar(
+            modifier = modifier,
+            title = title,
+            toolbarState = toolbarState,
+            isMoreVisible = true,
+            isCompleteVisible = true,
             onBackClicked = onBackClicked,
-            onMoreClicked = onMoreClicked,
+            onMenuClicked = onMoreClicked,
             onCompleteClicked = onCompleteClicked
         )
         DelayedContent(delayTimeMillis = contentDelayTimeMillis) {
@@ -142,12 +149,14 @@ private fun AllScreen(
                 is AllUiState.Loading -> {
                     // todo make loading.
                 }
+
                 is AllUiState.Success -> {
                     AllScheduleListContent(
-                        toolbarRenderState = toolbarRenderState,
-                        scheduleListResources = scheduleListResources,
+                        headline = title,
                         entryAt = uiState.entryAt,
-                        itemSelectionEnabled = itemSelectionEnabled,
+                        scheduleListResources = uiState.scheduleListResources,
+                        multiSelectionEnabled = uiState.multiSelectionEnabled,
+                        toolbarState = toolbarState,
                         onSimpleAdd = onSimpleAdd,
                         onSimpleEdit = onSimpleEdit
                     )
@@ -158,58 +167,40 @@ private fun AllScreen(
 }
 
 @Composable
-private fun AllScheduleListToolbar(
-    toolbarRenderState: ScheduleListToolbarRenderState,
-    onBackClicked: () -> Unit,
-    onMoreClicked: () -> Unit,
-    onCompleteClicked: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    ScheduleListToolbar(
-        modifier = modifier,
-        renderState = toolbarRenderState,
-        title = stringResource(StringIds.label_all),
-        isMoreVisible = true,
-        isCompleteVisible = true,
-        onBackClicked = onBackClicked,
-        onMenuClicked = onMoreClicked,
-        onCompleteClicked = onCompleteClicked
-    )
-}
-
-@Composable
 private fun AllScheduleListContent(
-    toolbarRenderState: ScheduleListToolbarRenderState,
-    scheduleListResources: IdentityList<UserScheduleListResource>,
+    headline: String,
     entryAt: Instant,
-    itemSelectionEnabled: Boolean,
+    scheduleListResources: List<UserScheduleListResource>,
+    multiSelectionEnabled: Boolean,
+    toolbarState: ScheduleListToolbarState,
     onSimpleAdd: (SimpleAdd) -> Unit,
     onSimpleEdit: (SimpleEdit) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val footerForm = remember { ScheduleListItem.FooterForm(formBottomLine = FormBottomLine.Type1) }
+    val scheduleListItemsAdaptation by rememberScheduleListItemsAdaptationState(
+        headline = headline,
+        elements = scheduleListResources,
+        buildBodyItemsIfNotEmpty = { elements ->
+            buildList {
+                elements.forEach { resource ->
+                    this += ScheduleListItem.Content(
+                        resource = resource,
+                        isLineVisible = true
+                    )
+                }
+                this += footerForm
+            }
+        }
+    )
     ScheduleListContent(
         modifier = modifier,
-        itemState = rememberScheduleListItemAdaptableState(
-            headline = stringResource(StringIds.label_all),
-            elements = scheduleListResources,
-            buildBodyItems = { elements ->
-                buildList {
-                    elements.forEach { resource ->
-                        this += ScheduleListItem.Content(
-                            resource = resource,
-                            isLineVisible = true
-                        )
-                    }
-                    this += footerForm
-                }
-            }
-        ),
-        toolbarRenderState = toolbarRenderState,
+        scheduleListItemsAdaptation = scheduleListItemsAdaptation,
         entryAt = entryAt,
-        itemSelectionEnabled = itemSelectionEnabled,
+        multiSelectionEnabled = multiSelectionEnabled,
         triggerAtFormatPatterns = remember { AllScheduleTriggerAtFormatPatterns() },
         theme = ScheduleListTheme.Point3,
+        toolbarState = toolbarState,
         onSimpleAdd = onSimpleAdd,
         onSimpleEdit = onSimpleEdit,
     )
@@ -220,12 +211,8 @@ private fun AllScheduleListContent(
 private fun AllScreenPreview() {
     PlaneatTheme {
         AllScreen(
-            scheduleListResources = IdentityList(),
             contentDelayTimeMillis = 0,
-            uiState = AllUiState.Success(
-                entryAt = Clock.System.now()
-            ),
-            itemSelectionEnabled = true,
+            uiState = AllUiState.Loading,
             onBackClicked = {},
             onMoreClicked = {},
             onCompleteClicked = {},
