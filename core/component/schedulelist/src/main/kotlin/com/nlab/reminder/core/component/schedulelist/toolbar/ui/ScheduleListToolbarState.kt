@@ -29,10 +29,16 @@ import androidx.compose.runtime.setValue
  * @author Thalys
  */
 @Stable
-class ScheduleListToolbarRenderState(
+class ScheduleListToolbarState(
     initialTitleVisible: Boolean,
     initialBackgroundAlpha: Float
 ) {
+    init {
+        require(initialBackgroundAlpha in 0f..1f) {
+            "backgroundAlpha must be between 0 and 1, but was $initialBackgroundAlpha"
+        }
+    }
+
     var titleVisible: Boolean by mutableStateOf(initialTitleVisible)
         internal set
 
@@ -42,9 +48,9 @@ class ScheduleListToolbarRenderState(
 }
 
 @Composable
-fun rememberScheduleListToolbarRenderState(
+fun rememberScheduleListToolbarState(
     initialTitleVisible: Boolean = false,
     @FloatRange(from = 0.0, to = 1.0) initialBackgroundAlpha: Float = 0f
-): ScheduleListToolbarRenderState {
-    return remember { ScheduleListToolbarRenderState(initialTitleVisible, initialBackgroundAlpha) }
+): ScheduleListToolbarState = remember {
+    ScheduleListToolbarState(initialTitleVisible, initialBackgroundAlpha)
 }

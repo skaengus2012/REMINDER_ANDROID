@@ -33,7 +33,6 @@ import com.nlab.reminder.core.android.view.awaitPost
 import com.nlab.reminder.core.android.view.inputmethod.hideSoftInputFromWindow
 import com.nlab.reminder.core.android.view.setVisible
 import com.nlab.reminder.core.android.view.touches
-import com.nlab.reminder.core.androidx.compose.runtime.IdentityList
 import com.nlab.reminder.core.androidx.fragment.viewLifecycle
 import com.nlab.reminder.core.androidx.fragment.viewLifecycleScope
 import com.nlab.reminder.core.androix.recyclerview.itemTouches
@@ -42,12 +41,13 @@ import com.nlab.reminder.core.androix.recyclerview.scrollState
 import com.nlab.reminder.core.androix.recyclerview.stickyheader.StickyHeaderHelper
 import com.nlab.reminder.core.androix.recyclerview.verticalScrollRange
 import com.nlab.reminder.core.component.schedulelist.databinding.FragmentScheduleListBinding
-import com.nlab.reminder.core.component.schedulelist.toolbar.ui.ScheduleListToolbarRenderState
+import com.nlab.reminder.core.component.schedulelist.toolbar.ui.ScheduleListToolbarState
 import com.nlab.reminder.core.data.model.ScheduleId
 import com.nlab.reminder.core.kotlinx.coroutines.flow.map
 import com.nlab.reminder.core.kotlinx.coroutines.flow.withPrev
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.collectLatest
@@ -55,8 +55,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.mapNotNull
@@ -79,15 +77,15 @@ internal class ScheduleListFragment : Fragment() {
     private var _binding: FragmentScheduleListBinding? = null
     private val binding: FragmentScheduleListBinding get() = checkNotNull(_binding)
 
-    private val scheduleListItemsState = MutableStateFlow<IdentityList<ScheduleListItem>>(IdentityList())
-    private val itemSelectionEnabledState = MutableStateFlow<Boolean?>(null)
-    private val triggerAtFormatPatternsState = MutableStateFlow<TriggerAtFormatPatterns?>(null)
-    private val themeState = MutableStateFlow<ScheduleListTheme?>(null)
-    private val timeZoneState = MutableStateFlow<TimeZone?>(null)
-    private val entryAtState = MutableStateFlow<Instant?>(null)
-    private val toolbarRenderValuesState = MutableStateFlow<ScheduleListToolbarRenderState?>(null)
-    private val simpleAddCommandObserverState = MutableStateFlow<((SimpleAdd) -> Unit)?>(null)
-    private val simpleEditCommandObserverState = MutableStateFlow<((SimpleEdit) -> Unit)?>(null)
+    private val scheduleListItemsAdaptationStream = mutableLatestEventFlow<ScheduleListItemsAdaptation>()
+    private val multiSelectionEnabledStream = mutableLatestEventFlow<Boolean>()
+    private val triggerAtFormatPatternsStream = mutableLatestEventFlow<TriggerAtFormatPatterns>()
+    private val themeStream = mutableLatestEventFlow<ScheduleListTheme>()
+    private val timeZoneStream = mutableLatestEventFlow<TimeZone>()
+    private val entryAtStream = mutableLatestEventFlow<Instant>()
+    private val toolbarStateStream = mutableLatestEventFlow<ScheduleListToolbarState?>()
+    private val simpleAddCommandObserverStream = mutableLatestEventFlow<(SimpleAdd) -> Unit>()
+    private val simpleEditCommandObserverStream = mutableLatestEventFlow<(SimpleEdit) -> Unit>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -201,11 +199,11 @@ internal class ScheduleListFragment : Fragment() {
             .stateIn(scope = viewLifecycleScope, started = SharingStarted.Eagerly, initialValue = null)
         viewLifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                toolbarRenderValuesState.collectLatest { toolbarRenderState ->
-                    if (toolbarRenderState == null) return@collectLatest
+                toolbarStateStream.collectLatest { toolbarState ->
+                    if (toolbarState == null) return@collectLatest
                     toolbarVisibilityState.collect { titleVisible ->
                         if (titleVisible != null) {
-                            toolbarRenderState.titleVisible = titleVisible
+                            toolbarState.titleVisible = titleVisible
                         }
                     }
                 }
@@ -231,11 +229,11 @@ internal class ScheduleListFragment : Fragment() {
         }.stateIn(scope = viewLifecycleScope, started = SharingStarted.Eagerly, null)
         viewLifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                toolbarRenderValuesState.collectLatest { toolbarRenderState ->
-                    if (toolbarRenderState == null) return@collectLatest
+                toolbarStateStream.collectLatest { toolbarValues ->
+                    if (toolbarValues == null) return@collectLatest
                     toolbarBackgroundAlphaState.collect { backgroundAlpha ->
                         if (backgroundAlpha != null) {
-                            toolbarRenderState.backgroundAlpha = backgroundAlpha
+                            toolbarValues.backgroundAlpha = backgroundAlpha
                         }
                     }
                 }
@@ -248,7 +246,7 @@ internal class ScheduleListFragment : Fragment() {
             .launchIn(viewLifecycleScope)
         viewLifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                simpleAddCommandObserverState.filterNotNull().collectLatest { observer ->
+                simpleAddCommandObserverStream.collectLatest { observer ->
                     simpleAddCommandsState.collect { simpleAdds ->
                         val command = simpleAdds.firstOrNull()
                         if (command != null) {
@@ -267,7 +265,7 @@ internal class ScheduleListFragment : Fragment() {
             .launchIn(viewLifecycleScope)
         viewLifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                simpleEditCommandObserverState.filterNotNull().collectLatest { observer ->
+                simpleEditCommandObserverStream.collectLatest { observer ->
                     simpleEditCommandState.collect { simpleEdits ->
                         val command = simpleEdits.firstOrNull()
                         if (command != null) {
@@ -290,9 +288,8 @@ internal class ScheduleListFragment : Fragment() {
 
         merge(
             recyclerViewItemTouches,
-            itemSelectionEnabledState
-                .filter { enabled -> enabled == true }
-                .distinctUntilChanged()
+            multiSelectionEnabledStream
+                .filter { enabled -> enabled }
                 .flowWithLifecycle(viewLifecycle),
             scrollStates
                 .distinctUntilChanged()
@@ -303,9 +300,7 @@ internal class ScheduleListFragment : Fragment() {
         ).onEach { itemTouchCallback.removeSwipeClamp(binding.recyclerviewSchedule) }
             .launchIn(viewLifecycleScope)
 
-        itemSelectionEnabledState
-            .filterNotNull()
-            .distinctUntilChanged()
+        multiSelectionEnabledStream
             .flowWithLifecycle(viewLifecycle)
             .onEach { enabled ->
                 scheduleListAdapter.setSelectionEnabled(enabled)
@@ -384,16 +379,28 @@ internal class ScheduleListFragment : Fragment() {
             .onEach { isVisible -> scheduleListDragAnchorOverlay.setVisible(isVisible) }
             .launchIn(viewLifecycleScope)
 
-        scheduleListItemsState
-            .map { it.value }
-            .distinctUntilChanged()
-            .flowOn(Dispatchers.Default)
-            .conflate()
+        scheduleListItemsAdaptationStream
             .flowWithLifecycle(viewLifecycle)
-            .onEach { items ->
+            .onEach { adaptation ->
+                val recyclerViewVisible: Boolean
+                val newItems: List<ScheduleListItem>
+                when (adaptation) {
+                    is ScheduleListItemsAdaptation.Absent -> {
+                        recyclerViewVisible = false
+                        newItems = emptyList()
+                    }
+                    is ScheduleListItemsAdaptation.Exist -> {
+                        recyclerViewVisible = true
+                        newItems = adaptation.items
+                    }
+                }
+                binding.recyclerviewSchedule.setVisible(
+                    isVisible = recyclerViewVisible,
+                    goneIfNotVisible = false
+                )
                 // For the conflate effect, wait to make it into a suspend function
                 suspendCancellableCoroutine { cons ->
-                    scheduleListAdapter.submitList(items = items) {
+                    scheduleListAdapter.submitList(items = newItems) {
                         cons.resume(Unit)
                     }
                 }
@@ -409,64 +416,69 @@ internal class ScheduleListFragment : Fragment() {
             }
             .launchIn(viewLifecycleScope)
 
-        triggerAtFormatPatternsState.filterNotNull()
-            .distinctUntilChanged()
+        triggerAtFormatPatternsStream
             .flowWithLifecycle(viewLifecycle)
             .onEach(scheduleListAdapter::updateTriggerAtFormatPatterns)
             .launchIn(viewLifecycleScope)
 
-        themeState.filterNotNull()
-            .distinctUntilChanged()
+        themeStream
             .flowWithLifecycle(viewLifecycle)
             .onEach(scheduleListAdapter::updateTheme)
             .launchIn(viewLifecycleScope)
 
-        timeZoneState.filterNotNull()
-            .distinctUntilChanged()
+        timeZoneStream
             .flowWithLifecycle(viewLifecycle)
             .onEach(scheduleListAdapter::updateTimeZone)
             .launchIn(viewLifecycleScope)
 
-        entryAtState.filterNotNull()
-            .distinctUntilChanged()
+        entryAtStream
             .flowWithLifecycle(viewLifecycle)
             .onEach(scheduleListAdapter::updateEntryAt)
             .launchIn(viewLifecycleScope)
     }
 
-    fun onScheduleListItemUpdated(items: IdentityList<ScheduleListItem>) {
-        scheduleListItemsState.value = items
+    fun onScheduleListItemsAdaptationUpdated(scheduleListItemsAdaptation: ScheduleListItemsAdaptation) {
+        scheduleListItemsAdaptationStream.tryEmit(scheduleListItemsAdaptation)
     }
 
-    fun onItemSelectionEnabledChanged(enabled: Boolean) {
-        itemSelectionEnabledState.value = enabled
+    fun onMultiSelectionEnabledChanged(enabled: Boolean) {
+        multiSelectionEnabledStream.tryEmit(enabled)
     }
 
     fun onTriggerAtFormatPatternsUpdated(patterns: TriggerAtFormatPatterns) {
-        triggerAtFormatPatternsState.value = patterns
+        triggerAtFormatPatternsStream.tryEmit(patterns)
     }
 
-    fun onThemeUpdated(theme: ScheduleListTheme?) {
-        themeState.value = theme
+    fun onThemeUpdated(theme: ScheduleListTheme) {
+        themeStream.tryEmit(theme)
     }
 
     fun onTimeZoneUpdated(timeZone: TimeZone) {
-        timeZoneState.value = timeZone
+        timeZoneStream.tryEmit(timeZone)
     }
 
     fun onEntryAtUpdated(entryAt: Instant) {
-        entryAtState.value = entryAt
+        entryAtStream.tryEmit(entryAt)
     }
 
-    fun onToolbarRenderStateUpdated(toolbarRenderState: ScheduleListToolbarRenderState?) {
-        toolbarRenderValuesState.value = toolbarRenderState
+    fun onToolbarStateUpdated(toolbarState: ScheduleListToolbarState?) {
+        toolbarStateStream.tryEmit(toolbarState)
     }
 
     fun onSimpleAddCommandObserverChanged(observer: (SimpleAdd) -> Unit) {
-        simpleAddCommandObserverState.value = observer
+        simpleAddCommandObserverStream.tryEmit(observer)
     }
 
     fun onSimpleEditCommandObserverChanged(observer: (SimpleEdit) -> Unit) {
-        simpleEditCommandObserverState.value = observer
+        simpleEditCommandObserverStream.tryEmit(observer)
     }
 }
+
+/**
+ * Emit is only executed when the value is changed to LaunchedEffect outside of the Fragment.
+ * Therefore, control external changes with a single buffer without distinct function.
+ */
+private fun <T> mutableLatestEventFlow(): MutableSharedFlow<T> = MutableSharedFlow(
+    replay = 1,
+    onBufferOverflow = BufferOverflow.DROP_OLDEST
+)

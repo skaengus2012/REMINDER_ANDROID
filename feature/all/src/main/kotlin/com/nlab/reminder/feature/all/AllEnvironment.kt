@@ -18,6 +18,9 @@ package com.nlab.reminder.feature.all
 
 import androidx.lifecycle.ViewModel
 import com.nlab.reminder.core.component.currenttime.GetCurrentTimeSnapshotStreamUseCase
+import com.nlab.reminder.core.data.qualifiers.ScheduleData
+import com.nlab.reminder.core.data.qualifiers.ScheduleDataOption.All
+import com.nlab.reminder.core.data.repository.CompletedScheduleShownRepository
 import com.nlab.reminder.core.data.repository.ScheduleRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -28,5 +31,7 @@ import javax.inject.Inject
 @HiltViewModel
 internal class AllEnvironment @Inject constructor(
     val scheduleRepository: ScheduleRepository,
-    val getCurrentTimeSnapshot: GetCurrentTimeSnapshotStreamUseCase
+    @param:ScheduleData(All) val completedScheduleShownRepository: CompletedScheduleShownRepository,
+    val getScheduleListResourcesStream: GetAllScheduleListResourcesStreamUseCase,
+    val getCurrentTimeSnapshot: GetCurrentTimeSnapshotStreamUseCase,
 ) : ViewModel()
