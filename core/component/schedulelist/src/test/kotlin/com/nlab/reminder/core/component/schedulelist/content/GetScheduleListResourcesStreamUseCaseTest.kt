@@ -45,12 +45,12 @@ class GetScheduleListResourcesStreamUseCaseTest {
     fun `Given schedules, When collect, Then emit resources with identical content mapping`() = runTest {
         val schedules = genSchedules()
         val useCase = genGetScheduleListResourcesStreamUseCase()
-        val flow = MutableStateFlow(schedules)
+        val flow = MutableStateFlow(schedules.toSet())
         useCase.invoke(schedulesStream = flow).test {
             val actualResources = awaitItem()
-            actualResources.forEachIndexed { index, resource ->
-                val schedule = schedules[index]
-                assertThat(resource.id, equalTo(schedule.id))
+            val expectedIdToSchedule = schedules.associateBy { it.id }
+            actualResources.forEach { resource ->
+                val schedule = expectedIdToSchedule.getValue(key = resource.id)
                 assertThat(resource.title, equalTo(schedule.content.title))
                 assertThat(resource.note, equalTo(schedule.content.note))
                 assertThat(resource.link, equalTo(schedule.content.link))
@@ -77,10 +77,11 @@ class GetScheduleListResourcesStreamUseCaseTest {
                 every { getTagsAsStream(GetTagQuery.ByIds(tagIds)) } returns flowOf(tags)
             }
         )
-        useCase.invoke(schedulesStream = flowOf(schedules)).test {
+        useCase.invoke(schedulesStream = flowOf(schedules.toSet())).test {
             val actualResources = awaitItem()
-            actualResources.forEachIndexed { index, resource ->
-                val expectedTags = schedules[index].content.tagIds
+            val expectedIdToSchedule = schedules.associateBy { it.id }
+            actualResources.forEach { resource ->
+                val expectedTags = expectedIdToSchedule.getValue(key = resource.id).content.tagIds
                     // It's valid because it was named rawId,
                     .sortedBy { it.rawId }
                     .map { tagId -> tags.find { it.id == tagId } }
@@ -98,7 +99,7 @@ class GetScheduleListResourcesStreamUseCaseTest {
             content = genScheduleContent(tagIds = emptySet())
         )
         val useCase = genGetScheduleListResourcesStreamUseCase()
-        useCase.invoke(schedulesStream = flowOf(listOf(schedule))).test {
+        useCase.invoke(schedulesStream = flowOf(setOf(schedule))).test {
             val actualResource = awaitItem().first()
             assertThat(actualResource.tags, equalTo(emptyList()))
 
@@ -116,10 +117,11 @@ class GetScheduleListResourcesStreamUseCaseTest {
                 every { getLinkToMetadataTableAsStream(links) } returns flowOf(linkToMetadataTable)
             }
         )
-        useCase.invoke(schedulesStream = flowOf(schedules)).test {
+        useCase.invoke(schedulesStream = flowOf(schedules.toSet())).test {
             val actualResources = awaitItem()
-            actualResources.forEachIndexed { index, resource ->
-                val expectedMetadata = schedules[index]
+            val expectedIdToSchedule = schedules.associateBy { it.id }
+            actualResources.forEach { resource ->
+                val expectedMetadata = expectedIdToSchedule.getValue(key = resource.id)
                     .content
                     .link
                     ?.let { linkToMetadataTable[it] }
@@ -136,7 +138,7 @@ class GetScheduleListResourcesStreamUseCaseTest {
             content = genScheduleContent(link = null)
         )
         val useCase = genGetScheduleListResourcesStreamUseCase()
-        useCase.invoke(schedulesStream = flowOf(listOf(schedule))).test {
+        useCase.invoke(schedulesStream = flowOf(setOf(schedule))).test {
             val actualResource = awaitItem().first()
             assertThat(actualResource.linkMetadata, nullValue())
 
