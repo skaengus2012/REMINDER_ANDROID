@@ -16,6 +16,8 @@
 
 package com.nlab.reminder.feature.all
 
+import com.nlab.reminder.core.component.currenttime.GetCurrentTimeSnapshotStreamUseCase
+import com.nlab.reminder.core.data.repository.CompletedScheduleShownRepository
 import com.nlab.reminder.core.data.repository.ScheduleRepository
 import io.mockk.mockk
 
@@ -24,5 +26,12 @@ import io.mockk.mockk
  */
 internal fun genAllEnvironment(
     scheduleRepository: ScheduleRepository = mockk(),
-
-): AllEnvironment =
+    completedScheduleShownRepository: CompletedScheduleShownRepository = mockk(),
+    getScheduleListResourcesFlow: GetAllUserScheduleListResourcesFlowUseCase = mockk(),
+    getCurrentTimeSnapshotStream: GetCurrentTimeSnapshotStreamUseCase = mockk()
+): AllEnvironment = AllEnvironment(
+    scheduleRepository = scheduleRepository,
+    completedScheduleShownRepository = completedScheduleShownRepository,
+    getAllUserScheduleListResourcesFlow = getScheduleListResourcesFlow,
+    getCurrentTimeSnapshotStream = getCurrentTimeSnapshotStream
+)
