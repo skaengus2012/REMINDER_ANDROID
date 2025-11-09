@@ -48,7 +48,7 @@ class GetAllScheduleListResourcesStreamUseCaseTest {
     @Test
     fun hello() = runTest {
         val expectedSchedules = genSchedules().toSet()
-        val scheduleStreamSlot = slot<Flow<List<Schedule>>>()
+        val scheduleStreamSlot = slot<Flow<Set<Schedule>>>()
         val useCase = genGetAllScheduleListResourcesStreamUseCase(
             completedScheduleShownRepository = mockk {
                 every { getAsStream() } returns flowOf(true)
@@ -61,7 +61,7 @@ class GetAllScheduleListResourcesStreamUseCaseTest {
             getScheduleListResourcesStream = mockk {
                 every {
                     this@mockk.invoke(capture(scheduleStreamSlot))
-                } returns flowOf(genScheduleListResources())
+                } returns flowOf(genScheduleListResources().toSet())
             }
         )
         backgroundScope.launch(unconfinedTestDispatcher()) {
@@ -80,7 +80,7 @@ class GetAllScheduleListResourcesStreamUseCaseTest {
     @Test
     fun hello2() = runTest {
         val expectedSchedules = genSchedules().toSet()
-        val scheduleStreamSlot = slot<Flow<List<Schedule>>>()
+        val scheduleStreamSlot = slot<Flow<Set<Schedule>>>()
         val useCase = genGetAllScheduleListResourcesStreamUseCase(
             completedScheduleShownRepository = mockk {
                 every { getAsStream() } returns flowOf(false)
@@ -93,7 +93,7 @@ class GetAllScheduleListResourcesStreamUseCaseTest {
             getScheduleListResourcesStream = mockk {
                 every {
                     this@mockk.invoke(capture(scheduleStreamSlot))
-                } returns flowOf(genScheduleListResources())
+                } returns flowOf(genScheduleListResources().toSet())
             }
         )
         backgroundScope.launch(unconfinedTestDispatcher()) {
@@ -125,7 +125,7 @@ class GetAllScheduleListResourcesStreamUseCaseTest {
             notCompletedSchedule,
             completedSchedule
         )
-        val scheduleStreamSlot = slot<Flow<List<Schedule>>>()
+        val scheduleStreamSlot = slot<Flow<Set<Schedule>>>()
         val useCase = genGetAllScheduleListResourcesStreamUseCase(
             completedScheduleShownRepository = mockk {
                 every { getAsStream() } returns flowOf(genBoolean())
@@ -138,7 +138,7 @@ class GetAllScheduleListResourcesStreamUseCaseTest {
             getScheduleListResourcesStream = mockk {
                 every {
                     this@mockk.invoke(capture(scheduleStreamSlot))
-                } returns flowOf(genScheduleListResources())
+                } returns flowOf(genScheduleListResources().toSet())
             }
         )
         backgroundScope.launch(unconfinedTestDispatcher()) {
@@ -170,7 +170,7 @@ class GetAllScheduleListResourcesStreamUseCaseTest {
             firstVisibleSchedule,
             secondVisibleSchedule
         )
-        val scheduleStreamSlot = slot<Flow<List<Schedule>>>()
+        val scheduleStreamSlot = slot<Flow<Set<Schedule>>>()
         val useCase = genGetAllScheduleListResourcesStreamUseCase(
             completedScheduleShownRepository = mockk {
                 every { getAsStream() } returns flowOf(genBoolean())
@@ -183,7 +183,7 @@ class GetAllScheduleListResourcesStreamUseCaseTest {
             getScheduleListResourcesStream = mockk {
                 every {
                     this@mockk.invoke(capture(scheduleStreamSlot))
-                } returns flowOf(genScheduleListResources())
+                } returns flowOf(genScheduleListResources().toSet())
             }
         )
         backgroundScope.launch(unconfinedTestDispatcher()) {
