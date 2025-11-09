@@ -22,6 +22,7 @@ import com.nlab.reminder.core.data.model.TagId
 import com.nlab.reminder.core.data.repository.GetTagQuery
 import com.nlab.reminder.core.data.repository.LinkMetadataRepository
 import com.nlab.reminder.core.data.repository.TagRepository
+import com.nlab.reminder.core.kotlin.collections.toSet
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.channelFlow
@@ -41,7 +42,7 @@ class GetScheduleListResourcesStreamUseCase(
     private val tagRepository: TagRepository,
     private val linkMetadataRepository: LinkMetadataRepository
 ) {
-    operator fun invoke(schedulesStream: Flow<List<Schedule>>): Flow<List<ScheduleListResource>> = channelFlow {
+    operator fun invoke(schedulesStream: Flow<Set<Schedule>>): Flow<Set<ScheduleListResource>> = channelFlow {
         val chunkFlow = schedulesStream
             .map { schedules ->
                 val totalTags = mutableSetOf<TagId>()
@@ -89,12 +90,12 @@ class GetScheduleListResourcesStreamUseCase(
                     else totalTags.filter { it.id in tagIds }
                 }
             )
-            schedules.map(::transformToScheduleListResource)
+            schedules.toSet(transform = ::transformToScheduleListResource)
         }.onEach { send(it) }.launchIn(this)
     }
 
     private data class Chunk(
-        val schedules: List<Schedule>,
+        val schedules: Set<Schedule>,
         val totalTagIds: Set<TagId>,
         val totalLinks: Set<Link>
     )
