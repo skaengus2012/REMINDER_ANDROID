@@ -32,6 +32,6 @@ import javax.inject.Inject
 internal class AllEnvironment @Inject constructor(
     val scheduleRepository: ScheduleRepository,
     @param:ScheduleData(All) val completedScheduleShownRepository: CompletedScheduleShownRepository,
-    val getScheduleListResourcesStream: GetAllScheduleListResourcesStreamUseCase,
-    val getCurrentTimeSnapshot: GetCurrentTimeSnapshotStreamUseCase,
+    val getAllUserScheduleListResourcesFlow: GetAllUserScheduleListResourcesFlowUseCase,
+    val getCurrentTimeSnapshotStream: GetCurrentTimeSnapshotStreamUseCase,
 ) : ViewModel()
