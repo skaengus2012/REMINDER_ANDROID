@@ -87,7 +87,7 @@ class GetScheduleListResourcesStreamUseCase(
     ) = chunkFlow.mapNotNull { it?.totalTagIds }.distinctUntilChanged().flatMapLatest { totalTagIds ->
         tagRepository
             .getTagsAsStream(query = GetTagQuery.ByIds(totalTagIds))
-            .map { tags -> Response(request = totalTagIds, data = tags) }
+            .map { tags -> Response(request = totalTagIds, data = tags.sortedBy { it.name.value }) }
     }
 
     private fun totalLinkToMetadataTableResponseFlowOf(

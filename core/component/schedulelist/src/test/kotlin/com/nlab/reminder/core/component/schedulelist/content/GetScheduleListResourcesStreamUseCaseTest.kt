@@ -100,7 +100,7 @@ class GetScheduleListResourcesStreamUseCaseTest {
             .flatten()
             .distinct()
             .toSet()
-        val tags = tagIds.toSet { tagId ->
+        val tags = tagIds.shuffled().toSet { tagId ->
             genTag(id = tagId, name = tagId.rawId.toString().toNonBlankString())
         }
         val useCase = genGetScheduleListResourcesStreamUseCase(
