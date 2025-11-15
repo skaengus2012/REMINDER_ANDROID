@@ -17,11 +17,14 @@
 package com.nlab.reminder.core.component.schedulelist.content
 
 import app.cash.turbine.test
+import com.nlab.reminder.core.data.model.genLink
 import com.nlab.reminder.core.data.model.genLinkMetadata
 import com.nlab.reminder.core.data.model.genSchedule
 import com.nlab.reminder.core.data.model.genScheduleContent
 import com.nlab.reminder.core.data.model.genSchedules
 import com.nlab.reminder.core.data.model.genTag
+import com.nlab.reminder.core.data.model.genTagIds
+import com.nlab.reminder.core.data.model.genTags
 import com.nlab.reminder.core.data.repository.GetTagQuery
 import com.nlab.reminder.core.data.repository.LinkMetadataRepository
 import com.nlab.reminder.core.data.repository.TagRepository
@@ -29,9 +32,17 @@ import com.nlab.reminder.core.kotlin.collections.toSet
 import com.nlab.reminder.core.kotlin.toNonBlankString
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.unconfinedTestDispatcher
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.nullValue
 import org.hamcrest.MatcherAssert.assertThat
@@ -46,7 +57,7 @@ class GetScheduleListResourcesStreamUseCaseTest {
         val schedules = genSchedules()
         val useCase = genGetScheduleListResourcesStreamUseCase()
         val flow = MutableStateFlow(schedules.toSet())
-        useCase.invoke(schedulesStream = flow).test {
+        useCase.invoke(schedulesFlow = flow).test {
             val actualResources = awaitItem()
             val expectedIdToSchedule = schedules.associateBy { it.id }
             actualResources.forEach { resource ->
@@ -59,6 +70,26 @@ class GetScheduleListResourcesStreamUseCaseTest {
             }
 
             cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Suppress("UnusedFlow")
+    @Test
+    fun `Given empty flow, When collect, Then never requests repositories`() = runTest {
+        val tagRepository: TagRepository = mockk()
+        val linkMetadataRepository: LinkMetadataRepository = mockk()
+        val useCase = genGetScheduleListResourcesStreamUseCase(
+            tagRepository = tagRepository,
+            linkMetadataRepository = linkMetadataRepository
+        )
+        backgroundScope.launch(unconfinedTestDispatcher()) {
+            useCase.invoke(emptyFlow()).collect()
+        }
+        verify(inverse = true) {
+            tagRepository.getTagsAsStream(any())
+        }
+        verify(inverse = true) {
+            linkMetadataRepository.getLinkToMetadataTableAsStream(any())
         }
     }
 
@@ -77,7 +108,7 @@ class GetScheduleListResourcesStreamUseCaseTest {
                 every { getTagsAsStream(GetTagQuery.ByIds(tagIds)) } returns flowOf(tags)
             }
         )
-        useCase.invoke(schedulesStream = flowOf(schedules.toSet())).test {
+        useCase.invoke(schedulesFlow = flowOf(schedules.toSet())).test {
             val actualResources = awaitItem()
             val expectedIdToSchedule = schedules.associateBy { it.id }
             actualResources.forEach { resource ->
@@ -99,7 +130,7 @@ class GetScheduleListResourcesStreamUseCaseTest {
             content = genScheduleContent(tagIds = emptySet())
         )
         val useCase = genGetScheduleListResourcesStreamUseCase()
-        useCase.invoke(schedulesStream = flowOf(setOf(schedule))).test {
+        useCase.invoke(schedulesFlow = flowOf(setOf(schedule))).test {
             val actualResource = awaitItem().first()
             assertThat(actualResource.tags, equalTo(emptyList()))
 
@@ -117,7 +148,7 @@ class GetScheduleListResourcesStreamUseCaseTest {
                 every { getLinkToMetadataTableAsStream(links) } returns flowOf(linkToMetadataTable)
             }
         )
-        useCase.invoke(schedulesStream = flowOf(schedules.toSet())).test {
+        useCase.invoke(schedulesFlow = flowOf(schedules.toSet())).test {
             val actualResources = awaitItem()
             val expectedIdToSchedule = schedules.associateBy { it.id }
             actualResources.forEach { resource ->
@@ -138,12 +169,88 @@ class GetScheduleListResourcesStreamUseCaseTest {
             content = genScheduleContent(link = null)
         )
         val useCase = genGetScheduleListResourcesStreamUseCase()
-        useCase.invoke(schedulesStream = flowOf(setOf(schedule))).test {
+        useCase.invoke(schedulesFlow = flowOf(setOf(schedule))).test {
             val actualResource = awaitItem().first()
             assertThat(actualResource.linkMetadata, nullValue())
 
             cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    @Test
+    fun `Given slow tagRepository, When new schedules emitted, Then ignore invalidated value`() = runTest {
+        val firstSchedule = genSchedule(
+            content = genScheduleContent(tagIds = genTagIds(count = 2))
+        )
+        val secondSchedule = firstSchedule.copy(
+            content = firstSchedule.content.copy(tagIds = genTagIds(count = 3))
+        )
+        val secondScheduleEmitDelayedTimeMs = 1000L
+        val secondTagsEmitDelayedTimeMs = 500L
+        val scheduleFlow = flow {
+            emit(setOf(firstSchedule))
+            delay(secondScheduleEmitDelayedTimeMs)
+            emit(setOf(secondSchedule))
+        }
+        val useCase = genGetScheduleListResourcesStreamUseCase(
+            tagRepository = mockk {
+                every { getTagsAsStream(any()) } answers {
+                    if (args[0] == GetTagQuery.ByIds(firstSchedule.content.tagIds)) {
+                        flowOf(genTags())
+                    } else {
+                        flow {
+                            //Scenario where second tag search is slow
+                            delay(secondTagsEmitDelayedTimeMs)
+                            emit(genTags())
+                        }
+                    }
+                }
+            }
+        )
+        val collected = mutableListOf<Set<ScheduleListResource>>()
+        backgroundScope.launch(unconfinedTestDispatcher()) {
+            useCase.invoke(scheduleFlow).collect { collected += it }
+        }
+        advanceTimeBy(secondScheduleEmitDelayedTimeMs + secondTagsEmitDelayedTimeMs / 2)
+        assertThat(collected.size, equalTo(1))
+    }
+
+    @Test
+    fun `Given slow linkMetadataRepository, When new schedules emitted, Then ignore invalidated value`() = runTest {
+        val firstSchedule = genSchedule(
+            content = genScheduleContent(link = genLink())
+        )
+        val secondSchedule = firstSchedule.copy(
+            content = firstSchedule.content.copy(link = null)
+        )
+        val secondScheduleEmitDelayedTimeMs = 1000L
+        val secondTagsEmitDelayedTimeMs = 500L
+        val scheduleFlow = flow {
+            emit(setOf(firstSchedule))
+            delay(secondScheduleEmitDelayedTimeMs)
+            emit(setOf(secondSchedule))
+        }
+        val useCase = genGetScheduleListResourcesStreamUseCase(
+            linkMetadataRepository = mockk {
+                every { getLinkToMetadataTableAsStream(any()) } answers {
+                    if (args[0] == setOf(firstSchedule.content.link!!)) {
+                        flowOf(emptyMap())
+                    } else {
+                        flow {
+                            //Scenario where second tag search is slow
+                            delay(secondTagsEmitDelayedTimeMs)
+                            emit(emptyMap())
+                        }
+                    }
+                }
+            }
+        )
+        val collected = mutableListOf<Set<ScheduleListResource>>()
+        backgroundScope.launch(unconfinedTestDispatcher()) {
+            useCase.invoke(scheduleFlow).collect { collected += it }
+        }
+        advanceTimeBy(secondScheduleEmitDelayedTimeMs + secondTagsEmitDelayedTimeMs / 2)
+        assertThat(collected.size, equalTo(1))
     }
 }
 
