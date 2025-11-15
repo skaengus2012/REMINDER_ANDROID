@@ -23,15 +23,18 @@ import com.nlab.reminder.core.data.repository.GetTagQuery
 import com.nlab.reminder.core.data.repository.LinkMetadataRepository
 import com.nlab.reminder.core.data.repository.TagRepository
 import com.nlab.reminder.core.kotlin.collections.toSet
+import com.nlab.reminder.core.kotlinx.coroutines.flow.map
+import com.nlab.reminder.core.kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 
@@ -42,61 +45,83 @@ class GetScheduleListResourcesStreamUseCase(
     private val tagRepository: TagRepository,
     private val linkMetadataRepository: LinkMetadataRepository
 ) {
-    operator fun invoke(schedulesStream: Flow<Set<Schedule>>): Flow<Set<ScheduleListResource>> = channelFlow {
-        val chunkFlow = schedulesStream
-            .map { schedules ->
-                val totalTags = mutableSetOf<TagId>()
-                val totalLinks = mutableSetOf<Link>()
-                schedules.forEach { schedule ->
-                    totalTags += schedule.content.tagIds
-                    schedule.content.link?.let(totalLinks::add)
-                }
-                Chunk(
-                    schedules = schedules,
-                    totalTagIds = totalTags,
-                    totalLinks = totalLinks
-                )
-            }
-            .stateIn(scope = this, started = SharingStarted.Eagerly, initialValue = null)
-        val totalTagsFlow = chunkFlow
-            .filterNotNull()
-            .map { it.totalTagIds }
-            .distinctUntilChanged()
-            .flatMapLatest { tagIds ->
-                tagRepository
-                    .getTagsAsStream(query = GetTagQuery.ByIds(tagIds))
-                    .map { tags -> tags.sortedBy { it.name.value } }
-            }
-        val totalLinkToMetadataTableFlow = chunkFlow
-            .filterNotNull()
-            .map { it.totalLinks }
-            .distinctUntilChanged()
-            .flatMapLatest(linkMetadataRepository::getLinkToMetadataTableAsStream)
+    operator fun invoke(schedulesFlow: Flow<Set<Schedule>>): Flow<Set<ScheduleListResource>> = channelFlow {
+        val resultFlow = MutableStateFlow<Set<ScheduleListResource>?>(null).also { flow ->
+            flow.filterNotNull()
+                .onEach { send(it) }
+                .launchIn(scope = this)
+        }
+        val chunkFlow = schedulesFlow
+            .map(transform = ::chunkOf)
+            .stateIn(scope = this, started = SharingStarted.Lazily, initialValue = null)
         combine(
-            chunkFlow.filterNotNull().map { it.schedules },
-            totalTagsFlow,
-            totalLinkToMetadataTableFlow
-        ) { schedules, totalTags, totalLinkMetadataTable ->
+            chunkFlow.filterNotNull(),
+            totalTagsResponseFlowOf(chunkFlow = chunkFlow),
+            totalLinkToMetadataTableResponseFlowOf(chunkFlow = chunkFlow)
+        ) { chunk, totalTagsResponse, totalLinkMetadataTableResponse ->
             fun transformToScheduleListResource(schedule: Schedule) = ScheduleListResource(
                 id = schedule.id,
                 title = schedule.content.title,
                 note = schedule.content.note,
                 link = schedule.content.link,
-                linkMetadata = totalLinkMetadataTable[schedule.content.link],
+                linkMetadata = totalLinkMetadataTableResponse.data[schedule.content.link],
                 timing = schedule.content.timing,
                 isComplete = schedule.isComplete,
                 tags = schedule.content.tagIds.let { tagIds ->
                     if (tagIds.isEmpty()) emptyList()
-                    else totalTags.filter { it.id in tagIds }
+                    else totalTagsResponse.data.filter { it.id in tagIds }
                 }
             )
-            schedules.toSet(transform = ::transformToScheduleListResource)
-        }.onEach { send(it) }.launchIn(this)
+
+            if (chunk.totalTagIds != totalTagsResponse.request) return@combine null
+            if (chunk.totalLinks != totalLinkMetadataTableResponse.request) return@combine null
+
+            chunk.schedules.toSet(transform = ::transformToScheduleListResource)
+        }.filterNotNull()
+            .onEach { resultFlow.value = it }
+            .launchIn(scope = this)
+    }
+
+    private fun totalTagsResponseFlowOf(
+        chunkFlow: StateFlow<Chunk?>
+    ) = chunkFlow.mapNotNull { it?.totalTagIds }.distinctUntilChanged().flatMapLatest { totalTagIds ->
+        tagRepository
+            .getTagsAsStream(query = GetTagQuery.ByIds(totalTagIds))
+            .map { tags -> Response(request = totalTagIds, data = tags.sortedBy { it.name.value }) }
+    }
+
+    private fun totalLinkToMetadataTableResponseFlowOf(
+        chunkFlow: StateFlow<Chunk?>
+    ) = chunkFlow.mapNotNull { it?.totalLinks }.distinctUntilChanged().flatMapLatest { totalLinks ->
+        linkMetadataRepository
+            .getLinkToMetadataTableAsStream(totalLinks)
+            .map { linkToMetadataTable -> Response(request = totalLinks, data = linkToMetadataTable) }
+    }
+
+    companion object {
+        private fun chunkOf(schedules: Set<Schedule>): Chunk {
+            val totalTags = mutableSetOf<TagId>()
+            val totalLinks = mutableSetOf<Link>()
+            schedules.forEach { schedule ->
+                totalTags += schedule.content.tagIds
+                schedule.content.link?.let(totalLinks::add)
+            }
+            return Chunk(
+                schedules = schedules,
+                totalTagIds = totalTags,
+                totalLinks = totalLinks
+            )
+        }
     }
 
     private data class Chunk(
         val schedules: Set<Schedule>,
         val totalTagIds: Set<TagId>,
         val totalLinks: Set<Link>
+    )
+
+    private data class Response<T, U>(
+        val request: T,
+        val data: U
     )
 }

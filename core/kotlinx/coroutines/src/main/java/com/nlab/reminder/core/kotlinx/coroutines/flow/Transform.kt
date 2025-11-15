@@ -19,6 +19,7 @@ package com.nlab.reminder.core.kotlinx.coroutines.flow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter as kotlinxCoroutineFilter
 import kotlinx.coroutines.flow.map as kotlinxCoroutineMap
+import kotlinx.coroutines.flow.mapNotNull as kotlinxCoroutineMapNotNull
 
 /**
  * There exists coverage that Jacoco does not recognize for Coroutine functions.
@@ -29,3 +30,5 @@ import kotlinx.coroutines.flow.map as kotlinxCoroutineMap
 fun <T> Flow<T>.filter(predicate: (T) -> Boolean): Flow<T> = kotlinxCoroutineFilter(predicate)
 
 fun <T, R> Flow<T>.map(transform: (value: T) -> R): Flow<R> = kotlinxCoroutineMap(transform)
+
+fun <T, R> Flow<T>.mapNotNull(transform: (value: T) -> R?): Flow<R> = kotlinxCoroutineMapNotNull(transform)
