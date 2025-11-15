@@ -237,7 +237,7 @@ class GetScheduleListResourcesStreamUseCaseTest {
                         flowOf(emptyMap())
                     } else {
                         flow {
-                            //Scenario where second tag search is slow
+                            // Scenario where second link metadata search is slow
                             delay(secondTagsEmitDelayedTimeMs)
                             emit(emptyMap())
                         }
