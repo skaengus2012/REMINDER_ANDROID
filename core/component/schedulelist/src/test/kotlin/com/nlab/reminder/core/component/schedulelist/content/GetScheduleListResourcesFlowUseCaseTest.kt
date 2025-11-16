@@ -52,11 +52,11 @@ import org.junit.Test
 /**
  * @author Thalys
  */
-class GetScheduleListResourcesStreamUseCaseTest {
+class GetScheduleListResourcesFlowUseCaseTest {
     @Test
     fun `Given schedules, When collect, Then emit resources with identical content mapping`() = runTest {
         val schedules = genSchedules()
-        val useCase = genGetScheduleListResourcesStreamUseCase()
+        val useCase = genGetScheduleListResourcesFlowUseCase()
         val flow = MutableStateFlow(schedules)
         useCase.invoke(schedulesFlow = flow).test {
             val actualResources = awaitItem()
@@ -79,7 +79,7 @@ class GetScheduleListResourcesStreamUseCaseTest {
     fun `Given empty flow, When collect, Then never requests repositories`() = runTest {
         val tagRepository: TagRepository = mockk()
         val linkMetadataRepository: LinkMetadataRepository = mockk()
-        val useCase = genGetScheduleListResourcesStreamUseCase(
+        val useCase = genGetScheduleListResourcesFlowUseCase(
             tagRepository = tagRepository,
             linkMetadataRepository = linkMetadataRepository
         )
@@ -104,7 +104,7 @@ class GetScheduleListResourcesStreamUseCaseTest {
         val tags = tagIds.shuffled().toSet { tagId ->
             genTag(id = tagId, name = tagId.rawId.toString().toNonBlankString())
         }
-        val useCase = genGetScheduleListResourcesStreamUseCase(
+        val useCase = genGetScheduleListResourcesFlowUseCase(
             tagRepository = mockk {
                 every { getTagsAsStream(GetTagQuery.ByIds(tagIds)) } returns flowOf(tags)
             }
@@ -130,7 +130,7 @@ class GetScheduleListResourcesStreamUseCaseTest {
         val schedule = genSchedule(
             content = genScheduleContent(tagIds = emptySet())
         )
-        val useCase = genGetScheduleListResourcesStreamUseCase()
+        val useCase = genGetScheduleListResourcesFlowUseCase()
         useCase.invoke(schedulesFlow = flowOf(setOf(schedule))).test {
             val actualResource = awaitItem().first()
             assertThat(actualResource.tags, equalTo(emptyList()))
@@ -144,7 +144,7 @@ class GetScheduleListResourcesStreamUseCaseTest {
         val schedules = genSchedules()
         val links = schedules.mapNotNull { it.content.link }.toSet()
         val linkToMetadataTable = links.associateWith { genLinkMetadata() }
-        val useCase = genGetScheduleListResourcesStreamUseCase(
+        val useCase = genGetScheduleListResourcesFlowUseCase(
             linkMetadataRepository = mockk {
                 every { getLinkToMetadataTableAsStream(links) } returns flowOf(linkToMetadataTable)
             }
@@ -169,7 +169,7 @@ class GetScheduleListResourcesStreamUseCaseTest {
         val schedule = genSchedule(
             content = genScheduleContent(link = null)
         )
-        val useCase = genGetScheduleListResourcesStreamUseCase()
+        val useCase = genGetScheduleListResourcesFlowUseCase()
         useCase.invoke(schedulesFlow = flowOf(setOf(schedule))).test {
             val actualResource = awaitItem().first()
             assertThat(actualResource.linkMetadata, nullValue())
@@ -193,7 +193,7 @@ class GetScheduleListResourcesStreamUseCaseTest {
             delay(secondScheduleEmitDelayedTimeMs)
             emit(setOf(secondSchedule))
         }
-        val useCase = genGetScheduleListResourcesStreamUseCase(
+        val useCase = genGetScheduleListResourcesFlowUseCase(
             tagRepository = mockk {
                 every { getTagsAsStream(any()) } answers {
                     if (args[0] == GetTagQuery.ByIds(firstSchedule.content.tagIds)) {
@@ -232,7 +232,7 @@ class GetScheduleListResourcesStreamUseCaseTest {
             delay(secondScheduleEmitDelayedTimeMs)
             emit(setOf(secondSchedule))
         }
-        val useCase = genGetScheduleListResourcesStreamUseCase(
+        val useCase = genGetScheduleListResourcesFlowUseCase(
             linkMetadataRepository = mockk {
                 every { getLinkToMetadataTableAsStream(any()) } answers {
                     if (args[0] == setOf(firstScheduleLink)) {
@@ -256,14 +256,14 @@ class GetScheduleListResourcesStreamUseCaseTest {
     }
 }
 
-private fun genGetScheduleListResourcesStreamUseCase(
+private fun genGetScheduleListResourcesFlowUseCase(
     tagRepository: TagRepository = mockk {
         every { getTagsAsStream(any()) } returns flowOf(emptySet())
     },
     linkMetadataRepository: LinkMetadataRepository = mockk {
         every { getLinkToMetadataTableAsStream(any()) } returns flowOf(emptyMap())
     }
-): GetScheduleListResourcesFlowUseCase = GetScheduleListResourcesFlowUseCase(
+) = GetScheduleListResourcesFlowUseCase(
     tagRepository = tagRepository,
     linkMetadataRepository = linkMetadataRepository
 )
