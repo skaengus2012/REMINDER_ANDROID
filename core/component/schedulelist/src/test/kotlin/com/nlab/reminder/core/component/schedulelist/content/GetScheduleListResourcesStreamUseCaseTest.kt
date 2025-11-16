@@ -56,7 +56,7 @@ class GetScheduleListResourcesStreamUseCaseTest {
     fun `Given schedules, When collect, Then emit resources with identical content mapping`() = runTest {
         val schedules = genSchedules()
         val useCase = genGetScheduleListResourcesStreamUseCase()
-        val flow = MutableStateFlow(schedules.toSet())
+        val flow = MutableStateFlow(schedules)
         useCase.invoke(schedulesFlow = flow).test {
             val actualResources = awaitItem()
             val expectedIdToSchedule = schedules.associateBy { it.id }
@@ -108,7 +108,7 @@ class GetScheduleListResourcesStreamUseCaseTest {
                 every { getTagsAsStream(GetTagQuery.ByIds(tagIds)) } returns flowOf(tags)
             }
         )
-        useCase.invoke(schedulesFlow = flowOf(schedules.toSet())).test {
+        useCase.invoke(schedulesFlow = flowOf(schedules)).test {
             val actualResources = awaitItem()
             val expectedIdToSchedule = schedules.associateBy { it.id }
             actualResources.forEach { resource ->
@@ -148,7 +148,7 @@ class GetScheduleListResourcesStreamUseCaseTest {
                 every { getLinkToMetadataTableAsStream(links) } returns flowOf(linkToMetadataTable)
             }
         )
-        useCase.invoke(schedulesFlow = flowOf(schedules.toSet())).test {
+        useCase.invoke(schedulesFlow = flowOf(schedules)).test {
             val actualResources = awaitItem()
             val expectedIdToSchedule = schedules.associateBy { it.id }
             actualResources.forEach { resource ->
