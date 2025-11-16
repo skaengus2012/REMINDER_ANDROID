@@ -316,13 +316,6 @@ internal class ScheduleDetailsEditText @JvmOverloads constructor(
             return
         }
 
-        setVisible(isVisible = scheduleTiming != null || tags.isNotEmpty())
-
-        if (needTagsDisplayTextUpdate) {
-            this.tags = tags
-            setInputAvailable(available = tags.isNotEmpty())
-        }
-
         if (needScheduleTimingDisplayTextUpdate) {
             this.scheduleCompleted = scheduleCompleted
             this.scheduleTiming = scheduleTiming
@@ -336,9 +329,19 @@ internal class ScheduleDetailsEditText @JvmOverloads constructor(
                     entryAt = entryAt,
                     completed = scheduleCompleted
                 )
-                setDetailsTextAndSelection(extraText = tagsDisplayFormatter.format(context, tags = tags))
             }
         }
+
+        if (needTagsDisplayTextUpdate) {
+            this.tags = tags
+            setInputAvailable(available = tags.isNotEmpty())
+        }
+
+        setVisible(isVisible = scheduleTiming != null || tags.isNotEmpty())
+
+        // This needs to be called when either scheduleTimingText or Tags change.
+        // For Tags, identity comparison is used, so if the tags are the same, tagsDisplayFormatter retrieves the data from the cache.
+        setDetailsTextAndSelection(extraText = tagsDisplayFormatter.format(context, tags = tags))
     }
 
     private fun createDetailsText(extraText: CharSequence): CharSequence {
