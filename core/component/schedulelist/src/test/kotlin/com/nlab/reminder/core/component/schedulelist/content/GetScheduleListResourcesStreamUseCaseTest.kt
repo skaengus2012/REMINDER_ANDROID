@@ -261,7 +261,7 @@ private fun genGetScheduleListResourcesStreamUseCase(
     linkMetadataRepository: LinkMetadataRepository = mockk {
         every { getLinkToMetadataTableAsStream(any()) } returns flowOf(emptyMap())
     }
-): GetScheduleListResourcesStreamUseCase = GetScheduleListResourcesStreamUseCase(
+): GetScheduleListResourcesFlowUseCase = GetScheduleListResourcesFlowUseCase(
     tagRepository = tagRepository,
     linkMetadataRepository = linkMetadataRepository
 )
