@@ -39,6 +39,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
@@ -209,7 +210,7 @@ class GetScheduleListResourcesStreamUseCaseTest {
         )
         val collected = mutableListOf<Set<ScheduleListResource>>()
         backgroundScope.launch(unconfinedTestDispatcher()) {
-            useCase.invoke(scheduleFlow).collect { collected += it }
+            useCase.invoke(scheduleFlow).toList(destination = collected)
         }
         advanceTimeBy(secondScheduleEmitDelayedTimeMs + secondTagsEmitDelayedTimeMs / 2)
         assertThat(collected.size, equalTo(1))
@@ -217,14 +218,15 @@ class GetScheduleListResourcesStreamUseCaseTest {
 
     @Test
     fun `Given slow linkMetadataRepository, When new schedules emitted, Then ignore invalidated value`() = runTest {
+        val firstScheduleLink = genLink()
         val firstSchedule = genSchedule(
-            content = genScheduleContent(link = genLink())
+            content = genScheduleContent(link = firstScheduleLink)
         )
         val secondSchedule = firstSchedule.copy(
             content = firstSchedule.content.copy(link = null)
         )
         val secondScheduleEmitDelayedTimeMs = 1000L
-        val secondTagsEmitDelayedTimeMs = 500L
+        val secondLinkMetadataEmitDelayedTimeMs = 500L
         val scheduleFlow = flow {
             emit(setOf(firstSchedule))
             delay(secondScheduleEmitDelayedTimeMs)
@@ -233,12 +235,12 @@ class GetScheduleListResourcesStreamUseCaseTest {
         val useCase = genGetScheduleListResourcesStreamUseCase(
             linkMetadataRepository = mockk {
                 every { getLinkToMetadataTableAsStream(any()) } answers {
-                    if (args[0] == setOf(firstSchedule.content.link!!)) {
-                        flowOf(emptyMap())
+                    if (args[0] == setOf(firstScheduleLink)) {
+                        flowOf(mapOf(firstScheduleLink to genLinkMetadata()))
                     } else {
                         flow {
                             // Scenario where second link metadata search is slow
-                            delay(secondTagsEmitDelayedTimeMs)
+                            delay(secondLinkMetadataEmitDelayedTimeMs)
                             emit(emptyMap())
                         }
                     }
@@ -247,9 +249,9 @@ class GetScheduleListResourcesStreamUseCaseTest {
         )
         val collected = mutableListOf<Set<ScheduleListResource>>()
         backgroundScope.launch(unconfinedTestDispatcher()) {
-            useCase.invoke(scheduleFlow).collect { collected += it }
+            useCase.invoke(scheduleFlow).toList(destination = collected)
         }
-        advanceTimeBy(secondScheduleEmitDelayedTimeMs + secondTagsEmitDelayedTimeMs / 2)
+        advanceTimeBy(secondScheduleEmitDelayedTimeMs + secondLinkMetadataEmitDelayedTimeMs / 2)
         assertThat(collected.size, equalTo(1))
     }
 }
