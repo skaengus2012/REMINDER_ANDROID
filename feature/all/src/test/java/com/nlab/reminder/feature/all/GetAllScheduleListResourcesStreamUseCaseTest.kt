@@ -204,7 +204,7 @@ private fun genGetAllScheduleListResourcesStreamUseCase(
     completedScheduleShownRepository: CompletedScheduleShownRepository = mockk(),
     scheduleRepository: ScheduleRepository = mockk(),
     getScheduleListResourcesStream: GetScheduleListResourcesStreamUseCase = mockk()
-) = GetAllScheduleListResourcesStreamUseCase(
+) = GetAllScheduleListResourcesFlowUseCase(
     completedScheduleShownRepository = completedScheduleShownRepository,
     scheduleRepository = scheduleRepository,
     getScheduleListResourcesStream = getScheduleListResourcesStream
