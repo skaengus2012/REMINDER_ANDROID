@@ -27,10 +27,12 @@ import com.nlab.reminder.core.data.model.genScheduleId
 import com.nlab.reminder.core.data.model.genScheduleTiming
 import com.nlab.reminder.core.data.model.genTags
 import com.nlab.reminder.core.kotlin.NonBlankString
+import com.nlab.reminder.core.kotlin.collections.toSet
 import com.nlab.reminder.core.kotlin.faker.genNonBlankString
 import com.nlab.reminder.core.kotlin.toNonBlankString
 import com.nlab.testkit.faker.genBoolean
 import com.nlab.testkit.faker.genInt
+import kotlin.collections.Set
 
 /**
  * @author Thalys
@@ -57,7 +59,7 @@ fun genScheduleListResource(
 
 fun genScheduleListResources(
     count: Int = genInt(min = 5, max = 10)
-): List<ScheduleListResource> = List(count) { index ->
+): Set<ScheduleListResource> = (1 .. count).toSet { index ->
     genScheduleListResource(
         id = ScheduleId(index.toLong()),
         title = "Test $index".toNonBlankString()
