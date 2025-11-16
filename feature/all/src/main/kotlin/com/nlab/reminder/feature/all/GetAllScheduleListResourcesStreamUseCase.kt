@@ -24,9 +24,17 @@ import com.nlab.reminder.core.data.qualifiers.ScheduleDataOption.All
 import com.nlab.reminder.core.data.repository.CompletedScheduleShownRepository
 import com.nlab.reminder.core.data.repository.GetScheduleQuery
 import com.nlab.reminder.core.data.repository.ScheduleRepository
+import com.nlab.reminder.core.kotlinx.coroutines.flow.channelFlow
+import com.nlab.reminder.core.kotlinx.coroutines.flow.combine
 import com.nlab.reminder.core.kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
 /**
@@ -37,21 +45,80 @@ internal class GetAllScheduleListResourcesStreamUseCase @Inject constructor(
     private val scheduleRepository: ScheduleRepository,
     private val getScheduleListResourcesStream: GetScheduleListResourcesStreamUseCase,
 ) {
+    private val scheduleComparator = compareBy<Schedule> {
+        // isComplete asc (false -> true)
+        it.isComplete
+    }.thenComparing { it.visiblePriority.value }
+
     operator fun invoke(): Flow<List<ScheduleListResource>> = completedScheduleShownRepository
         .getAsStream()
         .flatMapLatest { isCompletedScheduleVisible ->
-            scheduleRepository.getSchedulesAsStream(
-                if (isCompletedScheduleVisible) GetScheduleQuery.All
-                else GetScheduleQuery.ByComplete(isComplete = false)
-            )
+            channelFlow {
+                val schedulesStateFlow = scheduleRepository
+                    .getSchedulesAsStream(
+                        request = if (isCompletedScheduleVisible) {
+                            GetScheduleQuery.All
+                        } else {
+                            GetScheduleQuery.ByComplete(isComplete = false)
+                        }
+                    )
+                    .stateIn(
+                        scope = this,
+                        started = SharingStarted.Eagerly,
+                        initialValue = emptySet()
+                    )
+                combine(
+                    schedulesStateFlow.map { schedules -> schedules.associateBy { it.id } },
+                    getScheduleListResourcesStream(schedulesStateFlow),
+                ) { idToScheduleTable, scheduleListResources ->
+                    if (idToScheduleTable.size != scheduleListResources.size
+                        && scheduleListResources.any { it.id !in idToScheduleTable }
+                    ) {
+                        // invalid state
+                        return@combine null
+                    }
+                    scheduleListResources.sortedWith { resource1, resource2 ->
+                        val schedule1 = idToScheduleTable.getValue(resource1.id)
+                        val schedule2 = idToScheduleTable.getValue(resource2.id)
+                        scheduleComparator.compare(schedule1, schedule2)
+                    }
+                }.filterNotNull().onEach { send(it) }.launchIn(scope = this)
+            }
         }
-        .map { schedules ->
-            schedules.sortedWith(
-                comparator = compareBy<Schedule> {
-                    // isComplete asc (false -> true)
-                    it.isComplete
-                }.thenComparing { it.visiblePriority.value }
+
+    private fun getScheduleResourcesWith(
+        isCompletedScheduleVisible: Boolean
+    ): Flow<List<ScheduleListResource>> = channelFlow {
+        val schedulesStateFlow = scheduleRepository
+            .getSchedulesAsStream(
+                request = if (isCompletedScheduleVisible) {
+                    GetScheduleQuery.All
+                } else {
+                    GetScheduleQuery.ByComplete(isComplete = false)
+                }
             )
-        }
-        .let(getScheduleListResourcesStream::invoke)
+            .stateIn(
+                scope = this,
+                started = SharingStarted.Eagerly,
+                initialValue = emptySet()
+            )
+        combine(
+            schedulesStateFlow
+                .map { schedules -> schedules.associateBy { it.id } }
+                .distinctUntilChanged(),
+            getScheduleListResourcesStream(schedulesStateFlow),
+        ) { idToScheduleTable, scheduleListResources ->
+            if (idToScheduleTable.size != scheduleListResources.size
+                && scheduleListResources.any { it.id !in idToScheduleTable }
+            ) {
+                // invalid state
+                return@combine null
+            }
+            scheduleListResources.sortedWith { resource1, resource2 ->
+                val schedule1 = idToScheduleTable.getValue(resource1.id)
+                val schedule2 = idToScheduleTable.getValue(resource2.id)
+                scheduleComparator.compare(schedule1, schedule2)
+            }
+        }.filterNotNull().onEach { send(it) }.launchIn(scope = this)
+    }
 }
