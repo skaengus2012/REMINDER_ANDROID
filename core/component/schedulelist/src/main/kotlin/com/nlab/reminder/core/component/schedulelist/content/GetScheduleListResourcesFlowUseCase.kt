@@ -41,7 +41,7 @@ import kotlinx.coroutines.flow.stateIn
 /**
  * @author Thalys
  */
-class GetScheduleListResourcesStreamUseCase(
+class GetScheduleListResourcesFlowUseCase(
     private val tagRepository: TagRepository,
     private val linkMetadataRepository: LinkMetadataRepository
 ) {
@@ -77,9 +77,7 @@ class GetScheduleListResourcesStreamUseCase(
             if (chunk.totalLinks != totalLinkMetadataTableResponse.request) return@combine null
 
             chunk.schedules.toSet(transform = ::transformToScheduleListResource)
-        }.filterNotNull()
-            .onEach { resultFlow.value = it }
-            .launchIn(scope = this)
+        }.filterNotNull().onEach { resultFlow.value = it }.launchIn(scope = this)
     }
 
     private fun totalTagsResponseFlowOf(
