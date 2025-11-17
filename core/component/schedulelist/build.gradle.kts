@@ -31,6 +31,7 @@ dependencies {
     implementation(libs.androidx.fragment.compose)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.transition.ktx)
+    implementation(libs.kotlinx.collections.immutable)
     implementation(libs.timber)
 
     testImplementation(projects.core.dataTest)
