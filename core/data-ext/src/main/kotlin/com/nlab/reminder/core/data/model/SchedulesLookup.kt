@@ -31,6 +31,13 @@ data class SchedulesLookup(val values: Set<Schedule>) {
         return id in table
     }
 
+    /**
+     * Returns the [Schedule] associated with the given [id], or throws an exception if not found.
+     *
+     * @param id The [ScheduleId] to look up.
+     * @return The [Schedule] associated with the given [id].
+     * @throws NoSuchElementException if no [Schedule] with the given [id] exists.
+     */
     fun requireValue(id: ScheduleId): Schedule {
         return table.getValue(id)
     }
