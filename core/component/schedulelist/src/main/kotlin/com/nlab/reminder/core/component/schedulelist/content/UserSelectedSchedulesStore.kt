@@ -26,7 +26,7 @@ import kotlinx.coroutines.flow.update
 /**
  * @author Thalys
  */
-class ScheduleListSelectionStore {
+class UserSelectedSchedulesStore {
     private val _selectedIds = MutableStateFlow<PersistentSet<ScheduleId>>(persistentHashSetOf())
     val selectedIds: StateFlow<Set<ScheduleId>> = _selectedIds.asStateFlow()
 

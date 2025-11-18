@@ -16,7 +16,7 @@
 
 package com.nlab.reminder.core.component.schedulelist.di
 
-import com.nlab.reminder.core.component.schedulelist.content.ScheduleListSelectionStore
+import com.nlab.reminder.core.component.schedulelist.content.UserSelectedSchedulesStore
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -31,5 +31,5 @@ import dagger.hilt.android.scopes.ViewModelScoped
 internal object ViewModelScopeScheduleListModule {
     @ViewModelScoped
     @Provides
-    fun provideScheduleListSelectionStore(): ScheduleListSelectionStore = ScheduleListSelectionStore()
+    fun provideUserSelectedSchedulesStore(): UserSelectedSchedulesStore = UserSelectedSchedulesStore()
 }
