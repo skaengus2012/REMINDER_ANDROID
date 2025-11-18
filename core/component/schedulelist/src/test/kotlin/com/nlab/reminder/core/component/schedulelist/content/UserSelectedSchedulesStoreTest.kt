@@ -24,16 +24,16 @@ import org.junit.Test
 /**
  * @author Thalys
  */
-class ScheduleListSelectionStoreTest {
+class UserSelectedSchedulesStoreTest {
     @Test
     fun `Given store created, When state observed, Then selected is empty`() {
-        val interactionStore = ScheduleListSelectionStore()
+        val interactionStore = UserSelectedSchedulesStore()
         assertThat(interactionStore.selectedIds.value, equalTo(emptySet()))
     }
 
     @Test
     fun `Given scheduleId, When onSelectionChanged invoked, Then selected state is updated`() {
-        val interactionStore = ScheduleListSelectionStore()
+        val interactionStore = UserSelectedSchedulesStore()
         val scheduleId = genScheduleId()
 
         interactionStore.onSelectionChanged(scheduleId, selected = true)
