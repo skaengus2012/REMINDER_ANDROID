@@ -17,6 +17,9 @@
 package com.nlab.reminder.core.data.model
 
 /**
+ * Provides efficient lookup operations for schedules by their IDs.
+ *
+ * This class allows quick access to {@link Schedule} instances using their {@link ScheduleId}.
  * @author Thalys
  */
 data class SchedulesLookup(val values: Set<Schedule>) {
