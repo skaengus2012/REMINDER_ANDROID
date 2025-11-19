@@ -16,6 +16,8 @@
 
 package com.nlab.reminder.core.component.schedulelist.di
 
+import com.nlab.reminder.core.component.schedulelist.content.GetScheduleListResourcesFlowUseCase
+import com.nlab.reminder.core.component.schedulelist.content.GetUserScheduleListResourcesFlowUseCase
 import com.nlab.reminder.core.component.schedulelist.content.UserSelectedSchedulesStore
 import dagger.Module
 import dagger.Provides
@@ -32,4 +34,14 @@ internal object ViewModelScopeScheduleListModule {
     @ViewModelScoped
     @Provides
     fun provideUserSelectedSchedulesStore(): UserSelectedSchedulesStore = UserSelectedSchedulesStore()
+
+    @ViewModelScoped
+    @Provides
+    fun provideGetUserScheduleListResourcesFlowUseCase(
+        getScheduleListResourcesFlow: GetScheduleListResourcesFlowUseCase,
+        userSelectedSchedulesStore: UserSelectedSchedulesStore
+    ): GetUserScheduleListResourcesFlowUseCase = GetUserScheduleListResourcesFlowUseCase(
+        getScheduleListResourcesFlow = getScheduleListResourcesFlow,
+        userSelectedSchedulesStore = userSelectedSchedulesStore
+    )
 }
