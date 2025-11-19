@@ -100,7 +100,7 @@ class GetUserScheduleListResourcesFlowUseCaseTest {
     }
 
     @Test
-    fun `Given selected IDs, When invoked, Then reflects selection state in result`()= runTest {
+    fun `Given selected IDs, When invoked, Then reflects selection state in result`() = runTest {
         val schedules = genSchedules()
         val expectedSelectedIds =
             schedules.shuffledSubset(generateMinSize = schedules.size / 2).toSet { it.id }
