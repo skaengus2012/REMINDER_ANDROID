@@ -75,7 +75,8 @@ object FakeData {
                                 name = "이것은태그입니다만".toNonBlankString()
                             ),
                         )
-                    )
+                    ),
+                    selected = false
                 )
             }
         }

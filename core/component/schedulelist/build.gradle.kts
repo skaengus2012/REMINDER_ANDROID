@@ -15,6 +15,7 @@ android {
 
 dependencies {
     api(projects.core.component.displayformat)
+    api(projects.core.dataExt)
 
     implementation(projects.core.android)
     implementation(projects.core.androidx.fragment)
