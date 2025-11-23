@@ -226,7 +226,10 @@ internal class ContentViewHolder(
             jobs += viewLifecycleScope.launch {
                 combine(bindingId.filterNotNull(), selectedScheduleIds) { id, selectedIds -> id in selectedIds }
                     .distinctUntilChanged()
-                    .collect { binding.buttonSelection.isSelected = it }
+                    .collect {
+                        println("selected ${bindingId.value}")
+                        binding.buttonSelection.isSelected = it
+                    }
             }
             jobs += viewLifecycleScope.launch {
                 timeZoneState.collect { timeZone ->

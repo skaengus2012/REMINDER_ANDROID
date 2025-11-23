@@ -22,6 +22,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import com.nlab.reminder.core.component.schedulelist.content.ScheduleListElement
+import com.nlab.reminder.core.kotlin.collections.IdentityList
 import com.nlab.reminder.core.kotlin.collections.toIdentityList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -32,7 +33,7 @@ import kotlinx.coroutines.withContext
 @Immutable
 sealed class ScheduleListItemsAdaptation {
     internal data object Absent : ScheduleListItemsAdaptation()
-    internal data class Exist(val items: List<ScheduleListItem>) : ScheduleListItemsAdaptation()
+    internal data class Exist(val items: IdentityList<ScheduleListItem>) : ScheduleListItemsAdaptation()
 }
 
 @Composable
@@ -53,7 +54,9 @@ fun <T : ScheduleListElement> rememberScheduleListItemsAdaptationState(
         value = if (elements.isEmpty()) {
             emptyList()
         } else {
-            withContext(Dispatchers.Default) { buildBodyItemsIfNotEmpty(elements) }
+            withContext(Dispatchers.Default) {
+                buildBodyItemsIfNotEmpty(elements).toIdentityList()
+            }
         }
     }
     return produceState<ScheduleListItemsAdaptation>(

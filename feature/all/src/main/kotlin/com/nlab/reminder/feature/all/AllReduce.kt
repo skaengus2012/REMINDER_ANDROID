@@ -42,4 +42,17 @@ internal fun AllReduce(environment: AllEnvironment): AllReduce = DslReduce {
             )
         }
     }
+    stateScope<Success> {
+        transition<OnSelectionModeToggled> {
+            current.copy(multiSelectionEnabled = current.multiSelectionEnabled.not())
+        }
+        effect<OnSelectionModeToggled> {
+            if (current.multiSelectionEnabled) {
+                environment.userSelectedSchedulesStore.clear()
+            }
+        }
+        effect<OnItemSelectionChanged> {
+            environment.userSelectedSchedulesStore.onSelectionChanged(selectedIds = action.selectedIds)
+        }
+    }
 }

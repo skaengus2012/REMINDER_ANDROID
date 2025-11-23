@@ -40,8 +40,10 @@ import com.nlab.reminder.core.component.schedulelist.toolbar.ui.rememberSchedule
 import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
 import com.nlab.reminder.core.kotlin.collections.IdentityList
 import com.nlab.reminder.core.androidx.compose.runtime.rememberAccumulatedStateStream
+import com.nlab.reminder.core.data.model.ScheduleId
 import com.nlab.reminder.core.kotlin.collections.toIdentityList
 import com.nlab.reminder.core.translation.StringIds
+import com.nlab.reminder.feature.all.AllAction
 import com.nlab.reminder.feature.all.AllEnvironment
 import com.nlab.reminder.feature.all.AllReduce
 import com.nlab.reminder.feature.all.AllUiState
@@ -86,11 +88,12 @@ internal fun AllScreen(
         uiState = uiState,
         contentDelayTimeMillis = enterTransitionTimeInMillis,
         onBackClicked = onBackClicked,
-        onMoreClicked = {
-            // TODO implements
-        },
+        onMoreClicked = { store.dispatch(AllAction.OnSelectionModeToggled) },
         onCompleteClicked = {
             // TODO implements
+        },
+        onItemSelectionChanged = { selectedIds ->
+            store.dispatch(AllAction.OnItemSelectionChanged(selectedIds))
         },
         onSimpleAdd = { simpleAdd ->
             // TODO implements
@@ -123,6 +126,7 @@ private fun AllScreen(
     onBackClicked: () -> Unit,
     onMoreClicked: () -> Unit,
     onCompleteClicked: () -> Unit,
+    onItemSelectionChanged: (Set<ScheduleId>) -> Unit,
     onSimpleAdd: (SimpleAdd) -> Unit,
     onSimpleEdit: (SimpleEdit) -> Unit,
     modifier: Modifier = Modifier,
@@ -157,6 +161,7 @@ private fun AllScreen(
                         scheduleListResources = uiState.scheduleListResources,
                         multiSelectionEnabled = uiState.multiSelectionEnabled,
                         toolbarState = toolbarState,
+                        onItemSelectionChanged = onItemSelectionChanged,
                         onSimpleAdd = onSimpleAdd,
                         onSimpleEdit = onSimpleEdit
                     )
@@ -173,6 +178,7 @@ private fun AllScheduleListContent(
     scheduleListResources: List<UserScheduleListResource>,
     multiSelectionEnabled: Boolean,
     toolbarState: ScheduleListToolbarState,
+    onItemSelectionChanged: (Set<ScheduleId>) -> Unit,
     onSimpleAdd: (SimpleAdd) -> Unit,
     onSimpleEdit: (SimpleEdit) -> Unit,
     modifier: Modifier = Modifier
@@ -201,6 +207,7 @@ private fun AllScheduleListContent(
         triggerAtFormatPatterns = remember { AllScheduleTriggerAtFormatPatterns() },
         theme = ScheduleListTheme.Point3,
         toolbarState = toolbarState,
+        onItemSelectionChanged = onItemSelectionChanged,
         onSimpleAdd = onSimpleAdd,
         onSimpleEdit = onSimpleEdit,
     )
@@ -216,6 +223,7 @@ private fun AllScreenPreview() {
             onBackClicked = {},
             onMoreClicked = {},
             onCompleteClicked = {},
+            onItemSelectionChanged = {},
             onSimpleAdd = {},
             onSimpleEdit = {}
         )

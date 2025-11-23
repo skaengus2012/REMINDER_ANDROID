@@ -27,7 +27,7 @@ import kotlinx.coroutines.flow.update
  * @author Thalys
  */
 class UserSelectedSchedulesStore {
-    private val _selectedIds = MutableStateFlow<PersistentSet<ScheduleId>>(persistentHashSetOf())
+    private val _selectedIds = MutableStateFlow<Set<ScheduleId>>(emptySet())
     val selectedIds: StateFlow<Set<ScheduleId>> = _selectedIds.asStateFlow()
 
     fun onSelectionChanged(id: ScheduleId, selected: Boolean) {
@@ -35,5 +35,13 @@ class UserSelectedSchedulesStore {
             if (selected) current + id
             else current - id
         }
+    }
+
+    fun onSelectionChanged(selectedIds: Set<ScheduleId>) {
+        _selectedIds.update { selectedIds }
+    }
+
+    fun clear() {
+        _selectedIds.update { persistentHashSetOf() }
     }
 }

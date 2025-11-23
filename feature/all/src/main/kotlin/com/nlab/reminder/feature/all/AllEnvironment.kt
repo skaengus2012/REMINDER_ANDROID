@@ -18,6 +18,7 @@ package com.nlab.reminder.feature.all
 
 import androidx.lifecycle.ViewModel
 import com.nlab.reminder.core.component.currenttime.GetCurrentTimeSnapshotStreamUseCase
+import com.nlab.reminder.core.component.schedulelist.content.UserSelectedSchedulesStore
 import com.nlab.reminder.core.data.qualifiers.ScheduleData
 import com.nlab.reminder.core.data.qualifiers.ScheduleDataOption.All
 import com.nlab.reminder.core.data.repository.CompletedScheduleShownRepository
@@ -34,4 +35,5 @@ internal class AllEnvironment @Inject constructor(
     @param:ScheduleData(All) val completedScheduleShownRepository: CompletedScheduleShownRepository,
     val getAllUserScheduleListResourcesFlow: GetAllUserScheduleListResourcesFlowUseCase,
     val getCurrentTimeSnapshotStream: GetCurrentTimeSnapshotStreamUseCase,
+    val userSelectedSchedulesStore: UserSelectedSchedulesStore
 ) : ViewModel()
