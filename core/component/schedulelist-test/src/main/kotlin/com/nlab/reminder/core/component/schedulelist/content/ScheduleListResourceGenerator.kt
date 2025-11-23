@@ -18,6 +18,7 @@ package com.nlab.reminder.core.component.schedulelist.content
 
 import com.nlab.reminder.core.data.model.Link
 import com.nlab.reminder.core.data.model.LinkMetadata
+import com.nlab.reminder.core.data.model.Schedule
 import com.nlab.reminder.core.data.model.ScheduleId
 import com.nlab.reminder.core.data.model.ScheduleTiming
 import com.nlab.reminder.core.data.model.Tag
@@ -25,6 +26,7 @@ import com.nlab.reminder.core.data.model.genLink
 import com.nlab.reminder.core.data.model.genLinkMetadata
 import com.nlab.reminder.core.data.model.genScheduleId
 import com.nlab.reminder.core.data.model.genScheduleTiming
+import com.nlab.reminder.core.data.model.genTag
 import com.nlab.reminder.core.data.model.genTags
 import com.nlab.reminder.core.kotlin.NonBlankString
 import com.nlab.reminder.core.kotlin.collections.toSet
@@ -54,6 +56,21 @@ fun genScheduleListResource(
     linkMetadata = linkMetadata,
     timing = timing,
     isComplete = isComplete,
+    tags = tags
+)
+
+fun genScheduleListResource(
+    schedule: Schedule,
+    linkMetadata: LinkMetadata? = genLinkMetadata(),
+    tags: List<Tag> = schedule.content.tagIds.map { genTag(it) }
+): ScheduleListResource = genScheduleListResource(
+    id = schedule.id,
+    title = schedule.content.title,
+    note = schedule.content.note,
+    link = schedule.content.link,
+    linkMetadata = linkMetadata,
+    timing = schedule.content.timing,
+    isComplete = schedule.isComplete,
     tags = tags
 )
 
