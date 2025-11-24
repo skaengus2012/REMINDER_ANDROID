@@ -20,7 +20,6 @@ import com.nlab.reminder.core.data.model.ScheduleId
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 
 /**
  * @author Thalys
@@ -30,7 +29,7 @@ class UserSelectedSchedulesStore {
     val selectedIds: StateFlow<Set<ScheduleId>> = _selectedIds.asStateFlow()
 
     fun replace(selectedIds: Set<ScheduleId>) {
-        _selectedIds.update { selectedIds }
+        _selectedIds.value = selectedIds
     }
 }
 
