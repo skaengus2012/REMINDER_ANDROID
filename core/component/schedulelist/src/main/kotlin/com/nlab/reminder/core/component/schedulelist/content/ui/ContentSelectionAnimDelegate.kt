@@ -17,16 +17,19 @@
 package com.nlab.reminder.core.component.schedulelist.content.ui
 
 import android.animation.Animator
+import android.animation.AnimatorSet
 import android.animation.ValueAnimator
 import android.view.View
-import android.view.ViewGroup.LayoutParams
 import android.widget.ImageButton
+import androidx.annotation.FloatRange
+import androidx.core.view.doOnDetach
 import androidx.core.view.doOnLayout
 import androidx.core.view.updateLayoutParams
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import com.nlab.reminder.core.component.schedulelist.databinding.LayoutScheduleAdapterItemContentBinding
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
+import kotlin.math.abs
 
 /**
  * @author Doohyun
@@ -34,7 +37,8 @@ import kotlin.coroutines.resume
 internal class ContentSelectionAnimDelegate(
     private val binding: LayoutScheduleAdapterItemContentBinding,
 ) {
-    private var latestAnimators = emptySet<Animator>()
+    private var canAnimate: Boolean = false
+    private var latestAnimator: Animator? = null
     private var selectedDataLayoutWidth: Int = 0
     private var unselectedDataLayoutWidth: Int = 0
     private var selectedCompleteButtonTranslationX: Float = 0f
@@ -77,127 +81,209 @@ internal class ContentSelectionAnimDelegate(
                 }
     }
 
-    private inline fun animatorTransaction(block: (duration: Long) -> Set<Animator>) {
-        cancelAnimation()
-        val duration = if (latestAnimators.isEmpty()) 0L else 250L
-        val newAnimators = block(duration)
-        newAnimators.forEach { it.start() }
-        latestAnimators = newAnimators
-    }
-
-    fun startAnimation(selectable: Boolean) = animatorTransaction { duration ->
-        setOf(
-            createDataLayoutAnimator(selectable, duration),
-            createCompleteButtonTranslateAnimator(selectable, duration),
-            createCompleteButtonAlphaAnimator(selectable, duration),
-            createSelectionButtonTranslateAnimator(selectable, duration),
-            createSelectionButtonAlphaAnimator(selectable, duration),
-            createDragButtonTranslateAnimator(selectable, duration),
-            createDragButtonAlphaAnimator(selectable, duration)
-        )
+    fun startAnimation(selectable: Boolean) {
+        if (canAnimate.not()) {
+            canAnimate = true
+            applyDataLayout(selectable)
+            applyCompleteButtonTranslate(selectable)
+            applyCompleteButtonAlpha(selectable)
+            applySelectionButtonTranslateX(selectable)
+            applySelectionButtonAlpha(selectable)
+            applyDragButtonTranslateX(selectable)
+            applyDragButtonAlpha(selectable)
+        } else {
+            cancelAnimation()
+            val animatorItems = listOf(
+                createDataLayoutAnimator(selectable),
+                createCompleteButtonTranslateAnimator(selectable),
+                createCompleteButtonAlphaAnimator(selectable),
+                createSelectionButtonTranslateAnimator(selectable),
+                createSelectionButtonAlphaAnimator(selectable),
+                createDragButtonTranslateAnimator(selectable),
+                createDragButtonAlphaAnimator(selectable),
+            )
+            AnimatorSet()
+                .setDuration(250)
+                .apply {
+                    playTogether(animatorItems)
+                    interpolator = FastOutSlowInInterpolator()
+                }
+                .also { latestAnimator = it }
+                .start()
+        }
     }
 
     fun cancelAnimation() {
-        latestAnimators.forEach { it.cancel() }
+        latestAnimator?.cancel()
     }
 
-    private fun createDataLayoutAnimator(selectable: Boolean, duration: Long): Animator {
+    // Start of DataLayout area
+    private fun createDataLayoutAnimator(selectable: Boolean): Animator {
         val view = binding.layoutData
-        val animator = ValueAnimator.ofInt(
-            view.width,
-            if (selectable) selectedDataLayoutWidth
-            else unselectedDataLayoutWidth
-        )
-        animator.duration = duration
-        animator.interpolator = FastOutSlowInInterpolator()
+        val animator = ValueAnimator.ofInt(view.width, getDataLayoutWidth(selectable))
         animator.addUpdateListener { value ->
-            view.updateLayoutParams<LayoutParams> { width = value.animatedValue as Int }
+            val newWidth = value.animatedValue as Int
+            val currentWidth = view.layoutParams.width
+            if (currentWidth != newWidth) {
+                view.updateLayoutParams { width = newWidth }
+            }
         }
         return animator
     }
 
-    private fun createCompleteButtonTranslateAnimator(selectable: Boolean, duration: Long): Animator {
+    private fun applyDataLayout(selectable: Boolean) {
+        val view = binding.layoutData
+        val currentWidth = view.width
+        val newWidth = getDataLayoutWidth(selectable)
+        val needUpdate = abs(currentWidth - newWidth) > 1
+        if (needUpdate) {
+            val callback = Runnable {
+                view.updateLayoutParams { width = newWidth }
+            }
+            view.post(/* action = */ callback)
+            view.doOnDetach { v -> v.removeCallbacks(/* action = */ callback) }
+        }
+    }
+
+    private fun getDataLayoutWidth(selectable: Boolean): Int {
+        return if (selectable) selectedDataLayoutWidth else unselectedDataLayoutWidth
+    }
+    // End of DataLayout area
+
+    // Start of CompleteButton TranslateX area
+    private fun createCompleteButtonTranslateAnimator(selectable: Boolean): Animator {
         val targetView = binding.buttonComplete
         val animator = ValueAnimator.ofFloat(
             targetView.translationX,
-            if (selectable) selectedCompleteButtonTranslationX
-            else 0f
+            getCompleteButtonTranslateX(selectable)
         )
-        animator.duration = duration
         animator.addUpdateListener { value ->
             targetView.translationX = value.animatedValue as Float
         }
         return animator
     }
 
-    private fun createCompleteButtonAlphaAnimator(selectable: Boolean, duration: Long): Animator {
+    private fun applyCompleteButtonTranslate(selectable: Boolean) {
+        binding.buttonComplete.translationX = getCompleteButtonTranslateX(selectable)
+    }
+
+    private fun getCompleteButtonTranslateX(selectable: Boolean): Float {
+        return if (selectable) selectedCompleteButtonTranslationX else 0f
+    }
+    // End of CompleteButton TranslateX area
+
+    // Start of CompleteButton Alpha area
+    private fun createCompleteButtonAlphaAnimator(selectable: Boolean): Animator {
         val targetView = binding.buttonComplete
         val animator = ValueAnimator.ofFloat(
             targetView.alpha,
-            if (selectable) 0f else 1f
+            getCompleteButtonAlpha(selectable)
         )
-        animator.duration = duration
         animator.addUpdateListener { value ->
             targetView.alpha = value.animatedValue as Float
         }
         return animator
     }
 
-    private fun createSelectionButtonTranslateAnimator(selectable: Boolean, duration: Long): Animator {
+    private fun applyCompleteButtonAlpha(selectable: Boolean) {
+        binding.buttonComplete.alpha = getCompleteButtonAlpha(selectable)
+    }
+
+    @FloatRange(from = 0.0, to = 1.0)
+    private fun getCompleteButtonAlpha(selectable: Boolean): Float {
+        return if (selectable) 0f else 1f
+    }
+    // End of CompleteButton Alpha area
+
+    // Start of SelectionButton TranslateX area
+    private fun createSelectionButtonTranslateAnimator(selectable: Boolean): Animator {
         val targetView = binding.buttonSelection
         val animator = ValueAnimator.ofFloat(
             targetView.translationX,
-            if (selectable) selectedSelectionButtonTranslationX
-            else 0f
+            getSelectionButtonTranslateX(selectable)
         )
-        animator.duration = duration
         animator.addUpdateListener { value ->
             targetView.translationX = value.animatedValue as Float
         }
         return animator
     }
 
-    private fun createSelectionButtonAlphaAnimator(selectable: Boolean, duration: Long): Animator {
+    private fun applySelectionButtonTranslateX(selectable: Boolean) {
+        binding.buttonSelection.translationX = getSelectionButtonTranslateX(selectable)
+    }
+
+    private fun getSelectionButtonTranslateX(selectable: Boolean): Float {
+        return if (selectable) selectedSelectionButtonTranslationX else 0f
+    }
+    // End of SelectionButton TranslateX area
+
+    // Start of SelectionButton Alpha area
+    private fun createSelectionButtonAlphaAnimator(selectable: Boolean): Animator {
         val targetView = binding.buttonSelection
         val animator = ValueAnimator.ofFloat(
             targetView.alpha,
-            if (selectable) 1f
-            else 0f
+            getSelectionButtonAlpha(selectable)
         )
-        animator.duration = duration
         animator.addUpdateListener { value ->
             targetView.alpha = value.animatedValue as Float
         }
         return animator
     }
 
-    private fun createDragButtonTranslateAnimator(selectable: Boolean, duration: Long): Animator {
+    private fun applySelectionButtonAlpha(selectable: Boolean) {
+        binding.buttonSelection.alpha = getSelectionButtonAlpha(selectable)
+    }
+
+    @FloatRange(from = 0.0, to = 1.0)
+    private fun getSelectionButtonAlpha(selectable: Boolean): Float {
+        return if (selectable) 1f else 0f
+    }
+    // End of SelectionButton Alpha area
+
+    // Start of DragButton TranslateX area
+    private fun createDragButtonTranslateAnimator(selectable: Boolean): Animator {
         val targetView = binding.buttonDragHandle
         val animator = ValueAnimator.ofFloat(
             targetView.translationX,
-            if (selectable) selectedDragButtonTransitionX
-            else 0f
+            getDragButtonTranslateX(selectable)
         )
-        animator.duration = duration
         animator.addUpdateListener { value ->
             targetView.translationX = value.animatedValue as Float
         }
         return animator
     }
 
-    private fun createDragButtonAlphaAnimator(selectable: Boolean, duration: Long): Animator {
+    private fun applyDragButtonTranslateX(selectable: Boolean) {
+        binding.buttonDragHandle.translationX = getDragButtonTranslateX(selectable)
+    }
+
+    private fun getDragButtonTranslateX(selectable: Boolean): Float {
+        return if (selectable) selectedDragButtonTransitionX else 0f
+    }
+    // End of DragButton TranslateX area
+
+    // Start of DragButton Alpha area
+    private fun createDragButtonAlphaAnimator(selectable: Boolean): Animator {
         val targetView = binding.buttonDragHandle
         val animator = ValueAnimator.ofFloat(
             targetView.alpha,
-            if (selectable) 1f
-            else 0f
+            getDragButtonAlpha(selectable)
         )
-        animator.duration = duration
         animator.addUpdateListener { value ->
             targetView.alpha = value.animatedValue as Float
         }
         return animator
     }
+
+    private fun applyDragButtonAlpha(selectable: Boolean) {
+        binding.buttonDragHandle.alpha = getDragButtonAlpha(selectable)
+    }
+
+    @FloatRange(from = 0.0, to = 1.0)
+    private fun getDragButtonAlpha(selectable: Boolean): Float {
+        return if (selectable) 1f else 0f
+    }
+    // End of DragButton Alpha area
 
     fun applyStateTo(
         layoutData: View,
