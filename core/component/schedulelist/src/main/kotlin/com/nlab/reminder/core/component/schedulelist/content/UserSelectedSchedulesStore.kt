@@ -17,7 +17,6 @@
 package com.nlab.reminder.core.component.schedulelist.content
 
 import com.nlab.reminder.core.data.model.ScheduleId
-import kotlinx.collections.immutable.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -27,13 +26,14 @@ import kotlinx.coroutines.flow.update
  * @author Thalys
  */
 class UserSelectedSchedulesStore {
-    private val _selectedIds = MutableStateFlow<PersistentSet<ScheduleId>>(persistentHashSetOf())
+    private val _selectedIds = MutableStateFlow<Set<ScheduleId>>(emptySet())
     val selectedIds: StateFlow<Set<ScheduleId>> = _selectedIds.asStateFlow()
 
-    fun onSelectionChanged(id: ScheduleId, selected: Boolean) {
-        _selectedIds.update { current ->
-            if (selected) current + id
-            else current - id
-        }
+    fun replace(selectedIds: Set<ScheduleId>) {
+        _selectedIds.update { selectedIds }
     }
+}
+
+fun UserSelectedSchedulesStore.clear() {
+    replace(selectedIds = emptySet())
 }

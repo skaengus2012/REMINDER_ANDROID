@@ -16,31 +16,18 @@
 
 package com.nlab.reminder.core.component.schedulelist.content
 
-import com.nlab.reminder.core.data.model.ScheduleId
-import com.nlab.testkit.faker.genInt
+import com.nlab.reminder.core.data.model.genScheduleId
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
 
-/**
- * @author Thalys
- */
-class UserSelectedSchedulesStoreTest {
+class UserSelectedSchedulesStoreKtTest {
     @Test
-    fun `Given store created, When state observed, Then selected is empty`() {
-        val store = UserSelectedSchedulesStore()
-        assertThat(store.selectedIds.value, equalTo(emptySet()))
-    }
-
-    @Test
-    fun `Given scheduleIds, When replace invoked, Then selectedIds is updated`() {
-        val store = UserSelectedSchedulesStore()
-        val scheduleIds = List(size = genInt(min = 5, max = 10)) { index -> ScheduleId(rawId = index.toLong() + 1) }
-
-        store.replace(selectedIds = scheduleIds.shuffled().toSet())
-        assertThat(store.selectedIds.value, equalTo(scheduleIds.toSet()))
-
-        store.replace(selectedIds = emptySet())
+    fun `Given non-empty store, When clear invoked, Then selectedIds is empty`() {
+        val store = UserSelectedSchedulesStore().apply {
+            replace(setOf(genScheduleId()))
+        }
+        store.clear()
         assertThat(store.selectedIds.value, equalTo(emptySet()))
     }
 }
