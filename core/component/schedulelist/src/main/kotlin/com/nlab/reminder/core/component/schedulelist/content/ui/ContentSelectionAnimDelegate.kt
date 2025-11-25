@@ -22,6 +22,7 @@ import android.animation.ValueAnimator
 import android.view.View
 import android.widget.ImageButton
 import androidx.annotation.FloatRange
+import androidx.core.animation.addListener
 import androidx.core.view.doOnDetach
 import androidx.core.view.doOnLayout
 import androidx.core.view.updateLayoutParams
@@ -128,6 +129,11 @@ internal class ContentSelectionAnimDelegate(
                 view.updateLayoutParams { width = newWidth }
             }
         }
+        animator.addListener(
+            onStart = { view.setLayerType(View.LAYER_TYPE_HARDWARE, null) },
+            onEnd = { view.setLayerType(View.LAYER_TYPE_NONE, null) },
+            onCancel = { view.setLayerType(View.LAYER_TYPE_NONE, null) }
+        )
         return animator
     }
 

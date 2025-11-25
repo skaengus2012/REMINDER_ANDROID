@@ -28,11 +28,14 @@ import com.nlab.reminder.core.component.schedulelist.databinding.LayoutScheduleA
 import com.nlab.reminder.core.component.schedulelist.databinding.LayoutScheduleAdapterListGroupHeaderDefaultBinding
 import com.nlab.reminder.core.component.schedulelist.databinding.LayoutScheduleAdapterListGroupHeaderSubDefaultBinding
 import com.nlab.reminder.core.data.model.ScheduleId
+import kotlinx.collections.immutable.*
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.datetime.TimeZone
 import kotlin.time.Instant
@@ -57,7 +60,9 @@ internal class ScheduleListAdapter : RecyclerView.Adapter<ScheduleAdapterItemVie
     private val entryAtState = MutableStateFlow<Instant?>(null)
     private val scheduleTimingDisplayFormatterState = MutableStateFlow<ScheduleTimingDisplayFormatter?>(null)
     private val selectionEnabled = MutableStateFlow(false)
-    private val selectedScheduleIds = MutableStateFlow<Set<ScheduleId>>(emptySet())
+
+    private val _selectedScheduleIds = MutableStateFlow<PersistentSet<ScheduleId>>(persistentHashSetOf())
+    val selectedScheduleIds: StateFlow<Set<ScheduleId>> = _selectedScheduleIds.asStateFlow()
 
     private val _addRequests = MutableEventSharedFlow<SimpleAdd>()
     val addRequests: SharedFlow<SimpleAdd> = _addRequests.asSharedFlow()
@@ -106,7 +111,7 @@ internal class ScheduleListAdapter : RecyclerView.Adapter<ScheduleAdapterItemVie
                     entryAtState = entryAtState,
                     scheduleTimingDisplayFormatterState = scheduleTimingDisplayFormatterState,
                     selectionEnabled = selectionEnabled,
-                    selectedScheduleIds = selectedScheduleIds,
+                    selectedScheduleIds = _selectedScheduleIds,
                     onSimpleEditDone = { _editRequests.tryEmit(it) },
                     onDragHandleTouched = { _dragHandleTouches.tryEmit(it) },
                     onSelectButtonTouched = { _selectButtonTouches.tryEmit(it) },
@@ -205,10 +210,14 @@ internal class ScheduleListAdapter : RecyclerView.Adapter<ScheduleAdapterItemVie
     }
 
     fun setSelected(scheduleId: ScheduleId, selected: Boolean) {
-        selectedScheduleIds.update { old ->
+        _selectedScheduleIds.update { old ->
             if (selected) old + scheduleId
             else old - scheduleId
         }
+    }
+
+    fun setSelected(selectedIds: PersistentSet<ScheduleId>) {
+        _selectedScheduleIds.value = selectedIds
     }
 
     fun submitMoving(fromPosition: Int, toPosition: Int): Boolean {
@@ -227,10 +236,6 @@ internal class ScheduleListAdapter : RecyclerView.Adapter<ScheduleAdapterItemVie
 
     fun getCurrentList(): List<ScheduleListItem> {
         return differ.getCurrentList()
-    }
-
-    fun getCurrentSelected(): Set<ScheduleId> {
-        return selectedScheduleIds.value
     }
 
     fun updateTheme(theme: ScheduleListTheme) {

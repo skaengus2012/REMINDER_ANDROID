@@ -17,6 +17,7 @@
 package com.nlab.reminder.feature.all
 
 import com.nlab.reminder.core.component.schedulelist.content.UserScheduleListResource
+import com.nlab.reminder.core.data.model.ScheduleId
 import kotlin.time.Instant
 
 /**
@@ -27,4 +28,8 @@ internal sealed interface AllAction {
         val entryAt: Instant,
         val scheduleResources: List<UserScheduleListResource>
     ) : AllAction
+
+    data object OnSelectionModeToggled : AllAction
+
+    data class OnItemSelectionChanged(val selectedIds: Set<ScheduleId>) : AllAction
 }
