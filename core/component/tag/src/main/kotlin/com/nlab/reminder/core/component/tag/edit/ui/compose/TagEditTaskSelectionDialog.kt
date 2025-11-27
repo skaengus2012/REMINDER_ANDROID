@@ -16,12 +16,9 @@
 
 package com.nlab.reminder.core.component.tag.edit.ui.compose
 
-import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -29,9 +26,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
-import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.pluralStringResource
@@ -109,46 +104,27 @@ private fun TagEditTaskSelectionDialogButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Box(modifier = modifier) {
-        TagEditTaskSelectionDialogButtonBackground(
-            onClick = onClick,
-            onClickLabel = text
-        )
-        Text(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 15.dp, vertical = 7.5.dp),
-            text = text,
-            style = PlaneatTheme.typography.bodyMedium,
-            color = fontColor,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            textAlign = TextAlign.Center
-        )
-    }
-}
-
-@Composable
-private fun BoxScope.TagEditTaskSelectionDialogButtonBackground(
-    onClick: () -> Unit,
-    onClickLabel: String
-) {
-    Spacer(
-        modifier = Modifier
-            .matchParentSize()
-            .combinedClickable(
-                remember { MutableInteractionSource() },
-                indication = ripple(color = PlaneatTheme.colors.bgRipple1),
+    Text(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable(
                 onClick = throttleClick(onClick = onClick),
-                onClickLabel = onClickLabel,
+                onClickLabel = text,
                 role = Role.Button
             )
+            .padding(horizontal = 15.dp, vertical = 7.5.dp),
+        text = text,
+        style = PlaneatTheme.typography.bodyMedium,
+        color = fontColor,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+        textAlign = TextAlign.Center
     )
 }
 
 @Previews
 @Composable
-private fun TagEditTaskSelectionDialogPreview() {
+private fun TagEditIntroDialogPreview() {
     PlaneatTheme {
         Box(modifier = Modifier.size(300.dp)) {
             TagEditTaskSelectionDialog(

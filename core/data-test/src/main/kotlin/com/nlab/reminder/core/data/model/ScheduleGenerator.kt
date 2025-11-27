@@ -18,6 +18,7 @@ package com.nlab.reminder.core.data.model
 
 import com.nlab.reminder.core.kotlin.NonBlankString
 import com.nlab.reminder.core.kotlin.NonNegativeLong
+import com.nlab.reminder.core.kotlin.collections.toSet
 import com.nlab.reminder.core.kotlin.faker.genNonBlankString
 import com.nlab.reminder.core.kotlin.faker.genNonNegativeLong
 import com.nlab.testkit.faker.genBoolean
@@ -47,11 +48,24 @@ fun genScheduleContent(
 
 fun genScheduleTiming(
     triggerAt: Instant = Clock.System.now(),
-    isTriggerAtDateOnly: Boolean = genBoolean(),
-    repeat: Repeat? = genRepeat()
-): ScheduleTiming = ScheduleTiming(
+    isTriggerAtDateOnly: Boolean = genBoolean()
+): ScheduleTiming =
+    if (isTriggerAtDateOnly) genScheduleTimingDateType(triggerAt)
+    else genScheduleTimingDateTimeType(triggerAt)
+
+fun genScheduleTimingDateType(
+    triggerAt: Instant = Clock.System.now(),
+    dateOnlyRepeat: DateOnlyRepeat? = genDateOnlyRepeat()
+): ScheduleTiming.Date = ScheduleTiming.Date(
     triggerAt = triggerAt,
-    isTriggerAtDateOnly = isTriggerAtDateOnly,
+    dateOnlyRepeat = dateOnlyRepeat
+)
+
+fun genScheduleTimingDateTimeType(
+    triggerAt: Instant = Clock.System.now(),
+    repeat: Repeat? = genRepeat()
+): ScheduleTiming.DateTime = ScheduleTiming.DateTime(
+    triggerAt = triggerAt,
     repeat = repeat
 )
 
@@ -67,6 +81,6 @@ fun genSchedule(
     isComplete = isComplete
 )
 
-fun genSchedules(count: Int = genInt(min = 5, max = 10)): List<Schedule> = List(count) {
+fun genSchedules(count: Int = genInt(min = 5, max = 10)): Set<Schedule> = (1 .. count).toSet {
     genSchedule(id = ScheduleId(rawId = it.toLong() + 1))
 }

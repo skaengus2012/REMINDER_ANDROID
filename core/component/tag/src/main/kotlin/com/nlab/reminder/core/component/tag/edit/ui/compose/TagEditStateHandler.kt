@@ -17,7 +17,6 @@
 package com.nlab.reminder.core.component.tag.edit.ui.compose
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.remember
 import com.nlab.reminder.core.component.tag.edit.TagEditState
 
@@ -57,11 +56,9 @@ fun TagEditStateHandler(
                 shouldKeyboardShown = state.shouldUserInputReady,
                 onTextChanged = onRenameInputted,
                 onCancel = onCompleted,
-                onConfirm = onRenameConfirmClicked
+                onConfirm = onRenameConfirmClicked,
+                onKeyboardInitiallyDisplayed = onRenameInputReady,
             )
-            if (state.shouldUserInputReady) {
-                SideEffect { onRenameInputReady() }
-            }
         }
 
         is TagEditState.Merge -> {

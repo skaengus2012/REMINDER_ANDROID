@@ -15,8 +15,9 @@
   -->
 
 <resources>
+
     <style name="Theme.Planeat.SplashScreen" parent="Base.Theme.Planeat.SplashScreen">
         <item name="android:windowSplashScreenBrandingImage">@drawable/ic_brand_splash</item>
-        <item name="windowSplashScreenBackground">?bg_1</item>
     </style>
+
 </resources>

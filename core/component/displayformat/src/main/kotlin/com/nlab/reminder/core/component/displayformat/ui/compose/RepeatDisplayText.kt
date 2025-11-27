@@ -18,7 +18,7 @@ package com.nlab.reminder.core.component.displayformat.ui.compose
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
-import com.nlab.reminder.core.androidx.compose.ui.res.resources
+import androidx.compose.ui.platform.LocalResources
 import com.nlab.reminder.core.data.model.Repeat
 import kotlinx.datetime.LocalDate
 import com.nlab.reminder.core.component.displayformat.ui.repeatDisplayText as repeatDisplayTextOrigin
@@ -35,7 +35,7 @@ fun repeatDisplayText(
     repeat: Repeat,
     triggerAt: LocalDate
 ): String {
-    val resources = resources()
+    val resources = LocalResources.current
     return repeatDisplayTextOrigin(
         resources = resources,
         repeat = repeat,

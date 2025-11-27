@@ -16,12 +16,11 @@
 
 <resources>
     <!-- gray -->
-    <color name="gray_1">#F2F2F6</color>
     <color name="gray_2">#838387</color>
     <!-- https://m2.material.io/design/color/the-color-system.html#tools-for-picking-colors -->
-    <color name="gray_50">#FAFAFA</color>
     <color name="gray_400">#BDBDBD</color>
     <color name="gray_500">#9E9E9E</color>
+    <color name="gray_500_op_70">#B39E9E9E</color>
     <color name="gray_600">#757575</color>
     <color name="gray_700">#616161</color>
     <color name="gray_800">#424242</color>
@@ -32,34 +31,41 @@
 
     <!-- point -->
     <color name="point_1">#1CCF98</color>
+    <color name="point_1_sub">#7FD4AE</color>
     <color name="point_2">#BE94F3</color>
     <color name="point_3">#FFB631</color>
 
     <!-- light -->
-    <color name="bg_1_light">@color/gray_1</color>
+    <color name="bg_1_light">#F2F2F6</color>
+    <color name="bg_1_layer_light">@android:color/white</color>
+    <color name="bg_1_layer_ripple_light">#D3D3D3</color>
     <color name="bg_2_light">@android:color/white</color>
-    <color name="bg_ripple_1_light">#CBCBCB</color>
-    <color name="bg_card_1_light">@android:color/white</color>
-    <color name="bg_card_2_light">@color/gray_50</color>
-    <color name="bg_card_stroke_1_light">@color/gray_400</color>
+    <color name="bg_2_card_light">#EEEEEE</color>
+    <color name="bg_2_card_stroke_light">#D3D3D3</color>
     <color name="bg_line_1_light">@color/gray_400</color>
     <color name="bg_line_2_light">@color/gray_2</color>
-    <color name="bg_placeholder_1_light">@android:color/white</color>
+    <color name="bg_placeholder_1_light">#D3D3D3</color>
+    <color name="bg_ripple_light">@color/black_op12</color>
     <color name="content_1_light">#393939</color>
     <color name="content_2_light">#8A8A8D</color>
+    <color name="content_2_hint_light">#998A8A8D</color>
     <color name="content_3_light">@color/gray_500</color>
+    <color name="content_3_hint_light">@color/gray_500_op_70</color>
 
     <!-- dark -->
     <color name="bg_1_dark">@android:color/black</color>
-    <color name="bg_2_dark">#1C1C1D</color>
-    <color name="bg_ripple_1_dark">#49494C</color>
-    <color name="bg_card_1_dark">#1C1C1C</color>
-    <color name="bg_card_2_dark">@color/gray_800</color>
-    <color name="bg_card_stroke_1_dark">@color/gray_600</color>
+    <color name="bg_1_dark_layer">#1C1C1C</color>
+    <color name="bg_1_dark_layer_ripple">@color/white_op16</color>
+    <color name="bg_2_dark">@android:color/black</color>
+    <color name="bg_2_card_dark">@color/gray_800</color>
+    <color name="bg_2_card_stroke_dark">#EEEEEE</color>
     <color name="bg_line_1_dark">@color/gray_800</color>
     <color name="bg_line_2_dark">@color/gray_2</color>
     <color name="bg_placeholder_1_dark">@color/gray_700</color>
+    <color name="bg_ripple_dark">@color/white_op16</color>
     <color name="content_1_dark">@android:color/white</color>
     <color name="content_2_dark">#B7B7B7</color>
+    <color name="content_2_hint_dark">#99B7B7B7</color>
     <color name="content_3_dark">@color/gray_500</color>
+    <color name="content_3_hint_dark">@color/gray_500_op_70</color>
 </resources>

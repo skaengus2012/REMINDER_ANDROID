@@ -66,7 +66,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nlab.reminder.core.androidx.compose.ui.DelayedContent
 import com.nlab.reminder.core.androidx.compose.ui.tooling.preview.Previews
@@ -76,12 +76,14 @@ import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
 import com.nlab.reminder.core.kotlin.toNonBlankString
 import com.nlab.reminder.core.kotlin.toNonNegativeLong
 import com.nlab.reminder.core.androidx.compose.ui.ColorPressButton
+import com.nlab.reminder.core.androidx.compose.ui.HeadBlurLayer
 import com.nlab.reminder.core.androidx.compose.ui.throttleClick
 import com.nlab.reminder.core.component.tag.edit.ui.compose.TagEditStateHandler
 import com.nlab.reminder.core.component.tag.ui.compose.TagCard
 import com.nlab.reminder.core.designsystem.compose.component.PlaneatLoadingContent
 import com.nlab.reminder.core.designsystem.compose.icon.PlaneatIcons
 import com.nlab.reminder.core.designsystem.compose.theme.DrawableIds
+import com.nlab.reminder.core.designsystem.compose.theme.horizontalMediumPadding
 import com.nlab.reminder.core.kotlin.NonNegativeLong
 import com.nlab.reminder.core.translation.StringIds
 import com.nlab.reminder.feature.home.HomeAction
@@ -231,7 +233,7 @@ private fun HomeContents(
                 .fillMaxSize()
                 .verticalScroll(bodyScrollState)
                 .safeDrawingPadding()
-                .padding(start = 20.dp, top = bodyPaddingTop, end = 20.dp, bottom = bodyPaddingBottom),
+                .horizontalMediumPadding(top = bodyPaddingTop, boolean = bodyPaddingBottom),
             todayCount = todayCount,
             timetableCount = timetableCount,
             allCount = allCount,
@@ -242,7 +244,7 @@ private fun HomeContents(
             onTagClicked = onTagClicked,
             onTagLongClicked = onTagLongClicked,
         )
-        HeadBlurLayer(
+        HomeStatusBackground(
             modifier = Modifier.align(Alignment.TopCenter),
             startAnimOffset = 20.dp,
             bodyPaddingTop = bodyPaddingTop,
@@ -419,7 +421,7 @@ private fun AllCategoryCard(
     onClick: () -> Unit = {},
 ) {
     BasicCategoryCard(
-        name = stringResource(StringIds.home_category_all),
+        name = stringResource(StringIds.label_all),
         remainCount = remainCount.value,
         icon = {
             Image(
@@ -463,22 +465,22 @@ private fun BasicCategoryCard(
 
 @Composable
 private fun CategoryCardBackground(
-    onClick: () -> Unit = {},
-    onClickLabel: String? = null
+    onClick: () -> Unit,
+    onClickLabel: String?
 ) {
     Spacer(
         modifier = Modifier
             .aspectRatio(1 / 1.625f)
             .fillMaxWidth()
             .clip(RoundedCornerShape(8.dp))
+            .background(PlaneatTheme.colors.bg1Layer)
             .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = ripple(color = PlaneatTheme.colors.bgCard1Ripple),
                 onClick = onClick,
                 onClickLabel = onClickLabel,
+                interactionSource = remember { MutableInteractionSource() },
+                indication = ripple(color = PlaneatTheme.colors.bg1LayerRipple),
                 role = Role.Tab
             )
-            .background(PlaneatTheme.colors.bgCard1)
     )
 }
 
@@ -525,7 +527,7 @@ private fun TagCards(
     Box(
         modifier = modifier
             .clip(RoundedCornerShape(8.dp))
-            .background(PlaneatTheme.colors.bgCard1),
+            .background(PlaneatTheme.colors.bg1Layer),
     ) {
         if (tags.isEmpty()) {
             Text(
@@ -557,14 +559,12 @@ private fun TagCards(
 }
 
 @Composable
-private fun HeadBlurLayer(
+private fun HomeStatusBackground(
     startAnimOffset: Dp,
     bodyPaddingTop: Dp,
     bodyScrollState: ScrollState,
     modifier: Modifier = Modifier,
 ) {
-    val containerColor = PlaneatTheme.colors.bgCard1
-    val lineColor = PlaneatTheme.colors.bgLine1
     var computedHeightToPx by remember { mutableIntStateOf(0) }
     val startAnimOffsetToPx = with(LocalDensity.current) { startAnimOffset.toPx() }
     val bodyPaddingTopToPx = with(LocalDensity.current) { bodyPaddingTop.toPx() }
@@ -580,25 +580,13 @@ private fun HeadBlurLayer(
             }
         }
     }
-    Box(
+    HeadBlurLayer(
         modifier = modifier
             .fillMaxWidth()
             .windowInsetsTopHeight(WindowInsets.statusBars)
-            .onSizeChanged { computedHeightToPx = it.height }
-    ) {
-        Spacer(
-            modifier = Modifier
-                .fillMaxSize()
-                .drawBehind { drawRect(color = containerColor.copy(alpha = 0.96f * alphaState)) }
-        )
-        Spacer(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(0.5.dp)
-                .align(Alignment.BottomCenter)
-                .drawBehind { drawRect(color = lineColor.copy(alpha = alphaState)) }
-        )
-    }
+            .onSizeChanged { computedHeightToPx = it.height },
+        alpha = alphaState
+    )
 }
 
 @Composable
@@ -647,7 +635,7 @@ private fun BottomBlurLayer(
     alphaAnimScrollTriggerOffsetToPx: Int,
     modifier: Modifier = Modifier
 ) {
-    val containerColor = PlaneatTheme.colors.bgCard1
+    val containerColor = PlaneatTheme.colors.bg1Layer
     val lineColor = PlaneatTheme.colors.bgLine1
     val alphaState by remember(computedHeightToPx, alphaAnimScrollTriggerOffsetToPx, bodyScrollState) {
         val computedHeightWithOffsetToPx = computedHeightToPx + alphaAnimScrollTriggerOffsetToPx
@@ -698,7 +686,7 @@ private fun NewPlanButton(
             tint = contentColor
         )
         Text(
-            text = stringResource(StringIds.new_schedule_label),
+            text = stringResource(StringIds.new_plan),
             style = PlaneatTheme.typography.titleMedium,
             color = contentColor
         )

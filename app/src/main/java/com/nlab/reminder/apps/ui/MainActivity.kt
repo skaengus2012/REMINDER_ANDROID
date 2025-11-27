@@ -17,15 +17,18 @@
 package com.nlab.reminder.apps.ui
 
 import android.os.Bundle
+import android.widget.FrameLayout
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.core.view.isVisible
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nlab.reminder.core.android.widget.Toast
 import com.nlab.reminder.core.androidx.compose.ui.LocalTimeZone
+import com.nlab.reminder.core.component.schedulelist.content.ui.ScheduleListHolderActivity
 import com.nlab.reminder.core.data.util.TimeZoneMonitor
 import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -35,12 +38,14 @@ import javax.inject.Inject
  * @author Doohyun
  */
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), ScheduleListHolderActivity {
     @Inject
     lateinit var appToast: Toast
 
     @Inject
     lateinit var timeZoneMonitor: TimeZoneMonitor
+
+    private lateinit var scheduleListDragAnchorOverlay: FrameLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
@@ -62,5 +67,29 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+
+        scheduleListDragAnchorOverlay = FrameLayout(/* context= */ this)
+            .apply {
+                layoutParams = FrameLayout.LayoutParams(
+                    /*width = */ FrameLayout.LayoutParams.MATCH_PARENT,
+                    /*height = */ FrameLayout.LayoutParams.MATCH_PARENT
+                )
+                clipChildren = false
+                clipToPadding = false
+                isClickable = false
+                translationZ = SCHEDULE_LIST_DRAG_ANCHOR_OVERLAY_Z
+                isVisible = false
+            }
+            .also { overlay -> addContentView(/*view=*/ overlay, /*params=*/ overlay.layoutParams) }
+    }
+
+    override fun requireScheduleListDragAnchorOverlay(): FrameLayout {
+        return checkNotNull(scheduleListDragAnchorOverlay) {
+            "ScheduleListDragAnchorOverlay is not initialized."
+        }
+    }
+
+    companion object {
+        private const val SCHEDULE_LIST_DRAG_ANCHOR_OVERLAY_Z = 10f
     }
 }

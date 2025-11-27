@@ -57,15 +57,16 @@ include(
     ":core:android",
     ":core:androidx:compose",
     ":core:androidx:fragment",
-    ":core:androidx:lifecycle",
     ":core:androidx:navigation-compose",
     ":core:androidx:recyclerview",
-    ":core:androidx:transition",
     ":core:annotation",
     ":core:component:currenttime",
     ":core:component:displayformat",
+    ":core:component:schedulelist",
+    ":core:component:schedulelist-test",
     ":core:component:tag",
     ":core:component:tag-test",
+    ":core:component:toolbar",
     ":core:component:usermessage",
     ":core:component:usermessage-eventbus",
     ":core:component:usermessage-test",
@@ -84,13 +85,11 @@ include(
     ":core:kotlinx:datetime",
     ":core:local",
     ":core:network",
-    ":core:schedule",
-    ":core:schedule-ext",
-    ":core:schedule-test",
     ":core:translation",
     ":core:uitext",
     ":core:uitext-test",
 )
 include(
+    ":feature:all",
     ":feature:home"
 )

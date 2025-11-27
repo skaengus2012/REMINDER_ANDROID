@@ -16,8 +16,6 @@
 
 package com.nlab.reminder.core.data.model
 
-import kotlin.enums.enumEntries
-
 /**
  * @author Doohyun
  */

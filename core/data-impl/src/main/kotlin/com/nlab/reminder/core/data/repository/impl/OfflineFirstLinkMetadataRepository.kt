@@ -33,6 +33,7 @@ import kotlinx.collections.immutable.persistentHashMapOf
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import kotlin.concurrent.atomics.AtomicReference
@@ -45,20 +46,24 @@ class OfflineFirstLinkMetadataRepository(
     private val remoteDataSource: LinkThumbnailDataSource,
     private val remoteCache: LinkMetadataRemoteCache
 ) : LinkMetadataRepository {
-    override fun getLinkToMetadataTableAsStream(links: Set<Link>): Flow<Map<Link, LinkMetadata>> = flow {
-        val currentSnapshot = remoteCache.snapshot().filterKeys { it in links }
-        emit(currentSnapshot)
+    override fun getLinkToMetadataTableAsStream(links: Set<Link>): Flow<Map<Link, LinkMetadata>> {
+        val resultFlow = flow {
+            val currentSnapshot = remoteCache.snapshot().filterKeys { it in links }
+            emit(currentSnapshot)
 
-        val missingLinks = links - currentSnapshot.keys
-        if (missingLinks.isNotEmpty()) {
-            combine(
-                findOnLocal(missingLinks),
-                findOnRemote(missingLinks).onStart { emit(emptyMap()) }
-            ) { local, remote -> local + remote }
-                .distinctUntilChanged()
-                .filter { it.isNotEmpty() }
-                .collect { result -> emit(currentSnapshot + result) }
+            val missingLinks = links - currentSnapshot.keys
+            if (missingLinks.isNotEmpty()) {
+                combine(
+                    findOnLocal(missingLinks),
+                    findOnRemote(missingLinks).onStart { emit(emptyMap()) }
+                ) { local, remote -> local + remote }
+                    .filter { it.isNotEmpty() }
+                    .distinctUntilChanged()
+                    .map { result -> currentSnapshot + result }
+                    .collect { emit(it) }
+            }
         }
+        return resultFlow.distinctUntilChanged()
     }
 
     private fun findOnLocal(links: Set<Link>): Flow<Map<Link, LinkMetadata>> = flow {
