@@ -94,7 +94,6 @@ dependencies {
 
     testImplementation(projects.testkit)
     testImplementation(projects.core.kotlinTest)
-    testImplementation(projects.core.scheduleTest)
     androidTestImplementation(projects.core.local)
     androidTestImplementation(projects.testkit)
     androidTestImplementation(libs.javafaker)

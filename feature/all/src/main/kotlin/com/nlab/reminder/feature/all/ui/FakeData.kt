@@ -18,15 +18,14 @@ package com.nlab.reminder.feature.all.ui
 
 import com.nlab.reminder.core.component.schedulelist.content.ScheduleListResource
 import com.nlab.reminder.core.component.schedulelist.content.UserScheduleListResource
+import com.nlab.reminder.core.data.model.HourlyRepeat
 import com.nlab.reminder.core.data.model.Link
 import com.nlab.reminder.core.data.model.LinkMetadata
-import com.nlab.reminder.core.data.model.Repeat
 import com.nlab.reminder.core.data.model.ScheduleId
 import com.nlab.reminder.core.data.model.ScheduleTiming
 import com.nlab.reminder.core.data.model.Tag
 import com.nlab.reminder.core.data.model.TagId
 import com.nlab.reminder.core.kotlin.toNonBlankString
-import com.nlab.reminder.core.kotlin.toNonNegativeLong
 import com.nlab.reminder.core.kotlin.toPositiveInt
 import com.nlab.reminder.core.kotlin.tryToNonBlankStringOrNull
 import kotlin.time.Clock
@@ -57,12 +56,10 @@ object FakeData {
                                 imageUrl = uri.tryToNonBlankStringOrNull()
                             )
                         },
-                        timing = ScheduleTiming(
+                        timing = ScheduleTiming.DateTime(
                             triggerAt = Clock.System.now(),
-                            isTriggerAtDateOnly = false,
-                            repeat = Repeat.Hourly(interval = 5.toPositiveInt())
+                            repeat = HourlyRepeat(interval = 5.toPositiveInt())
                         ),
-                        defaultVisiblePriority = it.toNonNegativeLong(),
                         isComplete = false,
                         tags = listOf(
                             Tag(
@@ -78,7 +75,8 @@ object FakeData {
                                 name = "이것은태그입니다만".toNonBlankString()
                             ),
                         )
-                    )
+                    ),
+                    selected = false
                 )
             }
         }

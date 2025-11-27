@@ -14,23 +14,20 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.data.model
+package com.nlab.reminder.core.component.schedulelist.content
 
-import kotlin.time.Instant
+import com.nlab.reminder.core.data.model.genScheduleId
+import org.hamcrest.CoreMatchers.equalTo
+import org.hamcrest.MatcherAssert.assertThat
+import org.junit.Test
 
-/**
- * @author Doohyun
- */
-sealed class ScheduleTiming {
-    abstract val triggerAt: Instant
-
-    data class Date(
-        override val triggerAt: Instant,
-        val dateOnlyRepeat: DateOnlyRepeat?
-    ) : ScheduleTiming()
-
-    data class DateTime(
-        override val triggerAt: Instant,
-        val repeat: Repeat?
-    ) : ScheduleTiming()
+class UserSelectedSchedulesStoreKtTest {
+    @Test
+    fun `Given non-empty store, When clear invoked, Then selectedIds is empty`() {
+        val store = UserSelectedSchedulesStore().apply {
+            replace(setOf(genScheduleId()))
+        }
+        store.clear()
+        assertThat(store.selectedIds.value, equalTo(emptySet()))
+    }
 }

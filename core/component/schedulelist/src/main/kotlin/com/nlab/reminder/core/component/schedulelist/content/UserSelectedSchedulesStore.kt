@@ -14,20 +14,25 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.androidx.compose.ui.res
+package com.nlab.reminder.core.component.schedulelist.content
 
-import android.content.res.Resources
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ReadOnlyComposable
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
+import com.nlab.reminder.core.data.model.ScheduleId
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 /**
- * @author Doohyun
+ * @author Thalys
  */
-@Composable
-@ReadOnlyComposable
-fun resources(): Resources {
-    LocalConfiguration.current
-    return LocalContext.current.resources
+class UserSelectedSchedulesStore {
+    private val _selectedIds = MutableStateFlow<Set<ScheduleId>>(emptySet())
+    val selectedIds: StateFlow<Set<ScheduleId>> = _selectedIds.asStateFlow()
+
+    fun replace(selectedIds: Set<ScheduleId>) {
+        _selectedIds.value = selectedIds
+    }
+}
+
+fun UserSelectedSchedulesStore.clear() {
+    replace(selectedIds = emptySet())
 }

@@ -16,7 +16,8 @@
 
 package com.nlab.reminder.core.component.displayformat
 
-import com.nlab.reminder.core.data.model.genScheduleTiming
+import com.nlab.reminder.core.data.model.genScheduleTimingDateTimeType
+import com.nlab.reminder.core.data.model.genScheduleTimingDateType
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
@@ -62,10 +63,7 @@ class ScheduleTimingDisplayResourceKtTest {
         val entryAt: Instant = mockk {
             every { toLocalDateTime(seoulTimeZone) } returns expectedEntryAtLocalDateTime
         }
-        val scheduleTiming = genScheduleTiming(
-            triggerAt = triggerAt,
-            isTriggerAtDateOnly = true
-        )
+        val scheduleTiming = genScheduleTimingDateType(triggerAt = triggerAt)
 
        val scheduleTimingDisplayResource = ScheduleTimingDisplayResource(
             scheduleTiming = scheduleTiming,
@@ -73,18 +71,18 @@ class ScheduleTimingDisplayResourceKtTest {
             entryAt = entryAt
         )
 
-        val dateOnlyTypeResource = scheduleTimingDisplayResource as ScheduleTimingDisplayResource.DateOnly
+        val dateTypeResource = scheduleTimingDisplayResource as ScheduleTimingDisplayResource.Date
         assertThat(
-            dateOnlyTypeResource.triggerAt,
+            dateTypeResource.triggerAt,
             sameInstance(expectedTriggerAtLocalDate)
         )
         assertThat(
-            dateOnlyTypeResource.entryAt,
+            dateTypeResource.entryAt,
             sameInstance(expectedEntryAtLocalDateTime)
         )
         assertThat(
-            dateOnlyTypeResource.repeat,
-            sameInstance(scheduleTiming.repeat)
+            dateTypeResource.repeat,
+            sameInstance(scheduleTiming.dateOnlyRepeat)
         )
     }
 
@@ -98,10 +96,7 @@ class ScheduleTimingDisplayResourceKtTest {
         val entryAt: Instant = mockk {
             every { toLocalDateTime(seoulTimeZone) } returns expectedEntryAtLocalDateTime
         }
-        val scheduleTiming = genScheduleTiming(
-            triggerAt = triggerAt,
-            isTriggerAtDateOnly = false
-        )
+        val scheduleTiming = genScheduleTimingDateTimeType(triggerAt = triggerAt)
 
         val scheduleTimingDisplayResource = ScheduleTimingDisplayResource(
             scheduleTiming = scheduleTiming,

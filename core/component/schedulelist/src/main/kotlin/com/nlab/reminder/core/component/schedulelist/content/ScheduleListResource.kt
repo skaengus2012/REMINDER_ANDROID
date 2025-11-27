@@ -17,17 +17,18 @@
 package com.nlab.reminder.core.component.schedulelist.content
 
 import androidx.compose.runtime.Immutable
+import com.nlab.reminder.core.annotation.ExcludeFromGeneratedTestReport
 import com.nlab.reminder.core.data.model.Link
 import com.nlab.reminder.core.data.model.LinkMetadata
 import com.nlab.reminder.core.data.model.ScheduleId
 import com.nlab.reminder.core.data.model.ScheduleTiming
 import com.nlab.reminder.core.data.model.Tag
 import com.nlab.reminder.core.kotlin.NonBlankString
-import com.nlab.reminder.core.kotlin.NonNegativeLong
 
 /**
  * @author Doohyun
  */
+@ExcludeFromGeneratedTestReport
 @Immutable
 data class ScheduleListResource(
     val id: ScheduleId,
@@ -36,7 +37,6 @@ data class ScheduleListResource(
     val link: Link?,
     val linkMetadata: LinkMetadata?,
     val timing: ScheduleTiming?,
-    val defaultVisiblePriority: NonNegativeLong,
     val isComplete: Boolean,
     val tags: List<Tag>
 )

@@ -29,46 +29,53 @@ import kotlinx.datetime.Month
  * @author Doohyun
  */
 fun genRepeat(): Repeat = when (genInt(min = 0, max = 4)) {
-    0 -> genRepeatHourly()
-    1 -> genRepeatDaily()
-    2 -> genRepeatWeekly()
-    3 -> genRepeatMonthly()
-    else -> genRepeatYearly()
+    0 -> genHourlyRepeat()
+    1 -> genDailyRepeat()
+    2 -> genWeeklyRepeat()
+    3 -> genMonthlyRepeat()
+    else -> genYearlyRepeat()
 }
 
-fun genRepeatHourly(
-    interval: PositiveInt = genInt(min = 1, max = 999).toPositiveInt()
-): Repeat.Hourly = Repeat.Hourly(interval = interval)
+fun genDateOnlyRepeat(): DateOnlyRepeat = when (genInt(min = 0, max = 3)) {
+    0 -> genDailyRepeat()
+    1 -> genWeeklyRepeat()
+    2 -> genMonthlyRepeat()
+    else -> genYearlyRepeat()
+}
 
-fun genRepeatDaily(
+fun genHourlyRepeat(
     interval: PositiveInt = genInt(min = 1, max = 999).toPositiveInt()
-): Repeat.Daily = Repeat.Daily(interval = interval)
+): HourlyRepeat = HourlyRepeat(interval = interval)
 
-fun genRepeatWeekly(
+fun genDailyRepeat(
+    interval: PositiveInt = genInt(min = 1, max = 999).toPositiveInt()
+): DailyRepeat = DailyRepeat(interval = interval)
+
+fun genWeeklyRepeat(
     interval: PositiveInt = genInt(min = 1, max = 999).toPositiveInt(),
     daysOfWeeks: NonEmptySet<DayOfWeek> = DayOfWeek.entries
         .shuffledSubset()
         .toNonEmptySet()
-): Repeat.Weekly = Repeat.Weekly(
+): WeeklyRepeat = WeeklyRepeat(
     interval = interval,
     daysOfWeeks = daysOfWeeks
 )
 
-fun genRepeatMonthly(
+fun genMonthlyRepeat(
     interval: PositiveInt = genInt(min = 1, max = 999).toPositiveInt(),
     detail: MonthlyRepeatDetail = genMonthlyRepeatDetail()
-): Repeat.Monthly = Repeat.Monthly(
+): MonthlyRepeat = MonthlyRepeat(
     interval = interval,
     detail = detail
 )
 
-fun genRepeatYearly(
+fun genYearlyRepeat(
     interval: PositiveInt = genInt(min = 1, max = 999).toPositiveInt(),
     months: NonEmptySet<Month> = Month.entries
         .shuffledSubset()
         .toNonEmptySet(),
     daysOfWeekOption: YearlyDaysOfWeekOption? = genYearlyDaysOfWeekOption()
-): Repeat.Yearly = Repeat.Yearly(
+): YearlyRepeat = YearlyRepeat(
     interval = interval,
     months = months,
     daysOfWeekOption = daysOfWeekOption

@@ -16,13 +16,26 @@
 
 package com.nlab.reminder.core.component.schedulelist.content
 
-import com.nlab.reminder.core.annotation.ExcludeFromGeneratedTestReport
+import com.nlab.reminder.core.data.model.ScheduleId
+import com.nlab.reminder.core.kotlin.collections.toSet
+import com.nlab.testkit.faker.genBoolean
+import com.nlab.testkit.faker.genInt
 
 /**
  * @author Thalys
  */
-@ExcludeFromGeneratedTestReport
-data class UserScheduleListResource(
-    val schedule: ScheduleListResource,
-    val selected: Boolean
-) : ScheduleListObject
+fun genUserScheduleListResource(
+    schedule: ScheduleListResource = genScheduleListResource(),
+    selected: Boolean = genBoolean()
+): UserScheduleListResource = UserScheduleListResource(
+    schedule = schedule,
+    selected = selected
+)
+
+fun genUserScheduleListResources(
+    count: Int = genInt(min = 5, max = 10)
+): Set<UserScheduleListResource> = (1 .. count).toSet { index ->
+    genUserScheduleListResource(
+        schedule = genScheduleListResource(id = ScheduleId(index.toLong()))
+    )
+}

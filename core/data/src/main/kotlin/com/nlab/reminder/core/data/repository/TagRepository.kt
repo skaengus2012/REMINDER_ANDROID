@@ -33,12 +33,12 @@ interface TagRepository {
     fun getTagsAsStream(query: GetTagQuery): Flow<Set<Tag>>
 }
 
-sealed class SaveTagQuery private constructor() {
+sealed class SaveTagQuery {
     data class Add(val name: NonBlankString) : SaveTagQuery()
     data class Modify(val id: TagId, val name: NonBlankString, val shouldMergeIfExists: Boolean) : SaveTagQuery()
 }
 
-sealed class GetTagQuery private constructor() {
+sealed class GetTagQuery {
     data object OnlyUsed : GetTagQuery()
     data class ByIds(val tagIds: Set<TagId>) : GetTagQuery()
 }
