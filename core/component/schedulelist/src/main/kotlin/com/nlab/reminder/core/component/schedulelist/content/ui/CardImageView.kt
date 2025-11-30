@@ -18,45 +18,45 @@ package com.nlab.reminder.core.component.schedulelist.content.ui
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.View
+import androidx.annotation.FloatRange
 import androidx.appcompat.widget.AppCompatImageView
-import kotlin.math.roundToInt
+import com.nlab.reminder.core.component.schedulelist.R
 
 /**
  * @author Thalys
  */
-class RatioFreezingImageView @JvmOverloads constructor(
+internal class CardImageView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
 ) : AppCompatImageView(context, attrs, defStyleAttr) {
-    var myId: Int = 0
 
-    // 높이 동결 상태 및 고정 높이 저장 변수
-    private var fixedHeight: Int? = null
+    @FloatRange(from = 0.0, to = 1.0)
+    private var heightRatio: Float = 1f
+
+    // Height freezing status and variable to store the fixed height
+    private var fixedHeight: Int = -1
+
+    init {
+        attrs?.let {
+            val typedArray = context.obtainStyledAttributes(/* set = */ it, /* attrs = */ R.styleable.CardImageView)
+            heightRatio = typedArray.getFloat(/* index = */ R.styleable.CardImageView_heightRatio, /* defValue = */ 1f)
+            typedArray.recycle()
+        }
+    }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         val currentWidth = MeasureSpec.getSize(widthMeasureSpec)
 
-        if (fixedHeight == null && currentWidth > 0) {
-            // 최초 계산: width의 0.4 비율로 fixedHeight를 설정
-            fixedHeight = (currentWidth * HARDCODED_RATIO).toInt()
+        if (fixedHeight == -1 && currentWidth > 0) {
+            // Initial calculation: Set fixedHeight based on heightRatio of the width
+            fixedHeight = (currentWidth * heightRatio).toInt()
         }
-        println("\"RatioFreezingView#${myId}\", \"Current Width (onMeasure): $currentWidth, Fixed Height: $fixedHeight ${layoutParams.width}")
-
-        val heightToUse = fixedHeight ?: 0
 
         val finalHeightSpec = MeasureSpec.makeMeasureSpec(
-            heightToUse,
-            MeasureSpec.EXACTLY
+            /* size = */ fixedHeight,
+            /* mode = */ MeasureSpec.EXACTLY
         )
-
         super.onMeasure(widthMeasureSpec, finalHeightSpec)
-    }
-
-    companion object {
-
-        // 하드코딩된 비율 (예: 1:0.4)
-        private const val HARDCODED_RATIO = 0.4f
     }
 }

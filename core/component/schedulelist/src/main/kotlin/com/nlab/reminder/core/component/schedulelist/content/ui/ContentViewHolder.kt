@@ -248,6 +248,7 @@ internal class ContentViewHolder(
             }
         }
         itemView.doOnDetach {
+            selectionAnimDelegate.clearResources()
             jobs.cancelAllAndClear()
         }
     }

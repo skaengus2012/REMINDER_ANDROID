@@ -230,14 +230,14 @@
                 android:background="?bg_2_card"
                 android:paddingBottom="8dp">
 
-                <com.nlab.reminder.core.component.schedulelist.content.ui.RatioFreezingImageView
+                <com.nlab.reminder.core.component.schedulelist.content.ui.CardImageView
                     android:id="@+id/imageview_bg_link_thumbnail"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:background="?bg_placeholder_1"
                     android:importantForAccessibility="no"
                     android:scaleType="centerCrop"
-                    app:layout_constraintDimensionRatio="1:0.4"
+                    app:heightRatio="0.35"
                     app:layout_constraintHorizontal_bias="0"
                     app:layout_constraintTop_toTopOf="parent"
                     tools:srcCompat="@drawable/ic_schedule_link_error"

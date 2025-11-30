@@ -25,59 +25,32 @@ import androidx.annotation.FloatRange
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.view.doOnLayout
-import androidx.core.view.updateLayoutParams
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import com.nlab.reminder.core.component.schedulelist.databinding.LayoutScheduleAdapterItemContentBinding
+import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
-import kotlin.math.abs
 
 /**
  * @author Doohyun
  */
-private var key: Int = 1
-
 internal class ContentSelectionAnimDelegate(
     private val binding: LayoutScheduleAdapterItemContentBinding,
 ) {
-    private val constraintSetApplyAttachListener = object : View.OnAttachStateChangeListener {
-        private val callback = Runnable {
-            applyCompleteButtonTranslate(true)
-            applyCompleteButtonAlpha(true)
-            applySelectionButtonTranslateX(true)
-            applySelectionButtonAlpha(true)
-            applyDragButtonTranslateX(true)
-            applyDragButtonAlpha(true)
-        }
-
-        override fun onViewAttachedToWindow(view: View) {
-            selectedContentConstraintSet.applyTo(/* constraintLayout = */ binding.layoutContent)
-            binding.layoutContent.post(callback)
-        }
-
-        override fun onViewDetachedFromWindow(view: View) {
-            binding.root.removeOnAttachStateChangeListener(/* listener = */ this)
-            binding.layoutContent.removeCallbacks(callback)
-        }
-    }
-    private val animatorDisposeAttachListener = object : View.OnAttachStateChangeListener {
-        override fun onViewAttachedToWindow(view: View) = Unit
-        override fun onViewDetachedFromWindow(view: View) {
-            latestAnimator?.cancel()
-        }
-    }
-
     private lateinit var selectedContentConstraintSet: ConstraintSet
     private lateinit var unselectedContentConstraintSet: ConstraintSet
 
     private var selectedCardLinkWidth: Int = 0
     private var unselectedCardLinkWidth: Int = 0
 
-    private var latestAnimator: Animator? = null
-
     private var selectedCompleteButtonTranslationX: Float = 0f
     private var selectedSelectionButtonTranslationX: Float = 0f
     private var selectedDragButtonTransitionX: Float = 0f
+
+    private val disposableContentActions = mutableListOf<Runnable>()
+    private var disposableAnimator: Animator? = null
+
+    private var isFirstAnimate: Boolean = true
 
     suspend fun awaitReady() {
         if (binding.layoutContent.isLaidOut) return
@@ -100,20 +73,6 @@ internal class ContentSelectionAnimDelegate(
 
         selectedCardLinkWidth = binding.cardLink.width - dataSelectedGuideEnd
         unselectedCardLinkWidth = binding.cardLink.width // match constraint
-
-        selectedContentConstraintSet = ConstraintSet().apply {
-            clone(/* constraintLayout = */ binding.layoutContent)
-            constrainWidth(
-                /* viewId = */ binding.edittextTitle.id,
-                /* width = */  binding.edittextTitle.width - dataSelectedGuideEnd
-            )
-            constrainWidth(
-                /* viewId = */ binding.cardLink.id,
-                /* width = */ selectedCardLinkWidth
-            )
-        }
-        unselectedContentConstraintSet = ConstraintSet().apply { clone(/* constraintLayout = */ binding.layoutContent) }
-
         selectedCompleteButtonTranslationX = with(binding) {
             val completionSelectedGuideBegin = binding.guidelineCompletionSelectedStart
                 .constraintLayoutParams
@@ -133,74 +92,98 @@ internal class ContentSelectionAnimDelegate(
                 if (isLtr) -absValue
                 else absValue
             }
+
+        unselectedContentConstraintSet = ConstraintSet().apply { clone(/* constraintLayout = */ binding.layoutContent) }
+        selectedContentConstraintSet = ConstraintSet().apply {
+            clone(unselectedContentConstraintSet)
+
+            constrainWidth(
+                /* viewId = */ binding.edittextTitle.id,
+                /* width = */  binding.edittextTitle.width - dataSelectedGuideEnd
+            )
+            constrainWidth(
+                /* viewId = */ binding.cardLink.id,
+                /* width = */ selectedCardLinkWidth
+            )
+        }
+    }
+
+    private fun postAnimator(animator: Animator) {
+        disposableAnimator = animator
+        animator.start()
+    }
+
+    private fun disposeLatestAnimator() {
+        disposableAnimator?.cancel()
+        disposableAnimator = null
+    }
+
+    private fun postActionToContentLayout(action: Runnable) {
+        disposableContentActions += action
+        binding.layoutContent.post(action)
+    }
+
+    private fun disposeLatestContentLayoutAction() {
+        disposableContentActions.forEach { binding.layoutContent.removeCallbacks(/* action = */ it) }
+        disposableContentActions.clear()
+    }
+
+    private fun canAnimate(): Boolean {
+        return binding.layoutContent.isAttachedToWindow
+    }
+
+    fun clearResources() {
+        disposeLatestAnimator()
+        disposeLatestContentLayoutAction()
     }
 
     fun startAnimation(selectable: Boolean) {
-        val rootLayout = binding.root
-        rootLayout.removeOnAttachStateChangeListener(/* listener = */ constraintSetApplyAttachListener)
-        rootLayout.removeOnAttachStateChangeListener(/* listener = */ animatorDisposeAttachListener)
-
-        if (binding.root.isAttachedToWindow.not()) {
-            if (selectable) {
-                rootLayout.addOnAttachStateChangeListener(/* listener = */ constraintSetApplyAttachListener)
+        val currentIsFirstAnimate = isFirstAnimate
+        if (currentIsFirstAnimate) {
+            isFirstAnimate = false
+            if (selectable.not()) {
+                return
             }
-            return
         }
 
-        val animatorItems = listOf(
-            createDateContentWidthTransformAnimator(selectable),
-            createCompleteButtonTranslateAnimator(selectable),
-            createCompleteButtonAlphaAnimator(selectable),
-            createSelectionButtonTranslateAnimator(selectable),
-            createSelectionButtonAlphaAnimator(selectable),
-            createDragButtonTranslateAnimator(selectable),
-            createDragButtonAlphaAnimator(selectable),
-        )
-        val animator = AnimatorSet()
-            .setDuration(250)
-            .apply {
-                playTogether(animatorItems)
-                interpolator = FastOutSlowInInterpolator()
-            }
-        latestAnimator?.cancel()
-        latestAnimator = animator
-        rootLayout.addOnAttachStateChangeListener(/* listener = */ animatorDisposeAttachListener)
-        animator.start()
+        clearResources()
 
-        /**
-        if (canAnimate.not()) {
-            canAnimate = true
-            applyLayout(selectable)
-        } else {
-            val animatorItems = listOf(
-                createDateContentWidthTransformAnimator(selectable),
-                createCompleteButtonTranslateAnimator(selectable),
-                createCompleteButtonAlphaAnimator(selectable),
-                createSelectionButtonTranslateAnimator(selectable),
-                createSelectionButtonAlphaAnimator(selectable),
-                createDragButtonTranslateAnimator(selectable),
-                createDragButtonAlphaAnimator(selectable),
-            )
-            val animator = AnimatorSet()
-                .setDuration(250)
-                .apply {
-                    playTogether(animatorItems)
+        if (canAnimate() && currentIsFirstAnimate.not()) {
+            postAnimator(
+                animator = AnimatorSet().setDuration(250).apply {
+                    playTogether(/* items = */ createAnimators(selectable))
                     interpolator = FastOutSlowInInterpolator()
                 }
-                .also { latestAnimator = it }
-            val root = binding.root
-            val attachStateChangeListener = object : View.OnAttachStateChangeListener {
-                override fun onViewAttachedToWindow(v: View) = Unit
-                override fun onViewDetachedFromWindow(v: View) {
-                    animator.cancel()
-                    root.removeOnAttachStateChangeListener(/*listener = */ this)
-                }
-            }
-            root.addOnAttachStateChangeListener(attachStateChangeListener)
-            animator.start()
-        }*/
+            )
+        } else {
+            postActionToContentLayout { applyLayout(selectable) }
+        }
     }
 
+    // Start of configurations
+    private fun applyLayout(selectable: Boolean) {
+        val constraintSet = if (selectable) selectedContentConstraintSet else unselectedContentConstraintSet
+        constraintSet.applyTo(/* constraintLayout = */ binding.layoutContent)
+        postActionToContentLayout {
+            applyCompleteButtonTranslate(selectable)
+            applyCompleteButtonAlpha(selectable)
+            applySelectionButtonTranslateX(selectable)
+            applySelectionButtonAlpha(selectable)
+            applyDragButtonTranslateX(selectable)
+            applyDragButtonAlpha(selectable)
+        }
+    }
+
+    private fun createAnimators(selectable: Boolean): List<Animator> = listOf(
+        createDateContentWidthTransformAnimator(selectable),
+        createCompleteButtonTranslateAnimator(selectable),
+        createCompleteButtonAlphaAnimator(selectable),
+        createSelectionButtonTranslateAnimator(selectable),
+        createSelectionButtonAlphaAnimator(selectable),
+        createDragButtonTranslateAnimator(selectable),
+        createDragButtonAlphaAnimator(selectable),
+    )
+    // End of configurations
 
     // Start of DataLayout area
     private fun createDateContentWidthTransformAnimator(selectable: Boolean): Animator {
@@ -384,15 +367,3 @@ internal class ContentSelectionAnimDelegate(
 
 private val View.constraintLayoutParams: ConstraintLayout.LayoutParams
     get() = layoutParams as ConstraintLayout.LayoutParams
-
-private fun View.needWidthUpdate(newWidth: Int): Boolean {
-    return abs(width - newWidth) > 1
-}
-
-private fun View.updateWidthIfChanged(newWidth: Int): Boolean {
-    val needUpdate = abs(width - newWidth) > 1
-    if (needUpdate) {
-        updateLayoutParams { width = newWidth }
-    }
-    return needUpdate
-}
