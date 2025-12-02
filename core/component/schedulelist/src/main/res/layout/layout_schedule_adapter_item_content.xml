@@ -233,7 +233,7 @@
                 <com.nlab.reminder.core.component.schedulelist.content.ui.CardImageView
                     android:id="@+id/imageview_bg_link_thumbnail"
                     android:layout_width="match_parent"
-                    android:layout_height="0dp"
+                    android:layout_height="wrap_content"
                     android:background="?bg_placeholder_1"
                     android:importantForAccessibility="no"
                     android:scaleType="centerCrop"
