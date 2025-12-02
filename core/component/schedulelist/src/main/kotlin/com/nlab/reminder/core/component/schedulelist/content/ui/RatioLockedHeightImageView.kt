@@ -47,6 +47,10 @@ internal class RatioLockedHeightImageView @JvmOverloads constructor(
                 /* index = */ R.styleable.RatioLockedHeightImageView_heightRatio,
                 /* defValue = */ 1f
             )
+            require(heightRatio in 0.0f..1.0f) {
+                "The height ratio must be between 0.0 and 1.0, but was $heightRatio"
+            }
+
             typedArray.recycle()
         }
     }
@@ -59,10 +63,10 @@ internal class RatioLockedHeightImageView @JvmOverloads constructor(
             fixedHeight = (currentWidth * heightRatio).toInt()
         }
 
-        val finalHeightSpec = MeasureSpec.makeMeasureSpec(
+        val modifiedHeightMeasureSpec = MeasureSpec.makeMeasureSpec(
             /* size = */ fixedHeight,
             /* mode = */ MeasureSpec.EXACTLY
         )
-        super.onMeasure(widthMeasureSpec, finalHeightSpec)
+        super.onMeasure(widthMeasureSpec, modifiedHeightMeasureSpec)
     }
 }
