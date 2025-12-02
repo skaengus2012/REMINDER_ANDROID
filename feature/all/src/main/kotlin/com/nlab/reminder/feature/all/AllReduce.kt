@@ -16,6 +16,7 @@
 
 package com.nlab.reminder.feature.all
 
+import com.nlab.reminder.core.component.schedulelist.content.clear
 import com.nlab.statekit.dsl.reduce.DslReduce
 import com.nlab.statekit.reduce.Reduce
 import com.nlab.reminder.feature.all.AllAction.*
@@ -40,6 +41,19 @@ internal fun AllReduce(environment: AllEnvironment): AllReduce = DslReduce {
                 scheduleListResources = action.scheduleResources,
                 entryAt = action.entryAt
             )
+        }
+    }
+    stateScope<Success> {
+        transition<OnSelectionModeToggled> {
+            current.copy(multiSelectionEnabled = current.multiSelectionEnabled.not())
+        }
+        effect<OnSelectionModeToggled> {
+            if (current.multiSelectionEnabled) {
+                environment.userSelectedSchedulesStore.clear()
+            }
+        }
+        effect<OnItemSelectionChanged> {
+            environment.userSelectedSchedulesStore.replace(action.selectedIds)
         }
     }
 }

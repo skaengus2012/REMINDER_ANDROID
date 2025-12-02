@@ -45,6 +45,9 @@ import com.nlab.reminder.core.component.schedulelist.toolbar.ui.ScheduleListTool
 import com.nlab.reminder.core.data.model.ScheduleId
 import com.nlab.reminder.core.kotlinx.coroutines.flow.map
 import com.nlab.reminder.core.kotlinx.coroutines.flow.withPrev
+import kotlinx.collections.immutable.toPersistentHashSet
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -55,6 +58,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.mapNotNull
@@ -62,11 +66,10 @@ import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.datetime.TimeZone
-import kotlin.coroutines.resume
 import kotlin.math.absoluteValue
 import kotlin.time.Instant
 
@@ -84,6 +87,7 @@ internal class ScheduleListFragment : Fragment() {
     private val timeZoneStream = mutableLatestEventFlow<TimeZone>()
     private val entryAtStream = mutableLatestEventFlow<Instant>()
     private val toolbarStateStream = mutableLatestEventFlow<ScheduleListToolbarState?>()
+    private val itemSelectionObserverFlow = mutableLatestEventFlow<(Set<ScheduleId>) -> Unit>()
     private val simpleAddCommandObserverStream = mutableLatestEventFlow<(SimpleAdd) -> Unit>()
     private val simpleEditCommandObserverStream = mutableLatestEventFlow<(SimpleEdit) -> Unit>()
 
@@ -145,7 +149,7 @@ internal class ScheduleListFragment : Fragment() {
                 }
 
                 override fun findSelected(scheduleId: ScheduleId): Boolean {
-                    return scheduleId in scheduleListAdapter.getCurrentSelected()
+                    return scheduleId in scheduleListAdapter.selectedScheduleIds.value
                 }
             },
             onSelectedStateChanged = { scheduleId, selected ->
@@ -235,6 +239,50 @@ internal class ScheduleListFragment : Fragment() {
                         if (backgroundAlpha != null) {
                             toolbarValues.backgroundAlpha = backgroundAlpha
                         }
+                    }
+                }
+            }
+        }
+
+        val awaitItemScheduleSelectionSyncJob = CompletableDeferred<Unit>()
+        scheduleListItemsAdaptationStream
+            .transformLatest { adaptation ->
+                when (adaptation) {
+                    is ScheduleListItemsAdaptation.Absent -> {
+                        // If the adaptation is not 'Exist', cancel any ongoing delay/work and wait for the next item.
+                        return@transformLatest
+                    }
+
+                    is ScheduleListItemsAdaptation.Exist -> {
+                        // no-op
+                    }
+                }
+                if (awaitItemScheduleSelectionSyncJob.isCompleted) {
+                    // 이전값으로 잘못 싱크되는 걸 막기 위한 조치
+                    delay(200)
+                }
+                val selectedSchedulesIds = buildSet {
+                    adaptation.items.forEach { item ->
+                        if (item is ScheduleListItem.Content && item.resource.selected) {
+                            this += item.resource.schedule.id
+                        }
+                    }
+                }
+                emit(selectedSchedulesIds.toPersistentHashSet())
+            }
+            .flowOn(Dispatchers.Default)
+            .flowWithLifecycle(viewLifecycle)
+            .onEach { selectedIds ->
+                scheduleListAdapter.setSelected(selectedIds)
+                awaitItemScheduleSelectionSyncJob.complete(Unit)
+            }
+            .launchIn(viewLifecycleScope)
+        viewLifecycleScope.launch {
+            awaitItemScheduleSelectionSyncJob.await()
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                itemSelectionObserverFlow.collectLatest { observer ->
+                    scheduleListAdapter.selectedScheduleIds.collect { selectedIds ->
+                        observer.invoke(selectedIds)
                     }
                 }
             }
@@ -380,6 +428,15 @@ internal class ScheduleListFragment : Fragment() {
             .launchIn(viewLifecycleScope)
 
         scheduleListItemsAdaptationStream
+            .distinctUntilChanged { prev, next ->
+                if (prev is ScheduleListItemsAdaptation.Exist && next is ScheduleListItemsAdaptation.Exist) {
+                    prev.items.value == next.items.value
+                } else {
+                    prev == next
+                }
+            }
+            .flowOn(Dispatchers.Default)
+            .conflate()
             .flowWithLifecycle(viewLifecycle)
             .onEach { adaptation ->
                 val recyclerViewVisible: Boolean
@@ -389,6 +446,7 @@ internal class ScheduleListFragment : Fragment() {
                         recyclerViewVisible = false
                         newItems = emptyList()
                     }
+
                     is ScheduleListItemsAdaptation.Exist -> {
                         recyclerViewVisible = true
                         newItems = adaptation.items
@@ -398,12 +456,7 @@ internal class ScheduleListFragment : Fragment() {
                     isVisible = recyclerViewVisible,
                     goneIfNotVisible = false
                 )
-                // For the conflate effect, wait to make it into a suspend function
-                suspendCancellableCoroutine { cons ->
-                    scheduleListAdapter.submitList(items = newItems) {
-                        cons.resume(Unit)
-                    }
-                }
+                scheduleListAdapter.submitList(items = newItems, commitCallback = {})
             }
             .launchIn(viewLifecycleScope)
 
@@ -463,6 +516,10 @@ internal class ScheduleListFragment : Fragment() {
 
     fun onToolbarStateUpdated(toolbarState: ScheduleListToolbarState?) {
         toolbarStateStream.tryEmit(toolbarState)
+    }
+
+    fun onItemSelectionChangedObserverChanged(observer: (Set<ScheduleId>) -> Unit) {
+        itemSelectionObserverFlow.tryEmit(observer)
     }
 
     fun onSimpleAddCommandObserverChanged(observer: (SimpleAdd) -> Unit) {
