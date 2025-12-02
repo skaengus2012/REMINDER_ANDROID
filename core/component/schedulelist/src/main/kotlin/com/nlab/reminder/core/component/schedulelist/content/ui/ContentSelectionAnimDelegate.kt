@@ -162,7 +162,7 @@ internal class ContentSelectionAnimDelegate(
 
     // Start of configurations
     private fun applyLayout(selectable: Boolean) {
-        getConstraintSet(selectable).applyTo(/* constraintLayout = */ binding.layoutContent)
+        getContentConstraintSet(selectable).applyTo(/* constraintLayout = */ binding.layoutContent)
         postActionToContentLayout {
             applyCompleteButtonTranslate(selectable)
             applyCompleteButtonAlpha(selectable)
@@ -174,7 +174,7 @@ internal class ContentSelectionAnimDelegate(
     }
 
     private fun createAnimators(selectable: Boolean): List<Animator> = listOf(
-        createDateContentWidthTransformAnimator(selectable),
+        createContentWidthTransformAnimator(selectable),
         createCompleteButtonTranslateAnimator(selectable),
         createCompleteButtonAlphaAnimator(selectable),
         createSelectionButtonTranslateAnimator(selectable),
@@ -183,14 +183,14 @@ internal class ContentSelectionAnimDelegate(
         createDragButtonAlphaAnimator(selectable),
     )
 
-    private fun getConstraintSet(selectable: Boolean): ConstraintSet {
+    private fun getContentConstraintSet(selectable: Boolean): ConstraintSet {
         return if (selectable) selectedContentConstraintSet else unselectedContentConstraintSet
     }
     // End of configurations
 
-    // Start of DataLayout area
-    private fun createDateContentWidthTransformAnimator(selectable: Boolean): Animator {
-        val constraintSet = ConstraintSet().apply { clone(/* set = */ getConstraintSet(selectable)) }
+    // Start of content area
+    private fun createContentWidthTransformAnimator(selectable: Boolean): Animator {
+        val constraintSet = ConstraintSet().apply { clone(/* set = */ getContentConstraintSet(selectable)) }
         return ValueAnimator.ofInt(binding.cardLink.width, getCardLinkWidth(selectable)).apply {
             addUpdateListener { value ->
                 constraintSet.constrainWidth(
@@ -205,7 +205,7 @@ internal class ContentSelectionAnimDelegate(
     private fun getCardLinkWidth(selectable: Boolean): Int {
         return if (selectable) selectedCardLinkWidth else unselectedCardLinkWidth
     }
-    // End of DataLayout area
+    // End of content area
 
     // Start of CompleteButton TranslateX area
     private fun createCompleteButtonTranslateAnimator(selectable: Boolean): Animator {
@@ -343,7 +343,7 @@ internal class ContentSelectionAnimDelegate(
     // End of DragButton Alpha area
 
     fun applyStateToMirror(mirrorBinding: LayoutScheduleAdapterItemContentMirrorBinding) {
-        getConstraintSet(
+        getContentConstraintSet(
             selectable = mirrorBinding.buttonDragHandle.translationX == getDragButtonTranslateX(selectable = true)
         ).applyTo(/* constraintLayout = */ mirrorBinding.layoutContent)
 
