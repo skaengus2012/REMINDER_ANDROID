@@ -355,7 +355,7 @@ private class DraggableViewHolderDelegate(
                         /*attachToParent = */ false
                     )
                     .apply {
-                        root.alpha = 0.9f
+                        root.alpha = 0.8f
                         buttonComplete.setImageDrawable(binding.buttonComplete.drawable)
                     }
                     .also { viewPool.put(key, it.root) }
@@ -376,14 +376,9 @@ private class DraggableViewHolderDelegate(
 
             imageviewBgLinkThumbnail.visibility = binding.imageviewBgLinkThumbnail.visibility
             imageviewBgLinkThumbnail.setImageDrawable(binding.imageviewBgLinkThumbnail.drawable)
-
-            selectionAnimDelegate.applyStateTo(
-                layoutData,
-                buttonComplete,
-                buttonSelection,
-                buttonDragHandle
-            )
         }
+        selectionAnimDelegate.applyStateToMirror(mirrorBinding)
+
         return mirrorBinding.root
     }
 }

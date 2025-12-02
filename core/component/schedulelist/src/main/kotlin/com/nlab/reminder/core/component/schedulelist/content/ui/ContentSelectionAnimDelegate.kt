@@ -20,13 +20,13 @@ import android.animation.Animator
 import android.animation.AnimatorSet
 import android.animation.ValueAnimator
 import android.view.View
-import android.widget.ImageButton
 import androidx.annotation.FloatRange
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.view.doOnLayout
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import com.nlab.reminder.core.component.schedulelist.databinding.LayoutScheduleAdapterItemContentBinding
+import com.nlab.reminder.core.component.schedulelist.databinding.LayoutScheduleAdapterItemContentMirrorBinding
 import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
@@ -162,8 +162,7 @@ internal class ContentSelectionAnimDelegate(
 
     // Start of configurations
     private fun applyLayout(selectable: Boolean) {
-        val constraintSet = if (selectable) selectedContentConstraintSet else unselectedContentConstraintSet
-        constraintSet.applyTo(/* constraintLayout = */ binding.layoutContent)
+        getConstraintSet(selectable).applyTo(/* constraintLayout = */ binding.layoutContent)
         postActionToContentLayout {
             applyCompleteButtonTranslate(selectable)
             applyCompleteButtonAlpha(selectable)
@@ -183,13 +182,15 @@ internal class ContentSelectionAnimDelegate(
         createDragButtonTranslateAnimator(selectable),
         createDragButtonAlphaAnimator(selectable),
     )
+
+    private fun getConstraintSet(selectable: Boolean): ConstraintSet {
+        return if (selectable) selectedContentConstraintSet else unselectedContentConstraintSet
+    }
     // End of configurations
 
     // Start of DataLayout area
     private fun createDateContentWidthTransformAnimator(selectable: Boolean): Animator {
-        val constraintSet = ConstraintSet().apply {
-            clone(if (selectable) selectedContentConstraintSet else unselectedContentConstraintSet)
-        }
+        val constraintSet = ConstraintSet().apply { clone(/* set = */ getConstraintSet(selectable)) }
         return ValueAnimator.ofInt(binding.cardLink.width, getCardLinkWidth(selectable)).apply {
             addUpdateListener { value ->
                 constraintSet.constrainWidth(
@@ -341,27 +342,25 @@ internal class ContentSelectionAnimDelegate(
     }
     // End of DragButton Alpha area
 
-    fun applyStateTo(
-        layoutData: View,
-        buttonComplete: ImageButton,
-        buttonSelection: ImageButton,
-        buttonDragHandle: ImageButton
-    ) {
-        buttonComplete.apply {
+    fun applyStateToMirror(mirrorBinding: LayoutScheduleAdapterItemContentMirrorBinding) {
+        getConstraintSet(
+            selectable = mirrorBinding.buttonDragHandle.translationX == getDragButtonTranslateX(selectable = true)
+        ).applyTo(/* constraintLayout = */ mirrorBinding.layoutContent)
+
+        mirrorBinding.buttonComplete.apply {
             isSelected = binding.buttonComplete.isSelected
             alpha = binding.buttonComplete.alpha
             translationX = binding.buttonComplete.translationX
         }
-        buttonSelection.apply {
+        mirrorBinding.buttonSelection.apply {
             isSelected = binding.buttonSelection.isSelected
             alpha = binding.buttonSelection.alpha
             translationX = binding.buttonSelection.translationX
         }
-        buttonDragHandle.apply {
+        mirrorBinding.buttonDragHandle.apply {
             alpha = binding.buttonDragHandle.alpha
             translationX = binding.buttonDragHandle.translationX
         }
-     //   layoutData.updateLayoutParams { width = binding.layoutData.width }
     }
 }
 
