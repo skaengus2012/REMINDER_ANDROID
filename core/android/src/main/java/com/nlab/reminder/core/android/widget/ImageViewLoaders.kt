@@ -36,29 +36,30 @@ import com.nlab.reminder.core.android.R
 fun ImageView.bindImageAsync(
     url: String?,
     placeHolder: Drawable? = null,
-    error: Drawable? = null
+    error: Drawable? = null,
+    enableCrossfade: Boolean = false
 ): Boolean {
+    val prevImageSource = asyncImageSource
+    if (url == prevImageSource?.source) {
+        return false
+    }
+
     if (url == null) {
-        val isChanged = asyncImageSource?.disposable
-            ?.dispose()
-            ?.let { true }
-            ?: false
-        if (isChanged) {
-            asyncImageSource = null
-        }
         setImageDrawable(placeHolder)
-        return isChanged
-    } else {
-        if (asyncImageSource?.source == url) return false
-        asyncImageSource = AsyncImageSource(
-            source = url,
-            disposable = load(url) {
-                placeholder(placeHolder)
-                error(error)
-            }
-        )
+        prevImageSource?.disposable?.dispose()
+        asyncImageSource = null
         return true
     }
+
+    asyncImageSource = AsyncImageSource(
+        source = url,
+        disposable = load(url) {
+            placeholder(placeHolder)
+            error(error)
+            crossfade(if (enableCrossfade) 250 else 0)
+        }
+    )
+    return true
 }
 
 private var ImageView.asyncImageSource: AsyncImageSource?
