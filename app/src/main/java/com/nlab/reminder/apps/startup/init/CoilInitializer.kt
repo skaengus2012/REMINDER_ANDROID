@@ -41,7 +41,7 @@ internal class CoilInitializer : Initializer<Unit> {
                 .diskCache {
                     DiskCache.Builder()
                         .directory(directory = context.cacheDir.resolve("image_cache"))
-                        .maxSizeBytes(size = 200L * 1024 * 1024) // 200MB, recommend by GPT
+                        .maxSizeBytes(size = 200L * 1024 * 1024) // 200MB, recommended by GPT
                         .build()
                 }
                 .crossfade(enable = false)
