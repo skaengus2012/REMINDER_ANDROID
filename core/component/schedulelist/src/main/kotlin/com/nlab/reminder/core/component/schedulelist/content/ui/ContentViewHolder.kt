@@ -291,7 +291,8 @@ internal class ContentViewHolder(
             bindImageAsync(
                 url = linkImageUrl,
                 placeHolder = linkThumbnailPlaceHolderDrawable,
-                error = linkThumbnailPlaceHolderDrawable
+                error = linkThumbnailPlaceHolderDrawable,
+                enableCrossfade = true
             )
         }
     }
