@@ -35,7 +35,7 @@ internal class CoilInitializer : Initializer<Unit> {
             ImageLoader.Builder(context)
                 .memoryCache {
                     MemoryCache.Builder(context)
-                        .maxSizePercent(percent = 0.3) // recommend by GPT
+                        .maxSizePercent(percent = 0.3) // recommended by GPT
                         .build()
                 }
                 .diskCache {
