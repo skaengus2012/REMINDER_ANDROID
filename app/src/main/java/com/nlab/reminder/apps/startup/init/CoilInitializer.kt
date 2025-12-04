@@ -35,16 +35,16 @@ internal class CoilInitializer : Initializer<Unit> {
             ImageLoader.Builder(context)
                 .memoryCache {
                     MemoryCache.Builder(context)
-                        .maxSizePercent(percent = 0.5)
+                        .maxSizePercent(percent = 0.3) // recommend by GPT
                         .build()
                 }
                 .diskCache {
                     DiskCache.Builder()
-                        .directory(context.cacheDir.resolve("image_cache"))
-                        .maxSizePercent(percent = 0.05)
+                        .directory(directory = context.cacheDir.resolve("image_cache"))
+                        .maxSizeBytes(size = 200L * 1024 * 1024) // 200MB, recommend by GPT
                         .build()
                 }
-                .crossfade(enable = true)
+                .crossfade(enable = false)
                 .allowRgb565(enable = true)
                 .build()
         }
