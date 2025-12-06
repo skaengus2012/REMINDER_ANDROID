@@ -14,7 +14,8 @@
   ~ limitations under the License.
   -->
 
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -77,18 +78,11 @@
             app:layout_constraintGuide_begin="@dimen/schedule_data_start_complete_selection" />
 
         <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guideline_dataSelectedEnd"
+            android:id="@+id/guideline_extraContentEnd"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:orientation="vertical"
-            app:layout_constraintGuide_end="32dp" />
-
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guideline_dragSelectedStart"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:orientation="vertical"
-            app:layout_constraintGuide_end="@dimen/schedule_checkbox_touchable_size" />
+            app:layout_constraintGuide_end="@dimen/horizontal_padding_medium" />
 
         <ImageButton
             android:id="@+id/button_complete"
@@ -137,7 +131,8 @@
             android:scaleType="fitXY"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_info" />
+            app:srcCompat="@drawable/ic_info"
+            tools:visibility="visible" />
 
         <Button
             android:id="@+id/button_guideTitle"
@@ -210,19 +205,17 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="7.5dp"
-            android:layout_marginEnd="@dimen/horizontal_padding_medium"
             android:contentDescription="@string/content_description_open_link"
             android:descendantFocusability="blocksDescendants"
             app:cardCornerRadius="8dp"
             app:cardElevation="0dp"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toEndOf="@id/guideline_extraContentEnd"
             app:layout_constraintHorizontal_bias="0"
             app:layout_constraintStart_toStartOf="@id/guideline_bodyStart"
             app:layout_constraintTop_toBottomOf="@id/edittext_detail"
             app:layout_constraintWidth_max="500dp"
             app:strokeColor="?bg_2_card_stroke"
-            app:strokeWidth="0.5dp"
-            tools:visibility="visible">
+            app:strokeWidth="0.5dp">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
@@ -237,7 +230,7 @@
                     android:background="?bg_placeholder_1"
                     android:importantForAccessibility="no"
                     android:scaleType="centerCrop"
-                    app:heightRatio="0.35"
+                    app:heightRatio="0.4"
                     app:layout_constraintHorizontal_bias="0"
                     app:layout_constraintTop_toTopOf="parent"
                     tools:srcCompat="@drawable/ic_schedule_link_error"
