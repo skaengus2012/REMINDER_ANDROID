@@ -17,31 +17,24 @@
 package com.nlab.statekit.androidx.lifecycle.store.compose
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.nlab.statekit.androidx.lifecycle.store.RetainedStoreFactoryViewModel
+import androidx.compose.runtime.retain.retain
 import com.nlab.statekit.foundation.store.StoreMaterialScope
 import com.nlab.statekit.store.Store
-import kotlin.uuid.Uuid
 
 /**
  * @author Doohyun
  */
 @Composable
-fun <A : Any, S : Any> retainedStore(
-    key: Any,
-    block: StoreMaterialScope.() -> Store<A, S>
-): Store<A, S> {
-    val viewModel: RetainedStoreFactoryViewModel = viewModel()
-    val result = remember(key) {
-        viewModel.getOrPut(key, block)
-    }
-    return result
+fun <A : Any, S : Any> retained(calculation: StoreMaterialScope.() -> Store<A, S>): Store<A, S> {
+    val storeMaterialScope = retainStoreMaterialScope()
+    return retain { storeMaterialScope.calculation() }
 }
 
 @Composable
-fun <A : Any, S : Any> retainedStore(block: StoreMaterialScope.() -> Store<A, S>): Store<A, S> {
-    val uniqueId = rememberSaveable { Uuid.random() }
-    return retainedStore(key = uniqueId, block = block)
+fun <A : Any, S : Any> retainStore(
+    vararg keys: Any?,
+    calculation: StoreMaterialScope.() -> Store<A, S>
+): Store<A, S> {
+    val storeMaterialScope = retainStoreMaterialScope(keys = keys)
+    return retain(storeMaterialScope) { storeMaterialScope.calculation() }
 }
