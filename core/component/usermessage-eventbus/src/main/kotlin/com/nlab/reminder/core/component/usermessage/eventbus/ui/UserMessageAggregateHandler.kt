@@ -28,7 +28,7 @@ import com.nlab.reminder.core.component.usermessage.eventbus.UserMessageAggregat
 import com.nlab.reminder.core.component.usermessage.eventbus.UserMessageAggregateUiState
 import com.nlab.reminder.core.component.usermessage.eventbus.UserMessagePostedFlow
 import com.nlab.reminder.core.component.usermessage.ui.compose.UserMessageHandler
-import com.nlab.statekit.androidx.lifecycle.store.compose.retainedStore
+import com.nlab.statekit.androidx.lifecycle.store.compose.retained
 import com.nlab.statekit.bootstrap.DeliveryStarted
 import com.nlab.statekit.bootstrap.collectAsBootstrap
 import com.nlab.statekit.foundation.store.createStore
@@ -43,7 +43,7 @@ fun UserMessageAggregateHandler(
     showUserMessage: suspend CoroutineScope.(messageText: String, priority: FeedbackPriority) -> Unit,
     environment: UserMessageAggregateEnvironment = hiltViewModel()
 ) {
-    val store = retainedStore {
+    val store = retained {
         createStore(
             initState = UserMessageAggregateUiState(messages = emptyList()),
             reduce = UserMessageAggregateReduce(),

@@ -91,7 +91,7 @@ import com.nlab.reminder.feature.home.HomeEnvironment
 import com.nlab.reminder.feature.home.HomeReduce
 import com.nlab.reminder.feature.home.HomeUiState
 import com.nlab.reminder.feature.home.StateSyncFlow
-import com.nlab.statekit.androidx.lifecycle.store.compose.retainedStore
+import com.nlab.statekit.androidx.lifecycle.store.compose.retained
 import com.nlab.statekit.bootstrap.DeliveryStarted
 import com.nlab.statekit.bootstrap.collectAsBootstrap
 import com.nlab.statekit.foundation.store.createStore
@@ -107,7 +107,7 @@ internal fun HomeScreen(
     modifier: Modifier = Modifier,
     homeEnvironment: HomeEnvironment = hiltViewModel()
 ) {
-    val store = retainedStore {
+    val store = retained {
         createStore(
             initState = HomeUiState.Loading,
             reduce = HomeReduce(environment = homeEnvironment),
