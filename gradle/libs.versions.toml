@@ -81,7 +81,8 @@ androidx-test-junit = { module = "androidx.test.ext:junit", version.ref = "andro
 androidx-test-rules = { module = "androidx.test:rules", version.ref = "androidxTestRules" }
 androidx-test-runner = { module = "androidx.test:runner", version.ref = "androidxTestRules" }
 androidx-transition-ktx = { module = "androidx.transition:transition-ktx", version.ref = "androidxTransition" }
-coil-kt = { module = "io.coil-kt:coil", version.ref = "coil" }
+coil-kt = { group = "io.coil-kt", name = "coil", version.ref = "coil" }
+coil-kt-svg = { group = "io.coil-kt", name = "coil-svg", version.ref = "coil" }
 desugar-jdk-libs = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugarJdklibs" }  # use in configureComposeAndroid KotlinOptions.kt
 google-hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "googleHilt" }       # use in nlab.android.hilt.gradle.kts
 google-hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "googleHilt" }     # use in nlab.android.hilt.gradle.kts

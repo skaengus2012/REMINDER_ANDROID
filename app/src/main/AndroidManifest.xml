@@ -47,9 +47,6 @@
 			android:exported="false"
 			tools:node="merge">
 			<meta-data
-				android:name="com.nlab.reminder.apps.startup.init.CoilInitializer"
-				android:value="androidx.startup" />
-			<meta-data
 				android:name="com.nlab.reminder.apps.startup.init.StateKitPluginInitializer"
 				android:value="androidx.startup" />
 			<meta-data
