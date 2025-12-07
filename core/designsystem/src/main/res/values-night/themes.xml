@@ -22,7 +22,6 @@
         <item name="bg_1_layer_ripple">@color/bg_1_dark_layer_ripple</item>
         <item name="bg_2">@color/bg_2_dark</item>
         <item name="bg_2_card">@color/bg_2_card_dark</item>
-        <item name="bg_2_card_stroke">@color/bg_2_card_stroke_dark</item>
         <item name="bg_line_1">@color/bg_line_1_dark</item>
         <item name="bg_line_2">@color/bg_line_2_dark</item>
         <item name="bg_placeholder_1">@color/bg_placeholder_1_dark</item>
