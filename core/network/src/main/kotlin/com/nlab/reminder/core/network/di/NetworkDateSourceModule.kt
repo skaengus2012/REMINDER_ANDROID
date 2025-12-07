@@ -39,7 +39,7 @@ import javax.inject.Singleton
  */
 @Module
 @InstallIn(SingletonComponent::class)
-internal object NetworkModule {
+internal object NetworkDateSourceModule {
     @Reusable
     @Provides
     fun provideLinkMetadataSource(
