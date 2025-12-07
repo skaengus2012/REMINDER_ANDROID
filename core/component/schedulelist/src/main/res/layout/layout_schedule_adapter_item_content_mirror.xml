@@ -167,7 +167,7 @@
             app:layout_constraintTop_toBottomOf="@id/edittext_note"
             tools:text="MirrorView should changed to EditText" />
 
-        <androidx.cardview.widget.CardView
+        <com.google.android.material.card.MaterialCardView
             android:id="@+id/card_link"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -181,7 +181,7 @@
             app:layout_constraintStart_toStartOf="@id/guideline_bodyStart"
             app:layout_constraintTop_toBottomOf="@id/edittext_detail"
             app:layout_constraintWidth_max="500dp"
-            app:strokeColor="?bg_2_card_stroke"
+            app:strokeColor="?bg_line_1"
             app:strokeWidth="0.5dp">
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -250,7 +250,7 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-        </androidx.cardview.widget.CardView>
+        </com.google.android.material.card.MaterialCardView>
 
         <!-- It has marginBottom equal to the height of viewLine. -->
         <ImageButton
