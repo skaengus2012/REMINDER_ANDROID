@@ -41,7 +41,6 @@
     <color name="bg_1_layer_ripple_light">#D3D3D3</color>
     <color name="bg_2_light">@android:color/white</color>
     <color name="bg_2_card_light">#EEEEEE</color>
-    <color name="bg_2_card_stroke_light">#D3D3D3</color>
     <color name="bg_line_1_light">@color/gray_400</color>
     <color name="bg_line_2_light">@color/gray_2</color>
     <color name="bg_placeholder_1_light">#D3D3D3</color>
@@ -58,7 +57,6 @@
     <color name="bg_1_dark_layer_ripple">@color/white_op16</color>
     <color name="bg_2_dark">@android:color/black</color>
     <color name="bg_2_card_dark">@color/gray_800</color>
-    <color name="bg_2_card_stroke_dark">#EEEEEE</color>
     <color name="bg_line_1_dark">@color/gray_800</color>
     <color name="bg_line_2_dark">@color/gray_2</color>
     <color name="bg_placeholder_1_dark">@color/gray_700</color>

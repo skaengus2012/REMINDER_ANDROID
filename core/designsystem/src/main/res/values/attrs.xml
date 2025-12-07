@@ -20,7 +20,6 @@
     <attr name="bg_1_layer_ripple" format="color" />
     <attr name="bg_2" format="color" />
     <attr name="bg_2_card" format="color" />
-    <attr name="bg_2_card_stroke" format="color" />
     <attr name="bg_line_1" format="color" />
     <attr name="bg_line_2" format="color" />
     <attr name="bg_placeholder_1" format="color" />
