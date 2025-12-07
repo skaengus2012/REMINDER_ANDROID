@@ -17,21 +17,15 @@
 package com.nlab.reminder.core.network.di
 
 import android.content.Context
-import com.nlab.reminder.core.inject.qualifiers.coroutine.AppScope
-import com.nlab.reminder.core.inject.qualifiers.coroutine.Dispatcher
-import com.nlab.reminder.core.inject.qualifiers.coroutine.DispatcherOption.IO
-import com.nlab.reminder.core.network.datasource.LinkThumbnailDataSource
-import com.nlab.reminder.core.network.datasource.LinkThumbnailDataSourceImpl
-import com.nlab.reminder.core.network.datasource.TrustedTimeDataSource
-import com.nlab.reminder.core.network.datasource.TrustedTimeDataSourceImpl
+import coil.ImageLoader
+import coil.decode.SvgDecoder
+import coil.disk.DiskCache
+import coil.memory.MemoryCache
 import dagger.Module
 import dagger.Provides
-import dagger.Reusable
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
 import javax.inject.Singleton
 
 /**
@@ -40,19 +34,28 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 internal object NetworkModule {
-    @Reusable
     @Provides
-    fun provideLinkMetadataSource(
-        @Dispatcher(IO) dispatcher: CoroutineDispatcher
-    ): LinkThumbnailDataSource = LinkThumbnailDataSourceImpl(dispatcher)
-
     @Singleton
-    @Provides
-    fun provideTrustedTimeDataSource(
-        @ApplicationContext context: Context,
-        @AppScope coroutineScope: CoroutineScope
-    ): TrustedTimeDataSource = TrustedTimeDataSourceImpl(
-        context,
-        coroutineScope
-    )
+    fun provideImageLoader(
+        @ApplicationContext context: Context
+    ): ImageLoader = ImageLoader.Builder(context)
+        .components { add(SvgDecoder.Factory()) }
+        .memoryCache {
+            MemoryCache.Builder(context)
+                .maxSizePercent(percent = 0.3) // recommended by GPT
+                .build()
+        }
+        .diskCache {
+            DiskCache.Builder()
+                .directory(directory = context.cacheDir.resolve("image_cache"))
+                .maxSizeBytes(size = 200L * 1024 * 1024) // 200MB, recommended by GPT
+                .build()
+        }
+        // From Now in Android.
+        // https://github.com/android/nowinandroid/blob/55970c2487f82b8d33313e5d10dc97f2e5e531b9/core/network/src/main/kotlin/com/google/samples/apps/nowinandroid/core/network/di/NetworkModule.kt#L87
+        //
+        // Assume most content images are versioned urls
+        // but some problematic images are fetching each time.
+        .respectCacheHeaders(enable = false)
+        .build()
 }

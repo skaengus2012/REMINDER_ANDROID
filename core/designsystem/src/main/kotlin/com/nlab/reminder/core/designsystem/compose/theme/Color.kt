@@ -50,7 +50,6 @@ internal val Bg1LayerRippleLight = Color(0xFFD3D3D3)
 internal val Bg2Light = Color.White
 internal val Bg2LayerLight = Color(0xFFF8F8FA)
 internal val Bg2CardLight = Color(0xFFEEEEEE)
-internal val Bg2CardStrokeLight = Color(0xFFD3D3D3)
 internal val BgLine1Light = Gray400
 internal val BgLine2Light = Gray2
 internal val BgPlaceHolder1Light = Color(0xFFD3D3D3)
@@ -75,7 +74,6 @@ internal val Bg1LayerRippleDark = Color.White.copy(alpha = 0.16f)
 internal val Bg2Dark = Color.Black
 internal val Bg2LayerDark = Bg1LayerDark
 internal val Bg2CardDark = Gray800
-internal val Bg2CardStrokeDark = Color(0xFFEEEEEE)
 internal val BgLine1Dark = Gray800
 internal val BgLine2Dark = Gray2
 internal val BgPlaceHolder1Dark = Gray700

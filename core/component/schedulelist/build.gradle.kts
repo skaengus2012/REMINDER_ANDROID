@@ -32,6 +32,7 @@ dependencies {
     implementation(libs.androidx.fragment.compose)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.transition.ktx)
+    implementation(libs.google.material)
     implementation(libs.kotlinx.collections.immutable)
     implementation(libs.timber)
 
