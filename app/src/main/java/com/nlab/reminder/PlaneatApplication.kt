@@ -17,12 +17,22 @@
 package com.nlab.reminder
 
 import android.app.Application
+import coil.ImageLoader
+import coil.ImageLoaderFactory
 import com.nlab.reminder.core.annotation.ExcludeFromGeneratedTestReport
 import dagger.hilt.android.HiltAndroidApp
+import javax.inject.Inject
 
 /**
  * @author Doohyun
  */
 @ExcludeFromGeneratedTestReport
 @HiltAndroidApp
-class PlaneatApplication : Application()
+class PlaneatApplication : Application(), ImageLoaderFactory {
+    @Inject
+    lateinit var imageLoader: dagger.Lazy<ImageLoader>
+
+    override fun newImageLoader(): ImageLoader {
+        return imageLoader.get()
+    }
+}
