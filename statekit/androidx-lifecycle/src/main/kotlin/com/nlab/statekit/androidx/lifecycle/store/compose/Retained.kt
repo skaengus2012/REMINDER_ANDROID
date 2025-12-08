@@ -29,7 +29,7 @@ import kotlin.uuid.Uuid
  * @author Doohyun
  */
 @Composable
-fun <A : Any, S : Any> retainedStore(
+fun <A : Any, S : Any> retained(
     key: Any,
     block: StoreMaterialScope.() -> Store<A, S>
 ): Store<A, S> {
@@ -41,7 +41,7 @@ fun <A : Any, S : Any> retainedStore(
 }
 
 @Composable
-fun <A : Any, S : Any> retainedStore(block: StoreMaterialScope.() -> Store<A, S>): Store<A, S> {
+fun <A : Any, S : Any> retained(block: StoreMaterialScope.() -> Store<A, S>): Store<A, S> {
     val uniqueId = rememberSaveable { Uuid.random() }
-    return retainedStore(key = uniqueId, block = block)
+    return retained(key = uniqueId, block = block)
 }
