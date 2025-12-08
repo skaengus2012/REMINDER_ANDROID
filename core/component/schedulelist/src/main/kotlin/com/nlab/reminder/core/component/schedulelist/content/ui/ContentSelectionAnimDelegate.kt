@@ -49,17 +49,21 @@ internal class ContentSelectionAnimDelegate(private val binding: LayoutScheduleA
     private val disposableContentActions = mutableListOf<Runnable>()
     private var disposableAnimator: Animator? = null
 
+    private var isReady = false
     private var isFirstAnimate = true
     private var latestSelectable = false
 
     suspend fun awaitReady() {
-        if (binding.layoutContent.isLaidOut) return
         // await layout
         suspendCancellableCoroutine { cons ->
             binding.layoutContent.doOnLayout {
                 cons.resume(Unit)
             }
         }
+
+        // check ready.
+        if (isReady) return
+        isReady = true
 
         val isLtr = binding.root.layoutDirection.let { direction -> direction == View.LAYOUT_DIRECTION_LTR }
         val bodyStartGuideBegin = binding.guidelineBodyStart
