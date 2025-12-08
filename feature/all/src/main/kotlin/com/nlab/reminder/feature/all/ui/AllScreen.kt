@@ -18,10 +18,14 @@ package com.nlab.reminder.feature.all.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nlab.reminder.core.androidx.compose.ui.DelayedContent
@@ -183,6 +187,7 @@ private fun AllScheduleListContent(
     onSimpleEdit: (SimpleEdit) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val navBarsPaddings = WindowInsets.navigationBars.asPaddingValues()
     val footerForm = remember { ScheduleListItem.FooterForm(formBottomLine = FormBottomLine.Type1) }
     val scheduleListItemsAdaptation by rememberScheduleListItemsAdaptationState(
         headline = headline,
@@ -207,6 +212,10 @@ private fun AllScheduleListContent(
         triggerAtFormatPatterns = remember { AllScheduleTriggerAtFormatPatterns() },
         theme = ScheduleListTheme.Point3,
         toolbarState = toolbarState,
+        listBottomPadding = remember(navBarsPaddings, multiSelectionEnabled) {
+            val bottomPadding = navBarsPaddings.calculateBottomPadding()
+            if (multiSelectionEnabled) bottomPadding + 50.dp else bottomPadding
+        },
         onItemSelectionChanged = onItemSelectionChanged,
         onSimpleAdd = onSimpleAdd,
         onSimpleEdit = onSimpleEdit,

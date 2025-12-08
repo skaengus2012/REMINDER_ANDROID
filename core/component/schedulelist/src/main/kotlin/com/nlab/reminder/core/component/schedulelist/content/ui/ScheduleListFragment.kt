@@ -21,6 +21,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.util.TypedValueCompat.dpToPx
+import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.eventFlow
@@ -86,6 +87,7 @@ internal class ScheduleListFragment : Fragment() {
     private val themeStream = mutableLatestEventFlow<ScheduleListTheme>()
     private val timeZoneStream = mutableLatestEventFlow<TimeZone>()
     private val entryAtStream = mutableLatestEventFlow<Instant>()
+    private val listBottomPaddingStream = mutableLatestEventFlow<Int>()
     private val toolbarStateStream = mutableLatestEventFlow<ScheduleListToolbarState?>()
     private val itemSelectionObserverFlow = mutableLatestEventFlow<(Set<ScheduleId>) -> Unit>()
     private val simpleAddCommandObserverStream = mutableLatestEventFlow<(SimpleAdd) -> Unit>()
@@ -493,6 +495,20 @@ internal class ScheduleListFragment : Fragment() {
             .flowWithLifecycle(viewLifecycle)
             .onEach(scheduleListAdapter::updateEntryAt)
             .launchIn(viewLifecycleScope)
+
+        listBottomPaddingStream
+            .flowWithLifecycle(viewLifecycle)
+            .onEach { value ->
+                binding.recyclerviewSchedule.updatePadding(bottom = value)
+                if (value != 0) {
+                    val lastVisiblePosition = linearLayoutManager.findLastCompletelyVisibleItemPosition()
+                    val lastPosition = scheduleListAdapter.itemCount - 1
+                    if (lastVisiblePosition == lastPosition) {
+                        binding.recyclerviewSchedule.scrollBy(0, value)
+                    }
+                }
+            }
+            .launchIn(viewLifecycleScope)
     }
 
     fun onScheduleListItemsAdaptationUpdated(scheduleListItemsAdaptation: ScheduleListItemsAdaptation) {
@@ -517,6 +533,10 @@ internal class ScheduleListFragment : Fragment() {
 
     fun onEntryAtUpdated(entryAt: Instant) {
         entryAtStream.tryEmit(entryAt)
+    }
+
+    fun onListBottomPaddingUpdated(bottom: Int) {
+        listBottomPaddingStream.tryEmit(bottom)
     }
 
     fun onToolbarStateUpdated(toolbarState: ScheduleListToolbarState?) {

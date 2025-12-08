@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -32,7 +33,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.fragment.compose.AndroidFragment
 import com.nlab.reminder.core.androidx.compose.ui.LocalTimeZone
 import com.nlab.reminder.core.component.schedulelist.toolbar.ui.ScheduleListToolbarState
@@ -54,21 +58,27 @@ fun ScheduleListContent(
     onSimpleEdit: (SimpleEdit) -> Unit,
     modifier: Modifier = Modifier,
     toolbarState: ScheduleListToolbarState? = null,
+    listBottomPadding: Dp = 0.dp
 ) {
+    val density = LocalDensity.current
     val layoutDirection = LocalLayoutDirection.current
     val displayCutoutPaddings = WindowInsets.displayCutout.asPaddingValues()
-
     // Save fragment references in Compose state
     var fragmentRef by remember { mutableStateOf<ScheduleListFragment?>(null) }
     AndroidFragment<ScheduleListFragment>(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(
-                start = displayCutoutPaddings.calculateStartPadding(layoutDirection),
-                end = displayCutoutPaddings.calculateEndPadding(layoutDirection),
-            )
-            .navigationBarsPadding()
-            .imePadding()
+        modifier = run {
+            var ret = modifier
+                .fillMaxSize()
+                .padding(
+                    start = displayCutoutPaddings.calculateStartPadding(layoutDirection),
+                    end = displayCutoutPaddings.calculateEndPadding(layoutDirection),
+                )
+                .imePadding()
+            if (listBottomPadding == 0.dp) {
+                ret = ret.navigationBarsPadding()
+            }
+            ret
+        }
     ) { fragment -> fragmentRef = fragment }
 
     fragmentRef?.let { fragment ->
@@ -78,6 +88,15 @@ fun ScheduleListContent(
         }
         LaunchedEffect(fragment, entryAt) {
             fragment.onEntryAtUpdated(entryAt)
+        }
+        LaunchedEffect(fragment, density, listBottomPadding) {
+            fragment.onListBottomPaddingUpdated(
+                bottom = if (listBottomPadding == 0.dp) {
+                    0
+                } else with(density) {
+                    listBottomPadding.toPx().toInt()
+                }
+            )
         }
         LaunchedEffect(fragment, multiSelectionEnabled) {
             fragment.onMultiSelectionEnabledChanged(multiSelectionEnabled)
