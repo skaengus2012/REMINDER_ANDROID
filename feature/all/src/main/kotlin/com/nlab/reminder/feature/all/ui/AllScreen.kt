@@ -46,7 +46,7 @@ import com.nlab.reminder.feature.all.AllEnvironment
 import com.nlab.reminder.feature.all.AllReduce
 import com.nlab.reminder.feature.all.AllUiState
 import com.nlab.reminder.feature.all.AllUiStateSyncedFlow
-import com.nlab.statekit.androidx.lifecycle.store.compose.retainedStore
+import com.nlab.statekit.androidx.lifecycle.store.compose.retained
 import com.nlab.statekit.bootstrap.DeliveryStarted
 import com.nlab.statekit.bootstrap.collectAsBootstrap
 import com.nlab.statekit.foundation.store.createStore
@@ -63,7 +63,7 @@ internal fun AllScreen(
     modifier: Modifier = Modifier,
     environment: AllEnvironment = hiltViewModel()
 ) {
-    val store = retainedStore {
+    val store = retained {
         createStore(
             initState = AllUiState.Loading,
             reduce = AllReduce(environment),
