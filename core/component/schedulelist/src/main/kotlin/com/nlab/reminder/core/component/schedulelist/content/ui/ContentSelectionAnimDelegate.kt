@@ -49,16 +49,14 @@ internal class ContentSelectionAnimDelegate(private val binding: LayoutScheduleA
     private val disposableContentActions = mutableListOf<Runnable>()
     private var disposableAnimator: Animator? = null
 
-    private var isReady = false
     private var isFirstAnimate = true
     private var latestSelectable = false
 
     suspend fun awaitReady() {
-        if (isReady) return
+        if (binding.layoutContent.isLaidOut) return
         // await layout
         suspendCancellableCoroutine { cons ->
             binding.layoutContent.doOnLayout {
-                isReady = true
                 cons.resume(Unit)
             }
         }
