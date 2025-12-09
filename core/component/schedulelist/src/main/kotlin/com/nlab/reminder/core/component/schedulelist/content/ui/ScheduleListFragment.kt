@@ -21,6 +21,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.util.TypedValueCompat.dpToPx
+import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.eventFlow
@@ -86,6 +87,7 @@ internal class ScheduleListFragment : Fragment() {
     private val themeStream = mutableLatestEventFlow<ScheduleListTheme>()
     private val timeZoneStream = mutableLatestEventFlow<TimeZone>()
     private val entryAtStream = mutableLatestEventFlow<Instant>()
+    private val listBottomScrollPaddingStream = mutableLatestEventFlow<Int>()
     private val toolbarStateStream = mutableLatestEventFlow<ScheduleListToolbarState?>()
     private val itemSelectionObserverFlow = mutableLatestEventFlow<(Set<ScheduleId>) -> Unit>()
     private val simpleAddCommandObserverStream = mutableLatestEventFlow<(SimpleAdd) -> Unit>()
@@ -493,6 +495,14 @@ internal class ScheduleListFragment : Fragment() {
             .flowWithLifecycle(viewLifecycle)
             .onEach(scheduleListAdapter::updateEntryAt)
             .launchIn(viewLifecycleScope)
+
+        listBottomScrollPaddingStream
+            .flowWithLifecycle(viewLifecycle)
+            .onEach { value ->
+                binding.recyclerviewSchedule.updatePadding(bottom = value)
+                // TODO restore scroll position after updatePadding
+            }
+            .launchIn(viewLifecycleScope)
     }
 
     fun onScheduleListItemsAdaptationUpdated(scheduleListItemsAdaptation: ScheduleListItemsAdaptation) {
@@ -521,6 +531,10 @@ internal class ScheduleListFragment : Fragment() {
 
     fun onToolbarStateUpdated(toolbarState: ScheduleListToolbarState?) {
         toolbarStateStream.tryEmit(toolbarState)
+    }
+
+    fun onListBottomScrollPaddingUpdated(value: Int) {
+        listBottomScrollPaddingStream.tryEmit(value)
     }
 
     fun onItemSelectionChangedObserverChanged(observer: (Set<ScheduleId>) -> Unit) {
