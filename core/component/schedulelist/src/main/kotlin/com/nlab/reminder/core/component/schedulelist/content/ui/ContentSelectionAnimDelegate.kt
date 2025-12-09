@@ -23,14 +23,12 @@ import android.view.View
 import androidx.annotation.FloatRange
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
-import androidx.core.view.doOnLayout
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
+import com.nlab.reminder.core.android.view.awaitUntilLaidOut
 import com.nlab.reminder.core.component.schedulelist.R
 import com.nlab.reminder.core.component.schedulelist.databinding.LayoutScheduleAdapterItemContentBinding
 import com.nlab.reminder.core.component.schedulelist.databinding.LayoutScheduleAdapterItemContentMirrorBinding
 import kotlinx.coroutines.Runnable
-import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlin.coroutines.resume
 
 /**
  * @author Doohyun
@@ -55,13 +53,12 @@ internal class ContentSelectionAnimDelegate(private val binding: LayoutScheduleA
 
     suspend fun awaitReady() {
         // Check whether the settings have already been initialized
-        if (isReady) return
-
-        // await layout
-        suspendCancellableCoroutine { cons ->
-            binding.layoutContent.doOnLayout { cons.resume(Unit) }
+        if (isReady) {
+            return
         }
 
+        // await layout
+        binding.layoutContent.awaitUntilLaidOut()
         // initialized
         isReady = true
 
