@@ -88,3 +88,28 @@ fun View.focusChanges(emitCurrent: Boolean = false): Flow<Boolean> {
     }
     return if (emitCurrent) result.onStart { emit(hasFocus()) } else result
 }
+
+suspend fun View.awaitUntilLaidOut() {
+    if (isLaidOut && isLayoutRequested.not()) return
+
+    suspendCancellableCoroutine { cons ->
+        val listener = object : View.OnLayoutChangeListener {
+            override fun onLayoutChange(
+                view: View,
+                left: Int,
+                top: Int,
+                right: Int,
+                bottom: Int,
+                oldLeft: Int,
+                oldTop: Int,
+                oldRight: Int,
+                oldBottom: Int,
+            ) {
+                view.removeOnLayoutChangeListener(this)
+                cons.resume(Unit)
+            }
+        }
+        addOnLayoutChangeListener(listener)
+        cons.invokeOnCancellation { removeOnLayoutChangeListener(listener) }
+    }
+}
