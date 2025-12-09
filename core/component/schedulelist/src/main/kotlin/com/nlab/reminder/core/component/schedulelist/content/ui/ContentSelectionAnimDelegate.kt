@@ -54,14 +54,16 @@ internal class ContentSelectionAnimDelegate(private val binding: LayoutScheduleA
     private var latestSelectable = false
 
     suspend fun awaitReady() {
+        // Check whether the settings have already been initialized
         if (isReady) return
+
         // await layout
         suspendCancellableCoroutine { cons ->
-            binding.layoutContent.doOnLayout {
-                isReady = true
-                cons.resume(Unit)
-            }
+            binding.layoutContent.doOnLayout { cons.resume(Unit) }
         }
+
+        // initialized
+        isReady = true
 
         val isLtr = binding.root.layoutDirection.let { direction -> direction == View.LAYOUT_DIRECTION_LTR }
         val bodyStartGuideBegin = binding.guidelineBodyStart
