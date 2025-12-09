@@ -32,7 +32,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.fragment.compose.AndroidFragment
 import com.nlab.reminder.core.androidx.compose.ui.LocalTimeZone
 import com.nlab.reminder.core.component.schedulelist.toolbar.ui.ScheduleListToolbarState
@@ -53,6 +56,7 @@ fun ScheduleListContent(
     onSimpleAdd: (SimpleAdd) -> Unit,
     onSimpleEdit: (SimpleEdit) -> Unit,
     modifier: Modifier = Modifier,
+    listBottomScrollPadding: Dp = 0.dp, // A value greater than 0 must be included to become valid.
     toolbarState: ScheduleListToolbarState? = null,
 ) {
     val layoutDirection = LocalLayoutDirection.current
@@ -61,18 +65,24 @@ fun ScheduleListContent(
     // Save fragment references in Compose state
     var fragmentRef by remember { mutableStateOf<ScheduleListFragment?>(null) }
     AndroidFragment<ScheduleListFragment>(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(
-                start = displayCutoutPaddings.calculateStartPadding(layoutDirection),
-                end = displayCutoutPaddings.calculateEndPadding(layoutDirection),
-            )
-            .navigationBarsPadding()
-            .imePadding()
+        modifier = run {
+            var ret = modifier
+                .fillMaxSize()
+                .padding(
+                    start = displayCutoutPaddings.calculateStartPadding(layoutDirection),
+                    end = displayCutoutPaddings.calculateEndPadding(layoutDirection),
+                )
+                .imePadding()
+            if (listBottomScrollPadding <= 0.dp) {
+                ret = ret.navigationBarsPadding()
+            }
+            ret
+        }
     ) { fragment -> fragmentRef = fragment }
 
     fragmentRef?.let { fragment ->
         val timeZone = LocalTimeZone.current
+        val density = LocalDensity.current
         LaunchedEffect(fragment, scheduleListItemsAdaptation) {
             fragment.onScheduleListItemsAdaptationUpdated(scheduleListItemsAdaptation)
         }
@@ -93,6 +103,14 @@ fun ScheduleListContent(
         }
         LaunchedEffect(fragment, toolbarState) {
             fragment.onToolbarStateUpdated(toolbarState)
+        }
+        LaunchedEffect(fragment, density, listBottomScrollPadding) {
+            fragment.onListBottomScrollPaddingUpdated(
+                value = listBottomScrollPadding
+                    .takeIf { it > 0.dp }
+                    ?.let { with(density) { it.toPx().toInt() } }
+                    ?: 0
+            )
         }
         LaunchedEffect(fragment, onItemSelectionChanged) {
             fragment.onItemSelectionChangedObserverChanged(observer = onItemSelectionChanged)
