@@ -32,7 +32,7 @@ interface ScheduleRepository {
     fun getScheduleCountAsStream(query: GetScheduleCountQuery): Flow<NonNegativeLong>
 }
 
-sealed class SaveScheduleQuery private constructor() {
+sealed class SaveScheduleQuery {
     data class Add(
         val content: ScheduleContent,
         val tagIds: Set<TagId>,
@@ -45,7 +45,7 @@ sealed class SaveScheduleQuery private constructor() {
     ) : SaveScheduleQuery()
 }
 
-sealed class UpdateAllScheduleQuery private constructor() {
+sealed class UpdateAllScheduleQuery {
     data class Completes(
         val idToCompleteTable: Map<ScheduleId, Boolean>
     ) : UpdateAllScheduleQuery()
@@ -55,17 +55,17 @@ sealed class UpdateAllScheduleQuery private constructor() {
     ) : UpdateAllScheduleQuery()
 }
 
-sealed class DeleteScheduleQuery private constructor() {
+sealed class DeleteScheduleQuery {
     data class ByComplete(val isComplete: Boolean) : DeleteScheduleQuery()
     data class ByIds(val scheduleIds: Set<ScheduleId>) : DeleteScheduleQuery()
 }
 
-sealed class GetScheduleQuery private constructor() {
+sealed class GetScheduleQuery {
     data object All : GetScheduleQuery()
     data class ByComplete(val isComplete: Boolean) : GetScheduleQuery()
 }
 
-sealed class GetScheduleCountQuery private constructor() {
+sealed class GetScheduleCountQuery {
     data object Today : GetScheduleCountQuery()
     data object Timetable : GetScheduleCountQuery()
     data object All : GetScheduleCountQuery()
