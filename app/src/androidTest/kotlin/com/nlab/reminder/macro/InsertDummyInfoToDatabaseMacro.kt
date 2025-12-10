@@ -41,7 +41,7 @@ import kotlin.time.Clock
  */
 @RunWith(AndroidJUnit4::class)
 class InsertDummyInfoToDatabaseMacro {
-    private val faker: Faker = Faker(Locale("ko"))
+    private val faker: Faker = Faker(Locale.forLanguageTag(/* languageTag = */ "ko"))
     private val tagTextInputs: List<String> = listOf(
         "집안일",
         "약속",
