@@ -18,7 +18,10 @@ package com.nlab.reminder.feature.all.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -183,6 +186,7 @@ private fun AllScheduleListContent(
     onSimpleEdit: (SimpleEdit) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val navBarsPaddings = WindowInsets.navigationBars.asPaddingValues()
     val footerForm = remember { ScheduleListItem.FooterForm(formBottomLine = FormBottomLine.Type1) }
     val scheduleListItemsAdaptation by rememberScheduleListItemsAdaptationState(
         headline = headline,
@@ -206,6 +210,9 @@ private fun AllScheduleListContent(
         multiSelectionEnabled = multiSelectionEnabled,
         triggerAtFormatPatterns = remember { AllScheduleTriggerAtFormatPatterns() },
         theme = ScheduleListTheme.Point3,
+        listBottomScrollPadding = remember(navBarsPaddings) {
+            navBarsPaddings.calculateBottomPadding()
+        },
         toolbarState = toolbarState,
         onItemSelectionChanged = onItemSelectionChanged,
         onSimpleAdd = onSimpleAdd,
