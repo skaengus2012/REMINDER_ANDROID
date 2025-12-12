@@ -64,6 +64,7 @@ include(
     ":core:component:displayformat",
     ":core:component:schedulelist",
     ":core:component:schedulelist-test",
+    ":core:component:schedulework",
     ":core:component:tag",
     ":core:component:tag-test",
     ":core:component:toolbar",
