@@ -28,6 +28,7 @@ import com.nlab.reminder.core.local.database.dao.ScheduleTagListDAO
 import com.nlab.reminder.core.local.database.dao.ScheduleTimingSaveInput
 import com.nlab.reminder.core.local.database.dao.TagDAO
 import com.nlab.reminder.core.local.database.entity.ScheduleTagListEntity
+import com.nlab.testkit.faker.genInt
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Before
@@ -40,8 +41,8 @@ import kotlin.time.Clock
  * @author Doohyun
  */
 @RunWith(AndroidJUnit4::class)
-class InsertDummyInfoToDatabaseMacro {
-    private val faker: Faker = Faker(Locale("ko"))
+class InsertDummyDataToDatabaseMacro {
+    private val faker: Faker = Faker(Locale.forLanguageTag("ko"))
     private val tagTextInputs: List<String> = listOf(
         "집안일",
         "약속",
@@ -110,14 +111,51 @@ class InsertDummyInfoToDatabaseMacro {
     }
 
     @Test
-    fun input() = runBlocking {
+    fun insertDummyData() = runBlocking {
+        replaceDummyData(
+            shuffledSchedules = false,
+            scheduleCountLimit = Int.MAX_VALUE
+        )
+    }
+
+    @Test
+    fun insertShuffledDummyData() = runBlocking {
+        replaceDummyData(
+            shuffledSchedules = true,
+            scheduleCountLimit = Int.MAX_VALUE
+        )
+    }
+
+    @Test
+    fun insertSmallAmountDummyData() = runBlocking {
+        replaceDummyData(
+            shuffledSchedules = false,
+            scheduleCountLimit = genInt(min = 10, max = 20)
+        )
+    }
+
+    @Test
+    fun insertSmallAmountShuffledDummyData() = runBlocking {
+        replaceDummyData(
+            shuffledSchedules = true,
+            scheduleCountLimit = genInt(min = 10, max = 20)
+        )
+    }
+
+    private suspend fun replaceDummyData(shuffledSchedules: Boolean, scheduleCountLimit: Int) {
         database.clearAllTables()
 
         val savedTagEntities = tagTextInputs.map { tagText ->
             tagDao.insertAndGet(name = tagText.toNonBlankString())
         }
-        val savedScheduleEntities = scheduleHeadlineSaveInputs.map { headlineInput ->
-            scheduleDao.insertAndGet(headline = headlineInput, timing = scheduleTimingSaveInput)
+        val savedScheduleEntities = run {
+            var ret = scheduleHeadlineSaveInputs.map { headlineInput ->
+                scheduleDao.insertAndGet(headline = headlineInput, timing = scheduleTimingSaveInput)
+            }
+            if (shuffledSchedules) {
+                ret = ret.shuffled()
+            }
+            ret.take(scheduleCountLimit)
         }
         val scheduleTagListEntities = savedScheduleEntities
             .map { scheduleEntity ->
