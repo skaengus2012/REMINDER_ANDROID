@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.nlab.reminder.core.component.schedulework"
+    namespace = "com.nlab.reminder.core.component.schedule"
 }
 
 dependencies {
