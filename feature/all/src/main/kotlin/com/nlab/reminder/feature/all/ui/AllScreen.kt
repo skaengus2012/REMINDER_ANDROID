@@ -43,6 +43,7 @@ import com.nlab.reminder.core.component.schedulelist.toolbar.ui.rememberSchedule
 import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
 import com.nlab.reminder.core.kotlin.collections.IdentityList
 import com.nlab.reminder.core.androidx.compose.runtime.rememberAccumulatedStateStream
+import com.nlab.reminder.core.component.schedulelist.content.ui.CompletionUpdated
 import com.nlab.reminder.core.data.model.ScheduleId
 import com.nlab.reminder.core.kotlin.collections.toIdentityList
 import com.nlab.reminder.core.translation.StringIds
@@ -98,6 +99,10 @@ internal fun AllScreen(
         onItemSelectionChanged = { selectedIds ->
             store.dispatch(AllAction.OnItemSelectionChanged(selectedIds))
         },
+        onCompletionUpdated = { completionUpdated ->
+            // TODO implements
+            showAppToast("TODO Completion Updated $completionUpdated")
+        },
         onSimpleAdd = { simpleAdd ->
             // TODO implements
             showAppToast("TODO Simple Add $simpleAdd")
@@ -130,6 +135,7 @@ private fun AllScreen(
     onMoreClicked: () -> Unit,
     onCompleteClicked: () -> Unit,
     onItemSelectionChanged: (Set<ScheduleId>) -> Unit,
+    onCompletionUpdated: (CompletionUpdated) -> Unit,
     onSimpleAdd: (SimpleAdd) -> Unit,
     onSimpleEdit: (SimpleEdit) -> Unit,
     modifier: Modifier = Modifier,
@@ -165,6 +171,7 @@ private fun AllScreen(
                         multiSelectionEnabled = uiState.multiSelectionEnabled,
                         toolbarState = toolbarState,
                         onItemSelectionChanged = onItemSelectionChanged,
+                        onCompletionUpdated = onCompletionUpdated,
                         onSimpleAdd = onSimpleAdd,
                         onSimpleEdit = onSimpleEdit
                     )
@@ -182,6 +189,7 @@ private fun AllScheduleListContent(
     multiSelectionEnabled: Boolean,
     toolbarState: ScheduleListToolbarState,
     onItemSelectionChanged: (Set<ScheduleId>) -> Unit,
+    onCompletionUpdated: (CompletionUpdated) -> Unit,
     onSimpleAdd: (SimpleAdd) -> Unit,
     onSimpleEdit: (SimpleEdit) -> Unit,
     modifier: Modifier = Modifier
@@ -215,6 +223,7 @@ private fun AllScheduleListContent(
         },
         toolbarState = toolbarState,
         onItemSelectionChanged = onItemSelectionChanged,
+        onCompletionUpdated = onCompletionUpdated,
         onSimpleAdd = onSimpleAdd,
         onSimpleEdit = onSimpleEdit,
     )
@@ -231,6 +240,7 @@ private fun AllScreenPreview() {
             onMoreClicked = {},
             onCompleteClicked = {},
             onItemSelectionChanged = {},
+            onCompletionUpdated = {},
             onSimpleAdd = {},
             onSimpleEdit = {}
         )

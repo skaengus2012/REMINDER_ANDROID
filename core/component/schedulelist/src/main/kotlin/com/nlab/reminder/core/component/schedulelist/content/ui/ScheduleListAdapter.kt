@@ -61,8 +61,15 @@ internal class ScheduleListAdapter : RecyclerView.Adapter<ScheduleAdapterItemVie
     private val scheduleTimingDisplayFormatterState = MutableStateFlow<ScheduleTimingDisplayFormatter?>(null)
     private val selectionEnabled = MutableStateFlow(false)
 
-    private val _selectedScheduleIds = MutableStateFlow<PersistentSet<ScheduleId>>(persistentHashSetOf())
+    private val completionCheckedScheduleIds =
+        MutableStateFlow<PersistentSet<ScheduleId>>(persistentHashSetOf())
+
+    private val _selectedScheduleIds =
+        MutableStateFlow<PersistentSet<ScheduleId>>(persistentHashSetOf())
     val selectedScheduleIds: StateFlow<Set<ScheduleId>> = _selectedScheduleIds.asStateFlow()
+
+    private val _completionUpdateRequests = MutableEventSharedFlow<CompletionUpdated>()
+    val completionUpdateRequests: SharedFlow<CompletionUpdated> = _completionUpdateRequests.asSharedFlow()
 
     private val _addRequests = MutableEventSharedFlow<SimpleAdd>()
     val addRequests: SharedFlow<SimpleAdd> = _addRequests.asSharedFlow()
@@ -111,11 +118,21 @@ internal class ScheduleListAdapter : RecyclerView.Adapter<ScheduleAdapterItemVie
                     entryAtState = entryAtState,
                     scheduleTimingDisplayFormatterState = scheduleTimingDisplayFormatterState,
                     selectionEnabled = selectionEnabled,
-                    selectedScheduleIds = _selectedScheduleIds,
+                    selectedScheduleIds = selectedScheduleIds,
+                    completionCheckedScheduleIds = completionCheckedScheduleIds,
+                    onCompletionUpdated = { id, newCompletion ->
+                        completionCheckedScheduleIds.update { ids ->
+                            if (newCompletion) ids + id
+                            else ids - id
+                        }
+                        _completionUpdateRequests.tryEmit(CompletionUpdated(id, newCompletion))
+                    },
                     onSimpleEditDone = { _editRequests.tryEmit(it) },
                     onDragHandleTouched = { _dragHandleTouches.tryEmit(it) },
                     onSelectButtonTouched = { _selectButtonTouches.tryEmit(it) },
-                    onFocusChanged = { viewHolder, focused -> _focusChanges.tryEmit(FocusChange(viewHolder, focused)) },
+                    onFocusChanged = { viewHolder, focused ->
+                        _focusChanges.tryEmit(FocusChange(viewHolder, focused))
+                    },
                 )
             }
 
@@ -218,6 +235,10 @@ internal class ScheduleListAdapter : RecyclerView.Adapter<ScheduleAdapterItemVie
 
     fun setSelected(selectedIds: PersistentSet<ScheduleId>) {
         _selectedScheduleIds.value = selectedIds
+    }
+
+    fun setCompletionChecked(completionCheckedIds: PersistentSet<ScheduleId>) {
+        completionCheckedScheduleIds.value = completionCheckedIds
     }
 
     fun submitMoving(fromPosition: Int, toPosition: Int): Boolean {

@@ -53,6 +53,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
@@ -76,6 +77,8 @@ internal class ContentViewHolder(
     scheduleTimingDisplayFormatterState: StateFlow<ScheduleTimingDisplayFormatter?>,
     selectionEnabled: StateFlow<Boolean>,
     selectedScheduleIds: StateFlow<Set<ScheduleId>>,
+    completionCheckedScheduleIds: StateFlow<Set<ScheduleId>>,
+    onCompletionUpdated: (ScheduleId, Boolean) -> Unit,
     onSimpleEditDone: (SimpleEdit) -> Unit,
     onDragHandleTouched: (RecyclerView.ViewHolder) -> Unit,
     onSelectButtonTouched: (RecyclerView.ViewHolder) -> Unit,
@@ -182,9 +185,19 @@ internal class ContentViewHolder(
                     .collect(onSimpleEditDone)
             }
             jobs += viewLifecycleScope.launch {
-                binding.buttonComplete
-                    .throttleClicks()
-                    .collect { binding.buttonComplete.apply { it.isSelected = it.isSelected.not() } }
+                combine(
+                    bindingId.filterNotNull(),
+                    completionCheckedScheduleIds
+                ) { id, completionCheckedIds -> id in completionCheckedIds }
+                    .distinctUntilChanged()
+                    .collect { binding.buttonComplete.isSelected = it }
+            }
+            jobs += viewLifecycleScope.launch {
+                bindingId.filterNotNull().collectLatest { id ->
+                    binding.buttonComplete.throttleClicks().collect { v ->
+                        onCompletionUpdated(id, v.isSelected.not())
+                    }
+                }
             }
             jobs += viewLifecycleScope.launch {
                 selectionEnabled.collect { enabled ->
@@ -197,7 +210,9 @@ internal class ContentViewHolder(
                 combine(
                     selectionEnabled,
                     selectionAnimDelegate::awaitReady.asFlow()
-                ) { enabled, _ -> enabled }.distinctUntilChanged().collect { selectionAnimDelegate.startAnimation(it) }
+                ) { enabled, _ -> enabled }
+                    .distinctUntilChanged()
+                    .collect { selectionAnimDelegate.startAnimation(it) }
             }
             jobs += viewLifecycleScope.launch {
                 combine(
@@ -224,7 +239,10 @@ internal class ContentViewHolder(
                     .collect { onSelectButtonTouched(this@ContentViewHolder) }
             }
             jobs += viewLifecycleScope.launch {
-                combine(bindingId.filterNotNull(), selectedScheduleIds) { id, selectedIds -> id in selectedIds }
+                combine(
+                    bindingId.filterNotNull(),
+                    selectedScheduleIds
+                ) { id, selectedIds -> id in selectedIds }
                     .distinctUntilChanged()
                     .collect { binding.buttonSelection.isSelected = it }
             }

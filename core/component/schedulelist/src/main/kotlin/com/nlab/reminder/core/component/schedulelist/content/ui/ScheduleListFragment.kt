@@ -53,6 +53,7 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
@@ -90,8 +91,9 @@ internal class ScheduleListFragment : Fragment() {
     private val listBottomScrollPaddingStream = mutableLatestEventFlow<Int>()
     private val toolbarStateStream = mutableLatestEventFlow<ScheduleListToolbarState?>()
     private val itemSelectionObserverFlow = mutableLatestEventFlow<(Set<ScheduleId>) -> Unit>()
-    private val simpleAddCommandObserverStream = mutableLatestEventFlow<(SimpleAdd) -> Unit>()
-    private val simpleEditCommandObserverStream = mutableLatestEventFlow<(SimpleEdit) -> Unit>()
+    private val completionUpdateConsumerStream = mutableLatestEventFlow<(CompletionUpdated) -> Unit>()
+    private val simpleAddConsumerStream = mutableLatestEventFlow<(SimpleAdd) -> Unit>()
+    private val simpleEditConsumerStream = mutableLatestEventFlow<(SimpleEdit) -> Unit>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -295,42 +297,20 @@ internal class ScheduleListFragment : Fragment() {
             }
         }
 
-        val simpleAddCommandsState = MutableStateFlow<List<SimpleAdd>>(emptyList())
-        scheduleListAdapter.addRequests
-            .onEach { simpleAdd -> simpleAddCommandsState.update { it + simpleAdd } }
-            .launchIn(viewLifecycleScope)
-        viewLifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                simpleAddCommandObserverStream.collectLatest { observer ->
-                    simpleAddCommandsState.collect { simpleAdds ->
-                        val command = simpleAdds.firstOrNull()
-                        if (command != null) {
-                            observer.invoke(command)
-                            simpleAddCommandsState.update { it - command }
-                        }
-                    }
-                }
-            }
-        }
+        registerScheduleListViewEventConsumer(
+            scheduleListViewEventFlow = scheduleListAdapter.completionUpdateRequests,
+            viewEventConsumerFlow = completionUpdateConsumerStream
+        )
 
-        val simpleEditCommandState = MutableStateFlow<List<SimpleEdit>>(emptyList())
-        scheduleListAdapter.editRequests
-            .distinctUntilChanged()
-            .onEach { simpleEdit -> simpleEditCommandState.update { it + simpleEdit } }
-            .launchIn(viewLifecycleScope)
-        viewLifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                simpleEditCommandObserverStream.collectLatest { observer ->
-                    simpleEditCommandState.collect { simpleEdits ->
-                        val command = simpleEdits.firstOrNull()
-                        if (command != null) {
-                            observer.invoke(command)
-                            simpleEditCommandState.update { it - command }
-                        }
-                    }
-                }
-            }
-        }
+        registerScheduleListViewEventConsumer(
+            scheduleListViewEventFlow = scheduleListAdapter.addRequests,
+            viewEventConsumerFlow = simpleAddConsumerStream
+        )
+
+        registerScheduleListViewEventConsumer(
+            scheduleListViewEventFlow = scheduleListAdapter.editRequests,
+            viewEventConsumerFlow = simpleEditConsumerStream
+        )
 
         merge(
             // When ItemTouchHelper doesn't work, feed x from itemTouches
@@ -541,12 +521,16 @@ internal class ScheduleListFragment : Fragment() {
         itemSelectionObserverFlow.tryEmit(observer)
     }
 
-    fun onSimpleAddCommandObserverChanged(observer: (SimpleAdd) -> Unit) {
-        simpleAddCommandObserverStream.tryEmit(observer)
+    fun onCompletionUpdateConsumerChanged(consumer: (CompletionUpdated) -> Unit) {
+        completionUpdateConsumerStream.tryEmit(consumer)
     }
 
-    fun onSimpleEditCommandObserverChanged(observer: (SimpleEdit) -> Unit) {
-        simpleEditCommandObserverStream.tryEmit(observer)
+    fun onSimpleAddConsumerChanged(consumer: (SimpleAdd) -> Unit) {
+        simpleAddConsumerStream.tryEmit(consumer)
+    }
+
+    fun onSimpleEditConsumerChanged(consumer: (SimpleEdit) -> Unit) {
+        simpleEditConsumerStream.tryEmit(consumer)
     }
 }
 
@@ -558,3 +542,26 @@ private fun <T> mutableLatestEventFlow(): MutableSharedFlow<T> = MutableSharedFl
     replay = 1,
     onBufferOverflow = BufferOverflow.DROP_OLDEST
 )
+
+private fun <T> Fragment.registerScheduleListViewEventConsumer(
+    scheduleListViewEventFlow: SharedFlow<T>,
+    viewEventConsumerFlow: MutableSharedFlow<(T) -> Unit>
+) {
+    val viewEventQueue = MutableStateFlow<List<T>>(emptyList())
+    scheduleListViewEventFlow
+        .onEach { simpleAdd -> viewEventQueue.update { it + simpleAdd } }
+        .launchIn(viewLifecycleScope)
+    viewLifecycleScope.launch {
+        viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            viewEventConsumerFlow.collectLatest { consumer ->
+                viewEventQueue.collect { data ->
+                    val command = data.firstOrNull()
+                    if (command != null) {
+                        consumer.invoke(command)
+                        viewEventQueue.update { it - command }
+                    }
+                }
+            }
+        }
+    }
+}
