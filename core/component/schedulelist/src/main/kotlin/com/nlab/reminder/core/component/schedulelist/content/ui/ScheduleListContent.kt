@@ -53,6 +53,7 @@ fun ScheduleListContent(
     triggerAtFormatPatterns: TriggerAtFormatPatterns,
     theme: ScheduleListTheme,
     onItemSelectionChanged: (Set<ScheduleId>) -> Unit,
+    onCompletionUpdated: (CompletionUpdated) -> Unit,
     onSimpleAdd: (SimpleAdd) -> Unit,
     onSimpleEdit: (SimpleEdit) -> Unit,
     modifier: Modifier = Modifier,
@@ -115,11 +116,14 @@ fun ScheduleListContent(
         LaunchedEffect(fragment, onItemSelectionChanged) {
             fragment.onItemSelectionChangedObserverChanged(observer = onItemSelectionChanged)
         }
+        LaunchedEffect(fragment, onCompletionUpdated) {
+            fragment.onCompletionUpdateConsumerChanged(consumer = onCompletionUpdated)
+        }
         LaunchedEffect(fragment, onSimpleAdd) {
-            fragment.onSimpleAddCommandObserverChanged(observer = onSimpleAdd)
+            fragment.onSimpleAddConsumerChanged(consumer = onSimpleAdd)
         }
         LaunchedEffect(fragment, onSimpleEdit) {
-            fragment.onSimpleEditCommandObserverChanged(observer = onSimpleEdit)
+            fragment.onSimpleEditConsumerChanged(consumer = onSimpleEdit)
         }
     }
 }
