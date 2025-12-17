@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.component.schedule
+package com.nlab.reminder.core.component.schedule.domain
 
-import android.content.Context
+import com.nlab.reminder.core.data.model.Schedule
 
 /**
- * @author Thalys
+ * @author Doohyun
  */
-internal class CompletionWork(
-    appContext: Context,
-    workerParams: WorkerParameters
-) {
+class ScheduleService {
+    fun updateComplete(scheduleId: Schedule, isComplete: Boolean) {
+
+    }
 }

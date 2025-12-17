@@ -13,5 +13,6 @@ dependencies {
 
     implementation(projects.core.dataDi)
 
+    implementation(libs.androidx.hilt.work)
     implementation(libs.androidx.work.runtime.ktx)
 }
