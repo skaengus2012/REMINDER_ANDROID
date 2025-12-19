@@ -555,10 +555,10 @@ private fun <T> Fragment.registerScheduleListViewEventConsumer(
         viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
             viewEventConsumerFlow.collectLatest { consumer ->
                 viewEventQueue.collect { data ->
-                    val command = data.firstOrNull()
-                    if (command != null) {
-                        consumer.invoke(command)
-                        viewEventQueue.update { it - command }
+                    val event = data.firstOrNull()
+                    if (event != null) {
+                        consumer.invoke(event)
+                        viewEventQueue.update { it - event }
                     }
                 }
             }
