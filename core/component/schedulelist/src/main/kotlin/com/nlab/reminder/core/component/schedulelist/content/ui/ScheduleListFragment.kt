@@ -549,7 +549,7 @@ private fun <T> Fragment.registerScheduleListViewEventConsumer(
 ) {
     val viewEventQueue = MutableStateFlow<List<T>>(emptyList())
     scheduleListViewEventFlow
-        .onEach { simpleAdd -> viewEventQueue.update { it + simpleAdd } }
+        .onEach { event -> viewEventQueue.update { it + event } }
         .launchIn(viewLifecycleScope)
     viewLifecycleScope.launch {
         viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
