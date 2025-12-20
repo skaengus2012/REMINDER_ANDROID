@@ -17,6 +17,8 @@
 package com.nlab.reminder.core.component.schedulelist.content
 
 import com.nlab.reminder.core.data.model.SchedulesLookup
+import com.nlab.reminder.core.data.repository.GetScheduleCompletionBacklogStreamQuery
+import com.nlab.reminder.core.data.repository.ScheduleCompletionBacklogRepository
 import com.nlab.reminder.core.kotlin.collections.toSet
 import com.nlab.reminder.core.kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.Flow
@@ -35,6 +37,7 @@ import kotlinx.coroutines.flow.shareIn
  */
 class GetUserScheduleListResourcesFlowUseCase(
     private val getScheduleListResourcesFlow: GetScheduleListResourcesFlowUseCase,
+    private val scheduleCompletionBacklogRepository: ScheduleCompletionBacklogRepository,
     private val userSelectedSchedulesStore: UserSelectedSchedulesStore
 ) {
     operator fun invoke(
@@ -52,11 +55,21 @@ class GetUserScheduleListResourcesFlowUseCase(
         )
         combine(
             getScheduleListResourcesFlow(schedulesFlow = schedulesLookupFlow.map { it.values }),
+            scheduleCompletionBacklogRepository
+                .getBacklogsAsStream(query = GetScheduleCompletionBacklogStreamQuery.LatestPerScheduleId)
+                .map { backlogs ->
+                    backlogs.associateBy(
+                        keySelector = { it.scheduleId },
+                        valueTransform = { it.targetCompleted }
+                    )
+                },
             userSelectedIdsFlowOf(sharedSchedulesLookupFlow)
-        ) { scheduleResource, userSelectedIds ->
+        ) { scheduleResource, idToTargetCompletionTable, userSelectedIds ->
             scheduleResource.toSet { scheduleListResource ->
                 UserScheduleListResource(
                     schedule = scheduleListResource,
+                    completionChecked = idToTargetCompletionTable
+                        .getOrDefault(key = scheduleListResource.id, defaultValue = scheduleListResource.isComplete),
                     selected = scheduleListResource.id in userSelectedIds
                 )
             }

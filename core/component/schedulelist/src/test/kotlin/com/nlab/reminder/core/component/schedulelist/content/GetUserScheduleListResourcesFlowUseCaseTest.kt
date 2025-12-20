@@ -23,9 +23,12 @@ import com.nlab.reminder.core.data.model.SchedulesLookup
 import com.nlab.reminder.core.data.model.genLink
 import com.nlab.reminder.core.data.model.genLinkMetadata
 import com.nlab.reminder.core.data.model.genSchedule
+import com.nlab.reminder.core.data.model.genScheduleCompletionBacklog
 import com.nlab.reminder.core.data.model.genScheduleTiming
 import com.nlab.reminder.core.data.model.genSchedules
 import com.nlab.reminder.core.data.model.genTags
+import com.nlab.reminder.core.data.repository.GetScheduleCompletionBacklogStreamQuery
+import com.nlab.reminder.core.data.repository.ScheduleCompletionBacklogRepository
 import com.nlab.reminder.core.kotlin.collections.toSet
 import com.nlab.reminder.core.kotlin.faker.genNonBlankString
 import com.nlab.testkit.faker.genBoolean
@@ -83,9 +86,7 @@ class GetUserScheduleListResourcesFlowUseCaseTest {
         val expectedScheduleResources = schedules.toSet { genScheduleListResource(it.id) }
         val useCase = genGetUserScheduleListResourcesFlowUseCase(
             getScheduleListResourcesFlow = mockk {
-                every {
-                    this@mockk.invoke(any())
-                } returns flowOf(expectedScheduleResources)
+                every { this@mockk.invoke(any()) } returns flowOf(expectedScheduleResources)
             }
         )
         useCase.invoke(flowOf(SchedulesLookup(schedules))).test {
@@ -95,6 +96,57 @@ class GetUserScheduleListResourcesFlowUseCaseTest {
                 equalTo(expectedScheduleResources)
             )
 
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `Given backlog exists, When invoked, Then reflects backlog's completion state in result`() = runTest {
+        val completeCheckedSchedule = genSchedule(id = ScheduleId(1))
+        val completeNotCheckedSchedule = genSchedule(id = ScheduleId(2))
+        val useCase = genGetUserScheduleListResourcesFlowUseCase(
+            getScheduleListResourcesFlow = mockk {
+                every { this@mockk.invoke(any()) } returns flowOf(
+                    setOf(
+                        genScheduleListResource(
+                            id = completeCheckedSchedule.id,
+                            isComplete = completeCheckedSchedule.isComplete
+                        ),
+                        genScheduleListResource(
+                            id = completeNotCheckedSchedule.id,
+                            isComplete = completeNotCheckedSchedule.isComplete
+                        )
+                    )
+                )
+            },
+            scheduleCompletionBacklogRepository = mockk {
+                every {
+                    getBacklogsAsStream(GetScheduleCompletionBacklogStreamQuery.LatestPerScheduleId)
+                } returns flowOf(
+                    setOf(
+                        genScheduleCompletionBacklog(
+                            scheduleId = completeCheckedSchedule.id,
+                            targetCompleted = completeCheckedSchedule.isComplete.not()
+                        )
+                    )
+                )
+            }
+        )
+        val schedulesLookup = SchedulesLookup(setOf(completeCheckedSchedule, completeNotCheckedSchedule))
+        useCase.invoke(flowOf(schedulesLookup)).test {
+            val actualUserScheduleResources = awaitItem()
+            assertThat(
+                actualUserScheduleResources
+                    .first { it.schedule.id == completeCheckedSchedule.id }
+                    .completionChecked,
+                equalTo(completeCheckedSchedule.isComplete.not())
+            )
+            assertThat(
+                actualUserScheduleResources
+                    .first { it.schedule.id == completeNotCheckedSchedule.id }
+                    .completionChecked,
+                equalTo(completeNotCheckedSchedule.isComplete)
+            )
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -169,21 +221,28 @@ class GetUserScheduleListResourcesFlowUseCaseTest {
 
 private fun genGetUserScheduleListResourcesFlowUseCase(
     getScheduleListResourcesFlow: GetScheduleListResourcesFlowUseCase,
+    scheduleCompletionBacklogRepository: ScheduleCompletionBacklogRepository = mockk {
+        every { getBacklogsAsStream(query = any()) } returns flowOf(emptySet())
+    },
     userSelectedSchedulesStore: UserSelectedSchedulesStore = mockk {
         every { selectedIds } returns MutableStateFlow(emptySet())
     }
 ) = GetUserScheduleListResourcesFlowUseCase(
     getScheduleListResourcesFlow = getScheduleListResourcesFlow,
+    scheduleCompletionBacklogRepository = scheduleCompletionBacklogRepository,
     userSelectedSchedulesStore = userSelectedSchedulesStore
 )
 
-private fun genScheduleListResource(id: ScheduleId): ScheduleListResource = ScheduleListResource(
+private fun genScheduleListResource(
+    id: ScheduleId,
+    isComplete: Boolean = genBoolean()
+): ScheduleListResource = ScheduleListResource(
     id = id,
     title = genNonBlankString(),
     note = genNonBlankString(),
     link = genLink(),
     linkMetadata = genLinkMetadata(),
     timing = genScheduleTiming(),
-    isComplete = genBoolean(),
+    isComplete = isComplete,
     tags = genTags().toList()
 )

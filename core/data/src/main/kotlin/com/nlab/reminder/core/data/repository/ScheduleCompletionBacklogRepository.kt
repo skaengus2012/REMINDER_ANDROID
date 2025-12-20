@@ -28,9 +28,7 @@ interface ScheduleCompletionBacklogRepository {
     suspend fun save(scheduleId: ScheduleId, targetCompleted: Boolean): Result<ScheduleCompletionBacklog>
     suspend fun delete(backlogIds: Set<ScheduleCompletionBacklogId>): Result<Unit>
     suspend fun getBacklogs(): Result<Set<ScheduleCompletionBacklog>>
-    suspend fun getBacklogsAsStream(
-        query: GetScheduleCompletionBacklogStreamQuery
-    ): Flow<Set<ScheduleCompletionBacklog>>
+    fun getBacklogsAsStream(query: GetScheduleCompletionBacklogStreamQuery): Flow<Set<ScheduleCompletionBacklog>>
 }
 
 sealed class GetScheduleCompletionBacklogStreamQuery {

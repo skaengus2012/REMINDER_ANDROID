@@ -52,7 +52,7 @@ class LocalScheduleCompletionBacklogRepository(
         return entitiesResult.map(List<ScheduleCompletionBacklogEntity>::toBacklogs)
     }
 
-    override suspend fun getBacklogsAsStream(
+    override fun getBacklogsAsStream(
         query: GetScheduleCompletionBacklogStreamQuery
     ): Flow<Set<ScheduleCompletionBacklog>> {
         val entitiesFlow = when (query) {
