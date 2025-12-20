@@ -26,12 +26,14 @@ import dagger.hilt.components.SingletonComponent
 import com.nlab.reminder.core.data.qualifiers.ScheduleDataOption.*
 import com.nlab.reminder.core.data.repository.CompletedScheduleShownRepository
 import com.nlab.reminder.core.data.repository.LinkMetadataRepository
+import com.nlab.reminder.core.data.repository.ScheduleCompletionBacklogRepository
 import com.nlab.reminder.core.data.repository.ScheduleRepository
 import com.nlab.reminder.core.data.repository.SystemTimeSnapshotRepository
 import com.nlab.reminder.core.data.repository.TagRepository
 import com.nlab.reminder.core.data.repository.TimeSnapshotRepository
 import com.nlab.reminder.core.data.repository.impl.CompletedScheduleShownRepositoryImpl
 import com.nlab.reminder.core.data.repository.impl.LinkMetadataRemoteCache
+import com.nlab.reminder.core.data.repository.impl.LocalScheduleCompletionBacklogRepository
 import com.nlab.reminder.core.data.repository.impl.LocalScheduleRepository
 import com.nlab.reminder.core.data.repository.impl.LocalTagRepository
 import com.nlab.reminder.core.data.repository.impl.OfflineFirstLinkMetadataRepository
@@ -46,6 +48,7 @@ import com.nlab.reminder.core.kotlin.onFailure
 import com.nlab.reminder.core.kotlin.onSuccess
 import com.nlab.reminder.core.kotlin.toPositiveInt
 import com.nlab.reminder.core.local.database.dao.LinkMetadataDAO
+import com.nlab.reminder.core.local.database.dao.ScheduleCompletionBacklogDAO
 import com.nlab.reminder.core.local.database.dao.ScheduleDAO
 import com.nlab.reminder.core.local.database.dao.ScheduleRepeatDetailDAO
 import com.nlab.reminder.core.local.database.dao.ScheduleTagListDAO
@@ -57,11 +60,11 @@ import com.nlab.reminder.core.local.datastore.preference.PreferenceDataSource
 import com.nlab.reminder.core.network.datasource.LinkThumbnailDataSource
 import com.nlab.reminder.core.network.datasource.TrustedTimeDataSource
 import dagger.hilt.android.qualifiers.ApplicationContext
+import jakarta.inject.Singleton
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 
 import timber.log.Timber
-import javax.inject.Singleton
 
 /**
  * @author Doohyun
@@ -77,6 +80,14 @@ internal object AppScopeDataModule {
     ): CompletedScheduleShownRepository = CompletedScheduleShownRepositoryImpl(
         getAsStreamFunction = { preferenceDataSource.getAllScheduleCompleteShownAsStream() },
         setShownFunction = { preferenceDataSource.setAllScheduleCompleteShown(it) }
+    )
+
+    @Reusable
+    @Provides
+    fun provideScheduleCompletionBacklogRepository(
+        scheduleCompletionBacklogDAO: ScheduleCompletionBacklogDAO,
+    ): ScheduleCompletionBacklogRepository = LocalScheduleCompletionBacklogRepository(
+        scheduleCompletionBacklogDAO = scheduleCompletionBacklogDAO
     )
 
     @Reusable
