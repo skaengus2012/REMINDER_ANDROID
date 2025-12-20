@@ -27,13 +27,13 @@ import com.nlab.reminder.core.kotlin.onSuccess
 import com.nlab.reminder.core.kotlinx.coroutines.flow.channelFlow
 import com.nlab.reminder.core.kotlinx.coroutines.flow.combine
 import com.nlab.reminder.core.kotlinx.coroutines.flow.filter
+import com.nlab.reminder.core.kotlinx.coroutines.flow.map
 import com.nlab.reminder.core.local.database.dao.LinkMetadataDAO
 import com.nlab.reminder.core.network.datasource.LinkThumbnailDataSource
 import kotlinx.collections.immutable.persistentHashMapOf
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import kotlin.concurrent.atomics.AtomicReference
