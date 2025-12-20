@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 The N's lab Open Source Project
+ * Copyright (C) 2025 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,16 +16,18 @@
 
 package com.nlab.reminder.core.data.model
 
-import com.nlab.reminder.core.local.database.entity.TagEntity
-import com.nlab.testkit.faker.genInt
-
-typealias TagAndEntity = Pair<Tag, TagEntity>
+import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.core.IsEqual.equalTo
+import org.junit.Test
 
 /**
  * @author Doohyun
  */
-fun genTagAndEntity(tag: Tag = genTag()): TagAndEntity = tag to TagEntity(tag.id.rawId, tag.name.value)
-
-fun genTagAndEntities(count: Int = genInt(min = 5, max = 10)): List<TagAndEntity> = List(count) { index ->
-    genTagAndEntity(tag = genTag(id = TagId(index.toLong())))
+class ScheduleCompletionBacklogKtTest {
+    @Test
+    fun `Given entity, When convert to scheduleCompletionBacklog, Then return matching model`() {
+        val (expectedBacklog, entity) = genScheduleCompletionBacklogAndEntity()
+        val actualBacklog = ScheduleCompletionBacklog(entity)
+        assertThat(actualBacklog, equalTo(expectedBacklog))
+    }
 }
