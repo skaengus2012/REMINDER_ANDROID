@@ -248,7 +248,7 @@ internal class ScheduleListFragment : Fragment() {
             }
         }
 
-        val awaitItemScheduleSelectionSyncJob = CompletableDeferred<Unit>()
+        val awaitUserInteractionSyncJob = CompletableDeferred<Unit>()
         scheduleListItemsAdaptationStream
             .transformLatest { adaptation ->
                 when (adaptation) {
@@ -261,7 +261,7 @@ internal class ScheduleListFragment : Fragment() {
                         // no-op
                     }
                 }
-                if (awaitItemScheduleSelectionSyncJob.isCompleted) {
+                if (awaitUserInteractionSyncJob.isCompleted) {
                     // debounce time
                     // It's not need to sync all data.
                     //
@@ -270,24 +270,36 @@ internal class ScheduleListFragment : Fragment() {
                     // case2. When the selection is canceled, it must be a sync.
                     delay(200)
                 }
-                val selectedSchedulesIds = buildSet {
-                    adaptation.items.forEach { item ->
-                        if (item is ScheduleListItem.Content && item.resource.selected) {
-                            this += item.resource.schedule.id
-                        }
+
+                val completionCheckedSchedulesIds = hashSetOf<ScheduleId>()
+                val selectedSchedulesIds = hashSetOf<ScheduleId>()
+                for (item in adaptation.items) {
+                    if (item !is ScheduleListItem.Content) continue
+                    val userScheduleListResource = item.resource
+                    val scheduleId = userScheduleListResource.schedule.id
+                    if (userScheduleListResource.completionChecked) {
+                        completionCheckedSchedulesIds += scheduleId
+                    }
+                    if (userScheduleListResource.selected) {
+                        selectedSchedulesIds += scheduleId
                     }
                 }
-                emit(selectedSchedulesIds.toPersistentHashSet())
+                emit(
+                    UserInteraction(
+                        selectedScheduleIds = selectedSchedulesIds.toPersistentHashSet(),
+                        completionCheckedScheduleIds = completionCheckedSchedulesIds.toPersistentHashSet()
+                    )
+                )
             }
             .flowOn(Dispatchers.Default)
             .flowWithLifecycle(viewLifecycle)
-            .onEach { selectedIds ->
-                scheduleListAdapter.setSelected(selectedIds)
-                awaitItemScheduleSelectionSyncJob.complete(Unit)
+            .onEach { userInteraction ->
+                scheduleListAdapter.setUserInteraction(userInteraction)
+                awaitUserInteractionSyncJob.complete(Unit)
             }
             .launchIn(viewLifecycleScope)
         viewLifecycleScope.launch {
-            awaitItemScheduleSelectionSyncJob.await()
+            awaitUserInteractionSyncJob.await()
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 itemSelectionObserverFlow.collectLatest { observer ->
                     scheduleListAdapter.selectedScheduleIds.collect { selectedIds ->

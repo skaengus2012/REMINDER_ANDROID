@@ -26,9 +26,11 @@ import com.nlab.testkit.faker.genInt
  */
 fun genUserScheduleListResource(
     schedule: ScheduleListResource = genScheduleListResource(),
+    completionChecked: Boolean = genBoolean(),
     selected: Boolean = genBoolean()
 ): UserScheduleListResource = UserScheduleListResource(
     schedule = schedule,
+    completionChecked = completionChecked,
     selected = selected
 )
 

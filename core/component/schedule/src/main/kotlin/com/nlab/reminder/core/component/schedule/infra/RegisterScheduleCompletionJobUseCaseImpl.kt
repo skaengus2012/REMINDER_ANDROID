@@ -27,8 +27,7 @@ import com.nlab.reminder.core.component.schedule.RegisterScheduleCompleteJobUseC
 import com.nlab.reminder.core.data.repository.ScheduleCompletionBacklogRepository
 import com.nlab.reminder.core.data.repository.ScheduleRepository
 import com.nlab.reminder.core.data.repository.UpdateAllScheduleQuery
-import com.nlab.reminder.core.kotlin.getOrElse
-import com.nlab.reminder.core.kotlin.map
+import com.nlab.reminder.core.kotlin.collections.toSet
 import com.nlab.reminder.core.kotlin.onFailure
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -45,7 +44,7 @@ internal class RegisterScheduleCompleteJobUseCaseImpl(
     private val context: Context
 ) : RegisterScheduleCompleteJobUseCase {
     override operator fun invoke(delayTime: Duration) {
-        val workRequestBuilder = OneTimeWorkRequestBuilder<ScheduleCompletionWork>().apply {
+        val workRequestBuilder = OneTimeWorkRequestBuilder<ScheduleCompletionWorker>().apply {
             if (delayTime.isPositive()) {
                 setInitialDelay(delayTime.toJavaDuration())
             }
@@ -59,23 +58,27 @@ internal class RegisterScheduleCompleteJobUseCaseImpl(
 }
 
 @HiltWorker
-internal class ScheduleCompletionWork @AssistedInject constructor(
+internal class ScheduleCompletionWorker @AssistedInject constructor(
     @Assisted appContext: Context,
     @Assisted workerParams: WorkerParameters,
     private val scheduleRepository: ScheduleRepository,
     private val scheduleCompletionBacklogRepository: ScheduleCompletionBacklogRepository,
 ) : CoroutineWorker(appContext, workerParams) {
     override suspend fun doWork(): Result {
+        Timber.d("Start schedule completion work!")
+
         val currentBacklogs = scheduleCompletionBacklogRepository
             .getBacklogs()
-            .onFailure { Timber.e(it) }
+            .onFailure { Timber.e(it, "Failure schedule completion work, when loading backlogs") }
             .getOrElse { return Result.failure() }
-
-        if (currentBacklogs.isEmpty()) return Result.success()
+        if (currentBacklogs.isEmpty()) {
+            Timber.d("Finished schedule completion work without any backlogs")
+            return Result.success()
+        }
 
         // TODO use alarmManager
 
-        return scheduleRepository
+        scheduleRepository
             .updateAll(
                 query = UpdateAllScheduleQuery.Completes(
                     idToCompleteTable = buildMap {
@@ -85,8 +88,19 @@ internal class ScheduleCompletionWork @AssistedInject constructor(
                     }
                 )
             )
-            .map { Result.success() }
-            .onFailure { Timber.e(it) }
-            .getOrElse { Result.failure() }
+            .onFailure { t ->
+                Timber.e(t, "Failure schedule completion work, when schedule updated")
+                return Result.failure()
+            }
+
+        scheduleCompletionBacklogRepository
+            .delete(backlogIds = currentBacklogs.toSet { it.id })
+            .onFailure { t ->
+                Timber.e(t, "Failure schedule completion work, when backlog clean up")
+                return Result.failure()
+            }
+
+        Timber.d("Finished schedule completion work")
+        return Result.success()
     }
 }
