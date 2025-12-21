@@ -46,12 +46,21 @@
 			android:authorities="${applicationId}.androidx-startup"
 			android:exported="false"
 			tools:node="merge">
+            <!-- The default WorkManager should be disabled. -->
+            <!-- https://developer.android.com/training/dependency-injection/hilt-jetpack#workmanager -->
+            <meta-data
+                android:name="androidx.work.WorkManagerInitializer"
+                android:value="androidx.startup"
+                tools:node="remove" />
 			<meta-data
 				android:name="com.nlab.reminder.apps.startup.init.StateKitPluginInitializer"
 				android:value="androidx.startup" />
 			<meta-data
 				android:name="com.nlab.reminder.apps.startup.init.SystemTimeUsageObserveInitializer"
 				android:value="androidx.startup" />
+            <meta-data
+                android:name="com.nlab.reminder.apps.startup.init.WorkManagerInitializer"
+                android:value="androidx.startup" />
 		</provider>
 
 	</application>

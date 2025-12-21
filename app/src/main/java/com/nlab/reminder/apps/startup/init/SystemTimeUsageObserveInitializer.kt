@@ -40,7 +40,7 @@ import kotlinx.coroutines.launch
 /**
  * @author Doohyun
  */
-class SystemTimeUsageObserveInitializer : Initializer<Unit> {
+internal class SystemTimeUsageObserveInitializer : Initializer<Unit> {
     override fun create(context: Context) {
         val entryPoint = EntryPointAccessors.fromApplication<SystemTimeUsageObserveInitEntryPoint>(context)
         val coroutineScope = entryPoint.appCoroutineScope()
