@@ -19,6 +19,8 @@ package com.nlab.reminder.core.component.schedulelist.content.ui
 import android.animation.Animator
 import android.animation.ValueAnimator
 import android.graphics.Canvas
+import android.os.SystemClock
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewPropertyAnimator
 import android.view.animation.AccelerateInterpolator
@@ -76,6 +78,7 @@ internal class ScheduleListItemTouchCallback(
     private val outLocation = IntArray(2)
     private val mirrorViewBindingPool = DraggingMirrorViewPool()
     private val dragScaleInterpolator = OvershootInterpolator()
+    private val dragEndCallbacks = mutableListOf<() -> Unit>()
     private var disposeDragScaleAnimator: ViewPropertyAnimator? = null
     private var draggingViewHolder: RecyclerView.ViewHolder? = null
     private var dragAnchorMirrorView: View? = null
@@ -348,6 +351,25 @@ internal class ScheduleListItemTouchCallback(
         }
     }
 
+    fun stopDragging(recyclerView: RecyclerView, commitCallback: () -> Unit) {
+        if (selectedActionState != ItemTouchHelper.ACTION_STATE_DRAG) {
+            commitCallback.invoke()
+            return
+        }
+        val now = SystemClock.uptimeMillis()
+        val cancelEvent = MotionEvent.obtain(
+            now,
+            now,
+            MotionEvent.ACTION_CANCEL,
+            0f,
+            0f,
+            0
+        )
+        recyclerView.dispatchTouchEvent(cancelEvent)
+        cancelEvent.recycle()
+        dragEndCallbacks += commitCallback
+    }
+
     override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
         val oldActionState = selectedActionState
         selectedActionState = actionState
@@ -445,12 +467,15 @@ internal class ScheduleListItemTouchCallback(
                             viewHolder.itemView.setVisible(isVisible = true)
 
                             (viewHolder as? DraggableViewHolder)?.onDragStateChanged(isActive = false)
-
                             disposeDragScaleAnimator?.cancel()
                             disposeDragScaleAnimator = postDragScaleAnimator(
                                 view = viewHolder.itemView,
                                 scale = 1f,
-                                doOnAnimComplete = { disposeDragScaleAnimator = null }
+                                doOnAnimComplete = {
+                                    dragEndCallbacks.forEach { it.invoke() }
+                                    dragEndCallbacks.clear()
+                                    disposeDragScaleAnimator = null
+                                }
                             )
                         }
                         draggingViewHolder = null

@@ -455,7 +455,20 @@ internal class ScheduleListFragment : Fragment() {
                     isVisible = recyclerViewVisible,
                     goneIfNotVisible = false
                 )
-                scheduleListAdapter.submitList(items = newItems, commitCallback = {})
+                // If a drag is in progress, the list should be updated after the drag operation is completed
+                // to ensure the ViewHolder is stable.
+                awaitCompleteWith {
+                    itemTouchCallback.stopDragging(
+                        recyclerView = binding.recyclerviewSchedule,
+                        commitCallback = { complete(Unit) }
+                    )
+                }
+                awaitCompleteWith {
+                    scheduleListAdapter.submitList(
+                        items = newItems,
+                        commitCallback = { complete(Unit) }
+                    )
+                }
             }
             .launchIn(viewLifecycleScope)
 
@@ -576,4 +589,10 @@ private fun <T> Fragment.registerScheduleListViewEventConsumer(
             }
         }
     }
+}
+
+private suspend inline fun awaitCompleteWith(block: CompletableDeferred<Unit>.() -> Unit) {
+    CompletableDeferred<Unit>()
+        .also { it.block() }
+        .await()
 }
