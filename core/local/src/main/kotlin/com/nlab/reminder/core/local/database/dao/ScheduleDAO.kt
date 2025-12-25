@@ -157,28 +157,33 @@ abstract class ScheduleDAO {
 
     @Transaction
     open suspend fun updateByCompletes(idToCompleteTable: Map<Long, Boolean>) {
-        suspend fun updateByCompletesInternal(entities: Collection<ScheduleEntity>, isComplete: Boolean) {
-            if (entities.isEmpty()) return
-            val maxVisiblePriority = findMaxVisiblePriorityByCompleteOrElse(isComplete, defaultValue = { -1 })
-            entities.sortedBy { it.visiblePriority }.forEachIndexed { index, entity ->
-                insert(
-                    entity = entity.copy(
-                        scheduleId = EMPTY_GENERATED_ID,
-                        isComplete = isComplete,
-                        visiblePriority = maxVisiblePriority + index + 1
-                    )
-                )
-            }
-        }
-
-        val entities = findByIds(scheduleIds = idToCompleteTable.keys)
-        if (entities.isEmpty()) return
-
-        entities
-            .filter { entity -> entity.isComplete != idToCompleteTable.getValue(entity.scheduleId) }
+        findByIds(scheduleIds = idToCompleteTable.keys)
+            .filter { it.isComplete != idToCompleteTable.getValue(it.scheduleId) }
             .groupBy { it.isComplete }
             .forEach { (isComplete, entities) ->
-                updateByCompletesInternal(entities = entities, isComplete = isComplete.not())
+                val maxVisiblePriority = findMaxVisiblePriorityByCompleteOrElse(isComplete, defaultValue = { -1 })
+                entities.sortedBy { it.visiblePriority }.forEachIndexed { index, entity ->
+                    if (entity.repeatType == null) {
+                        // If no repeatTypes exist, only the completion flag is changed.
+                        update(
+                            entity.copy(
+                                isComplete = isComplete.not(),
+                                visiblePriority = maxVisiblePriority + index + 1
+                            )
+                        )
+                    } else {
+                        // If an repeatType exists, create a completion item and update it.
+                        insert(
+                            entity.copy(
+                                scheduleId = EMPTY_GENERATED_ID,
+                                isComplete = isComplete,
+                                visiblePriority = maxVisiblePriority + index + 1,
+                                repeatType = null,
+                                repeatInterval = null
+                            )
+                        )
+                    }
+                }
             }
     }
 
