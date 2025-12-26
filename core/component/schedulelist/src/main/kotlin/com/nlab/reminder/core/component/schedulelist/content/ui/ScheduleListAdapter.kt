@@ -222,13 +222,16 @@ internal class ScheduleListAdapter : RecyclerView.Adapter<ScheduleAdapterItemVie
         }
     }
 
-    fun setUserInteraction(userInteraction: UserInteraction) {
-        completionCheckedScheduleIds.value = userInteraction.completionCheckedScheduleIds
-        _selectedScheduleIds.value = userInteraction.selectedScheduleIds
-    }
-
     fun setSelectionEnabled(isEnabled: Boolean) {
         selectionEnabled.value = isEnabled
+    }
+
+    fun syncCompletion(completionCheckedScheduleIds: PersistentSet<ScheduleId>) {
+        this.completionCheckedScheduleIds.value = completionCheckedScheduleIds
+    }
+
+    fun syncSelected(selectedScheduleIds: PersistentSet<ScheduleId>) {
+        _selectedScheduleIds.value = selectedScheduleIds
     }
 
     fun setSelected(scheduleId: ScheduleId, selected: Boolean) {

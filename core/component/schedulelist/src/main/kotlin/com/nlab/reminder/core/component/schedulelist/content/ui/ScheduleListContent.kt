@@ -114,7 +114,7 @@ fun ScheduleListContent(
             )
         }
         LaunchedEffect(fragment, onItemSelectionChanged) {
-            fragment.onItemSelectionChangedObserverChanged(observer = onItemSelectionChanged)
+            fragment.onItemSelectionChangedConsumerChanged(observer = onItemSelectionChanged)
         }
         LaunchedEffect(fragment, onCompletionUpdated) {
             fragment.onCompletionUpdateConsumerChanged(consumer = onCompletionUpdated)

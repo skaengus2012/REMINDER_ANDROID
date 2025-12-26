@@ -41,11 +41,13 @@ import com.nlab.reminder.core.androix.recyclerview.scrollEvent
 import com.nlab.reminder.core.androix.recyclerview.scrollState
 import com.nlab.reminder.core.androix.recyclerview.stickyheader.StickyHeaderHelper
 import com.nlab.reminder.core.androix.recyclerview.verticalScrollRange
+import com.nlab.reminder.core.component.schedulelist.content.UserScheduleListResource
 import com.nlab.reminder.core.component.schedulelist.databinding.FragmentScheduleListBinding
 import com.nlab.reminder.core.component.schedulelist.toolbar.ui.ScheduleListToolbarState
 import com.nlab.reminder.core.data.model.ScheduleId
 import com.nlab.reminder.core.kotlinx.coroutines.flow.map
 import com.nlab.reminder.core.kotlinx.coroutines.flow.withPrev
+import kotlinx.collections.immutable.PersistentSet
 import kotlinx.collections.immutable.toPersistentHashSet
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
@@ -90,7 +92,7 @@ internal class ScheduleListFragment : Fragment() {
     private val entryAtStream = mutableLatestEventFlow<Instant>()
     private val listBottomScrollPaddingStream = mutableLatestEventFlow<Int>()
     private val toolbarStateStream = mutableLatestEventFlow<ScheduleListToolbarState?>()
-    private val itemSelectionObserverFlow = mutableLatestEventFlow<(Set<ScheduleId>) -> Unit>()
+    private val itemSelectionChangeConsumerFlow = mutableLatestEventFlow<(Set<ScheduleId>) -> Unit>()
     private val completionUpdateConsumerStream = mutableLatestEventFlow<(CompletionUpdated) -> Unit>()
     private val simpleAddConsumerStream = mutableLatestEventFlow<(SimpleAdd) -> Unit>()
     private val simpleEditConsumerStream = mutableLatestEventFlow<(SimpleEdit) -> Unit>()
@@ -248,78 +250,38 @@ internal class ScheduleListFragment : Fragment() {
             }
         }
 
-        val awaitUserInteractionSyncJob = CompletableDeferred<Unit>()
-        scheduleListItemsAdaptationStream
-            .transformLatest { adaptation ->
-                when (adaptation) {
-                    is ScheduleListItemsAdaptation.Absent -> {
-                        // If the adaptation is not 'Exist', cancel any ongoing delay/work and wait for the next item.
-                        return@transformLatest
-                    }
-
-                    is ScheduleListItemsAdaptation.Exist -> {
-                        // no-op
-                    }
-                }
-                if (awaitUserInteractionSyncJob.isCompleted) {
-                    // debounce time
-                    // It's not need to sync all data.
-                    //
-                    // This is because it is only necessary in the following cases.
-                    // case1. configuration should be synced at the time of the change.
-                    // case2. When the selection is canceled, it must be a sync.
-                    delay(200)
-                }
-
-                val completionCheckedSchedulesIds = hashSetOf<ScheduleId>()
-                val selectedSchedulesIds = hashSetOf<ScheduleId>()
-                for (item in adaptation.items) {
-                    if (item !is ScheduleListItem.Content) continue
-                    val userScheduleListResource = item.resource
-                    val scheduleId = userScheduleListResource.schedule.id
-                    if (userScheduleListResource.completionChecked) {
-                        completionCheckedSchedulesIds += scheduleId
-                    }
-                    if (userScheduleListResource.selected) {
-                        selectedSchedulesIds += scheduleId
-                    }
-                }
-                emit(
-                    UserInteraction(
-                        selectedScheduleIds = selectedSchedulesIds.toPersistentHashSet(),
-                        completionCheckedScheduleIds = completionCheckedSchedulesIds.toPersistentHashSet()
-                    )
-                )
-            }
-            .flowOn(Dispatchers.Default)
-            .flowWithLifecycle(viewLifecycle)
-            .onEach { userInteraction ->
-                scheduleListAdapter.setUserInteraction(userInteraction)
-                awaitUserInteractionSyncJob.complete(Unit)
-            }
-            .launchIn(viewLifecycleScope)
-        viewLifecycleScope.launch {
-            awaitUserInteractionSyncJob.await()
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                itemSelectionObserverFlow.collectLatest { observer ->
-                    scheduleListAdapter.selectedScheduleIds.collect { selectedIds ->
-                        observer.invoke(selectedIds)
-                    }
+        syncAndModifyScheduleListState(
+            syncDebounce = 200, // selection animation duration
+            syncSource = { adaptation ->
+                adaptation.toScheduleIdsBy { it.selected }
+            },
+            applySource = scheduleListAdapter::syncSelected,
+            forwardChangedStateToConsumer = {
+                itemSelectionChangeConsumerFlow.collectLatest { consumer ->
+                    scheduleListAdapter.selectedScheduleIds.collect(consumer::invoke)
                 }
             }
-        }
-
-        registerScheduleListViewEventConsumer(
-            scheduleListViewEventFlow = scheduleListAdapter.completionUpdateRequests,
-            viewEventConsumerFlow = completionUpdateConsumerStream
         )
 
-        registerScheduleListViewEventConsumer(
+        syncAndModifyScheduleListState(
+            syncDebounce = 1000, // completion debounce time with buffer
+            syncSource = { adaptation ->
+                adaptation.toScheduleIdsBy { it.completionChecked }
+            },
+            applySource = scheduleListAdapter::syncCompletion,
+            forwardChangedStateToConsumer = {
+                completionUpdateConsumerStream.collectLatest { consumer ->
+                    scheduleListAdapter.completionUpdateRequests.collect(consumer::invoke)
+                }
+            }
+        )
+
+        forwardScheduleListEventToConsumer(
             scheduleListViewEventFlow = scheduleListAdapter.addRequests,
             viewEventConsumerFlow = simpleAddConsumerStream
         )
 
-        registerScheduleListViewEventConsumer(
+        forwardScheduleListEventToConsumer(
             scheduleListViewEventFlow = scheduleListAdapter.editRequests,
             viewEventConsumerFlow = simpleEditConsumerStream
         )
@@ -510,6 +472,79 @@ internal class ScheduleListFragment : Fragment() {
             .launchIn(viewLifecycleScope)
     }
 
+    private fun <T> syncAndModifyScheduleListState(
+        syncDebounce: Long,
+        syncSource: (ScheduleListItemsAdaptation.Exist) -> T,
+        applySource: (T) -> Unit,
+        forwardChangedStateToConsumer: suspend () -> Unit
+    ) {
+        val awaitUserInteractionSyncJob = CompletableDeferred<Unit>()
+        scheduleListItemsAdaptationStream
+            .transformLatest { adaptation ->
+                when (adaptation) {
+                    is ScheduleListItemsAdaptation.Absent -> {
+                        // If the adaptation is not 'Exist', cancel any ongoing delay/work and wait for the next item.
+                        return@transformLatest
+                    }
+
+                    is ScheduleListItemsAdaptation.Exist -> {
+                        // no-op
+                    }
+                }
+                if (awaitUserInteractionSyncJob.isCompleted) {
+                    // debounce time
+                    // It's not need to sync all data.
+                    //
+                    // This is because it is only necessary in the following cases.
+                    // case1. configuration should be synced at the time of the change.
+                    // case2.
+                    //      When the selection is canceled, it must be a sync. (case. multi selection)
+                    delay(syncDebounce)
+                }
+
+                emit(syncSource(adaptation))
+            }
+            .distinctUntilChanged()
+            .flowOn(Dispatchers.Default)
+            .flowWithLifecycle(viewLifecycle)
+            .onEach { source ->
+                applySource(source)
+                if (awaitUserInteractionSyncJob.isActive) {
+                    awaitUserInteractionSyncJob.complete(Unit)
+                }
+            }
+            .launchIn(viewLifecycleScope)
+        viewLifecycleScope.launch {
+            awaitUserInteractionSyncJob.await()
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                forwardChangedStateToConsumer()
+            }
+        }
+    }
+
+    private fun <T> forwardScheduleListEventToConsumer(
+        scheduleListViewEventFlow: SharedFlow<T>,
+        viewEventConsumerFlow: MutableSharedFlow<(T) -> Unit>
+    ) {
+        val viewEventQueue = MutableStateFlow<List<T>>(emptyList())
+        scheduleListViewEventFlow
+            .onEach { event -> viewEventQueue.update { it + event } }
+            .launchIn(viewLifecycleScope)
+        viewLifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewEventConsumerFlow.collectLatest { consumer ->
+                    viewEventQueue.collect { data ->
+                        val event = data.firstOrNull()
+                        if (event != null) {
+                            consumer.invoke(event)
+                            viewEventQueue.update { it - event }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     fun onScheduleListItemsAdaptationUpdated(scheduleListItemsAdaptation: ScheduleListItemsAdaptation) {
         scheduleListItemsAdaptationStream.tryEmit(scheduleListItemsAdaptation)
     }
@@ -542,8 +577,8 @@ internal class ScheduleListFragment : Fragment() {
         listBottomScrollPaddingStream.tryEmit(value)
     }
 
-    fun onItemSelectionChangedObserverChanged(observer: (Set<ScheduleId>) -> Unit) {
-        itemSelectionObserverFlow.tryEmit(observer)
+    fun onItemSelectionChangedConsumerChanged(observer: (Set<ScheduleId>) -> Unit) {
+        itemSelectionChangeConsumerFlow.tryEmit(observer)
     }
 
     fun onCompletionUpdateConsumerChanged(consumer: (CompletionUpdated) -> Unit) {
@@ -568,31 +603,22 @@ private fun <T> mutableLatestEventFlow(): MutableSharedFlow<T> = MutableSharedFl
     onBufferOverflow = BufferOverflow.DROP_OLDEST
 )
 
-private fun <T> Fragment.registerScheduleListViewEventConsumer(
-    scheduleListViewEventFlow: SharedFlow<T>,
-    viewEventConsumerFlow: MutableSharedFlow<(T) -> Unit>
-) {
-    val viewEventQueue = MutableStateFlow<List<T>>(emptyList())
-    scheduleListViewEventFlow
-        .onEach { event -> viewEventQueue.update { it + event } }
-        .launchIn(viewLifecycleScope)
-    viewLifecycleScope.launch {
-        viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            viewEventConsumerFlow.collectLatest { consumer ->
-                viewEventQueue.collect { data ->
-                    val event = data.firstOrNull()
-                    if (event != null) {
-                        consumer.invoke(event)
-                        viewEventQueue.update { it - event }
-                    }
-                }
-            }
-        }
-    }
-}
-
 private suspend inline fun awaitCompleteWith(block: CompletableDeferred<Unit>.() -> Unit) {
     CompletableDeferred<Unit>()
         .also { it.block() }
         .await()
+}
+
+private fun ScheduleListItemsAdaptation.Exist.toScheduleIdsBy(
+    predicate: (UserScheduleListResource) -> Boolean
+): PersistentSet<ScheduleId> {
+    val selectedSchedulesIds = hashSetOf<ScheduleId>()
+    for (item in items) {
+        if (item !is ScheduleListItem.Content) continue
+        val userScheduleListResource = item.resource
+        if (predicate(userScheduleListResource)) {
+            selectedSchedulesIds += item.resource.schedule.id
+        }
+    }
+    return selectedSchedulesIds.toPersistentHashSet()
 }
