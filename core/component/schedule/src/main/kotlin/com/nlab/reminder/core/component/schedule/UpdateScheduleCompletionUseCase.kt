@@ -19,9 +19,8 @@ package com.nlab.reminder.core.component.schedule
 import com.nlab.reminder.core.data.model.ScheduleId
 import com.nlab.reminder.core.data.repository.ScheduleCompletionBacklogRepository
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.async
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.seconds
 
 /**
  * @author Thalys
@@ -32,20 +31,17 @@ class UpdateScheduleCompletionUseCase internal constructor(
     private val registerScheduleCompleteJob: RegisterScheduleCompleteJobUseCase,
     private val delayTime: Duration
 ) {
-    operator fun invoke(
+    suspend operator fun invoke(
         scheduleId: ScheduleId,
         targetCompleted: Boolean,
-        applyImmediately: Boolean
-    ) {
-        coroutineScope.launch {
-            scheduleCompletionBacklogRepository.save(scheduleId, targetCompleted)
-            registerScheduleCompleteJob(
-                delayTime = if (applyImmediately) 0.seconds else delayTime
-            )
+    ): Result<Unit> {
+        val resultJob = coroutineScope.async {
+            scheduleCompletionBacklogRepository
+                .save(scheduleId, targetCompleted)
+                .onSuccess { backlog ->
+                    registerScheduleCompleteJob(delayTime = delayTime, processUntilPriority = backlog.priority)
+                }
         }
+        return resultJob.await().map { /* do nothing */ }
     }
-}
-
-internal interface RegisterScheduleCompleteJobUseCase {
-    operator fun invoke(delayTime: Duration)
 }

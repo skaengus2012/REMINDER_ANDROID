@@ -17,6 +17,7 @@
 package com.nlab.reminder.core.component.schedule.di
 
 import android.content.Context
+import com.nlab.reminder.core.component.schedule.RegisterScheduleCompleteJobUseCase
 import com.nlab.reminder.core.component.schedule.UpdateScheduleCompletionUseCase
 import com.nlab.reminder.core.component.schedule.infra.RegisterScheduleCompleteJobUseCaseImpl
 import com.nlab.reminder.core.data.model.ScheduleCompletionBacklog
@@ -41,10 +42,16 @@ import kotlin.time.Duration.Companion.milliseconds
 internal object AppScopeScheduleModule {
     @Reusable
     @Provides
+    fun provideRegisterScheduleCompleteJobUseCase(
+        @ApplicationContext context: Context
+    ): RegisterScheduleCompleteJobUseCase = RegisterScheduleCompleteJobUseCaseImpl(context)
+
+    @Reusable
+    @Provides
     fun provideUpdateScheduleCompletionUseCase(
-        @ApplicationContext context: Context,
         @AppScope coroutineScope: CoroutineScope,
         scheduleCompletionBacklogRepository: ScheduleCompletionBacklogRepository,
+        registerScheduleCompleteJob: RegisterScheduleCompleteJobUseCase,
     ): UpdateScheduleCompletionUseCase = UpdateScheduleCompletionUseCase(
         coroutineScope = coroutineScope,
         scheduleCompletionBacklogRepository = object :
@@ -56,7 +63,7 @@ internal object AppScopeScheduleModule {
                 .save(scheduleId, targetCompleted)
                 .onFailure { Timber.e(it) }
         },
-        registerScheduleCompleteJob = RegisterScheduleCompleteJobUseCaseImpl(context),
+        registerScheduleCompleteJob = registerScheduleCompleteJob,
         delayTime = 500.milliseconds
     )
 }
