@@ -611,13 +611,13 @@ private suspend inline fun awaitCompleteWith(block: CompletableDeferred<Unit>.()
 private fun ScheduleListItemsAdaptation.Exist.toScheduleIdsBy(
     predicate: (UserScheduleListResource) -> Boolean
 ): PersistentSet<ScheduleId> {
-    val selectedSchedulesIds = hashSetOf<ScheduleId>()
+    val schedulesIds = hashSetOf<ScheduleId>()
     for (item in items) {
         if (item !is ScheduleListItem.Content) continue
         val userScheduleListResource = item.resource
         if (predicate(userScheduleListResource)) {
-            selectedSchedulesIds += item.resource.schedule.id
+            schedulesIds += item.resource.schedule.id
         }
     }
-    return selectedSchedulesIds.toPersistentHashSet()
+    return schedulesIds.toPersistentHashSet()
 }
