@@ -230,7 +230,7 @@
                     android:background="?bg_placeholder_1"
                     android:importantForAccessibility="no"
                     android:scaleType="centerCrop"
-                    app:heightRatio="0.4"
+                    app:heightRatio="0.35"
                     app:layout_constraintHorizontal_bias="0"
                     app:layout_constraintTop_toTopOf="parent"
                     tools:srcCompat="@drawable/ic_schedule_link_error"
