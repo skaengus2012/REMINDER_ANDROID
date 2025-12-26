@@ -351,12 +351,10 @@ internal class ContentSelectionAnimDelegate(private val binding: LayoutScheduleA
         ).applyTo(/* constraintLayout = */ mirrorBinding.layoutContent)
 
         mirrorBinding.buttonComplete.apply {
-            isSelected = binding.buttonComplete.isSelected
             alpha = binding.buttonComplete.alpha
             translationX = binding.buttonComplete.translationX
         }
         mirrorBinding.buttonSelection.apply {
-            isSelected = binding.buttonSelection.isSelected
             alpha = binding.buttonSelection.alpha
             translationX = binding.buttonSelection.translationX
         }

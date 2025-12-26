@@ -222,6 +222,11 @@ internal class ScheduleListAdapter : RecyclerView.Adapter<ScheduleAdapterItemVie
         }
     }
 
+    fun setUserInteraction(userInteraction: UserInteraction) {
+        completionCheckedScheduleIds.value = userInteraction.completionCheckedScheduleIds
+        _selectedScheduleIds.value = userInteraction.selectedScheduleIds
+    }
+
     fun setSelectionEnabled(isEnabled: Boolean) {
         selectionEnabled.value = isEnabled
     }
@@ -231,14 +236,6 @@ internal class ScheduleListAdapter : RecyclerView.Adapter<ScheduleAdapterItemVie
             if (selected) old + scheduleId
             else old - scheduleId
         }
-    }
-
-    fun setSelected(selectedIds: PersistentSet<ScheduleId>) {
-        _selectedScheduleIds.value = selectedIds
-    }
-
-    fun setCompletionChecked(completionCheckedIds: PersistentSet<ScheduleId>) {
-        completionCheckedScheduleIds.value = completionCheckedIds
     }
 
     fun submitMoving(fromPosition: Int, toPosition: Int): Boolean {

@@ -16,14 +16,10 @@
 
 package com.nlab.reminder.core.data.model
 
-import com.nlab.reminder.core.kotlin.NonNegativeInt
-import com.nlab.reminder.core.kotlin.toNonNegativeInt
-import com.nlab.reminder.core.local.database.entity.ScheduleTagListEntity
 import com.nlab.reminder.core.local.database.entity.TagEntity
 import com.nlab.testkit.faker.genInt
 
 typealias TagAndEntity = Pair<Tag, TagEntity>
-typealias TagAndUsageCount = Pair<Tag, NonNegativeInt>
 
 /**
  * @author Doohyun
@@ -32,21 +28,4 @@ fun genTagAndEntity(tag: Tag = genTag()): TagAndEntity = tag to TagEntity(tag.id
 
 fun genTagAndEntities(count: Int = genInt(min = 5, max = 10)): List<TagAndEntity> = List(count) { index ->
     genTagAndEntity(tag = genTag(id = TagId(index.toLong())))
-}
-
-fun genTagAndUsageCount(
-    tag: Tag = genTag(),
-    usageCount: NonNegativeInt = genInt(min = 0, max = 10).toNonNegativeInt()
-): TagAndUsageCount = Pair(tag, usageCount)
-
-fun Iterable<TagAndUsageCount>.toScheduleTagListEntities(): Set<ScheduleTagListEntity> {
-    val entities = flatMap { (tag, usageCount) ->
-        List(usageCount.value) {
-            ScheduleTagListEntity(
-                scheduleId = it.toLong() + 1,
-                tagId = tag.id.rawId
-            )
-        }
-    }
-    return entities.toSet()
 }

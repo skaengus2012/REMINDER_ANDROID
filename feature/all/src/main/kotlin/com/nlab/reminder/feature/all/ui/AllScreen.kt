@@ -100,8 +100,12 @@ internal fun AllScreen(
             store.dispatch(AllAction.OnItemSelectionChanged(selectedIds))
         },
         onCompletionUpdated = { completionUpdated ->
-            // TODO implements
-            showAppToast("TODO Completion Updated $completionUpdated")
+            store.dispatch(
+                AllAction.OnScheduleCompletionUpdated(
+                    scheduleId = completionUpdated.id,
+                    targetCompleted = completionUpdated.targetCompleted
+                )
+            )
         },
         onSimpleAdd = { simpleAdd ->
             // TODO implements

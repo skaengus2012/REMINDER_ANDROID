@@ -21,6 +21,7 @@ dependencies {
     implementation(projects.core.androidx.fragment)
     implementation(projects.core.androidx.recyclerview)
     implementation(projects.core.annotation)
+    implementation(projects.core.component.schedule)
     implementation(projects.core.component.toolbar)
     implementation(projects.core.dataDi)
     implementation(projects.core.kotlinx.coroutinesAndroid)

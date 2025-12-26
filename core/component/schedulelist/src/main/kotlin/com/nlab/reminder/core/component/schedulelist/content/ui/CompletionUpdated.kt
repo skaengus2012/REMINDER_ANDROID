@@ -23,5 +23,5 @@ import com.nlab.reminder.core.data.model.ScheduleId
  */
 data class CompletionUpdated(
     val id: ScheduleId,
-    val newCompletion: Boolean
+    val targetCompleted: Boolean
 )

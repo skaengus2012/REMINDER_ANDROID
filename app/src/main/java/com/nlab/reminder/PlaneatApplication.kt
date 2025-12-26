@@ -21,7 +21,7 @@ import coil.ImageLoader
 import coil.ImageLoaderFactory
 import com.nlab.reminder.core.annotation.ExcludeFromGeneratedTestReport
 import dagger.hilt.android.HiltAndroidApp
-import javax.inject.Inject
+import jakarta.inject.Inject
 
 /**
  * @author Doohyun

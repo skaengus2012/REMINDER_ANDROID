@@ -34,9 +34,9 @@ abstract class TagDAO {
     @Insert
     protected abstract suspend fun insert(entity: TagEntity): Long
 
-    @Transaction
-    open suspend fun insertAndGet(name: NonBlankString): TagEntity {
-        return checkNotNull(findById(tagId = insert(TagEntity(name = name.value))))
+    suspend fun insertAndGet(name: NonBlankString): TagEntity {
+        val newEntity = TagEntity(name = name.value)
+        return newEntity.copy(tagId = insert(newEntity))
     }
 
     @Query("SELECT * FROM tag WHERE tag_id = :tagId")

@@ -7,7 +7,7 @@ import org.junit.Test
 /**
  * @author Doohyun
  */
-internal class TagTransformsKtTest {
+class TagTransformsKtTest {
     @Test
     fun `Given tagEntity, When convert to Tag, Then return matching Tag`() {
         val (expectedTag, entity) = genTagAndEntity()

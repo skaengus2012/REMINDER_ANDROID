@@ -24,5 +24,6 @@ import com.nlab.reminder.core.annotation.ExcludeFromGeneratedTestReport
 @ExcludeFromGeneratedTestReport
 data class UserScheduleListResource(
     val schedule: ScheduleListResource,
+    val completionChecked: Boolean,
     val selected: Boolean
 ) : ScheduleListObject
