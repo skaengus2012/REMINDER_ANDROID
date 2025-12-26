@@ -19,6 +19,7 @@ package com.nlab.reminder.core.data.repository.impl
 import com.nlab.reminder.core.data.model.ScheduleCompletionBacklog
 import com.nlab.reminder.core.data.model.ScheduleCompletionBacklogId
 import com.nlab.reminder.core.data.model.ScheduleId
+import com.nlab.reminder.core.data.repository.GetScheduleCompletionBacklogQuery
 import com.nlab.reminder.core.data.repository.GetScheduleCompletionBacklogStreamQuery
 import com.nlab.reminder.core.data.repository.ScheduleCompletionBacklogRepository
 import com.nlab.reminder.core.kotlin.collections.toSet
@@ -47,9 +48,20 @@ class LocalScheduleCompletionBacklogRepository(
         return runCatching { scheduleCompletionBacklogDAO.deleteByIds(scheduleCompletionBacklogIds) }
     }
 
-    override suspend fun getBacklogs(): Result<Set<ScheduleCompletionBacklog>> {
-        val entitiesResult = runCatching { scheduleCompletionBacklogDAO.getAll() }
-        return entitiesResult.map(List<ScheduleCompletionBacklogEntity>::toBacklogs)
+    override suspend fun getBacklogs(query: GetScheduleCompletionBacklogQuery): Result<Set<ScheduleCompletionBacklog>> {
+        val entities = runCatching {
+            when (query) {
+                is GetScheduleCompletionBacklogQuery.All -> {
+                    scheduleCompletionBacklogDAO.getAll()
+                }
+                is GetScheduleCompletionBacklogQuery.ByScheduleIdsUpToPriority -> {
+                    scheduleCompletionBacklogDAO.findAllByScheduleIdsUpToInsertOrder(
+                        insertOrder = query.priority.value
+                    )
+                }
+            }
+        }
+        return entities.map(List<ScheduleCompletionBacklogEntity>::toBacklogs)
     }
 
     override fun getBacklogsAsStream(

@@ -14,19 +14,17 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.data.model
+package com.nlab.reminder.core.component.schedule
 
-import com.nlab.reminder.core.kotlin.toNonNegativeLong
-import com.nlab.reminder.core.local.database.entity.ScheduleCompletionBacklogEntity
+import com.nlab.reminder.core.kotlin.NonNegativeLong
+import kotlin.time.Duration
 
 /**
- * @author Doohyun
+ * @author Thalys
  */
-fun ScheduleCompletionBacklog(
-    entity: ScheduleCompletionBacklogEntity
-): ScheduleCompletionBacklog = ScheduleCompletionBacklog(
-    id = ScheduleCompletionBacklogId(entity.backlogId),
-    scheduleId = ScheduleId(entity.scheduleId),
-    targetCompleted = entity.targetCompleted,
-    priority = entity.insertOrder.toNonNegativeLong()
-)
+interface RegisterScheduleCompleteJobUseCase {
+    operator fun invoke(
+        debounceTimeout: Duration,
+        processUntilPriority: NonNegativeLong?
+    )
+}

@@ -16,6 +16,8 @@
 
 package com.nlab.reminder.core.kotlin
 
+import kotlin.Result as KotlinResult
+
 /**
  * Replication of Kotlin Result
  *
@@ -71,11 +73,6 @@ inline fun <T, U> Result<T>.map(transform: (T) -> U): Result<U> = when (this) {
 
 inline fun <R, T> Result<T>.mapCatching(transform: (T) -> R): Result<R> = when (this) {
     is Result.Success -> catching { transform(value) }
-    is Result.Failure -> Result.Failure(throwable)
-}
-
-inline fun <T, U> Result<T>.flatMap(transform: (T) -> Result<U>): Result<U> = when (this) {
-    is Result.Success -> transform(value)
     is Result.Failure -> Result.Failure(throwable)
 }
 

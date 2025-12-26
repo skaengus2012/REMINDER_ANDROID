@@ -23,12 +23,16 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
+import androidx.work.workDataOf
 import com.nlab.reminder.core.component.schedule.RegisterScheduleCompleteJobUseCase
+import com.nlab.reminder.core.data.repository.GetScheduleCompletionBacklogQuery
 import com.nlab.reminder.core.data.repository.ScheduleCompletionBacklogRepository
 import com.nlab.reminder.core.data.repository.ScheduleRepository
 import com.nlab.reminder.core.data.repository.UpdateAllScheduleQuery
+import com.nlab.reminder.core.kotlin.NonNegativeLong
 import com.nlab.reminder.core.kotlin.collections.toSet
 import com.nlab.reminder.core.kotlin.onFailure
+import com.nlab.reminder.core.kotlin.tryToNonNegativeLongOrNull
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import timber.log.Timber
@@ -38,19 +42,24 @@ import kotlin.time.toJavaDuration
 /**
  * @author Thalys
  */
-private const val KEY_SCHEDULE_COMPLETION_WORK_NAME = "key_schedule_completion_work_name"
+private const val KEY_WORK_NAME = "key_schedule_completion_work_name"
+private const val KEY_PROCESS_UNTIL_PRIORITY = "key_process_until_priority"
 
 internal class RegisterScheduleCompleteJobUseCaseImpl(
     private val context: Context
 ) : RegisterScheduleCompleteJobUseCase {
-    override operator fun invoke(delayTime: Duration) {
+
+    override fun invoke(debounceTimeout: Duration, processUntilPriority: NonNegativeLong?) {
         val workRequestBuilder = OneTimeWorkRequestBuilder<ScheduleCompletionWorker>().apply {
-            if (delayTime.isPositive()) {
-                setInitialDelay(delayTime.toJavaDuration())
+            if (debounceTimeout.isPositive()) {
+                setInitialDelay(debounceTimeout.toJavaDuration())
             }
+            setInputData(
+                workDataOf(KEY_PROCESS_UNTIL_PRIORITY to processUntilPriority?.value)
+            )
         }
         WorkManager.getInstance(context).enqueueUniqueWork(
-            uniqueWorkName = KEY_SCHEDULE_COMPLETION_WORK_NAME,
+            uniqueWorkName = KEY_WORK_NAME,
             existingWorkPolicy = ExistingWorkPolicy.REPLACE,
             request = workRequestBuilder.build()
         )
@@ -66,9 +75,13 @@ internal class ScheduleCompletionWorker @AssistedInject constructor(
 ) : CoroutineWorker(appContext, workerParams) {
     override suspend fun doWork(): Result {
         Timber.d("Start schedule completion work!")
-
         val currentBacklogs = scheduleCompletionBacklogRepository
-            .getBacklogs()
+            .getBacklogs(
+                query = inputData.getLong(KEY_PROCESS_UNTIL_PRIORITY, /* defaultValue = */ -1L)
+                    .tryToNonNegativeLongOrNull()
+                    ?.let { GetScheduleCompletionBacklogQuery.ByScheduleIdsUpToPriority(priority = it) }
+                    ?: GetScheduleCompletionBacklogQuery.All
+            )
             .onFailure { Timber.e(it, "Failure schedule completion work, when loading backlogs") }
             .getOrElse { return Result.failure() }
         if (currentBacklogs.isEmpty()) {

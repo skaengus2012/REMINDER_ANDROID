@@ -39,5 +39,5 @@ data class ScheduleCompletionBacklogEntity(
     @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "schedule_completion_backlog_id") val backlogId: Long = EMPTY_GENERATED_ID,
     @ColumnInfo(name = "schedule_id", index = true) val scheduleId: Long,
     @ColumnInfo(name = "target_completed") val targetCompleted: Boolean,
-    @ColumnInfo(name = "insert_order") val insertOrder: Int
+    @ColumnInfo(name = "insert_order") val insertOrder: Long
 )
