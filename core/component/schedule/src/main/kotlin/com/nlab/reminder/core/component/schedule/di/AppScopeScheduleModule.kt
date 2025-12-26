@@ -31,7 +31,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineScope
 import timber.log.Timber
-import kotlin.time.Duration.Companion.seconds
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * @author Thalys
@@ -57,6 +57,6 @@ internal object AppScopeScheduleModule {
                 .onFailure { Timber.e(it) }
         },
         registerScheduleCompleteJob = RegisterScheduleCompleteJobUseCaseImpl(context),
-        delayTime = 1.seconds
+        delayTime = 500.milliseconds
     )
 }

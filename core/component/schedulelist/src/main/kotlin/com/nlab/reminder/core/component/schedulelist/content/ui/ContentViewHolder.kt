@@ -190,7 +190,11 @@ internal class ContentViewHolder(
                     completionCheckedScheduleIds
                 ) { id, completionCheckedIds -> id in completionCheckedIds }
                     .distinctUntilChanged()
-                    .collect { binding.buttonComplete.isSelected = it }
+                    .collect {
+                        binding.buttonComplete.isSelected = it
+                        binding.getAllInputs().forEach { editText -> editText.isSelected = it }
+                        binding.edittextDetail.bindCompleted(completed = it)
+                    }
             }
             jobs += viewLifecycleScope.launch {
                 bindingId.filterNotNull().collectLatest { id ->
@@ -289,7 +293,7 @@ internal class ContentViewHolder(
         }
         binding.edittextDetail.apply {
             bindScheduleData(
-                scheduleCompleted = item.resource.schedule.isComplete,
+                completed = item.resource.completionChecked,
                 scheduleTiming = item.resource.schedule.timing,
                 tags = item.resource.schedule.tags
             )
@@ -381,8 +385,15 @@ private class DraggableViewHolderDelegate(
                     .also { viewPool.put(key, it.root) }
             }
         with(mirrorBinding) {
-            edittextTitle.bindText(binding.edittextTitle.text)
+            // completion check changed
+            // The style of each text works even if don't process it separately.
+            buttonComplete.isSelected = binding.buttonComplete.isSelected
 
+            // selection changed
+            buttonSelection.isSelected = binding.buttonSelection.isSelected
+
+            // bind
+            edittextTitle.bindText(binding.edittextTitle.text)
             edittextNote.bindText(binding.edittextNote.text)
             edittextNote.visibility = binding.edittextNote.visibility
 
