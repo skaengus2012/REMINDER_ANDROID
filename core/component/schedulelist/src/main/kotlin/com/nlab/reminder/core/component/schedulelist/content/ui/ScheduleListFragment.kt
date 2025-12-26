@@ -504,7 +504,6 @@ internal class ScheduleListFragment : Fragment() {
 
                 emit(syncSource(adaptation))
             }
-            .distinctUntilChanged()
             .flowOn(Dispatchers.Default)
             .flowWithLifecycle(viewLifecycle)
             .onEach { source ->
