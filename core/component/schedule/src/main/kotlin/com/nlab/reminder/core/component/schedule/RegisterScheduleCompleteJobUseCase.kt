@@ -24,7 +24,7 @@ import kotlin.time.Duration
  */
 interface RegisterScheduleCompleteJobUseCase {
     operator fun invoke(
-        delayTime: Duration,
+        debounceTimeout: Duration,
         processUntilPriority: NonNegativeLong?
     )
 }

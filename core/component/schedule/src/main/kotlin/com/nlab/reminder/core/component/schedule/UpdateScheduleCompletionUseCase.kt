@@ -25,11 +25,11 @@ import kotlin.time.Duration
 /**
  * @author Thalys
  */
-class UpdateScheduleCompletionUseCase internal constructor(
+class UpdateScheduleCompletionUseCase(
     private val coroutineScope: CoroutineScope,
     private val scheduleCompletionBacklogRepository: ScheduleCompletionBacklogRepository,
     private val registerScheduleCompleteJob: RegisterScheduleCompleteJobUseCase,
-    private val delayTime: Duration
+    private val debounceTimeout: Duration
 ) {
     suspend operator fun invoke(
         scheduleId: ScheduleId,
@@ -39,7 +39,7 @@ class UpdateScheduleCompletionUseCase internal constructor(
             scheduleCompletionBacklogRepository
                 .save(scheduleId, targetCompleted)
                 .onSuccess { backlog ->
-                    registerScheduleCompleteJob(delayTime = delayTime, processUntilPriority = backlog.priority)
+                    registerScheduleCompleteJob(debounceTimeout, processUntilPriority = backlog.priority)
                 }
         }
         return resultJob.await().map { /* do nothing */ }

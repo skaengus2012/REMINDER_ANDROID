@@ -64,6 +64,6 @@ internal object AppScopeScheduleModule {
                 .onFailure { Timber.e(it) }
         },
         registerScheduleCompleteJob = registerScheduleCompleteJob,
-        delayTime = 500.milliseconds
+        debounceTimeout = 500.milliseconds
     )
 }

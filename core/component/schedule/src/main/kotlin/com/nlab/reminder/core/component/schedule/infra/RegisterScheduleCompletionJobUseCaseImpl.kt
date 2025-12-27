@@ -49,10 +49,10 @@ internal class RegisterScheduleCompleteJobUseCaseImpl(
     private val context: Context
 ) : RegisterScheduleCompleteJobUseCase {
 
-    override fun invoke(delayTime: Duration, processUntilPriority: NonNegativeLong?) {
+    override fun invoke(debounceTimeout: Duration, processUntilPriority: NonNegativeLong?) {
         val workRequestBuilder = OneTimeWorkRequestBuilder<ScheduleCompletionWorker>().apply {
-            if (delayTime.isPositive()) {
-                setInitialDelay(delayTime.toJavaDuration())
+            if (debounceTimeout.isPositive()) {
+                setInitialDelay(debounceTimeout.toJavaDuration())
             }
             setInputData(
                 workDataOf(KEY_PROCESS_UNTIL_PRIORITY to processUntilPriority?.value)

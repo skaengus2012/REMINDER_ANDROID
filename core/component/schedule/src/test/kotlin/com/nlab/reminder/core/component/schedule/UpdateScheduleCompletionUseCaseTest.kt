@@ -19,6 +19,7 @@ package com.nlab.reminder.core.component.schedule
 import com.nlab.reminder.core.data.model.genScheduleCompletionBacklog
 import com.nlab.reminder.core.data.model.genScheduleId
 import com.nlab.reminder.core.data.repository.ScheduleCompletionBacklogRepository
+import com.nlab.reminder.core.kotlin.faker.genNonNegativeLong
 import com.nlab.reminder.core.kotlin.faker.genPositiveInt
 import com.nlab.testkit.faker.genBoolean
 import io.mockk.coEvery
@@ -27,6 +28,7 @@ import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.backgroundUnconfinedScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
@@ -41,61 +43,69 @@ class UpdateScheduleCompletionUseCaseTest {
     fun `Given useCase, When invoked, Then save backlog and register job in order`() = runTest {
         val scheduleId = genScheduleId()
         val targetCompleted = genBoolean()
+        val priority = genNonNegativeLong()
+        val debounceTimeout = genPositiveInt().value.seconds
         val scheduleCompletionBacklogRepository: ScheduleCompletionBacklogRepository = mockk {
             coEvery { save(scheduleId, targetCompleted) } returns Result.success(
                 genScheduleCompletionBacklog(
                     scheduleId = scheduleId,
-                    targetCompleted = targetCompleted
+                    targetCompleted = targetCompleted,
+                    priority = priority
                 )
             )
         }
         val registerScheduleCompleteJob: RegisterScheduleCompleteJobUseCase = mockk(relaxed = true)
         val useCase = genUpdateScheduleCompletionUseCase(
             scheduleCompletionBacklogRepository = scheduleCompletionBacklogRepository,
-            registerScheduleCompleteJob = registerScheduleCompleteJob
+            registerScheduleCompleteJob = registerScheduleCompleteJob,
+            debounceTimeout = debounceTimeout
         )
-        useCase.invoke(
-            scheduleId = scheduleId,
-            targetCompleted = targetCompleted,
-            applyImmediately = genBoolean()
-        )
+        useCase.invoke(scheduleId, targetCompleted)
+        advanceUntilIdle()
+
         coVerifyOrder {
             scheduleCompletionBacklogRepository.save(scheduleId, targetCompleted)
-            registerScheduleCompleteJob.invoke(any())
+            registerScheduleCompleteJob.invoke(debounceTimeout = debounceTimeout, processUntilPriority = priority)
         }
     }
 
     @Test
-    fun `Given applyImmediately is true, When schedules completion, Then registers job with zero delay`() = runTest {
-        val registerScheduleCompleteJob: RegisterScheduleCompleteJobUseCase = mockk(relaxed = true)
-        val useCase = genUpdateScheduleCompletionUseCase(
-            registerScheduleCompleteJob = registerScheduleCompleteJob
-        )
-        useCase.invoke(
-            scheduleId = genScheduleId(),
-            targetCompleted = genBoolean(),
-            applyImmediately = true
-        )
-        verify(exactly = 1) {
-            registerScheduleCompleteJob.invoke(delayTime = 0.seconds)
+    fun `Given useCase, When hello, Then save backlog and register job in order`() = runTest {
+        val debounceTimeout = genPositiveInt().value.seconds
+        val scheduleCompletionBacklogRepository: ScheduleCompletionBacklogRepository = mockk {
+            coEvery { save(any(), any()) } returns Result.failure(RuntimeException())
         }
-    }
-
-    @Test
-    fun `Given applyImmediately is false, When schedules completion, Then registers job with default delay`() = runTest {
         val registerScheduleCompleteJob: RegisterScheduleCompleteJobUseCase = mockk(relaxed = true)
-        val delayTime = genPositiveInt().value.seconds
         val useCase = genUpdateScheduleCompletionUseCase(
+            scheduleCompletionBacklogRepository = scheduleCompletionBacklogRepository,
             registerScheduleCompleteJob = registerScheduleCompleteJob,
-            delayTime = delayTime
+            debounceTimeout = debounceTimeout
         )
-        useCase.invoke(
-            scheduleId = genScheduleId(),
-            targetCompleted = genBoolean(),
-            applyImmediately = false
+        useCase.invoke(genScheduleId(), genBoolean())
+        advanceUntilIdle()
+
+        verify(inverse = true) {
+            registerScheduleCompleteJob.invoke(debounceTimeout = any(), processUntilPriority = any())
+        }
+    }
+
+    @Test
+    fun `Given useCase, When hello2, Then save backlog and register job in order`() = runTest {
+        val debounceTimeout = genPositiveInt().value.seconds
+        val scheduleCompletionBacklogRepository: ScheduleCompletionBacklogRepository = mockk {
+            coEvery { save(any(), any()) } returns Result.failure(RuntimeException())
+        }
+        val registerScheduleCompleteJob: RegisterScheduleCompleteJobUseCase = mockk(relaxed = true)
+        val useCase = genUpdateScheduleCompletionUseCase(
+            scheduleCompletionBacklogRepository = scheduleCompletionBacklogRepository,
+            registerScheduleCompleteJob = registerScheduleCompleteJob,
+            debounceTimeout = debounceTimeout
         )
-        verify(exactly = 1) {
-            registerScheduleCompleteJob.invoke(delayTime)
+        val result = useCase.invoke(genScheduleId(), genBoolean())
+        advanceUntilIdle()
+
+        verify(inverse = true) {
+            registerScheduleCompleteJob.invoke(debounceTimeout = any(), processUntilPriority = any())
         }
     }
 }
@@ -108,10 +118,10 @@ private fun TestScope.genUpdateScheduleCompletionUseCase(
         } returns Result.success(genScheduleCompletionBacklog())
     },
     registerScheduleCompleteJob: RegisterScheduleCompleteJobUseCase = mockk(),
-    delayTime: Duration = genPositiveInt().value.seconds
+    debounceTimeout: Duration = genPositiveInt().value.seconds
 ): UpdateScheduleCompletionUseCase = UpdateScheduleCompletionUseCase(
     coroutineScope = coroutineScope,
     scheduleCompletionBacklogRepository = scheduleCompletionBacklogRepository,
     registerScheduleCompleteJob = registerScheduleCompleteJob,
-    delayTime = delayTime
+    debounceTimeout = debounceTimeout
 )
