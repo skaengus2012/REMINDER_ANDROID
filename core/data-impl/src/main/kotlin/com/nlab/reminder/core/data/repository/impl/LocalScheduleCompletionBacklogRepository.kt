@@ -54,8 +54,8 @@ class LocalScheduleCompletionBacklogRepository(
                 is GetScheduleCompletionBacklogQuery.All -> {
                     scheduleCompletionBacklogDAO.getAll()
                 }
-                is GetScheduleCompletionBacklogQuery.AllRelatedByPriorityLessThanOrEqual -> {
-                    scheduleCompletionBacklogDAO.findAllRelatedByInsertOrderLessThanOrEqual(
+                is GetScheduleCompletionBacklogQuery.ByScheduleIdsUpToPriority -> {
+                    scheduleCompletionBacklogDAO.findAllByScheduleIdsUpToInsertOrder(
                         insertOrder = query.priority.value
                     )
                 }

@@ -16,10 +16,10 @@
 
 package com.nlab.reminder.core.data.model
 
-import com.nlab.reminder.core.kotlin.NonNegativeInt
+import com.nlab.reminder.core.kotlin.NonNegativeLong
 import com.nlab.reminder.core.kotlin.PositiveInt
 import com.nlab.reminder.core.kotlin.collections.toSet
-import com.nlab.reminder.core.kotlin.faker.genNonNegativeInt
+import com.nlab.reminder.core.kotlin.faker.genNonNegativeLong
 import com.nlab.reminder.core.kotlin.toPositiveInt
 import com.nlab.testkit.faker.genBoolean
 import com.nlab.testkit.faker.genIntGreaterThanZero
@@ -34,7 +34,7 @@ fun genScheduleCompletionBacklog(
     id: ScheduleCompletionBacklogId = genScheduleCompletionBacklogId(),
     scheduleId: ScheduleId = genScheduleId(),
     targetCompleted: Boolean = genBoolean(),
-    priority: NonNegativeInt = genNonNegativeInt()
+    priority: NonNegativeLong = genNonNegativeLong()
 ): ScheduleCompletionBacklog = ScheduleCompletionBacklog(
     id = id,
     scheduleId = scheduleId,

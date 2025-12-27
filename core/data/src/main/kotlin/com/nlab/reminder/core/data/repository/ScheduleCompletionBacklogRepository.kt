@@ -34,9 +34,7 @@ interface ScheduleCompletionBacklogRepository {
 
 sealed class GetScheduleCompletionBacklogQuery {
     data object All : GetScheduleCompletionBacklogQuery()
-    data class AllRelatedByPriorityLessThanOrEqual(
-        val priority: NonNegativeLong
-    ): GetScheduleCompletionBacklogQuery()
+    data class ByScheduleIdsUpToPriority(val priority: NonNegativeLong) : GetScheduleCompletionBacklogQuery()
 }
 
 sealed class GetScheduleCompletionBacklogStreamQuery {

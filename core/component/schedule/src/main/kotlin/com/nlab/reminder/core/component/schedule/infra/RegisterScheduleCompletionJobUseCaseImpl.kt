@@ -79,7 +79,7 @@ internal class ScheduleCompletionWorker @AssistedInject constructor(
             .getBacklogs(
                 query = inputData.getLong(KEY_PROCESS_UNTIL_PRIORITY, /* defaultValue = */ -1L)
                     .tryToNonNegativeLongOrNull()
-                    ?.let { GetScheduleCompletionBacklogQuery.AllRelatedByPriorityLessThanOrEqual(priority = it) }
+                    ?.let { GetScheduleCompletionBacklogQuery.ByScheduleIdsUpToPriority(priority = it) }
                     ?: GetScheduleCompletionBacklogQuery.All
             )
             .onFailure { Timber.e(it, "Failure schedule completion work, when loading backlogs") }

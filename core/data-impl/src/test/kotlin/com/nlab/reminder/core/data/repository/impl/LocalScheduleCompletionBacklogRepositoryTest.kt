@@ -22,12 +22,13 @@ import com.nlab.reminder.core.data.model.genScheduleCompletionBacklogAndEntities
 import com.nlab.reminder.core.data.model.genScheduleCompletionBacklogId
 import com.nlab.reminder.core.data.model.genScheduleCompletionBacklogs
 import com.nlab.reminder.core.data.model.genScheduleId
+import com.nlab.reminder.core.data.repository.GetScheduleCompletionBacklogQuery
 import com.nlab.reminder.core.data.repository.GetScheduleCompletionBacklogStreamQuery
 import com.nlab.reminder.core.kotlin.collections.toSet
+import com.nlab.reminder.core.kotlin.faker.genNonNegativeLong
 import com.nlab.reminder.core.local.database.dao.ScheduleCompletionBacklogDAO
 import com.nlab.reminder.core.local.database.entity.ScheduleCompletionBacklogEntity
 import com.nlab.testkit.faker.genBoolean
-import com.nlab.testkit.faker.genInt
 import com.nlab.testkit.faker.genLong
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -51,7 +52,7 @@ class LocalScheduleCompletionBacklogRepositoryTest {
                     backlogId = genLong(),
                     scheduleId = scheduleId.rawId,
                     targetCompleted = targetCompleted,
-                    insertOrder = genInt()
+                    insertOrder = genLong()
                 )
             }
             val repository = genLocalScheduleCompletionBacklogRepository(scheduleCompletionBacklogDAO)
@@ -104,27 +105,59 @@ class LocalScheduleCompletionBacklogRepositoryTest {
 
     @Test
     fun `Given dao returns entities, When getBacklogs, Then returns mapped backlogs`() = runTest {
-        val expectedBacklogAndEntities = genScheduleCompletionBacklogAndEntities()
-        val scheduleCompletionBacklogDAO: ScheduleCompletionBacklogDAO = mockk {
-            coEvery { getAll() } returns expectedBacklogAndEntities.map { (_, entity) -> entity }
+        suspend fun <T : GetScheduleCompletionBacklogQuery> verify(
+            query: T,
+            provideSuccessfulDAO: (T, List<ScheduleCompletionBacklogEntity>) -> ScheduleCompletionBacklogDAO
+        ) {
+            val expectedBacklogAndEntities = genScheduleCompletionBacklogAndEntities()
+            val repository = genLocalScheduleCompletionBacklogRepository(
+                scheduleCompletionBacklogDAO = provideSuccessfulDAO(
+                    query,
+                    expectedBacklogAndEntities.map { (_, entity) -> entity }
+                )
+            )
+            val actualBacklogs = repository.getBacklogs(query).getOrThrow()
+            assertThat(
+                actualBacklogs,
+                equalTo(expectedBacklogAndEntities.toSet { (backlog) -> backlog })
+            )
         }
-        val repository = genLocalScheduleCompletionBacklogRepository(scheduleCompletionBacklogDAO)
-        val actualBacklogs = repository.getBacklogs().getOrThrow()
-        assertThat(
-            actualBacklogs,
-            equalTo(expectedBacklogAndEntities.toSet { (backlog) -> backlog })
-        )
+        verify(query = GetScheduleCompletionBacklogQuery.All) { _, entities ->
+            mockk { coEvery { getAll() } returns entities }
+        }
+        verify(
+            query = GetScheduleCompletionBacklogQuery.ByScheduleIdsUpToPriority(priority = genNonNegativeLong())
+        ) { query, entities ->
+            mockk {
+                coEvery { findAllByScheduleIdsUpToInsertOrder(insertOrder = query.priority.value) } returns entities
+            }
+        }
     }
 
     @Test
     fun `Given dao fails to get entities, When getBacklogs, Then returns failure`() = runTest {
-        val expectedException = RuntimeException()
-        val scheduleCompletionBacklogDAO: ScheduleCompletionBacklogDAO = mockk {
-            coEvery { getAll() } throws expectedException
+        suspend fun <T : GetScheduleCompletionBacklogQuery> verify(
+            query: T,
+            provideFailingDAO: (T, Throwable) -> ScheduleCompletionBacklogDAO
+        ) {
+            val expectedException = RuntimeException()
+            val repository = genLocalScheduleCompletionBacklogRepository(
+                scheduleCompletionBacklogDAO = provideFailingDAO(query, expectedException)
+            )
+            val actualException = repository.getBacklogs(query).exceptionOrNull()
+            assertThat(actualException, sameInstance(expectedException))
         }
-        val repository = genLocalScheduleCompletionBacklogRepository(scheduleCompletionBacklogDAO)
-        val actualException = repository.getBacklogs().exceptionOrNull()
-        assertThat(actualException, sameInstance(expectedException))
+
+        verify(query = GetScheduleCompletionBacklogQuery.All) { _, throwable ->
+            mockk { coEvery { getAll() } throws  throwable }
+        }
+        verify(
+            query = GetScheduleCompletionBacklogQuery.ByScheduleIdsUpToPriority(priority = genNonNegativeLong())
+        ) { query, throwable ->
+            mockk {
+                coEvery { findAllByScheduleIdsUpToInsertOrder(insertOrder = query.priority.value) } throws throwable
+            }
+        }
     }
 
     @Test

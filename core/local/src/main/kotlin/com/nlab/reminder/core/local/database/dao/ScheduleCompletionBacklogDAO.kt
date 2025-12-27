@@ -58,7 +58,7 @@ abstract class ScheduleCompletionBacklogDAO {
         )
         """
     )
-    abstract suspend fun findAllRelatedByInsertOrderLessThanOrEqual(
+    abstract suspend fun findAllByScheduleIdsUpToInsertOrder(
         insertOrder: Long
     ): List<ScheduleCompletionBacklogEntity>
 
