@@ -25,23 +25,31 @@ import kotlin.time.Duration
 /**
  * @author Thalys
  */
-class UpdateScheduleCompletionUseCase(
-    private val coroutineScope: CoroutineScope,
+interface UpdateScheduleCompletionUseCase {
+    suspend operator fun invoke(scheduleId: ScheduleId, targetCompleted: Boolean): Result<Unit>
+}
+
+internal class DefaultUpdateScheduleCompletionUseCase(
     private val scheduleCompletionBacklogRepository: ScheduleCompletionBacklogRepository,
     private val registerScheduleCompleteJob: RegisterScheduleCompleteJobUseCase,
     private val debounceTimeout: Duration
-) {
-    suspend operator fun invoke(
+) : UpdateScheduleCompletionUseCase {
+    override suspend operator fun invoke(
         scheduleId: ScheduleId,
         targetCompleted: Boolean,
-    ): Result<Unit> {
-        val resultJob = coroutineScope.async {
-            scheduleCompletionBacklogRepository
-                .save(scheduleId, targetCompleted)
-                .onSuccess { backlog ->
-                    registerScheduleCompleteJob(debounceTimeout, processUntilPriority = backlog.priority)
-                }
-        }
-        return resultJob.await().map { /* do nothing */ }
-    }
+    ): Result<Unit> = scheduleCompletionBacklogRepository.save(scheduleId, targetCompleted)
+        .onSuccess { registerScheduleCompleteJob.invoke(debounceTimeout, processUntilPriority = it.priority) }
+        .map { /* do nothing */ }
+}
+
+internal class NonCancellableUpdateScheduleCompletionUseCase(
+    private val coroutineScope: CoroutineScope,
+    private val updateScheduleCompletionUseCase: UpdateScheduleCompletionUseCase
+) : UpdateScheduleCompletionUseCase {
+    override suspend fun invoke(
+        scheduleId: ScheduleId,
+        targetCompleted: Boolean
+    ): Result<Unit> = coroutineScope
+        .async { updateScheduleCompletionUseCase.invoke(scheduleId, targetCompleted) }
+        .await()
 }

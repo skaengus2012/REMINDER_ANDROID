@@ -22,7 +22,7 @@ package com.nlab.reminder.core.kotlin
 @JvmInline
 value class NonNegativeLong internal constructor(val value: Long) {
     init {
-        require(value >= 0) { "Value that will have a value of 0 or more" }
+        require(value >= 0) { "Value must be non-negative, but was $value" }
     }
 }
 

@@ -17,6 +17,8 @@
 package com.nlab.reminder.core.component.schedule.di
 
 import android.content.Context
+import com.nlab.reminder.core.component.schedule.DefaultUpdateScheduleCompletionUseCase
+import com.nlab.reminder.core.component.schedule.NonCancellableUpdateScheduleCompletionUseCase
 import com.nlab.reminder.core.component.schedule.RegisterScheduleCompleteJobUseCase
 import com.nlab.reminder.core.component.schedule.UpdateScheduleCompletionUseCase
 import com.nlab.reminder.core.component.schedule.infra.RegisterScheduleCompleteJobUseCaseImpl
@@ -40,30 +42,32 @@ import kotlin.time.Duration.Companion.milliseconds
 @Module
 @InstallIn(SingletonComponent::class)
 internal object AppScopeScheduleModule {
-    @Reusable
     @Provides
+    @Reusable
     fun provideRegisterScheduleCompleteJobUseCase(
         @ApplicationContext context: Context
     ): RegisterScheduleCompleteJobUseCase = RegisterScheduleCompleteJobUseCaseImpl(context)
 
-    @Reusable
     @Provides
+    @Reusable
     fun provideUpdateScheduleCompletionUseCase(
         @AppScope coroutineScope: CoroutineScope,
         scheduleCompletionBacklogRepository: ScheduleCompletionBacklogRepository,
         registerScheduleCompleteJob: RegisterScheduleCompleteJobUseCase,
-    ): UpdateScheduleCompletionUseCase = UpdateScheduleCompletionUseCase(
+    ): UpdateScheduleCompletionUseCase = NonCancellableUpdateScheduleCompletionUseCase(
         coroutineScope = coroutineScope,
-        scheduleCompletionBacklogRepository = object :
-            ScheduleCompletionBacklogRepository by scheduleCompletionBacklogRepository {
-            override suspend fun save(
-                scheduleId: ScheduleId,
-                targetCompleted: Boolean
-            ): Result<ScheduleCompletionBacklog> = scheduleCompletionBacklogRepository
-                .save(scheduleId, targetCompleted)
-                .onFailure { Timber.e(it) }
-        },
-        registerScheduleCompleteJob = registerScheduleCompleteJob,
-        debounceTimeout = 500.milliseconds
+        updateScheduleCompletionUseCase = DefaultUpdateScheduleCompletionUseCase(
+            scheduleCompletionBacklogRepository = object :
+                ScheduleCompletionBacklogRepository by scheduleCompletionBacklogRepository {
+                override suspend fun save(
+                    scheduleId: ScheduleId,
+                    targetCompleted: Boolean
+                ): Result<ScheduleCompletionBacklog> = scheduleCompletionBacklogRepository
+                    .save(scheduleId, targetCompleted)
+                    .onFailure { Timber.e(it) }
+            },
+            registerScheduleCompleteJob = registerScheduleCompleteJob,
+            debounceTimeout = 500.milliseconds
+        )
     )
 }
