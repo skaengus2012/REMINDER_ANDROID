@@ -32,7 +32,7 @@ import com.nlab.reminder.core.data.repository.UpdateAllScheduleQuery
 import com.nlab.reminder.core.kotlin.NonNegativeLong
 import com.nlab.reminder.core.kotlin.collections.toSet
 import com.nlab.reminder.core.kotlin.onFailure
-import com.nlab.reminder.core.kotlin.toNonNegativeLong
+import com.nlab.reminder.core.kotlin.tryToNonNegativeLongOrNull
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import timber.log.Timber
@@ -75,17 +75,13 @@ internal class ScheduleCompletionWorker @AssistedInject constructor(
 ) : CoroutineWorker(appContext, workerParams) {
     override suspend fun doWork(): Result {
         Timber.d("Start schedule completion work!")
-        val getBacklogQuery = inputData
-            .getLong(KEY_PROCESS_UNTIL_PRIORITY, /* defaultValue = */ -1L)
-            .let { value ->
-                if (value >= 0) {
-                    GetScheduleCompletionBacklogQuery.AllRelatedByPriorityLessThanOrEqual(priority = value.toNonNegativeLong())
-                } else {
-                    GetScheduleCompletionBacklogQuery.All
-                }
-            }
         val currentBacklogs = scheduleCompletionBacklogRepository
-            .getBacklogs(getBacklogQuery )
+            .getBacklogs(
+                query = inputData.getLong(KEY_PROCESS_UNTIL_PRIORITY, /* defaultValue = */ -1L)
+                    .tryToNonNegativeLongOrNull()
+                    ?.let { GetScheduleCompletionBacklogQuery.AllRelatedByPriorityLessThanOrEqual(priority = it) }
+                    ?: GetScheduleCompletionBacklogQuery.All
+            )
             .onFailure { Timber.e(it, "Failure schedule completion work, when loading backlogs") }
             .getOrElse { return Result.failure() }
         if (currentBacklogs.isEmpty()) {

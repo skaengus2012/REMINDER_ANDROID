@@ -30,9 +30,9 @@ fun Long.toNonNegativeLong(): NonNegativeLong = NonNegativeLong(value = this)
 
 fun Int.toNonNegativeLong(): NonNegativeLong = toLong().toNonNegativeLong()
 
-fun Long?.tryToNonNegativeLongOrZero(): NonNegativeLong =
-    if (this == null || this < 0) NonNegativeLong(value = 0)
+fun Long?.tryToNonNegativeLongOrNull(): NonNegativeLong? =
+    if (this == null || this < 0) null
     else NonNegativeLong(value = this)
 
-fun Int?.tryToNonNegativeLongOrZero(): NonNegativeLong =
-    this?.toLong().tryToNonNegativeLongOrZero()
+fun Long?.tryToNonNegativeLongOrZero(): NonNegativeLong =
+    tryToNonNegativeLongOrNull() ?: NonNegativeLong(value = 0)
