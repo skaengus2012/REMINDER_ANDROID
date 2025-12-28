@@ -149,7 +149,7 @@ class LocalScheduleCompletionBacklogRepositoryTest {
         }
 
         verify(query = GetScheduleCompletionBacklogQuery.All) { _, throwable ->
-            mockk { coEvery { getAll() } throws  throwable }
+            mockk { coEvery { getAll() } throws throwable }
         }
         verify(
             query = GetScheduleCompletionBacklogQuery.ByScheduleIdsUpToPriority(priority = genNonNegativeLong())
