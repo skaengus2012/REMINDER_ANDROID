@@ -16,8 +16,6 @@
 
 package com.nlab.reminder.core.kotlin
 
-import kotlin.Result as KotlinResult
-
 /**
  * Replication of Kotlin Result
  *
