@@ -16,7 +16,7 @@
 
 package com.nlab.reminder.core.data.model
 
-import com.nlab.reminder.core.kotlin.NonNegativeInt
+import com.nlab.reminder.core.kotlin.NonNegativeLong
 
 /**
  * @author Thalys
@@ -25,5 +25,5 @@ data class ScheduleCompletionBacklog(
     val id: ScheduleCompletionBacklogId,
     val scheduleId: ScheduleId,
     val targetCompleted: Boolean,
-    val priority: NonNegativeInt
+    val priority: NonNegativeLong
 )

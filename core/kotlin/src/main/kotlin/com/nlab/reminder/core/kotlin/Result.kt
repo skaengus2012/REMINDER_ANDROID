@@ -74,11 +74,6 @@ inline fun <R, T> Result<T>.mapCatching(transform: (T) -> R): Result<R> = when (
     is Result.Failure -> Result.Failure(throwable)
 }
 
-inline fun <T, U> Result<T>.flatMap(transform: (T) -> Result<U>): Result<U> = when (this) {
-    is Result.Success -> transform(value)
-    is Result.Failure -> Result.Failure(throwable)
-}
-
 inline fun <T> Result<T>.onFailure(action: (Throwable) -> Unit): Result<T> {
     if (this is Result.Failure) {
         action(throwable)

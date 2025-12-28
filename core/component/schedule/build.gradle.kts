@@ -12,6 +12,7 @@ android {
 dependencies {
     api(projects.core.data)
 
+    implementation(projects.core.annotation)
     implementation(projects.core.dataDi)
 
     implementation(libs.androidx.hilt.work)

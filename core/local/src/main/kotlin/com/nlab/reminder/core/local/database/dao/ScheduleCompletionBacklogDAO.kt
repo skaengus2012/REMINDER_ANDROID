@@ -47,6 +47,21 @@ abstract class ScheduleCompletionBacklogDAO {
     @Query("SELECT * FROM schedule_completion_backlog")
     abstract suspend fun getAll(): List<ScheduleCompletionBacklogEntity>
 
+    @Query(
+        """
+        SELECT * 
+        FROM schedule_completion_backlog
+        WHERE schedule_completion_backlog.schedule_id IN (
+            SELECT schedule_id
+            FROM schedule_completion_backlog
+            WHERE schedule_completion_backlog.insert_order <= :insertOrder
+        )
+        """
+    )
+    abstract suspend fun findAllByScheduleIdsUpToInsertOrder(
+        insertOrder: Long
+    ): List<ScheduleCompletionBacklogEntity>
+
     @Query("SELECT * FROM schedule_completion_backlog ORDER BY insert_order DESC LIMIT 1")
     protected abstract suspend fun findLatest(): ScheduleCompletionBacklogEntity?
 

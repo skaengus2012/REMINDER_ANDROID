@@ -19,6 +19,7 @@ package com.nlab.reminder.core.data.repository
 import com.nlab.reminder.core.data.model.ScheduleCompletionBacklog
 import com.nlab.reminder.core.data.model.ScheduleCompletionBacklogId
 import com.nlab.reminder.core.data.model.ScheduleId
+import com.nlab.reminder.core.kotlin.NonNegativeLong
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -27,8 +28,13 @@ import kotlinx.coroutines.flow.Flow
 interface ScheduleCompletionBacklogRepository {
     suspend fun save(scheduleId: ScheduleId, targetCompleted: Boolean): Result<ScheduleCompletionBacklog>
     suspend fun delete(backlogIds: Set<ScheduleCompletionBacklogId>): Result<Unit>
-    suspend fun getBacklogs(): Result<Set<ScheduleCompletionBacklog>>
+    suspend fun getBacklogs(query: GetScheduleCompletionBacklogQuery): Result<Set<ScheduleCompletionBacklog>>
     fun getBacklogsAsStream(query: GetScheduleCompletionBacklogStreamQuery): Flow<Set<ScheduleCompletionBacklog>>
+}
+
+sealed class GetScheduleCompletionBacklogQuery {
+    data object All : GetScheduleCompletionBacklogQuery()
+    data class ByScheduleIdsUpToPriority(val priority: NonNegativeLong) : GetScheduleCompletionBacklogQuery()
 }
 
 sealed class GetScheduleCompletionBacklogStreamQuery {
