@@ -68,7 +68,7 @@ class DefaultUpdateScheduleCompletionUseCaseTest {
     }
 
     @Test
-    fun `Given saving backlog fails, When invoked, Then dose not register job`() = runTest {
+    fun `Given saving backlog fails, When invoked, Then does not register job`() = runTest {
         val scheduleCompletionBacklogRepository: ScheduleCompletionBacklogRepository = mockk {
             coEvery {
                 save(any(), any())
