@@ -17,12 +17,8 @@
 package com.nlab.reminder.core.component.schedulelist.content.ui
 
 import com.nlab.reminder.core.data.model.ScheduleId
-import kotlinx.collections.immutable.PersistentSet
 
 /**
  * @author Thalys
  */
-internal data class UserInteraction(
-    val selectedScheduleIds: PersistentSet<ScheduleId>,
-    val completionCheckedScheduleIds: PersistentSet<ScheduleId>
-)
+data class SelectionUpdate(val selectedIds: Set<ScheduleId>)

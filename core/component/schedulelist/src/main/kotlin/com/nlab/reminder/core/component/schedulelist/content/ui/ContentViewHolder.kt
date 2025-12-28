@@ -78,7 +78,7 @@ internal class ContentViewHolder(
     selectionEnabled: StateFlow<Boolean>,
     selectedScheduleIds: StateFlow<Set<ScheduleId>>,
     completionCheckedScheduleIds: StateFlow<Set<ScheduleId>>,
-    onCompletionUpdated: (ScheduleId, Boolean) -> Unit,
+    onCompletionUpdated: (CompletionUpdate) -> Unit,
     onSimpleEditDone: (SimpleEdit) -> Unit,
     onDragHandleTouched: (RecyclerView.ViewHolder) -> Unit,
     onSelectButtonTouched: (RecyclerView.ViewHolder) -> Unit,
@@ -199,7 +199,11 @@ internal class ContentViewHolder(
             jobs += viewLifecycleScope.launch {
                 bindingId.filterNotNull().collectLatest { id ->
                     binding.buttonComplete.throttleClicks().collect { v ->
-                        onCompletionUpdated(id, v.isSelected.not())
+                        val completionUpdate = CompletionUpdate(
+                            id = id,
+                            targetCompleted = v.isSelected.not()
+                        )
+                        onCompletionUpdated(completionUpdate)
                     }
                 }
             }

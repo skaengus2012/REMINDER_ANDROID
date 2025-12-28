@@ -62,7 +62,7 @@ fun <T : ScheduleListElement> rememberScheduleListItemsAdaptationState(
     return produceState<ScheduleListItemsAdaptation>(
         initialValue = ScheduleListItemsAdaptation.Absent,
         key1 = headlineItem,
-        key2 = bodyItems
+        key2 = bodyItems,
     ) {
         val currentHeadlineItem = headlineItem
         val currentBodyItems = bodyItems

@@ -31,10 +31,7 @@ internal sealed interface AllAction {
 
     data object OnSelectionModeToggled : AllAction
 
-    data class OnItemSelectionChanged(val selectedIds: Set<ScheduleId>) : AllAction
+    data class OnItemSelectionUpdated(val selectedIds: Set<ScheduleId>) : AllAction
 
-    data class OnScheduleCompletionUpdated(
-        val scheduleId: ScheduleId,
-        val targetCompleted: Boolean
-    ) : AllAction
+    data class OnItemCompletionUpdated(val scheduleId: ScheduleId, val targetCompleted: Boolean) : AllAction
 }

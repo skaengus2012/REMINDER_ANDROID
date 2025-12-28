@@ -16,8 +16,11 @@
 
 package com.nlab.reminder.core.kotlinx.coroutines.flow
 
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.transform
 
 /**
  * @author Doohyun
@@ -34,3 +37,6 @@ fun <T> Flow<T>.throttleFirst(windowDuration: Long): Flow<T> = flow {
         }
     }
 }
+
+fun <T> Flow<T>.throttleLatest(windowDuration: Long): Flow<T> =
+    conflate().transform { emit(it); delay(windowDuration) }
