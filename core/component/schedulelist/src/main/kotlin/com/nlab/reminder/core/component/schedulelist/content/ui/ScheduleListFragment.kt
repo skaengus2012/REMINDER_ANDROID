@@ -41,6 +41,7 @@ import com.nlab.reminder.core.androix.recyclerview.scrollEvent
 import com.nlab.reminder.core.androix.recyclerview.scrollState
 import com.nlab.reminder.core.androix.recyclerview.stickyheader.StickyHeaderHelper
 import com.nlab.reminder.core.androix.recyclerview.verticalScrollRange
+import com.nlab.reminder.core.component.schedule.ScheduleIntId
 import com.nlab.reminder.core.component.schedulelist.databinding.FragmentScheduleListBinding
 import com.nlab.reminder.core.component.schedulelist.toolbar.ui.ScheduleListToolbarState
 import com.nlab.reminder.core.data.model.ScheduleId
@@ -123,13 +124,14 @@ internal class ScheduleListFragment : Fragment() {
             }
             scheduleListHolderActivity.requireScheduleListDragAnchorOverlay()
         }
+        val itemTouchAnimateDurationMs = 250L
         val itemTouchCallback = ScheduleListItemTouchCallback(
             scrollGuard = ScrollGuard()
                 .also { binding.recyclerviewSchedule.addOnScrollListener(/*listener=*/ it) },
             scrollGuardMargin = dpToPx(/* dpValue =*/ 24f, resources.displayMetrics),
             dragAnchorOverlay = scheduleListDragAnchorOverlay,
             dragToScaleTargetHeight = dpToPx(/* dpValue =*/ 150f, resources.displayMetrics),
-            animateDuration = 250L,
+            animateDuration = itemTouchAnimateDurationMs,
             clampSwipeThreshold = 0.5f,
             maxClampSwipeWidthMultiplier = 1.75f,
             itemMoveListener = object : ScheduleListItemTouchCallback.ItemMoveListener {
@@ -279,7 +281,7 @@ internal class ScheduleListFragment : Fragment() {
 
         withSync(
             syncSourceFlow = userInteractionSyncFlow.unwrap()
-                .debounce(200)
+                .debounce(itemTouchAnimateDurationMs)
                 .map { it.selectedIds },
             sync = scheduleListAdapter::syncSelected
         ) { syncJob ->
@@ -295,7 +297,11 @@ internal class ScheduleListFragment : Fragment() {
 
         withSync(
             syncSourceFlow = userInteractionSyncFlow.unwrap()
-                .debounce(750)
+                .debounce(
+                    timeoutMillis = resources
+                        .getInteger(ScheduleIntId.schedule_configs_completion_timeout_ms)
+                        .toLong()
+                )
                 .map { it.completionCheckedIds },
             sync = scheduleListAdapter::syncCompletionChecked,
         ) { syncJob ->
