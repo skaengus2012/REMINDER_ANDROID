@@ -38,7 +38,6 @@ class CachedCompletedScheduleShownRepository(
 
     override fun getAsStream(): Flow<Boolean> = sharedStream
 
-    override suspend fun setShown(isShown: Boolean): Result<Unit> {
-        return completedScheduleShownRepository.setShown(isShown)
-    }
+    override suspend fun setShown(isShown: Boolean): Result<Unit> =
+        completedScheduleShownRepository.setShown(isShown)
 }

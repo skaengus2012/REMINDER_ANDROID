@@ -28,11 +28,13 @@ internal fun AllUiStateSyncedFlow(
 ): Flow<AllAction.StateSynced> = with(environment) {
     combine(
         getCurrentTimeSnapshotStream(),
+        completedScheduleShownRepository.getAsStream(),
         getAllUserScheduleListResourcesFlow()
-    ) { entryAt, schedulesResources ->
+    ) { entryAt, completedScheduleVisible, schedulesResources ->
         AllAction.StateSynced(
             entryAt = entryAt,
-            scheduleResources = schedulesResources
+            completedScheduleVisible = completedScheduleVisible,
+            scheduleResources = schedulesResources,
         )
     }
 }

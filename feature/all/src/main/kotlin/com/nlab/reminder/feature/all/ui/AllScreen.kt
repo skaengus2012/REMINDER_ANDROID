@@ -116,6 +116,12 @@ internal fun AllScreen(
             showAppToast("TODO Simple Edit $simpleEdit")
         }
     )
+    if (uiState is AllUiState.Success) {
+        // TODO FOR TEST, REMOVE SOON
+        LaunchedEffect(Unit) {
+            store.dispatch(AllAction.OnCompletedScheduleVisibilityToggled)
+        }
+    }
 }
 
 private fun convertToOptimizedState(uiState: AllUiState): AllUiState =
