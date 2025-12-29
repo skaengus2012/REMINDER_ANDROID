@@ -26,13 +26,14 @@ import kotlinx.coroutines.flow.shareIn
 /**
  * @author Doohyun
  */
-class SharedCompletedScheduleShownRepository(
+class CachedCompletedScheduleShownRepository(
     coroutineScope: CoroutineScope,
     private val completedScheduleShownRepository: CompletedScheduleShownRepository
 ) : CompletedScheduleShownRepository {
     private val sharedStream = completedScheduleShownRepository.getAsStream().shareIn(
         coroutineScope,
-        started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5_000)
+        started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5_000),
+        replay = 1
     )
 
     override fun getAsStream(): Flow<Boolean> = sharedStream

@@ -38,7 +38,7 @@ import com.nlab.reminder.core.data.repository.impl.LocalScheduleRepository
 import com.nlab.reminder.core.data.repository.impl.LocalTagRepository
 import com.nlab.reminder.core.data.repository.impl.OfflineFirstLinkMetadataRepository
 import com.nlab.reminder.core.data.repository.impl.RemoteFirstTimeSnapshotRepository
-import com.nlab.reminder.core.data.repository.impl.SharedCompletedScheduleShownRepository
+import com.nlab.reminder.core.data.repository.impl.CachedCompletedScheduleShownRepository
 import com.nlab.reminder.core.data.util.SystemTimeChangedMonitor
 import com.nlab.reminder.core.data.util.SystemTimeZoneMonitor
 import com.nlab.reminder.core.data.util.TimeZoneMonitor
@@ -79,7 +79,7 @@ internal object AppScopeDataModule {
     fun provideAllCompletedScheduleShownRepository(
         @AppScope coroutineScope: CoroutineScope,
         preferenceDataSource: PreferenceDataSource
-    ): CompletedScheduleShownRepository = SharedCompletedScheduleShownRepository(
+    ): CompletedScheduleShownRepository = CachedCompletedScheduleShownRepository(
         coroutineScope = coroutineScope,
         completedScheduleShownRepository = DefaultCompletedScheduleShownRepository(
             getAsStreamFunction = { preferenceDataSource.getAllScheduleCompleteShownAsStream() },

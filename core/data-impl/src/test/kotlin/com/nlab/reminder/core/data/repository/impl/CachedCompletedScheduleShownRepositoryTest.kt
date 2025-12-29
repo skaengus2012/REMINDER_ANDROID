@@ -41,7 +41,7 @@ import org.junit.Test
 /**
  * @author Doohyun
  */
-class SharedCompletedScheduleShownRepositoryTest {
+class CachedCompletedScheduleShownRepositoryTest {
     @Test
     fun `Given value to set, When setShown invoked, Then delegates to internal repository`() = runTest {
         val input = genBoolean()
@@ -49,7 +49,7 @@ class SharedCompletedScheduleShownRepositoryTest {
             every { getAsStream() } returns emptyFlow()
             coEvery { setShown(input) } returns Result.Success(Unit)
         }
-        val repository = SharedCompletedScheduleShownRepository(
+        val repository = CachedCompletedScheduleShownRepository(
             coroutineScope = backgroundScope,
             completedScheduleShownRepository = internalRepository
         )
@@ -60,7 +60,7 @@ class SharedCompletedScheduleShownRepositoryTest {
     @Test
     fun `Given internal repository, When collect, Then receives value from internal repository`() = runTest {
         val expected = genBoolean()
-        val repository = SharedCompletedScheduleShownRepository(
+        val repository = CachedCompletedScheduleShownRepository(
             coroutineScope = backgroundScope,
             completedScheduleShownRepository = mockk {
                 every { getAsStream() } returns flowOf(expected)
@@ -78,7 +78,7 @@ class SharedCompletedScheduleShownRepositoryTest {
         val internalRepository: CompletedScheduleShownRepository = mockk {
             every { getAsStream() } returns flowOf(genBoolean())
         }
-        val repository = SharedCompletedScheduleShownRepository(
+        val repository = CachedCompletedScheduleShownRepository(
             coroutineScope = CoroutineScope(Dispatchers.Default),
             completedScheduleShownRepository = internalRepository
         )
