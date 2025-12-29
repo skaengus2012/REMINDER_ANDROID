@@ -34,10 +34,10 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.nlab.reminder.core.android.content.getThemeColor
 import com.nlab.reminder.core.android.view.clearFocusIfNeeded
-import com.nlab.reminder.core.android.view.clicks
 import com.nlab.reminder.core.android.view.filterActionDone
 import com.nlab.reminder.core.android.view.focusChanges
 import com.nlab.reminder.core.android.view.setVisible
+import com.nlab.reminder.core.android.view.throttleClicks
 import com.nlab.reminder.core.android.view.touches
 import com.nlab.reminder.core.android.widget.bindCursorVisible
 import com.nlab.reminder.core.android.widget.bindImageAsync
@@ -78,7 +78,7 @@ internal class ContentViewHolder(
     selectionEnabled: StateFlow<Boolean>,
     selectedScheduleIds: StateFlow<Set<ScheduleId>>,
     completionCheckedScheduleIds: StateFlow<Set<ScheduleId>>,
-    onCompletionUpdated: (ScheduleId, Boolean) -> Unit,
+    onCompletionUpdated: (CompletionUpdate) -> Unit,
     onSimpleEditDone: (SimpleEdit) -> Unit,
     onDragHandleTouched: (RecyclerView.ViewHolder) -> Unit,
     onSelectButtonTouched: (RecyclerView.ViewHolder) -> Unit,
@@ -198,9 +198,12 @@ internal class ContentViewHolder(
             }
             jobs += viewLifecycleScope.launch {
                 bindingId.filterNotNull().collectLatest { id ->
-                    // Processed as clicks for quick user response
-                    binding.buttonComplete.clicks().collect { v ->
-                        onCompletionUpdated(id, v.isSelected.not())
+                    binding.buttonComplete.throttleClicks().collect { v ->
+                        val completionUpdate = CompletionUpdate(
+                            id = id,
+                            targetCompleted = v.isSelected.not()
+                        )
+                        onCompletionUpdated(completionUpdate)
                     }
                 }
             }

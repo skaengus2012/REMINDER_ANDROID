@@ -39,7 +39,6 @@ import androidx.compose.ui.unit.dp
 import androidx.fragment.compose.AndroidFragment
 import com.nlab.reminder.core.androidx.compose.ui.LocalTimeZone
 import com.nlab.reminder.core.component.schedulelist.toolbar.ui.ScheduleListToolbarState
-import com.nlab.reminder.core.data.model.ScheduleId
 import kotlin.time.Instant
 
 /**
@@ -52,8 +51,8 @@ fun ScheduleListContent(
     multiSelectionEnabled: Boolean,
     triggerAtFormatPatterns: TriggerAtFormatPatterns,
     theme: ScheduleListTheme,
-    onItemSelectionChanged: (Set<ScheduleId>) -> Unit,
-    onCompletionUpdated: (CompletionUpdated) -> Unit,
+    onSelectionUpdated: (SelectionUpdate) -> Unit,
+    onCompletionUpdated: (CompletionUpdate) -> Unit,
     onSimpleAdd: (SimpleAdd) -> Unit,
     onSimpleEdit: (SimpleEdit) -> Unit,
     modifier: Modifier = Modifier,
@@ -113,8 +112,8 @@ fun ScheduleListContent(
                     ?: 0
             )
         }
-        LaunchedEffect(fragment, onItemSelectionChanged) {
-            fragment.onItemSelectionChangedObserverChanged(observer = onItemSelectionChanged)
+        LaunchedEffect(fragment, onSelectionUpdated) {
+            fragment.onSelectionUpdateConsumerChanged(observer = onSelectionUpdated)
         }
         LaunchedEffect(fragment, onCompletionUpdated) {
             fragment.onCompletionUpdateConsumerChanged(consumer = onCompletionUpdated)

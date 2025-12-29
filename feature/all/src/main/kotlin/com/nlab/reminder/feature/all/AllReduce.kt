@@ -52,10 +52,10 @@ internal fun AllReduce(environment: AllEnvironment): AllReduce = DslReduce {
                 environment.userSelectedSchedulesStore.clear()
             }
         }
-        effect<OnItemSelectionChanged> {
+        effect<OnItemSelectionUpdated> {
             environment.userSelectedSchedulesStore.replace(action.selectedIds)
         }
-        suspendEffect<OnScheduleCompletionUpdated> {
+        suspendEffect<OnItemCompletionUpdated> {
             environment.updateScheduleCompletion(
                 scheduleId = action.scheduleId,
                 targetCompleted = action.targetCompleted

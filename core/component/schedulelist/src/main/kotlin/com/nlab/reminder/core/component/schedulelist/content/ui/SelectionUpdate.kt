@@ -14,24 +14,11 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.feature.all
+package com.nlab.reminder.core.component.schedulelist.content.ui
 
-import com.nlab.reminder.core.component.schedulelist.content.UserScheduleListResource
 import com.nlab.reminder.core.data.model.ScheduleId
-import kotlin.time.Instant
 
 /**
  * @author Thalys
  */
-internal sealed interface AllAction {
-    data class StateSynced(
-        val entryAt: Instant,
-        val scheduleResources: List<UserScheduleListResource>
-    ) : AllAction
-
-    data object OnSelectionModeToggled : AllAction
-
-    data class OnItemSelectionUpdated(val selectedIds: Set<ScheduleId>) : AllAction
-
-    data class OnItemCompletionUpdated(val scheduleId: ScheduleId, val targetCompleted: Boolean) : AllAction
-}
+data class SelectionUpdate(val selectedIds: Set<ScheduleId>)

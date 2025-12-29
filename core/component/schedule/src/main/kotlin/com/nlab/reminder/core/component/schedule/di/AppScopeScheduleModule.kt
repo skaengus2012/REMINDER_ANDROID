@@ -20,6 +20,7 @@ import android.content.Context
 import com.nlab.reminder.core.component.schedule.DefaultUpdateScheduleCompletionUseCase
 import com.nlab.reminder.core.component.schedule.EnsuredUpdateScheduleCompletionUseCase
 import com.nlab.reminder.core.component.schedule.RegisterScheduleCompleteJobUseCase
+import com.nlab.reminder.core.component.schedule.ScheduleIntId
 import com.nlab.reminder.core.component.schedule.UpdateScheduleCompletionUseCase
 import com.nlab.reminder.core.component.schedule.infra.RegisterScheduleCompleteJobUseCaseImpl
 import com.nlab.reminder.core.data.model.ScheduleCompletionBacklog
@@ -51,6 +52,7 @@ internal object AppScopeScheduleModule {
     @Provides
     @Reusable
     fun provideUpdateScheduleCompletionUseCase(
+        @ApplicationContext context: Context,
         @AppScope coroutineScope: CoroutineScope,
         scheduleCompletionBacklogRepository: ScheduleCompletionBacklogRepository,
         registerScheduleCompleteJob: RegisterScheduleCompleteJobUseCase,
@@ -67,7 +69,9 @@ internal object AppScopeScheduleModule {
                     .onFailure { Timber.e(it) }
             },
             registerScheduleCompleteJob = registerScheduleCompleteJob,
-            debounceTimeout = 500.milliseconds
+            debounceTimeout = context.resources
+                .getInteger(ScheduleIntId.schedule_configs_completion_timeout_ms)
+                .milliseconds
         )
     )
 }

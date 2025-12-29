@@ -14,14 +14,9 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.component.schedulelist.content.ui
-
-import com.nlab.reminder.core.data.model.ScheduleId
+package com.nlab.reminder.core.component.schedule
 
 /**
- * @author Thalys
+ * @author Doohyun
  */
-data class CompletionUpdated(
-    val id: ScheduleId,
-    val targetCompleted: Boolean
-)
+typealias ScheduleIntId = R.integer

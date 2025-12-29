@@ -43,7 +43,7 @@ internal class StateKitPluginInitializer : Initializer<Unit> {
         StateKitPlugin.configGlobalStore { currentConfiguration ->
             val globalErrTagName = "reduce.globalErr"
             currentConfiguration.copy(
-                preferredCoroutineDispatcher = Dispatchers.Default,
+                preferredCoroutineDispatcher = Dispatchers.Default.limitedParallelism(parallelism = 1),
                 defaultCoroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
                     when (throwable) {
                         is UserMessageException -> {

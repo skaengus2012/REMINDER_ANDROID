@@ -37,6 +37,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.updateAndGet
 import kotlinx.datetime.TimeZone
 import kotlin.time.Instant
 
@@ -61,15 +62,13 @@ internal class ScheduleListAdapter : RecyclerView.Adapter<ScheduleAdapterItemVie
     private val scheduleTimingDisplayFormatterState = MutableStateFlow<ScheduleTimingDisplayFormatter?>(null)
     private val selectionEnabled = MutableStateFlow(false)
 
-    private val completionCheckedScheduleIds =
-        MutableStateFlow<PersistentSet<ScheduleId>>(persistentHashSetOf())
+    private val completionCheckedScheduleIds = MutableStateFlow(persistentHashSetOf<ScheduleId>())
+    private val _completionUpdateRequests = MutableEventSharedFlow<CompletionUpdate>()
+    val completionUpdateRequests: SharedFlow<CompletionUpdate> = _completionUpdateRequests.asSharedFlow()
 
-    private val _selectedScheduleIds =
-        MutableStateFlow<PersistentSet<ScheduleId>>(persistentHashSetOf())
-    val selectedScheduleIds: StateFlow<Set<ScheduleId>> = _selectedScheduleIds.asStateFlow()
-
-    private val _completionUpdateRequests = MutableEventSharedFlow<CompletionUpdated>()
-    val completionUpdateRequests: SharedFlow<CompletionUpdated> = _completionUpdateRequests.asSharedFlow()
+    private val selectedScheduleIds = MutableStateFlow(persistentHashSetOf<ScheduleId>())
+    private val _selectionUpdateRequests = MutableIdentityStateFlow<SelectionUpdate>()
+    val selectionUpdateRequests: IdentityStateFlow<SelectionUpdate> = _selectionUpdateRequests.asStateFlow()
 
     private val _addRequests = MutableEventSharedFlow<SimpleAdd>()
     val addRequests: SharedFlow<SimpleAdd> = _addRequests.asSharedFlow()
@@ -120,12 +119,12 @@ internal class ScheduleListAdapter : RecyclerView.Adapter<ScheduleAdapterItemVie
                     selectionEnabled = selectionEnabled,
                     selectedScheduleIds = selectedScheduleIds,
                     completionCheckedScheduleIds = completionCheckedScheduleIds,
-                    onCompletionUpdated = { id, newCompletion ->
+                    onCompletionUpdated = { completionUpdate ->
                         completionCheckedScheduleIds.update { ids ->
-                            if (newCompletion) ids + id
-                            else ids - id
+                            if (completionUpdate.targetCompleted) ids + completionUpdate.id
+                            else ids - completionUpdate.id
                         }
-                        _completionUpdateRequests.tryEmit(CompletionUpdated(id, newCompletion))
+                        _completionUpdateRequests.tryEmit(completionUpdate)
                     },
                     onSimpleEditDone = { _editRequests.tryEmit(it) },
                     onDragHandleTouched = { _dragHandleTouches.tryEmit(it) },
@@ -222,19 +221,24 @@ internal class ScheduleListAdapter : RecyclerView.Adapter<ScheduleAdapterItemVie
         }
     }
 
-    fun setUserInteraction(userInteraction: UserInteraction) {
-        completionCheckedScheduleIds.value = userInteraction.completionCheckedScheduleIds
-        _selectedScheduleIds.value = userInteraction.selectedScheduleIds
-    }
-
     fun setSelectionEnabled(isEnabled: Boolean) {
         selectionEnabled.value = isEnabled
     }
 
+    fun syncCompletionChecked(completionCheckedIds: PersistentSet<ScheduleId>) {
+        completionCheckedScheduleIds.value = completionCheckedIds
+    }
+
+    fun syncSelected(selectedIds: PersistentSet<ScheduleId>) {
+        selectedScheduleIds.value = selectedIds
+    }
+
     fun setSelected(scheduleId: ScheduleId, selected: Boolean) {
-        _selectedScheduleIds.update { old ->
-            if (selected) old + scheduleId
-            else old - scheduleId
+        val current = selectedScheduleIds.value
+        val updated = if (selected) current + scheduleId else current - scheduleId
+        if (current !== updated) {
+            selectedScheduleIds.value = updated
+            _selectionUpdateRequests.update(SelectionUpdate(selectedIds = updated))
         }
     }
 
@@ -254,6 +258,10 @@ internal class ScheduleListAdapter : RecyclerView.Adapter<ScheduleAdapterItemVie
 
     fun getCurrentList(): List<ScheduleListItem> {
         return differ.getCurrentList()
+    }
+
+    fun getCurrentSelectedIds(): Set<ScheduleId> {
+        return selectedScheduleIds.value
     }
 
     fun updateTheme(theme: ScheduleListTheme) {
@@ -278,7 +286,7 @@ internal class ScheduleListAdapter : RecyclerView.Adapter<ScheduleAdapterItemVie
 }
 
 @Suppress("FunctionName")
-private fun <T> MutableEventSharedFlow(): MutableSharedFlow<T> = MutableSharedFlow(
-    extraBufferCapacity = 128,
+private fun <T> MutableEventSharedFlow(extraBufferCapacity: Int = 128): MutableSharedFlow<T> = MutableSharedFlow(
+    extraBufferCapacity = extraBufferCapacity,
     onBufferOverflow = BufferOverflow.DROP_OLDEST
 )

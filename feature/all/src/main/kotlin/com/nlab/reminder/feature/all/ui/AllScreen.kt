@@ -43,8 +43,8 @@ import com.nlab.reminder.core.component.schedulelist.toolbar.ui.rememberSchedule
 import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
 import com.nlab.reminder.core.kotlin.collections.IdentityList
 import com.nlab.reminder.core.androidx.compose.runtime.rememberAccumulatedStateStream
-import com.nlab.reminder.core.component.schedulelist.content.ui.CompletionUpdated
-import com.nlab.reminder.core.data.model.ScheduleId
+import com.nlab.reminder.core.component.schedulelist.content.ui.CompletionUpdate
+import com.nlab.reminder.core.component.schedulelist.content.ui.SelectionUpdate
 import com.nlab.reminder.core.kotlin.collections.toIdentityList
 import com.nlab.reminder.core.translation.StringIds
 import com.nlab.reminder.feature.all.AllAction
@@ -96,14 +96,14 @@ internal fun AllScreen(
         onCompleteClicked = {
             // TODO implements
         },
-        onItemSelectionChanged = { selectedIds ->
-            store.dispatch(AllAction.OnItemSelectionChanged(selectedIds))
+        onItemSelectionChanged = { selectionUpdate ->
+            store.dispatch(AllAction.OnItemSelectionUpdated(selectionUpdate.selectedIds))
         },
-        onCompletionUpdated = { completionUpdated ->
+        onCompletionUpdated = { completionUpdate ->
             store.dispatch(
-                AllAction.OnScheduleCompletionUpdated(
-                    scheduleId = completionUpdated.id,
-                    targetCompleted = completionUpdated.targetCompleted
+                AllAction.OnItemCompletionUpdated(
+                    scheduleId = completionUpdate.id,
+                    targetCompleted = completionUpdate.targetCompleted
                 )
             )
         },
@@ -138,8 +138,8 @@ private fun AllScreen(
     onBackClicked: () -> Unit,
     onMoreClicked: () -> Unit,
     onCompleteClicked: () -> Unit,
-    onItemSelectionChanged: (Set<ScheduleId>) -> Unit,
-    onCompletionUpdated: (CompletionUpdated) -> Unit,
+    onItemSelectionChanged: (SelectionUpdate) -> Unit,
+    onCompletionUpdated: (CompletionUpdate) -> Unit,
     onSimpleAdd: (SimpleAdd) -> Unit,
     onSimpleEdit: (SimpleEdit) -> Unit,
     modifier: Modifier = Modifier,
@@ -192,8 +192,8 @@ private fun AllScheduleListContent(
     scheduleListResources: List<UserScheduleListResource>,
     multiSelectionEnabled: Boolean,
     toolbarState: ScheduleListToolbarState,
-    onItemSelectionChanged: (Set<ScheduleId>) -> Unit,
-    onCompletionUpdated: (CompletionUpdated) -> Unit,
+    onItemSelectionChanged: (SelectionUpdate) -> Unit,
+    onCompletionUpdated: (CompletionUpdate) -> Unit,
     onSimpleAdd: (SimpleAdd) -> Unit,
     onSimpleEdit: (SimpleEdit) -> Unit,
     modifier: Modifier = Modifier
@@ -226,7 +226,7 @@ private fun AllScheduleListContent(
             navBarsPaddings.calculateBottomPadding()
         },
         toolbarState = toolbarState,
-        onItemSelectionChanged = onItemSelectionChanged,
+        onSelectionUpdated = onItemSelectionChanged,
         onCompletionUpdated = onCompletionUpdated,
         onSimpleAdd = onSimpleAdd,
         onSimpleEdit = onSimpleEdit,
