@@ -26,8 +26,6 @@ import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
@@ -79,7 +77,7 @@ class CachedCompletedScheduleShownRepositoryTest {
             every { getAsStream() } returns flowOf(genBoolean())
         }
         val repository = CachedCompletedScheduleShownRepository(
-            coroutineScope = CoroutineScope(Dispatchers.Default),
+            coroutineScope = backgroundScope,
             completedScheduleShownRepository = internalRepository
         )
         repeat(genInt(min = 3, max = 10)) {
