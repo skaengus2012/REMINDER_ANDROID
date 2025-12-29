@@ -149,13 +149,13 @@ class InsertDummyDataToDatabaseMacro {
             tagDao.insertAndGet(name = tagText.toNonBlankString())
         }
         val savedScheduleEntities = run {
-            var ret = scheduleHeadlineSaveInputs.map { headlineInput ->
+            var target = scheduleHeadlineSaveInputs
+            if (shuffledSchedules) {
+                target = target.shuffled()
+            }
+            target.take(scheduleCountLimit).map { headlineInput ->
                 scheduleDao.insertAndGet(headline = headlineInput, timing = scheduleTimingSaveInput)
             }
-            if (shuffledSchedules) {
-                ret = ret.shuffled()
-            }
-            ret.take(scheduleCountLimit)
         }
         val scheduleTagListEntities = savedScheduleEntities
             .map { scheduleEntity ->
