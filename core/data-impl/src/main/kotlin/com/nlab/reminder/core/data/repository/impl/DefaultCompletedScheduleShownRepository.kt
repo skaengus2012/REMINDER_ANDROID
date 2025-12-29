@@ -23,7 +23,7 @@ import kotlinx.coroutines.flow.Flow
 /**
  * @author Doohyun
  */
-class CompletedScheduleShownRepositoryImpl(
+class DefaultCompletedScheduleShownRepository(
     private val getAsStreamFunction: () -> Flow<Boolean>,
     private val setShownFunction: suspend (isShown: Boolean) -> Result<Unit>
 ) : CompletedScheduleShownRepository {

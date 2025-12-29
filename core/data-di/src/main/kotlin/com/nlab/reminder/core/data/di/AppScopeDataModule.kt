@@ -31,7 +31,7 @@ import com.nlab.reminder.core.data.repository.ScheduleRepository
 import com.nlab.reminder.core.data.repository.SystemTimeSnapshotRepository
 import com.nlab.reminder.core.data.repository.TagRepository
 import com.nlab.reminder.core.data.repository.TimeSnapshotRepository
-import com.nlab.reminder.core.data.repository.impl.CompletedScheduleShownRepositoryImpl
+import com.nlab.reminder.core.data.repository.impl.DefaultCompletedScheduleShownRepository
 import com.nlab.reminder.core.data.repository.impl.LinkMetadataRemoteCache
 import com.nlab.reminder.core.data.repository.impl.LocalScheduleCompletionBacklogRepository
 import com.nlab.reminder.core.data.repository.impl.LocalScheduleRepository
@@ -77,7 +77,7 @@ internal object AppScopeDataModule {
     @Provides
     fun provideAllCompletedScheduleShownRepository(
         preferenceDataSource: PreferenceDataSource
-    ): CompletedScheduleShownRepository = CompletedScheduleShownRepositoryImpl(
+    ): CompletedScheduleShownRepository = DefaultCompletedScheduleShownRepository(
         getAsStreamFunction = { preferenceDataSource.getAllScheduleCompleteShownAsStream() },
         setShownFunction = { preferenceDataSource.setAllScheduleCompleteShown(it) }
     )
