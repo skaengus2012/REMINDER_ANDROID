@@ -68,7 +68,7 @@ class EnsuredUpdateScheduleCompletionUseCaseTest {
         )
         val scheduleId = genScheduleId()
         val targetCompleted = genBoolean()
-        val updateJob = (backgroundScope + unconfinedTestDispatcher()).launch {
+        val updateJob = backgroundScope.launch(unconfinedTestDispatcher()) {
             useCase.invoke(scheduleId = scheduleId, targetCompleted = targetCompleted)
         }
         advanceTimeBy(delayTimeMillis = delayTimeMillis / 2)
