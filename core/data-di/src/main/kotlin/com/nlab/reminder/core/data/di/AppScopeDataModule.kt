@@ -38,6 +38,7 @@ import com.nlab.reminder.core.data.repository.impl.LocalScheduleRepository
 import com.nlab.reminder.core.data.repository.impl.LocalTagRepository
 import com.nlab.reminder.core.data.repository.impl.OfflineFirstLinkMetadataRepository
 import com.nlab.reminder.core.data.repository.impl.RemoteFirstTimeSnapshotRepository
+import com.nlab.reminder.core.data.repository.impl.SharedCompletedScheduleShownRepository
 import com.nlab.reminder.core.data.util.SystemTimeChangedMonitor
 import com.nlab.reminder.core.data.util.SystemTimeZoneMonitor
 import com.nlab.reminder.core.data.util.TimeZoneMonitor
@@ -72,26 +73,30 @@ import timber.log.Timber
 @Module
 @InstallIn(SingletonComponent::class)
 internal object AppScopeDataModule {
-    @ScheduleData(All)
-    @Reusable
     @Provides
+    @Singleton
+    @ScheduleData(All)
     fun provideAllCompletedScheduleShownRepository(
+        @AppScope coroutineScope: CoroutineScope,
         preferenceDataSource: PreferenceDataSource
-    ): CompletedScheduleShownRepository = DefaultCompletedScheduleShownRepository(
-        getAsStreamFunction = { preferenceDataSource.getAllScheduleCompleteShownAsStream() },
-        setShownFunction = { preferenceDataSource.setAllScheduleCompleteShown(it) }
+    ): CompletedScheduleShownRepository = SharedCompletedScheduleShownRepository(
+        coroutineScope = coroutineScope,
+        completedScheduleShownRepository = DefaultCompletedScheduleShownRepository(
+            getAsStreamFunction = { preferenceDataSource.getAllScheduleCompleteShownAsStream() },
+            setShownFunction = { preferenceDataSource.setAllScheduleCompleteShown(it) }
+        )
     )
 
-    @Reusable
     @Provides
+    @Reusable
     fun provideScheduleCompletionBacklogRepository(
         scheduleCompletionBacklogDAO: ScheduleCompletionBacklogDAO,
     ): ScheduleCompletionBacklogRepository = LocalScheduleCompletionBacklogRepository(
         scheduleCompletionBacklogDAO = scheduleCompletionBacklogDAO
     )
 
-    @Reusable
     @Provides
+    @Reusable
     fun provideScheduleRepository(
         scheduleDAO: ScheduleDAO,
         scheduleRepeatDetailDAO: ScheduleRepeatDetailDAO,
@@ -106,8 +111,8 @@ internal object AppScopeDataModule {
         updateAndGetScheduleContentAggregate = updateAndGetScheduleContentAggregateTransaction
     )
 
-    @Reusable
     @Provides
+    @Reusable
     fun provideTagRepository(
         tagDAO: TagDAO,
         scheduleTagListDAO: ScheduleTagListDAO,
@@ -118,14 +123,14 @@ internal object AppScopeDataModule {
         updateOrMergeAndGetTag = updateOrReplaceAndGetTag
     )
 
-    @Singleton
     @Provides
+    @Singleton
     fun provideLinkMetadataRemoteCache(): LinkMetadataRemoteCache = LinkMetadataRemoteCache(
         cacheSize = 5000.toPositiveInt()
     )
 
-    @Reusable
     @Provides
+    @Reusable
     fun provideLinkMetadataTableRepository(
         linkMetadataDAO: LinkMetadataDAO,
         linkThumbnailDataSource: LinkThumbnailDataSource,
@@ -144,8 +149,8 @@ internal object AppScopeDataModule {
         remoteCache = linkMetadataRemoteCache
     )
 
-    @Reusable
     @Provides
+    @Reusable
     fun provideRemoteFirstTimeSnapshotRepository(
         trustedTimeDataSource: TrustedTimeDataSource,
         systemTimeChangedMonitor: SystemTimeChangedMonitor,
@@ -158,8 +163,8 @@ internal object AppScopeDataModule {
         fallbackSnapshotRepository = SystemTimeSnapshotRepository(systemTimeChangedMonitor = systemTimeChangedMonitor)
     )
 
-    @Singleton
     @Provides
+    @Singleton
     fun provideSystemTimeChangeMonitor(
         @ApplicationContext context: Context,
         @AppScope coroutineScope: CoroutineScope,
@@ -170,8 +175,8 @@ internal object AppScopeDataModule {
         dispatcher = dispatcher
     )
 
-    @Singleton
     @Provides
+    @Singleton
     fun provideTimeZoneMonitor(
         @ApplicationContext context: Context,
         @AppScope coroutineScope: CoroutineScope,
