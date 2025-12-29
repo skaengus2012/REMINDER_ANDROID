@@ -46,6 +46,7 @@ import com.nlab.reminder.core.component.schedulelist.databinding.FragmentSchedul
 import com.nlab.reminder.core.component.schedulelist.toolbar.ui.ScheduleListToolbarState
 import com.nlab.reminder.core.data.model.ScheduleId
 import com.nlab.reminder.core.kotlinx.coroutines.flow.map
+import com.nlab.reminder.core.kotlinx.coroutines.flow.throttleLatest
 import com.nlab.reminder.core.kotlinx.coroutines.flow.withPrev
 import kotlinx.collections.immutable.PersistentSet
 import kotlinx.collections.immutable.toPersistentSet
@@ -298,9 +299,7 @@ internal class ScheduleListFragment : Fragment() {
         withSync(
             syncSourceFlow = userInteractionSyncFlow.unwrap()
                 .debounce(
-                    timeoutMillis = resources
-                        .getInteger(ScheduleIntId.schedule_configs_completion_timeout_ms)
-                        .toLong()
+                     500
                 )
                 .map { it.completionCheckedIds },
             sync = scheduleListAdapter::syncCompletionChecked,

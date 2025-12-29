@@ -86,7 +86,9 @@ internal class GetAllUserScheduleListResourcesFlowUseCase @Inject constructor(
                 }.thenComparing { userScheduleListResource ->
                     schedulesLookup.requireValue(userScheduleListResource.schedule.id).visiblePriority.value
                 }
-            )
+            ).also {
+                println("Hello newSource first ${it.firstOrNull()?.schedule?.id} ${it.firstOrNull()?.completionChecked}")
+            }
         }.filterNotNull().onEach { resultFlow.value = it }.launchIn(scope = this)
     }
 }

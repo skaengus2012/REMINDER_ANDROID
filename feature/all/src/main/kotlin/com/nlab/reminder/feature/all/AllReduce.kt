@@ -61,6 +61,7 @@ internal fun AllReduce(environment: AllEnvironment): AllReduce = DslReduce {
             environment.userSelectedSchedulesStore.replace(action.selectedIds)
         }
         suspendEffect<OnItemCompletionUpdated> {
+            println("Hello OnItemCompletionUpdated ${action.scheduleId} ${action.targetCompleted}")
             environment.updateScheduleCompletion(
                 scheduleId = action.scheduleId,
                 targetCompleted = action.targetCompleted
