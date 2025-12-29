@@ -31,19 +31,24 @@ internal fun AllReduce(environment: AllEnvironment): AllReduce = DslReduce {
     actionScope<StateSynced> {
         transition<Loading> {
             Success(
-                scheduleListResources = action.scheduleResources,
                 entryAt = action.entryAt,
+                scheduleListResources = action.scheduleResources,
+                completedScheduleVisible = action.completedScheduleVisible,
                 multiSelectionEnabled = false
             )
         }
         transition<Success> {
             current.copy(
+                entryAt = action.entryAt,
+                completedScheduleVisible = action.completedScheduleVisible,
                 scheduleListResources = action.scheduleResources,
-                entryAt = action.entryAt
             )
         }
     }
     stateScope<Success> {
+        suspendEffect<OnCompletedScheduleVisibilityToggled> {
+            environment.completedScheduleShownRepository.setShown(isShown = current.completedScheduleVisible.not())
+        }
         transition<OnSelectionModeToggled> {
             current.copy(multiSelectionEnabled = current.multiSelectionEnabled.not())
         }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 The N's lab Open Source Project
+ * Copyright (C) 2025 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,15 +18,26 @@ package com.nlab.reminder.core.data.repository.impl
 
 import com.nlab.reminder.core.data.repository.CompletedScheduleShownRepository
 import com.nlab.reminder.core.kotlin.Result
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.shareIn
 
 /**
  * @author Doohyun
  */
-class CompletedScheduleShownRepositoryImpl(
-    private val getAsStreamFunction: () -> Flow<Boolean>,
-    private val setShownFunction: suspend (isShown: Boolean) -> Result<Unit>
+class CachedCompletedScheduleShownRepository(
+    coroutineScope: CoroutineScope,
+    private val completedScheduleShownRepository: CompletedScheduleShownRepository
 ) : CompletedScheduleShownRepository {
-    override fun getAsStream(): Flow<Boolean> = getAsStreamFunction.invoke()
-    override suspend fun setShown(isShown: Boolean): Result<Unit> = setShownFunction.invoke(isShown)
+    private val sharedStream = completedScheduleShownRepository.getAsStream().shareIn(
+        coroutineScope,
+        started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5_000),
+        replay = 1
+    )
+
+    override fun getAsStream(): Flow<Boolean> = sharedStream
+
+    override suspend fun setShown(isShown: Boolean): Result<Unit> =
+        completedScheduleShownRepository.setShown(isShown)
 }

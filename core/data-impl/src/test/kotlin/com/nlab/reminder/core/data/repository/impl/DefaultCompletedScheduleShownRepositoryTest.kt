@@ -15,7 +15,7 @@ import org.junit.Test
 /**
  * @author Doohyun
  */
-internal class CompletedScheduleDetailShownRepositoryImplTest {
+internal class DefaultCompletedScheduleShownRepositoryTest {
     @Test
     fun `When get as stream, Then getAsStreamFunction published`() = runTest {
         val expectedComplete = genBoolean()
@@ -44,4 +44,4 @@ internal class CompletedScheduleDetailShownRepositoryImplTest {
 private fun genCompletedScheduleShownRepository(
     getAsStreamFunction: () -> Flow<Boolean> = mockk(relaxed = true),
     setShownFunction: suspend (isShown: Boolean) -> Result<Unit> = mockk(relaxed = true)
-) = CompletedScheduleShownRepositoryImpl(getAsStreamFunction, setShownFunction)
+) = DefaultCompletedScheduleShownRepository(getAsStreamFunction, setShownFunction)

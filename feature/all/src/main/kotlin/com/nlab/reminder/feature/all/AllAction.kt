@@ -26,8 +26,11 @@ import kotlin.time.Instant
 internal sealed interface AllAction {
     data class StateSynced(
         val entryAt: Instant,
+        val completedScheduleVisible: Boolean,
         val scheduleResources: List<UserScheduleListResource>
     ) : AllAction
+
+    data object OnCompletedScheduleVisibilityToggled : AllAction
 
     data object OnSelectionModeToggled : AllAction
 
