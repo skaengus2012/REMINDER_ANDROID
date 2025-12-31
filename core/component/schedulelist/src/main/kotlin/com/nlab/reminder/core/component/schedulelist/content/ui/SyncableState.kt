@@ -36,9 +36,9 @@ internal class SyncableState<T>(
     private val syncDuration: Long,
 ) {
     private val syncFlow =
-        MutableStateFlow<StampedValue<T>>(StampedValue(initialValue, 0))
+        MutableStateFlow<StampedValue<T>>(StampedValue(initialValue, EMPTY_COMMIT_TIME))
     private val localFlow =
-        MutableStateFlow<StampedValue<T>>(StampedValue(initialValue, 0))
+        MutableStateFlow<StampedValue<T>>(StampedValue(initialValue, EMPTY_COMMIT_TIME))
 
     private var latestLocalCommitTime = 0L
     private var latestLocalAppliedTime = 0L
@@ -60,7 +60,7 @@ internal class SyncableState<T>(
                 }
 
                 if (sync.commitTime > latestSyncAppliedTime) {
-                    if (latestSyncAppliedTime != 0L && alreadyDelayed.not()) {
+                    if (latestSyncAppliedTime != EMPTY_COMMIT_TIME && alreadyDelayed.not()) {
                         delay(syncDuration)
                     }
                     latestSyncAppliedTime = sync.commitTime
@@ -82,6 +82,10 @@ internal class SyncableState<T>(
     fun snapshot(): T {
         if (latestLocalCommitTime > latestLocalAppliedTime) return localFlow.value.data
         return state.value
+    }
+
+    companion object {
+        private const val EMPTY_COMMIT_TIME = 0L
     }
 
     private class StampedValue<T>(val data: T, val commitTime: Long)
