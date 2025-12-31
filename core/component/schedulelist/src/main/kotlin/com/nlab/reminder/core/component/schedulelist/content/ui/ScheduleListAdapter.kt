@@ -18,6 +18,7 @@ package com.nlab.reminder.core.component.schedulelist.content.ui
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.recyclerview.widget.AdapterListUpdateCallback
 import androidx.recyclerview.widget.RecyclerView
 import com.nlab.reminder.core.component.schedulelist.databinding.LayoutScheduleAdapterItemContentBinding
@@ -33,11 +34,8 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.flow.updateAndGet
 import kotlinx.datetime.TimeZone
 import kotlin.time.Instant
 
@@ -52,7 +50,9 @@ private const val ITEM_VIEW_TYPE_SUB_GROUP_HEADER = 7
 /**
  * @author Thalys
  */
-internal class ScheduleListAdapter : RecyclerView.Adapter<ScheduleAdapterItemViewHolder>() {
+internal class ScheduleListAdapter(
+    lifecycleScope: LifecycleCoroutineScope,
+) : RecyclerView.Adapter<ScheduleAdapterItemViewHolder>() {
     private val differ = ScheduleListDiffer(listUpdateCallback = AdapterListUpdateCallback(/* adapter = */ this))
     private val dateTimeFormatPool = DateTimeFormatPool()
     private val tagsDisplayFormatter = TagsDisplayFormatter()
@@ -62,11 +62,19 @@ internal class ScheduleListAdapter : RecyclerView.Adapter<ScheduleAdapterItemVie
     private val scheduleTimingDisplayFormatterState = MutableStateFlow<ScheduleTimingDisplayFormatter?>(null)
     private val selectionEnabled = MutableStateFlow(false)
 
-    private val completionCheckedScheduleIds = MutableStateFlow(persistentHashSetOf<ScheduleId>())
+    private val completionCheckedScheduleIds = SyncableState<PersistentSet<ScheduleId>>(
+        lifecycleScope = lifecycleScope,
+        initialValue = persistentHashSetOf(),
+        syncDuration = 300L
+    )
     private val _completionUpdateRequests = MutableEventSharedFlow<CompletionUpdate>()
     val completionUpdateRequests: SharedFlow<CompletionUpdate> = _completionUpdateRequests.asSharedFlow()
 
-    private val selectedScheduleIds = MutableStateFlow(persistentHashSetOf<ScheduleId>())
+    private val selectedScheduleIds = SyncableState<PersistentSet<ScheduleId>>(
+        lifecycleScope = lifecycleScope,
+        initialValue = persistentHashSetOf(),
+        syncDuration = 300L
+    )
     private val _selectionUpdateRequests = MutableIdentityStateFlow<SelectionUpdate>()
     val selectionUpdateRequests: IdentityStateFlow<SelectionUpdate> = _selectionUpdateRequests.asStateFlow()
 
@@ -117,13 +125,17 @@ internal class ScheduleListAdapter : RecyclerView.Adapter<ScheduleAdapterItemVie
                     entryAtState = entryAtState,
                     scheduleTimingDisplayFormatterState = scheduleTimingDisplayFormatterState,
                     selectionEnabled = selectionEnabled,
-                    selectedScheduleIds = selectedScheduleIds,
-                    completionCheckedScheduleIds = completionCheckedScheduleIds,
+                    selectedScheduleIds = selectedScheduleIds.state,
+                    completionCheckedScheduleIds = completionCheckedScheduleIds.state,
                     onCompletionUpdated = { completionUpdate ->
-                        completionCheckedScheduleIds.update { ids ->
-                            if (completionUpdate.targetCompleted) ids + completionUpdate.id
-                            else ids - completionUpdate.id
-                        }
+                        val currentIds = completionCheckedScheduleIds.snapshot()
+                        completionCheckedScheduleIds.set(
+                            if (completionUpdate.targetCompleted) {
+                                currentIds + completionUpdate.id
+                            } else {
+                                currentIds - completionUpdate.id
+                            }
+                        )
                         _completionUpdateRequests.tryEmit(completionUpdate)
                     },
                     onSimpleEditDone = { _editRequests.tryEmit(it) },
@@ -226,18 +238,18 @@ internal class ScheduleListAdapter : RecyclerView.Adapter<ScheduleAdapterItemVie
     }
 
     fun syncCompletionChecked(completionCheckedIds: PersistentSet<ScheduleId>) {
-        completionCheckedScheduleIds.value = completionCheckedIds
+        completionCheckedScheduleIds.sync(completionCheckedIds)
     }
 
     fun syncSelected(selectedIds: PersistentSet<ScheduleId>) {
-        selectedScheduleIds.value = selectedIds
+        selectedScheduleIds.sync(selectedIds)
     }
 
     fun setSelected(scheduleId: ScheduleId, selected: Boolean) {
-        val current = selectedScheduleIds.value
+        val current = selectedScheduleIds.snapshot()
         val updated = if (selected) current + scheduleId else current - scheduleId
-        if (current !== updated) {
-            selectedScheduleIds.value = updated
+        if (current != updated) {
+            selectedScheduleIds.set(updated)
             _selectionUpdateRequests.update(SelectionUpdate(selectedIds = updated))
         }
     }
@@ -261,7 +273,7 @@ internal class ScheduleListAdapter : RecyclerView.Adapter<ScheduleAdapterItemVie
     }
 
     fun getCurrentSelectedIds(): Set<ScheduleId> {
-        return selectedScheduleIds.value
+        return selectedScheduleIds.state.value
     }
 
     fun updateTheme(theme: ScheduleListTheme) {

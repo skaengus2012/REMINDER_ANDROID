@@ -41,7 +41,6 @@ import com.nlab.reminder.core.androix.recyclerview.scrollEvent
 import com.nlab.reminder.core.androix.recyclerview.scrollState
 import com.nlab.reminder.core.androix.recyclerview.stickyheader.StickyHeaderHelper
 import com.nlab.reminder.core.androix.recyclerview.verticalScrollRange
-import com.nlab.reminder.core.component.schedule.ScheduleIntId
 import com.nlab.reminder.core.component.schedulelist.databinding.FragmentScheduleListBinding
 import com.nlab.reminder.core.component.schedulelist.toolbar.ui.ScheduleListToolbarState
 import com.nlab.reminder.core.data.model.ScheduleId
@@ -60,7 +59,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.conflate
-import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
@@ -114,7 +112,7 @@ internal class ScheduleListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val scheduleListAdapter = ScheduleListAdapter().apply {
+        val scheduleListAdapter = ScheduleListAdapter(viewLifecycleScope).apply {
             stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
         }
         val linearLayoutManager = LinearLayoutManager(/*context = */ requireContext())
@@ -280,9 +278,7 @@ internal class ScheduleListFragment : Fragment() {
             .launchIn(viewLifecycleScope)
 
         withSync(
-            syncSourceFlow = userInteractionSyncFlow.unwrap()
-                .debounce(itemTouchAnimateDurationMs)
-                .map { it.selectedIds },
+            syncSourceFlow = userInteractionSyncFlow.unwrap().map { it.selectedIds },
             sync = scheduleListAdapter::syncSelected
         ) { syncJob ->
             viewLifecycleScope.launch {
@@ -296,13 +292,7 @@ internal class ScheduleListFragment : Fragment() {
         }
 
         withSync(
-            syncSourceFlow = userInteractionSyncFlow.unwrap()
-                .debounce(
-                    timeoutMillis = resources
-                        .getInteger(ScheduleIntId.schedule_configs_completion_timeout_ms)
-                        .toLong()
-                )
-                .map { it.completionCheckedIds },
+            syncSourceFlow = userInteractionSyncFlow.unwrap().map { it.completionCheckedIds },
             sync = scheduleListAdapter::syncCompletionChecked,
         ) { syncJob ->
             forwardEventToConsumer(
