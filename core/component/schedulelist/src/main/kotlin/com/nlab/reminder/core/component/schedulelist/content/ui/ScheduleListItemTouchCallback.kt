@@ -480,6 +480,7 @@ internal class ScheduleListItemTouchCallback(
                         }
                         draggingViewHolder = null
 
+                        itemMoveListener.onMoveEnded()
                         scrollGuard.setBlocked(false)
                         // FIXME Sticky update may be required. from GPT
                     }
