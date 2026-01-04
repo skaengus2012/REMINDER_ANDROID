@@ -60,15 +60,7 @@ abstract class ScheduleDAO {
         if (scheduleIds.isEmpty()) emptyList()
         else findByIdsInternal(scheduleIds)
 
-    @Query(
-        """
-        SELECT visible_priority
-        FROM schedule 
-        WHERE is_complete = :isComplete
-        ORDER BY visible_priority DESC 
-        LIMIT 1
-        """
-    )
+    @Query("SELECT MAX(visible_priority) FROM schedule WHERE is_complete = :isComplete")
     protected abstract suspend fun findMaxVisiblePriorityByComplete(isComplete: Boolean): Long?
 
     private suspend inline fun findMaxVisiblePriorityByCompleteOrElse(
@@ -161,7 +153,10 @@ abstract class ScheduleDAO {
             .filter { it.isComplete != idToCompleteTable.getValue(it.scheduleId) }
             .groupBy { it.isComplete }
             .forEach { (isComplete, entities) ->
-                val maxVisiblePriority = findMaxVisiblePriorityByCompleteOrElse(isComplete, defaultValue = { -1 })
+                val maxVisiblePriority = findMaxVisiblePriorityByCompleteOrElse(
+                    isComplete = isComplete.not(), // targetComplete
+                    defaultValue = { -1 }
+                )
                 entities.sortedBy { it.visiblePriority }.forEachIndexed { index, entity ->
                     if (entity.repeatType == null) {
                         // If no repeatTypes exist, only the completion flag is changed.
