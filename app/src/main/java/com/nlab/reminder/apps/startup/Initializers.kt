@@ -19,8 +19,12 @@
 package com.nlab.reminder.apps.startup
 
 import androidx.startup.Initializer
+import kotlin.reflect.KClass
 
 /**
  * @author Doohyun
  */
 fun EmptyDependencies(): List<Class<out Initializer<*>>> = emptyList()
+
+fun dependenciesOf(vararg dependencies: KClass<out Initializer<*>>): List<Class<out Initializer<*>>> =
+    dependencies.map { it.java }

@@ -53,6 +53,7 @@ sealed class UpdateAllScheduleQuery {
     data class VisiblePriorities(
         val idToVisiblePriorityTable: Map<ScheduleId, NonNegativeLong>
     ) : UpdateAllScheduleQuery()
+    data object ReindexVisiblePriorities : UpdateAllScheduleQuery()
 }
 
 sealed class DeleteScheduleQuery {

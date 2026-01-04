@@ -15,9 +15,8 @@ dependencies {
     implementation(projects.core.annotation)
     implementation(projects.core.dataDi)
 
-    implementation(libs.androidx.hilt.work)
+    implementation(libs.bundles.androidx.hilt.work)
     ksp(libs.androidx.hilt.compiler)
-    implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.timber)
 
     testImplementation(projects.core.dataTest)

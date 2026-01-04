@@ -158,6 +158,22 @@ internal class LocalScheduleRepositoryTest {
     }
 
     @Test
+    fun `When reindex visible priorities, Then dao called reindexVisiblePriorities and return success`() = runTest {
+        // given
+        val scheduleDAO: ScheduleDAO = mockk(relaxed = true)
+        val repository = genLocalScheduleRepository(scheduleDAO = scheduleDAO)
+
+        // when
+        val result = repository.updateAll(UpdateAllScheduleQuery.ReindexVisiblePriorities)
+
+        // then
+        coVerify(exactly = 1) {
+            scheduleDAO.reindexVisiblePriorities()
+        }
+        assertThat(result.isSuccess, equalTo(true))
+    }
+
+    @Test
     fun `Given complete flag, When delete by complete, Then dao deletes by completion and return success`() = runTest {
         // given
         val isComplete = genBoolean()
