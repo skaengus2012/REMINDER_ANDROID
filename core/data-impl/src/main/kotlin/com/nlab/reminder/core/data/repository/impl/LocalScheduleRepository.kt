@@ -96,6 +96,9 @@ class LocalScheduleRepository(
                         .associate { (id, visiblePriority) -> id.rawId to visiblePriority }
                 )
             }
+            is UpdateAllScheduleQuery.ReindexVisiblePriorities -> {
+                scheduleDAO.reindexVisiblePriorities()
+            }
         }
     }
 

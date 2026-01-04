@@ -44,6 +44,9 @@ abstract class ScheduleDAO {
     @Delete
     protected abstract suspend fun delete(entity: ScheduleEntity)
 
+    @Query("SELECT * FROM schedule")
+    protected abstract fun getAll(): List<ScheduleEntity>
+
     @Query("SELECT * FROM schedule WHERE is_complete = :isComplete")
     protected abstract suspend fun findByComplete(isComplete: Boolean): List<ScheduleEntity>
 
@@ -180,6 +183,15 @@ abstract class ScheduleDAO {
                     }
                 }
             }
+    }
+
+    @Transaction
+    open suspend fun reindexVisiblePriorities() {
+        getAll().groupBy(keySelector = { it.isComplete }).forEach { (_, entities) ->
+            entities.sortedBy { it.visiblePriority }.forEachIndexed { index, entity ->
+                update(entity.copy(visiblePriority = index + 1L))
+            }
+        }
     }
 
     @Transaction
