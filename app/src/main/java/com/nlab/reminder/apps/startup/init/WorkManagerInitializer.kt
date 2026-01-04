@@ -30,7 +30,7 @@ import dagger.hilt.components.SingletonComponent
 /**
  * @author Thalys
  */
-internal class WorkManagerInitializer : Initializer<WorkManager> {
+class WorkManagerInitializer : Initializer<WorkManager> {
     override fun create(context: Context): WorkManager {
         val entryPoint = EntryPointAccessors.fromApplication<WorkManagerInitializerEntryPoint>(context)
         val configuration = Configuration.Builder()

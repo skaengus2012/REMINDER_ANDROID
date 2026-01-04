@@ -112,6 +112,10 @@ kotlin-gradle-plugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-p
 ksp-gradle-plugin = { group = "com.google.devtools.ksp", name = "com.google.devtools.ksp.gradle.plugin", version.ref = "ksp" }
 
 
+[bundles]
+androidx-hilt-work = [ "androidx-hilt-work", "androidx-work-runtime-ktx" ]
+
+
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
 compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
