@@ -39,6 +39,8 @@ class ScheduleCompletionCleanupInitializer : Initializer<Unit> {
         val applicationScope = entryPoint.applicationCoroutineScope()
         val registerScheduleCompleteJobUseCase = entryPoint.registerScheduleCompleteJob()
         applicationScope.launch(Dispatchers.Default) {
+            // Use zero debounce so that the startup cleanup runs immediately without delaying app initialization,
+            // and pass null priority to allow the job to process all eligible schedules instead of limiting by priority.
             registerScheduleCompleteJobUseCase(debounceTimeout = 0.seconds, processUntilPriority = null)
         }
     }
