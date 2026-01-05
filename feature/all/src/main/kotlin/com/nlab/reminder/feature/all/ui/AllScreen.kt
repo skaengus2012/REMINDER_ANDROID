@@ -107,6 +107,9 @@ internal fun AllScreen(
                 )
             )
         },
+        onItemPositionUpdated = { userScheduleListResources ->
+            // TODO implement
+        },
         onSimpleAdd = { simpleAdd ->
             // TODO implements
             showAppToast("TODO Simple Add $simpleAdd")
@@ -146,6 +149,7 @@ private fun AllScreen(
     onCompleteClicked: () -> Unit,
     onItemSelectionChanged: (SelectionUpdate) -> Unit,
     onCompletionUpdated: (CompletionUpdate) -> Unit,
+    onItemPositionUpdated: (List<UserScheduleListResource>) -> Unit,
     onSimpleAdd: (SimpleAdd) -> Unit,
     onSimpleEdit: (SimpleEdit) -> Unit,
     modifier: Modifier = Modifier,
@@ -182,6 +186,7 @@ private fun AllScreen(
                         toolbarState = toolbarState,
                         onItemSelectionChanged = onItemSelectionChanged,
                         onCompletionUpdated = onCompletionUpdated,
+                        onItemPositionUpdated = onItemPositionUpdated,
                         onSimpleAdd = onSimpleAdd,
                         onSimpleEdit = onSimpleEdit
                     )
@@ -200,6 +205,7 @@ private fun AllScheduleListContent(
     toolbarState: ScheduleListToolbarState,
     onItemSelectionChanged: (SelectionUpdate) -> Unit,
     onCompletionUpdated: (CompletionUpdate) -> Unit,
+    onItemPositionUpdated: (List<UserScheduleListResource>) -> Unit,
     onSimpleAdd: (SimpleAdd) -> Unit,
     onSimpleEdit: (SimpleEdit) -> Unit,
     modifier: Modifier = Modifier
@@ -234,6 +240,16 @@ private fun AllScheduleListContent(
         toolbarState = toolbarState,
         onSelectionUpdated = onItemSelectionChanged,
         onCompletionUpdated = onCompletionUpdated,
+        onItemPositionUpdated = { itemPositionUpdated ->
+            val userScheduleListResources = buildList {
+                itemPositionUpdated.snapshot.forEach { item ->
+                    if (item is ScheduleListItem.Content) {
+                        this += item.resource
+                    }
+                }
+            }
+            onItemPositionUpdated(userScheduleListResources)
+        },
         onSimpleAdd = onSimpleAdd,
         onSimpleEdit = onSimpleEdit,
     )
@@ -251,6 +267,7 @@ private fun AllScreenPreview() {
             onCompleteClicked = {},
             onItemSelectionChanged = {},
             onCompletionUpdated = {},
+            onItemPositionUpdated = {},
             onSimpleAdd = {},
             onSimpleEdit = {}
         )

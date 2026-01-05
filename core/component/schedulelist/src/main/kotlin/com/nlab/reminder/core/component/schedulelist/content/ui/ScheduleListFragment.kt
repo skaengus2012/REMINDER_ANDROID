@@ -93,6 +93,7 @@ internal class ScheduleListFragment : Fragment() {
     private val toolbarStateState = MutableIdentityStateFlow<ScheduleListToolbarState?>()
     private val selectionUpdateConsumerState = MutableIdentityStateFlow<(SelectionUpdate) -> Unit>()
     private val completionUpdateConsumerState = MutableIdentityStateFlow<(CompletionUpdate) -> Unit>()
+    private val itemPositionUpdateConsumerState = MutableIdentityStateFlow<(ItemPositionUpdate) -> Unit>()
     private val simpleAddConsumerState = MutableIdentityStateFlow<(SimpleAdd) -> Unit>()
     private val simpleEditConsumerState = MutableIdentityStateFlow<(SimpleEdit) -> Unit>()
 
@@ -287,6 +288,14 @@ internal class ScheduleListFragment : Fragment() {
                     selectionUpdateConsumerState.unwrap().collectLatest { consumer ->
                         scheduleListAdapter.selectionUpdateRequests.unwrap().collect(consumer)
                     }
+                }
+            }
+        }
+
+        viewLifecycleScope.launch {
+            viewLifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                itemPositionUpdateConsumerState.unwrap().collectLatest { consumer ->
+                    scheduleListAdapter.itemPositionUpdateRequests.unwrap().collect(consumer)
                 }
             }
         }
@@ -575,6 +584,10 @@ internal class ScheduleListFragment : Fragment() {
 
     fun onCompletionUpdateConsumerChanged(consumer: (CompletionUpdate) -> Unit) {
         completionUpdateConsumerState.update(consumer)
+    }
+
+    fun onItemPositionUpdateConsumerChanged(consumer: (ItemPositionUpdate) -> Unit) {
+        itemPositionUpdateConsumerState.update(consumer)
     }
 
     fun onSimpleAddConsumerChanged(consumer: (SimpleAdd) -> Unit) {
