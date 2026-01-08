@@ -89,13 +89,13 @@ class LocalScheduleRepository(
                 )
             }
 
-            is UpdateAllScheduleQuery.VisiblePriorities -> {
-                scheduleDAO.updateByVisiblePriorities(
-                    idToVisiblePriorityTable = query.idToVisiblePriorityTable
-                        .entries
-                        .associate { (id, visiblePriority) -> id.rawId to visiblePriority }
+            is UpdateAllScheduleQuery.ReorderWithCompletedGroup -> {
+                scheduleDAO.updateByCompletedToSortedIdsTable(
+                    completedGroupSortedIds = query.completedGroupSortedIds.map { it.rawId },
+                    uncompletedGroupSortedIds = query.uncompletedGroupSortedIds.map { it.rawId },
                 )
             }
+
             is UpdateAllScheduleQuery.ReindexVisiblePriorities -> {
                 scheduleDAO.reindexVisiblePriorities()
             }

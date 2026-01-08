@@ -50,9 +50,11 @@ sealed class UpdateAllScheduleQuery {
         val idToCompleteTable: Map<ScheduleId, Boolean>
     ) : UpdateAllScheduleQuery()
 
-    data class VisiblePriorities(
-        val idToVisiblePriorityTable: Map<ScheduleId, NonNegativeLong>
+    data class ReorderWithCompletedGroup(
+        val completedGroupSortedIds: List<ScheduleId>,
+        val uncompletedGroupSortedIds: List<ScheduleId>
     ) : UpdateAllScheduleQuery()
+
     data object ReindexVisiblePriorities : UpdateAllScheduleQuery()
 }
 

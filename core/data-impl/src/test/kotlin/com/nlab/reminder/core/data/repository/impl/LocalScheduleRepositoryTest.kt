@@ -29,7 +29,6 @@ import com.nlab.reminder.core.data.repository.SaveScheduleQuery
 import com.nlab.reminder.core.data.repository.UpdateAllScheduleQuery
 import com.nlab.reminder.core.kotlin.getOrThrow
 import com.nlab.reminder.core.kotlin.isSuccess
-import com.nlab.reminder.core.kotlin.toNonNegativeLong
 import com.nlab.reminder.core.local.database.dao.ScheduleDAO
 import com.nlab.reminder.core.local.database.dao.ScheduleRepeatDetailDAO
 import com.nlab.reminder.core.local.database.dao.ScheduleTagListDAO
@@ -136,22 +135,26 @@ internal class LocalScheduleRepositoryTest {
     }
 
     @Test
-    fun `Given id-visiblePriority, When update priorities, Then dao called update and return success`() = runTest {
+    fun `Given schedule order, When reordering with completed group, Then dao updates successfully`() = runTest {
         // given
-        val sampleSize = genInt(min = 5, max = 10)
-        val ids = List(sampleSize) { ScheduleId(it.toLong()) }
-        val visiblePriorities = List(sampleSize) { (it + 1).toNonNegativeLong() }
-        val idToPriority = ids.zip(visiblePriorities).toMap()
+        val completedRandomRawIds = (1..genInt(min = 5, max = 10)).map { it.toLong() }.shuffled()
+        val uncompletedRandomRawIds = (1..genInt(min = 5, max = 10)).map { it.toLong() }.shuffled()
         val scheduleDAO: ScheduleDAO = mockk(relaxed = true)
         val repository = genLocalScheduleRepository(scheduleDAO = scheduleDAO)
 
         // when
-        val result = repository.updateAll(UpdateAllScheduleQuery.VisiblePriorities(idToPriority))
+        val result = repository.updateAll(
+            query = UpdateAllScheduleQuery.ReorderWithCompletedGroup(
+                completedGroupSortedIds = completedRandomRawIds.map { ScheduleId(it) },
+                uncompletedGroupSortedIds = uncompletedRandomRawIds.map { ScheduleId(it) }
+            )
+        )
 
         // then
         coVerify(exactly = 1) {
-            scheduleDAO.updateByVisiblePriorities(
-                idToVisiblePriorityTable = ids.map { it.rawId }.zip(visiblePriorities.map { it }).toMap()
+            scheduleDAO.updateByCompletedToSortedIdsTable(
+                completedGroupSortedIds = completedRandomRawIds,
+                uncompletedGroupSortedIds = uncompletedRandomRawIds
             )
         }
         assertThat(result.isSuccess, equalTo(true))
