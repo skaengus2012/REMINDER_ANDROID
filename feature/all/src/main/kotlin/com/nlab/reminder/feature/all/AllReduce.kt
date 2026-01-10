@@ -32,7 +32,8 @@ internal fun AllReduce(environment: AllEnvironment): AllReduce = DslReduce {
         transition<Loading> {
             Success(
                 entryAt = action.entryAt,
-                scheduleListResources = action.scheduleResources,
+                scheduleResources = action.scheduleResources,
+                scheduleResourcesUpdateId = 0,
                 completedScheduleVisible = action.completedScheduleVisible,
                 multiSelectionEnabled = false
             )
@@ -40,8 +41,9 @@ internal fun AllReduce(environment: AllEnvironment): AllReduce = DslReduce {
         transition<Success> {
             current.copy(
                 entryAt = action.entryAt,
+                scheduleResources = action.scheduleResources,
+                scheduleResourcesUpdateId = 0,
                 completedScheduleVisible = action.completedScheduleVisible,
-                scheduleListResources = action.scheduleResources,
             )
         }
     }

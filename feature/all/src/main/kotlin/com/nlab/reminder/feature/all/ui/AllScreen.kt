@@ -129,15 +129,15 @@ internal fun AllScreen(
 
 private fun convertToOptimizedState(uiState: AllUiState): AllUiState =
     if (uiState !is AllUiState.Success) uiState
-    else uiState.copy(scheduleListResources = uiState.scheduleListResources.toIdentityList())
+    else uiState.copy(scheduleResources = uiState.scheduleResources.toIdentityList())
 
 private fun reuseScheduleListIfUnchanged(prev: AllUiState.Success, next: AllUiState.Success): AllUiState {
-    if (prev.scheduleListResources !is IdentityList
-        || prev.scheduleListResources.value != next.scheduleListResources
+    if (prev.scheduleResources !is IdentityList
+        || prev.scheduleResources.value != next.scheduleResources
     ) {
         return convertToOptimizedState(uiState = next)
     }
-    return next.copy(scheduleListResources = prev.scheduleListResources)
+    return next.copy(scheduleResources = prev.scheduleResources)
 }
 
 @Composable
@@ -181,7 +181,8 @@ private fun AllScreen(
                     AllScheduleListContent(
                         headline = title,
                         entryAt = uiState.entryAt,
-                        scheduleListResources = uiState.scheduleListResources,
+                        scheduleResources = uiState.scheduleResources,
+                        scheduleResourcesUpdateId = uiState.scheduleResourcesUpdateId,
                         multiSelectionEnabled = uiState.multiSelectionEnabled,
                         toolbarState = toolbarState,
                         onItemSelectionChanged = onItemSelectionChanged,
@@ -200,7 +201,8 @@ private fun AllScreen(
 private fun AllScheduleListContent(
     headline: String,
     entryAt: Instant,
-    scheduleListResources: List<UserScheduleListResource>,
+    scheduleResources: List<UserScheduleListResource>,
+    scheduleResourcesUpdateId: Long,
     multiSelectionEnabled: Boolean,
     toolbarState: ScheduleListToolbarState,
     onItemSelectionChanged: (SelectionUpdate) -> Unit,
@@ -214,7 +216,8 @@ private fun AllScheduleListContent(
     val footerForm = remember { ScheduleListItem.FooterForm(formBottomLine = FormBottomLine.Type1) }
     val scheduleListItemsAdaptation by rememberScheduleListItemsAdaptationState(
         headline = headline,
-        elements = scheduleListResources,
+        elements = scheduleResources,
+        elementUpdateId = scheduleResourcesUpdateId,
         buildBodyItemsIfNotEmpty = { elements ->
             buildList {
                 elements.forEach { resource ->

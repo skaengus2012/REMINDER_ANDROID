@@ -428,7 +428,7 @@ internal class ScheduleListFragment : Fragment() {
         scheduleListItemsAdaptationState.unwrap()
             .distinctUntilChanged { prev, next ->
                 if (prev is ScheduleListItemsAdaptation.Exist && next is ScheduleListItemsAdaptation.Exist) {
-                    prev.items.value == next.items.value
+                    prev.itemUpdateId == next.itemUpdateId && prev.items.value == next.items.value
                 } else {
                     prev == next
                 }

@@ -33,13 +33,17 @@ import kotlinx.coroutines.withContext
 @Immutable
 sealed class ScheduleListItemsAdaptation {
     internal data object Absent : ScheduleListItemsAdaptation()
-    internal data class Exist(val items: IdentityList<ScheduleListItem>) : ScheduleListItemsAdaptation()
+    internal data class Exist(
+        val items: IdentityList<ScheduleListItem>,
+        val itemUpdateId: Long
+    ) : ScheduleListItemsAdaptation()
 }
 
 @Composable
 fun <T : ScheduleListElement> rememberScheduleListItemsAdaptationState(
     headline: String,
     elements: List<T>,
+    elementUpdateId: Long,
     buildBodyItemsIfNotEmpty: (List<T>) -> List<ScheduleListItem>,
 ): State<ScheduleListItemsAdaptation> {
     val headlineItem by produceState<ScheduleListItem.Headline?>(
@@ -63,6 +67,7 @@ fun <T : ScheduleListElement> rememberScheduleListItemsAdaptationState(
         initialValue = ScheduleListItemsAdaptation.Absent,
         key1 = headlineItem,
         key2 = bodyItems,
+        key3 = elementUpdateId
     ) {
         val currentHeadlineItem = headlineItem
         val currentBodyItems = bodyItems
@@ -82,7 +87,7 @@ fun <T : ScheduleListElement> rememberScheduleListItemsAdaptationState(
                     addAll(currentBodyItems)
                 }
             }
-            ScheduleListItemsAdaptation.Exist(items = totalItems.toIdentityList())
+            ScheduleListItemsAdaptation.Exist(items = totalItems.toIdentityList(), itemUpdateId = elementUpdateId)
         }
     }
 }

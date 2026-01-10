@@ -27,7 +27,8 @@ internal sealed class AllUiState {
 
     data class Success(
         val entryAt: Instant,
-        val scheduleListResources: List<UserScheduleListResource>,
+        val scheduleResources: List<UserScheduleListResource>,
+        val scheduleResourcesUpdateId: Long,
         val completedScheduleVisible: Boolean,
         val multiSelectionEnabled: Boolean,
     ) : AllUiState()
