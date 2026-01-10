@@ -108,7 +108,7 @@ internal fun AllScreen(
             )
         },
         onItemPositionUpdated = { userScheduleListResources ->
-            // TODO implement
+            store.dispatch(AllAction.OnItemPositionUpdated(userScheduleListResources))
         },
         onSimpleAdd = { simpleAdd ->
             // TODO implements

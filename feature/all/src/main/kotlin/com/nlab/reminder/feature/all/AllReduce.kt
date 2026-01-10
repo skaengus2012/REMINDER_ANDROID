@@ -17,6 +17,7 @@
 package com.nlab.reminder.feature.all
 
 import com.nlab.reminder.core.component.schedulelist.content.clear
+import com.nlab.reminder.core.data.repository.UpdateAllScheduleQuery
 import com.nlab.statekit.dsl.reduce.DslReduce
 import com.nlab.statekit.reduce.Reduce
 import com.nlab.reminder.feature.all.AllAction.*
@@ -48,9 +49,15 @@ internal fun AllReduce(environment: AllEnvironment): AllReduce = DslReduce {
         }
     }
     stateScope<Success> {
+        transition<RevertScheduleResources> {
+            if (current.scheduleResources != action.scheduleResources) current
+            else current.copy(scheduleResourcesUpdateId = current.scheduleResourcesUpdateId + 1)
+        }
+
         suspendEffect<OnCompletedScheduleVisibilityToggled> {
             environment.completedScheduleShownRepository.setShown(isShown = current.completedScheduleVisible.not())
         }
+
         transition<OnSelectionModeToggled> {
             current.copy(multiSelectionEnabled = current.multiSelectionEnabled.not())
         }
@@ -59,13 +66,39 @@ internal fun AllReduce(environment: AllEnvironment): AllReduce = DslReduce {
                 environment.userSelectedSchedulesStore.clear()
             }
         }
+
         effect<OnItemSelectionUpdated> {
             environment.userSelectedSchedulesStore.replace(action.selectedIds)
         }
+
         suspendEffect<OnItemCompletionUpdated> {
             environment.updateScheduleCompletion(
                 scheduleId = action.scheduleId,
                 targetCompleted = action.targetCompleted
+            )
+        }
+
+        suspendEffect<OnItemPositionUpdated> {
+            val snapshot = action.snapshot
+
+            val maxUncompletedIndex = snapshot.indexOfLast { it.schedule.isComplete.not() }
+            val minCompletedIndex = snapshot.indexOfFirst { it.schedule.isComplete }
+            if (maxUncompletedIndex != -1 && minCompletedIndex != -1 && maxUncompletedIndex >= minCompletedIndex) {
+                dispatch(RevertScheduleResources(current.scheduleResources))
+                return@suspendEffect
+            }
+
+            val completedScheduleIds =
+                if (minCompletedIndex == -1) emptyList()
+                else snapshot.mapNotNull { resource -> resource.takeIf { it.schedule.isComplete }?.schedule?.id }
+            val uncompletedScheduleIds =
+                if (maxUncompletedIndex == -1) emptyList()
+                else snapshot.mapNotNull { resource -> resource.takeIf { it.schedule.isComplete.not() }?.schedule?.id }
+            environment.scheduleRepository.updateAll(
+                query = UpdateAllScheduleQuery.ReorderWithCompletedGroup(
+                    completedGroupSortedIds = completedScheduleIds,
+                    uncompletedGroupSortedIds = uncompletedScheduleIds
+                )
             )
         }
     }
