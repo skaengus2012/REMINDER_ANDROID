@@ -500,7 +500,13 @@ internal class ScheduleListItemTouchCallback(
         .setInterpolator(dragScaleInterpolator)
         .setListener(
             doOnEnd = { doOnAnimComplete() },
-            doOnCancel = { doOnAnimComplete() }
+            doOnCancel = {
+                // When canceled, the scale state is restored.
+                // When drag is restored, the scale may not return.
+                view.scaleX = scale
+                view.scaleY = scale
+                doOnAnimComplete()
+            }
         )
         .also { it.start() }
 
