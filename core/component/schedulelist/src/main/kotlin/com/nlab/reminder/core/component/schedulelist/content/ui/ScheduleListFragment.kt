@@ -134,10 +134,19 @@ internal class ScheduleListFragment : Fragment() {
             clampSwipeThreshold = 0.5f,
             maxClampSwipeWidthMultiplier = 1.75f,
             itemMoveListener = object : ScheduleListItemTouchCallback.ItemMoveListener {
-                override fun onMove(fromPosition: Int, toPosition: Int): Boolean = scheduleListAdapter.submitMoving(
-                    fromPosition = fromPosition,
-                    toPosition = toPosition
-                )
+                override fun onMove(fromPosition: Int, toPosition: Int): Boolean {
+                    val firstPos = linearLayoutManager.findFirstCompletelyVisibleItemPosition()
+                    val lastPos = linearLayoutManager.findLastCompletelyVisibleItemPosition()
+                    if (firstPos != RecyclerView.NO_POSITION
+                        && lastPos != RecyclerView.NO_POSITION
+                        && toPosition !in firstPos..lastPos
+                    ) return false
+
+                    return scheduleListAdapter.submitMoving(
+                        fromPosition = fromPosition,
+                        toPosition = toPosition
+                    )
+                }
 
                 override fun onMoveEnded() {
                     scheduleListAdapter.submitMoveDone()
@@ -251,33 +260,7 @@ internal class ScheduleListFragment : Fragment() {
             }
         }
 
-        val userInteractionSyncFlow = MutableIdentityStateFlow<UserInteraction>()
-        scheduleListItemsAdaptationState.unwrap()
-            .filterIsInstance<ScheduleListItemsAdaptation.Exist>()
-            .map { adaptation ->
-                val completionCheckedSchedulesIds = hashSetOf<ScheduleId>()
-                val selectedSchedulesIds = hashSetOf<ScheduleId>()
-                for (item in adaptation.items) {
-                    if (item !is ScheduleListItem.Content) continue
-                    val userScheduleListResource = item.resource
-                    val scheduleId = userScheduleListResource.schedule.id
-                    if (userScheduleListResource.completionChecked) {
-                        completionCheckedSchedulesIds += scheduleId
-                    }
-                    if (userScheduleListResource.selected) {
-                        selectedSchedulesIds += scheduleId
-                    }
-                }
-                UserInteraction(
-                    completionCheckedIds = completionCheckedSchedulesIds.toPersistentSet(),
-                    selectedIds = selectedSchedulesIds.toPersistentSet()
-                )
-            }
-            .flowOn(Dispatchers.Default)
-            .flowWithLifecycle(viewLifecycle)
-            .onEach(userInteractionSyncFlow::update)
-            .launchIn(viewLifecycleScope)
-
+        val userInteractionSyncFlow = createUserInteractionSyncFlow()
         withSync(
             syncSourceFlow = userInteractionSyncFlow.unwrap().map { it.selectedIds },
             sync = scheduleListAdapter::syncSelected
@@ -433,6 +416,13 @@ internal class ScheduleListFragment : Fragment() {
                     prev == next
                 }
             }
+            .mapLatest { adaptation ->
+                if (adaptation is ScheduleListItemsAdaptation.Exist && adaptation.replayStamp > 0) {
+                    // A short delay for a smooth revert.
+                    delay(500)
+                }
+                adaptation
+            }
             .flowOn(Dispatchers.Default)
             .flowWithLifecycle(viewLifecycle)
             .onEach { adaptation ->
@@ -461,6 +451,7 @@ internal class ScheduleListFragment : Fragment() {
                         commitCallback = { complete(Unit) }
                     )
                 }
+
                 awaitCompleteWith {
                     scheduleListAdapter.submitList(
                         items = newItems,
@@ -469,6 +460,7 @@ internal class ScheduleListFragment : Fragment() {
                 }
             }
             .launchIn(viewLifecycleScope)
+
 
         viewLifecycle.eventFlow
             .filter { event -> event == Lifecycle.Event.ON_DESTROY }
@@ -506,6 +498,36 @@ internal class ScheduleListFragment : Fragment() {
                 // TODO restore scroll position after updatePadding
             }
             .launchIn(viewLifecycleScope)
+    }
+
+    private fun createUserInteractionSyncFlow(): IdentityStateFlow<UserInteraction> {
+        val resultFlow = MutableIdentityStateFlow<UserInteraction>()
+        scheduleListItemsAdaptationState.unwrap()
+            .filterIsInstance<ScheduleListItemsAdaptation.Exist>()
+            .map { adaptation ->
+                val completionCheckedSchedulesIds = hashSetOf<ScheduleId>()
+                val selectedSchedulesIds = hashSetOf<ScheduleId>()
+                for (item in adaptation.items) {
+                    if (item !is ScheduleListItem.Content) continue
+                    val userScheduleListResource = item.resource
+                    val scheduleId = userScheduleListResource.schedule.id
+                    if (userScheduleListResource.completionChecked) {
+                        completionCheckedSchedulesIds += scheduleId
+                    }
+                    if (userScheduleListResource.selected) {
+                        selectedSchedulesIds += scheduleId
+                    }
+                }
+                UserInteraction(
+                    completionCheckedIds = completionCheckedSchedulesIds.toPersistentSet(),
+                    selectedIds = selectedSchedulesIds.toPersistentSet()
+                )
+            }
+            .flowOn(Dispatchers.Default)
+            .flowWithLifecycle(viewLifecycle)
+            .onEach(resultFlow::update)
+            .launchIn(viewLifecycleScope)
+        return resultFlow
     }
 
     private inline fun <T> withSync(
