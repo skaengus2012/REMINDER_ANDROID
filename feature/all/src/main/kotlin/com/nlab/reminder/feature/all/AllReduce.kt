@@ -34,24 +34,27 @@ internal fun AllReduce(environment: AllEnvironment): AllReduce = DslReduce {
             Success(
                 entryAt = action.entryAt,
                 scheduleResources = action.scheduleResources,
-                scheduleResourcesUpdateId = 0,
                 completedScheduleVisible = action.completedScheduleVisible,
-                multiSelectionEnabled = false
+                multiSelectionEnabled = false,
+                replayStamp = 0,
             )
         }
         transition<Success> {
             current.copy(
                 entryAt = action.entryAt,
                 scheduleResources = action.scheduleResources,
-                scheduleResourcesUpdateId = 0,
                 completedScheduleVisible = action.completedScheduleVisible,
+                replayStamp = 0,
             )
         }
     }
     stateScope<Success> {
         transition<RevertScheduleResources> {
-            if (current.scheduleResources != action.scheduleResources) current
-            else current.copy(scheduleResourcesUpdateId = current.scheduleResourcesUpdateId + 1)
+            when {
+                current.replayStamp != action.prevReplayStamp -> current
+                current.scheduleResources != action.prevScheduleResources -> current
+                else -> current.copy(replayStamp = current.replayStamp + 1)
+            }
         }
 
         suspendEffect<OnCompletedScheduleVisibilityToggled> {
@@ -84,7 +87,12 @@ internal fun AllReduce(environment: AllEnvironment): AllReduce = DslReduce {
             val maxUncompletedIndex = snapshot.indexOfLast { it.schedule.isComplete.not() }
             val minCompletedIndex = snapshot.indexOfFirst { it.schedule.isComplete }
             if (maxUncompletedIndex != -1 && minCompletedIndex != -1 && maxUncompletedIndex >= minCompletedIndex) {
-                dispatch(RevertScheduleResources(current.scheduleResources))
+                dispatch(
+                    action = RevertScheduleResources(
+                        prevScheduleResources = current.scheduleResources,
+                        prevReplayStamp = current.replayStamp
+                    )
+                )
                 return@suspendEffect
             }
 

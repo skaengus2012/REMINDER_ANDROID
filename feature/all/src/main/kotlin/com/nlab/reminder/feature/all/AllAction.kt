@@ -30,7 +30,10 @@ internal sealed interface AllAction {
         val scheduleResources: List<UserScheduleListResource>
     ) : AllAction
 
-    data class RevertScheduleResources(val scheduleResources: List<UserScheduleListResource>) : AllAction
+    data class RevertScheduleResources(
+        val prevScheduleResources: List<UserScheduleListResource>,
+        val prevReplayStamp: Long,
+    ) : AllAction
 
     data object OnCompletedScheduleVisibilityToggled : AllAction
 

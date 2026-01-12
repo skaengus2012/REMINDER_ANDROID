@@ -182,7 +182,7 @@ private fun AllScreen(
                         headline = title,
                         entryAt = uiState.entryAt,
                         scheduleResources = uiState.scheduleResources,
-                        scheduleResourcesUpdateId = uiState.scheduleResourcesUpdateId,
+                        replayStamp = uiState.replayStamp,
                         multiSelectionEnabled = uiState.multiSelectionEnabled,
                         toolbarState = toolbarState,
                         onItemSelectionChanged = onItemSelectionChanged,
@@ -202,7 +202,7 @@ private fun AllScheduleListContent(
     headline: String,
     entryAt: Instant,
     scheduleResources: List<UserScheduleListResource>,
-    scheduleResourcesUpdateId: Long,
+    replayStamp: Long,
     multiSelectionEnabled: Boolean,
     toolbarState: ScheduleListToolbarState,
     onItemSelectionChanged: (SelectionUpdate) -> Unit,
@@ -217,7 +217,7 @@ private fun AllScheduleListContent(
     val scheduleListItemsAdaptation by rememberScheduleListItemsAdaptationState(
         headline = headline,
         elements = scheduleResources,
-        elementUpdateId = scheduleResourcesUpdateId,
+        elementsReplayStamp = replayStamp,
         buildBodyItemsIfNotEmpty = { elements ->
             buildList {
                 elements.forEach { resource ->

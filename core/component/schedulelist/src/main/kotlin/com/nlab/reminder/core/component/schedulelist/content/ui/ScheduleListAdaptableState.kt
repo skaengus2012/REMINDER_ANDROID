@@ -35,7 +35,7 @@ sealed class ScheduleListItemsAdaptation {
     internal data object Absent : ScheduleListItemsAdaptation()
     internal data class Exist(
         val items: IdentityList<ScheduleListItem>,
-        val itemUpdateId: Long
+        val replayStamp: Long
     ) : ScheduleListItemsAdaptation()
 }
 
@@ -43,7 +43,7 @@ sealed class ScheduleListItemsAdaptation {
 fun <T : ScheduleListElement> rememberScheduleListItemsAdaptationState(
     headline: String,
     elements: List<T>,
-    elementUpdateId: Long,
+    elementsReplayStamp: Long,
     buildBodyItemsIfNotEmpty: (List<T>) -> List<ScheduleListItem>,
 ): State<ScheduleListItemsAdaptation> {
     val headlineItem by produceState<ScheduleListItem.Headline?>(
@@ -67,7 +67,7 @@ fun <T : ScheduleListElement> rememberScheduleListItemsAdaptationState(
         initialValue = ScheduleListItemsAdaptation.Absent,
         key1 = headlineItem,
         key2 = bodyItems,
-        key3 = elementUpdateId
+        key3 = elementsReplayStamp
     ) {
         val currentHeadlineItem = headlineItem
         val currentBodyItems = bodyItems
@@ -87,7 +87,7 @@ fun <T : ScheduleListElement> rememberScheduleListItemsAdaptationState(
                     addAll(currentBodyItems)
                 }
             }
-            ScheduleListItemsAdaptation.Exist(items = totalItems.toIdentityList(), itemUpdateId = elementUpdateId)
+            ScheduleListItemsAdaptation.Exist(items = totalItems.toIdentityList(), replayStamp = elementsReplayStamp)
         }
     }
 }
