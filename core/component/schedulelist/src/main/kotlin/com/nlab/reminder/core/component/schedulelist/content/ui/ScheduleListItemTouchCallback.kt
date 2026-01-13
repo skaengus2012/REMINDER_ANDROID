@@ -124,7 +124,16 @@ internal class ScheduleListItemTouchCallback(
     }
 
     override fun getDragDirs(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
-        return if (viewHolder is DraggableViewHolder && viewHolder.userDraggable()) {
+        if (selectedActionState == ItemTouchHelper.ACTION_STATE_IDLE) {
+            // Occasionally, when dragging, it may swipe.
+            // force removal
+            removeSwipeClamp(recyclerView)
+        }
+
+        return if (selectedActionState != ItemTouchHelper.ACTION_STATE_SWIPE
+            && viewHolder is DraggableViewHolder
+            && viewHolder.userDraggable()
+        ) {
             super.getDragDirs(recyclerView, viewHolder)
         } else {
             ItemTouchHelper.ACTION_STATE_IDLE
@@ -132,7 +141,10 @@ internal class ScheduleListItemTouchCallback(
     }
 
     override fun getSwipeDirs(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
-        return if (viewHolder is SwipeableViewHolder && viewHolder.userSwipeable()) {
+        return if (selectedActionState != ItemTouchHelper.ACTION_STATE_DRAG
+            && viewHolder is SwipeableViewHolder
+            && viewHolder.userSwipeable()
+        ) {
             super.getSwipeDirs(recyclerView, viewHolder)
         } else {
             ItemTouchHelper.ACTION_STATE_IDLE
