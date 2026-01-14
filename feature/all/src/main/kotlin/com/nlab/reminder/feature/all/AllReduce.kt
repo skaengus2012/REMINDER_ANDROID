@@ -17,6 +17,7 @@
 package com.nlab.reminder.feature.all
 
 import com.nlab.reminder.core.component.schedulelist.content.clear
+import com.nlab.reminder.core.data.repository.UpdateAllScheduleQuery
 import com.nlab.statekit.dsl.reduce.DslReduce
 import com.nlab.statekit.reduce.Reduce
 import com.nlab.reminder.feature.all.AllAction.*
@@ -32,23 +33,34 @@ internal fun AllReduce(environment: AllEnvironment): AllReduce = DslReduce {
         transition<Loading> {
             Success(
                 entryAt = action.entryAt,
-                scheduleListResources = action.scheduleResources,
+                scheduleResources = action.scheduleResources,
                 completedScheduleVisible = action.completedScheduleVisible,
-                multiSelectionEnabled = false
+                multiSelectionEnabled = false,
+                replayStamp = 0,
             )
         }
         transition<Success> {
             current.copy(
                 entryAt = action.entryAt,
+                scheduleResources = action.scheduleResources,
                 completedScheduleVisible = action.completedScheduleVisible,
-                scheduleListResources = action.scheduleResources,
+                replayStamp = 0,
             )
         }
     }
     stateScope<Success> {
+        transition<RevertScheduleResources> {
+            when {
+                current.replayStamp != action.prevReplayStamp -> current
+                current.scheduleResources != action.prevScheduleResources -> current
+                else -> current.copy(replayStamp = current.replayStamp + 1)
+            }
+        }
+
         suspendEffect<OnCompletedScheduleVisibilityToggled> {
             environment.completedScheduleShownRepository.setShown(isShown = current.completedScheduleVisible.not())
         }
+
         transition<OnSelectionModeToggled> {
             current.copy(multiSelectionEnabled = current.multiSelectionEnabled.not())
         }
@@ -57,13 +69,44 @@ internal fun AllReduce(environment: AllEnvironment): AllReduce = DslReduce {
                 environment.userSelectedSchedulesStore.clear()
             }
         }
+
         effect<OnItemSelectionUpdated> {
             environment.userSelectedSchedulesStore.replace(action.selectedIds)
         }
+
         suspendEffect<OnItemCompletionUpdated> {
             environment.updateScheduleCompletion(
                 scheduleId = action.scheduleId,
                 targetCompleted = action.targetCompleted
+            )
+        }
+
+        suspendEffect<OnItemPositionUpdated> {
+            val snapshot = action.snapshot
+
+            val maxUncompletedIndex = snapshot.indexOfLast { it.schedule.isComplete.not() }
+            val minCompletedIndex = snapshot.indexOfFirst { it.schedule.isComplete }
+            if (maxUncompletedIndex != -1 && minCompletedIndex != -1 && maxUncompletedIndex >= minCompletedIndex) {
+                dispatch(
+                    action = RevertScheduleResources(
+                        prevScheduleResources = current.scheduleResources,
+                        prevReplayStamp = current.replayStamp
+                    )
+                )
+                return@suspendEffect
+            }
+
+            val completedScheduleIds =
+                if (minCompletedIndex == -1) emptyList()
+                else snapshot.mapNotNull { resource -> resource.takeIf { it.schedule.isComplete }?.schedule?.id }
+            val uncompletedScheduleIds =
+                if (maxUncompletedIndex == -1) emptyList()
+                else snapshot.mapNotNull { resource -> resource.takeIf { it.schedule.isComplete.not() }?.schedule?.id }
+            environment.scheduleRepository.updateAll(
+                query = UpdateAllScheduleQuery.ReorderWithCompletedGroup(
+                    completedGroupSortedIds = completedScheduleIds,
+                    uncompletedGroupSortedIds = uncompletedScheduleIds
+                )
             )
         }
     }

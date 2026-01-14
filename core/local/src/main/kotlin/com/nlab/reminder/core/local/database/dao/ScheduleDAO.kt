@@ -23,8 +23,8 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import com.nlab.reminder.core.kotlin.NonBlankString
-import com.nlab.reminder.core.kotlin.NonNegativeLong
 import com.nlab.reminder.core.kotlin.PositiveInt
+import com.nlab.reminder.core.kotlin.collections.toSet
 import com.nlab.reminder.core.local.database.entity.ScheduleEntity
 import com.nlab.reminder.core.local.database.entity.EMPTY_GENERATED_ID
 import com.nlab.reminder.core.local.database.entity.RepeatType
@@ -72,7 +72,7 @@ abstract class ScheduleDAO {
     ): Long = findMaxVisiblePriorityByComplete(isComplete) ?: defaultValue()
 
     @Query("UPDATE schedule SET visible_priority = :visiblePriority WHERE schedule_id = :scheduleId")
-    protected abstract suspend fun updateVisiblePriorityInternal(scheduleId: Long, visiblePriority: Long)
+    protected abstract suspend fun updateVisiblePriority(scheduleId: Long, visiblePriority: Long)
 
     @Query("DELETE FROM schedule WHERE is_complete = :isComplete")
     protected abstract suspend fun deleteByCompleteInternal(isComplete: Boolean)
@@ -139,14 +139,35 @@ abstract class ScheduleDAO {
     }
 
     @Transaction
-    open suspend fun updateByVisiblePriorities(idToVisiblePriorityTable: Map<Long, NonNegativeLong>) {
-        if (idToVisiblePriorityTable.isEmpty()) return
-        val sampleSchedule = findById(scheduleId = idToVisiblePriorityTable.firstNotNullOf { it.key })
-        checkNotNull(sampleSchedule)
-        check(idToVisiblePriorityTable.keys == findIdsByComplete(sampleSchedule.isComplete).toSet())
+    open suspend fun updateByCompletedToSortedIdsTable(
+        completedGroupSortedIds: List<Long>,
+        uncompletedGroupSortedIds: List<Long>
+    ) {
+        val scheduleIds = buildSet {
+            if (completedGroupSortedIds.size > 1) addAll(completedGroupSortedIds)
+            if (uncompletedGroupSortedIds.size > 1) addAll(uncompletedGroupSortedIds)
+        }
+        if (scheduleIds.isEmpty()) return
 
-        idToVisiblePriorityTable.forEach { (id, visiblePriority) ->
-            updateVisiblePriorityInternal(scheduleId = id, visiblePriority = visiblePriority.value)
+        val entities = findByIds(scheduleIds)
+        require(scheduleIds.size == entities.size) {
+            "Mismatch between requested schedule IDs and found entities. Some IDs may not exist in the database."
+        }
+        entities.groupBy { it.isComplete }.forEach { (isComplete, groupEntities) ->
+            val targetSortedIds = if (isComplete) completedGroupSortedIds else uncompletedGroupSortedIds
+            check(groupEntities.size == targetSortedIds.size) {
+                "Size mismatch in group [isComplete=$isComplete] for priority update."
+            }
+
+            val sortedEntities = groupEntities.sortedBy { it.visiblePriority }
+            val entityIds = sortedEntities.toSet { it.scheduleId }
+            check(targetSortedIds.all { it in entityIds }) {
+                "Mismatch: Some target IDs were not found in the database."
+            }
+
+            targetSortedIds.zip(sortedEntities) { id, entity ->
+                updateVisiblePriority(scheduleId = id, visiblePriority = entity.visiblePriority)
+            }
         }
     }
 

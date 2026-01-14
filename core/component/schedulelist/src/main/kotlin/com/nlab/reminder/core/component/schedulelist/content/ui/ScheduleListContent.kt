@@ -53,6 +53,7 @@ fun ScheduleListContent(
     theme: ScheduleListTheme,
     onSelectionUpdated: (SelectionUpdate) -> Unit,
     onCompletionUpdated: (CompletionUpdate) -> Unit,
+    onItemPositionUpdated: (ItemPositionUpdate) -> Unit,
     onSimpleAdd: (SimpleAdd) -> Unit,
     onSimpleEdit: (SimpleEdit) -> Unit,
     modifier: Modifier = Modifier,
@@ -117,6 +118,9 @@ fun ScheduleListContent(
         }
         LaunchedEffect(fragment, onCompletionUpdated) {
             fragment.onCompletionUpdateConsumerChanged(consumer = onCompletionUpdated)
+        }
+        LaunchedEffect(fragment, onItemPositionUpdated) {
+            fragment.onItemPositionUpdateConsumerChanged(consumer = onItemPositionUpdated)
         }
         LaunchedEffect(fragment, onSimpleAdd) {
             fragment.onSimpleAddConsumerChanged(consumer = onSimpleAdd)

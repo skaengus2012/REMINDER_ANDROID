@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The N's lab Open Source Project
+ * Copyright (C) 2026 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,22 +14,11 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.feature.all
-
-import com.nlab.reminder.core.component.schedulelist.content.UserScheduleListResource
-import kotlin.time.Instant
+package com.nlab.reminder.core.component.schedulelist.content.ui
 
 /**
  * @author Thalys
  */
-internal sealed class AllUiState {
-    data object Loading : AllUiState()
-
-    data class Success(
-        val entryAt: Instant,
-        val scheduleResources: List<UserScheduleListResource>,
-        val completedScheduleVisible: Boolean,
-        val multiSelectionEnabled: Boolean,
-        val replayStamp: Long,
-    ) : AllUiState()
-}
+data class ItemPositionUpdate(
+    val snapshot: List<ScheduleListItem>
+)

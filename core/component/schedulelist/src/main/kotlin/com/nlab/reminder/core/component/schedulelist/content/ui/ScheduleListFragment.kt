@@ -53,6 +53,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -74,6 +75,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.TimeZone
 import kotlin.math.absoluteValue
+import kotlin.math.min
 import kotlin.time.Instant
 
 /**
@@ -93,6 +95,7 @@ internal class ScheduleListFragment : Fragment() {
     private val toolbarStateState = MutableIdentityStateFlow<ScheduleListToolbarState?>()
     private val selectionUpdateConsumerState = MutableIdentityStateFlow<(SelectionUpdate) -> Unit>()
     private val completionUpdateConsumerState = MutableIdentityStateFlow<(CompletionUpdate) -> Unit>()
+    private val itemPositionUpdateConsumerState = MutableIdentityStateFlow<(ItemPositionUpdate) -> Unit>()
     private val simpleAddConsumerState = MutableIdentityStateFlow<(SimpleAdd) -> Unit>()
     private val simpleEditConsumerState = MutableIdentityStateFlow<(SimpleEdit) -> Unit>()
 
@@ -133,10 +136,19 @@ internal class ScheduleListFragment : Fragment() {
             clampSwipeThreshold = 0.5f,
             maxClampSwipeWidthMultiplier = 1.75f,
             itemMoveListener = object : ScheduleListItemTouchCallback.ItemMoveListener {
-                override fun onMove(fromPosition: Int, toPosition: Int): Boolean = scheduleListAdapter.submitMoving(
-                    fromPosition = fromPosition,
-                    toPosition = toPosition
-                )
+                override fun onMove(fromPosition: Int, toPosition: Int): Boolean {
+                    val firstPos = linearLayoutManager.findFirstCompletelyVisibleItemPosition()
+                    val lastPos = linearLayoutManager.findLastCompletelyVisibleItemPosition()
+                    if (firstPos != RecyclerView.NO_POSITION
+                        && lastPos != RecyclerView.NO_POSITION
+                        && toPosition !in firstPos..lastPos
+                    ) return false
+
+                    return scheduleListAdapter.submitMoving(
+                        fromPosition = fromPosition,
+                        toPosition = toPosition
+                    )
+                }
 
                 override fun onMoveEnded() {
                     scheduleListAdapter.submitMoveDone()
@@ -250,33 +262,7 @@ internal class ScheduleListFragment : Fragment() {
             }
         }
 
-        val userInteractionSyncFlow = MutableIdentityStateFlow<UserInteraction>()
-        scheduleListItemsAdaptationState.unwrap()
-            .filterIsInstance<ScheduleListItemsAdaptation.Exist>()
-            .map { adaptation ->
-                val completionCheckedSchedulesIds = hashSetOf<ScheduleId>()
-                val selectedSchedulesIds = hashSetOf<ScheduleId>()
-                for (item in adaptation.items) {
-                    if (item !is ScheduleListItem.Content) continue
-                    val userScheduleListResource = item.resource
-                    val scheduleId = userScheduleListResource.schedule.id
-                    if (userScheduleListResource.completionChecked) {
-                        completionCheckedSchedulesIds += scheduleId
-                    }
-                    if (userScheduleListResource.selected) {
-                        selectedSchedulesIds += scheduleId
-                    }
-                }
-                UserInteraction(
-                    completionCheckedIds = completionCheckedSchedulesIds.toPersistentSet(),
-                    selectedIds = selectedSchedulesIds.toPersistentSet()
-                )
-            }
-            .flowOn(Dispatchers.Default)
-            .flowWithLifecycle(viewLifecycle)
-            .onEach(userInteractionSyncFlow::update)
-            .launchIn(viewLifecycleScope)
-
+        val userInteractionSyncFlow = createUserInteractionSyncFlow()
         withSync(
             syncSourceFlow = userInteractionSyncFlow.unwrap().map { it.selectedIds },
             sync = scheduleListAdapter::syncSelected
@@ -287,6 +273,14 @@ internal class ScheduleListFragment : Fragment() {
                     selectionUpdateConsumerState.unwrap().collectLatest { consumer ->
                         scheduleListAdapter.selectionUpdateRequests.unwrap().collect(consumer)
                     }
+                }
+            }
+        }
+
+        viewLifecycleScope.launch {
+            viewLifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                itemPositionUpdateConsumerState.unwrap().collectLatest { consumer ->
+                    scheduleListAdapter.itemPositionUpdateRequests.unwrap().collect(consumer)
                 }
             }
         }
@@ -416,28 +410,52 @@ internal class ScheduleListFragment : Fragment() {
             .onEach { isVisible -> scheduleListDragAnchorOverlay.setVisible(isVisible) }
             .launchIn(viewLifecycleScope)
 
+        val adjustPosEvents = MutableSharedFlow<Int>(extraBufferCapacity = 1)
+        viewLifecycleScope.launch {
+            adjustPosEvents.collectLatest { pos ->
+                if (pos == RecyclerView.NO_POSITION) return@collectLatest
+
+                binding.recyclerviewSchedule.run {
+                    awaitPost()
+                    if (linearLayoutManager.findFirstVisibleItemPosition() != pos) {
+                       scrollToPosition(min(scheduleListAdapter.itemCount, pos))
+                    }
+                }
+            }
+        }
+
         scheduleListItemsAdaptationState.unwrap()
             .distinctUntilChanged { prev, next ->
                 if (prev is ScheduleListItemsAdaptation.Exist && next is ScheduleListItemsAdaptation.Exist) {
-                    prev.items.value == next.items.value
+                    prev.replayStamp == next.replayStamp && prev.items.value == next.items.value
                 } else {
                     prev == next
                 }
+            }
+            .mapLatest { adaptation ->
+                if (adaptation is ScheduleListItemsAdaptation.Exist && adaptation.replayStamp > 0) {
+                    // A short delay for a smooth revert.
+                    delay(500)
+                }
+                adaptation
             }
             .flowOn(Dispatchers.Default)
             .flowWithLifecycle(viewLifecycle)
             .onEach { adaptation ->
                 val recyclerViewVisible: Boolean
                 val newItems: List<ScheduleListItem>
+                val replayStamp: Long
                 when (adaptation) {
                     is ScheduleListItemsAdaptation.Absent -> {
                         recyclerViewVisible = false
                         newItems = emptyList()
+                        replayStamp = 0
                     }
 
                     is ScheduleListItemsAdaptation.Exist -> {
                         recyclerViewVisible = true
                         newItems = adaptation.items
+                        replayStamp = adaptation.replayStamp
                     }
                 }
                 binding.recyclerviewSchedule.setVisible(
@@ -452,14 +470,20 @@ internal class ScheduleListFragment : Fragment() {
                         commitCallback = { complete(Unit) }
                     )
                 }
+
+                val firstVisiblePosBeforeUpdate =
+                    if (replayStamp == 0L) RecyclerView.NO_POSITION
+                    else linearLayoutManager.findFirstVisibleItemPosition()
                 awaitCompleteWith {
                     scheduleListAdapter.submitList(
                         items = newItems,
                         commitCallback = { complete(Unit) }
                     )
                 }
+                adjustPosEvents.tryEmit(firstVisiblePosBeforeUpdate)
             }
             .launchIn(viewLifecycleScope)
+
 
         viewLifecycle.eventFlow
             .filter { event -> event == Lifecycle.Event.ON_DESTROY }
@@ -497,6 +521,36 @@ internal class ScheduleListFragment : Fragment() {
                 // TODO restore scroll position after updatePadding
             }
             .launchIn(viewLifecycleScope)
+    }
+
+    private fun createUserInteractionSyncFlow(): IdentityStateFlow<UserInteraction> {
+        val resultFlow = MutableIdentityStateFlow<UserInteraction>()
+        scheduleListItemsAdaptationState.unwrap()
+            .filterIsInstance<ScheduleListItemsAdaptation.Exist>()
+            .map { adaptation ->
+                val completionCheckedSchedulesIds = hashSetOf<ScheduleId>()
+                val selectedSchedulesIds = hashSetOf<ScheduleId>()
+                for (item in adaptation.items) {
+                    if (item !is ScheduleListItem.Content) continue
+                    val userScheduleListResource = item.resource
+                    val scheduleId = userScheduleListResource.schedule.id
+                    if (userScheduleListResource.completionChecked) {
+                        completionCheckedSchedulesIds += scheduleId
+                    }
+                    if (userScheduleListResource.selected) {
+                        selectedSchedulesIds += scheduleId
+                    }
+                }
+                UserInteraction(
+                    completionCheckedIds = completionCheckedSchedulesIds.toPersistentSet(),
+                    selectedIds = selectedSchedulesIds.toPersistentSet()
+                )
+            }
+            .flowOn(Dispatchers.Default)
+            .flowWithLifecycle(viewLifecycle)
+            .onEach(resultFlow::update)
+            .launchIn(viewLifecycleScope)
+        return resultFlow
     }
 
     private inline fun <T> withSync(
@@ -575,6 +629,10 @@ internal class ScheduleListFragment : Fragment() {
 
     fun onCompletionUpdateConsumerChanged(consumer: (CompletionUpdate) -> Unit) {
         completionUpdateConsumerState.update(consumer)
+    }
+
+    fun onItemPositionUpdateConsumerChanged(consumer: (ItemPositionUpdate) -> Unit) {
+        itemPositionUpdateConsumerState.update(consumer)
     }
 
     fun onSimpleAddConsumerChanged(consumer: (SimpleAdd) -> Unit) {

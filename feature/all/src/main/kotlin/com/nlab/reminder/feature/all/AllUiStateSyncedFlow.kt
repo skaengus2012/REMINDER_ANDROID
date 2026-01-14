@@ -34,7 +34,7 @@ internal fun AllUiStateSyncedFlow(
         AllAction.StateSynced(
             entryAt = entryAt,
             completedScheduleVisible = completedScheduleVisible,
-            scheduleResources = schedulesResources,
+            scheduleResources = schedulesResources
         )
     }
 }

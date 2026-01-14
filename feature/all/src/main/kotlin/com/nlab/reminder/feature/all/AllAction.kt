@@ -30,6 +30,11 @@ internal sealed interface AllAction {
         val scheduleResources: List<UserScheduleListResource>
     ) : AllAction
 
+    data class RevertScheduleResources(
+        val prevScheduleResources: List<UserScheduleListResource>,
+        val prevReplayStamp: Long,
+    ) : AllAction
+
     data object OnCompletedScheduleVisibilityToggled : AllAction
 
     data object OnSelectionModeToggled : AllAction
@@ -37,4 +42,6 @@ internal sealed interface AllAction {
     data class OnItemSelectionUpdated(val selectedIds: Set<ScheduleId>) : AllAction
 
     data class OnItemCompletionUpdated(val scheduleId: ScheduleId, val targetCompleted: Boolean) : AllAction
+
+    data class OnItemPositionUpdated(val snapshot: List<UserScheduleListResource>) : AllAction
 }

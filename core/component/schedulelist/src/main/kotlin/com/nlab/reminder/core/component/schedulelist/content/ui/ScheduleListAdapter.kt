@@ -62,6 +62,8 @@ internal class ScheduleListAdapter(
     private val scheduleTimingDisplayFormatterState = MutableStateFlow<ScheduleTimingDisplayFormatter?>(null)
     private val selectionEnabled = MutableStateFlow(false)
 
+    // MutableEventSharedFlow: Used to send events that should not be conflated.
+    // MutableIdentityStateFlow: Used when the current state needs to be reflected immediately because it is conflated.
     private val completionCheckedScheduleIds = SyncableState<PersistentSet<ScheduleId>>(
         lifecycleScope = lifecycleScope,
         initialValue = persistentHashSetOf(),
@@ -77,6 +79,9 @@ internal class ScheduleListAdapter(
     )
     private val _selectionUpdateRequests = MutableIdentityStateFlow<SelectionUpdate>()
     val selectionUpdateRequests: IdentityStateFlow<SelectionUpdate> = _selectionUpdateRequests.asStateFlow()
+
+    private val _itemPositionUpdateRequests = MutableIdentityStateFlow<ItemPositionUpdate>()
+    val itemPositionUpdateRequests: IdentityStateFlow<ItemPositionUpdate> = _itemPositionUpdateRequests.asStateFlow()
 
     private val _addRequests = MutableEventSharedFlow<SimpleAdd>()
     val addRequests: SharedFlow<SimpleAdd> = _addRequests.asSharedFlow()
@@ -259,7 +264,11 @@ internal class ScheduleListAdapter(
     }
 
     fun submitMoveDone() {
-        differ.syncMoving(commitCallback = {})
+        differ.syncMoving(
+            commitCallback = {
+                _itemPositionUpdateRequests.update(ItemPositionUpdate(snapshot = getCurrentList().toList()))
+            }
+        )
     }
 
     fun submitList(items: List<ScheduleListItem>?, commitCallback: CommitCallback) {

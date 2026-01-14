@@ -107,6 +107,9 @@ internal fun AllScreen(
                 )
             )
         },
+        onItemPositionUpdated = { userScheduleListResources ->
+            store.dispatch(AllAction.OnItemPositionUpdated(userScheduleListResources))
+        },
         onSimpleAdd = { simpleAdd ->
             // TODO implements
             showAppToast("TODO Simple Add $simpleAdd")
@@ -126,15 +129,15 @@ internal fun AllScreen(
 
 private fun convertToOptimizedState(uiState: AllUiState): AllUiState =
     if (uiState !is AllUiState.Success) uiState
-    else uiState.copy(scheduleListResources = uiState.scheduleListResources.toIdentityList())
+    else uiState.copy(scheduleResources = uiState.scheduleResources.toIdentityList())
 
 private fun reuseScheduleListIfUnchanged(prev: AllUiState.Success, next: AllUiState.Success): AllUiState {
-    if (prev.scheduleListResources !is IdentityList
-        || prev.scheduleListResources.value != next.scheduleListResources
+    if (prev.scheduleResources !is IdentityList
+        || prev.scheduleResources.value != next.scheduleResources
     ) {
         return convertToOptimizedState(uiState = next)
     }
-    return next.copy(scheduleListResources = prev.scheduleListResources)
+    return next.copy(scheduleResources = prev.scheduleResources)
 }
 
 @Composable
@@ -146,6 +149,7 @@ private fun AllScreen(
     onCompleteClicked: () -> Unit,
     onItemSelectionChanged: (SelectionUpdate) -> Unit,
     onCompletionUpdated: (CompletionUpdate) -> Unit,
+    onItemPositionUpdated: (List<UserScheduleListResource>) -> Unit,
     onSimpleAdd: (SimpleAdd) -> Unit,
     onSimpleEdit: (SimpleEdit) -> Unit,
     modifier: Modifier = Modifier,
@@ -177,11 +181,13 @@ private fun AllScreen(
                     AllScheduleListContent(
                         headline = title,
                         entryAt = uiState.entryAt,
-                        scheduleListResources = uiState.scheduleListResources,
+                        scheduleResources = uiState.scheduleResources,
+                        replayStamp = uiState.replayStamp,
                         multiSelectionEnabled = uiState.multiSelectionEnabled,
                         toolbarState = toolbarState,
                         onItemSelectionChanged = onItemSelectionChanged,
                         onCompletionUpdated = onCompletionUpdated,
+                        onItemPositionUpdated = onItemPositionUpdated,
                         onSimpleAdd = onSimpleAdd,
                         onSimpleEdit = onSimpleEdit
                     )
@@ -195,11 +201,13 @@ private fun AllScreen(
 private fun AllScheduleListContent(
     headline: String,
     entryAt: Instant,
-    scheduleListResources: List<UserScheduleListResource>,
+    scheduleResources: List<UserScheduleListResource>,
+    replayStamp: Long,
     multiSelectionEnabled: Boolean,
     toolbarState: ScheduleListToolbarState,
     onItemSelectionChanged: (SelectionUpdate) -> Unit,
     onCompletionUpdated: (CompletionUpdate) -> Unit,
+    onItemPositionUpdated: (List<UserScheduleListResource>) -> Unit,
     onSimpleAdd: (SimpleAdd) -> Unit,
     onSimpleEdit: (SimpleEdit) -> Unit,
     modifier: Modifier = Modifier
@@ -208,7 +216,8 @@ private fun AllScheduleListContent(
     val footerForm = remember { ScheduleListItem.FooterForm(formBottomLine = FormBottomLine.Type1) }
     val scheduleListItemsAdaptation by rememberScheduleListItemsAdaptationState(
         headline = headline,
-        elements = scheduleListResources,
+        elements = scheduleResources,
+        elementsReplayStamp = replayStamp,
         buildBodyItemsIfNotEmpty = { elements ->
             buildList {
                 elements.forEach { resource ->
@@ -234,6 +243,16 @@ private fun AllScheduleListContent(
         toolbarState = toolbarState,
         onSelectionUpdated = onItemSelectionChanged,
         onCompletionUpdated = onCompletionUpdated,
+        onItemPositionUpdated = { itemPositionUpdated ->
+            val userScheduleListResources = buildList {
+                itemPositionUpdated.snapshot.forEach { item ->
+                    if (item is ScheduleListItem.Content) {
+                        this += item.resource
+                    }
+                }
+            }
+            onItemPositionUpdated(userScheduleListResources)
+        },
         onSimpleAdd = onSimpleAdd,
         onSimpleEdit = onSimpleEdit,
     )
@@ -251,6 +270,7 @@ private fun AllScreenPreview() {
             onCompleteClicked = {},
             onItemSelectionChanged = {},
             onCompletionUpdated = {},
+            onItemPositionUpdated = {},
             onSimpleAdd = {},
             onSimpleEdit = {}
         )
