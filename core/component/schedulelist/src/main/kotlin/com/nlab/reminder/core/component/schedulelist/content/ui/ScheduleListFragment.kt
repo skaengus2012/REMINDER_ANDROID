@@ -53,6 +53,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -74,6 +75,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.TimeZone
 import kotlin.math.absoluteValue
+import kotlin.math.min
 import kotlin.time.Instant
 
 /**
@@ -408,6 +410,20 @@ internal class ScheduleListFragment : Fragment() {
             .onEach { isVisible -> scheduleListDragAnchorOverlay.setVisible(isVisible) }
             .launchIn(viewLifecycleScope)
 
+        val adjustPosEvents = MutableSharedFlow<Int>(extraBufferCapacity = 1)
+        viewLifecycleScope.launch {
+            adjustPosEvents.collectLatest { pos ->
+                if (pos == RecyclerView.NO_POSITION) return@collectLatest
+
+                binding.recyclerviewSchedule.run {
+                    awaitPost()
+                    if (linearLayoutManager.findFirstVisibleItemPosition() != pos) {
+                       scrollToPosition(min(scheduleListAdapter.itemCount, pos))
+                    }
+                }
+            }
+        }
+
         scheduleListItemsAdaptationState.unwrap()
             .distinctUntilChanged { prev, next ->
                 if (prev is ScheduleListItemsAdaptation.Exist && next is ScheduleListItemsAdaptation.Exist) {
@@ -428,15 +444,18 @@ internal class ScheduleListFragment : Fragment() {
             .onEach { adaptation ->
                 val recyclerViewVisible: Boolean
                 val newItems: List<ScheduleListItem>
+                val replayStamp: Long
                 when (adaptation) {
                     is ScheduleListItemsAdaptation.Absent -> {
                         recyclerViewVisible = false
                         newItems = emptyList()
+                        replayStamp = 0
                     }
 
                     is ScheduleListItemsAdaptation.Exist -> {
                         recyclerViewVisible = true
                         newItems = adaptation.items
+                        replayStamp = adaptation.replayStamp
                     }
                 }
                 binding.recyclerviewSchedule.setVisible(
@@ -452,12 +471,16 @@ internal class ScheduleListFragment : Fragment() {
                     )
                 }
 
+                val firstVisiblePosBeforeUpdate =
+                    if (replayStamp == 0L) RecyclerView.NO_POSITION
+                    else linearLayoutManager.findFirstVisibleItemPosition()
                 awaitCompleteWith {
                     scheduleListAdapter.submitList(
                         items = newItems,
                         commitCallback = { complete(Unit) }
                     )
                 }
+                adjustPosEvents.tryEmit(firstVisiblePosBeforeUpdate)
             }
             .launchIn(viewLifecycleScope)
 
