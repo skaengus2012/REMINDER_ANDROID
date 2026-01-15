@@ -126,7 +126,7 @@ internal fun AllReduce(environment: AllEnvironment): AllReduce = DslReduce {
                         )
                     )
                 )
-            // TODO make failed cases.
+            // TODO Handle failure cases from save(), e.g. network/DB I/O errors, validation failures (invalid/empty title or note), and repository constraint violations, and surface them appropriately in the UI/logs.
         }
     }
 }
