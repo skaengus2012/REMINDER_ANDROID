@@ -33,15 +33,11 @@ interface ScheduleRepository {
 }
 
 sealed class SaveScheduleQuery {
-    data class Add(
-        val content: ScheduleContent,
-        val tagIds: Set<TagId>,
-    ) : SaveScheduleQuery()
+    data class Add(val content: ScheduleContent) : SaveScheduleQuery()
 
     data class Modify(
         val id: ScheduleId,
-        val content: ScheduleContent,
-        val tagIds: Set<TagId>
+        val content: ScheduleContent
     ) : SaveScheduleQuery()
 }
 

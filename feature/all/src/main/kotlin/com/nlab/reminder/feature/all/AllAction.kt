@@ -18,6 +18,7 @@ package com.nlab.reminder.feature.all
 
 import com.nlab.reminder.core.component.schedulelist.content.UserScheduleListResource
 import com.nlab.reminder.core.data.model.ScheduleId
+import com.nlab.reminder.core.kotlin.NonBlankString
 import kotlin.time.Instant
 
 /**
@@ -44,4 +45,6 @@ internal sealed interface AllAction {
     data class OnItemCompletionUpdated(val scheduleId: ScheduleId, val targetCompleted: Boolean) : AllAction
 
     data class OnItemPositionUpdated(val snapshot: List<UserScheduleListResource>) : AllAction
+
+    data class AddSchedule(val title: NonBlankString, val note: String) : AllAction
 }

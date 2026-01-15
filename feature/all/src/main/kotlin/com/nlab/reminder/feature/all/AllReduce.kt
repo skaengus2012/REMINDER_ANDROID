@@ -17,7 +17,10 @@
 package com.nlab.reminder.feature.all
 
 import com.nlab.reminder.core.component.schedulelist.content.clear
+import com.nlab.reminder.core.data.model.ScheduleContent
+import com.nlab.reminder.core.data.repository.SaveScheduleQuery
 import com.nlab.reminder.core.data.repository.UpdateAllScheduleQuery
+import com.nlab.reminder.core.kotlin.tryToNonBlankStringOrNull
 import com.nlab.statekit.dsl.reduce.DslReduce
 import com.nlab.statekit.reduce.Reduce
 import com.nlab.reminder.feature.all.AllAction.*
@@ -108,6 +111,22 @@ internal fun AllReduce(environment: AllEnvironment): AllReduce = DslReduce {
                     uncompletedGroupSortedIds = uncompletedScheduleIds
                 )
             )
+        }
+
+        suspendEffect<AddSchedule> {
+            environment.scheduleRepository
+                .save(
+                    query = SaveScheduleQuery.Add(
+                        content = ScheduleContent(
+                            title = action.title,
+                            note = action.note.tryToNonBlankStringOrNull(),
+                            link = null,
+                            tagIds = emptySet(),
+                            timing = null
+                        )
+                    )
+                )
+            // TODO Handle failure cases from save(), e.g. network/DB I/O errors, validation failures (invalid/empty title or note), and repository constraint violations, and surface them appropriately in the UI/logs.
         }
     }
 }
