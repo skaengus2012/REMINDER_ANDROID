@@ -16,11 +16,13 @@
 
 package com.nlab.reminder.core.component.schedulelist.content.ui
 
+import com.nlab.reminder.core.kotlin.NonBlankString
+
 /**
  * @author Thalys
  */
 data class SimpleAdd(
     val headerKey: Any?,
-    val title: String,
+    val title: NonBlankString,
     val note: String
 )

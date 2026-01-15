@@ -26,6 +26,7 @@ import com.nlab.reminder.core.android.view.setVisible
 import com.nlab.reminder.core.android.widget.bindCursorVisible
 import com.nlab.reminder.core.android.widget.bindText
 import com.nlab.reminder.core.component.schedulelist.databinding.LayoutScheduleAdapterItemFormBinding
+import com.nlab.reminder.core.kotlin.tryToNonBlankStringOrNull
 import com.nlab.reminder.core.translation.StringIds
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -99,16 +100,16 @@ internal class FormViewHolderDelegate(
             hasInputFocus
                 .focusLostCompletelyChanges()
                 .mapNotNull { savable ->
-                    if (savable) {
-                        SimpleAdd(
-                            headerKey = null, // TODO implements
-                            title = binding.edittextTitle.text?.toString().let { curTitle ->
-                                if (curTitle.isNullOrBlank()) itemView.context.getString(StringIds.new_plan)
-                                else curTitle
-                            },
-                            note = binding.edittextNote.text?.toString().orEmpty()
-                        )
-                    } else null
+                    if (savable.not()) return@mapNotNull null
+                    val title = binding.edittextTitle.text
+                        ?.toString()
+                        .tryToNonBlankStringOrNull()
+                        ?: return@mapNotNull null
+                    SimpleAdd(
+                        headerKey = null, // TODO implements
+                        title = title,
+                        note = binding.edittextNote.text?.toString().orEmpty()
+                    )
                 }
                 .collect { simpleAdd -> binding.clearInput(); onSimpleAddDone(simpleAdd) }
         }
