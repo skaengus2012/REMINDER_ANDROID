@@ -17,7 +17,11 @@
 package com.nlab.reminder.feature.all
 
 import com.nlab.reminder.core.component.schedulelist.content.clear
+import com.nlab.reminder.core.data.model.ScheduleContent
+import com.nlab.reminder.core.data.repository.SaveScheduleQuery
 import com.nlab.reminder.core.data.repository.UpdateAllScheduleQuery
+import com.nlab.reminder.core.kotlin.toNonBlankString
+import com.nlab.reminder.core.kotlin.tryToNonBlankStringOrNull
 import com.nlab.statekit.dsl.reduce.DslReduce
 import com.nlab.statekit.reduce.Reduce
 import com.nlab.reminder.feature.all.AllAction.*
@@ -108,6 +112,22 @@ internal fun AllReduce(environment: AllEnvironment): AllReduce = DslReduce {
                     uncompletedGroupSortedIds = uncompletedScheduleIds
                 )
             )
+        }
+
+        suspendEffect<AddSchedule> {
+            environment.scheduleRepository
+                .save(
+                    query = SaveScheduleQuery.Add(
+                        content = ScheduleContent(
+                            title = action.title.toNonBlankString(),
+                            note = action.note.tryToNonBlankStringOrNull(),
+                            link = null,
+                            tagIds = emptySet(),
+                            timing = null
+                        )
+                    )
+                )
+            // TODO make failed cases.
         }
     }
 }

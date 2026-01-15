@@ -17,7 +17,6 @@
 package com.nlab.reminder.core.data.repository.impl
 
 import com.nlab.reminder.core.data.model.ScheduleId
-import com.nlab.reminder.core.data.model.TagId
 import com.nlab.reminder.core.data.model.genSchedule
 import com.nlab.reminder.core.data.model.genScheduleAndEntities
 import com.nlab.reminder.core.data.model.genScheduleAndEntity
@@ -56,7 +55,6 @@ internal class LocalScheduleRepositoryTest {
     fun `Given schedule and tagIds, When save is called, Then it should insert and return the schedule`() = runTest {
         // given
         val (schedule, entity) = genScheduleAndEntities(count = 1).first()
-        val tagIds = List(size = genInt(min = 2, max = 5)) { TagId(it.toLong()) }
         val aggregate = schedule.content.toAggregate()
         val insertAndGetScheduleWithExtra: InsertAndGetScheduleContentAggregateTransaction = mockk {
             coEvery { invoke(scheduleContentAggregate = aggregate) } returns ScheduleContentAggregateSavedSnapshot(
@@ -70,7 +68,7 @@ internal class LocalScheduleRepositoryTest {
         )
 
         // when
-        val actual = repository.save(query = SaveScheduleQuery.Add(schedule.content, tagIds.toSet()))
+        val actual = repository.save(query = SaveScheduleQuery.Add(schedule.content))
 
         // then
         coVerify(exactly = 1) {
@@ -83,7 +81,6 @@ internal class LocalScheduleRepositoryTest {
     fun `Given schedule and tagIds, When modify is called, Then it should update and return the schedule`() = runTest {
         // given
         val (schedule, entity) = genScheduleAndEntities(count = 1).first()
-        val tagIds = List(size = genInt(min = 2, max = 5)) { TagId(it.toLong()) }
         val rawScheduleId = schedule.id.rawId
         val aggregate = schedule.content.toAggregate()
         val updateAndGetScheduleWithExtra: UpdateAndGetScheduleContentAggregateTransaction = mockk {
@@ -103,7 +100,7 @@ internal class LocalScheduleRepositoryTest {
         )
 
         // when
-        val actual = repository.save(query = SaveScheduleQuery.Modify(schedule.id, schedule.content, tagIds.toSet()))
+        val actual = repository.save(query = SaveScheduleQuery.Modify(schedule.id, schedule.content))
 
         // then
         coVerify(exactly = 1) {
