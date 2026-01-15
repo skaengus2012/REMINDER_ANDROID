@@ -114,8 +114,13 @@ internal fun AllScreen(
             store.dispatch(AllAction.AddSchedule(title = simpleAdd.title, note = simpleAdd.note))
         },
         onSimpleEdit = { simpleEdit ->
-            // TODO implements
-            showAppToast("TODO Simple Edit $simpleEdit")
+            store.dispatch(
+                AllAction.EditSchedule(
+                    id = simpleEdit.id,
+                    title = simpleEdit.title,
+                    note = simpleEdit.note
+                )
+            )
         }
     )
     if (uiState is AllUiState.Success) {

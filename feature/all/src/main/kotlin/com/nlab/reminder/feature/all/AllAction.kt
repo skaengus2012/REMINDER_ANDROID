@@ -47,4 +47,6 @@ internal sealed interface AllAction {
     data class OnItemPositionUpdated(val snapshot: List<UserScheduleListResource>) : AllAction
 
     data class AddSchedule(val title: NonBlankString, val note: String) : AllAction
+
+    data class EditSchedule(val id: ScheduleId, val title: NonBlankString, val note: String) : AllAction
 }
