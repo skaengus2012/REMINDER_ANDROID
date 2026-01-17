@@ -174,17 +174,17 @@ internal class ContentViewHolder(
                     .focusLostCompletelyChanges()
                     .mapNotNull { savable ->
                         if (savable.not()) return@mapNotNull null
+                        val id = bindingId.value ?: return@mapNotNull null
                         val title = binding.edittextTitle.text
                             ?.toString()
                             .tryToNonBlankStringOrNull()
                             ?: return@mapNotNull null
-                        bindingId.value?.let { id ->
-                            SimpleEdit(
-                                id = id,
-                                title = title,
-                                note = binding.edittextNote.text?.toString().orEmpty()
-                            )
-                        }
+
+                        SimpleEdit(
+                            id = id,
+                            title = title,
+                            note = binding.edittextNote.text?.toString().orEmpty()
+                        )
                     }
                     .collect(onSimpleEditDone)
             }
