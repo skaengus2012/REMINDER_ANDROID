@@ -47,6 +47,7 @@ import com.nlab.reminder.core.component.schedulelist.databinding.LayoutScheduleA
 import com.nlab.reminder.core.component.schedulelist.databinding.LayoutScheduleAdapterItemContentMirrorBinding
 import com.nlab.reminder.core.data.model.ScheduleId
 import com.nlab.reminder.core.designsystem.compose.theme.AttrIds
+import com.nlab.reminder.core.kotlin.tryToNonBlankStringOrNull
 import com.nlab.reminder.core.kotlinx.coroutines.cancelAllAndClear
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -172,15 +173,18 @@ internal class ContentViewHolder(
                 hasInputFocusChanges
                     .focusLostCompletelyChanges()
                     .mapNotNull { savable ->
-                        if (savable) {
-                            bindingId.value?.let { id ->
-                                SimpleEdit(
-                                    id = id,
-                                    binding.edittextTitle.text?.toString().orEmpty(),
-                                    binding.edittextNote.text?.toString().orEmpty()
-                                )
-                            }
-                        } else null
+                        if (savable.not()) return@mapNotNull null
+                        val id = bindingId.value ?: return@mapNotNull null
+                        val title = binding.edittextTitle.text
+                            ?.toString()
+                            .tryToNonBlankStringOrNull()
+                            ?: return@mapNotNull null
+
+                        SimpleEdit(
+                            id = id,
+                            title = title,
+                            note = binding.edittextNote.text?.toString().orEmpty()
+                        )
                     }
                     .collect(onSimpleEditDone)
             }

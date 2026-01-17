@@ -17,12 +17,13 @@
 package com.nlab.reminder.core.component.schedulelist.content.ui
 
 import com.nlab.reminder.core.data.model.ScheduleId
+import com.nlab.reminder.core.kotlin.NonBlankString
 
 /**
  * @author Doohyun
  */
 data class SimpleEdit(
     val id: ScheduleId,
-    val title: String,
+    val title: NonBlankString,
     val note: String
 )

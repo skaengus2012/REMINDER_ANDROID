@@ -20,6 +20,7 @@ import com.nlab.reminder.core.component.schedulelist.content.clear
 import com.nlab.reminder.core.data.model.ScheduleContent
 import com.nlab.reminder.core.data.repository.SaveScheduleQuery
 import com.nlab.reminder.core.data.repository.UpdateAllScheduleQuery
+import com.nlab.reminder.core.kotlin.collections.toSet
 import com.nlab.reminder.core.kotlin.tryToNonBlankStringOrNull
 import com.nlab.statekit.dsl.reduce.DslReduce
 import com.nlab.statekit.reduce.Reduce
@@ -123,6 +124,30 @@ internal fun AllReduce(environment: AllEnvironment): AllReduce = DslReduce {
                             link = null,
                             tagIds = emptySet(),
                             timing = null
+                        )
+                    )
+                )
+            // TODO Handle failure cases from save(), e.g. network/DB I/O errors, validation failures (invalid/empty title or note), and repository constraint violations, and surface them appropriately in the UI/logs.
+        }
+
+        suspendEffect<EditSchedule> {
+            val curSchedule = current.scheduleResources
+                .find { it.schedule.id == action.id }
+                ?.schedule
+                ?: return@suspendEffect
+            if (curSchedule.title == action.title && curSchedule.note?.value == action.note) {
+                return@suspendEffect
+            }
+            environment.scheduleRepository
+                .save(
+                    query = SaveScheduleQuery.Modify(
+                        id = action.id,
+                        content = ScheduleContent(
+                            title = action.title,
+                            note = action.note.tryToNonBlankStringOrNull(),
+                            link = curSchedule.link,
+                            tagIds = curSchedule.tags.toSet { it.id },
+                            timing = curSchedule.timing
                         )
                     )
                 )
