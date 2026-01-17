@@ -68,10 +68,23 @@ internal object TagStyleParser {
         if (appliedSpans.isEmpty()) {
             output[0] = -1
             output[1] = -1
-        } else {
-            output[0] = text.getSpanStart(appliedSpans.first())
-            output[1] = text.getSpanEnd(appliedSpans.last())
+            return
         }
+
+        // Prevent treating adjacent tags as a single drag selection when there is no whitespace between them.
+        // E.g., "#Hello#World" should not be recognized as a single combined drag range.
+        if (start == end && appliedSpans.size == 2) {
+            val firstEnd = text.getSpanEnd(appliedSpans.first())
+            val lastFirst = text.getSpanStart(appliedSpans.last())
+            if (firstEnd == lastFirst && firstEnd == start) {
+                output[0] = -1
+                output[1] = -1
+                return
+            }
+        }
+
+        output[0] = text.getSpanStart(appliedSpans.first())
+        output[1] = text.getSpanEnd(appliedSpans.last())
     }
 }
 
