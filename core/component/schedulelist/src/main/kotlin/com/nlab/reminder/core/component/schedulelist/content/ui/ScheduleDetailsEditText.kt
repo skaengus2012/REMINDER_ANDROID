@@ -19,6 +19,7 @@ package com.nlab.reminder.core.component.schedulelist.content.ui
 import android.annotation.SuppressLint
 import android.content.Context
 import android.text.Editable
+import android.text.Spanned
 import android.text.TextUtils
 import android.text.TextWatcher
 import android.util.AttributeSet
@@ -44,6 +45,8 @@ internal class ScheduleDetailsEditText @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyleAttr: Int = R.attr.editTextStyle
 ) : AppCompatEditText(context, attrs, defStyleAttr) {
+    private val tagStyleParser = TagStyleParser
+
     private val tagSelectionAdjustRunnable: Runnable
     private lateinit var tagsDisplayFormatter: TagsDisplayFormatter
 
@@ -232,6 +235,45 @@ internal class ScheduleDetailsEditText @JvmOverloads constructor(
         val currentText = text
         return if (currentText == null || scheduleTimingText.isEmpty()) currentText
         else currentText.subSequence(scheduleTimingText.length, currentText.length)
+    }
+
+    fun hello() {
+        context(mutate: MutableList<String>)
+        fun CharSequence.addNotBlankedSubstring(start: Int, end: Int) {
+            substring(start, end).trim().takeIf { it.isNotBlank() }?.let { mutate.add(it) }
+        }
+
+        val extraText = (findExtraText() as? Spanned) ?: return
+        val tagStyles = tagStyleParser.findAppliedTagStyles(
+            text = extraText,
+            start = 0,
+            end = extraText.length
+        )
+
+        val result = buildList {
+            val extraTextToString = extraText.toString()
+            println("Hello total ${extraText.length}")
+            var cursor = 0
+            for (style in tagStyles) {
+                val start = extraText.getSpanStart(style)
+                val end = extraText.getSpanEnd(style)
+                println("Hello index $start $end $cursor")
+                if (start > cursor) {
+                    println("Hello vv ${extraText.substring(cursor, start)}")
+                    extraText.addNotBlankedSubstring(cursor, start)
+                }
+                println("Hello index $start $end $cursor ${extraText.substring(start, end)}")
+                add(extraText.substring(start, end))
+                cursor = end
+            }
+            /**
+            if (cursor < extraText.length) {
+                extraText.addNotBlankedSubstring(cursor, extraText.length)
+            }*/
+        }
+        result.forEach {
+            println("Hello $it")
+        }
     }
 
     override fun onTextContextMenuItem(id: Int): Boolean {

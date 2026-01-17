@@ -196,7 +196,6 @@ internal class ContentViewHolder(
                             ?.toString()
                             .tryToNonBlankStringOrNull()
                             ?: return@mapNotNull null
-
                         SimpleEdit(
                             id = id,
                             title = title,
