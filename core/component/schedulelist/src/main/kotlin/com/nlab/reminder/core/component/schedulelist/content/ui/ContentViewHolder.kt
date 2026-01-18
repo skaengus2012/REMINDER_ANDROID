@@ -33,6 +33,7 @@ import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.nlab.reminder.core.android.content.getThemeColor
+import com.nlab.reminder.core.android.view.awaitPost
 import com.nlab.reminder.core.android.view.clearFocusIfNeeded
 import com.nlab.reminder.core.android.view.filterActionDone
 import com.nlab.reminder.core.android.view.focusChanges
@@ -127,7 +128,7 @@ internal class ContentViewHolder(
                 .distinctUntilChanged()
                 .shareInWithJobCollector(viewLifecycleScope, jobs, replay = 1)
             val hasInputFocusChanges = inputFocuses
-                .map { it != ContentInputFocus.Nothing }
+                .map { it.hasFocus() }
                 .distinctUntilChanged()
                 .shareInWithJobCollector(viewLifecycleScope, jobs, replay = 1)
 
@@ -150,7 +151,24 @@ internal class ContentViewHolder(
                 }
             }
             jobs += viewLifecycleScope.launch {
-                inputFocuses.collect { inputFocus ->
+                inputFocuses.collectLatest { inputFocus ->
+                    binding.buttonInfo.run {
+                        val newVisible = inputFocus.hasFocus()
+                        if (isVisible != newVisible) {
+                            isVisible = newVisible
+
+                            if (newVisible) {
+                                // When the info button becomes visible, the parent layout is remeasured
+                                // and the EditText width changes. The cursor position is computed during
+                                // the subsequent layout/draw pass, so updating focus immediately can
+                                // use stale layout information and place the cursor incorrectly.
+                                // awaitPost() posts to the main thread queue so this runs on the next
+                                // frame, after Android has applied the visibility change and completed
+                                // the layout/drawing cycle, ensuring the cursor position is correct.
+                                awaitPost()
+                            }
+                        }
+                    }
                     val focusedEditText = binding.findInput(inputFocus)
                     binding.getAllInputs().forEach { editText ->
                         editText.bindCursorVisible(isVisible = editText === focusedEditText)
@@ -158,10 +176,9 @@ internal class ContentViewHolder(
                 }
             }
             jobs += viewLifecycleScope.launch {
-                hasInputFocusChanges.collect(binding.buttonInfo::setVisible)
-            }
-            jobs += viewLifecycleScope.launch {
-                hasInputFocusChanges.collect { focused -> onFocusChanged(this@ContentViewHolder, focused) }
+                hasInputFocusChanges.collect { focused ->
+                    onFocusChanged(this@ContentViewHolder, focused)
+                }
             }
             jobs += viewLifecycleScope.launch {
                 registerEditNoteVisibility(
@@ -446,6 +463,10 @@ private class SwipeableViewHolderDelegate(
 
 private enum class ContentInputFocus {
     Title, Note, Detail, Nothing
+}
+
+private fun ContentInputFocus.hasFocus(): Boolean {
+    return this != ContentInputFocus.Nothing
 }
 
 private fun LayoutScheduleAdapterItemContentBinding.getAllInputs(): Iterable<EditText> = listOf(
