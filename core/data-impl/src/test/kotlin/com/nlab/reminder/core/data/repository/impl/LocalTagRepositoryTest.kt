@@ -28,6 +28,7 @@ import com.nlab.reminder.core.local.database.dao.ScheduleTagListDAO
 import com.nlab.reminder.core.local.database.dao.TagDAO
 import com.nlab.reminder.core.local.database.transaction.UpdateOrMergeAndGetTagTransaction
 import com.nlab.testkit.faker.genBothify
+import com.nlab.testkit.faker.genInt
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -53,7 +54,7 @@ class LocalTagRepositoryTest {
 
         // When
         val tagDAO: TagDAO = mockk {
-            coEvery { insertAndGet(trimmedName) } returns entity
+            coEvery { insertAndGet(name = trimmedName) } returns entity
         }
         val repository = genLocalTagRepository(tagDAO = tagDAO)
         val actualTag = repository.save(query)
@@ -82,6 +83,21 @@ class LocalTagRepositoryTest {
         // Then
         coVerify(exactly = 1) { tagDAO.updateAndGet(inputTagId.rawId, trimmedName) }
         assertThat(actualTag.getOrThrow(), equalTo(expectedTag))
+    }
+
+    @Test
+    fun `Given add bulk query, When save, Then insert names and return new tags`() = runTest {
+        val inputTagNames = List(genInt(min = 5, max = 10)) { "${it}_${genBothify()}" }
+        val query = SaveBulkTagQuery.Add(names = inputTagNames.toSet { it.toNonBlankString() })
+        val tagAndEntities = List(inputTagNames.size) { genTagAndEntity() }
+        val tagDAO: TagDAO = mockk {
+            coEvery { insertAndGet(names = query.names) } returns tagAndEntities.map { (_, entity) -> entity }
+        }
+        val repository = genLocalTagRepository(tagDAO = tagDAO)
+        val actualTags = repository.saveBulk(query)
+
+        coVerify(exactly = 1) { tagDAO.insertAndGet(query.names) }
+        assertThat(actualTags.getOrThrow(), equalTo(tagAndEntities.toSet { (tag) -> tag }))
     }
 
     @Test

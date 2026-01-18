@@ -19,6 +19,7 @@ package com.nlab.reminder.core.data.repository.impl
 import com.nlab.reminder.core.data.model.Tag
 import com.nlab.reminder.core.data.model.TagId
 import com.nlab.reminder.core.data.repository.GetTagQuery
+import com.nlab.reminder.core.data.repository.SaveBulkTagQuery
 import com.nlab.reminder.core.data.repository.SaveTagQuery
 import com.nlab.reminder.core.data.repository.TagRepository
 import com.nlab.reminder.core.kotlin.NonNegativeInt
@@ -63,6 +64,17 @@ class LocalTagRepository(
         return entityResult.map(::Tag)
     }
 
+    override suspend fun saveBulk(query: SaveBulkTagQuery): Result<Set<Tag>> {
+        val entitiesResult = catching {
+            when (query) {
+                is SaveBulkTagQuery.Add -> {
+                    tagDAO.insertAndGet(names = query.names.toSet { it.trim() })
+                }
+            }
+        }
+        return entitiesResult.map { it.toTags() }
+    }
+
     override suspend fun delete(id: TagId) = catching {
         tagDAO.deleteById(id.rawId)
     }
@@ -90,6 +102,8 @@ class LocalTagRepository(
                 tagDAO.findByIdsAsStream(query.tagIds.toSet(TagId::rawId)).distinctUntilChanged()
             }
         }
-        return entitiesFlow.map { entities -> entities.toSet(::Tag) }
+        return entitiesFlow.map { it.toTags() }
     }
 }
+
+private fun List<TagEntity>.toTags(): Set<Tag> = toSet(::Tag)

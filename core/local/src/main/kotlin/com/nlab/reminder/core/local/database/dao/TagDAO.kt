@@ -22,6 +22,7 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import com.nlab.reminder.core.kotlin.NonBlankString
+import com.nlab.reminder.core.kotlin.collections.toSet
 import com.nlab.reminder.core.local.database.entity.TagEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
@@ -39,14 +40,41 @@ abstract class TagDAO {
         return newEntity.copy(tagId = insert(newEntity))
     }
 
+    @Insert
+    protected abstract suspend fun insert(entities: List<TagEntity>): List<Long>
+
+    @Transaction
+    open suspend fun insertAndGet(names: Set<NonBlankString>): List<TagEntity> {
+        if (names.isEmpty()) return emptyList()
+
+        val currentNameToEntityTable =
+            findByNames(tagNames = names.toSet { it.value }).associateBy { it.name }
+
+        val ret = mutableListOf<TagEntity>()
+        val newEntities = mutableListOf<TagEntity>()
+        names.forEach { name ->
+            val currentEntity = currentNameToEntityTable[name.value]
+            if (currentEntity == null) {
+                newEntities.add(TagEntity(name = name.value))
+            } else {
+                ret += currentEntity
+            }
+        }
+        if (newEntities.isNotEmpty()) {
+            val ids = insert(entities = newEntities)
+            newEntities.zip(ids) { entity, id -> entity.copy(tagId = id) }.forEach { ret += it }
+        }
+        return ret
+    }
+
     @Query("SELECT * FROM tag WHERE tag_id = :tagId")
     protected abstract suspend fun findById(tagId: Long): TagEntity?
 
     @Query("SELECT * FROM tag WHERE name = :tagName")
     abstract suspend fun findByName(tagName: String): TagEntity?
 
-    @Query("SELECT * FROM tag")
-    abstract fun getAsStream(): Flow<List<TagEntity>>
+    @Query("SELECT * FROM tag WHERE name IN (:tagNames)")
+    internal abstract suspend fun findByNames(tagNames: Set<String>): List<TagEntity>
 
     @Query("SELECT * FROM tag WHERE tag_id IN (:tagIds)")
     protected abstract fun findByIdsAsStreamInternal(tagIds: Set<Long>): Flow<List<TagEntity>>
@@ -54,6 +82,9 @@ abstract class TagDAO {
     fun findByIdsAsStream(tagIds: Set<Long>): Flow<List<TagEntity>> =
         if (tagIds.isEmpty()) flowOf(emptyList())
         else findByIdsAsStreamInternal(tagIds)
+
+    @Query("SELECT * FROM tag")
+    abstract fun getAsStream(): Flow<List<TagEntity>>
 
     @Update
     protected abstract suspend fun update(entity: TagEntity)
