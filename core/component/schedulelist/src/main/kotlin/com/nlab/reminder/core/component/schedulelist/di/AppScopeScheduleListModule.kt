@@ -16,8 +16,10 @@
 
 package com.nlab.reminder.core.component.schedulelist.di
 
+import com.nlab.reminder.core.component.schedulelist.content.EditScheduleContentInListUseCase
 import com.nlab.reminder.core.component.schedulelist.content.GetScheduleListResourcesFlowUseCase
 import com.nlab.reminder.core.data.repository.LinkMetadataRepository
+import com.nlab.reminder.core.data.repository.ScheduleRepository
 import com.nlab.reminder.core.data.repository.TagRepository
 import dagger.Module
 import dagger.Provides
@@ -33,10 +35,20 @@ import dagger.hilt.components.SingletonComponent
 internal object AppScopeScheduleListModule {
     @Reusable
     @Provides
+    fun provideEditScheduleContentInListUseCase(
+        scheduleRepository: ScheduleRepository,
+        tagRepository: TagRepository,
+    ) = EditScheduleContentInListUseCase(
+        scheduleRepository,
+        tagRepository
+    )
+
+    @Reusable
+    @Provides
     fun provideGetScheduleListResourcesFlowUseCase(
         tagRepository: TagRepository,
         linkMetadataRepository: LinkMetadataRepository
-    ): GetScheduleListResourcesFlowUseCase = GetScheduleListResourcesFlowUseCase(
+    ) = GetScheduleListResourcesFlowUseCase(
         tagRepository = tagRepository,
         linkMetadataRepository = linkMetadataRepository
     )
