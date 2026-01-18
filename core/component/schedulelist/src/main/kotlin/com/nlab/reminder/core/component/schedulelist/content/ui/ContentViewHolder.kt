@@ -158,9 +158,13 @@ internal class ContentViewHolder(
                             isVisible = newVisible
 
                             if (newVisible) {
-                                // As the info button appears, the layout of EditText changes.
-                                // At this time, the cursor position may not be correct.
-                                // Therefore, give focus to the next frame.
+                                // When the info button becomes visible, the parent layout is remeasured
+                                // and the EditText width changes. The cursor position is computed during
+                                // the subsequent layout/draw pass, so updating focus immediately can
+                                // use stale layout information and place the cursor incorrectly.
+                                // awaitPost() posts to the main thread queue so this runs on the next
+                                // frame, after Android has applied the visibility change and completed
+                                // the layout/drawing cycle, ensuring the cursor position is correct.
                                 awaitPost()
                             }
                         }
