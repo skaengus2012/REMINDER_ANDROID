@@ -30,6 +30,7 @@ import androidx.core.view.doOnDetach
 import com.nlab.reminder.core.android.view.setVisible
 import com.nlab.reminder.core.data.model.ScheduleTiming
 import com.nlab.reminder.core.data.model.Tag
+import com.nlab.reminder.core.data.model.TagId
 import kotlinx.coroutines.Runnable
 import kotlinx.datetime.TimeZone
 import timber.log.Timber
@@ -96,11 +97,13 @@ internal class ScheduleDetailsEditText @JvmOverloads constructor(
             private var start = -1
             private var count = -1
             private var after = -1
+            private var spacePressedPos = -1
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
                 this.start = start
                 this.count = count
                 this.after = after
+                this.spacePressedPos = -1
                 this.partialTagDeletionCapture.reset()
 
                 if (isUpdatingDetailsText.not() && count > 0) {
@@ -114,11 +117,17 @@ internal class ScheduleDetailsEditText @JvmOverloads constructor(
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 // do nothing
+                if (count > 0) {
+                    val newChars = s?.subSequence(start, start + count)
+                    if (newChars?.toString() == " ") {
+                        spacePressedPos = start
+                    }
+                }
             }
 
-            override fun afterTextChanged(s: Editable?) {
+            override fun afterTextChanged(s: Editable) {
                 if (isUpdatingDetailsText) return
-                if (scheduleTimingText.isNotEmpty() && s?.startsWith(scheduleTimingText) != true) {
+                if (scheduleTimingText.isNotEmpty() && s.startsWith(scheduleTimingText).not()) {
                     Timber.w(message = "Unexpected input encountered in ScheduleDetailsEditText.")
                     runWithDetailsTextUpdate { setText(scheduleTimingText) }
                     setSelection(scheduleTimingText.length)
@@ -133,6 +142,33 @@ internal class ScheduleDetailsEditText @JvmOverloads constructor(
                     return
                 }
 
+                if (spacePressedPos >= 0 && s.getOrNull(spacePressedPos - 1) != ' ') {
+                    val currentExtraText = findExtraText()
+                    if (currentExtraText is Spanned) {
+                        val tagNames = tagsDisplayFormatter.parse(currentExtraText)
+                        if (tagNames.isNotEmpty()) {
+                            val fakeTagId = TagId(0)
+                            val fakeTags = tagNames.map { tagName ->
+                                Tag(id = fakeTagId, name = tagName)
+                            }
+                            tags = fakeTags
+                            val detailsText = createDetailsText(
+                                tagsDisplayFormatter.format(context, fakeTags)
+                            )
+                            val selectionPos = detailsText.indexOf(
+                                char = ' ',
+                                startIndex = spacePressedPos
+                            ).let { index ->
+                                if (index == -1) detailsText.length
+                                else index
+                            }
+                            runWithDetailsTextUpdate { setText(detailsText) }
+                            setSelection(selectionPos)
+                            return
+                        }
+                    }
+                }
+
                 if (start >= 0 && after > 0) {
                     val result = tagStyleRemover.remove(
                         text = s,
@@ -143,7 +179,6 @@ internal class ScheduleDetailsEditText @JvmOverloads constructor(
                         // https://github.com/skaengus2012/REMINDER_ANDROID/issues/556
                         // When input is performed while a tag is attached to the cursor,
                         // remove the tag and replace it with the new text.
-                        s as Editable
                         val newText = s.subSequence(start, start + after)
                         s.delete(result.styleStart, result.styleEnd)
                         s.insert(result.styleStart, newText)
@@ -157,7 +192,6 @@ internal class ScheduleDetailsEditText @JvmOverloads constructor(
                             /*stop= */newSelEnd
                         )
                     }
-
                     return
                 }
             }
@@ -235,45 +269,6 @@ internal class ScheduleDetailsEditText @JvmOverloads constructor(
         val currentText = text
         return if (currentText == null || scheduleTimingText.isEmpty()) currentText
         else currentText.subSequence(scheduleTimingText.length, currentText.length)
-    }
-
-    fun hello() {
-        context(mutate: MutableList<String>)
-        fun CharSequence.addNotBlankedSubstring(start: Int, end: Int) {
-            substring(start, end).trim().takeIf { it.isNotBlank() }?.let { mutate.add(it) }
-        }
-
-        val extraText = (findExtraText() as? Spanned) ?: return
-        val tagStyles = tagStyleParser.findAppliedTagStyles(
-            text = extraText,
-            start = 0,
-            end = extraText.length
-        )
-
-        val result = buildList {
-            val extraTextToString = extraText.toString()
-            println("Hello total ${extraText.length}")
-            var cursor = 0
-            for (style in tagStyles) {
-                val start = extraText.getSpanStart(style)
-                val end = extraText.getSpanEnd(style)
-                println("Hello index $start $end $cursor")
-                if (start > cursor) {
-                    println("Hello vv ${extraText.substring(cursor, start)}")
-                    extraText.addNotBlankedSubstring(cursor, start)
-                }
-                println("Hello index $start $end $cursor ${extraText.substring(start, end)}")
-                add(extraText.substring(start, end))
-                cursor = end
-            }
-            /**
-            if (cursor < extraText.length) {
-                extraText.addNotBlankedSubstring(cursor, extraText.length)
-            }*/
-        }
-        result.forEach {
-            println("Hello $it")
-        }
     }
 
     override fun onTextContextMenuItem(id: Int): Boolean {
