@@ -25,5 +25,5 @@ import com.nlab.reminder.core.kotlin.NonBlankString
 data class SimpleEdit(
     val id: ScheduleId,
     val title: NonBlankString,
-    val note: String
+    val note: NonBlankString?
 )
