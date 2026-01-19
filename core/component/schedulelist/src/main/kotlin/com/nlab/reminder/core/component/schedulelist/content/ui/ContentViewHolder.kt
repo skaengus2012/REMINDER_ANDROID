@@ -203,7 +203,8 @@ internal class ContentViewHolder(
                             title = title,
                             note = binding.edittextNote.text?.toString()
                                 .tryToNonBlankStringOrNull()
-                                ?.trim()
+                                ?.trim(),
+                            tagNames = binding.edittextDetail.getCurrentTagTexts()
                         )
                     }
                     .collect(onSimpleEditDone)

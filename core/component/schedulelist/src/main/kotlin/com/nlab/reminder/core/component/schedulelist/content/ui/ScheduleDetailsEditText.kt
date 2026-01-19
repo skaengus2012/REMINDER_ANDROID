@@ -31,6 +31,7 @@ import com.nlab.reminder.core.android.view.setVisible
 import com.nlab.reminder.core.data.model.ScheduleTiming
 import com.nlab.reminder.core.data.model.Tag
 import com.nlab.reminder.core.data.model.TagId
+import com.nlab.reminder.core.kotlin.NonBlankString
 import kotlinx.coroutines.Runnable
 import kotlinx.datetime.TimeZone
 import timber.log.Timber
@@ -46,8 +47,6 @@ internal class ScheduleDetailsEditText @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyleAttr: Int = R.attr.editTextStyle
 ) : AppCompatEditText(context, attrs, defStyleAttr) {
-    private val tagStyleParser = TagStyleParser
-
     private val tagSelectionAdjustRunnable: Runnable
     private lateinit var tagsDisplayFormatter: TagsDisplayFormatter
 
@@ -198,6 +197,15 @@ internal class ScheduleDetailsEditText @JvmOverloads constructor(
         })
 
         setInputAvailable(available = false)
+    }
+
+    fun getCurrentTagTexts(): Set<NonBlankString> {
+        if (tags.isNullOrEmpty()) return emptySet()
+
+        val currentExtraText = findExtraText()
+        if (currentExtraText !is Spanned) return emptySet()
+
+        return tagsDisplayFormatter.parse(currentExtraText).toSet()
     }
 
     @SuppressLint("ClickableViewAccessibility")

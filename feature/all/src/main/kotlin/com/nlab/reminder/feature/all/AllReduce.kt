@@ -135,23 +135,15 @@ internal fun AllReduce(environment: AllEnvironment): AllReduce = DslReduce {
                 .find { it.schedule.id == action.id }
                 ?.schedule
                 ?: return@suspendEffect
-            if (curSchedule.title == action.title && curSchedule.note?.value == action.note) {
-                return@suspendEffect
+            val editResult = environment.editScheduleListResource(
+                originResource = curSchedule,
+                title = action.title,
+                note = action.note,
+                tagNames = action.tagNames
+            )
+            editResult.onFailure { t ->
+                // TODO Handle failure cases from save(), e.g. network/DB I/O errors, validation failures (invalid/empty title or note), and repository constraint violations, and surface them appropriately in the UI/logs.
             }
-            environment.scheduleRepository
-                .save(
-                    query = SaveScheduleQuery.Modify(
-                        id = action.id,
-                        content = ScheduleContent(
-                            title = action.title,
-                            note = action.note.tryToNonBlankStringOrNull(),
-                            link = curSchedule.link,
-                            tagIds = curSchedule.tags.toSet { it.id },
-                            timing = curSchedule.timing
-                        )
-                    )
-                )
-            // TODO Handle failure cases from save(), e.g. network/DB I/O errors, validation failures (invalid/empty title or note), and repository constraint violations, and surface them appropriately in the UI/logs.
         }
     }
 }
