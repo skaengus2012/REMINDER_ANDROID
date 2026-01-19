@@ -20,18 +20,12 @@ import app.cash.turbine.test
 import com.nlab.reminder.core.data.model.Schedule
 import com.nlab.reminder.core.data.model.ScheduleId
 import com.nlab.reminder.core.data.model.SchedulesLookup
-import com.nlab.reminder.core.data.model.genLink
-import com.nlab.reminder.core.data.model.genLinkMetadata
 import com.nlab.reminder.core.data.model.genSchedule
 import com.nlab.reminder.core.data.model.genScheduleCompletionBacklog
-import com.nlab.reminder.core.data.model.genScheduleTiming
 import com.nlab.reminder.core.data.model.genSchedules
-import com.nlab.reminder.core.data.model.genTags
 import com.nlab.reminder.core.data.repository.GetScheduleCompletionBacklogStreamQuery
 import com.nlab.reminder.core.data.repository.ScheduleCompletionBacklogRepository
 import com.nlab.reminder.core.kotlin.collections.toSet
-import com.nlab.reminder.core.kotlin.faker.genNonBlankString
-import com.nlab.testkit.faker.genBoolean
 import com.nlab.testkit.faker.shuffledSubset
 import io.mockk.every
 import io.mockk.mockk
@@ -231,18 +225,4 @@ private fun genGetUserScheduleListResourcesFlowUseCase(
     getScheduleListResourcesFlow = getScheduleListResourcesFlow,
     scheduleCompletionBacklogRepository = scheduleCompletionBacklogRepository,
     userSelectedSchedulesStore = userSelectedSchedulesStore
-)
-
-private fun genScheduleListResource(
-    id: ScheduleId,
-    isComplete: Boolean = genBoolean()
-): ScheduleListResource = ScheduleListResource(
-    id = id,
-    title = genNonBlankString(),
-    note = genNonBlankString(),
-    link = genLink(),
-    linkMetadata = genLinkMetadata(),
-    timing = genScheduleTiming(),
-    isComplete = isComplete,
-    tags = genTags().toList()
 )

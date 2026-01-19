@@ -17,7 +17,6 @@
 package com.nlab.reminder.core.component.schedulelist.content
 
 import com.nlab.reminder.core.data.model.ScheduleContent
-import com.nlab.reminder.core.data.model.ScheduleId
 import com.nlab.reminder.core.data.repository.SaveBulkTagQuery
 import com.nlab.reminder.core.data.repository.SaveScheduleQuery
 import com.nlab.reminder.core.data.repository.ScheduleRepository
@@ -25,31 +24,45 @@ import com.nlab.reminder.core.data.repository.TagRepository
 import com.nlab.reminder.core.kotlin.NonBlankString
 import com.nlab.reminder.core.kotlin.collections.toSet
 import com.nlab.reminder.core.kotlin.getOrThrow
+import dagger.Reusable
+import javax.inject.Inject
 
 /**
  * @author Thalys
  */
-class EditScheduleContentInListUseCase(
+@Reusable
+class EditScheduleListResourceUseCase @Inject constructor(
     private val scheduleRepository: ScheduleRepository,
     private val tagRepository: TagRepository,
 ) {
     suspend operator fun invoke(
-        id: ScheduleId,
-        originContent: ScheduleContent,
+        originResource: ScheduleListResource,
         title: NonBlankString,
         note: NonBlankString?,
         tagNames: Set<NonBlankString>,
-    ): Result<Unit> = runCatching {
-        val tagIds = tagRepository.saveBulk(query = SaveBulkTagQuery.Add(tagNames))
-            .getOrThrow()
-            .toSet { it.id }
-        val newContent = originContent.copy(
-            title = title,
-            note = note,
-            tagIds = tagIds
-        )
-        scheduleRepository
-            .save(query = SaveScheduleQuery.Modify(id = id, content = newContent))
-            .getOrThrow()
+    ): Result<Unit> {
+        if (originResource.title == title
+            && originResource.note == note
+            && originResource.tags.toSet { it.name } == tagNames
+        ) {
+            // not changed
+            return Result.success(Unit)
+        }
+
+        return runCatching {
+            val tagIds = tagRepository.saveBulk(query = SaveBulkTagQuery.Add(tagNames))
+                .getOrThrow()
+                .toSet { it.id }
+            val newContent = ScheduleContent(
+                title = title,
+                note = note,
+                link = originResource.link,
+                tagIds = tagIds,
+                timing = originResource.timing,
+            )
+            scheduleRepository
+                .save(query = SaveScheduleQuery.Modify(id = originResource.id, content = newContent))
+                .getOrThrow()
+        }
     }
 }
