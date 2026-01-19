@@ -137,10 +137,7 @@ internal class TagsDisplayFormatter {
             if (cursor < next) {
                 unwrapTagDisplayText(text.substring(startIndex = cursor, endIndex = next))
                     .tryToNonBlankStringOrNull()
-                    ?.value
-                    ?.trim()
-                    ?.toNonBlankString()
-                    ?.let { newText -> ret += newText }
+                    ?.let { ret += it }
             }
             range?.let { unwrapTagDisplayText(text.substring(it.first, it.last)) }
                 .tryToNonBlankStringOrNull()
