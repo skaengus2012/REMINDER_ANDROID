@@ -141,7 +141,7 @@ internal class ScheduleDetailsEditText @JvmOverloads constructor(
                     return
                 }
 
-                if (spacePressedPos >= 0 && s.getOrNull(spacePressedPos - 1) != ' ') {
+                if (spacePressedPos > 0 && s.getOrNull(spacePressedPos - 1) != ' ') {
                     val currentExtraText = findExtraText()
                     if (currentExtraText is Spanned) {
                         val tagNames = tagsDisplayFormatter.parse(currentExtraText)
