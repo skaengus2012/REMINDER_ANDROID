@@ -48,9 +48,10 @@ jobs:
 
       - name: Upload test report to codecov
         if: ${{ matrix.buildType == 'release' && !cancelled() }}
-        uses: codecov/test-results-action@v1
+        uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+          report_type: test_results
 
       - name: Send ci result to slack channel
         uses: 8398a7/action-slack@v3
