@@ -33,7 +33,7 @@ import com.nlab.reminder.core.component.displayformat.ui.unwrapTagDisplayText
 import com.nlab.reminder.core.data.model.Tag
 import com.nlab.reminder.core.designsystem.compose.theme.AttrIds
 import com.nlab.reminder.core.kotlin.NonBlankString
-import com.nlab.reminder.core.kotlin.toNonBlankString
+import com.nlab.reminder.core.kotlin.trim
 import com.nlab.reminder.core.kotlin.tryToNonBlankStringOrNull
 import java.util.IdentityHashMap
 import kotlin.math.max
@@ -99,7 +99,6 @@ internal object TagStyleParser {
 
 internal class TagsDisplayFormatter {
     private val cache = IdentityHashMap<List<Tag>, CharSequence>()
-    private val tagStyleParser = TagStyleParser
 
     fun format(context: Context, tags: List<Tag>): CharSequence = cache.getOrPut(tags) {
         val spans = Array(tags.size) { index ->
@@ -110,6 +109,14 @@ internal class TagsDisplayFormatter {
         }
         TextUtils.concat(*spans)
     }
+
+    fun releaseCache() {
+        cache.clear()
+    }
+}
+
+internal object TagsDisplayParser {
+    private val tagStyleParser = TagStyleParser
 
     fun parse(text: Spanned): List<NonBlankString> {
         val textLength = text.length
@@ -135,20 +142,22 @@ internal class TagsDisplayFormatter {
 
             val next = range?.first ?: textLength
             if (cursor < next) {
-                unwrapTagDisplayText(text.substring(startIndex = cursor, endIndex = next))
-                    .tryToNonBlankStringOrNull()
-                    ?.let { ret += it }
+                parseTagNameFromRange(text, startIndex = cursor, endIndex = next)?.let { ret += it }
             }
-            range?.let { unwrapTagDisplayText(text.substring(it.first, it.last)) }
-                .tryToNonBlankStringOrNull()
-                ?.let { ret += it }
+            if (range != null) {
+                parseTagNameFromRange(text, startIndex = range.first, endIndex = range.last)?.let { ret += it }
+            }
         }
         return ret
     }
 
-    fun releaseCache() {
-        cache.clear()
-    }
+    private fun parseTagNameFromRange(
+        text: CharSequence,
+        startIndex: Int,
+        endIndex: Int
+    ): NonBlankString? = unwrapTagDisplayText(text.substring(startIndex = startIndex, endIndex = endIndex))
+        .tryToNonBlankStringOrNull()
+        ?.trim()
 }
 
 internal class PartialTagDeletionCapture {

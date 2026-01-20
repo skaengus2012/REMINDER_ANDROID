@@ -47,6 +47,8 @@ internal class ScheduleDetailsEditText @JvmOverloads constructor(
     defStyleAttr: Int = R.attr.editTextStyle
 ) : AppCompatEditText(context, attrs, defStyleAttr) {
     private val tagSelectionAdjustRunnable: Runnable
+
+    private val tagsDisplayParser = TagsDisplayParser
     private lateinit var tagsDisplayFormatter: TagsDisplayFormatter
 
     private var scheduleTimingText: CharSequence = ""
@@ -146,7 +148,7 @@ internal class ScheduleDetailsEditText @JvmOverloads constructor(
                 if (spacePressedPos > 0 && s.getOrNull(spacePressedPos - 1) != ' ') {
                     val currentExtraText = findExtraText()
                     if (currentExtraText is Spanned) {
-                        val tagNames = tagsDisplayFormatter.parse(currentExtraText)
+                        val tagNames = tagsDisplayParser.parse(currentExtraText)
                         if (tagNames.isNotEmpty()) {
                             val fakeTagId = TagId(0)
                             val fakeTags = tagNames.map { tagName ->
@@ -207,7 +209,7 @@ internal class ScheduleDetailsEditText @JvmOverloads constructor(
         val currentExtraText = findExtraText()
         if (currentExtraText !is Spanned) return emptySet()
 
-        return tagsDisplayFormatter.parse(currentExtraText).toSet()
+        return tagsDisplayParser.parse(currentExtraText).toSet()
     }
 
     @SuppressLint("ClickableViewAccessibility")
