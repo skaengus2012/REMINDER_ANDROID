@@ -22,3 +22,4 @@ import com.nlab.reminder.core.data.model.Tag
  * @author Doohyun
  */
 fun tagDisplayText(tag: Tag): String = "#${tag.name.value}"
+fun unwrapTagDisplayText(text: String): String = text.trimStart('#')

@@ -36,7 +36,7 @@ internal object AppScopeScheduleListModule {
     fun provideGetScheduleListResourcesFlowUseCase(
         tagRepository: TagRepository,
         linkMetadataRepository: LinkMetadataRepository
-    ): GetScheduleListResourcesFlowUseCase = GetScheduleListResourcesFlowUseCase(
+    ) = GetScheduleListResourcesFlowUseCase(
         tagRepository = tagRepository,
         linkMetadataRepository = linkMetadataRepository
     )

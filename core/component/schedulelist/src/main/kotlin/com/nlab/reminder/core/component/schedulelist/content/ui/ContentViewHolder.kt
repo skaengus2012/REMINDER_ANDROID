@@ -48,6 +48,7 @@ import com.nlab.reminder.core.component.schedulelist.databinding.LayoutScheduleA
 import com.nlab.reminder.core.component.schedulelist.databinding.LayoutScheduleAdapterItemContentMirrorBinding
 import com.nlab.reminder.core.data.model.ScheduleId
 import com.nlab.reminder.core.designsystem.compose.theme.AttrIds
+import com.nlab.reminder.core.kotlin.trim
 import com.nlab.reminder.core.kotlin.tryToNonBlankStringOrNull
 import com.nlab.reminder.core.kotlinx.coroutines.cancelAllAndClear
 import kotlinx.coroutines.Job
@@ -195,12 +196,15 @@ internal class ContentViewHolder(
                         val title = binding.edittextTitle.text
                             ?.toString()
                             .tryToNonBlankStringOrNull()
+                            ?.trim()
                             ?: return@mapNotNull null
-
                         SimpleEdit(
                             id = id,
                             title = title,
-                            note = binding.edittextNote.text?.toString().orEmpty()
+                            note = binding.edittextNote.text?.toString()
+                                .tryToNonBlankStringOrNull()
+                                ?.trim(),
+                            tagNames = binding.edittextDetail.getCurrentTagTexts()
                         )
                     }
                     .collect(onSimpleEditDone)

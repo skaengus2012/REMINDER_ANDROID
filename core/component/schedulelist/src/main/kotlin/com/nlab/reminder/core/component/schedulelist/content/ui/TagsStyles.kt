@@ -29,8 +29,12 @@ import androidx.core.text.buildSpannedString
 import androidx.core.text.inSpans
 import com.nlab.reminder.core.android.content.getThemeColor
 import com.nlab.reminder.core.component.displayformat.ui.tagDisplayText
+import com.nlab.reminder.core.component.displayformat.ui.unwrapTagDisplayText
 import com.nlab.reminder.core.data.model.Tag
 import com.nlab.reminder.core.designsystem.compose.theme.AttrIds
+import com.nlab.reminder.core.kotlin.NonBlankString
+import com.nlab.reminder.core.kotlin.trim
+import com.nlab.reminder.core.kotlin.tryToNonBlankStringOrNull
 import java.util.IdentityHashMap
 import kotlin.math.max
 import kotlin.math.min
@@ -49,6 +53,9 @@ internal class TagStyleSpan(
 }
 
 internal object TagStyleParser {
+    /**
+     * @return An array of TagStyleSpan, TagStyleSpan does not guarantee the applied text order.
+     */
     fun findAppliedTagStyles(
         text: Spanned,
         start: Int,
@@ -68,10 +75,25 @@ internal object TagStyleParser {
         if (appliedSpans.isEmpty()) {
             output[0] = -1
             output[1] = -1
-        } else {
-            output[0] = text.getSpanStart(appliedSpans.first())
-            output[1] = text.getSpanEnd(appliedSpans.last())
+            return
         }
+
+        val sortedAppliedSpans = appliedSpans.sortedBy { text.getSpanStart(it) }
+
+        // Prevent treating adjacent tags as a single drag selection when there is no whitespace between them.
+        // E.g., "#Hello#World" should not be recognized as a single combined drag range.
+        if (start == end && sortedAppliedSpans.size == 2) {
+            val firstEnd = text.getSpanEnd(sortedAppliedSpans.first())
+            val lastFirst = text.getSpanStart(sortedAppliedSpans.last())
+            if (firstEnd == lastFirst && firstEnd == start) {
+                output[0] = -1
+                output[1] = -1
+                return
+            }
+        }
+
+        output[0] = text.getSpanStart(sortedAppliedSpans.first())
+        output[1] = text.getSpanEnd(sortedAppliedSpans.last())
     }
 }
 
@@ -91,6 +113,51 @@ internal class TagsDisplayFormatter {
     fun releaseCache() {
         cache.clear()
     }
+}
+
+internal object TagsDisplayParser {
+    private val tagStyleParser = TagStyleParser
+
+    fun parse(text: Spanned): List<NonBlankString> {
+        val textLength = text.length
+        val tagStyles = tagStyleParser.findAppliedTagStyles(
+            text = text,
+            start = 0,
+            end = textLength
+        )
+
+        val tagRanges = ArrayList<IntRange>(tagStyles.size).apply {
+            tagStyles.forEach { style ->
+                val start = text.getSpanStart(style)
+                val end = text.getSpanEnd(style)
+                add(start..end)
+            }
+            sortBy { it.first }
+        }
+
+        val ret = mutableListOf<NonBlankString>()
+        for (i in 0..tagRanges.size) {
+            val cursor = tagRanges.getOrNull(i - 1)?.last ?: 0
+            val range = tagRanges.getOrNull(i)
+
+            val next = range?.first ?: textLength
+            if (cursor < next) {
+                parseTagNameFromRange(text, startIndex = cursor, endIndex = next)?.let { ret += it }
+            }
+            if (range != null) {
+                parseTagNameFromRange(text, startIndex = range.first, endIndex = range.last)?.let { ret += it }
+            }
+        }
+        return ret
+    }
+
+    private fun parseTagNameFromRange(
+        text: CharSequence,
+        startIndex: Int,
+        endIndex: Int
+    ): NonBlankString? = unwrapTagDisplayText(text.substring(startIndex = startIndex, endIndex = endIndex))
+        .tryToNonBlankStringOrNull()
+        ?.trim()
 }
 
 internal class PartialTagDeletionCapture {
@@ -183,13 +250,10 @@ internal class TagSelectionAdjustHelper {
             selEnd,
             output = appliedTagStyleRange
         )
-        val tagStart = appliedTagStyleRange[0]
-        val tagEnd = appliedTagStyleRange[1]
-        if (tagStart == -1
-            || tagEnd == -1
-            || (selStart == tagStart && selEnd == tagEnd)
-            || ((tagStart >= selStart || selStart >= tagEnd) && (tagStart >= selEnd || selEnd >= tagEnd))
-        ) return
+        val tagStart = appliedTagStyleRange[0].takeIf { it != -1 } ?: return
+        val tagEnd = appliedTagStyleRange[1].takeIf { it != -1 } ?: return
+        if (selStart == tagStart && selEnd == tagEnd) return
+        if (selStart !in (tagStart + 1)..<tagEnd && selEnd !in (tagStart + 1)..<tagEnd) return
 
         invokeWhenNewSelectionNeeded(min(selStart, tagStart), max(selEnd, tagEnd))
     }

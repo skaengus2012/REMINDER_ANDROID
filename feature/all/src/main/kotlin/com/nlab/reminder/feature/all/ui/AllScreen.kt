@@ -118,7 +118,8 @@ internal fun AllScreen(
                 AllAction.EditSchedule(
                     id = simpleEdit.id,
                     title = simpleEdit.title,
-                    note = simpleEdit.note
+                    note = simpleEdit.note,
+                    tagNames = simpleEdit.tagNames
                 )
             )
         }

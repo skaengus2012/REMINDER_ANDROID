@@ -28,6 +28,7 @@ import com.nlab.reminder.core.kotlin.NonNegativeInt
  */
 interface TagRepository {
     suspend fun save(query: SaveTagQuery): Result<Tag>
+    suspend fun saveBulk(query: SaveBulkTagQuery): Result<Set<Tag>>
     suspend fun delete(id: TagId): Result<Unit>
     suspend fun getUsageCount(tagId: TagId): Result<NonNegativeInt>
     fun getTagsAsStream(query: GetTagQuery): Flow<Set<Tag>>
@@ -36,6 +37,10 @@ interface TagRepository {
 sealed class SaveTagQuery {
     data class Add(val name: NonBlankString) : SaveTagQuery()
     data class Modify(val id: TagId, val name: NonBlankString, val shouldMergeIfExists: Boolean) : SaveTagQuery()
+}
+
+sealed class SaveBulkTagQuery {
+    data class Add(val names: Set<NonBlankString>) : SaveBulkTagQuery()
 }
 
 sealed class GetTagQuery {

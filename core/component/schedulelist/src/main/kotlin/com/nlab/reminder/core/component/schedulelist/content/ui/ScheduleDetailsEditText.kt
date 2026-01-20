@@ -19,6 +19,7 @@ package com.nlab.reminder.core.component.schedulelist.content.ui
 import android.annotation.SuppressLint
 import android.content.Context
 import android.text.Editable
+import android.text.Spanned
 import android.text.TextUtils
 import android.text.TextWatcher
 import android.util.AttributeSet
@@ -29,9 +30,10 @@ import androidx.core.view.doOnDetach
 import com.nlab.reminder.core.android.view.setVisible
 import com.nlab.reminder.core.data.model.ScheduleTiming
 import com.nlab.reminder.core.data.model.Tag
+import com.nlab.reminder.core.data.model.TagId
+import com.nlab.reminder.core.kotlin.NonBlankString
 import kotlinx.coroutines.Runnable
 import kotlinx.datetime.TimeZone
-import timber.log.Timber
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.time.Instant
@@ -45,6 +47,8 @@ internal class ScheduleDetailsEditText @JvmOverloads constructor(
     defStyleAttr: Int = R.attr.editTextStyle
 ) : AppCompatEditText(context, attrs, defStyleAttr) {
     private val tagSelectionAdjustRunnable: Runnable
+
+    private val tagsDisplayParser = TagsDisplayParser
     private lateinit var tagsDisplayFormatter: TagsDisplayFormatter
 
     private var scheduleTimingText: CharSequence = ""
@@ -93,14 +97,25 @@ internal class ScheduleDetailsEditText @JvmOverloads constructor(
             private var start = -1
             private var count = -1
             private var after = -1
+            private var spacePressedPos = -1
 
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
+                if (isUpdatingDetailsText) return
+
                 this.start = start
                 this.count = count
                 this.after = after
+                this.spacePressedPos = -1
                 this.partialTagDeletionCapture.reset()
 
-                if (isUpdatingDetailsText.not() && count > 0) {
+                if (count > 0 && scheduleTimingText.isNotEmpty() && start < scheduleTimingText.length) {
+                    // Prevent scheduleTimingText from being removed.
+                    runWithDetailsTextUpdate { setText(s) }
+                    setSelection(s.length)
+                    return
+                }
+
+                if (count > 0) {
                     partialTagDeletionCapture.check(
                         text = s,
                         start = start,
@@ -109,18 +124,19 @@ internal class ScheduleDetailsEditText @JvmOverloads constructor(
                 }
             }
 
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                // do nothing
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+                if (isUpdatingDetailsText) return
+
+                if (count > 0) {
+                    val newChars = s.subSequence(start, start + count)
+                    if (newChars.toString() == " ") {
+                        spacePressedPos = start
+                    }
+                }
             }
 
-            override fun afterTextChanged(s: Editable?) {
+            override fun afterTextChanged(s: Editable) {
                 if (isUpdatingDetailsText) return
-                if (scheduleTimingText.isNotEmpty() && s?.startsWith(scheduleTimingText) != true) {
-                    Timber.w(message = "Unexpected input encountered in ScheduleDetailsEditText.")
-                    runWithDetailsTextUpdate { setText(scheduleTimingText) }
-                    setSelection(scheduleTimingText.length)
-                    return
-                }
 
                 if (partialTagDeletionCapture.isTried) {
                     val targetStart = partialTagDeletionCapture.deletingTagStart
@@ -128,6 +144,33 @@ internal class ScheduleDetailsEditText @JvmOverloads constructor(
                     runWithDetailsTextUpdate { setText(partialTagDeletionCapture.textForRecovery) }
                     setSelection(targetStart, targetEnd)
                     return
+                }
+
+                if (spacePressedPos > 0 && s.getOrNull(spacePressedPos - 1) != ' ') {
+                    val currentExtraText = findExtraText()
+                    if (currentExtraText is Spanned) {
+                        val tagNames = tagsDisplayParser.parse(currentExtraText)
+                        if (tagNames.isNotEmpty()) {
+                            val placeholderTagId = TagId(0)
+                            val placeholderTags = tagNames.map { tagName ->
+                                Tag(id = placeholderTagId, name = tagName)
+                            }
+                            tags = placeholderTags
+                            val detailsText = createDetailsText(
+                                extraText = tagsDisplayFormatter.format(context, placeholderTags)
+                            )
+                            val selectionPos = detailsText.indexOf(
+                                char = ' ',
+                                startIndex = spacePressedPos
+                            ).let { index ->
+                                if (index == -1) detailsText.length
+                                else index
+                            }
+                            runWithDetailsTextUpdate { setText(detailsText) }
+                            setSelection(selectionPos)
+                            return
+                        }
+                    }
                 }
 
                 if (start >= 0 && after > 0) {
@@ -140,7 +183,6 @@ internal class ScheduleDetailsEditText @JvmOverloads constructor(
                         // https://github.com/skaengus2012/REMINDER_ANDROID/issues/556
                         // When input is performed while a tag is attached to the cursor,
                         // remove the tag and replace it with the new text.
-                        s as Editable
                         val newText = s.subSequence(start, start + after)
                         s.delete(result.styleStart, result.styleEnd)
                         s.insert(result.styleStart, newText)
@@ -154,13 +196,21 @@ internal class ScheduleDetailsEditText @JvmOverloads constructor(
                             /*stop= */newSelEnd
                         )
                     }
-
                     return
                 }
             }
         })
 
         setInputAvailable(available = false)
+    }
+
+    fun getCurrentTagTexts(): Set<NonBlankString> {
+        if (tags.isNullOrEmpty()) return emptySet()
+
+        val currentExtraText = findExtraText()
+        if (currentExtraText !is Spanned) return emptySet()
+
+        return tagsDisplayParser.parse(currentExtraText).toSet()
     }
 
     @SuppressLint("ClickableViewAccessibility")
