@@ -151,13 +151,13 @@ internal class ScheduleDetailsEditText @JvmOverloads constructor(
                     if (currentExtraText is Spanned) {
                         val tagNames = tagsDisplayParser.parse(currentExtraText)
                         if (tagNames.isNotEmpty()) {
-                            val fakeTagId = TagId(0)
-                            val fakeTags = tagNames.map { tagName ->
-                                Tag(id = fakeTagId, name = tagName)
+                            val placeholderTagId = TagId(0)
+                            val placeholderTags = tagNames.map { tagName ->
+                                Tag(id = placeholderTagId, name = tagName)
                             }
-                            tags = fakeTags
+                            tags = placeholderTags
                             val detailsText = createDetailsText(
-                                extraText = tagsDisplayFormatter.format(context, fakeTags)
+                                extraText = tagsDisplayFormatter.format(context, placeholderTags)
                             )
                             val selectionPos = detailsText.indexOf(
                                 char = ' ',
