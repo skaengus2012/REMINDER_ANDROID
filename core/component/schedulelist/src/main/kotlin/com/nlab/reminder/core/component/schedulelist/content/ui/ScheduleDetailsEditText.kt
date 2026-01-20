@@ -34,7 +34,6 @@ import com.nlab.reminder.core.data.model.TagId
 import com.nlab.reminder.core.kotlin.NonBlankString
 import kotlinx.coroutines.Runnable
 import kotlinx.datetime.TimeZone
-import timber.log.Timber
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.time.Instant
@@ -98,14 +97,22 @@ internal class ScheduleDetailsEditText @JvmOverloads constructor(
             private var after = -1
             private var spacePressedPos = -1
 
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
+                if (isUpdatingDetailsText) return
+
                 this.start = start
                 this.count = count
                 this.after = after
                 this.spacePressedPos = -1
                 this.partialTagDeletionCapture.reset()
 
-                if (isUpdatingDetailsText.not() && count > 0) {
+                if (count > 0 && scheduleTimingText.isNotEmpty() && start < scheduleTimingText.length) {
+                    runWithDetailsTextUpdate { setText(s) }
+                    setSelection(s.length)
+                    return
+                }
+
+                if (count > 0) {
                     partialTagDeletionCapture.check(
                         text = s,
                         start = start,
@@ -114,11 +121,12 @@ internal class ScheduleDetailsEditText @JvmOverloads constructor(
                 }
             }
 
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                // do nothing
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+                if (isUpdatingDetailsText) return
+
                 if (count > 0) {
-                    val newChars = s?.subSequence(start, start + count)
-                    if (newChars?.toString() == " ") {
+                    val newChars = s.subSequence(start, start + count)
+                    if (newChars.toString() == " ") {
                         spacePressedPos = start
                     }
                 }
@@ -126,12 +134,6 @@ internal class ScheduleDetailsEditText @JvmOverloads constructor(
 
             override fun afterTextChanged(s: Editable) {
                 if (isUpdatingDetailsText) return
-                if (scheduleTimingText.isNotEmpty() && s.startsWith(scheduleTimingText).not()) {
-                    Timber.w(message = "Unexpected input encountered in ScheduleDetailsEditText.")
-                    runWithDetailsTextUpdate { setText(scheduleTimingText) }
-                    setSelection(scheduleTimingText.length)
-                    return
-                }
 
                 if (partialTagDeletionCapture.isTried) {
                     val targetStart = partialTagDeletionCapture.deletingTagStart
@@ -152,7 +154,7 @@ internal class ScheduleDetailsEditText @JvmOverloads constructor(
                             }
                             tags = fakeTags
                             val detailsText = createDetailsText(
-                                tagsDisplayFormatter.format(context, fakeTags)
+                                extraText = tagsDisplayFormatter.format(context, fakeTags)
                             )
                             val selectionPos = detailsText.indexOf(
                                 char = ' ',
