@@ -21,6 +21,7 @@ import com.nlab.reminder.core.data.repository.GetScheduleCompletionBacklogStream
 import com.nlab.reminder.core.data.repository.ScheduleCompletionBacklogRepository
 import com.nlab.reminder.core.kotlin.collections.toSet
 import com.nlab.reminder.core.kotlinx.coroutines.flow.map
+import dagger.hilt.android.scopes.ViewModelScoped
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -31,11 +32,13 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.shareIn
+import javax.inject.Inject
 
 /**
  * @author Thalys
  */
-class GetUserScheduleListResourcesFlowUseCase(
+@ViewModelScoped
+class GetUserScheduleListResourcesFlowUseCase @Inject constructor(
     private val getScheduleListResourcesFlow: GetScheduleListResourcesFlowUseCase,
     private val scheduleCompletionBacklogRepository: ScheduleCompletionBacklogRepository,
     private val userSelectedSchedulesStore: UserSelectedSchedulesStore
