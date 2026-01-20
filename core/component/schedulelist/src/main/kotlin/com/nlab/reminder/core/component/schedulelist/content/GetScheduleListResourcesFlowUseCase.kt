@@ -25,6 +25,7 @@ import com.nlab.reminder.core.data.repository.TagRepository
 import com.nlab.reminder.core.kotlin.collections.toSet
 import com.nlab.reminder.core.kotlinx.coroutines.flow.map
 import com.nlab.reminder.core.kotlinx.coroutines.flow.mapNotNull
+import dagger.Reusable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -37,11 +38,13 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
+import javax.inject.Inject
 
 /**
  * @author Thalys
  */
-class GetScheduleListResourcesFlowUseCase(
+@Reusable
+class GetScheduleListResourcesFlowUseCase @Inject constructor(
     private val tagRepository: TagRepository,
     private val linkMetadataRepository: LinkMetadataRepository
 ) {

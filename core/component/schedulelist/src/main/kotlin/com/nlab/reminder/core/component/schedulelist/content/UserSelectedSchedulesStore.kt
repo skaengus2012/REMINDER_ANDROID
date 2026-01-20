@@ -17,14 +17,17 @@
 package com.nlab.reminder.core.component.schedulelist.content
 
 import com.nlab.reminder.core.data.model.ScheduleId
+import dagger.hilt.android.scopes.ViewModelScoped
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import javax.inject.Inject
 
 /**
  * @author Thalys
  */
-class UserSelectedSchedulesStore {
+@ViewModelScoped
+class UserSelectedSchedulesStore @Inject constructor() {
     private val _selectedIds = MutableStateFlow<Set<ScheduleId>>(emptySet())
     val selectedIds: StateFlow<Set<ScheduleId>> = _selectedIds.asStateFlow()
 
