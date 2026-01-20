@@ -109,6 +109,7 @@ internal class ScheduleDetailsEditText @JvmOverloads constructor(
                 this.partialTagDeletionCapture.reset()
 
                 if (count > 0 && scheduleTimingText.isNotEmpty() && start < scheduleTimingText.length) {
+                    // Prevent scheduleTimingText from being removed.
                     runWithDetailsTextUpdate { setText(s) }
                     setSelection(s.length)
                     return
