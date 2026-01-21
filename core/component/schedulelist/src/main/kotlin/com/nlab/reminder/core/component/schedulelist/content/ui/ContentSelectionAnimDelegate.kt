@@ -343,7 +343,8 @@ internal class ContentSelectionAnimDelegate(private val binding: LayoutScheduleA
     fun applyStateToMirror(mirrorBinding: LayoutScheduleAdapterItemContentMirrorBinding) {
         getContentConstraintSet(
             selectable = binding.buttonDragHandle.translationX == getDragButtonTranslateX(selectable = true)
-        ).applyTo(/* constraintLayout = */ mirrorBinding.layoutContent)
+        ).apply { visibilityStateDecorator.decorateTo(constraintSet = this) }
+            .applyTo(/* constraintLayout = */ mirrorBinding.layoutContent)
 
         mirrorBinding.buttonComplete.apply {
             alpha = binding.buttonComplete.alpha
