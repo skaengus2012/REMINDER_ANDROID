@@ -392,10 +392,7 @@ private class DraggableViewHolderDelegate(
         _draggingState.value = isActive
     }
 
-    override fun mirrorView(
-        parent: ViewGroup,
-        viewPool: DraggingMirrorViewPool
-    ): View {
+    override fun mirrorView(parent: ViewGroup, viewPool: DraggingMirrorViewPool): View {
         val key = ContentViewHolder::class
         val mirrorBinding = viewPool.get(key)
             ?.let { LayoutScheduleAdapterItemContentMirrorBinding.bind(it) }
@@ -423,11 +420,9 @@ private class DraggableViewHolderDelegate(
             // bind
             edittextTitle.bindText(binding.edittextTitle.text)
             edittextNote.bindText(binding.edittextNote.text)
-            edittextNote.visibility = binding.edittextNote.visibility
 
             edittextDetail.bindText(binding.edittextDetail.text)
 
-            cardLink.visibility = binding.cardLink.visibility
             textviewLink.bindText(binding.textviewLink.text)
 
             textviewTitleLink.bindText(binding.textviewTitleLink.text)
@@ -437,7 +432,6 @@ private class DraggableViewHolderDelegate(
             imageviewBgLinkThumbnail.setImageDrawable(binding.imageviewBgLinkThumbnail.drawable)
         }
         selectionAnimDelegate.applyStateToMirror(mirrorBinding)
-
         return mirrorBinding.root
     }
 }
