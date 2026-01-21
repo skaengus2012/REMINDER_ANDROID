@@ -34,6 +34,8 @@ import kotlinx.coroutines.Runnable
  * @author Doohyun
  */
 internal class ContentSelectionAnimDelegate(private val binding: LayoutScheduleAdapterItemContentBinding) {
+    private val visibilityStateDecorator = VisibilityStateDecorator(binding)
+
     private lateinit var unselectedContentConstraintSet: ConstraintSet
     private lateinit var selectedContentConstraintSet: ConstraintSet
 
@@ -169,7 +171,7 @@ internal class ContentSelectionAnimDelegate(private val binding: LayoutScheduleA
         ConstraintSet()
             .apply {
                 clone(/* set = */  getContentConstraintSet(selectable))
-                decorateVisibilityTo(/* constraintSet = */ this)
+                visibilityStateDecorator.decorateTo(constraintSet = this)
             }
             .applyTo(/* constraintLayout = */ binding.layoutContent)
         postActionToContentLayout {
@@ -196,13 +198,6 @@ internal class ContentSelectionAnimDelegate(private val binding: LayoutScheduleA
         return if (selectable) selectedContentConstraintSet else unselectedContentConstraintSet
     }
 
-    private fun decorateVisibilityTo(constraintSet: ConstraintSet) {
-        constraintSet.setVisibility(
-            /* viewId = */ binding.cardLink.id,
-            /* visibility = */ binding.cardLink.visibility
-        )
-    }
-
     // End of configurations
 
     // Start of extra content area
@@ -213,7 +208,7 @@ internal class ContentSelectionAnimDelegate(private val binding: LayoutScheduleA
             .guideEnd
         return ValueAnimator.ofInt(currentMediaGuideEnd, getExtraContentGuideEnd(selectable)).apply {
             addUpdateListener { value ->
-                decorateVisibilityTo(constraintSet)
+                visibilityStateDecorator.decorateTo(constraintSet)
                 constraintSet.setGuidelineEnd(
                     /* guidelineID = */ binding.guidelineExtraContentEnd.id,
                     /* margin = */ value.animatedValue as Int
@@ -361,6 +356,20 @@ internal class ContentSelectionAnimDelegate(private val binding: LayoutScheduleA
         mirrorBinding.buttonDragHandle.apply {
             alpha = binding.buttonDragHandle.alpha
             translationX = binding.buttonDragHandle.translationX
+        }
+    }
+}
+
+private class VisibilityStateDecorator(binding: LayoutScheduleAdapterItemContentBinding) {
+    private val targets = listOf(
+        binding.edittextNote,
+        binding.edittextDetail,
+        binding.cardLink
+    )
+
+    fun decorateTo(constraintSet: ConstraintSet) {
+        targets.forEach { v ->
+            constraintSet.setVisibility(/* viewId = */ v.id, /* visibility = */ v.visibility)
         }
     }
 }
