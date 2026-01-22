@@ -61,12 +61,10 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:src="@drawable/checkbox_schedule_check_on_point1" />
 
-        <!-- It has marginBottom equal to the height of viewLine. -->
         <ImageButton
             android:id="@+id/button_selection"
             android:layout_width="@dimen/schedule_checkbox_touchable_size"
             android:layout_height="@dimen/schedule_checkbox_touchable_size"
-            android:layout_marginBottom="0.5dp"
             android:background="@null"
             android:contentDescription="@string/content_description_select"
             android:padding="@dimen/schedule_checkbox_padding"
@@ -252,12 +250,10 @@
 
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- It has marginBottom equal to the height of viewLine. -->
         <ImageButton
             android:id="@+id/button_dragHandle"
             android:layout_width="@dimen/schedule_checkbox_touchable_size"
             android:layout_height="@dimen/schedule_checkbox_touchable_size"
-            android:layout_marginBottom="0.5dp"
             android:background="@android:color/transparent"
             android:contentDescription="@string/content_description_drag"
             android:padding="13dp"
@@ -272,13 +268,13 @@
             android:id="@+id/view_line"
             android:layout_width="0dp"
             android:layout_height="0.5dp"
-            android:layout_alignParentEnd="true"
             android:layout_marginTop="15dp"
             android:background="?bg_line_1"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@id/guideline_bodyStart"
-            app:layout_constraintTop_toBottomOf="@id/card_link" />
+            app:layout_constraintTop_toBottomOf="@id/card_link"
+            app:layout_constraintVertical_bias="1.0" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

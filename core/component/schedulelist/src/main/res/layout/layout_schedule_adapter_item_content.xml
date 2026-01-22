@@ -14,8 +14,7 @@
   ~ limitations under the License.
   -->
 
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -24,8 +23,10 @@
     <FrameLayout
         android:id="@+id/layout_clamp"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="invisible">
+        android:layout_height="0dp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <FrameLayout
             android:layout_width="match_parent"
@@ -51,9 +52,7 @@
             android:minHeight="0dp"
             android:padding="0dp"
             android:text="@string/label_delete"
-            android:textColor="?white"
-            app:drawableTint="?white"
-            app:drawableTopCompat="@drawable/ic_trash_24" />
+            android:textColor="?white" />
 
     </FrameLayout>
 
@@ -96,12 +95,10 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:src="@drawable/checkbox_schedule_check_on_point1" />
 
-        <!-- It has marginBottom equal to the height of viewLine. -->
         <ImageButton
             android:id="@+id/button_selection"
             android:layout_width="@dimen/schedule_checkbox_touchable_size"
             android:layout_height="@dimen/schedule_checkbox_touchable_size"
-            android:layout_marginBottom="0.5dp"
             android:background="@null"
             android:contentDescription="@string/content_description_select"
             android:padding="@dimen/schedule_checkbox_padding"
@@ -204,7 +201,6 @@
             android:id="@+id/card_link"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="7.5dp"
             android:contentDescription="@string/content_description_open_link"
             android:descendantFocusability="blocksDescendants"
             app:cardCornerRadius="8dp"
@@ -285,12 +281,10 @@
 
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- It has marginBottom equal to the height of viewLine. -->
         <ImageButton
             android:id="@+id/button_dragHandle"
             android:layout_width="@dimen/schedule_checkbox_touchable_size"
             android:layout_height="@dimen/schedule_checkbox_touchable_size"
-            android:layout_marginBottom="0.5dp"
             android:background="@android:color/transparent"
             android:contentDescription="@string/content_description_drag"
             android:padding="13dp"
@@ -305,14 +299,43 @@
             android:id="@+id/view_line"
             android:layout_width="0dp"
             android:layout_height="0.5dp"
-            android:layout_alignParentEnd="true"
             android:layout_marginTop="15dp"
             android:background="?bg_line_1"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@id/guideline_bodyStart"
-            app:layout_constraintTop_toBottomOf="@id/card_link" />
+            app:layout_constraintTop_toBottomOf="@id/card_link"
+            app:layout_constraintVertical_bias="1.0" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-</FrameLayout>
+    <FrameLayout
+        android:id="@+id/layout_clamp2"
+        android:layout_width="50dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="?red1" />
+
+        <Button
+            android:id="@+id/button_delete_2"
+            style="@style/PlaneatTheme.Style.Typography.BodySmall"
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|center_vertical"
+            android:layout_marginTop="1dp"
+            android:background="@android:color/transparent"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:padding="0dp"
+            android:text="@string/label_delete"
+            android:textColor="?white" />
+
+    </FrameLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
