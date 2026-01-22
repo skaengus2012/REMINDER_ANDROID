@@ -62,9 +62,10 @@ internal class ScheduleListItemTouchCallback(
      * When dragging, if the item needs to be retracted, the height value
      */
     private val dragToScaleTargetHeight: Float,
-    @IntRange(from = 0) private val animateDuration: Long,
-    @FloatRange(from = 0.0, to = 1.0) private val clampSwipeThreshold: Float,
-    @FloatRange(from = 1.0) private val maxClampSwipeWidthMultiplier: Float,
+    @param:IntRange(from = 0) private val dragScaleAnimateDuration: Long,
+    @param:IntRange(from = 0) private val swipeCancelAnimateDuration: Long,
+    @param:FloatRange(from = 0.0, to = 1.0) private val clampSwipeThreshold: Float,
+    @param:FloatRange(from = 1.0) private val maxClampSwipeWidthMultiplier: Float,
     private val itemMoveListener: ItemMoveListener,
 ) : ItemTouchHelper.SimpleCallback(
     /* dragDirs=*/ ItemTouchHelper.UP or ItemTouchHelper.DOWN,
@@ -262,7 +263,7 @@ internal class ScheduleListItemTouchCallback(
         }
         val latestSwiping = viewHolder.userSwipingDX ?: 0f
         ValueAnimator.ofFloat(latestSwiping, goalX)
-            .setDuration(animateDuration)
+            .setDuration(swipeCancelAnimateDuration)
             .apply {
                 if (animationType == SWIPING_CLAMP_ANIMATION_SHOW) {
                     interpolator = swipingClampOpenAnimationInterpolator
@@ -508,7 +509,7 @@ internal class ScheduleListItemTouchCallback(
     ): ViewPropertyAnimator = view.animate()
         .scaleX(scale)
         .scaleY(scale)
-        .setDuration(animateDuration)
+        .setDuration(dragScaleAnimateDuration)
         .setInterpolator(dragScaleInterpolator)
         .setListener(
             doOnEnd = { doOnAnimComplete() },

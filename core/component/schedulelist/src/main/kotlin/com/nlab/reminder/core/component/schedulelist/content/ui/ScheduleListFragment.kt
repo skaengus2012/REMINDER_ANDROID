@@ -125,14 +125,14 @@ internal class ScheduleListFragment : Fragment() {
             }
             scheduleListHolderActivity.requireScheduleListDragAnchorOverlay()
         }
-        val itemTouchAnimateDurationMs = 250L
         val itemTouchCallback = ScheduleListItemTouchCallback(
             scrollGuard = ScrollGuard()
                 .also { binding.recyclerviewSchedule.addOnScrollListener(/*listener=*/ it) },
             scrollGuardMargin = dpToPx(/* dpValue =*/ 24f, resources.displayMetrics),
             dragAnchorOverlay = scheduleListDragAnchorOverlay,
             dragToScaleTargetHeight = dpToPx(/* dpValue =*/ 150f, resources.displayMetrics),
-            animateDuration = itemTouchAnimateDurationMs,
+            dragScaleAnimateDuration = 250L,
+            swipeCancelAnimateDuration = 100L,
             clampSwipeThreshold = 0.5f,
             maxClampSwipeWidthMultiplier = 1.75f,
             itemMoveListener = object : ScheduleListItemTouchCallback.ItemMoveListener {
