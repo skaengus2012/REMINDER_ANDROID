@@ -72,7 +72,7 @@ fun PlaneatDropdownMenuItem(
     ),
 ) {
     DropdownMenuItem(
-        modifier =  modifier.height(30.dp),
+        modifier = modifier.height(30.dp),
         text = text,
         onClick = onClick,
         leadingIcon = leadingIcon,
@@ -174,7 +174,7 @@ private fun PlaneatDropdownTrailingMenuItemPreview() {
                 )
 
                 PlaneatDropdownDivider()
-                
+
                 PlaneatDropdownMenuItem(
                     text = { PlaneatDropdownText(text = "Info") },
                     onClick = {},
