@@ -64,7 +64,7 @@ fun ScheduleListToolbar(
     onSelectionCompleteClicked: () -> Unit,
     modifier: Modifier = Modifier,
     menuDropdown: MenuDropdown? = null,
-    onEditCompleteClicked: (() -> Unit?)? = null
+    onEditCompleteClicked: (() -> Unit)? = null
 ) {
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
