@@ -388,6 +388,22 @@ internal class ScheduleListFragment : Fragment() {
             }
             .launchIn(viewLifecycleScope)
 
+        viewLifecycleScope.launch {
+            viewLifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                toolbarStateState.unwrap().collectLatest { toolbarState ->
+                    if (toolbarState == null) return@collectLatest
+                    scheduleListAdapter.focusChanges.collectLatest { event ->
+                        if (event.focused) toolbarState.editCompleteVisible = true
+                        else {
+                            // Prevents the keyboard from lowering and then coming up immediately due to changing the input field.
+                            delay(100)
+                            toolbarState.editCompleteVisible = false
+                        }
+                    }
+                }
+            }
+        }
+
         scheduleListAdapter.dragHandleTouches
             .conflate()
             .onEach { itemTouchHelper.startDrag(it) }

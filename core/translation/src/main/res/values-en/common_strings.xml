@@ -19,6 +19,8 @@
     <string name="april_short">Apr</string>
     <string name="august">August</string>
     <string name="august_short">Aug</string>
+    <string name="content_completed_shown">Show completed</string>
+    <string name="content_completed_hidden">Hide completed</string>
     <string name="content_every_days_fixed">Daily</string>
     <string name="content_every_days_interval" formatted="true">Every %1$d days</string>
     <string name="content_every_hours_fixed">Hourly</string>
@@ -48,6 +50,7 @@
     <string name="content_frequency_monthly">Monthly</string>
     <string name="content_frequency_weekly">Weekly</string>
     <string name="content_frequency_yearly">Yearly</string>
+    <string name="content_select_plans">Select plans</string>
     <plurals name="content_tag_delete_dialog_double">
         <item quantity="one">%1$s and %2$s are being used in %3$d notification.</item>
         <item quantity="other">%1$s and %2$s are being used in %3$d notifications.</item>

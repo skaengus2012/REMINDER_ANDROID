@@ -20,7 +20,6 @@ import com.nlab.reminder.core.component.schedulelist.content.clear
 import com.nlab.reminder.core.data.model.ScheduleContent
 import com.nlab.reminder.core.data.repository.SaveScheduleQuery
 import com.nlab.reminder.core.data.repository.UpdateAllScheduleQuery
-import com.nlab.reminder.core.kotlin.collections.toSet
 import com.nlab.reminder.core.kotlin.tryToNonBlankStringOrNull
 import com.nlab.statekit.dsl.reduce.DslReduce
 import com.nlab.statekit.reduce.Reduce
@@ -39,6 +38,7 @@ internal fun AllReduce(environment: AllEnvironment): AllReduce = DslReduce {
                 entryAt = action.entryAt,
                 scheduleResources = action.scheduleResources,
                 completedScheduleVisible = action.completedScheduleVisible,
+                menuDropdownVisible = false,
                 multiSelectionEnabled = false,
                 replayStamp = 0,
             )
@@ -53,7 +53,7 @@ internal fun AllReduce(environment: AllEnvironment): AllReduce = DslReduce {
         }
     }
     stateScope<Success> {
-        transition<RevertScheduleResources> {
+        transition<UndoScheduleResources> {
             when {
                 current.replayStamp != action.prevReplayStamp -> current
                 current.scheduleResources != action.prevScheduleResources -> current
@@ -61,38 +61,42 @@ internal fun AllReduce(environment: AllEnvironment): AllReduce = DslReduce {
             }
         }
 
-        suspendEffect<OnCompletedScheduleVisibilityToggled> {
-            environment.completedScheduleShownRepository.setShown(isShown = current.completedScheduleVisible.not())
+        suspendEffect<CompletedScheduleVisibilityChangeClicked> {
+            environment.completedScheduleShownRepository.setShown(isShown = action.visible)
         }
 
-        transition<OnSelectionModeToggled> {
-            current.copy(multiSelectionEnabled = current.multiSelectionEnabled.not())
+        transition<SelectionModeClicked> {
+            current.copy(multiSelectionEnabled = action.enabled)
         }
-        effect<OnSelectionModeToggled> {
-            if (current.multiSelectionEnabled) {
+        effect<SelectionModeClicked> {
+            if (action.enabled.not()) {
                 environment.userSelectedSchedulesStore.clear()
             }
         }
 
-        effect<OnItemSelectionUpdated> {
+        transition<MenuClicked> { current.copy(menuDropdownVisible = true) }
+
+        transition<MenuDropdownDismissed> { current.copy(menuDropdownVisible = false) }
+
+        effect<ItemSelectionUpdated> {
             environment.userSelectedSchedulesStore.replace(action.selectedIds)
         }
 
-        suspendEffect<OnItemCompletionUpdated> {
+        suspendEffect<ItemCompletionUpdated> {
             environment.updateScheduleCompletion(
                 scheduleId = action.scheduleId,
                 targetCompleted = action.targetCompleted
             )
         }
 
-        suspendEffect<OnItemPositionUpdated> {
+        suspendEffect<ItemPositionUpdated> {
             val snapshot = action.snapshot
 
             val maxUncompletedIndex = snapshot.indexOfLast { it.schedule.isComplete.not() }
             val minCompletedIndex = snapshot.indexOfFirst { it.schedule.isComplete }
             if (maxUncompletedIndex != -1 && minCompletedIndex != -1 && maxUncompletedIndex >= minCompletedIndex) {
                 dispatch(
-                    action = RevertScheduleResources(
+                    action = UndoScheduleResources(
                         prevScheduleResources = current.scheduleResources,
                         prevReplayStamp = current.replayStamp
                     )
