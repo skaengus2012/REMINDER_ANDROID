@@ -31,20 +31,24 @@ internal sealed interface AllAction {
         val scheduleResources: List<UserScheduleListResource>
     ) : AllAction
 
-    data class RevertScheduleResources(
+    data class UndoScheduleResources(
         val prevScheduleResources: List<UserScheduleListResource>,
         val prevReplayStamp: Long,
     ) : AllAction
 
-    data object OnCompletedScheduleVisibilityToggled : AllAction
+    data class CompletedScheduleVisibilityChangeClicked(val visible: Boolean) : AllAction
 
-    data object OnSelectionModeToggled : AllAction
+    data class SelectionModeClicked(val enabled: Boolean) : AllAction
 
-    data class OnItemSelectionUpdated(val selectedIds: Set<ScheduleId>) : AllAction
+    data object MenuClicked : AllAction
 
-    data class OnItemCompletionUpdated(val scheduleId: ScheduleId, val targetCompleted: Boolean) : AllAction
+    data object MenuDropdownDismissed : AllAction
 
-    data class OnItemPositionUpdated(val snapshot: List<UserScheduleListResource>) : AllAction
+    data class ItemSelectionUpdated(val selectedIds: Set<ScheduleId>) : AllAction
+
+    data class ItemCompletionUpdated(val scheduleId: ScheduleId, val targetCompleted: Boolean) : AllAction
+
+    data class ItemPositionUpdated(val snapshot: List<UserScheduleListResource>) : AllAction
 
     data class AddSchedule(val title: NonBlankString, val note: String) : AllAction
 

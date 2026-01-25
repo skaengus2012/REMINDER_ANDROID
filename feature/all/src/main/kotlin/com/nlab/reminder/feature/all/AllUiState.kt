@@ -29,6 +29,7 @@ internal sealed class AllUiState {
         val entryAt: Instant,
         val scheduleResources: List<UserScheduleListResource>,
         val completedScheduleVisible: Boolean,
+        val menuDropdownVisible: Boolean,
         val multiSelectionEnabled: Boolean,
         val replayStamp: Long,
     ) : AllUiState()

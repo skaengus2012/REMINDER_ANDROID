@@ -31,7 +31,8 @@ import androidx.compose.runtime.setValue
 @Stable
 class ScheduleListToolbarState(
     initialTitleVisible: Boolean,
-    initialBackgroundAlpha: Float
+    initialBackgroundAlpha: Float,
+    initialEditCompleteVisible: Boolean
 ) {
     init {
         require(initialBackgroundAlpha in 0f..1f) {
@@ -45,12 +46,16 @@ class ScheduleListToolbarState(
     @get:FloatRange(from = 0.0, to = 1.0)
     var backgroundAlpha: Float by mutableFloatStateOf(initialBackgroundAlpha)
         internal set
+
+    var editCompleteVisible: Boolean by mutableStateOf(initialEditCompleteVisible)
+        internal set
 }
 
 @Composable
 fun rememberScheduleListToolbarState(
     initialTitleVisible: Boolean = false,
-    @FloatRange(from = 0.0, to = 1.0) initialBackgroundAlpha: Float = 0f
+    @FloatRange(from = 0.0, to = 1.0) initialBackgroundAlpha: Float = 0f,
+    initialEditCompleteVisible: Boolean = false
 ): ScheduleListToolbarState = remember {
-    ScheduleListToolbarState(initialTitleVisible, initialBackgroundAlpha)
+    ScheduleListToolbarState(initialTitleVisible, initialBackgroundAlpha, initialEditCompleteVisible)
 }

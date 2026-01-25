@@ -22,9 +22,12 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nlab.reminder.core.androidx.compose.ui.DelayedContent
@@ -45,6 +48,13 @@ import com.nlab.reminder.core.kotlin.collections.IdentityList
 import com.nlab.reminder.core.androidx.compose.runtime.rememberAccumulatedStateStream
 import com.nlab.reminder.core.component.schedulelist.content.ui.CompletionUpdate
 import com.nlab.reminder.core.component.schedulelist.content.ui.SelectionUpdate
+import com.nlab.reminder.core.component.schedulelist.toolbar.ui.MenuDropdown
+import com.nlab.reminder.core.designsystem.compose.component.PlaneatDropdownDivider
+import com.nlab.reminder.core.designsystem.compose.component.PlaneatDropdownIcon
+import com.nlab.reminder.core.designsystem.compose.component.PlaneatDropdownMenu
+import com.nlab.reminder.core.designsystem.compose.component.PlaneatDropdownMenuItem
+import com.nlab.reminder.core.designsystem.compose.component.PlaneatDropdownText
+import com.nlab.reminder.core.designsystem.compose.theme.DrawableIds
 import com.nlab.reminder.core.kotlin.collections.toIdentityList
 import com.nlab.reminder.core.translation.StringIds
 import com.nlab.reminder.feature.all.AllAction
@@ -81,8 +91,11 @@ internal fun AllScreen(
     val uiState by store.state
         .rememberAccumulatedStateStream(
             accumulator = { prev, next ->
-                if (prev !is AllUiState.Success || next !is AllUiState.Success) convertToOptimizedState(uiState = next)
-                else reuseScheduleListIfUnchanged(prev = prev, next = next)
+                if (prev !is AllUiState.Success || next !is AllUiState.Success) {
+                    convertToOptimizedState(uiState = next)
+                } else {
+                    reuseScheduleListIfUnchanged(prev = prev, next = next)
+                }
             },
             initialValueTransform = ::convertToOptimizedState
         )
@@ -92,23 +105,30 @@ internal fun AllScreen(
         uiState = uiState,
         contentDelayTimeMillis = enterTransitionTimeInMillis,
         onBackClicked = onBackClicked,
-        onMoreClicked = { store.dispatch(AllAction.OnSelectionModeToggled) },
-        onCompleteClicked = {
-            // TODO implements
+        onMenuClicked = { store.dispatch(AllAction.MenuClicked) },
+        onMenuDropdownDismissed = { store.dispatch(AllAction.MenuDropdownDismissed) },
+        onSelectionStartClicked = {
+            store.dispatch(AllAction.SelectionModeClicked(enabled = true))
+        },
+        onSelectionCompleteClicked = {
+            store.dispatch(AllAction.SelectionModeClicked(enabled = false))
+        },
+        onCompletedScheduleVisibilityChangeClicked = {
+            store.dispatch(AllAction.CompletedScheduleVisibilityChangeClicked(it))
         },
         onItemSelectionChanged = { selectionUpdate ->
-            store.dispatch(AllAction.OnItemSelectionUpdated(selectionUpdate.selectedIds))
+            store.dispatch(AllAction.ItemSelectionUpdated(selectionUpdate.selectedIds))
         },
         onCompletionUpdated = { completionUpdate ->
             store.dispatch(
-                AllAction.OnItemCompletionUpdated(
+                AllAction.ItemCompletionUpdated(
                     scheduleId = completionUpdate.id,
                     targetCompleted = completionUpdate.targetCompleted
                 )
             )
         },
         onItemPositionUpdated = { userScheduleListResources ->
-            store.dispatch(AllAction.OnItemPositionUpdated(userScheduleListResources))
+            store.dispatch(AllAction.ItemPositionUpdated(userScheduleListResources))
         },
         onSimpleAdd = { simpleAdd ->
             store.dispatch(AllAction.AddSchedule(title = simpleAdd.title, note = simpleAdd.note))
@@ -124,19 +144,16 @@ internal fun AllScreen(
             )
         }
     )
-    if (uiState is AllUiState.Success) {
-        // TODO FOR TEST, REMOVE SOON
-        LaunchedEffect(Unit) {
-            store.dispatch(AllAction.OnCompletedScheduleVisibilityToggled)
-        }
-    }
 }
 
 private fun convertToOptimizedState(uiState: AllUiState): AllUiState =
     if (uiState !is AllUiState.Success) uiState
     else uiState.copy(scheduleResources = uiState.scheduleResources.toIdentityList())
 
-private fun reuseScheduleListIfUnchanged(prev: AllUiState.Success, next: AllUiState.Success): AllUiState {
+private fun reuseScheduleListIfUnchanged(
+    prev: AllUiState.Success,
+    next: AllUiState.Success
+): AllUiState {
     if (prev.scheduleResources !is IdentityList
         || prev.scheduleResources.value != next.scheduleResources
     ) {
@@ -150,8 +167,11 @@ private fun AllScreen(
     uiState: AllUiState,
     contentDelayTimeMillis: Long,
     onBackClicked: () -> Unit,
-    onMoreClicked: () -> Unit,
-    onCompleteClicked: () -> Unit,
+    onMenuClicked: () -> Unit,
+    onMenuDropdownDismissed: () -> Unit,
+    onSelectionStartClicked: () -> Unit,
+    onSelectionCompleteClicked: () -> Unit,
+    onCompletedScheduleVisibilityChangeClicked: (Boolean) -> Unit,
     onItemSelectionChanged: (SelectionUpdate) -> Unit,
     onCompletionUpdated: (CompletionUpdate) -> Unit,
     onItemPositionUpdated: (List<UserScheduleListResource>) -> Unit,
@@ -166,15 +186,26 @@ private fun AllScreen(
     ) {
         val title = stringResource(StringIds.label_all)
         val toolbarState = rememberScheduleListToolbarState()
+        val successUiState = uiState as? AllUiState.Success
         ScheduleListToolbar(
             modifier = modifier,
             title = title,
             toolbarState = toolbarState,
-            isMoreVisible = true,
-            isCompleteVisible = true,
+            menuVisible = successUiState?.multiSelectionEnabled?.not() ?: true,
+            menuDropdown = MenuDropdown(
+                isVisible = successUiState?.menuDropdownVisible ?: false
+            ) {
+                MenuDropdown(
+                    isCompletedScheduleShown = checkNotNull(successUiState).completedScheduleVisible,
+                    onSelectionStartClicked = onSelectionStartClicked,
+                    onCompletedScheduleVisibilityChangeClicked = onCompletedScheduleVisibilityChangeClicked,
+                    onDismissed = onMenuDropdownDismissed,
+                )
+            },
+            onMenuClicked = onMenuClicked,
+            selectionCompleteVisible = successUiState?.multiSelectionEnabled ?: false,
+            onSelectionCompleteClicked = onSelectionCompleteClicked,
             onBackClicked = onBackClicked,
-            onMenuClicked = onMoreClicked,
-            onCompleteClicked = onCompleteClicked
         )
         DelayedContent(delayTimeMillis = contentDelayTimeMillis) {
             when (uiState) {
@@ -263,6 +294,61 @@ private fun AllScheduleListContent(
     )
 }
 
+@Composable
+private fun MenuDropdown(
+    isCompletedScheduleShown: Boolean,
+    onSelectionStartClicked: () -> Unit,
+    onCompletedScheduleVisibilityChangeClicked: (Boolean) -> Unit,
+    onDismissed: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    PlaneatDropdownMenu(
+        modifier = modifier.width(250.dp),
+        onDismissRequest = onDismissed,
+        expanded = true
+    ) {
+        PlaneatDropdownMenuItem(
+            text = {
+                PlaneatDropdownText(text = stringResource(StringIds.content_select_plans))
+            },
+            leadingIcon = {
+                PlaneatDropdownIcon(
+                    painter = painterResource(DrawableIds.ic_round_check_stroke_24)
+                )
+            },
+            onClick = {
+                onSelectionStartClicked()
+                onDismissed()
+            }
+        )
+
+        PlaneatDropdownDivider()
+
+        PlaneatDropdownMenuItem(
+            text = {
+                PlaneatDropdownText(
+                    text = stringResource(
+                        if (isCompletedScheduleShown) StringIds.content_completed_hidden
+                        else StringIds.content_completed_shown
+                    )
+                )
+            },
+            leadingIcon = {
+                PlaneatDropdownIcon(
+                    painter = painterResource(
+                        if (isCompletedScheduleShown) DrawableIds.ic_eye_invisible_24
+                        else DrawableIds.ic_eye_visible_24
+                    )
+                )
+            },
+            onClick = {
+                onCompletedScheduleVisibilityChangeClicked(isCompletedScheduleShown.not())
+                onDismissed()
+            }
+        )
+    }
+}
+
 @Previews
 @Composable
 private fun AllScreenPreview() {
@@ -271,8 +357,11 @@ private fun AllScreenPreview() {
             contentDelayTimeMillis = 0,
             uiState = AllUiState.Loading,
             onBackClicked = {},
-            onMoreClicked = {},
-            onCompleteClicked = {},
+            onMenuClicked = {},
+            onMenuDropdownDismissed = {},
+            onSelectionStartClicked = {},
+            onSelectionCompleteClicked = {},
+            onCompletedScheduleVisibilityChangeClicked = {},
             onItemSelectionChanged = {},
             onCompletionUpdated = {},
             onItemPositionUpdated = {},

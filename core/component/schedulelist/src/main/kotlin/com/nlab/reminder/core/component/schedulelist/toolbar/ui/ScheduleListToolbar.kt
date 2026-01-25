@@ -30,6 +30,7 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
@@ -56,12 +57,14 @@ import com.nlab.reminder.core.translation.StringIds
 fun ScheduleListToolbar(
     title: String,
     toolbarState: ScheduleListToolbarState,
-    isMoreVisible: Boolean,
-    isCompleteVisible: Boolean,
+    menuVisible: Boolean,
+    selectionCompleteVisible: Boolean,
     onBackClicked: () -> Unit,
     onMenuClicked: () -> Unit,
-    onCompleteClicked: () -> Unit,
+    onSelectionCompleteClicked: () -> Unit,
     modifier: Modifier = Modifier,
+    menuDropdown: MenuDropdown? = null,
+    onEditCompleteClicked: (() -> Unit?)? = null
 ) {
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -82,18 +85,24 @@ fun ScheduleListToolbar(
                 .displayCutoutPadding()
                 .toolbarHeight(),
             title = title,
-            isTitleVisible = toolbarState.titleVisible,
-            isMoreVisible = isMoreVisible,
-            isCompleteVisible = isCompleteVisible,
+            titleVisible = toolbarState.titleVisible,
+            menuDropdown = menuDropdown,
+            isMenuVisible = menuVisible,
+            onMenuClicked = {
+                clearInput()
+                onMenuClicked()
+            },
+            selectionCompleteVisible = selectionCompleteVisible,
+            onSelectionCompleteClicked = onSelectionCompleteClicked,
+            editCompleteVisible = toolbarState.editCompleteVisible,
+            onEditCompleteClicked = {
+                clearInput()
+                onEditCompleteClicked?.invoke()
+            },
             onBackClicked = {
                 clearInput()
                 onBackClicked()
-            },
-            onMenuClicked = onMenuClicked,
-            onCompleteClicked = {
-                clearInput()
-                onCompleteClicked()
-            },
+            }
         )
     }
 }
@@ -101,19 +110,22 @@ fun ScheduleListToolbar(
 @Composable
 private fun ScheduleListToolbarContent(
     title: String,
-    isTitleVisible: Boolean,
-    isMoreVisible: Boolean,
-    isCompleteVisible: Boolean,
+    titleVisible: Boolean,
+    isMenuVisible: Boolean,
+    menuDropdown: MenuDropdown?,
+    selectionCompleteVisible: Boolean,
+    editCompleteVisible: Boolean,
     onBackClicked: () -> Unit,
     onMenuClicked: () -> Unit,
-    onCompleteClicked: () -> Unit,
+    onSelectionCompleteClicked: () -> Unit,
+    onEditCompleteClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(modifier = modifier) {
         ScheduleListTitle(
             modifier = Modifier.align(Alignment.Center),
             title = title,
-            isVisible = isTitleVisible
+            visible = titleVisible
         )
 
         BackButton(
@@ -128,17 +140,19 @@ private fun ScheduleListToolbarContent(
                 .align(Alignment.CenterEnd)
                 .padding(end = 2.dp)
         ) {
-            if (isMoreVisible) {
-                IconButton(
-                    onClick = throttleClick(onClick = onMenuClicked),
-                    painter = painterResource(DrawableIds.ic_more),
-                    contentDescription = stringResource(StringIds.content_description_more),
-                    tint = PlaneatTheme.colors.point1,
+            if (isMenuVisible) {
+                MenuButton(
+                    onClick = onMenuClicked,
+                    menuDropdown = menuDropdown,
                 )
             }
 
-            if (isCompleteVisible) {
-                CompleteButton(onClick = onCompleteClicked)
+            if (selectionCompleteVisible) {
+                CompleteButton(onClick = onSelectionCompleteClicked)
+            }
+
+            if (editCompleteVisible) {
+                CompleteButton(onClick = onEditCompleteClicked)
             }
         }
     }
@@ -147,12 +161,12 @@ private fun ScheduleListToolbarContent(
 @Composable
 private fun ScheduleListTitle(
     title: String,
-    isVisible: Boolean,
+    visible: Boolean,
     modifier: Modifier = Modifier
 ) {
     AnimatedVisibility(
         modifier = modifier,
-        visible = isVisible,
+        visible = visible,
         enter = fadeIn(tween(durationMillis = 200)),
         exit = fadeOut(tween(durationMillis = 200)),
     ) {
@@ -185,6 +199,32 @@ private fun BackButton(
     }
 }
 
+@Composable
+private fun MenuButton(
+    onClick: () -> Unit,
+    menuDropdown: MenuDropdown?,
+    modifier: Modifier = Modifier
+) {
+    Box(modifier = modifier) {
+        IconButton(
+            onClick = throttleClick(onClick = onClick),
+            painter = painterResource(DrawableIds.ic_more),
+            contentDescription = stringResource(StringIds.content_description_more),
+            tint = PlaneatTheme.colors.point1,
+        )
+        menuDropdown?.let { dropdown ->
+            if (dropdown.isVisible) {
+                dropdown.content()
+            }
+        }
+    }
+}
+
+@Immutable
+data class MenuDropdown(
+    val isVisible: Boolean,
+    val content: @Composable () -> Unit
+)
 
 @Previews
 @Composable
@@ -195,11 +235,11 @@ private fun ScheduleListToolbarPreview() {
                 modifier = Modifier.fillMaxWidth(),
                 title = "Today",
                 toolbarState = rememberScheduleListToolbarState(),
-                isMoreVisible = true,
-                isCompleteVisible = true,
+                menuVisible = true,
+                selectionCompleteVisible = false,
                 onBackClicked = {},
                 onMenuClicked = {},
-                onCompleteClicked = {}
+                onSelectionCompleteClicked = {}
             )
         }
     }
@@ -217,11 +257,11 @@ private fun ScheduleListToolbarWithTitlePreview() {
                     initialTitleVisible = true,
                     initialBackgroundAlpha = 1f
                 ),
-                isMoreVisible = true,
-                isCompleteVisible = true,
+                menuVisible = true,
+                selectionCompleteVisible = false,
                 onBackClicked = {},
                 onMenuClicked = {},
-                onCompleteClicked = {}
+                onSelectionCompleteClicked = {}
             )
         }
     }
