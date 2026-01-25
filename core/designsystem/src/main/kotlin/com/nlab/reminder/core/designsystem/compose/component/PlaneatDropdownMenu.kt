@@ -1,6 +1,7 @@
 package com.nlab.reminder.core.designsystem.compose.component
 
 import android.content.res.Configuration
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -19,13 +20,13 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MenuItemColors
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupProperties
 import com.nlab.reminder.core.designsystem.compose.theme.DrawableIds
@@ -41,15 +42,22 @@ fun PlaneatDropdownMenu(
     modifier: Modifier = Modifier,
     scrollState: ScrollState = rememberScrollState(),
     properties: PopupProperties = PopupProperties(focusable = true),
+    offset: DpOffset = DpOffset(0.dp, 0.dp),
     content: @Composable ColumnScope.() -> Unit,
 ) {
     DropdownMenu(
         expanded = expanded,
         onDismissRequest = onDismissRequest,
+        offset = offset,
         shape = RoundedCornerShape(size = 8.dp),
         modifier = modifier.background(PlaneatTheme.colors.bg1Layer),
         scrollState = scrollState,
         properties = properties,
+        shadowElevation = 2.dp,
+        border = BorderStroke(
+            width = 0.5.dp,
+            color = PlaneatTheme.colors.bgLine1
+        ),
         content = content
     )
 }
@@ -72,13 +80,13 @@ fun PlaneatDropdownMenuItem(
     ),
 ) {
     DropdownMenuItem(
-        modifier = modifier.height(30.dp),
+        modifier = modifier,
         text = text,
         onClick = onClick,
         leadingIcon = leadingIcon,
         trailingIcon = trailingIcon,
         enabled = enabled,
-        colors = colors
+        colors = colors,
     )
 }
 
@@ -95,39 +103,22 @@ fun PlaneatDropdownText(
 }
 
 @Composable
-fun PlaneatDropdownLeadingIcon(
+fun PlaneatDropdownIcon(
     painter: Painter,
     modifier: Modifier = Modifier,
 ) {
     Icon(
-        modifier = modifier.size(18.dp),
+        modifier = modifier.size(24.dp),
         painter = painter,
         contentDescription = null,
     )
 }
 
 @Composable
-fun PlaneatDropdownTrailingIcon(
-    painter: Painter,
-    modifier: Modifier = Modifier,
-) {
-    Box(
-        modifier = modifier.width(24.dp),
-        contentAlignment = Alignment.CenterEnd
-    ) {
-        Icon(
-            modifier = modifier.size(18.dp),
-            painter = painter,
-            contentDescription = null,
-        )
-    }
-}
-
-@Composable
 fun PlaneatDropdownDivider(
     modifier: Modifier = Modifier,
     thickness: Dp = 0.5.dp,
-    color: Color = PlaneatTheme.colors.content2
+    color: Color = PlaneatTheme.colors.bgLine1
 ) {
     HorizontalDivider(
         modifier = modifier,
@@ -179,7 +170,7 @@ private fun PlaneatDropdownTrailingMenuItemPreview() {
                     text = { PlaneatDropdownText(text = "Info") },
                     onClick = {},
                     trailingIcon = {
-                        PlaneatDropdownTrailingIcon(
+                        PlaneatDropdownIcon(
                             painterResource(DrawableIds.ic_more)
                         )
                     }
@@ -191,7 +182,7 @@ private fun PlaneatDropdownTrailingMenuItemPreview() {
                     text = { PlaneatDropdownText(text = "Info Disabled") },
                     onClick = {},
                     trailingIcon = {
-                        PlaneatDropdownTrailingIcon(
+                        PlaneatDropdownIcon(
                             painterResource(DrawableIds.ic_more)
                         )
                     },
@@ -204,7 +195,7 @@ private fun PlaneatDropdownTrailingMenuItemPreview() {
                     text = { PlaneatDropdownText(text = "More") },
                     onClick = {},
                     leadingIcon = {
-                        PlaneatDropdownLeadingIcon(
+                        PlaneatDropdownIcon(
                             painterResource(DrawableIds.ic_more)
                         )
                     }
@@ -216,7 +207,7 @@ private fun PlaneatDropdownTrailingMenuItemPreview() {
                     text = { PlaneatDropdownText(text = "Info Disabled") },
                     onClick = {},
                     leadingIcon = {
-                        PlaneatDropdownLeadingIcon(
+                        PlaneatDropdownIcon(
                             painterResource(DrawableIds.ic_more)
                         )
                     },
