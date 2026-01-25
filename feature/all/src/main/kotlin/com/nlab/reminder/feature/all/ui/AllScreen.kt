@@ -196,7 +196,8 @@ private fun AllScreen(
                 isVisible = successUiState?.menuDropdownVisible ?: false
             ) {
                 MenuDropdown(
-                    isCompletedScheduleShown = checkNotNull(successUiState).completedScheduleVisible,
+                    // safe: this lambda is invoked only when successUiState is a non-null AllUiState.Success
+                    isCompletedScheduleShown = successUiState!!.completedScheduleVisible,
                     onSelectionStartClicked = onSelectionStartClicked,
                     onCompletedScheduleVisibilityChangeClicked = onCompletedScheduleVisibilityChangeClicked,
                     onDismissed = onMenuDropdownDismissed,
