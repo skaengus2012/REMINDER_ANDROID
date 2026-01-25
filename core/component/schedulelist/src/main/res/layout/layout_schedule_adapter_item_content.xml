@@ -201,6 +201,7 @@
             android:id="@+id/card_link"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
             android:contentDescription="@string/content_description_open_link"
             android:descendantFocusability="blocksDescendants"
             app:cardCornerRadius="8dp"
