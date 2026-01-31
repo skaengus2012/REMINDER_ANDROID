@@ -46,7 +46,9 @@ import com.nlab.reminder.core.component.schedulelist.toolbar.ui.rememberSchedule
 import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
 import com.nlab.reminder.core.kotlin.collections.IdentityList
 import com.nlab.reminder.core.androidx.compose.runtime.rememberAccumulatedStateStream
+import com.nlab.reminder.core.component.schedulelist.content.ui.ClearableCompletedOption
 import com.nlab.reminder.core.component.schedulelist.content.ui.CompletionUpdate
+import com.nlab.reminder.core.component.schedulelist.content.ui.ScheduleListHeadlineOption
 import com.nlab.reminder.core.component.schedulelist.content.ui.SelectionUpdate
 import com.nlab.reminder.core.component.schedulelist.toolbar.ui.MenuDropdown
 import com.nlab.reminder.core.designsystem.compose.component.PlaneatDropdownDivider
@@ -56,6 +58,7 @@ import com.nlab.reminder.core.designsystem.compose.component.PlaneatDropdownMenu
 import com.nlab.reminder.core.designsystem.compose.component.PlaneatDropdownText
 import com.nlab.reminder.core.designsystem.compose.theme.DrawableIds
 import com.nlab.reminder.core.kotlin.collections.toIdentityList
+import com.nlab.reminder.core.kotlin.toNonNegativeLong
 import com.nlab.reminder.core.translation.StringIds
 import com.nlab.reminder.feature.all.AllAction
 import com.nlab.reminder.feature.all.AllEnvironment
@@ -218,6 +221,7 @@ private fun AllScreen(
                     AllScheduleListContent(
                         headline = title,
                         entryAt = uiState.entryAt,
+                        completedScheduleVisible = uiState.completedScheduleVisible,
                         scheduleResources = uiState.scheduleResources,
                         replayStamp = uiState.replayStamp,
                         multiSelectionEnabled = uiState.multiSelectionEnabled,
@@ -238,6 +242,7 @@ private fun AllScreen(
 private fun AllScheduleListContent(
     headline: String,
     entryAt: Instant,
+    completedScheduleVisible: Boolean,
     scheduleResources: List<UserScheduleListResource>,
     replayStamp: Long,
     multiSelectionEnabled: Boolean,
@@ -252,7 +257,16 @@ private fun AllScheduleListContent(
     val navBarsPaddings = WindowInsets.navigationBars.asPaddingValues()
     val footerForm = remember { ScheduleListItem.FooterForm(formBottomLine = FormBottomLine.Type1) }
     val scheduleListItemsAdaptation by rememberScheduleListItemsAdaptationState(
-        headline = headline,
+        headline = ScheduleListHeadlineOption(
+            title = headline,
+            clearableCompletedOption = when (completedScheduleVisible) {
+                true -> ClearableCompletedOption(
+                    completedScheduleCount = scheduleResources.count { it.schedule.isComplete }.toNonNegativeLong()
+                )
+
+                false -> null
+            }
+        ),
         elements = scheduleResources,
         elementsReplayStamp = replayStamp,
         buildBodyItemsIfNotEmpty = { elements ->

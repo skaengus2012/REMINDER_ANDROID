@@ -22,6 +22,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import com.nlab.reminder.core.component.schedulelist.content.ScheduleListElement
+import com.nlab.reminder.core.kotlin.NonNegativeLong
 import com.nlab.reminder.core.kotlin.collections.IdentityList
 import com.nlab.reminder.core.kotlin.collections.toIdentityList
 import kotlinx.coroutines.Dispatchers
@@ -39,17 +40,29 @@ sealed class ScheduleListItemsAdaptation {
     ) : ScheduleListItemsAdaptation()
 }
 
+@Immutable
+data class ScheduleListHeadlineOption(
+    val title: String,
+    val clearableCompletedOption: ClearableCompletedOption? = null
+)
+
+@Immutable
+data class ClearableCompletedOption(
+    val completedScheduleCount: NonNegativeLong
+)
+
 @Composable
 fun <T : ScheduleListElement> rememberScheduleListItemsAdaptationState(
-    headline: String,
+    headline: ScheduleListHeadlineOption,
     elements: List<T>,
     elementsReplayStamp: Long,
     buildBodyItemsIfNotEmpty: (List<T>) -> List<ScheduleListItem>,
 ): State<ScheduleListItemsAdaptation> {
-    val headlineItem by produceState<ScheduleListItem.Headline?>(
-        initialValue = null,
-        key1 = headline
-    ) { value = ScheduleListItem.Headline(text = headline) }
+    val headlineItem = ScheduleListItem.Headline(text = headline.title)
+    val clearableCompletedSubHeadlineItem = headline
+        .clearableCompletedOption
+        ?.let { ScheduleListItem.ClearableCompletedSubHeadline(completedScheduleCount = it.completedScheduleCount) }
+
     val bodyItems by produceState<List<ScheduleListItem>?>(
         initialValue = null,
         key1 = elements,
@@ -63,23 +76,27 @@ fun <T : ScheduleListElement> rememberScheduleListItemsAdaptationState(
             }
         }
     }
+
     return produceState<ScheduleListItemsAdaptation>(
         initialValue = ScheduleListItemsAdaptation.Absent,
-        key1 = headlineItem,
-        key2 = bodyItems,
-        key3 = elementsReplayStamp
+        headlineItem,
+        clearableCompletedSubHeadlineItem,
+        bodyItems,
+        elementsReplayStamp,
     ) {
-        val currentHeadlineItem = headlineItem
         val currentBodyItems = bodyItems
-        if (currentHeadlineItem == null || currentBodyItems == null) {
+        if (currentBodyItems == null) {
             value = ScheduleListItemsAdaptation.Absent
             return@produceState
         }
+
         value = withContext(Dispatchers.Default) {
             val totalItems = buildList {
                 // add headline
-                add(currentHeadlineItem)
-                add(ScheduleListItem.HeadlinePadding)
+                add(headlineItem)
+
+                // add sub headline
+                add(clearableCompletedSubHeadlineItem ?: ScheduleListItem.HeadlinePadding)
 
                 if (currentBodyItems.isEmpty()) {
                     // TODO add empty ui
@@ -87,7 +104,10 @@ fun <T : ScheduleListElement> rememberScheduleListItemsAdaptationState(
                     addAll(currentBodyItems)
                 }
             }
-            ScheduleListItemsAdaptation.Exist(items = totalItems.toIdentityList(), replayStamp = elementsReplayStamp)
+            ScheduleListItemsAdaptation.Exist(
+                items = totalItems.toIdentityList(),
+                replayStamp = elementsReplayStamp
+            )
         }
     }
 }
