@@ -27,7 +27,7 @@ internal class ScheduleAdapterItemDiffCallback : DiffUtil.ItemCallback<ScheduleL
             oldItem.resource.schedule.id == newItem.resource.schedule.id
         }
 
-        else -> oldItem === newItem
+        else -> oldItem == newItem
     }
 
     override fun areContentsTheSame(oldItem: ScheduleListItem, newItem: ScheduleListItem): Boolean {

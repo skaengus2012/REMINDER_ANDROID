@@ -46,10 +46,7 @@ fun <T : ScheduleListElement> rememberScheduleListItemsAdaptationState(
     elementsReplayStamp: Long,
     buildBodyItemsIfNotEmpty: (List<T>) -> List<ScheduleListItem>,
 ): State<ScheduleListItemsAdaptation> {
-    val headlineItem by produceState<ScheduleListItem.Headline?>(
-        initialValue = null,
-        key1 = headline
-    ) { value = ScheduleListItem.Headline(text = headline) }
+    val headlineItem = ScheduleListItem.Headline(text = headline)
     val bodyItems by produceState<List<ScheduleListItem>?>(
         initialValue = null,
         key1 = elements,
@@ -63,31 +60,34 @@ fun <T : ScheduleListElement> rememberScheduleListItemsAdaptationState(
             }
         }
     }
+
     return produceState<ScheduleListItemsAdaptation>(
         initialValue = ScheduleListItemsAdaptation.Absent,
-        key1 = headlineItem,
-        key2 = bodyItems,
-        key3 = elementsReplayStamp
+        headlineItem,
+        bodyItems,
+        elementsReplayStamp,
     ) {
-        val currentHeadlineItem = headlineItem
         val currentBodyItems = bodyItems
-        if (currentHeadlineItem == null || currentBodyItems == null) {
+        if (currentBodyItems == null) {
             value = ScheduleListItemsAdaptation.Absent
             return@produceState
         }
+
         value = withContext(Dispatchers.Default) {
             val totalItems = buildList {
                 // add headline
-                add(currentHeadlineItem)
+                add(headlineItem)
                 add(ScheduleListItem.HeadlinePadding)
-
                 if (currentBodyItems.isEmpty()) {
                     // TODO add empty ui
                 } else {
                     addAll(currentBodyItems)
                 }
             }
-            ScheduleListItemsAdaptation.Exist(items = totalItems.toIdentityList(), replayStamp = elementsReplayStamp)
+            ScheduleListItemsAdaptation.Exist(
+                items = totalItems.toIdentityList(),
+                replayStamp = elementsReplayStamp
+            )
         }
     }
 }

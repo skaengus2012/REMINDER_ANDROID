@@ -18,12 +18,17 @@ package com.nlab.reminder.core.component.schedulelist.content.ui
 
 import androidx.compose.runtime.Immutable
 import com.nlab.reminder.core.component.schedulelist.content.UserScheduleListResource
+import com.nlab.reminder.core.kotlin.NonNegativeInt
 
 /**
  * @author Doohyun
  */
 @Immutable
 sealed class ScheduleListItem {
+    data class ClearableCompletedSubHeadline(
+        val completedScheduleCount: NonNegativeInt
+    ) : ScheduleListItem()
+
     data class Content(
         val resource: UserScheduleListResource,
         val isLineVisible: Boolean
