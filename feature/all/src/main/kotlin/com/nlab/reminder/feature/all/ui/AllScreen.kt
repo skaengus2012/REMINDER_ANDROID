@@ -56,6 +56,7 @@ import com.nlab.reminder.core.designsystem.compose.component.PlaneatDropdownMenu
 import com.nlab.reminder.core.designsystem.compose.component.PlaneatDropdownText
 import com.nlab.reminder.core.designsystem.compose.theme.DrawableIds
 import com.nlab.reminder.core.kotlin.collections.toIdentityList
+import com.nlab.reminder.core.kotlin.toNonNegativeInt
 import com.nlab.reminder.core.translation.StringIds
 import com.nlab.reminder.feature.all.AllAction
 import com.nlab.reminder.feature.all.AllEnvironment
@@ -218,6 +219,7 @@ private fun AllScreen(
                     AllScheduleListContent(
                         headline = title,
                         entryAt = uiState.entryAt,
+                        completedScheduleVisible = uiState.completedScheduleVisible,
                         scheduleResources = uiState.scheduleResources,
                         replayStamp = uiState.replayStamp,
                         multiSelectionEnabled = uiState.multiSelectionEnabled,
@@ -238,6 +240,7 @@ private fun AllScreen(
 private fun AllScheduleListContent(
     headline: String,
     entryAt: Instant,
+    completedScheduleVisible: Boolean,
     scheduleResources: List<UserScheduleListResource>,
     replayStamp: Long,
     multiSelectionEnabled: Boolean,
@@ -250,19 +253,30 @@ private fun AllScheduleListContent(
     modifier: Modifier = Modifier
 ) {
     val navBarsPaddings = WindowInsets.navigationBars.asPaddingValues()
-    val footerForm = remember { ScheduleListItem.FooterForm(formBottomLine = FormBottomLine.Type1) }
+    val footerForm = remember {
+        ScheduleListItem.FooterForm(formBottomLine = FormBottomLine.Type1)
+    }
     val scheduleListItemsAdaptation by rememberScheduleListItemsAdaptationState(
         headline = headline,
         elements = scheduleResources,
         elementsReplayStamp = replayStamp,
         buildBodyItemsIfNotEmpty = { elements ->
             buildList {
+                if (completedScheduleVisible) {
+                    this += ScheduleListItem.ClearableCompletedSubHeadline(
+                        completedScheduleCount = elements
+                            .count { it.schedule.isComplete }
+                            .toNonNegativeInt()
+                    )
+                }
+
                 elements.forEach { resource ->
                     this += ScheduleListItem.Content(
                         resource = resource,
                         isLineVisible = true
                     )
                 }
+
                 this += footerForm
             }
         }

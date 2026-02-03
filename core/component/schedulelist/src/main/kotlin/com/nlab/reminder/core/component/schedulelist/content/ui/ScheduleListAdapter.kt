@@ -21,6 +21,7 @@ import android.view.ViewGroup
 import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.recyclerview.widget.AdapterListUpdateCallback
 import androidx.recyclerview.widget.RecyclerView
+import com.nlab.reminder.core.component.schedulelist.databinding.LayoutScheduleAdapterItemComposeViewBinding
 import com.nlab.reminder.core.component.schedulelist.databinding.LayoutScheduleAdapterItemContentBinding
 import com.nlab.reminder.core.component.schedulelist.databinding.LayoutScheduleAdapterItemFooterFormBinding
 import com.nlab.reminder.core.component.schedulelist.databinding.LayoutScheduleAdapterItemFormBinding
@@ -39,13 +40,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.datetime.TimeZone
 import kotlin.time.Instant
 
-private const val ITEM_VIEW_TYPE_CONTENT = 1
-private const val ITEM_VIEW_TYPE_FOOTER_FORM = 2
-private const val ITEM_VIEW_TYPE_FORM = 3
-private const val ITEM_VIEW_TYPE_HEADLINE = 4
-private const val ITEM_VIEW_TYPE_HEADLINE_PADDING = 5
-private const val ITEM_VIEW_TYPE_GROUP_HEADER = 6
-private const val ITEM_VIEW_TYPE_SUB_GROUP_HEADER = 7
+private const val ITEM_VIEW_TYPE_CLEARABLE_COMPLETED_SUB_HEADLINE = 1
+private const val ITEM_VIEW_TYPE_CONTENT = 2
+private const val ITEM_VIEW_TYPE_FOOTER_FORM = 3
+private const val ITEM_VIEW_TYPE_FORM = 4
+private const val ITEM_VIEW_TYPE_HEADLINE = 5
+private const val ITEM_VIEW_TYPE_HEADLINE_PADDING = 6
+private const val ITEM_VIEW_TYPE_GROUP_HEADER = 7
+private const val ITEM_VIEW_TYPE_SUB_GROUP_HEADER = 8
 
 /**
  * @author Thalys
@@ -105,8 +107,9 @@ internal class ScheduleListAdapter(
     override fun getItemCount(): Int = differ.getCurrentList().size
 
     override fun getItemViewType(position: Int): Int = when (getItem(position)) {
-        is ScheduleListItem.Form -> ITEM_VIEW_TYPE_FORM
+        is ScheduleListItem.ClearableCompletedSubHeadline -> ITEM_VIEW_TYPE_CLEARABLE_COMPLETED_SUB_HEADLINE
         is ScheduleListItem.Content -> ITEM_VIEW_TYPE_CONTENT
+        is ScheduleListItem.Form -> ITEM_VIEW_TYPE_FORM
         is ScheduleListItem.FooterForm -> ITEM_VIEW_TYPE_FOOTER_FORM
         is ScheduleListItem.Headline -> ITEM_VIEW_TYPE_HEADLINE
         is ScheduleListItem.HeadlinePadding -> ITEM_VIEW_TYPE_HEADLINE_PADDING
@@ -117,6 +120,17 @@ internal class ScheduleListAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ScheduleAdapterItemViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
         return when (viewType) {
+            ITEM_VIEW_TYPE_CLEARABLE_COMPLETED_SUB_HEADLINE -> {
+                ClearableCompletedSubHeadlineViewHolder(
+                    binding = LayoutScheduleAdapterItemComposeViewBinding.inflate(
+                        layoutInflater,
+                        parent,
+                        /* attachToParent = */ false
+                    ),
+                    onClearClicked = {}
+                )
+            }
+
             ITEM_VIEW_TYPE_CONTENT -> {
                 ContentViewHolder(
                     binding = LayoutScheduleAdapterItemContentBinding.inflate(
@@ -228,8 +242,9 @@ internal class ScheduleListAdapter(
     override fun onBindViewHolder(holder: ScheduleAdapterItemViewHolder, position: Int) {
         val item = getItem(position)
         when (holder) {
-            is FormViewHolder -> holder.bind(item as ScheduleListItem.Form)
+            is ClearableCompletedSubHeadlineViewHolder -> holder.bind(item as ScheduleListItem.ClearableCompletedSubHeadline)
             is ContentViewHolder -> holder.bind(item as ScheduleListItem.Content)
+            is FormViewHolder -> holder.bind(item as ScheduleListItem.Form)
             is FooterFormViewHolder -> holder.bind(item as ScheduleListItem.FooterForm)
             is HeadlineViewHolder -> holder.bind(item as ScheduleListItem.Headline)
             is GroupHeaderViewHolder -> holder.bind(item as ScheduleListItem.GroupHeader)
