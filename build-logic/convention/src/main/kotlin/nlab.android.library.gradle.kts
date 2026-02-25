@@ -19,7 +19,6 @@ import com.nlab.reminder.configureKotlinAndroid
 import org.gradle.kotlin.dsl.configure
 
 apply(plugin = "com.android.library")
-apply(plugin = "org.jetbrains.kotlin.android")
 
 extensions.configure<LibraryExtension> {
     configureAndroidSdk(this)

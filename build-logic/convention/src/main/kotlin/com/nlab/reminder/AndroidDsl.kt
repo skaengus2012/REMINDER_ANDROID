@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The N's lab Open Source Project
+ * Copyright (C) 2026 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,22 @@
 
 package com.nlab.reminder
 
+import com.android.build.api.dsl.ApplicationExtension
 import com.android.build.api.dsl.CommonExtension
+import com.android.build.api.dsl.LibraryExtension
+import com.android.build.api.dsl.Packaging
 
 /**
- * @author Doohyun
+ * @author Thalys
  */
-internal fun configureViewBinding(commonExtension: CommonExtension<*, *, *, *, *, *>) {
-    commonExtension.buildFeatures.viewBinding = true
+internal fun CommonExtension.packaging(action: Packaging.() -> Unit) {
+    when (this) {
+        is ApplicationExtension -> {
+            packaging(action)
+        }
+
+        is LibraryExtension -> {
+            packaging(action)
+        }
+    }
 }

@@ -20,7 +20,6 @@ plugins {
     alias(libs.plugins.nlab.android.hilt)
     alias(libs.plugins.ksp)
     id("kotlin-parcelize")
-    kotlin("kapt")
 }
 
 android {
