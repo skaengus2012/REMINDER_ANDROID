@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import com.android.build.gradle.LibraryExtension
+import com.android.build.api.dsl.LibraryExtension
 import com.nlab.reminder.configureAndroidSdk
 import com.nlab.reminder.configureKotlinAndroid
 import org.gradle.kotlin.dsl.configure
