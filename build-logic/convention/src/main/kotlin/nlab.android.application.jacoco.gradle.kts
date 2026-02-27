@@ -1,3 +1,4 @@
+import com.android.build.api.dsl.ApplicationExtension
 import com.android.build.api.variant.ApplicationAndroidComponentsExtension
 import com.nlab.reminder.configureJacocoAndroid
 import org.gradle.kotlin.dsl.getByType
@@ -21,4 +22,7 @@ import org.gradle.kotlin.dsl.getByType
 apply(plugin = "com.android.application")
 apply(plugin = "jacoco")
 
-configureJacocoAndroid(extensions.getByType<ApplicationAndroidComponentsExtension>())
+configureJacocoAndroid(
+    commonExtension = extensions.getByType<ApplicationExtension>(),
+    androidComponentExtension = extensions.getByType<ApplicationAndroidComponentsExtension>()
+)

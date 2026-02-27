@@ -16,6 +16,7 @@
 
 package com.nlab.reminder
 
+import com.android.build.api.dsl.CommonExtension
 import com.android.build.api.variant.AndroidComponentsExtension
 import com.android.build.api.variant.Variant
 import org.gradle.api.Project
@@ -29,12 +30,21 @@ import org.gradle.testing.jacoco.plugins.JacocoTaskExtension
 /**
  * @author Doohyun
  */
-internal fun Project.configureJacocoAndroid(extension: AndroidComponentsExtension<*, *, *>) {
+internal fun Project.configureJacocoAndroid(
+    commonExtension: CommonExtension,
+    androidComponentExtension: AndroidComponentsExtension<*, *, *>
+) {
+    commonExtension.buildTypes.forEach { it.enableUnitTestCoverage = true }
+    commonExtension.buildTypes.named("debug") {
+        // Configure only the debug build, otherwise it will force the debuggable flag on release buildTypes as well
+        enableAndroidTestCoverage = true
+    }
+
     configureJacocoToolVersion()
     val jacocoReportTaskStub = tasks.register(jacocoTestReportTaskDefaultName) {
         group = "verification"
     }
-    extension.onVariants { variant ->
+    androidComponentExtension.onVariants { variant ->
         val jacocoTestReportForVariant = registerJacocoTestReportTask(
             name = "jacocoTestReport${variant.name.capitalized()}",
             testTaskName = "test${variant.name.capitalized()}UnitTest",

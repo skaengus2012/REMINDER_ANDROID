@@ -13,10 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import com.android.build.api.dsl.LibraryExtension
 import com.android.build.api.variant.LibraryAndroidComponentsExtension
 import com.nlab.reminder.configureJacocoAndroid
 
 apply(plugin = "com.android.library")
 apply(plugin = "jacoco")
 
-configureJacocoAndroid(extensions.getByType<LibraryAndroidComponentsExtension>())
+configureJacocoAndroid(
+    commonExtension = extensions.getByType<LibraryExtension>(),
+    androidComponentExtension = extensions.getByType<LibraryAndroidComponentsExtension>()
+)
