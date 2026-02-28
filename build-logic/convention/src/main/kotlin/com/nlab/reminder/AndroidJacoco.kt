@@ -16,11 +16,16 @@
 
 package com.nlab.reminder
 
+import com.android.build.api.artifact.ScopedArtifact
+import com.android.build.api.dsl.CommonExtension
 import com.android.build.api.variant.AndroidComponentsExtension
-import com.android.build.api.variant.Variant
+import com.android.build.api.variant.ScopedArtifacts
+import com.android.build.api.variant.SourceDirectories
 import org.gradle.api.Project
-import org.gradle.api.file.ConfigurableFileCollection
-import org.gradle.api.file.ConfigurableFileTree
+import org.gradle.api.file.Directory
+import org.gradle.api.file.RegularFile
+import org.gradle.api.provider.ListProperty
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.testing.Test
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.withType
@@ -29,23 +34,69 @@ import org.gradle.testing.jacoco.plugins.JacocoTaskExtension
 /**
  * @author Doohyun
  */
-internal fun Project.configureJacocoAndroid(extension: AndroidComponentsExtension<*, *, *>) {
+internal fun Project.configureJacocoAndroid(
+    commonExtension: CommonExtension,
+    androidComponentExtension: AndroidComponentsExtension<*, *, *>
+) {
+    commonExtension.buildTypes.forEach { it.enableUnitTestCoverage = true }
+    commonExtension.buildTypes.named("debug") {
+        // Configure only the debug build, otherwise it will force the debuggable flag on release buildTypes as well
+        enableAndroidTestCoverage = true
+    }
+
     configureJacocoToolVersion()
     val jacocoReportTaskStub = tasks.register(jacocoTestReportTaskDefaultName) {
         group = "verification"
     }
-    extension.onVariants { variant ->
-        val jacocoTestReportForVariant = registerJacocoTestReportTask(
-            name = "jacocoTestReport${variant.name.capitalized()}",
-            testTaskName = "test${variant.name.capitalized()}UnitTest",
-        ) {
-            sourceDirectories.setFrom(androidJacocoSourcesDirectories(variant))
-            classDirectories.setFrom(androidJacocoClassDirectories(variant))
+
+    androidComponentExtension.onVariants { variant ->
+        val variantName = variant.name.capitalized()
+        val testTaskName = "test${variantName}UnitTest"
+
+        val myObjFactory = project.objects
+        val allJars: ListProperty<RegularFile> = myObjFactory.listProperty(RegularFile::class.java)
+        val allDirectories: ListProperty<Directory> = myObjFactory.listProperty(Directory::class.java)
+
+        val reportTask = registerJacocoTestReportTask(name = "jacocoTestReport${variantName}") {
+            dependsOn(testTaskName)
+            executionData.setFrom(
+                fileTree(layout.buildDirectory.dir("jacoco")) {
+                    include("$testTaskName.exec")
+                },
+                fileTree(layout.buildDirectory.dir("outputs/unit_test_code_coverage")) {
+                    include("**/$testTaskName.exec")
+                }
+            )
+
+            fun SourceDirectories.Flat?.toFilePaths(): Provider<List<String>> = this
+                ?.all
+                ?.map { directories -> directories.map { it.asFile.path } }
+                ?: provider { emptyList() }
+            sourceDirectories.setFrom(
+                files(
+                    variant.sources.java.toFilePaths(),
+                    variant.sources.kotlin.toFilePaths(),
+                ),
+            )
+            classDirectories.setFrom(
+                allJars,
+                allDirectories.map { dirs ->
+                    dirs.map { dir ->
+                        myObjFactory.fileTree().setDir(dir).exclude(coverageExclusions)
+                    }
+                },
+            )
         }
         jacocoReportTaskStub.configure {
-            finalizedBy(jacocoTestReportForVariant)
+            finalizedBy(reportTask)
         }
-
+        variant.artifacts.forScope(ScopedArtifacts.Scope.PROJECT)
+            .use(reportTask)
+            .toGet(
+                ScopedArtifact.CLASSES,
+                { _ -> allJars },
+                { _ -> allDirectories },
+            )
         tasks.withType<Test>().configureEach {
             configure<JacocoTaskExtension> {
                 // Required for JaCoCo + Robolectric
@@ -60,40 +111,29 @@ internal fun Project.configureJacocoAndroid(extension: AndroidComponentsExtensio
     }
 }
 
-private fun Project.androidJacocoSourcesDirectories(variant: Variant): ConfigurableFileCollection =
-    files(
-        "$projectDir/src/main/java",
-        "$projectDir/src/main/kotlin",
-        "$projectDir/src/${variant.name}/java",
-        "$projectDir/src/${variant.name}/kotlin"
-    )
+private val coverageExclusions = jacocoExcludePatterns + setOf(
+    "**/R.class",
+    "**/R$*.class",
+    "**/*_Hilt*.class",
+    "**/Hilt_*.class",
+    "**/BuildConfig.*",
+    "**/Manifest*.*",
+    "**/android/**",
+    "**/androidx/**/compose/**",
+    "**/compose/**",
+    "**/di/**",
+    "**/fake/**",
+    "**/navigation/**",
+    "**/startup/**",
+    "**/test/**",
+    "**/ui/**",
 
-private fun Project.androidJacocoClassDirectories(variant: Variant): ConfigurableFileTree =
-    fileTree("${layout.buildDirectory.get()}/tmp/kotlin-classes/${variant.name}") {
-        exclude(
-            jacocoExcludePatterns + setOf(
-                "**/R.class",
-                "**/R$*.class",
-                "**/BuildConfig.*",
-                "**/Manifest*.*",
-                "**/android/**",
-                "**/androidx/**/compose/**",
-                "**/compose/**",
-                "**/di/**",
-                "**/fake/**",
-                "**/navigation/**",
-                "**/startup/**",
-                "**/test/**",
-                "**/ui/**",
+    /* filtering unnecessary feature components */
+    "**/*Action$*.class",
+    "**/*UiState$*.class",
+    "**/*Environment.class",
 
-                /* filtering unnecessary feature components */
-                "**/*Action$*.class",
-                "**/*UiState$*.class",
-                "**/*Environment.class",
-
-                /* filtering Navigation Component generated classes */
-                "**/*Args*.*",
-                "**/*Directions*.*",
-            )
-        )
-    }
+    /* filtering Navigation Component generated classes */
+    "**/*Args*.*",
+    "**/*Directions*.*",
+)

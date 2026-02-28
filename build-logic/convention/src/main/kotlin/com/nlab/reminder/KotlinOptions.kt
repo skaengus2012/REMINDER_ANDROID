@@ -34,9 +34,9 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 private val selectedJavaVersion: JavaVersion get() = JavaVersion.VERSION_17
 private val selectedJvmTarget: JvmTarget get() = JvmTarget.JVM_17
 
-internal fun Project.configureKotlinAndroid(commonExtension: CommonExtension<*, *, *, *, *, *>) {
+internal fun Project.configureKotlinAndroid(commonExtension: CommonExtension) {
     commonExtension.apply {
-        compileOptions {
+        compileOptions.apply {
             // for kotlinx.datetime
             // https://github.com/Kotlin/kotlinx-datetime?tab=readme-ov-file#using-in-your-projects
             // https://developer.android.com/studio/write/java8-support#library-desugaring

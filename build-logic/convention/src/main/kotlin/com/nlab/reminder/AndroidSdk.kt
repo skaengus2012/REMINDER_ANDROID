@@ -22,18 +22,22 @@ import org.gradle.api.Project
 /**
  * @author Doohyun
  */
-internal fun Project.configureAndroidSdk(commonExtension: CommonExtension<*, *, *, *, *, *>) = with(commonExtension) {
-    compileSdk = libs.findVersion("compileSdk").get().toString().toInt()
-    defaultConfig.minSdk = libs.findVersion("minSdk").get().toString().toInt()
+internal fun Project.configureAndroidSdk(commonExtension: CommonExtension) {
+    commonExtension.apply {
+        compileSdk = libs.findVersion("compileSdk").get().toString().toInt()
 
-    // for android Instrumentation test
-    defaultConfig.testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-    packaging {
-        resources {
-            merges += listOf(
-                "META-INF/LICENSE.md",
-                "META-INF/LICENSE-notice.md"
-            )
+        defaultConfig.apply {
+            minSdk = libs.findVersion("minSdk").get().toString().toInt()
+            testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"  // for android Instrumentation test
+        }
+
+        packaging {
+            resources {
+                merges += listOf(
+                    "META-INF/LICENSE.md",
+                    "META-INF/LICENSE-notice.md"
+                )
+            }
         }
     }
 }
