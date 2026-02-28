@@ -20,7 +20,6 @@ import com.nlab.reminder.libs
 import org.gradle.kotlin.dsl.configure
 
 apply(plugin = "com.android.application")
-apply(plugin = "org.jetbrains.kotlin.android")
 
 extensions.configure<ApplicationExtension> {
     defaultConfig {
