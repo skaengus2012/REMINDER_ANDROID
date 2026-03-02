@@ -259,7 +259,7 @@ class MultiSelectTouchListener(
                 }
                 setSelected(i, false)
             }
-            return
+            return@with
         }
 
         if (to < from) {

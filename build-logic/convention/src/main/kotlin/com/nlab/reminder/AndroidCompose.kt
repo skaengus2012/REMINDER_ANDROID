@@ -26,15 +26,9 @@ import org.jetbrains.kotlin.compose.compiler.gradle.ComposeCompilerGradlePluginE
 /**
  * @author Doohyun
  */
-internal fun Project.configureComposeAndroid(commonExtension: CommonExtension<*, *, *, *, *, *>) {
+internal fun Project.configureComposeAndroid(commonExtension: CommonExtension) {
     commonExtension.apply {
-        buildFeatures {
-            compose = true
-        }
-
-        composeOptions {
-            kotlinCompilerExtensionVersion = libs.findVersion("androidxComposeCompiler").get().toString()
-        }
+        buildFeatures.compose = true
     }
 
     dependencies {

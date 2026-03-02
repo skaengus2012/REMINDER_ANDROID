@@ -35,7 +35,6 @@ internal fun Project.configureJacocoToolVersion() {
 
 internal fun Project.registerJacocoTestReportTask(
     name: String,
-    testTaskName: String,
     configuration: JacocoReport.() -> Unit
 ): TaskProvider<JacocoReport> = tasks.register<JacocoReport>(name) {
     group = "verification"
@@ -43,8 +42,6 @@ internal fun Project.registerJacocoTestReportTask(
         xml.required = true
         html.required = true
     }
-    dependsOn(testTaskName)
-    executionData.setFrom(file("${layout.buildDirectory.get()}/jacoco/$testTaskName.exec"))
     configuration()
 }
 

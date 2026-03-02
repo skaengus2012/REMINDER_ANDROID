@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 The N"s lab Open Source Project
+ * Copyright (C) 2022 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,10 @@
 plugins {
     alias(libs.plugins.nlab.android.application)
     alias(libs.plugins.nlab.android.application.compose)
-    alias(libs.plugins.nlab.android.application.jacoco)
+    // alias(libs.plugins.nlab.android.application.jacoco) // Plugin not used as there are currently no tests
     alias(libs.plugins.nlab.android.hilt)
     alias(libs.plugins.ksp)
     id("kotlin-parcelize")
-    kotlin("kapt")
 }
 
 android {
@@ -45,12 +44,14 @@ android {
             isShrinkResources = true
             signingConfig = signingConfigs.getByName("debug") // TODO make release key..
         }
-    }
 
-    buildTypes.forEach { buildType ->
-        if (buildType.isMinifyEnabled) {
-            buildType.proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"))
-            buildType.proguardFile("proguard-rules.pro")
+        all {
+            if (isMinifyEnabled) {
+                proguardFiles(
+                    getDefaultProguardFile("proguard-android-optimize.txt"),
+                    "proguard-rules.pro"
+                )
+            }
         }
     }
 }
