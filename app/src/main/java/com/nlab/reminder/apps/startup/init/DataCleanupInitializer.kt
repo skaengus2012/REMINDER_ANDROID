@@ -45,7 +45,6 @@ private const val KEY_REINDEX_VISIBLE_PRIORITY_WORK_NAME = "key_reindex_visible_
 class DataCleanupInitializer : Initializer<Unit> {
     override fun create(context: Context) {
         val constraints = Constraints.Builder()
-            .setRequiresDeviceIdle(true)
             .setRequiresCharging(true)
             .build()
         registerWork<ReindexVisiblePriorityWorker>(
