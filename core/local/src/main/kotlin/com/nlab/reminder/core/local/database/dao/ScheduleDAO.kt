@@ -75,7 +75,15 @@ abstract class ScheduleDAO {
     protected abstract suspend fun updateVisiblePriority(scheduleId: Long, visiblePriority: Long)
 
     @Query("DELETE FROM schedule WHERE is_complete = :isComplete")
-    protected abstract suspend fun deleteByCompleteInternal(isComplete: Boolean)
+    abstract suspend fun deleteByComplete(isComplete: Boolean)
+
+    @Query("DELETE FROM schedule WHERE schedule_id IN (:scheduleIds)")
+    protected abstract suspend fun deleteByScheduleIdsInternal(scheduleIds: Set<Long>)
+
+    open suspend fun deleteByScheduleIds(scheduleIds: Set<Long>) {
+        if (scheduleIds.isEmpty()) return
+        deleteByScheduleIdsInternal(scheduleIds)
+    }
 
     @Transaction
     open suspend fun insertAndGet(
@@ -212,36 +220,6 @@ abstract class ScheduleDAO {
             entities.sortedBy { it.visiblePriority }.forEachIndexed { index, entity ->
                 update(entity.copy(visiblePriority = index + 1L))
             }
-        }
-    }
-
-    @Transaction
-    open suspend fun deleteByScheduleIds(scheduleIds: Set<Long>) {
-        val entities = findByIds(scheduleIds = scheduleIds)
-        if (entities.isEmpty()) return
-
-        entities.forEach { delete(it) }
-
-        if (entities.any { it.isComplete }) {
-            correctVisiblePriorityWithComplete(isComplete = true)
-        }
-        if (entities.any { it.isComplete.not() }) {
-            correctVisiblePriorityWithComplete(isComplete = false)
-        }
-    }
-
-    @Transaction
-    open suspend fun deleteByComplete(isComplete: Boolean) {
-        deleteByCompleteInternal(isComplete)
-        correctVisiblePriorityWithComplete(isComplete)
-    }
-
-    private suspend fun correctVisiblePriorityWithComplete(isComplete: Boolean) {
-        val entities = findByComplete(isComplete)
-        if (entities.isEmpty()) return
-
-        entities.sortedBy { it.visiblePriority }.forEachIndexed { index, entity ->
-            update(entity.copy(visiblePriority = index.toLong()))
         }
     }
 }
