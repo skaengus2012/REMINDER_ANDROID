@@ -228,7 +228,10 @@ private fun AllScreen(
                         onCompletionUpdated = onCompletionUpdated,
                         onItemPositionUpdated = onItemPositionUpdated,
                         onSimpleAdd = onSimpleAdd,
-                        onSimpleEdit = onSimpleEdit
+                        onSimpleEdit = onSimpleEdit,
+                        onCompletedScheduleCleanupRequested = {
+                            // TODO implements
+                        }
                     )
                 }
             }
@@ -250,6 +253,7 @@ private fun AllScheduleListContent(
     onItemPositionUpdated: (List<UserScheduleListResource>) -> Unit,
     onSimpleAdd: (SimpleAdd) -> Unit,
     onSimpleEdit: (SimpleEdit) -> Unit,
+    onCompletedScheduleCleanupRequested: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val navBarsPaddings = WindowInsets.navigationBars.asPaddingValues()
@@ -306,6 +310,7 @@ private fun AllScheduleListContent(
         },
         onSimpleAdd = onSimpleAdd,
         onSimpleEdit = onSimpleEdit,
+        onCompletedScheduleCleanupRequested = onCompletedScheduleCleanupRequested,
     )
 }
 

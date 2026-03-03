@@ -94,6 +94,7 @@ internal class ScheduleListFragment : Fragment() {
     private val listBottomScrollPaddingState = MutableIdentityStateFlow<Int>()
     private val toolbarStateState = MutableIdentityStateFlow<ScheduleListToolbarState?>()
     private val selectionUpdateConsumerState = MutableIdentityStateFlow<(SelectionUpdate) -> Unit>()
+    private val completedSchedulesCleanupConsumer = MutableIdentityStateFlow<() -> Unit>()
     private val completionUpdateConsumerState = MutableIdentityStateFlow<(CompletionUpdate) -> Unit>()
     private val itemPositionUpdateConsumerState = MutableIdentityStateFlow<(ItemPositionUpdate) -> Unit>()
     private val simpleAddConsumerState = MutableIdentityStateFlow<(SimpleAdd) -> Unit>()
@@ -295,6 +296,14 @@ internal class ScheduleListFragment : Fragment() {
                 awaitConsumerReady = { syncJob.join() }
             )
         }
+
+        forwardEventToConsumer(
+            eventSourceFlow = scheduleListAdapter.clearCompletedSchedulesRequests,
+            eventConsumerFlow = completedSchedulesCleanupConsumer
+                .unwrap()
+                .map { consumer -> { consumer() } },
+            awaitConsumerReady = {}
+        )
 
         forwardEventToConsumer(
             eventSourceFlow = scheduleListAdapter.addRequests,
@@ -641,6 +650,10 @@ internal class ScheduleListFragment : Fragment() {
 
     fun onSelectionUpdateConsumerChanged(observer: (SelectionUpdate) -> Unit) {
         selectionUpdateConsumerState.update(observer)
+    }
+
+    fun onCompletedSchedulesCleanupConsumerChanged(consumer: ()-> Unit) {
+        completedSchedulesCleanupConsumer.update(consumer)
     }
 
     fun onCompletionUpdateConsumerChanged(consumer: (CompletionUpdate) -> Unit) {

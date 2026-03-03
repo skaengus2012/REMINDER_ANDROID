@@ -56,6 +56,7 @@ fun ScheduleListContent(
     onItemPositionUpdated: (ItemPositionUpdate) -> Unit,
     onSimpleAdd: (SimpleAdd) -> Unit,
     onSimpleEdit: (SimpleEdit) -> Unit,
+    onCompletedScheduleCleanupRequested: () -> Unit,
     modifier: Modifier = Modifier,
     listBottomScrollPadding: Dp = 0.dp, // A value greater than 0 must be included to become valid.
     toolbarState: ScheduleListToolbarState? = null,
@@ -127,6 +128,9 @@ fun ScheduleListContent(
         }
         LaunchedEffect(fragment, onSimpleEdit) {
             fragment.onSimpleEditConsumerChanged(consumer = onSimpleEdit)
+        }
+        LaunchedEffect(fragment, onCompletedScheduleCleanupRequested) {
+            fragment.onCompletedSchedulesCleanupConsumerChanged(consumer = onCompletedScheduleCleanupRequested)
         }
     }
 }

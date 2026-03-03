@@ -88,11 +88,14 @@ internal class ScheduleListAdapter(
     private val _addRequests = MutableEventSharedFlow<SimpleAdd>()
     val addRequests: SharedFlow<SimpleAdd> = _addRequests.asSharedFlow()
 
-    private val _editRequests = MutableEventSharedFlow<SimpleEdit>()
-    val editRequests: SharedFlow<SimpleEdit> = _editRequests.asSharedFlow()
+    private val _clearCompletedScheduleRequests = MutableEventSharedFlow<Unit>()
+    val clearCompletedSchedulesRequests: SharedFlow<Unit> = _clearCompletedScheduleRequests.asSharedFlow()
 
     private val _dragHandleTouches = MutableEventSharedFlow<RecyclerView.ViewHolder>()
     val dragHandleTouches: SharedFlow<RecyclerView.ViewHolder> = _dragHandleTouches.asSharedFlow()
+
+    private val _editRequests = MutableEventSharedFlow<SimpleEdit>()
+    val editRequests: SharedFlow<SimpleEdit> = _editRequests.asSharedFlow()
 
     private val _selectButtonTouches = MutableEventSharedFlow<RecyclerView.ViewHolder>()
     val selectButtonTouches: SharedFlow<RecyclerView.ViewHolder> = _selectButtonTouches.asSharedFlow()
@@ -127,7 +130,7 @@ internal class ScheduleListAdapter(
                         parent,
                         /* attachToParent = */ false
                     ),
-                    onClearClicked = {}
+                    onClearClicked = { _clearCompletedScheduleRequests.tryEmit(Unit) }
                 )
             }
 
