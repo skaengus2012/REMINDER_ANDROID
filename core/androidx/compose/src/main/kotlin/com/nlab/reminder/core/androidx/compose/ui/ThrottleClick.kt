@@ -20,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.*
 import com.nlab.reminder.core.kotlinx.coroutines.flow.throttleFirst
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 
 /**
@@ -30,11 +31,17 @@ fun throttleClick(
     windowDuration: Long = 500,
     onClick: () -> Unit
 ): () -> Unit {
-    val clickEvent = remember { MutableSharedFlow<Unit>(extraBufferCapacity = 1) }
-    LaunchedEffect(windowDuration, onClick) {
+    val currentOnClick by rememberUpdatedState(onClick)
+    val clickEvent = remember {
+        MutableSharedFlow<Unit>(
+            extraBufferCapacity = 1,
+            onBufferOverflow = BufferOverflow.DROP_OLDEST
+        )
+    }
+    LaunchedEffect(windowDuration) {
         clickEvent
             .throttleFirst(windowDuration)
-            .collect { onClick() }
+            .collect { currentOnClick() }
     }
     return { clickEvent.tryEmit(Unit) }
 }
