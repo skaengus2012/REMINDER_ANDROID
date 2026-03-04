@@ -153,7 +153,7 @@ internal fun TagDeleteBottomSheet(
                 }
             }
         ),
-        onDismissRequest = onCancel,
+        onDismissRequest = currentOnCancel,
         sheetState = sheetState
     )
 }
