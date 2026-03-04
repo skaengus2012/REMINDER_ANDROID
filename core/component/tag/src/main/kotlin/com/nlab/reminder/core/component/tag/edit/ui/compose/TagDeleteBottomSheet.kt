@@ -16,34 +16,21 @@
 
 package com.nlab.reminder.core.component.tag.edit.ui.compose
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import com.nlab.reminder.core.androidx.compose.ui.throttleClick
-import com.nlab.reminder.core.androidx.compose.ui.tooling.preview.Previews
 import com.nlab.reminder.core.component.displayformat.ui.tagDisplayText
 import com.nlab.reminder.core.data.model.Tag
-import com.nlab.reminder.core.data.model.TagId
 import com.nlab.reminder.core.designsystem.compose.component.PlaneatBottomSheet
-import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
+import com.nlab.reminder.core.designsystem.compose.component.PlaneatBottomButton
+import com.nlab.reminder.core.designsystem.compose.component.PlaneatBottomSheetBody
+import com.nlab.reminder.core.designsystem.compose.component.PlaneatBottomSheetTitle
 import com.nlab.reminder.core.kotlin.NonNegativeInt
-import com.nlab.reminder.core.kotlin.toNonBlankString
-import com.nlab.reminder.core.kotlin.toNonNegativeInt
 import com.nlab.reminder.core.translation.PluralsIds
 import com.nlab.reminder.core.translation.StringIds
 import kotlinx.coroutines.launch
@@ -60,52 +47,19 @@ internal fun TagDeleteBottomSheet(
 ) {
     val coroutineScope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val tagSize = tags.size
+    val currentOnConfirm by rememberUpdatedState(onConfirm)
+    val currentOnCancel by rememberUpdatedState(onCancel)
     PlaneatBottomSheet(
-        onDismissRequest = onCancel,
-        sheetState = sheetState
-    ) {
-        TagDeleteBottomSheetContent(
-            tags = tags,
-            usageCount = usageCount,
-            onConfirm = {
-                coroutineScope.launch {
-                    sheetState.hide()
-                    onConfirm()
-                }
-            },
-            onCancel = {
-                coroutineScope.launch {
-                    sheetState.hide()
-                    onCancel()
-                }
-            }
-        )
-    }
-}
-
-@Composable
-private fun TagDeleteBottomSheetContent(
-    tags: List<Tag>,
-    usageCount: NonNegativeInt,
-    onConfirm: () -> Unit,
-    onCancel: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Column(modifier = modifier) {
-        val tagNameSize = tags.size
-        Text(
-            modifier = Modifier.fillMaxWidth(),
-            text = pluralStringResource(id = PluralsIds.title_tag_delete_dialog, count = tagNameSize, tagNameSize),
-            style = PlaneatTheme.typography.bodySmall,
-            color = PlaneatTheme.colors.content1,
-            textAlign = TextAlign.Center
-        )
-        Text(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 30.dp, top = 6.dp, end = 30.dp, bottom = 22.dp),
-            style = PlaneatTheme.typography.bodySmall,
-            text = when (tagNameSize) {
+        title = PlaneatBottomSheetTitle.Text(
+            text = pluralStringResource(
+                id = PluralsIds.title_tag_delete_dialog,
+                count = tagSize,
+                tagSize
+            )
+        ),
+        body = PlaneatBottomSheetBody.Text(
+            text = when (tagSize) {
                 0 -> ""
                 1 -> {
                     val firstTagDisplayText = tagDisplayText(tags.first())
@@ -129,6 +83,7 @@ private fun TagDeleteBottomSheetContent(
                         }
                     )
                 }
+
                 2 -> {
                     val firstTagDisplayText = tagDisplayText(tags.first())
                     val lastTagDisplayText = tagDisplayText(tags.last())
@@ -154,9 +109,10 @@ private fun TagDeleteBottomSheetContent(
                         }
                     )
                 }
+
                 else -> {
                     val firstTagDisplayText = tagDisplayText(tags.first())
-                    val extraSize = tagNameSize - 1
+                    val extraSize = tagSize - 1
                     getUsageCountLabel(
                         usageCount = usageCount,
                         transform = { count ->
@@ -179,130 +135,25 @@ private fun TagDeleteBottomSheetContent(
                         }
                     )
                 }
+            }
+        ),
+        button = PlaneatBottomButton.TwoButton(
+            primaryButtonText = stringResource(id = StringIds.label_delete),
+            onPrimaryButtonClicked = throttleClick {
+                coroutineScope.launch {
+                    sheetState.hide()
+                    currentOnConfirm()
+                }
             },
-            color = PlaneatTheme.colors.content1,
-            textAlign = TextAlign.Center
-        )
-        HorizontalDivider(
-            thickness = 0.5.dp,
-            color = PlaneatTheme.colors.bgLine1,
-        )
-        TagEditDeleteButton(
-            text = stringResource(id = StringIds.label_delete),
-            fontColor = PlaneatTheme.colors.red1,
-            onClick = onConfirm
-        )
-        TagEditDeleteButton(
-            text = stringResource(id = StringIds.cancel),
-            fontColor = PlaneatTheme.colors.content2,
-            onClick = onCancel,
-            modifier = Modifier.padding(bottom = 10.dp)
-        )
-    }
-}
-
-@Composable
-private fun TagEditDeleteButton(
-    text: String,
-    fontColor: Color,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Surface(
-        modifier = modifier
-            .fillMaxWidth()
-            .clickable(
-                onClick = throttleClick(onClick = onClick),
-                onClickLabel = text,
-                role = Role.Button
-            ),
-        color = Color.Transparent
-    ) {
-        Text(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 10.dp),
-            text = text,
-            textAlign = TextAlign.Center,
-            color = fontColor,
-            style = PlaneatTheme.typography.bodyLarge,
-        )
-    }
-}
-
-@Previews
-@Composable
-private fun TagEditDeleteBottomSheetContentPreview() {
-    PlaneatTheme {
-        TagDeleteBottomSheetContent(
-            modifier = Modifier.background(PlaneatTheme.colors.bgDialogSurface),
-            tags = listOf(
-                Tag(
-                    id = TagId(rawId = 1),
-                    name = "SingleTag".toNonBlankString()
-                )
-            ),
-            usageCount = 5.toNonNegativeInt(),
-            onConfirm = {},
-            onCancel = {},
-        )
-    }
-}
-
-@Previews
-@Composable
-private fun TwoSizeTagEditDeleteBottomSheetContentPreview() {
-    PlaneatTheme {
-        TagDeleteBottomSheetContent(
-            modifier = Modifier.background(PlaneatTheme.colors.bgDialogSurface),
-            tags = listOf(
-                Tag(
-                    id = TagId(rawId = 1),
-                    name = "one".toNonBlankString()
-                ),
-                Tag(
-                    id = TagId(rawId = 2),
-                    name = "two".toNonBlankString()
-                )
-            ),
-            usageCount = 5.toNonNegativeInt(),
-            onConfirm = {},
-            onCancel = {},
-        )
-    }
-}
-
-@Previews
-@Composable
-private fun OtherSizeTagEditDeleteBottomSheetContentPreview() {
-    PlaneatTheme {
-        TagDeleteBottomSheetContent(
-            modifier = Modifier.background(PlaneatTheme.colors.bgDialogSurface),
-            tags = listOf(
-                Tag(
-                    id = TagId(rawId = 1),
-                    name = "one".toNonBlankString()
-                ),
-                Tag(
-                    id = TagId(rawId = 2),
-                    name = "two".toNonBlankString()
-                ),
-                Tag(
-                    id = TagId(rawId = 3),
-                    name = "three".toNonBlankString()
-                ),
-                Tag(
-                    id = TagId(rawId = 4),
-                    name = "four".toNonBlankString()
-                ),
-                Tag(
-                    id = TagId(rawId = 5),
-                    name = "five".toNonBlankString()
-                ),
-            ),
-            usageCount = 5.toNonNegativeInt(),
-            onConfirm = {},
-            onCancel = {},
-        )
-    }
+            secondaryButtonText = stringResource(id = StringIds.cancel),
+            onSecondaryButtonClicked = throttleClick {
+                coroutineScope.launch {
+                    sheetState.hide()
+                    currentOnCancel()
+                }
+            }
+        ),
+        onDismissRequest = currentOnCancel,
+        sheetState = sheetState
+    )
 }
