@@ -44,9 +44,9 @@ import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
  */
 @Composable
 fun PlaneatBottomSheet(
-    title: PlanetBottomSheetTitle,
-    body: PlanetBottomSheetBody,
-    button: PlanetBottomButton,
+    title: PlaneatBottomSheetTitle,
+    body: PlaneatBottomSheetBody,
+    button: PlaneatBottomButton,
     onDismissRequest: () -> Unit,
     sheetState: SheetState = rememberModalBottomSheetState(),
 ) {
@@ -64,9 +64,9 @@ fun PlaneatBottomSheet(
 
 @Composable
 private fun Content(
-    title: PlanetBottomSheetTitle,
-    body: PlanetBottomSheetBody,
-    button: PlanetBottomButton,
+    title: PlaneatBottomSheetTitle,
+    body: PlaneatBottomSheetBody,
+    button: PlaneatBottomButton,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
@@ -89,12 +89,12 @@ private fun Content(
 
 @Composable
 private fun Title(
-    title: PlanetBottomSheetTitle,
+    title: PlaneatBottomSheetTitle,
     modifier: Modifier = Modifier
 ) {
     when (title) {
-        is PlanetBottomSheetTitle.None -> {}
-        is PlanetBottomSheetTitle.Text -> {
+        is PlaneatBottomSheetTitle.None -> {}
+        is PlaneatBottomSheetTitle.Text -> {
             Text(
                 modifier = modifier.padding(bottom = 6.dp),
                 text = title.text,
@@ -108,12 +108,12 @@ private fun Title(
 
 @Composable
 private fun Body(
-    body: PlanetBottomSheetBody,
+    body: PlaneatBottomSheetBody,
     modifier: Modifier = Modifier
 ) {
     when (body) {
-        is PlanetBottomSheetBody.None -> {}
-        is PlanetBottomSheetBody.Text -> {
+        is PlaneatBottomSheetBody.None -> {}
+        is PlaneatBottomSheetBody.Text -> {
             Column(
                 modifier = modifier,
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -140,11 +140,11 @@ private fun Body(
 
 @Composable
 private fun Button(
-    button: PlanetBottomButton,
+    button: PlaneatBottomButton,
     modifier: Modifier = Modifier
 ) {
     when (button) {
-        is PlanetBottomButton.TwoButton -> {
+        is PlaneatBottomButton.TwoButton -> {
             Column(modifier = modifier) {
                 BaseButton(
                     modifier = Modifier.fillMaxWidth(),
@@ -192,25 +192,25 @@ private fun BaseButton(
 }
 
 @Immutable
-sealed class PlanetBottomSheetTitle {
-    data object None : PlanetBottomSheetTitle()
-    data class Text(val text: String) : PlanetBottomSheetTitle()
+sealed class PlaneatBottomSheetTitle {
+    data object None : PlaneatBottomSheetTitle()
+    data class Text(val text: String) : PlaneatBottomSheetTitle()
 }
 
 @Immutable
-sealed class PlanetBottomSheetBody {
-    data object None : PlanetBottomSheetBody()
-    data class Text(val text: String) : PlanetBottomSheetBody()
+sealed class PlaneatBottomSheetBody {
+    data object None : PlaneatBottomSheetBody()
+    data class Text(val text: String) : PlaneatBottomSheetBody()
 }
 
 @Immutable
-sealed class PlanetBottomButton {
+sealed class PlaneatBottomButton {
     data class TwoButton(
         val primaryButtonText: String,
         val onPrimaryButtonClicked: () -> Unit,
         val secondaryButtonText: String,
         val onSecondaryButtonClicked: () -> Unit
-    ) : PlanetBottomButton()
+    ) : PlaneatBottomButton()
 }
 
 @Preview(
@@ -228,9 +228,9 @@ private fun NoneTitlePreview() {
     PlaneatTheme {
         Content(
             modifier = Modifier.background(color = PlaneatTheme.colors.bgDialogSurface),
-            title = PlanetBottomSheetTitle.None,
-            body = PlanetBottomSheetBody.Text(text = "This is sample body"),
-            button = PlanetBottomButton.TwoButton(
+            title = PlaneatBottomSheetTitle.None,
+            body = PlaneatBottomSheetBody.Text(text = "This is sample body"),
+            button = PlaneatBottomButton.TwoButton(
                 primaryButtonText = "Primary",
                 onPrimaryButtonClicked = {},
                 secondaryButtonText = "Secondary",
@@ -255,9 +255,9 @@ private fun TextTitlePreview() {
     PlaneatTheme {
         Content(
             modifier = Modifier.background(color = PlaneatTheme.colors.bgDialogSurface),
-            title = PlanetBottomSheetTitle.Text(text = "Title"),
-            body = PlanetBottomSheetBody.Text(text = "This is sample body"),
-            button = PlanetBottomButton.TwoButton(
+            title = PlaneatBottomSheetTitle.Text(text = "Title"),
+            body = PlaneatBottomSheetBody.Text(text = "This is sample body"),
+            button = PlaneatBottomButton.TwoButton(
                 primaryButtonText = "Primary",
                 onPrimaryButtonClicked = {},
                 secondaryButtonText = "Secondary",
@@ -282,9 +282,9 @@ private fun OnlyButtonsPreview() {
     PlaneatTheme {
         Content(
             modifier = Modifier.background(color = PlaneatTheme.colors.bgDialogSurface),
-            title = PlanetBottomSheetTitle.None,
-            body = PlanetBottomSheetBody.None,
-            button = PlanetBottomButton.TwoButton(
+            title = PlaneatBottomSheetTitle.None,
+            body = PlaneatBottomSheetBody.None,
+            button = PlaneatBottomButton.TwoButton(
                 primaryButtonText = "Primary Button",
                 onPrimaryButtonClicked = {},
                 secondaryButtonText = "Secondary",

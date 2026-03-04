@@ -27,9 +27,9 @@ import com.nlab.reminder.core.androidx.compose.ui.throttleClick
 import com.nlab.reminder.core.component.displayformat.ui.tagDisplayText
 import com.nlab.reminder.core.data.model.Tag
 import com.nlab.reminder.core.designsystem.compose.component.PlaneatBottomSheet
-import com.nlab.reminder.core.designsystem.compose.component.PlanetBottomButton
-import com.nlab.reminder.core.designsystem.compose.component.PlanetBottomSheetBody
-import com.nlab.reminder.core.designsystem.compose.component.PlanetBottomSheetTitle
+import com.nlab.reminder.core.designsystem.compose.component.PlaneatBottomButton
+import com.nlab.reminder.core.designsystem.compose.component.PlaneatBottomSheetBody
+import com.nlab.reminder.core.designsystem.compose.component.PlaneatBottomSheetTitle
 import com.nlab.reminder.core.kotlin.NonNegativeInt
 import com.nlab.reminder.core.translation.PluralsIds
 import com.nlab.reminder.core.translation.StringIds
@@ -51,14 +51,14 @@ internal fun TagDeleteBottomSheet(
     val currentOnConfirm by rememberUpdatedState(onConfirm)
     val currentOnCancel by rememberUpdatedState(onCancel)
     PlaneatBottomSheet(
-        title = PlanetBottomSheetTitle.Text(
+        title = PlaneatBottomSheetTitle.Text(
             text = pluralStringResource(
                 id = PluralsIds.title_tag_delete_dialog,
                 count = tagSize,
                 tagSize
             )
         ),
-        body = PlanetBottomSheetBody.Text(
+        body = PlaneatBottomSheetBody.Text(
             text = when (tagSize) {
                 0 -> ""
                 1 -> {
@@ -137,7 +137,7 @@ internal fun TagDeleteBottomSheet(
                 }
             }
         ),
-        button = PlanetBottomButton.TwoButton(
+        button = PlaneatBottomButton.TwoButton(
             primaryButtonText = stringResource(id = StringIds.label_delete),
             onPrimaryButtonClicked = throttleClick {
                 coroutineScope.launch {
