@@ -26,6 +26,7 @@ import com.nlab.reminder.core.data.qualifiers.ScheduleDataOption.All
 import com.nlab.reminder.core.data.repository.CompletedScheduleShownRepository
 import com.nlab.reminder.core.data.repository.GetScheduleQuery
 import com.nlab.reminder.core.data.repository.ScheduleRepository
+import com.nlab.reminder.core.kotlin.toNonNegativeInt
 import com.nlab.reminder.core.kotlinx.coroutines.flow.channelFlow
 import com.nlab.reminder.core.kotlinx.coroutines.flow.combine
 import com.nlab.reminder.core.kotlinx.coroutines.flow.map
@@ -63,7 +64,15 @@ internal class GetUserScheduleListResourceReportFlowUseCase @Inject constructor(
                 .let(::getScheduleResourcesFlowWith)
                 .map { userScheduleListResources ->
                     UserScheduleListResourceReport(
-                        completedScheduleShown = completedScheduleShown,
+                        completedScheduleSummary = CompletedScheduleSummary(
+                            shown = completedScheduleShown,
+                            count = run {
+                                val rawCount =
+                                    if (completedScheduleShown.not()) 0
+                                    else userScheduleListResources.count { it.schedule.isComplete }
+                                rawCount.toNonNegativeInt()
+                            }
+                        ),
                         userScheduleListResources = userScheduleListResources
                     )
                 }
@@ -100,6 +109,6 @@ internal class GetUserScheduleListResourceReportFlowUseCase @Inject constructor(
 
 @ExcludeFromGeneratedTestReport
 internal data class UserScheduleListResourceReport(
-    val completedScheduleShown: Boolean,
+    val completedScheduleSummary: CompletedScheduleSummary,
     val userScheduleListResources: List<UserScheduleListResource>
 )

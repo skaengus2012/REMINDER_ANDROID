@@ -37,9 +37,10 @@ internal fun AllReduce(environment: AllEnvironment): AllReduce = DslReduce {
             Success(
                 entryAt = action.entryAt,
                 scheduleResources = action.userScheduleListResourceReport.userScheduleListResources,
-                completedScheduleVisible = action.userScheduleListResourceReport.completedScheduleShown,
-                menuDropdownVisible = false,
+                completedScheduleSummary = action.userScheduleListResourceReport.completedScheduleSummary,
+                menuExpanded = false,
                 multiSelectionEnabled = false,
+                showCompletedSchedulesCleanupConfirmation = false,
                 replayStamp = 0,
             )
         }
@@ -47,7 +48,7 @@ internal fun AllReduce(environment: AllEnvironment): AllReduce = DslReduce {
             current.copy(
                 entryAt = action.entryAt,
                 scheduleResources = action.userScheduleListResourceReport.userScheduleListResources,
-                completedScheduleVisible = action.userScheduleListResourceReport.completedScheduleShown,
+                completedScheduleSummary = action.userScheduleListResourceReport.completedScheduleSummary,
                 replayStamp = 0,
             )
         }
@@ -65,6 +66,20 @@ internal fun AllReduce(environment: AllEnvironment): AllReduce = DslReduce {
             environment.completedScheduleShownRepository.setShown(isShown = action.visible)
         }
 
+        transition<CompletedSchedulesCleanupClicked> {
+            current.copy(showCompletedSchedulesCleanupConfirmation = true)
+        }
+
+        transition<CompletedSchedulesCleanupInteracted> {
+            current.copy(showCompletedSchedulesCleanupConfirmation = false)
+        }
+
+        suspendEffect<CompletedSchedulesCleanupInteracted> {
+            if (action.confirmed) {
+                // TODO MAKE CompletedScheduleCleanupInteracted
+            }
+        }
+
         transition<SelectionModeClicked> {
             current.copy(multiSelectionEnabled = action.enabled)
         }
@@ -74,9 +89,9 @@ internal fun AllReduce(environment: AllEnvironment): AllReduce = DslReduce {
             }
         }
 
-        transition<MenuClicked> { current.copy(menuDropdownVisible = true) }
+        transition<MenuClicked> { current.copy(menuExpanded = true) }
 
-        transition<MenuDropdownDismissed> { current.copy(menuDropdownVisible = false) }
+        transition<MenuDropdownDismissed> { current.copy(menuExpanded = false) }
 
         effect<ItemSelectionUpdated> {
             environment.userSelectedSchedulesStore.replace(action.selectedIds)

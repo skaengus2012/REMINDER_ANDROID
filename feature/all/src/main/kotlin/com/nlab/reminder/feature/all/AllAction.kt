@@ -37,6 +37,10 @@ internal sealed interface AllAction {
 
     data class CompletedScheduleVisibilityChangeClicked(val visible: Boolean) : AllAction
 
+    data object CompletedSchedulesCleanupClicked : AllAction
+
+    data class CompletedSchedulesCleanupInteracted(val confirmed: Boolean) : AllAction
+
     data class SelectionModeClicked(val enabled: Boolean) : AllAction
 
     data object MenuClicked : AllAction

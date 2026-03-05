@@ -30,6 +30,7 @@ import com.nlab.reminder.core.data.repository.CompletedScheduleShownRepository
 import com.nlab.reminder.core.data.repository.GetScheduleQuery
 import com.nlab.reminder.core.data.repository.ScheduleRepository
 import com.nlab.reminder.core.kotlin.collections.toSet
+import com.nlab.reminder.core.kotlin.toNonNegativeInt
 import com.nlab.reminder.core.kotlin.toNonNegativeLong
 import com.nlab.testkit.faker.genBoolean
 import com.nlab.testkit.faker.genIntGreaterThanZero
@@ -48,7 +49,6 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.unconfinedTestDispatcher
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.trueValue
 import org.junit.Test
 
 /**
@@ -89,8 +89,8 @@ class GetUserScheduleListResourceReportFlowTest {
     }
 
     @Test
-    fun `Given completed schedule shown, When collect, Then receive shown status report`() = runTest {
-        val completedSchedules = List(genIntGreaterThanZero(max = 10)) {
+    fun `Given completed schedule shown, When collect, Then receive shown summary report`() = runTest {
+        val completedSchedules = List(size = genIntGreaterThanZero(max = 10)) {
             genSchedule(
                 id = ScheduleId(it.toLong()),
                 isComplete = true,
@@ -131,7 +131,15 @@ class GetUserScheduleListResourceReportFlowTest {
 
         useCase.invoke().test {
             val actualReport = awaitItem()
-            assertThat(actualReport.completedScheduleShown, trueValue())
+            assertThat(
+                actualReport.completedScheduleSummary,
+                equalTo(
+                    CompletedScheduleSummary(
+                        shown = true,
+                        count = completedSchedules.size.toNonNegativeInt(),
+                    )
+                )
+            )
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -170,7 +178,7 @@ class GetUserScheduleListResourceReportFlowTest {
     }
 
     @Test
-    fun `Given completed schedule not shown, When collect, Then receive hidden status report`() = runTest {
+    fun `Given completed schedule not shown, When collect, Then receive not shown summary report`() = runTest {
         val notCompletedSchedules = genSchedules()
         val expectedUserScheduleListResources = notCompletedSchedules.toSet { schedule ->
             genUserScheduleListResource(genScheduleListResource(schedule))
@@ -196,7 +204,15 @@ class GetUserScheduleListResourceReportFlowTest {
 
         useCase.invoke().test {
             val actualReport = awaitItem()
-            assertThat(actualReport.completedScheduleShown.not(), trueValue())
+            assertThat(
+                actualReport.completedScheduleSummary,
+                equalTo(
+                    CompletedScheduleSummary(
+                        shown = false,
+                        count = 0.toNonNegativeInt(),
+                    )
+                )
+            )
             cancelAndIgnoreRemainingEvents()
         }
     }

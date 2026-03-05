@@ -20,7 +20,15 @@
     <string name="august">August</string>
     <string name="august_short">Aug</string>
     <string name="clear">Clear</string>
+    <plurals name="confirm_delete_reminder">
+        <item quantity="one">Delete Reminder</item>
+        <item quantity="other">Delete %1$d Reminders</item>
+    </plurals>
     <string name="content_completed_hidden">Hide completed</string>
+    <plurals name="content_completed_schedules_cleanup_notice_in_list">
+        <item quantity="one">%1$d completed reminder will be deleted from the list</item>
+        <item quantity="other">%1$d completed reminders will be deleted from the list</item>
+    </plurals>
     <string name="content_completed_shown">Show completed</string>
     <string name="content_completed_with_count" formatted="true">%1$d Completed</string>
     <string name="content_every_days_fixed">Daily</string>

@@ -20,7 +20,13 @@
     <string name="august">8월</string>
     <string name="august_short">8월</string>
     <string name="clear">지우기</string>
+    <plurals name="confirm_delete_reminder">
+        <item quantity="other">%1$d개의 알림 삭제</item>
+    </plurals>
     <string name="content_completed_hidden">완료된 플랜 가리기</string>
+    <plurals name="content_completed_schedules_cleanup_notice_in_list">
+        <item quantity="other">%1$d개의 완료된 알림이 목록에서 삭제됩니다.</item>
+    </plurals>
     <string name="content_completed_shown">완료된 플랜 보기</string>
     <string name="content_completed_with_count" formatted="true">%1$d개 완료됨</string>
     <string name="content_every_days_fixed">매일</string>
