@@ -18,9 +18,7 @@ package com.nlab.reminder.core.component.tag.edit.ui.compose
 
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import com.nlab.reminder.core.androidx.compose.ui.throttleClick
@@ -48,8 +46,6 @@ internal fun TagDeleteBottomSheet(
     val coroutineScope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val tagSize = tags.size
-    val currentOnConfirm by rememberUpdatedState(onConfirm)
-    val currentOnCancel by rememberUpdatedState(onCancel)
     PlaneatBottomSheet(
         title = PlaneatBottomSheetTitle.Text(
             text = pluralStringResource(
@@ -142,18 +138,18 @@ internal fun TagDeleteBottomSheet(
             onPrimaryButtonClicked = throttleClick {
                 coroutineScope.launch {
                     sheetState.hide()
-                    currentOnConfirm()
+                    onConfirm()
                 }
             },
             secondaryButtonText = stringResource(id = StringIds.cancel),
             onSecondaryButtonClicked = throttleClick {
                 coroutineScope.launch {
                     sheetState.hide()
-                    currentOnCancel()
+                    onCancel()
                 }
             }
         ),
-        onDismissRequest = currentOnCancel,
+        onDismissRequest = onCancel,
         sheetState = sheetState
     )
 }
