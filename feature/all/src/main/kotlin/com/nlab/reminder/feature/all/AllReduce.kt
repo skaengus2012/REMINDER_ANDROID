@@ -18,8 +18,10 @@ package com.nlab.reminder.feature.all
 
 import com.nlab.reminder.core.component.schedulelist.content.clear
 import com.nlab.reminder.core.data.model.ScheduleContent
+import com.nlab.reminder.core.data.repository.DeleteScheduleQuery
 import com.nlab.reminder.core.data.repository.SaveScheduleQuery
 import com.nlab.reminder.core.data.repository.UpdateAllScheduleQuery
+import com.nlab.reminder.core.kotlin.onFailure
 import com.nlab.reminder.core.kotlin.tryToNonBlankStringOrNull
 import com.nlab.statekit.dsl.reduce.DslReduce
 import com.nlab.statekit.reduce.Reduce
@@ -76,7 +78,11 @@ internal fun AllReduce(environment: AllEnvironment): AllReduce = DslReduce {
 
         suspendEffect<CompletedSchedulesCleanupInteracted> {
             if (action.confirmed) {
-                // TODO MAKE CompletedScheduleCleanupInteracted
+                environment.scheduleRepository
+                    .delete(DeleteScheduleQuery.ByComplete(isComplete = true))
+                    .onFailure { t ->
+                        // TODO Handle failure
+                    }
             }
         }
 

@@ -21,6 +21,7 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
@@ -53,6 +54,8 @@ internal class RegisterScheduleCompleteJobUseCaseImpl(
         val workRequestBuilder = OneTimeWorkRequestBuilder<ScheduleCompletionWorker>().apply {
             if (debounceTimeout.isPositive()) {
                 setInitialDelay(debounceTimeout.toJavaDuration())
+            } else {
+                setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
             }
             setInputData(
                 workDataOf(KEY_PROCESS_UNTIL_PRIORITY to processUntilPriority?.value)
