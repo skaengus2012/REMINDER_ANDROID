@@ -76,7 +76,7 @@ private fun ClearableCompletedScheduleItem(
     Column(modifier = modifier.fillMaxWidth()) {
         val horizontalPadding = dimensionResource(DimenIds.horizontal_padding_medium)
         Row(
-            modifier = modifier.padding(start = horizontalPadding, top = 0.dp, end = horizontalPadding, bottom = 10.dp),
+            modifier = Modifier.padding(start = horizontalPadding, top = 0.dp, end = horizontalPadding, bottom = 10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
