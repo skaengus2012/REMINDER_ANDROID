@@ -27,8 +27,7 @@ import kotlin.time.Instant
 internal sealed interface AllAction {
     data class StateSynced(
         val entryAt: Instant,
-        val completedScheduleVisible: Boolean,
-        val scheduleResources: List<UserScheduleListResource>
+        val userScheduleListResourceReport: UserScheduleListResourceReport
     ) : AllAction
 
     data class UndoScheduleResources(
@@ -37,6 +36,10 @@ internal sealed interface AllAction {
     ) : AllAction
 
     data class CompletedScheduleVisibilityChangeClicked(val visible: Boolean) : AllAction
+
+    data object CompletedSchedulesCleanupClicked : AllAction
+
+    data class CompletedSchedulesCleanupInteracted(val confirmed: Boolean) : AllAction
 
     data class SelectionModeClicked(val enabled: Boolean) : AllAction
 

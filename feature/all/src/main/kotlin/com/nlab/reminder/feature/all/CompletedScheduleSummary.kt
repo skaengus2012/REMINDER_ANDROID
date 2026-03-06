@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The N's lab Open Source Project
+ * Copyright (C) 2026 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,22 +16,14 @@
 
 package com.nlab.reminder.feature.all
 
-import com.nlab.reminder.core.component.schedulelist.content.UserScheduleListResource
-import kotlin.time.Instant
+import com.nlab.reminder.core.annotation.ExcludeFromGeneratedTestReport
+import com.nlab.reminder.core.kotlin.NonNegativeInt
 
 /**
  * @author Thalys
  */
-internal sealed class AllUiState {
-    data object Loading : AllUiState()
-
-    data class Success(
-        val entryAt: Instant,
-        val scheduleResources: List<UserScheduleListResource>,
-        val completedScheduleSummary: CompletedScheduleSummary,
-        val menuExpanded: Boolean,
-        val multiSelectionEnabled: Boolean,
-        val showCompletedSchedulesCleanupConfirmation: Boolean,
-        val replayStamp: Long,
-    ) : AllUiState()
-}
+@ExcludeFromGeneratedTestReport
+internal data class CompletedScheduleSummary(
+    val shown: Boolean,
+    val count: NonNegativeInt
+)

@@ -18,8 +18,10 @@ package com.nlab.reminder.feature.all
 
 import com.nlab.reminder.core.component.schedulelist.content.clear
 import com.nlab.reminder.core.data.model.ScheduleContent
+import com.nlab.reminder.core.data.repository.DeleteScheduleQuery
 import com.nlab.reminder.core.data.repository.SaveScheduleQuery
 import com.nlab.reminder.core.data.repository.UpdateAllScheduleQuery
+import com.nlab.reminder.core.kotlin.onFailure
 import com.nlab.reminder.core.kotlin.tryToNonBlankStringOrNull
 import com.nlab.statekit.dsl.reduce.DslReduce
 import com.nlab.statekit.reduce.Reduce
@@ -36,18 +38,19 @@ internal fun AllReduce(environment: AllEnvironment): AllReduce = DslReduce {
         transition<Loading> {
             Success(
                 entryAt = action.entryAt,
-                scheduleResources = action.scheduleResources,
-                completedScheduleVisible = action.completedScheduleVisible,
-                menuDropdownVisible = false,
+                scheduleResources = action.userScheduleListResourceReport.userScheduleListResources,
+                completedScheduleSummary = action.userScheduleListResourceReport.completedScheduleSummary,
+                menuExpanded = false,
                 multiSelectionEnabled = false,
+                showCompletedSchedulesCleanupConfirmation = false,
                 replayStamp = 0,
             )
         }
         transition<Success> {
             current.copy(
                 entryAt = action.entryAt,
-                scheduleResources = action.scheduleResources,
-                completedScheduleVisible = action.completedScheduleVisible,
+                scheduleResources = action.userScheduleListResourceReport.userScheduleListResources,
+                completedScheduleSummary = action.userScheduleListResourceReport.completedScheduleSummary,
                 replayStamp = 0,
             )
         }
@@ -65,6 +68,24 @@ internal fun AllReduce(environment: AllEnvironment): AllReduce = DslReduce {
             environment.completedScheduleShownRepository.setShown(isShown = action.visible)
         }
 
+        transition<CompletedSchedulesCleanupClicked> {
+            current.copy(showCompletedSchedulesCleanupConfirmation = true)
+        }
+
+        transition<CompletedSchedulesCleanupInteracted> {
+            current.copy(showCompletedSchedulesCleanupConfirmation = false)
+        }
+
+        suspendEffect<CompletedSchedulesCleanupInteracted> {
+            if (action.confirmed) {
+                environment.scheduleRepository
+                    .delete(DeleteScheduleQuery.ByComplete(isComplete = true))
+                    .onFailure { t ->
+                        // TODO Handle failure
+                    }
+            }
+        }
+
         transition<SelectionModeClicked> {
             current.copy(multiSelectionEnabled = action.enabled)
         }
@@ -74,9 +95,9 @@ internal fun AllReduce(environment: AllEnvironment): AllReduce = DslReduce {
             }
         }
 
-        transition<MenuClicked> { current.copy(menuDropdownVisible = true) }
+        transition<MenuClicked> { current.copy(menuExpanded = true) }
 
-        transition<MenuDropdownDismissed> { current.copy(menuDropdownVisible = false) }
+        transition<MenuDropdownDismissed> { current.copy(menuExpanded = false) }
 
         effect<ItemSelectionUpdated> {
             environment.userSelectedSchedulesStore.replace(action.selectedIds)

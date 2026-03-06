@@ -16,6 +16,7 @@
 
 package com.nlab.reminder.feature.all
 
+import com.nlab.reminder.core.annotation.ExcludeFromGeneratedTestReport
 import com.nlab.reminder.core.component.schedulelist.content.GetUserScheduleListResourcesFlowUseCase
 import com.nlab.reminder.core.component.schedulelist.content.UserScheduleListResource
 import com.nlab.reminder.core.data.model.Schedule
@@ -25,6 +26,7 @@ import com.nlab.reminder.core.data.qualifiers.ScheduleDataOption.All
 import com.nlab.reminder.core.data.repository.CompletedScheduleShownRepository
 import com.nlab.reminder.core.data.repository.GetScheduleQuery
 import com.nlab.reminder.core.data.repository.ScheduleRepository
+import com.nlab.reminder.core.kotlin.toNonNegativeInt
 import com.nlab.reminder.core.kotlinx.coroutines.flow.channelFlow
 import com.nlab.reminder.core.kotlinx.coroutines.flow.combine
 import com.nlab.reminder.core.kotlinx.coroutines.flow.map
@@ -43,23 +45,37 @@ import javax.inject.Inject
  * @author Thalys
  */
 @Reusable
-internal class GetAllUserScheduleListResourcesFlowUseCase @Inject constructor(
+internal class GetUserScheduleListResourceReportFlowUseCase @Inject constructor(
     @param:ScheduleData(All) private val completedScheduleShownRepository: CompletedScheduleShownRepository,
     private val scheduleRepository: ScheduleRepository,
     private val getUserScheduleListResourcesFlow: GetUserScheduleListResourcesFlowUseCase,
 ) {
-    operator fun invoke(): Flow<List<UserScheduleListResource>> = completedScheduleShownRepository
+    operator fun invoke(): Flow<UserScheduleListResourceReport> = completedScheduleShownRepository
         .getAsStream()
-        .flatMapLatest { isCompletedScheduleVisible ->
+        .flatMapLatest { completedScheduleShown ->
             scheduleRepository
                 .getSchedulesAsStream(
-                    request = if (isCompletedScheduleVisible) {
+                    request = if (completedScheduleShown) {
                         GetScheduleQuery.All
                     } else {
                         GetScheduleQuery.ByComplete(isComplete = false)
                     }
                 )
                 .let(::getScheduleResourcesFlowWith)
+                .map { userScheduleListResources ->
+                    UserScheduleListResourceReport(
+                        completedScheduleSummary = CompletedScheduleSummary(
+                            shown = completedScheduleShown,
+                            count = run {
+                                val rawCount =
+                                    if (completedScheduleShown.not()) 0
+                                    else userScheduleListResources.count { it.schedule.isComplete }
+                                rawCount.toNonNegativeInt()
+                            }
+                        ),
+                        userScheduleListResources = userScheduleListResources
+                    )
+                }
         }
 
     private fun getScheduleResourcesFlowWith(scheduleFlow: Flow<Set<Schedule>>) = channelFlow {
@@ -90,3 +106,9 @@ internal class GetAllUserScheduleListResourcesFlowUseCase @Inject constructor(
         }.filterNotNull().onEach { resultFlow.value = it }.launchIn(scope = this)
     }
 }
+
+@ExcludeFromGeneratedTestReport
+internal data class UserScheduleListResourceReport(
+    val completedScheduleSummary: CompletedScheduleSummary,
+    val userScheduleListResources: List<UserScheduleListResource>
+)

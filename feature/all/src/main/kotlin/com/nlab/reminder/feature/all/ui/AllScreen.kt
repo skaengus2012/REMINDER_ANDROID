@@ -48,6 +48,7 @@ import com.nlab.reminder.core.kotlin.collections.IdentityList
 import com.nlab.reminder.core.androidx.compose.runtime.rememberAccumulatedStateStream
 import com.nlab.reminder.core.component.schedulelist.content.ui.CompletionUpdate
 import com.nlab.reminder.core.component.schedulelist.content.ui.SelectionUpdate
+import com.nlab.reminder.core.component.schedulelist.modal.ui.CompletedSchedulesCleanupConfirmBottomSheet
 import com.nlab.reminder.core.component.schedulelist.toolbar.ui.MenuDropdown
 import com.nlab.reminder.core.designsystem.compose.component.PlaneatDropdownDivider
 import com.nlab.reminder.core.designsystem.compose.component.PlaneatDropdownIcon
@@ -62,6 +63,7 @@ import com.nlab.reminder.feature.all.AllEnvironment
 import com.nlab.reminder.feature.all.AllReduce
 import com.nlab.reminder.feature.all.AllUiState
 import com.nlab.reminder.feature.all.AllUiStateSyncedFlow
+import com.nlab.reminder.feature.all.CompletedScheduleSummary
 import com.nlab.statekit.androidx.lifecycle.store.compose.retained
 import com.nlab.statekit.bootstrap.DeliveryStarted
 import com.nlab.statekit.bootstrap.collectAsBootstrap
@@ -114,7 +116,13 @@ internal fun AllScreen(
             store.dispatch(AllAction.SelectionModeClicked(enabled = false))
         },
         onCompletedScheduleVisibilityChangeClicked = {
-            store.dispatch(AllAction.CompletedScheduleVisibilityChangeClicked(it))
+            store.dispatch(AllAction.CompletedScheduleVisibilityChangeClicked(visible = it))
+        },
+        onCompletedSchedulesCleanupClicked = {
+            store.dispatch(AllAction.CompletedSchedulesCleanupClicked)
+        },
+        onCompletedSchedulesCleanupInteracted = {
+            store.dispatch(AllAction.CompletedSchedulesCleanupInteracted(confirmed = it))
         },
         onItemSelectionChanged = { selectionUpdate ->
             store.dispatch(AllAction.ItemSelectionUpdated(selectionUpdate.selectedIds))
@@ -172,6 +180,8 @@ private fun AllScreen(
     onSelectionStartClicked: () -> Unit,
     onSelectionCompleteClicked: () -> Unit,
     onCompletedScheduleVisibilityChangeClicked: (Boolean) -> Unit,
+    onCompletedSchedulesCleanupClicked: () -> Unit,
+    onCompletedSchedulesCleanupInteracted: (Boolean) -> Unit,
     onItemSelectionChanged: (SelectionUpdate) -> Unit,
     onCompletionUpdated: (CompletionUpdate) -> Unit,
     onItemPositionUpdated: (List<UserScheduleListResource>) -> Unit,
@@ -193,11 +203,11 @@ private fun AllScreen(
             toolbarState = toolbarState,
             menuVisible = successUiState?.multiSelectionEnabled?.not() ?: true,
             menuDropdown = MenuDropdown(
-                isVisible = successUiState?.menuDropdownVisible ?: false
+                isVisible = successUiState?.menuExpanded ?: false
             ) {
                 MenuDropdown(
                     // safe: this lambda is invoked only when successUiState is a non-null AllUiState.Success
-                    isCompletedScheduleShown = successUiState!!.completedScheduleVisible,
+                    isCompletedScheduleShown = successUiState!!.completedScheduleSummary.shown,
                     onSelectionStartClicked = onSelectionStartClicked,
                     onCompletedScheduleVisibilityChangeClicked = onCompletedScheduleVisibilityChangeClicked,
                     onDismissed = onMenuDropdownDismissed,
@@ -218,6 +228,7 @@ private fun AllScreen(
                     AllScheduleListContent(
                         headline = title,
                         entryAt = uiState.entryAt,
+                        completedScheduleSummary = uiState.completedScheduleSummary,
                         scheduleResources = uiState.scheduleResources,
                         replayStamp = uiState.replayStamp,
                         multiSelectionEnabled = uiState.multiSelectionEnabled,
@@ -226,8 +237,17 @@ private fun AllScreen(
                         onCompletionUpdated = onCompletionUpdated,
                         onItemPositionUpdated = onItemPositionUpdated,
                         onSimpleAdd = onSimpleAdd,
-                        onSimpleEdit = onSimpleEdit
+                        onSimpleEdit = onSimpleEdit,
+                        onCompletedSchedulesCleanupRequested = onCompletedSchedulesCleanupClicked
                     )
+
+                    if (uiState.showCompletedSchedulesCleanupConfirmation) {
+                        CompletedSchedulesCleanupConfirmBottomSheet(
+                            completedSchedulesCount = uiState.completedScheduleSummary.count,
+                            onConfirm = { onCompletedSchedulesCleanupInteracted(true) },
+                            onCancel = { onCompletedSchedulesCleanupInteracted(false) }
+                        )
+                    }
                 }
             }
         }
@@ -238,6 +258,7 @@ private fun AllScreen(
 private fun AllScheduleListContent(
     headline: String,
     entryAt: Instant,
+    completedScheduleSummary: CompletedScheduleSummary,
     scheduleResources: List<UserScheduleListResource>,
     replayStamp: Long,
     multiSelectionEnabled: Boolean,
@@ -247,22 +268,32 @@ private fun AllScheduleListContent(
     onItemPositionUpdated: (List<UserScheduleListResource>) -> Unit,
     onSimpleAdd: (SimpleAdd) -> Unit,
     onSimpleEdit: (SimpleEdit) -> Unit,
+    onCompletedSchedulesCleanupRequested: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val navBarsPaddings = WindowInsets.navigationBars.asPaddingValues()
-    val footerForm = remember { ScheduleListItem.FooterForm(formBottomLine = FormBottomLine.Type1) }
+    val footerForm = remember {
+        ScheduleListItem.FooterForm(formBottomLine = FormBottomLine.Type1)
+    }
     val scheduleListItemsAdaptation by rememberScheduleListItemsAdaptationState(
         headline = headline,
         elements = scheduleResources,
         elementsReplayStamp = replayStamp,
         buildBodyItemsIfNotEmpty = { elements ->
             buildList {
+                if (completedScheduleSummary.shown) {
+                    this += ScheduleListItem.ClearableCompletedSubHeadline(
+                        completedScheduleCount = completedScheduleSummary.count
+                    )
+                }
+
                 elements.forEach { resource ->
                     this += ScheduleListItem.Content(
                         resource = resource,
                         isLineVisible = true
                     )
                 }
+
                 this += footerForm
             }
         }
@@ -292,6 +323,7 @@ private fun AllScheduleListContent(
         },
         onSimpleAdd = onSimpleAdd,
         onSimpleEdit = onSimpleEdit,
+        onCompletedSchedulesCleanupRequested = onCompletedSchedulesCleanupRequested,
     )
 }
 
@@ -363,6 +395,8 @@ private fun AllScreenPreview() {
             onSelectionStartClicked = {},
             onSelectionCompleteClicked = {},
             onCompletedScheduleVisibilityChangeClicked = {},
+            onCompletedSchedulesCleanupClicked = {},
+            onCompletedSchedulesCleanupInteracted = {},
             onItemSelectionChanged = {},
             onCompletionUpdated = {},
             onItemPositionUpdated = {},

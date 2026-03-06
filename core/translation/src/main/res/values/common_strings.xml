@@ -19,8 +19,16 @@
     <string name="april_short">4월</string>
     <string name="august">8월</string>
     <string name="august_short">8월</string>
-    <string name="content_completed_shown">완료된 플랜 보기</string>
+    <string name="clear">지우기</string>
+    <plurals name="confirm_delete_reminder">
+        <item quantity="other">%1$d개의 알림 삭제</item>
+    </plurals>
     <string name="content_completed_hidden">완료된 플랜 가리기</string>
+    <plurals name="content_completed_schedules_cleanup_notice_in_list">
+        <item quantity="other">%1$d개의 완료된 알림이 목록에서 삭제됩니다.</item>
+    </plurals>
+    <string name="content_completed_shown">완료된 플랜 보기</string>
+    <string name="content_completed_with_count" formatted="true">%1$d개 완료됨</string>
     <string name="content_every_days_fixed">매일</string>
     <string name="content_every_days_interval">%1$d일마다</string>
     <string name="content_every_hours_fixed">매시간</string>
@@ -133,6 +141,7 @@
     <string name="september">9월</string>
     <string name="september_short">9월</string>
     <string name="sunday">일요일</string>
+    <string name="symbol_bullet">•</string>
     <string name="third">세 번째</string>
     <string name="thursday">목요일</string>
     <plurals name="title_tag_delete_dialog">

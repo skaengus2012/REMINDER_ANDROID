@@ -19,8 +19,18 @@
     <string name="april_short">Apr</string>
     <string name="august">August</string>
     <string name="august_short">Aug</string>
-    <string name="content_completed_shown">Show completed</string>
+    <string name="clear">Clear</string>
+    <plurals name="confirm_delete_reminder">
+        <item quantity="one">Delete Reminder</item>
+        <item quantity="other">Delete %1$d Reminders</item>
+    </plurals>
     <string name="content_completed_hidden">Hide completed</string>
+    <plurals name="content_completed_schedules_cleanup_notice_in_list">
+        <item quantity="one">%1$d completed reminder will be deleted from the list</item>
+        <item quantity="other">%1$d completed reminders will be deleted from the list</item>
+    </plurals>
+    <string name="content_completed_shown">Show completed</string>
+    <string name="content_completed_with_count" formatted="true">%1$d Completed</string>
     <string name="content_every_days_fixed">Daily</string>
     <string name="content_every_days_interval" formatted="true">Every %1$d days</string>
     <string name="content_every_hours_fixed">Hourly</string>
@@ -146,6 +156,7 @@
     <string name="september">September</string>
     <string name="september_short">Sep</string>
     <string name="sunday">Sunday</string>
+    <string name="symbol_bullet">•</string>
     <string name="third">third</string>
     <string name="thursday">Thursday</string>
     <plurals name="title_tag_delete_dialog">
