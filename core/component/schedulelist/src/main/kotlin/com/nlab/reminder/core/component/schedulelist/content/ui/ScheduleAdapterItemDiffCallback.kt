@@ -33,7 +33,7 @@ internal class ScheduleAdapterItemDiffCallback : DiffUtil.ItemCallback<ScheduleL
         }
 
         else -> {
-            // When there is no ID such as header, footer, etc.
+            // For items without an explicit ID (e.g., headers, footers, forms), fall back to equality.
             true
         }
     }
