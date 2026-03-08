@@ -51,12 +51,14 @@ import kotlinx.collections.immutable.toPersistentSet
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.conflate
@@ -337,7 +339,23 @@ internal class ScheduleListFragment : Fragment() {
                 .filter { (prev, cur) ->
                     prev == RecyclerView.SCROLL_STATE_IDLE && cur == RecyclerView.SCROLL_STATE_DRAGGING
                 },
-        ).onEach { itemTouchCallback.removeSwipeClamp(binding.recyclerviewSchedule) }
+        ).onEach { itemTouchCallback.removeSwipeClamp() }
+            .launchIn(viewLifecycleScope)
+
+        callbackFlow {
+            val recyclerView = binding.recyclerviewSchedule
+            val listener = object : RecyclerView.OnChildAttachStateChangeListener {
+                fun dispatchViewHolderEvents(v: View) {
+                    if (v.isLaidOut.not()) return
+                    recyclerView.findContainingViewHolder(v)?.let { trySend(it) }
+                }
+
+                override fun onChildViewAttachedToWindow(v: View) = dispatchViewHolderEvents(v)
+                override fun onChildViewDetachedFromWindow(v: View) = dispatchViewHolderEvents(v)
+            }
+            recyclerView.addOnChildAttachStateChangeListener(listener)
+            awaitClose { recyclerView.removeOnChildAttachStateChangeListener(listener) }
+        }.onEach { viewHolder -> itemTouchCallback.resetSwipeClamp(viewHolder) }
             .launchIn(viewLifecycleScope)
 
         multiSelectionEnabledState.unwrap()
