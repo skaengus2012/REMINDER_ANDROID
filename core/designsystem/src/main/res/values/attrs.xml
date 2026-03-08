@@ -38,4 +38,5 @@
     <attr name="white" format="color" />
     <attr name="black" format="color" />
     <attr name="red1" format="color" />
+    <attr name="dark_gray1" format="color" />
 </resources>
