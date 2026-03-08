@@ -134,7 +134,7 @@ internal fun TagDeleteBottomSheet(
             }
         ),
         button = PlaneatBottomButton.TwoButton(
-            primaryButtonText = stringResource(id = StringIds.label_delete),
+            primaryButtonText = stringResource(id = StringIds.delete),
             onPrimaryButtonClicked = throttleClick {
                 coroutineScope.launch {
                     sheetState.hide()

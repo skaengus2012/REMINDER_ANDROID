@@ -58,7 +58,6 @@
     <string name="format_trigger_at_date_only_tomorrow">내일</string>
     <string name="format_trigger_at_time_only">a h:mm</string>
     <string name="label_complete">완료</string>
-    <string name="label_delete">삭제</string>
     <string name="label_lists">목록</string>
     <string name="label_all">전체</string>
     <string name="new_plan">새로운 플랜</string>

@@ -102,6 +102,8 @@
     </plurals>
     <string name="december">12월</string>
     <string name="december_short">12월</string>
+    <string name="delete">삭제</string>
+    <string name="details">세부사항</string>
     <string name="february">2월</string>
     <string name="february_short">2월</string>
     <string name="fifth">다섯 번째</string>

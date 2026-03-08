@@ -133,7 +133,7 @@ internal class ScheduleListFragment : Fragment() {
             dragAnchorOverlay = scheduleListDragAnchorOverlay,
             dragToScaleTargetHeight = dpToPx(/* dpValue =*/ 150f, resources.displayMetrics),
             dragScaleAnimateDuration = 250L,
-            swipeCancelAnimateDuration = 100L,
+            swipeCancelAnimateDuration = 350L,
             clampSwipeThreshold = 0.5f,
             maxClampSwipeWidthMultiplier = 1.75f,
             itemMoveListener = object : ScheduleListItemTouchCallback.ItemMoveListener {

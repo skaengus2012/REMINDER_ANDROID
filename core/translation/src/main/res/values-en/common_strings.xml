@@ -113,6 +113,8 @@
     </plurals>
     <string name="december">December</string>
     <string name="december_short">Dec</string>
+    <string name="delete">Delete</string>
+    <string name="details">Details</string>
     <string name="february">February</string>
     <string name="february_short">Feb</string>
     <string name="fifth">fifth</string>
