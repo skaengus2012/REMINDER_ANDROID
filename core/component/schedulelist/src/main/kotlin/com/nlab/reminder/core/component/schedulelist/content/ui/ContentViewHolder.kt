@@ -84,6 +84,8 @@ internal class ContentViewHolder(
     completionCheckedScheduleIds: StateFlow<Set<ScheduleId>>,
     onCompletionUpdated: (CompletionUpdate) -> Unit,
     onSimpleEditDone: (SimpleEdit) -> Unit,
+    onDeleteRequested: (Delete) -> Unit,
+    onOpenDetailRequested: (OpenDetail) -> Unit,
     onDragHandleTouched: (RecyclerView.ViewHolder) -> Unit,
     onSelectButtonTouched: (RecyclerView.ViewHolder) -> Unit,
     onFocusChanged: (RecyclerView.ViewHolder, Boolean) -> Unit,
@@ -296,6 +298,28 @@ internal class ContentViewHolder(
                 scheduleTimingDisplayFormatterState.collect { formatter ->
                     if (formatter == null) return@collect
                     binding.edittextDetail.bindScheduleTimingDisplayFormatter(formatter)
+                }
+            }
+            jobs += viewLifecycleScope.launch {
+                bindingId.filterNotNull().collectLatest { id ->
+                    var openDetail: OpenDetail? = null
+                    binding.layoutClamp.buttonDetails.throttleClicks().collect {
+                        if (openDetail == null) {
+                            openDetail = OpenDetail(id = id, from = OpenDetailFrom.Clamp)
+                        }
+                        onOpenDetailRequested(openDetail)
+                    }
+                }
+            }
+            jobs += viewLifecycleScope.launch {
+                bindingId.filterNotNull().collectLatest { id ->
+                    var delete: Delete? = null
+                    binding.layoutClamp.buttonDelete.throttleClicks().collect {
+                        if (delete == null) {
+                            delete = Delete(id)
+                        }
+                        onDeleteRequested(delete)
+                    }
                 }
             }
         }

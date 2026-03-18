@@ -53,7 +53,9 @@ fun ScheduleListContent(
     theme: ScheduleListTheme,
     onSelectionUpdated: (SelectionUpdate) -> Unit,
     onCompletionUpdated: (CompletionUpdate) -> Unit,
+    onDeleteRequested: (Delete) -> Unit,
     onItemPositionUpdated: (ItemPositionUpdate) -> Unit,
+    onOpenDetailRequested: (OpenDetail) -> Unit,
     onSimpleAdd: (SimpleAdd) -> Unit,
     onSimpleEdit: (SimpleEdit) -> Unit,
     onCompletedSchedulesCleanupRequested: () -> Unit,
@@ -120,8 +122,14 @@ fun ScheduleListContent(
         LaunchedEffect(fragment, onCompletionUpdated) {
             fragment.onCompletionUpdateConsumerChanged(consumer = onCompletionUpdated)
         }
+        LaunchedEffect(fragment, onDeleteRequested) {
+            fragment.onDeleteConsumerChanged(consumer = onDeleteRequested)
+        }
         LaunchedEffect(fragment, onItemPositionUpdated) {
             fragment.onItemPositionUpdateConsumerChanged(consumer = onItemPositionUpdated)
+        }
+        LaunchedEffect(fragment, onOpenDetailRequested) {
+            fragment.onOpenDetailConsumerChanged(onOpenDetailRequested)
         }
         LaunchedEffect(fragment, onSimpleAdd) {
             fragment.onSimpleAddConsumerChanged(consumer = onSimpleAdd)

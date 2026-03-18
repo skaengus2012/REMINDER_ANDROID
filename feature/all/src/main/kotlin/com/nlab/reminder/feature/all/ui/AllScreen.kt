@@ -47,6 +47,8 @@ import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
 import com.nlab.reminder.core.kotlin.collections.IdentityList
 import com.nlab.reminder.core.androidx.compose.runtime.rememberAccumulatedStateStream
 import com.nlab.reminder.core.component.schedulelist.content.ui.CompletionUpdate
+import com.nlab.reminder.core.component.schedulelist.content.ui.Delete
+import com.nlab.reminder.core.component.schedulelist.content.ui.OpenDetail
 import com.nlab.reminder.core.component.schedulelist.content.ui.SelectionUpdate
 import com.nlab.reminder.core.component.schedulelist.modal.ui.CompletedSchedulesCleanupConfirmBottomSheet
 import com.nlab.reminder.core.component.schedulelist.toolbar.ui.MenuDropdown
@@ -124,9 +126,6 @@ internal fun AllScreen(
         onCompletedSchedulesCleanupInteracted = {
             store.dispatch(AllAction.CompletedSchedulesCleanupInteracted(confirmed = it))
         },
-        onItemSelectionChanged = { selectionUpdate ->
-            store.dispatch(AllAction.ItemSelectionUpdated(selectionUpdate.selectedIds))
-        },
         onCompletionUpdated = { completionUpdate ->
             store.dispatch(
                 AllAction.ItemCompletionUpdated(
@@ -135,8 +134,17 @@ internal fun AllScreen(
                 )
             )
         },
+        onDeleteRequested = { delete ->
+            showAppToast("TODO implements $delete")
+        },
         onItemPositionUpdated = { userScheduleListResources ->
             store.dispatch(AllAction.ItemPositionUpdated(userScheduleListResources))
+        },
+        onItemSelectionChanged = { selectionUpdate ->
+            store.dispatch(AllAction.ItemSelectionUpdated(selectionUpdate.selectedIds))
+        },
+        onOpenDetailRequested = { openDetail ->
+            showAppToast("TODO implements $openDetail")
         },
         onSimpleAdd = { simpleAdd ->
             store.dispatch(AllAction.AddSchedule(title = simpleAdd.title, note = simpleAdd.note))
@@ -182,9 +190,11 @@ private fun AllScreen(
     onCompletedScheduleVisibilityChangeClicked: (Boolean) -> Unit,
     onCompletedSchedulesCleanupClicked: () -> Unit,
     onCompletedSchedulesCleanupInteracted: (Boolean) -> Unit,
-    onItemSelectionChanged: (SelectionUpdate) -> Unit,
     onCompletionUpdated: (CompletionUpdate) -> Unit,
+    onDeleteRequested: (Delete) -> Unit,
     onItemPositionUpdated: (List<UserScheduleListResource>) -> Unit,
+    onItemSelectionChanged: (SelectionUpdate) -> Unit,
+    onOpenDetailRequested: (OpenDetail) -> Unit,
     onSimpleAdd: (SimpleAdd) -> Unit,
     onSimpleEdit: (SimpleEdit) -> Unit,
     modifier: Modifier = Modifier,
@@ -235,7 +245,9 @@ private fun AllScreen(
                         toolbarState = toolbarState,
                         onItemSelectionChanged = onItemSelectionChanged,
                         onCompletionUpdated = onCompletionUpdated,
+                        onDeleteRequested = onDeleteRequested,
                         onItemPositionUpdated = onItemPositionUpdated,
+                        onOpenDetailRequested = onOpenDetailRequested,
                         onSimpleAdd = onSimpleAdd,
                         onSimpleEdit = onSimpleEdit,
                         onCompletedSchedulesCleanupRequested = onCompletedSchedulesCleanupClicked
@@ -265,7 +277,9 @@ private fun AllScheduleListContent(
     toolbarState: ScheduleListToolbarState,
     onItemSelectionChanged: (SelectionUpdate) -> Unit,
     onCompletionUpdated: (CompletionUpdate) -> Unit,
+    onDeleteRequested: (Delete) -> Unit,
     onItemPositionUpdated: (List<UserScheduleListResource>) -> Unit,
+    onOpenDetailRequested: (OpenDetail) -> Unit,
     onSimpleAdd: (SimpleAdd) -> Unit,
     onSimpleEdit: (SimpleEdit) -> Unit,
     onCompletedSchedulesCleanupRequested: () -> Unit,
@@ -311,6 +325,7 @@ private fun AllScheduleListContent(
         toolbarState = toolbarState,
         onSelectionUpdated = onItemSelectionChanged,
         onCompletionUpdated = onCompletionUpdated,
+        onDeleteRequested = onDeleteRequested,
         onItemPositionUpdated = { itemPositionUpdated ->
             val userScheduleListResources = buildList {
                 itemPositionUpdated.snapshot.forEach { item ->
@@ -321,6 +336,7 @@ private fun AllScheduleListContent(
             }
             onItemPositionUpdated(userScheduleListResources)
         },
+        onOpenDetailRequested = onOpenDetailRequested,
         onSimpleAdd = onSimpleAdd,
         onSimpleEdit = onSimpleEdit,
         onCompletedSchedulesCleanupRequested = onCompletedSchedulesCleanupRequested,
@@ -397,9 +413,11 @@ private fun AllScreenPreview() {
             onCompletedScheduleVisibilityChangeClicked = {},
             onCompletedSchedulesCleanupClicked = {},
             onCompletedSchedulesCleanupInteracted = {},
-            onItemSelectionChanged = {},
             onCompletionUpdated = {},
+            onDeleteRequested = {},
             onItemPositionUpdated = {},
+            onItemSelectionChanged = {},
+            onOpenDetailRequested = {},
             onSimpleAdd = {},
             onSimpleEdit = {}
         )

@@ -18,6 +18,7 @@ package com.nlab.reminder.core.component.schedulelist.content.ui
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.util.TypedValueCompat.dpToPx
@@ -44,36 +45,35 @@ import com.nlab.reminder.core.androix.recyclerview.verticalScrollRange
 import com.nlab.reminder.core.component.schedulelist.databinding.FragmentScheduleListBinding
 import com.nlab.reminder.core.component.schedulelist.toolbar.ui.ScheduleListToolbarState
 import com.nlab.reminder.core.data.model.ScheduleId
-import com.nlab.reminder.core.kotlinx.coroutines.flow.map
 import com.nlab.reminder.core.kotlinx.coroutines.flow.withPrev
 import kotlinx.collections.immutable.PersistentSet
 import kotlinx.collections.immutable.toPersistentSet
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.TimeZone
 import kotlin.math.absoluteValue
@@ -96,9 +96,11 @@ internal class ScheduleListFragment : Fragment() {
     private val listBottomScrollPaddingState = MutableIdentityStateFlow<Int>()
     private val toolbarStateState = MutableIdentityStateFlow<ScheduleListToolbarState?>()
     private val selectionUpdateConsumerState = MutableIdentityStateFlow<(SelectionUpdate) -> Unit>()
-    private val completedSchedulesCleanupConsumer = MutableIdentityStateFlow<() -> Unit>()
+    private val completedSchedulesCleanupConsumerState = MutableIdentityStateFlow<() -> Unit>()
     private val completionUpdateConsumerState = MutableIdentityStateFlow<(CompletionUpdate) -> Unit>()
+    private val deleteConsumerState = MutableIdentityStateFlow<(Delete) -> Unit>()
     private val itemPositionUpdateConsumerState = MutableIdentityStateFlow<(ItemPositionUpdate) -> Unit>()
+    private val openDetailConsumerState = MutableIdentityStateFlow<(OpenDetail) -> Unit>()
     private val simpleAddConsumerState = MutableIdentityStateFlow<(SimpleAdd) -> Unit>()
     private val simpleEditConsumerState = MutableIdentityStateFlow<(SimpleEdit) -> Unit>()
 
@@ -212,6 +214,9 @@ internal class ScheduleListFragment : Fragment() {
             .map { linearLayoutManager.findLastVisibleItemPosition() }
             .distinctUntilChanged()
             .shareIn(viewLifecycleScope, SharingStarted.Eagerly)
+        val focusChanges = scheduleListAdapter.focusChanges
+            .receiveAsFlow()
+            .shareIn(viewLifecycleScope, SharingStarted.Eagerly)
 
         val toolbarVisibilityState = combine(
             verticalScrollRanges
@@ -293,30 +298,37 @@ internal class ScheduleListFragment : Fragment() {
             sync = scheduleListAdapter::syncCompletionChecked,
         ) { syncJob ->
             forwardEventToConsumer(
-                eventSourceFlow = scheduleListAdapter.completionUpdateRequests,
+                eventSource = scheduleListAdapter.completionUpdateRequests,
                 eventConsumerFlow = completionUpdateConsumerState.unwrap(),
                 awaitConsumerReady = { syncJob.join() }
             )
         }
 
         forwardEventToConsumer(
-            eventSourceFlow = scheduleListAdapter.clearCompletedSchedulesRequests,
-            eventConsumerFlow = completedSchedulesCleanupConsumer
+            eventSource = scheduleListAdapter.clearCompletedSchedulesRequests,
+            eventConsumerFlow = completedSchedulesCleanupConsumerState
                 .unwrap()
-                .map { consumer -> { consumer() } },
-            awaitConsumerReady = {}
+                .map { consumer -> { consumer() } }
         )
 
         forwardEventToConsumer(
-            eventSourceFlow = scheduleListAdapter.addRequests,
-            eventConsumerFlow = simpleAddConsumerState.unwrap(),
-            awaitConsumerReady = {}
+            eventSource = scheduleListAdapter.deleteRequests,
+            eventConsumerFlow = deleteConsumerState.unwrap()
         )
 
         forwardEventToConsumer(
-            eventSourceFlow = scheduleListAdapter.editRequests,
-            eventConsumerFlow = simpleEditConsumerState.unwrap(),
-            awaitConsumerReady = {}
+            eventSource = scheduleListAdapter.openDetailRequests,
+            eventConsumerFlow = openDetailConsumerState.unwrap()
+        )
+
+        forwardEventToConsumer(
+            eventSource = scheduleListAdapter.addRequests,
+            eventConsumerFlow = simpleAddConsumerState.unwrap()
+        )
+
+        forwardEventToConsumer(
+            eventSource = scheduleListAdapter.editRequests,
+            eventConsumerFlow = simpleEditConsumerState.unwrap()
         )
 
         merge(
@@ -329,7 +341,6 @@ internal class ScheduleListFragment : Fragment() {
             .launchIn(viewLifecycleScope)
 
         merge(
-            recyclerViewItemTouches,
             multiSelectionEnabledState.unwrap()
                 .filter { enabled -> enabled }
                 .flowWithLifecycle(viewLifecycle),
@@ -340,6 +351,17 @@ internal class ScheduleListFragment : Fragment() {
                     prev == RecyclerView.SCROLL_STATE_IDLE && cur == RecyclerView.SCROLL_STATE_DRAGGING
                 },
         ).onEach { itemTouchCallback.removeSwipeClamp() }
+            .launchIn(viewLifecycleScope)
+
+        recyclerViewItemTouches
+            .filter { it.action == MotionEvent.ACTION_DOWN }
+            .onEach { event ->
+                val viewHolder = binding.recyclerviewSchedule
+                    .findChildViewUnder(event.x, event.y)
+                    ?.let { binding.recyclerviewSchedule.getChildViewHolder(it) }
+                    ?: return@onEach
+                itemTouchCallback.removeSwipeClampWith(viewHolder, touchX = event.x)
+            }
             .launchIn(viewLifecycleScope)
 
         callbackFlow {
@@ -371,7 +393,7 @@ internal class ScheduleListFragment : Fragment() {
             }
             .launchIn(viewLifecycleScope)
 
-        scheduleListAdapter.focusChanges
+        focusChanges
             .onEach { focusChanged ->
                 if (focusChanged.focused) {
                     val receivedPosition = focusChanged.viewHolder.bindingAdapterPosition
@@ -385,8 +407,7 @@ internal class ScheduleListFragment : Fragment() {
             .launchIn(viewLifecycleScope)
 
         combine(
-            scheduleListAdapter.focusChanges
-                .map { it.viewHolder.bindingAdapterPosition to it.focused },
+            focusChanges.map { it.viewHolder.bindingAdapterPosition to it.focused },
             firstVisiblePositions,
             lastVisiblePositions
         ) { (viewHolderPosition, focused), firstVisiblePosition, lastVisiblePosition ->
@@ -419,7 +440,7 @@ internal class ScheduleListFragment : Fragment() {
             viewLifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 toolbarStateState.unwrap().collectLatest { toolbarState ->
                     if (toolbarState == null) return@collectLatest
-                    scheduleListAdapter.focusChanges.collectLatest { event ->
+                    focusChanges.collectLatest { event ->
                         if (event.focused) toolbarState.editCompleteVisible = true
                         else {
                             // Prevents the keyboard from lowering and then coming up immediately due to changing the input field.
@@ -431,15 +452,13 @@ internal class ScheduleListFragment : Fragment() {
             }
         }
 
-        scheduleListAdapter.dragHandleTouches
-            .conflate()
-            .onEach { itemTouchHelper.startDrag(it) }
-            .launchIn(viewLifecycleScope)
+        viewLifecycleScope.launch {
+            for (viewHolder in scheduleListAdapter.dragHandleTouches) itemTouchHelper.startDrag(viewHolder)
+        }
 
-        scheduleListAdapter.selectButtonTouches
-            .conflate()
-            .onEach { multiSelectionHelper.enable(it) }
-            .launchIn(viewLifecycleScope)
+        viewLifecycleScope.launch {
+            for (viewHolder in scheduleListAdapter.selectButtonTouches) multiSelectionHelper.enable(viewHolder)
+        }
 
         viewLifecycle.eventFlow
             .mapNotNull { event ->
@@ -453,9 +472,12 @@ internal class ScheduleListFragment : Fragment() {
             .onEach { isVisible -> scheduleListDragAnchorOverlay.setVisible(isVisible) }
             .launchIn(viewLifecycleScope)
 
-        val adjustPosEvents = MutableSharedFlow<Int>(extraBufferCapacity = 1)
+        val adjustPosEvents = Channel<Int>(
+            capacity = 1,
+            onBufferOverflow = BufferOverflow.DROP_OLDEST
+        )
         viewLifecycleScope.launch {
-            adjustPosEvents.collectLatest { pos ->
+            adjustPosEvents.receiveAsFlow().collectLatest { pos ->
                 if (pos == RecyclerView.NO_POSITION) return@collectLatest
 
                 binding.recyclerviewSchedule.run {
@@ -523,10 +545,9 @@ internal class ScheduleListFragment : Fragment() {
                         commitCallback = { complete(Unit) }
                     )
                 }
-                adjustPosEvents.tryEmit(firstVisiblePosBeforeUpdate)
+                adjustPosEvents.trySend(firstVisiblePosBeforeUpdate)
             }
             .launchIn(viewLifecycleScope)
-
 
         viewLifecycle.eventFlow
             .filter { event -> event == Lifecycle.Event.ON_DESTROY }
@@ -609,26 +630,16 @@ internal class ScheduleListFragment : Fragment() {
         block(firstSyncJob)
     }
 
-    private inline fun <T> forwardEventToConsumer(
-        eventSourceFlow: SharedFlow<T>,
+    private fun <T> forwardEventToConsumer(
+        eventSource: ReceiveChannel<T>,
         eventConsumerFlow: Flow<(T) -> Unit>,
-        crossinline awaitConsumerReady: suspend () -> Unit
+        awaitConsumerReady: suspend () -> Unit = {}
     ) {
-        val eventQueueState = MutableStateFlow<List<T>>(emptyList())
-        eventSourceFlow
-            .onEach { event -> eventQueueState.update { it + event } }
-            .launchIn(viewLifecycleScope)
         viewLifecycleScope.launch {
             awaitConsumerReady()
             viewLifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 eventConsumerFlow.collectLatest { consumer ->
-                    eventQueueState.collect { data ->
-                        val event = data.firstOrNull()
-                        if (event != null) {
-                            consumer.invoke(event)
-                            eventQueueState.update { it - event }
-                        }
-                    }
+                    for (event in eventSource) consumer.invoke(event)
                 }
             }
         }
@@ -671,15 +682,23 @@ internal class ScheduleListFragment : Fragment() {
     }
 
     fun onCompletedSchedulesCleanupConsumerChanged(consumer: ()-> Unit) {
-        completedSchedulesCleanupConsumer.update(consumer)
+        completedSchedulesCleanupConsumerState.update(consumer)
     }
 
     fun onCompletionUpdateConsumerChanged(consumer: (CompletionUpdate) -> Unit) {
         completionUpdateConsumerState.update(consumer)
     }
 
+    fun onDeleteConsumerChanged(consumer: (Delete) -> Unit) {
+        deleteConsumerState.update(consumer)
+    }
+
     fun onItemPositionUpdateConsumerChanged(consumer: (ItemPositionUpdate) -> Unit) {
         itemPositionUpdateConsumerState.update(consumer)
+    }
+
+    fun onOpenDetailConsumerChanged(consumer: (OpenDetail) -> Unit) {
+        openDetailConsumerState.update(consumer)
     }
 
     fun onSimpleAddConsumerChanged(consumer: (SimpleAdd) -> Unit) {

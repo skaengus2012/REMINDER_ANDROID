@@ -330,6 +330,33 @@ internal class ScheduleListItemTouchCallback(
         curSwipingViewHolder = null
     }
 
+    fun removeSwipeClampWith(viewHolder: RecyclerView.ViewHolder, touchX: Float) {
+        if (curSwipingViewHolder === viewHolder && isTouchInClampArea(viewHolder, touchX)) {
+            // If the viewHolder is currently swiped and the touch is within the clamp area,
+            // do not ignore the clamp.
+            return
+        }
+        removeSwipeClamp()
+    }
+
+    private fun isTouchInClampArea(viewHolder: RecyclerView.ViewHolder, touchX: Float): Boolean {
+        val swipingDX = viewHolder.userSwipingDX ?: return false
+        if (swipingDX == 0f) return false
+
+        val itemView = viewHolder.itemView
+        itemView.getLocationInWindow(outLocation)
+
+        // Calculate the relative X coordinate within the itemView
+        val relativeX = touchX - itemView.left
+        return if (itemView.isLayoutRtl) {
+            // In RTL: Swiping right reveals the clamp on the left (swipingDX > 0)
+            relativeX < swipingDX
+        } else {
+            // In LTR: Swiping left reveals the clamp on the right (swipingDX < 0)
+            relativeX > (itemView.width + swipingDX)
+        }
+    }
+
     fun resetSwipeClamp(viewHolder: RecyclerView.ViewHolder) {
         if (viewHolder !is SwipeableViewHolder) return
 
