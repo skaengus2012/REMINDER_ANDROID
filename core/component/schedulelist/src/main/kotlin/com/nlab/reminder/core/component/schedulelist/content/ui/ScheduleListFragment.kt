@@ -637,10 +637,12 @@ internal class ScheduleListFragment : Fragment() {
     ) {
         viewLifecycleScope.launch {
             awaitConsumerReady()
+
+            var currentConsumer: ((T) -> Unit)? = null
+            launch { eventConsumerFlow.collect { currentConsumer = it } }
+
             viewLifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                eventConsumerFlow.collectLatest { consumer ->
-                    for (event in eventSource) consumer.invoke(event)
-                }
+                for (event in eventSource) currentConsumer?.invoke(event)
             }
         }
     }
