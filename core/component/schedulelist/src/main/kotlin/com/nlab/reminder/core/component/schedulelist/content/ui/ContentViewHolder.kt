@@ -66,6 +66,7 @@ import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import kotlinx.datetime.TimeZone
 import kotlin.math.absoluteValue
+import kotlin.math.max
 import kotlin.time.Instant
 
 /**
@@ -83,6 +84,8 @@ internal class ContentViewHolder(
     completionCheckedScheduleIds: StateFlow<Set<ScheduleId>>,
     onCompletionUpdated: (CompletionUpdate) -> Unit,
     onSimpleEditDone: (SimpleEdit) -> Unit,
+    onDeleteRequested: (Delete) -> Unit,
+    onOpenDetailRequested: (OpenDetail) -> Unit,
     onDragHandleTouched: (RecyclerView.ViewHolder) -> Unit,
     onSelectButtonTouched: (RecyclerView.ViewHolder) -> Unit,
     onFocusChanged: (RecyclerView.ViewHolder, Boolean) -> Unit,
@@ -297,6 +300,20 @@ internal class ContentViewHolder(
                     binding.edittextDetail.bindScheduleTimingDisplayFormatter(formatter)
                 }
             }
+            jobs += viewLifecycleScope.launch {
+                bindingId.filterNotNull().collectLatest { id ->
+                    binding.layoutClamp.buttonDetails.throttleClicks().collect {
+                        onOpenDetailRequested(OpenDetail(id = id, from = OpenDetailFrom.Clamp))
+                    }
+                }
+            }
+            jobs += viewLifecycleScope.launch {
+                bindingId.filterNotNull().collectLatest { id ->
+                    binding.layoutClamp.buttonDelete.throttleClicks().collect {
+                        onDeleteRequested(Delete(id))
+                    }
+                }
+            }
         }
         itemView.doOnDetach {
             selectionAnimDelegate.clearResources()
@@ -439,23 +456,50 @@ private class DraggableViewHolderDelegate(
 private class SwipeableViewHolderDelegate(
     private val binding: LayoutScheduleAdapterItemContentBinding,
 ) : SwipeableViewHolder {
-    private val clampAlphaOrigin: Float = binding.layoutClampDim.alpha
+    private val clampAlphaOrigin: Float = binding.layoutClamp.layoutDim.alpha
 
     private val _swipingState = MutableStateFlow(false)
     val swipingState: StateFlow<Boolean> = _swipingState.asStateFlow()
 
+    private val translatableViews = binding.layoutClamp.let {
+        listOf(
+            it.viewBtnDetailsBg,
+            it.buttonDetails,
+            it.viewBtnDeleteBg,
+            it.buttonDelete
+        )
+    }
+    private val scalableViews = binding.layoutClamp.let {
+        listOf(
+            it.viewBtnDetailsBg,
+            it.viewBtnDeleteBg,
+        )
+    }
     override val swipeView: View = binding.layoutContent
-    override val clampView: View = binding.buttonDelete
+    override val clampView: View = binding.layoutClamp.spacePivot
 
     override fun userSwipeable(): Boolean {
         return binding.isInteractable()
     }
 
     override fun onSwipe(dx: Float) {
-        val isActive = dx.absoluteValue != 0f
+        val absoluteDx = dx.absoluteValue
+        val clampTotalSize = clampView.width.toFloat()
+        val clampPercent = absoluteDx / clampTotalSize
+
+        val isActive = clampPercent != 0f
         _swipingState.value = isActive
-        binding.layoutClamp.setVisible(isVisible = isActive, goneIfNotVisible = false)
-        binding.layoutClampDim.alpha = clampAlphaOrigin - dx.absoluteValue / clampView.width * clampAlphaOrigin
+        binding.layoutClamp.root.setVisible(isVisible = isActive, goneIfNotVisible = false)
+
+        val remainingFraction = (1 - clampPercent)
+        binding.layoutClamp.layoutDim.alpha = clampAlphaOrigin * remainingFraction
+
+        translatableViews.forEach { v ->
+            v.translationX = (clampTotalSize - v.left + clampView.left) * remainingFraction
+        }
+
+        val scaleFactor = max(clampPercent, 1f)
+        scalableViews.forEach { v -> v.pivotX = 0f; v.scaleX = scaleFactor }
     }
 }
 

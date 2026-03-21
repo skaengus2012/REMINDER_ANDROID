@@ -57,7 +57,6 @@
     <string name="format_trigger_at_time_only">h:mm a</string>
     <string name="label_all">All</string>
     <string name="label_complete">Done</string>
-    <string name="label_delete">Delete</string>
     <string name="label_lists">Lists</string>
     <string name="new_plan">New Plan</string>
 </resources>

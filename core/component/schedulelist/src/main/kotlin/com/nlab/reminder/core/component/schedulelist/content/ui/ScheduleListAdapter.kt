@@ -32,10 +32,9 @@ import com.nlab.reminder.core.component.schedulelist.databinding.LayoutScheduleA
 import com.nlab.reminder.core.data.model.ScheduleId
 import kotlinx.collections.immutable.*
 import kotlinx.coroutines.channels.BufferOverflow
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.datetime.TimeZone
 import kotlin.time.Instant
@@ -71,8 +70,8 @@ internal class ScheduleListAdapter(
         initialValue = persistentHashSetOf(),
         syncDuration = 300L
     )
-    private val _completionUpdateRequests = MutableEventSharedFlow<CompletionUpdate>()
-    val completionUpdateRequests: SharedFlow<CompletionUpdate> = _completionUpdateRequests.asSharedFlow()
+    private val _completionUpdateRequests = EventChannel<CompletionUpdate>()
+    val completionUpdateRequests: ReceiveChannel<CompletionUpdate> = _completionUpdateRequests
 
     private val selectedScheduleIds = SyncableState<PersistentSet<ScheduleId>>(
         lifecycleScope = lifecycleScope,
@@ -85,23 +84,29 @@ internal class ScheduleListAdapter(
     private val _itemPositionUpdateRequests = MutableIdentityStateFlow<ItemPositionUpdate>()
     val itemPositionUpdateRequests: IdentityStateFlow<ItemPositionUpdate> = _itemPositionUpdateRequests.asStateFlow()
 
-    private val _addRequests = MutableEventSharedFlow<SimpleAdd>()
-    val addRequests: SharedFlow<SimpleAdd> = _addRequests.asSharedFlow()
+    private val _addRequests = EventChannel<SimpleAdd>()
+    val addRequests: ReceiveChannel<SimpleAdd> = _addRequests
 
-    private val _clearCompletedScheduleRequests = MutableEventSharedFlow<Unit>()
-    val clearCompletedSchedulesRequests: SharedFlow<Unit> = _clearCompletedScheduleRequests.asSharedFlow()
+    private val _clearCompletedScheduleRequests = EventChannel<Unit>()
+    val clearCompletedSchedulesRequests: ReceiveChannel<Unit> = _clearCompletedScheduleRequests
 
-    private val _dragHandleTouches = MutableEventSharedFlow<RecyclerView.ViewHolder>()
-    val dragHandleTouches: SharedFlow<RecyclerView.ViewHolder> = _dragHandleTouches.asSharedFlow()
+    private val _dragHandleTouches = EventChannel<RecyclerView.ViewHolder>()
+    val dragHandleTouches: ReceiveChannel<RecyclerView.ViewHolder> = _dragHandleTouches
 
-    private val _editRequests = MutableEventSharedFlow<SimpleEdit>()
-    val editRequests: SharedFlow<SimpleEdit> = _editRequests.asSharedFlow()
+    private val _editRequests = EventChannel<SimpleEdit>()
+    val editRequests: ReceiveChannel<SimpleEdit> = _editRequests
 
-    private val _selectButtonTouches = MutableEventSharedFlow<RecyclerView.ViewHolder>()
-    val selectButtonTouches: SharedFlow<RecyclerView.ViewHolder> = _selectButtonTouches.asSharedFlow()
+    private val _deleteRequests = EventChannel<Delete>()
+    val deleteRequests: ReceiveChannel<Delete> = _deleteRequests
 
-    private val _focusChanges = MutableEventSharedFlow<FocusChange>()
-    val focusChanges: SharedFlow<FocusChange> = _focusChanges.asSharedFlow()
+    private val _openDetailRequests = EventChannel<OpenDetail>()
+    val openDetailRequests: ReceiveChannel<OpenDetail> = _openDetailRequests
+
+    private val _selectButtonTouches = EventChannel<RecyclerView.ViewHolder>()
+    val selectButtonTouches: ReceiveChannel<RecyclerView.ViewHolder> = _selectButtonTouches
+
+    private val _focusChanges = EventChannel<FocusChange>()
+    val focusChanges: ReceiveChannel<FocusChange> = _focusChanges
 
     private fun getItem(position: Int): ScheduleListItem {
         return differ.getCurrentList()[position]
@@ -130,7 +135,7 @@ internal class ScheduleListAdapter(
                         parent,
                         /* attachToParent = */ false
                     ),
-                    onClearClicked = { _clearCompletedScheduleRequests.tryEmit(Unit) }
+                    onClearClicked = { _clearCompletedScheduleRequests.trySend(Unit) }
                 )
             }
 
@@ -158,13 +163,15 @@ internal class ScheduleListAdapter(
                                 currentIds - completionUpdate.id
                             }
                         )
-                        _completionUpdateRequests.tryEmit(completionUpdate)
+                        _completionUpdateRequests.trySend(completionUpdate)
                     },
-                    onSimpleEditDone = { _editRequests.tryEmit(it) },
-                    onDragHandleTouched = { _dragHandleTouches.tryEmit(it) },
-                    onSelectButtonTouched = { _selectButtonTouches.tryEmit(it) },
+                    onSimpleEditDone = { _editRequests.trySend(it) },
+                    onDeleteRequested = { _deleteRequests.trySend(it) },
+                    onOpenDetailRequested = { _openDetailRequests.trySend(it) },
+                    onDragHandleTouched = { _dragHandleTouches.trySend(it) },
+                    onSelectButtonTouched = { _selectButtonTouches.trySend(it) },
                     onFocusChanged = { viewHolder, focused ->
-                        _focusChanges.tryEmit(FocusChange(viewHolder, focused))
+                        _focusChanges.trySend(FocusChange(viewHolder, focused))
                     },
                 )
             }
@@ -177,8 +184,8 @@ internal class ScheduleListAdapter(
                         /* attachToParent = */ false
                     ),
                     themeState = themeState,
-                    onSimpleAddDone = { _addRequests.tryEmit(it) },
-                    onFocusChanged = { viewHolder, focused -> _focusChanges.tryEmit(FocusChange(viewHolder, focused)) },
+                    onSimpleAddDone = { _addRequests.trySend(it) },
+                    onFocusChanged = { viewHolder, focused -> _focusChanges.trySend(FocusChange(viewHolder, focused)) },
                 )
             }
 
@@ -190,8 +197,8 @@ internal class ScheduleListAdapter(
                         /* attachToParent = */ false
                     ),
                     themeState = themeState,
-                    onSimpleAddDone = { _addRequests.tryEmit(it) },
-                    onFocusChanged = { viewHolder, focused -> _focusChanges.tryEmit(FocusChange(viewHolder, focused)) }
+                    onSimpleAddDone = { _addRequests.trySend(it) },
+                    onFocusChanged = { viewHolder, focused -> _focusChanges.trySend(FocusChange(viewHolder, focused)) }
                 )
             }
 
@@ -325,7 +332,7 @@ internal class ScheduleListAdapter(
 }
 
 @Suppress("FunctionName")
-private fun <T> MutableEventSharedFlow(extraBufferCapacity: Int = 128): MutableSharedFlow<T> = MutableSharedFlow(
-    extraBufferCapacity = extraBufferCapacity,
+private fun <T> EventChannel(capacity: Int = 128): Channel<T> = Channel(
+    capacity = capacity,
     onBufferOverflow = BufferOverflow.DROP_OLDEST
 )
