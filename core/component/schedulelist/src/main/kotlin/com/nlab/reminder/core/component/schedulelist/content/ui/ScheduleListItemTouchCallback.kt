@@ -344,8 +344,6 @@ internal class ScheduleListItemTouchCallback(
         if (swipingDX == 0f) return false
 
         val itemView = viewHolder.itemView
-        itemView.getLocationInWindow(outLocation)
-
         // Calculate the relative X coordinate within the itemView
         val relativeX = touchX - itemView.left
         return if (itemView.isLayoutRtl) {
