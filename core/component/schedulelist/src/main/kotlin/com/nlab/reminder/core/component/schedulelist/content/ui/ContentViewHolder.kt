@@ -302,23 +302,15 @@ internal class ContentViewHolder(
             }
             jobs += viewLifecycleScope.launch {
                 bindingId.filterNotNull().collectLatest { id ->
-                    var openDetail: OpenDetail? = null
                     binding.layoutClamp.buttonDetails.throttleClicks().collect {
-                        if (openDetail == null) {
-                            openDetail = OpenDetail(id = id, from = OpenDetailFrom.Clamp)
-                        }
-                        onOpenDetailRequested(openDetail)
+                        onOpenDetailRequested(OpenDetail(id = id, from = OpenDetailFrom.Clamp))
                     }
                 }
             }
             jobs += viewLifecycleScope.launch {
                 bindingId.filterNotNull().collectLatest { id ->
-                    var delete: Delete? = null
                     binding.layoutClamp.buttonDelete.throttleClicks().collect {
-                        if (delete == null) {
-                            delete = Delete(id)
-                        }
-                        onDeleteRequested(delete)
+                        onDeleteRequested(Delete(id))
                     }
                 }
             }
