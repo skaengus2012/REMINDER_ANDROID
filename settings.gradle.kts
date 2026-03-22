@@ -60,6 +60,7 @@ include(
     ":core:androidx:navigation-compose",
     ":core:androidx:recyclerview",
     ":core:annotation",
+    ":core:component:bottombar",
     ":core:component:currenttime",
     ":core:component:displayformat",
     ":core:component:schedule",

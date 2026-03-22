@@ -13,6 +13,7 @@ dependencies {
     implementation(projects.core.designsystem)
     implementation(projects.core.kotlin)
     implementation(projects.core.kotlinx.coroutinesAndroid)
+    implementation(projects.core.translation)
 
     implementation(libs.androidx.compose.material3)
 }

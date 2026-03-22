@@ -74,9 +74,9 @@ import com.nlab.reminder.core.data.model.TagId
 import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
 import com.nlab.reminder.core.kotlin.toNonBlankString
 import com.nlab.reminder.core.kotlin.toNonNegativeLong
-import com.nlab.reminder.core.androidx.compose.ui.ColorPressButton
 import com.nlab.reminder.core.androidx.compose.ui.HeadBlurLayer
 import com.nlab.reminder.core.androidx.compose.ui.throttleClick
+import com.nlab.reminder.core.component.bottombar.ui.NewPlanButton
 import com.nlab.reminder.core.component.tag.edit.ui.compose.TagEditStateHandler
 import com.nlab.reminder.core.component.tag.ui.compose.TagCard
 import com.nlab.reminder.core.designsystem.compose.component.PlaneatLoadingContent
@@ -618,8 +618,8 @@ private fun BottomActions(
                 NewPlanButton(
                     modifier = Modifier
                         .height(contentHeight)
-                        .padding(start = 20.dp, end = 10.dp),
-                    onClick = onNewPlanClicked
+                        .padding(start = 10.dp),
+                    onClick = throttleClick(onClick = onNewPlanClicked)
                 )
                 Spacer(modifier = Modifier.windowInsetsBottomHeight(WindowInsets.navigationBars))
             }
@@ -662,32 +662,6 @@ private fun BottomBlurLayer(
                 .height(0.5.dp)
                 .align(Alignment.TopCenter)
                 .drawBehind { drawRect(color = lineColor.copy(alpha = alphaState)) }
-        )
-    }
-}
-
-@Composable
-private fun NewPlanButton(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    ColorPressButton(
-        contentColor = PlaneatTheme.colors.point1,
-        modifier = modifier,
-        onClick = throttleClick(onClick = onClick)
-    ) { contentColor ->
-        Icon(
-            modifier = Modifier
-                .width(35.73.dp)
-                .height(20.69.dp),
-            painter = painterResource(id = DrawableIds.ic_new_plan),
-            contentDescription = null,
-            tint = contentColor
-        )
-        Text(
-            text = stringResource(StringIds.new_plan),
-            style = PlaneatTheme.typography.titleMedium,
-            color = contentColor
         )
     }
 }
