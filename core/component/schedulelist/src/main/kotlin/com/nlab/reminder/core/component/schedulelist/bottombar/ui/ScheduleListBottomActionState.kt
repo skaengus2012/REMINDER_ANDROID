@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The N's lab Open Source Project
+ * Copyright (C) 2026 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.component.schedulelist.toolbar.ui
+package com.nlab.reminder.core.component.schedulelist.bottombar.ui
 
 import androidx.annotation.FloatRange
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 
@@ -29,10 +28,8 @@ import androidx.compose.runtime.setValue
  * @author Thalys
  */
 @Stable
-class ScheduleListToolbarState internal constructor(
-    initialTitleVisible: Boolean,
-    @FloatRange(from = 0.0, to = 1.0) initialBackgroundAlpha: Float,
-    initialEditCompleteVisible: Boolean
+class ScheduleListBottomActionState internal constructor(
+    @FloatRange(from = 0.0, to = 1.0) initialBackgroundAlpha: Float
 ) {
     init {
         require(initialBackgroundAlpha in 0f..1f) {
@@ -40,22 +37,14 @@ class ScheduleListToolbarState internal constructor(
         }
     }
 
-    var titleVisible: Boolean by mutableStateOf(initialTitleVisible)
-        internal set
-
     @get:FloatRange(from = 0.0, to = 1.0)
     var backgroundAlpha: Float by mutableFloatStateOf(initialBackgroundAlpha)
-        internal set
-
-    var editCompleteVisible: Boolean by mutableStateOf(initialEditCompleteVisible)
         internal set
 }
 
 @Composable
-fun rememberScheduleListToolbarState(
-    initialTitleVisible: Boolean = false,
+fun rememberScheduleListBottomActionState(
     @FloatRange(from = 0.0, to = 1.0) initialBackgroundAlpha: Float = 0f,
-    initialEditCompleteVisible: Boolean = false
-): ScheduleListToolbarState = remember {
-    ScheduleListToolbarState(initialTitleVisible, initialBackgroundAlpha, initialEditCompleteVisible)
+): ScheduleListBottomActionState = remember {
+    ScheduleListBottomActionState(initialBackgroundAlpha)
 }
