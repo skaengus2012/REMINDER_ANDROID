@@ -21,12 +21,10 @@ import android.view.ViewGroup
 import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.recyclerview.widget.AdapterListUpdateCallback
 import androidx.recyclerview.widget.RecyclerView
-import com.nlab.reminder.core.component.schedulelist.databinding.LayoutScheduleAdapterItemComposeViewBinding
 import com.nlab.reminder.core.component.schedulelist.databinding.LayoutScheduleAdapterItemContentBinding
 import com.nlab.reminder.core.component.schedulelist.databinding.LayoutScheduleAdapterItemFooterFormBinding
 import com.nlab.reminder.core.component.schedulelist.databinding.LayoutScheduleAdapterItemFormBinding
 import com.nlab.reminder.core.component.schedulelist.databinding.LayoutScheduleAdapterItemHeadlineBinding
-import com.nlab.reminder.core.component.schedulelist.databinding.LayoutScheduleAdapterItemHeadlinePaddingBinding
 import com.nlab.reminder.core.component.schedulelist.databinding.LayoutScheduleAdapterListGroupHeaderDefaultBinding
 import com.nlab.reminder.core.component.schedulelist.databinding.LayoutScheduleAdapterListGroupHeaderSubDefaultBinding
 import com.nlab.reminder.core.data.model.ScheduleId
@@ -44,8 +42,8 @@ private const val ITEM_VIEW_TYPE_CONTENT = 2
 private const val ITEM_VIEW_TYPE_FOOTER_FORM = 3
 private const val ITEM_VIEW_TYPE_FORM = 4
 private const val ITEM_VIEW_TYPE_HEADLINE = 5
-private const val ITEM_VIEW_TYPE_HEADLINE_PADDING = 6
-private const val ITEM_VIEW_TYPE_GROUP_HEADER = 7
+private const val ITEM_VIEW_TYPE_GROUP_HEADER = 6
+private const val ITEM_VIEW_TYPE_PADDING = 7
 private const val ITEM_VIEW_TYPE_SUB_GROUP_HEADER = 8
 
 /**
@@ -120,8 +118,8 @@ internal class ScheduleListAdapter(
         is ScheduleListItem.Form -> ITEM_VIEW_TYPE_FORM
         is ScheduleListItem.FooterForm -> ITEM_VIEW_TYPE_FOOTER_FORM
         is ScheduleListItem.Headline -> ITEM_VIEW_TYPE_HEADLINE
-        is ScheduleListItem.HeadlinePadding -> ITEM_VIEW_TYPE_HEADLINE_PADDING
         is ScheduleListItem.GroupHeader -> ITEM_VIEW_TYPE_GROUP_HEADER
+        is ScheduleListItem.Padding -> ITEM_VIEW_TYPE_PADDING
         is ScheduleListItem.SubGroupHeader -> ITEM_VIEW_TYPE_SUB_GROUP_HEADER
     }
 
@@ -130,11 +128,7 @@ internal class ScheduleListAdapter(
         return when (viewType) {
             ITEM_VIEW_TYPE_CLEARABLE_COMPLETED_SUB_HEADLINE -> {
                 ClearableCompletedSubHeadlineViewHolder(
-                    binding = LayoutScheduleAdapterItemComposeViewBinding.inflate(
-                        layoutInflater,
-                        parent,
-                        /* attachToParent = */ false
-                    ),
+                    binding = ComposeViewItemBinding(layoutInflater, parent),
                     onClearClicked = { _clearCompletedScheduleRequests.trySend(Unit) }
                 )
             }
@@ -213,16 +207,6 @@ internal class ScheduleListAdapter(
                 )
             }
 
-            ITEM_VIEW_TYPE_HEADLINE_PADDING -> {
-                HeadlinePaddingViewHolder(
-                    binding = LayoutScheduleAdapterItemHeadlinePaddingBinding.inflate(
-                        layoutInflater,
-                        parent,
-                        /* attachToParent = */ false
-                    ),
-                )
-            }
-
             ITEM_VIEW_TYPE_GROUP_HEADER -> {
                 GroupHeaderViewHolder(
                     binding = LayoutScheduleAdapterListGroupHeaderDefaultBinding.inflate(
@@ -230,6 +214,12 @@ internal class ScheduleListAdapter(
                         parent,
                         /* attachToParent = */ false
                     )
+                )
+            }
+
+            ITEM_VIEW_TYPE_PADDING -> {
+                PaddingViewHolder(
+                    binding = ComposeViewItemBinding(layoutInflater, parent)
                 )
             }
 
@@ -242,6 +232,7 @@ internal class ScheduleListAdapter(
                     )
                 )
             }
+
 
             else -> {
                 throw IllegalArgumentException("Unknown view type: $viewType")
@@ -259,7 +250,7 @@ internal class ScheduleListAdapter(
             is HeadlineViewHolder -> holder.bind(item as ScheduleListItem.Headline)
             is GroupHeaderViewHolder -> holder.bind(item as ScheduleListItem.GroupHeader)
             is SubGroupHeaderViewHolder -> holder.bind(item as ScheduleListItem.SubGroupHeader)
-            is HeadlinePaddingViewHolder -> Unit
+            is PaddingViewHolder -> holder.bind(item as ScheduleListItem.Padding)
         }
     }
 
