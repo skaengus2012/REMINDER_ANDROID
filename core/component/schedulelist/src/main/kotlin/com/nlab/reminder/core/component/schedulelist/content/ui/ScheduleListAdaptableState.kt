@@ -21,6 +21,7 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
 import com.nlab.reminder.core.component.schedulelist.content.ScheduleListElement
 import com.nlab.reminder.core.kotlin.collections.IdentityList
 import com.nlab.reminder.core.kotlin.collections.toIdentityList
@@ -47,6 +48,12 @@ fun <T : ScheduleListElement> rememberScheduleListItemsAdaptationState(
     buildBodyItemsIfNotEmpty: (List<T>) -> List<ScheduleListItem>,
 ): State<ScheduleListItemsAdaptation> {
     val headlineItem = ScheduleListItem.Headline(text = headline)
+    val headlinePadding = remember {
+        ScheduleListItem.Padding(type = ScheduleListItemPaddingType.Headline)
+    }
+    val footerPadding = remember {
+        ScheduleListItem.Padding(type = ScheduleListItemPaddingType.Footer)
+    }
     val bodyItems by produceState<List<ScheduleListItem>?>(
         initialValue = null,
         key1 = elements,
@@ -77,11 +84,12 @@ fun <T : ScheduleListElement> rememberScheduleListItemsAdaptationState(
             val totalItems = buildList {
                 // add headline
                 add(headlineItem)
-                add(ScheduleListItem.HeadlinePadding)
+                add(headlinePadding)
                 if (currentBodyItems.isEmpty()) {
                     // TODO add empty ui
                 } else {
                     addAll(currentBodyItems)
+                    add(footerPadding)
                 }
             }
             ScheduleListItemsAdaptation.Exist(

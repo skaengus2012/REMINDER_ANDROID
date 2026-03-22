@@ -59,7 +59,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -532,7 +531,7 @@ private fun TagCards(
         if (tags.isEmpty()) {
             Text(
                 modifier = Modifier.align(Alignment.Center),
-                text = LocalContext.current.getString(StringIds.common_tag_empty),
+                text = stringResource(StringIds.common_tag_empty),
                 style = PlaneatTheme.typography.bodyMedium,
                 color = PlaneatTheme.colors.content2,
             )

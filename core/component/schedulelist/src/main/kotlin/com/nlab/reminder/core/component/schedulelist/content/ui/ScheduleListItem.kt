@@ -46,8 +46,6 @@ sealed class ScheduleListItem {
 
     internal data class Headline(val text: String) : ScheduleListItem()
 
-    internal data object HeadlinePadding : ScheduleListItem()
-
     data class GroupHeader(
         val title: String,
         val subTitle: CharSequence,
@@ -56,4 +54,11 @@ sealed class ScheduleListItem {
     data class SubGroupHeader(
         val title: CharSequence
     ) : ScheduleListItem(), StickyHeaderItem
+
+    internal data class Padding(val type: ScheduleListItemPaddingType): ScheduleListItem()
+}
+
+internal enum class ScheduleListItemPaddingType {
+    Headline,
+    Footer
 }
