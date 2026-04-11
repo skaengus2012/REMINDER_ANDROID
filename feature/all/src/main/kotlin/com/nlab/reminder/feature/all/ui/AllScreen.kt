@@ -49,7 +49,6 @@ import com.nlab.reminder.core.component.schedulelist.toolbar.ui.rememberSchedule
 import com.nlab.reminder.core.component.schedulelist.bottombar.ui.ScheduleListBottomAppbarState
 import com.nlab.reminder.core.component.schedulelist.bottombar.ui.rememberScheduleListBottomAppbarState
 import com.nlab.reminder.core.component.bottomappbar.ui.BottomAppbar
-import com.nlab.reminder.core.component.bottomappbar.ui.BottomAppbarDefaults
 import com.nlab.reminder.core.component.bottomappbar.ui.NewPlanButton
 import com.nlab.reminder.core.androidx.compose.ui.throttleClick
 import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
