@@ -25,6 +25,8 @@ import com.nlab.reminder.core.kotlin.NonNegativeInt
  */
 @Immutable
 sealed class ScheduleListItem {
+    internal data object BottomAppbarPadding : ScheduleListItem()
+
     data class ClearableCompletedSubHeadline(
         val completedScheduleCount: NonNegativeInt
     ) : ScheduleListItem()
@@ -44,14 +46,14 @@ sealed class ScheduleListItem {
         val formBottomLine: FormBottomLine
     ) : ScheduleListItem()
 
-    internal data class Headline(val text: String) : ScheduleListItem()
-
-    internal data object HeadlinePadding : ScheduleListItem()
-
     data class GroupHeader(
         val title: String,
         val subTitle: CharSequence,
     ) : ScheduleListItem(), StickyHeaderItem
+
+    internal data class Headline(val text: String) : ScheduleListItem()
+
+    internal data object HeadlinePadding : ScheduleListItem()
 
     data class SubGroupHeader(
         val title: CharSequence

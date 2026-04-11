@@ -15,6 +15,7 @@ android {
 
 dependencies {
     api(projects.core.component.displayformat)
+    api(projects.core.component.bottomappbar)
     api(projects.core.dataExt)
 
     implementation(projects.core.android)

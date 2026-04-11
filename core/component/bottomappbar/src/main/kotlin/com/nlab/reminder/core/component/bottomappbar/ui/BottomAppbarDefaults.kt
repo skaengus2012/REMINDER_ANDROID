@@ -14,26 +14,16 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.component.schedulelist.content.ui
+package com.nlab.reminder.core.component.bottomappbar.ui
 
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
-import androidx.compose.ui.Modifier
+import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
 
 /**
- * A ViewHolder that renders the headline-to-content padding spacer (15 dp).
- *
- * @author Doohyun
+ * @author Thalys
  */
-internal class HeadlinePaddingViewHolder(
-    binding: ComposeViewItemBinding
-) : ScheduleAdapterItemViewHolder(binding.root) {
-
-    init {
-        binding.setContent {
-            Spacer(modifier = Modifier.height(15.dp))
-        }
-    }
+object BottomAppbarDefaults {
+    @get:ReadOnlyComposable
+    val Height: Dp get() = 50.dp
 }

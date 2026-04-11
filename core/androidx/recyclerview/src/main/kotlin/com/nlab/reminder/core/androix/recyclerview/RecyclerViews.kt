@@ -79,3 +79,45 @@ fun RecyclerView.itemTouches(): Flow<MotionEvent> = callbackFlow {
         removeOnItemTouchListener(listener)
     }
 }
+
+data object SimpleItemUpdated
+fun RecyclerView.Adapter<*>.itemUpdatesSimplified(): Flow<SimpleItemUpdated> = callbackFlow {
+    val listener = object : RecyclerView.AdapterDataObserver() {
+        fun notifyJustItemChanged() {
+            trySend(SimpleItemUpdated)
+        }
+
+        override fun onChanged() = notifyJustItemChanged()
+
+        override fun onItemRangeChanged(
+            positionStart: Int,
+            itemCount: Int
+        ) = notifyJustItemChanged()
+
+        override fun onItemRangeChanged(
+            positionStart: Int,
+            itemCount: Int,
+            payload: Any?
+        ) = notifyJustItemChanged()
+
+        override fun onItemRangeInserted(
+            positionStart: Int,
+            itemCount: Int
+        ) = notifyJustItemChanged()
+
+        override fun onItemRangeRemoved(
+            positionStart: Int,
+            itemCount: Int
+        ) = notifyJustItemChanged()
+
+        override fun onItemRangeMoved(
+            fromPosition: Int,
+            toPosition: Int,
+            itemCount: Int
+        ) = notifyJustItemChanged()
+    }
+    registerAdapterDataObserver(listener)
+    awaitClose {
+        unregisterAdapterDataObserver(listener)
+    }
+}

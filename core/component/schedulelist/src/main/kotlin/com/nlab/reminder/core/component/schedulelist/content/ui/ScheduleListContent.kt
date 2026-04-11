@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.fragment.compose.AndroidFragment
 import com.nlab.reminder.core.androidx.compose.ui.LocalTimeZone
 import com.nlab.reminder.core.component.schedulelist.toolbar.ui.ScheduleListToolbarState
+import com.nlab.reminder.core.component.schedulelist.bottombar.ui.ScheduleListBottomAppbarState
 import kotlin.time.Instant
 
 /**
@@ -62,6 +63,7 @@ fun ScheduleListContent(
     modifier: Modifier = Modifier,
     listBottomScrollPadding: Dp = 0.dp, // A value greater than 0 must be included to become valid.
     toolbarState: ScheduleListToolbarState? = null,
+    bottomAppbarState: ScheduleListBottomAppbarState? = null,
 ) {
     val layoutDirection = LocalLayoutDirection.current
     val displayCutoutPaddings = WindowInsets.displayCutout.asPaddingValues()
@@ -107,6 +109,9 @@ fun ScheduleListContent(
         }
         LaunchedEffect(fragment, toolbarState) {
             fragment.onToolbarStateUpdated(toolbarState)
+        }
+        LaunchedEffect(fragment, bottomAppbarState) {
+            fragment.onBottomAppbarStateUpdated(bottomAppbarState)
         }
         LaunchedEffect(fragment, density, listBottomScrollPadding) {
             fragment.onListBottomScrollPaddingUpdated(

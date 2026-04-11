@@ -82,6 +82,7 @@ fun <T : ScheduleListElement> rememberScheduleListItemsAdaptationState(
                     // TODO add empty ui
                 } else {
                     addAll(currentBodyItems)
+                    add(ScheduleListItem.BottomAppbarPadding)
                 }
             }
             ScheduleListItemsAdaptation.Exist(
