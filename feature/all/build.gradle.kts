@@ -8,6 +8,8 @@ android {
 }
 
 dependencies {
+    api(projects.core.component.bottomappbar)
+
     implementation(projects.core.component.currenttime)
     implementation(projects.core.component.schedule)
     implementation(projects.core.component.schedulelist)

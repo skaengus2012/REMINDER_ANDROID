@@ -17,13 +17,16 @@
 package com.nlab.reminder.feature.all.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -43,6 +46,12 @@ import com.nlab.reminder.core.component.schedulelist.content.ui.rememberSchedule
 import com.nlab.reminder.core.component.schedulelist.toolbar.ui.ScheduleListToolbar
 import com.nlab.reminder.core.component.schedulelist.toolbar.ui.ScheduleListToolbarState
 import com.nlab.reminder.core.component.schedulelist.toolbar.ui.rememberScheduleListToolbarState
+import com.nlab.reminder.core.component.schedulelist.bottombar.ui.ScheduleListBottomAppbarState
+import com.nlab.reminder.core.component.schedulelist.bottombar.ui.rememberScheduleListBottomAppbarState
+import com.nlab.reminder.core.component.bottomappbar.ui.BottomAppbar
+import com.nlab.reminder.core.component.bottomappbar.ui.BottomAppbarDefaults
+import com.nlab.reminder.core.component.bottomappbar.ui.NewPlanButton
+import com.nlab.reminder.core.androidx.compose.ui.throttleClick
 import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
 import com.nlab.reminder.core.kotlin.collections.IdentityList
 import com.nlab.reminder.core.androidx.compose.runtime.rememberAccumulatedStateStream
@@ -158,6 +167,9 @@ internal fun AllScreen(
                     tagNames = simpleEdit.tagNames
                 )
             )
+        },
+        onNewPlanClicked = {
+            showAppToast("TODO implements NewPlan")
         }
     )
 }
@@ -197,71 +209,87 @@ private fun AllScreen(
     onOpenDetailRequested: (OpenDetail) -> Unit,
     onSimpleAdd: (SimpleAdd) -> Unit,
     onSimpleEdit: (SimpleEdit) -> Unit,
+    onNewPlanClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Column(
+    val toolbarState = rememberScheduleListToolbarState()
+    val bottomAppbarState = rememberScheduleListBottomAppbarState()
+    val title = stringResource(StringIds.label_all)
+    val successUiState = uiState as? AllUiState.Success
+    Box(
         modifier = modifier
             .background(color = PlaneatTheme.colors.bg2)
             .fillMaxSize()
     ) {
-        val title = stringResource(StringIds.label_all)
-        val toolbarState = rememberScheduleListToolbarState()
-        val successUiState = uiState as? AllUiState.Success
-        ScheduleListToolbar(
-            modifier = modifier,
-            title = title,
-            toolbarState = toolbarState,
-            menuVisible = successUiState?.multiSelectionEnabled?.not() ?: true,
-            menuDropdown = MenuDropdown(
-                isVisible = successUiState?.menuExpanded ?: false
-            ) {
-                MenuDropdown(
-                    // safe: this lambda is invoked only when successUiState is a non-null AllUiState.Success
-                    isCompletedScheduleShown = successUiState!!.completedScheduleSummary.shown,
-                    onSelectionStartClicked = onSelectionStartClicked,
-                    onCompletedScheduleVisibilityChangeClicked = onCompletedScheduleVisibilityChangeClicked,
-                    onDismissed = onMenuDropdownDismissed,
-                )
-            },
-            onMenuClicked = onMenuClicked,
-            selectionCompleteVisible = successUiState?.multiSelectionEnabled ?: false,
-            onSelectionCompleteClicked = onSelectionCompleteClicked,
-            onBackClicked = onBackClicked,
-        )
-        DelayedContent(delayTimeMillis = contentDelayTimeMillis) {
-            when (uiState) {
-                is AllUiState.Loading -> {
-                    // todo make loading.
-                }
-
-                is AllUiState.Success -> {
-                    AllScheduleListContent(
-                        headline = title,
-                        entryAt = uiState.entryAt,
-                        completedScheduleSummary = uiState.completedScheduleSummary,
-                        scheduleResources = uiState.scheduleResources,
-                        replayStamp = uiState.replayStamp,
-                        multiSelectionEnabled = uiState.multiSelectionEnabled,
-                        toolbarState = toolbarState,
-                        onItemSelectionChanged = onItemSelectionChanged,
-                        onCompletionUpdated = onCompletionUpdated,
-                        onDeleteRequested = onDeleteRequested,
-                        onItemPositionUpdated = onItemPositionUpdated,
-                        onOpenDetailRequested = onOpenDetailRequested,
-                        onSimpleAdd = onSimpleAdd,
-                        onSimpleEdit = onSimpleEdit,
-                        onCompletedSchedulesCleanupRequested = onCompletedSchedulesCleanupClicked
+        Column {
+            ScheduleListToolbar(
+                modifier = modifier,
+                title = title,
+                toolbarState = toolbarState,
+                menuVisible = successUiState?.multiSelectionEnabled?.not() ?: true,
+                menuDropdown = MenuDropdown(
+                    isVisible = successUiState?.menuExpanded ?: false
+                ) {
+                    MenuDropdown(
+                        // safe: this lambda is invoked only when successUiState is a non-null AllUiState.Success
+                        isCompletedScheduleShown = successUiState!!.completedScheduleSummary.shown,
+                        onSelectionStartClicked = onSelectionStartClicked,
+                        onCompletedScheduleVisibilityChangeClicked = onCompletedScheduleVisibilityChangeClicked,
+                        onDismissed = onMenuDropdownDismissed,
                     )
+                },
+                onMenuClicked = onMenuClicked,
+                selectionCompleteVisible = successUiState?.multiSelectionEnabled ?: false,
+                onSelectionCompleteClicked = onSelectionCompleteClicked,
+                onBackClicked = onBackClicked,
+            )
+            DelayedContent(delayTimeMillis = contentDelayTimeMillis) {
+                when (uiState) {
+                    is AllUiState.Loading -> {
+                        // todo make loading.
+                    }
 
-                    if (uiState.showCompletedSchedulesCleanupConfirmation) {
-                        CompletedSchedulesCleanupConfirmBottomSheet(
-                            completedSchedulesCount = uiState.completedScheduleSummary.count,
-                            onConfirm = { onCompletedSchedulesCleanupInteracted(true) },
-                            onCancel = { onCompletedSchedulesCleanupInteracted(false) }
+                    is AllUiState.Success -> {
+                        AllScheduleListContent(
+                            headline = title,
+                            entryAt = uiState.entryAt,
+                            completedScheduleSummary = uiState.completedScheduleSummary,
+                            scheduleResources = uiState.scheduleResources,
+                            replayStamp = uiState.replayStamp,
+                            multiSelectionEnabled = uiState.multiSelectionEnabled,
+                            toolbarState = toolbarState,
+                            bottomAppbarState = bottomAppbarState,
+                            onItemSelectionChanged = onItemSelectionChanged,
+                            onCompletionUpdated = onCompletionUpdated,
+                            onDeleteRequested = onDeleteRequested,
+                            onItemPositionUpdated = onItemPositionUpdated,
+                            onOpenDetailRequested = onOpenDetailRequested,
+                            onSimpleAdd = onSimpleAdd,
+                            onSimpleEdit = onSimpleEdit,
+                            onCompletedSchedulesCleanupRequested = onCompletedSchedulesCleanupClicked
                         )
+
+                        if (uiState.showCompletedSchedulesCleanupConfirmation) {
+                            CompletedSchedulesCleanupConfirmBottomSheet(
+                                completedSchedulesCount = uiState.completedScheduleSummary.count,
+                                onConfirm = { onCompletedSchedulesCleanupInteracted(true) },
+                                onCancel = { onCompletedSchedulesCleanupInteracted(false) }
+                            )
+                        }
                     }
                 }
             }
+        }
+        
+        BottomAppbar(
+            bottomAppbarState = bottomAppbarState,
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()
+        ) {
+            NewPlanButton(
+                onClick = throttleClick(onClick = onNewPlanClicked)
+            )
         }
     }
 }
@@ -275,6 +303,7 @@ private fun AllScheduleListContent(
     replayStamp: Long,
     multiSelectionEnabled: Boolean,
     toolbarState: ScheduleListToolbarState,
+    bottomAppbarState: ScheduleListBottomAppbarState,
     onItemSelectionChanged: (SelectionUpdate) -> Unit,
     onCompletionUpdated: (CompletionUpdate) -> Unit,
     onDeleteRequested: (Delete) -> Unit,
@@ -323,6 +352,7 @@ private fun AllScheduleListContent(
             navBarsPaddings.calculateBottomPadding()
         },
         toolbarState = toolbarState,
+        bottomAppbarState = bottomAppbarState,
         onSelectionUpdated = onItemSelectionChanged,
         onCompletionUpdated = onCompletionUpdated,
         onDeleteRequested = onDeleteRequested,
@@ -419,7 +449,8 @@ private fun AllScreenPreview() {
             onItemSelectionChanged = {},
             onOpenDetailRequested = {},
             onSimpleAdd = {},
-            onSimpleEdit = {}
+            onSimpleEdit = {},
+            onNewPlanClicked = {}
         )
     }
 }
