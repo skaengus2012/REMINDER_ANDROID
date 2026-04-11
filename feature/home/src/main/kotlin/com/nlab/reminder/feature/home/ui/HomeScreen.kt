@@ -31,20 +31,16 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.layout.windowInsetsBottomHeight
-import androidx.compose.foundation.layout.windowInsetsStartWidth
 import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -57,9 +53,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -75,9 +69,11 @@ import com.nlab.reminder.core.data.model.TagId
 import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
 import com.nlab.reminder.core.kotlin.toNonBlankString
 import com.nlab.reminder.core.kotlin.toNonNegativeLong
-import com.nlab.reminder.core.androidx.compose.ui.ColorPressButton
 import com.nlab.reminder.core.androidx.compose.ui.HeadBlurLayer
 import com.nlab.reminder.core.androidx.compose.ui.throttleClick
+import com.nlab.reminder.core.component.bottomappbar.ui.BottomAppbar
+import com.nlab.reminder.core.component.bottomappbar.ui.rememberDelegatedBottomAppbarState
+import com.nlab.reminder.core.component.bottomappbar.ui.NewPlanButton
 import com.nlab.reminder.core.component.tag.edit.ui.compose.TagEditStateHandler
 import com.nlab.reminder.core.component.tag.ui.compose.TagCard
 import com.nlab.reminder.core.designsystem.compose.component.PlaneatLoadingContent
@@ -532,7 +528,7 @@ private fun TagCards(
         if (tags.isEmpty()) {
             Text(
                 modifier = Modifier.align(Alignment.Center),
-                text = LocalContext.current.getString(StringIds.common_tag_empty),
+                text = stringResource(StringIds.common_tag_empty),
                 style = PlaneatTheme.typography.bodyMedium,
                 color = PlaneatTheme.colors.content2,
             )
@@ -598,97 +594,45 @@ private fun BottomActions(
     modifier: Modifier = Modifier,
 ) {
     var computedHeightToPx by remember { mutableIntStateOf(0) }
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .onSizeChanged { computedHeightToPx = it.height }
-    ) {
-        if (computedHeightToPx != 0) {
-            BottomBlurLayer(
-                modifier = Modifier.matchParentSize(),
-                computedHeightToPx = computedHeightToPx,
-                alphaAnimScrollTriggerOffsetToPx = with(LocalDensity.current) {
-                    remember(contentHeight, bodyBottomPadding) { (bodyBottomPadding - contentHeight).toPx().toInt() }
-                },
-                bodyScrollState = bodyScrollState,
-            )
-        }
-        Row {
-            Spacer(modifier = Modifier.windowInsetsStartWidth(WindowInsets.displayCutout))
-            Column {
-                NewPlanButton(
-                    modifier = Modifier
-                        .height(contentHeight)
-                        .padding(start = 20.dp, end = 10.dp),
-                    onClick = onNewPlanClicked
-                )
-                Spacer(modifier = Modifier.windowInsetsBottomHeight(WindowInsets.navigationBars))
-            }
-        }
+    val density = LocalDensity.current
+    val alphaAnimScrollTriggerOffsetToPx = remember(contentHeight, bodyBottomPadding, density) {
+        with(density) { (bodyBottomPadding - contentHeight).toPx().toInt() }
     }
-}
-
-@Composable
-private fun BottomBlurLayer(
-    bodyScrollState: ScrollState,
-    computedHeightToPx: Int,
-    alphaAnimScrollTriggerOffsetToPx: Int,
-    modifier: Modifier = Modifier
-) {
-    val containerColor = PlaneatTheme.colors.bg1Layer
-    val lineColor = PlaneatTheme.colors.bgLine1
-    val alphaState by remember(computedHeightToPx, alphaAnimScrollTriggerOffsetToPx, bodyScrollState) {
+    val backgroundAlphaState = remember(
+        computedHeightToPx,
+        alphaAnimScrollTriggerOffsetToPx,
+        bodyScrollState
+    ) {
         val computedHeightWithOffsetToPx = computedHeightToPx + alphaAnimScrollTriggerOffsetToPx
         val maxBottomContainerAnimPx = (computedHeightWithOffsetToPx - computedHeightToPx).toFloat()
         derivedStateOf {
-            if (bodyScrollState.maxValue == Int.MAX_VALUE) 0f
-            else {
+            if (bodyScrollState.maxValue == Int.MAX_VALUE
+                // Prevent division by zero when the maximum animation range is zero or negative.
+                || maxBottomContainerAnimPx <= 0f
+            ) {
+                0f
+            } else {
                 val remainScrollToPx = bodyScrollState.maxValue - bodyScrollState.value
                 val visibleClipToPaddingHeight =
                     maxOf(computedHeightWithOffsetToPx - remainScrollToPx, 0)
                 val bottomContainerAnimPx = maxOf(visibleClipToPaddingHeight - computedHeightToPx, 0)
-                1f - bottomContainerAnimPx / maxBottomContainerAnimPx
+
+                // Prevent alpha from dropping below 0f when over-scrolling past the maximum scroll limit (rubber banding).
+                (1f - bottomContainerAnimPx / maxBottomContainerAnimPx).coerceIn(0f, 1f)
             }
         }
     }
-    Box(modifier = modifier) {
-        Spacer(
-            modifier = Modifier
-                .matchParentSize()
-                .drawBehind { drawRect(color = containerColor.copy(alpha = 0.925f * alphaState)) }
-        )
-        Spacer(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(0.5.dp)
-                .align(Alignment.TopCenter)
-                .drawBehind { drawRect(color = lineColor.copy(alpha = alphaState)) }
-        )
-    }
-}
-
-@Composable
-private fun NewPlanButton(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    ColorPressButton(
-        contentColor = PlaneatTheme.colors.point1,
-        modifier = modifier,
-        onClick = throttleClick(onClick = onClick)
-    ) { contentColor ->
-        Icon(
-            modifier = Modifier
-                .width(35.73.dp)
-                .height(20.69.dp),
-            painter = painterResource(id = DrawableIds.ic_new_plan),
-            contentDescription = null,
-            tint = contentColor
-        )
-        Text(
-            text = stringResource(StringIds.new_plan),
-            style = PlaneatTheme.typography.titleMedium,
-            color = contentColor
+    BottomAppbar(
+        bottomAppbarState = rememberDelegatedBottomAppbarState(
+            backgroundAlphaState = backgroundAlphaState
+        ),
+        modifier = modifier
+            .fillMaxWidth()
+            .onSizeChanged { computedHeightToPx = it.height }
+    ) {
+        NewPlanButton(
+            modifier = Modifier.height(contentHeight),
+            onClick = throttleClick(onClick = onNewPlanClicked)
         )
     }
 }

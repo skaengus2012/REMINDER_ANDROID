@@ -8,6 +8,7 @@ android {
 }
 
 dependencies {
+    implementation(projects.core.component.bottomappbar)
     implementation(projects.core.component.tag)
     implementation(projects.core.dataDi)
 
