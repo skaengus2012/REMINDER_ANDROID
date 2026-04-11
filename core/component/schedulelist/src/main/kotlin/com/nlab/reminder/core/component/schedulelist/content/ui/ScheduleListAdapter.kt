@@ -21,12 +21,10 @@ import android.view.ViewGroup
 import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.recyclerview.widget.AdapterListUpdateCallback
 import androidx.recyclerview.widget.RecyclerView
-import com.nlab.reminder.core.component.schedulelist.databinding.LayoutScheduleAdapterItemComposeViewBinding
 import com.nlab.reminder.core.component.schedulelist.databinding.LayoutScheduleAdapterItemContentBinding
 import com.nlab.reminder.core.component.schedulelist.databinding.LayoutScheduleAdapterItemFooterFormBinding
 import com.nlab.reminder.core.component.schedulelist.databinding.LayoutScheduleAdapterItemFormBinding
 import com.nlab.reminder.core.component.schedulelist.databinding.LayoutScheduleAdapterItemHeadlineBinding
-import com.nlab.reminder.core.component.schedulelist.databinding.LayoutScheduleAdapterItemHeadlinePaddingBinding
 import com.nlab.reminder.core.component.schedulelist.databinding.LayoutScheduleAdapterListGroupHeaderDefaultBinding
 import com.nlab.reminder.core.component.schedulelist.databinding.LayoutScheduleAdapterListGroupHeaderSubDefaultBinding
 import com.nlab.reminder.core.data.model.ScheduleId
@@ -39,14 +37,15 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.datetime.TimeZone
 import kotlin.time.Instant
 
-private const val ITEM_VIEW_TYPE_CLEARABLE_COMPLETED_SUB_HEADLINE = 1
-private const val ITEM_VIEW_TYPE_CONTENT = 2
-private const val ITEM_VIEW_TYPE_FOOTER_FORM = 3
-private const val ITEM_VIEW_TYPE_FORM = 4
-private const val ITEM_VIEW_TYPE_HEADLINE = 5
-private const val ITEM_VIEW_TYPE_HEADLINE_PADDING = 6
-private const val ITEM_VIEW_TYPE_GROUP_HEADER = 7
-private const val ITEM_VIEW_TYPE_SUB_GROUP_HEADER = 8
+private const val ITEM_VIEW_TYPE_BOTTOM_APPBAR_PADDING = 1
+private const val ITEM_VIEW_TYPE_CLEARABLE_COMPLETED_SUB_HEADLINE = 2
+private const val ITEM_VIEW_TYPE_CONTENT = 3
+private const val ITEM_VIEW_TYPE_FOOTER_FORM = 4
+private const val ITEM_VIEW_TYPE_FORM = 5
+private const val ITEM_VIEW_TYPE_GROUP_HEADER = 6
+private const val ITEM_VIEW_TYPE_HEADLINE = 7
+private const val ITEM_VIEW_TYPE_HEADLINE_PADDING = 8
+private const val ITEM_VIEW_TYPE_SUB_GROUP_HEADER = 9
 
 /**
  * @author Thalys
@@ -115,26 +114,29 @@ internal class ScheduleListAdapter(
     override fun getItemCount(): Int = differ.getCurrentList().size
 
     override fun getItemViewType(position: Int): Int = when (getItem(position)) {
+        is ScheduleListItem.BottomAppbarPadding -> ITEM_VIEW_TYPE_BOTTOM_APPBAR_PADDING
         is ScheduleListItem.ClearableCompletedSubHeadline -> ITEM_VIEW_TYPE_CLEARABLE_COMPLETED_SUB_HEADLINE
         is ScheduleListItem.Content -> ITEM_VIEW_TYPE_CONTENT
-        is ScheduleListItem.Form -> ITEM_VIEW_TYPE_FORM
         is ScheduleListItem.FooterForm -> ITEM_VIEW_TYPE_FOOTER_FORM
+        is ScheduleListItem.Form -> ITEM_VIEW_TYPE_FORM
+        is ScheduleListItem.GroupHeader -> ITEM_VIEW_TYPE_GROUP_HEADER
         is ScheduleListItem.Headline -> ITEM_VIEW_TYPE_HEADLINE
         is ScheduleListItem.HeadlinePadding -> ITEM_VIEW_TYPE_HEADLINE_PADDING
-        is ScheduleListItem.GroupHeader -> ITEM_VIEW_TYPE_GROUP_HEADER
         is ScheduleListItem.SubGroupHeader -> ITEM_VIEW_TYPE_SUB_GROUP_HEADER
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ScheduleAdapterItemViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
         return when (viewType) {
+            ITEM_VIEW_TYPE_BOTTOM_APPBAR_PADDING -> {
+                BottomAppbarPaddingViewHolder(
+                    binding = ComposeViewItemBinding(layoutInflater, parent)
+                )
+            }
+
             ITEM_VIEW_TYPE_CLEARABLE_COMPLETED_SUB_HEADLINE -> {
                 ClearableCompletedSubHeadlineViewHolder(
-                    binding = LayoutScheduleAdapterItemComposeViewBinding.inflate(
-                        layoutInflater,
-                        parent,
-                        /* attachToParent = */ false
-                    ),
+                    binding = ComposeViewItemBinding(layoutInflater, parent),
                     onClearClicked = { _clearCompletedScheduleRequests.trySend(Unit) }
                 )
             }
@@ -202,6 +204,16 @@ internal class ScheduleListAdapter(
                 )
             }
 
+            ITEM_VIEW_TYPE_GROUP_HEADER -> {
+                GroupHeaderViewHolder(
+                    binding = LayoutScheduleAdapterListGroupHeaderDefaultBinding.inflate(
+                        layoutInflater,
+                        parent,
+                        /* attachToParent = */ false
+                    )
+                )
+            }
+
             ITEM_VIEW_TYPE_HEADLINE -> {
                 HeadlineViewHolder(
                     binding = LayoutScheduleAdapterItemHeadlineBinding.inflate(
@@ -215,21 +227,7 @@ internal class ScheduleListAdapter(
 
             ITEM_VIEW_TYPE_HEADLINE_PADDING -> {
                 HeadlinePaddingViewHolder(
-                    binding = LayoutScheduleAdapterItemHeadlinePaddingBinding.inflate(
-                        layoutInflater,
-                        parent,
-                        /* attachToParent = */ false
-                    ),
-                )
-            }
-
-            ITEM_VIEW_TYPE_GROUP_HEADER -> {
-                GroupHeaderViewHolder(
-                    binding = LayoutScheduleAdapterListGroupHeaderDefaultBinding.inflate(
-                        layoutInflater,
-                        parent,
-                        /* attachToParent = */ false
-                    )
+                    binding = ComposeViewItemBinding(layoutInflater, parent)
                 )
             }
 
@@ -252,14 +250,15 @@ internal class ScheduleListAdapter(
     override fun onBindViewHolder(holder: ScheduleAdapterItemViewHolder, position: Int) {
         val item = getItem(position)
         when (holder) {
+            is BottomAppbarPaddingViewHolder -> Unit
             is ClearableCompletedSubHeadlineViewHolder -> holder.bind(item as ScheduleListItem.ClearableCompletedSubHeadline)
             is ContentViewHolder -> holder.bind(item as ScheduleListItem.Content)
-            is FormViewHolder -> holder.bind(item as ScheduleListItem.Form)
             is FooterFormViewHolder -> holder.bind(item as ScheduleListItem.FooterForm)
-            is HeadlineViewHolder -> holder.bind(item as ScheduleListItem.Headline)
+            is FormViewHolder -> holder.bind(item as ScheduleListItem.Form)
             is GroupHeaderViewHolder -> holder.bind(item as ScheduleListItem.GroupHeader)
-            is SubGroupHeaderViewHolder -> holder.bind(item as ScheduleListItem.SubGroupHeader)
+            is HeadlineViewHolder -> holder.bind(item as ScheduleListItem.Headline)
             is HeadlinePaddingViewHolder -> Unit
+            is SubGroupHeaderViewHolder -> holder.bind(item as ScheduleListItem.SubGroupHeader)
         }
     }
 

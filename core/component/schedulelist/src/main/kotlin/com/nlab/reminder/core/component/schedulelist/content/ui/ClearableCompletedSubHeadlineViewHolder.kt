@@ -28,14 +28,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.nlab.reminder.core.androidx.compose.ui.ColorPressButton
 import com.nlab.reminder.core.androidx.compose.ui.throttleClick
 import com.nlab.reminder.core.androidx.compose.ui.tooling.preview.Previews
-import com.nlab.reminder.core.component.schedulelist.databinding.LayoutScheduleAdapterItemComposeViewBinding
 import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
 import com.nlab.reminder.core.designsystem.compose.theme.DimenIds
 import com.nlab.reminder.core.kotlin.NonNegativeInt
@@ -46,17 +44,11 @@ import com.nlab.reminder.core.translation.StringIds
  * @author Thalys
  */
 internal class ClearableCompletedSubHeadlineViewHolder(
-    binding: LayoutScheduleAdapterItemComposeViewBinding,
+    private val binding: ComposeViewItemBinding,
     private val onClearClicked: () -> Unit
 ) : ScheduleAdapterItemViewHolder(binding.root) {
-    private val composeView = binding.composeView.apply {
-        setViewCompositionStrategy(
-            ViewCompositionStrategy.DisposeOnDetachedFromWindowOrReleasedFromPool
-        )
-    }
-
     fun bind(item: ScheduleListItem.ClearableCompletedSubHeadline) {
-        composeView.setContent { 
+        binding.setContent {
             PlaneatTheme {
                 ClearableCompletedScheduleItem(
                     completedScheduleCount = item.completedScheduleCount,

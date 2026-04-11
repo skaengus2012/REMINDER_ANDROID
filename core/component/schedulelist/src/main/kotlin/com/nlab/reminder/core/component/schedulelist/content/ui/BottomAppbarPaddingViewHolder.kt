@@ -3,22 +3,22 @@ package com.nlab.reminder.core.component.schedulelist.content.ui
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import com.nlab.reminder.core.component.bottomappbar.ui.BottomAppbarDefaults
 import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
 
 /**
- * A ViewHolder that renders the headline-to-content padding spacer (15 dp).
+ * A ViewHolder that renders the bottom-appbar padding spacer.
  *
  * @author Doohyun
  */
-internal class HeadlinePaddingViewHolder(
+internal class BottomAppbarPaddingViewHolder(
     binding: ComposeViewItemBinding
 ) : ScheduleAdapterItemViewHolder(binding.root) {
 
     init {
         binding.setContent {
             PlaneatTheme {
-                Spacer(modifier = Modifier.height(15.dp))
+                Spacer(modifier = Modifier.height(BottomAppbarDefaults.Height))
             }
         }
     }
