@@ -29,9 +29,9 @@ import androidx.compose.runtime.setValue
  * @author Thalys
  */
 @Stable
-class ScheduleListToolbarState(
+class ScheduleListToolbarState internal constructor(
     initialTitleVisible: Boolean,
-    initialBackgroundAlpha: Float,
+    @FloatRange(from = 0.0, to = 1.0) initialBackgroundAlpha: Float,
     initialEditCompleteVisible: Boolean
 ) {
     init {

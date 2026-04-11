@@ -14,7 +14,7 @@
   ~ limitations under the License.
   -->
 
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -22,8 +22,8 @@
         android:id="@+id/recyclerview_schedule"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scrollbarThumbVertical="?bg_line_1"
         android:clipToPadding="false"
+        android:scrollbarThumbVertical="?bg_line_1"
         android:scrollbars="vertical" />
 
     <FrameLayout
@@ -31,4 +31,4 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</FrameLayout>
