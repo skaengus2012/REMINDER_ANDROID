@@ -15,13 +15,13 @@ android {
 
 dependencies {
     api(projects.core.component.displayformat)
+    api(projects.core.component.bottomappbar)
     api(projects.core.dataExt)
 
     implementation(projects.core.android)
     implementation(projects.core.androidx.fragment)
     implementation(projects.core.androidx.recyclerview)
     implementation(projects.core.annotation)
-    implementation(projects.core.component.bottomappbar)
     implementation(projects.core.component.schedule)
     implementation(projects.core.component.toolbar)
     implementation(projects.core.dataDi)

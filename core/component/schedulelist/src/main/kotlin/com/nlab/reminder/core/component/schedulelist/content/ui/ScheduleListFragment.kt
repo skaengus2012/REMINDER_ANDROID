@@ -197,6 +197,9 @@ internal class ScheduleListFragment : Fragment() {
             multiSelectionHelper.attachToRecyclerView(recyclerView = recyclerviewSchedule)
         }
 
+        val scrollEvents = binding.recyclerviewSchedule
+            .scrollEvent()
+            .shareIn(viewLifecycleScope, started = SharingStarted.Eagerly)
         val scrollStates = binding.recyclerviewSchedule
             .scrollState()
             .shareIn(viewLifecycleScope, started = SharingStarted.Eagerly)
@@ -206,13 +209,11 @@ internal class ScheduleListFragment : Fragment() {
         val recyclerViewItemTouches = binding.recyclerviewSchedule
             .itemTouches()
             .shareIn(viewLifecycleScope, SharingStarted.Eagerly)
-        val firstVisiblePositions = binding.recyclerviewSchedule
-            .scrollEvent()
+        val firstVisiblePositions = scrollEvents
             .map { linearLayoutManager.findFirstVisibleItemPosition() }
             .distinctUntilChanged()
             .shareIn(viewLifecycleScope, SharingStarted.Eagerly)
-        val lastVisiblePositions = binding.recyclerviewSchedule
-            .scrollEvent()
+        val lastVisiblePositions = scrollEvents
             .map { linearLayoutManager.findLastVisibleItemPosition() }
             .distinctUntilChanged()
             .shareIn(viewLifecycleScope, SharingStarted.Eagerly)
@@ -251,7 +252,7 @@ internal class ScheduleListFragment : Fragment() {
                     else -> 1f
                 }
             }.distinctUntilChanged(),
-            binding.recyclerviewSchedule.scrollEvent()
+            scrollEvents
         ) { params, _ ->
             if (params is Float) params
             else {
@@ -273,7 +274,7 @@ internal class ScheduleListFragment : Fragment() {
         }
 
         val backgroundAlphaFlow = merge(
-            binding.recyclerviewSchedule.scrollEvent(),
+            scrollEvents,
             scheduleListAdapter.itemUpdatesSimplified().mapLatest {
                 // await next frame
                 binding.recyclerviewSchedule.awaitPost()

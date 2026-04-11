@@ -17,9 +17,7 @@ internal class BottomAppbarPaddingViewHolder(
 
     init {
         binding.setContent {
-            PlaneatTheme {
-                Spacer(modifier = Modifier.height(BottomAppbarDefaults.Height))
-            }
+            Spacer(modifier = Modifier.height(BottomAppbarDefaults.Height))
         }
     }
 }

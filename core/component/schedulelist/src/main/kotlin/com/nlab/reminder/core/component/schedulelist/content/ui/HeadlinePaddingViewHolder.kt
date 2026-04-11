@@ -17,9 +17,7 @@ internal class HeadlinePaddingViewHolder(
 
     init {
         binding.setContent {
-            PlaneatTheme {
-                Spacer(modifier = Modifier.height(15.dp))
-            }
+            Spacer(modifier = Modifier.height(15.dp))
         }
     }
 }

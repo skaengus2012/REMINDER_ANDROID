@@ -43,6 +43,6 @@ class ScheduleListBottomAppbarState internal constructor(
 @Composable
 fun rememberScheduleListBottomAppbarState(
     @FloatRange(from = 0.0, to = 1.0) initialBackgroundAlpha: Float = 0f
-): ScheduleListBottomAppbarState = remember {
+): ScheduleListBottomAppbarState = remember(initialBackgroundAlpha) {
     ScheduleListBottomAppbarState(initialBackgroundAlpha)
 }
