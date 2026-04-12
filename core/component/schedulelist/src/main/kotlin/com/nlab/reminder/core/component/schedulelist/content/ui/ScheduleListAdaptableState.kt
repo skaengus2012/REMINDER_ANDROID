@@ -77,16 +77,25 @@ fun <T : ScheduleListElement> rememberScheduleListItemsAdaptationState(
     }
 
     // Stage 3: Adaptive wrapper for perfect sync and fast-track updates.
+    // Since produceState runs asynchronously, there is a delay between input changes and snapshot delivery.
+    // This derivedStateOf checks if the current snapshot is already in sync with the latest inputs.
     return remember {
         derivedStateOf {
             val snapshot =
                 snapshotState.value
                 ?: return@derivedStateOf ScheduleListItemsAdaptation.Absent
-            // If data content hasn't changed, sync with the latest stamp immediately (Fast-track for Undo).
+
+            // Check if the snapshot's data matches the current inputs.
+            // Using '==' for elements is O(1) here because elements are expected to be an IdentityList,
+            // which overrides equals() to use referential equality of its internal value.
+            // This allows us to sync with produceState's key comparison logic (which uses equals()).
             val isSync =
-                snapshot.elements === currentElements && snapshot.headline == currentHeadline
+                snapshot.elements == currentElements && snapshot.headline == currentHeadline
+
             ScheduleListItemsAdaptation.Exist(
                 snapshot.items,
+                // If data is in sync, we immediately adopt the latest stamp (Fast-track for Undo).
+                // Otherwise, we must stick with the snapshot's stamp to avoid inconsistent UI states.
                 replayStamp = if (isSync) currentStamp else snapshot.replayStamp
             )
         }
