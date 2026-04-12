@@ -19,7 +19,6 @@ package com.nlab.reminder.core.component.schedulelist.content.ui
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.State
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import com.nlab.reminder.core.component.schedulelist.content.ScheduleListElement
 import com.nlab.reminder.core.kotlin.collections.IdentityList
@@ -45,42 +44,25 @@ fun <T : ScheduleListElement> rememberScheduleListItemsAdaptationState(
     elements: List<T>,
     elementsReplayStamp: Long,
     buildBodyItems: (List<T>) -> List<ScheduleListItem>,
-): State<ScheduleListItemsAdaptation> {
-    val headlineItem = ScheduleListItem.Headline(text = headline)
-    val bodyItems by produceState<List<ScheduleListItem>?>(
-        initialValue = null,
-        key1 = elements,
-        key2 = buildBodyItems
-    ) {
-        value = withContext(Dispatchers.Default) {
-            buildBodyItems(elements).toIdentityList()
+): State<ScheduleListItemsAdaptation> = produceState<ScheduleListItemsAdaptation>(
+    initialValue = ScheduleListItemsAdaptation.Absent,
+    headline,
+    elements,
+    elementsReplayStamp,
+    buildBodyItems
+) {
+    value = withContext(Dispatchers.Default) {
+        val bodyItems = buildBodyItems(elements)
+        // capacity = bodyItems.size + 3 (headline, headlinePadding, bottomAppbarPadding)
+        val totalItems = buildList(capacity = bodyItems.size + 3) {
+            add(ScheduleListItem.Headline(text = headline))
+            add(ScheduleListItem.HeadlinePadding)
+            addAll(bodyItems)
+            add(ScheduleListItem.BottomAppbarPadding)
         }
-    }
-
-    return produceState<ScheduleListItemsAdaptation>(
-        initialValue = ScheduleListItemsAdaptation.Absent,
-        headlineItem,
-        bodyItems,
-        elementsReplayStamp,
-    ) {
-        val currentBodyItems = bodyItems
-        if (currentBodyItems == null) {
-            value = ScheduleListItemsAdaptation.Absent
-            return@produceState
-        }
-
-        value = withContext(Dispatchers.Default) {
-            val totalItems = buildList {
-                // add headline
-                add(headlineItem)
-                add(ScheduleListItem.HeadlinePadding)
-                addAll(currentBodyItems)
-                add(ScheduleListItem.BottomAppbarPadding)
-            }
-            ScheduleListItemsAdaptation.Exist(
-                items = totalItems.toIdentityList(),
-                replayStamp = elementsReplayStamp
-            )
-        }
+        ScheduleListItemsAdaptation.Exist(
+            items = totalItems.toIdentityList(),
+            replayStamp = elementsReplayStamp
+        )
     }
 }
