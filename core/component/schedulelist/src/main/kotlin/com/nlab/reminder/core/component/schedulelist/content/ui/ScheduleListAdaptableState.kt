@@ -49,18 +49,21 @@ fun <T : ScheduleListElement> rememberScheduleListItemsAdaptationState(
     elementsReplayStamp: Long,
     buildBodyItems: (List<T>) -> List<ScheduleListItem>,
 ): State<ScheduleListItemsAdaptation> {
-    // Stage 1: Track the latest inputs as State to avoid O(N) equals() on Main thread.
+    // Stage 1: Track the latest inputs as State to ensure they are correctly captured 
+    // by the Stage 3 closure without restarting the entire pipeline.
     val currentElements by rememberUpdatedState(elements)
     val currentStamp by rememberUpdatedState(elementsReplayStamp)
     val currentHeadline by rememberUpdatedState(headline)
+    val currentBuildBodyItems by rememberUpdatedState(buildBodyItems)
 
     // Stage 2: Heavy transformation in background.
-    // Keyed by data content only, allowing it to skip when only the stamp changes (Undo case).
+    // Note: Keys (headline, elements) are compared using equals() on the Main thread.
+    // To achieve O(1) performance, callers should provide an IdentityList.
     val snapshotState = produceState<AdaptationSnapshot?>(
         initialValue = null,
         headline,
         elements,
-        buildBodyItems
+        currentBuildBodyItems
     ) {
         value = withContext(Dispatchers.Default) {
             val bodyItems = buildBodyItems(elements)
