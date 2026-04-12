@@ -19,7 +19,11 @@ package com.nlab.reminder.core.component.schedulelist.content.ui
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.State
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import com.nlab.reminder.core.component.schedulelist.content.ScheduleListElement
 import com.nlab.reminder.core.kotlin.collections.IdentityList
 import com.nlab.reminder.core.kotlin.collections.toIdentityList
@@ -44,25 +48,57 @@ fun <T : ScheduleListElement> rememberScheduleListItemsAdaptationState(
     elements: List<T>,
     elementsReplayStamp: Long,
     buildBodyItems: (List<T>) -> List<ScheduleListItem>,
-): State<ScheduleListItemsAdaptation> = produceState<ScheduleListItemsAdaptation>(
-    initialValue = ScheduleListItemsAdaptation.Absent,
-    headline,
-    elements,
-    elementsReplayStamp,
-    buildBodyItems
-) {
-    value = withContext(Dispatchers.Default) {
-        val bodyItems = buildBodyItems(elements)
-        // capacity = bodyItems.size + 3 (headline, headlinePadding, bottomAppbarPadding)
-        val totalItems = buildList(capacity = bodyItems.size + 3) {
-            add(ScheduleListItem.Headline(text = headline))
-            add(ScheduleListItem.HeadlinePadding)
-            addAll(bodyItems)
-            add(ScheduleListItem.BottomAppbarPadding)
+): State<ScheduleListItemsAdaptation> {
+    // Stage 1: Track the latest inputs as State to avoid O(N) equals() on Main thread.
+    val currentElements by rememberUpdatedState(elements)
+    val currentStamp by rememberUpdatedState(elementsReplayStamp)
+    val currentHeadline by rememberUpdatedState(headline)
+
+    // Stage 2: Heavy transformation in background.
+    // Keyed by data content only, allowing it to skip when only the stamp changes (Undo case).
+    val snapshotState = produceState<AdaptationSnapshot?>(
+        initialValue = null,
+        headline,
+        elements,
+        buildBodyItems
+    ) {
+        value = withContext(Dispatchers.Default) {
+            val bodyItems = buildBodyItems(elements)
+            // capacity = bodyItems.size + 3 (headline, headlinePadding, bottomAppbarPadding)
+            val totalItems = buildList(capacity = bodyItems.size + 3) {
+                add(ScheduleListItem.Headline(text = headline))
+                add(ScheduleListItem.HeadlinePadding)
+                addAll(bodyItems)
+                add(ScheduleListItem.BottomAppbarPadding)
+            }.toIdentityList()
+
+            AdaptationSnapshot(totalItems, elements, headline, elementsReplayStamp)
         }
-        ScheduleListItemsAdaptation.Exist(
-            items = totalItems.toIdentityList(),
-            replayStamp = elementsReplayStamp
-        )
+    }
+
+    // Stage 3: Adaptive wrapper for perfect sync and fast-track updates.
+    return remember {
+        derivedStateOf {
+            val snapshot =
+                snapshotState.value
+                ?: return@derivedStateOf ScheduleListItemsAdaptation.Absent
+            // If data content hasn't changed, sync with the latest stamp immediately (Fast-track for Undo).
+            val isSync =
+                snapshot.elements === currentElements && snapshot.headline == currentHeadline
+            ScheduleListItemsAdaptation.Exist(
+                snapshot.items,
+                replayStamp = if (isSync) currentStamp else snapshot.replayStamp
+            )
+        }
     }
 }
+
+/**
+ * Internal snapshot of the adaptation result paired with the inputs that produced it.
+ */
+private data class AdaptationSnapshot(
+    val items: IdentityList<ScheduleListItem>,
+    val elements: List<*>,
+    val headline: String,
+    val replayStamp: Long
+)
