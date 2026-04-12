@@ -44,20 +44,16 @@ fun <T : ScheduleListElement> rememberScheduleListItemsAdaptationState(
     headline: String,
     elements: List<T>,
     elementsReplayStamp: Long,
-    buildBodyItemsIfNotEmpty: (List<T>) -> List<ScheduleListItem>,
+    buildBodyItems: (List<T>) -> List<ScheduleListItem>,
 ): State<ScheduleListItemsAdaptation> {
     val headlineItem = ScheduleListItem.Headline(text = headline)
     val bodyItems by produceState<List<ScheduleListItem>?>(
         initialValue = null,
         key1 = elements,
-        key2 = buildBodyItemsIfNotEmpty
+        key2 = buildBodyItems
     ) {
-        value = if (elements.isEmpty()) {
-            emptyList()
-        } else {
-            withContext(Dispatchers.Default) {
-                buildBodyItemsIfNotEmpty(elements).toIdentityList()
-            }
+        value = withContext(Dispatchers.Default) {
+            buildBodyItems(elements).toIdentityList()
         }
     }
 
@@ -78,12 +74,8 @@ fun <T : ScheduleListElement> rememberScheduleListItemsAdaptationState(
                 // add headline
                 add(headlineItem)
                 add(ScheduleListItem.HeadlinePadding)
-                if (currentBodyItems.isEmpty()) {
-                    // TODO add empty ui
-                } else {
-                    addAll(currentBodyItems)
-                    add(ScheduleListItem.BottomAppbarPadding)
-                }
+                addAll(currentBodyItems)
+                add(ScheduleListItem.BottomAppbarPadding)
             }
             ScheduleListItemsAdaptation.Exist(
                 items = totalItems.toIdentityList(),
