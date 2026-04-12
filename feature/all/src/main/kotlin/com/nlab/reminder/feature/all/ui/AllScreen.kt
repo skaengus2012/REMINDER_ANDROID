@@ -321,7 +321,7 @@ private fun AllScheduleListContent(
         headline = headline,
         elements = scheduleResources,
         elementsReplayStamp = replayStamp,
-        buildBodyItemsIfNotEmpty = { elements ->
+        buildBodyItems = { elements ->
             buildList {
                 if (completedScheduleSummary.shown) {
                     this += ScheduleListItem.ClearableCompletedSubHeadline(

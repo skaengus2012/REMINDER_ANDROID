@@ -19,8 +19,11 @@ package com.nlab.reminder.core.component.schedulelist.content.ui
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.State
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import com.nlab.reminder.core.component.schedulelist.content.ScheduleListElement
 import com.nlab.reminder.core.kotlin.collections.IdentityList
 import com.nlab.reminder.core.kotlin.collections.toIdentityList
@@ -44,51 +47,70 @@ fun <T : ScheduleListElement> rememberScheduleListItemsAdaptationState(
     headline: String,
     elements: List<T>,
     elementsReplayStamp: Long,
-    buildBodyItemsIfNotEmpty: (List<T>) -> List<ScheduleListItem>,
+    buildBodyItems: (List<T>) -> List<ScheduleListItem>,
 ): State<ScheduleListItemsAdaptation> {
-    val headlineItem = ScheduleListItem.Headline(text = headline)
-    val bodyItems by produceState<List<ScheduleListItem>?>(
+    // Stage 1: Track the latest inputs as State to ensure they are correctly captured 
+    // by the Stage 3 closure without restarting the entire pipeline.
+    val currentElements by rememberUpdatedState(elements)
+    val currentStamp by rememberUpdatedState(elementsReplayStamp)
+    val currentHeadline by rememberUpdatedState(headline)
+    val currentBuildBodyItems by rememberUpdatedState(buildBodyItems)
+
+    // Stage 2: Heavy transformation in background.
+    // Note: Keys (headline, elements) are compared using equals() on the Main thread.
+    // To achieve O(1) performance, callers should provide an IdentityList.
+    val snapshotState = produceState<AdaptationSnapshot?>(
         initialValue = null,
-        key1 = elements,
-        key2 = buildBodyItemsIfNotEmpty
+        headline,
+        elements,
+        currentBuildBodyItems
     ) {
-        value = if (elements.isEmpty()) {
-            emptyList()
-        } else {
-            withContext(Dispatchers.Default) {
-                buildBodyItemsIfNotEmpty(elements).toIdentityList()
-            }
+        value = withContext(Dispatchers.Default) {
+            val bodyItems = buildBodyItems(elements)
+            // capacity = bodyItems.size + 3 (headline, headlinePadding, bottomAppbarPadding)
+            val totalItems = buildList(capacity = bodyItems.size + 3) {
+                add(ScheduleListItem.Headline(text = headline))
+                add(ScheduleListItem.HeadlinePadding)
+                addAll(bodyItems)
+                add(ScheduleListItem.BottomAppbarPadding)
+            }.toIdentityList()
+
+            AdaptationSnapshot(totalItems, elements, headline, elementsReplayStamp)
         }
     }
 
-    return produceState<ScheduleListItemsAdaptation>(
-        initialValue = ScheduleListItemsAdaptation.Absent,
-        headlineItem,
-        bodyItems,
-        elementsReplayStamp,
-    ) {
-        val currentBodyItems = bodyItems
-        if (currentBodyItems == null) {
-            value = ScheduleListItemsAdaptation.Absent
-            return@produceState
-        }
+    // Stage 3: Adaptive wrapper for perfect sync and fast-track updates.
+    // Since produceState runs asynchronously, there is a delay between input changes and snapshot delivery.
+    // This derivedStateOf checks if the current snapshot is already in sync with the latest inputs.
+    return remember {
+        derivedStateOf {
+            val snapshot =
+                snapshotState.value
+                ?: return@derivedStateOf ScheduleListItemsAdaptation.Absent
 
-        value = withContext(Dispatchers.Default) {
-            val totalItems = buildList {
-                // add headline
-                add(headlineItem)
-                add(ScheduleListItem.HeadlinePadding)
-                if (currentBodyItems.isEmpty()) {
-                    // TODO add empty ui
-                } else {
-                    addAll(currentBodyItems)
-                    add(ScheduleListItem.BottomAppbarPadding)
-                }
-            }
+            // Check if the snapshot's data matches the current inputs.
+            // Using '==' for elements is O(1) here because elements are expected to be an IdentityList,
+            // which overrides equals() to use referential equality of its internal value.
+            // This allows us to sync with produceState's key comparison logic (which uses equals()).
+            val isSync =
+                snapshot.elements == currentElements && snapshot.headline == currentHeadline
+
             ScheduleListItemsAdaptation.Exist(
-                items = totalItems.toIdentityList(),
-                replayStamp = elementsReplayStamp
+                snapshot.items,
+                // If data is in sync, we immediately adopt the latest stamp (Fast-track for Undo).
+                // Otherwise, we must stick with the snapshot's stamp to avoid inconsistent UI states.
+                replayStamp = if (isSync) currentStamp else snapshot.replayStamp
             )
         }
     }
 }
+
+/**
+ * Internal snapshot of the adaptation result paired with the inputs that produced it.
+ */
+private data class AdaptationSnapshot(
+    val items: IdentityList<ScheduleListItem>,
+    val elements: List<*>,
+    val headline: String,
+    val replayStamp: Long
+)
