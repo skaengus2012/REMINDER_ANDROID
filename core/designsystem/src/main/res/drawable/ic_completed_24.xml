@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (C) 2024 The N's lab Open Source Project
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~        http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!--
+  Mirrors checkbox_schedule_check_on_point1 specs:
+    - canvas: 24x24dp → viewport 24x24
+    - Outer circle: diameter 22dp (r=11), stroke 1.5dp → drawn at r=11-0.75=10.25, centered at 12,12
+    - Inner circle: inset 4.5dp from oval edge → inner circle start at 4.5dp from edge → r = 11 - 4.5 - 0.75 = 5.75, centered 12,12
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- Outer ring: r=10.25, stroke=1.5dp, centered at 12,12 -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#FF000000"
+        android:strokeWidth="1.5"
+        android:pathData="M 12,12 m -10.25,0 a 10.25,10.25 0 1,0 20.5,0 a 10.25,10.25 0 1,0 -20.5,0" />
+
+    <!-- Inner filled dot: inset 4.5dp from oval edge → r = 11 - 4.5 = 6.5, less half outer stroke 0.75 → r=5.75 -->
+    <path
+        android:fillColor="#FF000000"
+        android:pathData="M 12,12 m -5.75,0 a 5.75,5.75 0 1,0 11.5,0 a 5.75,5.75 0 1,0 -11.5,0" />
+
+</vector>
