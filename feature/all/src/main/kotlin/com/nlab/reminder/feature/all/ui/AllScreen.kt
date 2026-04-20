@@ -30,6 +30,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Icon
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -295,30 +296,30 @@ private fun AllScreen(
                 .fillMaxWidth()
         ) {
             if (successUiState?.multiSelectionEnabled == true) {
-                val tint = PlaneatTheme.colors.content1
+                val tint = PlaneatTheme.colors.content3
                 SelectionActionItem(
-                    iconRes = DrawableIds.ic_modify_schedule_policy_24,
+                    iconRes = DrawableIds.ic_calendar_clock_24,
                     contentDescription = null, // Or set to a meaningful string
                     onClick = { /* TODO Handle schedule policy modification */ },
                     tint = tint,
                     modifier = Modifier.weight(1f)
                 )
                 SelectionActionItem(
-                    iconRes = DrawableIds.ic_completed_24,
+                    iconRes = DrawableIds.ic_done_all_24,
                     contentDescription = null,
                     onClick = { /* TODO Handle completing selected items */ },
                     tint = tint,
                     modifier = Modifier.weight(1f)
                 )
                 SelectionActionItem(
-                    iconRes = DrawableIds.ic_add_tags_24,
+                    iconRes = DrawableIds.ic_hash_tag_24,
                     contentDescription = null,
                     onClick = { /* TODO Handle adding tags to selected items */ },
                     tint = tint,
                     modifier = Modifier.weight(1f)
                 )
                 SelectionActionItem(
-                    iconRes = DrawableIds.ic_delete_24,
+                    iconRes = DrawableIds.ic_trash_24,
                     contentDescription = null,
                     onClick = { /* TODO Handle deleting selected items */ },
                     tint = tint,
@@ -347,11 +348,10 @@ private fun RowScope.SelectionActionItem(
             .clickable(onClick = onClick),
         contentAlignment = Alignment.Center
     ) {
-        Image(
+        Icon(
             painter = painterResource(id = iconRes),
             contentDescription = contentDescription,
-            colorFilter = ColorFilter.tint(tint),
-            contentScale = ContentScale.Fit,
+            tint = tint,
             modifier = Modifier.size(24.dp)
         )
     }
