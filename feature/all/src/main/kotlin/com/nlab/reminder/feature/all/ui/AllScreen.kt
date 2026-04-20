@@ -16,18 +16,27 @@
 
 package com.nlab.reminder.feature.all.ui
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Icon
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -286,10 +295,65 @@ private fun AllScreen(
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
         ) {
-            NewPlanButton(
-                onClick = throttleClick(onClick = onNewPlanClicked)
-            )
+            if (successUiState?.multiSelectionEnabled == true) {
+                val tint = PlaneatTheme.colors.content3
+                SelectionActionItem(
+                    iconRes = DrawableIds.ic_calendar_clock_24,
+                    contentDescription = null, // Or set to a meaningful string
+                    onClick = { /* TODO Handle schedule policy modification */ },
+                    tint = tint,
+                    modifier = Modifier.weight(1f)
+                )
+                SelectionActionItem(
+                    iconRes = DrawableIds.ic_done_all_24,
+                    contentDescription = null,
+                    onClick = { /* TODO Handle completing selected items */ },
+                    tint = tint,
+                    modifier = Modifier.weight(1f)
+                )
+                SelectionActionItem(
+                    iconRes = DrawableIds.ic_hash_tag_24,
+                    contentDescription = null,
+                    onClick = { /* TODO Handle adding tags to selected items */ },
+                    tint = tint,
+                    modifier = Modifier.weight(1f)
+                )
+                SelectionActionItem(
+                    iconRes = DrawableIds.ic_trash_24,
+                    contentDescription = null,
+                    onClick = { /* TODO Handle deleting selected items */ },
+                    tint = tint,
+                    modifier = Modifier.weight(1f)
+                )
+            } else {
+                NewPlanButton(
+                    onClick = throttleClick(onClick = onNewPlanClicked)
+                )
+            }
         }
+    }
+}
+
+@Composable
+private fun RowScope.SelectionActionItem(
+    iconRes: Int,
+    contentDescription: String?,
+    onClick: () -> Unit,
+    tint: Color,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .fillMaxHeight()
+            .clickable(onClick = onClick),
+        contentAlignment = Alignment.Center
+    ) {
+        Icon(
+            painter = painterResource(id = iconRes),
+            contentDescription = contentDescription,
+            tint = tint,
+            modifier = Modifier.size(24.dp)
+        )
     }
 }
 
