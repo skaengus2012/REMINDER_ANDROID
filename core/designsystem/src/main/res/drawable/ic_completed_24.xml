@@ -27,16 +27,26 @@
     android:viewportWidth="24"
     android:viewportHeight="24">
 
-    <!-- Outer ring: r=10.25, stroke=1.5dp, centered at 12,12 -->
+    <!--
+      Scaled down from checkbox_schedule_check_on_point1 to match the visual size
+      of other icons (adding ~3dp padding):
+        - Original Outer R: 11  -> New Outer R: 9
+        - Original Stroke: 1.5 -> New Stroke: 1.2
+        - Original Inner R: 7.5 -> New Inner R: 6.1
+    -->
+
+    <!-- Outer ring: r=9, stroke=1.2dp, centered at (12,12) -->
     <path
         android:fillColor="@android:color/transparent"
         android:strokeColor="#FF000000"
-        android:strokeWidth="1.5"
-        android:pathData="M 12,12 m -10.25,0 a 10.25,10.25 0 1,0 20.5,0 a 10.25,10.25 0 1,0 -20.5,0" />
+        android:strokeWidth="1.2"
+        android:pathData="M 12,12 m -9,0 a 9,9 0 1,0 18,0 a 9,9 0 1,0 -18,0" />
 
-    <!-- Inner filled dot: inset 4.5dp from oval edge → r = 11 - 4.5 = 6.5, less half outer stroke 0.75 → r=5.75 -->
+    <!-- Inner solid dot: r=6.1, centered at (12,12) -->
     <path
         android:fillColor="#FF000000"
-        android:pathData="M 12,12 m -5.75,0 a 5.75,5.75 0 1,0 11.5,0 a 5.75,5.75 0 1,0 -11.5,0" />
+        android:pathData="M 12,12 m -6.1,0 a 6.1,6.1 0 1,0 12.2,0 a 6.1,6.1 0 1,0 -12.2,0" />
+
+
 
 </vector>
