@@ -312,8 +312,15 @@ internal class ScheduleListFragment : Fragment() {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 bottomAppbarStateFlow.unwrap().collectLatest { bottomAppbarState ->
                     if (bottomAppbarState == null) return@collectLatest
-                    backgroundAlphaFlow.collectLatest { backgroundAlpha ->
-                        bottomAppbarState.backgroundAlpha = backgroundAlpha
+                    backgroundAlphaFlow.collectLatest { targetAlpha ->
+                        // To prevent the background from disappearing too abruptly when the list shrinks after item deletion,
+                        // a slight delay (150ms) is applied only when the background becomes transparent (targetAlpha == 0f).
+                        // If a new scroll event occurs during the delay, the previous delay is immediately cancelled 
+                        // by collectLatest, and the latest state is applied.
+                        if (targetAlpha == 0f && bottomAppbarState.backgroundAlpha > 0f) {
+                            delay(150)
+                        }
+                        bottomAppbarState.backgroundAlpha = targetAlpha
                     }
                 }
             }
