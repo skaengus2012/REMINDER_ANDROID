@@ -16,6 +16,7 @@
 
 package com.nlab.reminder.core.component.schedulelist.content.ui
 
+import android.animation.ValueAnimator
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -276,51 +277,51 @@ internal class ScheduleListFragment : Fragment() {
         val backgroundAlphaFlow = merge(
             scrollEvents,
             scheduleListAdapter.itemUpdatesSimplified().mapLatest {
-                // await next frame
                 binding.recyclerviewSchedule.awaitPost()
-            }
+            },
+            listBottomScrollPaddingFlow.unwrap().map { Unit }
         ).map {
             val rvHeight = binding.recyclerviewSchedule.height
-            if (rvHeight == 0) {
-                return@map 0f
-            }
+            val bottomPadding = (listBottomScrollPaddingFlow.value as? Identity.Exist)?.value ?: 0
+            val threshold = rvHeight - bottomPadding
+            
+            if (rvHeight <= 0) return@map 0f
 
             val itemCount = scheduleListAdapter.itemCount
-            if (itemCount <= 1) {
-                // Empty or no footer
-                return@map 0f
-            }
+            if (itemCount <= 0) return@map 0f
 
-            val firstView = linearLayoutManager.findViewByPosition(0)
-            val lastView = linearLayoutManager.findViewByPosition(itemCount - 1)
+            val lastVisiblePos = linearLayoutManager.findLastVisibleItemPosition()
+            if (lastVisiblePos == RecyclerView.NO_POSITION) return@map 0f
 
-            // Content does not fill the screen completely
-            if (firstView != null && lastView != null && firstView.top >= 0 && lastView.bottom <= rvHeight) {
-                return@map 0f
-            }
+            // If the footer item is completely out of view, content is behind the bar.
+            if (lastVisiblePos < itemCount - 1) return@map 1f
 
-            // The footer is not visible
-            if (lastView == null || lastView.height <= 0) {
-                return@map 1f
-            }
+            val lastView = linearLayoutManager.findViewByPosition(lastVisiblePos) ?: return@map 1f
 
-            val visibleHeight = (rvHeight - lastView.top).coerceIn(0, lastView.height)
-            1f - (visibleHeight.toFloat() / lastView.height)
+            // The 'threshold' represents the bottom limit where the last item rests perfectly when fully scrolled.
+            // If the last item's (footer) BOTTOM goes below this threshold, 
+            // it means the footer is getting partially covered by the BottomAppBar bounds.
+            if (lastView.bottom > threshold) 1f else 0f
         }.distinctUntilChanged()
 
         viewLifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 bottomAppbarStateFlow.unwrap().collectLatest { bottomAppbarState ->
                     if (bottomAppbarState == null) return@collectLatest
-                    backgroundAlphaFlow.collectLatest { targetAlpha ->
-                        // To prevent the background from disappearing too abruptly when the list shrinks after item deletion,
-                        // a slight delay (150ms) is applied only when the background becomes transparent (targetAlpha == 0f).
-                        // If a new scroll event occurs during the delay, the previous delay is immediately cancelled 
-                        // by collectLatest, and the latest state is applied.
+                    var fadeOutAnimator: ValueAnimator? = null
+                    backgroundAlphaFlow.collect { targetAlpha ->
+                        fadeOutAnimator?.cancel()
                         if (targetAlpha == 0f && bottomAppbarState.backgroundAlpha > 0f) {
-                            delay(150)
+                            // Smooth fade-out when background disappears (e.g. items removed)
+                            fadeOutAnimator = ValueAnimator.ofFloat(bottomAppbarState.backgroundAlpha, 0f).apply {
+                                duration = 300L
+                                addUpdateListener { bottomAppbarState.backgroundAlpha = it.animatedValue as Float }
+                                start()
+                            }
+                        } else {
+                            // Instant snap when background appears (scroll triggers immediate feedback)
+                            bottomAppbarState.backgroundAlpha = targetAlpha
                         }
-                        bottomAppbarState.backgroundAlpha = targetAlpha
                     }
                 }
             }
