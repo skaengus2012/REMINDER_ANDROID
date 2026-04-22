@@ -274,34 +274,21 @@ internal class ScheduleListFragment : Fragment() {
             }
         }
 
-        val backgroundAlphaFlow = merge(
+        val bottomAppbarBackgroundAlphaFlow = merge(
             scrollEvents,
             scheduleListAdapter.itemUpdatesSimplified().mapLatest {
                 binding.recyclerviewSchedule.awaitPost()
-            },
-            listBottomScrollPaddingFlow.unwrap().map { Unit }
+            }
         ).map {
-            val rvHeight = binding.recyclerviewSchedule.height
-            val bottomPadding = (listBottomScrollPaddingFlow.value as? Identity.Exist)?.value ?: 0
-            val threshold = rvHeight - bottomPadding
-            
-            if (rvHeight <= 0) return@map 0f
+            val rv = binding.recyclerviewSchedule
+            if (rv.height <= 0) return@map 0f
 
             val itemCount = scheduleListAdapter.itemCount
             if (itemCount <= 0) return@map 0f
 
-            val lastVisiblePos = linearLayoutManager.findLastVisibleItemPosition()
-            if (lastVisiblePos == RecyclerView.NO_POSITION) return@map 0f
-
-            // If the footer item is completely out of view, content is behind the bar.
-            if (lastVisiblePos < itemCount - 1) return@map 1f
-
-            val lastView = linearLayoutManager.findViewByPosition(lastVisiblePos) ?: return@map 1f
-
-            // The 'threshold' represents the bottom limit where the last item rests perfectly when fully scrolled.
-            // If the last item's (footer) BOTTOM goes below this threshold, 
-            // it means the footer is getting partially covered by the BottomAppBar bounds.
-            if (lastView.bottom > threshold) 1f else 0f
+            // If the RecyclerView can scroll down, the footer is at least partially hidden behind the BottomAppBar.
+            // This also covers the case where items don't fill the screen (canScrollVertically returns false → 0f).
+            if (rv.canScrollVertically(1)) 1f else 0f
         }.distinctUntilChanged()
 
         viewLifecycleScope.launch {
@@ -309,7 +296,7 @@ internal class ScheduleListFragment : Fragment() {
                 bottomAppbarStateFlow.unwrap().collectLatest { bottomAppbarState ->
                     if (bottomAppbarState == null) return@collectLatest
                     var fadeOutAnimator: ValueAnimator? = null
-                    backgroundAlphaFlow.collect { targetAlpha ->
+                    bottomAppbarBackgroundAlphaFlow.collect { targetAlpha ->
                         fadeOutAnimator?.cancel()
                         if (targetAlpha == 0f && bottomAppbarState.backgroundAlpha > 0f) {
                             // Smooth fade-out when background disappears (e.g. items removed)
