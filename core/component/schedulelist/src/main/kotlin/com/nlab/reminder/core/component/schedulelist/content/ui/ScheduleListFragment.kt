@@ -16,6 +16,7 @@
 
 package com.nlab.reminder.core.component.schedulelist.content.ui
 
+import android.animation.ValueAnimator
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -243,7 +244,7 @@ internal class ScheduleListFragment : Fragment() {
             }
         }
 
-        val toolbarBackgroundAlphaState = combine(
+        val toolbarBgAlphaFlow = combine(
             firstVisiblePositions.map { pos ->
                 when (pos) {
                     0 -> 0f
@@ -264,61 +265,61 @@ internal class ScheduleListFragment : Fragment() {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 toolbarStateFlow.unwrap().collectLatest { toolbarValues ->
                     if (toolbarValues == null) return@collectLatest
-                    toolbarBackgroundAlphaState.collect { backgroundAlpha ->
-                        if (backgroundAlpha != null) {
-                            toolbarValues.backgroundAlpha = backgroundAlpha
-                        }
+                    toolbarBgAlphaFlow.collect { newAlpha ->
+                        if (newAlpha == null) return@collect
+                        toolbarValues.backgroundAlpha = newAlpha
                     }
                 }
             }
         }
 
-        val backgroundAlphaFlow = merge(
+        val bottomAppbarBgAlphaFlow = merge(
             scrollEvents,
             scheduleListAdapter.itemUpdatesSimplified().mapLatest {
-                // await next frame
                 binding.recyclerviewSchedule.awaitPost()
             }
         ).map {
-            val rvHeight = binding.recyclerviewSchedule.height
-            if (rvHeight == 0) {
-                return@map 0f
-            }
+            val rv = binding.recyclerviewSchedule
+            if (rv.height <= 0) return@map 0f
 
             val itemCount = scheduleListAdapter.itemCount
-            if (itemCount <= 1) {
-                // Empty or no footer
-                return@map 0f
-            }
+            if (itemCount <= 0) return@map 0f
 
-            val firstView = linearLayoutManager.findViewByPosition(0)
-            val lastView = linearLayoutManager.findViewByPosition(itemCount - 1)
-
-            // Content does not fill the screen completely
-            if (firstView != null && lastView != null && firstView.top >= 0 && lastView.bottom <= rvHeight) {
-                return@map 0f
-            }
-
-            // The footer is not visible
-            if (lastView == null || lastView.height <= 0) {
-                return@map 1f
-            }
-
-            val visibleHeight = (rvHeight - lastView.top).coerceIn(0, lastView.height)
-            1f - (visibleHeight.toFloat() / lastView.height)
-        }.distinctUntilChanged()
-
+            // If the RecyclerView can scroll down, the footer is at least partially hidden behind the BottomAppBar.
+            // This also covers the case where items don't fill the screen (canScrollVertically returns false → 0f).
+            // canScrollVertically(1) checks if the view can scroll down (towards the bottom).
+            if (rv.canScrollVertically(1)) 1f else 0f
+        }.stateIn(scope = viewLifecycleScope, started = SharingStarted.Eagerly, null)
         viewLifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 bottomAppbarStateFlow.unwrap().collectLatest { bottomAppbarState ->
                     if (bottomAppbarState == null) return@collectLatest
-                    backgroundAlphaFlow.collectLatest { backgroundAlpha ->
-                        bottomAppbarState.backgroundAlpha = backgroundAlpha
+                    var animator: ValueAnimator? = null
+                    try {
+                        bottomAppbarBgAlphaFlow.collect { alpha ->
+                            if (alpha == null) return@collect
+
+                            animator?.cancel()
+                            val currentAlpha = bottomAppbarState.backgroundAlpha
+                            if (alpha != currentAlpha) {
+                                animator = if (alpha > 0f) {
+                                    // Smooth fade-in when background appears
+                                    ValueAnimator.ofFloat(currentAlpha, alpha)
+                                } else {
+                                    // Smooth fade-out when background disappears (e.g. items removed)
+                                    ValueAnimator.ofFloat(currentAlpha, 0f)
+                                }.apply {
+                                    duration = 300L
+                                    addUpdateListener { bottomAppbarState.backgroundAlpha = it.animatedValue as Float }
+                                }.also { it.start() }
+                            }
+                        }
+                    } finally {
+                        animator?.cancel()
                     }
                 }
             }
         }
-
 
         val userInteractionSyncFlow = createUserInteractionSyncFlow()
         withSync(
