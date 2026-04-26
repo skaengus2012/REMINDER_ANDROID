@@ -16,6 +16,7 @@
 
 package com.nlab.reminder.core.component.schedulelist.content.ui
 
+import android.animation.ValueAnimator
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -273,47 +274,42 @@ internal class ScheduleListFragment : Fragment() {
             }
         }
 
-        val backgroundAlphaFlow = merge(
+        val bottomAppbarBackgroundAlphaFlow = merge(
             scrollEvents,
             scheduleListAdapter.itemUpdatesSimplified().mapLatest {
-                // await next frame
                 binding.recyclerviewSchedule.awaitPost()
             }
         ).map {
-            val rvHeight = binding.recyclerviewSchedule.height
-            if (rvHeight == 0) {
-                return@map 0f
-            }
+            val rv = binding.recyclerviewSchedule
+            if (rv.height <= 0) return@map 0f
 
             val itemCount = scheduleListAdapter.itemCount
-            if (itemCount <= 1) {
-                // Empty or no footer
-                return@map 0f
-            }
+            if (itemCount <= 0) return@map 0f
 
-            val firstView = linearLayoutManager.findViewByPosition(0)
-            val lastView = linearLayoutManager.findViewByPosition(itemCount - 1)
-
-            // Content does not fill the screen completely
-            if (firstView != null && lastView != null && firstView.top >= 0 && lastView.bottom <= rvHeight) {
-                return@map 0f
-            }
-
-            // The footer is not visible
-            if (lastView == null || lastView.height <= 0) {
-                return@map 1f
-            }
-
-            val visibleHeight = (rvHeight - lastView.top).coerceIn(0, lastView.height)
-            1f - (visibleHeight.toFloat() / lastView.height)
+            // If the RecyclerView can scroll down, the footer is at least partially hidden behind the BottomAppBar.
+            // This also covers the case where items don't fill the screen (canScrollVertically returns false → 0f).
+            // canScrollVertically(1) checks if the view can scroll down (towards the bottom).
+            if (rv.canScrollVertically(1)) 1f else 0f
         }.distinctUntilChanged()
 
         viewLifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 bottomAppbarStateFlow.unwrap().collectLatest { bottomAppbarState ->
                     if (bottomAppbarState == null) return@collectLatest
-                    backgroundAlphaFlow.collectLatest { backgroundAlpha ->
-                        bottomAppbarState.backgroundAlpha = backgroundAlpha
+                    var fadeOutAnimator: ValueAnimator? = null
+                    bottomAppbarBackgroundAlphaFlow.collect { targetAlpha ->
+                        fadeOutAnimator?.cancel()
+                        if (targetAlpha == 0f && bottomAppbarState.backgroundAlpha > 0f) {
+                            // Smooth fade-out when background disappears (e.g. items removed)
+                            fadeOutAnimator = ValueAnimator.ofFloat(bottomAppbarState.backgroundAlpha, 0f).apply {
+                                duration = 300L
+                                addUpdateListener { bottomAppbarState.backgroundAlpha = it.animatedValue as Float }
+                                start()
+                            }
+                        } else {
+                            // Instant snap when background appears (scroll triggers immediate feedback)
+                            bottomAppbarState.backgroundAlpha = targetAlpha
+                        }
                     }
                 }
             }
