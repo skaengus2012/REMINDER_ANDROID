@@ -299,16 +299,23 @@ internal class ScheduleListFragment : Fragment() {
                     var animator: ValueAnimator? = null
                     bottomAppbarBackgroundAlphaFlow.collect { targetAlpha ->
                         animator?.cancel()
-                        if (targetAlpha == 0f && bottomAppbarState.backgroundAlpha > 0f) {
-                            // Smooth fade-out when background disappears (e.g. items removed)
-                            animator = ValueAnimator.ofFloat(bottomAppbarState.backgroundAlpha, 0f).apply {
-                                duration = 300L
-                                addUpdateListener { bottomAppbarState.backgroundAlpha = it.animatedValue as Float }
-                                start()
+                        val currentAlpha = bottomAppbarState.backgroundAlpha
+                        if (targetAlpha != currentAlpha) {
+                            if (targetAlpha > 0f) {
+                                // Smooth fade-in when background appears
+                                animator = ValueAnimator.ofFloat(currentAlpha, targetAlpha).apply {
+                                    duration = 200L
+                                    addUpdateListener { bottomAppbarState.backgroundAlpha = it.animatedValue as Float }
+                                    start()
+                                }
+                            } else {
+                                // Smooth fade-out when background disappears (e.g. items removed)
+                                animator = ValueAnimator.ofFloat(currentAlpha, 0f).apply {
+                                    duration = 300L
+                                    addUpdateListener { bottomAppbarState.backgroundAlpha = it.animatedValue as Float }
+                                    start()
+                                }
                             }
-                        } else {
-                            // Instant snap when background appears (scroll triggers immediate feedback)
-                            bottomAppbarState.backgroundAlpha = targetAlpha
                         }
                     }
                 }
