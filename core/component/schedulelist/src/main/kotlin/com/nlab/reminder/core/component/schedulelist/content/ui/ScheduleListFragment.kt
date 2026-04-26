@@ -244,7 +244,7 @@ internal class ScheduleListFragment : Fragment() {
             }
         }
 
-        val toolbarBackgroundAlphaState = combine(
+        val toolbarBgAlphaFlow = combine(
             firstVisiblePositions.map { pos ->
                 when (pos) {
                     0 -> 0f
@@ -265,16 +265,15 @@ internal class ScheduleListFragment : Fragment() {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 toolbarStateFlow.unwrap().collectLatest { toolbarValues ->
                     if (toolbarValues == null) return@collectLatest
-                    toolbarBackgroundAlphaState.collect { backgroundAlpha ->
-                        if (backgroundAlpha != null) {
-                            toolbarValues.backgroundAlpha = backgroundAlpha
-                        }
+                    toolbarBgAlphaFlow.collect { newAlpha ->
+                        if (newAlpha == null) return@collect
+                        toolbarValues.backgroundAlpha = newAlpha
                     }
                 }
             }
         }
 
-        val bottomAppbarBackgroundAlphaFlow = merge(
+        val bottomAppbarBgAlphaFlow = merge(
             scrollEvents,
             scheduleListAdapter.itemUpdatesSimplified().mapLatest {
                 binding.recyclerviewSchedule.awaitPost()
@@ -290,38 +289,37 @@ internal class ScheduleListFragment : Fragment() {
             // This also covers the case where items don't fill the screen (canScrollVertically returns false → 0f).
             // canScrollVertically(1) checks if the view can scroll down (towards the bottom).
             if (rv.canScrollVertically(1)) 1f else 0f
-        }.distinctUntilChanged()
-
+        }.stateIn(scope = viewLifecycleScope, started = SharingStarted.Eagerly, null)
         viewLifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 bottomAppbarStateFlow.unwrap().collectLatest { bottomAppbarState ->
                     if (bottomAppbarState == null) return@collectLatest
                     var animator: ValueAnimator? = null
-                    bottomAppbarBackgroundAlphaFlow.collect { targetAlpha ->
-                        animator?.cancel()
-                        val currentAlpha = bottomAppbarState.backgroundAlpha
-                        if (targetAlpha != currentAlpha) {
-                            if (targetAlpha > 0f) {
-                                // Smooth fade-in when background appears
-                                animator = ValueAnimator.ofFloat(currentAlpha, targetAlpha).apply {
-                                    duration = 200L
-                                    addUpdateListener { bottomAppbarState.backgroundAlpha = it.animatedValue as Float }
-                                    start()
-                                }
-                            } else {
-                                // Smooth fade-out when background disappears (e.g. items removed)
-                                animator = ValueAnimator.ofFloat(currentAlpha, 0f).apply {
+                    try {
+                        bottomAppbarBgAlphaFlow.collect { alpha ->
+                            if (alpha == null) return@collect
+
+                            animator?.cancel()
+                            val currentAlpha = bottomAppbarState.backgroundAlpha
+                            if (alpha != currentAlpha) {
+                                animator = if (alpha > 0f) {
+                                    // Smooth fade-in when background appears
+                                    ValueAnimator.ofFloat(currentAlpha, alpha)
+                                } else {
+                                    // Smooth fade-out when background disappears (e.g. items removed)
+                                    ValueAnimator.ofFloat(currentAlpha, 0f)
+                                }.apply {
                                     duration = 300L
                                     addUpdateListener { bottomAppbarState.backgroundAlpha = it.animatedValue as Float }
-                                    start()
-                                }
+                                }.also { it.start() }
                             }
                         }
+                    } finally {
+                        animator?.cancel()
                     }
                 }
             }
         }
-
 
         val userInteractionSyncFlow = createUserInteractionSyncFlow()
         withSync(
