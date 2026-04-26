@@ -288,6 +288,7 @@ internal class ScheduleListFragment : Fragment() {
 
             // If the RecyclerView can scroll down, the footer is at least partially hidden behind the BottomAppBar.
             // This also covers the case where items don't fill the screen (canScrollVertically returns false → 0f).
+            // canScrollVertically(1) checks if the view can scroll down (towards the bottom).
             if (rv.canScrollVertically(1)) 1f else 0f
         }.distinctUntilChanged()
 
