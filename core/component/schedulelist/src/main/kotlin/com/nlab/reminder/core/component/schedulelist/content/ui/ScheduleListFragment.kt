@@ -296,12 +296,12 @@ internal class ScheduleListFragment : Fragment() {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 bottomAppbarStateFlow.unwrap().collectLatest { bottomAppbarState ->
                     if (bottomAppbarState == null) return@collectLatest
-                    var fadeOutAnimator: ValueAnimator? = null
+                    var animator: ValueAnimator? = null
                     bottomAppbarBackgroundAlphaFlow.collect { targetAlpha ->
-                        fadeOutAnimator?.cancel()
+                        animator?.cancel()
                         if (targetAlpha == 0f && bottomAppbarState.backgroundAlpha > 0f) {
                             // Smooth fade-out when background disappears (e.g. items removed)
-                            fadeOutAnimator = ValueAnimator.ofFloat(bottomAppbarState.backgroundAlpha, 0f).apply {
+                            animator = ValueAnimator.ofFloat(bottomAppbarState.backgroundAlpha, 0f).apply {
                                 duration = 300L
                                 addUpdateListener { bottomAppbarState.backgroundAlpha = it.animatedValue as Float }
                                 start()
