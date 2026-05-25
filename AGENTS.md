@@ -1,5 +1,16 @@
 # Reminder Android Project (AI Agent Guide)
 
+## 📋 Guidelines Index
+
+Detailed guidelines are in `docs/guidelines/`. Read the relevant file before performing the task.
+
+| File | When to read |
+|------|--------------|
+| [`docs/guidelines/commit-rules.md`](docs/guidelines/commit-rules.md) | Before creating any git commit |
+
+---
+
+
 This file serves as a guide for AI coding assistants (agents) to understand the architecture, module layout, and build/test workflows of the **REMINDER_ANDROID** project.
 
 ---
