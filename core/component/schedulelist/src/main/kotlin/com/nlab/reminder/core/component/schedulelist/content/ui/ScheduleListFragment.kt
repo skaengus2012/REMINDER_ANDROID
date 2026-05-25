@@ -34,6 +34,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.nlab.reminder.core.android.view.awaitPost
 import com.nlab.reminder.core.android.view.inputmethod.hideSoftInputFromWindow
+import com.nlab.reminder.core.android.view.layoutChanges
 import com.nlab.reminder.core.android.view.setVisible
 import com.nlab.reminder.core.android.view.touches
 import com.nlab.reminder.core.androidx.fragment.viewLifecycle
@@ -275,15 +276,27 @@ internal class ScheduleListFragment : Fragment() {
 
         val bottomAppbarBgAlphaFlow = merge(
             scrollEvents,
-            scheduleListAdapter.itemUpdatesSimplified().mapLatest {
-                binding.recyclerviewSchedule.awaitPost()
-            }
-        ).map {
+            scheduleListAdapter.itemUpdatesSimplified()
+                .mapLatest { binding.recyclerviewSchedule.awaitPost() },
+            binding.recyclerviewSchedule.layoutChanges()
+        ).mapNotNull {
             val rv = binding.recyclerviewSchedule
-            if (rv.height <= 0) return@map 0f
+            if (rv.isLaidOut.not() || rv.height <= 0) return@mapNotNull null
+
+            val identity = scheduleListItemsAdaptationsFlow.value
+            val adaptation = if (identity is Identity.Exist) identity.value else null
+            if (adaptation !is ScheduleListItemsAdaptation.Exist) return@mapNotNull null
 
             val itemCount = scheduleListAdapter.itemCount
-            if (itemCount <= 0) return@map 0f
+            if (itemCount <= 0) {
+                if (adaptation.items.isNotEmpty()) {
+                    return@mapNotNull null
+                } else {
+                    return@mapNotNull 0f
+                }
+            }
+
+            if (rv.childCount <= 0) return@mapNotNull null
 
             // If the RecyclerView can scroll down, the footer is at least partially hidden behind the BottomAppBar.
             // This also covers the case where items don't fill the screen (canScrollVertically returns false → 0f).
@@ -295,23 +308,27 @@ internal class ScheduleListFragment : Fragment() {
                 bottomAppbarStateFlow.unwrap().collectLatest { bottomAppbarState ->
                     if (bottomAppbarState == null) return@collectLatest
                     var animator: ValueAnimator? = null
+                    var isFirstEmission = true
                     try {
                         bottomAppbarBgAlphaFlow.collect { alpha ->
                             if (alpha == null) return@collect
 
                             animator?.cancel()
-                            val currentAlpha = bottomAppbarState.backgroundAlpha
-                            if (alpha != currentAlpha) {
-                                animator = if (alpha > 0f) {
-                                    // Smooth fade-in when background appears
-                                    ValueAnimator.ofFloat(currentAlpha, alpha)
-                                } else {
-                                    // Smooth fade-out when background disappears (e.g. items removed)
-                                    ValueAnimator.ofFloat(currentAlpha, 0f)
-                                }.apply {
-                                    duration = 300L
-                                    addUpdateListener { bottomAppbarState.backgroundAlpha = it.animatedValue as Float }
-                                }.also { it.start() }
+                            if (isFirstEmission) {
+                                bottomAppbarState.backgroundAlpha = alpha
+                                isFirstEmission = false
+                            } else {
+                                val currentAlpha = bottomAppbarState.backgroundAlpha
+                                if (alpha != currentAlpha) {
+                                    animator = if (alpha > 0f) {
+                                        ValueAnimator.ofFloat(currentAlpha, alpha)
+                                    } else {
+                                        ValueAnimator.ofFloat(currentAlpha, 0f)
+                                    }.apply {
+                                        duration = 300L
+                                        addUpdateListener { bottomAppbarState.backgroundAlpha = it.animatedValue as Float }
+                                    }.also { it.start() }
+                                }
                             }
                         }
                     } finally {

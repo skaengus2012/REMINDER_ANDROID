@@ -89,6 +89,14 @@ fun View.focusChanges(emitCurrent: Boolean = false): Flow<Boolean> {
     return if (emitCurrent) result.onStart { emit(hasFocus()) } else result
 }
 
+fun View.layoutChanges(): Flow<View> = callbackFlow {
+    val listener = View.OnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
+        trySend(this@layoutChanges)
+    }
+    addOnLayoutChangeListener(listener)
+    awaitClose { removeOnLayoutChangeListener(listener) }
+}
+
 suspend fun View.awaitUntilLaidOut() {
     if (isLaidOut && isLayoutRequested.not()) return
 
