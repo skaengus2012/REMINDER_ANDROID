@@ -35,26 +35,28 @@ internal class SyncableState<T>(
     initialValue: T,
     private val syncDuration: Long,
 ) {
-    private val syncFlow =
-        MutableStateFlow<StampedValue<T>>(StampedValue(initialValue, EMPTY_COMMIT_TIME))
-    private val localFlow =
-        MutableStateFlow<StampedValue<T>>(StampedValue(initialValue, EMPTY_COMMIT_TIME))
+    private val syncFlow = MutableStateFlow(
+        value = StampedValue(initialValue, EMPTY_COMMIT_TIME)
+    )
+    private val localFlow = MutableStateFlow(
+        value = StampedValue(initialValue, EMPTY_COMMIT_TIME)
+    )
 
     private var latestLocalCommitTime = 0L
     private var latestLocalAppliedTime = 0L
     private var latestSyncAppliedTime = 0L
 
     val state = channelFlow {
-        val combinedState = MutableIdentityStateFlow<T>()
+        val combinedState = MutableLatestSharedFlow<T>()
         launch {
-            combinedState.unwrap().collect { send(it) }
+            combinedState.collect { send(it) }
         }
         launch {
             combine(localFlow, syncFlow, ::Pair).collectLatest { (local, sync) ->
                 var alreadyDelayed = false
                 if (local.commitTime > latestLocalAppliedTime) {
                     latestLocalAppliedTime = local.commitTime
-                    combinedState.update(local.data)
+                    combinedState.tryEmit(local.data)
                     delay(syncDuration)
                     alreadyDelayed = true
                 }
@@ -64,7 +66,7 @@ internal class SyncableState<T>(
                         delay(syncDuration)
                     }
                     latestSyncAppliedTime = sync.commitTime
-                    combinedState.update(sync.data)
+                    combinedState.tryEmit(sync.data)
                 }
             }
         }

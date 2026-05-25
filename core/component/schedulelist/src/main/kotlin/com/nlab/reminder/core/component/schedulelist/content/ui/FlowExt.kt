@@ -22,6 +22,7 @@ import com.nlab.reminder.core.android.widget.textChanges
 import com.nlab.reminder.core.kotlinx.coroutines.flow.withPrev
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -38,6 +39,10 @@ import kotlinx.coroutines.launch
  * @author Doohyun
  */
 private const val FOCUS_LOST_CONFIRMATION_DURATION = 100L
+
+@Suppress("FunctionName")
+internal fun <T> MutableLatestSharedFlow(): MutableSharedFlow<T> =
+    MutableSharedFlow(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
 
 internal suspend inline fun Flow<Boolean>.collectWithHiddenDebounce(
     crossinline collect: suspend (Boolean) -> Unit

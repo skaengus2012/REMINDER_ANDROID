@@ -32,8 +32,9 @@ import kotlinx.collections.immutable.*
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.datetime.TimeZone
 import kotlin.time.Instant
 
@@ -63,7 +64,6 @@ internal class ScheduleListAdapter(
     private val selectionEnabled = MutableStateFlow(false)
 
     // MutableEventSharedFlow: Used to send events that should not be conflated.
-    // MutableIdentityStateFlow: Used when the current state needs to be reflected immediately because it is conflated.
     private val completionCheckedScheduleIds = SyncableState<PersistentSet<ScheduleId>>(
         lifecycleScope = lifecycleScope,
         initialValue = persistentHashSetOf(),
@@ -77,11 +77,11 @@ internal class ScheduleListAdapter(
         initialValue = persistentHashSetOf(),
         syncDuration = 300L
     )
-    private val _selectionUpdateRequests = MutableIdentityStateFlow<SelectionUpdate>()
-    val selectionUpdateRequests: IdentityStateFlow<SelectionUpdate> = _selectionUpdateRequests.asStateFlow()
+    private val _selectionUpdateRequests = MutableLatestSharedFlow<SelectionUpdate>()
+    val selectionUpdateRequests: Flow<SelectionUpdate> = _selectionUpdateRequests.asSharedFlow()
 
-    private val _itemPositionUpdateRequests = MutableIdentityStateFlow<ItemPositionUpdate>()
-    val itemPositionUpdateRequests: IdentityStateFlow<ItemPositionUpdate> = _itemPositionUpdateRequests.asStateFlow()
+    private val _itemPositionUpdateRequests = MutableLatestSharedFlow<ItemPositionUpdate>()
+    val itemPositionUpdateRequests: Flow<ItemPositionUpdate> = _itemPositionUpdateRequests.asSharedFlow()
 
     private val _addRequests = EventChannel<SimpleAdd>()
     val addRequests: ReceiveChannel<SimpleAdd> = _addRequests
@@ -279,7 +279,7 @@ internal class ScheduleListAdapter(
         val updated = if (selected) current + scheduleId else current - scheduleId
         if (current != updated) {
             selectedScheduleIds.set(updated)
-            _selectionUpdateRequests.update(SelectionUpdate(selectedIds = updated))
+            _selectionUpdateRequests.tryEmit(SelectionUpdate(selectedIds = updated))
         }
     }
 
@@ -290,7 +290,7 @@ internal class ScheduleListAdapter(
     fun submitMoveDone() {
         differ.syncMoving(
             commitCallback = {
-                _itemPositionUpdateRequests.update(ItemPositionUpdate(snapshot = getCurrentList().toList()))
+                _itemPositionUpdateRequests.tryEmit(ItemPositionUpdate(snapshot = getCurrentList().toList()))
             }
         )
     }

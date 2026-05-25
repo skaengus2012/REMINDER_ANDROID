@@ -91,23 +91,23 @@ internal class ScheduleListFragment : Fragment() {
     private var _binding: FragmentScheduleListBinding? = null
     private val binding: FragmentScheduleListBinding get() = checkNotNull(_binding)
 
-    private val scheduleListItemsAdaptationsFlow = MutableIdentityStateFlow<ScheduleListItemsAdaptation>()
-    private val multiSelectionEnabledFlow = MutableIdentityStateFlow<Boolean>()
-    private val triggerAtFormatPatternsFlow = MutableIdentityStateFlow<TriggerAtFormatPatterns>()
-    private val themeFlow = MutableIdentityStateFlow<ScheduleListTheme>()
-    private val timeZoneFlow = MutableIdentityStateFlow<TimeZone>()
-    private val entryAtFlow = MutableIdentityStateFlow<Instant>()
-    private val listBottomScrollPaddingFlow = MutableIdentityStateFlow<Int>()
-    private val toolbarStateFlow = MutableIdentityStateFlow<ScheduleListToolbarState?>()
-    private val bottomAppbarStateFlow = MutableIdentityStateFlow<ScheduleListBottomAppbarState?>()
-    private val selectionUpdateConsumerFlow = MutableIdentityStateFlow<(SelectionUpdate) -> Unit>()
-    private val completedSchedulesCleanupConsumerFlow = MutableIdentityStateFlow<() -> Unit>()
-    private val completionUpdateConsumerFlow = MutableIdentityStateFlow<(CompletionUpdate) -> Unit>()
-    private val deleteConsumerFlow = MutableIdentityStateFlow<(Delete) -> Unit>()
-    private val itemPositionUpdateConsumerFlow = MutableIdentityStateFlow<(ItemPositionUpdate) -> Unit>()
-    private val openDetailConsumerFlow = MutableIdentityStateFlow<(OpenDetail) -> Unit>()
-    private val simpleAddConsumerFlow = MutableIdentityStateFlow<(SimpleAdd) -> Unit>()
-    private val simpleEditConsumerFlow = MutableIdentityStateFlow<(SimpleEdit) -> Unit>()
+    private val scheduleListItemsAdaptationsFlow = MutableLatestSharedFlow<ScheduleListItemsAdaptation>()
+    private val multiSelectionEnabledFlow = MutableLatestSharedFlow<Boolean>()
+    private val triggerAtFormatPatternsFlow = MutableLatestSharedFlow<TriggerAtFormatPatterns>()
+    private val themeFlow = MutableLatestSharedFlow<ScheduleListTheme>()
+    private val timeZoneFlow = MutableLatestSharedFlow<TimeZone>()
+    private val entryAtFlow = MutableLatestSharedFlow<Instant>()
+    private val listBottomScrollPaddingFlow = MutableLatestSharedFlow<Int>()
+    private val toolbarStateFlow = MutableLatestSharedFlow<ScheduleListToolbarState?>()
+    private val bottomAppbarStateFlow = MutableLatestSharedFlow<ScheduleListBottomAppbarState?>()
+    private val selectionUpdateConsumerFlow = MutableLatestSharedFlow<(SelectionUpdate) -> Unit>()
+    private val completedSchedulesCleanupConsumerFlow = MutableLatestSharedFlow<() -> Unit>()
+    private val completionUpdateConsumerFlow = MutableLatestSharedFlow<(CompletionUpdate) -> Unit>()
+    private val deleteConsumerFlow = MutableLatestSharedFlow<(Delete) -> Unit>()
+    private val itemPositionUpdateConsumerFlow = MutableLatestSharedFlow<(ItemPositionUpdate) -> Unit>()
+    private val openDetailConsumerFlow = MutableLatestSharedFlow<(OpenDetail) -> Unit>()
+    private val simpleAddConsumerFlow = MutableLatestSharedFlow<(SimpleAdd) -> Unit>()
+    private val simpleEditConsumerFlow = MutableLatestSharedFlow<(SimpleEdit) -> Unit>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -234,7 +234,7 @@ internal class ScheduleListFragment : Fragment() {
             .stateIn(scope = viewLifecycleScope, started = SharingStarted.Eagerly, initialValue = null)
         viewLifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                toolbarStateFlow.unwrap().collectLatest { toolbarState ->
+                toolbarStateFlow.collectLatest { toolbarState ->
                     if (toolbarState == null) return@collectLatest
                     toolbarVisibilityState.collect { titleVisible ->
                         if (titleVisible != null) {
@@ -264,7 +264,7 @@ internal class ScheduleListFragment : Fragment() {
         }.stateIn(scope = viewLifecycleScope, started = SharingStarted.Eagerly, null)
         viewLifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                toolbarStateFlow.unwrap().collectLatest { toolbarValues ->
+                toolbarStateFlow.collectLatest { toolbarValues ->
                     if (toolbarValues == null) return@collectLatest
                     toolbarBgAlphaFlow.collect { newAlpha ->
                         if (newAlpha == null) return@collect
@@ -274,29 +274,29 @@ internal class ScheduleListFragment : Fragment() {
             }
         }
 
-        val bottomAppbarBgAlphaFlow = merge(
-            scrollEvents,
-            scheduleListAdapter.itemUpdatesSimplified()
-                .mapLatest { binding.recyclerviewSchedule.awaitPost() },
-            binding.recyclerviewSchedule.layoutChanges()
-        ).mapNotNull {
+        val bottomAppbarBgAlphaFlow = combine(
+            merge(
+                scrollEvents,
+                scheduleListAdapter.itemUpdatesSimplified()
+                    .mapLatest { binding.recyclerviewSchedule.awaitPost() },
+                binding.recyclerviewSchedule.layoutChanges()
+            ),
+            scheduleListItemsAdaptationsFlow
+        ) { _, adaptation ->
             val rv = binding.recyclerviewSchedule
-            if (rv.isLaidOut.not() || rv.height <= 0) return@mapNotNull null
-
-            val identity = scheduleListItemsAdaptationsFlow.value
-            val adaptation = if (identity is Identity.Exist) identity.value else null
-            if (adaptation !is ScheduleListItemsAdaptation.Exist) return@mapNotNull null
+            if (rv.isLaidOut.not() || rv.height <= 0) return@combine null
+            if (adaptation !is ScheduleListItemsAdaptation.Exist) return@combine null
 
             val itemCount = scheduleListAdapter.itemCount
             if (itemCount <= 0) {
                 if (adaptation.items.isNotEmpty()) {
-                    return@mapNotNull null
+                    return@combine null
                 } else {
-                    return@mapNotNull 0f
+                    return@combine 0f
                 }
             }
 
-            if (rv.childCount <= 0) return@mapNotNull null
+            if (rv.childCount <= 0) return@combine null
 
             // If the RecyclerView can scroll down, the footer is at least partially hidden behind the BottomAppBar.
             // This also covers the case where items don't fill the screen (canScrollVertically returns false → 0f).
@@ -305,7 +305,7 @@ internal class ScheduleListFragment : Fragment() {
         }.stateIn(scope = viewLifecycleScope, started = SharingStarted.Eagerly, null)
         viewLifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                bottomAppbarStateFlow.unwrap().collectLatest { bottomAppbarState ->
+                bottomAppbarStateFlow.collectLatest { bottomAppbarState ->
                     if (bottomAppbarState == null) return@collectLatest
                     var animator: ValueAnimator? = null
                     var isFirstEmission = true
@@ -340,14 +340,14 @@ internal class ScheduleListFragment : Fragment() {
 
         val userInteractionSyncFlow = createUserInteractionSyncFlow()
         withSync(
-            syncSourceFlow = userInteractionSyncFlow.unwrap().map { it.selectedIds },
+            syncSourceFlow = userInteractionSyncFlow.map { it.selectedIds },
             sync = scheduleListAdapter::syncSelected
         ) { syncJob ->
             viewLifecycleScope.launch {
                 syncJob.join()
                 viewLifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    selectionUpdateConsumerFlow.unwrap().collectLatest { consumer ->
-                        scheduleListAdapter.selectionUpdateRequests.unwrap().collect(consumer)
+                    selectionUpdateConsumerFlow.collectLatest { consumer ->
+                        scheduleListAdapter.selectionUpdateRequests.collect(consumer)
                     }
                 }
             }
@@ -355,19 +355,19 @@ internal class ScheduleListFragment : Fragment() {
 
         viewLifecycleScope.launch {
             viewLifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                itemPositionUpdateConsumerFlow.unwrap().collectLatest { consumer ->
-                    scheduleListAdapter.itemPositionUpdateRequests.unwrap().collect(consumer)
+                itemPositionUpdateConsumerFlow.collectLatest { consumer ->
+                    scheduleListAdapter.itemPositionUpdateRequests.collect(consumer)
                 }
             }
         }
 
         withSync(
-            syncSourceFlow = userInteractionSyncFlow.unwrap().map { it.completionCheckedIds },
+            syncSourceFlow = userInteractionSyncFlow.map { it.completionCheckedIds },
             sync = scheduleListAdapter::syncCompletionChecked,
         ) { syncJob ->
             forwardEventToConsumer(
                 eventSource = scheduleListAdapter.completionUpdateRequests,
-                eventConsumerFlow = completionUpdateConsumerFlow.unwrap(),
+                eventConsumerFlow = completionUpdateConsumerFlow,
                 awaitConsumerReady = { syncJob.join() }
             )
         }
@@ -375,28 +375,27 @@ internal class ScheduleListFragment : Fragment() {
         forwardEventToConsumer(
             eventSource = scheduleListAdapter.clearCompletedSchedulesRequests,
             eventConsumerFlow = completedSchedulesCleanupConsumerFlow
-                .unwrap()
                 .map { consumer -> { consumer() } }
         )
 
         forwardEventToConsumer(
             eventSource = scheduleListAdapter.deleteRequests,
-            eventConsumerFlow = deleteConsumerFlow.unwrap()
+            eventConsumerFlow = deleteConsumerFlow
         )
 
         forwardEventToConsumer(
             eventSource = scheduleListAdapter.openDetailRequests,
-            eventConsumerFlow = openDetailConsumerFlow.unwrap()
+            eventConsumerFlow = openDetailConsumerFlow
         )
 
         forwardEventToConsumer(
             eventSource = scheduleListAdapter.addRequests,
-            eventConsumerFlow = simpleAddConsumerFlow.unwrap()
+            eventConsumerFlow = simpleAddConsumerFlow
         )
 
         forwardEventToConsumer(
             eventSource = scheduleListAdapter.editRequests,
-            eventConsumerFlow = simpleEditConsumerFlow.unwrap()
+            eventConsumerFlow = simpleEditConsumerFlow
         )
 
         merge(
@@ -409,7 +408,7 @@ internal class ScheduleListFragment : Fragment() {
             .launchIn(viewLifecycleScope)
 
         merge(
-            multiSelectionEnabledFlow.unwrap()
+            multiSelectionEnabledFlow
                 .filter { enabled -> enabled }
                 .flowWithLifecycle(viewLifecycle),
             scrollStates
@@ -448,7 +447,7 @@ internal class ScheduleListFragment : Fragment() {
         }.onEach { viewHolder -> itemTouchCallback.resetSwipeClamp(viewHolder) }
             .launchIn(viewLifecycleScope)
 
-        multiSelectionEnabledFlow.unwrap()
+        multiSelectionEnabledFlow
             .flowWithLifecycle(viewLifecycle)
             .onEach { enabled ->
                 scheduleListAdapter.setSelectionEnabled(enabled)
@@ -506,7 +505,7 @@ internal class ScheduleListFragment : Fragment() {
 
         viewLifecycleScope.launch {
             viewLifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                toolbarStateFlow.unwrap().collectLatest { toolbarState ->
+                toolbarStateFlow.collectLatest { toolbarState ->
                     if (toolbarState == null) return@collectLatest
                     focusChanges.collectLatest { event ->
                         if (event.focused) toolbarState.editCompleteVisible = true
@@ -557,7 +556,7 @@ internal class ScheduleListFragment : Fragment() {
             }
         }
 
-        scheduleListItemsAdaptationsFlow.unwrap()
+        scheduleListItemsAdaptationsFlow
             .distinctUntilChanged { prev, next ->
                 if (prev is ScheduleListItemsAdaptation.Exist && next is ScheduleListItemsAdaptation.Exist) {
                     prev.replayStamp == next.replayStamp && prev.items.value == next.items.value
@@ -626,27 +625,27 @@ internal class ScheduleListFragment : Fragment() {
             }
             .launchIn(viewLifecycleScope)
 
-        triggerAtFormatPatternsFlow.unwrap()
+        triggerAtFormatPatternsFlow
             .flowWithLifecycle(viewLifecycle)
             .onEach(scheduleListAdapter::updateTriggerAtFormatPatterns)
             .launchIn(viewLifecycleScope)
 
-        themeFlow.unwrap()
+        themeFlow
             .flowWithLifecycle(viewLifecycle)
             .onEach(scheduleListAdapter::updateTheme)
             .launchIn(viewLifecycleScope)
 
-        timeZoneFlow.unwrap()
+        timeZoneFlow
             .flowWithLifecycle(viewLifecycle)
             .onEach(scheduleListAdapter::updateTimeZone)
             .launchIn(viewLifecycleScope)
 
-        entryAtFlow.unwrap()
+        entryAtFlow
             .flowWithLifecycle(viewLifecycle)
             .onEach(scheduleListAdapter::updateEntryAt)
             .launchIn(viewLifecycleScope)
 
-        listBottomScrollPaddingFlow.unwrap()
+        listBottomScrollPaddingFlow
             .flowWithLifecycle(viewLifecycle)
             .onEach { value ->
                 binding.recyclerviewSchedule.updatePadding(bottom = value)
@@ -655,9 +654,9 @@ internal class ScheduleListFragment : Fragment() {
             .launchIn(viewLifecycleScope)
     }
 
-    private fun createUserInteractionSyncFlow(): IdentityStateFlow<UserInteraction> {
-        val resultFlow = MutableIdentityStateFlow<UserInteraction>()
-        scheduleListItemsAdaptationsFlow.unwrap()
+    private fun createUserInteractionSyncFlow(): Flow<UserInteraction> {
+        val resultFlow = MutableLatestSharedFlow<UserInteraction>()
+        scheduleListItemsAdaptationsFlow
             .filterIsInstance<ScheduleListItemsAdaptation.Exist>()
             .map { adaptation ->
                 val completionCheckedSchedulesIds = hashSetOf<ScheduleId>()
@@ -680,7 +679,7 @@ internal class ScheduleListFragment : Fragment() {
             }
             .flowOn(Dispatchers.Default)
             .flowWithLifecycle(viewLifecycle)
-            .onEach(resultFlow::update)
+            .onEach(resultFlow::tryEmit)
             .launchIn(viewLifecycleScope)
         return resultFlow
     }
@@ -716,71 +715,71 @@ internal class ScheduleListFragment : Fragment() {
     }
 
     fun onScheduleListItemsAdaptationUpdated(scheduleListItemsAdaptation: ScheduleListItemsAdaptation) {
-        scheduleListItemsAdaptationsFlow.update(scheduleListItemsAdaptation)
+        scheduleListItemsAdaptationsFlow.tryEmit(scheduleListItemsAdaptation)
     }
 
     fun onMultiSelectionEnabledChanged(enabled: Boolean) {
-        multiSelectionEnabledFlow.update(enabled)
+        multiSelectionEnabledFlow.tryEmit(enabled)
     }
 
     fun onTriggerAtFormatPatternsUpdated(patterns: TriggerAtFormatPatterns) {
-        triggerAtFormatPatternsFlow.update(patterns)
+        triggerAtFormatPatternsFlow.tryEmit(patterns)
     }
 
     fun onThemeUpdated(theme: ScheduleListTheme) {
-        themeFlow.update(theme)
+        themeFlow.tryEmit(theme)
     }
 
     fun onTimeZoneUpdated(timeZone: TimeZone) {
-        timeZoneFlow.update(timeZone)
+        timeZoneFlow.tryEmit(timeZone)
     }
 
     fun onEntryAtUpdated(entryAt: Instant) {
-        entryAtFlow.update(entryAt)
+        entryAtFlow.tryEmit(entryAt)
     }
 
     fun onToolbarStateUpdated(toolbarState: ScheduleListToolbarState?) {
-        toolbarStateFlow.update(toolbarState)
+        toolbarStateFlow.tryEmit(toolbarState)
     }
 
     fun onBottomAppbarStateUpdated(state: ScheduleListBottomAppbarState?) {
-        bottomAppbarStateFlow.update(state)
+        bottomAppbarStateFlow.tryEmit(state)
     }
 
     fun onListBottomScrollPaddingUpdated(value: Int) {
-        listBottomScrollPaddingFlow.update(value)
+        listBottomScrollPaddingFlow.tryEmit(value)
     }
 
     fun onSelectionUpdateConsumerChanged(observer: (SelectionUpdate) -> Unit) {
-        selectionUpdateConsumerFlow.update(observer)
+        selectionUpdateConsumerFlow.tryEmit(observer)
     }
 
     fun onCompletedSchedulesCleanupConsumerChanged(consumer: ()-> Unit) {
-        completedSchedulesCleanupConsumerFlow.update(consumer)
+        completedSchedulesCleanupConsumerFlow.tryEmit(consumer)
     }
 
     fun onCompletionUpdateConsumerChanged(consumer: (CompletionUpdate) -> Unit) {
-        completionUpdateConsumerFlow.update(consumer)
+        completionUpdateConsumerFlow.tryEmit(consumer)
     }
 
     fun onDeleteConsumerChanged(consumer: (Delete) -> Unit) {
-        deleteConsumerFlow.update(consumer)
+        deleteConsumerFlow.tryEmit(consumer)
     }
 
     fun onItemPositionUpdateConsumerChanged(consumer: (ItemPositionUpdate) -> Unit) {
-        itemPositionUpdateConsumerFlow.update(consumer)
+        itemPositionUpdateConsumerFlow.tryEmit(consumer)
     }
 
     fun onOpenDetailConsumerChanged(consumer: (OpenDetail) -> Unit) {
-        openDetailConsumerFlow.update(consumer)
+        openDetailConsumerFlow.tryEmit(consumer)
     }
 
     fun onSimpleAddConsumerChanged(consumer: (SimpleAdd) -> Unit) {
-        simpleAddConsumerFlow.update(consumer)
+        simpleAddConsumerFlow.tryEmit(consumer)
     }
 
     fun onSimpleEditConsumerChanged(consumer: (SimpleEdit) -> Unit) {
-        simpleEditConsumerFlow.update(consumer)
+        simpleEditConsumerFlow.tryEmit(consumer)
     }
 }
 
