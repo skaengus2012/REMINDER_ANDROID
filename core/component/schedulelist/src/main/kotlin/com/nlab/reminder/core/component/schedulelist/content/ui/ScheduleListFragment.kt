@@ -274,29 +274,29 @@ internal class ScheduleListFragment : Fragment() {
             }
         }
 
-        val bottomAppbarBgAlphaFlow = merge(
-            scrollEvents,
-            scheduleListAdapter.itemUpdatesSimplified()
-                .mapLatest { binding.recyclerviewSchedule.awaitPost() },
-            binding.recyclerviewSchedule.layoutChanges()
-        ).mapNotNull {
+        val bottomAppbarBgAlphaFlow = combine(
+            merge(
+                scrollEvents,
+                scheduleListAdapter.itemUpdatesSimplified()
+                    .mapLatest { binding.recyclerviewSchedule.awaitPost() },
+                binding.recyclerviewSchedule.layoutChanges()
+            ),
+            scheduleListItemsAdaptationsFlow.unwrap()
+        ) { _, adaptation ->
             val rv = binding.recyclerviewSchedule
-            if (rv.isLaidOut.not() || rv.height <= 0) return@mapNotNull null
-
-            val identity = scheduleListItemsAdaptationsFlow.value
-            val adaptation = if (identity is Identity.Exist) identity.value else null
-            if (adaptation !is ScheduleListItemsAdaptation.Exist) return@mapNotNull null
+            if (rv.isLaidOut.not() || rv.height <= 0) return@combine null
+            if (adaptation !is ScheduleListItemsAdaptation.Exist) return@combine null
 
             val itemCount = scheduleListAdapter.itemCount
             if (itemCount <= 0) {
                 if (adaptation.items.isNotEmpty()) {
-                    return@mapNotNull null
+                    return@combine null
                 } else {
-                    return@mapNotNull 0f
+                    return@combine 0f
                 }
             }
 
-            if (rv.childCount <= 0) return@mapNotNull null
+            if (rv.childCount <= 0) return@combine null
 
             // If the RecyclerView can scroll down, the footer is at least partially hidden behind the BottomAppBar.
             // This also covers the case where items don't fill the screen (canScrollVertically returns false → 0f).
