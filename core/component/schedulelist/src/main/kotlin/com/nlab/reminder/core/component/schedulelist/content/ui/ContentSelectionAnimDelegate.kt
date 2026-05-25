@@ -22,7 +22,6 @@ import android.animation.ValueAnimator
 import android.view.View
 import androidx.annotation.FloatRange
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.constraintlayout.widget.ConstraintSet
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import com.nlab.reminder.core.android.view.awaitUntilLaidOut
 import com.nlab.reminder.core.component.schedulelist.R
@@ -34,11 +33,6 @@ import kotlinx.coroutines.Runnable
  * @author Doohyun
  */
 internal class ContentSelectionAnimDelegate(private val binding: LayoutScheduleAdapterItemContentBinding) {
-    private val visibilityStateDecorator = VisibilityStateDecorator(binding)
-
-    private lateinit var unselectedContentConstraintSet: ConstraintSet
-    private lateinit var selectedContentConstraintSet: ConstraintSet
-
     private var selectedExtraContentGuideEnd = 0
     private var unselectedExtraContentGuideEnd = 0
 
@@ -91,25 +85,6 @@ internal class ContentSelectionAnimDelegate(private val binding: LayoutScheduleA
         selectedDragButtonTransitionX =
             if (isLtr) -checkboxTouchableWidth
             else checkboxTouchableWidth
-        unselectedContentConstraintSet = ConstraintSet().apply {
-            clone(/* constraintLayout = */ binding.layoutContent)
-            setVisibility(
-                /* viewId = */ binding.buttonInfo.id,
-                /* visibility = */ ConstraintSet.GONE
-            )
-        }
-        selectedContentConstraintSet = ConstraintSet().apply {
-            clone(unselectedContentConstraintSet)
-            setGoneMargin(
-                /* viewId = */ binding.edittextTitle.id,
-                /* anchor = */ ConstraintSet.END,
-                /* value = */ checkboxTouchableWidth
-            )
-            setGuidelineEnd(
-                /* guidelineID = */ binding.guidelineExtraContentEnd.id,
-                /* margin = */ selectedExtraContentGuideEnd
-            )
-        }
     }
 
     private fun postAnimator(animator: Animator) {
@@ -168,12 +143,14 @@ internal class ContentSelectionAnimDelegate(private val binding: LayoutScheduleA
 
     // Start of configurations
     private fun applyLayout(selectable: Boolean) {
-        ConstraintSet()
-            .apply {
-                clone(/* set = */  getContentConstraintSet(selectable))
-                visibilityStateDecorator.decorateTo(constraintSet = this)
-            }
-            .applyTo(/* constraintLayout = */ binding.layoutContent)
+        val titleParams = binding.edittextTitle.constraintLayoutParams
+        titleParams.goneEndMargin = if (selectable) selectedExtraContentGuideEnd else 0
+        binding.edittextTitle.layoutParams = titleParams
+
+        val guideParams = binding.guidelineExtraContentEnd.constraintLayoutParams
+        guideParams.guideEnd = getExtraContentGuideEnd(selectable)
+        binding.guidelineExtraContentEnd.layoutParams = guideParams
+
         postActionToContentLayout {
             applyCompleteButtonTranslate(selectable)
             applyCompleteButtonAlpha(selectable)
@@ -194,26 +171,23 @@ internal class ContentSelectionAnimDelegate(private val binding: LayoutScheduleA
         createDragButtonAlphaAnimator(selectable),
     )
 
-    private fun getContentConstraintSet(selectable: Boolean): ConstraintSet {
-        return if (selectable) selectedContentConstraintSet else unselectedContentConstraintSet
-    }
-
     // End of configurations
 
     // Start of extra content area
     private fun createExtraContentWidthTransformAnimator(selectable: Boolean): Animator {
-        val constraintSet = ConstraintSet().apply { clone(/* set = */ getContentConstraintSet(selectable)) }
         val currentMediaGuideEnd = binding.guidelineExtraContentEnd
             .constraintLayoutParams
             .guideEnd
+
+        val titleParams = binding.edittextTitle.constraintLayoutParams
+        titleParams.goneEndMargin = if (selectable) selectedExtraContentGuideEnd else 0
+        binding.edittextTitle.layoutParams = titleParams
+
         return ValueAnimator.ofInt(currentMediaGuideEnd, getExtraContentGuideEnd(selectable)).apply {
             addUpdateListener { value ->
-                visibilityStateDecorator.decorateTo(constraintSet)
-                constraintSet.setGuidelineEnd(
-                    /* guidelineID = */ binding.guidelineExtraContentEnd.id,
-                    /* margin = */ value.animatedValue as Int
-                )
-                constraintSet.applyTo(/* constraintLayout = */ binding.layoutContent)
+                val params = binding.guidelineExtraContentEnd.constraintLayoutParams
+                params.guideEnd = value.animatedValue as Int
+                binding.guidelineExtraContentEnd.layoutParams = params
             }
         }
     }
@@ -341,10 +315,15 @@ internal class ContentSelectionAnimDelegate(private val binding: LayoutScheduleA
     // End of DragButton Alpha area
 
     fun applyStateToMirror(mirrorBinding: LayoutScheduleAdapterItemContentMirrorBinding) {
-        getContentConstraintSet(
-            selectable = binding.buttonDragHandle.translationX == getDragButtonTranslateX(selectable = true)
-        ).apply { visibilityStateDecorator.decorateTo(constraintSet = this) }
-            .applyTo(/* constraintLayout = */ mirrorBinding.layoutContent)
+        val selectable = binding.buttonDragHandle.translationX == getDragButtonTranslateX(selectable = true)
+
+        val titleParams = mirrorBinding.edittextTitle.constraintLayoutParams
+        titleParams.goneEndMargin = if (selectable) selectedExtraContentGuideEnd else 0
+        mirrorBinding.edittextTitle.layoutParams = titleParams
+
+        val guideParams = mirrorBinding.guidelineExtraContentEnd.constraintLayoutParams
+        guideParams.guideEnd = getExtraContentGuideEnd(selectable)
+        mirrorBinding.guidelineExtraContentEnd.layoutParams = guideParams
 
         mirrorBinding.buttonComplete.apply {
             alpha = binding.buttonComplete.alpha
@@ -357,20 +336,6 @@ internal class ContentSelectionAnimDelegate(private val binding: LayoutScheduleA
         mirrorBinding.buttonDragHandle.apply {
             alpha = binding.buttonDragHandle.alpha
             translationX = binding.buttonDragHandle.translationX
-        }
-    }
-}
-
-private class VisibilityStateDecorator(binding: LayoutScheduleAdapterItemContentBinding) {
-    private val targets = listOf(
-        binding.edittextNote,
-        binding.edittextDetail,
-        binding.cardLink
-    )
-
-    fun decorateTo(constraintSet: ConstraintSet) {
-        targets.forEach { v ->
-            constraintSet.setVisibility(/* viewId = */ v.id, /* visibility = */ v.visibility)
         }
     }
 }
