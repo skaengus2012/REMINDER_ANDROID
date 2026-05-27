@@ -6,8 +6,9 @@ Detailed guidelines are in `docs/guidelines/`. Read the relevant file before per
 
 | File | When to read |
 |------|--------------|
-| [`docs/guidelines/commit-rules.md`](docs/guidelines/commit-rules.md) | Before creating any git commit |
 | [`.agents/skills/`](.agents/skills/) | For any project custom automation tasks (e.g. creating git worktrees, etc.) |
+| [`docs/guidelines/branch-rules.md`](docs/guidelines/branch-rules.md) | Before creating or merging any git branch |
+| [`docs/guidelines/commit-rules.md`](docs/guidelines/commit-rules.md) | Before creating any git commit |
 
 ---
 

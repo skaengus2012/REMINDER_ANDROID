@@ -6,7 +6,7 @@
 <Type> #<issue-number> - <subject>
 ```
 
-- **Type**: `Implement` / `Fix` / `Refactor` / `Chore`
+- **Type**: `Implement` / `Fix` / `Refactor` / `Chore` / `Docs`
 - **Issue number**: GitHub issue number, or `N/A` if not applicable
 - **Subject**: Written in English
 
@@ -20,6 +20,7 @@
 | `Fix` | Bug fix |
 | `Refactor` | Code restructuring without behavior change |
 | `Chore` | Build config, dependencies, and other miscellaneous tasks |
+| `Docs` | Documentation updates (e.g., guidelines, WIKI, README) |
 
 ---
 
