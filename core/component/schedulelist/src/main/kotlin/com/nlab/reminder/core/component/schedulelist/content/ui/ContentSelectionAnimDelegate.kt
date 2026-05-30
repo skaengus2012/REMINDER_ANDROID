@@ -23,6 +23,10 @@ import android.view.View
 import android.widget.TextView
 import androidx.annotation.FloatRange
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.Guideline
+import androidx.core.animation.doOnCancel
+import androidx.core.animation.doOnEnd
+import androidx.core.util.TypedValueCompat.dpToPx
 import androidx.core.view.isVisible
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import com.nlab.reminder.core.android.view.awaitUntilLaidOut
@@ -145,8 +149,15 @@ internal class ContentSelectionAnimDelegate(private val binding: LayoutScheduleA
                 } else {
                     binding.cardLink.width + deltaWidth
                 }
-                val density = binding.root.context.resources.displayMetrics.density
-                val marginAndBrowserWidth = (46 * density).toInt() // 10dp(start) + 6dp(end) + 20dp(browser) + 10dp(browser end)
+                // 46dp represents the non-text horizontal space occupied by margins and the browser icon in the XML layout:
+                // - 10dp: textviewLink start margin
+                // - 6dp: textviewLink end margin (spacing between link text and browser icon)
+                // - 20dp: imageviewBrowser width
+                // - 10dp: imageviewBrowser end margin
+                val marginAndBrowserWidth = dpToPx(
+                    46f,
+                    binding.root.context.resources.displayMetrics
+                ).toInt()
                 val targetTextWidth = (targetCardWidth - marginAndBrowserWidth).coerceAtLeast(0)
 
                 binding.textviewLink.setupFixedLayoutWidthDuringAnimation(targetTextWidth, animatorSet)
@@ -172,12 +183,9 @@ internal class ContentSelectionAnimDelegate(private val binding: LayoutScheduleA
         binding.guidelineExtraContentEnd.layoutParams = guideParams
 
         postActionToContentLayout {
-            applyCompleteButtonTranslate(selectable)
-            applyCompleteButtonAlpha(selectable)
-            applySelectionButtonTranslateX(selectable)
-            applySelectionButtonAlpha(selectable)
-            applyDragButtonTranslateX(selectable)
-            applyDragButtonAlpha(selectable)
+            binding.buttonComplete.applyOrAnimate(getCompleteButtonTranslateX(selectable), getCompleteButtonAlpha(selectable))
+            binding.buttonSelection.applyOrAnimate(getSelectionButtonTranslateX(selectable), getSelectionButtonAlpha(selectable))
+            binding.buttonDragHandle.applyOrAnimate(getDragButtonTranslateX(selectable), getDragButtonAlpha(selectable))
         }
     }
 
@@ -192,35 +200,26 @@ internal class ContentSelectionAnimDelegate(private val binding: LayoutScheduleA
         }
     }
 
-    private fun createAnimators(selectable: Boolean): List<Animator> = listOf(
-        createExtraContentWidthTransformAnimator(selectable),
-        createCompleteButtonTranslateAnimator(selectable),
-        createCompleteButtonAlphaAnimator(selectable),
-        createSelectionButtonTranslateAnimator(selectable),
-        createSelectionButtonAlphaAnimator(selectable),
-        createDragButtonTranslateAnimator(selectable),
-        createDragButtonAlphaAnimator(selectable),
-    )
+    private fun createAnimators(selectable: Boolean): List<Animator> = buildList {
+        val titleParams = binding.edittextTitle.constraintLayoutParams
+        titleParams.goneEndMargin = if (selectable) selectedExtraContentGuideEnd else 0
+        binding.edittextTitle.layoutParams = titleParams
+
+        add(binding.guidelineExtraContentEnd.guideEndAnimator(getExtraContentGuideEnd(selectable)))
+        binding.buttonComplete.applyOrAnimate(getCompleteButtonTranslateX(selectable), getCompleteButtonAlpha(selectable), this)
+        binding.buttonSelection.applyOrAnimate(getSelectionButtonTranslateX(selectable), getSelectionButtonAlpha(selectable), this)
+        binding.buttonDragHandle.applyOrAnimate(getDragButtonTranslateX(selectable), getDragButtonAlpha(selectable), this)
+    }
 
     // End of configurations
 
     // Start of extra content area
     private fun createExtraContentWidthTransformAnimator(selectable: Boolean): Animator {
-        val currentMediaGuideEnd = binding.guidelineExtraContentEnd
-            .constraintLayoutParams
-            .guideEnd
-
         val titleParams = binding.edittextTitle.constraintLayoutParams
         titleParams.goneEndMargin = if (selectable) selectedExtraContentGuideEnd else 0
         binding.edittextTitle.layoutParams = titleParams
 
-        return ValueAnimator.ofInt(currentMediaGuideEnd, getExtraContentGuideEnd(selectable)).apply {
-            addUpdateListener { value ->
-                val params = binding.guidelineExtraContentEnd.constraintLayoutParams
-                params.guideEnd = value.animatedValue as Int
-                binding.guidelineExtraContentEnd.layoutParams = params
-            }
-        }
+        return binding.guidelineExtraContentEnd.guideEndAnimator(getExtraContentGuideEnd(selectable))
     }
 
     private fun getExtraContentGuideEnd(selectable: Boolean): Int {
@@ -228,86 +227,32 @@ internal class ContentSelectionAnimDelegate(private val binding: LayoutScheduleA
     }
     // End of extra content area
 
-    // Start of CompleteButton TranslateX area
-    private fun createCompleteButtonTranslateAnimator(selectable: Boolean): Animator =
-        binding.buttonComplete.translationXAnimator(getCompleteButtonTranslateX(selectable))
-
-    private fun applyCompleteButtonTranslate(selectable: Boolean) {
-        binding.buttonComplete.translationX = getCompleteButtonTranslateX(selectable)
-    }
-
     private fun getCompleteButtonTranslateX(selectable: Boolean): Float {
         return if (selectable) selectedCompleteButtonTranslationX.toFloat() else 0f
-    }
-    // End of CompleteButton TranslateX area
-
-    // Start of CompleteButton Alpha area
-    private fun createCompleteButtonAlphaAnimator(selectable: Boolean): Animator =
-        binding.buttonComplete.alphaAnimator(getCompleteButtonAlpha(selectable))
-
-    private fun applyCompleteButtonAlpha(selectable: Boolean) {
-        binding.buttonComplete.alpha = getCompleteButtonAlpha(selectable)
     }
 
     @FloatRange(from = 0.0, to = 1.0)
     private fun getCompleteButtonAlpha(selectable: Boolean): Float {
         return if (selectable) 0f else 1f
     }
-    // End of CompleteButton Alpha area
-
-    // Start of SelectionButton TranslateX area
-    private fun createSelectionButtonTranslateAnimator(selectable: Boolean): Animator =
-        binding.buttonSelection.translationXAnimator(getSelectionButtonTranslateX(selectable))
-
-    private fun applySelectionButtonTranslateX(selectable: Boolean) {
-        binding.buttonSelection.translationX = getSelectionButtonTranslateX(selectable)
-    }
 
     private fun getSelectionButtonTranslateX(selectable: Boolean): Float {
         return if (selectable) selectedSelectionButtonTranslationX.toFloat() else 0f
-    }
-    // End of SelectionButton TranslateX area
-
-    // Start of SelectionButton Alpha area
-    private fun createSelectionButtonAlphaAnimator(selectable: Boolean): Animator =
-        binding.buttonSelection.alphaAnimator(getSelectionButtonAlpha(selectable))
-
-    private fun applySelectionButtonAlpha(selectable: Boolean) {
-        binding.buttonSelection.alpha = getSelectionButtonAlpha(selectable)
     }
 
     @FloatRange(from = 0.0, to = 1.0)
     private fun getSelectionButtonAlpha(selectable: Boolean): Float {
         return if (selectable) 1f else 0f
     }
-    // End of SelectionButton Alpha area
-
-    // Start of DragButton TranslateX area
-    private fun createDragButtonTranslateAnimator(selectable: Boolean): Animator =
-        binding.buttonDragHandle.translationXAnimator(getDragButtonTranslateX(selectable))
-
-    private fun applyDragButtonTranslateX(selectable: Boolean) {
-        binding.buttonDragHandle.translationX = getDragButtonTranslateX(selectable)
-    }
 
     private fun getDragButtonTranslateX(selectable: Boolean): Float {
         return if (selectable) selectedDragButtonTransitionX.toFloat() else 0f
-    }
-    // End of DragButton TranslateX area
-
-    // Start of DragButton Alpha area
-    private fun createDragButtonAlphaAnimator(selectable: Boolean): Animator =
-        binding.buttonDragHandle.alphaAnimator(getDragButtonAlpha(selectable))
-
-    private fun applyDragButtonAlpha(selectable: Boolean) {
-        binding.buttonDragHandle.alpha = getDragButtonAlpha(selectable)
     }
 
     @FloatRange(from = 0.0, to = 1.0)
     private fun getDragButtonAlpha(selectable: Boolean): Float {
         return if (selectable) 1f else 0f
     }
-    // End of DragButton Alpha area
 
     fun applyStateToMirror(mirrorBinding: LayoutScheduleAdapterItemContentMirrorBinding) {
         val selectable = binding.buttonDragHandle.translationX == getDragButtonTranslateX(selectable = true)
@@ -338,6 +283,15 @@ internal class ContentSelectionAnimDelegate(private val binding: LayoutScheduleA
 private val View.constraintLayoutParams: ConstraintLayout.LayoutParams
     get() = layoutParams as ConstraintLayout.LayoutParams
 
+private fun Guideline.guideEndAnimator(targetGuideEnd: Int): ValueAnimator =
+    ValueAnimator.ofInt(constraintLayoutParams.guideEnd, targetGuideEnd).apply {
+        addUpdateListener {
+            val params = constraintLayoutParams
+            params.guideEnd = it.animatedValue as Int
+            layoutParams = params
+        }
+    }
+
 /**
  * Extension utilities to simplify View numeric animations
  */
@@ -350,6 +304,20 @@ private fun View.translationXAnimator(targetTranslationX: Float): ValueAnimator 
     ValueAnimator.ofFloat(translationX, targetTranslationX).apply {
         addUpdateListener { translationX = it.animatedValue as Float }
     }
+
+private fun View.applyOrAnimate(
+    targetTranslationX: Float,
+    targetAlpha: Float,
+    animators: MutableList<Animator>? = null
+) {
+    if (animators != null) {
+        animators += translationXAnimator(targetTranslationX)
+        animators += alphaAnimator(targetAlpha)
+    } else {
+        this.translationX = targetTranslationX
+        this.alpha = targetAlpha
+    }
+}
 
 /**
  * Lock the width of TextView (and its subclasses like EditText) to [targetWidth] during the animation.
@@ -365,17 +333,7 @@ private fun TextView.setupFixedLayoutWidthDuringAnimation(
     // Lock the width immediately at the start
     this.layoutParams = this.layoutParams.apply { width = targetWidth }
     
-    // Register a listener to restore the width on animation end or cancellation
-    animator.addListener(object : Animator.AnimatorListener {
-        override fun onAnimationStart(animation: Animator) {}
-        override fun onAnimationRepeat(animation: Animator) {}
-        override fun onAnimationCancel(animation: Animator) {
-            this@setupFixedLayoutWidthDuringAnimation.layoutParams = 
-                this@setupFixedLayoutWidthDuringAnimation.layoutParams.apply { width = restoreWidth }
-        }
-        override fun onAnimationEnd(animation: Animator) {
-            this@setupFixedLayoutWidthDuringAnimation.layoutParams = 
-                this@setupFixedLayoutWidthDuringAnimation.layoutParams.apply { width = restoreWidth }
-        }
-    })
+    // Use Android KTX extensions to restore layout width on animation end or cancellation
+    animator.doOnEnd { layoutParams = layoutParams.apply { width = restoreWidth } }
+    animator.doOnCancel { layoutParams = layoutParams.apply { width = restoreWidth } }
 }
