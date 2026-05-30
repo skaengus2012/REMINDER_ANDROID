@@ -18,7 +18,6 @@ package com.nlab.reminder.core.component.schedulelist.content.ui
 
 import android.animation.Animator
 import android.animation.AnimatorSet
-import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.view.View
 import android.widget.TextView
@@ -29,7 +28,6 @@ import androidx.core.animation.doOnCancel
 import androidx.core.animation.doOnEnd
 import androidx.core.util.TypedValueCompat.dpToPx
 import androidx.core.view.isVisible
-import androidx.core.view.updateLayoutParams
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import com.nlab.reminder.core.android.view.awaitUntilLaidOut
 import com.nlab.reminder.core.component.schedulelist.R
@@ -203,6 +201,10 @@ internal class ContentSelectionAnimDelegate(private val binding: LayoutScheduleA
     }
 
     private fun createAnimators(selectable: Boolean): List<Animator> = buildList {
+        val titleParams = binding.edittextTitle.constraintLayoutParams
+        titleParams.goneEndMargin = if (selectable) selectedExtraContentGuideEnd else 0
+        binding.edittextTitle.layoutParams = titleParams
+
         add(binding.guidelineExtraContentEnd.guideEndAnimator(getExtraContentGuideEnd(selectable)))
         binding.buttonComplete.applyOrAnimate(getCompleteButtonTranslateX(selectable), getCompleteButtonAlpha(selectable), this)
         binding.buttonSelection.applyOrAnimate(getSelectionButtonTranslateX(selectable), getSelectionButtonAlpha(selectable), this)
@@ -284,20 +286,24 @@ private val View.constraintLayoutParams: ConstraintLayout.LayoutParams
 private fun Guideline.guideEndAnimator(targetGuideEnd: Int): ValueAnimator =
     ValueAnimator.ofInt(constraintLayoutParams.guideEnd, targetGuideEnd).apply {
         addUpdateListener {
-            updateLayoutParams<ConstraintLayout.LayoutParams> {
-                guideEnd = it.animatedValue as Int
-            }
+            val params = constraintLayoutParams
+            params.guideEnd = it.animatedValue as Int
+            layoutParams = params
         }
     }
 
 /**
  * Extension utilities to simplify View numeric animations
  */
-private fun View.alphaAnimator(targetAlpha: Float): Animator =
-    ObjectAnimator.ofFloat(this, View.ALPHA, targetAlpha)
+private fun View.alphaAnimator(targetAlpha: Float): ValueAnimator =
+    ValueAnimator.ofFloat(alpha, targetAlpha).apply {
+        addUpdateListener { alpha = it.animatedValue as Float }
+    }
 
-private fun View.translationXAnimator(targetTranslationX: Float): Animator =
-    ObjectAnimator.ofFloat(this, View.TRANSLATION_X, targetTranslationX)
+private fun View.translationXAnimator(targetTranslationX: Float): ValueAnimator =
+    ValueAnimator.ofFloat(translationX, targetTranslationX).apply {
+        addUpdateListener { translationX = it.animatedValue as Float }
+    }
 
 private fun View.applyOrAnimate(
     targetTranslationX: Float,
@@ -325,9 +331,9 @@ private fun TextView.setupFixedLayoutWidthDuringAnimation(
     if (targetWidth <= 0) return
     
     // Lock the width immediately at the start
-    updateLayoutParams { width = targetWidth }
+    this.layoutParams = this.layoutParams.apply { width = targetWidth }
     
     // Use Android KTX extensions to restore layout width on animation end or cancellation
-    animator.doOnEnd { updateLayoutParams { width = restoreWidth } }
-    animator.doOnCancel { updateLayoutParams { width = restoreWidth } }
+    animator.doOnEnd { layoutParams = layoutParams.apply { width = restoreWidth } }
+    animator.doOnCancel { layoutParams = layoutParams.apply { width = restoreWidth } }
 }
