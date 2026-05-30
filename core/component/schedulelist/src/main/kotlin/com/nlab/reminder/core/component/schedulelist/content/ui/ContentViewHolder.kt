@@ -25,7 +25,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.view.doOnAttach
 import androidx.core.view.doOnDetach
 import androidx.core.view.isVisible
@@ -94,13 +93,8 @@ internal class ContentViewHolder(
     SwipeableViewHolder {
     private val linkThumbnailPlaceHolderDrawable: Drawable? = with(itemView) {
         AppCompatResources.getDrawable(context, R.drawable.ic_schedule_link_error)
-            ?.let(DrawableCompat::wrap)
-            ?.apply {
-                DrawableCompat.setTint(
-                    mutate(),
-                    context.getThemeColor(AttrIds.content_2)
-                )
-            }
+            ?.mutate()
+            ?.apply { setTint(context.getThemeColor(AttrIds.content_2)) }
     }
     private val selectionAnimDelegate = ContentSelectionAnimDelegate(binding)
     private val draggableViewHolderDelegate = DraggableViewHolderDelegate(binding, selectionAnimDelegate)
