@@ -23,6 +23,7 @@ import android.view.View
 import android.widget.TextView
 import androidx.annotation.FloatRange
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.util.TypedValueCompat.dpToPx
 import androidx.core.view.isVisible
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import com.nlab.reminder.core.android.view.awaitUntilLaidOut
@@ -145,8 +146,15 @@ internal class ContentSelectionAnimDelegate(private val binding: LayoutScheduleA
                 } else {
                     binding.cardLink.width + deltaWidth
                 }
-                val density = binding.root.context.resources.displayMetrics.density
-                val marginAndBrowserWidth = (46 * density).toInt() // 10dp(start) + 6dp(end) + 20dp(browser) + 10dp(browser end)
+                // 46dp represents the non-text horizontal space occupied by margins and the browser icon in the XML layout:
+                // - 10dp: textviewLink start margin
+                // - 6dp: textviewLink end margin (spacing between link text and browser icon)
+                // - 20dp: imageviewBrowser width
+                // - 10dp: imageviewBrowser end margin
+                val marginAndBrowserWidth = dpToPx(
+                    46f,
+                    binding.root.context.resources.displayMetrics
+                ).toInt()
                 val targetTextWidth = (targetCardWidth - marginAndBrowserWidth).coerceAtLeast(0)
 
                 binding.textviewLink.setupFixedLayoutWidthDuringAnimation(targetTextWidth, animatorSet)
