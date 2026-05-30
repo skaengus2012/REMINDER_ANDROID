@@ -19,7 +19,9 @@ package com.nlab.reminder.feature.all.ui
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
+import androidx.compose.material3.ripple
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsets
@@ -296,11 +298,13 @@ private fun AllScreen(
                 .fillMaxWidth()
         ) {
             if (successUiState?.multiSelectionEnabled == true) {
-                val tint = PlaneatTheme.colors.content3
+                val isSelectedNotEmpty = successUiState.scheduleResources.any { it.selected }
+                val tint = if (isSelectedNotEmpty) PlaneatTheme.colors.point1 else PlaneatTheme.colors.content2Hint
                 SelectionActionItem(
                     iconRes = DrawableIds.ic_calendar_clock_24,
                     contentDescription = null, // Or set to a meaningful string
                     onClick = { /* TODO Handle schedule policy modification */ },
+                    enabled = isSelectedNotEmpty,
                     tint = tint,
                     modifier = Modifier.weight(1f)
                 )
@@ -308,6 +312,7 @@ private fun AllScreen(
                     iconRes = DrawableIds.ic_done_all_24,
                     contentDescription = null,
                     onClick = { /* TODO Handle completing selected items */ },
+                    enabled = isSelectedNotEmpty,
                     tint = tint,
                     modifier = Modifier.weight(1f)
                 )
@@ -315,6 +320,7 @@ private fun AllScreen(
                     iconRes = DrawableIds.ic_hash_tag_24,
                     contentDescription = null,
                     onClick = { /* TODO Handle adding tags to selected items */ },
+                    enabled = isSelectedNotEmpty,
                     tint = tint,
                     modifier = Modifier.weight(1f)
                 )
@@ -322,6 +328,7 @@ private fun AllScreen(
                     iconRes = DrawableIds.ic_trash_24,
                     contentDescription = null,
                     onClick = { /* TODO Handle deleting selected items */ },
+                    enabled = isSelectedNotEmpty,
                     tint = tint,
                     modifier = Modifier.weight(1f)
                 )
@@ -339,13 +346,19 @@ private fun RowScope.SelectionActionItem(
     iconRes: Int,
     contentDescription: String?,
     onClick: () -> Unit,
+    enabled: Boolean,
     tint: Color,
     modifier: Modifier = Modifier
 ) {
     Box(
         modifier = modifier
             .fillMaxHeight()
-            .clickable(onClick = onClick),
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = ripple(bounded = false, radius = 24.dp),
+                enabled = enabled,
+                onClick = onClick
+            ),
         contentAlignment = Alignment.Center
     ) {
         Icon(
