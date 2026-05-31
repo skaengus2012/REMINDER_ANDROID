@@ -16,29 +16,18 @@
 
 package com.nlab.reminder.feature.all.ui
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
-import androidx.compose.material3.ripple
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBars
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Icon
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -59,8 +48,7 @@ import com.nlab.reminder.core.component.schedulelist.toolbar.ui.ScheduleListTool
 import com.nlab.reminder.core.component.schedulelist.toolbar.ui.rememberScheduleListToolbarState
 import com.nlab.reminder.core.component.schedulelist.bottombar.ui.ScheduleListBottomAppbarState
 import com.nlab.reminder.core.component.schedulelist.bottombar.ui.rememberScheduleListBottomAppbarState
-import com.nlab.reminder.core.component.bottomappbar.ui.BottomAppbar
-import com.nlab.reminder.core.component.bottomappbar.ui.NewPlanButton
+import com.nlab.reminder.core.component.schedulelist.bottombar.ui.ScheduleListBottomAppbar
 import com.nlab.reminder.core.androidx.compose.ui.throttleClick
 import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
 import com.nlab.reminder.core.kotlin.collections.IdentityList
@@ -180,6 +168,18 @@ internal fun AllScreen(
         },
         onNewPlanClicked = {
             showAppToast("TODO implements NewPlan")
+        },
+        onSelectedSchedulesTimingConfigClicked = {
+            showAppToast("TODO implements Timing")
+        },
+        onSelectedSchedulesCompleteClicked = {
+            showAppToast("TODO implements Complete")
+        },
+        onSelectedSchedulesTagClicked = {
+            showAppToast("TODO implements Tag")
+        },
+        onSelectedSchedulesDeleteClicked = {
+            showAppToast("TODO implements Delete")
         }
     )
 }
@@ -220,6 +220,10 @@ private fun AllScreen(
     onSimpleAdd: (SimpleAdd) -> Unit,
     onSimpleEdit: (SimpleEdit) -> Unit,
     onNewPlanClicked: () -> Unit,
+    onSelectedSchedulesTimingConfigClicked: () -> Unit,
+    onSelectedSchedulesCompleteClicked: () -> Unit,
+    onSelectedSchedulesTagClicked: () -> Unit,
+    onSelectedSchedulesDeleteClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val toolbarState = rememberScheduleListToolbarState()
@@ -237,16 +241,17 @@ private fun AllScreen(
                 title = title,
                 toolbarState = toolbarState,
                 menuVisible = successUiState?.multiSelectionEnabled?.not() ?: true,
-                menuDropdown = MenuDropdown(
-                    isVisible = successUiState?.menuExpanded ?: false
-                ) {
+                menuDropdown = successUiState?.let { state ->
                     MenuDropdown(
-                        // safe: this lambda is invoked only when successUiState is a non-null AllUiState.Success
-                        isCompletedScheduleShown = successUiState!!.completedScheduleSummary.shown,
-                        onSelectionStartClicked = onSelectionStartClicked,
-                        onCompletedScheduleVisibilityChangeClicked = onCompletedScheduleVisibilityChangeClicked,
-                        onDismissed = onMenuDropdownDismissed,
-                    )
+                        isVisible = state.menuExpanded
+                    ) {
+                        MenuDropdown(
+                            isCompletedScheduleShown = state.completedScheduleSummary.shown,
+                            onSelectionStartClicked = onSelectionStartClicked,
+                            onCompletedScheduleVisibilityChangeClicked = onCompletedScheduleVisibilityChangeClicked,
+                            onDismissed = onMenuDropdownDismissed,
+                        )
+                    }
                 },
                 onMenuClicked = onMenuClicked,
                 selectionCompleteVisible = successUiState?.multiSelectionEnabled ?: false,
@@ -290,82 +295,19 @@ private fun AllScreen(
                 }
             }
         }
-        
-        BottomAppbar(
-            bottomAppbarState = bottomAppbarState,
+
+        ScheduleListBottomAppbar(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .fillMaxWidth()
-        ) {
-            if (successUiState?.multiSelectionEnabled == true) {
-                val isSelectedNotEmpty = successUiState.scheduleResources.any { it.selected }
-                val tint = if (isSelectedNotEmpty) PlaneatTheme.colors.point1 else PlaneatTheme.colors.content2Hint
-                SelectionActionItem(
-                    iconRes = DrawableIds.ic_calendar_clock_24,
-                    contentDescription = null, // Or set to a meaningful string
-                    onClick = { /* TODO Handle schedule policy modification */ },
-                    enabled = isSelectedNotEmpty,
-                    tint = tint,
-                    modifier = Modifier.weight(1f)
-                )
-                SelectionActionItem(
-                    iconRes = DrawableIds.ic_done_all_24,
-                    contentDescription = null,
-                    onClick = { /* TODO Handle completing selected items */ },
-                    enabled = isSelectedNotEmpty,
-                    tint = tint,
-                    modifier = Modifier.weight(1f)
-                )
-                SelectionActionItem(
-                    iconRes = DrawableIds.ic_hash_tag_24,
-                    contentDescription = null,
-                    onClick = { /* TODO Handle adding tags to selected items */ },
-                    enabled = isSelectedNotEmpty,
-                    tint = tint,
-                    modifier = Modifier.weight(1f)
-                )
-                SelectionActionItem(
-                    iconRes = DrawableIds.ic_trash_24,
-                    contentDescription = null,
-                    onClick = { /* TODO Handle deleting selected items */ },
-                    enabled = isSelectedNotEmpty,
-                    tint = tint,
-                    modifier = Modifier.weight(1f)
-                )
-            } else {
-                NewPlanButton(
-                    onClick = throttleClick(onClick = onNewPlanClicked)
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun RowScope.SelectionActionItem(
-    iconRes: Int,
-    contentDescription: String?,
-    onClick: () -> Unit,
-    enabled: Boolean,
-    tint: Color,
-    modifier: Modifier = Modifier
-) {
-    Box(
-        modifier = modifier
-            .fillMaxHeight()
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = ripple(bounded = false, radius = 24.dp),
-                enabled = enabled,
-                onClick = onClick
-            ),
-        contentAlignment = Alignment.Center
-    ) {
-        Icon(
-            painter = painterResource(id = iconRes),
-            contentDescription = contentDescription,
-            tint = tint,
-            modifier = Modifier.size(24.dp)
+                .fillMaxWidth(),
+            bottomAppbarState = bottomAppbarState,
+            isMultiSelectionEnabled = successUiState?.multiSelectionEnabled == true,
+            isSelectedEmpty = successUiState?.scheduleResources?.any { it.selected } != true,
+            onTimingConfigClicked = throttleClick(onClick = onSelectedSchedulesTimingConfigClicked),
+            onCompleteClicked = throttleClick(onClick = onSelectedSchedulesCompleteClicked),
+            onTagConfigClicked = throttleClick(onClick = onSelectedSchedulesTagClicked),
+            onDeleteClicked = throttleClick(onClick = onSelectedSchedulesDeleteClicked),
+            onNewPlanClicked = throttleClick(onClick = onNewPlanClicked),
         )
     }
 }
@@ -526,7 +468,11 @@ private fun AllScreenPreview() {
             onOpenDetailRequested = {},
             onSimpleAdd = {},
             onSimpleEdit = {},
-            onNewPlanClicked = {}
+            onNewPlanClicked = {},
+            onSelectedSchedulesTimingConfigClicked = {},
+            onSelectedSchedulesCompleteClicked = {},
+            onSelectedSchedulesTagClicked = {},
+            onSelectedSchedulesDeleteClicked = {}
         )
     }
 }
