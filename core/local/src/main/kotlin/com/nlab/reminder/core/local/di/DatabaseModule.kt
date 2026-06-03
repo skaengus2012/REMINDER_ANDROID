@@ -21,6 +21,7 @@ import com.nlab.reminder.core.local.database.configuration.ReminderDatabase
 import com.nlab.reminder.core.local.database.dao.LinkMetadataDAO
 import com.nlab.reminder.core.local.database.dao.RepeatDetailDAO
 import com.nlab.reminder.core.local.database.dao.ScheduleCompletionBacklogDAO
+import com.nlab.reminder.core.local.database.dao.ScheduleDeletionBacklogDAO
 import com.nlab.reminder.core.local.database.dao.ScheduleDAO
 import com.nlab.reminder.core.local.database.dao.ScheduleRepeatDetailDAO
 import com.nlab.reminder.core.local.database.dao.ScheduleTagListDAO
@@ -53,6 +54,11 @@ internal object DatabaseModule {
     fun provideScheduleCompletionBacklogDAO(
         reminderDatabase: ReminderDatabase
     ): ScheduleCompletionBacklogDAO = reminderDatabase.scheduleCompletionBacklogDAO()
+
+    @Provides
+    fun provideScheduleDeletionBacklogDAO(
+        reminderDatabase: ReminderDatabase
+    ): ScheduleDeletionBacklogDAO = reminderDatabase.scheduleDeletionBacklogDAO()
 
     @Provides
     fun provideScheduleDAO(
