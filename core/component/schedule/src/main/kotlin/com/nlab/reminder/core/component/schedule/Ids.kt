@@ -19,4 +19,4 @@ package com.nlab.reminder.core.component.schedule
 /**
  * @author Doohyun
  */
-typealias ScheduleIntId = R.integer
+internal typealias ScheduleIntId = R.integer

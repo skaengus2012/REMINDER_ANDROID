@@ -36,12 +36,4 @@ abstract class ScheduleDeletionBacklogDAO {
 
     @Query("SELECT * FROM schedule_deletion_backlog")
     abstract suspend fun getAll(): List<ScheduleDeletionBacklogEntity>
-
-    @Query("DELETE FROM schedule_deletion_backlog WHERE schedule_deletion_backlog_id IN (:backlogIds)")
-    protected abstract suspend fun deleteByIdsInternal(backlogIds: Set<Long>)
-
-    suspend fun deleteByIds(backlogIds: Set<Long>) {
-        if (backlogIds.isEmpty()) return
-        deleteByIdsInternal(backlogIds)
-    }
 }

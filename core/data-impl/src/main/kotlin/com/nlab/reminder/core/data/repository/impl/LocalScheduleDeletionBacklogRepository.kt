@@ -17,7 +17,6 @@
 package com.nlab.reminder.core.data.repository.impl
 
 import com.nlab.reminder.core.data.model.ScheduleDeletionBacklog
-import com.nlab.reminder.core.data.model.ScheduleDeletionBacklogId
 import com.nlab.reminder.core.data.model.ScheduleId
 import com.nlab.reminder.core.data.repository.ScheduleDeletionBacklogRepository
 import com.nlab.reminder.core.kotlin.collections.toSet
@@ -32,10 +31,6 @@ class LocalScheduleDeletionBacklogRepository(
 ) : ScheduleDeletionBacklogRepository {
     override suspend fun save(scheduleIds: Set<ScheduleId>): Result<Unit> = runCatching {
         scheduleDeletionBacklogDAO.insertAll(scheduleIds.toSet { it.rawId })
-    }
-
-    override suspend fun delete(backlogIds: Set<ScheduleDeletionBacklogId>): Result<Unit> = runCatching {
-        scheduleDeletionBacklogDAO.deleteByIds(backlogIds.toSet { it.value })
     }
 
     override suspend fun getBacklogs(): Result<Set<ScheduleDeletionBacklog>> = runCatching {

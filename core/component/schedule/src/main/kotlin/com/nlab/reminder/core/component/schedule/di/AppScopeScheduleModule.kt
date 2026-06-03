@@ -17,16 +17,23 @@
 package com.nlab.reminder.core.component.schedule.di
 
 import android.content.Context
+import com.nlab.reminder.core.component.schedule.DefaultDeleteScheduleUseCase
 import com.nlab.reminder.core.component.schedule.DefaultUpdateScheduleCompletionUseCase
+import com.nlab.reminder.core.component.schedule.DeleteScheduleUseCase
+import com.nlab.reminder.core.component.schedule.EnsuredDeleteScheduleUseCase
 import com.nlab.reminder.core.component.schedule.EnsuredUpdateScheduleCompletionUseCase
 import com.nlab.reminder.core.component.schedule.RegisterScheduleCompleteJobUseCase
+import com.nlab.reminder.core.component.schedule.RegisterScheduleDeletionJobUseCase
 import com.nlab.reminder.core.component.schedule.ScheduleIntId
 import com.nlab.reminder.core.component.schedule.UpdateScheduleCompletionUseCase
 import com.nlab.reminder.core.component.schedule.infra.RegisterScheduleCompleteJobUseCaseImpl
+import com.nlab.reminder.core.component.schedule.infra.RegisterScheduleDeletionJobUseCaseImpl
 import com.nlab.reminder.core.data.model.ScheduleCompletionBacklog
 import com.nlab.reminder.core.data.model.ScheduleId
 import com.nlab.reminder.core.data.repository.ScheduleCompletionBacklogRepository
+import com.nlab.reminder.core.data.repository.ScheduleDeletionBacklogRepository
 import com.nlab.reminder.core.inject.qualifiers.coroutine.AppScope
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.Reusable
@@ -42,13 +49,22 @@ import kotlin.time.Duration.Companion.milliseconds
  */
 @Module
 @InstallIn(SingletonComponent::class)
-internal object AppScopeScheduleModule {
-    @Provides
-    @Reusable
-    fun provideRegisterScheduleCompleteJobUseCase(
-        @ApplicationContext context: Context
-    ): RegisterScheduleCompleteJobUseCase = RegisterScheduleCompleteJobUseCaseImpl(context)
+internal interface AppScopeScheduleBindsModule {
+    @Binds
+    fun bindRegisterScheduleCompleteJobUseCase(
+        impl: RegisterScheduleCompleteJobUseCaseImpl
+    ): RegisterScheduleCompleteJobUseCase
 
+    @Binds
+    fun bindRegisterScheduleDeletionJobUseCase(
+        impl: RegisterScheduleDeletionJobUseCaseImpl
+    ): RegisterScheduleDeletionJobUseCase
+}
+
+
+@Module
+@InstallIn(SingletonComponent::class)
+internal object AppScopeScheduleProvideModule {
     @Provides
     @Reusable
     fun provideUpdateScheduleCompletionUseCase(
@@ -72,6 +88,25 @@ internal object AppScopeScheduleModule {
             debounceTimeout = context.resources
                 .getInteger(ScheduleIntId.schedule_configs_completion_timeout_ms)
                 .milliseconds
+        )
+    )
+
+    @Provides
+    @Reusable
+    fun provideDeleteScheduleUseCase(
+        @AppScope coroutineScope: CoroutineScope,
+        scheduleDeletionBacklogRepository: ScheduleDeletionBacklogRepository,
+        registerScheduleDeletionJob: RegisterScheduleDeletionJobUseCase
+    ): DeleteScheduleUseCase = EnsuredDeleteScheduleUseCase(
+        coroutineScope = coroutineScope,
+        deleteScheduleUseCase = DefaultDeleteScheduleUseCase(
+            deletionBacklogRepository = object :
+                ScheduleDeletionBacklogRepository by scheduleDeletionBacklogRepository {
+                override suspend fun save(scheduleIds: Set<ScheduleId>): Result<Unit> =
+                    scheduleDeletionBacklogRepository.save(scheduleIds)
+                        .onFailure { Timber.e(it) }
+            },
+            registerScheduleDeletionJob = registerScheduleDeletionJob
         )
     )
 }

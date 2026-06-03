@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The N's lab Open Source Project
+ * Copyright (C) 2026 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 package com.nlab.reminder.core.component.schedule
 
 import com.nlab.reminder.core.data.model.genScheduleId
-import com.nlab.testkit.faker.genBoolean
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
@@ -33,23 +32,21 @@ import org.junit.Test
 /**
  * @author Doohyun
  */
-class EnsuredUpdateScheduleCompletionUseCaseTest {
+class EnsuredDeleteScheduleUseCaseTest {
     @Test
     fun `Given internalUseCase, When invoked, Then internalUseCase invoked`() = runTest {
-        val internalUseCase: UpdateScheduleCompletionUseCase = mockk {
-            coEvery {
-                invoke(scheduleId = any(), targetCompleted = any())
-            } returns ScheduleJobResult.Success
+        val internalUseCase: DeleteScheduleUseCase = mockk {
+            coEvery { invoke(scheduleIds = any()) } returns ScheduleJobResult.Success
         }
-        val useCase = EnsuredUpdateScheduleCompletionUseCase(
+        val useCase = EnsuredDeleteScheduleUseCase(
             coroutineScope = this,
-            updateScheduleCompletionUseCase = internalUseCase
+            deleteScheduleUseCase = internalUseCase
         )
-        val scheduleId = genScheduleId()
-        val targetCompleted = genBoolean()
-        useCase.invoke(scheduleId = scheduleId, targetCompleted = targetCompleted)
+        val scheduleIds = setOf(genScheduleId())
+        useCase.invoke(scheduleIds = scheduleIds)
+        
         coVerify(exactly = 1) {
-            internalUseCase.invoke(scheduleId, targetCompleted)
+            internalUseCase.invoke(scheduleIds)
         }
     }
 
@@ -57,21 +54,21 @@ class EnsuredUpdateScheduleCompletionUseCaseTest {
     fun `Given updateJob, When cancelled, Then internal useCase still completes`() = runTest {
         var updated = false
         val delayTimeMillis = 1000L
-        val useCase = EnsuredUpdateScheduleCompletionUseCase(
+        val useCase = EnsuredDeleteScheduleUseCase(
             coroutineScope = this,
-            updateScheduleCompletionUseCase = mockk {
-                coEvery { invoke(scheduleId = any(), targetCompleted = any()) } coAnswers {
+            deleteScheduleUseCase = mockk {
+                coEvery { invoke(scheduleIds = any()) } coAnswers {
                     delay(delayTimeMillis)
                     updated = true
                     ScheduleJobResult.Success
                 }
             }
         )
-        val scheduleId = genScheduleId()
-        val targetCompleted = genBoolean()
+        val scheduleIds = setOf(genScheduleId())
         val updateJob = backgroundScope.launch(unconfinedTestDispatcher()) {
-            useCase.invoke(scheduleId = scheduleId, targetCompleted = targetCompleted)
+            useCase.invoke(scheduleIds = scheduleIds)
         }
+        
         advanceTimeBy(delayTimeMillis = delayTimeMillis / 2)
         assertThat(updated.not(), trueValue())
         updateJob.cancel()

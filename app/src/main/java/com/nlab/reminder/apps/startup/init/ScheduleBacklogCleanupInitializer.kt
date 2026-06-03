@@ -19,29 +19,31 @@ package com.nlab.reminder.apps.startup.init
 import android.content.Context
 import androidx.startup.Initializer
 import com.nlab.reminder.apps.startup.dependenciesOf
-import com.nlab.reminder.core.component.schedule.RegisterScheduleCompleteJobUseCase
+import com.nlab.reminder.core.component.schedule.CleanUpScheduleBacklogsUseCase
 import com.nlab.reminder.core.inject.qualifiers.coroutine.AppScope
+import com.nlab.reminder.core.inject.qualifiers.coroutine.Dispatcher
+import com.nlab.reminder.core.inject.qualifiers.coroutine.DispatcherOption.IO
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlin.time.Duration.Companion.seconds
 
 /**
  * @author Doohyun
  */
-class ScheduleCompletionCleanupInitializer : Initializer<Unit> {
+class ScheduleBacklogCleanupInitializer : Initializer<Unit> {
     override fun create(context: Context) {
-        val entryPoint = EntryPointAccessors.fromApplication<ScheduleCompletionCleanupInitializerEntryPoint>(context)
-        val applicationScope = entryPoint.applicationCoroutineScope()
-        val registerScheduleCompleteJobUseCase = entryPoint.registerScheduleCompleteJob()
-        applicationScope.launch(Dispatchers.Default) {
-            // Use zero debounce so that the startup cleanup runs immediately without delaying app initialization,
-            // and pass null priority to allow the job to process all eligible schedules instead of limiting by priority.
-            registerScheduleCompleteJobUseCase(debounceTimeout = 0.seconds, processUntilPriority = null)
+        val entryPoint: ScheduleBacklogCleanupInitializerEntryPoint =
+            EntryPointAccessors.fromApplication(context)
+        val applicationScope = entryPoint.applicationScope()
+        val dispatcher = entryPoint.dispatcher()
+        val cleanUpScheduleBacklogs = entryPoint.cleanUpScheduleBacklogs()
+
+        applicationScope.launch(dispatcher) {
+            cleanUpScheduleBacklogs()
         }
     }
 
@@ -50,8 +52,12 @@ class ScheduleCompletionCleanupInitializer : Initializer<Unit> {
 
 @EntryPoint
 @InstallIn(SingletonComponent::class)
-interface ScheduleCompletionCleanupInitializerEntryPoint {
+interface ScheduleBacklogCleanupInitializerEntryPoint {
     @AppScope
-    fun applicationCoroutineScope(): CoroutineScope
-    fun registerScheduleCompleteJob(): RegisterScheduleCompleteJobUseCase
+    fun applicationScope(): CoroutineScope
+
+    fun cleanUpScheduleBacklogs(): CleanUpScheduleBacklogsUseCase
+
+    @Dispatcher(IO)
+    fun dispatcher(): CoroutineDispatcher
 }

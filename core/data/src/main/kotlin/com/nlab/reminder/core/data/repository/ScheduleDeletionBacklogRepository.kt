@@ -25,6 +25,5 @@ import com.nlab.reminder.core.data.model.ScheduleId
  */
 interface ScheduleDeletionBacklogRepository {
     suspend fun save(scheduleIds: Set<ScheduleId>): Result<Unit>
-    suspend fun delete(backlogIds: Set<ScheduleDeletionBacklogId>): Result<Unit>
     suspend fun getBacklogs(): Result<Set<ScheduleDeletionBacklog>>
 }

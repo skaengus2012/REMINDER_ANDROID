@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The N's lab Open Source Project
+ * Copyright (C) 2026 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,9 @@
 
 package com.nlab.reminder.core.component.schedule
 
-import com.nlab.reminder.core.kotlin.NonNegativeLong
-import kotlin.time.Duration
-
 /**
- * @author Thalys
+ * @author Doohyun
  */
-interface RegisterScheduleCompleteJobUseCase {
-    suspend operator fun invoke(
-        debounceTimeout: Duration,
-        processUntilPriority: NonNegativeLong?
-    ): ScheduleJobResult
+interface RegisterScheduleDeletionJobUseCase {
+    suspend operator fun invoke(): ScheduleJobResult
 }

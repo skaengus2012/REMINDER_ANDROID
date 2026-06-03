@@ -17,7 +17,6 @@
 package com.nlab.reminder.core.data.repository.impl
 
 import com.nlab.reminder.core.data.model.genScheduleDeletionBacklogAndEntities
-import com.nlab.reminder.core.data.model.genScheduleDeletionBacklogId
 import com.nlab.reminder.core.data.model.genScheduleDeletionBacklogs
 import com.nlab.reminder.core.data.model.genScheduleId
 import com.nlab.reminder.core.kotlin.collections.toSet
@@ -61,33 +60,7 @@ class LocalScheduleDeletionBacklogRepositoryTest {
         assertThat(actualException, sameInstance(expectedException))
     }
 
-    @Test
-    fun `Given backlogIds, When delete, Then calls dao to delete with rawIds`() = runTest {
-        val backlogIds = genScheduleDeletionBacklogs().toSet { it.id }
-        val backlogRawIds = backlogIds.toSet { it.value }
-        val scheduleDeletionBacklogDAO: ScheduleDeletionBacklogDAO = mockk(relaxed = true)
-        val repository = genLocalScheduleDeletionBacklogRepository(scheduleDeletionBacklogDAO)
-        
-        val result = repository.delete(backlogIds)
-        assertThat(result.isSuccess, equalTo(true))
-        coVerify(exactly = 1) {
-            scheduleDeletionBacklogDAO.deleteByIds(backlogRawIds)
-        }
-    }
 
-    @Test
-    fun `Given dao delete fails, When delete, Then returns failure`() = runTest {
-        val expectedException = RuntimeException()
-        val scheduleDeletionBacklogDAO: ScheduleDeletionBacklogDAO = mockk {
-            coEvery { deleteByIds(any()) } throws expectedException
-        }
-        val repository = genLocalScheduleDeletionBacklogRepository(scheduleDeletionBacklogDAO)
-        
-        val actualException = repository
-            .delete(setOf(genScheduleDeletionBacklogId()))
-            .exceptionOrNull()
-        assertThat(actualException, sameInstance(expectedException))
-    }
 
     @Test
     fun `Given dao returns entities, When getBacklogs, Then returns mapped backlogs`() = runTest {

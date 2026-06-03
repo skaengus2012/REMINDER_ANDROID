@@ -22,10 +22,12 @@ import androidx.work.CoroutineWorker
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.OutOfQuotaPolicy
+import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.nlab.reminder.core.component.schedule.RegisterScheduleCompleteJobUseCase
+import com.nlab.reminder.core.component.schedule.ScheduleJobResult
 import com.nlab.reminder.core.data.repository.GetScheduleCompletionBacklogQuery
 import com.nlab.reminder.core.data.repository.ScheduleCompletionBacklogRepository
 import com.nlab.reminder.core.data.repository.ScheduleRepository
@@ -34,9 +36,15 @@ import com.nlab.reminder.core.kotlin.NonNegativeLong
 import com.nlab.reminder.core.kotlin.collections.toSet
 import com.nlab.reminder.core.kotlin.onFailure
 import com.nlab.reminder.core.kotlin.tryToNonNegativeLongOrNull
+import dagger.Reusable
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import timber.log.Timber
+import javax.inject.Inject
 import kotlin.time.Duration
 import kotlin.time.toJavaDuration
 
@@ -46,11 +54,16 @@ import kotlin.time.toJavaDuration
 private const val KEY_WORK_NAME = "key_schedule_completion_work_name"
 private const val KEY_PROCESS_UNTIL_PRIORITY = "key_process_until_priority"
 
-internal class RegisterScheduleCompleteJobUseCaseImpl(
-    private val context: Context
+@Reusable
+internal class RegisterScheduleCompleteJobUseCaseImpl @Inject constructor(
+    @ApplicationContext context: Context
 ) : RegisterScheduleCompleteJobUseCase {
+    private val workManager = WorkManager.getInstance(context)
 
-    override fun invoke(debounceTimeout: Duration, processUntilPriority: NonNegativeLong?) {
+    override suspend fun invoke(
+        debounceTimeout: Duration,
+        processUntilPriority: NonNegativeLong?
+    ): ScheduleJobResult {
         val workRequestBuilder = OneTimeWorkRequestBuilder<ScheduleCompletionWorker>().apply {
             if (debounceTimeout.isPositive()) {
                 setInitialDelay(debounceTimeout.toJavaDuration())
@@ -61,11 +74,24 @@ internal class RegisterScheduleCompleteJobUseCaseImpl(
                 workDataOf(KEY_PROCESS_UNTIL_PRIORITY to processUntilPriority?.value)
             )
         }
-        WorkManager.getInstance(context).enqueueUniqueWork(
+        val workRequest = workRequestBuilder.build()
+        workManager.enqueueUniqueWork(
             uniqueWorkName = KEY_WORK_NAME,
             existingWorkPolicy = ExistingWorkPolicy.REPLACE,
-            request = workRequestBuilder.build()
+            request = workRequest
         )
+        val workInfo = workManager.getWorkInfoByIdFlow(workRequest.id)
+            .filterNotNull()
+            .filter { it.state.isFinished }
+            .first()
+        return when (workInfo.state) {
+            WorkInfo.State.SUCCEEDED -> ScheduleJobResult.Success
+            WorkInfo.State.CANCELLED -> ScheduleJobResult.Cancelled
+            else -> {
+                val errorMsg = "Work failed with state: ${workInfo.state}"
+                ScheduleJobResult.Failure(IllegalStateException(errorMsg))
+            }
+        }
     }
 }
 

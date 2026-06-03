@@ -27,7 +27,10 @@ import kotlin.time.Duration
  * @author Thalys
  */
 interface UpdateScheduleCompletionUseCase {
-    suspend operator fun invoke(scheduleId: ScheduleId, targetCompleted: Boolean): Result<Unit>
+    suspend operator fun invoke(
+        scheduleId: ScheduleId,
+        targetCompleted: Boolean
+    ): ScheduleJobResult
 }
 
 internal class DefaultUpdateScheduleCompletionUseCase(
@@ -38,9 +41,18 @@ internal class DefaultUpdateScheduleCompletionUseCase(
     override suspend operator fun invoke(
         scheduleId: ScheduleId,
         targetCompleted: Boolean,
-    ): Result<Unit> = scheduleCompletionBacklogRepository.save(scheduleId, targetCompleted)
-        .onSuccess { registerScheduleCompleteJob.invoke(debounceTimeout, processUntilPriority = it.priority) }
-        .map { /* do nothing */ }
+    ): ScheduleJobResult {
+        return scheduleCompletionBacklogRepository.save(scheduleId, targetCompleted)
+            .fold(
+                onSuccess = { backlog ->
+                    registerScheduleCompleteJob(
+                        debounceTimeout = debounceTimeout,
+                        processUntilPriority = backlog.priority
+                    )
+                },
+                onFailure = { ScheduleJobResult.Failure(it) }
+            )
+    }
 }
 
 internal class EnsuredUpdateScheduleCompletionUseCase(
@@ -51,7 +63,7 @@ internal class EnsuredUpdateScheduleCompletionUseCase(
     override suspend fun invoke(
         scheduleId: ScheduleId,
         targetCompleted: Boolean
-    ): Result<Unit> = coroutineScope
+    ): ScheduleJobResult = coroutineScope
         .async { updateScheduleCompletionUseCase.invoke(scheduleId, targetCompleted) }
         .await()
 }
