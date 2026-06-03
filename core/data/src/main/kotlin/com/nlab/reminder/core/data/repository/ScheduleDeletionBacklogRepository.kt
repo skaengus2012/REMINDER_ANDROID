@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The N's lab Open Source Project
+ * Copyright (C) 2026 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,17 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.data.model
+package com.nlab.reminder.core.data.repository
 
-import com.nlab.reminder.core.kotlin.toNonNegativeLong
-import com.nlab.reminder.core.local.database.entity.ScheduleCompletionBacklogEntity
+import com.nlab.reminder.core.data.model.ScheduleDeletionBacklog
+import com.nlab.reminder.core.data.model.ScheduleDeletionBacklogId
+import com.nlab.reminder.core.data.model.ScheduleId
 
 /**
  * @author Doohyun
  */
-internal fun ScheduleCompletionBacklog(
-    entity: ScheduleCompletionBacklogEntity
-): ScheduleCompletionBacklog = ScheduleCompletionBacklog(
-    id = ScheduleCompletionBacklogId(entity.backlogId),
-    scheduleId = ScheduleId(entity.scheduleId),
-    targetCompleted = entity.targetCompleted,
-    priority = entity.insertOrder.toNonNegativeLong()
-)
+interface ScheduleDeletionBacklogRepository {
+    suspend fun save(scheduleIds: Set<ScheduleId>): Result<Unit>
+    suspend fun delete(backlogIds: Set<ScheduleDeletionBacklogId>): Result<Unit>
+    suspend fun getBacklogs(): Result<Set<ScheduleDeletionBacklog>>
+}

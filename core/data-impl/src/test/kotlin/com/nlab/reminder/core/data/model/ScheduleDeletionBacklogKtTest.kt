@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The N's lab Open Source Project
+ * Copyright (C) 2026 The N's lab Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,17 +16,18 @@
 
 package com.nlab.reminder.core.data.model
 
-import com.nlab.reminder.core.kotlin.toNonNegativeLong
-import com.nlab.reminder.core.local.database.entity.ScheduleCompletionBacklogEntity
+import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.core.IsEqual.equalTo
+import org.junit.Test
 
 /**
  * @author Doohyun
  */
-internal fun ScheduleCompletionBacklog(
-    entity: ScheduleCompletionBacklogEntity
-): ScheduleCompletionBacklog = ScheduleCompletionBacklog(
-    id = ScheduleCompletionBacklogId(entity.backlogId),
-    scheduleId = ScheduleId(entity.scheduleId),
-    targetCompleted = entity.targetCompleted,
-    priority = entity.insertOrder.toNonNegativeLong()
-)
+class ScheduleDeletionBacklogKtTest {
+    @Test
+    fun `Given entity, When convert to scheduleDeletionBacklog, Then return matching model`() {
+        val (expectedBacklog, entity) = genScheduleDeletionBacklogAndEntity()
+        val actualBacklog = ScheduleDeletionBacklog(entity)
+        assertThat(actualBacklog, equalTo(expectedBacklog))
+    }
+}

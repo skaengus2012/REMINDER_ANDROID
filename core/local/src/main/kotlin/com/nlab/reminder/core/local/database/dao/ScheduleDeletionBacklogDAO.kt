@@ -25,16 +25,13 @@ import com.nlab.reminder.core.local.database.entity.ScheduleDeletionBacklogEntit
 @Dao
 abstract class ScheduleDeletionBacklogDAO {
     @Insert
-    protected abstract suspend fun insertAll(
+    protected abstract suspend fun insertAllInternal(
         entities: List<ScheduleDeletionBacklogEntity>
     ): List<Long>
 
-    open suspend fun insertAllAndGet(scheduleIds: Set<Long>): List<ScheduleDeletionBacklogEntity> {
-        val inputEntities = scheduleIds.map { ScheduleDeletionBacklogEntity(scheduleId = it) }
-        val outputIds = insertAll(inputEntities)
-        return inputEntities.zip(outputIds) { inputEntity, outputId ->
-            inputEntity.copy(backlogId = outputId)
-        }
+    suspend fun insertAll(scheduleIds: Set<Long>) {
+        val entities = scheduleIds.map { ScheduleDeletionBacklogEntity(scheduleId = it) }
+        insertAllInternal(entities)
     }
 
     @Query("SELECT * FROM schedule_deletion_backlog")
