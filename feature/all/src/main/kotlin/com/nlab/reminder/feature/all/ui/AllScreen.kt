@@ -142,7 +142,7 @@ internal fun AllScreen(
             )
         },
         onDeleteRequested = { delete ->
-            showAppToast("TODO implements $delete")
+            store.dispatch(AllAction.DeleteSchedule(delete.id))
         },
         onItemPositionUpdated = { userScheduleListResources ->
             store.dispatch(AllAction.ItemPositionUpdated(userScheduleListResources))

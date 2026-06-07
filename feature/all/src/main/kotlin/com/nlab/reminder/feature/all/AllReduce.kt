@@ -155,6 +155,11 @@ internal fun AllReduce(environment: AllEnvironment): AllReduce = DslReduce {
             // TODO Handle failure cases from save(), e.g. network/DB I/O errors, validation failures (invalid/empty title or note), and repository constraint violations, and surface them appropriately in the UI/logs.
         }
 
+        suspendEffect<DeleteSchedule> {
+            environment.deleteSchedule(scheduleIds = setOf(action.scheduleId))
+            // TODO Handle failure cases
+        }
+
         suspendEffect<EditSchedule> {
             val curSchedule = current.scheduleResources
                 .find { it.schedule.id == action.id }

@@ -18,6 +18,7 @@ package com.nlab.reminder.feature.all
 
 import androidx.lifecycle.ViewModel
 import com.nlab.reminder.core.component.currenttime.GetCurrentTimeSnapshotStreamUseCase
+import com.nlab.reminder.core.component.schedule.DeleteScheduleUseCase
 import com.nlab.reminder.core.component.schedule.UpdateScheduleCompletionUseCase
 import com.nlab.reminder.core.component.schedulelist.content.EditScheduleListResourceUseCase
 import com.nlab.reminder.core.component.schedulelist.content.UserSelectedSchedulesStore
@@ -33,6 +34,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 internal class AllEnvironment @Inject constructor(
+    val deleteSchedule: DeleteScheduleUseCase,
     val scheduleRepository: ScheduleRepository,
     @param:ScheduleData(All) val completedScheduleShownRepository: CompletedScheduleShownRepository,
     val getUserScheduleListResourceReportFlow: GetUserScheduleListResourceReportFlowUseCase,

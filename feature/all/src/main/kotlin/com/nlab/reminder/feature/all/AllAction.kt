@@ -55,6 +55,8 @@ internal sealed interface AllAction {
 
     data class AddSchedule(val title: NonBlankString, val note: String) : AllAction
 
+    data class DeleteSchedule(val scheduleId: ScheduleId) : AllAction
+
     data class EditSchedule(
         val id: ScheduleId,
         val title: NonBlankString,
