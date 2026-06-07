@@ -34,15 +34,16 @@ internal typealias AllReduce = Reduce<AllAction, AllUiState>
  * @author Thalys
  */
 internal fun AllReduce(environment: AllEnvironment): AllReduce = DslReduce {
-    actionScope<StateSynced> {
+    actionScope<StateSyncCompleted> {
         transition<Loading> {
             Success(
                 entryAt = action.entryAt,
                 scheduleResources = action.userScheduleListResourceReport.userScheduleListResources,
-                completedScheduleSummary = action.userScheduleListResourceReport.completedScheduleSummary,
+                scheduleListStats = action.userScheduleListResourceReport.scheduleListStats,
                 menuExpanded = false,
                 multiSelectionEnabled = false,
                 showCompletedSchedulesCleanupConfirmation = false,
+                showSelectedSchedulesDeletionConfirmation = false,
                 replayStamp = 0,
             )
         }
@@ -50,13 +51,13 @@ internal fun AllReduce(environment: AllEnvironment): AllReduce = DslReduce {
             current.copy(
                 entryAt = action.entryAt,
                 scheduleResources = action.userScheduleListResourceReport.userScheduleListResources,
-                completedScheduleSummary = action.userScheduleListResourceReport.completedScheduleSummary,
+                scheduleListStats = action.userScheduleListResourceReport.scheduleListStats,
                 replayStamp = 0,
             )
         }
     }
     stateScope<Success> {
-        transition<UndoScheduleResources> {
+        transition<ScheduleRestoreRequested> {
             when {
                 current.replayStamp != action.prevReplayStamp -> current
                 current.scheduleResources != action.prevScheduleResources -> current
@@ -64,7 +65,7 @@ internal fun AllReduce(environment: AllEnvironment): AllReduce = DslReduce {
             }
         }
 
-        suspendEffect<CompletedScheduleVisibilityChangeClicked> {
+        suspendEffect<CompletedSchedulesToggleClicked> {
             environment.completedScheduleShownRepository.setShown(isShown = action.visible)
         }
 
@@ -72,11 +73,11 @@ internal fun AllReduce(environment: AllEnvironment): AllReduce = DslReduce {
             current.copy(showCompletedSchedulesCleanupConfirmation = true)
         }
 
-        transition<CompletedSchedulesCleanupInteracted> {
+        transition<CleanupConfirmAnswered> {
             current.copy(showCompletedSchedulesCleanupConfirmation = false)
         }
 
-        suspendEffect<CompletedSchedulesCleanupInteracted> {
+        suspendEffect<CleanupConfirmAnswered> {
             if (action.confirmed) {
                 environment.scheduleRepository
                     .delete(DeleteScheduleQuery.ByComplete(isComplete = true))
@@ -93,6 +94,14 @@ internal fun AllReduce(environment: AllEnvironment): AllReduce = DslReduce {
             if (action.enabled.not()) {
                 environment.userSelectedSchedulesStore.clear()
             }
+        }
+
+        transition<SelectionModeDisabled> {
+            current.copy(multiSelectionEnabled = false)
+        }
+
+        effect<SelectionModeDisabled> {
+            environment.userSelectedSchedulesStore.clear()
         }
 
         transition<MenuClicked> { current.copy(menuExpanded = true) }
@@ -117,7 +126,7 @@ internal fun AllReduce(environment: AllEnvironment): AllReduce = DslReduce {
             val minCompletedIndex = snapshot.indexOfFirst { it.schedule.isComplete }
             if (maxUncompletedIndex != -1 && minCompletedIndex != -1 && maxUncompletedIndex >= minCompletedIndex) {
                 dispatch(
-                    action = UndoScheduleResources(
+                    action = ScheduleRestoreRequested(
                         prevScheduleResources = current.scheduleResources,
                         prevReplayStamp = current.replayStamp
                     )
@@ -139,7 +148,7 @@ internal fun AllReduce(environment: AllEnvironment): AllReduce = DslReduce {
             )
         }
 
-        suspendEffect<AddSchedule> {
+        suspendEffect<ScheduleAdditionSubmitted> {
             environment.scheduleRepository
                 .save(
                     query = SaveScheduleQuery.Add(
@@ -155,12 +164,12 @@ internal fun AllReduce(environment: AllEnvironment): AllReduce = DslReduce {
             // TODO Handle failure cases from save(), e.g. network/DB I/O errors, validation failures (invalid/empty title or note), and repository constraint violations, and surface them appropriately in the UI/logs.
         }
 
-        suspendEffect<DeleteSchedule> {
+        suspendEffect<ScheduleDeletionClicked> {
             environment.deleteSchedule(scheduleIds = setOf(action.scheduleId))
             // TODO Handle failure cases
         }
 
-        suspendEffect<EditSchedule> {
+        suspendEffect<ScheduleEditSubmitted> {
             val curSchedule = current.scheduleResources
                 .find { it.schedule.id == action.id }
                 ?.schedule
@@ -175,5 +184,14 @@ internal fun AllReduce(environment: AllEnvironment): AllReduce = DslReduce {
                 // TODO Handle failure cases from save(), e.g. network/DB I/O errors, validation failures (invalid/empty title or note), and repository constraint violations, and surface them appropriately in the UI/logs.
             }
         }
+
+        transition<SelectedSchedulesDeletionClicked> {
+            current.copy(showSelectedSchedulesDeletionConfirmation = true)
+        }
+
+        transition<SelectedSchedulesDeletionConfirmAnswered> {
+            current.copy(showSelectedSchedulesDeletionConfirmation = false)
+        }
+
     }
 }

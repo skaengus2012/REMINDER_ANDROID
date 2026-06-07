@@ -16,6 +16,7 @@
 
 package com.nlab.reminder.feature.all
 
+import com.nlab.reminder.core.component.schedule.DeleteScheduleUseCase
 import com.nlab.reminder.core.component.currenttime.GetCurrentTimeSnapshotStreamUseCase
 import com.nlab.reminder.core.component.schedule.UpdateScheduleCompletionUseCase
 import com.nlab.reminder.core.component.schedulelist.content.EditScheduleListResourceUseCase
@@ -28,6 +29,7 @@ import io.mockk.mockk
  * @author Doohyun
  */
 internal fun genAllEnvironment(
+    deleteSchedule: DeleteScheduleUseCase = mockk(),
     scheduleRepository: ScheduleRepository = mockk(),
     completedScheduleShownRepository: CompletedScheduleShownRepository = mockk(),
     getUserScheduleListResourceReportFlow: GetUserScheduleListResourceReportFlowUseCase = mockk(),
@@ -36,6 +38,7 @@ internal fun genAllEnvironment(
     userSelectedSchedulesStore: UserSelectedSchedulesStore = mockk(),
     editScheduleListResource: EditScheduleListResourceUseCase = mockk()
 ): AllEnvironment = AllEnvironment(
+    deleteSchedule = deleteSchedule,
     scheduleRepository = scheduleRepository,
     completedScheduleShownRepository = completedScheduleShownRepository,
     getUserScheduleListResourceReportFlow = getUserScheduleListResourceReportFlow,

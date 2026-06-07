@@ -132,11 +132,11 @@ class GetUserScheduleListResourceReportFlowTest {
         useCase.invoke().test {
             val actualReport = awaitItem()
             assertThat(
-                actualReport.completedScheduleSummary,
+                actualReport.scheduleListStats,
                 equalTo(
-                    CompletedScheduleSummary(
-                        shown = true,
-                        count = completedSchedules.size.toNonNegativeInt(),
+                    ScheduleListStats(
+                        completedShown = true,
+                        completedCount = completedSchedules.size.toNonNegativeInt(),
                     )
                 )
             )
@@ -205,11 +205,11 @@ class GetUserScheduleListResourceReportFlowTest {
         useCase.invoke().test {
             val actualReport = awaitItem()
             assertThat(
-                actualReport.completedScheduleSummary,
+                actualReport.scheduleListStats,
                 equalTo(
-                    CompletedScheduleSummary(
-                        shown = false,
-                        count = 0.toNonNegativeInt(),
+                    ScheduleListStats(
+                        completedShown = false,
+                        completedCount = 0.toNonNegativeInt(),
                     )
                 )
             )

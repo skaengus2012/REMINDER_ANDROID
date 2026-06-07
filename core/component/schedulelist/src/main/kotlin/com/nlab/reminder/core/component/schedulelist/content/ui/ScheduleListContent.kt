@@ -39,7 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.fragment.compose.AndroidFragment
 import com.nlab.reminder.core.androidx.compose.ui.LocalTimeZone
 import com.nlab.reminder.core.component.schedulelist.toolbar.ui.ScheduleListToolbarState
-import com.nlab.reminder.core.component.schedulelist.bottombar.ui.ScheduleListBottomAppbarState
+import com.nlab.reminder.core.component.schedulelist.bottomappbar.ui.ScheduleListBottomAppbarState
 import kotlin.time.Instant
 
 /**

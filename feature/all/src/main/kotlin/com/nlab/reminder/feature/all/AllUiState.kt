@@ -28,10 +28,11 @@ internal sealed class AllUiState {
     data class Success(
         val entryAt: Instant,
         val scheduleResources: List<UserScheduleListResource>,
-        val completedScheduleSummary: CompletedScheduleSummary,
+        val scheduleListStats: ScheduleListStats,
         val menuExpanded: Boolean,
         val multiSelectionEnabled: Boolean,
         val showCompletedSchedulesCleanupConfirmation: Boolean,
+        val showSelectedSchedulesDeletionConfirmation: Boolean,
         val replayStamp: Long,
     ) : AllUiState()
 }

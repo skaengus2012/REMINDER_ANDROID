@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.component.schedulelist.bottombar.ui
+package com.nlab.reminder.core.component.schedulelist.bottomappbar.ui
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -44,7 +44,7 @@ import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
 fun ScheduleListBottomAppbar(
     bottomAppbarState: ScheduleListBottomAppbarState,
     isMultiSelectionEnabled: Boolean,
-    isSelectedEmpty: Boolean,
+    isMultiSelectionContentEnabled: Boolean,
     onTimingConfigClicked: () -> Unit,
     onCompleteClicked: () -> Unit,
     onTagConfigClicked: () -> Unit,
@@ -58,34 +58,33 @@ fun ScheduleListBottomAppbar(
     ) {
         if (isMultiSelectionEnabled) {
             val tint =
-                if (isSelectedEmpty) PlaneatTheme.colors.content2Hint
-                else PlaneatTheme.colors.point1
-            val enabled = isSelectedEmpty.not()
+                if (isMultiSelectionContentEnabled) PlaneatTheme.colors.point1
+                else PlaneatTheme.colors.content2Hint
             SelectionActionItem(
                 iconRes = DrawableIds.ic_calendar_clock_24,
                 contentDescription = null,
-                enabled = enabled,
+                enabled = isMultiSelectionContentEnabled,
                 tint = tint,
                 onClick = onTimingConfigClicked,
             )
             SelectionActionItem(
                 iconRes = DrawableIds.ic_done_all_24,
                 contentDescription = null,
-                enabled = enabled,
+                enabled = isMultiSelectionContentEnabled,
                 tint = tint,
                 onClick = onCompleteClicked,
             )
             SelectionActionItem(
                 iconRes = DrawableIds.ic_hash_tag_24,
                 contentDescription = null,
-                enabled = enabled,
+                enabled = isMultiSelectionContentEnabled,
                 tint = tint,
                 onClick = onTagConfigClicked,
             )
             SelectionActionItem(
                 iconRes = DrawableIds.ic_trash_24,
                 contentDescription = null,
-                enabled = enabled,
+                enabled = isMultiSelectionContentEnabled,
                 tint = tint,
                 onClick = onDeleteClicked,
             )
@@ -134,7 +133,7 @@ private fun ScheduleListBottomAppbarNormalPreview() {
         ScheduleListBottomAppbar(
             bottomAppbarState = rememberScheduleListBottomAppbarState(initialBackgroundAlpha = 1f),
             isMultiSelectionEnabled = false,
-            isSelectedEmpty = true,
+            isMultiSelectionContentEnabled = false,
             onTimingConfigClicked = {},
             onCompleteClicked = {},
             onTagConfigClicked = {},
@@ -151,7 +150,7 @@ private fun ScheduleListBottomAppbarMultiSelectEmptyPreview() {
         ScheduleListBottomAppbar(
             bottomAppbarState = rememberScheduleListBottomAppbarState(initialBackgroundAlpha = 1f),
             isMultiSelectionEnabled = true,
-            isSelectedEmpty = true,
+            isMultiSelectionContentEnabled = false,
             onTimingConfigClicked = {},
             onCompleteClicked = {},
             onTagConfigClicked = {},
@@ -168,7 +167,7 @@ private fun ScheduleListBottomAppbarMultiSelectSelectedPreview() {
         ScheduleListBottomAppbar(
             bottomAppbarState = rememberScheduleListBottomAppbarState(initialBackgroundAlpha = 1f),
             isMultiSelectionEnabled = true,
-            isSelectedEmpty = false,
+            isMultiSelectionContentEnabled = true,
             onTimingConfigClicked = {},
             onCompleteClicked = {},
             onTagConfigClicked = {},

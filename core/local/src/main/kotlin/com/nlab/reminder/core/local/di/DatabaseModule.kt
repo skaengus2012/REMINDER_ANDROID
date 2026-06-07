@@ -23,8 +23,8 @@ import com.nlab.reminder.core.local.database.dao.RepeatDetailDAO
 import com.nlab.reminder.core.local.database.dao.ScheduleCompletionBacklogDAO
 import com.nlab.reminder.core.local.database.dao.ScheduleDeletionBacklogDAO
 import com.nlab.reminder.core.local.database.dao.ScheduleDAO
-import com.nlab.reminder.core.local.database.dao.ScheduleRepeatDetailDAO
 import com.nlab.reminder.core.local.database.dao.ScheduleTagListDAO
+import com.nlab.reminder.core.local.database.dao.ScheduleCompositeDAO
 import com.nlab.reminder.core.local.database.dao.TagDAO
 import dagger.Module
 import dagger.Provides
@@ -66,11 +66,6 @@ internal object DatabaseModule {
     ): ScheduleDAO = reminderDatabase.scheduleDAO()
 
     @Provides
-    fun provideScheduleRepeatDetailDAO(
-        reminderDatabase: ReminderDatabase
-    ): ScheduleRepeatDetailDAO = reminderDatabase.scheduleRepeatDetailDAO()
-
-    @Provides
     fun provideScheduleTagListDAO(
         reminderDatabase: ReminderDatabase
     ): ScheduleTagListDAO = reminderDatabase.scheduleTagListDAO()
@@ -84,4 +79,9 @@ internal object DatabaseModule {
     fun provideRepeatDetailDAO(
         reminderDatabase: ReminderDatabase
     ): RepeatDetailDAO = reminderDatabase.repeatDetailDAO()
+
+    @Provides
+    fun provideScheduleCompositeDAO(
+        reminderDatabase: ReminderDatabase
+    ): ScheduleCompositeDAO = reminderDatabase.scheduleCompositeDAO()
 }

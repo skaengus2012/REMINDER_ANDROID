@@ -25,42 +25,51 @@ import kotlin.time.Instant
  * @author Thalys
  */
 internal sealed interface AllAction {
-    data class StateSynced(
-        val entryAt: Instant,
-        val userScheduleListResourceReport: UserScheduleListResourceReport
-    ) : AllAction
-
-    data class UndoScheduleResources(
-        val prevScheduleResources: List<UserScheduleListResource>,
-        val prevReplayStamp: Long,
-    ) : AllAction
-
-    data class CompletedScheduleVisibilityChangeClicked(val visible: Boolean) : AllAction
+    data class CleanupConfirmAnswered(val confirmed: Boolean) : AllAction
 
     data object CompletedSchedulesCleanupClicked : AllAction
 
-    data class CompletedSchedulesCleanupInteracted(val confirmed: Boolean) : AllAction
+    data class CompletedSchedulesToggleClicked(val visible: Boolean) : AllAction
 
-    data class SelectionModeClicked(val enabled: Boolean) : AllAction
+    data class ItemCompletionUpdated(
+        val scheduleId: ScheduleId,
+        val targetCompleted: Boolean
+    ) : AllAction
+
+    data class ItemPositionUpdated(val snapshot: List<UserScheduleListResource>) : AllAction
+
+    data class ItemSelectionUpdated(val selectedIds: Set<ScheduleId>) : AllAction
 
     data object MenuClicked : AllAction
 
     data object MenuDropdownDismissed : AllAction
 
-    data class ItemSelectionUpdated(val selectedIds: Set<ScheduleId>) : AllAction
+    data class ScheduleAdditionSubmitted(val title: NonBlankString, val note: String) : AllAction
 
-    data class ItemCompletionUpdated(val scheduleId: ScheduleId, val targetCompleted: Boolean) : AllAction
+    data class ScheduleDeletionClicked(val scheduleId: ScheduleId) : AllAction
 
-    data class ItemPositionUpdated(val snapshot: List<UserScheduleListResource>) : AllAction
-
-    data class AddSchedule(val title: NonBlankString, val note: String) : AllAction
-
-    data class DeleteSchedule(val scheduleId: ScheduleId) : AllAction
-
-    data class EditSchedule(
+    data class ScheduleEditSubmitted(
         val id: ScheduleId,
         val title: NonBlankString,
         val note: NonBlankString?,
         val tagNames: Set<NonBlankString>
+    ) : AllAction
+
+    data class ScheduleRestoreRequested(
+        val prevScheduleResources: List<UserScheduleListResource>,
+        val prevReplayStamp: Long,
+    ) : AllAction
+
+    data object SelectedSchedulesDeletionClicked : AllAction
+
+    data class SelectedSchedulesDeletionConfirmAnswered(val confirmed: Boolean) : AllAction
+
+    data class SelectionModeClicked(val enabled: Boolean) : AllAction
+
+    data object SelectionModeDisabled : AllAction
+
+    data class StateSyncCompleted(
+        val entryAt: Instant,
+        val userScheduleListResourceReport: UserScheduleListResourceReport
     ) : AllAction
 }

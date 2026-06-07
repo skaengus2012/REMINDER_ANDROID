@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.core.component.schedulelist.bottombar.ui
+package com.nlab.reminder.core.component.schedulelist.bottomappbar.ui
 
 import androidx.annotation.FloatRange
 import androidx.compose.runtime.Composable

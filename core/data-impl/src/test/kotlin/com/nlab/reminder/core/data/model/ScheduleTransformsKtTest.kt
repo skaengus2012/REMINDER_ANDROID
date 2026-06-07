@@ -2,6 +2,7 @@ package com.nlab.reminder.core.data.model
 
 import com.nlab.reminder.core.kotlin.collections.toSet
 import com.nlab.reminder.core.kotlin.faker.genNonNegativeLong
+import com.nlab.reminder.core.local.database.entity.ScheduleCompositeEntity
 import com.nlab.reminder.core.local.database.transaction.ScheduleRepeatAggregate
 import com.nlab.testkit.faker.genBlank
 import com.nlab.testkit.faker.genBoolean
@@ -104,7 +105,7 @@ class ScheduleTransformsKtTest {
                     repeatType = null,
                     repeatInterval = null
                 ),
-                repeatDetailEntities = emptySet()
+                repeatDetailEntities = emptyList()
             )
         }
         val actualSchedule = Schedule(entity)
@@ -120,7 +121,7 @@ class ScheduleTransformsKtTest {
                     repeatType = null,
                     repeatInterval = null
                 ),
-                repeatDetailEntities = emptySet()
+                repeatDetailEntities = emptyList()
             )
         }
         Schedule(entity)
@@ -135,7 +136,7 @@ class ScheduleTransformsKtTest {
                     repeatType = null,
                     repeatInterval = null
                 ),
-                repeatDetailEntities = emptySet()
+                repeatDetailEntities = emptyList()
             )
         }
         Schedule(entity)
@@ -154,7 +155,7 @@ class ScheduleTransformsKtTest {
                 scheduleEntity = scheduleEntity.copy(
                     isTriggerAtDateOnly = true
                 ),
-                repeatDetailEntities = emptySet()
+                repeatDetailEntities = emptyList()
             )
         }
         Schedule(entity)
@@ -172,7 +173,7 @@ class ScheduleTransformsKtTest {
                         repeatInterval = null,
                         isTriggerAtDateOnly = isTriggerAtDateOnly
                     ),
-                    repeatDetailEntities = emptySet()
+                    repeatDetailEntities = emptyList()
                 )
             }
             val actualSchedule = Schedule(entity)
@@ -212,7 +213,7 @@ class ScheduleTransformsKtTest {
                     repeatInterval = null,
                     isTriggerAtDateOnly = false
                 ),
-                repeatDetailEntities = emptySet()
+                repeatDetailEntities = emptyList()
             )
         }
         val actualScheduleTiming = Schedule(entity).content.timing as ScheduleTiming.DateTime
@@ -340,6 +341,6 @@ private fun buildScheduleCompositeEntity(
 @Suppress("TestFunctionName")
 private fun Schedule(compositeEntity: ScheduleCompositeEntity): Schedule = Schedule(
     scheduleEntity = compositeEntity.scheduleEntity,
-    scheduleTagListEntities = compositeEntity.scheduleTagListEntities,
-    repeatDetailEntities = compositeEntity.repeatDetailEntities
+    scheduleTagListEntities = compositeEntity.scheduleTagListEntities.toSet(),
+    repeatDetailEntities = compositeEntity.repeatDetailEntities.toSet()
 )

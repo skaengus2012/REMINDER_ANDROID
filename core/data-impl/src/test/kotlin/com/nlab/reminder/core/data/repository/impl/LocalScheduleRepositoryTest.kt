@@ -29,8 +29,8 @@ import com.nlab.reminder.core.data.repository.UpdateAllScheduleQuery
 import com.nlab.reminder.core.kotlin.getOrThrow
 import com.nlab.reminder.core.kotlin.isSuccess
 import com.nlab.reminder.core.local.database.dao.ScheduleDAO
-import com.nlab.reminder.core.local.database.dao.ScheduleRepeatDetailDAO
-import com.nlab.reminder.core.local.database.dao.ScheduleTagListDAO
+import com.nlab.reminder.core.local.database.dao.ScheduleCompositeDAO
+import com.nlab.reminder.core.local.database.entity.ScheduleCompositeEntity
 import com.nlab.reminder.core.local.database.transaction.InsertAndGetScheduleContentAggregateTransaction
 import com.nlab.reminder.core.local.database.transaction.ScheduleContentAggregateSavedSnapshot
 import com.nlab.reminder.core.local.database.transaction.UpdateAndGetScheduleContentAggregateTransaction
@@ -59,8 +59,8 @@ internal class LocalScheduleRepositoryTest {
         val insertAndGetScheduleWithExtra: InsertAndGetScheduleContentAggregateTransaction = mockk {
             coEvery { invoke(scheduleContentAggregate = aggregate) } returns ScheduleContentAggregateSavedSnapshot(
                 scheduleEntity = entity.scheduleEntity,
-                scheduleTagListEntities = entity.scheduleTagListEntities,
-                repeatDetailEntities = entity.repeatDetailEntities
+                scheduleTagListEntities = entity.scheduleTagListEntities.toSet(),
+                repeatDetailEntities = entity.repeatDetailEntities.toSet()
             )
         }
         val repository = genLocalScheduleRepository(
@@ -91,8 +91,8 @@ internal class LocalScheduleRepositoryTest {
                 )
             } returns ScheduleContentAggregateSavedSnapshot(
                 scheduleEntity = entity.scheduleEntity,
-                scheduleTagListEntities = entity.scheduleTagListEntities,
-                repeatDetailEntities = entity.repeatDetailEntities
+                scheduleTagListEntities = entity.scheduleTagListEntities.toSet(),
+                repeatDetailEntities = entity.repeatDetailEntities.toSet()
             )
         }
         val repository = genLocalScheduleRepository(
@@ -212,16 +212,16 @@ internal class LocalScheduleRepositoryTest {
         // given
         val (schedule, entity) = genScheduleAndEntity()
         val query = GetScheduleQuery.All
+        val dbComposite = ScheduleCompositeEntity(
+            scheduleEntity = entity.scheduleEntity,
+            scheduleTagListEntities = entity.scheduleTagListEntities.toList(),
+            repeatDetailEntities = entity.repeatDetailEntities.toList()
+        )
 
         // when
         val repository = genLocalScheduleRepository(
-            scheduleRepeatDetailDAO = mockk {
-                every { getAsStream() } returns flowOf(mapOf(entity.scheduleEntity to entity.repeatDetailEntities))
-            },
-            scheduleTagListDAO = mockk {
-                every { findByScheduleIdsAsStream(scheduleIds = setOf(schedule.id.rawId)) } returns flowOf(
-                    entity.scheduleTagListEntities.toList()
-                )
+            scheduleCompositeDAO = mockk {
+                every { getAsStream() } returns flowOf(listOf(dbComposite))
             }
         )
         val result = repository
@@ -241,14 +241,16 @@ internal class LocalScheduleRepositoryTest {
             )
         )
         val query = GetScheduleQuery.All
+        val dbComposite = ScheduleCompositeEntity(
+            scheduleEntity = entity.scheduleEntity,
+            scheduleTagListEntities = emptyList(),
+            repeatDetailEntities = entity.repeatDetailEntities.toList()
+        )
 
         // when
         val repository = genLocalScheduleRepository(
-            scheduleRepeatDetailDAO = mockk {
-                every { getAsStream() } returns flowOf(mapOf(entity.scheduleEntity to entity.repeatDetailEntities))
-            },
-            scheduleTagListDAO = mockk {
-                every { findByScheduleIdsAsStream(scheduleIds = setOf(schedule.id.rawId)) } returns flowOf(emptyList())
+            scheduleCompositeDAO = mockk {
+                every { getAsStream() } returns flowOf(listOf(dbComposite))
             }
         )
         val result = repository
@@ -266,16 +268,16 @@ internal class LocalScheduleRepositoryTest {
     fun `Given completion status, When collect schedules, Then return schedules from dao`() = runTest {
         // given
         val (schedule, entity) = genScheduleAndEntity()
+        val dbComposite = ScheduleCompositeEntity(
+            scheduleEntity = entity.scheduleEntity,
+            scheduleTagListEntities = entity.scheduleTagListEntities.toList(),
+            repeatDetailEntities = entity.repeatDetailEntities.toList()
+        )
         val repository = genLocalScheduleRepository(
-            scheduleRepeatDetailDAO = mockk {
-                every { findByCompleteAsStream(isComplete = schedule.isComplete) } returns flowOf(
-                    mapOf(entity.scheduleEntity to entity.repeatDetailEntities)
-                )
-            },
-            scheduleTagListDAO = mockk {
-                every { findByScheduleIdsAsStream(scheduleIds = setOf(schedule.id.rawId)) } returns flowOf(
-                    entity.scheduleTagListEntities.toList()
-                )
+            scheduleCompositeDAO = mockk {
+                every {
+                    findByCompleteAsStream(isComplete = schedule.isComplete)
+                } returns flowOf(listOf(dbComposite))
             }
         )
 
@@ -291,14 +293,14 @@ internal class LocalScheduleRepositoryTest {
 
 private fun genLocalScheduleRepository(
     scheduleDAO: ScheduleDAO = mockk(),
-    scheduleRepeatDetailDAO: ScheduleRepeatDetailDAO = mockk(),
-    scheduleTagListDAO: ScheduleTagListDAO = mockk(),
-    insertAndGetScheduleContentAggregate: InsertAndGetScheduleContentAggregateTransaction = mockk(),
-    updateAndGetScheduleContentAggregate: UpdateAndGetScheduleContentAggregateTransaction = mockk()
+    scheduleCompositeDAO: ScheduleCompositeDAO = mockk(),
+    insertAndGetScheduleContentAggregate:
+        InsertAndGetScheduleContentAggregateTransaction = mockk(),
+    updateAndGetScheduleContentAggregate:
+        UpdateAndGetScheduleContentAggregateTransaction = mockk()
 ) = LocalScheduleRepository(
     scheduleDAO = scheduleDAO,
-    scheduleRepeatDetailDAO = scheduleRepeatDetailDAO,
-    scheduleTagListDAO = scheduleTagListDAO,
+    scheduleCompositeDAO = scheduleCompositeDAO,
     insertAndGetScheduleContentAggregate = insertAndGetScheduleContentAggregate,
     updateAndGetScheduleContentAggregate = updateAndGetScheduleContentAggregate
 )

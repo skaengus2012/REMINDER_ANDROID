@@ -64,14 +64,17 @@ internal class GetUserScheduleListResourceReportFlowUseCase @Inject constructor(
                 .let(::getScheduleResourcesFlowWith)
                 .map { userScheduleListResources ->
                     UserScheduleListResourceReport(
-                        completedScheduleSummary = CompletedScheduleSummary(
-                            shown = completedScheduleShown,
-                            count = run {
+                        scheduleListStats = ScheduleListStats(
+                            completedShown = completedScheduleShown,
+                            completedCount = run {
                                 val rawCount =
                                     if (completedScheduleShown.not()) 0
                                     else userScheduleListResources.count { it.schedule.isComplete }
                                 rawCount.toNonNegativeInt()
-                            }
+                            },
+                            selectedCount = userScheduleListResources
+                                .count { it.selected }
+                                .toNonNegativeInt()
                         ),
                         userScheduleListResources = userScheduleListResources
                     )
@@ -98,9 +101,14 @@ internal class GetUserScheduleListResourceReportFlowUseCase @Inject constructor(
                 // 1. Uncompleted schedules precede completed schedules.
                 // 2. compared by displayPriority
                 comparator = compareBy<UserScheduleListResource> { userScheduleListResource ->
-                    schedulesLookup.requireValue(userScheduleListResource.schedule.id).isComplete
+                    schedulesLookup
+                        .requireValue(userScheduleListResource.schedule.id)
+                        .isComplete
                 }.thenComparing { userScheduleListResource ->
-                    schedulesLookup.requireValue(userScheduleListResource.schedule.id).visiblePriority.value
+                    schedulesLookup
+                        .requireValue(userScheduleListResource.schedule.id)
+                        .visiblePriority
+                        .value
                 }
             )
         }.filterNotNull().onEach { resultFlow.value = it }.launchIn(scope = this)
@@ -109,6 +117,6 @@ internal class GetUserScheduleListResourceReportFlowUseCase @Inject constructor(
 
 @ExcludeFromGeneratedTestReport
 internal data class UserScheduleListResourceReport(
-    val completedScheduleSummary: CompletedScheduleSummary,
+    val scheduleListStats: ScheduleListStats,
     val userScheduleListResources: List<UserScheduleListResource>
 )

@@ -53,7 +53,7 @@ import com.nlab.reminder.core.local.database.dao.LinkMetadataDAO
 import com.nlab.reminder.core.local.database.dao.ScheduleCompletionBacklogDAO
 import com.nlab.reminder.core.local.database.dao.ScheduleDeletionBacklogDAO
 import com.nlab.reminder.core.local.database.dao.ScheduleDAO
-import com.nlab.reminder.core.local.database.dao.ScheduleRepeatDetailDAO
+import com.nlab.reminder.core.local.database.dao.ScheduleCompositeDAO
 import com.nlab.reminder.core.local.database.dao.ScheduleTagListDAO
 import com.nlab.reminder.core.local.database.dao.TagDAO
 import com.nlab.reminder.core.local.database.transaction.InsertAndGetScheduleContentAggregateTransaction
@@ -105,14 +105,14 @@ internal object AppScopeDataModule {
     @Reusable
     fun provideScheduleRepository(
         scheduleDAO: ScheduleDAO,
-        scheduleRepeatDetailDAO: ScheduleRepeatDetailDAO,
-        scheduleTagListDAO: ScheduleTagListDAO,
-        insertAndGetScheduleContentAggregateTransaction: InsertAndGetScheduleContentAggregateTransaction,
-        updateAndGetScheduleContentAggregateTransaction: UpdateAndGetScheduleContentAggregateTransaction
+        scheduleCompositeDAO: ScheduleCompositeDAO,
+        insertAndGetScheduleContentAggregateTransaction:
+            InsertAndGetScheduleContentAggregateTransaction,
+        updateAndGetScheduleContentAggregateTransaction:
+            UpdateAndGetScheduleContentAggregateTransaction
     ): ScheduleRepository = LocalScheduleRepository(
         scheduleDAO = scheduleDAO,
-        scheduleRepeatDetailDAO = scheduleRepeatDetailDAO,
-        scheduleTagListDAO = scheduleTagListDAO,
+        scheduleCompositeDAO = scheduleCompositeDAO,
         insertAndGetScheduleContentAggregate = insertAndGetScheduleContentAggregateTransaction,
         updateAndGetScheduleContentAggregate = updateAndGetScheduleContentAggregateTransaction
     )

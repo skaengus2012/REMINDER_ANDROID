@@ -23,7 +23,8 @@ import com.nlab.reminder.core.kotlin.NonNegativeInt
  * @author Thalys
  */
 @ExcludeFromGeneratedTestReport
-internal data class CompletedScheduleSummary(
-    val shown: Boolean,
-    val count: NonNegativeInt
+internal data class ScheduleListStats(
+    val completedShown: Boolean,
+    val completedCount: NonNegativeInt,
+    val selectedCount: NonNegativeInt
 )

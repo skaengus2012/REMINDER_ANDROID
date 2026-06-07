@@ -47,7 +47,7 @@ import com.nlab.reminder.core.androix.recyclerview.stickyheader.StickyHeaderHelp
 import com.nlab.reminder.core.androix.recyclerview.verticalScrollRange
 import com.nlab.reminder.core.component.schedulelist.databinding.FragmentScheduleListBinding
 import com.nlab.reminder.core.component.schedulelist.toolbar.ui.ScheduleListToolbarState
-import com.nlab.reminder.core.component.schedulelist.bottombar.ui.ScheduleListBottomAppbarState
+import com.nlab.reminder.core.component.schedulelist.bottomappbar.ui.ScheduleListBottomAppbarState
 import com.nlab.reminder.core.data.model.ScheduleId
 import com.nlab.reminder.core.kotlinx.coroutines.flow.withPrev
 import kotlinx.collections.immutable.PersistentSet
