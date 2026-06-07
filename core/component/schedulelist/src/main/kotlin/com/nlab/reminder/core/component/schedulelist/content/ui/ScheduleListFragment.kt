@@ -57,7 +57,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -82,6 +81,7 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.TimeZone
 import kotlin.math.absoluteValue
 import kotlin.math.min
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Instant
 
 /**
@@ -141,8 +141,8 @@ internal class ScheduleListFragment : Fragment() {
             scrollGuardMargin = dpToPx(/* dpValue =*/ 24f, resources.displayMetrics),
             dragAnchorOverlay = scheduleListDragAnchorOverlay,
             dragToScaleTargetHeight = dpToPx(/* dpValue =*/ 150f, resources.displayMetrics),
-            dragScaleAnimateDuration = 250L,
-            swipeCancelAnimateDuration = 350L,
+            dragScaleAnimateDuration = DRAG_SCALE_ANIMATE_DURATION,
+            swipeCancelAnimateDuration = SWIPE_CANCEL_ANIMATE_DURATION,
             clampSwipeThreshold = 0.5f,
             maxClampSwipeWidthMultiplier = 1.75f,
             itemMoveListener = object : ScheduleListItemTouchCallback.ItemMoveListener {
@@ -353,48 +353,50 @@ internal class ScheduleListFragment : Fragment() {
             }
         }
 
-        viewLifecycleScope.launch {
-            viewLifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                itemPositionUpdateConsumerFlow.collectLatest { consumer ->
-                    scheduleListAdapter.itemPositionUpdateRequests.collect(consumer)
-                }
-            }
-        }
+        forwardEventToConsumer(
+            eventSource = scheduleListAdapter.itemPositionUpdateRequests,
+            eventConsumerFlow = itemPositionUpdateConsumerFlow
+        )
 
         withSync(
             syncSourceFlow = userInteractionSyncFlow.map { it.completionCheckedIds },
             sync = scheduleListAdapter::syncCompletionChecked,
         ) { syncJob ->
             forwardEventToConsumer(
-                eventSource = scheduleListAdapter.completionUpdateRequests,
+                eventSource = scheduleListAdapter.completionUpdateRequests.receiveAsFlow(),
                 eventConsumerFlow = completionUpdateConsumerFlow,
                 awaitConsumerReady = { syncJob.join() }
             )
         }
 
         forwardEventToConsumer(
-            eventSource = scheduleListAdapter.clearCompletedSchedulesRequests,
+            eventSource = scheduleListAdapter.clearCompletedSchedulesRequests.receiveAsFlow(),
             eventConsumerFlow = completedSchedulesCleanupConsumerFlow
                 .map { consumer -> { consumer() } }
         )
 
         forwardEventToConsumer(
-            eventSource = scheduleListAdapter.deleteRequests,
+            eventSource = scheduleListAdapter.deleteRequests
+                .receiveAsFlow()
+                .onEach {
+                    itemTouchCallback.removeSwipeClamp()
+                    delay(SWIPE_CANCEL_ANIMATE_DURATION.milliseconds)
+                },
             eventConsumerFlow = deleteConsumerFlow
         )
 
         forwardEventToConsumer(
-            eventSource = scheduleListAdapter.openDetailRequests,
+            eventSource = scheduleListAdapter.openDetailRequests.receiveAsFlow(),
             eventConsumerFlow = openDetailConsumerFlow
         )
 
         forwardEventToConsumer(
-            eventSource = scheduleListAdapter.addRequests,
+            eventSource = scheduleListAdapter.addRequests.receiveAsFlow(),
             eventConsumerFlow = simpleAddConsumerFlow
         )
 
         forwardEventToConsumer(
-            eventSource = scheduleListAdapter.editRequests,
+            eventSource = scheduleListAdapter.editRequests.receiveAsFlow(),
             eventConsumerFlow = simpleEditConsumerFlow
         )
 
@@ -489,7 +491,7 @@ internal class ScheduleListFragment : Fragment() {
                 else {
                     // Prevents the keyboard from lowering and then coming up immediately due to changing the input field.
                     if (flag == 1) {
-                        delay(100)
+                        delay(100.milliseconds)
                     }
                     false
                 }
@@ -511,7 +513,7 @@ internal class ScheduleListFragment : Fragment() {
                         if (event.focused) toolbarState.editCompleteVisible = true
                         else {
                             // Prevents the keyboard from lowering and then coming up immediately due to changing the input field.
-                            delay(100)
+                            delay(100.milliseconds)
                             toolbarState.editCompleteVisible = false
                         }
                     }
@@ -698,7 +700,7 @@ internal class ScheduleListFragment : Fragment() {
     }
 
     private fun <T> forwardEventToConsumer(
-        eventSource: ReceiveChannel<T>,
+        eventSource: Flow<T>,
         eventConsumerFlow: Flow<(T) -> Unit>,
         awaitConsumerReady: suspend () -> Unit = {}
     ) {
@@ -708,8 +710,8 @@ internal class ScheduleListFragment : Fragment() {
             var currentConsumer: ((T) -> Unit)? = null
             launch { eventConsumerFlow.collect { currentConsumer = it } }
 
-            viewLifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                for (event in eventSource) currentConsumer?.invoke(event)
+            eventSource.collect { event ->
+                currentConsumer?.invoke(event)
             }
         }
     }
@@ -780,6 +782,11 @@ internal class ScheduleListFragment : Fragment() {
 
     fun onSimpleEditConsumerChanged(consumer: (SimpleEdit) -> Unit) {
         simpleEditConsumerFlow.tryEmit(consumer)
+    }
+
+    companion object {
+        private const val DRAG_SCALE_ANIMATE_DURATION = 250L
+        private const val SWIPE_CANCEL_ANIMATE_DURATION = 250L
     }
 }
 
