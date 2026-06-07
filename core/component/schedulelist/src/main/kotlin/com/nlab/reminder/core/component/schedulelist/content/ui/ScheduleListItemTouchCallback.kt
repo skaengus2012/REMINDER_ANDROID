@@ -311,6 +311,10 @@ internal class ScheduleListItemTouchCallback(
 
     private fun removeSwipeClampInternal(viewHolder: RecyclerView.ViewHolder) {
         if (viewHolder !is SwipeableViewHolder) return
+        if (viewHolder.bindingAdapterPosition == RecyclerView.NO_POSITION) {
+            resetSwipeClamp(viewHolder)
+            return
+        }
         registerSwipeClampAnimator(
             viewHolder = viewHolder,
             animationType = SWIPING_CLAMP_ANIMATION_HIDE
@@ -502,15 +506,24 @@ internal class ScheduleListItemTouchCallback(
                             viewHolder.itemView.setVisible(isVisible = true)
                             (viewHolder as? DraggableViewHolder)?.onDragStateChanged(isActive = false)
                             disposeDragScaleAnimator?.cancel()
-                            disposeDragScaleAnimator = postDragScaleAnimator(
-                                view = viewHolder.itemView,
-                                scale = 1f,
-                                doOnAnimComplete = {
-                                    dragEndCallbacks.forEach { it.invoke() }
-                                    dragEndCallbacks.clear()
-                                    disposeDragScaleAnimator = null
-                                }
-                            )
+
+                            val onDragComplete = {
+                                dragEndCallbacks.forEach { it.invoke() }
+                                dragEndCallbacks.clear()
+                                disposeDragScaleAnimator = null
+                            }
+
+                            if (viewHolder.bindingAdapterPosition == RecyclerView.NO_POSITION) {
+                                viewHolder.itemView.scaleX = 1f
+                                viewHolder.itemView.scaleY = 1f
+                                onDragComplete()
+                            } else {
+                                disposeDragScaleAnimator = postDragScaleAnimator(
+                                    view = viewHolder.itemView,
+                                    scale = 1f,
+                                    doOnAnimComplete = onDragComplete
+                                )
+                            }
                         }
                         draggingViewHolder = null
                         itemMoveListener.onMoveEnded()
