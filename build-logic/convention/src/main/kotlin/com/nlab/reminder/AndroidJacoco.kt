@@ -112,28 +112,40 @@ internal fun Project.configureJacocoAndroid(
 }
 
 private val coverageExclusions = jacocoExcludePatterns + setOf(
+    /* Android & System generated classes */
     "**/R.class",
     "**/R$*.class",
-    "**/*_Hilt*.class",
-    "**/Hilt_*.class",
     "**/BuildConfig.*",
     "**/Manifest*.*",
-    "**/android/**",
-    "**/androidx/**/compose/**",
-    "**/compose/**",
-    "**/di/**",
-    "**/fake/**",
-    "**/navigation/**",
-    "**/startup/**",
-    "**/test/**",
-    "**/ui/**",
 
-    /* filtering unnecessary feature components */
+    /* Dagger & Hilt DI generated classes */
+    "**/*_Hilt*.class",
+    "**/Hilt_*.class",
+    "**/*_Factory.class",
+    "**/*_Factory$*.class",
+    "**/*_MembersInjector.class",
+
+    /* DataBinding & ViewBinding classes */
+    "**/databinding/**",
+    "**/*Binding.class",
+    "**/*BindingImpl.class",
+
+    /* Navigation Component generated classes */
+    "**/navigation/**",
+    "**/*Args*.*",
+    "**/*Directions*.*",
+
+    /* Unnecessary feature components */
     "**/*Action$*.class",
     "**/*UiState$*.class",
     "**/*Environment.class",
 
-    /* filtering Navigation Component generated classes */
-    "**/*Args*.*",
-    "**/*Directions*.*",
+    "**/android/**",
+    "**/androidx/**/compose/**",
+    "**/compose/**",
+    "**/ui/**",
+    "**/di/**",
+    "**/fake/**",
+    "**/test/**",
+    "**/startup/**",
 )
