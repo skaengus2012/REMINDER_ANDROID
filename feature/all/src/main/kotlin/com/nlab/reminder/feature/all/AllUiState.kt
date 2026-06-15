@@ -30,7 +30,7 @@ internal sealed class AllUiState {
         val scheduleResources: List<UserScheduleListResource>,
         val scheduleListStats: ScheduleListStats,
         val menuExpanded: Boolean,
-        val multiSelectionEnabled: Boolean,
+        val selectionEnabled: Boolean,
         val showCompletedSchedulesCleanupConfirmation: Boolean,
         val showSelectedSchedulesDeletionConfirmation: Boolean,
         val replayStamp: Long,

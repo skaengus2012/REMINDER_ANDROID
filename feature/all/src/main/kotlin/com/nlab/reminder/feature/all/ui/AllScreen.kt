@@ -131,7 +131,7 @@ internal fun AllScreen(
         onCompletedSchedulesCleanupClicked = {
             store.dispatch(AllAction.CompletedSchedulesCleanupClicked)
         },
-        onCompletedSchedulesCleanupInteracted = {
+        onCompletedSchedulesCleanupAnswered = {
             store.dispatch(AllAction.CleanupConfirmAnswered(confirmed = it))
         },
         onCompletionUpdated = { completionUpdate ->
@@ -184,8 +184,13 @@ internal fun AllScreen(
         onSelectedSchedulesTagClicked = {
             showAppToast("TODO implements Tag")
         },
-        onSelectedSchedulesDeleteClicked = {
+        onSelectedSchedulesDeletionClicked = {
             store.dispatch(AllAction.SelectedSchedulesDeletionClicked)
+        },
+        onSelectedSchedulesDeletionAnswered = {
+            store.dispatch(
+                AllAction.SelectedSchedulesDeletionConfirmAnswered(confirmed = it)
+            )
         }
     )
 }
@@ -217,7 +222,7 @@ private fun AllScreen(
     onSelectionCompleteClicked: () -> Unit,
     onCompletedScheduleVisibilityChangeClicked: (Boolean) -> Unit,
     onCompletedSchedulesCleanupClicked: () -> Unit,
-    onCompletedSchedulesCleanupInteracted: (Boolean) -> Unit,
+    onCompletedSchedulesCleanupAnswered: (Boolean) -> Unit,
     onCompletionUpdated: (CompletionUpdate) -> Unit,
     onDeleteRequested: (Delete) -> Unit,
     onItemPositionUpdated: (List<UserScheduleListResource>) -> Unit,
@@ -229,7 +234,8 @@ private fun AllScreen(
     onSelectedSchedulesTimingConfigClicked: () -> Unit,
     onSelectedSchedulesCompleteClicked: () -> Unit,
     onSelectedSchedulesTagClicked: () -> Unit,
-    onSelectedSchedulesDeleteClicked: () -> Unit,
+    onSelectedSchedulesDeletionClicked: () -> Unit,
+    onSelectedSchedulesDeletionAnswered: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val toolbarState = rememberScheduleListToolbarState()
@@ -245,7 +251,7 @@ private fun AllScreen(
             ScheduleListToolbar(
                 title = title,
                 toolbarState = toolbarState,
-                menuVisible = successUiState?.multiSelectionEnabled?.not() ?: true,
+                menuVisible = successUiState?.selectionEnabled?.not() ?: true,
                 menuDropdown = successUiState?.let { state ->
                     MenuDropdown(isVisible = state.menuExpanded) {
                         MenuDropdown(
@@ -257,7 +263,7 @@ private fun AllScreen(
                     }
                 },
                 onMenuClicked = onMenuClicked,
-                selectionCompleteVisible = successUiState?.multiSelectionEnabled ?: false,
+                selectionCompleteVisible = successUiState?.selectionEnabled ?: false,
                 onSelectionCompleteClicked = onSelectionCompleteClicked,
                 onBackClicked = onBackClicked,
             )
@@ -275,7 +281,7 @@ private fun AllScreen(
                             completedScheduleShown = uiState.scheduleListStats.completedShown,
                             completedScheduleCount = uiState.scheduleListStats.completedCount,
                             replayStamp = uiState.replayStamp,
-                            multiSelectionEnabled = uiState.multiSelectionEnabled,
+                            multiSelectionEnabled = uiState.selectionEnabled,
                             toolbarState = toolbarState,
                             bottomAppbarState = bottomAppbarState,
                             onItemSelectionChanged = onItemSelectionChanged,
@@ -291,20 +297,16 @@ private fun AllScreen(
                         if (uiState.showCompletedSchedulesCleanupConfirmation) {
                             CompletedSchedulesCleanupConfirmBottomSheet(
                                 completedSchedulesCount = uiState.scheduleListStats.completedCount,
-                                onConfirm = { onCompletedSchedulesCleanupInteracted(true) },
-                                onCancel = { onCompletedSchedulesCleanupInteracted(false) }
+                                onConfirm = { onCompletedSchedulesCleanupAnswered(true) },
+                                onCancel = { onCompletedSchedulesCleanupAnswered(false) }
                             )
                         }
 
                         if (uiState.showSelectedSchedulesDeletionConfirmation) {
                             SelectedSchedulesDeleteConfirmBottomSheet(
                                 selectedScheduleCount = uiState.scheduleListStats.selectedCount,
-                                onConfirm = {
-
-                                },
-                                onCancel = {
-
-                                }
+                                onConfirm = { onSelectedSchedulesDeletionAnswered(true) },
+                                onCancel = { onSelectedSchedulesDeletionAnswered(false) }
                             )
                         }
                     }
@@ -317,7 +319,7 @@ private fun AllScreen(
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth(),
             bottomAppbarState = bottomAppbarState,
-            isMultiSelectionEnabled = successUiState?.multiSelectionEnabled == true,
+            isMultiSelectionEnabled = successUiState?.selectionEnabled == true,
             isMultiSelectionContentEnabled = successUiState
                 ?.scheduleListStats
                 ?.selectedCount
@@ -325,7 +327,7 @@ private fun AllScreen(
             onTimingConfigClicked = throttleClick(onClick = onSelectedSchedulesTimingConfigClicked),
             onCompleteClicked = throttleClick(onClick = onSelectedSchedulesCompleteClicked),
             onTagConfigClicked = throttleClick(onClick = onSelectedSchedulesTagClicked),
-            onDeleteClicked = throttleClick(onClick = onSelectedSchedulesDeleteClicked),
+            onDeleteClicked = throttleClick(onClick = onSelectedSchedulesDeletionClicked),
             onNewPlanClicked = throttleClick(onClick = onNewPlanClicked),
         )
     }
@@ -480,7 +482,7 @@ private fun AllScreenPreview() {
             onSelectionCompleteClicked = {},
             onCompletedScheduleVisibilityChangeClicked = {},
             onCompletedSchedulesCleanupClicked = {},
-            onCompletedSchedulesCleanupInteracted = {},
+            onCompletedSchedulesCleanupAnswered = {},
             onCompletionUpdated = {},
             onDeleteRequested = {},
             onItemPositionUpdated = {},
@@ -492,7 +494,8 @@ private fun AllScreenPreview() {
             onSelectedSchedulesTimingConfigClicked = {},
             onSelectedSchedulesCompleteClicked = {},
             onSelectedSchedulesTagClicked = {},
-            onSelectedSchedulesDeleteClicked = {}
+            onSelectedSchedulesDeletionClicked = {},
+            onSelectedSchedulesDeletionAnswered = {}
         )
     }
 }

@@ -21,6 +21,7 @@ import com.nlab.reminder.core.data.model.ScheduleContent
 import com.nlab.reminder.core.data.repository.DeleteScheduleQuery
 import com.nlab.reminder.core.data.repository.SaveScheduleQuery
 import com.nlab.reminder.core.data.repository.UpdateAllScheduleQuery
+import com.nlab.reminder.core.kotlin.collections.toSet
 import com.nlab.reminder.core.kotlin.onFailure
 import com.nlab.reminder.core.kotlin.tryToNonBlankStringOrNull
 import com.nlab.statekit.dsl.reduce.DslReduce
@@ -41,7 +42,7 @@ internal fun AllReduce(environment: AllEnvironment): AllReduce = DslReduce {
                 scheduleResources = action.userScheduleListResourceReport.userScheduleListResources,
                 scheduleListStats = action.userScheduleListResourceReport.scheduleListStats,
                 menuExpanded = false,
-                multiSelectionEnabled = false,
+                selectionEnabled = false,
                 showCompletedSchedulesCleanupConfirmation = false,
                 showSelectedSchedulesDeletionConfirmation = false,
                 replayStamp = 0,
@@ -87,21 +88,30 @@ internal fun AllReduce(environment: AllEnvironment): AllReduce = DslReduce {
             }
         }
 
-        transition<SelectionModeClicked> {
-            current.copy(multiSelectionEnabled = action.enabled)
-        }
-        effect<SelectionModeClicked> {
-            if (action.enabled.not()) {
-                environment.userSelectedSchedulesStore.clear()
+        suspendEffect<StateSyncCompleted> {
+            if (current.selectionEnabled.not()) return@suspendEffect
+
+            val isChanged = environment.isScheduleListResourceChanged(
+                oldElements = current.scheduleResources,
+                newElements = action.userScheduleListResourceReport.userScheduleListResources
+            )
+            if (isChanged) {
+                dispatch(SelectionModeChangeRequested(enabled = false))
             }
         }
 
-        transition<SelectionModeDisabled> {
-            current.copy(multiSelectionEnabled = false)
+        suspendEffect<SelectionModeClicked> {
+            dispatch(SelectionModeChangeRequested(enabled = action.enabled))
         }
 
-        effect<SelectionModeDisabled> {
-            environment.userSelectedSchedulesStore.clear()
+        transition<SelectionModeChangeRequested> {
+            current.copy(selectionEnabled = action.enabled)
+        }
+
+        effect<SelectionModeChangeRequested> {
+            if (action.enabled.not()) {
+                environment.userSelectedSchedulesStore.clear()
+            }
         }
 
         transition<MenuClicked> { current.copy(menuExpanded = true) }
@@ -149,18 +159,17 @@ internal fun AllReduce(environment: AllEnvironment): AllReduce = DslReduce {
         }
 
         suspendEffect<ScheduleAdditionSubmitted> {
-            environment.scheduleRepository
-                .save(
-                    query = SaveScheduleQuery.Add(
-                        content = ScheduleContent(
-                            title = action.title,
-                            note = action.note.tryToNonBlankStringOrNull(),
-                            link = null,
-                            tagIds = emptySet(),
-                            timing = null
-                        )
+            environment.scheduleRepository.save(
+                query = SaveScheduleQuery.Add(
+                    content = ScheduleContent(
+                        title = action.title,
+                        note = action.note.tryToNonBlankStringOrNull(),
+                        link = null,
+                        tagIds = emptySet(),
+                        timing = null
                     )
                 )
+            )
             // TODO Handle failure cases from save(), e.g. network/DB I/O errors, validation failures (invalid/empty title or note), and repository constraint violations, and surface them appropriately in the UI/logs.
         }
 
@@ -193,5 +202,16 @@ internal fun AllReduce(environment: AllEnvironment): AllReduce = DslReduce {
             current.copy(showSelectedSchedulesDeletionConfirmation = false)
         }
 
+        suspendEffect<SelectedSchedulesDeletionConfirmAnswered> {
+            if (action.confirmed.not()) return@suspendEffect
+            if (current.scheduleListStats.selectedCount.value == 0) return@suspendEffect
+
+            environment.deleteSchedule(
+                scheduleIds = current.scheduleResources
+                    .mapNotNull { resource -> resource.takeIf { it.selected }?.schedule?.id }
+                    .toSet()
+            )
+            // TODO Handle failure cases from save(), e.g. network/DB I/O errors, validation failures (invalid/empty title or note), and repository constraint violations, and surface them appropriately in the UI/logs.
+        }
     }
 }

@@ -137,6 +137,9 @@ class GetUserScheduleListResourceReportFlowTest {
                     ScheduleListStats(
                         completedShown = true,
                         completedCount = completedSchedules.size.toNonNegativeInt(),
+                        selectedCount = expectedUserScheduleListResources
+                            .count { it.selected }
+                            .toNonNegativeInt()
                     )
                 )
             )
@@ -210,6 +213,7 @@ class GetUserScheduleListResourceReportFlowTest {
                     ScheduleListStats(
                         completedShown = false,
                         completedCount = 0.toNonNegativeInt(),
+                        selectedCount = expectedUserScheduleListResources.count { it.selected }.toNonNegativeInt()
                     )
                 )
             )

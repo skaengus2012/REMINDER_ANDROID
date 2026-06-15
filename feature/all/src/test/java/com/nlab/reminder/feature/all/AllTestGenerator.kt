@@ -23,6 +23,7 @@ import com.nlab.reminder.core.component.schedulelist.content.EditScheduleListRes
 import com.nlab.reminder.core.component.schedulelist.content.UserSelectedSchedulesStore
 import com.nlab.reminder.core.data.repository.CompletedScheduleShownRepository
 import com.nlab.reminder.core.data.repository.ScheduleRepository
+import com.nlab.reminder.core.component.schedulelist.content.IsScheduleListResourceChangedUseCase
 import io.mockk.mockk
 
 /**
@@ -36,7 +37,8 @@ internal fun genAllEnvironment(
     getCurrentTimeSnapshotStream: GetCurrentTimeSnapshotStreamUseCase = mockk(),
     updateScheduleCompletion: UpdateScheduleCompletionUseCase = mockk(),
     userSelectedSchedulesStore: UserSelectedSchedulesStore = mockk(),
-    editScheduleListResource: EditScheduleListResourceUseCase = mockk()
+    editScheduleListResource: EditScheduleListResourceUseCase = mockk(),
+    isScheduleListResourceChanged: IsScheduleListResourceChangedUseCase = mockk()
 ): AllEnvironment = AllEnvironment(
     deleteSchedule = deleteSchedule,
     scheduleRepository = scheduleRepository,
@@ -45,5 +47,6 @@ internal fun genAllEnvironment(
     getCurrentTimeSnapshotStream = getCurrentTimeSnapshotStream,
     updateScheduleCompletion = updateScheduleCompletion,
     userSelectedSchedulesStore = userSelectedSchedulesStore,
-    editScheduleListResource = editScheduleListResource
+    editScheduleListResource = editScheduleListResource,
+    isScheduleListResourceChanged = isScheduleListResourceChanged
 )

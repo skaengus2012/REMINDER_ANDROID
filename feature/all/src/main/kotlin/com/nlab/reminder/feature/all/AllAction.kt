@@ -66,7 +66,7 @@ internal sealed interface AllAction {
 
     data class SelectionModeClicked(val enabled: Boolean) : AllAction
 
-    data object SelectionModeDisabled : AllAction
+    data class SelectionModeChangeRequested(val enabled: Boolean) : AllAction
 
     data class StateSyncCompleted(
         val entryAt: Instant,
