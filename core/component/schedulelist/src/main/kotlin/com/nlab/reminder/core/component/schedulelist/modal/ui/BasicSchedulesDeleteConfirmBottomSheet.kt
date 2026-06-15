@@ -19,8 +19,9 @@ import kotlinx.coroutines.launch
  * @author Doohyun
  */
 @Composable
-fun SelectedSchedulesDeleteConfirmBottomSheet(
-    selectedScheduleCount: NonNegativeInt,
+internal fun BasicSchedulesDeleteConfirmBottomSheet(
+    bodyMessage: String,
+    deletionCount: NonNegativeInt,
     onConfirm: () -> Unit,
     onCancel: () -> Unit
 ) {
@@ -28,12 +29,12 @@ fun SelectedSchedulesDeleteConfirmBottomSheet(
     val coroutineScope = rememberCoroutineScope()
     PlaneatBottomSheet(
         title = PlaneatBottomSheetTitle.None,
-        body = PlaneatBottomSheetBody.None,
+        body = PlaneatBottomSheetBody.Text(bodyMessage),
         button = PlaneatBottomButton.TwoButton(
             primaryButtonText = pluralStringResource(
                 id = PluralsIds.confirm_delete_reminder,
-                count = selectedScheduleCount.value,
-                selectedScheduleCount.value
+                count = deletionCount.value,
+                deletionCount.value
             ),
             onPrimaryButtonClicked = throttleClick {
                 coroutineScope.launch {

@@ -16,20 +16,10 @@
 
 package com.nlab.reminder.core.component.schedulelist.modal.ui
 
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.res.pluralStringResource
-import androidx.compose.ui.res.stringResource
-import com.nlab.reminder.core.androidx.compose.ui.throttleClick
-import com.nlab.reminder.core.designsystem.compose.component.PlaneatBottomButton
-import com.nlab.reminder.core.designsystem.compose.component.PlaneatBottomSheet
-import com.nlab.reminder.core.designsystem.compose.component.PlaneatBottomSheetBody
-import com.nlab.reminder.core.designsystem.compose.component.PlaneatBottomSheetTitle
 import com.nlab.reminder.core.kotlin.NonNegativeInt
 import com.nlab.reminder.core.translation.PluralsIds
-import com.nlab.reminder.core.translation.StringIds
-import kotlinx.coroutines.launch
 
 /**
  * @author Thalys
@@ -40,38 +30,14 @@ fun CompletedSchedulesCleanupConfirmBottomSheet(
     onConfirm: () -> Unit,
     onCancel: () -> Unit
 ) {
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    val coroutineScope = rememberCoroutineScope()
-    PlaneatBottomSheet(
-        title = PlaneatBottomSheetTitle.None,
-        body = PlaneatBottomSheetBody.Text(
-            pluralStringResource(
-                id = PluralsIds.content_completed_schedules_cleanup_notice_in_list,
-                count = completedSchedulesCount.value,
-                completedSchedulesCount.value
-            )
+    BasicSchedulesDeleteConfirmBottomSheet(
+        bodyMessage = pluralStringResource(
+            id = PluralsIds.content_completed_schedules_cleanup_notice_in_list,
+            count = completedSchedulesCount.value,
+            completedSchedulesCount.value
         ),
-        button = PlaneatBottomButton.TwoButton(
-            primaryButtonText = pluralStringResource(
-                id = PluralsIds.confirm_delete_reminder,
-                count = completedSchedulesCount.value,
-                completedSchedulesCount.value
-            ),
-            onPrimaryButtonClicked = throttleClick {
-                coroutineScope.launch {
-                    sheetState.hide()
-                    onConfirm()
-                }
-            },
-            secondaryButtonText = stringResource(StringIds.cancel),
-            onSecondaryButtonClicked = throttleClick {
-                coroutineScope.launch {
-                    sheetState.hide()
-                    onCancel()
-                }
-            }
-        ),
-        onDismissRequest = onCancel,
-        sheetState = sheetState
+        deletionCount = completedSchedulesCount,
+        onConfirm = onConfirm,
+        onCancel = onCancel
     )
 }

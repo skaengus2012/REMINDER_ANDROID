@@ -58,7 +58,7 @@ import com.nlab.reminder.core.component.schedulelist.content.ui.Delete
 import com.nlab.reminder.core.component.schedulelist.content.ui.OpenDetail
 import com.nlab.reminder.core.component.schedulelist.content.ui.SelectionUpdate
 import com.nlab.reminder.core.component.schedulelist.modal.ui.CompletedSchedulesCleanupConfirmBottomSheet
-import com.nlab.reminder.core.component.schedulelist.modal.ui.SelectedSchedulesDeleteConfirmBottomSheet
+import com.nlab.reminder.core.component.schedulelist.modal.ui.SchedulesDeleteConfirmBottomSheet
 import com.nlab.reminder.core.component.schedulelist.toolbar.ui.MenuDropdown
 import com.nlab.reminder.core.designsystem.compose.component.PlaneatDropdownDivider
 import com.nlab.reminder.core.designsystem.compose.component.PlaneatDropdownIcon
@@ -303,8 +303,8 @@ private fun AllScreen(
                         }
 
                         if (uiState.showSelectedSchedulesDeletionConfirmation) {
-                            SelectedSchedulesDeleteConfirmBottomSheet(
-                                selectedScheduleCount = uiState.scheduleListStats.selectedCount,
+                            SchedulesDeleteConfirmBottomSheet(
+                                deletionCount = uiState.scheduleListStats.selectedCount,
                                 onConfirm = { onSelectedSchedulesDeletionAnswered(true) },
                                 onCancel = { onSelectedSchedulesDeletionAnswered(false) }
                             )
