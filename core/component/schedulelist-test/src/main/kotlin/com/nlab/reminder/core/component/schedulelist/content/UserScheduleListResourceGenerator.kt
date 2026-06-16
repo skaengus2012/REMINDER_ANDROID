@@ -16,6 +16,8 @@
 
 package com.nlab.reminder.core.component.schedulelist.content
 
+import com.nlab.reminder.core.component.schedulelist.ScheduleListResource
+import com.nlab.reminder.core.component.schedulelist.UserScheduleListResource
 import com.nlab.reminder.core.data.model.ScheduleId
 import com.nlab.reminder.core.kotlin.collections.toSet
 import com.nlab.testkit.faker.genBoolean

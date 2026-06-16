@@ -16,7 +16,7 @@
 
 package com.nlab.reminder.feature.all
 
-import com.nlab.reminder.core.component.schedulelist.content.UserScheduleListResource
+import com.nlab.reminder.core.component.schedulelist.UserScheduleListResource
 import kotlin.time.Instant
 
 /**

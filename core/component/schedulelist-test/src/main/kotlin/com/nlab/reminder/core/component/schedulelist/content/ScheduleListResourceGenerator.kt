@@ -16,6 +16,7 @@
 
 package com.nlab.reminder.core.component.schedulelist.content
 
+import com.nlab.reminder.core.component.schedulelist.ScheduleListResource
 import com.nlab.reminder.core.data.model.Link
 import com.nlab.reminder.core.data.model.LinkMetadata
 import com.nlab.reminder.core.data.model.Schedule

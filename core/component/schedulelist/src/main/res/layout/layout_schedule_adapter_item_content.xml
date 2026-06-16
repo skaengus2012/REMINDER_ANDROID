@@ -157,7 +157,7 @@
             tools:ignore="Autofill,LabelFor,TextFields"
             tools:text="@tools:sample/lorem" />
 
-        <com.nlab.reminder.core.component.schedulelist.content.ui.ScheduleDetailsEditText
+        <com.nlab.reminder.core.component.schedulelist.ui.content.ScheduleDetailsEditText
             android:id="@+id/edittext_detail"
             style="@style/PlaneatTheme.Style.Typography.BodySmall"
             android:layout_width="0dp"
@@ -194,7 +194,7 @@
                 android:background="?bg_2_card"
                 android:paddingBottom="8dp">
 
-                <com.nlab.reminder.core.component.schedulelist.content.ui.RatioLockedHeightImageView
+                <com.nlab.reminder.core.component.schedulelist.ui.content.RatioLockedHeightImageView
                     android:id="@+id/imageview_bg_link_thumbnail"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

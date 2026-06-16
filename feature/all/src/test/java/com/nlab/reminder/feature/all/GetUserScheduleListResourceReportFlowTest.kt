@@ -17,7 +17,7 @@
 package com.nlab.reminder.feature.all
 
 import app.cash.turbine.test
-import com.nlab.reminder.core.component.schedulelist.content.GetUserScheduleListResourcesFlowUseCase
+import com.nlab.reminder.core.component.schedulelist.GetUserScheduleListResourcesFlowUseCase
 import com.nlab.reminder.core.component.schedulelist.content.genScheduleListResource
 import com.nlab.reminder.core.component.schedulelist.content.genUserScheduleListResource
 import com.nlab.reminder.core.component.schedulelist.content.genUserScheduleListResources

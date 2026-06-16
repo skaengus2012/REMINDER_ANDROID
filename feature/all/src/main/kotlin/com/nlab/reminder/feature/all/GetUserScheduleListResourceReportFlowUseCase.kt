@@ -17,8 +17,8 @@
 package com.nlab.reminder.feature.all
 
 import com.nlab.reminder.core.annotation.ExcludeFromGeneratedTestReport
-import com.nlab.reminder.core.component.schedulelist.content.GetUserScheduleListResourcesFlowUseCase
-import com.nlab.reminder.core.component.schedulelist.content.UserScheduleListResource
+import com.nlab.reminder.core.component.schedulelist.GetUserScheduleListResourcesFlowUseCase
+import com.nlab.reminder.core.component.schedulelist.UserScheduleListResource
 import com.nlab.reminder.core.data.model.Schedule
 import com.nlab.reminder.core.data.model.SchedulesLookup
 import com.nlab.reminder.core.data.qualifiers.ScheduleData

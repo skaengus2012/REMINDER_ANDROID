@@ -19,7 +19,7 @@ package com.nlab.reminder.feature.all.ui
 import android.content.res.Resources
 import com.nlab.reminder.core.component.displayformat.ui.DateTimeFormatPattern
 import com.nlab.reminder.core.component.displayformat.ui.triggerAtDateTimeFormatPatternForList
-import com.nlab.reminder.core.component.schedulelist.content.ui.TriggerAtFormatPatterns
+import com.nlab.reminder.core.component.schedulelist.ui.content.TriggerAtFormatPatterns
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 

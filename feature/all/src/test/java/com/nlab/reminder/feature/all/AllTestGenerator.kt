@@ -19,11 +19,11 @@ package com.nlab.reminder.feature.all
 import com.nlab.reminder.core.component.schedule.DeleteScheduleUseCase
 import com.nlab.reminder.core.component.currenttime.GetCurrentTimeSnapshotStreamUseCase
 import com.nlab.reminder.core.component.schedule.UpdateScheduleCompletionUseCase
-import com.nlab.reminder.core.component.schedulelist.content.EditScheduleListResourceUseCase
-import com.nlab.reminder.core.component.schedulelist.content.UserSelectedSchedulesStore
+import com.nlab.reminder.core.component.schedulelist.EditScheduleListResourceUseCase
+import com.nlab.reminder.core.component.schedulelist.UserSelectedSchedulesStore
 import com.nlab.reminder.core.data.repository.CompletedScheduleShownRepository
 import com.nlab.reminder.core.data.repository.ScheduleRepository
-import com.nlab.reminder.core.component.schedulelist.content.IsScheduleListResourceChangedUseCase
+import com.nlab.reminder.core.component.schedulelist.IsScheduleListResourceChangedUseCase
 import io.mockk.mockk
 
 /**

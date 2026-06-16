@@ -16,12 +16,11 @@
 
 package com.nlab.reminder.feature.all
 
-import com.nlab.reminder.core.component.schedulelist.content.clear
+import com.nlab.reminder.core.component.schedulelist.clear
 import com.nlab.reminder.core.data.model.ScheduleContent
 import com.nlab.reminder.core.data.repository.DeleteScheduleQuery
 import com.nlab.reminder.core.data.repository.SaveScheduleQuery
 import com.nlab.reminder.core.data.repository.UpdateAllScheduleQuery
-import com.nlab.reminder.core.kotlin.collections.toSet
 import com.nlab.reminder.core.kotlin.onFailure
 import com.nlab.reminder.core.kotlin.tryToNonBlankStringOrNull
 import com.nlab.statekit.dsl.reduce.DslReduce
