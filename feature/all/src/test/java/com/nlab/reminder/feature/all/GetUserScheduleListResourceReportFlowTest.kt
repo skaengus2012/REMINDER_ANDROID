@@ -354,6 +354,57 @@ class GetUserScheduleListResourceReportFlowTest {
             )
         )
     }
+
+    @Test
+    fun `Given selected schedules exist, When collect, Then receive report with correct selectedCount`() = runTest {
+        val schedules = genSchedules(count = 5)
+        val expectedSelectedCount = 3
+        val userScheduleListResources = schedules.mapIndexed { index, schedule ->
+            genUserScheduleListResource(
+                schedule = genScheduleListResource(schedule),
+                selected = (index < expectedSelectedCount)
+            )
+        }
+        val useCase = genGetUserScheduleListResourceReportFlow(
+            scheduleRepository = mockk {
+                every { getSchedulesAsStream(any()) } returns flowOf(schedules.toSet())
+            },
+            getUserScheduleListResourcesFlow = mockk {
+                every { this@mockk.invoke(any()) } returns flowOf(userScheduleListResources.toHashSet())
+            }
+        )
+
+        useCase.invoke().test {
+            val actualReport = awaitItem()
+            assertThat(actualReport.scheduleListStats.selectedCount?.value, equalTo(expectedSelectedCount))
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `Given selected schedules not exist, When collect, Then receive report with null selectedCount`() = runTest {
+        val schedules = genSchedules(count = 5)
+        val userScheduleListResources = schedules.map { schedule ->
+            genUserScheduleListResource(
+                schedule = genScheduleListResource(schedule),
+                selected = false
+            )
+        }
+        val useCase = genGetUserScheduleListResourceReportFlow(
+            scheduleRepository = mockk {
+                every { getSchedulesAsStream(any()) } returns flowOf(schedules.toSet())
+            },
+            getUserScheduleListResourcesFlow = mockk {
+                every { this@mockk.invoke(any()) } returns flowOf(userScheduleListResources.toHashSet())
+            }
+        )
+
+        useCase.invoke().test {
+            val actualReport = awaitItem()
+            assertThat(actualReport.scheduleListStats.selectedCount, equalTo(null))
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
 }
 
 private fun genGetUserScheduleListResourceReportFlow(
