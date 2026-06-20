@@ -376,12 +376,7 @@ internal class ScheduleListFragment : Fragment() {
         )
 
         forwardEventToConsumer(
-            eventSource = scheduleListAdapter.deleteRequests
-                .receiveAsFlow()
-                .onEach {
-                    itemTouchCallback.removeSwipeClamp()
-                    delay(SWIPE_CANCEL_ANIMATE_DURATION.milliseconds)
-                },
+            eventSource = scheduleListAdapter.deleteRequests.receiveAsFlow(),
             eventConsumerFlow = deleteConsumerFlow
         )
 
