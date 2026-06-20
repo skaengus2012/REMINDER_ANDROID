@@ -1,14 +1,14 @@
 package com.nlab.reminder.core.component.schedulelist
 
+import com.nlab.reminder.core.annotation.ExcludeFromGeneratedTestReport
 import com.nlab.reminder.core.data.model.ScheduleId
 import com.nlab.reminder.core.kotlin.toNonNegativeInt
 
 /**
  * @author Doohyun
  */
-fun ScheduleListElement.userScheduleListResourceOrNull(): UserScheduleListResource? {
-    return this as? UserScheduleListResource
-}
+fun ScheduleListElement.userScheduleListResourceOrNull(): UserScheduleListResource? =
+    this as? UserScheduleListResource
 
 fun Collection<ScheduleListElement>.toScheduleListStats(
     needCompletedCount: Boolean,
@@ -28,6 +28,7 @@ fun Collection<ScheduleListElement>.toScheduleListStats(
     )
 }
 
+@ExcludeFromGeneratedTestReport
 inline fun Collection<ScheduleListElement>.mapToScheduleIds(
     predicate: (UserScheduleListResource) -> Boolean
 ): Set<ScheduleId> = buildSet {
@@ -40,6 +41,7 @@ inline fun Collection<ScheduleListElement>.mapToScheduleIds(
     }
 }
 
+@ExcludeFromGeneratedTestReport
 inline fun List<ScheduleListElement>.mapToScheduleIdsList(
     predicate: (UserScheduleListResource) -> Boolean
 ): List<ScheduleId> = mapNotNull { element ->
