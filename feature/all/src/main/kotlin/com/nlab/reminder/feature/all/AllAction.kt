@@ -62,7 +62,7 @@ internal sealed interface AllAction {
 
     data object SelectedSchedulesDeletionClicked : AllAction
 
-    data class SelectedSchedulesDeletionConfirmAnswered(val confirmed: Boolean) : AllAction
+    data class SchedulesDeletionConfirmAnswered(val confirmed: Boolean) : AllAction
 
     data class SelectionModeClicked(val enabled: Boolean) : AllAction
 

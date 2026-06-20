@@ -57,8 +57,8 @@ import com.nlab.reminder.core.component.schedulelist.ui.content.CompletionUpdate
 import com.nlab.reminder.core.component.schedulelist.ui.content.Delete
 import com.nlab.reminder.core.component.schedulelist.ui.content.OpenDetail
 import com.nlab.reminder.core.component.schedulelist.ui.content.SelectionUpdate
-import com.nlab.reminder.core.component.schedulelist.ui.modal.CompletedSchedulesCleanupConfirmBottomSheet
-import com.nlab.reminder.core.component.schedulelist.ui.modal.SchedulesDeleteConfirmBottomSheet
+import com.nlab.reminder.core.component.schedulelist.ui.modal.CompletedSchedulesCleanupConfirmBottomSheetHandler
+import com.nlab.reminder.core.component.schedulelist.ui.modal.SchedulesDeleteConfirmationHandler
 import com.nlab.reminder.core.component.schedulelist.ui.toolbar.MenuDropdown
 import com.nlab.reminder.core.designsystem.compose.component.PlaneatDropdownDivider
 import com.nlab.reminder.core.designsystem.compose.component.PlaneatDropdownIcon
@@ -187,9 +187,9 @@ internal fun AllScreen(
         onSelectedSchedulesDeletionClicked = {
             store.dispatch(AllAction.SelectedSchedulesDeletionClicked)
         },
-        onSelectedSchedulesDeletionAnswered = {
+        onSchedulesDeletionAnswered = {
             store.dispatch(
-                AllAction.SelectedSchedulesDeletionConfirmAnswered(confirmed = it)
+                AllAction.SchedulesDeletionConfirmAnswered(confirmed = it)
             )
         }
     )
@@ -235,7 +235,7 @@ private fun AllScreen(
     onSelectedSchedulesCompleteClicked: () -> Unit,
     onSelectedSchedulesTagClicked: () -> Unit,
     onSelectedSchedulesDeletionClicked: () -> Unit,
-    onSelectedSchedulesDeletionAnswered: (Boolean) -> Unit,
+    onSchedulesDeletionAnswered: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val toolbarState = rememberScheduleListToolbarState()
@@ -255,7 +255,7 @@ private fun AllScreen(
                 menuDropdown = successUiState?.let { state ->
                     MenuDropdown(isVisible = state.menuExpanded) {
                         MenuDropdown(
-                            isCompletedScheduleShown = state.scheduleListStats.completedShown,
+                            isCompletedScheduleShown = state.stats.completedShown,
                             onSelectionStartClicked = onSelectionStartClicked,
                             onCompletedScheduleVisibilityChangeClicked = onCompletedScheduleVisibilityChangeClicked,
                             onDismissed = onMenuDropdownDismissed,
@@ -278,8 +278,8 @@ private fun AllScreen(
                             headline = title,
                             entryAt = uiState.entryAt,
                             scheduleResources = uiState.scheduleResources,
-                            completedScheduleShown = uiState.scheduleListStats.completedShown,
-                            completedScheduleCount = uiState.scheduleListStats.completedCount,
+                            completedScheduleShown = uiState.stats.completedShown,
+                            completedScheduleCount = uiState.stats.completedCount,
                             replayStamp = uiState.replayStamp,
                             multiSelectionEnabled = uiState.selectionEnabled,
                             toolbarState = toolbarState,
@@ -294,21 +294,17 @@ private fun AllScreen(
                             onCompletedSchedulesCleanupRequested = onCompletedSchedulesCleanupClicked
                         )
 
-                        if (uiState.showCompletedSchedulesCleanupConfirmation) {
-                            CompletedSchedulesCleanupConfirmBottomSheet(
-                                completedSchedulesCount = uiState.scheduleListStats.completedCount,
-                                onConfirm = { onCompletedSchedulesCleanupAnswered(true) },
-                                onCancel = { onCompletedSchedulesCleanupAnswered(false) }
-                            )
-                        }
+                        CompletedSchedulesCleanupConfirmBottomSheetHandler(
+                            confirmation = uiState.completedSchedulesCleanupConfirmation,
+                            onConfirm = { onCompletedSchedulesCleanupAnswered(true) },
+                            onCancel = { onCompletedSchedulesCleanupAnswered(false) }
+                        )
 
-                        if (uiState.showSelectedSchedulesDeletionConfirmation) {
-                            SchedulesDeleteConfirmBottomSheet(
-                                deletionCount = uiState.scheduleListStats.selectedCount,
-                                onConfirm = { onSelectedSchedulesDeletionAnswered(true) },
-                                onCancel = { onSelectedSchedulesDeletionAnswered(false) }
-                            )
-                        }
+                        SchedulesDeleteConfirmationHandler(
+                            confirmation = uiState.schedulesDeletionConfirmation,
+                            onConfirm = { onSchedulesDeletionAnswered(true) },
+                            onCancel = { onSchedulesDeletionAnswered(false) }
+                        )
                     }
                 }
             }
@@ -320,10 +316,7 @@ private fun AllScreen(
                 .fillMaxWidth(),
             bottomAppbarState = bottomAppbarState,
             isMultiSelectionEnabled = successUiState?.selectionEnabled == true,
-            isMultiSelectionContentEnabled = successUiState
-                ?.scheduleListStats
-                ?.selectedCount
-                ?.value != 0,
+            isMultiSelectionContentEnabled = successUiState?.stats?.selectedCount != null,
             onTimingConfigClicked = throttleClick(onClick = onSelectedSchedulesTimingConfigClicked),
             onCompleteClicked = throttleClick(onClick = onSelectedSchedulesCompleteClicked),
             onTagConfigClicked = throttleClick(onClick = onSelectedSchedulesTagClicked),
@@ -495,7 +488,7 @@ private fun AllScreenPreview() {
             onSelectedSchedulesCompleteClicked = {},
             onSelectedSchedulesTagClicked = {},
             onSelectedSchedulesDeletionClicked = {},
-            onSelectedSchedulesDeletionAnswered = {}
+            onSchedulesDeletionAnswered = {}
         )
     }
 }

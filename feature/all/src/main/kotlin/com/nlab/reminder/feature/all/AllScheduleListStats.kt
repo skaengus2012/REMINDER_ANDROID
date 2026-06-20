@@ -17,14 +17,26 @@
 package com.nlab.reminder.feature.all
 
 import com.nlab.reminder.core.annotation.ExcludeFromGeneratedTestReport
+import com.nlab.reminder.core.component.schedulelist.ScheduleListStats
 import com.nlab.reminder.core.kotlin.NonNegativeInt
+import com.nlab.reminder.core.kotlin.PositiveInt
+import com.nlab.reminder.core.kotlin.tryToPositiveInt
 
 /**
  * @author Thalys
  */
 @ExcludeFromGeneratedTestReport
-internal data class ScheduleListStats(
+internal data class AllScheduleListStats(
     val completedShown: Boolean,
     val completedCount: NonNegativeInt,
-    val selectedCount: NonNegativeInt
+    val selectedCount: PositiveInt?
+)
+
+internal fun AllScheduleListStats(
+    completedShown: Boolean,
+    stats: ScheduleListStats
+): AllScheduleListStats = AllScheduleListStats(
+    completedShown = completedShown,
+    completedCount = stats.completedCount,
+    selectedCount = stats.selectedCount.tryToPositiveInt()
 )

@@ -18,26 +18,34 @@ package com.nlab.reminder.core.component.schedulelist.ui.modal
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.pluralStringResource
-import com.nlab.reminder.core.kotlin.NonNegativeInt
+import com.nlab.reminder.core.component.schedulelist.CompletedSchedulesCleanupConfirmation
 import com.nlab.reminder.core.translation.PluralsIds
 
 /**
  * @author Thalys
  */
 @Composable
-fun CompletedSchedulesCleanupConfirmBottomSheet(
-    completedSchedulesCount: NonNegativeInt,
+fun CompletedSchedulesCleanupConfirmBottomSheetHandler(
+    confirmation: CompletedSchedulesCleanupConfirmation,
     onConfirm: () -> Unit,
     onCancel: () -> Unit
 ) {
-    BasicSchedulesDeleteConfirmBottomSheet(
-        bodyMessage = pluralStringResource(
-            id = PluralsIds.content_completed_schedules_cleanup_notice_in_list,
-            count = completedSchedulesCount.value,
-            completedSchedulesCount.value
-        ),
-        deletionCount = completedSchedulesCount,
-        onConfirm = onConfirm,
-        onCancel = onCancel
-    )
+    when (confirmation) {
+        CompletedSchedulesCleanupConfirmation.Absent -> {
+            // do nothing
+        }
+
+        is CompletedSchedulesCleanupConfirmation.Present -> {
+            BasicSchedulesDeleteConfirmBottomSheet(
+                bodyMessage = pluralStringResource(
+                    id = PluralsIds.content_completed_schedules_cleanup_notice_in_list,
+                    count = confirmation.completedCount.value,
+                    confirmation.completedCount.value
+                ),
+                deletionCount = confirmation.completedCount,
+                onConfirm = onConfirm,
+                onCancel = onCancel
+            )
+        }
+    }
 }

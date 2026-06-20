@@ -16,7 +16,10 @@
 
 package com.nlab.reminder.core.component.schedulelist
 
+import androidx.compose.runtime.Immutable
+
 /**
  * @author Thalys
  */
+@Immutable
 sealed interface ScheduleListObject : ScheduleListElement

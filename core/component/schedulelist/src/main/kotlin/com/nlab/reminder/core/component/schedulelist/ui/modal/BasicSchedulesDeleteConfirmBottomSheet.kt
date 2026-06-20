@@ -10,7 +10,7 @@ import com.nlab.reminder.core.designsystem.compose.component.PlaneatBottomButton
 import com.nlab.reminder.core.designsystem.compose.component.PlaneatBottomSheet
 import com.nlab.reminder.core.designsystem.compose.component.PlaneatBottomSheetBody
 import com.nlab.reminder.core.designsystem.compose.component.PlaneatBottomSheetTitle
-import com.nlab.reminder.core.kotlin.NonNegativeInt
+import com.nlab.reminder.core.kotlin.PositiveInt
 import com.nlab.reminder.core.translation.PluralsIds
 import com.nlab.reminder.core.translation.StringIds
 import kotlinx.coroutines.launch
@@ -21,7 +21,7 @@ import kotlinx.coroutines.launch
 @Composable
 internal fun BasicSchedulesDeleteConfirmBottomSheet(
     bodyMessage: String,
-    deletionCount: NonNegativeInt,
+    deletionCount: PositiveInt,
     onConfirm: () -> Unit,
     onCancel: () -> Unit
 ) {

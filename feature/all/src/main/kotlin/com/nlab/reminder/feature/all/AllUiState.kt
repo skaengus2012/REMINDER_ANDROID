@@ -16,6 +16,8 @@
 
 package com.nlab.reminder.feature.all
 
+import com.nlab.reminder.core.component.schedulelist.CompletedSchedulesCleanupConfirmation
+import com.nlab.reminder.core.component.schedulelist.ScheduleDeletionConfirmation
 import com.nlab.reminder.core.component.schedulelist.UserScheduleListResource
 import kotlin.time.Instant
 
@@ -28,11 +30,11 @@ internal sealed class AllUiState {
     data class Success(
         val entryAt: Instant,
         val scheduleResources: List<UserScheduleListResource>,
-        val scheduleListStats: ScheduleListStats,
+        val stats: AllScheduleListStats,
         val menuExpanded: Boolean,
         val selectionEnabled: Boolean,
-        val showCompletedSchedulesCleanupConfirmation: Boolean,
-        val showSelectedSchedulesDeletionConfirmation: Boolean,
+        val completedSchedulesCleanupConfirmation: CompletedSchedulesCleanupConfirmation,
+        val schedulesDeletionConfirmation: ScheduleDeletionConfirmation,
         val replayStamp: Long,
     ) : AllUiState()
 }

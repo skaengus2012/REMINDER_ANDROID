@@ -30,7 +30,6 @@ import com.nlab.reminder.core.data.repository.CompletedScheduleShownRepository
 import com.nlab.reminder.core.data.repository.GetScheduleQuery
 import com.nlab.reminder.core.data.repository.ScheduleRepository
 import com.nlab.reminder.core.kotlin.collections.toSet
-import com.nlab.reminder.core.kotlin.toNonNegativeInt
 import com.nlab.reminder.core.kotlin.toNonNegativeLong
 import com.nlab.testkit.faker.genBoolean
 import com.nlab.testkit.faker.genIntGreaterThanZero
@@ -49,6 +48,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.unconfinedTestDispatcher
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.trueValue
 import org.junit.Test
 
 /**
@@ -131,17 +131,10 @@ class GetUserScheduleListResourceReportFlowTest {
 
         useCase.invoke().test {
             val actualReport = awaitItem()
+            assertThat(actualReport.scheduleListStats.completedShown, trueValue())
             assertThat(
-                actualReport.scheduleListStats,
-                equalTo(
-                    ScheduleListStats(
-                        completedShown = true,
-                        completedCount = completedSchedules.size.toNonNegativeInt(),
-                        selectedCount = expectedUserScheduleListResources
-                            .count { it.selected }
-                            .toNonNegativeInt()
-                    )
-                )
+                actualReport.scheduleListStats.completedCount.value,
+                equalTo(completedSchedules.size)
             )
             cancelAndIgnoreRemainingEvents()
         }
@@ -207,15 +200,10 @@ class GetUserScheduleListResourceReportFlowTest {
 
         useCase.invoke().test {
             val actualReport = awaitItem()
+            assertThat(actualReport.scheduleListStats.completedShown.not(), trueValue())
             assertThat(
-                actualReport.scheduleListStats,
-                equalTo(
-                    ScheduleListStats(
-                        completedShown = false,
-                        completedCount = 0.toNonNegativeInt(),
-                        selectedCount = expectedUserScheduleListResources.count { it.selected }.toNonNegativeInt()
-                    )
-                )
+                actualReport.scheduleListStats.completedCount.value,
+                equalTo(0)
             )
             cancelAndIgnoreRemainingEvents()
         }

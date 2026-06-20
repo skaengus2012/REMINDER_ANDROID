@@ -16,13 +16,17 @@
 
 package com.nlab.reminder.feature.all
 
+import com.nlab.reminder.core.component.schedulelist.CompletedSchedulesCleanupConfirmation
+import com.nlab.reminder.core.component.schedulelist.ScheduleDeletionConfirmation
 import com.nlab.reminder.core.component.schedulelist.clear
+import com.nlab.reminder.core.component.schedulelist.mapToScheduleIds
+import com.nlab.reminder.core.component.schedulelist.mapToScheduleIdsList
 import com.nlab.reminder.core.data.model.ScheduleContent
-import com.nlab.reminder.core.data.repository.DeleteScheduleQuery
 import com.nlab.reminder.core.data.repository.SaveScheduleQuery
 import com.nlab.reminder.core.data.repository.UpdateAllScheduleQuery
-import com.nlab.reminder.core.kotlin.onFailure
+import com.nlab.reminder.core.kotlin.collections.toNonEmptySet
 import com.nlab.reminder.core.kotlin.tryToNonBlankStringOrNull
+import com.nlab.reminder.core.kotlin.tryToPositiveInt
 import com.nlab.statekit.dsl.reduce.DslReduce
 import com.nlab.statekit.reduce.Reduce
 import com.nlab.reminder.feature.all.AllAction.*
@@ -39,11 +43,11 @@ internal fun AllReduce(environment: AllEnvironment): AllReduce = DslReduce {
             Success(
                 entryAt = action.entryAt,
                 scheduleResources = action.userScheduleListResourceReport.userScheduleListResources,
-                scheduleListStats = action.userScheduleListResourceReport.scheduleListStats,
+                stats = action.userScheduleListResourceReport.scheduleListStats,
                 menuExpanded = false,
                 selectionEnabled = false,
-                showCompletedSchedulesCleanupConfirmation = false,
-                showSelectedSchedulesDeletionConfirmation = false,
+                completedSchedulesCleanupConfirmation = CompletedSchedulesCleanupConfirmation.Absent,
+                schedulesDeletionConfirmation = ScheduleDeletionConfirmation.Absent,
                 replayStamp = 0,
             )
         }
@@ -51,7 +55,7 @@ internal fun AllReduce(environment: AllEnvironment): AllReduce = DslReduce {
             current.copy(
                 entryAt = action.entryAt,
                 scheduleResources = action.userScheduleListResourceReport.userScheduleListResources,
-                scheduleListStats = action.userScheduleListResourceReport.scheduleListStats,
+                stats = action.userScheduleListResourceReport.scheduleListStats,
                 replayStamp = 0,
             )
         }
@@ -70,20 +74,30 @@ internal fun AllReduce(environment: AllEnvironment): AllReduce = DslReduce {
         }
 
         transition<CompletedSchedulesCleanupClicked> {
-            current.copy(showCompletedSchedulesCleanupConfirmation = true)
+            val completedCount = current.stats.completedCount.tryToPositiveInt()
+            current.copy(
+                completedSchedulesCleanupConfirmation = if (completedCount == null) {
+                    CompletedSchedulesCleanupConfirmation.Absent
+                } else {
+                    CompletedSchedulesCleanupConfirmation.Present(completedCount)
+                }
+            )
         }
 
         transition<CleanupConfirmAnswered> {
-            current.copy(showCompletedSchedulesCleanupConfirmation = false)
+            current.copy(
+                completedSchedulesCleanupConfirmation = CompletedSchedulesCleanupConfirmation.Absent
+            )
         }
 
         suspendEffect<CleanupConfirmAnswered> {
             if (action.confirmed) {
-                environment.scheduleRepository
-                    .delete(DeleteScheduleQuery.ByComplete(isComplete = true))
-                    .onFailure { t ->
-                        // TODO Handle failure
+                environment.deleteSchedule(
+                    scheduleIds = current.scheduleResources.mapToScheduleIds {
+                        it.schedule.isComplete
                     }
+                )
+                // TODO Handle failure cases from save(), e.g. network/DB I/O errors, validation failures (invalid/empty title or note), and repository constraint violations, and surface them appropriately in the UI/logs.
             }
         }
 
@@ -145,10 +159,10 @@ internal fun AllReduce(environment: AllEnvironment): AllReduce = DslReduce {
 
             val completedScheduleIds =
                 if (minCompletedIndex == -1) emptyList()
-                else snapshot.mapNotNull { resource -> resource.takeIf { it.schedule.isComplete }?.schedule?.id }
+                else snapshot.mapToScheduleIdsList { it.schedule.isComplete }
             val uncompletedScheduleIds =
                 if (maxUncompletedIndex == -1) emptyList()
-                else snapshot.mapNotNull { resource -> resource.takeIf { it.schedule.isComplete.not() }?.schedule?.id }
+                else snapshot.mapToScheduleIdsList { it.schedule.isComplete.not() }
             environment.scheduleRepository.updateAll(
                 query = UpdateAllScheduleQuery.ReorderWithCompletedGroup(
                     completedGroupSortedIds = completedScheduleIds,
@@ -172,9 +186,12 @@ internal fun AllReduce(environment: AllEnvironment): AllReduce = DslReduce {
             // TODO Handle failure cases from save(), e.g. network/DB I/O errors, validation failures (invalid/empty title or note), and repository constraint violations, and surface them appropriately in the UI/logs.
         }
 
-        suspendEffect<ScheduleDeletionClicked> {
-            environment.deleteSchedule(scheduleIds = setOf(action.scheduleId))
-            // TODO Handle failure cases
+        transition<ScheduleDeletionClicked> {
+            current.copy(
+                schedulesDeletionConfirmation = ScheduleDeletionConfirmation.Present(
+                    targetIds = setOf(action.scheduleId).toNonEmptySet()
+                )
+            )
         }
 
         suspendEffect<ScheduleEditSubmitted> {
@@ -182,34 +199,40 @@ internal fun AllReduce(environment: AllEnvironment): AllReduce = DslReduce {
                 .find { it.schedule.id == action.id }
                 ?.schedule
                 ?: return@suspendEffect
-            val editResult = environment.editScheduleListResource(
+            environment.editScheduleListResource(
                 originResource = curSchedule,
                 title = action.title,
                 note = action.note,
                 tagNames = action.tagNames
             )
-            editResult.onFailure { t ->
-                // TODO Handle failure cases from save(), e.g. network/DB I/O errors, validation failures (invalid/empty title or note), and repository constraint violations, and surface them appropriately in the UI/logs.
-            }
+            // TODO Handle failure cases from save(), e.g. network/DB I/O errors, validation failures (invalid/empty title or note), and repository constraint violations, and surface them appropriately in the UI/logs.
         }
 
         transition<SelectedSchedulesDeletionClicked> {
-            current.copy(showSelectedSchedulesDeletionConfirmation = true)
-        }
-
-        transition<SelectedSchedulesDeletionConfirmAnswered> {
-            current.copy(showSelectedSchedulesDeletionConfirmation = false)
-        }
-
-        suspendEffect<SelectedSchedulesDeletionConfirmAnswered> {
-            if (action.confirmed.not()) return@suspendEffect
-            if (current.scheduleListStats.selectedCount.value == 0) return@suspendEffect
-
-            environment.deleteSchedule(
-                scheduleIds = current.scheduleResources
-                    .mapNotNull { resource -> resource.takeIf { it.selected }?.schedule?.id }
-                    .toSet()
+            val selectedIds = current.scheduleResources.mapToScheduleIds { it.selected }
+            current.copy(
+                schedulesDeletionConfirmation = if (selectedIds.isEmpty()) {
+                    ScheduleDeletionConfirmation.Absent
+                } else {
+                    ScheduleDeletionConfirmation.Present(targetIds = selectedIds.toNonEmptySet())
+                }
             )
+        }
+
+        transition<SchedulesDeletionConfirmAnswered> {
+            current.copy(schedulesDeletionConfirmation = ScheduleDeletionConfirmation.Absent)
+        }
+
+        suspendEffect<SchedulesDeletionConfirmAnswered> {
+            if (action.confirmed.not()) {
+                return@suspendEffect
+            }
+            val confirmation = current.schedulesDeletionConfirmation
+            if (confirmation !is ScheduleDeletionConfirmation.Present) {
+                return@suspendEffect
+            }
+
+            environment.deleteSchedule(scheduleIds = confirmation.targetIds.value)
             // TODO Handle failure cases from save(), e.g. network/DB I/O errors, validation failures (invalid/empty title or note), and repository constraint violations, and surface them appropriately in the UI/logs.
         }
     }
