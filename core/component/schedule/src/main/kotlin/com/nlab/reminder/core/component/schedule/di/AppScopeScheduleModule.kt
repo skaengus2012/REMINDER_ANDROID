@@ -17,6 +17,7 @@
 package com.nlab.reminder.core.component.schedule.di
 
 import android.content.Context
+import androidx.work.WorkManager
 import com.nlab.reminder.core.component.schedule.DefaultDeleteScheduleUseCase
 import com.nlab.reminder.core.component.schedule.DefaultUpdateScheduleCompletionUseCase
 import com.nlab.reminder.core.component.schedule.DeleteScheduleUseCase
@@ -65,6 +66,10 @@ internal interface AppScopeScheduleBindsModule {
 @Module
 @InstallIn(SingletonComponent::class)
 internal object AppScopeScheduleProvideModule {
+    @Provides
+    fun provideWorkManager(@ApplicationContext context: Context): WorkManager =
+        WorkManager.getInstance(context)
+
     @Provides
     @Reusable
     fun provideUpdateScheduleCompletionUseCase(

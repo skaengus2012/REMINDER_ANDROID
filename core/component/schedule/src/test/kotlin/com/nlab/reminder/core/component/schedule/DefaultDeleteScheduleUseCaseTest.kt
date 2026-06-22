@@ -35,12 +35,15 @@ class DefaultDeleteScheduleUseCaseTest {
     fun `Given save succeeds, When delete, Then save and register`() = runTest {
         val scheduleIds = setOf(genScheduleId())
         val saveResult = Result.success(Unit)
-        val scheduleDeletionBacklogRepository: ScheduleDeletionBacklogRepository = mockk {
-            coEvery { save(scheduleIds) } returns saveResult
-        }
+        val scheduleDeletionBacklogRepository: ScheduleDeletionBacklogRepository =
+            mockk {
+                coEvery { save(scheduleIds) } returns saveResult
+            }
         val jobResult = ScheduleJobResult.Success
-        val registerScheduleDeletionJob: RegisterScheduleDeletionJobUseCase = mockk()
-        coEvery { registerScheduleDeletionJob.invoke() } returns jobResult
+        val registerScheduleDeletionJob: RegisterScheduleDeletionJobUseCase =
+            mockk {
+                coEvery { this@mockk.invoke() } returns jobResult
+            }
         val useCase = DefaultDeleteScheduleUseCase(
             deletionBacklogRepository = scheduleDeletionBacklogRepository,
             registerScheduleDeletionJob = registerScheduleDeletionJob
@@ -60,10 +63,12 @@ class DefaultDeleteScheduleUseCaseTest {
         val scheduleIds = setOf(genScheduleId())
         val expectedException = RuntimeException()
         val saveResult = Result.failure<Unit>(expectedException)
-        val scheduleDeletionBacklogRepository: ScheduleDeletionBacklogRepository = mockk {
-            coEvery { save(scheduleIds) } returns saveResult
-        }
-        val registerScheduleDeletionJob: RegisterScheduleDeletionJobUseCase = mockk(relaxed = true)
+        val scheduleDeletionBacklogRepository: ScheduleDeletionBacklogRepository =
+            mockk {
+                coEvery { save(scheduleIds) } returns saveResult
+            }
+        val registerScheduleDeletionJob: RegisterScheduleDeletionJobUseCase =
+            mockk(relaxed = true)
         val useCase = DefaultDeleteScheduleUseCase(
             deletionBacklogRepository = scheduleDeletionBacklogRepository,
             registerScheduleDeletionJob = registerScheduleDeletionJob
@@ -77,8 +82,10 @@ class DefaultDeleteScheduleUseCaseTest {
 
     @Test
     fun `Given empty scheduleIds, When delete, Then do nothing`() = runTest {
-        val scheduleDeletionBacklogRepository: ScheduleDeletionBacklogRepository = mockk(relaxed = true)
-        val registerScheduleDeletionJob: RegisterScheduleDeletionJobUseCase = mockk(relaxed = true)
+        val scheduleDeletionBacklogRepository: ScheduleDeletionBacklogRepository =
+            mockk(relaxed = true)
+        val registerScheduleDeletionJob: RegisterScheduleDeletionJobUseCase =
+            mockk(relaxed = true)
         val useCase = DefaultDeleteScheduleUseCase(
             deletionBacklogRepository = scheduleDeletionBacklogRepository,
             registerScheduleDeletionJob = registerScheduleDeletionJob
@@ -95,13 +102,16 @@ class DefaultDeleteScheduleUseCaseTest {
     fun `Given save succeeds and job fails, When delete, Then return failure`() = runTest {
         val scheduleIds = setOf(genScheduleId())
         val saveResult = Result.success(Unit)
-        val scheduleDeletionBacklogRepository: ScheduleDeletionBacklogRepository = mockk {
-            coEvery { save(scheduleIds) } returns saveResult
-        }
+        val scheduleDeletionBacklogRepository: ScheduleDeletionBacklogRepository =
+            mockk {
+                coEvery { save(scheduleIds) } returns saveResult
+            }
         val expectedException = RuntimeException()
         val jobResult = ScheduleJobResult.Failure(expectedException)
-        val registerScheduleDeletionJob: RegisterScheduleDeletionJobUseCase = mockk()
-        coEvery { registerScheduleDeletionJob.invoke() } returns jobResult
+        val registerScheduleDeletionJob: RegisterScheduleDeletionJobUseCase =
+            mockk {
+                coEvery { this@mockk.invoke() } returns jobResult
+            }
         val useCase = DefaultDeleteScheduleUseCase(
             deletionBacklogRepository = scheduleDeletionBacklogRepository,
             registerScheduleDeletionJob = registerScheduleDeletionJob
@@ -110,6 +120,33 @@ class DefaultDeleteScheduleUseCaseTest {
         val result = useCase.invoke(scheduleIds)
         
         assertThat(result, equalTo(ScheduleJobResult.Failure(expectedException)))
+        coVerifyOrder {
+            scheduleDeletionBacklogRepository.save(scheduleIds)
+            registerScheduleDeletionJob.invoke()
+        }
+    }
+
+    @Test
+    fun `Given save succeeds and job is retrying, When delete, Then return retrying`() = runTest {
+        val scheduleIds = setOf(genScheduleId())
+        val saveResult = Result.success(Unit)
+        val scheduleDeletionBacklogRepository: ScheduleDeletionBacklogRepository =
+            mockk {
+                coEvery { save(scheduleIds) } returns saveResult
+            }
+        val jobResult = ScheduleJobResult.Retrying
+        val registerScheduleDeletionJob: RegisterScheduleDeletionJobUseCase =
+            mockk {
+                coEvery { this@mockk.invoke() } returns jobResult
+            }
+        val useCase = DefaultDeleteScheduleUseCase(
+            deletionBacklogRepository = scheduleDeletionBacklogRepository,
+            registerScheduleDeletionJob = registerScheduleDeletionJob
+        )
+        
+        val result = useCase.invoke(scheduleIds)
+        
+        assertThat(result, equalTo(ScheduleJobResult.Retrying))
         coVerifyOrder {
             scheduleDeletionBacklogRepository.save(scheduleIds)
             registerScheduleDeletionJob.invoke()

@@ -16,11 +16,21 @@
 
 package com.nlab.reminder.core.component.schedule
 
+import com.nlab.reminder.core.annotation.ExcludeFromGeneratedTestReport
+
 /**
  * @author Doohyun
  */
 sealed interface ScheduleJobResult {
+    @ExcludeFromGeneratedTestReport
     data object Success : ScheduleJobResult
+
+    @ExcludeFromGeneratedTestReport
     data object Cancelled : ScheduleJobResult
+
+    @ExcludeFromGeneratedTestReport
+    data object Retrying : ScheduleJobResult
+
+    @ExcludeFromGeneratedTestReport
     data class Failure(val throwable: Throwable) : ScheduleJobResult
 }

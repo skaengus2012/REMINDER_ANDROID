@@ -22,7 +22,6 @@ import androidx.work.CoroutineWorker
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.OutOfQuotaPolicy
-import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
@@ -34,15 +33,11 @@ import com.nlab.reminder.core.data.repository.ScheduleRepository
 import com.nlab.reminder.core.data.repository.UpdateAllScheduleQuery
 import com.nlab.reminder.core.kotlin.NonNegativeLong
 import com.nlab.reminder.core.kotlin.collections.toSet
-import com.nlab.reminder.core.kotlin.onFailure
+import com.nlab.reminder.core.kotlin.getOrThrow
 import com.nlab.reminder.core.kotlin.tryToNonNegativeLongOrNull
 import dagger.Reusable
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
 import timber.log.Timber
 import javax.inject.Inject
 import kotlin.time.Duration
@@ -53,12 +48,12 @@ import kotlin.time.toJavaDuration
  */
 private const val KEY_WORK_NAME = "key_schedule_completion_work_name"
 private const val KEY_PROCESS_UNTIL_PRIORITY = "key_process_until_priority"
+private const val KEY_ERROR_MESSAGE = "key_schedule_completion_error_message"
 
 @Reusable
 internal class RegisterScheduleCompleteJobUseCaseImpl @Inject constructor(
-    @ApplicationContext context: Context
+    private val workManager: WorkManager
 ) : RegisterScheduleCompleteJobUseCase {
-    private val workManager = WorkManager.getInstance(context)
 
     override suspend fun invoke(
         debounceTimeout: Duration,
@@ -70,6 +65,7 @@ internal class RegisterScheduleCompleteJobUseCaseImpl @Inject constructor(
             } else {
                 setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
             }
+            setBackoffCriteria()
             setInputData(
                 workDataOf(KEY_PROCESS_UNTIL_PRIORITY to processUntilPriority?.value)
             )
@@ -80,18 +76,10 @@ internal class RegisterScheduleCompleteJobUseCaseImpl @Inject constructor(
             existingWorkPolicy = ExistingWorkPolicy.REPLACE,
             request = workRequest
         )
-        val workInfo = workManager.getWorkInfoByIdFlow(workRequest.id)
-            .filterNotNull()
-            .filter { it.state.isFinished }
-            .first()
-        return when (workInfo.state) {
-            WorkInfo.State.SUCCEEDED -> ScheduleJobResult.Success
-            WorkInfo.State.CANCELLED -> ScheduleJobResult.Cancelled
-            else -> {
-                val errorMsg = "Work failed with state: ${workInfo.state}"
-                ScheduleJobResult.Failure(IllegalStateException(errorMsg))
-            }
-        }
+        return workManager.awaitJobResult(
+            workRequestId = workRequest.id,
+            keyErrorMsg = KEY_ERROR_MESSAGE
+        )
     }
 }
 
@@ -102,7 +90,7 @@ internal class ScheduleCompletionWorker @AssistedInject constructor(
     private val scheduleRepository: ScheduleRepository,
     private val scheduleCompletionBacklogRepository: ScheduleCompletionBacklogRepository,
 ) : CoroutineWorker(appContext, workerParams) {
-    override suspend fun doWork(): Result {
+    override suspend fun doWork(): Result = runWithRetry(keyErrorMessage = KEY_ERROR_MESSAGE) {
         Timber.d("Start schedule completion work!")
         val currentBacklogs = scheduleCompletionBacklogRepository
             .getBacklogs(
@@ -111,11 +99,10 @@ internal class ScheduleCompletionWorker @AssistedInject constructor(
                     ?.let { GetScheduleCompletionBacklogQuery.ByScheduleIdsUpToPriority(priority = it) }
                     ?: GetScheduleCompletionBacklogQuery.All
             )
-            .onFailure { Timber.e(it, "Failure schedule completion work, when loading backlogs") }
-            .getOrElse { return Result.failure() }
+            .getOrThrow()
         if (currentBacklogs.isEmpty()) {
             Timber.d("Finished schedule completion work without any backlogs")
-            return Result.success()
+            return@runWithRetry
         }
 
         // TODO use alarmManager
@@ -130,19 +117,12 @@ internal class ScheduleCompletionWorker @AssistedInject constructor(
                     }
                 )
             )
-            .onFailure { t ->
-                Timber.e(t, "Failure schedule completion work, when schedule updated")
-                return Result.failure()
-            }
+            .getOrThrow()
 
         scheduleCompletionBacklogRepository
             .delete(backlogIds = currentBacklogs.toSet { it.id })
-            .onFailure { t ->
-                Timber.e(t, "Failure schedule completion work, when backlog clean up")
-                return Result.failure()
-            }
+            .getOrThrow()
 
         Timber.d("Finished schedule completion work")
-        return Result.success()
     }
 }

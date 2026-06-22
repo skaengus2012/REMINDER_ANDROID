@@ -22,7 +22,6 @@ import androidx.work.CoroutineWorker
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.OutOfQuotaPolicy
-import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
@@ -32,14 +31,10 @@ import com.nlab.reminder.core.data.repository.DeleteScheduleQuery
 import com.nlab.reminder.core.data.repository.ScheduleDeletionBacklogRepository
 import com.nlab.reminder.core.data.repository.ScheduleRepository
 import com.nlab.reminder.core.kotlin.collections.toSet
-import com.nlab.reminder.core.kotlin.onFailure
+import com.nlab.reminder.core.kotlin.getOrThrow
 import dagger.Reusable
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -51,13 +46,13 @@ private const val KEY_ERROR_MESSAGE = "key_schedule_deletion_error_message"
 
 @Reusable
 internal class RegisterScheduleDeletionJobUseCaseImpl @Inject constructor(
-    @ApplicationContext context: Context
+    private val workManager: WorkManager
 ) : RegisterScheduleDeletionJobUseCase {
-    private val workManager = WorkManager.getInstance(context)
 
     override suspend fun invoke(): ScheduleJobResult {
         val workRequest = OneTimeWorkRequestBuilder<ScheduleDeletionWorker>()
             .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+            .setBackoffCriteria()
             .build()
         // Use REPLACE to cancel any active deletion workers and queue the new one.
         // Since the worker processes all backlogs at once, cancelling prior jobs
@@ -67,20 +62,10 @@ internal class RegisterScheduleDeletionJobUseCaseImpl @Inject constructor(
             ExistingWorkPolicy.REPLACE,
             workRequest
         )
-        val workInfo = workManager.getWorkInfoByIdFlow(workRequest.id)
-            .filterNotNull()
-            .filter { it.state.isFinished }
-            .first()
-        return when (workInfo.state) {
-            WorkInfo.State.SUCCEEDED -> ScheduleJobResult.Success
-            WorkInfo.State.CANCELLED -> ScheduleJobResult.Cancelled
-            else -> {
-                val errorMessage = workInfo.outputData
-                    .getString(KEY_ERROR_MESSAGE)
-                    ?: "Work failed with state: ${workInfo.state}"
-                ScheduleJobResult.Failure(IllegalStateException(errorMessage))
-            }
-        }
+        return workManager.awaitJobResult(
+            workRequestId = workRequest.id,
+            keyErrorMsg = KEY_ERROR_MESSAGE
+        )
     }
 }
 
@@ -91,30 +76,21 @@ internal class ScheduleDeletionWorker @AssistedInject constructor(
     private val scheduleRepository: ScheduleRepository,
     private val scheduleDeletionBacklogRepository: ScheduleDeletionBacklogRepository
 ) : CoroutineWorker(appContext, workerParams) {
-    override suspend fun doWork(): Result {
+    override suspend fun doWork(): Result = runWithRetry(keyErrorMessage = KEY_ERROR_MESSAGE) {
         Timber.d("Start schedule deletion work!")
 
-        val currentBacklogs = scheduleDeletionBacklogRepository.getBacklogs().getOrElse { t ->
-            Timber.e(t, "Failure schedule deletion work, when loading backlogs")
-            val errorMessage = t.message ?: "Failed to load backlogs"
-            return Result.failure(workDataOf(KEY_ERROR_MESSAGE to errorMessage))
-        }
+        val currentBacklogs = scheduleDeletionBacklogRepository.getBacklogs().getOrThrow()
         if (currentBacklogs.isEmpty()) {
             Timber.d("Finished schedule deletion work without any backlogs")
-            return Result.success()
+            return@runWithRetry
         }
 
         // TODO clear AlarmManager metadata
 
         scheduleRepository
             .delete(DeleteScheduleQuery.ByIds(currentBacklogs.toSet { it.scheduleId }))
-            .onFailure { t ->
-                Timber.e(t, "Failure schedule deletion work, when schedule deleted")
-                val errorMessage = t.message ?: "Failed to delete schedules"
-                return Result.failure(workDataOf(KEY_ERROR_MESSAGE to errorMessage))
-            }
+            .getOrThrow()
 
         Timber.d("Finished schedule deletion work")
-        return Result.success()
     }
 }

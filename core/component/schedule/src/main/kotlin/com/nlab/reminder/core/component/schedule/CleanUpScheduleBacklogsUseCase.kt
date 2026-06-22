@@ -36,6 +36,7 @@ class CleanUpScheduleBacklogsUseCase @Inject constructor(
             debounceTimeout = 0.seconds,
             processUntilPriority = null
         )
+
         return CleanUpScheduleBacklogsReport(
             completionResult = completeResult,
             deletionResult = deletionResult,
