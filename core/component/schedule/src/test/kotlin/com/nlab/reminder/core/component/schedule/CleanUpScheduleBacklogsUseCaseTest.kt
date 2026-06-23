@@ -30,20 +30,18 @@ import kotlin.time.Duration.Companion.seconds
  */
 class CleanUpScheduleBacklogsUseCaseTest {
     @Test
-    fun `Given jobs succeed, When cleanup backlogs, Then return success report`() = runTest {
-        val requestScheduleDeletionJob: RequestScheduleDeletionJobUseCase =
-            mockk {
-                coEvery { this@mockk.invoke() } returns ScheduleJobResult.Success
-            }
-        val requestScheduleCompletionJob: RequestScheduleCompletionJobUseCase =
-            mockk {
-                coEvery {
-                    this@mockk.invoke(
-                        debounceTimeout = 0.seconds,
-                        processUntilPriority = null
-                    )
-                } returns ScheduleJobResult.Success
-            }
+    fun `Given jobs succeed, When cleanup, Then return success report`() = runTest {
+        val requestScheduleDeletionJob: RequestScheduleDeletionJobUseCase = mockk {
+            coEvery { this@mockk.invoke() } returns ScheduleJobResult.Success
+        }
+        val requestScheduleCompletionJob: RequestScheduleCompletionJobUseCase = mockk {
+            coEvery {
+                this@mockk.invoke(
+                    debounceTimeout = 0.seconds,
+                    processUntilPriority = null
+                )
+            } returns ScheduleJobResult.Success
+        }
         val useCase = CleanUpScheduleBacklogsUseCase(
             requestScheduleDeletionJob = requestScheduleDeletionJob,
             requestScheduleCompletionJob = requestScheduleCompletionJob
@@ -70,23 +68,21 @@ class CleanUpScheduleBacklogsUseCaseTest {
     }
 
     @Test
-    fun `Given delete fails, When cleanup backlogs, Then complete is run and return failure`() = runTest {
+    fun `Given delete fails, When cleanup, Then run complete and return failure`() = runTest {
         val expectedException = RuntimeException()
-        val requestScheduleDeletionJob: RequestScheduleDeletionJobUseCase =
-            mockk {
-                coEvery {
-                    this@mockk.invoke()
-                } returns ScheduleJobResult.Failure(expectedException)
-            }
-        val requestScheduleCompletionJob: RequestScheduleCompletionJobUseCase =
-            mockk {
-                coEvery {
-                    this@mockk.invoke(
-                        debounceTimeout = 0.seconds,
-                        processUntilPriority = null
-                    )
-                } returns ScheduleJobResult.Success
-            }
+        val requestScheduleDeletionJob: RequestScheduleDeletionJobUseCase = mockk {
+            coEvery {
+                this@mockk.invoke()
+            } returns ScheduleJobResult.Failure(expectedException)
+        }
+        val requestScheduleCompletionJob: RequestScheduleCompletionJobUseCase = mockk {
+            coEvery {
+                this@mockk.invoke(
+                    debounceTimeout = 0.seconds,
+                    processUntilPriority = null
+                )
+            } returns ScheduleJobResult.Success
+        }
         val useCase = CleanUpScheduleBacklogsUseCase(
             requestScheduleDeletionJob = requestScheduleDeletionJob,
             requestScheduleCompletionJob = requestScheduleCompletionJob
@@ -114,12 +110,11 @@ class CleanUpScheduleBacklogsUseCaseTest {
 
     @Test
     fun `Given delete cancelled, When cleanup backlogs, Then return cancelled`() = runTest {
-        val requestScheduleDeletionJob: RequestScheduleDeletionJobUseCase =
-            mockk {
+        val useCase = CleanUpScheduleBacklogsUseCase(
+            requestScheduleDeletionJob = mockk {
                 coEvery { this@mockk.invoke() } returns ScheduleJobResult.Cancelled
-            }
-        val requestScheduleCompletionJob: RequestScheduleCompletionJobUseCase =
-            mockk {
+            },
+            requestScheduleCompletionJob = mockk {
                 coEvery {
                     this@mockk.invoke(
                         debounceTimeout = 0.seconds,
@@ -127,9 +122,6 @@ class CleanUpScheduleBacklogsUseCaseTest {
                     )
                 } returns ScheduleJobResult.Success
             }
-        val useCase = CleanUpScheduleBacklogsUseCase(
-            requestScheduleDeletionJob = requestScheduleDeletionJob,
-            requestScheduleCompletionJob = requestScheduleCompletionJob
         )
 
         val result = useCase.invoke()
@@ -147,12 +139,11 @@ class CleanUpScheduleBacklogsUseCaseTest {
 
     @Test
     fun `Given complete cancelled, When cleanup backlogs, Then return cancelled`() = runTest {
-        val requestScheduleDeletionJob: RequestScheduleDeletionJobUseCase =
-            mockk {
+        val useCase = CleanUpScheduleBacklogsUseCase(
+            requestScheduleDeletionJob = mockk {
                 coEvery { this@mockk.invoke() } returns ScheduleJobResult.Success
-            }
-        val requestScheduleCompletionJob: RequestScheduleCompletionJobUseCase =
-            mockk {
+            },
+            requestScheduleCompletionJob = mockk {
                 coEvery {
                     this@mockk.invoke(
                         debounceTimeout = 0.seconds,
@@ -160,9 +151,6 @@ class CleanUpScheduleBacklogsUseCaseTest {
                     )
                 } returns ScheduleJobResult.Cancelled
             }
-        val useCase = CleanUpScheduleBacklogsUseCase(
-            requestScheduleDeletionJob = requestScheduleDeletionJob,
-            requestScheduleCompletionJob = requestScheduleCompletionJob
         )
 
         val result = useCase.invoke()
@@ -181,12 +169,11 @@ class CleanUpScheduleBacklogsUseCaseTest {
     @Test
     fun `Given complete fails, When cleanup backlogs, Then return failure`() = runTest {
         val expectedException = RuntimeException()
-        val requestScheduleDeletionJob: RequestScheduleDeletionJobUseCase =
-            mockk {
+        val useCase = CleanUpScheduleBacklogsUseCase(
+            requestScheduleDeletionJob = mockk {
                 coEvery { this@mockk.invoke() } returns ScheduleJobResult.Success
-            }
-        val requestScheduleCompletionJob: RequestScheduleCompletionJobUseCase =
-            mockk {
+            },
+            requestScheduleCompletionJob = mockk {
                 coEvery {
                     this@mockk.invoke(
                         debounceTimeout = 0.seconds,
@@ -194,9 +181,6 @@ class CleanUpScheduleBacklogsUseCaseTest {
                     )
                 } returns ScheduleJobResult.Failure(expectedException)
             }
-        val useCase = CleanUpScheduleBacklogsUseCase(
-            requestScheduleDeletionJob = requestScheduleDeletionJob,
-            requestScheduleCompletionJob = requestScheduleCompletionJob
         )
 
         val result = useCase.invoke()
@@ -213,13 +197,12 @@ class CleanUpScheduleBacklogsUseCaseTest {
     }
 
     @Test
-    fun `Given deletion job is retrying, When cleanup backlogs, Then return retrying report`() = runTest {
-        val requestScheduleDeletionJob: RequestScheduleDeletionJobUseCase =
-            mockk {
+    fun `Given delete retrying, When cleanup, Then return retrying report`() = runTest {
+        val useCase = CleanUpScheduleBacklogsUseCase(
+            requestScheduleDeletionJob = mockk {
                 coEvery { this@mockk.invoke() } returns ScheduleJobResult.Retrying
-            }
-        val requestScheduleCompletionJob: RequestScheduleCompletionJobUseCase =
-            mockk {
+            },
+            requestScheduleCompletionJob = mockk {
                 coEvery {
                     this@mockk.invoke(
                         debounceTimeout = 0.seconds,
@@ -227,9 +210,6 @@ class CleanUpScheduleBacklogsUseCaseTest {
                     )
                 } returns ScheduleJobResult.Success
             }
-        val useCase = CleanUpScheduleBacklogsUseCase(
-            requestScheduleDeletionJob = requestScheduleDeletionJob,
-            requestScheduleCompletionJob = requestScheduleCompletionJob
         )
 
         val result = useCase.invoke()
@@ -246,13 +226,12 @@ class CleanUpScheduleBacklogsUseCaseTest {
     }
 
     @Test
-    fun `Given completion job is retrying, When cleanup backlogs, Then return retrying report`() = runTest {
-        val requestScheduleDeletionJob: RequestScheduleDeletionJobUseCase =
-            mockk {
+    fun `Given complete retrying, When cleanup, Then return retrying report`() = runTest {
+        val useCase = CleanUpScheduleBacklogsUseCase(
+            requestScheduleDeletionJob = mockk {
                 coEvery { this@mockk.invoke() } returns ScheduleJobResult.Success
-            }
-        val requestScheduleCompletionJob: RequestScheduleCompletionJobUseCase =
-            mockk {
+            },
+            requestScheduleCompletionJob = mockk {
                 coEvery {
                     this@mockk.invoke(
                         debounceTimeout = 0.seconds,
@@ -260,9 +239,6 @@ class CleanUpScheduleBacklogsUseCaseTest {
                     )
                 } returns ScheduleJobResult.Retrying
             }
-        val useCase = CleanUpScheduleBacklogsUseCase(
-            requestScheduleDeletionJob = requestScheduleDeletionJob,
-            requestScheduleCompletionJob = requestScheduleCompletionJob
         )
 
         val result = useCase.invoke()
