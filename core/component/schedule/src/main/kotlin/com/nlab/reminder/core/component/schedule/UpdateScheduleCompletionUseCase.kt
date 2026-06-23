@@ -35,7 +35,7 @@ interface UpdateScheduleCompletionUseCase {
 
 internal class DefaultUpdateScheduleCompletionUseCase(
     private val scheduleCompletionBacklogRepository: ScheduleCompletionBacklogRepository,
-    private val registerScheduleCompleteJob: RegisterScheduleCompleteJobUseCase,
+    private val requestScheduleCompletionJob: RequestScheduleCompletionJobUseCase,
     private val debounceTimeout: Duration
 ) : UpdateScheduleCompletionUseCase {
     override suspend operator fun invoke(
@@ -45,7 +45,7 @@ internal class DefaultUpdateScheduleCompletionUseCase(
         return scheduleCompletionBacklogRepository.save(scheduleId, targetCompleted)
             .fold(
                 onSuccess = { backlog ->
-                    registerScheduleCompleteJob(
+                    requestScheduleCompletionJob(
                         debounceTimeout = debounceTimeout,
                         processUntilPriority = backlog.priority
                     )

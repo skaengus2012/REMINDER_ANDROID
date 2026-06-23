@@ -31,12 +31,12 @@ interface DeleteScheduleUseCase {
 
 internal class DefaultDeleteScheduleUseCase(
     private val deletionBacklogRepository: ScheduleDeletionBacklogRepository,
-    private val registerScheduleDeletionJob: RegisterScheduleDeletionJobUseCase
+    private val requestScheduleDeletionJob: RequestScheduleDeletionJobUseCase
 ) : DeleteScheduleUseCase {
     override suspend fun invoke(scheduleIds: Set<ScheduleId>): ScheduleJobResult {
         if (scheduleIds.isEmpty()) return ScheduleJobResult.Success
         return deletionBacklogRepository.save(scheduleIds).fold(
-            onSuccess = { registerScheduleDeletionJob() },
+            onSuccess = { requestScheduleDeletionJob() },
             onFailure = { ScheduleJobResult.Failure(it) }
         )
     }

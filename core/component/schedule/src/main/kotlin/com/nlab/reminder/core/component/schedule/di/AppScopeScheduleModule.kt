@@ -23,12 +23,12 @@ import com.nlab.reminder.core.component.schedule.DefaultUpdateScheduleCompletion
 import com.nlab.reminder.core.component.schedule.DeleteScheduleUseCase
 import com.nlab.reminder.core.component.schedule.EnsuredDeleteScheduleUseCase
 import com.nlab.reminder.core.component.schedule.EnsuredUpdateScheduleCompletionUseCase
-import com.nlab.reminder.core.component.schedule.RegisterScheduleCompleteJobUseCase
-import com.nlab.reminder.core.component.schedule.RegisterScheduleDeletionJobUseCase
+import com.nlab.reminder.core.component.schedule.RequestScheduleCompletionJobUseCase
+import com.nlab.reminder.core.component.schedule.RequestScheduleDeletionJobUseCase
 import com.nlab.reminder.core.component.schedule.ScheduleIntId
 import com.nlab.reminder.core.component.schedule.UpdateScheduleCompletionUseCase
-import com.nlab.reminder.core.component.schedule.infra.RegisterScheduleCompleteJobUseCaseImpl
-import com.nlab.reminder.core.component.schedule.infra.RegisterScheduleDeletionJobUseCaseImpl
+import com.nlab.reminder.core.component.schedule.infra.RequestScheduleCompletionJobUseCaseImpl
+import com.nlab.reminder.core.component.schedule.infra.RequestScheduleDeletionJobUseCaseImpl
 import com.nlab.reminder.core.data.model.ScheduleCompletionBacklog
 import com.nlab.reminder.core.data.model.ScheduleId
 import com.nlab.reminder.core.data.repository.ScheduleCompletionBacklogRepository
@@ -52,14 +52,14 @@ import kotlin.time.Duration.Companion.milliseconds
 @InstallIn(SingletonComponent::class)
 internal interface AppScopeScheduleBindsModule {
     @Binds
-    fun bindRegisterScheduleCompleteJobUseCase(
-        impl: RegisterScheduleCompleteJobUseCaseImpl
-    ): RegisterScheduleCompleteJobUseCase
+    fun bindRequestScheduleCompletionJobUseCase(
+        impl: RequestScheduleCompletionJobUseCaseImpl
+    ): RequestScheduleCompletionJobUseCase
 
     @Binds
-    fun bindRegisterScheduleDeletionJobUseCase(
-        impl: RegisterScheduleDeletionJobUseCaseImpl
-    ): RegisterScheduleDeletionJobUseCase
+    fun bindRequestScheduleDeletionJobUseCase(
+        impl: RequestScheduleDeletionJobUseCaseImpl
+    ): RequestScheduleDeletionJobUseCase
 }
 
 
@@ -76,7 +76,7 @@ internal object AppScopeScheduleProvideModule {
         @ApplicationContext context: Context,
         @AppScope coroutineScope: CoroutineScope,
         scheduleCompletionBacklogRepository: ScheduleCompletionBacklogRepository,
-        registerScheduleCompleteJob: RegisterScheduleCompleteJobUseCase,
+        requestScheduleCompletionJob: RequestScheduleCompletionJobUseCase,
     ): UpdateScheduleCompletionUseCase = EnsuredUpdateScheduleCompletionUseCase(
         coroutineScope = coroutineScope,
         updateScheduleCompletionUseCase = DefaultUpdateScheduleCompletionUseCase(
@@ -89,7 +89,7 @@ internal object AppScopeScheduleProvideModule {
                     .save(scheduleId, targetCompleted)
                     .onFailure { Timber.e(it) }
             },
-            registerScheduleCompleteJob = registerScheduleCompleteJob,
+            requestScheduleCompletionJob = requestScheduleCompletionJob,
             debounceTimeout = context.resources
                 .getInteger(ScheduleIntId.schedule_configs_completion_timeout_ms)
                 .milliseconds
@@ -101,7 +101,7 @@ internal object AppScopeScheduleProvideModule {
     fun provideDeleteScheduleUseCase(
         @AppScope coroutineScope: CoroutineScope,
         scheduleDeletionBacklogRepository: ScheduleDeletionBacklogRepository,
-        registerScheduleDeletionJob: RegisterScheduleDeletionJobUseCase
+        requestScheduleDeletionJob: RequestScheduleDeletionJobUseCase
     ): DeleteScheduleUseCase = EnsuredDeleteScheduleUseCase(
         coroutineScope = coroutineScope,
         deleteScheduleUseCase = DefaultDeleteScheduleUseCase(
@@ -111,7 +111,7 @@ internal object AppScopeScheduleProvideModule {
                     scheduleDeletionBacklogRepository.save(scheduleIds)
                         .onFailure { Timber.e(it) }
             },
-            registerScheduleDeletionJob = registerScheduleDeletionJob
+            requestScheduleDeletionJob = requestScheduleDeletionJob
         )
     )
 }

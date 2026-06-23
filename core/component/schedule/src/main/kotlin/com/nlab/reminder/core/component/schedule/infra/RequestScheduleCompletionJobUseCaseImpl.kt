@@ -25,7 +25,7 @@ import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
-import com.nlab.reminder.core.component.schedule.RegisterScheduleCompleteJobUseCase
+import com.nlab.reminder.core.component.schedule.RequestScheduleCompletionJobUseCase
 import com.nlab.reminder.core.component.schedule.ScheduleJobResult
 import com.nlab.reminder.core.data.repository.GetScheduleCompletionBacklogQuery
 import com.nlab.reminder.core.data.repository.ScheduleCompletionBacklogRepository
@@ -51,9 +51,9 @@ private const val KEY_PROCESS_UNTIL_PRIORITY = "key_process_until_priority"
 private const val KEY_ERROR_MESSAGE = "key_schedule_completion_error_message"
 
 @Reusable
-internal class RegisterScheduleCompleteJobUseCaseImpl @Inject constructor(
+internal class RequestScheduleCompletionJobUseCaseImpl @Inject constructor(
     private val workManager: WorkManager
-) : RegisterScheduleCompleteJobUseCase {
+) : RequestScheduleCompletionJobUseCase {
 
     override suspend fun invoke(
         debounceTimeout: Duration,

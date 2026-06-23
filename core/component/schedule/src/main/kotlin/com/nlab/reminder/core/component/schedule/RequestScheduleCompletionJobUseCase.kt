@@ -22,7 +22,7 @@ import kotlin.time.Duration
 /**
  * @author Thalys
  */
-interface RegisterScheduleCompleteJobUseCase {
+interface RequestScheduleCompletionJobUseCase {
     suspend operator fun invoke(
         debounceTimeout: Duration,
         processUntilPriority: NonNegativeLong?

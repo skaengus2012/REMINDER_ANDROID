@@ -25,7 +25,7 @@ import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
-import com.nlab.reminder.core.component.schedule.RegisterScheduleDeletionJobUseCase
+import com.nlab.reminder.core.component.schedule.RequestScheduleDeletionJobUseCase
 import com.nlab.reminder.core.component.schedule.ScheduleJobResult
 import com.nlab.reminder.core.data.repository.DeleteScheduleQuery
 import com.nlab.reminder.core.data.repository.ScheduleDeletionBacklogRepository
@@ -45,9 +45,9 @@ private const val KEY_WORK_NAME = "key_schedule_deletion_work_name"
 private const val KEY_ERROR_MESSAGE = "key_schedule_deletion_error_message"
 
 @Reusable
-internal class RegisterScheduleDeletionJobUseCaseImpl @Inject constructor(
+internal class RequestScheduleDeletionJobUseCaseImpl @Inject constructor(
     private val workManager: WorkManager
-) : RegisterScheduleDeletionJobUseCase {
+) : RequestScheduleDeletionJobUseCase {
 
     override suspend fun invoke(): ScheduleJobResult {
         val workRequest = OneTimeWorkRequestBuilder<ScheduleDeletionWorker>()

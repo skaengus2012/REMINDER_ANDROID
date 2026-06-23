@@ -19,6 +19,6 @@ package com.nlab.reminder.core.component.schedule
 /**
  * @author Doohyun
  */
-interface RegisterScheduleDeletionJobUseCase {
+interface RequestScheduleDeletionJobUseCase {
     suspend operator fun invoke(): ScheduleJobResult
 }

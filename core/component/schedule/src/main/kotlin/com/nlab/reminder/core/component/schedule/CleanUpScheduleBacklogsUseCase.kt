@@ -26,13 +26,13 @@ import kotlin.time.Duration.Companion.seconds
  */
 @Reusable
 class CleanUpScheduleBacklogsUseCase @Inject constructor(
-    private val registerScheduleDeletionJob: RegisterScheduleDeletionJobUseCase,
-    private val registerScheduleCompleteJob: RegisterScheduleCompleteJobUseCase
+    private val requestScheduleDeletionJob: RequestScheduleDeletionJobUseCase,
+    private val requestScheduleCompletionJob: RequestScheduleCompletionJobUseCase
 ) {
     suspend operator fun invoke(): CleanUpScheduleBacklogsReport {
         // Run deletion first to clear deleted schedules before updating completion states.
-        val deletionResult = registerScheduleDeletionJob()
-        val completeResult = registerScheduleCompleteJob(
+        val deletionResult = requestScheduleDeletionJob()
+        val completeResult = requestScheduleCompletionJob(
             debounceTimeout = 0.seconds,
             processUntilPriority = null
         )
