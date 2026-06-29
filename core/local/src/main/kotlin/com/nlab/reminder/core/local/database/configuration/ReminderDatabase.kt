@@ -21,13 +21,15 @@ import androidx.room.*
 import com.nlab.reminder.core.local.database.dao.LinkMetadataDAO
 import com.nlab.reminder.core.local.database.dao.RepeatDetailDAO
 import com.nlab.reminder.core.local.database.dao.ScheduleCompletionBacklogDAO
+import com.nlab.reminder.core.local.database.dao.ScheduleDeletionBacklogDAO
 import com.nlab.reminder.core.local.database.dao.ScheduleDAO
-import com.nlab.reminder.core.local.database.dao.ScheduleRepeatDetailDAO
 import com.nlab.reminder.core.local.database.dao.ScheduleTagListDAO
+import com.nlab.reminder.core.local.database.dao.ScheduleCompositeDAO
 import com.nlab.reminder.core.local.database.dao.TagDAO
 import com.nlab.reminder.core.local.database.entity.LinkMetadataEntity
 import com.nlab.reminder.core.local.database.entity.RepeatDetailEntity
 import com.nlab.reminder.core.local.database.entity.ScheduleCompletionBacklogEntity
+import com.nlab.reminder.core.local.database.entity.ScheduleDeletionBacklogEntity
 import com.nlab.reminder.core.local.database.entity.ScheduleEntity
 import com.nlab.reminder.core.local.database.entity.ScheduleTagListEntity
 import com.nlab.reminder.core.local.database.entity.TagEntity
@@ -43,6 +45,7 @@ private const val DB_NAME = "reminder_common.db"
         LinkMetadataEntity::class,
         RepeatDetailEntity::class,
         ScheduleCompletionBacklogEntity::class,
+        ScheduleDeletionBacklogEntity::class,
         ScheduleEntity::class,
         ScheduleTagListEntity::class,
         TagEntity::class
@@ -58,9 +61,10 @@ abstract class ReminderDatabase : RoomDatabase() {
     abstract fun linkMetadataDAO(): LinkMetadataDAO
     abstract fun repeatDetailDAO(): RepeatDetailDAO
     abstract fun scheduleCompletionBacklogDAO(): ScheduleCompletionBacklogDAO
+    abstract fun scheduleDeletionBacklogDAO(): ScheduleDeletionBacklogDAO
     abstract fun scheduleDAO(): ScheduleDAO
-    abstract fun scheduleRepeatDetailDAO(): ScheduleRepeatDetailDAO
     abstract fun scheduleTagListDAO(): ScheduleTagListDAO
+    abstract fun scheduleCompositeDAO(): ScheduleCompositeDAO
     abstract fun tagDAO(): TagDAO
 }
 

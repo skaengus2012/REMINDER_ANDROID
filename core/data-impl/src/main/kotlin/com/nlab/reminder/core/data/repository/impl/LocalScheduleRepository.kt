@@ -31,14 +31,9 @@ import com.nlab.reminder.core.kotlin.Result
 import com.nlab.reminder.core.kotlin.catching
 import com.nlab.reminder.core.kotlin.collections.toSet
 import com.nlab.reminder.core.kotlin.tryToNonNegativeLongOrZero
-import com.nlab.reminder.core.kotlinx.coroutines.flow.flatMapLatest
 import com.nlab.reminder.core.kotlinx.coroutines.flow.map
 import com.nlab.reminder.core.local.database.dao.ScheduleDAO
-import com.nlab.reminder.core.local.database.dao.ScheduleRepeatDetailDAO
-import com.nlab.reminder.core.local.database.dao.ScheduleTagListDAO
-import com.nlab.reminder.core.local.database.entity.RepeatDetailEntity
-import com.nlab.reminder.core.local.database.entity.ScheduleEntity
-import com.nlab.reminder.core.local.database.entity.ScheduleTagListEntity
+import com.nlab.reminder.core.local.database.dao.ScheduleCompositeDAO
 import com.nlab.reminder.core.local.database.transaction.InsertAndGetScheduleContentAggregateTransaction
 import com.nlab.reminder.core.local.database.transaction.UpdateAndGetScheduleContentAggregateTransaction
 import kotlinx.coroutines.flow.Flow
@@ -49,8 +44,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
  */
 class LocalScheduleRepository(
     private val scheduleDAO: ScheduleDAO,
-    private val scheduleRepeatDetailDAO: ScheduleRepeatDetailDAO,
-    private val scheduleTagListDAO: ScheduleTagListDAO,
+    private val scheduleCompositeDAO: ScheduleCompositeDAO,
     private val insertAndGetScheduleContentAggregate: InsertAndGetScheduleContentAggregateTransaction,
     private val updateAndGetScheduleContentAggregate: UpdateAndGetScheduleContentAggregateTransaction
 ) : ScheduleRepository {
@@ -114,38 +108,24 @@ class LocalScheduleRepository(
         }
     }
 
-    override fun getSchedulesAsStream(request: GetScheduleQuery): Flow<Set<Schedule>> {
-        fun transformSchedules(
-            scheduleToRepeatDetailEntitiesTable: Map<ScheduleEntity, Set<RepeatDetailEntity>>,
-            scheduleTagListEntities: List<ScheduleTagListEntity>
-        ): Set<Schedule> {
-            val scheduleIdToEntityTable = scheduleTagListEntities.groupBy { it.scheduleId }
-            return scheduleToRepeatDetailEntitiesTable.entries.toSet { (scheduleEntity, repeatDetailEntities) ->
-                Schedule(
-                    scheduleEntity = scheduleEntity,
-                    scheduleTagListEntities = scheduleIdToEntityTable[scheduleEntity.scheduleId]
-                        .orEmpty()
-                        .toSet(),
-                    repeatDetailEntities = repeatDetailEntities
-                )
+    override fun getSchedulesAsStream(
+        request: GetScheduleQuery
+    ): Flow<Set<Schedule>> {
+        val compositeFlow = when (request) {
+            is GetScheduleQuery.All -> scheduleCompositeDAO.getAsStream()
+            is GetScheduleQuery.ByComplete -> {
+                scheduleCompositeDAO.findByCompleteAsStream(request.isComplete)
             }
         }
 
-        val entitiesFlow = when (request) {
-            is GetScheduleQuery.All -> scheduleRepeatDetailDAO.getAsStream()
-            is GetScheduleQuery.ByComplete -> scheduleRepeatDetailDAO.findByCompleteAsStream(request.isComplete)
-        }
-
-        return entitiesFlow.distinctUntilChanged().flatMapLatest { entities ->
-            scheduleTagListDAO
-                .findByScheduleIdsAsStream(scheduleIds = entities.keys.toSet { it.scheduleId })
-                .distinctUntilChanged()
-                .map { scheduleTagListEntities ->
-                    transformSchedules(
-                        scheduleToRepeatDetailEntitiesTable = entities,
-                        scheduleTagListEntities = scheduleTagListEntities
-                    )
-                }
+        return compositeFlow.distinctUntilChanged().map { composites ->
+            composites.toSet { composite ->
+                Schedule(
+                    scheduleEntity = composite.scheduleEntity,
+                    scheduleTagListEntities = composite.scheduleTagListEntities.toSet(),
+                    repeatDetailEntities = composite.repeatDetailEntities.toSet()
+                )
+            }
         }
     }
 

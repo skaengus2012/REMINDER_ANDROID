@@ -16,31 +16,37 @@
 
 package com.nlab.reminder.feature.all
 
+import com.nlab.reminder.core.component.schedule.DeleteScheduleUseCase
 import com.nlab.reminder.core.component.currenttime.GetCurrentTimeSnapshotStreamUseCase
 import com.nlab.reminder.core.component.schedule.UpdateScheduleCompletionUseCase
-import com.nlab.reminder.core.component.schedulelist.content.EditScheduleListResourceUseCase
-import com.nlab.reminder.core.component.schedulelist.content.UserSelectedSchedulesStore
+import com.nlab.reminder.core.component.schedulelist.EditScheduleListResourceUseCase
+import com.nlab.reminder.core.component.schedulelist.UserSelectedSchedulesStore
 import com.nlab.reminder.core.data.repository.CompletedScheduleShownRepository
 import com.nlab.reminder.core.data.repository.ScheduleRepository
+import com.nlab.reminder.core.component.schedulelist.IsScheduleListResourceChangedUseCase
 import io.mockk.mockk
 
 /**
  * @author Doohyun
  */
 internal fun genAllEnvironment(
+    deleteSchedule: DeleteScheduleUseCase = mockk(),
     scheduleRepository: ScheduleRepository = mockk(),
     completedScheduleShownRepository: CompletedScheduleShownRepository = mockk(),
     getUserScheduleListResourceReportFlow: GetUserScheduleListResourceReportFlowUseCase = mockk(),
     getCurrentTimeSnapshotStream: GetCurrentTimeSnapshotStreamUseCase = mockk(),
     updateScheduleCompletion: UpdateScheduleCompletionUseCase = mockk(),
     userSelectedSchedulesStore: UserSelectedSchedulesStore = mockk(),
-    editScheduleListResource: EditScheduleListResourceUseCase = mockk()
+    editScheduleListResource: EditScheduleListResourceUseCase = mockk(),
+    isScheduleListResourceChanged: IsScheduleListResourceChangedUseCase = mockk()
 ): AllEnvironment = AllEnvironment(
+    deleteSchedule = deleteSchedule,
     scheduleRepository = scheduleRepository,
     completedScheduleShownRepository = completedScheduleShownRepository,
     getUserScheduleListResourceReportFlow = getUserScheduleListResourceReportFlow,
     getCurrentTimeSnapshotStream = getCurrentTimeSnapshotStream,
     updateScheduleCompletion = updateScheduleCompletion,
     userSelectedSchedulesStore = userSelectedSchedulesStore,
-    editScheduleListResource = editScheduleListResource
+    editScheduleListResource = editScheduleListResource,
+    isScheduleListResourceChanged = isScheduleListResourceChanged
 )

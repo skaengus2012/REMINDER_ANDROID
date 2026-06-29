@@ -31,3 +31,6 @@ fun Int.toPositiveInt(): PositiveInt = PositiveInt(value = this)
 fun Int?.tryToPositiveInt(): PositiveInt? =
     if (this == null || this < 1) null
     else PositiveInt(value = this)
+
+fun NonNegativeInt?.tryToPositiveInt(): PositiveInt? =
+    this?.value?.tryToPositiveInt()

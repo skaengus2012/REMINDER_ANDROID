@@ -22,12 +22,12 @@ import com.nlab.reminder.core.data.repository.ScheduleCompletionBacklogRepositor
 import com.nlab.reminder.core.kotlin.faker.genNonNegativeLong
 import com.nlab.reminder.core.kotlin.faker.genPositiveInt
 import com.nlab.testkit.faker.genBoolean
-import io.mockk.Called
 import io.mockk.coEvery
 import io.mockk.coVerifyOrder
 import io.mockk.mockk
-import io.mockk.verify
 import kotlinx.coroutines.test.runTest
+import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.core.IsEqual.equalTo
 import org.junit.Test
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -37,7 +37,7 @@ import kotlin.time.Duration.Companion.seconds
  */
 class DefaultUpdateScheduleCompletionUseCaseTest {
     @Test
-    fun `Given saving backlog succeeds, When invoked, Then save backlog and register job in order`() = runTest {
+    fun `Given save backlog succeeds, When update completion, Then save and register`() = runTest {
         suspend fun verify(targetCompleted: Boolean) {
             val scheduleId = genScheduleId()
             val priority = genNonNegativeLong()
@@ -51,36 +51,114 @@ class DefaultUpdateScheduleCompletionUseCaseTest {
                     )
                 )
             }
-            val registerScheduleCompleteJob: RegisterScheduleCompleteJobUseCase = mockk(relaxed = true)
+            val requestScheduleCompletionJob: RequestScheduleCompletionJobUseCase = mockk {
+                coEvery {
+                    this@mockk.invoke(debounceTimeout, priority)
+                } returns ScheduleJobResult.Success
+            }
             val useCase = genUpdateScheduleCompletionUseCase(
                 scheduleCompletionBacklogRepository = scheduleCompletionBacklogRepository,
-                registerScheduleCompleteJob = registerScheduleCompleteJob,
+                requestScheduleCompletionJob = requestScheduleCompletionJob,
                 debounceTimeout = debounceTimeout
             )
-            useCase.invoke(scheduleId, targetCompleted)
+
+            val result = useCase.invoke(scheduleId, targetCompleted)
+
+            assertThat(result, equalTo(ScheduleJobResult.Success))
             coVerifyOrder {
                 scheduleCompletionBacklogRepository.save(scheduleId, targetCompleted)
-                registerScheduleCompleteJob.invoke(debounceTimeout = debounceTimeout, processUntilPriority = priority)
+                requestScheduleCompletionJob.invoke(
+                    debounceTimeout = debounceTimeout,
+                    processUntilPriority = priority
+                )
             }
         }
+
         verify(targetCompleted = true)
         verify(targetCompleted = false)
     }
 
     @Test
-    fun `Given saving backlog fails, When invoked, Then does not register job`() = runTest {
-        val scheduleCompletionBacklogRepository: ScheduleCompletionBacklogRepository = mockk {
-            coEvery {
-                save(any(), any())
-            } returns Result.failure(RuntimeException())
-        }
-        val registerScheduleCompleteJob: RegisterScheduleCompleteJobUseCase = mockk(relaxed = true)
+    fun `Given save backlog fails, When update completion, Then return failure`() = runTest {
+        val expectedException = RuntimeException()
         val useCase = genUpdateScheduleCompletionUseCase(
-            scheduleCompletionBacklogRepository = scheduleCompletionBacklogRepository,
-            registerScheduleCompleteJob = registerScheduleCompleteJob,
+            scheduleCompletionBacklogRepository = mockk {
+                coEvery {
+                    save(any(), any())
+                } returns Result.failure(expectedException)
+            },
+            requestScheduleCompletionJob = mockk(relaxed = true)
         )
-        useCase.invoke(scheduleId = genScheduleId(), targetCompleted = genBoolean())
-        verify { registerScheduleCompleteJob wasNot Called }
+
+        val result = useCase.invoke(
+            scheduleId = genScheduleId(),
+            targetCompleted = genBoolean()
+        )
+
+        assertThat(
+            result,
+            equalTo(ScheduleJobResult.Failure(expectedException))
+        )
+    }
+
+    @Test
+    fun `Given register job fails, When update completion, Then return failure`() = runTest {
+        val scheduleId = genScheduleId()
+        val priority = genNonNegativeLong()
+        val debounceTimeout = genPositiveInt().value.seconds
+        val expectedException = RuntimeException()
+        val useCase = genUpdateScheduleCompletionUseCase(
+            scheduleCompletionBacklogRepository = mockk {
+                coEvery { save(scheduleId, true) } returns Result.success(
+                    genScheduleCompletionBacklog(
+                        scheduleId = scheduleId,
+                        targetCompleted = true,
+                        priority = priority
+                    )
+                )
+            },
+            requestScheduleCompletionJob = mockk {
+                coEvery {
+                    this@mockk.invoke(debounceTimeout, priority)
+                } returns ScheduleJobResult.Failure(expectedException)
+            },
+            debounceTimeout = debounceTimeout
+        )
+
+        val result = useCase.invoke(scheduleId, true)
+
+        assertThat(
+            result,
+            equalTo(ScheduleJobResult.Failure(expectedException))
+        )
+    }
+
+    @Test
+    fun `Given register job is retrying, When update completion, Then return retrying`() = runTest {
+        val scheduleId = genScheduleId()
+        val priority = genNonNegativeLong()
+        val debounceTimeout = genPositiveInt().value.seconds
+        val useCase = genUpdateScheduleCompletionUseCase(
+            scheduleCompletionBacklogRepository = mockk {
+                coEvery { save(scheduleId, true) } returns Result.success(
+                    genScheduleCompletionBacklog(
+                        scheduleId = scheduleId,
+                        targetCompleted = true,
+                        priority = priority
+                    )
+                )
+            },
+            requestScheduleCompletionJob = mockk {
+                coEvery {
+                    this@mockk.invoke(debounceTimeout, priority)
+                } returns ScheduleJobResult.Retrying
+            },
+            debounceTimeout = debounceTimeout
+        )
+
+        val result = useCase.invoke(scheduleId, true)
+
+        assertThat(result, equalTo(ScheduleJobResult.Retrying))
     }
 }
 
@@ -90,10 +168,12 @@ private fun genUpdateScheduleCompletionUseCase(
             save(any(), any())
         } returns Result.success(genScheduleCompletionBacklog())
     },
-    registerScheduleCompleteJob: RegisterScheduleCompleteJobUseCase = mockk(relaxed = true),
+    requestScheduleCompletionJob: RequestScheduleCompletionJobUseCase = mockk(),
     debounceTimeout: Duration = genPositiveInt().value.seconds
-) = DefaultUpdateScheduleCompletionUseCase(
-    scheduleCompletionBacklogRepository = scheduleCompletionBacklogRepository,
-    registerScheduleCompleteJob = registerScheduleCompleteJob,
-    debounceTimeout = debounceTimeout
-)
+): DefaultUpdateScheduleCompletionUseCase {
+    return DefaultUpdateScheduleCompletionUseCase(
+        scheduleCompletionBacklogRepository = scheduleCompletionBacklogRepository,
+        requestScheduleCompletionJob = requestScheduleCompletionJob,
+        debounceTimeout = debounceTimeout
+    )
+}

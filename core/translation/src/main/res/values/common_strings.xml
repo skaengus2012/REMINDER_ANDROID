@@ -59,6 +59,7 @@
     <string name="content_frequency_weekly">매주</string>
     <string name="content_frequency_yearly">매년</string>
     <string name="content_select_plans">플랜 선택</string>
+    <string name="content_schedules_delete_notice_in_list">선택한 알림이 목록에서 삭제됩니다.</string>
     <plurals name="content_tag_delete_dialog_double">
         <item quantity="other">%1$s 및 %2$s이(가) %3$d개의 알림에서 사용되고 있습니다.</item>
     </plurals>

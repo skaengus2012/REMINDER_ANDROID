@@ -25,12 +25,12 @@ import kotlinx.coroutines.flow.combine
 @Suppress("FunctionName")
 internal fun AllUiStateSyncedFlow(
     environment: AllEnvironment
-): Flow<AllAction.StateSynced> = with(environment) {
+): Flow<AllAction.StateSyncCompleted> = with(environment) {
     combine(
         getCurrentTimeSnapshotStream(),
         getUserScheduleListResourceReportFlow()
     ) { entryAt, userScheduleResourceReport ->
-        AllAction.StateSynced(
+        AllAction.StateSyncCompleted(
             entryAt = entryAt,
             userScheduleListResourceReport = userScheduleResourceReport
         )

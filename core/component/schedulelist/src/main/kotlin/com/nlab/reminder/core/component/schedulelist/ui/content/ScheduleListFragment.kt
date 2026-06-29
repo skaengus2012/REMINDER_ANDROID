@@ -1,0 +1,797 @@
+/*
+ * Copyright (C) 2025 The N's lab Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.nlab.reminder.core.component.schedulelist.ui.content
+
+import android.animation.ValueAnimator
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.MotionEvent
+import android.view.View
+import android.view.ViewGroup
+import androidx.core.util.TypedValueCompat.dpToPx
+import androidx.core.view.updatePadding
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.eventFlow
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.nlab.reminder.core.android.view.awaitPost
+import com.nlab.reminder.core.android.view.inputmethod.hideSoftInputFromWindow
+import com.nlab.reminder.core.android.view.layoutChanges
+import com.nlab.reminder.core.android.view.setVisible
+import com.nlab.reminder.core.android.view.touches
+import com.nlab.reminder.core.androidx.fragment.viewLifecycle
+import com.nlab.reminder.core.androidx.fragment.viewLifecycleScope
+import com.nlab.reminder.core.androix.recyclerview.itemTouches
+import com.nlab.reminder.core.androix.recyclerview.itemUpdatesSimplified
+import com.nlab.reminder.core.androix.recyclerview.scrollEvent
+import com.nlab.reminder.core.androix.recyclerview.scrollState
+import com.nlab.reminder.core.androix.recyclerview.stickyheader.StickyHeaderHelper
+import com.nlab.reminder.core.androix.recyclerview.verticalScrollRange
+import com.nlab.reminder.core.component.schedulelist.databinding.FragmentScheduleListBinding
+import com.nlab.reminder.core.component.schedulelist.ui.toolbar.ScheduleListToolbarState
+import com.nlab.reminder.core.component.schedulelist.ui.bottomappbar.ScheduleListBottomAppbarState
+import com.nlab.reminder.core.data.model.ScheduleId
+import com.nlab.reminder.core.kotlinx.coroutines.flow.withPrev
+import kotlinx.collections.immutable.PersistentSet
+import kotlinx.collections.immutable.toPersistentSet
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
+import kotlinx.datetime.TimeZone
+import kotlin.math.absoluteValue
+import kotlin.math.min
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Instant
+
+/**
+ * @author Thalys
+ */
+internal class ScheduleListFragment : Fragment() {
+    private var _binding: FragmentScheduleListBinding? = null
+    private val binding: FragmentScheduleListBinding get() = checkNotNull(_binding)
+
+    private val scheduleListItemsAdaptationsFlow = MutableLatestSharedFlow<ScheduleListItemsAdaptation>()
+    private val multiSelectionEnabledFlow = MutableLatestSharedFlow<Boolean>()
+    private val triggerAtFormatPatternsFlow = MutableLatestSharedFlow<TriggerAtFormatPatterns>()
+    private val themeFlow = MutableLatestSharedFlow<ScheduleListTheme>()
+    private val timeZoneFlow = MutableLatestSharedFlow<TimeZone>()
+    private val entryAtFlow = MutableLatestSharedFlow<Instant>()
+    private val listBottomScrollPaddingFlow = MutableLatestSharedFlow<Int>()
+    private val toolbarStateFlow = MutableLatestSharedFlow<ScheduleListToolbarState?>()
+    private val bottomAppbarStateFlow = MutableLatestSharedFlow<ScheduleListBottomAppbarState?>()
+    private val selectionUpdateConsumerFlow = MutableLatestSharedFlow<(SelectionUpdate) -> Unit>()
+    private val completedSchedulesCleanupConsumerFlow = MutableLatestSharedFlow<() -> Unit>()
+    private val completionUpdateConsumerFlow = MutableLatestSharedFlow<(CompletionUpdate) -> Unit>()
+    private val deleteConsumerFlow = MutableLatestSharedFlow<(Delete) -> Unit>()
+    private val itemPositionUpdateConsumerFlow = MutableLatestSharedFlow<(ItemPositionUpdate) -> Unit>()
+    private val openDetailConsumerFlow = MutableLatestSharedFlow<(OpenDetail) -> Unit>()
+    private val simpleAddConsumerFlow = MutableLatestSharedFlow<(SimpleAdd) -> Unit>()
+    private val simpleEditConsumerFlow = MutableLatestSharedFlow<(SimpleEdit) -> Unit>()
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View = FragmentScheduleListBinding
+        .inflate(inflater, /* parent = */ container, /* attachToParent = */ false)
+        .also { _binding = it }
+        .root
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        val scheduleListAdapter = ScheduleListAdapter(viewLifecycleScope).apply {
+            stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
+        }
+        val linearLayoutManager = LinearLayoutManager(/*context = */ requireContext())
+        val scheduleListDragAnchorOverlay = run {
+            val scheduleListHolderActivity = checkNotNull(activity as? ScheduleListHolderActivity) {
+                "The hosting Activity is expected to be a ScheduleListHolderActivity but it's not."
+            }
+            scheduleListHolderActivity.requireScheduleListDragAnchorOverlay()
+        }
+        val itemTouchCallback = ScheduleListItemTouchCallback(
+            scrollGuard = ScrollGuard()
+                .also { binding.recyclerviewSchedule.addOnScrollListener(/*listener=*/ it) },
+            scrollGuardMargin = dpToPx(/* dpValue =*/ 24f, resources.displayMetrics),
+            dragAnchorOverlay = scheduleListDragAnchorOverlay,
+            dragToScaleTargetHeight = dpToPx(/* dpValue =*/ 150f, resources.displayMetrics),
+            dragScaleAnimateDuration = DRAG_SCALE_ANIMATE_DURATION,
+            swipeCancelAnimateDuration = SWIPE_CANCEL_ANIMATE_DURATION,
+            clampSwipeThreshold = 0.5f,
+            maxClampSwipeWidthMultiplier = 1.75f,
+            itemMoveListener = object : ScheduleListItemTouchCallback.ItemMoveListener {
+                override fun onMove(fromPosition: Int, toPosition: Int): Boolean {
+                    val firstPos = linearLayoutManager.findFirstCompletelyVisibleItemPosition()
+                    val lastPos = linearLayoutManager.findLastCompletelyVisibleItemPosition()
+                    if (firstPos != RecyclerView.NO_POSITION
+                        && lastPos != RecyclerView.NO_POSITION
+                        && toPosition !in firstPos..lastPos
+                    ) return false
+
+                    return scheduleListAdapter.submitMoving(
+                        fromPosition = fromPosition,
+                        toPosition = toPosition
+                    )
+                }
+
+                override fun onMoveEnded() {
+                    scheduleListAdapter.submitMoveDone()
+                }
+            }
+        )
+        val itemTouchHelper = ItemTouchHelper(itemTouchCallback)
+        val stickyHeaderHelper = StickyHeaderHelper()
+        val multiSelectionHelper = ScheduleListSelectionHelper(
+            selectionSource = object : ScheduleListSelectionSource {
+                override fun findScheduleId(position: Int): ScheduleId? {
+                    val item = scheduleListAdapter.getCurrentList().getOrNull(position)
+                    if (item !is ScheduleListItem.Content) return null
+
+                    return item.resource.schedule.id
+                }
+
+                override fun findSelected(scheduleId: ScheduleId): Boolean {
+                    return scheduleId in scheduleListAdapter.getCurrentSelectedIds()
+                }
+            },
+            onSelectedStateChanged = { scheduleId, selected ->
+                scheduleListAdapter.setSelected(scheduleId, selected)
+            },
+        )
+        with(binding) {
+            recyclerviewSchedule.layoutManager = linearLayoutManager
+            recyclerviewSchedule.adapter = scheduleListAdapter
+            recyclerviewSchedule.itemAnimator = ScheduleListAnimator()
+            stickyHeaderHelper.attach(
+                recyclerView = recyclerviewSchedule,
+                stickyHeaderContainer = containerStickyHeader,
+                stickyHeaderAdapter = ScheduleListStickyHeaderAdapter(
+                    getCurrentList = scheduleListAdapter::getCurrentList
+                ).also { scheduleListAdapter.registerAdapterDataObserver(/*observer = */ it) }
+            )
+            itemTouchHelper.attachToRecyclerView(/* recyclerView=*/ recyclerviewSchedule)
+            multiSelectionHelper.attachToRecyclerView(recyclerView = recyclerviewSchedule)
+        }
+
+        val scrollEvents = binding.recyclerviewSchedule
+            .scrollEvent()
+            .shareIn(viewLifecycleScope, started = SharingStarted.Eagerly)
+        val scrollStates = binding.recyclerviewSchedule
+            .scrollState()
+            .shareIn(viewLifecycleScope, started = SharingStarted.Eagerly)
+        val verticalScrollRanges = binding.recyclerviewSchedule
+            .verticalScrollRange()
+            .shareIn(viewLifecycleScope, started = SharingStarted.Eagerly)
+        val recyclerViewItemTouches = binding.recyclerviewSchedule
+            .itemTouches()
+            .shareIn(viewLifecycleScope, SharingStarted.Eagerly)
+        val firstVisiblePositions = scrollEvents
+            .map { linearLayoutManager.findFirstVisibleItemPosition() }
+            .distinctUntilChanged()
+            .shareIn(viewLifecycleScope, SharingStarted.Eagerly)
+        val lastVisiblePositions = scrollEvents
+            .map { linearLayoutManager.findLastVisibleItemPosition() }
+            .distinctUntilChanged()
+            .shareIn(viewLifecycleScope, SharingStarted.Eagerly)
+        val focusChanges = scheduleListAdapter.focusChanges
+            .receiveAsFlow()
+            .shareIn(viewLifecycleScope, SharingStarted.Eagerly)
+
+        val toolbarVisibilityState = combine(
+            verticalScrollRanges
+                .map { it > 0 }
+                .distinctUntilChanged(),
+            firstVisiblePositions
+                .map { it > 0 }
+                .distinctUntilChanged()
+        ) { hasScrollRange, isHeadlineNotVisible -> hasScrollRange && isHeadlineNotVisible }
+            .stateIn(scope = viewLifecycleScope, started = SharingStarted.Eagerly, initialValue = null)
+        viewLifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                toolbarStateFlow.collectLatest { toolbarState ->
+                    if (toolbarState == null) return@collectLatest
+                    toolbarVisibilityState.collect { titleVisible ->
+                        if (titleVisible != null) {
+                            toolbarState.titleVisible = titleVisible
+                        }
+                    }
+                }
+            }
+        }
+
+        val toolbarBgAlphaFlow = combine(
+            firstVisiblePositions.map { pos ->
+                when (pos) {
+                    0 -> 0f
+                    // This is for HeadlinePadding
+                    1 -> checkNotNull(linearLayoutManager.findViewByPosition(/*position =*/ 1))
+                    else -> 1f
+                }
+            }.distinctUntilChanged(),
+            scrollEvents
+        ) { params, _ ->
+            if (params is Float) params
+            else {
+                val itemView = params as View
+                itemView.top.absoluteValue.toFloat() / itemView.height
+            }
+        }.stateIn(scope = viewLifecycleScope, started = SharingStarted.Eagerly, null)
+        viewLifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                toolbarStateFlow.collectLatest { toolbarValues ->
+                    if (toolbarValues == null) return@collectLatest
+                    toolbarBgAlphaFlow.collect { newAlpha ->
+                        if (newAlpha == null) return@collect
+                        toolbarValues.backgroundAlpha = newAlpha
+                    }
+                }
+            }
+        }
+
+        val bottomAppbarBgAlphaFlow = combine(
+            merge(
+                scrollEvents,
+                scheduleListAdapter.itemUpdatesSimplified()
+                    .mapLatest { binding.recyclerviewSchedule.awaitPost() },
+                binding.recyclerviewSchedule.layoutChanges()
+            ),
+            scheduleListItemsAdaptationsFlow
+        ) { _, adaptation ->
+            val rv = binding.recyclerviewSchedule
+            if (rv.isLaidOut.not() || rv.height <= 0) return@combine null
+            if (adaptation !is ScheduleListItemsAdaptation.Exist) return@combine null
+
+            val itemCount = scheduleListAdapter.itemCount
+            if (itemCount <= 0) {
+                if (adaptation.items.isNotEmpty()) {
+                    return@combine null
+                } else {
+                    return@combine 0f
+                }
+            }
+
+            if (rv.childCount <= 0) return@combine null
+
+            // If the RecyclerView can scroll down, the footer is at least partially hidden behind the BottomAppBar.
+            // This also covers the case where items don't fill the screen (canScrollVertically returns false → 0f).
+            // canScrollVertically(1) checks if the view can scroll down (towards the bottom).
+            if (rv.canScrollVertically(1)) 1f else 0f
+        }.stateIn(scope = viewLifecycleScope, started = SharingStarted.Eagerly, null)
+        viewLifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                bottomAppbarStateFlow.collectLatest { bottomAppbarState ->
+                    if (bottomAppbarState == null) return@collectLatest
+                    var animator: ValueAnimator? = null
+                    var isFirstEmission = true
+                    try {
+                        bottomAppbarBgAlphaFlow.collect { alpha ->
+                            if (alpha == null) return@collect
+
+                            animator?.cancel()
+                            if (isFirstEmission) {
+                                bottomAppbarState.backgroundAlpha = alpha
+                                isFirstEmission = false
+                            } else {
+                                val currentAlpha = bottomAppbarState.backgroundAlpha
+                                if (alpha != currentAlpha) {
+                                    animator = if (alpha > 0f) {
+                                        ValueAnimator.ofFloat(currentAlpha, alpha)
+                                    } else {
+                                        ValueAnimator.ofFloat(currentAlpha, 0f)
+                                    }.apply {
+                                        duration = 300L
+                                        addUpdateListener { bottomAppbarState.backgroundAlpha = it.animatedValue as Float }
+                                    }.also { it.start() }
+                                }
+                            }
+                        }
+                    } finally {
+                        animator?.cancel()
+                    }
+                }
+            }
+        }
+
+        val userInteractionSyncFlow = createUserInteractionSyncFlow()
+        withSync(
+            syncSourceFlow = userInteractionSyncFlow.map { it.selectedIds },
+            sync = scheduleListAdapter::syncSelected
+        ) { syncJob ->
+            viewLifecycleScope.launch {
+                syncJob.join()
+                viewLifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    selectionUpdateConsumerFlow.collectLatest { consumer ->
+                        scheduleListAdapter.selectionUpdateRequests.collect(consumer)
+                    }
+                }
+            }
+        }
+
+        forwardEventToConsumer(
+            eventSource = scheduleListAdapter.itemPositionUpdateRequests,
+            eventConsumerFlow = itemPositionUpdateConsumerFlow
+        )
+
+        withSync(
+            syncSourceFlow = userInteractionSyncFlow.map { it.completionCheckedIds },
+            sync = scheduleListAdapter::syncCompletionChecked,
+        ) { syncJob ->
+            forwardEventToConsumer(
+                eventSource = scheduleListAdapter.completionUpdateRequests.receiveAsFlow(),
+                eventConsumerFlow = completionUpdateConsumerFlow,
+                awaitConsumerReady = { syncJob.join() }
+            )
+        }
+
+        forwardEventToConsumer(
+            eventSource = scheduleListAdapter.clearCompletedSchedulesRequests.receiveAsFlow(),
+            eventConsumerFlow = completedSchedulesCleanupConsumerFlow
+                .map { consumer -> { consumer() } }
+        )
+
+        forwardEventToConsumer(
+            eventSource = scheduleListAdapter.deleteRequests.receiveAsFlow(),
+            eventConsumerFlow = deleteConsumerFlow
+        )
+
+        forwardEventToConsumer(
+            eventSource = scheduleListAdapter.openDetailRequests.receiveAsFlow(),
+            eventConsumerFlow = openDetailConsumerFlow
+        )
+
+        forwardEventToConsumer(
+            eventSource = scheduleListAdapter.addRequests.receiveAsFlow(),
+            eventConsumerFlow = simpleAddConsumerFlow
+        )
+
+        forwardEventToConsumer(
+            eventSource = scheduleListAdapter.editRequests.receiveAsFlow(),
+            eventConsumerFlow = simpleEditConsumerFlow
+        )
+
+        merge(
+            // When ItemTouchHelper doesn't work, feed x from itemTouches
+            recyclerViewItemTouches.map { it.x },
+            // When ItemTouchHelper is in drag operation, the touches are supplied from x
+            binding.recyclerviewSchedule.touches().map { it.x }
+        ).distinctUntilChanged()
+            .onEach { itemTouchCallback.setContainerTouchX(it) }
+            .launchIn(viewLifecycleScope)
+
+        merge(
+            multiSelectionEnabledFlow
+                .filter { enabled -> enabled }
+                .flowWithLifecycle(viewLifecycle),
+            scrollStates
+                .distinctUntilChanged()
+                .withPrev(RecyclerView.SCROLL_STATE_IDLE)
+                .filter { (prev, cur) ->
+                    prev == RecyclerView.SCROLL_STATE_IDLE && cur == RecyclerView.SCROLL_STATE_DRAGGING
+                },
+        ).onEach { itemTouchCallback.removeSwipeClamp() }
+            .launchIn(viewLifecycleScope)
+
+        recyclerViewItemTouches
+            .filter { it.action == MotionEvent.ACTION_DOWN }
+            .onEach { event ->
+                val viewHolder = binding.recyclerviewSchedule
+                    .findChildViewUnder(event.x, event.y)
+                    ?.let { binding.recyclerviewSchedule.getChildViewHolder(it) }
+                    ?: return@onEach
+                itemTouchCallback.removeSwipeClampWith(viewHolder, touchX = event.x)
+            }
+            .launchIn(viewLifecycleScope)
+
+        callbackFlow {
+            val recyclerView = binding.recyclerviewSchedule
+            val listener = object : RecyclerView.OnChildAttachStateChangeListener {
+                fun dispatchViewHolderEvents(v: View) {
+                    if (v.isLaidOut.not()) return
+                    recyclerView.findContainingViewHolder(v)?.let { trySend(it) }
+                }
+
+                override fun onChildViewAttachedToWindow(v: View) = dispatchViewHolderEvents(v)
+                override fun onChildViewDetachedFromWindow(v: View) = dispatchViewHolderEvents(v)
+            }
+            recyclerView.addOnChildAttachStateChangeListener(listener)
+            awaitClose { recyclerView.removeOnChildAttachStateChangeListener(listener) }
+        }.onEach { viewHolder -> itemTouchCallback.resetSwipeClamp(viewHolder) }
+            .launchIn(viewLifecycleScope)
+
+        multiSelectionEnabledFlow
+            .flowWithLifecycle(viewLifecycle)
+            .onEach { enabled ->
+                scheduleListAdapter.setSelectionEnabled(enabled)
+                itemTouchCallback.isItemViewSwipeEnabled = enabled.not()
+                itemTouchCallback.isLongPressDragEnabled = enabled.not()
+
+                if (enabled.not()) {
+                    multiSelectionHelper.disable()
+                }
+            }
+            .launchIn(viewLifecycleScope)
+
+        focusChanges
+            .onEach { focusChanged ->
+                if (focusChanged.focused) {
+                    val receivedPosition = focusChanged.viewHolder.bindingAdapterPosition
+                    view.awaitPost()
+                    // Prevents position from changing due to UI size change depending on focus change.
+                    if (receivedPosition == focusChanged.viewHolder.bindingAdapterPosition) {
+                        binding.recyclerviewSchedule.scrollToPosition(receivedPosition)
+                    }
+                }
+            }
+            .launchIn(viewLifecycleScope)
+
+        combine(
+            focusChanges.map { it.viewHolder.bindingAdapterPosition to it.focused },
+            firstVisiblePositions,
+            lastVisiblePositions
+        ) { (viewHolderPosition, focused), firstVisiblePosition, lastVisiblePosition ->
+            when {
+                focused -> 0 // focused
+                viewHolderPosition in firstVisiblePosition..lastVisiblePosition -> 1 // not focused
+                else -> 2 // focused by scrolling
+            }
+        }.distinctUntilChanged()
+            .mapLatest { flag ->
+                if (flag == 0) true
+                else {
+                    // Prevents the keyboard from lowering and then coming up immediately due to changing the input field.
+                    if (flag == 1) {
+                        delay(100.milliseconds)
+                    }
+                    false
+                }
+            }
+            .withPrev()
+            .distinctUntilChanged()
+            .onEach { (prevFocused, curFocused) ->
+                if (prevFocused && curFocused.not()) {
+                    view.hideSoftInputFromWindow()
+                }
+            }
+            .launchIn(viewLifecycleScope)
+
+        viewLifecycleScope.launch {
+            viewLifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                toolbarStateFlow.collectLatest { toolbarState ->
+                    if (toolbarState == null) return@collectLatest
+                    focusChanges.collectLatest { event ->
+                        if (event.focused) toolbarState.editCompleteVisible = true
+                        else {
+                            // Prevents the keyboard from lowering and then coming up immediately due to changing the input field.
+                            delay(100.milliseconds)
+                            toolbarState.editCompleteVisible = false
+                        }
+                    }
+                }
+            }
+        }
+
+        viewLifecycleScope.launch {
+            for (viewHolder in scheduleListAdapter.dragHandleTouches) itemTouchHelper.startDrag(viewHolder)
+        }
+
+        viewLifecycleScope.launch {
+            for (viewHolder in scheduleListAdapter.selectButtonTouches) multiSelectionHelper.enable(viewHolder)
+        }
+
+        viewLifecycle.eventFlow
+            .mapNotNull { event ->
+                when (event) {
+                    Lifecycle.Event.ON_START -> true
+                    Lifecycle.Event.ON_STOP -> false
+                    else -> null
+                }
+            }
+            .distinctUntilChanged()
+            .onEach { isVisible -> scheduleListDragAnchorOverlay.setVisible(isVisible) }
+            .launchIn(viewLifecycleScope)
+
+        val adjustPosEvents = Channel<Int>(
+            capacity = 1,
+            onBufferOverflow = BufferOverflow.DROP_OLDEST
+        )
+        viewLifecycleScope.launch {
+            adjustPosEvents.receiveAsFlow().collectLatest { pos ->
+                if (pos == RecyclerView.NO_POSITION) return@collectLatest
+
+                binding.recyclerviewSchedule.run {
+                    awaitPost()
+                    if (linearLayoutManager.findFirstVisibleItemPosition() != pos) {
+                       scrollToPosition(min(scheduleListAdapter.itemCount, pos))
+                    }
+                }
+            }
+        }
+
+        scheduleListItemsAdaptationsFlow
+            .distinctUntilChanged { prev, next ->
+                if (prev is ScheduleListItemsAdaptation.Exist && next is ScheduleListItemsAdaptation.Exist) {
+                    prev.replayStamp == next.replayStamp && prev.items.value == next.items.value
+                } else {
+                    prev == next
+                }
+            }
+            .mapLatest { adaptation ->
+                if (adaptation is ScheduleListItemsAdaptation.Exist && adaptation.replayStamp > 0) {
+                    // A short delay for a smooth revert.
+                    delay(500)
+                }
+                adaptation
+            }
+            .flowOn(Dispatchers.Default)
+            .flowWithLifecycle(viewLifecycle)
+            .onEach { adaptation ->
+                val recyclerViewVisible: Boolean
+                val newItems: List<ScheduleListItem>
+                val replayStamp: Long
+                when (adaptation) {
+                    is ScheduleListItemsAdaptation.Absent -> {
+                        recyclerViewVisible = false
+                        newItems = emptyList()
+                        replayStamp = 0
+                    }
+
+                    is ScheduleListItemsAdaptation.Exist -> {
+                        recyclerViewVisible = true
+                        newItems = adaptation.items
+                        replayStamp = adaptation.replayStamp
+                    }
+                }
+                binding.recyclerviewSchedule.setVisible(
+                    isVisible = recyclerViewVisible,
+                    goneIfNotVisible = false
+                )
+                // If a drag is in progress, the list should be updated after the drag operation is completed
+                // to ensure the ViewHolder is stable.
+                awaitCompleteWith {
+                    itemTouchCallback.stopDragging(
+                        recyclerView = binding.recyclerviewSchedule,
+                        commitCallback = { complete(Unit) }
+                    )
+                }
+
+                val firstVisiblePosBeforeUpdate =
+                    if (replayStamp == 0L) RecyclerView.NO_POSITION
+                    else linearLayoutManager.findFirstVisibleItemPosition()
+                awaitCompleteWith {
+                    scheduleListAdapter.submitList(
+                        items = newItems,
+                        commitCallback = { complete(Unit) }
+                    )
+                }
+                adjustPosEvents.trySend(firstVisiblePosBeforeUpdate)
+            }
+            .launchIn(viewLifecycleScope)
+
+        viewLifecycle.eventFlow
+            .filter { event -> event == Lifecycle.Event.ON_DESTROY }
+            .onEach {
+                stickyHeaderHelper.detach()
+                itemTouchCallback.clearResource()
+                multiSelectionHelper.clearResource()
+            }
+            .launchIn(viewLifecycleScope)
+
+        triggerAtFormatPatternsFlow
+            .flowWithLifecycle(viewLifecycle)
+            .onEach(scheduleListAdapter::updateTriggerAtFormatPatterns)
+            .launchIn(viewLifecycleScope)
+
+        themeFlow
+            .flowWithLifecycle(viewLifecycle)
+            .onEach(scheduleListAdapter::updateTheme)
+            .launchIn(viewLifecycleScope)
+
+        timeZoneFlow
+            .flowWithLifecycle(viewLifecycle)
+            .onEach(scheduleListAdapter::updateTimeZone)
+            .launchIn(viewLifecycleScope)
+
+        entryAtFlow
+            .flowWithLifecycle(viewLifecycle)
+            .onEach(scheduleListAdapter::updateEntryAt)
+            .launchIn(viewLifecycleScope)
+
+        listBottomScrollPaddingFlow
+            .flowWithLifecycle(viewLifecycle)
+            .onEach { value ->
+                binding.recyclerviewSchedule.updatePadding(bottom = value)
+                // TODO restore scroll position after updatePadding
+            }
+            .launchIn(viewLifecycleScope)
+    }
+
+    private fun createUserInteractionSyncFlow(): Flow<UserInteraction> {
+        val resultFlow = MutableLatestSharedFlow<UserInteraction>()
+        scheduleListItemsAdaptationsFlow
+            .filterIsInstance<ScheduleListItemsAdaptation.Exist>()
+            .map { adaptation ->
+                val completionCheckedSchedulesIds = hashSetOf<ScheduleId>()
+                val selectedSchedulesIds = hashSetOf<ScheduleId>()
+                for (item in adaptation.items) {
+                    if (item !is ScheduleListItem.Content) continue
+                    val userScheduleListResource = item.resource
+                    val scheduleId = userScheduleListResource.schedule.id
+                    if (userScheduleListResource.completionChecked) {
+                        completionCheckedSchedulesIds += scheduleId
+                    }
+                    if (userScheduleListResource.selected) {
+                        selectedSchedulesIds += scheduleId
+                    }
+                }
+                UserInteraction(
+                    completionCheckedIds = completionCheckedSchedulesIds.toPersistentSet(),
+                    selectedIds = selectedSchedulesIds.toPersistentSet()
+                )
+            }
+            .flowOn(Dispatchers.Default)
+            .flowWithLifecycle(viewLifecycle)
+            .onEach(resultFlow::tryEmit)
+            .launchIn(viewLifecycleScope)
+        return resultFlow
+    }
+
+    private inline fun <T> withSync(
+        syncSourceFlow: Flow<T>,
+        crossinline sync: (T) -> Unit,
+        block: (Job) -> Unit
+    ) {
+        val firstSyncJob = CompletableDeferred<Unit>()
+        syncSourceFlow
+            .flowWithLifecycle(viewLifecycle)
+            .onEach { sync(it); firstSyncJob.complete(Unit) }
+            .launchIn(viewLifecycleScope)
+        block(firstSyncJob)
+    }
+
+    private fun <T> forwardEventToConsumer(
+        eventSource: Flow<T>,
+        eventConsumerFlow: Flow<(T) -> Unit>,
+        awaitConsumerReady: suspend () -> Unit = {}
+    ) {
+        viewLifecycleScope.launch {
+            awaitConsumerReady()
+
+            var currentConsumer: ((T) -> Unit)? = null
+            launch { eventConsumerFlow.collect { currentConsumer = it } }
+
+            eventSource.collect { event ->
+                currentConsumer?.invoke(event)
+            }
+        }
+    }
+
+    fun onScheduleListItemsAdaptationUpdated(scheduleListItemsAdaptation: ScheduleListItemsAdaptation) {
+        scheduleListItemsAdaptationsFlow.tryEmit(scheduleListItemsAdaptation)
+    }
+
+    fun onMultiSelectionEnabledChanged(enabled: Boolean) {
+        multiSelectionEnabledFlow.tryEmit(enabled)
+    }
+
+    fun onTriggerAtFormatPatternsUpdated(patterns: TriggerAtFormatPatterns) {
+        triggerAtFormatPatternsFlow.tryEmit(patterns)
+    }
+
+    fun onThemeUpdated(theme: ScheduleListTheme) {
+        themeFlow.tryEmit(theme)
+    }
+
+    fun onTimeZoneUpdated(timeZone: TimeZone) {
+        timeZoneFlow.tryEmit(timeZone)
+    }
+
+    fun onEntryAtUpdated(entryAt: Instant) {
+        entryAtFlow.tryEmit(entryAt)
+    }
+
+    fun onToolbarStateUpdated(toolbarState: ScheduleListToolbarState?) {
+        toolbarStateFlow.tryEmit(toolbarState)
+    }
+
+    fun onBottomAppbarStateUpdated(state: ScheduleListBottomAppbarState?) {
+        bottomAppbarStateFlow.tryEmit(state)
+    }
+
+    fun onListBottomScrollPaddingUpdated(value: Int) {
+        listBottomScrollPaddingFlow.tryEmit(value)
+    }
+
+    fun onSelectionUpdateConsumerChanged(observer: (SelectionUpdate) -> Unit) {
+        selectionUpdateConsumerFlow.tryEmit(observer)
+    }
+
+    fun onCompletedSchedulesCleanupConsumerChanged(consumer: ()-> Unit) {
+        completedSchedulesCleanupConsumerFlow.tryEmit(consumer)
+    }
+
+    fun onCompletionUpdateConsumerChanged(consumer: (CompletionUpdate) -> Unit) {
+        completionUpdateConsumerFlow.tryEmit(consumer)
+    }
+
+    fun onDeleteConsumerChanged(consumer: (Delete) -> Unit) {
+        deleteConsumerFlow.tryEmit(consumer)
+    }
+
+    fun onItemPositionUpdateConsumerChanged(consumer: (ItemPositionUpdate) -> Unit) {
+        itemPositionUpdateConsumerFlow.tryEmit(consumer)
+    }
+
+    fun onOpenDetailConsumerChanged(consumer: (OpenDetail) -> Unit) {
+        openDetailConsumerFlow.tryEmit(consumer)
+    }
+
+    fun onSimpleAddConsumerChanged(consumer: (SimpleAdd) -> Unit) {
+        simpleAddConsumerFlow.tryEmit(consumer)
+    }
+
+    fun onSimpleEditConsumerChanged(consumer: (SimpleEdit) -> Unit) {
+        simpleEditConsumerFlow.tryEmit(consumer)
+    }
+
+    companion object {
+        private const val DRAG_SCALE_ANIMATE_DURATION = 250L
+        private const val SWIPE_CANCEL_ANIMATE_DURATION = 250L
+    }
+}
+
+private suspend inline fun awaitCompleteWith(block: CompletableDeferred<Unit>.() -> Unit) {
+    CompletableDeferred<Unit>()
+        .also { it.block() }
+        .await()
+}
+
+private data class UserInteraction(
+    val completionCheckedIds: PersistentSet<ScheduleId>,
+    val selectedIds: PersistentSet<ScheduleId>
+)

@@ -17,10 +17,10 @@
 package com.nlab.reminder.feature.all
 
 import app.cash.turbine.test
-import com.nlab.reminder.core.component.schedulelist.content.GetUserScheduleListResourcesFlowUseCase
-import com.nlab.reminder.core.component.schedulelist.content.genScheduleListResource
-import com.nlab.reminder.core.component.schedulelist.content.genUserScheduleListResource
-import com.nlab.reminder.core.component.schedulelist.content.genUserScheduleListResources
+import com.nlab.reminder.core.component.schedulelist.GetUserScheduleListResourcesFlowUseCase
+import com.nlab.reminder.core.component.schedulelist.genScheduleListResource
+import com.nlab.reminder.core.component.schedulelist.genUserScheduleListResource
+import com.nlab.reminder.core.component.schedulelist.genUserScheduleListResources
 import com.nlab.reminder.core.data.model.Schedule
 import com.nlab.reminder.core.data.model.ScheduleId
 import com.nlab.reminder.core.data.model.SchedulesLookup
@@ -30,7 +30,6 @@ import com.nlab.reminder.core.data.repository.CompletedScheduleShownRepository
 import com.nlab.reminder.core.data.repository.GetScheduleQuery
 import com.nlab.reminder.core.data.repository.ScheduleRepository
 import com.nlab.reminder.core.kotlin.collections.toSet
-import com.nlab.reminder.core.kotlin.toNonNegativeInt
 import com.nlab.reminder.core.kotlin.toNonNegativeLong
 import com.nlab.testkit.faker.genBoolean
 import com.nlab.testkit.faker.genIntGreaterThanZero
@@ -49,6 +48,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.unconfinedTestDispatcher
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.trueValue
 import org.junit.Test
 
 /**
@@ -131,14 +131,10 @@ class GetUserScheduleListResourceReportFlowTest {
 
         useCase.invoke().test {
             val actualReport = awaitItem()
+            assertThat(actualReport.scheduleListStats.completedShown, trueValue())
             assertThat(
-                actualReport.completedScheduleSummary,
-                equalTo(
-                    CompletedScheduleSummary(
-                        shown = true,
-                        count = completedSchedules.size.toNonNegativeInt(),
-                    )
-                )
+                actualReport.scheduleListStats.completedCount.value,
+                equalTo(completedSchedules.size)
             )
             cancelAndIgnoreRemainingEvents()
         }
@@ -204,14 +200,10 @@ class GetUserScheduleListResourceReportFlowTest {
 
         useCase.invoke().test {
             val actualReport = awaitItem()
+            assertThat(actualReport.scheduleListStats.completedShown.not(), trueValue())
             assertThat(
-                actualReport.completedScheduleSummary,
-                equalTo(
-                    CompletedScheduleSummary(
-                        shown = false,
-                        count = 0.toNonNegativeInt(),
-                    )
-                )
+                actualReport.scheduleListStats.completedCount.value,
+                equalTo(0)
             )
             cancelAndIgnoreRemainingEvents()
         }
@@ -361,6 +353,57 @@ class GetUserScheduleListResourceReportFlowTest {
                 genSchedule(id = ScheduleId(3))
             )
         )
+    }
+
+    @Test
+    fun `Given selected schedules exist, When collect, Then receive report with correct selectedCount`() = runTest {
+        val schedules = genSchedules(count = 5)
+        val expectedSelectedCount = 3
+        val userScheduleListResources = schedules.mapIndexed { index, schedule ->
+            genUserScheduleListResource(
+                schedule = genScheduleListResource(schedule),
+                selected = (index < expectedSelectedCount)
+            )
+        }
+        val useCase = genGetUserScheduleListResourceReportFlow(
+            scheduleRepository = mockk {
+                every { getSchedulesAsStream(any()) } returns flowOf(schedules.toSet())
+            },
+            getUserScheduleListResourcesFlow = mockk {
+                every { this@mockk.invoke(any()) } returns flowOf(userScheduleListResources.toHashSet())
+            }
+        )
+
+        useCase.invoke().test {
+            val actualReport = awaitItem()
+            assertThat(actualReport.scheduleListStats.selectedCount?.value, equalTo(expectedSelectedCount))
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `Given selected schedules not exist, When collect, Then receive report with null selectedCount`() = runTest {
+        val schedules = genSchedules(count = 5)
+        val userScheduleListResources = schedules.map { schedule ->
+            genUserScheduleListResource(
+                schedule = genScheduleListResource(schedule),
+                selected = false
+            )
+        }
+        val useCase = genGetUserScheduleListResourceReportFlow(
+            scheduleRepository = mockk {
+                every { getSchedulesAsStream(any()) } returns flowOf(schedules.toSet())
+            },
+            getUserScheduleListResourcesFlow = mockk {
+                every { this@mockk.invoke(any()) } returns flowOf(userScheduleListResources.toHashSet())
+            }
+        )
+
+        useCase.invoke().test {
+            val actualReport = awaitItem()
+            assertThat(actualReport.scheduleListStats.selectedCount, equalTo(null))
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 }
 

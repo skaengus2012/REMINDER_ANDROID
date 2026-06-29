@@ -61,6 +61,7 @@
     <string name="content_frequency_weekly">Weekly</string>
     <string name="content_frequency_yearly">Yearly</string>
     <string name="content_select_plans">Select plans</string>
+    <string name="content_schedules_delete_notice_in_list">Selected reminders will be deleted from the list.</string>
     <plurals name="content_tag_delete_dialog_double">
         <item quantity="one">%1$s and %2$s are being used in %3$d notification.</item>
         <item quantity="other">%1$s and %2$s are being used in %3$d notifications.</item>

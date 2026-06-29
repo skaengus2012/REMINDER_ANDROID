@@ -22,7 +22,7 @@ import com.nlab.reminder.core.local.database.entity.ScheduleCompletionBacklogEnt
 /**
  * @author Doohyun
  */
-fun ScheduleCompletionBacklog(
+internal fun ScheduleCompletionBacklog(
     entity: ScheduleCompletionBacklogEntity
 ): ScheduleCompletionBacklog = ScheduleCompletionBacklog(
     id = ScheduleCompletionBacklogId(entity.backlogId),

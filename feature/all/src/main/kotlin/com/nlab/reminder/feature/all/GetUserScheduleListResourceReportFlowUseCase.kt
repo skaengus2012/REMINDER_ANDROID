@@ -17,8 +17,9 @@
 package com.nlab.reminder.feature.all
 
 import com.nlab.reminder.core.annotation.ExcludeFromGeneratedTestReport
-import com.nlab.reminder.core.component.schedulelist.content.GetUserScheduleListResourcesFlowUseCase
-import com.nlab.reminder.core.component.schedulelist.content.UserScheduleListResource
+import com.nlab.reminder.core.component.schedulelist.GetUserScheduleListResourcesFlowUseCase
+import com.nlab.reminder.core.component.schedulelist.UserScheduleListResource
+import com.nlab.reminder.core.component.schedulelist.toScheduleListStats
 import com.nlab.reminder.core.data.model.Schedule
 import com.nlab.reminder.core.data.model.SchedulesLookup
 import com.nlab.reminder.core.data.qualifiers.ScheduleData
@@ -26,7 +27,6 @@ import com.nlab.reminder.core.data.qualifiers.ScheduleDataOption.All
 import com.nlab.reminder.core.data.repository.CompletedScheduleShownRepository
 import com.nlab.reminder.core.data.repository.GetScheduleQuery
 import com.nlab.reminder.core.data.repository.ScheduleRepository
-import com.nlab.reminder.core.kotlin.toNonNegativeInt
 import com.nlab.reminder.core.kotlinx.coroutines.flow.channelFlow
 import com.nlab.reminder.core.kotlinx.coroutines.flow.combine
 import com.nlab.reminder.core.kotlinx.coroutines.flow.map
@@ -64,14 +64,12 @@ internal class GetUserScheduleListResourceReportFlowUseCase @Inject constructor(
                 .let(::getScheduleResourcesFlowWith)
                 .map { userScheduleListResources ->
                     UserScheduleListResourceReport(
-                        completedScheduleSummary = CompletedScheduleSummary(
-                            shown = completedScheduleShown,
-                            count = run {
-                                val rawCount =
-                                    if (completedScheduleShown.not()) 0
-                                    else userScheduleListResources.count { it.schedule.isComplete }
-                                rawCount.toNonNegativeInt()
-                            }
+                        scheduleListStats = AllScheduleListStats(
+                            completedShown = completedScheduleShown,
+                            stats = userScheduleListResources.toScheduleListStats(
+                                needCompletedCount = completedScheduleShown,
+                                needSelectedCount = true
+                            ),
                         ),
                         userScheduleListResources = userScheduleListResources
                     )
@@ -98,9 +96,14 @@ internal class GetUserScheduleListResourceReportFlowUseCase @Inject constructor(
                 // 1. Uncompleted schedules precede completed schedules.
                 // 2. compared by displayPriority
                 comparator = compareBy<UserScheduleListResource> { userScheduleListResource ->
-                    schedulesLookup.requireValue(userScheduleListResource.schedule.id).isComplete
+                    schedulesLookup
+                        .requireValue(userScheduleListResource.schedule.id)
+                        .isComplete
                 }.thenComparing { userScheduleListResource ->
-                    schedulesLookup.requireValue(userScheduleListResource.schedule.id).visiblePriority.value
+                    schedulesLookup
+                        .requireValue(userScheduleListResource.schedule.id)
+                        .visiblePriority
+                        .value
                 }
             )
         }.filterNotNull().onEach { resultFlow.value = it }.launchIn(scope = this)
@@ -109,6 +112,6 @@ internal class GetUserScheduleListResourceReportFlowUseCase @Inject constructor(
 
 @ExcludeFromGeneratedTestReport
 internal data class UserScheduleListResourceReport(
-    val completedScheduleSummary: CompletedScheduleSummary,
+    val scheduleListStats: AllScheduleListStats,
     val userScheduleListResources: List<UserScheduleListResource>
 )

@@ -1,0 +1,529 @@
+/*
+ * Copyright (C) 2025 The N's lab Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.nlab.reminder.core.component.schedulelist.ui.content
+
+import android.content.res.ColorStateList
+import android.graphics.drawable.Drawable
+import android.text.InputType
+import android.view.LayoutInflater
+import android.view.MotionEvent
+import android.view.View
+import android.view.ViewGroup
+import android.widget.EditText
+import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.view.doOnAttach
+import androidx.core.view.doOnDetach
+import androidx.core.view.isVisible
+import androidx.lifecycle.findViewTreeLifecycleOwner
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.RecyclerView
+import com.nlab.reminder.core.android.content.getThemeColor
+import com.nlab.reminder.core.android.view.awaitPost
+import com.nlab.reminder.core.android.view.clearFocusIfNeeded
+import com.nlab.reminder.core.android.view.filterActionDone
+import com.nlab.reminder.core.android.view.focusChanges
+import com.nlab.reminder.core.android.view.setVisible
+import com.nlab.reminder.core.android.view.throttleClicks
+import com.nlab.reminder.core.android.view.touches
+import com.nlab.reminder.core.android.widget.bindCursorVisible
+import com.nlab.reminder.core.android.widget.bindImageAsync
+import com.nlab.reminder.core.android.widget.bindText
+import com.nlab.reminder.core.component.schedulelist.R
+import com.nlab.reminder.core.component.schedulelist.databinding.LayoutScheduleAdapterItemContentBinding
+import com.nlab.reminder.core.component.schedulelist.databinding.LayoutScheduleAdapterItemContentMirrorBinding
+import com.nlab.reminder.core.data.model.ScheduleId
+import com.nlab.reminder.core.designsystem.compose.theme.AttrIds
+import com.nlab.reminder.core.kotlin.trim
+import com.nlab.reminder.core.kotlin.tryToNonBlankStringOrNull
+import com.nlab.reminder.core.kotlinx.coroutines.cancelAllAndClear
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.launch
+import kotlinx.datetime.TimeZone
+import kotlin.math.absoluteValue
+import kotlin.math.max
+import kotlin.time.Instant
+
+/**
+ * @author Thalys
+ */
+internal class ContentViewHolder(
+    private val binding: LayoutScheduleAdapterItemContentBinding,
+    tagsDisplayFormatter: TagsDisplayFormatter,
+    themeState: StateFlow<ScheduleListTheme>,
+    timeZoneState: StateFlow<TimeZone?>,
+    entryAtState: StateFlow<Instant?>,
+    scheduleTimingDisplayFormatterState: StateFlow<ScheduleTimingDisplayFormatter?>,
+    selectionEnabled: StateFlow<Boolean>,
+    selectedScheduleIds: StateFlow<Set<ScheduleId>>,
+    completionCheckedScheduleIds: StateFlow<Set<ScheduleId>>,
+    onCompletionUpdated: (CompletionUpdate) -> Unit,
+    onSimpleEditDone: (SimpleEdit) -> Unit,
+    onDeleteRequested: (Delete) -> Unit,
+    onOpenDetailRequested: (OpenDetail) -> Unit,
+    onDragHandleTouched: (RecyclerView.ViewHolder) -> Unit,
+    onSelectButtonTouched: (RecyclerView.ViewHolder) -> Unit,
+    onFocusChanged: (RecyclerView.ViewHolder, Boolean) -> Unit,
+) : ScheduleAdapterItemViewHolder(binding.root),
+    DraggableViewHolder,
+    SwipeableViewHolder {
+    private val linkThumbnailPlaceHolderDrawable: Drawable? = with(itemView) {
+        AppCompatResources.getDrawable(context, R.drawable.ic_schedule_link_error)
+            ?.mutate()
+            ?.apply { setTint(context.getThemeColor(AttrIds.content_2)) }
+    }
+    private val selectionAnimDelegate = ContentSelectionAnimDelegate(binding)
+    private val draggableViewHolderDelegate = DraggableViewHolderDelegate(binding, selectionAnimDelegate)
+    private val swipeableViewHolderDelegate = SwipeableViewHolderDelegate(binding)
+    private val bindingId = MutableStateFlow<ScheduleId?>(null)
+
+    override val swipeView: View get() = swipeableViewHolderDelegate.swipeView
+    override val clampView: View get() = swipeableViewHolderDelegate.clampView
+
+    init {
+        binding.edittextDetail.initialize(tagsDisplayFormatter = tagsDisplayFormatter)
+
+        // Processing for multiline input and actionDone support
+        binding.edittextTitle.setRawInputType(InputType.TYPE_CLASS_TEXT)
+        binding.edittextDetail.setRawInputType(InputType.TYPE_CLASS_TEXT)
+
+        val jobs = mutableListOf<Job>()
+        itemView.doOnAttach { view ->
+            val viewLifecycleOwner = view.findViewTreeLifecycleOwner() ?: return@doOnAttach
+            val viewLifecycleScope = viewLifecycleOwner.lifecycleScope
+            val inputFocuses = combine(
+                ContentInputFocus.entries.mapNotNull { contentInputFocus ->
+                    binding.findInput(contentInputFocus)
+                        ?.focusChanges(emitCurrent = true)
+                        ?.distinctUntilChanged()
+                        ?.map { hasFocus -> if (hasFocus) contentInputFocus else null }
+                }
+            ) { focuses -> focuses.find { it != null } ?: ContentInputFocus.Nothing }
+                .distinctUntilChanged()
+                .shareInWithJobCollector(viewLifecycleScope, jobs, replay = 1)
+            val hasInputFocusChanges = inputFocuses
+                .map { it.hasFocus() }
+                .distinctUntilChanged()
+                .shareInWithJobCollector(viewLifecycleScope, jobs, replay = 1)
+
+            jobs += viewLifecycleScope.launch {
+                themeState.collect { theme ->
+                    binding.buttonComplete.setImageResource(
+                        when (theme) {
+                            ScheduleListTheme.Point1 -> R.drawable.checkbox_schedule_check_selector_point1
+                            ScheduleListTheme.Point2 -> R.drawable.checkbox_schedule_check_selector_point2
+                            ScheduleListTheme.Point3 -> R.drawable.checkbox_schedule_check_selector_point3
+                        }
+                    )
+                }
+            }
+            jobs += viewLifecycleScope.launch {
+                themeState.collect { theme ->
+                    binding.buttonInfo.apply {
+                        imageTintList = ColorStateList.valueOf(theme.getButtonInfoColor(context))
+                    }
+                }
+            }
+            jobs += viewLifecycleScope.launch {
+                inputFocuses.collectLatest { inputFocus ->
+                    binding.buttonInfo.run {
+                        val newVisible = inputFocus.hasFocus()
+                        if (isVisible != newVisible) {
+                            isVisible = newVisible
+
+                            if (newVisible) {
+                                // When the info button becomes visible, the parent layout is remeasured
+                                // and the EditText width changes. The cursor position is computed during
+                                // the subsequent layout/draw pass, so updating focus immediately can
+                                // use stale layout information and place the cursor incorrectly.
+                                // awaitPost() posts to the main thread queue so this runs on the next
+                                // frame, after Android has applied the visibility change and completed
+                                // the layout/drawing cycle, ensuring the cursor position is correct.
+                                awaitPost()
+                            }
+                        }
+                    }
+                    val focusedEditText = binding.findInput(inputFocus)
+                    binding.getAllInputs().forEach { editText ->
+                        editText.bindCursorVisible(isVisible = editText === focusedEditText)
+                    }
+                }
+            }
+            jobs += viewLifecycleScope.launch {
+                hasInputFocusChanges.collect { focused ->
+                    onFocusChanged(this@ContentViewHolder, focused)
+                }
+            }
+            jobs += viewLifecycleScope.launch {
+                registerEditNoteVisibility(
+                    edittextNote = binding.edittextNote,
+                    viewHolderEditFocusedFlow = hasInputFocusChanges
+                )
+            }
+            jobs += viewLifecycleScope.launch {
+                hasInputFocusChanges
+                    .focusLostCompletelyChanges()
+                    .mapNotNull { savable ->
+                        if (savable.not()) return@mapNotNull null
+                        val id = bindingId.value ?: return@mapNotNull null
+                        val title = binding.edittextTitle.text
+                            ?.toString()
+                            .tryToNonBlankStringOrNull()
+                            ?.trim()
+                            ?: return@mapNotNull null
+                        SimpleEdit(
+                            id = id,
+                            title = title,
+                            note = binding.edittextNote.text?.toString()
+                                .tryToNonBlankStringOrNull()
+                                ?.trim(),
+                            tagNames = binding.edittextDetail.getCurrentTagTexts()
+                        )
+                    }
+                    .collect(onSimpleEditDone)
+            }
+            jobs += viewLifecycleScope.launch {
+                combine(
+                    bindingId.filterNotNull(),
+                    completionCheckedScheduleIds
+                ) { id, completionCheckedIds -> id in completionCheckedIds }
+                    .distinctUntilChanged()
+                    .collect {
+                        binding.buttonComplete.isSelected = it
+                        binding.getAllInputs().forEach { editText -> editText.isSelected = it }
+                        binding.edittextDetail.bindCompleted(completed = it)
+                    }
+            }
+            jobs += viewLifecycleScope.launch {
+                bindingId.filterNotNull().collectLatest { id ->
+                    binding.buttonComplete.throttleClicks().collect { v ->
+                        val completionUpdate = CompletionUpdate(
+                            id = id,
+                            targetCompleted = v.isSelected.not()
+                        )
+                        onCompletionUpdated(completionUpdate)
+                    }
+                }
+            }
+            jobs += viewLifecycleScope.launch {
+                selectionEnabled.collect { enabled ->
+                    binding.buttonSelection.isEnabled = enabled
+                    binding.buttonDragHandle.isEnabled = enabled
+                    binding.buttonComplete.isEnabled = enabled.not()
+                }
+            }
+            jobs += viewLifecycleScope.launch {
+                combine(
+                    selectionEnabled,
+                    selectionAnimDelegate::awaitReady.asFlow()
+                ) { enabled, _ -> enabled }
+                    .distinctUntilChanged()
+                    .collect { selectionAnimDelegate.startAnimation(it) }
+            }
+            jobs += viewLifecycleScope.launch {
+                combine(
+                    selectionEnabled,
+                    draggableViewHolderDelegate.draggingState,
+                    swipeableViewHolderDelegate.swipingState
+                ) { selectionUsable, dragging, swiping -> selectionUsable || dragging || swiping }
+                    .distinctUntilChanged()
+                    .map { it.not() }
+                    .collect { enabled ->
+                        binding.getAllInputs().forEach { it.isEnabled = enabled }
+                    }
+            }
+            jobs += viewLifecycleScope.launch {
+                binding.buttonDragHandle
+                    .touches()
+                    .filterActionDone()
+                    .collect { onDragHandleTouched(this@ContentViewHolder) }
+            }
+            jobs += viewLifecycleScope.launch {
+                binding.buttonSelection
+                    .touches()
+                    .filter { it.action == MotionEvent.ACTION_DOWN }
+                    .collect { onSelectButtonTouched(this@ContentViewHolder) }
+            }
+            jobs += viewLifecycleScope.launch {
+                combine(
+                    bindingId.filterNotNull(),
+                    selectedScheduleIds
+                ) { id, selectedIds -> id in selectedIds }
+                    .distinctUntilChanged()
+                    .collect { binding.buttonSelection.isSelected = it }
+            }
+            jobs += viewLifecycleScope.launch {
+                timeZoneState.collect { timeZone ->
+                    if (timeZone == null) return@collect
+                    binding.edittextDetail.bindTimeZone(timeZone)
+                }
+            }
+            jobs += viewLifecycleScope.launch {
+                entryAtState.collect { entryAt ->
+                    if (entryAt == null) return@collect
+                    binding.edittextDetail.bindEntryAt(entryAt)
+                }
+            }
+            jobs += viewLifecycleScope.launch {
+                scheduleTimingDisplayFormatterState.collect { formatter ->
+                    if (formatter == null) return@collect
+                    binding.edittextDetail.bindScheduleTimingDisplayFormatter(formatter)
+                }
+            }
+            jobs += viewLifecycleScope.launch {
+                bindingId.filterNotNull().collectLatest { id ->
+                    binding.layoutClamp.buttonDetails.throttleClicks().collect {
+                        onOpenDetailRequested(OpenDetail(id = id, from = OpenDetailFrom.Clamp))
+                    }
+                }
+            }
+            jobs += viewLifecycleScope.launch {
+                bindingId.filterNotNull().collectLatest { id ->
+                    binding.layoutClamp.buttonDelete.throttleClicks().collect {
+                        onDeleteRequested(Delete(id))
+                    }
+                }
+            }
+        }
+        itemView.doOnDetach {
+            selectionAnimDelegate.clearResources()
+            jobs.cancelAllAndClear()
+        }
+    }
+
+    fun bind(item: ScheduleListItem.Content) {
+        bindingId.value = item.resource.schedule.id
+        binding.viewLine
+            .setVisible(isVisible = item.isLineVisible, goneIfNotVisible = false)
+        binding.edittextTitle.apply {
+            bindText(item.resource.schedule.title.value)
+            clearFocusIfNeeded()
+        }
+        binding.edittextNote.apply {
+            val isChanged = bindText(item.resource.schedule.note?.value)
+            if (isChanged) {
+                setSelection(text?.length ?: 0)
+            }
+            clearFocusIfNeeded()
+        }
+        binding.edittextDetail.apply {
+            bindScheduleData(
+                scheduleTiming = item.resource.schedule.timing,
+                completed = item.resource.completionChecked,
+                tags = item.resource.schedule.tags
+            )
+            clearFocusIfNeeded()
+        }
+        binding.cardLink
+            .setVisible(isVisible = item.resource.schedule.link != null)
+        binding.textviewLink
+            .bindText(item.resource.schedule.link?.rawLink?.value)
+        binding.textviewTitleLink.apply {
+            val linkTitle = item.resource.schedule.linkMetadata?.title?.value
+            setVisible(isVisible = linkTitle != null)
+            bindText(linkTitle)
+        }
+        binding.imageviewBgLinkThumbnail.apply {
+            val linkImageUrl = item.resource.schedule.linkMetadata?.imageUrl?.value
+            setVisible(isVisible = linkImageUrl != null)
+            bindImageAsync(
+                url = linkImageUrl,
+                placeHolder = linkThumbnailPlaceHolderDrawable,
+                error = linkThumbnailPlaceHolderDrawable,
+                enableCrossfade = true
+            )
+        }
+    }
+
+    override fun userDraggable(): Boolean {
+        return draggableViewHolderDelegate.userDraggable()
+    }
+
+    override fun isScaleOnDraggingNeeded(): Boolean {
+        return draggableViewHolderDelegate.isScaleOnDraggingNeeded()
+    }
+
+    override fun onDragStateChanged(isActive: Boolean) {
+        draggableViewHolderDelegate.onDragStateChanged(isActive)
+    }
+
+    override fun mirrorView(parent: ViewGroup, viewPool: DraggingMirrorViewPool): View {
+        return draggableViewHolderDelegate.mirrorView(parent, viewPool)
+    }
+
+    override fun userSwipeable(): Boolean {
+        return swipeableViewHolderDelegate.userSwipeable()
+    }
+
+    override fun onSwipe(dx: Float) {
+        swipeableViewHolderDelegate.onSwipe(dx)
+    }
+}
+
+private class DraggableViewHolderDelegate(
+    private val binding: LayoutScheduleAdapterItemContentBinding,
+    private val selectionAnimDelegate: ContentSelectionAnimDelegate
+) : DraggableViewHolder {
+    private val _draggingState = MutableStateFlow(false)
+    val draggingState: StateFlow<Boolean> = _draggingState.asStateFlow()
+
+    override fun userDraggable(): Boolean {
+        return binding.isInteractable()
+    }
+
+    override fun isScaleOnDraggingNeeded(): Boolean {
+        return binding.imageviewBgLinkThumbnail.isVisible
+    }
+
+    override fun onDragStateChanged(isActive: Boolean) {
+        _draggingState.value = isActive
+    }
+
+    override fun mirrorView(parent: ViewGroup, viewPool: DraggingMirrorViewPool): View {
+        val key = ContentViewHolder::class
+        val mirrorBinding = viewPool.get(key)
+            ?.let { LayoutScheduleAdapterItemContentMirrorBinding.bind(it) }
+            ?: run {
+                LayoutScheduleAdapterItemContentMirrorBinding
+                    .inflate(
+                        /*inflater = */ LayoutInflater.from(parent.context),
+                        /*parent = */ parent,
+                        /*attachToParent = */ false
+                    )
+                    .apply {
+                        root.alpha = 0.8f
+                        buttonComplete.setImageDrawable(binding.buttonComplete.drawable)
+                    }
+                    .also { viewPool.put(key, it.root) }
+            }
+        with(mirrorBinding) {
+            // completion check changed
+            // The style of each text works even if don't process it separately.
+            buttonComplete.isSelected = binding.buttonComplete.isSelected
+
+            // selection changed
+            buttonSelection.isSelected = binding.buttonSelection.isSelected
+
+            // bind
+            edittextTitle.bindText(binding.edittextTitle.text)
+            edittextNote.bindText(binding.edittextNote.text)
+
+            edittextDetail.bindText(binding.edittextDetail.text)
+
+            textviewLink.bindText(binding.textviewLink.text)
+
+            textviewTitleLink.bindText(binding.textviewTitleLink.text)
+            textviewTitleLink.visibility = binding.textviewTitleLink.visibility
+
+            imageviewBgLinkThumbnail.visibility = binding.imageviewBgLinkThumbnail.visibility
+            imageviewBgLinkThumbnail.setImageDrawable(binding.imageviewBgLinkThumbnail.drawable)
+        }
+        selectionAnimDelegate.applyStateToMirror(mirrorBinding)
+        return mirrorBinding.root
+    }
+}
+
+private class SwipeableViewHolderDelegate(
+    private val binding: LayoutScheduleAdapterItemContentBinding,
+) : SwipeableViewHolder {
+    private val clampAlphaOrigin: Float = binding.layoutClamp.layoutDim.alpha
+
+    private val _swipingState = MutableStateFlow(false)
+    val swipingState: StateFlow<Boolean> = _swipingState.asStateFlow()
+
+    private val translatableViews = binding.layoutClamp.let {
+        listOf(
+            it.viewBtnDetailsBg,
+            it.buttonDetails,
+            it.viewBtnDeleteBg,
+            it.buttonDelete
+        )
+    }
+    private val scalableViews = binding.layoutClamp.let {
+        listOf(
+            it.viewBtnDetailsBg,
+            it.viewBtnDeleteBg,
+        )
+    }
+    override val swipeView: View = binding.layoutContent
+    override val clampView: View = binding.layoutClamp.spacePivot
+
+    override fun userSwipeable(): Boolean {
+        return binding.isInteractable()
+    }
+
+    override fun onSwipe(dx: Float) {
+        val absoluteDx = dx.absoluteValue
+        val clampTotalSize = clampView.width.toFloat()
+        val clampPercent = absoluteDx / clampTotalSize
+
+        val isActive = clampPercent != 0f
+        _swipingState.value = isActive
+        binding.layoutClamp.root.setVisible(isVisible = isActive, goneIfNotVisible = false)
+
+        val remainingFraction = (1 - clampPercent)
+        binding.layoutClamp.layoutDim.alpha = clampAlphaOrigin * remainingFraction
+
+        translatableViews.forEach { v ->
+            v.translationX = (clampTotalSize - v.left + clampView.left) * remainingFraction
+        }
+
+        val scaleFactor = max(clampPercent, 1f)
+        scalableViews.forEach { v -> v.pivotX = 0f; v.scaleX = scaleFactor }
+    }
+}
+
+private enum class ContentInputFocus {
+    Title, Note, Detail, Nothing
+}
+
+private fun ContentInputFocus.hasFocus(): Boolean {
+    return this != ContentInputFocus.Nothing
+}
+
+private fun LayoutScheduleAdapterItemContentBinding.getAllInputs(): Iterable<EditText> = listOf(
+    edittextTitle,
+    edittextNote,
+    edittextDetail
+)
+
+private fun LayoutScheduleAdapterItemContentBinding.isInteractable(): Boolean {
+    return edittextTitle.hasSelection().not()
+            && edittextNote.hasSelection().not()
+            // Tag interactions often conflict with drag or swipe events
+            // Should block interactions when focus is present
+            && edittextDetail.hasFocus().not()
+}
+
+private fun LayoutScheduleAdapterItemContentBinding.findInput(contentInputFocus: ContentInputFocus): EditText? {
+    return when (contentInputFocus) {
+        ContentInputFocus.Title -> edittextTitle
+        ContentInputFocus.Note -> edittextNote
+        ContentInputFocus.Detail -> edittextDetail
+        ContentInputFocus.Nothing -> null
+    }
+}

@@ -23,7 +23,6 @@ import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.plus
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.unconfinedTestDispatcher
@@ -38,7 +37,9 @@ class EnsuredUpdateScheduleCompletionUseCaseTest {
     @Test
     fun `Given internalUseCase, When invoked, Then internalUseCase invoked`() = runTest {
         val internalUseCase: UpdateScheduleCompletionUseCase = mockk {
-            coEvery { invoke(scheduleId = any(), targetCompleted = any()) } returns Result.success(Unit)
+            coEvery {
+                invoke(scheduleId = any(), targetCompleted = any())
+            } returns ScheduleJobResult.Success
         }
         val useCase = EnsuredUpdateScheduleCompletionUseCase(
             coroutineScope = this,
@@ -62,7 +63,7 @@ class EnsuredUpdateScheduleCompletionUseCaseTest {
                 coEvery { invoke(scheduleId = any(), targetCompleted = any()) } coAnswers {
                     delay(delayTimeMillis)
                     updated = true
-                    Result.success(Unit)
+                    ScheduleJobResult.Success
                 }
             }
         )

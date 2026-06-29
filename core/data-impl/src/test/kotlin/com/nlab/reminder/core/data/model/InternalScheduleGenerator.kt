@@ -21,6 +21,7 @@ import com.nlab.reminder.core.kotlin.collections.toSetIndexed
 import com.nlab.reminder.core.local.database.entity.RepeatDetailEntity
 import com.nlab.reminder.core.local.database.entity.ScheduleEntity
 import com.nlab.reminder.core.local.database.entity.ScheduleTagListEntity
+import com.nlab.reminder.core.local.database.entity.ScheduleCompositeEntity
 import com.nlab.reminder.core.local.database.transaction.ScheduleRepeatDetailAggregate
 import com.nlab.testkit.faker.genInt
 
@@ -29,12 +30,6 @@ typealias ScheduleAndEntity = Pair<Schedule, ScheduleCompositeEntity>
 /**
  * @author Doohyun
  */
-data class ScheduleCompositeEntity(
-    val scheduleEntity: ScheduleEntity,
-    val scheduleTagListEntities: Set<ScheduleTagListEntity>,
-    val repeatDetailEntities: Set<RepeatDetailEntity>,
-)
-
 fun genScheduleAndEntity(
     schedule: Schedule = genSchedule(),
     lastRepeatId: Long = -1
@@ -65,8 +60,8 @@ fun genScheduleAndEntity(
     }
     val scheduleWithDetailEntity = ScheduleCompositeEntity(
         scheduleEntity = scheduleEntity,
-        scheduleTagListEntities = scheduleTagListEntities,
-        repeatDetailEntities = repeatDetailEntities
+        scheduleTagListEntities = scheduleTagListEntities.toList(),
+        repeatDetailEntities = repeatDetailEntities.toList()
     )
     return schedule to scheduleWithDetailEntity
 }
@@ -88,9 +83,7 @@ private fun RepeatDetailEntities(
     }
 }
 
-fun genScheduleAndEntities(
-    count: Int = genInt(min = 5, max = 10)
-): Set<ScheduleAndEntity> {
+fun genScheduleAndEntities(count: Int = genInt(min = 5, max = 10)): Set<ScheduleAndEntity> {
     val acc = genSchedules(count = count).fold(Pair(emptyList<ScheduleAndEntity>(), -1L)) { acc, schedule ->
         val (prevScheduleAndEntities, prevLastRepeatId) = acc
         val scheduleAndEntity = genScheduleAndEntity(schedule, prevLastRepeatId)

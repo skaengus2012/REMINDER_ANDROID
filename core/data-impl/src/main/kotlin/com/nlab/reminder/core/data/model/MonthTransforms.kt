@@ -34,7 +34,7 @@ import kotlinx.datetime.Month
 /**
  * @author Doohyun
  */
-fun Month(@RepeatMonth month: String): Month = when (month) {
+internal fun Month(@RepeatMonth month: String): Month = when (month) {
     REPEAT_MONTH_JAN -> Month.JANUARY
     REPEAT_MONTH_FEB -> Month.FEBRUARY
     REPEAT_MONTH_MAR -> Month.MARCH
@@ -51,7 +51,7 @@ fun Month(@RepeatMonth month: String): Month = when (month) {
 }
 
 @RepeatMonth
-fun Month.toRepeatMonth(): String = when (this) {
+internal fun Month.toRepeatMonth(): String = when (this) {
     Month.JANUARY -> REPEAT_MONTH_JAN
     Month.FEBRUARY -> REPEAT_MONTH_FEB
     Month.MARCH -> REPEAT_MONTH_MAR

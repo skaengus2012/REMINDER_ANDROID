@@ -27,6 +27,7 @@ import com.nlab.reminder.core.data.qualifiers.ScheduleDataOption.*
 import com.nlab.reminder.core.data.repository.CompletedScheduleShownRepository
 import com.nlab.reminder.core.data.repository.LinkMetadataRepository
 import com.nlab.reminder.core.data.repository.ScheduleCompletionBacklogRepository
+import com.nlab.reminder.core.data.repository.ScheduleDeletionBacklogRepository
 import com.nlab.reminder.core.data.repository.ScheduleRepository
 import com.nlab.reminder.core.data.repository.SystemTimeSnapshotRepository
 import com.nlab.reminder.core.data.repository.TagRepository
@@ -34,6 +35,7 @@ import com.nlab.reminder.core.data.repository.TimeSnapshotRepository
 import com.nlab.reminder.core.data.repository.impl.DefaultCompletedScheduleShownRepository
 import com.nlab.reminder.core.data.repository.impl.LinkMetadataRemoteCache
 import com.nlab.reminder.core.data.repository.impl.LocalScheduleCompletionBacklogRepository
+import com.nlab.reminder.core.data.repository.impl.LocalScheduleDeletionBacklogRepository
 import com.nlab.reminder.core.data.repository.impl.LocalScheduleRepository
 import com.nlab.reminder.core.data.repository.impl.LocalTagRepository
 import com.nlab.reminder.core.data.repository.impl.OfflineFirstLinkMetadataRepository
@@ -49,8 +51,9 @@ import com.nlab.reminder.core.kotlin.onSuccess
 import com.nlab.reminder.core.kotlin.toPositiveInt
 import com.nlab.reminder.core.local.database.dao.LinkMetadataDAO
 import com.nlab.reminder.core.local.database.dao.ScheduleCompletionBacklogDAO
+import com.nlab.reminder.core.local.database.dao.ScheduleDeletionBacklogDAO
 import com.nlab.reminder.core.local.database.dao.ScheduleDAO
-import com.nlab.reminder.core.local.database.dao.ScheduleRepeatDetailDAO
+import com.nlab.reminder.core.local.database.dao.ScheduleCompositeDAO
 import com.nlab.reminder.core.local.database.dao.ScheduleTagListDAO
 import com.nlab.reminder.core.local.database.dao.TagDAO
 import com.nlab.reminder.core.local.database.transaction.InsertAndGetScheduleContentAggregateTransaction
@@ -92,16 +95,24 @@ internal object AppScopeDataModule {
 
     @Provides
     @Reusable
+    fun provideScheduleDeletionBacklogRepository(
+        scheduleDeletionBacklogDAO: ScheduleDeletionBacklogDAO,
+    ): ScheduleDeletionBacklogRepository = LocalScheduleDeletionBacklogRepository(
+        scheduleDeletionBacklogDAO = scheduleDeletionBacklogDAO
+    )
+
+    @Provides
+    @Reusable
     fun provideScheduleRepository(
         scheduleDAO: ScheduleDAO,
-        scheduleRepeatDetailDAO: ScheduleRepeatDetailDAO,
-        scheduleTagListDAO: ScheduleTagListDAO,
-        insertAndGetScheduleContentAggregateTransaction: InsertAndGetScheduleContentAggregateTransaction,
-        updateAndGetScheduleContentAggregateTransaction: UpdateAndGetScheduleContentAggregateTransaction
+        scheduleCompositeDAO: ScheduleCompositeDAO,
+        insertAndGetScheduleContentAggregateTransaction:
+            InsertAndGetScheduleContentAggregateTransaction,
+        updateAndGetScheduleContentAggregateTransaction:
+            UpdateAndGetScheduleContentAggregateTransaction
     ): ScheduleRepository = LocalScheduleRepository(
         scheduleDAO = scheduleDAO,
-        scheduleRepeatDetailDAO = scheduleRepeatDetailDAO,
-        scheduleTagListDAO = scheduleTagListDAO,
+        scheduleCompositeDAO = scheduleCompositeDAO,
         insertAndGetScheduleContentAggregate = insertAndGetScheduleContentAggregateTransaction,
         updateAndGetScheduleContentAggregate = updateAndGetScheduleContentAggregateTransaction
     )

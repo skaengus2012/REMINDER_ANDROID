@@ -56,7 +56,7 @@
                 android:name="com.nlab.reminder.apps.startup.init.DataCleanupInitializer"
                 android:value="androidx.startup" />
             <meta-data
-                android:name="com.nlab.reminder.apps.startup.init.ScheduleCompletionCleanupInitializer"
+                android:name="com.nlab.reminder.apps.startup.init.ScheduleBacklogCleanupInitializer"
                 android:value="androidx.startup" />
 			<meta-data
 				android:name="com.nlab.reminder.apps.startup.init.StateKitPluginInitializer"
