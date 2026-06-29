@@ -97,5 +97,7 @@ internal inline fun CoroutineWorker.runWithRetry(
 }
 
 private fun isTransientThrowable(t: Throwable): Boolean {
-    return t is java.io.IOException || t is android.database.sqlite.SQLiteException
+    return t is java.io.IOException ||
+        t is android.database.sqlite.SQLiteDatabaseLockedException ||
+        t is android.database.sqlite.SQLiteDiskIOException
 }
