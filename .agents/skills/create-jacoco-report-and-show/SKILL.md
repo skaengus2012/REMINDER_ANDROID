@@ -25,14 +25,23 @@ If the user does not specify a module name (e.g., `:core:component:tag`) in thei
 Present the deduced top 1~3 modules as multiple-choice options using the `ask_question` tool.
 Since the user's desired module might not be in the candidates, you must always include an **`Other (Manual Input)`** option.
 
-### 2. Execute Gradle Command (Cache Reset & Report Generation)
-- Once the target module is selected, use the `run_command` tool to execute the following command:
+### 2. Dynamic Task Discovery
+Because the exact name of the Jacoco task can vary depending on the module type (e.g., `jacocoTestReportJvm`, `jacocoTestReportDebug`, `jacocoTestReportRelease`, `jacocoTestReport`), you must dynamically query the available tasks for the selected module.
+- Use the `run_command` tool to execute the following command:
   ```bash
-  ./gradlew <module>:clean <module>:jacocoTestReport
+  ./gradlew <module>:tasks --all | grep jacocoTestReport
   ```
-  *(Note: Replace `<module>` with the user's selected module name.)*
+- Parse the output to extract all available Jacoco tasks for that module.
+- Present the extracted tasks to the user as multiple-choice options using the `ask_question` tool so they can select the exact task they want to execute.
 
-### 3. Locate the Report File
+### 3. Execute Gradle Command (Cache Reset & Report Generation)
+- Once the specific task is selected, use the `run_command` tool to execute the following command:
+  ```bash
+  ./gradlew <module>:clean <module>:<selected_task>
+  ```
+  *(Note: Replace `<module>` and `<selected_task>` with the user's choices.)*
+
+### 4. Locate the Report File
 - After generation is complete, find the `index.html` file within the module's directory path.
 - Execute the `find` command based on the module path (replace colons `:` with slashes `/`):
   ```bash
@@ -40,7 +49,7 @@ Since the user's desired module might not be in the candidates, you must always 
   ```
   *(Example: For module `:statekit:core`, search within `statekit/core/build`)*
 
-### 4. Open Browser and Provide Result
+### 5. Open Browser and Provide Result
 - Use the **absolute path** of the found `index.html` file to execute the Mac browser open command:
   ```bash
   open <absolute_path_to_index.html>
