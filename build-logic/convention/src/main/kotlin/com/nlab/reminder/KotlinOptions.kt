@@ -81,17 +81,18 @@ internal fun Project.configureKotlinJvm() {
 private inline fun <reified T : KotlinBaseExtension> Project.configureKotlin(
     crossinline block: KotlinJvmCompilerOptions.() -> Unit = {}
 ) = configure<T> {
-    // Override by setting warningsAsErrors=true in your ~/.gradle/gradle.properties
-    val warningsAsErrors = providers.gradleProperty("warningsAsErrors").map {
-        it.toBoolean()
-    }.orElse(false)
     when (this) {
         is KotlinAndroidProjectExtension -> compilerOptions
         is KotlinJvmProjectExtension -> compilerOptions
         else -> error("Unsupported project extension $this ${T::class}")
     }.apply {
         jvmTarget.set(selectedJvmTarget)
-        allWarningsAsErrors.set(warningsAsErrors)
+        // Override by setting warningsAsErrors=true in your ~/.gradle/gradle.properties
+        allWarningsAsErrors.set(
+            providers.gradleProperty("warningsAsErrors").map {
+                it.toBoolean()
+            }.orElse(false)
+        )
         freeCompilerArgs.addAll(
             "-opt-in=kotlin.Experimental",
             "-opt-in=kotlin.concurrent.atomics.ExperimentalAtomicApi",
