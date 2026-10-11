@@ -39,8 +39,6 @@ import com.nlab.reminder.feature.all.navigation.navigateToAll
 /**
  * @author Thalys
  */
-private const val HOME_TRANSITION_DURATION = 300
-
 @Composable
 fun PlaneatNavHost(
     appState: PlaneatAppState,
@@ -86,6 +84,8 @@ fun PlaneatNavHost(
         }
     }
 }
+
+private const val HOME_TRANSITION_DURATION = 300
 
 private val fromHomeEnterTransitionFactory: EnterTransitionFactory = {
     slideIntoContainer(
