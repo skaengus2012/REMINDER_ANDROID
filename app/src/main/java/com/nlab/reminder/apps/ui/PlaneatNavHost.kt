@@ -54,14 +54,20 @@ fun PlaneatNavHost(
         enterTransition = { EnterTransition.None },
         exitTransition = { ExitTransition.None },
         popEnterTransition = { EnterTransition.None },
-        popExitTransition = { ExitTransition.None }
+        popExitTransition = { ExitTransition.None },
+        predictivePopEnterTransition = {
+            // TODO If screen-specific transitions are needed in the future, handle branching based on targetState/initialState.
+            homePopEnterTransitionFactory() ?: EnterTransition.None
+        },
+        predictivePopExitTransition = {
+            // TODO If screen-specific transitions are needed in the future, handle branching based on initialState/targetState.
+            fromHomePopExitTransitionFactory() ?: ExitTransition.None
+        }
     ) {
         homeEntryPoint {
-            val enterTransitionFactoryFromHome = createFromHomeEnterTransitionFactory()
-            val popExitTransitionFactoryFromHome = createFromHomePopExitTransitionFactory()
             homeScreen(
-                provideExitTransition = createHomeExitTransition(),
-                providePopEnterTransition = createHomePopEnterTransitionFactory(),
+                provideExitTransition = homeExitTransitionFactory,
+                providePopEnterTransition = homePopEnterTransitionFactory,
                 onTodayCategoryClicked = {
                     // TODO implement
                 },
@@ -72,8 +78,8 @@ fun PlaneatNavHost(
             )
             allScreen(
                 enterTransitionTimeInMillis = HOME_TRANSITION_DURATION,
-                provideEnterTransition = enterTransitionFactoryFromHome,
-                providePopExitTransition = popExitTransitionFactoryFromHome,
+                provideEnterTransition = fromHomeEnterTransitionFactory,
+                providePopExitTransition = fromHomePopExitTransitionFactory,
                 showAppToast = { appState.showApplicationToast(it) },
                 onBackClicked = { navController.popBackStack() }
             )
@@ -81,14 +87,14 @@ fun PlaneatNavHost(
     }
 }
 
-private fun createFromHomeEnterTransitionFactory(): EnterTransitionFactory = {
+private val fromHomeEnterTransitionFactory: EnterTransitionFactory = {
     slideIntoContainer(
         animationSpec = tween(HOME_TRANSITION_DURATION, easing = EaseIn),
         towards = AnimatedContentTransitionScope.SlideDirection.Start
     )
 }
 
-private fun createHomeExitTransition(): ExitTransitionFactory = {
+private val homeExitTransitionFactory: ExitTransitionFactory = {
     slideOutOfContainer(
         animationSpec = tween(HOME_TRANSITION_DURATION, easing = EaseOut),
         towards = AnimatedContentTransitionScope.SlideDirection.Start,
@@ -96,7 +102,7 @@ private fun createHomeExitTransition(): ExitTransitionFactory = {
     ) + fadeOut(animationSpec = tween(HOME_TRANSITION_DURATION, easing = LinearEasing), targetAlpha = 0.2f)
 }
 
-private fun createHomePopEnterTransitionFactory(): EnterTransitionFactory = {
+private val homePopEnterTransitionFactory: EnterTransitionFactory = {
     slideIntoContainer(
         animationSpec = tween(HOME_TRANSITION_DURATION, easing = EaseIn),
         towards = AnimatedContentTransitionScope.SlideDirection.End,
@@ -104,7 +110,7 @@ private fun createHomePopEnterTransitionFactory(): EnterTransitionFactory = {
     ) + fadeIn(animationSpec = tween(HOME_TRANSITION_DURATION, easing = LinearEasing), initialAlpha = 0.2f)
 }
 
-private fun createFromHomePopExitTransitionFactory(): ExitTransitionFactory = {
+private val fromHomePopExitTransitionFactory: ExitTransitionFactory = {
     slideOutOfContainer(
         animationSpec = tween(HOME_TRANSITION_DURATION, easing = EaseOut),
         towards = AnimatedContentTransitionScope.SlideDirection.End
