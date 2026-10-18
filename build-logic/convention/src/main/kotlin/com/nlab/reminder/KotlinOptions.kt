@@ -30,8 +30,8 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 /**
  * @author Doohyun
  */
-private val selectedJavaVersion: JavaVersion get() = JavaVersion.VERSION_17
-private val selectedJvmTarget: JvmTarget get() = JvmTarget.JVM_17
+private val selectedJavaVersion: JavaVersion get() = JavaVersion.VERSION_21
+private val selectedJvmTarget: JvmTarget get() = JvmTarget.JVM_21
 
 internal fun Project.configureKotlinAndroid(commonExtension: CommonExtension) {
     commonExtension.apply {
