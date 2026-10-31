@@ -161,7 +161,7 @@ Assign the PR to the current user (`--assignee @me`) if the linked issue is assi
 
 ## Step 8. Report
 
-Reply in Korean with: PR URL, base <- head branches, labels, what was verified, and any skipped step or commit-rule
+Reply with: PR URL, base <- head branches, labels, what was verified, and any skipped step or commit-rule
 violation the user should know about. Remind the user that the PR is a Draft and is theirs to mark Ready.
 
 ---
