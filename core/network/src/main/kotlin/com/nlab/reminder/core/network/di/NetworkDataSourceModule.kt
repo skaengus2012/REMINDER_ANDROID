@@ -32,6 +32,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import okhttp3.OkHttpClient
 import javax.inject.Singleton
 
 /**
@@ -43,8 +44,9 @@ internal object NetworkDataSourceModule {
     @Reusable
     @Provides
     fun provideLinkMetadataSource(
-        @Dispatcher(IO) dispatcher: CoroutineDispatcher
-    ): LinkThumbnailDataSource = LinkThumbnailDataSourceImpl(dispatcher)
+        @Dispatcher(IO) dispatcher: CoroutineDispatcher,
+        okHttpClient: OkHttpClient
+    ): LinkThumbnailDataSource = LinkThumbnailDataSourceImpl(dispatcher, okHttpClient)
 
     @Singleton
     @Provides
