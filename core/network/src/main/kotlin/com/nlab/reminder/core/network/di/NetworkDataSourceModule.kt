@@ -20,6 +20,7 @@ import android.content.Context
 import com.nlab.reminder.core.inject.qualifiers.coroutine.AppScope
 import com.nlab.reminder.core.inject.qualifiers.coroutine.Dispatcher
 import com.nlab.reminder.core.inject.qualifiers.coroutine.DispatcherOption.IO
+import com.nlab.reminder.core.network.datasource.HtmlDataSource
 import com.nlab.reminder.core.network.datasource.LinkThumbnailDataSource
 import com.nlab.reminder.core.network.datasource.LinkThumbnailDataSourceImpl
 import com.nlab.reminder.core.network.datasource.TrustedTimeDataSource
@@ -43,8 +44,9 @@ internal object NetworkDataSourceModule {
     @Reusable
     @Provides
     fun provideLinkMetadataSource(
-        @Dispatcher(IO) dispatcher: CoroutineDispatcher
-    ): LinkThumbnailDataSource = LinkThumbnailDataSourceImpl(dispatcher)
+        @Dispatcher(IO) dispatcher: CoroutineDispatcher,
+        htmlDataSource: HtmlDataSource
+    ): LinkThumbnailDataSource = LinkThumbnailDataSourceImpl(dispatcher, htmlDataSource)
 
     @Singleton
     @Provides

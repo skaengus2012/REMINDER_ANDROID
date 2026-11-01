@@ -29,6 +29,7 @@ androidxTransition = "1.7.2"
 appCashTurbine = "1.2.0"
 coil = "2.7.0"
 desugarJdklibs = "2.1.5"
+flocon = "1.10.0"
 googleHilt = "2.60.1"
 googleMaterial = "1.14.0"
 googlePlayServicesTime = "16.0.1"
@@ -43,6 +44,7 @@ ksp = "2.3.12"
 kotlinxCollectionsImmutable = "0.5.2"
 kotlinxCoroutine = "1.11.0"
 mockk = "1.14.11"
+retrofit = "3.0.0"
 squareLeakcanary = "2.14"
 timber = "5.0.1"
 turbine = "1.2.1"
@@ -85,6 +87,8 @@ coil-kt-svg = { group = "io.coil-kt", name = "coil-svg", version.ref = "coil" }
 desugar-jdk-libs = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugarJdklibs" }  # use in configureComposeAndroid KotlinOptions.kt
 google-hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "googleHilt" }       # use in nlab.android.hilt.gradle.kts
 google-hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "googleHilt" }     # use in nlab.android.hilt.gradle.kts
+flocon = { module = "io.github.openflocon:flocon", version.ref = "flocon" }
+flocon-okhttp = { module = "io.github.openflocon:flocon-okhttp-interceptor", version.ref = "flocon" }
 google-material = { group = "com.google.android.material", name = "material", version.ref = "googleMaterial" }
 google-play-services-time = { module = "com.google.android.gms:play-services-time", version.ref = "googlePlayServicesTime" }
 javafaker = { module = "com.github.javafaker:javafaker", version.ref = "javafaker" }
@@ -97,6 +101,7 @@ kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-t
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
+retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 squeare-leakcanary = { module = "com.squareup.leakcanary:leakcanary-android", version.ref = "squareLeakcanary" }
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 turbine = { group = "app.cash.turbine", name = "turbine", version.ref = "turbine" }
