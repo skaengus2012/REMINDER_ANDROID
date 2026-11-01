@@ -24,6 +24,7 @@ docs/spec/
 |------|------|--------------|
 | `requirements.md` | Requirements analysis: what is needed, collected from the issue body, comments, and parent issue | `create-gh-issue-analysis-report` |
 | `plan.md` | The plan for the work: design and tasks, kept up to date as the work progresses | `create-plans` |
+| `mockup/<screen>.html` | Optional visual reference for a UI change: one self-contained HTML file per screen | `create-mockup` |
 
 There is no separate result document. What was actually implemented is recorded in the code, the git history, and the PR description.
 
