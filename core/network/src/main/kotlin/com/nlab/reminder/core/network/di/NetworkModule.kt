@@ -35,6 +35,12 @@ import retrofit2.Retrofit
 import javax.inject.Singleton
 
 /**
+ * `Retrofit.Builder.build()` throws without a base URL, but [HtmlApi] always receives an absolute `@Url`,
+ * which Retrofit uses as is. So this value is never requested and any valid URL works.
+ */
+private const val UNUSED_BASE_URL = "https://localhost/"
+
+/**
  * @author Doohyun
  */
 @Module
@@ -53,7 +59,7 @@ internal object NetworkModule {
     fun provideHtmlApi(
         okHttpClientProvider: Lazy<OkHttpClient>
     ): HtmlApi = Retrofit.Builder()
-        .baseUrl("https://localhost/") // Required by Retrofit, but ignored because every call passes an absolute @Url.
+        .baseUrl(UNUSED_BASE_URL)
         .callFactory { request -> okHttpClientProvider.get().newCall(request) }
         .build()
         .create(HtmlApi::class.java)
