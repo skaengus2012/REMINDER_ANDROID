@@ -97,3 +97,4 @@
 | 2026-11-01 | PR 리뷰 반영: 상수 객체 `NetworkConstants`를 `BaseUrls`로, `UNUSED_BASE_URL`을 `UNUSED`로 변경 | PR #881 리뷰 코멘트 |
 | 2026-11-01 | PR 리뷰 반영: Retrofit 서비스 구현을 별도 타입 `HtmlDataSource`로 분리하고 `LinkThumbnailDataSourceImpl`이 이를 소유해 사용. `withContext`는 본문 읽기가 블로킹이라 유지 | PR #881 리뷰 코멘트 |
 | 2026-11-01 | PR 리뷰 반영: `HtmlDataSource`의 스코프를 `@Singleton`에서 `@Reusable`로 변경 | PR #881 리뷰 코멘트 |
+| 2026-11-01 | PR 리뷰 반영: `LinkThumbnailDataSource.kt`의 charset 감지 상수를 파일 상단의 다른 상수 옆으로 이동 | PR #881 리뷰 코멘트 |

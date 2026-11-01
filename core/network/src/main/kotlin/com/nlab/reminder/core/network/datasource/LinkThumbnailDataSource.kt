@@ -35,6 +35,9 @@ import java.nio.charset.Charset
 private const val OG_TITLE = "og:title"
 private const val OG_IMAGE = "og:image"
 private val TAGS_REQUIRED: Set<String> = setOf(OG_TITLE, OG_IMAGE)
+private const val CHARSET_SNIFF_BYTES = 1024L
+private val META_CHARSET_REGEX =
+    Regex("""<meta[^>]+charset\s*=\s*["']?\s*([A-Za-z0-9_.:\-]+)""", RegexOption.IGNORE_CASE)
 
 private fun Element.toProperty(): String = attr("property")
 private fun Element.toContent(): String = attr("content")
@@ -76,9 +79,6 @@ internal class LinkThumbnailDataSourceImpl(
     }
 }
 
-private const val CHARSET_SNIFF_BYTES = 1024L
-private val META_CHARSET_REGEX = Regex("""<meta[^>]+charset\s*=\s*["']?\s*([A-Za-z0-9_.:\-]+)""", RegexOption.IGNORE_CASE)
-
 /**
  * Opens a reader for the body without consuming it.
  * Uses the charset declared by the server, otherwise the one in `<meta>` found in the first bytes, otherwise UTF-8.
@@ -88,7 +88,9 @@ private fun ResponseBody.openReader(): Reader {
 
     val source = source()
     source.request(CHARSET_SNIFF_BYTES)
-    val head = source.buffer.snapshot(minOf(source.buffer.size, CHARSET_SNIFF_BYTES).toInt()).string(Charsets.ISO_8859_1)
+    val head = source.buffer
+        .snapshot(minOf(source.buffer.size, CHARSET_SNIFF_BYTES).toInt())
+        .string(Charsets.ISO_8859_1)
     val sniffed: Charset? = META_CHARSET_REGEX.find(head)
         ?.groupValues?.get(1)
         ?.let { name -> runCatching { Charset.forName(name) }.getOrNull() }
