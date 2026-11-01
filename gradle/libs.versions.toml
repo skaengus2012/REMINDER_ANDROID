@@ -44,7 +44,6 @@ ksp = "2.3.12"
 kotlinxCollectionsImmutable = "0.5.2"
 kotlinxCoroutine = "1.11.0"
 mockk = "1.14.11"
-retrofit = "3.0.0"
 squareLeakcanary = "2.14"
 timber = "5.0.1"
 turbine = "1.2.1"
@@ -101,7 +100,6 @@ kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-t
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
-retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 squeare-leakcanary = { module = "com.squareup.leakcanary:leakcanary-android", version.ref = "squareLeakcanary" }
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 turbine = { group = "app.cash.turbine", name = "turbine", version.ref = "turbine" }

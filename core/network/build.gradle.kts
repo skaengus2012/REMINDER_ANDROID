@@ -15,5 +15,4 @@ dependencies {
     implementation(libs.coil.kt.svg)
     implementation(libs.google.play.services.time)
     implementation(libs.jsoup)
-    implementation(libs.retrofit)
 }
