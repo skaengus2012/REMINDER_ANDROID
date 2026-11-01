@@ -93,7 +93,6 @@ dependencies {
 
     debugImplementation(libs.flocon)
     debugImplementation(libs.flocon.okhttp)
-    debugImplementation(libs.okhttp)
     debugImplementation(libs.squeare.leakcanary)
 
     testImplementation(projects.testkit)
