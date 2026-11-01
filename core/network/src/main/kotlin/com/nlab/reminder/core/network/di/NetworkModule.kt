@@ -21,9 +21,6 @@ import coil.ImageLoader
 import coil.decode.SvgDecoder
 import coil.disk.DiskCache
 import coil.memory.MemoryCache
-import com.nlab.reminder.core.network.NetworkConstants
-import com.nlab.reminder.core.network.datasource.HtmlApi
-import com.nlab.reminder.core.network.infra.RetrofitFactory
 import dagger.Lazy
 import dagger.Module
 import dagger.Provides
@@ -48,12 +45,6 @@ internal object NetworkModule {
     ): OkHttpClient = OkHttpClient.Builder()
         .apply { interceptors.forEach(::addInterceptor) }
         .build()
-
-    @Provides
-    @Singleton
-    fun provideHtmlApi(
-        retrofitFactory: RetrofitFactory
-    ): HtmlApi = retrofitFactory.create(NetworkConstants.UNUSED_BASE_URL).create(HtmlApi::class.java)
 
     @Provides
     @Singleton

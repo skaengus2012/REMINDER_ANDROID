@@ -19,12 +19,17 @@ package com.nlab.reminder.core.network.datasource
 import com.nlab.reminder.core.kotlin.NonBlankString
 import com.nlab.reminder.core.kotlin.Result
 import com.nlab.reminder.core.kotlin.catching
+import com.nlab.reminder.core.network.NetworkConstants
+import com.nlab.reminder.core.network.infra.RetrofitFactory
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import okhttp3.ResponseBody
 import org.jsoup.nodes.Element
 import org.jsoup.parser.Parser
 import org.jsoup.parser.StreamParser
+import retrofit2.http.GET
+import retrofit2.http.Streaming
+import retrofit2.http.Url
 import java.io.InputStreamReader
 import java.io.Reader
 import java.nio.charset.Charset
@@ -47,12 +52,16 @@ fun interface LinkThumbnailDataSource {
 
 internal class LinkThumbnailDataSourceImpl(
     private val dispatcher: CoroutineDispatcher,
-    private val htmlApi: HtmlApi
+    retrofitFactory: RetrofitFactory
 ) : LinkThumbnailDataSource {
+    private val apiService: LinkThumbnailApiService = retrofitFactory
+        .create(NetworkConstants.UNUSED_BASE_URL)
+        .create(LinkThumbnailApiService::class.java)
+
     override suspend fun getLinkThumbnail(url: NonBlankString): Result<LinkThumbnailResponse> = catching {
         withContext(dispatcher) {
             // The body is not read yet at this point. StreamParser reads it lazily and stops after <head>.
-            val metaTagToValues = htmlApi.getHtml(url.value).use { body ->
+            val metaTagToValues = apiService.getHtml(url.value).use { body ->
                 StreamParser(Parser.htmlParser()).use { parser ->
                     parser.parse(body.openReader(), url.value)
                     parser.selectFirst("head")
@@ -74,6 +83,16 @@ internal class LinkThumbnailDataSourceImpl(
             }
         }
     }
+}
+
+private interface LinkThumbnailApiService {
+    /**
+     * Fetches the page at the absolute [url]. [Streaming] is required: without it Retrofit buffers the whole body in
+     * memory, which defeats the stream parsing of the head element.
+     */
+    @Streaming
+    @GET
+    suspend fun getHtml(@Url url: String): ResponseBody
 }
 
 private const val CHARSET_SNIFF_BYTES = 1024L
