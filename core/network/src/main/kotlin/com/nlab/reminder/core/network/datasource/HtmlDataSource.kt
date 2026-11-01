@@ -18,12 +18,12 @@ package com.nlab.reminder.core.network.datasource
 
 import com.nlab.reminder.core.network.BaseUrls
 import com.nlab.reminder.core.network.infra.RetrofitFactory
+import dagger.Reusable
 import okhttp3.ResponseBody
 import retrofit2.http.GET
 import retrofit2.http.Streaming
 import retrofit2.http.Url
 import javax.inject.Inject
-import javax.inject.Singleton
 
 /**
  * Fetches a page from any absolute URL. The body is returned unread, so the caller must close it and read it off the
@@ -31,7 +31,7 @@ import javax.inject.Singleton
  *
  * @author Doohyun
  */
-@Singleton
+@Reusable
 internal class HtmlDataSource @Inject constructor(
     retrofitFactory: RetrofitFactory
 ) : HtmlApiService by retrofitFactory

@@ -96,3 +96,4 @@
 | 2026-11-01 | PR 리뷰 반영: 서비스 보관 방식을 프로퍼티에서 android-boot와 같은 위임(`by`)으로 변경. file-private 인터페이스를 supertype으로 둘 수 없다던 이전 커밋 설명은 틀렸음(컴파일로 확인) | PR #881 리뷰 코멘트 |
 | 2026-11-01 | PR 리뷰 반영: 상수 객체 `NetworkConstants`를 `BaseUrls`로, `UNUSED_BASE_URL`을 `UNUSED`로 변경 | PR #881 리뷰 코멘트 |
 | 2026-11-01 | PR 리뷰 반영: Retrofit 서비스 구현을 별도 타입 `HtmlDataSource`로 분리하고 `LinkThumbnailDataSourceImpl`이 이를 소유해 사용. `withContext`는 본문 읽기가 블로킹이라 유지 | PR #881 리뷰 코멘트 |
+| 2026-11-01 | PR 리뷰 반영: `HtmlDataSource`의 스코프를 `@Singleton`에서 `@Reusable`로 변경 | PR #881 리뷰 코멘트 |
