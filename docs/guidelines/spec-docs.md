@@ -8,7 +8,9 @@ Documents about a single GitHub issue are kept together under `docs/spec/issue<n
 docs/spec/
 └── issue<number>/
     ├── requirements.md   # Requirements analysis
-    └── plan.md           # Plan for the work (kept up to date as the work progresses)
+    ├── plan.md           # Plan for the work (kept up to date as the work progresses)
+    └── mockup/           # Optional. HTML mockups for UI changes
+        └── <screen>.html
 ```
 
 - One folder per issue. The folder is created by the skill that writes the first document.
@@ -22,6 +24,7 @@ docs/spec/
 |------|------|--------------|
 | `requirements.md` | Requirements analysis: what is needed, collected from the issue body, comments, and parent issue | `create-gh-issue-analysis-report` |
 | `plan.md` | The plan for the work: design and tasks, kept up to date as the work progresses | `create-plans` |
+| `mockup/<screen>.html` | Optional visual reference for a UI change: one self-contained HTML file per screen | `create-mockup` |
 
 There is no separate result document. What was actually implemented is recorded in the code, the git history, and the PR description.
 
@@ -33,6 +36,13 @@ There is no separate result document. What was actually implemented is recorded 
 - Describes **how** the work is planned, and always represents the **current state** of the plan.
 - When the plan changes during the work, edit it in place and record the change in `Change History`.
 - Even so, it is not guaranteed to match the final code. Treat the code as the source of truth for what was built.
+
+### `mockup/`
+- Optional. Exists only when the issue has a UI change and a mockup was made for it.
+- Holds one HTML file per screen, each a single self-contained file (no external CDN) that opens offline in a browser.
+- **Read it before implementing an issue** when it exists, together with `requirements.md`.
+- It is a visual reference, not a specification. Treat the code as the source of truth for what was built.
+- It does not need a `Change History` table. Git history records its changes.
 
 ---
 

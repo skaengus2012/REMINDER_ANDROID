@@ -94,6 +94,8 @@ dependencies {
     implementation(libs.google.material)
     implementation(libs.timber)
 
+    debugImplementation(libs.flocon)
+    debugImplementation(libs.flocon.okhttp)
     debugImplementation(libs.squeare.leakcanary)
 
     testImplementation(projects.testkit)
