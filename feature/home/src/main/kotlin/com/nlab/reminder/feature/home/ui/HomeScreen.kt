@@ -38,7 +38,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
@@ -56,12 +55,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -625,7 +622,6 @@ private fun BottomActions(
             }
         }
     }
-<<<<<<< HEAD
     BottomAppbar(
         bottomAppbarState = rememberDelegatedBottomAppbarState(
             backgroundAlphaState = backgroundAlphaState
@@ -637,45 +633,6 @@ private fun BottomActions(
         NewPlanButton(
             modifier = Modifier.height(contentHeight),
             onClick = throttleClick(onClick = onNewPlanClicked)
-=======
-    Box(modifier = modifier) {
-        Spacer(
-            modifier = Modifier
-                .matchParentSize()
-                .drawBehind { drawRect(color = containerColor.copy(alpha = 0.925f * alphaState)) }
-        )
-        Spacer(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(0.5.dp)
-                .align(Alignment.TopCenter)
-                .drawBehind { drawRect(color = lineColor.copy(alpha = alphaState)) }
-        )
-    }
-}
-
-@Composable
-private fun NewPlanButton(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    ColorPressButton(
-        contentColor = PlaneatTheme.colors.point1,
-        modifier = modifier,
-        onClick = throttleClick(onClick = onClick)
-    ) { contentColor ->
-        Icon(
-            modifier = Modifier.size(width = 27.dp, height = 21.dp),
-            painter = painterResource(id = DrawableIds.ic_new_plan),
-            contentDescription = null,
-            tint = contentColor
-        )
-        Spacer(modifier = Modifier.width(10.dp))
-        Text(
-            text = stringResource(StringIds.new_plan),
-            style = PlaneatTheme.typography.titleMedium,
-            color = contentColor
->>>>>>> master
         )
     }
 }
@@ -702,28 +659,6 @@ private fun HomeContentsPreview() {
                 onTagLongClicked = {},
                 onNewPlanClicked = {}
             )
-        }
-    }
-}
-
-@Previews
-@Composable
-private fun NewPlanButtonPreview() {
-    PlaneatTheme {
-        Box(modifier = Modifier.background(PlaneatTheme.colors.bg1)) {
-            NewPlanButton(onClick = {})
-        }
-    }
-}
-
-@Previews
-@Composable
-private fun NewPlanButtonRtlPreview() {
-    PlaneatTheme {
-        CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-            Box(modifier = Modifier.background(PlaneatTheme.colors.bg1)) {
-                NewPlanButton(onClick = {})
-            }
         }
     }
 }
