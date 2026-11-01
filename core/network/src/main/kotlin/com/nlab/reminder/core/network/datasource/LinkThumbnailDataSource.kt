@@ -53,15 +53,15 @@ fun interface LinkThumbnailDataSource {
 internal class LinkThumbnailDataSourceImpl(
     private val dispatcher: CoroutineDispatcher,
     retrofitFactory: RetrofitFactory
-) : LinkThumbnailDataSource {
-    private val apiService: LinkThumbnailApiService = retrofitFactory
+) : LinkThumbnailDataSource,
+    LinkThumbnailApiService by retrofitFactory
         .create(NetworkConstants.UNUSED_BASE_URL)
-        .create(LinkThumbnailApiService::class.java)
+        .create(LinkThumbnailApiService::class.java) {
 
     override suspend fun getLinkThumbnail(url: NonBlankString): Result<LinkThumbnailResponse> = catching {
         withContext(dispatcher) {
             // The body is not read yet at this point. StreamParser reads it lazily and stops after <head>.
-            val metaTagToValues = apiService.getHtml(url.value).use { body ->
+            val metaTagToValues = getHtml(url.value).use { body ->
                 StreamParser(Parser.htmlParser()).use { parser ->
                     parser.parse(body.openReader(), url.value)
                     parser.selectFirst("head")
