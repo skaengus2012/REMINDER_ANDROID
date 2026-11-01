@@ -45,7 +45,7 @@ private const val UNUSED_BASE_URL = "https://localhost/"
  */
 @Module
 @InstallIn(SingletonComponent::class)
-internal object AppScopeNetworkModule {
+internal object NetworkModule {
     @Provides
     @Singleton
     fun provideOkHttpClient(
