@@ -43,9 +43,6 @@ import kotlin.coroutines.resumeWithException
  */
 private const val OG_TITLE = "og:title"
 private const val OG_IMAGE = "og:image"
-// Same user agent Jsoup.connect used, so sites keep serving OG tags as before.
-private const val BROWSER_USER_AGENT =
-    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36"
 private val TAGS_REQUIRED: Set<String> = setOf(OG_TITLE, OG_IMAGE)
 
 private fun Element.toProperty(): String = attr("property")
@@ -63,10 +60,7 @@ internal class LinkThumbnailDataSourceImpl(
 ) : LinkThumbnailDataSource {
     override suspend fun getLinkThumbnail(url: NonBlankString): Result<LinkThumbnailResponse> = catching {
         withContext(dispatcher) {
-            val request = Request.Builder()
-                .url(url.value)
-                .header("User-Agent", BROWSER_USER_AGENT)
-                .build()
+            val request = Request.Builder().url(url.value).build()
             val metaTagToValues = okHttpClient.newCall(request).await().use { response ->
                 if (!response.isSuccessful) throw IOException("Unexpected response code: ${response.code}")
                 val body = response.body ?: throw IOException("Response body is empty")

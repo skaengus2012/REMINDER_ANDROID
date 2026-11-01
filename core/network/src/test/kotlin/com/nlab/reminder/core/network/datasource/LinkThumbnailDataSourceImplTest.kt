@@ -102,22 +102,6 @@ class LinkThumbnailDataSourceImplTest {
         }
 
     @Test
-    fun `When getting thumbnail, Then request carries a browser like user agent`() = runTest {
-        var userAgent: String? = null
-        val dataSource = genDataSource(
-            html = html(head = OG_TITLE_TAG),
-            extraInterceptor = Interceptor { chain ->
-                userAgent = chain.request().header("User-Agent")
-                chain.proceed(chain.request())
-            }
-        )
-
-        dataSource.getLinkThumbnail(URL.toNonBlankString())
-
-        assertThat(userAgent?.startsWith("Mozilla/5.0"), equalTo(true))
-    }
-
-    @Test
     fun `Given legacy charset declared only in meta tag, When getting thumbnail, Then decode title correctly`() =
         runTest {
             val html = """<html><head><meta charset="euc-kr"><meta property="og:title" content="네이버"></head></html>"""
