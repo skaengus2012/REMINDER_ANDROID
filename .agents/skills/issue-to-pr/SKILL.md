@@ -57,10 +57,23 @@ The rest of this document refers to these values by name.
 
 ---
 
-## Step 1. Identify the Issue
+## Step 1. Identify the Issue and the Working Branch
 
 Take the issue number from the argument. If it is missing, extract `issue<N>` from the current branch name. If neither
 works, ask the user; never guess a number.
+
+Then check the working branch with `git branch --show-current` against `<branchRulesPath>`. Do this whether or not a
+PR will be created, because Step 7 and the workflow both commit on the current branch. The branch is acceptable when
+it is `feature/issue<N>` or `epic/issue<N>` for this issue, or a worktree branch (`worktree/...`), whose remote name
+is settled later in Step 7-2.
+
+Otherwise (for example `master`, `develop`, or another issue's branch), stop before anything is written or committed
+and ask with `AskUserQuestion`:
+- **Create `feature/issue<N>` from the current branch** (Recommended when the current branch is the intended parent)
+- **Switch to an existing branch** (ask which one)
+- **Continue on the current branch anyway** (the user accepts that commits land there)
+
+Never commit the spec documents or the implementation to `master` or `develop` unless the user chose to continue.
 
 ## Step 2. Ask Before Starting
 

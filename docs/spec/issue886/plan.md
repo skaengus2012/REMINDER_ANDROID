@@ -79,7 +79,7 @@
 5. 워크플로우 사전 준비(base 브랜치 / 원격 브랜치 결정, `args` JSON 구성)와 호출, 결과 보고 단계 작성.
    - **Verify**: `args` 스키마(issue, rounds, createPr, reviewerModel, baseBranch, remoteBranch, config)가 SKILL.md와 워크플로우 스크립트에서 동일한지 대조.
 6. `.agents/workflows/plan-to-pr.js` 뼈대 작성: `meta`, `args` 검증, JSON schema 정의(구현 결과, 리뷰 지적, 마무리 결과).
-   - **Verify**: 스크립트를 임시로 `.mjs`로 복사해 `node --check`로 구문 검사(스크래치패드에서 실행).
+   - **Verify**: 스크립트를 async 함수로 감싼 임시 `.mjs`를 만들어 `node --check`로 구문 검사(스크래치패드에서 실행). 스크립트가 최상위 `return`을 쓰고 `export const meta`는 함수 안에서 쓸 수 없으므로, 감쌀 때 `export`를 떼어낸다(`(async () => {` + `const meta ...` + 본문 + `})()`). 원본을 그대로 `.mjs`로 검사하면 `Illegal return statement` 오류가 난다.
 7. 구현 단계 작성: 구현자 프롬프트(경로 전달, TDD, 커밋 규칙, 변경 모듈 단위 테스트, UI QA 분기, 디바이스 없음 처리, 1회 재시도 후 중단).
    - **Verify**: `node --check` 통과. FR-10~FR-12와 실패 동작 결정이 코드에 대응하는지 확인.
 8. 리뷰 루프 작성: 구조화 리뷰, 조기 종료, 변경분 재리뷰, 라운드 상한과 `unresolved` 기록.
@@ -93,7 +93,7 @@
 
 ## 검증
 - 요구사항 대응: FR-1~FR-15, NFR-2가 위 태스크의 Verify에서 각각 확인되었는지 마지막에 체크리스트로 대조한다.
-- 구문: `plan-to-pr.js`는 `node --check`를 통과해야 한다.
+- 구문: `plan-to-pr.js`는 태스크 6의 방식(async 함수로 감싼 임시 `.mjs`)으로 `node --check`를 통과해야 한다.
 - 동작: 태스크 10의 `dryRun` 실행으로 `args` 전달과 루프 제어를 확인한다.
 - 독립 검토: 태스크 11의 Opus 검토를 통과해야 한다.
 - 실제 이슈 한 건에 대한 종단 간 실행은 사람이 수행한다. 이 작업의 범위에는 코드 변경 PR이 생기는 실행이 포함되지 않는다.
@@ -108,3 +108,4 @@
 | 2026-11-02 | Opus 검토 반영: 시작 지점 선택지 4개 이하, `plan.md`의 `testStrategy:` 줄에서 값 읽기, 클린 트리 보장, 리뷰어가 `requesting-code-review`의 서브에이전트 생성·`gh` 코멘트 게시를 하지 않도록 제한, 리뷰어 막힘 보고(`failureReason`), 마무리 결과 검증, `headCommit` 정확성, `fullTestCommand`·`rounds` 필수화로 하드코딩 제거 | Opus 검토(태스크 11) |
 | 2026-11-02 | 수정분에 대한 Opus 재검토는 사용자 결정으로 수행하지 않음. `dryRun` 재실행(정상 경로, 필수 키 누락 경로)과 구문 검사로 대체 | 사용자 요청 |
 | 2026-11-02 | `AGENTS.md` 가이드 인덱스에 `issue-to-pr` 행 추가 | 사용자 요청 |
+| 2026-11-02 | PR #888 Opus 리뷰 반영: `SKILL.md` Step 1에 작업 브랜치 확인 단계 추가(`master` 등에서 실행하면 중단하고 질문, `branch-rules.md` 준수). 구문 검사 방법을 정정: 원본을 `.mjs`로 복사하면 최상위 `return` 때문에 `Illegal return statement`가 나므로 async 함수로 감싸서 검사(스크립트는 정상, 위 "구문 검사 통과" 기록은 감싼 방식으로 재확인됨) | PR #888 Opus 리뷰(I1, I2) |
