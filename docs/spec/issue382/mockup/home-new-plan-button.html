@@ -7,11 +7,13 @@
   Notes
   - 이 목업은 시각 참고용이며 코드가 기준이다. 줄 높이는 근사값이다(Typography.kt가 lineHeight를 지정하지 않음).
   - 색상 토큰은 core:designsystem Color.kt / ColorScheme.kt 에서 가져왔다. 라이트/다크 모두 제공.
-  - 하단 바 높이 50dp, 버튼 padding start 20 / end 10, 아이콘 27x21, 아이콘-글자 간격 10 (HomeScreen.kt).
+  - 하단 바 높이 50dp, 버튼 padding start 20 / end 10, 아이콘 27x27, 아이콘-글자 간격 8 (HomeScreen.kt).
   - 글자: titleMedium = 18sp / Bold(700). 시스템 기본 폰트(sans-serif) 사용.
+  - 아이콘은 정사각형(27x27dp): 그림 크기는 그대로, 세로 여백을 채워 가운데 정렬(translateY 3).
   - ic_new_plan 은 현재 android:autoMirrored="true" 이다(RTL에서 반전됨). 목표 상태는 autoMirrored 제거.
     아이콘 모양이 변경 주제이므로 실제 벡터(pathData)를 인라인 SVG 로 변환했다.
     틴트는 코드에서 point1(눌림 시 alpha 0.5)로 칠하므로 currentColor 를 사용한다.
+  - 변경: 아이콘-글자 간격을 LTR/RTL 모두 10dp -> 8dp 로 통일했다(HomeScreen.kt Spacer).
   - RTL 에서 Row 는 자동으로 뒤집혀 아이콘이 글자 오른쪽에 놓인다(dir="rtl" 로 재현).
 -->
 <html lang="ko">
@@ -87,8 +89,8 @@
     cursor: pointer;
   }
   .new-plan:active { color: color-mix(in srgb, var(--point-1) 50%, transparent); } /* pressed alpha 0.5 */
-  .new-plan svg { width: 27px; height: 21px; flex: none; display: block; }
-  .new-plan .gap { width: 10px; flex: none; }
+  .new-plan svg { width: 27px; height: 27px; flex: none; display: block; }
+  .new-plan .gap { width: 8px; flex: none; }  /* Spacer(8.dp), LTR/RTL 공통 */
   .new-plan .text { font-size: 18px; font-weight: 700; line-height: 1.2; }
 
   /* 현재(문제) 상태 재현: autoMirrored 로 RTL 에서 반전 */
@@ -97,21 +99,23 @@
 </head>
 <body>
   <h1>홈 하단 "새로운 플랜" 버튼</h1>
-  <p class="sub">#382 · 라이트/다크 자동 전환 · 아이콘: ic_new_plan (27x21dp)</p>
+  <p class="sub">#382 · 라이트/다크 자동 전환 · 아이콘: ic_new_plan (27x27dp)</p>
 
-  <!-- SVG symbol: ic_new_plan 변환 (viewport 27x21, 모든 path fill = 틴트) -->
+  <!-- SVG symbol: ic_new_plan 변환 (viewport 27x27, 그림은 세로 translateY 3, 모든 path fill = 틴트) -->
   <svg width="0" height="0" style="position:absolute" aria-hidden="true">
     <defs>
-      <symbol id="ic-new-plan" viewBox="0 0 27 21">
+      <symbol id="ic-new-plan" viewBox="0 0 27 27">
+        <g transform="translate(0 3)">
         <path fill="currentColor" d="M19.902,14.83L19.9,14.829C18.142,12.791 14.222,10.987 11.231,10.05C14.06,8.755 17.586,6.57 19.057,4.403C17.212,1.74 14.159,0 10.705,0C5.071,0 0.503,4.632 0.503,10.346C0.503,16.06 5.071,20.692 10.705,20.692C14.754,20.692 18.253,18.299 19.901,14.832L19.902,14.831V14.83ZM9.772,7.382C9.26,7.382 8.876,7.052 8.876,6.542C8.876,6.03 9.26,5.7 9.772,5.7C10.285,5.7 10.669,6.027 10.669,6.542C10.669,7.051 10.285,7.382 9.772,7.382ZM10.672,10.301L10.67,10.3L10.674,10.299L10.672,10.301Z"/>
         <path fill="currentColor" d="M24.446,9.149H27.087V10.839H24.446V13.424H22.77V10.839H20.128V9.149H22.77V6.536H24.446V9.149Z"/>
+        </g>
       </symbol>
     </defs>
   </svg>
 
   <section class="state">
-    <div class="label">1. LTR (변경 없음)</div>
-    <div class="desc">아이콘이 글자 왼쪽. 팩맨 입과 "+"가 오른쪽.</div>
+    <div class="label">1. LTR (간격 10dp -> 8dp)</div>
+    <div class="desc">아이콘이 글자 왼쪽. 아이콘-글자 간격 8dp. 팩맨 입과 "+"가 오른쪽.</div>
     <div class="frame" dir="ltr">
       <div class="bottom-bar">
         <button class="new-plan">
@@ -125,7 +129,7 @@
 
   <section class="state good">
     <div class="label">2. RTL - 목표 (비반전)</div>
-    <div class="desc">아이콘이 글자 오른쪽으로 이동하되 모양은 LTR 과 동일(autoMirrored 제거). 로고와 방향이 일치.</div>
+    <div class="desc">아이콘이 글자 오른쪽으로 이동하되 모양은 LTR 과 동일(autoMirrored 제거). 로고와 방향이 일치. </div>
     <div class="frame" dir="rtl">
       <div class="bottom-bar">
         <button class="new-plan">
