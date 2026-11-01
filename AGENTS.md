@@ -8,9 +8,10 @@ Detailed guidelines are in `docs/guidelines/`. Read the relevant file before per
 |------|--------------|
 | [`.agents/skills/`](.agents/skills/) | For any project custom automation tasks (e.g. creating git worktrees, etc.) |
 | [`.agents/skills/create-pr`](.agents/skills/create-pr/SKILL.md) | When the user asks to create or open a pull request |
+| [`.agents/skills/create-mockup`](.agents/skills/create-mockup/SKILL.md) | When the user asks to design a screen or create a UI mockup for an issue |
 | [`docs/guidelines/branch-rules.md`](docs/guidelines/branch-rules.md) | Before creating or merging any git branch |
 | [`docs/guidelines/commit-rules.md`](docs/guidelines/commit-rules.md) | Before creating any git commit |
-| [`docs/guidelines/spec-docs.md`](docs/guidelines/spec-docs.md) | Before implementing a GitHub issue (read `docs/spec/issue<number>/requirements.md` if it exists), or when creating or updating a document under `docs/spec/` |
+| [`docs/guidelines/spec-docs.md`](docs/guidelines/spec-docs.md) | Before implementing a GitHub issue (read `docs/spec/issue<number>/requirements.md` and `docs/spec/issue<number>/mockup/` if they exist), or when creating or updating a document under `docs/spec/` |
 
 ---
 
