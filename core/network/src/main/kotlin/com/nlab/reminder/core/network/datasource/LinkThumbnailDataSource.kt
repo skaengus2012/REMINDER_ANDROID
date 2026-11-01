@@ -19,7 +19,7 @@ package com.nlab.reminder.core.network.datasource
 import com.nlab.reminder.core.kotlin.NonBlankString
 import com.nlab.reminder.core.kotlin.Result
 import com.nlab.reminder.core.kotlin.catching
-import com.nlab.reminder.core.network.NetworkConstants
+import com.nlab.reminder.core.network.BaseUrls
 import com.nlab.reminder.core.network.infra.RetrofitFactory
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
@@ -55,7 +55,7 @@ internal class LinkThumbnailDataSourceImpl(
     retrofitFactory: RetrofitFactory
 ) : LinkThumbnailDataSource,
     LinkThumbnailApiService by retrofitFactory
-        .create(NetworkConstants.UNUSED_BASE_URL)
+        .create(BaseUrls.UNUSED)
         .create(LinkThumbnailApiService::class.java) {
 
     override suspend fun getLinkThumbnail(url: NonBlankString): Result<LinkThumbnailResponse> = catching {

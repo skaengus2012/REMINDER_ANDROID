@@ -19,10 +19,10 @@ package com.nlab.reminder.core.network
 /**
  * @author Doohyun
  */
-internal object NetworkConstants {
+internal object BaseUrls {
     /**
      * `Retrofit.Builder.build()` throws without a base URL, but requests that pass an absolute `@Url` use that URL
      * as is. So this value is never requested and any valid URL ending with `/` works.
      */
-    const val UNUSED_BASE_URL = "https://localhost/"
+    const val UNUSED = "https://localhost/"
 }
