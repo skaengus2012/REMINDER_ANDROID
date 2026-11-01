@@ -16,7 +16,6 @@
 
 package com.nlab.reminder.core.androidx.compose.ui
 
-import androidx.annotation.FloatRange
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
@@ -38,7 +37,7 @@ import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
  */
 @Composable
 fun HeadBlurLayer(
-    @FloatRange(from = 0.0, to = 1.0) alpha: Float,
+    alpha: () -> Float,
     modifier: Modifier = Modifier,
     containerColor: Color = PlaneatTheme.colors.bg1Layer,
     lineColor: Color = PlaneatTheme.colors.bgLine1,
@@ -48,14 +47,14 @@ fun HeadBlurLayer(
         Spacer(
             modifier = Modifier
                 .fillMaxSize()
-                .drawBehind { drawRect(color = containerColor.copy(alpha = defaultContainerAlpha * alpha)) }
+                .drawBehind { drawRect(color = containerColor.copy(alpha = defaultContainerAlpha * alpha())) }
         )
         Spacer(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(0.5.dp)
                 .align(Alignment.BottomCenter)
-                .drawBehind { drawRect(color = lineColor.copy(alpha = alpha)) }
+                .drawBehind { drawRect(color = lineColor.copy(alpha = alpha())) }
         )
     }
 }
@@ -73,7 +72,7 @@ private fun HeadBlurPreview() {
             Box(modifier = Modifier.height(50.dp)) {
                 HeadBlurLayer(
                     modifier = Modifier.fillMaxWidth(),
-                    alpha = 1f
+                    alpha = { 1f }
                 )
 
                 Text(

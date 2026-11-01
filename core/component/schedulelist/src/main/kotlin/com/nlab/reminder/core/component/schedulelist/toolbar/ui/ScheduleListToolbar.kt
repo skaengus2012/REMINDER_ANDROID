@@ -72,7 +72,7 @@ fun ScheduleListToolbar(
     Box(modifier) {
         HeadBlurLayer(
             modifier = Modifier.matchParentSize(),
-            alpha = renderState.backgroundAlpha,
+            alpha = { renderState.backgroundAlpha },
             containerColor = PlaneatTheme.colors.bg2Layer,
         )
         ScheduleListToolbarContent(
