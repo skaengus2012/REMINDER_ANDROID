@@ -21,11 +21,15 @@ import coil.ImageLoader
 import coil.decode.SvgDecoder
 import coil.disk.DiskCache
 import coil.memory.MemoryCache
+import dagger.Lazy
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import dagger.multibindings.Multibinds
+import okhttp3.Interceptor
+import okhttp3.OkHttpClient
 import javax.inject.Singleton
 
 /**
@@ -36,9 +40,19 @@ import javax.inject.Singleton
 internal object NetworkModule {
     @Provides
     @Singleton
+    fun provideOkHttpClient(
+        interceptors: Set<@JvmSuppressWildcards Interceptor>
+    ): OkHttpClient = OkHttpClient.Builder()
+        .apply { interceptors.forEach(::addInterceptor) }
+        .build()
+
+    @Provides
+    @Singleton
     fun provideImageLoader(
-        @ApplicationContext context: Context
+        @ApplicationContext context: Context,
+        okHttpClientProvider: Lazy<OkHttpClient>
     ): ImageLoader = ImageLoader.Builder(context)
+        .okHttpClient { okHttpClientProvider.get() }
         .components { add(SvgDecoder.Factory()) }
         .memoryCache {
             MemoryCache.Builder(context)
@@ -58,4 +72,15 @@ internal object NetworkModule {
         // but some problematic images are fetching each time.
         .respectCacheHeaders(enable = false)
         .build()
+}
+
+/**
+ * Declares an empty [Interceptor] set so that builds without any contributor (e.g. release) still compile.
+ * Debug-only interceptors are contributed with `@IntoSet` from the app's debug source set.
+ */
+@Module
+@InstallIn(SingletonComponent::class)
+internal interface NetworkInterceptorModule {
+    @Multibinds
+    fun bindInterceptors(): Set<Interceptor>
 }
