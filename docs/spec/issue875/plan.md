@@ -41,7 +41,7 @@
    - 버전 카탈로그에 `flocon`, `flocon-okhttp`(참고 프로젝트 기준 1.10.0), `retrofit`(3.0.0)을 추가한다. `okhttp`(4.12.0)는 Retrofit과 Coil이 전이 의존성으로 제공하므로 따로 선언하지 않는다.
    - `app/build.gradle.kts`에 `debugImplementation(libs.flocon)`과 `debugImplementation(libs.flocon.okhttp)`를 추가한다.
    - `app/src/debug`에 `FloconInitializer`(`Flocon.initialize(context)`)를 만들고 debug `AndroidManifest.xml`의 `InitializationProvider`에 등록한다.
-   - `app/src/debug`에 `@IntoSet Interceptor`로 `FloconOkhttpInterceptor()`를 제공하는 Hilt 모듈(`AppScopeDebugApplicationModule`, 기존 `AppScope<이름>Module` 관례)을 추가한다.
+   - `app/src/debug`에 `@IntoSet Interceptor`로 `FloconOkhttpInterceptor()`를 제공하는 Hilt 모듈(`DebugAppsModule`)을 추가한다.
 
 ## 작업
 1. 버전 카탈로그에 `retrofit`, `flocon`, `flocon-okhttp`를 추가하고 `core/network`에 `retrofit` 의존성을 선언한다.
@@ -85,8 +85,9 @@
 | 2026-11-01 | 참고 구조에 nowinandroid 추가, 절대 경로 제거 | 사용자 요청 |
 | 2026-11-01 | Task 1~7 구현 완료. 클라이언트 노출 타입을 `OkHttpClient`로 확정. Task 8(수동 확인)은 미수행 | 구현 |
 | 2026-11-01 | 코드 리뷰 반영: 브라우저 UA, charset 감지, 취소 전파. 실기기 확인 결과와 미반영 항목을 미결 사항에 기록 | 코드 리뷰, 실기기 확인 |
-| 2026-11-01 | PR 리뷰 반영: 전 경로 스트리밍 파싱(meta charset 감지), 브라우저 UA 제거, 모듈명을 `AppScopeDebugApplicationModule`로 변경, Task 4(테스트) 제외 | PR #881 리뷰 코멘트 |
+| 2026-11-01 | PR 리뷰 반영: 전 경로 스트리밍 파싱(meta charset 감지), 브라우저 UA 제거, 모듈명을 `DebugAppsModule`로 변경, Task 4(테스트) 제외 | PR #881 리뷰 코멘트 |
 | 2026-11-01 | PR 리뷰 반영: OkHttp 5 상향 대신 Retrofit 3.0.0(OkHttp 4.12 유지)으로 링크 썸네일 요청을 구현. 데이터소스가 `OkHttpClient`를 직접 받지 않도록 `LinkThumbnailApi`만 주입 | PR #881 리뷰 코멘트, 사용자 결정 |
 | 2026-11-01 | PR 리뷰 반영: `LinkThumbnailApi`를 범용 이름 `HtmlApi`로 변경, 불필요한 `debugImplementation(libs.okhttp)` 제거 | PR #881 리뷰 코멘트 |
 | 2026-11-01 | PR 리뷰 반영: `NetworkModule`을 `NetworkModule`로 변경, 명시적 `okhttp` 의존성 제거, `Lazy`+`callFactory` 처리를 모은 `RetrofitFactory` 추가 | PR #881 리뷰 코멘트 |
 | 2026-11-01 | PR 리뷰 반영: `AppScopeNetworkModule` 이름 변경을 원복(`NetworkModule`) | PR #881 리뷰 코멘트 |
+| 2026-11-01 | PR 리뷰 반영: debug Hilt 모듈 이름을 `DebugAppsModule`로 변경 | PR #881 리뷰 코멘트 |

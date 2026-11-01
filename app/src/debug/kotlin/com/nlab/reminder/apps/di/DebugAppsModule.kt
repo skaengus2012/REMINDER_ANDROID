@@ -29,7 +29,7 @@ import okhttp3.Interceptor
  */
 @Module
 @InstallIn(SingletonComponent::class)
-internal object AppScopeDebugApplicationModule {
+internal object DebugAppsModule {
     @Provides
     @IntoSet
     fun provideFloconOkhttpInterceptor(): Interceptor = FloconOkhttpInterceptor()
