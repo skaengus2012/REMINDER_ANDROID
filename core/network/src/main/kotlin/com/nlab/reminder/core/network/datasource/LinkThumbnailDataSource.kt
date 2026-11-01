@@ -21,22 +21,13 @@ import com.nlab.reminder.core.kotlin.Result
 import com.nlab.reminder.core.kotlin.catching
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
-import kotlinx.coroutines.suspendCancellableCoroutine
-import okhttp3.Call
-import okhttp3.Callback
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.Response
 import okhttp3.ResponseBody
 import org.jsoup.nodes.Element
 import org.jsoup.parser.Parser
 import org.jsoup.parser.StreamParser
-import java.io.IOException
 import java.io.InputStreamReader
 import java.io.Reader
 import java.nio.charset.Charset
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
 
 /**
  * @author Doohyun
@@ -56,15 +47,12 @@ fun interface LinkThumbnailDataSource {
 
 internal class LinkThumbnailDataSourceImpl(
     private val dispatcher: CoroutineDispatcher,
-    private val okHttpClient: OkHttpClient
+    private val linkThumbnailApi: LinkThumbnailApi
 ) : LinkThumbnailDataSource {
     override suspend fun getLinkThumbnail(url: NonBlankString): Result<LinkThumbnailResponse> = catching {
         withContext(dispatcher) {
-            val request = Request.Builder().url(url.value).build()
-            val metaTagToValues = okHttpClient.newCall(request).await().use { response ->
-                if (!response.isSuccessful) throw IOException("Unexpected response code: ${response.code}")
-                val body = response.body ?: throw IOException("Response body is empty")
-                // The body is not read yet at this point. StreamParser reads it lazily and stops after <head>.
+            // The body is not read yet at this point. StreamParser reads it lazily and stops after <head>.
+            val metaTagToValues = linkThumbnailApi.getHtml(url.value).use { body ->
                 StreamParser(Parser.htmlParser()).use { parser ->
                     parser.parse(body.openReader(), url.value)
                     parser.selectFirst("head")
@@ -86,22 +74,6 @@ internal class LinkThumbnailDataSourceImpl(
             }
         }
     }
-}
-
-/**
- * Suspends until the response arrives and cancels the underlying [Call] when the coroutine is cancelled.
- */
-private suspend fun Call.await(): Response = suspendCancellableCoroutine { continuation ->
-    continuation.invokeOnCancellation { cancel() }
-    enqueue(object : Callback {
-        override fun onResponse(call: Call, response: Response) {
-            if (continuation.isActive) continuation.resume(response) else response.close()
-        }
-
-        override fun onFailure(call: Call, e: IOException) {
-            continuation.resumeWithException(e)
-        }
-    })
 }
 
 private const val CHARSET_SNIFF_BYTES = 1024L

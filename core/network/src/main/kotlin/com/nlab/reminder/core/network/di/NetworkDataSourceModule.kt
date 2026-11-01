@@ -20,6 +20,7 @@ import android.content.Context
 import com.nlab.reminder.core.inject.qualifiers.coroutine.AppScope
 import com.nlab.reminder.core.inject.qualifiers.coroutine.Dispatcher
 import com.nlab.reminder.core.inject.qualifiers.coroutine.DispatcherOption.IO
+import com.nlab.reminder.core.network.datasource.LinkThumbnailApi
 import com.nlab.reminder.core.network.datasource.LinkThumbnailDataSource
 import com.nlab.reminder.core.network.datasource.LinkThumbnailDataSourceImpl
 import com.nlab.reminder.core.network.datasource.TrustedTimeDataSource
@@ -32,7 +33,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import okhttp3.OkHttpClient
 import javax.inject.Singleton
 
 /**
@@ -45,8 +45,8 @@ internal object NetworkDataSourceModule {
     @Provides
     fun provideLinkMetadataSource(
         @Dispatcher(IO) dispatcher: CoroutineDispatcher,
-        okHttpClient: OkHttpClient
-    ): LinkThumbnailDataSource = LinkThumbnailDataSourceImpl(dispatcher, okHttpClient)
+        linkThumbnailApi: LinkThumbnailApi
+    ): LinkThumbnailDataSource = LinkThumbnailDataSourceImpl(dispatcher, linkThumbnailApi)
 
     @Singleton
     @Provides

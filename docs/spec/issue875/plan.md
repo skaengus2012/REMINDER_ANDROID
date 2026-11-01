@@ -33,23 +33,25 @@
    - `@Multibinds`로 빈 `Set<Interceptor>`를 선언해, release에서도 바인딩이 비어 있는 채로 컴파일되게 한다.
    - `ImageLoader`는 `.okHttpClient { okHttpClientProvider.get() }`(`dagger.Lazy`)로 공유 클라이언트를 사용한다.
 2. **링크 썸네일 요청 OkHttp 전환 (`core/network`)**
-   - `LinkThumbnailDataSourceImpl`이 OkHttp로 HTML을 받고, 응답 본문 스트림을 Jsoup streamParser로 파싱하도록 바꾼다.
+   - Retrofit 인터페이스 `LinkThumbnailApi`(`@Streaming @GET suspend fun getHtml(@Url url: String): ResponseBody`)로 HTML을 받고, 응답 본문 스트림을 Jsoup streamParser로 파싱하도록 바꾼다. `LinkThumbnailDataSourceImpl`은 `OkHttpClient`를 직접 받지 않고 이 인터페이스만 주입받는다.
+   - `OkHttpClient`는 `NetworkModule` 안에서만 `dagger.Lazy`로 쓴다(`ImageLoader`, `Retrofit`의 `callFactory`). 데이터소스가 클라이언트를 직접 받아 `Lazy` 없이 쓰는 실수를 막기 위함이다.
+   - `@Streaming`이 없으면 Retrofit이 본문 전체를 버퍼링하므로 반드시 붙인다.
    - 기존 동작(`og:title`, `og:image` 추출, `catching` 기반 `Result`)은 유지한다. 동작 보존은 기존 테스트로 확인한다.
 3. **Flocon 도입 (`app`, debug 전용)**
-   - 버전 카탈로그에 `flocon`, `flocon-okhttp`(참고 프로젝트 기준 1.10.0), 그리고 `okhttp`를 추가한다. `core/network`가 `OkHttpClient`를 직접 사용하므로 `okhttp`는 명시적으로 선언한다.
+   - 버전 카탈로그에 `flocon`, `flocon-okhttp`(참고 프로젝트 기준 1.10.0), `okhttp`(4.12.0), `retrofit`(3.0.0)을 추가한다. `core/network`가 `OkHttpClient`를 직접 사용하므로 `okhttp`는 명시적으로 선언한다.
    - `app/build.gradle.kts`에 `debugImplementation(libs.flocon)`과 `debugImplementation(libs.flocon.okhttp)`를 추가한다.
    - `app/src/debug`에 `FloconInitializer`(`Flocon.initialize(context)`)를 만들고 debug `AndroidManifest.xml`의 `InitializationProvider`에 등록한다.
    - `app/src/debug`에 `@IntoSet Interceptor`로 `FloconOkhttpInterceptor()`를 제공하는 Hilt 모듈(`AppScopeDebugApplicationModule`, 기존 `AppScope<이름>Module` 관례)을 추가한다.
 
 ## 작업
-1. 버전 카탈로그에 `okhttp`, `flocon`, `flocon-okhttp`를 추가하고 `core/network`에 `okhttp` 의존성을 선언한다.
+1. 버전 카탈로그에 `okhttp`, `retrofit`, `flocon`, `flocon-okhttp`를 추가하고 `core/network`에 `okhttp`, `retrofit` 의존성을 선언한다.
    - **Verify**: `./gradlew :core:network:assembleDebug`
 2. `NetworkModule`에 `Set<Interceptor>` `@Multibinds`와 `@Singleton OkHttpClient`를 추가하고, `ImageLoader`가 이 클라이언트를 사용하게 한다.
    - **Verify**: `./gradlew :app:assembleDebug` (Hilt 그래프 컴파일 확인)
-3. `LinkThumbnailDataSourceImpl`이 `OkHttpClient`를 주입받아 OkHttp로 요청하고 Jsoup으로 파싱하게 바꾼다. `NetworkDataSourceModule`의 제공 코드를 함께 수정한다.
+3. `LinkThumbnailDataSourceImpl`이 `LinkThumbnailApi`(Retrofit)를 주입받아 요청하고 Jsoup으로 파싱하게 바꾼다. `NetworkModule`/`NetworkDataSourceModule`의 제공 코드를 함께 수정한다.
    - 모든 경우에 `StreamParser`로 스트리밍 파싱한다. 서버가 charset을 선언하지 않으면 본문 앞 1KB의 `<meta>`에서 charset을 감지한다.
    - 브라우저 UA는 지정하지 않는다(비교 결과 이점이 없었고, 일부 사이트는 OkHttp 기본 UA에서만 og 태그를 제공).
-   - 코루틴이 취소되면 `Call.cancel()`이 호출되도록 `Call.await()`(`suspendCancellableCoroutine`)를 사용한다.
+   - 코루틴 취소 시 호출 취소는 Retrofit의 `suspend` 지원이 처리한다(직접 만든 `Call.await()`는 제거).
    - **Verify**: `./gradlew :core:network:test :core:data-impl:test`
 4. ~~링크 썸네일 데이터소스 테스트를 추가한다.~~ (Dropped: 리뷰 결과 네트워크 동작에 대한 테스트는 불필요하다고 판단해 테스트와 `testImplementation` 의존성을 제거했다.) 원래 내용: 링크 썸네일 데이터소스 테스트를 추가한다. `MockWebServer` 또는 가짜 `Interceptor`로 `og:title`/`og:image` 추출, 메타 태그 누락, 요청 실패 시 `Result` 실패를 검증한다. (프로젝트 TDD 원칙에 따라 3번보다 먼저 작성한다.)
    - **Verify**: `./gradlew :core:network:test`
@@ -84,3 +86,4 @@
 | 2026-11-01 | Task 1~7 구현 완료. 클라이언트 노출 타입을 `OkHttpClient`로 확정. Task 8(수동 확인)은 미수행 | 구현 |
 | 2026-11-01 | 코드 리뷰 반영: 브라우저 UA, charset 감지, 취소 전파. 실기기 확인 결과와 미반영 항목을 미결 사항에 기록 | 코드 리뷰, 실기기 확인 |
 | 2026-11-01 | PR 리뷰 반영: 전 경로 스트리밍 파싱(meta charset 감지), 브라우저 UA 제거, 모듈명을 `AppScopeDebugApplicationModule`로 변경, Task 4(테스트) 제외 | PR #881 리뷰 코멘트 |
+| 2026-11-01 | PR 리뷰 반영: OkHttp 5 상향 대신 Retrofit 3.0.0(OkHttp 4.12 유지)으로 링크 썸네일 요청을 구현. 데이터소스가 `OkHttpClient`를 직접 받지 않도록 `LinkThumbnailApi`만 주입 | PR #881 리뷰 코멘트, 사용자 결정 |

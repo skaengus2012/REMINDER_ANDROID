@@ -21,6 +21,7 @@ import coil.ImageLoader
 import coil.decode.SvgDecoder
 import coil.disk.DiskCache
 import coil.memory.MemoryCache
+import com.nlab.reminder.core.network.datasource.LinkThumbnailApi
 import dagger.Lazy
 import dagger.Module
 import dagger.Provides
@@ -30,6 +31,7 @@ import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.Multibinds
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
+import retrofit2.Retrofit
 import javax.inject.Singleton
 
 /**
@@ -45,6 +47,16 @@ internal object NetworkModule {
     ): OkHttpClient = OkHttpClient.Builder()
         .apply { interceptors.forEach(::addInterceptor) }
         .build()
+
+    @Provides
+    @Singleton
+    fun provideLinkThumbnailApi(
+        okHttpClientProvider: Lazy<OkHttpClient>
+    ): LinkThumbnailApi = Retrofit.Builder()
+        .baseUrl("https://localhost/") // Required by Retrofit, but ignored because every call passes an absolute @Url.
+        .callFactory { request -> okHttpClientProvider.get().newCall(request) }
+        .build()
+        .create(LinkThumbnailApi::class.java)
 
     @Provides
     @Singleton
