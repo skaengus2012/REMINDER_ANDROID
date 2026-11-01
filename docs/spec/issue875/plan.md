@@ -91,3 +91,4 @@
 | 2026-11-01 | PR 리뷰 반영: `NetworkModule`을 `AppScopeNetworkModule`로 변경, 명시적 `okhttp` 의존성 제거, `Lazy`+`callFactory` 처리를 모은 `RetrofitFactory` 추가 | PR #881 리뷰 코멘트 |
 | 2026-11-01 | PR 리뷰 반영: `AppScopeNetworkModule` 이름 변경을 원복(`NetworkModule`) | PR #881 리뷰 코멘트 |
 | 2026-11-01 | PR 리뷰 반영: debug Hilt 모듈 이름을 `DebugAppsModule`로 변경 | PR #881 리뷰 코멘트 |
+| 2026-11-01 | PR 리뷰 반영: 더미 base URL 상수를 `NetworkConstants` 객체로 분리 | PR #881 리뷰 코멘트 |

@@ -21,6 +21,7 @@ import coil.ImageLoader
 import coil.decode.SvgDecoder
 import coil.disk.DiskCache
 import coil.memory.MemoryCache
+import com.nlab.reminder.core.network.NetworkConstants
 import com.nlab.reminder.core.network.datasource.HtmlApi
 import com.nlab.reminder.core.network.infra.RetrofitFactory
 import dagger.Lazy
@@ -33,12 +34,6 @@ import dagger.multibindings.Multibinds
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import javax.inject.Singleton
-
-/**
- * `Retrofit.Builder.build()` throws without a base URL, but [HtmlApi] always receives an absolute `@Url`,
- * which Retrofit uses as is. So this value is never requested and any valid URL works.
- */
-private const val UNUSED_BASE_URL = "https://localhost/"
 
 /**
  * @author Doohyun
@@ -58,7 +53,7 @@ internal object NetworkModule {
     @Singleton
     fun provideHtmlApi(
         retrofitFactory: RetrofitFactory
-    ): HtmlApi = retrofitFactory.create(UNUSED_BASE_URL).create(HtmlApi::class.java)
+    ): HtmlApi = retrofitFactory.create(NetworkConstants.UNUSED_BASE_URL).create(HtmlApi::class.java)
 
     @Provides
     @Singleton
