@@ -85,9 +85,9 @@
 | 2026-11-01 | 참고 구조에 nowinandroid 추가, 절대 경로 제거 | 사용자 요청 |
 | 2026-11-01 | Task 1~7 구현 완료. 클라이언트 노출 타입을 `OkHttpClient`로 확정. Task 8(수동 확인)은 미수행 | 구현 |
 | 2026-11-01 | 코드 리뷰 반영: 브라우저 UA, charset 감지, 취소 전파. 실기기 확인 결과와 미반영 항목을 미결 사항에 기록 | 코드 리뷰, 실기기 확인 |
-| 2026-11-01 | PR 리뷰 반영: 전 경로 스트리밍 파싱(meta charset 감지), 브라우저 UA 제거, 모듈명을 `DebugAppsModule`로 변경, Task 4(테스트) 제외 | PR #881 리뷰 코멘트 |
+| 2026-11-01 | PR 리뷰 반영: 전 경로 스트리밍 파싱(meta charset 감지), 브라우저 UA 제거, 모듈명을 `AppScopeDebugApplicationModule`로 변경, Task 4(테스트) 제외 | PR #881 리뷰 코멘트 |
 | 2026-11-01 | PR 리뷰 반영: OkHttp 5 상향 대신 Retrofit 3.0.0(OkHttp 4.12 유지)으로 링크 썸네일 요청을 구현. 데이터소스가 `OkHttpClient`를 직접 받지 않도록 `LinkThumbnailApi`만 주입 | PR #881 리뷰 코멘트, 사용자 결정 |
 | 2026-11-01 | PR 리뷰 반영: `LinkThumbnailApi`를 범용 이름 `HtmlApi`로 변경, 불필요한 `debugImplementation(libs.okhttp)` 제거 | PR #881 리뷰 코멘트 |
-| 2026-11-01 | PR 리뷰 반영: `NetworkModule`을 `NetworkModule`로 변경, 명시적 `okhttp` 의존성 제거, `Lazy`+`callFactory` 처리를 모은 `RetrofitFactory` 추가 | PR #881 리뷰 코멘트 |
+| 2026-11-01 | PR 리뷰 반영: `NetworkModule`을 `AppScopeNetworkModule`로 변경, 명시적 `okhttp` 의존성 제거, `Lazy`+`callFactory` 처리를 모은 `RetrofitFactory` 추가 | PR #881 리뷰 코멘트 |
 | 2026-11-01 | PR 리뷰 반영: `AppScopeNetworkModule` 이름 변경을 원복(`NetworkModule`) | PR #881 리뷰 코멘트 |
 | 2026-11-01 | PR 리뷰 반영: debug Hilt 모듈 이름을 `DebugAppsModule`로 변경 | PR #881 리뷰 코멘트 |
