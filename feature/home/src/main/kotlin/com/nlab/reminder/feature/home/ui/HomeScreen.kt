@@ -622,7 +622,6 @@ private fun BottomActions(
             }
         }
     }
-<<<<<<< HEAD
     BottomAppbar(
         bottomAppbarState = rememberDelegatedBottomAppbarState(
             backgroundAlphaState = backgroundAlphaState
@@ -634,44 +633,6 @@ private fun BottomActions(
         NewPlanButton(
             modifier = Modifier.height(contentHeight),
             onClick = throttleClick(onClick = onNewPlanClicked)
-=======
-    Box(modifier = modifier) {
-        Spacer(
-            modifier = Modifier
-                .matchParentSize()
-                .drawBehind { drawRect(color = containerColor.copy(alpha = 0.925f * alphaState)) }
-        )
-        Spacer(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(0.5.dp)
-                .align(Alignment.TopCenter)
-                .drawBehind { drawRect(color = lineColor.copy(alpha = alphaState)) }
-        )
-    }
-}
-
-@Composable
-private fun NewPlanButton(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    ColorPressButton(
-        contentColor = PlaneatTheme.colors.point1,
-        modifier = modifier,
-        onClick = throttleClick(onClick = onClick)
-    ) { contentColor ->
-        Icon(
-            painter = painterResource(id = DrawableIds.ic_new_plan),
-            contentDescription = null,
-            tint = contentColor
-        )
-        Spacer(modifier = Modifier.width(8.dp))
-        Text(
-            text = stringResource(StringIds.new_plan),
-            style = PlaneatTheme.typography.titleMedium,
-            color = contentColor
->>>>>>> master
         )
     }
 }
