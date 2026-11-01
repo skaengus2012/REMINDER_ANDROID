@@ -10,6 +10,7 @@ Detailed guidelines are in `docs/guidelines/`. Read the relevant file before per
 | [`.agents/skills/create-pr`](.agents/skills/create-pr/SKILL.md) | When the user asks to create or open a pull request |
 | [`docs/guidelines/branch-rules.md`](docs/guidelines/branch-rules.md) | Before creating or merging any git branch |
 | [`docs/guidelines/commit-rules.md`](docs/guidelines/commit-rules.md) | Before creating any git commit |
+| [`docs/guidelines/spec-docs.md`](docs/guidelines/spec-docs.md) | Before implementing a GitHub issue (read `docs/spec/issue<number>/requirements.md` if it exists), or when creating or updating a document under `docs/spec/` |
 
 ---
 
