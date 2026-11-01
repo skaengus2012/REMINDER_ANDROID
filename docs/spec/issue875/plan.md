@@ -33,7 +33,7 @@
    - `@Multibinds`로 빈 `Set<Interceptor>`를 선언해, release에서도 바인딩이 비어 있는 채로 컴파일되게 한다.
    - `ImageLoader`는 `.okHttpClient { okHttpClientProvider.get() }`(`dagger.Lazy`)로 공유 클라이언트를 사용한다.
 2. **링크 썸네일 요청 OkHttp 전환 (`core/network`)**
-   - 같은 파일의 `private interface LinkThumbnailApiService`(`@Streaming @GET suspend fun getHtml(@Url url: String): ResponseBody`)로 HTML을 받고, 응답 본문 스트림을 Jsoup streamParser로 파싱하도록 바꾼다. `LinkThumbnailDataSourceImpl`은 `OkHttpClient`를 직접 받지 않고 `RetrofitFactory`를 주입받아, `LinkThumbnailApiService by retrofitFactory.create(...).create()` 위임으로 서비스를 구현한다(android-boot의 Single-File Encapsulation 규칙). 더미 base URL은 `BaseUrls.UNUSED`로 관리한다.
+   - 별도 타입 `HtmlDataSource`가 같은 파일의 `private interface HtmlApiService`(`@Streaming @GET suspend fun getHtml(@Url url: String): ResponseBody`)를 `by retrofitFactory.create(...).create()` 위임으로 구현해 HTML 본문을 받는다(android-boot의 Single-File Encapsulation 규칙). `LinkThumbnailDataSourceImpl`은 `OkHttpClient`나 `RetrofitFactory`를 직접 받지 않고 `HtmlDataSource`를 소유해 쓰며, 받은 본문 스트림을 Jsoup streamParser로 파싱한다. 더미 base URL은 `BaseUrls.UNUSED`로 관리한다.
    - `OkHttpClient`는 `dagger.Lazy`로만 쓴다(`NetworkModule`의 `ImageLoader`, 그리고 Retrofit 생성을 한곳에 모은 `RetrofitFactory`의 `callFactory`). 데이터소스가 클라이언트를 직접 받아 `Lazy` 없이 쓰는 실수를 막기 위함이다.
    - `@Streaming`이 없으면 Retrofit이 본문 전체를 버퍼링하므로 반드시 붙인다.
    - 기존 동작(`og:title`, `og:image` 추출, `catching` 기반 `Result`)은 유지한다. 동작 보존은 기존 테스트로 확인한다.
@@ -48,7 +48,7 @@
    - **Verify**: `./gradlew :core:network:assembleDebug`
 2. `NetworkModule`에 `Set<Interceptor>` `@Multibinds`와 `@Singleton OkHttpClient`를 추가하고, `ImageLoader`가 이 클라이언트를 사용하게 한다.
    - **Verify**: `./gradlew :app:assembleDebug` (Hilt 그래프 컴파일 확인)
-3. `LinkThumbnailDataSourceImpl`이 `RetrofitFactory`로 만든 Retrofit 서비스로 요청하고 Jsoup으로 파싱하게 바꾼다. `NetworkDataSourceModule`의 제공 코드를 함께 수정한다.
+3. `LinkThumbnailDataSourceImpl`이 `HtmlDataSource`로 요청하고 Jsoup으로 파싱하게 바꾼다. `NetworkDataSourceModule`의 제공 코드를 함께 수정한다.
    - 모든 경우에 `StreamParser`로 스트리밍 파싱한다. 서버가 charset을 선언하지 않으면 본문 앞 1KB의 `<meta>`에서 charset을 감지한다.
    - 브라우저 UA는 지정하지 않는다(비교 결과 이점이 없었고, 일부 사이트는 OkHttp 기본 UA에서만 og 태그를 제공).
    - 코루틴 취소 시 호출 취소는 Retrofit의 `suspend` 지원이 처리한다(직접 만든 `Call.await()`는 제거).
@@ -95,3 +95,4 @@
 | 2026-11-01 | PR 리뷰 반영: android-boot 규칙(Single-File Encapsulation)에 맞춰 `HtmlApi`를 제거하고 `private interface LinkThumbnailApiService`를 `LinkThumbnailDataSource.kt`로 이동. `provideHtmlApi` 제거, 데이터소스가 `RetrofitFactory`를 직접 주입받음 | PR #881 리뷰 코멘트 |
 | 2026-11-01 | PR 리뷰 반영: 서비스 보관 방식을 프로퍼티에서 android-boot와 같은 위임(`by`)으로 변경. file-private 인터페이스를 supertype으로 둘 수 없다던 이전 커밋 설명은 틀렸음(컴파일로 확인) | PR #881 리뷰 코멘트 |
 | 2026-11-01 | PR 리뷰 반영: 상수 객체 `NetworkConstants`를 `BaseUrls`로, `UNUSED_BASE_URL`을 `UNUSED`로 변경 | PR #881 리뷰 코멘트 |
+| 2026-11-01 | PR 리뷰 반영: Retrofit 서비스 구현을 별도 타입 `HtmlDataSource`로 분리하고 `LinkThumbnailDataSourceImpl`이 이를 소유해 사용. `withContext`는 본문 읽기가 블로킹이라 유지 | PR #881 리뷰 코멘트 |
