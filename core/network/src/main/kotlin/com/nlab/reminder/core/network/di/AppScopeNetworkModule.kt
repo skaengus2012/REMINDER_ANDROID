@@ -22,6 +22,7 @@ import coil.decode.SvgDecoder
 import coil.disk.DiskCache
 import coil.memory.MemoryCache
 import com.nlab.reminder.core.network.datasource.HtmlApi
+import com.nlab.reminder.core.network.infra.RetrofitFactory
 import dagger.Lazy
 import dagger.Module
 import dagger.Provides
@@ -31,7 +32,6 @@ import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.Multibinds
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
-import retrofit2.Retrofit
 import javax.inject.Singleton
 
 /**
@@ -57,12 +57,8 @@ internal object AppScopeNetworkModule {
     @Provides
     @Singleton
     fun provideHtmlApi(
-        okHttpClientProvider: Lazy<OkHttpClient>
-    ): HtmlApi = Retrofit.Builder()
-        .baseUrl(UNUSED_BASE_URL)
-        .callFactory { request -> okHttpClientProvider.get().newCall(request) }
-        .build()
-        .create(HtmlApi::class.java)
+        retrofitFactory: RetrofitFactory
+    ): HtmlApi = retrofitFactory.create(UNUSED_BASE_URL).create(HtmlApi::class.java)
 
     @Provides
     @Singleton

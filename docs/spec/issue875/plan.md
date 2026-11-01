@@ -34,7 +34,7 @@
    - `ImageLoader`는 `.okHttpClient { okHttpClientProvider.get() }`(`dagger.Lazy`)로 공유 클라이언트를 사용한다.
 2. **링크 썸네일 요청 OkHttp 전환 (`core/network`)**
    - Retrofit 인터페이스 `HtmlApi`(`@Streaming @GET suspend fun getHtml(@Url url: String): ResponseBody`)로 HTML을 받고, 응답 본문 스트림을 Jsoup streamParser로 파싱하도록 바꾼다. `LinkThumbnailDataSourceImpl`은 `OkHttpClient`를 직접 받지 않고 이 인터페이스만 주입받는다.
-   - `OkHttpClient`는 `AppScopeNetworkModule` 안에서만 `dagger.Lazy`로 쓴다(`ImageLoader`, `Retrofit`의 `callFactory`). 데이터소스가 클라이언트를 직접 받아 `Lazy` 없이 쓰는 실수를 막기 위함이다.
+   - `OkHttpClient`는 `dagger.Lazy`로만 쓴다(`AppScopeNetworkModule`의 `ImageLoader`, 그리고 Retrofit 생성을 한곳에 모은 `RetrofitFactory`의 `callFactory`). 데이터소스가 클라이언트를 직접 받아 `Lazy` 없이 쓰는 실수를 막기 위함이다.
    - `@Streaming`이 없으면 Retrofit이 본문 전체를 버퍼링하므로 반드시 붙인다.
    - 기존 동작(`og:title`, `og:image` 추출, `catching` 기반 `Result`)은 유지한다. 동작 보존은 기존 테스트로 확인한다.
 3. **Flocon 도입 (`app`, debug 전용)**
@@ -88,3 +88,4 @@
 | 2026-11-01 | PR 리뷰 반영: 전 경로 스트리밍 파싱(meta charset 감지), 브라우저 UA 제거, 모듈명을 `AppScopeDebugApplicationModule`로 변경, Task 4(테스트) 제외 | PR #881 리뷰 코멘트 |
 | 2026-11-01 | PR 리뷰 반영: OkHttp 5 상향 대신 Retrofit 3.0.0(OkHttp 4.12 유지)으로 링크 썸네일 요청을 구현. 데이터소스가 `OkHttpClient`를 직접 받지 않도록 `LinkThumbnailApi`만 주입 | PR #881 리뷰 코멘트, 사용자 결정 |
 | 2026-11-01 | PR 리뷰 반영: `LinkThumbnailApi`를 범용 이름 `HtmlApi`로 변경, 불필요한 `debugImplementation(libs.okhttp)` 제거 | PR #881 리뷰 코멘트 |
+| 2026-11-01 | PR 리뷰 반영: `NetworkModule`을 `AppScopeNetworkModule`로 변경, 명시적 `okhttp` 의존성 제거, `Lazy`+`callFactory` 처리를 모은 `RetrofitFactory` 추가 | PR #881 리뷰 코멘트 |
