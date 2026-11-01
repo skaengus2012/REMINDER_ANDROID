@@ -39,7 +39,7 @@
    - 버전 카탈로그에 `flocon`, `flocon-okhttp`(참고 프로젝트 기준 1.10.0), 그리고 `okhttp`를 추가한다. `core/network`가 `OkHttpClient`를 직접 사용하므로 `okhttp`는 명시적으로 선언한다.
    - `app/build.gradle.kts`에 `debugImplementation(libs.flocon)`과 `debugImplementation(libs.flocon.okhttp)`를 추가한다.
    - `app/src/debug`에 `FloconInitializer`(`Flocon.initialize(context)`)를 만들고 debug `AndroidManifest.xml`의 `InitializationProvider`에 등록한다.
-   - `app/src/debug`에 `@IntoSet Interceptor`로 `FloconOkhttpInterceptor()`를 제공하는 Hilt 모듈을 추가한다.
+   - `app/src/debug`에 `@IntoSet Interceptor`로 `FloconOkhttpInterceptor()`를 제공하는 Hilt 모듈(`AppScopeDebugApplicationModule`, 기존 `AppScope<이름>Module` 관례)을 추가한다.
 
 ## 작업
 1. 버전 카탈로그에 `okhttp`, `flocon`, `flocon-okhttp`를 추가하고 `core/network`에 `okhttp` 의존성을 선언한다.
@@ -47,11 +47,11 @@
 2. `NetworkModule`에 `Set<Interceptor>` `@Multibinds`와 `@Singleton OkHttpClient`를 추가하고, `ImageLoader`가 이 클라이언트를 사용하게 한다.
    - **Verify**: `./gradlew :app:assembleDebug` (Hilt 그래프 컴파일 확인)
 3. `LinkThumbnailDataSourceImpl`이 `OkHttpClient`를 주입받아 OkHttp로 요청하고 Jsoup으로 파싱하게 바꾼다. `NetworkDataSourceModule`의 제공 코드를 함께 수정한다.
-   - OkHttp 기본 UA(`okhttp/x.y.z`) 대신 Jsoup 기본값과 같은 브라우저 UA를 보낸다.
-   - 서버가 charset을 선언하면 `StreamParser`로, 선언하지 않으면 Jsoup이 BOM과 `<meta charset>`을 감지하도록 한다.
+   - 모든 경우에 `StreamParser`로 스트리밍 파싱한다. 서버가 charset을 선언하지 않으면 본문 앞 1KB의 `<meta>`에서 charset을 감지한다.
+   - 브라우저 UA는 지정하지 않는다(비교 결과 이점이 없었고, 일부 사이트는 OkHttp 기본 UA에서만 og 태그를 제공).
    - 코루틴이 취소되면 `Call.cancel()`이 호출되도록 `Call.await()`(`suspendCancellableCoroutine`)를 사용한다.
    - **Verify**: `./gradlew :core:network:test :core:data-impl:test`
-4. 링크 썸네일 데이터소스 테스트를 추가한다. `MockWebServer` 또는 가짜 `Interceptor`로 `og:title`/`og:image` 추출, 메타 태그 누락, 요청 실패 시 `Result` 실패를 검증한다. (프로젝트 TDD 원칙에 따라 3번보다 먼저 작성한다.)
+4. ~~링크 썸네일 데이터소스 테스트를 추가한다.~~ (Dropped: 리뷰 결과 네트워크 동작에 대한 테스트는 불필요하다고 판단해 테스트와 `testImplementation` 의존성을 제거했다.) 원래 내용: 링크 썸네일 데이터소스 테스트를 추가한다. `MockWebServer` 또는 가짜 `Interceptor`로 `og:title`/`og:image` 추출, 메타 태그 누락, 요청 실패 시 `Result` 실패를 검증한다. (프로젝트 TDD 원칙에 따라 3번보다 먼저 작성한다.)
    - **Verify**: `./gradlew :core:network:test`
 5. `app`에 Flocon 의존성을 `debugImplementation`으로 추가하고, debug 소스셋에 `FloconInitializer`와 Flocon 인터셉터 Hilt 모듈을 추가한다. debug `AndroidManifest.xml`에 Initializer를 등록한다.
    - **Verify**: `./gradlew :app:assembleDebug`
@@ -71,8 +71,8 @@
 ## 미결 사항
 - Flocon 버전(1.10.0)은 참고 프로젝트 기준이므로 구현 시 최신 안정 버전을 확인한다.
 - `TrustedTimeDataSource`(Play Services)는 Flocon 대상에서 제외하는 것으로 계획했다. 포함이 필요하면 알려 달라.
-- 링크 썸네일 요청은 현재 앱 UI에서 호출되지 않는다(`feature/all`이 `FakeData`를 사용). 따라서 Task 8에서 Flocon으로 확인된 것은 Coil 이미지 요청뿐이며, 썸네일 요청은 단위 테스트로만 검증했다. 화면 연결(#601) 이후 재확인이 필요하다.
-- 코드 리뷰에서 지적됐으나 이번에 반영하지 않은 항목: OkHttp 기본 타임아웃(10초, 기존 Jsoup 30초), 이미지/썸네일 클라이언트 분리, 인터셉터 실행 순서 보장.
+- 링크 썸네일 요청은 현재 앱 UI에서 호출되지 않는다(`feature/all`이 `FakeData`를 사용). 따라서 Task 8에서 Flocon으로 확인된 것은 Coil 이미지 요청뿐이며, 썸네일 요청은 확인하지 못했고 테스트도 두지 않았다. 화면 연결(#601) 이후 재확인이 필요하다.
+- 코드 리뷰(자동)에서 지적됐으나 반영하지 않은 항목: OkHttp 기본 타임아웃(10초, 기존 Jsoup 30초), 이미지/썸네일 클라이언트 분리, 인터셉터 실행 순서 보장.
 
 ---
 
@@ -83,3 +83,4 @@
 | 2026-11-01 | 참고 구조에 nowinandroid 추가, 절대 경로 제거 | 사용자 요청 |
 | 2026-11-01 | Task 1~7 구현 완료. 클라이언트 노출 타입을 `OkHttpClient`로 확정. Task 8(수동 확인)은 미수행 | 구현 |
 | 2026-11-01 | 코드 리뷰 반영: 브라우저 UA, charset 감지, 취소 전파. 실기기 확인 결과와 미반영 항목을 미결 사항에 기록 | 코드 리뷰, 실기기 확인 |
+| 2026-11-01 | PR 리뷰 반영: 전 경로 스트리밍 파싱(meta charset 감지), 브라우저 UA 제거, 모듈명을 `AppScopeDebugApplicationModule`로 변경, Task 4(테스트) 제외 | PR #881 리뷰 코멘트 |
