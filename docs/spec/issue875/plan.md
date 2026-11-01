@@ -38,13 +38,13 @@
    - `@Streaming`이 없으면 Retrofit이 본문 전체를 버퍼링하므로 반드시 붙인다.
    - 기존 동작(`og:title`, `og:image` 추출, `catching` 기반 `Result`)은 유지한다. 동작 보존은 기존 테스트로 확인한다.
 3. **Flocon 도입 (`app`, debug 전용)**
-   - 버전 카탈로그에 `flocon`, `flocon-okhttp`(참고 프로젝트 기준 1.10.0), `okhttp`(4.12.0), `retrofit`(3.0.0)을 추가한다. `core/network`가 `OkHttpClient`를 직접 사용하므로 `okhttp`는 명시적으로 선언한다.
+   - 버전 카탈로그에 `flocon`, `flocon-okhttp`(참고 프로젝트 기준 1.10.0), `retrofit`(3.0.0)을 추가한다. `okhttp`(4.12.0)는 Retrofit과 Coil이 전이 의존성으로 제공하므로 따로 선언하지 않는다.
    - `app/build.gradle.kts`에 `debugImplementation(libs.flocon)`과 `debugImplementation(libs.flocon.okhttp)`를 추가한다.
    - `app/src/debug`에 `FloconInitializer`(`Flocon.initialize(context)`)를 만들고 debug `AndroidManifest.xml`의 `InitializationProvider`에 등록한다.
    - `app/src/debug`에 `@IntoSet Interceptor`로 `FloconOkhttpInterceptor()`를 제공하는 Hilt 모듈(`AppScopeDebugApplicationModule`, 기존 `AppScope<이름>Module` 관례)을 추가한다.
 
 ## 작업
-1. 버전 카탈로그에 `okhttp`, `retrofit`, `flocon`, `flocon-okhttp`를 추가하고 `core/network`에 `okhttp`, `retrofit` 의존성을 선언한다.
+1. 버전 카탈로그에 `retrofit`, `flocon`, `flocon-okhttp`를 추가하고 `core/network`에 `retrofit` 의존성을 선언한다.
    - **Verify**: `./gradlew :core:network:assembleDebug`
 2. `AppScopeNetworkModule`에 `Set<Interceptor>` `@Multibinds`와 `@Singleton OkHttpClient`를 추가하고, `ImageLoader`가 이 클라이언트를 사용하게 한다.
    - **Verify**: `./gradlew :app:assembleDebug` (Hilt 그래프 컴파일 확인)
