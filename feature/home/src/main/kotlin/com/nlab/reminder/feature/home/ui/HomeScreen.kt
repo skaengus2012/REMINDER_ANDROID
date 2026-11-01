@@ -681,12 +681,12 @@ private fun NewPlanButton(
         onClick = throttleClick(onClick = onClick)
     ) { contentColor ->
         Icon(
-            modifier = Modifier.size(width = 27.dp, height = 21.dp),
+            modifier = Modifier.size(27.dp),
             painter = painterResource(id = DrawableIds.ic_new_plan),
             contentDescription = null,
             tint = contentColor
         )
-        Spacer(modifier = Modifier.width(10.dp))
+        Spacer(modifier = Modifier.width(8.dp))
         Text(
             text = stringResource(StringIds.new_plan),
             style = PlaneatTheme.typography.titleMedium,
