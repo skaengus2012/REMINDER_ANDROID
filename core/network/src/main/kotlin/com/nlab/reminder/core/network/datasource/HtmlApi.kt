@@ -24,7 +24,7 @@ import retrofit2.http.Url
 /**
  * @author Doohyun
  */
-internal interface LinkThumbnailApi {
+internal interface HtmlApi {
     /**
      * Fetches the page at [url]. [Streaming] is required: without it Retrofit buffers the whole body in memory,
      * which defeats the stream parsing of the head element.

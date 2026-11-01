@@ -21,7 +21,7 @@ import coil.ImageLoader
 import coil.decode.SvgDecoder
 import coil.disk.DiskCache
 import coil.memory.MemoryCache
-import com.nlab.reminder.core.network.datasource.LinkThumbnailApi
+import com.nlab.reminder.core.network.datasource.HtmlApi
 import dagger.Lazy
 import dagger.Module
 import dagger.Provides
@@ -50,13 +50,13 @@ internal object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideLinkThumbnailApi(
+    fun provideHtmlApi(
         okHttpClientProvider: Lazy<OkHttpClient>
-    ): LinkThumbnailApi = Retrofit.Builder()
+    ): HtmlApi = Retrofit.Builder()
         .baseUrl("https://localhost/") // Required by Retrofit, but ignored because every call passes an absolute @Url.
         .callFactory { request -> okHttpClientProvider.get().newCall(request) }
         .build()
-        .create(LinkThumbnailApi::class.java)
+        .create(HtmlApi::class.java)
 
     @Provides
     @Singleton

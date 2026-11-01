@@ -47,12 +47,12 @@ fun interface LinkThumbnailDataSource {
 
 internal class LinkThumbnailDataSourceImpl(
     private val dispatcher: CoroutineDispatcher,
-    private val linkThumbnailApi: LinkThumbnailApi
+    private val htmlApi: HtmlApi
 ) : LinkThumbnailDataSource {
     override suspend fun getLinkThumbnail(url: NonBlankString): Result<LinkThumbnailResponse> = catching {
         withContext(dispatcher) {
             // The body is not read yet at this point. StreamParser reads it lazily and stops after <head>.
-            val metaTagToValues = linkThumbnailApi.getHtml(url.value).use { body ->
+            val metaTagToValues = htmlApi.getHtml(url.value).use { body ->
                 StreamParser(Parser.htmlParser()).use { parser ->
                     parser.parse(body.openReader(), url.value)
                     parser.selectFirst("head")
