@@ -40,7 +40,6 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
@@ -681,7 +680,6 @@ private fun NewPlanButton(
         onClick = throttleClick(onClick = onClick)
     ) { contentColor ->
         Icon(
-            modifier = Modifier.size(27.dp),
             painter = painterResource(id = DrawableIds.ic_new_plan),
             contentDescription = null,
             tint = contentColor
