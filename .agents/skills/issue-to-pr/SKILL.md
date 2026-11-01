@@ -107,6 +107,8 @@ answers, and rerun the subagent with them. Never fill the gap yourself.
 
 ## Step 4. Gate 1: Review the Requirements
 
+Skip when the chosen start point is later than this step (reviewing the existing plan, or running the workflow).
+
 Show the user the path, the FR/NFR counts and the Open Questions, then ask with `AskUserQuestion`:
 **Approve** / **Request changes**.
 
@@ -134,10 +136,11 @@ If questions come back, ask the user (one `AskUserQuestion` call, grouped), then
 ## Step 6. Gate 2: Review the Plan
 
 Same loop as Gate 1 for `plan.md`: show the path, task count, test strategy and open questions; **Approve** /
-**Request changes**; on changes rerun the plan subagent with the request and ask again until approved.
+**Request changes**; on changes rerun the plan subagent with the request and ask again until approved. Skip this loop
+when the chosen start point is running the workflow with the existing approved plan.
 
-Read the approved `testStrategy` from the literal `testStrategy:` line in `plan.md`, not from memory, so it is also
-correct when the run started at Gate 2 or at the workflow. If the line is missing or unclear, ask the user which
+Always read the approved `testStrategy` from the literal `testStrategy:` line in `plan.md`, even when the loop above
+was skipped, and not from memory, so it is also correct when the run started at Gate 2 or at the workflow. If the line is missing or unclear, ask the user which
 strategy to use; never assume one.
 
 ## Step 7. Prepare and Run the Workflow

@@ -58,7 +58,7 @@
 - 라벨은 `create-pr`의 추천 규칙으로 자동 선택하고 확인 단계를 생략한다고 마무리 에이전트에 명시한다.
 - 규칙 위반이나 판단 불가 시에는 추측하지 않고 중단 후 보고한다(FR-14).
 
-### 확인이 필요한 제안 (승인 대상)
+### 구현에 반영된 제안 (PR 검토에서 최종 확인)
 | 항목 | 제안 |
 |------|------|
 | 워크플로우 위치 | `.agents/workflows/plan-to-pr.js`, 스킬이 `scriptPath`로 호출 (프로젝트에 `.claude`가 없고 모든 에이전트 자산이 `.agents/` 아래에 있음) |
@@ -77,7 +77,7 @@
 4. 계획 수립 서브에이전트 호출(질문 불가 시 질문 목록 반환, 테스트 전략 포함)과 게이트 2 작성.
    - **Verify**: FR-5, FR-6 대응 확인. 테스트 전략 선택지(단위만 / 단위 + UI QA)가 계획 산출 지시에 포함되어 있는지 확인.
 5. 워크플로우 사전 준비(base 브랜치 / 원격 브랜치 결정, `args` JSON 구성)와 호출, 결과 보고 단계 작성.
-   - **Verify**: `args` 스키마(issue, rounds, createPr, reviewerModel, baseBranch, remoteBranch, config)가 SKILL.md와 워크플로우 스크립트에서 동일한지 대조.
+   - **Verify**: `args` 스키마(issue, rounds, createPr, reviewerModel, testStrategy, startCommit, baseBranch, remoteBranch, config)가 SKILL.md와 워크플로우 스크립트에서 동일한지 대조.
 6. `.agents/workflows/plan-to-pr.js` 뼈대 작성: `meta`, `args` 검증, JSON schema 정의(구현 결과, 리뷰 지적, 마무리 결과).
    - **Verify**: 스크립트를 async 함수로 감싼 임시 `.mjs`를 만들어 `node --check`로 구문 검사(스크래치패드에서 실행). 스크립트가 최상위 `return`을 쓰고 `export const meta`는 함수 안에서 쓸 수 없으므로, 감쌀 때 `export`를 떼어낸다(`(async () => {` + `const meta ...` + 본문 + `})()`). 원본을 그대로 `.mjs`로 검사하면 `Illegal return statement` 오류가 난다.
 7. 구현 단계 작성: 구현자 프롬프트(경로 전달, TDD, 커밋 규칙, 변경 모듈 단위 테스트, UI QA 분기, 디바이스 없음 처리, 1회 재시도 후 중단).
@@ -108,4 +108,5 @@
 | 2026-11-02 | Opus 검토 반영: 시작 지점 선택지 4개 이하, `plan.md`의 `testStrategy:` 줄에서 값 읽기, 클린 트리 보장, 리뷰어가 `requesting-code-review`의 서브에이전트 생성·`gh` 코멘트 게시를 하지 않도록 제한, 리뷰어 막힘 보고(`failureReason`), 마무리 결과 검증, `headCommit` 정확성, `fullTestCommand`·`rounds` 필수화로 하드코딩 제거 | Opus 검토(태스크 11) |
 | 2026-11-02 | 수정분에 대한 Opus 재검토는 사용자 결정으로 수행하지 않음. `dryRun` 재실행(정상 경로, 필수 키 누락 경로)과 구문 검사로 대체 | 사용자 요청 |
 | 2026-11-02 | `AGENTS.md` 가이드 인덱스에 `issue-to-pr` 행 추가 | 사용자 요청 |
+| 2026-11-02 | PR #888 Opus 리뷰의 경미한 지적 반영: 최종 검증·리뷰 수정 단계에 `fullTestCommand` 분기 추가, PR 본문의 미해결 쟁점에 구현자 응답(`implementerResponse`) 함께 기록, `reviewerModel` 값 검증, `SKILL.md`의 Gate 1·Gate 2 생략 조건 명시와 `testStrategy` 읽기를 항상 수행하도록 명확화, args 대조 목록에 `testStrategy`·`startCommit` 추가, 이미 구현된 제안 표의 제목을 현재 상태에 맞게 수정. 반영하지 않은 항목: `agent()`의 `effort` 옵션(dry-run 전용이며 오류 없이 통과), Project Config 밖 브랜치 패턴·전역 스킬 경로(공유 저장소 승격 시 설정 계약으로 처리, nlab-agent#26) | PR #888 Opus 리뷰(m1~m9) |
 | 2026-11-02 | PR #888 Opus 리뷰 반영: `SKILL.md` Step 1에 작업 브랜치 확인 단계 추가(`master` 등에서 실행하면 중단하고 질문, `branch-rules.md` 준수). 구문 검사 방법을 정정: 원본을 `.mjs`로 복사하면 최상위 `return` 때문에 `Illegal return statement`가 나므로 async 함수로 감싸서 검사(스크립트는 정상, 위 "구문 검사 통과" 기록은 감싼 방식으로 재확인됨) | PR #888 Opus 리뷰(I1, I2) |

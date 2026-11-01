@@ -26,6 +26,9 @@ function validateArgs(a) {
   if (!a.issue) return 'args.issue is required'
   if (!a.startCommit) return 'args.startCommit is required'
   if (!Number.isInteger(a.rounds) || a.rounds < 0) return 'args.rounds must be an integer >= 0'
+  if (a.reviewerModel !== undefined && !['opus', 'sonnet', 'inherit'].includes(a.reviewerModel)) {
+    return "args.reviewerModel must be 'opus', 'sonnet' or 'inherit'"
+  }
   if (!a.config || typeof a.config !== 'object') return 'args.config is required'
   for (const key of REQUIRED_CONFIG) {
     if (!a.config[key]) return `args.config.${key} is required`
@@ -216,7 +219,8 @@ function fixPrompt(open) {
     'For each finding either fix it (with a test when it changes behavior) or rebut it with a concrete reason. '
       + 'Address blocking findings first; fix suggestions only when trivial.',
     CLEAN_TREE,
-    `Rerun \`${cfg.testCommand}\` for the affected modules. `
+    `Rerun \`${cfg.testCommand}\` for the affected modules, or \`${cfg.fullTestCommand}\` when the change is `
+      + 'cross-cutting (for example build scripts). '
       + 'If a test fails, fix it once and rerun; if it still fails, return status "failed".',
     'Return headCommit as the output of `git rev-parse HEAD`.',
   ].join('\n')
@@ -230,7 +234,8 @@ function finishPrompt(state) {
         + 'confirmation. Do not rewrite history; if a commit-rule violation or any other blocker appears, return '
         + 'status "failed" with the reason instead of guessing.',
       state.unresolved.length || state.suggestions.length
-        ? 'Add a section "Unresolved review points" to the PR body listing: '
+        ? 'Add a section "Unresolved review points" to the PR body listing each point with the reviewer finding and '
+          + 'the implementer response (implementerResponse) so both positions are visible: '
           + JSON.stringify({ blocking: state.unresolved, suggestions: state.suggestions })
         : 'No unresolved review points exist; do not add such a section.',
       state.manualUiCheckRequired
@@ -243,7 +248,8 @@ function finishPrompt(state) {
   return [
     `You are the finisher for GitHub issue #${issue}. ${NO_INPUT}`,
     `First follow ${cfg.verifySkillPath}: run \`${cfg.testCommand}\` for the modules changed since `
-      + `${args.startCommit} (\`git diff --name-only ${args.startCommit}..HEAD\`). If anything fails, fix it once and `
+      + `${args.startCommit} (\`git diff --name-only ${args.startCommit}..HEAD\`), or \`${cfg.fullTestCommand}\` when `
+      + 'the change is cross-cutting (for example build scripts). If anything fails, fix it once and '
       + 'rerun; if it still fails return status "failed". Record only commands you actually ran.',
     CLEAN_TREE,
     'Return headCommit as the output of `git rev-parse HEAD` after any fix.',
@@ -313,8 +319,12 @@ while (blocking(open).length > 0 && round < rounds) {
   open = review.findings
 }
 
-const unresolved = blocking(open)
-const suggestions = open.filter(f => f.severity !== 'blocking')
+// Record both positions: the reviewer's finding and the implementer's latest response (fix or rebuttal).
+const responseById = {}
+for (const r of responses) responseById[r.id] = `${r.action}: ${r.note}`
+const withResponse = f => Object.assign({}, f, { implementerResponse: responseById[f.id] || null })
+const unresolved = blocking(open).map(withResponse)
+const suggestions = open.filter(f => f.severity !== 'blocking').map(withResponse)
 if (unresolved.length) {
   log(`Discussion cap reached with ${unresolved.length} unresolved blocking finding(s); recorded for the PR body`)
 }
