@@ -53,7 +53,7 @@ fun BottomAppbar(
     Box(modifier = modifier) {
         BottomBlurLayer(
             modifier = Modifier.matchParentSize(),
-            alphaProvider = { bottomAppbarState.backgroundAlpha * 0.925f }
+            alphaProvider = { bottomAppbarState.backgroundAlpha }
         )
         Column {
             Row(

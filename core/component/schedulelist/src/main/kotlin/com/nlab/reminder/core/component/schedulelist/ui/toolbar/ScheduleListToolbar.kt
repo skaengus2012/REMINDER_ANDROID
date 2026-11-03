@@ -75,11 +75,7 @@ fun ScheduleListToolbar(
     Box(modifier) {
         HeadBlurLayer(
             modifier = Modifier.matchParentSize(),
-<<<<<<< HEAD:core/component/schedulelist/src/main/kotlin/com/nlab/reminder/core/component/schedulelist/ui/toolbar/ScheduleListToolbar.kt
-            alpha = toolbarState.backgroundAlpha,
-=======
-            alpha = { renderState.backgroundAlpha },
->>>>>>> master:core/component/schedulelist/src/main/kotlin/com/nlab/reminder/core/component/schedulelist/toolbar/ui/ScheduleListToolbar.kt
+            alpha = { toolbarState.backgroundAlpha },
             containerColor = PlaneatTheme.colors.bg2Layer,
         )
         ScheduleListToolbarContent(

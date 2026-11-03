@@ -27,12 +27,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.CompositingStrategy
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import com.nlab.reminder.core.androidx.compose.ui.tooling.preview.Previews
 import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
 
 /**
+ * @param alphaProvider Lambda returning the layer alpha in range 0.0..1.0. It is read in the layer phase only,
+ * so scrolling updates the layer property without redrawing the static rects.
  * @author Doohyun
  */
 @Composable
@@ -40,22 +45,20 @@ fun BottomBlurLayer(
     alphaProvider: () -> Float,
     modifier: Modifier = Modifier,
     containerColor: Color = PlaneatTheme.colors.bg1Layer,
-    lineColor: Color = PlaneatTheme.colors.bgLine1
+    lineColor: Color = PlaneatTheme.colors.bgLine1,
+    defaultContainerAlpha: Float = 0.925f
 ) {
-    Box(modifier = modifier) {
-        Spacer(
-            modifier = Modifier
-                .fillMaxSize()
-                .drawBehind { drawRect(color = containerColor.copy(alpha = alphaProvider())) }
-        )
-        Spacer(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(0.5.dp)
-                .align(Alignment.TopCenter)
-                .drawBehind { drawRect(color = lineColor.copy(alpha = alphaProvider())) }
-        )
-    }
+    Spacer(
+        modifier = modifier
+            .graphicsLayer {
+                alpha = alphaProvider().coerceIn(0f, 1f)
+                compositingStrategy = CompositingStrategy.ModulateAlpha
+            }
+            .drawBehind {
+                drawRect(color = containerColor.copy(alpha = defaultContainerAlpha))
+                drawRect(color = lineColor, size = Size(size.width, 0.5.dp.roundToPx().toFloat()))
+            }
+    )
 }
 
 @Previews

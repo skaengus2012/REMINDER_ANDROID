@@ -53,15 +53,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-<<<<<<< HEAD
 import androidx.compose.ui.layout.onSizeChanged
-=======
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.graphics.CompositingStrategy
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.platform.LocalContext
->>>>>>> master
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -601,7 +593,6 @@ private fun BottomActions(
     onNewPlanClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-<<<<<<< HEAD
     var computedHeightToPx by remember { mutableIntStateOf(0) }
     val density = LocalDensity.current
     val alphaAnimScrollTriggerOffsetToPx = remember(contentHeight, bodyBottomPadding, density) {
@@ -615,19 +606,21 @@ private fun BottomActions(
         val computedHeightWithOffsetToPx = computedHeightToPx + alphaAnimScrollTriggerOffsetToPx
         val maxBottomContainerAnimPx = (computedHeightWithOffsetToPx - computedHeightToPx).toFloat()
         derivedStateOf {
-            if (bodyScrollState.maxValue == Int.MAX_VALUE
-                // Prevent division by zero when the maximum animation range is zero or negative.
-                || maxBottomContainerAnimPx <= 0f
-            ) {
+            if (bodyScrollState.maxValue == Int.MAX_VALUE) {
                 0f
             } else {
                 val remainScrollToPx = bodyScrollState.maxValue - bodyScrollState.value
-                val visibleClipToPaddingHeight =
-                    maxOf(computedHeightWithOffsetToPx - remainScrollToPx, 0)
-                val bottomContainerAnimPx = maxOf(visibleClipToPaddingHeight - computedHeightToPx, 0)
+                if (maxBottomContainerAnimPx <= 0f) {
+                    // No animation range (0 / 0f would be NaN): visible while scrollable content remains below.
+                    if (remainScrollToPx > 0) 1f else 0f
+                } else {
+                    val visibleClipToPaddingHeight =
+                        maxOf(computedHeightWithOffsetToPx - remainScrollToPx, 0)
+                    val bottomContainerAnimPx = maxOf(visibleClipToPaddingHeight - computedHeightToPx, 0)
 
-                // Prevent alpha from dropping below 0f when over-scrolling past the maximum scroll limit (rubber banding).
-                (1f - bottomContainerAnimPx / maxBottomContainerAnimPx).coerceIn(0f, 1f)
+                    // Prevent alpha from dropping below 0f when over-scrolling past the maximum scroll limit (rubber banding).
+                    (1f - bottomContainerAnimPx / maxBottomContainerAnimPx).coerceIn(0f, 1f)
+                }
             }
         }
     }
@@ -642,87 +635,6 @@ private fun BottomActions(
         NewPlanButton(
             modifier = Modifier.height(contentHeight),
             onClick = throttleClick(onClick = onNewPlanClicked)
-=======
-    Box(modifier = modifier.fillMaxWidth()) {
-        BottomBlurLayer(
-            modifier = Modifier.matchParentSize(),
-            alphaAnimScrollTriggerOffset = bodyBottomPadding - contentHeight,
-            bodyScrollState = bodyScrollState,
-        )
-        Row {
-            Spacer(modifier = Modifier.windowInsetsStartWidth(WindowInsets.displayCutout))
-            Column {
-                NewPlanButton(
-                    modifier = Modifier
-                        .height(contentHeight)
-                        .padding(start = 20.dp, end = 10.dp),
-                    onClick = onNewPlanClicked
-                )
-                Spacer(modifier = Modifier.windowInsetsBottomHeight(WindowInsets.navigationBars))
-            }
-        }
-    }
-}
-
-@Composable
-private fun BottomBlurLayer(
-    bodyScrollState: ScrollState,
-    alphaAnimScrollTriggerOffset: Dp,
-    modifier: Modifier = Modifier
-) {
-    val containerColor = PlaneatTheme.colors.bg1Layer
-    val lineColor = PlaneatTheme.colors.bgLine1
-    Spacer(
-        modifier = modifier
-            .graphicsLayer {
-                // Alpha is computed in the layer phase, so scrolling only updates the layer property
-                // and the static rects below are not redrawn while the alpha stays constant.
-                val computedHeightToPx = size.height.toInt()
-                val alphaAnimScrollTriggerOffsetToPx = alphaAnimScrollTriggerOffset.toPx().toInt()
-                alpha = if (bodyScrollState.maxValue == Int.MAX_VALUE) 0f
-                else {
-                    val computedHeightWithOffsetToPx = computedHeightToPx + alphaAnimScrollTriggerOffsetToPx
-                    val maxBottomContainerAnimPx = (computedHeightWithOffsetToPx - computedHeightToPx).toFloat()
-                    val remainScrollToPx = bodyScrollState.maxValue - bodyScrollState.value
-                    if (maxBottomContainerAnimPx <= 0f) {
-                        // No animation range (0 / 0f would be NaN): visible while scrollable content remains below.
-                        if (remainScrollToPx > 0) 1f else 0f
-                    } else {
-                        val visibleClipToPaddingHeight = maxOf(computedHeightWithOffsetToPx - remainScrollToPx, 0)
-                        val bottomContainerAnimPx = maxOf(visibleClipToPaddingHeight - computedHeightToPx, 0)
-                        (1f - bottomContainerAnimPx / maxBottomContainerAnimPx).coerceIn(0f, 1f)
-                    }
-                }
-                compositingStrategy = CompositingStrategy.ModulateAlpha
-            }
-            .drawBehind {
-                drawRect(color = containerColor.copy(alpha = 0.925f))
-                drawRect(color = lineColor, size = Size(size.width, 0.5.dp.roundToPx().toFloat()))
-            }
-    )
-}
-
-@Composable
-private fun NewPlanButton(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    ColorPressButton(
-        contentColor = PlaneatTheme.colors.point1,
-        modifier = modifier,
-        onClick = throttleClick(onClick = onClick)
-    ) { contentColor ->
-        Icon(
-            painter = painterResource(id = DrawableIds.ic_new_plan),
-            contentDescription = null,
-            tint = contentColor
-        )
-        Spacer(modifier = Modifier.width(8.dp))
-        Text(
-            text = stringResource(StringIds.new_plan),
-            style = PlaneatTheme.typography.titleMedium,
-            color = contentColor
->>>>>>> master
         )
     }
 }
