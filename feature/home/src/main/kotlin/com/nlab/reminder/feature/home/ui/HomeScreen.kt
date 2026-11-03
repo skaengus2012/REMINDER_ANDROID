@@ -58,6 +58,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.graphics.CompositingStrategy
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -569,13 +571,16 @@ private fun HomeStatusBackground(
 ) {
     val startAnimOffsetToPx = with(LocalDensity.current) { startAnimOffset.toPx() }
     val bodyPaddingTopToPx = with(LocalDensity.current) { bodyPaddingTop.toPx() }
+    // TODO Consider replacing derivedStateOf with computedStateOf once Compose 1.13+ is stable (currently 1.12.1).
     val alphaState by remember(startAnimOffsetToPx, bodyPaddingTopToPx, bodyScrollState) {
         val maxBottomContainerAnimPx = (bodyPaddingTopToPx - startAnimOffsetToPx)
         derivedStateOf {
             val curState = bodyScrollState.value
             when {
                 curState < startAnimOffsetToPx -> 0f
-                curState > bodyPaddingTopToPx -> 1f
+                // `>=` keeps the else branch's divisor positive (startAnimOffset < bodyPaddingTop there),
+                // so a zero-length animation range yields 1f instead of NaN (0 / 0f).
+                curState >= bodyPaddingTopToPx -> 1f
                 else -> (curState - startAnimOffsetToPx) / maxBottomContainerAnimPx
             }
         }
@@ -626,22 +631,32 @@ private fun BottomBlurLayer(
     val containerColor = PlaneatTheme.colors.bg1Layer
     val lineColor = PlaneatTheme.colors.bgLine1
     Spacer(
-        modifier = modifier.drawBehind {
-            // Size and scroll state are read in the draw phase, so no layout-to-composition feedback is needed.
-            val computedHeightToPx = size.height.toInt()
-            val alphaAnimScrollTriggerOffsetToPx = alphaAnimScrollTriggerOffset.toPx().toInt()
-            val alpha = if (bodyScrollState.maxValue == Int.MAX_VALUE) 0f
-            else {
-                val computedHeightWithOffsetToPx = computedHeightToPx + alphaAnimScrollTriggerOffsetToPx
-                val maxBottomContainerAnimPx = (computedHeightWithOffsetToPx - computedHeightToPx).toFloat()
-                val remainScrollToPx = bodyScrollState.maxValue - bodyScrollState.value
-                val visibleClipToPaddingHeight = maxOf(computedHeightWithOffsetToPx - remainScrollToPx, 0)
-                val bottomContainerAnimPx = maxOf(visibleClipToPaddingHeight - computedHeightToPx, 0)
-                1f - bottomContainerAnimPx / maxBottomContainerAnimPx
+        modifier = modifier
+            .graphicsLayer {
+                // Alpha is computed in the layer phase, so scrolling only updates the layer property
+                // and the static rects below are not redrawn while the alpha stays constant.
+                val computedHeightToPx = size.height.toInt()
+                val alphaAnimScrollTriggerOffsetToPx = alphaAnimScrollTriggerOffset.toPx().toInt()
+                alpha = if (bodyScrollState.maxValue == Int.MAX_VALUE) 0f
+                else {
+                    val computedHeightWithOffsetToPx = computedHeightToPx + alphaAnimScrollTriggerOffsetToPx
+                    val maxBottomContainerAnimPx = (computedHeightWithOffsetToPx - computedHeightToPx).toFloat()
+                    val remainScrollToPx = bodyScrollState.maxValue - bodyScrollState.value
+                    if (maxBottomContainerAnimPx <= 0f) {
+                        // No animation range (0 / 0f would be NaN): visible while scrollable content remains below.
+                        if (remainScrollToPx > 0) 1f else 0f
+                    } else {
+                        val visibleClipToPaddingHeight = maxOf(computedHeightWithOffsetToPx - remainScrollToPx, 0)
+                        val bottomContainerAnimPx = maxOf(visibleClipToPaddingHeight - computedHeightToPx, 0)
+                        (1f - bottomContainerAnimPx / maxBottomContainerAnimPx).coerceIn(0f, 1f)
+                    }
+                }
+                compositingStrategy = CompositingStrategy.ModulateAlpha
             }
-            drawRect(color = containerColor.copy(alpha = 0.925f * alpha))
-            drawRect(color = lineColor.copy(alpha = alpha), size = Size(size.width, 0.5.dp.roundToPx().toFloat()))
-        }
+            .drawBehind {
+                drawRect(color = containerColor.copy(alpha = 0.925f))
+                drawRect(color = lineColor, size = Size(size.width, 0.5.dp.roundToPx().toFloat()))
+            }
     )
 }
 
