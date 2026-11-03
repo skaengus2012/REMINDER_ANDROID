@@ -640,7 +640,7 @@ private fun BottomBlurLayer(
                 1f - bottomContainerAnimPx / maxBottomContainerAnimPx
             }
             drawRect(color = containerColor.copy(alpha = 0.925f * alpha))
-            drawRect(color = lineColor.copy(alpha = alpha), size = Size(size.width, 0.5.dp.toPx()))
+            drawRect(color = lineColor.copy(alpha = alpha), size = Size(size.width, 0.5.dp.roundToPx().toFloat()))
         }
     )
 }
