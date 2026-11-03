@@ -36,13 +36,13 @@ import com.nlab.reminder.core.androidx.compose.ui.tooling.preview.Previews
 import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
 
 /**
- * @param alphaProvider Lambda returning the layer alpha in range 0.0..1.0. It is read in the layer phase only,
+ * @param alpha Lambda returning the layer alpha in range 0.0..1.0. It is read in the layer phase only,
  * so scrolling updates the layer property without redrawing the static rects.
  * @author Doohyun
  */
 @Composable
 fun BottomBlurLayer(
-    alphaProvider: () -> Float,
+    alpha: () -> Float,
     modifier: Modifier = Modifier,
     containerColor: Color = PlaneatTheme.colors.bg1Layer,
     lineColor: Color = PlaneatTheme.colors.bgLine1,
@@ -51,7 +51,7 @@ fun BottomBlurLayer(
     Spacer(
         modifier = modifier
             .graphicsLayer {
-                alpha = alphaProvider().coerceIn(0f, 1f)
+                this.alpha = alpha().coerceIn(0f, 1f)
                 compositingStrategy = CompositingStrategy.ModulateAlpha
             }
             .drawBehind {
@@ -74,7 +74,7 @@ private fun BottomBlurLayerPreview() {
             Box(modifier = Modifier.height(50.dp)) {
                 BottomBlurLayer(
                     modifier = Modifier.fillMaxWidth(),
-                    alphaProvider = { 1f }
+                    alpha = { 1f }
                 )
 
                 Text(
