@@ -61,6 +61,8 @@ dragAnchorOverlay.post(removal)
    - `postedCallback_doesNotRemoveView_afterClearResource`: `clearResource()` 후 늦게 `run()`해도 `removeView`가 호출되지 않는다. (`any()`가 null 인자를 매칭하는지 불확실하므로 `allAny()`를 쓰거나 처음 실행에서 실패가 실제로 나오는지 확인한다.)
    - **Verify**: 구현 전(Task 2 이전)에 `./gradlew :core:component:schedulelist:test --tests '*ScheduleListItemTouchCallbackTest'`가 컴파일되고 두 테스트 모두 실패하며, Task 3 이후 통과
 6. (Task 4 이후) Maestro로 비타이밍 시나리오(아래 검증 섹션의 M1·M2·M3·M4)를 실행하고 결과(통과/실패, 기기)를 기록한다. flow 파일은 저장소에 커밋하지 않는다(범위 밖). 드래그 프로브 결과(2026-11-04, 구현 전 코드, 실기기): 일반 모드에서는 드래그 핸들이 없고 길게 눌러 드래그하는 방식이라 Maestro `swipe`로는 드래그가 시작되지 않았다(순서 불변). `adb shell input draganddrop <x1> <y1> <x2> <y2> 1500`은 드래그가 실제로 동작해 순서가 바뀌었고 반대로 드래그해 원복도 확인했다. 따라서 드래그 동작은 `adb draganddrop`으로, 회전·다크모드·`back`·화면 검증은 Maestro로 나눠 수행한다.
+   - 실행 결과(2026-11-04, 구현 후 빌드를 `adb install -r`로 설치한 실기기, 앱 프로세스 재시작 없음): M1 통과(드래그 후 순서 변경, 반대 드래그로 원복, 미러 뷰 잔상 없음), M2 통과(12회 연속 드래그·원복 후 순서·화면 동일, `logcat`에 `FATAL EXCEPTION`/`IllegalStateException` 없음), M3 통과(드래그 후 가로 회전→세로 복귀, 다크모드 on→off 후에도 순서 유지, 크래시·잔상 없음), M4 통과(`back` 후 재진입 3회 반복, 이후 드래그 정상). 테스트 후 다크모드·회전 설정과 아이템 순서는 원래대로 되돌렸다.
+   - 한계: 이 확인은 회귀·크래시 여부만 보여 준다. `removeCallbacks`가 실제로 취소했는지는 화면으로 구분되지 않는다.
    - **Verify**: 각 시나리오가 통과하고 앱이 종료되지 않음. 실패 시 원인을 PR에 기록
 7. (Task 4 이후) 타이밍 시나리오(아래 검증 섹션의 H1·H2·H3)를 사람이 기기에서 확인하고 결과를 PR 본문에 기록한다. 재현되지 않으면 "재현 시도했으나 타이밍상 보장 불가"라고 그대로 적는다.
    - **Verify**: PR 본문의 체크리스트에 각 시나리오의 결과가 기록됨
