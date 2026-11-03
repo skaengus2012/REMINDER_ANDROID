@@ -571,6 +571,7 @@ private fun HomeStatusBackground(
 ) {
     val startAnimOffsetToPx = with(LocalDensity.current) { startAnimOffset.toPx() }
     val bodyPaddingTopToPx = with(LocalDensity.current) { bodyPaddingTop.toPx() }
+    // TODO Consider replacing derivedStateOf with computedStateOf once Compose 1.13+ is stable (currently 1.12.1).
     val alphaState by remember(startAnimOffsetToPx, bodyPaddingTopToPx, bodyScrollState) {
         val maxBottomContainerAnimPx = (bodyPaddingTopToPx - startAnimOffsetToPx)
         derivedStateOf {
