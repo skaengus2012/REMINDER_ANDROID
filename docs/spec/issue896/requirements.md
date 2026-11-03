@@ -75,9 +75,12 @@
 - 본문과 댓글 간 충돌은 없다 (댓글 없음).
 - 본문은 `drawBehind`에서 `bodyScrollState.value`를 직접 읽는 상태를 전제로 하지만, 현재 작업 트리의 `BottomBlurLayer`는 아직 `derivedStateOf` + `onSizeChanged` 구조다. 전제는 PR #894 기준이다 (미해결 질문 참고).
 
+- PR #894 정적 분석 노트: 블러 알파 계산(`BottomBlurLayer`, `HomeStatusBackground`)은 애니메이션 구간 길이가 0이면 `0 / 0f = NaN`이 된다. 현재는 호출부가 상수이고 `private`이라 도달하지 않지만, 이번 이슈에서 `BottomBlurLayer` 알파 계산을 `graphicsLayer`로 옮기므로 함께 방어한다(동작 변화 없음). 상세는 `plan.md`의 "0 나누기(NaN) 방어" 참고.
+
 ---
 
 ## 변경 이력
 | 날짜 | 변경 | 출처 |
 |------|------|------|
 | 2026-11-03 | 최초 작성 | 본문, 부모 이슈 #895, 관련 이슈 #893 |
+| 2026-11-03 | 0 나누기(NaN) 방어 참고 사항 추가 | PR #894 정적 분석 노트 |

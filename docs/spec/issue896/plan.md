@@ -39,6 +39,13 @@
 - 계산식은 읽기 쉽도록 `graphicsLayer` 안에서 로컬 함수/변수로 정리하되 동작은 바꾸지 않는다. `derivedStateOf`는 도입하지 않는다(람다가 layer 단계에서 스크롤 상태를 직접 읽는 것으로 충분).
 - `HeadBlurLayer`는 알파가 0..1로 연속 변하므로 이번 이슈에서는 현행 유지한다(이슈 범위 밖).
 
+### 0 나누기(NaN) 방어 (PR #894 정적 분석 노트 반영)
+- 배경: `BottomBlurLayer`의 `bottomContainerAnimPx / maxBottomContainerAnimPx`는 `alphaAnimScrollTriggerOffset`이 0px이면 `0 / 0f = NaN`이 되고, `coerceIn`은 NaN을 걸러내지 못한다. `HomeStatusBackground`도 `startAnimOffset == bodyPaddingTop`이고 스크롤 값이 그 값과 같으면 `else` 분기에서 `0 / 0f`가 된다.
+- 현재는 호출부가 상수(`75.dp - 50.dp = 25.dp`, `32.dp - 20.dp = 12.dp`)이고 세 composable이 모두 `private`이라 도달하지 않는다. 동작 변화 없이 방어만 추가한다. 음수 offset은 애니메이션 구간이 0으로 clamp되어 기존에도 안전했다.
+- `BottomBlurLayer`: `maxBottomContainerAnimPx <= 0f`이면 나눗셈을 건너뛰고, 아래쪽에 스크롤할 내용이 남아 있으면(`remainScrollToPx > 0`) 알파 `1f`, 아니면 `0f`로 한다.
+- `HomeStatusBackground`: `curState > bodyPaddingTopToPx`를 `>=`로 바꾼다. `else` 분기는 `startAnimOffset < bodyPaddingTop`일 때만 도달하므로 분모가 항상 양수이고, 두 값이 같으면 `1f`가 된다. 일반 경우의 결과는 동일하다.
+- 단위 테스트는 추가하지 않는다(private composable이고 현재 입력으로는 새 분기에 도달하지 않음). `:feature:home` 컴파일과 기존 테스트로 회귀를 확인했다.
+
 ## Tasks
 1. 변경 전 기준 측정: 현재 브랜치 debug 빌드로 Home 스크롤 시나리오의 gfxinfo(jank %, 90/95/99 percentile 프레임 시간)를 3회 기록하고 변경 전 스크린샷(Home 상단/스크롤 중/하단)을 저장한다 (저장소 외부 스크래치 경로).
    - **Verify**: 측정값/스크린샷이 PR 본문 작성에 쓸 수 있도록 정리됨 (수동 확인).
@@ -66,4 +73,5 @@ testStrategy: unit+ui
 | Date | Change | Source |
 |------|--------|--------|
 | 2026-11-03 | Initial draft | requirements.md, 사용자 요청(Open Questions 보수적 기본값 적용) |
+| 2026-11-03 | `BottomBlurLayer`/`HomeStatusBackground`의 0 나누기(NaN) 방어 추가 (Architecture 섹션 신설) | PR #894 정적 분석 노트(사용자 요청) |
 | 2026-11-03 | 기준 브랜치가 origin/epic/issue895(#894 포함)로 변경됨. 현재 코드 재점검 후 FR-2/FR-3 완료로 판단, Task 2 Dropped, Task 3를 BottomBlurLayer 전용으로 수정, #894 관련 가정/질문 제거 | 사용자 결정(코디네이터 전달), 코드 재확인 |
