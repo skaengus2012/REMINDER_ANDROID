@@ -577,7 +577,9 @@ private fun HomeStatusBackground(
             val curState = bodyScrollState.value
             when {
                 curState < startAnimOffsetToPx -> 0f
-                curState > bodyPaddingTopToPx -> 1f
+                // `>=` keeps the else branch's divisor positive (startAnimOffset < bodyPaddingTop there),
+                // so a zero-length animation range yields 1f instead of NaN (0 / 0f).
+                curState >= bodyPaddingTopToPx -> 1f
                 else -> (curState - startAnimOffsetToPx) / maxBottomContainerAnimPx
             }
         }
@@ -639,9 +641,14 @@ private fun BottomBlurLayer(
                     val computedHeightWithOffsetToPx = computedHeightToPx + alphaAnimScrollTriggerOffsetToPx
                     val maxBottomContainerAnimPx = (computedHeightWithOffsetToPx - computedHeightToPx).toFloat()
                     val remainScrollToPx = bodyScrollState.maxValue - bodyScrollState.value
-                    val visibleClipToPaddingHeight = maxOf(computedHeightWithOffsetToPx - remainScrollToPx, 0)
-                    val bottomContainerAnimPx = maxOf(visibleClipToPaddingHeight - computedHeightToPx, 0)
-                    (1f - bottomContainerAnimPx / maxBottomContainerAnimPx).coerceIn(0f, 1f)
+                    if (maxBottomContainerAnimPx <= 0f) {
+                        // No animation range (0 / 0f would be NaN): visible while scrollable content remains below.
+                        if (remainScrollToPx > 0) 1f else 0f
+                    } else {
+                        val visibleClipToPaddingHeight = maxOf(computedHeightWithOffsetToPx - remainScrollToPx, 0)
+                        val bottomContainerAnimPx = maxOf(visibleClipToPaddingHeight - computedHeightToPx, 0)
+                        (1f - bottomContainerAnimPx / maxBottomContainerAnimPx).coerceIn(0f, 1f)
+                    }
                 }
                 compositingStrategy = CompositingStrategy.ModulateAlpha
             }
