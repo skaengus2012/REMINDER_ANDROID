@@ -58,7 +58,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -567,15 +567,13 @@ private fun HomeStatusBackground(
     bodyScrollState: ScrollState,
     modifier: Modifier = Modifier,
 ) {
-    var computedHeightToPx by remember { mutableIntStateOf(0) }
     val startAnimOffsetToPx = with(LocalDensity.current) { startAnimOffset.toPx() }
     val bodyPaddingTopToPx = with(LocalDensity.current) { bodyPaddingTop.toPx() }
-    val alphaState by remember(computedHeightToPx, startAnimOffsetToPx, bodyPaddingTopToPx, bodyScrollState) {
+    val alphaState by remember(startAnimOffsetToPx, bodyPaddingTopToPx, bodyScrollState) {
         val maxBottomContainerAnimPx = (bodyPaddingTopToPx - startAnimOffsetToPx)
         derivedStateOf {
             val curState = bodyScrollState.value
             when {
-                computedHeightToPx == 0 -> 0f
                 curState < startAnimOffsetToPx -> 0f
                 curState > bodyPaddingTopToPx -> 1f
                 else -> (curState - startAnimOffsetToPx) / maxBottomContainerAnimPx
@@ -585,9 +583,8 @@ private fun HomeStatusBackground(
     HeadBlurLayer(
         modifier = modifier
             .fillMaxWidth()
-            .windowInsetsTopHeight(WindowInsets.statusBars)
-            .onSizeChanged { computedHeightToPx = it.height },
-        alpha = alphaState
+            .windowInsetsTopHeight(WindowInsets.statusBars),
+        alpha = { alphaState }
     )
 }
 
@@ -599,22 +596,12 @@ private fun BottomActions(
     onNewPlanClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var computedHeightToPx by remember { mutableIntStateOf(0) }
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .onSizeChanged { computedHeightToPx = it.height }
-    ) {
-        if (computedHeightToPx != 0) {
-            BottomBlurLayer(
-                modifier = Modifier.matchParentSize(),
-                computedHeightToPx = computedHeightToPx,
-                alphaAnimScrollTriggerOffsetToPx = with(LocalDensity.current) {
-                    remember(contentHeight, bodyBottomPadding) { (bodyBottomPadding - contentHeight).toPx().toInt() }
-                },
-                bodyScrollState = bodyScrollState,
-            )
-        }
+    Box(modifier = modifier.fillMaxWidth()) {
+        BottomBlurLayer(
+            modifier = Modifier.matchParentSize(),
+            alphaAnimScrollTriggerOffset = bodyBottomPadding - contentHeight,
+            bodyScrollState = bodyScrollState,
+        )
         Row {
             Spacer(modifier = Modifier.windowInsetsStartWidth(WindowInsets.displayCutout))
             Column {
@@ -633,40 +620,29 @@ private fun BottomActions(
 @Composable
 private fun BottomBlurLayer(
     bodyScrollState: ScrollState,
-    computedHeightToPx: Int,
-    alphaAnimScrollTriggerOffsetToPx: Int,
+    alphaAnimScrollTriggerOffset: Dp,
     modifier: Modifier = Modifier
 ) {
     val containerColor = PlaneatTheme.colors.bg1Layer
     val lineColor = PlaneatTheme.colors.bgLine1
-    val alphaState by remember(computedHeightToPx, alphaAnimScrollTriggerOffsetToPx, bodyScrollState) {
-        val computedHeightWithOffsetToPx = computedHeightToPx + alphaAnimScrollTriggerOffsetToPx
-        val maxBottomContainerAnimPx = (computedHeightWithOffsetToPx - computedHeightToPx).toFloat()
-        derivedStateOf {
-            if (bodyScrollState.maxValue == Int.MAX_VALUE) 0f
+    Spacer(
+        modifier = modifier.drawBehind {
+            // Size and scroll state are read in the draw phase, so no layout-to-composition feedback is needed.
+            val computedHeightToPx = size.height.toInt()
+            val alphaAnimScrollTriggerOffsetToPx = alphaAnimScrollTriggerOffset.toPx().toInt()
+            val alpha = if (bodyScrollState.maxValue == Int.MAX_VALUE) 0f
             else {
+                val computedHeightWithOffsetToPx = computedHeightToPx + alphaAnimScrollTriggerOffsetToPx
+                val maxBottomContainerAnimPx = (computedHeightWithOffsetToPx - computedHeightToPx).toFloat()
                 val remainScrollToPx = bodyScrollState.maxValue - bodyScrollState.value
-                val visibleClipToPaddingHeight =
-                    maxOf(computedHeightWithOffsetToPx - remainScrollToPx, 0)
+                val visibleClipToPaddingHeight = maxOf(computedHeightWithOffsetToPx - remainScrollToPx, 0)
                 val bottomContainerAnimPx = maxOf(visibleClipToPaddingHeight - computedHeightToPx, 0)
                 1f - bottomContainerAnimPx / maxBottomContainerAnimPx
             }
+            drawRect(color = containerColor.copy(alpha = 0.925f * alpha))
+            drawRect(color = lineColor.copy(alpha = alpha), size = Size(size.width, 0.5.dp.roundToPx().toFloat()))
         }
-    }
-    Box(modifier = modifier) {
-        Spacer(
-            modifier = Modifier
-                .matchParentSize()
-                .drawBehind { drawRect(color = containerColor.copy(alpha = 0.925f * alphaState)) }
-        )
-        Spacer(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(0.5.dp)
-                .align(Alignment.TopCenter)
-                .drawBehind { drawRect(color = lineColor.copy(alpha = alphaState)) }
-        )
-    }
+    )
 }
 
 @Composable
