@@ -27,6 +27,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.nlab.reminder.core.androidx.compose.ui.tooling.preview.Previews
@@ -45,20 +47,20 @@ fun HeadBlurLayer(
     lineColor: Color = PlaneatTheme.colors.bgLine1,
     defaultContainerAlpha: Float = 0.96f
 ) {
-    Box(modifier = modifier) {
-        Spacer(
-            modifier = Modifier
-                .fillMaxSize()
-                .drawBehind { drawRect(color = containerColor.copy(alpha = defaultContainerAlpha * alpha().coerceIn(0f, 1f))) }
-        )
-        Spacer(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(0.5.dp)
-                .align(Alignment.BottomCenter)
-                .drawBehind { drawRect(color = lineColor.copy(alpha = alpha().coerceIn(0f, 1f))) }
-        )
-    }
+    Spacer(
+        modifier = modifier
+            .fillMaxSize()
+            .drawBehind {
+                val currentAlpha = alpha().coerceIn(0f, 1f)
+                val lineHeightToPx = 0.5.dp.roundToPx().toFloat()
+                drawRect(color = containerColor.copy(alpha = defaultContainerAlpha * currentAlpha))
+                drawRect(
+                    color = lineColor.copy(alpha = currentAlpha),
+                    topLeft = Offset(x = 0f, y = size.height - lineHeightToPx),
+                    size = Size(width = size.width, height = lineHeightToPx)
+                )
+            }
+    )
 }
 
 @Previews
