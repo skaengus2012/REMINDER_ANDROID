@@ -436,6 +436,10 @@ private class DraggableViewHolderDelegate(
 
             textviewLink.bindText(binding.textviewLink.text)
 
+            // Visibility must be copied every time because mirror views are pooled.
+            buttonInfo.visibility = binding.buttonInfo.visibility
+            cardLink.visibility = binding.cardLink.visibility
+
             textviewTitleLink.bindText(binding.textviewTitleLink.text)
             textviewTitleLink.visibility = binding.textviewTitleLink.visibility
 
