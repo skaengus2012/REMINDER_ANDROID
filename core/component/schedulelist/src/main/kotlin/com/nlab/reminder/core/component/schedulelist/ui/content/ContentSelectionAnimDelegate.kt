@@ -257,8 +257,10 @@ internal class ContentSelectionAnimDelegate(private val binding: LayoutScheduleA
     fun applyStateToMirror(mirrorBinding: LayoutScheduleAdapterItemContentMirrorBinding) {
         val selectable = binding.buttonDragHandle.translationX == getDragButtonTranslateX(selectable = true)
 
+        // Copy the margin currently applied to the original, so the mirror's text width always matches it.
+        // (The original keeps the layout default until a selection transition applies a new margin.)
         val titleParams = mirrorBinding.edittextTitle.constraintLayoutParams
-        titleParams.goneEndMargin = if (selectable) selectedExtraContentGuideEnd else 0
+        titleParams.goneEndMargin = binding.edittextTitle.constraintLayoutParams.goneEndMargin
         mirrorBinding.edittextTitle.layoutParams = titleParams
 
         val guideParams = mirrorBinding.guidelineExtraContentEnd.constraintLayoutParams
