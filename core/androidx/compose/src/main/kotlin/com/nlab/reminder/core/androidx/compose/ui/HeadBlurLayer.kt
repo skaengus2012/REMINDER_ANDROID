@@ -16,7 +16,6 @@
 
 package com.nlab.reminder.core.androidx.compose.ui
 
-import androidx.annotation.FloatRange
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
@@ -28,36 +27,40 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.nlab.reminder.core.androidx.compose.ui.tooling.preview.Previews
 import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
 
 /**
+ * @param alpha Lambda returning the layer alpha in range 0.0..1.0. It is read in the draw phase only,
+ * and values outside the range are coerced.
  * @author Thalys
  */
 @Composable
 fun HeadBlurLayer(
-    @FloatRange(from = 0.0, to = 1.0) alpha: Float,
+    alpha: () -> Float,
     modifier: Modifier = Modifier,
     containerColor: Color = PlaneatTheme.colors.bg1Layer,
     lineColor: Color = PlaneatTheme.colors.bgLine1,
     defaultContainerAlpha: Float = 0.96f
 ) {
-    Box(modifier = modifier) {
-        Spacer(
-            modifier = Modifier
-                .fillMaxSize()
-                .drawBehind { drawRect(color = containerColor.copy(alpha = defaultContainerAlpha * alpha)) }
-        )
-        Spacer(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(0.5.dp)
-                .align(Alignment.BottomCenter)
-                .drawBehind { drawRect(color = lineColor.copy(alpha = alpha)) }
-        )
-    }
+    Spacer(
+        modifier = modifier
+            .fillMaxSize()
+            .drawBehind {
+                val currentAlpha = alpha().coerceIn(0f, 1f)
+                val lineHeightToPx = 0.5.dp.roundToPx().toFloat()
+                drawRect(color = containerColor.copy(alpha = defaultContainerAlpha * currentAlpha))
+                drawRect(
+                    color = lineColor.copy(alpha = currentAlpha),
+                    topLeft = Offset(x = 0f, y = size.height - lineHeightToPx),
+                    size = Size(width = size.width, height = lineHeightToPx)
+                )
+            }
+    )
 }
 
 @Previews
@@ -73,7 +76,7 @@ private fun HeadBlurPreview() {
             Box(modifier = Modifier.height(50.dp)) {
                 HeadBlurLayer(
                     modifier = Modifier.fillMaxWidth(),
-                    alpha = 1f
+                    alpha = { 1f }
                 )
 
                 Text(
