@@ -80,6 +80,7 @@ internal class ScheduleListItemTouchCallback(
     private val mirrorViewBindingPool = DraggingMirrorViewPool()
     private val dragScaleInterpolator = OvershootInterpolator()
     private val dragEndCallbacks = mutableListOf<() -> Unit>()
+    private val pendingMirrorViewRemovals = mutableSetOf<Runnable>()
     private var disposeDragScaleAnimator: ViewPropertyAnimator? = null
     private var draggingViewHolder: RecyclerView.ViewHolder? = null
     private var dragAnchorMirrorView: View? = null
@@ -494,10 +495,20 @@ internal class ScheduleListItemTouchCallback(
                             // According to GPT's explanation, ItemTouchHelper's onSelectedChange and clearView
                             // can be triggered during the middle of a layout pass.
                             // If we remove it immediately at this moment, an IllegalStateException may occur.
-                            dragAnchorOverlay.post {
-                                if (selectedActionState == ItemTouchHelper.ACTION_STATE_DRAG && dragAnchorMirrorView === v) return@post
-                                dragAnchorOverlay.removeView(v)
+                            val removal = object : Runnable {
+                                override fun run() {
+                                    // If it is no longer pending, it was cancelled by clearResource().
+                                    // View.removeCallbacks can't remove it from the handler queue
+                                    // when the overlay is detached, so guard here as well.
+                                    if (pendingMirrorViewRemovals.remove(this).not()) return
+                                    if (selectedActionState == ItemTouchHelper.ACTION_STATE_DRAG
+                                        && dragAnchorMirrorView === v
+                                    ) return
+                                    dragAnchorOverlay.removeView(v)
+                                }
                             }
+                            pendingMirrorViewRemovals += removal
+                            dragAnchorOverlay.post(removal)
                         }
                         dragAnchorMirrorView = null
 
@@ -557,6 +568,8 @@ internal class ScheduleListItemTouchCallback(
         .also { it.start() }
 
     fun clearResource() {
+        pendingMirrorViewRemovals.forEach { dragAnchorOverlay.removeCallbacks(it) }
+        pendingMirrorViewRemovals.clear()
         mirrorViewBindingPool.clear()
         dragAnchorOverlay.removeAllViews()
         disposeSwipeClampAnimators.forEach { it.cancel() }
