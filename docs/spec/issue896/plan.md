@@ -20,7 +20,7 @@
 1. **기준 브랜치**: `feature/issue896`(= `origin/epic/issue895` 기반, #894 포함)에서 작업한다.
 2. **벤치마크**: 새 Macrobenchmark 모듈은 추가하지 않는다. 저장소에 코드를 남기지 않는 일회성 로컬 측정(Home 스크롤 시나리오, `adb shell dumpsys gfxinfo <pkg> framestats`/`reset`으로 jank 비율과 프레임 시간 비교)으로 변경 전/후를 비교하고 결과만 PR 본문에 기록한다.
 3. **공개 API**: `HeadBlurLayer` 시그니처는 변경하지 않는다. 코드상 변경이 필요하지 않다. `BottomBlurLayer`는 private이라 자유롭게 바꾼다.
-4. **FR-4(선택)**: 이번 PR 범위에서 제외한다. 별도 후속으로 남긴다.
+4. **FR-4(선택)**: 이번 PR 범위에서 제외한다. 별도 후속으로 남긴다. 현재 Compose runtime이 1.12.1(BOM 2026.09.00, 최신 stable)이라 `computedStateOf`(Compose 1.13+)를 사용할 수 없다. 1.13은 beta(`1.13.0-beta02`)까지만 나와 있어, 1.13 stable과 BOM이 나오면 의존성 갱신과 함께 별도 이슈로 재검토한다. 그때까지 `HomeStatusBackground`에 TODO 주석을 남긴다.
 5. **시각 동일성 확인**: 변경 전/후 스크린샷 비교(Home 스크롤 상단/중간/하단). 자동 스크린샷 테스트는 추가하지 않는다.
 6. **병합 순서**: 같은 파일을 다루는 다른 #895 하위 PR과의 충돌은 PR 단계에서 해결한다.
 
@@ -73,5 +73,6 @@ testStrategy: unit+ui
 | Date | Change | Source |
 |------|--------|--------|
 | 2026-11-03 | Initial draft | requirements.md, 사용자 요청(Open Questions 보수적 기본값 적용) |
+| 2026-11-03 | FR-4 제외 사유 기록(Compose 1.12.1이라 `computedStateOf` 불가, 1.13 stable 이후 재검토), `HomeStatusBackground`에 TODO 추가 | Compose 성능 점검, 사용자 요청 |
 | 2026-11-03 | `BottomBlurLayer`/`HomeStatusBackground`의 0 나누기(NaN) 방어 추가 (Architecture 섹션 신설) | PR #894 정적 분석 노트(사용자 요청) |
 | 2026-11-03 | 기준 브랜치가 origin/epic/issue895(#894 포함)로 변경됨. 현재 코드 재점검 후 FR-2/FR-3 완료로 판단, Task 2 Dropped, Task 3를 BottomBlurLayer 전용으로 수정, #894 관련 가정/질문 제거 | 사용자 결정(코디네이터 전달), 코드 재확인 |
