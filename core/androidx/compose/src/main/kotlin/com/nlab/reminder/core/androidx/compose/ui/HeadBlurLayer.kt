@@ -33,6 +33,8 @@ import com.nlab.reminder.core.androidx.compose.ui.tooling.preview.Previews
 import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
 
 /**
+ * @param alpha Lambda returning the layer alpha in range 0.0..1.0. It is read in the draw phase only,
+ * and values outside the range are coerced.
  * @author Thalys
  */
 @Composable
@@ -47,14 +49,14 @@ fun HeadBlurLayer(
         Spacer(
             modifier = Modifier
                 .fillMaxSize()
-                .drawBehind { drawRect(color = containerColor.copy(alpha = defaultContainerAlpha * alpha())) }
+                .drawBehind { drawRect(color = containerColor.copy(alpha = defaultContainerAlpha * alpha().coerceIn(0f, 1f))) }
         )
         Spacer(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(0.5.dp)
                 .align(Alignment.BottomCenter)
-                .drawBehind { drawRect(color = lineColor.copy(alpha = alpha())) }
+                .drawBehind { drawRect(color = lineColor.copy(alpha = alpha().coerceIn(0f, 1f))) }
         )
     }
 }
