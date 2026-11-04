@@ -51,7 +51,9 @@
   - `src/main/res/layout/layout_schedule_adapter_item_content_mirror.xml`: 미러 뷰 레이아웃. `button_info`, `card_link`(내부 `imageview_bg_link_thumbnail`)와 이들을 기준으로 한 마진/제약(`layout_goneMarginEnd`, `layout_marginTop` 등)이 있다.
   - `ui/content/ContentViewHolder.kt`: `mirrorView(parent, viewPool)`을 `draggableViewHolderDelegate`에 위임하고 `LayoutScheduleAdapterItemContentMirrorBinding`을 사용한다.
   - `ui/content/DraggableViewHolder.kt`, `ui/content/ScheduleListItemTouchCallback.kt`: 미러 뷰 생성, 풀링(`DraggingMirrorViewPool`), 드래그 오버레이 처리.
-- 원본 아이템 레이아웃과 미러 뷰 레이아웃이 별도 파일인지, 어떤 시점에 가시성이 동기화되는지는 이번 분석에서 확인하지 않았다.
+  - `src/main/res/layout/layout_schedule_adapter_item_content.xml`: 원본 아이템 레이아웃. 미러 뷰 레이아웃과는 별도 파일이며, `layout_content` 내부의 차이는 상세 입력창 타입과 `view_line` 속성뿐이다.
+  - `ui/content/ContentSelectionAnimDelegate.kt`: `applyStateToMirror()` 가 선택 모드 상태(title 의 `goneEndMargin`, guideline 끝 위치, 버튼 alpha/translationX)를 미러에 반영한다. 선택 전환이 일어나기 전까지 원본 title 의 `goneEndMargin` 은 레이아웃 기본값이다.
+- 미러 뷰는 `mirrorView()` 호출 시점(드래그 시작)에 원본 상태를 한 번 복사하며, 이후 원본이 바뀌어도 갱신되지 않는다.
 
 ## Open Questions
 - 태그 텍스트가 정확히 어떤 뷰를 가리키는가? 스크린샷 외에 본문에 설명이 없다. (현재 미러 레이아웃에서는 태그 전용 뷰가 확인되지 않았다.)
@@ -72,3 +74,4 @@
 | 날짜 | 변경 내용 | 출처 |
 |------|-----------|------|
 | 2026-11-04 | 최초 작성 | 본문 |
+| 2026-11-04 | 영향 범위에 원본/미러 레이아웃 관계와 `applyStateToMirror()` 의 역할을 확인한 내용 반영 | 코드 확인 |

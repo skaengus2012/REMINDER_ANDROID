@@ -32,33 +32,31 @@ requirements.md 의 요구사항을 그대로 따른다. 가장 보수적으로 
   - `src/main/res/layout/layout_schedule_adapter_item_content_mirror.xml`
 - 원본 아이템은 `bindCard`/`bind` 에서 `cardLink`, `textviewTitleLink`, `imageviewBgLinkThumbnail` 의 가시성을 데이터에 맞춰 바꾸고, `buttonInfo` 는 입력 포커스 여부에 따라 `isVisible` 을 바꾼다.
 - 그러나 `mirrorView()` 는 `textviewTitleLink` 와 `imageviewBgLinkThumbnail` 의 가시성만 복사하고, `cardLink` 와 `buttonInfo` 의 가시성은 복사하지 않는다.
+- 또한 `applyStateToMirror()` 는 미러 title 의 `goneEndMargin` 을 선택 모드가 아닐 때 0 으로 강제했다. 원본은 선택 전환이 일어나기 전까지 레이아웃 기본값(`horizontal_padding_medium`)을 유지하므로 미러의 텍스트 폭이 달라진다.
 - 미러 뷰는 `DraggingMirrorViewPool` 로 재사용되므로, 이전 드래그의 상태가 남을 수 있다.
 - 미러 레이아웃에서 `card_link`(`layout_marginTop=10dp`), `view_line`(`layout_marginTop=15dp`), `edittext_title`(`layout_goneMarginEnd`) 의 마진/제약은 대상 뷰가 `GONE` 이어야 의도대로 동작한다.
 
 ### 수정 방향
-1. `mirrorView()` 에서 원본의 `cardLink.visibility` 와 `buttonInfo.visibility` 를 미러 바인딩으로 매번 복사한다. (풀링된 뷰의 잔여 상태 방지)
-2. `imageviewBgLinkThumbnail` 가 원본에서 `GONE` 일 때 미러에서도 `GONE` 이 되도록 복사를 유지하고, 마진/제약(`layout_goneMargin*`)이 원본 레이아웃과 일치하는지 두 XML 을 비교해 차이를 맞춘다.
-3. 미러 XML 이 원본 XML 과 다른 부분은 의도된 차이(EditText 사용, 드래그 핸들 등)만 남기고, 가시성/마진 관련 차이는 제거한다.
-4. 동기화 규칙은 단위 테스트가 가능하도록 순수 함수/값(예: 가시성 매핑)로 분리할 수 있는 경우에만 분리한다. 모듈에 Robolectric 이 없으므로 View 바인딩 자체는 JVM 단위 테스트가 불가능하다.
+1. `ContentSelectionAnimDelegate.applyStateToMirror()` 에서 원본 `layoutContent` 를 `ConstraintSet.clone()` 한 뒤 미러 `layoutContent` 에 `applyTo()` 한다. 원본의 제약, margin/`goneMargin`, guideline 위치, visibility, alpha, translation 이 드래그 시작 시점 기준으로 한 번에 미러에 반영된다. (풀링된 뷰의 잔여 상태 방지)
+   - 이전에는 `selectable` 플래그로 `goneEndMargin`/`guideEnd` 를 계산하고 버튼 alpha/translationX 를 개별 복사했다. 특히 미러의 `goneEndMargin` 을 0 으로 강제해 원본(레이아웃 기본값 유지)보다 텍스트 폭이 넓어지는 것이 태그 텍스트가 다르게 줄바꿈되는 직접 원인이었다.
+2. `layoutContent` 의 직계 자식이 아닌 뷰(`cardLink` 내부의 `textviewTitleLink`, `imageviewBgLinkThumbnail`)는 `ConstraintSet` 범위 밖이므로 `mirrorView()` 에서 기존처럼 개별 복사한다.
+3. 두 XML 을 비교한 결과 `layoutContent` 내부의 차이는 상세 입력창 타입(`ScheduleDetailsEditText` vs `EditText`)과 `view_line`(background, `verticalBias`)뿐이라 XML 은 변경하지 않는다. 미러 XML 직계 자식의 제약은 런타임에 원본 값으로 덮어써진다.
+4. View 바인딩 자체는 모듈에 Robolectric 이 없어 JVM 단위 테스트가 불가능하다. 동기화 규칙을 인위적으로 분리하지 않고 실기기에서 확인한다.
 
 ### 비범위
 - 미러 뷰 alpha/elevation 등 의도된 시각 효과 변경
-- 이슈에 명시되지 않은 다른 숨김 뷰(메모, 상세 텍스트 등) 동기화 추가
+- 이슈에 명시되지 않은 다른 숨김 뷰(메모, 상세 텍스트 등)를 의도해서 추가하는 동기화. 다만 `ConstraintSet` 적용으로 직계 자식인 `edittext_note`/`edittext_detail` 의 visibility 도 함께 원본과 같아진다.
 - Compose 코드 변경
 
 ## 작업 목록
 1. 재현 및 원인 확정: 원본/미러 XML 을 비교하고, 링크가 없는 아이템 및 info 버튼 숨김 상태에서 마진 차이가 발생하는 지점을 정리한다.
-   - **Verify**: 두 레이아웃의 차이 목록이 PR 설명에 근거로 남고, 원인이 `mirrorView()` 의 가시성 미동기화임을 확인한다.
-2. `mirrorView()` 에서 `cardLink` 와 `buttonInfo` 의 가시성을 원본에서 미러로 매번 복사하도록 수정한다. (FR-2)
+   - **Verify**: 원인이 미러의 `goneEndMargin` 0 강제와 `buttonInfo`/`cardLink` visibility 미동기화임을 확인한다.
+2. `applyStateToMirror()` 를 `ConstraintSet` clone/apply 방식으로 교체하고, `mirrorView()` 의 `buttonInfo`/`cardLink` 개별 복사는 제거한다. (FR-1, FR-2, FR-3)
    - **Verify**: `./gradlew :core:component:schedulelist:compileDebugKotlin`
-3. 미러 XML 의 마진/`layout_goneMargin*` 제약이 원본 XML 과 일치하도록 보정한다. (FR-1, FR-3)
-   - **Verify**: `./gradlew :core:component:schedulelist:assembleDebug`
-4. 가시성 동기화 규칙을 JVM 테스트 가능한 형태로 분리할 수 있는지 판단하고, 가능한 경우 분리한 로직에 단위 테스트를 추가한다. 분리가 인위적이면 분리하지 않고 사유를 PR 설명에 적는다.
+3. 변경된 모듈의 기존 단위 테스트 전체 실행.
    - **Verify**: `./gradlew :core:component:schedulelist:test`
-5. 변경된 모듈의 기존 단위 테스트 전체 실행.
-   - **Verify**: `./gradlew :core:component:schedulelist:test`
-6. 에뮬레이터에서 UI 확인 (Maestro): 링크 없는 아이템, 링크가 있으나 썸네일이 없는 아이템, info 버튼이 숨겨진 아이템을 각각 드래그하여 미러 뷰 외형과 태그 텍스트 위치를 원본과 비교한다.
-   - **Verify**: Maestro 플로우 실행 결과 및 스크린샷 비교 (드래그 전후 태그 텍스트 위치 동일, 미러 뷰에 불필요한 여백 없음)
+4. 실기기 확인: 링크 없는 아이템, 링크와 썸네일이 있는 아이템, 링크는 있으나 썸네일이 없는 아이템, info 버튼이 숨겨진 아이템, 노트/일정이 없는 아이템, 선택 모드를 켰다 끈 뒤의 아이템을 각각 드래그하여 미러 뷰 외형과 태그 텍스트 위치를 원본과 비교한다.
+   - **Verify**: 드래그 전후 태그 텍스트 위치 동일, 미러 뷰에 불필요한 여백 없음
 
 ## 검증
 testStrategy: unit+ui
@@ -66,12 +64,11 @@ testStrategy: unit+ui
 - 선택 사유: 변경이 레이아웃 XML 과 뷰 바인딩(UI)에 해당하여 단위 테스트만으로는 FR-1~FR-3 을 증명할 수 없다. 모듈에 Robolectric 이 없어 View 동작은 JVM 에서 검증되지 않는다.
 - 단위 테스트: `./gradlew :core:component:schedulelist:test` (변경 모듈 한정)
 - 빌드: `./gradlew :app:assembleDebug`
-- UI QA (Maestro): 인수 조건 4개를 시나리오로 확인한다.
+- UI QA (실기기, 수동): 인수 조건 4개를 시나리오로 확인한다.
   - 링크 썸네일이 없는 아이템 드래그 시 미러 뷰에 여백이 없다. (FR-2)
   - info 버튼이 숨겨진 아이템 드래그 시 미러 뷰에 여백이 없다. (FR-2)
   - 드래그 시작 전후 태그 텍스트 위치가 같다. (FR-3)
   - 미러 뷰와 원본의 외형이 같다 (의도된 alpha/elevation 제외). (FR-1)
-- 저장소에 `.maestro` 디렉터리가 없으므로 Maestro 플로우는 새로 작성해야 하며, 에뮬레이터 준비 여부는 실행 시점에 확인한다.
 
 ---
 
@@ -79,3 +76,4 @@ testStrategy: unit+ui
 | 날짜 | 변경 내용 | 출처 |
 |------|-----------|------|
 | 2026-11-04 | 초안 작성 | requirements.md |
+| 2026-11-04 | 수정 방향을 개별 복사에서 `ConstraintSet` clone/apply 로 변경하고, XML 비교 결과·작업 목록·검증(수동 확인)을 현재 구현에 맞게 갱신 | 구현 중 검토 |
