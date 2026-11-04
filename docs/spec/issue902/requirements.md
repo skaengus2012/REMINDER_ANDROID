@@ -1,0 +1,77 @@
+# 요구사항 분석: [Bug] Hidden items appear in the mirror view while dragging in a scrollable list (#902)
+
+- 이슈: https://github.com/skaengus2012/REMINDER_ANDROID/issues/902
+- 부모 이슈: 없음
+- 라벨: bug
+- 생성일: 2026-11-03
+- 최종 수정일: 2026-11-04
+- 분석 기준점: 2026-11-03T22:14:11Z
+
+## 배경 및 문제
+- 스크롤 가능한 목록에서 아이템을 드래그하는 동안 미러 뷰(드래그 그림자)에 보이지 않아야 할 요소가 영향을 준다.
+- 첨부 스크린샷 기준으로, 비어 있는 링크 썸네일 뷰와 정보(info) 버튼은 숨겨져 있지만 그 자리가 마진으로 그대로 남는다.
+- 그 결과 레이아웃이 벌어지고 태그 텍스트가 밀려 보인다.
+- 스크린샷은 "Normal"(원본 아이템)과 "Dragging"(드래그 중) 두 장이다.
+- 이슈에 댓글은 없다.
+
+## 목표
+- 드래그 중 미러 뷰가 원본 아이템과 동일하게 보이도록 한다.
+
+## 범위
+### 포함
+- 드래그 중 미러 뷰에서 숨겨진 뷰(빈 링크 썸네일 뷰, info 버튼)가 마진/공간을 차지하지 않게 하는 것
+- 드래그 중 태그 텍스트가 밀리지 않게 하는 것
+
+### 제외
+- 이슈에 명시된 제외 범위 없음 (Open Questions 참고)
+
+## 기능 요구사항
+| ID | 요구사항 | 출처 |
+|----|----------|------|
+| FR-1 | 드래그 중 미러 뷰는 원본 아이템과 동일하게 보여야 한다. | 본문 (Needs) |
+| FR-2 | 숨겨진 뷰(빈 링크 썸네일 뷰, info 버튼)는 미러 뷰에서 어떤 마진이나 공간도 차지하지 않아야 한다. | 본문 (Needs) |
+| FR-3 | 드래그 중 태그 텍스트가 밀리지 않아야 한다. | 본문 (Needs) |
+
+## 비기능 요구사항
+| ID | 요구사항 | 출처 |
+|----|----------|------|
+| - | 이슈에 명시된 비기능 요구사항 없음 | - |
+
+(NFR 항목 0개)
+
+## 인수 조건
+- [ ] 드래그 중 미러 뷰와 원본 아이템의 외형이 동일하다. (FR-1)
+- [ ] 링크 썸네일이 비어 있는 아이템을 드래그해도 미러 뷰에 해당 영역의 여백이 생기지 않는다. (FR-2)
+- [ ] info 버튼이 숨겨진 아이템을 드래그해도 미러 뷰에 해당 영역의 여백이 생기지 않는다. (FR-2)
+- [ ] 드래그 시작 전후로 태그 텍스트 위치가 변하지 않는다. (FR-3)
+
+## 영향 범위
+코드에서 확인한 관련 위치 (구현 설계는 하지 않음).
+- `core/component/schedulelist` 모듈
+  - `src/main/res/layout/layout_schedule_adapter_item_content_mirror.xml`: 미러 뷰 레이아웃. `button_info`, `card_link`(내부 `imageview_bg_link_thumbnail`)와 이들을 기준으로 한 마진/제약(`layout_goneMarginEnd`, `layout_marginTop` 등)이 있다.
+  - `ui/content/ContentViewHolder.kt`: `mirrorView(parent, viewPool)`을 `draggableViewHolderDelegate`에 위임하고 `LayoutScheduleAdapterItemContentMirrorBinding`을 사용한다.
+  - `ui/content/DraggableViewHolder.kt`, `ui/content/ScheduleListItemTouchCallback.kt`: 미러 뷰 생성, 풀링(`DraggingMirrorViewPool`), 드래그 오버레이 처리.
+  - `src/main/res/layout/layout_schedule_adapter_item_content.xml`: 원본 아이템 레이아웃. 미러 뷰 레이아웃과는 별도 파일이며, `layout_content` 내부의 차이는 상세 입력창 타입과 `view_line` 속성뿐이다.
+  - `ui/content/ContentSelectionAnimDelegate.kt`: `applyStateToMirror()` 가 선택 모드 상태(title 의 `goneEndMargin`, guideline 끝 위치, 버튼 alpha/translationX)를 미러에 반영한다. 선택 전환이 일어나기 전까지 원본 title 의 `goneEndMargin` 은 레이아웃 기본값이다.
+- 미러 뷰는 `mirrorView()` 호출 시점(드래그 시작)에 원본 상태를 한 번 복사하며, 이후 원본이 바뀌어도 갱신되지 않는다.
+
+## Open Questions
+- 태그 텍스트가 정확히 어떤 뷰를 가리키는가? 스크린샷 외에 본문에 설명이 없다. (현재 미러 레이아웃에서는 태그 전용 뷰가 확인되지 않았다.)
+- "숨겨진 뷰"의 범위는 빈 링크 썸네일 뷰와 info 버튼으로 한정하는가, 아니면 그 외 숨김 상태 뷰(예: 비어 있는 메모/상세 텍스트, 선택/완료 관련 버튼 등)도 포함하는가?
+- "원본 아이템과 동일"의 기준 범위는 무엇인가? 드래그 시작 시 의도된 시각 변화(그림자 elevation, 스케일 확대 등)는 허용되는가?
+- 문제가 발생하는 대상 화면은 어디까지인가? (스크롤 목록을 쓰는 모든 화면인지, 특정 화면인지, 재현 조건 포함)
+- 재현 가능한 조건(링크 유무, info 버튼 표시 조건, 기기/폰트 크기 등)이 필요한가? 이슈 본문에는 없다.
+- 회귀를 막기 위한 테스트 범위(단위 테스트, 스크린샷 테스트, 수동 검증)를 어떻게 정할 것인가? 프로젝트는 TDD 중심이지만 이슈에 명시가 없다.
+- 이 이슈가 속한 에픽/상위 브랜치 여부(PR base 브랜치 결정)는 어떻게 되는가? 부모 이슈는 없다.
+
+## 충돌 및 참고
+- 본문과 댓글 간 충돌 없음 (댓글 없음).
+- 본문의 "Needs" 첫 항목은 문장 중간에 줄바꿈이 있으나("The mirror view while \n\ndragging ...") 의미는 "드래그 중 미러 뷰는 원본과 동일해야 한다"로 해석했다.
+
+---
+
+## 변경 이력
+| 날짜 | 변경 내용 | 출처 |
+|------|-----------|------|
+| 2026-11-04 | 최초 작성 | 본문 |
+| 2026-11-04 | 영향 범위에 원본/미러 레이아웃 관계와 `applyStateToMirror()` 의 역할을 확인한 내용 반영 | 코드 확인 |
