@@ -16,11 +16,11 @@
 
 package com.nlab.reminder.core.local.datastore.preference
 
-import com.nlab.reminder.core.kotlinx.coroutines.suspendRunCatching
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
+import com.nlab.reminder.core.kotlinx.coroutines.suspendRunCatching
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 

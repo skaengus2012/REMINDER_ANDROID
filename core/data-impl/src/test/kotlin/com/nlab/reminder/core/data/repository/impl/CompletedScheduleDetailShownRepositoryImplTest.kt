@@ -47,7 +47,7 @@ internal class CompletedScheduleDetailShownRepositoryImplTest {
 
     @Test
     fun `Given suspending setShownFunction, When set shown, Then return function result after resumed`() = runTest {
-        // Covers the suspended branch of value class return (Jacoco reports it separately)
+        // Verifies the result is propagated when the function actually suspends
         val expectedResult = Result.success(Unit)
         val repository = genCompletedScheduleShownRepository(
             setShownFunction = {

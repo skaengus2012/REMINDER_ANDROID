@@ -16,7 +16,6 @@
 
 package com.nlab.reminder.core.data.repository.impl
 
-import com.nlab.reminder.core.kotlinx.coroutines.suspendRunCatching
 import com.nlab.reminder.core.data.model.Tag
 import com.nlab.reminder.core.data.model.TagId
 import com.nlab.reminder.core.data.repository.GetTagQuery
@@ -28,6 +27,7 @@ import com.nlab.reminder.core.kotlin.collections.toSet
 import com.nlab.reminder.core.kotlin.toNonNegativeInt
 import com.nlab.reminder.core.kotlin.trim
 import com.nlab.reminder.core.kotlinx.coroutines.flow.combine
+import com.nlab.reminder.core.kotlinx.coroutines.suspendRunCatching
 import com.nlab.reminder.core.local.database.dao.ScheduleTagListDAO
 import com.nlab.reminder.core.local.database.dao.TagDAO
 import com.nlab.reminder.core.local.database.entity.TagEntity

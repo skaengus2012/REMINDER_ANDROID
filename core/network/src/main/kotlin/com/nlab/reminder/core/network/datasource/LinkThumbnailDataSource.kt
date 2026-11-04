@@ -16,8 +16,8 @@
 
 package com.nlab.reminder.core.network.datasource
 
-import com.nlab.reminder.core.kotlinx.coroutines.suspendRunCatching
 import com.nlab.reminder.core.kotlin.NonBlankString
+import com.nlab.reminder.core.kotlinx.coroutines.suspendRunCatching
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import org.jsoup.Jsoup

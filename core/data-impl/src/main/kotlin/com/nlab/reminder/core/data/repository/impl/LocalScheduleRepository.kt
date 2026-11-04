@@ -16,7 +16,6 @@
 
 package com.nlab.reminder.core.data.repository.impl
 
-import com.nlab.reminder.core.kotlinx.coroutines.suspendRunCatching
 import com.nlab.reminder.core.annotation.ExcludeFromGeneratedTestReport
 import com.nlab.reminder.core.data.model.Schedule
 import com.nlab.reminder.core.data.model.toAggregate
@@ -32,6 +31,7 @@ import com.nlab.reminder.core.kotlin.collections.toSet
 import com.nlab.reminder.core.kotlin.tryToNonNegativeLongOrZero
 import com.nlab.reminder.core.kotlinx.coroutines.flow.flatMapLatest
 import com.nlab.reminder.core.kotlinx.coroutines.flow.map
+import com.nlab.reminder.core.kotlinx.coroutines.suspendRunCatching
 import com.nlab.reminder.core.local.database.dao.ScheduleDAO
 import com.nlab.reminder.core.local.database.dao.ScheduleRepeatDetailDAO
 import com.nlab.reminder.core.local.database.dao.ScheduleTagListDAO
