@@ -7,7 +7,6 @@ import com.nlab.reminder.core.data.model.genLink
 import com.nlab.reminder.core.data.model.genLinkAndMetadataAndEntity
 import com.nlab.reminder.core.local.database.dao.LinkMetadataDAO
 import com.nlab.reminder.core.network.datasource.LinkThumbnailDataSource
-import com.nlab.reminder.core.kotlin.Result
 import com.nlab.reminder.core.network.datasource.LinkThumbnailResponse
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -65,7 +64,7 @@ class OfflineFirstLinkMetadataRepositoryTest {
                 coEvery { findByLinks(any()) } returns emptyList()
             },
             remoteDataSource = mockk {
-                coEvery { getLinkThumbnail(any()) } returns Result.Failure(RuntimeException())
+                coEvery { getLinkThumbnail(any()) } returns Result.failure(RuntimeException())
             },
             remoteCatch = mockk {
                 every { snapshot() } returns emptyMap()
@@ -104,7 +103,7 @@ class OfflineFirstLinkMetadataRepositoryTest {
         val (expectedLink, expectedMetadata) = genLinkAndMetadataAndEntity()
         val linkMetadataRepository = genOfflineFirstLinkMetadataRepository(
             remoteDataSource = mockk {
-                coEvery { getLinkThumbnail(expectedLink.rawLink) } returns Result.Success(
+                coEvery { getLinkThumbnail(expectedLink.rawLink) } returns Result.success(
                     LinkThumbnailResponse(
                         title = expectedMetadata.title?.value,
                         image = expectedMetadata.imageUrl?.value
@@ -128,7 +127,7 @@ private fun genOfflineFirstLinkMetadataRepository(
         coEvery { findByLinks(any()) } returns emptyList()
     },
     remoteDataSource: LinkThumbnailDataSource = mockk<LinkThumbnailDataSource> {
-        coEvery { getLinkThumbnail(any()) } returns Result.Failure(RuntimeException())
+        coEvery { getLinkThumbnail(any()) } returns Result.failure(RuntimeException())
     },
     remoteCatch: LinkMetadataRemoteCache = mockk<LinkMetadataRemoteCache>(relaxed = true) {
         every { snapshot() } returns emptyMap()

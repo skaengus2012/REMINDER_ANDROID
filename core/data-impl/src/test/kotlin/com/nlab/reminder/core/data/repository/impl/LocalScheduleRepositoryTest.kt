@@ -27,8 +27,6 @@ import com.nlab.reminder.core.data.repository.DeleteScheduleQuery
 import com.nlab.reminder.core.data.repository.GetScheduleQuery
 import com.nlab.reminder.core.data.repository.SaveScheduleQuery
 import com.nlab.reminder.core.data.repository.UpdateAllScheduleQuery
-import com.nlab.reminder.core.kotlin.getOrThrow
-import com.nlab.reminder.core.kotlin.isSuccess
 import com.nlab.reminder.core.kotlin.toNonNegativeLong
 import com.nlab.reminder.core.local.database.dao.ScheduleDAO
 import com.nlab.reminder.core.local.database.dao.ScheduleRepeatDetailDAO

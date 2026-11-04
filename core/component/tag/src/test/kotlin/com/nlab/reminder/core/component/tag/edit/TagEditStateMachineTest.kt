@@ -7,7 +7,6 @@ import com.nlab.reminder.core.data.model.genTagId
 import com.nlab.reminder.core.data.model.genTags
 import com.nlab.reminder.core.data.repository.SaveTagQuery
 import com.nlab.reminder.core.data.repository.TagRepository
-import com.nlab.reminder.core.kotlin.Result
 import com.nlab.reminder.core.kotlin.faker.genNonBlankString
 import com.nlab.reminder.core.kotlin.faker.genNonNegativeInt
 import com.nlab.reminder.core.kotlin.toNonBlankString
@@ -53,12 +52,12 @@ class TagEditStateMachineTest {
         )
         val tagEditStateMachine = genTagEditStateMachine(
             tagRepository = mockk {
-                coEvery { getUsageCount(current.tag.id) } returns Result.Success(usageCount)
+                coEvery { getUsageCount(current.tag.id) } returns Result.success(usageCount)
             }
         )
         val actualTask = tagEditStateMachine.startRename(current)
         assertThat(actualTask.next, equalTo(TagEditState.Processing(current)))
-        assertThat(actualTask.processAndGet(), equalTo(Result.Success(expectedAfterProcessState)))
+        assertThat(actualTask.processAndGet(), equalTo(Result.success(expectedAfterProcessState)))
     }
 
     @Test
@@ -101,7 +100,7 @@ class TagEditStateMachineTest {
         val tagEditStateMachine = genTagEditStateMachine()
         val actualTask = tagEditStateMachine.tryUpdateName(current, genTags())
         assertThat(actualTask.next, equalTo(current))
-        assertThat(actualTask.processAndGet(), equalTo(Result.Success(current)))
+        assertThat(actualTask.processAndGet(), equalTo(Result.success(current)))
     }
 
     @Test
@@ -110,7 +109,7 @@ class TagEditStateMachineTest {
         val tagEditStateMachine = genTagEditStateMachine()
         val actualTask = tagEditStateMachine.tryUpdateName(current, genTags())
         assertThat(actualTask.next, equalTo(TagEditState.None))
-        assertThat(actualTask.processAndGet(), equalTo(Result.Success(TagEditState.None)))
+        assertThat(actualTask.processAndGet(), equalTo(Result.success(TagEditState.None)))
     }
 
     @Test
@@ -124,7 +123,7 @@ class TagEditStateMachineTest {
         val tagEditStateMachine = genTagEditStateMachine()
         val actualTask = tagEditStateMachine.tryUpdateName(current, compareTags)
         assertThat(actualTask.next, equalTo(TagEditState.None))
-        assertThat(actualTask.processAndGet(), equalTo(Result.Success(TagEditState.None)))
+        assertThat(actualTask.processAndGet(), equalTo(Result.success(TagEditState.None)))
     }
 
     @Test
@@ -148,7 +147,7 @@ class TagEditStateMachineTest {
         val tagEditStateMachine = genTagEditStateMachine()
         val actualTask = tagEditStateMachine.tryUpdateName(current, compareTags)
         assertThat(actualTask.next, equalTo(expectedState))
-        assertThat(actualTask.processAndGet(), equalTo(Result.Success(expectedState)))
+        assertThat(actualTask.processAndGet(), equalTo(Result.success(expectedState)))
     }
 
     @Test
@@ -162,7 +161,7 @@ class TagEditStateMachineTest {
                     name = current.renameText.toNonBlankString(),
                     shouldMergeIfExists = false
                 )
-                coEvery { save(query) } returns Result.Success(
+                coEvery { save(query) } returns Result.success(
                     current.tag.copy(name = current.renameText.toNonBlankString())
                 )
             }
@@ -174,7 +173,7 @@ class TagEditStateMachineTest {
         )
         assertThat(
             actualTask.processAndGet(),
-            equalTo(Result.Success(expectedAfterProcessState))
+            equalTo(Result.success(expectedAfterProcessState))
         )
     }
 
@@ -191,7 +190,7 @@ class TagEditStateMachineTest {
                     name = targetName,
                     shouldMergeIfExists = true
                 )
-                coEvery { save(query) } returns Result.Success(current.to)
+                coEvery { save(query) } returns Result.success(current.to)
             }
         )
         val actualTask = tagEditStateMachine.merge(current)
@@ -201,7 +200,7 @@ class TagEditStateMachineTest {
         )
         assertThat(
             actualTask.processAndGet(),
-            equalTo(Result.Success(expectedAfterProcessState))
+            equalTo(Result.success(expectedAfterProcessState))
         )
     }
 
@@ -235,12 +234,12 @@ class TagEditStateMachineTest {
         )
         val tagEditStateMachine = genTagEditStateMachine(
             tagRepository = mockk {
-                coEvery { getUsageCount(current.tag.id) } returns Result.Success(usageCount)
+                coEvery { getUsageCount(current.tag.id) } returns Result.success(usageCount)
             }
         )
         val actualTask = tagEditStateMachine.startDelete(current)
         assertThat(actualTask.next, equalTo(TagEditState.Processing(current)))
-        assertThat(actualTask.processAndGet(), equalTo(Result.Success(expectedAfterProcessState)))
+        assertThat(actualTask.processAndGet(), equalTo(Result.success(expectedAfterProcessState)))
     }
 
     @Test
@@ -248,12 +247,77 @@ class TagEditStateMachineTest {
         val current = genDeleteState()
         val tagEditStateMachine = genTagEditStateMachine(
             tagRepository = mockk {
-                coEvery { delete(current.tag.id) } returns Result.Success(Unit)
+                coEvery { delete(current.tag.id) } returns Result.success(Unit)
             }
         )
         val actualTask = tagEditStateMachine.delete(current)
         assertThat(actualTask.next, equalTo(TagEditState.Processing(current)))
-        assertThat(actualTask.processAndGet(), equalTo(Result.Success(TagEditState.None)))
+        assertThat(actualTask.processAndGet(), equalTo(Result.success(TagEditState.None)))
+    }
+
+    @Test
+    fun `Given await task selection and usage count failure, When start rename, Then processAndGet returns failure`() = runTest {
+        val current = genAwaitTaskSelectionState()
+        val throwable = IllegalStateException()
+        val tagEditStateMachine = genTagEditStateMachine(
+            tagRepository = mockk {
+                coEvery { getUsageCount(current.tag.id) } returns Result.failure(throwable)
+            }
+        )
+        val actualTask = tagEditStateMachine.startRename(current)
+        assertThat(actualTask.processAndGet().exceptionOrNull(), equalTo(throwable))
+    }
+
+    @Test
+    fun `Given await task selection and usage count failure, When start delete, Then processAndGet returns failure`() = runTest {
+        val current = genAwaitTaskSelectionState()
+        val throwable = IllegalStateException()
+        val tagEditStateMachine = genTagEditStateMachine(
+            tagRepository = mockk {
+                coEvery { getUsageCount(current.tag.id) } returns Result.failure(throwable)
+            }
+        )
+        val actualTask = tagEditStateMachine.startDelete(current)
+        assertThat(actualTask.processAndGet().exceptionOrNull(), equalTo(throwable))
+    }
+
+    @Test
+    fun `Given rename state and save failure, When try update name, Then processAndGet returns failure`() = runTest {
+        val current = genRenameState()
+        val throwable = IllegalStateException()
+        val tagEditStateMachine = genTagEditStateMachine(
+            tagRepository = mockk {
+                coEvery { save(any()) } returns Result.failure(throwable)
+            }
+        )
+        val actualTask = tagEditStateMachine.tryUpdateName(current, compareTags = emptySet())
+        assertThat(actualTask.processAndGet().exceptionOrNull(), equalTo(throwable))
+    }
+
+    @Test
+    fun `Given merge state and save failure, When merge, Then processAndGet returns failure`() = runTest {
+        val current = genMergeState()
+        val throwable = IllegalStateException()
+        val tagEditStateMachine = genTagEditStateMachine(
+            tagRepository = mockk {
+                coEvery { save(any()) } returns Result.failure(throwable)
+            }
+        )
+        val actualTask = tagEditStateMachine.merge(current)
+        assertThat(actualTask.processAndGet().exceptionOrNull(), equalTo(throwable))
+    }
+
+    @Test
+    fun `Given delete state and delete failure, When delete, Then processAndGet returns failure`() = runTest {
+        val current = genDeleteState()
+        val throwable = IllegalStateException()
+        val tagEditStateMachine = genTagEditStateMachine(
+            tagRepository = mockk {
+                coEvery { delete(current.tag.id) } returns Result.failure(throwable)
+            }
+        )
+        val actualTask = tagEditStateMachine.delete(current)
+        assertThat(actualTask.processAndGet().exceptionOrNull(), equalTo(throwable))
     }
 }
 

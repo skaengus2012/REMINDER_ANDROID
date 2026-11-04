@@ -16,11 +16,10 @@
 
 package com.nlab.reminder.core.network.datasource
 
+import com.nlab.reminder.core.kotlinx.coroutines.suspendRunCatching
 import android.content.Context
 import com.google.android.gms.time.TrustedTime
 import com.google.android.gms.time.TrustedTimeClient
-import com.nlab.reminder.core.kotlin.Result
-import com.nlab.reminder.core.kotlin.catching
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -48,7 +47,7 @@ class TrustedTimeDataSourceImpl(
         }
     }
 
-    override suspend fun getCurrentTime(): Result<Instant> = catching {
+    override suspend fun getCurrentTime(): Result<Instant> = suspendRunCatching {
         trustedTimeClientDeferred
             .await()
             .computeCurrentUnixEpochMillis()

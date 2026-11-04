@@ -16,6 +16,7 @@
 
 package com.nlab.reminder.core.data.repository.impl
 
+import com.nlab.reminder.core.kotlinx.coroutines.suspendRunCatching
 import com.nlab.reminder.core.data.model.Tag
 import com.nlab.reminder.core.data.model.TagId
 import com.nlab.reminder.core.data.repository.GetTagQuery
@@ -23,10 +24,7 @@ import com.nlab.reminder.core.data.repository.SaveTagQuery
 import com.nlab.reminder.core.data.repository.TagRepository
 import com.nlab.reminder.core.kotlin.NonNegativeInt
 import com.nlab.reminder.core.kotlinx.coroutines.flow.map
-import com.nlab.reminder.core.kotlin.Result
-import com.nlab.reminder.core.kotlin.catching
 import com.nlab.reminder.core.kotlin.collections.toSet
-import com.nlab.reminder.core.kotlin.map
 import com.nlab.reminder.core.kotlin.toNonNegativeInt
 import com.nlab.reminder.core.kotlin.trim
 import com.nlab.reminder.core.kotlinx.coroutines.flow.combine
@@ -46,7 +44,7 @@ class LocalTagRepository(
     private val updateOrMergeAndGetTag: UpdateOrMergeAndGetTagTransaction
 ) : TagRepository {
     override suspend fun save(query: SaveTagQuery): Result<Tag> {
-        val entityResult = catching {
+        val entityResult = suspendRunCatching {
             when (query) {
                 is SaveTagQuery.Add -> {
                     tagDAO.insertAndGet(name = query.name.trim())
@@ -63,11 +61,11 @@ class LocalTagRepository(
         return entityResult.map(::Tag)
     }
 
-    override suspend fun delete(id: TagId) = catching {
+    override suspend fun delete(id: TagId) = suspendRunCatching {
         tagDAO.deleteById(id.rawId)
     }
 
-    override suspend fun getUsageCount(tagId: TagId): Result<NonNegativeInt> = catching {
+    override suspend fun getUsageCount(tagId: TagId): Result<NonNegativeInt> = suspendRunCatching {
         scheduleTagListDAO
             .findScheduleIdCountByTagId(tagId = tagId.rawId)
             .toNonNegativeInt()

@@ -1,6 +1,5 @@
 package com.nlab.reminder.core.component.tag.edit
 
-import com.nlab.reminder.core.kotlin.Result
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
@@ -20,7 +19,7 @@ class TagEditTaskKtTest {
         val actualTask = TagEditTask(state)
         assertThat(actualTask.current, sameInstance(state))
         assertThat(actualTask.next, equalTo(state))
-        assertThat(actualTask.processAndGet(), equalTo(Result.Success(state)))
+        assertThat(actualTask.processAndGet(), equalTo(Result.success(state)))
     }
 
     @Test
@@ -30,7 +29,7 @@ class TagEditTaskKtTest {
 
         assertThat(actualTask.current, sameInstance(expectedState))
         assertThat(actualTask.next, equalTo(expectedState))
-        assertThat(actualTask.processAndGet(), equalTo(Result.Success(expectedState)))
+        assertThat(actualTask.processAndGet(), equalTo(Result.success(expectedState)))
     }
 
     @Test
@@ -38,10 +37,10 @@ class TagEditTaskKtTest {
         val inputState = genRenameState()
         val expectedAfterProcessState = TagEditState.None
         val actualTask = TagEditTask<TagEditState.Rename>(inputState) {
-            Result.Success(expectedAfterProcessState)
+            Result.success(expectedAfterProcessState)
         }
         assertThat(actualTask.next, equalTo(TagEditState.Processing(inputState)))
-        assertThat(actualTask.processAndGet(), equalTo(Result.Success(expectedAfterProcessState)))
+        assertThat(actualTask.processAndGet(), equalTo(Result.success(expectedAfterProcessState)))
     }
 
     @Test
@@ -69,10 +68,10 @@ class TagEditTaskKtTest {
         val task = TagEditTask(
             current = current,
             next = next,
-            processAndGet = { Result.Success(next) }
+            processAndGet = { Result.success(next) }
         )
         val expectedTransitions = listOf(
-            Result.Success(
+            Result.success(
                 TagEditStateTransition(
                     previous = current,
                     updated = next
@@ -99,16 +98,16 @@ class TagEditTaskKtTest {
         val task = TagEditTask(
             current = current,
             next = next,
-            processAndGet = { Result.Success(updated) }
+            processAndGet = { Result.success(updated) }
         )
         val expectedTransitions = listOf(
-            Result.Success(
+            Result.success(
                 TagEditStateTransition(
                     previous = current,
                     updated = next
                 )
             ),
-            Result.Success(
+            Result.success(
                 TagEditStateTransition(
                     previous = next,
                     updated = updated
@@ -135,16 +134,16 @@ class TagEditTaskKtTest {
         val task = TagEditTask(
             current = current,
             next = next,
-            processAndGet = { Result.Failure(throwable) }
+            processAndGet = { Result.failure(throwable) }
         )
         val expectedTransitions = listOf(
-            Result.Success(
+            Result.success(
                 TagEditStateTransition(
                     previous = current,
                     updated = next
                 )
             ),
-            Result.Failure(throwable)
+            Result.failure(throwable)
         )
 
         // when
