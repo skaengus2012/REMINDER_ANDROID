@@ -23,6 +23,7 @@ import android.view.View
 import android.widget.TextView
 import androidx.annotation.FloatRange
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.ConstraintSet
 import androidx.constraintlayout.widget.Guideline
 import androidx.core.animation.doOnCancel
 import androidx.core.animation.doOnEnd
@@ -255,30 +256,14 @@ internal class ContentSelectionAnimDelegate(private val binding: LayoutScheduleA
     }
 
     fun applyStateToMirror(mirrorBinding: LayoutScheduleAdapterItemContentMirrorBinding) {
-        val selectable = binding.buttonDragHandle.translationX == getDragButtonTranslateX(selectable = true)
-
-        // Copy the margin currently applied to the original, so the mirror's text width always matches it.
-        // (The original keeps the layout default until a selection transition applies a new margin.)
-        val titleParams = mirrorBinding.edittextTitle.constraintLayoutParams
-        titleParams.goneEndMargin = binding.edittextTitle.constraintLayoutParams.goneEndMargin
-        mirrorBinding.edittextTitle.layoutParams = titleParams
-
-        val guideParams = mirrorBinding.guidelineExtraContentEnd.constraintLayoutParams
-        guideParams.guideEnd = getExtraContentGuideEnd(selectable)
-        mirrorBinding.guidelineExtraContentEnd.layoutParams = guideParams
-
-        mirrorBinding.buttonComplete.apply {
-            alpha = binding.buttonComplete.alpha
-            translationX = binding.buttonComplete.translationX
-        }
-        mirrorBinding.buttonSelection.apply {
-            alpha = binding.buttonSelection.alpha
-            translationX = binding.buttonSelection.translationX
-        }
-        mirrorBinding.buttonDragHandle.apply {
-            alpha = binding.buttonDragHandle.alpha
-            translationX = binding.buttonDragHandle.translationX
-        }
+        // Snapshot the original's current constraints, margins, guideline positions, visibility,
+        // alpha and translation, so the mirror always matches the original (even during a transition).
+        // Views that are not direct children of layoutContent (e.g. inside cardLink) are not covered.
+        // Note: constraints of the mirror layout's direct children are overwritten at runtime,
+        // so changing them only in the mirror XML has no effect.
+        ConstraintSet()
+            .apply { clone(/* constraintLayout = */ binding.layoutContent) }
+            .applyTo(/* constraintLayout = */ mirrorBinding.layoutContent)
     }
 }
 
