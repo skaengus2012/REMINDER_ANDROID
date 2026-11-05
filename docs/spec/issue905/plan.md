@@ -17,14 +17,14 @@ requirements.md의 FR-1 ~ FR-8, NFR-1 ~ NFR-2를 따른다. 요약:
 - FR-4: `flatMap` 호출처 없음 확인으로 종료, 신규 `flatMap` 추가 없음
 - FR-5: `core/kotlin`의 `Result.kt` 삭제
 - FR-6: 테스트를 `Result.success` / `Result.failure` / `exceptionOrNull()`로 수정, mockk value class `returns` 동작 확인
-- FR-7: `core:kotlinx:coroutines`에 `suspendRunCatching` 추가(`CancellationException` 재던짐, 그 외 `Exception`만 `Result.failure`), `core:local`에 의존성 추가. 해당 모듈은 Jacoco/테스트 비적용 유지
+- FR-7: `core:kotlinx:coroutines`에 `suspendRunCatching` 추가(`CancellationException` 재던짐, 그 외 `Throwable`은 `Result.failure`), `core:local`에 의존성 추가. 해당 모듈은 Jacoco/테스트 비적용 유지
 - FR-8: `TagEditTask` SUSPEND 우회, `@ExcludeFromGeneratedTestReport`, Jacoco 안내 주석 등 우회 코드를 NFR-2 달성 기준으로 처리
 - NFR-1: `./gradlew test` 통과
 - NFR-2: 모든 모듈 인스트럭션/브랜치/라인 100%
 
 ## Architecture/Design
-- `suspendRunCatching`은 `core/kotlinx/coroutines/src/main/java/com/nlab/reminder/core/kotlinx/coroutines/`(기존 소스 디렉터리가 `java`) 아래 새 파일(예: `Result.kt`)에 `inline fun <T> suspendRunCatching(block: () -> T): Result<T>` 형태로 둔다. `try { Result.success(block()) } catch (e: CancellationException) { throw e } catch (e: Exception) { Result.failure(e) }`. android `Log`는 쓰지 않는다. `inline`이라 `block` 안에서 suspend 호출이 가능하다.
-- 동작 차이 주의: 기존 `catching`은 `Throwable` 전체를 잡았으나 새 방식은 `CancellationException`을 재던지고 `Error`는 잡지 않는다(요구사항 FR-7 결정 사항).
+- `suspendRunCatching`은 `core/kotlinx/coroutines/src/main/java/com/nlab/reminder/core/kotlinx/coroutines/`(기존 소스 디렉터리가 `java`) 아래 새 파일(`ResultExtensions.kt`)에 `inline fun <T> suspendRunCatching(block: () -> T): Result<T>` 형태로 둔다. `try { Result.success(block()) } catch (e: CancellationException) { throw e } catch (e: Throwable) { Result.failure(e) }`. android `Log`는 쓰지 않는다. `inline`이라 `block` 안에서 suspend 호출이 가능하다.
+- 동작 차이 주의: 기존 `catching`은 `Throwable` 전체를 잡았으나 새 방식도 `runCatching`처럼 `Throwable` 전체를 잡되 `CancellationException`만 재던진다(리뷰 반영).
 - 모든 main의 `catching` 호출 9곳은 suspend 함수 안이므로 모두 `suspendRunCatching`으로 교체한다. 테스트의 `catching` 1곳(`UserMessageResultExtensionsKtTest`)은 non-suspend 헬퍼이므로 `runCatching`을 쓴다.
 - 표준 API 대응: `getOrThrow`, `getOrNull`, `getOrElse`, `map`, `mapCatching`, `onSuccess`, `onFailure`, `isSuccess`, `isFailure`는 이름이 같아 `core.kotlin` import 제거만으로 대부분 이어진다. `Result.Success(x)` / `Result.Failure<T>(t)` 직접 생성은 `Result.success(x)` / `Result.failure<T>(t)`로 바꾼다.
 - `TagEditTask.kt`: `core.kotlin.*` 와일드카드 import 제거, `Result.Success`/`Result.Failure` 생성 7곳 교체. SUSPEND 우회(미리 만든 `ret` 반환)와 `@ExcludeFromGeneratedTestReport`는 Task 8에서 Jacoco `0.8.16` 결과를 보고 유지/제거를 정한다(제거는 100%가 확인될 때만).
@@ -66,7 +66,7 @@ testStrategy: unit
   ./gradlew jacocoTestReportJvm jacocoTestReportRelease
   ```
 - 최종 확인: `./gradlew test` 통과, 위 Jacoco 명령 통과, `./gradlew :app:assembleDebug` 성공, 자체 `Result`/`catching` 잔존 사용 0건.
-- 위험 요소(검증으로 확인): (a) `0.8.16` 해석 가능 여부와 value class 측정 개선 여부, (b) mockk 1.14.11에서 `returns Result.success(...)` 동작, (c) `catching`의 `Throwable` -> `suspendRunCatching`의 `Exception` 전환에 따른 테스트 영향.
+- 위험 요소(검증으로 확인): (a) `0.8.16` 해석 가능 여부와 value class 측정 개선 여부, (b) mockk 1.14.11에서 `returns Result.success(...)` 동작, (c) `catching`의 `Throwable` -> `suspendRunCatching`의 `CancellationException` 재던짐에 따른 테스트 영향.
 
 ---
 

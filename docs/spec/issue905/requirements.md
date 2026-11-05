@@ -43,7 +43,7 @@
 | FR-4 | `flatMap` 사용처를 확인한다. 현재 코드에 `Result.flatMap`의 호출처가 없음을 확인했으므로 "사용처 없음 확인"으로 마무리하고, 신규 `flatMap` 확장 함수는 만들지 않는다. (사용자의 "1 맞음" 응답을 이렇게 해석한 것이며, 해석임을 명시한다.) | 본문, 사용자 결정(해석) |
 | FR-5 | 자체 `Result.kt`를 삭제한다. | 본문 |
 | FR-6 | 자체 `Result`에 의존하는 관련 테스트를 수정한다. `Result.Success` / `Result.Failure` 생성은 `Result.success` / `Result.failure`로, `(x as Result.Failure).throwable`은 `exceptionOrNull()`로 바꾸고, `equalTo` 비교는 유지한다. mockk의 `returns`에 value class(`kotlin.Result`)를 쓸 때의 동작과 Jacoco 영향은 검증 대상으로 기록하고 확인한다. | 본문, 사용자 결정 |
-| FR-7 | `core:kotlinx:coroutines`에 `suspendRunCatching`을 추가한다(`core:kotlin` 아님, 사용자 결정). `CancellationException`은 다시 던지고, 그 외 `Exception`만 `Result.failure`로 감싼다. 순수 Kotlin 모듈이므로 android `Log`를 쓰지 않는다. `suspend` 블록에서 기존 `catching`을 대체하는 지점은 이것을 사용하며, 사용 모듈에 필요한 `core:kotlinx:coroutines` 의존성(예: `core:local`)을 추가한다. `core:kotlinx:coroutines`는 Jacoco를 적용하지 않는 모듈이며 이번에도 적용하지 않고, `suspendRunCatching`에 대한 별도 테스트도 요구하지 않는다(사용자 정정). | 사용자 결정 |
+| FR-7 | `core:kotlinx:coroutines`에 `suspendRunCatching`을 추가한다(`core:kotlin` 아님, 사용자 결정). `CancellationException`은 다시 던지고, 그 외 `Throwable`은 `runCatching`과 동일하게 `Result.failure`로 감싼다. 순수 Kotlin 모듈이므로 android `Log`를 쓰지 않는다. `suspend` 블록에서 기존 `catching`을 대체하는 지점은 이것을 사용하며, 사용 모듈에 필요한 `core:kotlinx:coroutines` 의존성(예: `core:local`)을 추가한다. `core:kotlinx:coroutines`는 Jacoco를 적용하지 않는 모듈이며 이번에도 적용하지 않고, `suspendRunCatching`에 대한 별도 테스트도 요구하지 않는다(사용자 정정). | 사용자 결정 |
 | FR-8 | 전환 후 모든 모듈 커버리지가 100%로 유지되도록(NFR-2) `TagEditTask`의 SUSPEND 우회, `@ExcludeFromGeneratedTestReport`, Jacoco 안내 주석 등 우회 코드를 처리한다. 유지, 제거, 신규 우회 중 어느 방식이든 이 목표를 달성하는 수단이며 범위 안에 포함한다. | 사용자 결정 |
 
 ## 비기능 요구사항
@@ -58,7 +58,7 @@
 - [ ] 코드베이스에 자체 `Result`(`com.nlab.reminder.core.kotlin.Result`)와 `catching` 사용이 남아 있지 않다.
 - [ ] `flatMap` 사용처가 없음이 확인되어 있고 신규 `flatMap` 확장은 추가되지 않았다.
 - [ ] `core/kotlin`의 `Result.kt`가 삭제되어 있다.
-- [ ] `core:kotlinx:coroutines`에 `suspendRunCatching`(`CancellationException` 재던짐, 그 외 `Exception`만 `Result.failure`로 래핑)이 있다.
+- [ ] `core:kotlinx:coroutines`에 `suspendRunCatching`(`CancellationException` 재던짐, 그 외 `Throwable`은 `Result.failure`로 래핑)이 있다.
 - [ ] `suspendRunCatching`을 쓰는 모듈(`core:local` 등)이 `core:kotlinx:coroutines`에 의존한다.
 - [ ] `suspend` 블록의 기존 `catching` 대체 지점이 `suspendRunCatching`을 쓴다.
 - [ ] 테스트가 `Result.success` / `Result.failure` / `exceptionOrNull()`로 수정되어 있고 mockk value class `returns` 동작이 확인되어 있다.
