@@ -53,6 +53,8 @@ requirements.md의 FR-1 ~ FR-8, NFR-1 ~ NFR-2를 따른다. 요약:
    - **Verify**: `./gradlew :app:assembleDebug` 성공, grep 결과 0건
 10. Jacoco 우회 코드(FR-8)를 처리한다. `TagEditTask`의 SUSPEND 우회와 `UserMessageResultExtensions.kt`의 `@ExcludeFromGeneratedTestReport`/KDoc 등을 Jacoco `0.8.16` 리포트 결과에 맞춰 유지/제거/수정하고, 표준 `Result`가 리포트에 반영되는지(FR-2) 확인한다. 100%가 확인되지 않은 우회는 제거하지 않는다.
     - **Verify**: `./gradlew jacocoTestReportJvm jacocoTestReportRelease` 후 대상 모듈 리포트에서 해당 클래스가 측정되고 100%
+    - 결과(`CompletedScheduleShownRepositoryImpl`): `@ExcludeFromGeneratedTestReport`와 안내 주석을 제거한다. 미커버 브랜치의 원인은 continuation 상태 머신이 아니라 `isShown`을 박싱하는 Boolean 분기(`true`/`false`)였고, 테스트가 `genBoolean()` 랜덤 값 하나만 넘겨 한쪽만 커버되던 것이다. 테스트에서 `true`/`false`를 모두 호출하도록 고쳐 우회 없이 100%를 확인했다. `delay` 기반 suspend 케이스 테스트는 커버리지에 영향이 없어 삭제한다. 파라미터명은 `getAsStreamFunc`/`setShownFunc`로 정리한다.
+    - mockk은 `suspend (Boolean) -> Result<Unit>` 람다를 스텁할 수 없으므로(`Function2.invoke`가 `Object`로 지워짐) 직접 만든 fake로 검증한다.
 11. 전체 테스트와 전체 Jacoco 리포트를 실행해 NFR-1, NFR-2를 확인한다. 100%가 아닌 모듈이 있으면 원인(value class 계측 문제, 테스트 부족)을 파악해 수정하고 Task 10으로 돌아간다.
     - **Verify**: `./gradlew test`와 `./gradlew jacocoTestReportJvm jacocoTestReportRelease`, 모든 모듈 인스트럭션/브랜치/라인 100%
 
@@ -74,3 +76,4 @@ testStrategy: unit
 | Date | Change | Source |
 |------|--------|--------|
 | 2026-11-05 | Initial draft | requirements.md |
+| 2026-11-05 | 리뷰 반영: `suspendRunCatching`이 `Throwable`을 잡도록 수정, 파일명을 `ResultExt.kt`로 변경, `CompletedScheduleShownRepositoryImpl`의 Jacoco 우회 제거(Task 10 결과 기록) | PR 907 리뷰 |
