@@ -23,7 +23,7 @@ requirements.md의 FR-1 ~ FR-8, NFR-1 ~ NFR-2를 따른다. 요약:
 - NFR-2: 모든 모듈 인스트럭션/브랜치/라인 100%
 
 ## Architecture/Design
-- `suspendRunCatching`은 `core/kotlinx/coroutines/src/main/java/com/nlab/reminder/core/kotlinx/coroutines/`(기존 소스 디렉터리가 `java`) 아래 새 파일(`ResultExtensions.kt`)에 `inline fun <T> suspendRunCatching(block: () -> T): Result<T>` 형태로 둔다. `try { Result.success(block()) } catch (e: CancellationException) { throw e } catch (e: Throwable) { Result.failure(e) }`. android `Log`는 쓰지 않는다. `inline`이라 `block` 안에서 suspend 호출이 가능하다.
+- `suspendRunCatching`은 `core/kotlinx/coroutines/src/main/java/com/nlab/reminder/core/kotlinx/coroutines/`(기존 소스 디렉터리가 `java`) 아래 새 파일(`ResultExt.kt`)에 `inline fun <T> suspendRunCatching(block: () -> T): Result<T>` 형태로 둔다. `try { Result.success(block()) } catch (e: CancellationException) { throw e } catch (e: Throwable) { Result.failure(e) }`. android `Log`는 쓰지 않는다. `inline`이라 `block` 안에서 suspend 호출이 가능하다.
 - 동작 차이 주의: 기존 `catching`은 `Throwable` 전체를 잡았으나 새 방식도 `runCatching`처럼 `Throwable` 전체를 잡되 `CancellationException`만 재던진다(리뷰 반영).
 - 모든 main의 `catching` 호출 9곳은 suspend 함수 안이므로 모두 `suspendRunCatching`으로 교체한다. 테스트의 `catching` 1곳(`UserMessageResultExtensionsKtTest`)은 non-suspend 헬퍼이므로 `runCatching`을 쓴다.
 - 표준 API 대응: `getOrThrow`, `getOrNull`, `getOrElse`, `map`, `mapCatching`, `onSuccess`, `onFailure`, `isSuccess`, `isFailure`는 이름이 같아 `core.kotlin` import 제거만으로 대부분 이어진다. `Result.Success(x)` / `Result.Failure<T>(t)` 직접 생성은 `Result.success(x)` / `Result.failure<T>(t)`로 바꾼다.
