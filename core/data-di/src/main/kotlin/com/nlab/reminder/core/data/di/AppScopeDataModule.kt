@@ -73,8 +73,8 @@ internal object AppScopeDataModule {
     fun provideCompletedScheduleShownRepository(
         preferenceDataSource: PreferenceDataSource
     ): CompletedScheduleShownRepository = CompletedScheduleShownRepositoryImpl(
-        getAsStreamFunction = { preferenceDataSource.getAllScheduleCompleteShownAsStream() },
-        setShownFunction = { preferenceDataSource.setAllScheduleCompleteShown(it) }
+        getAsStreamFunc = { preferenceDataSource.getAllScheduleCompleteShownAsStream() },
+        setShownFunc = { preferenceDataSource.setAllScheduleCompleteShown(it) }
     )
 
     @Reusable

@@ -16,7 +16,6 @@
 
 package com.nlab.reminder.core.data.repository.impl
 
-import com.nlab.reminder.core.annotation.ExcludeFromGeneratedTestReport
 import com.nlab.reminder.core.data.repository.CompletedScheduleShownRepository
 import kotlinx.coroutines.flow.Flow
 
@@ -24,11 +23,9 @@ import kotlinx.coroutines.flow.Flow
  * @author Doohyun
  */
 class CompletedScheduleShownRepositoryImpl(
-    private val getAsStreamFunction: () -> Flow<Boolean>,
-    private val setShownFunction: suspend (isShown: Boolean) -> Result<Unit>
+    private val getAsStreamFunc: () -> Flow<Boolean>,
+    private val setShownFunc: suspend (isShown: Boolean) -> Result<Unit>
 ) : CompletedScheduleShownRepository {
-    override fun getAsStream(): Flow<Boolean> = getAsStreamFunction.invoke()
-    // Jacoco reports an uncoverable branch in the continuation state machine of suspend functions returning Result
-    @ExcludeFromGeneratedTestReport
-    override suspend fun setShown(isShown: Boolean): Result<Unit> = setShownFunction.invoke(isShown)
+    override fun getAsStream(): Flow<Boolean> = getAsStreamFunc.invoke()
+    override suspend fun setShown(isShown: Boolean): Result<Unit> = setShownFunc.invoke(isShown)
 }
