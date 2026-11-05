@@ -27,12 +27,11 @@ import com.nlab.reminder.core.data.repository.ScheduleRepository
 import com.nlab.reminder.core.data.repository.UpdateAllScheduleQuery
 import com.nlab.reminder.core.data.repository.fake.FakeScheduleRepositoryDelegate
 import com.nlab.reminder.core.kotlin.NonNegativeLong
-import com.nlab.reminder.core.kotlin.Result
-import com.nlab.reminder.core.kotlin.catching
 import com.nlab.reminder.core.kotlin.collections.toSet
 import com.nlab.reminder.core.kotlin.tryToNonNegativeLongOrZero
 import com.nlab.reminder.core.kotlinx.coroutines.flow.flatMapLatest
 import com.nlab.reminder.core.kotlinx.coroutines.flow.map
+import com.nlab.reminder.core.kotlinx.coroutines.suspendRunCatching
 import com.nlab.reminder.core.local.database.dao.ScheduleDAO
 import com.nlab.reminder.core.local.database.dao.ScheduleRepeatDetailDAO
 import com.nlab.reminder.core.local.database.dao.ScheduleTagListDAO
@@ -54,7 +53,7 @@ class LocalScheduleRepository(
     private val insertAndGetScheduleContentAggregate: InsertAndGetScheduleContentAggregateTransaction,
     private val updateAndGetScheduleContentAggregate: UpdateAndGetScheduleContentAggregateTransaction
 ) : ScheduleRepository {
-    override suspend fun save(query: SaveScheduleQuery): Result<Schedule> = catching {
+    override suspend fun save(query: SaveScheduleQuery): Result<Schedule> = suspendRunCatching {
         when (query) {
             is SaveScheduleQuery.Add -> {
                 val insertedSnapshot = insertAndGetScheduleContentAggregate(
@@ -81,7 +80,7 @@ class LocalScheduleRepository(
         }
     }
 
-    override suspend fun updateAll(query: UpdateAllScheduleQuery): Result<Unit> = catching {
+    override suspend fun updateAll(query: UpdateAllScheduleQuery): Result<Unit> = suspendRunCatching {
         when (query) {
             is UpdateAllScheduleQuery.Completes -> {
                 scheduleDAO.updateByCompletes(
@@ -99,7 +98,7 @@ class LocalScheduleRepository(
         }
     }
 
-    override suspend fun delete(query: DeleteScheduleQuery): Result<Unit> = catching {
+    override suspend fun delete(query: DeleteScheduleQuery): Result<Unit> = suspendRunCatching {
         when (query) {
             is DeleteScheduleQuery.ByComplete -> {
                 scheduleDAO.deleteByComplete(query.isComplete)
