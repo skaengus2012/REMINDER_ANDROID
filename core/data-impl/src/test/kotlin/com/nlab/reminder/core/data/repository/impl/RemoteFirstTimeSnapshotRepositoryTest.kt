@@ -19,7 +19,6 @@ package com.nlab.reminder.core.data.repository.impl
 import app.cash.turbine.test
 import com.nlab.reminder.core.data.model.genTimeSnapshot
 import com.nlab.reminder.core.data.repository.TimeSnapshotRepository
-import com.nlab.reminder.core.kotlin.Result
 import com.nlab.reminder.core.network.datasource.TrustedTimeDataSource
 import io.mockk.coEvery
 import io.mockk.mockk
@@ -37,7 +36,7 @@ class RemoteFirstTimeSnapshotRepositoryTest {
     fun `Given trusted time available, When collecting now stream, Then return remote snapshot once`() = runTest {
         val expected = genTimeSnapshot(fromRemote = true)
         val trustedTimeDataSource = mockk<TrustedTimeDataSource> {
-            coEvery { getCurrentTime() } returns Result.Success(expected.value)
+            coEvery { getCurrentTime() } returns Result.success(expected.value)
         }
         val timeSnapshotRepository = genRemoteFirstTimeSnapshotRepository(
             trustedTimeDataSource = trustedTimeDataSource
@@ -52,7 +51,7 @@ class RemoteFirstTimeSnapshotRepositoryTest {
     fun `Given trusted time fails, When collecting now stream, Then fallback snapshot is emitted`() = runTest {
         val expected = genTimeSnapshot(fromRemote = false)
         val trustedTimeDataSource = mockk<TrustedTimeDataSource> {
-            coEvery { getCurrentTime() } returns Result.Failure(IllegalStateException())
+            coEvery { getCurrentTime() } returns Result.failure(IllegalStateException())
         }
         val fallbackSnapshotRepository = mockk<TimeSnapshotRepository> {
             coEvery { getNowSnapshotAsStream() } returns flowOf(expected)

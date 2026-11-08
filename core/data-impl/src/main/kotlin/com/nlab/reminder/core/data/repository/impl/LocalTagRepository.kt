@@ -24,13 +24,11 @@ import com.nlab.reminder.core.data.repository.SaveTagQuery
 import com.nlab.reminder.core.data.repository.TagRepository
 import com.nlab.reminder.core.kotlin.NonNegativeInt
 import com.nlab.reminder.core.kotlinx.coroutines.flow.map
-import com.nlab.reminder.core.kotlin.Result
-import com.nlab.reminder.core.kotlin.catching
 import com.nlab.reminder.core.kotlin.collections.toSet
-import com.nlab.reminder.core.kotlin.map
 import com.nlab.reminder.core.kotlin.toNonNegativeInt
 import com.nlab.reminder.core.kotlin.trim
 import com.nlab.reminder.core.kotlinx.coroutines.flow.combine
+import com.nlab.reminder.core.kotlinx.coroutines.suspendRunCatching
 import com.nlab.reminder.core.local.database.dao.ScheduleTagListDAO
 import com.nlab.reminder.core.local.database.dao.TagDAO
 import com.nlab.reminder.core.local.database.entity.TagEntity
@@ -47,7 +45,7 @@ class LocalTagRepository(
     private val updateOrMergeAndGetTag: UpdateOrMergeAndGetTagTransaction
 ) : TagRepository {
     override suspend fun save(query: SaveTagQuery): Result<Tag> {
-        val entityResult = catching {
+        val entityResult = suspendRunCatching {
             when (query) {
                 is SaveTagQuery.Add -> {
                     tagDAO.insertAndGet(name = query.name.trim())
@@ -64,6 +62,7 @@ class LocalTagRepository(
         return entityResult.map(::Tag)
     }
 
+<<<<<<< HEAD
     override suspend fun saveBulk(query: SaveBulkTagQuery): Result<Set<Tag>> {
         val entitiesResult = catching {
             when (query) {
@@ -76,10 +75,13 @@ class LocalTagRepository(
     }
 
     override suspend fun delete(id: TagId) = catching {
+=======
+    override suspend fun delete(id: TagId) = suspendRunCatching {
+>>>>>>> master
         tagDAO.deleteById(id.rawId)
     }
 
-    override suspend fun getUsageCount(tagId: TagId): Result<NonNegativeInt> = catching {
+    override suspend fun getUsageCount(tagId: TagId): Result<NonNegativeInt> = suspendRunCatching {
         scheduleTagListDAO
             .findScheduleIdCountByTagId(tagId = tagId.rawId)
             .toNonNegativeInt()

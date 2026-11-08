@@ -17,8 +17,6 @@
 package com.nlab.reminder.core.component.usermessage
 
 import com.nlab.reminder.core.annotation.ExcludeFromGeneratedTestReport
-import com.nlab.reminder.core.kotlin.Result
-import com.nlab.reminder.core.kotlin.getOrThrow
 
 /**
  * @author Doohyun

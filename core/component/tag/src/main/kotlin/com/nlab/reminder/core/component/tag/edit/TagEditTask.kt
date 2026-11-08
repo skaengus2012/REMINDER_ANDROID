@@ -17,7 +17,6 @@
 package com.nlab.reminder.core.component.tag.edit
 
 import com.nlab.reminder.core.annotation.ExcludeFromGeneratedTestReport
-import com.nlab.reminder.core.kotlin.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlin.reflect.KClass
@@ -40,7 +39,7 @@ data class TagEditStateTransition(
 )
 
 internal fun TagEditTask(current: TagEditState): TagEditTask {
-    val ret = Result.Success(current)
+    val ret = Result.success(current)
     val processAndGet = {
         // prevent Missing in the Jacoco report by SUSPEND FUNCTION
         ret
@@ -80,25 +79,25 @@ private fun <T> TagEditTask(
  * Processes a [TagEditTask] as a flow of [Result] containing [TagEditStateTransition].
  *
  * This function emits state transitions as they occur:
- * - If the current and next states differ, emits a [Result.Success] containing the transition from `current` to `next`.
+ * - If the current and next states differ, emits a [Result.success] containing the transition from `current` to `next`.
  * - Then performs the processing via [TagEditTask.processAndGet], and:
- *    - If the resulting state is different from `next`, emits another [Result.Success] with the transition.
- *    - If an error occurs during processing, emits a [Result.Failure] containing the exception.
+ *    - If the resulting state is different from `next`, emits another [Result.success] with the transition.
+ *    - If an error occurs during processing, emits a [Result.failure] containing the exception.
  *
  * @return A cold flow that emits one or two [Result] depending on the state transitions and any errors.
  */
 fun TagEditTask.processAsFlow(): Flow<Result<TagEditStateTransition>> = flow {
     if (current != next) {
-        emit(Result.Success(TagEditStateTransition(current, next)))
+        emit(Result.success(TagEditStateTransition(current, next)))
     }
     processAndGet()
         .onSuccess { updated ->
             if (updated != next) {
-                emit(Result.Success(TagEditStateTransition(next, updated)))
+                emit(Result.success(TagEditStateTransition(next, updated)))
             }
         }
         .onFailure { t ->
-            val errorResult = Result.Failure<TagEditStateTransition>(t)
+            val errorResult = Result.failure<TagEditStateTransition>(t)
             emit(errorResult)
         }
 }

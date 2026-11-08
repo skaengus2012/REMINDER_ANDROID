@@ -17,16 +17,21 @@
 package com.nlab.reminder.core.data.repository.impl
 
 import com.nlab.reminder.core.data.repository.CompletedScheduleShownRepository
-import com.nlab.reminder.core.kotlin.Result
 import kotlinx.coroutines.flow.Flow
 
 /**
  * @author Doohyun
  */
+<<<<<<< HEAD:core/data-impl/src/main/kotlin/com/nlab/reminder/core/data/repository/impl/DefaultCompletedScheduleShownRepository.kt
 class DefaultCompletedScheduleShownRepository(
     private val getAsStreamFunction: () -> Flow<Boolean>,
     private val setShownFunction: suspend (isShown: Boolean) -> Result<Unit>
+=======
+class CompletedScheduleShownRepositoryImpl(
+    private val getAsStreamFunc: () -> Flow<Boolean>,
+    private val setShownFunc: suspend (isShown: Boolean) -> Result<Unit>
+>>>>>>> master:core/data-impl/src/main/kotlin/com/nlab/reminder/core/data/repository/impl/CompletedScheduleShownRepositoryImpl.kt
 ) : CompletedScheduleShownRepository {
-    override fun getAsStream(): Flow<Boolean> = getAsStreamFunction.invoke()
-    override suspend fun setShown(isShown: Boolean): Result<Unit> = setShownFunction.invoke(isShown)
+    override fun getAsStream(): Flow<Boolean> = getAsStreamFunc.invoke()
+    override suspend fun setShown(isShown: Boolean): Result<Unit> = setShownFunc.invoke(isShown)
 }

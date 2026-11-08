@@ -27,7 +27,6 @@ import com.nlab.reminder.core.component.usermessage.UserMessageException
 import com.nlab.reminder.core.component.usermessage.genUserMessageExceptionSource
 import com.nlab.reminder.core.data.model.genTag
 import com.nlab.reminder.core.data.model.genTags
-import com.nlab.reminder.core.kotlin.Result
 import com.nlab.statekit.test.reduce.LaunchedTrace
 import com.nlab.statekit.test.reduce.expectedNotChanged
 import com.nlab.statekit.test.reduce.test
@@ -432,14 +431,14 @@ private fun genCurrentAndNextTagEditState(): Pair<TagEditState, TagEditState> {
 
 private fun mockTagEditTaskWith(previous: TagEditState, updated: TagEditState): TagEditTask = mockk {
     every { processAsFlow() } returns flowOf(
-        Result.Success(
+        Result.success(
             TagEditStateTransition(previous, updated)
         )
     )
 }
 
 private fun mockTagEditTaskWith(throwable: Throwable): TagEditTask = mockk {
-    every { processAsFlow() } returns flowOf(Result.Failure(throwable))
+    every { processAsFlow() } returns flowOf(Result.failure(throwable))
 }
 
 private fun runTestWithTagEditTaskMock(testBody: suspend TestScope.() -> Unit) {

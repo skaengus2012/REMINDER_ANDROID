@@ -18,7 +18,6 @@ package com.nlab.reminder.core.local.datastore.preference
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
-import com.nlab.reminder.core.kotlin.Result
 import kotlinx.coroutines.flow.Flow
 
 /**

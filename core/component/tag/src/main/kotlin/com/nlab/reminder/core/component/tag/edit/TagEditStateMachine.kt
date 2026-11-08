@@ -19,7 +19,6 @@ package com.nlab.reminder.core.component.tag.edit
 import com.nlab.reminder.core.data.model.Tag
 import com.nlab.reminder.core.data.repository.SaveTagQuery
 import com.nlab.reminder.core.data.repository.TagRepository
-import com.nlab.reminder.core.kotlin.map
 import com.nlab.reminder.core.kotlin.tryToNonBlankStringOrNull
 import dagger.Reusable
 import javax.inject.Inject
