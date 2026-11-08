@@ -48,6 +48,8 @@ requirements.md의 FR-1 ~ FR-8, NFR-1 ~ NFR-2를 따른다. 요약:
 7. `core:component:usermessage`(`UserMessageResultExtensions.kt`)와 `core:component:tag`(`TagEditStateMachine.kt`, `TagEditTask.kt`), `feature:home`(`HomeReduce.kt`) main 코드를 전환한다. `TagEditTask.kt`의 `Result.Success`/`Result.Failure` 생성은 `Result.success`/`Result.failure`로 교체한다.
    - **Verify**: `./gradlew :core:component:usermessage:compileKotlin :core:component:tag:compileKotlin :feature:home:compileDebugKotlin` (모듈 변종 이름은 실제 태스크에 맞춘다)
 8. 테스트 9개(`TagEditStateMachineTest`, `TagEditTaskKtTest`, `UserMessageResultExtensionsKtTest`, `CompletedScheduleDetailShownRepositoryImplTest`, `LocalScheduleRepositoryTest`, `LocalTagRepositoryTest`, `OfflineFirstLinkMetadataRepositoryTest`, `RemoteFirstTimeSnapshotRepositoryTest`, `HomeReduceKtTest`)를 수정한다. `Result.Success/Failure` -> `Result.success/failure`, `(catching(block) as Result.Failure).throwable` -> `runCatching(block).exceptionOrNull()`, `equalTo` 비교는 유지한다. mockk의 `returns`에 `kotlin.Result`(value class)를 쓰는 지점의 동작을 확인하고 필요하면 mockk 호출 방식을 조정한다(FR-6).
+    - 결과(실패 경로 테스트): 표준 `Result.map`이 호출 지점에 인라인되면서 실패 분기가 호출 지점의 브랜치로 계측되므로, 성공 경로만 테스트하면 브랜치 100%(NFR-2)가 깨진다. `TagEditStateMachineTest`의 5개 호출 지점(`startRename`, `startDelete`, `tryUpdateName`, `merge`, `delete`)과 `LocalTagRepositoryTest`의 `save`(`Add`)에 실패 경로 테스트를 추가했다. 이 테스트들을 빼면 `core:component:tag`에서 브랜치 5개, `core:data-impl`에서 1개가 미커버가 됨을 확인했다.
+    - 구조: `TagEditStateMachineTest`는 메서드별로 성공·실패를 한 테스트로 묶고 로컬 `verify`로 변형을 돌린다. 이름은 줄 전체가 100자 이내가 되도록 `Then Processing, <결과> or failure`로 줄이고, 부족한 설명은 함수 위 KDoc에 적는다. `LocalTagRepositoryTest`는 로컬 함수 없이 `Add` 성공 테스트 바로 뒤에 실패 테스트를 둔다.
    - **Verify**: `./gradlew :core:component:tag:test :core:component:usermessage:test :core:data-impl:test :feature:home:test`
 9. 자체 `Result.kt`를 삭제하고 `grep -rn "core.kotlin.Result\|core.kotlin.catching\|catching" --include=*.kt`로 잔존 사용이 없음을 확인한다. 삭제 후 불필요해진 `projects.core.kotlin` 의존이 있는지 확인하고, 있으면 제거한다(없애도 빌드가 통과하는 경우만).
    - **Verify**: `./gradlew :app:assembleDebug` 성공, grep 결과 0건
@@ -77,3 +79,4 @@ testStrategy: unit
 |------|--------|--------|
 | 2026-11-05 | Initial draft | requirements.md |
 | 2026-11-05 | 리뷰 반영: `suspendRunCatching`이 `Throwable`을 잡도록 수정, 파일명을 `ResultExt.kt`로 변경, `CompletedScheduleShownRepositoryImpl`의 Jacoco 우회 제거(Task 10 결과 기록) | PR 907 리뷰 |
+| 2026-11-08 | 리뷰 반영: Task 8에 실패 경로 테스트를 추가한 이유(표준 `Result.map` 인라인으로 생긴 실패 분기, NFR-2)와 테스트 구조(성공·실패 병합, 로컬 `verify`, 이름·KDoc 규칙)를 기록 | PR 907 리뷰 |
