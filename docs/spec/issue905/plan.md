@@ -80,3 +80,4 @@ testStrategy: unit
 | 2026-11-05 | Initial draft | requirements.md |
 | 2026-11-05 | 리뷰 반영: `suspendRunCatching`이 `Throwable`을 잡도록 수정, 파일명을 `ResultExt.kt`로 변경, `CompletedScheduleShownRepositoryImpl`의 Jacoco 우회 제거(Task 10 결과 기록) | PR 907 리뷰 |
 | 2026-11-08 | 리뷰 반영: Task 8에 실패 경로 테스트를 추가한 이유(표준 `Result.map` 인라인으로 생긴 실패 분기, NFR-2)와 테스트 구조(성공·실패 병합, 로컬 `verify`, 이름·KDoc 규칙)를 기록 | PR 907 리뷰 |
+| 2026-11-08 | `epic/issue601` 병합 후속: 에픽에만 있던 사용처(`saveBulk`, `EditScheduleListResourceUseCase`, 워커 2개, `DataCleanupInitializer`, 관련 테스트)를 Task 4~9와 같은 방식으로 교체하고 `saveBulk` 실패 경로 테스트를 추가(Task 8 근거 동일). `Result.kt` 삭제 | 에픽 병합 |

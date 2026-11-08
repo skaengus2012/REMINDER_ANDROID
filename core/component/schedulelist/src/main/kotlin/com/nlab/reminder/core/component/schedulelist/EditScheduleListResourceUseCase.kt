@@ -23,7 +23,7 @@ import com.nlab.reminder.core.data.repository.ScheduleRepository
 import com.nlab.reminder.core.data.repository.TagRepository
 import com.nlab.reminder.core.kotlin.NonBlankString
 import com.nlab.reminder.core.kotlin.collections.toSet
-import com.nlab.reminder.core.kotlin.getOrThrow
+import com.nlab.reminder.core.kotlinx.coroutines.suspendRunCatching
 import dagger.Reusable
 import javax.inject.Inject
 
@@ -49,7 +49,7 @@ class EditScheduleListResourceUseCase @Inject constructor(
             return Result.success(Unit)
         }
 
-        return runCatching {
+        return suspendRunCatching {
             val tagIds = tagRepository.saveBulk(query = SaveBulkTagQuery.Add(tagNames))
                 .getOrThrow()
                 .toSet { it.id }

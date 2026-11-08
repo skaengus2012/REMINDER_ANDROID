@@ -31,7 +31,6 @@ import com.nlab.reminder.core.data.repository.DeleteScheduleQuery
 import com.nlab.reminder.core.data.repository.ScheduleDeletionBacklogRepository
 import com.nlab.reminder.core.data.repository.ScheduleRepository
 import com.nlab.reminder.core.kotlin.collections.toSet
-import com.nlab.reminder.core.kotlin.getOrThrow
 import dagger.Reusable
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject

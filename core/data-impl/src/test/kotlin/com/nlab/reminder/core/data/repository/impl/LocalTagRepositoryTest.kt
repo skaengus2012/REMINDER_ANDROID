@@ -67,7 +67,7 @@ class LocalTagRepositoryTest {
         val throwable = IllegalStateException()
         val query = SaveTagQuery.Add(name = genBothify("?#").toNonBlankString())
         val tagDAO: TagDAO = mockk {
-            coEvery { insertAndGet(any()) } throws throwable
+            coEvery { insertAndGet(name = any()) } throws throwable
         }
 
         // When
@@ -111,6 +111,19 @@ class LocalTagRepositoryTest {
 
         coVerify(exactly = 1) { tagDAO.insertAndGet(query.names) }
         assertThat(actualTags.getOrThrow(), equalTo(tagAndEntities.toSet { (tag) -> tag }))
+    }
+
+    @Test
+    fun `Given add bulk query and dao failure, When save, Then return failure`() = runTest {
+        val throwable = IllegalStateException()
+        val query = SaveBulkTagQuery.Add(names = setOf(genBothify("?#").toNonBlankString()))
+        val tagDAO: TagDAO = mockk {
+            coEvery { insertAndGet(names = any()) } throws throwable
+        }
+
+        val actualResult = genLocalTagRepository(tagDAO = tagDAO).saveBulk(query)
+
+        assertThat(actualResult.exceptionOrNull(), equalTo(throwable))
     }
 
     @Test

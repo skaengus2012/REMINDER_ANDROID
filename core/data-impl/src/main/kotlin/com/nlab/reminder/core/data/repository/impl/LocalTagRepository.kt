@@ -63,7 +63,7 @@ class LocalTagRepository(
     }
 
     override suspend fun saveBulk(query: SaveBulkTagQuery): Result<Set<Tag>> {
-        val entitiesResult = catching {
+        val entitiesResult = suspendRunCatching {
             when (query) {
                 is SaveBulkTagQuery.Add -> {
                     tagDAO.insertAndGet(names = query.names.toSet { it.trim() })
