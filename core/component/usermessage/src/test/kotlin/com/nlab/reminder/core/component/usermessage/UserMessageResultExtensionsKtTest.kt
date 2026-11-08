@@ -16,8 +16,6 @@
 
 package com.nlab.reminder.core.component.usermessage
 
-import com.nlab.reminder.core.kotlin.Result
-import com.nlab.reminder.core.kotlin.catching
 import com.nlab.reminder.core.text.genUiText
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.sameInstance
@@ -33,7 +31,7 @@ class UserMessageResultExtensionsKtTest {
     @Test
     fun `Given success result, When getOrThrowMessage, Then result return value`() {
         val value = Any()
-        val result = Result.Success(value)
+        val result = Result.success(value)
         val actualValue = result.getOrThrowMessage { genUserMessageExceptionSource() }
         assertThat(actualValue, sameInstance(value))
     }
@@ -45,7 +43,7 @@ class UserMessageResultExtensionsKtTest {
             origin = Throwable()
         )
         val actual = runAndGetUserMessageException {
-            Result.Failure<Any>(originThrowable).getOrThrowMessage {
+            Result.failure<Any>(originThrowable).getOrThrowMessage {
                 genUserMessageExceptionSource(
                     message = null,
                     priority = null
@@ -63,7 +61,7 @@ class UserMessageResultExtensionsKtTest {
         )
         val expectedMessage = genUiText()
         val actual = runAndGetUserMessageException {
-            Result.Failure<Any>(originThrowable).getOrThrowMessage {
+            Result.failure<Any>(originThrowable).getOrThrowMessage {
                 genUserMessageExceptionSource(
                     message = expectedMessage,
                     priority = null
@@ -82,7 +80,7 @@ class UserMessageResultExtensionsKtTest {
         )
         val expectedPriority = FeedbackPriority.entries.random()
         val actual = runAndGetUserMessageException {
-            Result.Failure<Any>(originThrowable).getOrThrowMessage {
+            Result.failure<Any>(originThrowable).getOrThrowMessage {
                 genUserMessageExceptionSource(
                     message = null,
                     priority = expectedPriority
@@ -96,7 +94,7 @@ class UserMessageResultExtensionsKtTest {
     @Test
     fun `Given result with throwable, When getOrThrowMessage, Then throw userMessageException`() {
         val originThrowable = Throwable()
-        val result = Result.Failure<Any>(originThrowable)
+        val result = Result.failure<Any>(originThrowable)
         val id = genUserMessageId()
         val message = genUiText()
         val priority = FeedbackPriority.entries.random()
@@ -134,5 +132,5 @@ class UserMessageResultExtensionsKtTest {
 }
 
 private fun runAndGetUserMessageException(block: () -> Unit): UserMessageException {
-    return (catching(block) as Result.Failure).throwable as UserMessageException
+    return runCatching(block).exceptionOrNull() as UserMessageException
 }

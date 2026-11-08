@@ -33,7 +33,6 @@ import com.nlab.reminder.core.data.repository.ScheduleRepository
 import com.nlab.reminder.core.data.repository.UpdateAllScheduleQuery
 import com.nlab.reminder.core.kotlin.NonNegativeLong
 import com.nlab.reminder.core.kotlin.collections.toSet
-import com.nlab.reminder.core.kotlin.getOrThrow
 import com.nlab.reminder.core.kotlin.tryToNonNegativeLongOrNull
 import dagger.Reusable
 import dagger.assisted.Assisted

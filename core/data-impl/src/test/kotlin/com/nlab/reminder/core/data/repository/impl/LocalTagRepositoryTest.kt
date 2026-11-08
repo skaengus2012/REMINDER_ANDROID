@@ -18,11 +18,8 @@ package com.nlab.reminder.core.data.repository.impl
 
 import com.nlab.reminder.core.data.model.*
 import com.nlab.reminder.core.data.repository.*
-import com.nlab.reminder.core.kotlin.Result
 import com.nlab.reminder.core.kotlin.collections.toSet
 import com.nlab.reminder.core.kotlin.faker.genNonNegativeInt
-import com.nlab.reminder.core.kotlin.getOrThrow
-import com.nlab.reminder.core.kotlin.isSuccess
 import com.nlab.reminder.core.kotlin.toNonBlankString
 import com.nlab.reminder.core.local.database.dao.ScheduleTagListDAO
 import com.nlab.reminder.core.local.database.dao.TagDAO
@@ -65,6 +62,22 @@ class LocalTagRepositoryTest {
     }
 
     @Test
+    fun `Given add query and dao failure, When save, Then return failure`() = runTest {
+        // Given
+        val throwable = IllegalStateException()
+        val query = SaveTagQuery.Add(name = genBothify("?#").toNonBlankString())
+        val tagDAO: TagDAO = mockk {
+            coEvery { insertAndGet(name = any()) } throws throwable
+        }
+
+        // When
+        val actualResult = genLocalTagRepository(tagDAO = tagDAO).save(query)
+
+        // Then
+        assertThat(actualResult.exceptionOrNull(), equalTo(throwable))
+    }
+
+    @Test
     fun `Given modify query with not merge, When save, Then update trimmed text and return updated tag`() = runTest {
         // Given
         val inputTagId = genTagId()
@@ -98,6 +111,19 @@ class LocalTagRepositoryTest {
 
         coVerify(exactly = 1) { tagDAO.insertAndGet(query.names) }
         assertThat(actualTags.getOrThrow(), equalTo(tagAndEntities.toSet { (tag) -> tag }))
+    }
+
+    @Test
+    fun `Given add bulk query and dao failure, When save, Then return failure`() = runTest {
+        val throwable = IllegalStateException()
+        val query = SaveBulkTagQuery.Add(names = setOf(genBothify("?#").toNonBlankString()))
+        val tagDAO: TagDAO = mockk {
+            coEvery { insertAndGet(names = any()) } throws throwable
+        }
+
+        val actualResult = genLocalTagRepository(tagDAO = tagDAO).saveBulk(query)
+
+        assertThat(actualResult.exceptionOrNull(), equalTo(throwable))
     }
 
     @Test
@@ -152,7 +178,7 @@ class LocalTagRepositoryTest {
         // Then
         assertThat(
             actualUsageCount,
-            equalTo(Result.Success(expectedUsageCount))
+            equalTo(Result.success(expectedUsageCount))
         )
     }
 

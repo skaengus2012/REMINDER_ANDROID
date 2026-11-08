@@ -25,7 +25,6 @@ import com.nlab.reminder.core.data.repository.SaveScheduleQuery
 import com.nlab.reminder.core.data.repository.ScheduleRepository
 import com.nlab.reminder.core.data.repository.TagRepository
 import com.nlab.reminder.core.kotlin.NonBlankString
-import com.nlab.reminder.core.kotlin.Result
 import com.nlab.reminder.core.kotlin.collections.toSet
 import com.nlab.reminder.core.kotlin.faker.genNonBlankString
 import com.nlab.reminder.core.kotlin.toNonBlankString
@@ -82,10 +81,10 @@ class EditScheduleListResourceUseCaseTest {
                 scheduleRepository = mockk {
                     coEvery {
                         save(capture(scheduleModifyQuerySlot))
-                    } returns Result.Success(genSchedule())
+                    } returns Result.success(genSchedule())
                 },
                 tagRepository = mockk {
-                    coEvery { saveBulk(query = SaveBulkTagQuery.Add(tagNames)) } returns Result.Success(tags)
+                    coEvery { saveBulk(query = SaveBulkTagQuery.Add(tagNames)) } returns Result.success(tags)
                 }
             )
             useCase.invoke(
@@ -131,7 +130,7 @@ class EditScheduleListResourceUseCaseTest {
         val expectedException = RuntimeException()
         val useCase = genEditScheduleListResourceUseCase(
             tagRepository = mockk {
-                coEvery { saveBulk(any()) } returns Result.Failure(expectedException)
+                coEvery { saveBulk(any()) } returns Result.failure(expectedException)
             }
         )
         val originResource = genScheduleListResource()
@@ -149,7 +148,7 @@ class EditScheduleListResourceUseCaseTest {
         val expectedException = RuntimeException()
         val useCase = genEditScheduleListResourceUseCase(
             scheduleRepository = mockk {
-                coEvery { save(any()) } returns Result.Failure(expectedException)
+                coEvery { save(any()) } returns Result.failure(expectedException)
             }
         )
         val originResource = genScheduleListResource()
@@ -165,10 +164,10 @@ class EditScheduleListResourceUseCaseTest {
 
 private fun genEditScheduleListResourceUseCase(
     scheduleRepository: ScheduleRepository = mockk {
-        coEvery { save(any()) } returns Result.Success(genSchedule())
+        coEvery { save(any()) } returns Result.success(genSchedule())
     },
     tagRepository: TagRepository = mockk {
-        coEvery { saveBulk(any()) } returns Result.Success(genTags())
+        coEvery { saveBulk(any()) } returns Result.success(genTags())
     }
 ) = EditScheduleListResourceUseCase(
     scheduleRepository = scheduleRepository,

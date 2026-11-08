@@ -20,8 +20,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
-import com.nlab.reminder.core.kotlin.Result
-import com.nlab.reminder.core.kotlin.catching
+import com.nlab.reminder.core.kotlinx.coroutines.suspendRunCatching
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -30,7 +29,7 @@ import kotlinx.coroutines.flow.map
  */
 internal suspend fun DataStore<Preferences>.tryEdit(
     transform: suspend (MutablePreferences) -> Unit
-): Result<Unit> = catching { edit(transform) }
+): Result<Unit> = suspendRunCatching { edit(transform) }
 
 internal suspend fun <T> DataStore<Preferences>.tryEdit(
     key: Preferences.Key<T>,

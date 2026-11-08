@@ -29,9 +29,6 @@ import androidx.work.WorkerParameters
 import com.nlab.reminder.apps.startup.dependenciesOf
 import com.nlab.reminder.core.data.repository.ScheduleRepository
 import com.nlab.reminder.core.data.repository.UpdateAllScheduleQuery
-import com.nlab.reminder.core.kotlin.getOrElse
-import com.nlab.reminder.core.kotlin.map
-import com.nlab.reminder.core.kotlin.onFailure
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import timber.log.Timber
