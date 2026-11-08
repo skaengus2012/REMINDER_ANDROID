@@ -1,8 +1,6 @@
 package com.nlab.reminder.core.data.repository.impl
 
-import com.nlab.reminder.core.kotlin.Result
 import com.nlab.testkit.faker.genBoolean
-import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -15,12 +13,12 @@ import org.junit.Test
 /**
  * @author Doohyun
  */
-internal class CompletedScheduleDetailShownRepositoryImplTest {
+class CompletedScheduleDetailShownRepositoryImplTest {
     @Test
     fun `When get as stream, Then getAsStreamFunction published`() = runTest {
         val expectedComplete = genBoolean()
         val repository = genCompletedScheduleShownRepository(
-            getAsStreamFunction = { flowOf(expectedComplete) }
+            getAsStreamFunc = { flowOf(expectedComplete) }
         )
         assertThat(
             expectedComplete,
@@ -29,19 +27,27 @@ internal class CompletedScheduleDetailShownRepositoryImplTest {
     }
 
     @Test
-    fun `When set shown, Then setShownFunction invoked`() = runTest {
-        val setShownFunction: suspend (isShown: Boolean) -> Result<Unit> = mockk(relaxed = true)
-        val repository = genCompletedScheduleShownRepository(setShownFunction = setShownFunction)
-        val input = genBoolean()
-
-        repository.setShown(input)
-        coVerify(exactly = 1) {
-            setShownFunction.invoke(input)
+    fun `When set shown, Then setShownFunc invoked once with input`() = runTest {
+        suspend fun verify(expectedInput: Boolean) {
+            val invokedInputs = mutableListOf<Boolean>()
+            val expectedResult = Result.success(Unit)
+            val repository = genCompletedScheduleShownRepository(
+                setShownFunc = suspend { isShown ->
+                    invokedInputs += isShown
+                    expectedResult
+                }
+            )
+            val actualResult = repository.setShown(expectedInput)
+            assertThat(invokedInputs, equalTo(listOf(expectedInput)))
+            assertThat(actualResult, equalTo(expectedResult))
         }
+
+        verify(true)
+        verify(false)
     }
 }
 
 private fun genCompletedScheduleShownRepository(
-    getAsStreamFunction: () -> Flow<Boolean> = mockk(relaxed = true),
-    setShownFunction: suspend (isShown: Boolean) -> Result<Unit> = mockk(relaxed = true)
-) = CompletedScheduleShownRepositoryImpl(getAsStreamFunction, setShownFunction)
+    getAsStreamFunc: () -> Flow<Boolean> = mockk(relaxed = true),
+    setShownFunc: suspend (isShown: Boolean) -> Result<Unit> = { Result.success(Unit) }
+) = CompletedScheduleShownRepositoryImpl(getAsStreamFunc, setShownFunc)

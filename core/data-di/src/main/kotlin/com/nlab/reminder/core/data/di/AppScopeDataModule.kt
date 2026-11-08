@@ -42,8 +42,6 @@ import com.nlab.reminder.core.data.util.TimeZoneMonitor
 import com.nlab.reminder.core.inject.qualifiers.coroutine.AppScope
 import com.nlab.reminder.core.inject.qualifiers.coroutine.Dispatcher
 import com.nlab.reminder.core.inject.qualifiers.coroutine.DispatcherOption.*
-import com.nlab.reminder.core.kotlin.onFailure
-import com.nlab.reminder.core.kotlin.onSuccess
 import com.nlab.reminder.core.kotlin.toPositiveInt
 import com.nlab.reminder.core.local.database.dao.LinkMetadataDAO
 import com.nlab.reminder.core.local.database.dao.ScheduleDAO
@@ -75,8 +73,8 @@ internal object AppScopeDataModule {
     fun provideCompletedScheduleShownRepository(
         preferenceDataSource: PreferenceDataSource
     ): CompletedScheduleShownRepository = CompletedScheduleShownRepositoryImpl(
-        getAsStreamFunction = { preferenceDataSource.getAllScheduleCompleteShownAsStream() },
-        setShownFunction = { preferenceDataSource.setAllScheduleCompleteShown(it) }
+        getAsStreamFunc = { preferenceDataSource.getAllScheduleCompleteShownAsStream() },
+        setShownFunc = { preferenceDataSource.setAllScheduleCompleteShown(it) }
     )
 
     @Reusable

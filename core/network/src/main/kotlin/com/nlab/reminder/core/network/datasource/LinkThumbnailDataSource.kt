@@ -17,8 +17,7 @@
 package com.nlab.reminder.core.network.datasource
 
 import com.nlab.reminder.core.kotlin.NonBlankString
-import com.nlab.reminder.core.kotlin.Result
-import com.nlab.reminder.core.kotlin.catching
+import com.nlab.reminder.core.kotlinx.coroutines.suspendRunCatching
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import org.jsoup.Jsoup
@@ -41,7 +40,7 @@ fun interface LinkThumbnailDataSource {
 }
 
 internal class LinkThumbnailDataSourceImpl(private val dispatcher: CoroutineDispatcher) : LinkThumbnailDataSource {
-    override suspend fun getLinkThumbnail(url: NonBlankString): Result<LinkThumbnailResponse> = catching {
+    override suspend fun getLinkThumbnail(url: NonBlankString): Result<LinkThumbnailResponse> = suspendRunCatching {
         withContext(dispatcher) {
             val metaTagToValues = Jsoup.connect(url.value).execute()
                 .streamParser()
