@@ -13,11 +13,7 @@ import org.junit.Test
 /**
  * @author Doohyun
  */
-<<<<<<< HEAD:core/data-impl/src/test/kotlin/com/nlab/reminder/core/data/repository/impl/DefaultCompletedScheduleShownRepositoryTest.kt
 internal class DefaultCompletedScheduleShownRepositoryTest {
-=======
-class CompletedScheduleDetailShownRepositoryImplTest {
->>>>>>> master:core/data-impl/src/test/kotlin/com/nlab/reminder/core/data/repository/impl/CompletedScheduleDetailShownRepositoryImplTest.kt
     @Test
     fun `When get as stream, Then getAsStreamFunction published`() = runTest {
         val expectedComplete = genBoolean()
@@ -52,12 +48,6 @@ class CompletedScheduleDetailShownRepositoryImplTest {
 }
 
 private fun genCompletedScheduleShownRepository(
-<<<<<<< HEAD:core/data-impl/src/test/kotlin/com/nlab/reminder/core/data/repository/impl/DefaultCompletedScheduleShownRepositoryTest.kt
-    getAsStreamFunction: () -> Flow<Boolean> = mockk(relaxed = true),
-    setShownFunction: suspend (isShown: Boolean) -> Result<Unit> = mockk(relaxed = true)
-) = DefaultCompletedScheduleShownRepository(getAsStreamFunction, setShownFunction)
-=======
     getAsStreamFunc: () -> Flow<Boolean> = mockk(relaxed = true),
     setShownFunc: suspend (isShown: Boolean) -> Result<Unit> = { Result.success(Unit) }
-) = CompletedScheduleShownRepositoryImpl(getAsStreamFunc, setShownFunc)
->>>>>>> master:core/data-impl/src/test/kotlin/com/nlab/reminder/core/data/repository/impl/CompletedScheduleDetailShownRepositoryImplTest.kt
+) = DefaultCompletedScheduleShownRepository(getAsStreamFunc, setShownFunc)

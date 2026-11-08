@@ -62,7 +62,6 @@ class LocalTagRepository(
         return entityResult.map(::Tag)
     }
 
-<<<<<<< HEAD
     override suspend fun saveBulk(query: SaveBulkTagQuery): Result<Set<Tag>> {
         val entitiesResult = catching {
             when (query) {
@@ -74,10 +73,7 @@ class LocalTagRepository(
         return entitiesResult.map { it.toTags() }
     }
 
-    override suspend fun delete(id: TagId) = catching {
-=======
     override suspend fun delete(id: TagId) = suspendRunCatching {
->>>>>>> master
         tagDAO.deleteById(id.rawId)
     }
 
