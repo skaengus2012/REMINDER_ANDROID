@@ -61,6 +61,22 @@ class LocalTagRepositoryTest {
     }
 
     @Test
+    fun `Given add query and dao failure, When save, Then return failure`() = runTest {
+        // Given
+        val throwable = IllegalStateException()
+        val query = SaveTagQuery.Add(name = genBothify("?#").toNonBlankString())
+        val tagDAO: TagDAO = mockk {
+            coEvery { insertAndGet(any()) } throws throwable
+        }
+
+        // When
+        val actualResult = genLocalTagRepository(tagDAO = tagDAO).save(query)
+
+        // Then
+        assertThat(actualResult.exceptionOrNull(), equalTo(throwable))
+    }
+
+    @Test
     fun `Given modify query with not merge, When save, Then update trimmed text and return updated tag`() = runTest {
         // Given
         val inputTagId = genTagId()
@@ -100,22 +116,6 @@ class LocalTagRepositoryTest {
         // Then
         coVerify(exactly = 1) { updateOrMergeAndGetTagTransaction.invoke(inputTagId.rawId, trimmedName) }
         assertThat(actualTag.getOrThrow(), equalTo(expectedTag))
-    }
-
-    @Test
-    fun `Given add query and dao failure, When save, Then return failure`() = runTest {
-        // Given
-        val throwable = IllegalStateException()
-        val query = SaveTagQuery.Add(name = genBothify("?#").toNonBlankString())
-        val tagDAO: TagDAO = mockk {
-            coEvery { insertAndGet(any()) } throws throwable
-        }
-
-        // When
-        val actualResult = genLocalTagRepository(tagDAO = tagDAO).save(query)
-
-        // Then
-        assertThat(actualResult.exceptionOrNull(), equalTo(throwable))
     }
 
     @Test
