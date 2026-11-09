@@ -37,7 +37,7 @@ import javax.inject.Inject
 @Reusable
 class GetTagEditTaskTransitionFlowUseCase @Inject constructor() {
     /**
-     * @return A cold flow that emits one or two [Result] depending on the state transitions and any errors.
+     * @return A cold flow that emits zero, one, or two [Result] depending on the state transitions and any errors.
      */
     operator fun invoke(task: TagEditTask): Flow<Result<TagEditStateTransition>> = flow {
         val current = task.current
