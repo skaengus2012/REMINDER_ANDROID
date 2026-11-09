@@ -129,13 +129,16 @@ class HomeReduceKtTest {
         val (currentTagEditState, nextTagEditState) = genCurrentAndNextTagEditState()
         val task = mockk<TagEditTask>()
         genHomeReduce(
-            environment = genHomeEnvironment(tagEditStateMachine = mockk {
-                every { startRename(currentTagEditState) } returns task
-            }, getTagEditTaskTransitionFlow = genGetTagEditTaskTransitionFlow(
-                task = task,
-                previous = currentTagEditState,
-                updated = nextTagEditState
-            ))
+            environment = genHomeEnvironment(
+                tagEditStateMachine = mockk {
+                    every { startRename(currentTagEditState) } returns task
+                },
+                getTagEditTaskTransitionFlow = genGetTagEditTaskTransitionFlow(
+                    task = task,
+                    previous = currentTagEditState,
+                    updated = nextTagEditState
+                )
+            )
         ).test()
             .givenCurrent(genHomeUiStateSuccess(tagEditState = currentTagEditState))
             .actionToDispatch(HomeAction.TagRenameRequestClicked)
@@ -217,13 +220,16 @@ class HomeReduceKtTest {
         val compareTags = genTags().toList()
         val task = mockk<TagEditTask>()
         genHomeReduce(
-            environment = genHomeEnvironment(tagEditStateMachine = mockk {
-                every { tryUpdateName(currentTagEditState, compareTags) } returns task
-            }, getTagEditTaskTransitionFlow = genGetTagEditTaskTransitionFlow(
-                task = task,
-                previous = currentTagEditState,
-                updated = nextTagEditState
-            ))
+            environment = genHomeEnvironment(
+                tagEditStateMachine = mockk {
+                    every { tryUpdateName(currentTagEditState, compareTags) } returns task
+                },
+                getTagEditTaskTransitionFlow = genGetTagEditTaskTransitionFlow(
+                    task = task,
+                    previous = currentTagEditState,
+                    updated = nextTagEditState
+                )
+            )
         ).test()
             .givenCurrent(genHomeUiStateSuccess(tags = compareTags, tagEditState = currentTagEditState))
             .actionToDispatch(HomeAction.TagRenameConfirmClicked)
@@ -268,13 +274,16 @@ class HomeReduceKtTest {
         val (currentTagEditState, nextTagEditState) = genCurrentAndNextTagEditState()
         val task = mockk<TagEditTask>()
         genHomeReduce(
-            environment = genHomeEnvironment(tagEditStateMachine = mockk {
-                every { merge(currentTagEditState) } returns task
-            }, getTagEditTaskTransitionFlow = genGetTagEditTaskTransitionFlow(
-                task = task,
-                previous = currentTagEditState,
-                updated = nextTagEditState
-            ))
+            environment = genHomeEnvironment(
+                tagEditStateMachine = mockk {
+                    every { merge(currentTagEditState) } returns task
+                },
+                getTagEditTaskTransitionFlow = genGetTagEditTaskTransitionFlow(
+                    task = task,
+                    previous = currentTagEditState,
+                    updated = nextTagEditState
+                )
+            )
         ).test()
             .givenCurrent(genHomeUiStateSuccess(tagEditState = currentTagEditState))
             .actionToDispatch(HomeAction.TagReplaceConfirmClicked)
@@ -332,13 +341,16 @@ class HomeReduceKtTest {
         val (currentTagEditState, nextTagEditState) = genCurrentAndNextTagEditState()
         val task = mockk<TagEditTask>()
         genHomeReduce(
-            environment = genHomeEnvironment(tagEditStateMachine = mockk {
-                every { startDelete(currentTagEditState) } returns task
-            }, getTagEditTaskTransitionFlow = genGetTagEditTaskTransitionFlow(
-                task = task,
-                previous = currentTagEditState,
-                updated = nextTagEditState
-            ))
+            environment = genHomeEnvironment(
+                tagEditStateMachine = mockk {
+                    every { startDelete(currentTagEditState) } returns task
+                },
+                getTagEditTaskTransitionFlow = genGetTagEditTaskTransitionFlow(
+                    task = task,
+                    previous = currentTagEditState,
+                    updated = nextTagEditState
+                )
+            )
         ).test()
             .givenCurrent(genHomeUiStateSuccess(tagEditState = currentTagEditState))
             .actionToDispatch(HomeAction.TagDeleteRequestClicked)
@@ -383,13 +395,16 @@ class HomeReduceKtTest {
         val (currentTagEditState, nextTagEditState) = genCurrentAndNextTagEditState()
         val task = mockk<TagEditTask>()
         genHomeReduce(
-            environment = genHomeEnvironment(tagEditStateMachine = mockk {
-                every { delete(currentTagEditState) } returns task
-            }, getTagEditTaskTransitionFlow = genGetTagEditTaskTransitionFlow(
-                task = task,
-                previous = currentTagEditState,
-                updated = nextTagEditState
-            ))
+            environment = genHomeEnvironment(
+                tagEditStateMachine = mockk {
+                    every { delete(currentTagEditState) } returns task
+                },
+                getTagEditTaskTransitionFlow = genGetTagEditTaskTransitionFlow(
+                    task = task,
+                    previous = currentTagEditState,
+                    updated = nextTagEditState
+                )
+            )
         ).test()
             .givenCurrent(genHomeUiStateSuccess(tagEditState = currentTagEditState))
             .actionToDispatch(HomeAction.TagDeleteConfirmClicked)
