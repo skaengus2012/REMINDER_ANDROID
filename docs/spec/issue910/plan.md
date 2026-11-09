@@ -45,7 +45,7 @@ Source: Android developer guide "Domain layer", Naming conventions (https://deve
 
 ### Consumers
 - `HomeEnvironment` gets a new constructor field `val getTagEditTaskTransitionFlow: GetTagEditTaskTransitionFlowUseCase` (concrete class).
-- `HomeReduce`: replace `.processAsFlow()` with `environment.getTagEditTaskTransitionFlow(task)` at 5 places (e.g. `val task = environment.tagEditStateMachine.startRename(...)`, then pass it), remove the extension import.
+- `HomeReduce`: replace `.processAsFlow()` with `environment.getTagEditTaskTransitionFlow(task)` at 5 places by chaining the state machine call into the use case (e.g. `environment.tagEditStateMachine.startRename(...).let(environment.getTagEditTaskTransitionFlow::invoke)`), remove the extension import.
 - Remove `fun TagEditTask.processAsFlow()` from `TagEditTask.kt` and clean now-unused imports (`Flow`, `flow`).
 
 ### Tests
@@ -85,3 +85,4 @@ testStrategy: unit
 | 2026-11-09 | Plain interface instead of `fun interface`, mockk-based test approach; renamed `TagEditTaskProcessor` to `ProcessTagEditTaskAsFlowUseCase` (no `-er` names, follows `...UseCase` convention) | user change request |
 | 2026-11-09 | Dropped interface, `Impl`, and `@Binds` module; single concrete `@Reusable @Inject` UseCase class named per the Android domain-layer convention; tests mock the concrete class | user change request |
 | 2026-11-09 | Final name `GetTagEditTaskTransitionFlowUseCase` (field `getTagEditTaskTransitionFlow`, test `GetTagEditTaskTransitionFlowUseCaseTest`); Naming rationale rewritten (cold flow, not an execution verb). Earlier rows keep the previous names as history. | user decision |
+| 2026-11-10 | `HomeReduce` call sites changed to chaining via `.let(environment.getTagEditTaskTransitionFlow::invoke)` (the reviewer's `environment::getTagEditTaskTransitionFlow` does not compile: it is a property reference, not `invoke`); test helpers renamed `mock*` to `gen*` | PR #914 review |

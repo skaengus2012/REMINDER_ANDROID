@@ -40,7 +40,7 @@ Make `processAsFlow` an explicit, injectable dependency of its callers so that c
 - [ ] `processAsFlow` is no longer consumed as a top-level extension function by callers; it is provided as an explicit dependency.
 - [ ] `HomeReduce` receives the dependency explicitly.
 - [ ] `HomeReduceKtTest` contains no `mockkStatic(TagEditTask::processAsFlow)` / `unmockkStatic`.
-- [ ] `TagEditTaskKtTest` still covers `processAsFlow` as before and passes.
+- [ ] The `processAsFlow` test cases are carried over to `GetTagEditTaskTransitionFlowUseCaseTest` with the same scenarios and expectations, and pass.
 - [ ] All existing tests of affected modules pass.
 
 ## Impact
