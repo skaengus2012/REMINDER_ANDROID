@@ -133,7 +133,7 @@ class HomeReduceKtTest {
                 tagEditStateMachine = mockk {
                     every { startRename(currentTagEditState) } returns task
                 },
-                getTagEditTaskTransitionFlow = genGetTagEditTaskTransitionFlow(
+                getTagEditTaskTransitionFlow = genGetTagEditTaskTransitionFlowUseCase(
                     task = task,
                     previous = currentTagEditState,
                     updated = nextTagEditState
@@ -159,7 +159,7 @@ class HomeReduceKtTest {
                 tagEditStateMachine = mockk {
                     every { startRename(any()) } returns task
                 },
-                getTagEditTaskTransitionFlow = genGetTagEditTaskTransitionFlow(
+                getTagEditTaskTransitionFlow = genGetTagEditTaskTransitionFlowUseCase(
                     task = task,
                     throwable = expectedUserMessageException
                 ),
@@ -224,7 +224,7 @@ class HomeReduceKtTest {
                 tagEditStateMachine = mockk {
                     every { tryUpdateName(currentTagEditState, compareTags) } returns task
                 },
-                getTagEditTaskTransitionFlow = genGetTagEditTaskTransitionFlow(
+                getTagEditTaskTransitionFlow = genGetTagEditTaskTransitionFlowUseCase(
                     task = task,
                     previous = currentTagEditState,
                     updated = nextTagEditState
@@ -250,7 +250,7 @@ class HomeReduceKtTest {
                 tagEditStateMachine = mockk {
                     every { tryUpdateName(any(), any()) } returns task
                 },
-                getTagEditTaskTransitionFlow = genGetTagEditTaskTransitionFlow(
+                getTagEditTaskTransitionFlow = genGetTagEditTaskTransitionFlowUseCase(
                     task = task,
                     throwable = expectedUserMessageException
                 ),
@@ -278,7 +278,7 @@ class HomeReduceKtTest {
                 tagEditStateMachine = mockk {
                     every { merge(currentTagEditState) } returns task
                 },
-                getTagEditTaskTransitionFlow = genGetTagEditTaskTransitionFlow(
+                getTagEditTaskTransitionFlow = genGetTagEditTaskTransitionFlowUseCase(
                     task = task,
                     previous = currentTagEditState,
                     updated = nextTagEditState
@@ -304,7 +304,7 @@ class HomeReduceKtTest {
                 tagEditStateMachine = mockk {
                     every { merge(any()) } returns task
                 },
-                getTagEditTaskTransitionFlow = genGetTagEditTaskTransitionFlow(
+                getTagEditTaskTransitionFlow = genGetTagEditTaskTransitionFlowUseCase(
                     task = task,
                     throwable = expectedUserMessageException
                 ),
@@ -345,7 +345,7 @@ class HomeReduceKtTest {
                 tagEditStateMachine = mockk {
                     every { startDelete(currentTagEditState) } returns task
                 },
-                getTagEditTaskTransitionFlow = genGetTagEditTaskTransitionFlow(
+                getTagEditTaskTransitionFlow = genGetTagEditTaskTransitionFlowUseCase(
                     task = task,
                     previous = currentTagEditState,
                     updated = nextTagEditState
@@ -371,7 +371,7 @@ class HomeReduceKtTest {
                 tagEditStateMachine = mockk {
                     every { startDelete(any()) } returns task
                 },
-                getTagEditTaskTransitionFlow = genGetTagEditTaskTransitionFlow(
+                getTagEditTaskTransitionFlow = genGetTagEditTaskTransitionFlowUseCase(
                     task = task,
                     throwable = expectedUserMessageException
                 ),
@@ -399,7 +399,7 @@ class HomeReduceKtTest {
                 tagEditStateMachine = mockk {
                     every { delete(currentTagEditState) } returns task
                 },
-                getTagEditTaskTransitionFlow = genGetTagEditTaskTransitionFlow(
+                getTagEditTaskTransitionFlow = genGetTagEditTaskTransitionFlowUseCase(
                     task = task,
                     previous = currentTagEditState,
                     updated = nextTagEditState
@@ -425,7 +425,7 @@ class HomeReduceKtTest {
                 tagEditStateMachine = mockk {
                     every { delete(any()) } returns task
                 },
-                getTagEditTaskTransitionFlow = genGetTagEditTaskTransitionFlow(
+                getTagEditTaskTransitionFlow = genGetTagEditTaskTransitionFlowUseCase(
                     task = task,
                     throwable = expectedUserMessageException
                 ),
@@ -466,7 +466,7 @@ private fun genCurrentAndNextTagEditState(): Pair<TagEditState, TagEditState> {
     return currentTagEditState to nextTagEditState
 }
 
-private fun genGetTagEditTaskTransitionFlow(
+private fun genGetTagEditTaskTransitionFlowUseCase(
     task: TagEditTask,
     previous: TagEditState,
     updated: TagEditState
@@ -478,7 +478,7 @@ private fun genGetTagEditTaskTransitionFlow(
     )
 }
 
-private fun genGetTagEditTaskTransitionFlow(
+private fun genGetTagEditTaskTransitionFlowUseCase(
     task: TagEditTask,
     throwable: Throwable
 ): GetTagEditTaskTransitionFlowUseCase = mockk {
