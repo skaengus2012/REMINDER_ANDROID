@@ -16,13 +16,13 @@
 
 package com.nlab.reminder.feature.home
 
+import com.nlab.reminder.core.component.tag.edit.GetTagEditTaskTransitionFlowUseCase
 import com.nlab.reminder.core.component.tag.edit.TagEditState
 import com.nlab.reminder.core.component.tag.edit.TagEditStateMachine
 import com.nlab.reminder.core.component.tag.edit.TagEditStateTransition
 import com.nlab.reminder.core.component.tag.edit.TagEditTask
 import com.nlab.reminder.core.component.tag.edit.genTagEditStateExcludeTypeOf
 import com.nlab.reminder.core.component.tag.edit.genTagEditStateTypeOf
-import com.nlab.reminder.core.component.tag.edit.processAsFlow
 import com.nlab.reminder.core.component.usermessage.UserMessageException
 import com.nlab.reminder.core.component.usermessage.genUserMessageExceptionSource
 import com.nlab.reminder.core.data.model.genTag
@@ -33,10 +33,7 @@ import com.nlab.statekit.test.reduce.test
 import com.nlab.testkit.faker.genBothify
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.mockkStatic
-import io.mockk.unmockkStatic
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.sameInstance
@@ -128,15 +125,20 @@ class HomeReduceKtTest {
     }
 
     @Test
-    fun `Given success, rename starting success, When start rename, Then update state`() = runTestWithTagEditTaskMock {
+    fun `Given success, rename starting success, When start rename, Then update state`() = runTest {
         val (currentTagEditState, nextTagEditState) = genCurrentAndNextTagEditState()
+        val task = mockk<TagEditTask>()
         genHomeReduce(
-            environment = genHomeEnvironment(tagEditStateMachine = mockk {
-                every { startRename(currentTagEditState) } returns mockTagEditTaskWith(
+            environment = genHomeEnvironment(
+                tagEditStateMachine = mockk {
+                    every { startRename(currentTagEditState) } returns task
+                },
+                getTagEditTaskTransitionFlow = genGetTagEditTaskTransitionFlowUseCase(
+                    task = task,
                     previous = currentTagEditState,
                     updated = nextTagEditState
                 )
-            })
+            )
         ).test()
             .givenCurrent(genHomeUiStateSuccess(tagEditState = currentTagEditState))
             .actionToDispatch(HomeAction.TagRenameRequestClicked)
@@ -145,19 +147,22 @@ class HomeReduceKtTest {
     }
 
     @Test
-    fun `Given success, rename starting failed, When start rename, Then throw user err`() = runTestWithTagEditTaskMock {
+    fun `Given success, rename starting failed, When start rename, Then throw user err`() = runTest {
         val userMessageExceptionSource = genUserMessageExceptionSource()
         val expectedUserMessageException = UserMessageException(
             source = userMessageExceptionSource,
             origin = Throwable()
         )
+        val task = mockk<TagEditTask>()
         val traces = genHomeReduce(
             environment = genHomeEnvironment(
                 tagEditStateMachine = mockk {
-                    every { startRename(any()) } returns mockTagEditTaskWith(
-                        throwable = expectedUserMessageException
-                    )
+                    every { startRename(any()) } returns task
                 },
+                getTagEditTaskTransitionFlow = genGetTagEditTaskTransitionFlowUseCase(
+                    task = task,
+                    throwable = expectedUserMessageException
+                ),
                 userMessageFactory = mockk {
                     every { createExceptionSource() } returns userMessageExceptionSource
                 }
@@ -210,16 +215,21 @@ class HomeReduceKtTest {
     }
 
     @Test
-    fun `Given success, update name success, When confirm rename, Then update state`() = runTestWithTagEditTaskMock {
+    fun `Given success, update name success, When confirm rename, Then update state`() = runTest {
         val (currentTagEditState, nextTagEditState) = genCurrentAndNextTagEditState()
         val compareTags = genTags().toList()
+        val task = mockk<TagEditTask>()
         genHomeReduce(
-            environment = genHomeEnvironment(tagEditStateMachine = mockk {
-                every { tryUpdateName(currentTagEditState, compareTags) } returns mockTagEditTaskWith(
+            environment = genHomeEnvironment(
+                tagEditStateMachine = mockk {
+                    every { tryUpdateName(currentTagEditState, compareTags) } returns task
+                },
+                getTagEditTaskTransitionFlow = genGetTagEditTaskTransitionFlowUseCase(
+                    task = task,
                     previous = currentTagEditState,
                     updated = nextTagEditState
                 )
-            })
+            )
         ).test()
             .givenCurrent(genHomeUiStateSuccess(tags = compareTags, tagEditState = currentTagEditState))
             .actionToDispatch(HomeAction.TagRenameConfirmClicked)
@@ -228,19 +238,22 @@ class HomeReduceKtTest {
     }
 
     @Test
-    fun `Given success, update name failed, When confirm rename, Then throw user err`() = runTestWithTagEditTaskMock {
+    fun `Given success, update name failed, When confirm rename, Then throw user err`() = runTest {
         val userMessageExceptionSource = genUserMessageExceptionSource()
         val expectedUserMessageException = UserMessageException(
             source = userMessageExceptionSource,
             origin = Throwable()
         )
+        val task = mockk<TagEditTask>()
         val traces = genHomeReduce(
             environment = genHomeEnvironment(
                 tagEditStateMachine = mockk {
-                    every { tryUpdateName(any(), any()) } returns mockTagEditTaskWith(
-                        expectedUserMessageException
-                    )
+                    every { tryUpdateName(any(), any()) } returns task
                 },
+                getTagEditTaskTransitionFlow = genGetTagEditTaskTransitionFlowUseCase(
+                    task = task,
+                    throwable = expectedUserMessageException
+                ),
                 userMessageFactory = mockk {
                     every { createExceptionSource() } returns userMessageExceptionSource
                 }
@@ -257,15 +270,20 @@ class HomeReduceKtTest {
     }
 
     @Test
-    fun `Given success, merge success, When replace confirmed, Then update state`() = runTestWithTagEditTaskMock {
+    fun `Given success, merge success, When replace confirmed, Then update state`() = runTest {
         val (currentTagEditState, nextTagEditState) = genCurrentAndNextTagEditState()
+        val task = mockk<TagEditTask>()
         genHomeReduce(
-            environment = genHomeEnvironment(tagEditStateMachine = mockk {
-                every { merge(currentTagEditState) } returns mockTagEditTaskWith(
+            environment = genHomeEnvironment(
+                tagEditStateMachine = mockk {
+                    every { merge(currentTagEditState) } returns task
+                },
+                getTagEditTaskTransitionFlow = genGetTagEditTaskTransitionFlowUseCase(
+                    task = task,
                     previous = currentTagEditState,
                     updated = nextTagEditState
                 )
-            })
+            )
         ).test()
             .givenCurrent(genHomeUiStateSuccess(tagEditState = currentTagEditState))
             .actionToDispatch(HomeAction.TagReplaceConfirmClicked)
@@ -274,19 +292,22 @@ class HomeReduceKtTest {
     }
 
     @Test
-    fun `Given success, merge failed, When replace confirmed, Then throw user err`() = runTestWithTagEditTaskMock {
+    fun `Given success, merge failed, When replace confirmed, Then throw user err`() = runTest {
         val userMessageExceptionSource = genUserMessageExceptionSource()
         val expectedUserMessageException = UserMessageException(
             source = userMessageExceptionSource,
             origin = Throwable()
         )
+        val task = mockk<TagEditTask>()
         val traces = genHomeReduce(
             environment = genHomeEnvironment(
                 tagEditStateMachine = mockk {
-                    every { merge(any()) } returns mockTagEditTaskWith(
-                        throwable = expectedUserMessageException
-                    )
+                    every { merge(any()) } returns task
                 },
+                getTagEditTaskTransitionFlow = genGetTagEditTaskTransitionFlowUseCase(
+                    task = task,
+                    throwable = expectedUserMessageException
+                ),
                 userMessageFactory = mockk {
                     every { createExceptionSource() } returns userMessageExceptionSource
                 }
@@ -316,15 +337,20 @@ class HomeReduceKtTest {
     }
 
     @Test
-    fun `Given success, start delete success, When start delete, Then update state`() = runTestWithTagEditTaskMock {
+    fun `Given success, start delete success, When start delete, Then update state`() = runTest {
         val (currentTagEditState, nextTagEditState) = genCurrentAndNextTagEditState()
+        val task = mockk<TagEditTask>()
         genHomeReduce(
-            environment = genHomeEnvironment(tagEditStateMachine = mockk {
-                every { startDelete(currentTagEditState) } returns mockTagEditTaskWith(
+            environment = genHomeEnvironment(
+                tagEditStateMachine = mockk {
+                    every { startDelete(currentTagEditState) } returns task
+                },
+                getTagEditTaskTransitionFlow = genGetTagEditTaskTransitionFlowUseCase(
+                    task = task,
                     previous = currentTagEditState,
                     updated = nextTagEditState
                 )
-            })
+            )
         ).test()
             .givenCurrent(genHomeUiStateSuccess(tagEditState = currentTagEditState))
             .actionToDispatch(HomeAction.TagDeleteRequestClicked)
@@ -333,19 +359,22 @@ class HomeReduceKtTest {
     }
 
     @Test
-    fun `Given success, start delete failed, When start delete, Then throw user err`() = runTestWithTagEditTaskMock {
+    fun `Given success, start delete failed, When start delete, Then throw user err`() = runTest {
         val userMessageExceptionSource = genUserMessageExceptionSource()
         val expectedUserMessageException = UserMessageException(
             source = userMessageExceptionSource,
             origin = Throwable()
         )
+        val task = mockk<TagEditTask>()
         val traces = genHomeReduce(
             environment = genHomeEnvironment(
                 tagEditStateMachine = mockk {
-                    every { startDelete(any()) } returns mockTagEditTaskWith(
-                        throwable = expectedUserMessageException
-                    )
+                    every { startDelete(any()) } returns task
                 },
+                getTagEditTaskTransitionFlow = genGetTagEditTaskTransitionFlowUseCase(
+                    task = task,
+                    throwable = expectedUserMessageException
+                ),
                 userMessageFactory = mockk {
                     every { createExceptionSource() } returns userMessageExceptionSource
                 }
@@ -362,15 +391,20 @@ class HomeReduceKtTest {
     }
 
     @Test
-    fun `Given success, delete success, When confirm delete, Then update state`() = runTestWithTagEditTaskMock {
+    fun `Given success, delete success, When confirm delete, Then update state`() = runTest {
         val (currentTagEditState, nextTagEditState) = genCurrentAndNextTagEditState()
+        val task = mockk<TagEditTask>()
         genHomeReduce(
-            environment = genHomeEnvironment(tagEditStateMachine = mockk {
-                every { delete(currentTagEditState) } returns mockTagEditTaskWith(
+            environment = genHomeEnvironment(
+                tagEditStateMachine = mockk {
+                    every { delete(currentTagEditState) } returns task
+                },
+                getTagEditTaskTransitionFlow = genGetTagEditTaskTransitionFlowUseCase(
+                    task = task,
                     previous = currentTagEditState,
                     updated = nextTagEditState
                 )
-            })
+            )
         ).test()
             .givenCurrent(genHomeUiStateSuccess(tagEditState = currentTagEditState))
             .actionToDispatch(HomeAction.TagDeleteConfirmClicked)
@@ -379,19 +413,22 @@ class HomeReduceKtTest {
     }
 
     @Test
-    fun `Given success, delete failed, When confirm delete, Then throw user err`() = runTestWithTagEditTaskMock {
+    fun `Given success, delete failed, When confirm delete, Then throw user err`() = runTest {
         val userMessageExceptionSource = genUserMessageExceptionSource()
         val expectedUserMessageException = UserMessageException(
             source = userMessageExceptionSource,
             origin = Throwable()
         )
+        val task = mockk<TagEditTask>()
         val traces = genHomeReduce(
             environment = genHomeEnvironment(
                 tagEditStateMachine = mockk {
-                    every { delete(any()) } returns mockTagEditTaskWith(
-                        throwable = expectedUserMessageException
-                    )
+                    every { delete(any()) } returns task
                 },
+                getTagEditTaskTransitionFlow = genGetTagEditTaskTransitionFlowUseCase(
+                    task = task,
+                    throwable = expectedUserMessageException
+                ),
                 userMessageFactory = mockk {
                     every { createExceptionSource() } returns userMessageExceptionSource
                 }
@@ -429,25 +466,23 @@ private fun genCurrentAndNextTagEditState(): Pair<TagEditState, TagEditState> {
     return currentTagEditState to nextTagEditState
 }
 
-private fun mockTagEditTaskWith(previous: TagEditState, updated: TagEditState): TagEditTask = mockk {
-    every { processAsFlow() } returns flowOf(
+private fun genGetTagEditTaskTransitionFlowUseCase(
+    task: TagEditTask,
+    previous: TagEditState,
+    updated: TagEditState
+): GetTagEditTaskTransitionFlowUseCase = mockk {
+    every { this@mockk(task) } returns flowOf(
         Result.success(
             TagEditStateTransition(previous, updated)
         )
     )
 }
 
-private fun mockTagEditTaskWith(throwable: Throwable): TagEditTask = mockk {
-    every { processAsFlow() } returns flowOf(Result.failure(throwable))
-}
-
-private fun runTestWithTagEditTaskMock(testBody: suspend TestScope.() -> Unit) {
-    // before
-    mockkStatic(TagEditTask::processAsFlow)
-    // test
-    runTest(testBody = testBody)
-    // after
-    unmockkStatic(TagEditTask::processAsFlow)
+private fun genGetTagEditTaskTransitionFlowUseCase(
+    task: TagEditTask,
+    throwable: Throwable
+): GetTagEditTaskTransitionFlowUseCase = mockk {
+    every { this@mockk(task) } returns flowOf(Result.failure(throwable))
 }
 
 private fun assertUserMessageException(

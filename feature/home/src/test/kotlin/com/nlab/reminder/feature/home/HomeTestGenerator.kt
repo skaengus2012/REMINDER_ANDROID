@@ -16,6 +16,7 @@
 
 package com.nlab.reminder.feature.home
 
+import com.nlab.reminder.core.component.tag.edit.GetTagEditTaskTransitionFlowUseCase
 import com.nlab.reminder.core.component.tag.edit.TagEditState
 import com.nlab.reminder.core.component.tag.edit.TagEditStateMachine
 import com.nlab.reminder.core.component.tag.edit.genTagEditState
@@ -35,11 +36,13 @@ internal fun genHomeEnvironment(
     scheduleRepository: ScheduleRepository = mockk(),
     tagRepository: TagRepository = mockk(),
     tagEditStateMachine: TagEditStateMachine = mockk(),
+    getTagEditTaskTransitionFlow: GetTagEditTaskTransitionFlowUseCase = mockk(),
     userMessageFactory: UserMessageFactory = mockk()
 ) = HomeEnvironment(
     scheduleRepository = scheduleRepository,
     tagRepository = tagRepository,
     tagEditStateMachine = tagEditStateMachine,
+    getTagEditTaskTransitionFlow = getTagEditTaskTransitionFlow,
     userMessageFactory = userMessageFactory
 )
 
