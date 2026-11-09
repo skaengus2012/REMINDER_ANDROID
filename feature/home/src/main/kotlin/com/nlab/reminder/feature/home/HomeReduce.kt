@@ -65,8 +65,9 @@ internal fun HomeReduce(environment: HomeEnvironment): HomeReduce = DslReduce {
             )
         }
         suspendEffect<TagRenameRequestClicked> {
-            val task = environment.tagEditStateMachine.startRename(current.tagEditState)
-            environment.getTagEditTaskTransitionFlow(task)
+            environment.tagEditStateMachine
+                .startRename(current.tagEditState)
+                .let(environment.getTagEditTaskTransitionFlow::invoke)
                 .mapOrThrowCompareAndSetTagEditState(environment.userMessageFactory)
                 .collect(::dispatch)
         }
@@ -85,14 +86,16 @@ internal fun HomeReduce(environment: HomeEnvironment): HomeReduce = DslReduce {
             )
         }
         suspendEffect<TagRenameConfirmClicked> {
-            val task = environment.tagEditStateMachine.tryUpdateName(current = current.tagEditState, compareTags = current.tags)
-            environment.getTagEditTaskTransitionFlow(task)
+            environment.tagEditStateMachine
+                .tryUpdateName(current = current.tagEditState, compareTags = current.tags)
+                .let(environment.getTagEditTaskTransitionFlow::invoke)
                 .mapOrThrowCompareAndSetTagEditState(environment.userMessageFactory)
                 .collect(::dispatch)
         }
         suspendEffect<TagReplaceConfirmClicked> {
-            val task = environment.tagEditStateMachine.merge(current = current.tagEditState)
-            environment.getTagEditTaskTransitionFlow(task)
+            environment.tagEditStateMachine
+                .merge(current = current.tagEditState)
+                .let(environment.getTagEditTaskTransitionFlow::invoke)
                 .mapOrThrowCompareAndSetTagEditState(environment.userMessageFactory)
                 .collect(::dispatch)
         }
@@ -104,14 +107,16 @@ internal fun HomeReduce(environment: HomeEnvironment): HomeReduce = DslReduce {
             )
         }
         suspendEffect<TagDeleteRequestClicked> {
-            val task = environment.tagEditStateMachine.startDelete(current = current.tagEditState)
-            environment.getTagEditTaskTransitionFlow(task)
+            environment.tagEditStateMachine
+                .startDelete(current = current.tagEditState)
+                .let(environment.getTagEditTaskTransitionFlow::invoke)
                 .mapOrThrowCompareAndSetTagEditState(environment.userMessageFactory)
                 .collect(::dispatch)
         }
         suspendEffect<TagDeleteConfirmClicked> {
-            val task = environment.tagEditStateMachine.delete(current = current.tagEditState)
-            environment.getTagEditTaskTransitionFlow(task)
+            environment.tagEditStateMachine
+                .delete(current = current.tagEditState)
+                .let(environment.getTagEditTaskTransitionFlow::invoke)
                 .mapOrThrowCompareAndSetTagEditState(environment.userMessageFactory)
                 .collect(::dispatch)
         }
