@@ -16,10 +16,11 @@
 
 package com.nlab.reminder.feature.home
 
+import com.nlab.reminder.core.component.tag.edit.GetTagEditTaskTransitionFlowUseCase
 import com.nlab.reminder.core.component.tag.edit.TagEditState
 import com.nlab.reminder.core.component.tag.edit.TagEditStateMachine
+import com.nlab.reminder.core.component.tag.edit.TagEditStateTransition
 import com.nlab.reminder.core.component.tag.edit.TagEditTask
-import com.nlab.reminder.core.component.tag.edit.genGetTagEditTaskTransitionFlow
 import com.nlab.reminder.core.component.tag.edit.genTagEditStateExcludeTypeOf
 import com.nlab.reminder.core.component.tag.edit.genTagEditStateTypeOf
 import com.nlab.reminder.core.component.usermessage.UserMessageException
@@ -32,6 +33,7 @@ import com.nlab.statekit.test.reduce.test
 import com.nlab.testkit.faker.genBothify
 import io.mockk.every
 import io.mockk.mockk
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.sameInstance
@@ -462,6 +464,25 @@ private fun genCurrentAndNextTagEditState(): Pair<TagEditState, TagEditState> {
     val currentTagEditState = genTagEditStateTypeOf<TagEditState.None>()
     val nextTagEditState = genTagEditStateExcludeTypeOf(currentTagEditState::class)
     return currentTagEditState to nextTagEditState
+}
+
+private fun genGetTagEditTaskTransitionFlow(
+    task: TagEditTask,
+    previous: TagEditState,
+    updated: TagEditState
+): GetTagEditTaskTransitionFlowUseCase = mockk {
+    every { this@mockk(task) } returns flowOf(
+        Result.success(
+            TagEditStateTransition(previous, updated)
+        )
+    )
+}
+
+private fun genGetTagEditTaskTransitionFlow(
+    task: TagEditTask,
+    throwable: Throwable
+): GetTagEditTaskTransitionFlowUseCase = mockk {
+    every { this@mockk(task) } returns flowOf(Result.failure(throwable))
 }
 
 private fun assertUserMessageException(
