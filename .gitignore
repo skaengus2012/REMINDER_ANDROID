@@ -34,3 +34,4 @@ captures/
 
 # Agent worktrees
 .agents/worktrees/
+.claude/worktrees/
