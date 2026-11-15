@@ -1,11 +1,11 @@
 ---
-name: git-worktree-creator
+name: create-worktree
 description: >-
   Analyzes git repository context (branches, commit history) to recommend prefixes,
   worktree names (issue-based), and base branches, and safely creates a git worktree.
 ---
 
-# Git Worktree Creator Skill
+# Create Worktree Skill
 
 ## Overview
 
