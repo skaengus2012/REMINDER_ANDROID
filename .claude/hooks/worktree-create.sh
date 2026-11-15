@@ -16,6 +16,7 @@
 # Contract: the last line of stdout must be the absolute worktree path. All other output goes to stderr.
 # Difference from the skill: the skill asks the user for prefix/name/base, but the hook is non-interactive, so the rules above replace those questions.
 set -euo pipefail
+unset CDPATH   # keep `cd` silent and deterministic
 
 log() { echo "worktree-create: $*" >&2; }
 
@@ -31,7 +32,8 @@ fi
 start_dir="${CLAUDE_PROJECT_DIR:-$PWD}"
 # Always resolve against the main repository root, even if the session is inside another worktree.
 # (`cd` + `pwd -P` instead of `rev-parse --path-format=absolute`, which requires git >= 2.31)
-common_dir=$(cd "$start_dir" && cd "$(git rev-parse --git-common-dir)" && pwd -P)
+git_common=$(git -C "$start_dir" rev-parse --git-common-dir)   # split so a failure aborts under set -e
+common_dir=$(cd "$start_dir" && cd "$git_common" && pwd -P)
 repo_root=$(dirname "$common_dir")
 git_() { git -C "$repo_root" "$@"; }
 

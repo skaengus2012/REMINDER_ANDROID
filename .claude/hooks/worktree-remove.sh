@@ -5,6 +5,7 @@
 # Behaves like the default removal (`git worktree remove --force`), but explicitly guarantees that the branch is left untouched.
 # Exit code 0 means the worktree is treated as removed; a non-zero code is treated as a failed removal if the directory still exists.
 set -euo pipefail
+unset CDPATH   # keep `cd` silent and deterministic
 
 log() { echo "worktree-remove: $*" >&2; }
 
@@ -25,7 +26,8 @@ fi
 
 # Only act on paths other than the main repository (safeguard).
 # (`cd` + `pwd -P` instead of `rev-parse --path-format=absolute`, which requires git >= 2.31)
-common_dir=$(cd "$path" && cd "$(git rev-parse --git-common-dir)" && pwd -P)
+git_common=$(git -C "$path" rev-parse --git-common-dir)   # split so a failure aborts under set -e
+common_dir=$(cd "$path" && cd "$git_common" && pwd -P)
 repo_root=$(dirname "$common_dir")
 [ "$(cd "$path" && pwd -P)" != "$(cd "$repo_root" && pwd -P)" ] \
   || { log "refusing to remove the main repository: $path"; exit 1; }

@@ -25,7 +25,7 @@ The skill is interactive (asks prefix, name, base). A `WorktreeCreate` hook rece
 
 ### `worktree-create.sh`
 - Parse `.name` with `jq`, falling back to `sed` when `jq` is missing.
-- Resolve the main repository root from `git rev-parse --path-format=absolute --git-common-dir`, so a session started inside another worktree still creates worktrees under the main root.
+- Resolve the main repository root from `git rev-parse --git-common-dir` made absolute with `cd` + `pwd -P` (`--path-format=absolute` needs git >= 2.31 and breaks older git such as 2.23), so a session started inside another worktree still creates worktrees under the main root.
 - Map the name to a branch (FR-2), validate with `git check-ref-format --branch`, derive `safe_name` and the target path (FR-1).
 - `git worktree prune` first, then handle an existing target: reuse only if it is registered and on the expected branch (FR-4); otherwise fail.
 - Existing branch → `git worktree add <path> <branch>`; new branch → `git worktree add <path> -b <branch> <base>` with the base chosen as in FR-3 (`WORKTREE_BASE` is validated).
