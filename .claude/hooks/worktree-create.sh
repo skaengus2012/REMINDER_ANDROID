@@ -30,7 +30,8 @@ fi
 
 start_dir="${CLAUDE_PROJECT_DIR:-$PWD}"
 # Always resolve against the main repository root, even if the session is inside another worktree.
-common_dir=$(git -C "$start_dir" rev-parse --path-format=absolute --git-common-dir)
+# (`cd` + `pwd -P` instead of `rev-parse --path-format=absolute`, which requires git >= 2.31)
+common_dir=$(cd "$start_dir" && cd "$(git rev-parse --git-common-dir)" && pwd -P)
 repo_root=$(dirname "$common_dir")
 git_() { git -C "$repo_root" "$@"; }
 
