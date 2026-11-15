@@ -17,7 +17,7 @@ Agent sessions create worktrees with the app/CLI default (`.claude/worktrees/`),
 - FR-6: Removal deletes only the worktree directory and keeps the branch; refuses the main repository; missing path is success.
 - FR-7: Register both hooks in `.claude/settings.json`.
 - NFR-1: Follow the hook contract (last stdout line is the absolute path; everything else to stderr).
-- Optional follow-ups from the issue: ignore `.claude/worktrees/` in `.gitignore`; document the hook/skill relationship in `SKILL.md`.
+- Optional follow-ups from the issue: ignore `.claude/worktrees/` in `.gitignore`.
 
 ## Architecture/Design
 ### Hook vs. skill
@@ -53,11 +53,9 @@ The skill is interactive (asks prefix, name, base). A `WorktreeCreate` hook rece
    - **Verify**: `jq . .claude/settings.json`
 4. Ignore `.claude/worktrees/` in `.gitignore` so teammates do not see the default-location worktrees as untracked.
    - **Verify**: `git check-ignore -v .claude/worktrees/x`
-5. Document the relationship between the hooks and the skill in `.agents/skills/git-worktree-creator/SKILL.md`, especially the differences in prefix/name/base selection.
-   - **Verify**: the new section exists in `SKILL.md` and matches the rules in FR-2/FR-3.
-6. Sync `requirements.md` (acceptance criteria, open questions, change history) with the work done in Tasks 4 and 5.
+5. Sync `requirements.md` (acceptance criteria, open questions, change history) with the work done in Task 4.
    - **Verify**: resolved open questions are removed and recorded in `Change History`.
-7. Verify in the Claude desktop app that the Worktree toggle goes through `WorktreeCreate` and that `WorktreeRemove` runs on session close/archive/delete. *(Manual; pending)*
+6. Verify in the Claude desktop app that the Worktree toggle goes through `WorktreeCreate` and that `WorktreeRemove` runs on session close/archive/delete. *(Manual; pending)*
    - **Verify**: start a worktree session from the desktop app and check the path/branch; close or delete it and confirm the directory is removed while the branch remains.
 
 ## Verification
@@ -66,7 +64,7 @@ testStrategy: manual
 - No production Android code changes, so Gradle unit tests and Maestro UI QA are not applicable.
 - Hook scripts are verified with `bash -n` and the manual scenarios listed in Tasks 1 and 2, each of which cleans up its temporary worktrees and branches.
 - The hooks were cross-reviewed by a separate model; its high/medium findings are reflected in the scripts.
-- Task 7 can only be confirmed by using the desktop app; until then FR-7 is verified only at the configuration level.
+- Task 6 can only be confirmed by using the desktop app; until then FR-7 is verified only at the configuration level.
 
 ---
 
@@ -74,3 +72,4 @@ testStrategy: manual
 | Date | Change | Source |
 |------|--------|--------|
 | 2026-11-15 | Initial draft | requirements.md / user request |
+| 2026-11-15 | Removed the `SKILL.md` documentation task (hooks are Claude Code only and live under `.claude/`); renumbered Tasks 6-7 to 5-6 | User request |

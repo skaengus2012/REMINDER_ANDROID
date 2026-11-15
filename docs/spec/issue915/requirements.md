@@ -52,14 +52,12 @@ Make worktree creation and removal follow the project's conventions automaticall
 - [ ] Verified in the Claude desktop app that the Worktree toggle goes through the `WorktreeCreate` hook.
 - [ ] Verified in the Claude desktop app that the `WorktreeRemove` hook runs when a session is closed, archived, or deleted.
 - [x] `.claude/worktrees/` is ignored in `.gitignore` (optional follow-up from the issue).
-- [x] `git-worktree-creator/SKILL.md` documents the relationship between the hooks and the skill (optional follow-up from the issue).
 - [x] Changes are committed and pushed on `feature/issue915`.
 
 ## Impact
 - `.claude/hooks/worktree-create.sh` (new)
 - `.claude/hooks/worktree-remove.sh` (new)
 - `.claude/settings.json` (new)
-- `.agents/skills/git-worktree-creator/SKILL.md` (a section on the relationship with the hooks was added)
 - `docs/guidelines/branch-rules.md` (reference rules; unchanged)
 - `.gitignore` (`.agents/worktrees/` already ignored; `.claude/worktrees/` added)
 - `docs/spec/issue915/plan.md` (new)
@@ -84,4 +82,6 @@ Make worktree creation and removal follow the project's conventions automaticall
 | Date | Change | Source |
 |------|--------|--------|
 | 2026-11-15 | Initial draft | Body |
-| 2026-11-15 | Resolved the `.gitignore` and `SKILL.md` open questions by implementing both; marked their acceptance criteria as done | User request (plan Tasks 4, 5) |
+| 2026-11-15 | Resolved the `.gitignore` open question by implementing it; marked its acceptance criterion as done | User request (plan Task 4) |
+| 2026-11-15 | Dropped the optional `SKILL.md` follow-up: the hooks live in `.claude/` and only Claude Code triggers them, so the skill needs no description of them | User request |
+| 2026-11-15 | Replaced `rev-parse --path-format=absolute` (git >= 2.31) with `cd` + `pwd -P` so the hooks also work on older git (e.g. 2.23) | Cross-review |

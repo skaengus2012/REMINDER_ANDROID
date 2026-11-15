@@ -73,24 +73,6 @@ Check if the selected branch already exists in the repository:
 
 ---
 
-## 🔗 Relationship with the WorktreeCreate / WorktreeRemove Hooks
-
-The project registers `WorktreeCreate` and `WorktreeRemove` hooks in `.claude/settings.json`
-(`.claude/hooks/worktree-create.sh`, `.claude/hooks/worktree-remove.sh`). They apply the same rules as this skill
-(location, `/` → `_` path conversion, existing-branch handling) whenever the app/CLI creates a worktree on its own,
-but they cannot ask questions, so the interactive choices are replaced by rules:
-
-| Choice | This skill (interactive) | Hook (non-interactive) |
-|--------|--------------------------|------------------------|
-| Prefix / name | Asks the user | Issue-number names (`123`, `#123`, `issue123`) → `feature/issue<N>`; `feature-issue<N>` / `epic-issue<N>` → `feature|epic/issue<N>`; names containing `/` as-is; other names → `worktree-<name>` |
-| Base branch | Asks the user | `WORKTREE_BASE` env var > session branch if `epic/*` > `master` > `main` > `HEAD` |
-| Removal | Not covered | Removes only the worktree directory and keeps the branch |
-
-Use this skill when you need to pick the prefix or base branch yourself (e.g. an epic sub-task from a branch other than the
-session's). The hook additionally copies `local.properties` into the new worktree.
-
----
-
 ## ⚠️ Common Mistakes & Troubleshooting
 
 1. **Parent Directory Missing**: If `.agents/worktrees` does not exist, run `mkdir -p .agents/worktrees` before adding the worktree.
