@@ -51,15 +51,18 @@ Make worktree creation and removal follow the project's conventions automaticall
 - [x] Both hooks are registered in `.claude/settings.json`.
 - [ ] Verified in the Claude desktop app that the Worktree toggle goes through the `WorktreeCreate` hook.
 - [ ] Verified in the Claude desktop app that the `WorktreeRemove` hook runs when a session is closed, archived, or deleted.
-- [ ] Changes are committed.
+- [x] `.claude/worktrees/` is ignored in `.gitignore` (optional follow-up from the issue).
+- [x] `git-worktree-creator/SKILL.md` documents the relationship between the hooks and the skill (optional follow-up from the issue).
+- [x] Changes are committed and pushed on `feature/issue915`.
 
 ## Impact
 - `.claude/hooks/worktree-create.sh` (new)
 - `.claude/hooks/worktree-remove.sh` (new)
 - `.claude/settings.json` (new)
-- `.agents/skills/git-worktree-creator/SKILL.md` (reference rules; unchanged so far)
+- `.agents/skills/git-worktree-creator/SKILL.md` (a section on the relationship with the hooks was added)
 - `docs/guidelines/branch-rules.md` (reference rules; unchanged)
-- `.gitignore` (`.agents/worktrees/` already ignored; `.claude/worktrees/` is only in the local `.git/info/exclude`)
+- `.gitignore` (`.agents/worktrees/` already ignored; `.claude/worktrees/` added)
+- `docs/spec/issue915/plan.md` (new)
 
 ## Open Questions
 - Does the desktop app's Worktree toggle go through the `WorktreeCreate` hook? The Claude Code docs do not list it explicitly; if it does not, the default `.claude/worktrees/` location is used.
@@ -67,8 +70,6 @@ Make worktree creation and removal follow the project's conventions automaticall
 - Should the main checkout be switched back to the parent branch when a worktree is removed? A worktree does not change the main checkout's branch, so this was interpreted as the session returning to its original directory, which the app/CLI handles. It is not implemented in the hook.
 - Is the temporary `worktree-<name>` branch for non-issue names acceptable under `branch-rules.md`, which only lists `master`, `epic/*`, and `feature/*`?
 - Should the base fall back to `origin/master` instead of the local `master`, to avoid branching from a stale local branch? The skill uses the local branch.
-- Should `.claude/worktrees/` be added to `.gitignore` for teammates?
-- Should `SKILL.md` document the relationship between the hooks and the skill, especially the base-branch selection difference?
 - Should a variant that force-removes worktrees at session end regardless of changes (e.g. via `SessionEnd`) be considered? The `WorktreeRemove` hook only runs after the app/CLI decides to remove.
 
 ## Conflicts and Notes
@@ -83,3 +84,4 @@ Make worktree creation and removal follow the project's conventions automaticall
 | Date | Change | Source |
 |------|--------|--------|
 | 2026-11-15 | Initial draft | Body |
+| 2026-11-15 | Resolved the `.gitignore` and `SKILL.md` open questions by implementing both; marked their acceptance criteria as done | User request (plan Tasks 4, 5) |
