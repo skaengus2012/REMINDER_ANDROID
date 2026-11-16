@@ -29,13 +29,16 @@
 
 ## Architecture/Design
 ### 코드 검토로 확인한 문제 (FR-2 / FR-3 체크리스트 초안)
-- [ ] E1 (이슈 본문 확인): Step 2 시작 지점 질문이 선택지 1개일 때 `InputValidationError`, 호출 전체 거부. (`.agents/skills/issue-to-pr/SKILL.md` Step 2)
-- [ ] E2: Step 2는 "항상 단일 `AskUserQuestion` 호출로 묻는다"고 되어 있어 위 규칙(질문 생략)과 충돌한다. 문구 정리 필요.
-- [ ] E3: Step 3/5에서 서브에이전트가 반환한 Open Questions를 "한 번의 `AskUserQuestion` 호출로 묶어" 묻게 되어 있다. 질문이 5개 이상이거나 자연스러운 선택지가 없는 질문이면 제약을 위반한다.
-- [ ] E4: Step 7-2의 `remoteBranch`/`baseBranch` "ask the user"가 선택지 개수 보장 없이 기술되어 있다.
-- [ ] E5: `create-pr` skill Step 2는 부모 브랜치를 결정하지 못하면 후보를 `master` 하나만 두고 `AskUserQuestion`을 호출하게 되어 선택지가 1개가 된다. (`.agents/skills/create-pr/SKILL.md` 68행 부근)
-- [ ] E6: `plan-to-pr.js`의 `validateArgs`는 `a.createPr`를 truthy로 검사하지만 실제 동작은 `args.createPr === true`로 판단한다. 문자열 `"true"` 등이 전달되면 검증은 통과하는데 PR 단계는 건너뛰어 불일치가 생긴다. `testStrategy`/`issue` 타입 검증도 느슨하다.
-- [ ] E7: workflow의 finisher 에이전트는 질문할 수 없으나 `create-pr` skill에는 사용자 확인 지점이 있다. `finishPrompt`가 이를 모두 덮는지(base 브랜치, 원격 브랜치, 커밋 규칙 위반 등) 검토하고 빠진 지점이 있으면 프롬프트에 결정을 추가하거나 `failed` 반환 규칙을 명시한다.
+- [x] E1 (이슈 본문 확인): Step 2 시작 지점 질문이 선택지 1개일 때 `InputValidationError`, 호출 전체 거부. (`.agents/skills/issue-to-pr/SKILL.md` Step 2)
+- [x] E2: Step 2는 "항상 단일 `AskUserQuestion` 호출로 묻는다"고 되어 있어 위 규칙(질문 생략)과 충돌한다. 문구 정리 필요.
+- [x] E3: Step 3/5에서 서브에이전트가 반환한 Open Questions를 "한 번의 `AskUserQuestion` 호출로 묶어" 묻게 되어 있다. 질문이 5개 이상이거나 자연스러운 선택지가 없는 질문이면 제약을 위반한다.
+- [x] E4: Step 7-2의 `remoteBranch`/`baseBranch` "ask the user"가 선택지 개수 보장 없이 기술되어 있다.
+- [x] E5: `create-pr` skill Step 2는 부모 브랜치를 결정하지 못하면 후보를 `master` 하나만 두고 `AskUserQuestion`을 호출하게 되어 선택지가 1개가 된다. (`.agents/skills/create-pr/SKILL.md` 68행 부근)
+- [x] E6: `plan-to-pr.js`의 `validateArgs`는 `a.createPr`를 truthy로 검사하지만 실제 동작은 `args.createPr === true`로 판단한다. 문자열 `"true"` 등이 전달되면 검증은 통과하는데 PR 단계는 건너뛰어 불일치가 생긴다. `testStrategy`/`issue` 타입 검증도 느슨하다.
+- [x] E7: workflow의 finisher 에이전트는 질문할 수 없으나 `create-pr` skill에는 사용자 확인 지점이 있다. `finishPrompt`가 이를 모두 덮는지(base 브랜치, 원격 브랜치, 커밋 규칙 위반 등) 검토하고 빠진 지점이 있으면 프롬프트에 결정을 추가하거나 `failed` 반환 규칙을 명시한다.
+
+E7 감사 결과: `finishPrompt`에 create-pr의 모든 확인 지점(미커밋 변경, 이슈 번호 누락, base/remote 브랜치 미확정, 커밋 규칙 위반, 검증 실패, 라벨)을 명시하고 결정이 없으면 `failed`로 반환하도록 보완함.
+검증 메모: `node`가 없어 `osascript -l JavaScript`로 `plan-to-pr.js` 구문 검사 통과. `Workflow` dryRun은 이 환경에서 실행 불가(미실행). 이슈 본문/댓글은 수정하지 않음.
 
 ### 수정 방향
 1. `issue-to-pr/SKILL.md`에 "Asking the user" 공통 규칙 섹션을 추가한다: 질문당 선택지 2~4개, 호출당 질문 1~4개, 선택지 2개 미만은 질문 생략 + 한 줄 명시, 열린 질문은 자유 입력 채팅 질문(A8).

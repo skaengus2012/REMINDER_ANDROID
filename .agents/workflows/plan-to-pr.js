@@ -23,12 +23,16 @@ const REQUIRED_CONFIG = [
 
 function validateArgs(a) {
   if (!a || typeof a !== 'object') return 'args must be a JSON object'
-  if (!a.issue) return 'args.issue is required'
-  if (!a.startCommit) return 'args.startCommit is required'
+  if (!Number.isInteger(a.issue) || a.issue <= 0) return 'args.issue must be a positive integer'
+  if (typeof a.startCommit !== 'string' || !a.startCommit) return 'args.startCommit must be a non-empty string'
   if (!Number.isInteger(a.rounds) || a.rounds < 0) return 'args.rounds must be an integer >= 0'
   if (a.reviewerModel !== undefined && !['opus', 'sonnet', 'inherit'].includes(a.reviewerModel)) {
     return "args.reviewerModel must be 'opus', 'sonnet' or 'inherit'"
   }
+  if (a.testStrategy !== undefined && !['unit', 'unit+ui'].includes(a.testStrategy)) {
+    return "args.testStrategy must be 'unit' or 'unit+ui'"
+  }
+  if (typeof a.createPr !== 'boolean') return 'args.createPr must be a boolean (true or false)'
   if (!a.config || typeof a.config !== 'object') return 'args.config is required'
   for (const key of REQUIRED_CONFIG) {
     if (!a.config[key]) return `args.config.${key} is required`
@@ -36,7 +40,7 @@ function validateArgs(a) {
   if (a.testStrategy === 'unit+ui' && !a.config.uiQaTool) {
     return 'args.config.uiQaTool is required when testStrategy is unit+ui'
   }
-  if (a.createPr && (!a.baseBranch || !a.remoteBranch)) {
+  if (a.createPr === true && (!a.baseBranch || !a.remoteBranch)) {
     return 'args.baseBranch and args.remoteBranch are required when createPr is true (the workflow cannot ask)'
   }
   return null
@@ -232,7 +236,10 @@ function finishPrompt(state) {
       `Then follow ${cfg.prSkillPath} to open the Draft PR. Decisions are already made, do not ask: base branch is `
         + `"${args.baseBranch}", remote branch is "${args.remoteBranch}". Select the recommended labels without `
         + 'confirmation. Do not rewrite history; if a commit-rule violation or any other blocker appears, return '
-        + 'status "failed" with the reason instead of guessing.',
+        + 'status "failed" with the reason instead of guessing. Every point where the skill would ask the user '
+        + '(uncommitted changes, issue number missing from the branch name, base or remote branch not settled, '
+        + 'commit-rule violations, a failing verification, labels that do not exist) must not be resolved by guessing: '
+        + 'use the decisions given here, otherwise return status "failed" with the reason.',
       state.unresolved.length || state.suggestions.length
         ? 'Add a section "Unresolved review points" to the PR body listing each point with the reviewer finding and '
           + 'the implementer response (implementerResponse) so both positions are visible: '
