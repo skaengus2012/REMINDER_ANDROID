@@ -235,10 +235,11 @@ function finishPrompt(state) {
     ? [
       `Then follow ${cfg.prSkillPath} to open the Draft PR. Decisions are already made, do not ask: base branch is `
         + `"${args.baseBranch}", remote branch is "${args.remoteBranch}". Select the recommended labels without `
-        + 'confirmation. Do not rewrite history; if a commit-rule violation or any other blocker appears, return '
+        + 'confirmation, skipping any recommended label that does not exist in the repository. '
+        + 'Do not rewrite history; if a commit-rule violation or any other blocker appears, return '
         + 'status "failed" with the reason instead of guessing. Every point where the skill would ask the user '
         + '(uncommitted changes, issue number missing from the branch name, base or remote branch not settled, '
-        + 'commit-rule violations, a failing verification, labels that do not exist) must not be resolved by guessing: '
+        + 'commit-rule violations, a failing verification) must not be resolved by guessing: '
         + 'use the decisions given here, otherwise return status "failed" with the reason.',
       state.unresolved.length || state.suggestions.length
         ? 'Add a section "Unresolved review points" to the PR body listing each point with the reviewer finding and '

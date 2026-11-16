@@ -125,7 +125,8 @@ Launch a subagent (`Agent`) with a prompt like:
 > a user decision.
 
 If the subagent reports a critical ambiguity that blocks the report, stop: show the questions to the user, ask for the
-answers (follow "Asking the user": at most 4 questions per call, and plain chat for questions without options), and rerun the subagent with them. Never fill the gap yourself.
+answers (follow "Asking the user": at most 4 questions per call, and plain chat for questions without
+options), and rerun the subagent with them. Never fill the gap yourself.
 
 ## Step 4. Gate 1: Review the Requirements
 
@@ -160,11 +161,13 @@ subagent with the answers.
 ## Step 6. Gate 2: Review the Plan
 
 Same loop as Gate 1 for `plan.md`: show the path, task count, test strategy and open questions; **Approve** /
-**Request changes** (2 options); on changes rerun the plan subagent with the request and ask again until approved. Skip this loop
+**Request changes** (2 options); on changes rerun the plan subagent with the request and ask again until approved.
+Skip this loop
 when the chosen start point is running the workflow with the existing approved plan.
 
 Always read the approved `testStrategy` from the literal `testStrategy:` line in `plan.md`, even when the loop above
-was skipped, and not from memory, so it is also correct when the run started at Gate 2 or at the workflow. If the line is missing or unclear, ask the user which
+was skipped, and not from memory, so it is also correct when the run started at Gate 2 or at the workflow. If the line is missing or unclear, ask the
+user which
 strategy to use; never assume one.
 
 ## Step 7. Prepare and Run the Workflow
@@ -242,6 +245,7 @@ manualUiCheckRequired, calls }`. Report to the user, in Korean:
 1. **Putting a gate inside the workflow**: the workflow cannot ask. Gates stay in this skill.
 2. **Guessing through ambiguity**: stop and report instead of choosing an interpretation.
 3. **Passing a stringified `args`**: pass a real JSON object, otherwise the script receives one string.
-4. **Skipping the pre-start questions** because the answers seem obvious. Always ask.
+4. **Skipping the pre-start questions** because the answers seem obvious. Always ask, except questions with fewer than 2 options: state those in one line
+   instead (see "Asking the user").
 5. **Launching the workflow before the spec documents are committed**: `create-pr` stops on a dirty tree.
 6. **Retrying an aborted workflow silently**: report the failure first.

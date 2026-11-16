@@ -83,3 +83,4 @@ testStrategy: unit
 | Date | Change | Source |
 |------|--------|--------|
 | 2026-11-17 | Initial draft | requirements.md |
+| 2026-11-17 | Mark E1~E7 checklist resolved, add E7 audit result, replace Task 6/8 verification with verification notes | review feedback |
