@@ -87,8 +87,8 @@ desugar-jdk-libs = { module = "com.android.tools:desugar_jdk_libs", version.ref 
 google-hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "googleHilt" }       # use in nlab.android.hilt.gradle.kts
 google-hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "googleHilt" }     # use in nlab.android.hilt.gradle.kts
 flocon = { module = "io.github.openflocon:flocon", version.ref = "flocon" }
-flocon-okhttp = { module = "io.github.openflocon:flocon-okhttp-interceptor", version.ref = "flocon" }
 flocon-network-core = { module = "io.github.openflocon:flocon-network-core", version.ref = "flocon" }
+flocon-okhttp = { module = "io.github.openflocon:flocon-okhttp-interceptor", version.ref = "flocon" }
 google-material = { group = "com.google.android.material", name = "material", version.ref = "googleMaterial" }
 google-play-services-time = { module = "com.google.android.gms:play-services-time", version.ref = "googlePlayServicesTime" }
 javafaker = { module = "com.github.javafaker:javafaker", version.ref = "javafaker" }
