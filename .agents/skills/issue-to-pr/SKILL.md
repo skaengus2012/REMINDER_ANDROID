@@ -63,8 +63,8 @@ the tool reject the whole call and the user sees none of the questions:
 1. Each question has 2 to 4 options.
 2. Each call has 1 to 4 questions. If more questions are pending, split them into several calls.
 3. A question with fewer than 2 options is not asked. Do not pass it to `AskUserQuestion`: state the path taken in
-   one line of chat in Korean (e.g. "시작 지점: 처음부터 (기존 spec 문서 없음)"), continue, and ask only the remaining
-   questions. If no question is left, skip the call.
+   one line of chat in the user's language (e.g. "Start point: from the beginning (no existing spec documents)"),
+   continue, and ask only the remaining questions. If no question is left, skip the call.
 4. An open question without natural options (for example "which branch?") is asked as a plain chat question for a
    free-text answer. Never invent filler options and never guess the answer.
 
@@ -102,7 +102,7 @@ user seems to have answered earlier. Questions that end up with fewer than 2 opt
 
    | Existing files | Options offered |
    |----------------|-----------------|
-   | none | only "From the beginning": 1 option, so do not ask; state "시작 지점: 처음부터 (기존 spec 문서 없음)" |
+   | none | only "From the beginning": 1 option, so do not ask; state "Start point: from the beginning (no existing spec documents)" |
    | `requirements.md` only | From the beginning, Review the existing requirements |
    | `plan.md` only | From the beginning, Review the existing plan, Run the workflow |
    | both | all four |
