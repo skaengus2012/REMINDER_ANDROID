@@ -5,8 +5,8 @@ description: >-
   requirements analysis, human review gate 1, plan creation, human review gate 2, then a dynamic workflow
   (`plan-to-pr`) that implements the plan with TDD, self-tests, runs a bounded review discussion with a separate
   reviewer, verifies, and opens a Draft PR. Use this skill whenever the user wants to take a GitHub issue all the way
-  to a pull request, start working on an issue end to end, or says things like "이슈 처음부터 PR까지 진행해줘" /
-  "이슈 886 시작해줘", even if they do not mention 'issue-to-pr'.
+  to a pull request, start working on an issue end to end, or says things like "take this issue all the way to a PR" /
+  "start issue 886", even if they do not mention 'issue-to-pr'.
 ---
 
 # Issue to PR Skill

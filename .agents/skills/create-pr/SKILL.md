@@ -5,7 +5,7 @@ description: >-
   Validates the branch/commit conventions, picks the correct base branch (master or epic), runs tests for the
   changed modules, drafts the title and body from the linked GitHub issue and commit log, then pushes and opens
   a Draft PR with `gh`. Use this skill whenever the user asks to create, open, or submit a pull request, push
-  the work for review, or says things like "PR 올려줘" / "PR 만들어줘", even if they do not mention 'create-pr'.
+  the work for review, or says things like "open a PR" / "create a PR", even if they do not mention 'create-pr'.
 ---
 
 # Create PR Skill
