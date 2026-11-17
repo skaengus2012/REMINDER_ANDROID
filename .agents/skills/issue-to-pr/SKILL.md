@@ -55,6 +55,19 @@ The rest of this document refers to these values by name.
   `~` to the absolute home directory first, since a tool may not resolve it.
 - Pass paths, not pasted document contents.
 
+## Asking the user
+
+Every `AskUserQuestion` call in this skill (and in `<prSkillPath>`) must obey these rules, because a violation makes
+the tool reject the whole call and the user sees none of the questions:
+
+1. Each question has 2 to 4 options.
+2. Each call has 1 to 4 questions. If more questions are pending, split them into several calls.
+3. A question with fewer than 2 options is not asked. Do not pass it to `AskUserQuestion`: state the path taken in
+   one line of chat in the user's language (e.g. "Start point: from the beginning (no existing spec documents)"),
+   continue, and ask only the remaining questions. If no question is left, skip the call.
+4. An open question without natural options (for example "which branch?") is asked as a plain chat question for a
+   free-text answer. Never invent filler options and never guess the answer.
+
 ---
 
 ## Step 1. Identify the Issue and the Working Branch
@@ -68,28 +81,37 @@ it is `feature/issue<N>` or `epic/issue<N>` for this issue, or a worktree branch
 is settled later in Step 7-2.
 
 Otherwise (for example `master`, `develop`, or another issue's branch), stop before anything is written or committed
-and ask with `AskUserQuestion`:
+and ask with `AskUserQuestion` (see "Asking the user"):
 - **Create `feature/issue<N>` from the current branch** (Recommended when the current branch is the intended parent)
-- **Switch to an existing branch** (ask which one)
+- **Switch to an existing branch** (afterwards ask which one as a plain chat question)
 - **Continue on the current branch anyway** (the user accepts that commits land there)
 
 Never commit the spec documents or the implementation to `master` or `develop` unless the user chose to continue.
 
 ## Step 2. Ask Before Starting
 
-Always ask, in a single `AskUserQuestion` call, even if the user seems to have answered earlier:
+Build the question list first, then ask it in a single `AskUserQuestion` call (see "Asking the user"), even if the
+user seems to have answered earlier. Questions that end up with fewer than 2 options are removed from the list.
 
-1. **Start point** (`AskUserQuestion` allows at most 4 options): check which of `<specDir>/requirements.md` and
-   `<specDir>/plan.md` exist and offer only the points that apply:
+1. **Start point**: check which of `<specDir>/requirements.md` and `<specDir>/plan.md` exist and offer only the
+   points that apply:
    - From the beginning (requirements analysis)
    - Review the existing requirements (Gate 1); the plan is created or updated after approval
    - Review the existing plan (Gate 2)
    - Run the workflow with the existing approved plan
+
+   | Existing files | Options offered |
+   |----------------|-----------------|
+   | none | only "From the beginning": 1 option, so do not ask; state "Start point: from the beginning (no existing spec documents)" |
+   | `requirements.md` only | From the beginning, Review the existing requirements |
+   | `plan.md` only | From the beginning, Review the existing plan, Run the workflow |
+   | both | all four |
 2. **Max code-review discussion rounds**: `1`, `2` (default, Recommended), `3`.
 3. **Create the Draft PR**: yes / no. If no, the workflow stops after final verification, leaving local commits only.
 4. **Reviewer model**: `opus` (default, Recommended), `sonnet`, or the session default (`inherit`).
 
-Keep the answers; they are passed to the workflow in Step 7.
+Questions 2 to 4 always have at least 2 options, so the call always has 3 or 4 questions. Keep the answers (and the
+start point that was stated instead of asked); they are passed to the workflow in Step 7.
 
 ## Step 3. Requirements Analysis
 
@@ -103,13 +125,14 @@ Launch a subagent (`Agent`) with a prompt like:
 > a user decision.
 
 If the subagent reports a critical ambiguity that blocks the report, stop: show the questions to the user, ask for the
-answers, and rerun the subagent with them. Never fill the gap yourself.
+answers (follow "Asking the user": at most 4 questions per call, and plain chat for questions without
+options), and rerun the subagent with them. Never fill the gap yourself.
 
 ## Step 4. Gate 1: Review the Requirements
 
 Skip when the chosen start point is later than this step (reviewing the existing plan, or running the workflow).
 
-Show the user the path, the FR/NFR counts and the Open Questions, then ask with `AskUserQuestion`:
+Show the user the path, the FR/NFR counts and the Open Questions, then ask with `AskUserQuestion` (2 options):
 **Approve** / **Request changes**.
 
 - **Request changes**: collect the change request, launch the same subagent again with the request (update in place,
@@ -131,16 +154,20 @@ Launch a subagent with a prompt like:
 > exists). Write `<specDir>/plan.md`. Reply with: the file path, the task count, the `testStrategy` value, and the
 > questions that need a user decision.
 
-If questions come back, ask the user (one `AskUserQuestion` call, grouped), then rerun the subagent with the answers.
+If questions come back, ask the user following "Asking the user": group them into `AskUserQuestion` calls of at most
+4 questions each, only for questions with 2 to 4 options; ask the others as plain chat questions. Then rerun the
+subagent with the answers.
 
 ## Step 6. Gate 2: Review the Plan
 
 Same loop as Gate 1 for `plan.md`: show the path, task count, test strategy and open questions; **Approve** /
-**Request changes**; on changes rerun the plan subagent with the request and ask again until approved. Skip this loop
+**Request changes** (2 options); on changes rerun the plan subagent with the request and ask again until approved.
+Skip this loop
 when the chosen start point is running the workflow with the existing approved plan.
 
 Always read the approved `testStrategy` from the literal `testStrategy:` line in `plan.md`, even when the loop above
-was skipped, and not from memory, so it is also correct when the run started at Gate 2 or at the workflow. If the line is missing or unclear, ask the user which
+was skipped, and not from memory, so it is also correct when the run started at Gate 2 or at the workflow. If the line is missing or unclear, ask the
+user which
 strategy to use; never assume one.
 
 ## Step 7. Prepare and Run the Workflow
@@ -158,9 +185,11 @@ the way, or discard are the user's call); do not start the workflow until the tr
 The workflow cannot ask questions, but `<prSkillPath>` asks about the base branch and the remote branch name. Decide
 both now, using its Step 1 and Step 2 rules (read it):
 
-- `remoteBranch`: the current branch if it matches `feature/issue<N>` / `epic/issue<N>`, otherwise ask the user
-  (recommend `feature/issue<N>`).
-- `baseBranch`: the parent branch when it is `master`, `develop` or `epic/*`; otherwise ask the user.
+- `remoteBranch`: the current branch if it matches `feature/issue<N>` / `epic/issue<N>`, otherwise ask the user as a
+  plain chat question (recommend `feature/issue<N>`); there is no natural second option.
+- `baseBranch`: the parent branch when it is `master`, `develop` or `epic/*`. Otherwise ask with `AskUserQuestion`
+  using the candidates from `<prSkillPath>` Step 2 with duplicates removed; if only `master` remains, do not ask:
+  use `master` and state it.
 
 State both in one line before continuing. If the user chose not to create the PR, pass `null` for both.
 
@@ -216,6 +245,7 @@ manualUiCheckRequired, calls }`. Report to the user, in Korean:
 1. **Putting a gate inside the workflow**: the workflow cannot ask. Gates stay in this skill.
 2. **Guessing through ambiguity**: stop and report instead of choosing an interpretation.
 3. **Passing a stringified `args`**: pass a real JSON object, otherwise the script receives one string.
-4. **Skipping the pre-start questions** because the answers seem obvious. Always ask.
+4. **Skipping the pre-start questions** because the answers seem obvious. Always ask, except questions with fewer than 2 options: state those in one line
+   instead (see "Asking the user").
 5. **Launching the workflow before the spec documents are committed**: `create-pr` stops on a dirty tree.
 6. **Retrying an aborted workflow silently**: report the failure first.
