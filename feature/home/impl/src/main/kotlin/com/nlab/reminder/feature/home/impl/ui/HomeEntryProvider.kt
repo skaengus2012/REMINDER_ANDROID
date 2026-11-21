@@ -25,15 +25,15 @@ import com.nlab.reminder.feature.home.api.navigation.HomeNavKey
 /**
  * @author Thalys
  */
-fun EntryProviderScope<NavKey>.homeEntry(
-    navigator: Navigator,
-    onTodayCategoryClicked: () -> Unit,
-    onTimetableCategoryClicked: () -> Unit,
-) {
+fun EntryProviderScope<NavKey>.homeEntry(navigator: Navigator) {
     entry<HomeNavKey> {
         HomeScreen(
-            onTodayCategoryClicked = onTodayCategoryClicked,
-            onTimetableCategoryClicked = onTimetableCategoryClicked,
+            onTodayCategoryClicked = {
+                // TODO navigate with navigator when the destination NavKey is implemented
+            },
+            onTimetableCategoryClicked = {
+                // TODO navigate with navigator when the destination NavKey is implemented
+            },
             onAllCategoryClicked = { navigator.navigateToAll() }
         )
     }

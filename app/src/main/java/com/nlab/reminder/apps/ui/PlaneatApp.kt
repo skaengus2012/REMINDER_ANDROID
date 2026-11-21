@@ -36,15 +36,7 @@ import com.nlab.reminder.feature.home.impl.ui.homeEntry
 fun PlaneatApp(appState: PlaneatAppState) {
     val navigator = remember(appState.backStack) { Navigator(appState.backStack) }
     val entryProvider = entryProvider {
-        homeEntry(
-            navigator = navigator,
-            onTodayCategoryClicked = {
-                // TODO implement
-            },
-            onTimetableCategoryClicked = {
-                // TODO implement
-            }
-        )
+        homeEntry(navigator = navigator)
         allEntry(
             navigator = navigator,
             enterTransitionTimeInMillis = HOME_TRANSITION_DURATION,
