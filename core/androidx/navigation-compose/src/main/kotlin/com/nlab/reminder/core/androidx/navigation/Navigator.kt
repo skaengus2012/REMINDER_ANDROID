@@ -21,16 +21,16 @@ import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 
 /**
- * Owns the [backStack] and handles navigation events on it with [navigate] and [goBack].
- * [backStack] is exposed for rendering, so only hand over a [Navigator] to features, and move through [navigate] and
- * [goBack] to keep the rules (no duplicated key, never empty).
+ * Handles navigation events on the [backStack] with [navigate] and [goBack].
+ * The [backStack] is kept private, so features that only receive a [Navigator] cannot bypass its rules
+ * (no duplicated key, never empty). Whoever renders the back stack holds it separately and passes it here.
  * Create the back stack with `rememberNavBackStack` and keep this with `remember`, so that the back stack is restored
  * across configuration changes and process death.
  *
  * @author Thalys
  */
 @Stable
-class Navigator(val backStack: NavBackStack<NavKey>) {
+class Navigator(private val backStack: NavBackStack<NavKey>) {
     /**
      * Moves [key] to the top of the back stack. If the key is already in the stack, it is moved instead of duplicated.
      * This applies to the start key too, so navigating to it does not clear the stack.

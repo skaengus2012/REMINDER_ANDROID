@@ -20,7 +20,6 @@ import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.nullValue
-import org.hamcrest.CoreMatchers.sameInstance
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
 
@@ -37,13 +36,6 @@ private fun genNavigator(): Pair<NavBackStack<NavKey>, Navigator> {
  * @author Thalys
  */
 class NavigatorTest {
-    @Test
-    fun `Given back stack, When create navigator, Then it exposes the same back stack`() {
-        val (backStack, navigator) = genNavigator()
-
-        assertThat(navigator.backStack, sameInstance(backStack))
-    }
-
     @Test
     fun `Given initial stack, When navigate to key, Then key is added to the top`() {
         val (backStack, navigator) = genNavigator()

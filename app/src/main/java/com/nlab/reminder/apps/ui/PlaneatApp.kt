@@ -50,7 +50,7 @@ fun PlaneatApp(appState: PlaneatAppState) {
     }
     NavDisplay(
         modifier = Modifier.fillMaxSize(),
-        backStack = navigator.backStack,
+        backStack = appState.backStack,
         entryDecorators = listOf(
             rememberSaveableStateHolderNavEntryDecorator(),
             rememberViewModelStoreNavEntryDecorator(),
