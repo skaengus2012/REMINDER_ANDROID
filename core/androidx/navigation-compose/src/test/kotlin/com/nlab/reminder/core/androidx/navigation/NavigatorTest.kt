@@ -27,15 +27,15 @@ private object StartKey : NavKey
 private object SecondKey : NavKey
 private object ThirdKey : NavKey
 
+private fun genNavigator(): Pair<NavBackStack<NavKey>, Navigator> {
+    val backStack = NavBackStack<NavKey>(StartKey)
+    return backStack to Navigator(backStack)
+}
+
 /**
  * @author Thalys
  */
 class NavigatorTest {
-    private fun genNavigator(): Pair<NavBackStack<NavKey>, Navigator> {
-        val backStack = NavBackStack<NavKey>(StartKey)
-        return backStack to Navigator(backStack)
-    }
-
     @Test
     fun `Given initial stack, When navigate to key, Then key is added to the top`() {
         val (backStack, navigator) = genNavigator()
