@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.feature.all.impl.navigation
+package com.nlab.reminder.feature.all.impl.ui
 
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import com.nlab.reminder.core.androidx.navigation.compose.Navigator
 import com.nlab.reminder.feature.all.api.navigation.AllNavKey
-import com.nlab.reminder.feature.all.impl.ui.AllScreen
 
 /**
  * @param metadata [androidx.navigation3.runtime.NavEntry] metadata, such as `NavDisplay.transitionSpec`.

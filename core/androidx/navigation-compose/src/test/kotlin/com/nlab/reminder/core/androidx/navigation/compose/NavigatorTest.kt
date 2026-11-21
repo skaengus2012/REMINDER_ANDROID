@@ -20,7 +20,6 @@ import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
-import org.junit.Assert.assertThrows
 import org.junit.Test
 
 private object StartKey : NavKey
@@ -31,91 +30,90 @@ private object ThirdKey : NavKey
  * @author Thalys
  */
 class NavigatorTest {
-    private fun genNavigator(): Pair<NavigationState, Navigator> {
-        val state = NavigationState(startKey = StartKey, backStack = NavBackStack<NavKey>(StartKey))
-        return state to Navigator(state)
+    private fun genNavigator(): Pair<NavBackStack<NavKey>, Navigator> {
+        val backStack = NavBackStack<NavKey>(StartKey)
+        return backStack to Navigator(backStack)
     }
 
     @Test
-    fun `Given initial state, When read keys, Then current key is start key`() {
-        val (state, _) = genNavigator()
-
-        assertThat(state.startKey, equalTo(StartKey))
-        assertThat(state.currentKey, equalTo(StartKey))
-    }
-
-    @Test
-    fun `Given initial state, When navigate to key, Then key is added to the top`() {
-        val (state, navigator) = genNavigator()
+    fun `Given initial stack, When navigate to key, Then key is added to the top`() {
+        val (backStack, navigator) = genNavigator()
 
         navigator.navigate(SecondKey)
 
-        assertThat(state.backStack.toList(), equalTo(listOf<NavKey>(StartKey, SecondKey)))
-        assertThat(state.currentKey, equalTo(SecondKey))
+        assertThat(backStack.toList(), equalTo(listOf<NavKey>(StartKey, SecondKey)))
     }
 
     @Test
     fun `Given key on top, When navigate to same key, Then stack has no duplicate`() {
-        val (state, navigator) = genNavigator()
+        val (backStack, navigator) = genNavigator()
         navigator.navigate(SecondKey)
 
         navigator.navigate(SecondKey)
 
-        assertThat(state.backStack.toList(), equalTo(listOf<NavKey>(StartKey, SecondKey)))
+        assertThat(backStack.toList(), equalTo(listOf<NavKey>(StartKey, SecondKey)))
     }
 
     @Test
     fun `Given key in the middle, When navigate to it again, Then it moves to the top`() {
-        val (state, navigator) = genNavigator()
+        val (backStack, navigator) = genNavigator()
         navigator.navigate(SecondKey)
         navigator.navigate(ThirdKey)
 
         navigator.navigate(SecondKey)
 
-        assertThat(state.backStack.toList(), equalTo(listOf<NavKey>(StartKey, ThirdKey, SecondKey)))
-        assertThat(state.currentKey, equalTo(SecondKey))
+        assertThat(backStack.toList(), equalTo(listOf<NavKey>(StartKey, ThirdKey, SecondKey)))
     }
 
     @Test
-    fun `Given multiple keys, When navigate to start key, Then stack is cleared to start key`() {
-        val (state, navigator) = genNavigator()
+    fun `Given multiple keys, When navigate to start key, Then start key moves to the top`() {
+        val (backStack, navigator) = genNavigator()
         navigator.navigate(SecondKey)
-        navigator.navigate(ThirdKey)
 
         navigator.navigate(StartKey)
 
-        assertThat(state.backStack.toList(), equalTo(listOf<NavKey>(StartKey)))
-        assertThat(state.currentKey, equalTo(StartKey))
+        assertThat(backStack.toList(), equalTo(listOf<NavKey>(SecondKey, StartKey)))
     }
 
     @Test
-    fun `Given two keys, When go back once, Then stack has only start key`() {
-        val (state, navigator) = genNavigator()
+    fun `Given start key moved to the top, When go back, Then previous key becomes the only key`() {
+        val (backStack, navigator) = genNavigator()
         navigator.navigate(SecondKey)
+        navigator.navigate(StartKey)
 
         navigator.goBack()
 
-        assertThat(state.backStack.toList(), equalTo(listOf<NavKey>(StartKey)))
-        assertThat(state.currentKey, equalTo(StartKey))
+        assertThat(backStack.toList(), equalTo(listOf<NavKey>(SecondKey)))
+    }
+
+    @Test
+    fun `Given only start key, When navigate to start key, Then stack remains start key`() {
+        val (backStack, navigator) = genNavigator()
+
+        navigator.navigate(StartKey)
+
+        assertThat(backStack.toList(), equalTo(listOf<NavKey>(StartKey)))
     }
 
     @Test
     fun `Given three keys, When go back twice, Then stack has only start key`() {
-        val (state, navigator) = genNavigator()
+        val (backStack, navigator) = genNavigator()
         navigator.navigate(SecondKey)
         navigator.navigate(ThirdKey)
 
         navigator.goBack()
-        assertThat(state.currentKey, equalTo(SecondKey))
+        assertThat(backStack.last(), equalTo(SecondKey))
         navigator.goBack()
 
-        assertThat(state.backStack.toList(), equalTo(listOf<NavKey>(StartKey)))
+        assertThat(backStack.toList(), equalTo(listOf<NavKey>(StartKey)))
     }
 
     @Test
-    fun `Given only start key, When go back, Then throw IllegalStateException`() {
-        val (_, navigator) = genNavigator()
+    fun `Given only start key, When go back, Then stack remains start key`() {
+        val (backStack, navigator) = genNavigator()
 
-        assertThrows(IllegalStateException::class.java) { navigator.goBack() }
+        navigator.goBack()
+
+        assertThat(backStack.toList(), equalTo(listOf<NavKey>(StartKey)))
     }
 }
