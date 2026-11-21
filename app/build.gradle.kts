@@ -75,8 +75,9 @@ dependencies {
     implementation(projects.core.translation)
     implementation(projects.statekit.foundation)
 
-    implementation(projects.feature.all)
-    implementation(projects.feature.home)
+    implementation(projects.feature.all.impl)
+    implementation(projects.feature.home.impl)
+    implementation(projects.feature.home.api)
 
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.appcompat)
@@ -85,7 +86,6 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
-    implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.startup.runtime)
     implementation(libs.coil.kt)
     implementation(libs.google.material)
