@@ -37,9 +37,8 @@ import com.nlab.reminder.core.androidx.navigation.compose.EnterTransitionFactory
 import com.nlab.reminder.core.androidx.navigation.compose.ExitTransitionFactory
 import com.nlab.reminder.core.androidx.navigation.compose.Navigator
 import com.nlab.reminder.core.androidx.navigation.compose.toEntries
-import com.nlab.reminder.feature.all.navigation.allEntry
-import com.nlab.reminder.feature.all.navigation.navigateToAll
-import com.nlab.reminder.feature.home.navigation.homeEntry
+import com.nlab.reminder.feature.all.impl.navigation.allEntry
+import com.nlab.reminder.feature.home.impl.navigation.homeEntry
 
 /**
  * @author Thalys
@@ -53,23 +52,23 @@ fun PlaneatNavHost(
     val navigator = remember(navigationState) { Navigator(navigationState) }
     val entryProvider = entryProvider {
         homeEntry(
+            navigator = navigator,
             onTodayCategoryClicked = {
                 // TODO implement
             },
             onTimetableCategoryClicked = {
                 // TODO implement
-            },
-            onAllCategoryClicked = { navigator.navigateToAll() }
+            }
         )
         allEntry(
+            navigator = navigator,
             enterTransitionTimeInMillis = HOME_TRANSITION_DURATION,
             // The transition between Home and All is decided by the metadata of All, because Navigation 3 uses
             // the metadata of the entry that is pushed (or popped) for both of the entries involved.
             metadata = NavDisplay.transitionSpec { homeToAllTransform() } +
                     NavDisplay.popTransitionSpec { allToHomeTransform() } +
                     NavDisplay.predictivePopTransitionSpec { allToHomeTransform() },
-            showAppToast = { appState.showApplicationToast(it) },
-            onBackClicked = { navigator.goBack() }
+            showAppToast = { appState.showApplicationToast(it) }
         )
     }
     NavDisplay(

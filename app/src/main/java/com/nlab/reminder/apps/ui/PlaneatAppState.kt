@@ -24,7 +24,7 @@ import com.nlab.reminder.core.android.widget.Toast
 import com.nlab.reminder.core.androidx.navigation.compose.NavigationState
 import com.nlab.reminder.core.androidx.navigation.compose.rememberNavigationState
 import com.nlab.reminder.core.data.util.TimeZoneMonitor
-import com.nlab.reminder.feature.home.navigation.HomeNavKey
+import com.nlab.reminder.feature.home.api.navigation.HomeNavKey
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow

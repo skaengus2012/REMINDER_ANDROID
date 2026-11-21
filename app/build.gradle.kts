@@ -75,8 +75,10 @@ dependencies {
     implementation(projects.core.translation)
     implementation(projects.statekit.foundation)
 
-    implementation(projects.feature.all)
-    implementation(projects.feature.home)
+    implementation(projects.feature.all.impl)
+    implementation(projects.feature.all.api)
+    implementation(projects.feature.home.impl)
+    implementation(projects.feature.home.api)
 
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.appcompat)
