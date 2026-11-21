@@ -20,10 +20,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.nlab.reminder.core.android.widget.Toast
+import com.nlab.reminder.core.androidx.navigation.compose.NavigationState
+import com.nlab.reminder.core.androidx.navigation.compose.rememberNavigationState
 import com.nlab.reminder.core.data.util.TimeZoneMonitor
+import com.nlab.reminder.feature.home.navigation.HomeNavKey
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -37,7 +38,7 @@ import kotlinx.datetime.TimeZone
 class PlaneatAppState(
     coroutineScope: CoroutineScope,
     timeZoneMonitor: TimeZoneMonitor,
-    val navController: NavHostController,
+    val navigationState: NavigationState,
     private val appToast: Toast,
 ) {
     val currentTimeZone: StateFlow<TimeZone> = timeZoneMonitor
@@ -58,17 +59,17 @@ fun rememberPlaneatAppState(
     timeZoneMonitor: TimeZoneMonitor,
     appToast: Toast,
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
-    navController: NavHostController = rememberNavController(),
+    navigationState: NavigationState = rememberNavigationState(startKey = HomeNavKey),
 ): PlaneatAppState = remember(
     timeZoneMonitor,
     appToast,
     coroutineScope,
-    navController
+    navigationState
 ) {
     PlaneatAppState(
         timeZoneMonitor = timeZoneMonitor,
         appToast = appToast,
         coroutineScope = coroutineScope,
-        navController = navController,
+        navigationState = navigationState,
     )
 }

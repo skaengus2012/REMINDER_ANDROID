@@ -27,6 +27,6 @@ apply(plugin = "nlab.android.library.statekit")
 configureStdFeatureDependencies()
 
 dependencies {
-    "implementation"(libs.findLibrary("androidx-hilt-navigation-compose").get())
+    "implementation"(libs.findLibrary("androidx-hilt-lifecycle-viewmodel-compose").get())
     "implementation"(libs.findLibrary("androidx-lifecycle-runtime-compose").get())
 }

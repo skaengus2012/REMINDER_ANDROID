@@ -19,12 +19,12 @@ package com.nlab.reminder.core.androidx.navigation.compose
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
-import androidx.navigation.NavBackStackEntry
+import androidx.navigation3.scene.Scene
 
 /**
  * @author Thalys
  */
 typealias EnterTransitionFactory =
-        AnimatedContentTransitionScope<NavBackStackEntry>.() -> @JvmSuppressWildcards EnterTransition?
+        AnimatedContentTransitionScope<Scene<*>>.() -> @JvmSuppressWildcards EnterTransition?
 typealias ExitTransitionFactory =
-        AnimatedContentTransitionScope<NavBackStackEntry>.() -> @JvmSuppressWildcards ExitTransition?
+        AnimatedContentTransitionScope<Scene<*>>.() -> @JvmSuppressWildcards ExitTransition?

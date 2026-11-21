@@ -17,6 +17,7 @@
 package com.nlab.reminder.apps.ui
 
 import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.ContentTransform
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.EaseIn
@@ -25,16 +26,20 @@ import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.navigation.compose.NavHost
+import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.scene.Scene
+import androidx.navigation3.ui.NavDisplay
 import com.nlab.reminder.core.androidx.navigation.compose.EnterTransitionFactory
 import com.nlab.reminder.core.androidx.navigation.compose.ExitTransitionFactory
-import com.nlab.reminder.feature.home.navigation.HomeEntryPointRoute
-import com.nlab.reminder.feature.home.navigation.homeEntryPoint
-import com.nlab.reminder.feature.home.navigation.homeScreen
-import com.nlab.reminder.feature.all.navigation.allScreen
+import com.nlab.reminder.core.androidx.navigation.compose.Navigator
+import com.nlab.reminder.core.androidx.navigation.compose.toEntries
+import com.nlab.reminder.feature.all.navigation.allEntry
 import com.nlab.reminder.feature.all.navigation.navigateToAll
+import com.nlab.reminder.feature.home.navigation.homeEntry
 
 /**
  * @author Thalys
@@ -44,45 +49,37 @@ fun PlaneatNavHost(
     appState: PlaneatAppState,
     modifier: Modifier = Modifier
 ) {
-    val navController = appState.navController
-    NavHost(
-        navController = navController,
-        startDestination = HomeEntryPointRoute,
-        modifier = modifier,
-        enterTransition = { EnterTransition.None },
-        exitTransition = { ExitTransition.None },
-        popEnterTransition = { EnterTransition.None },
-        popExitTransition = { ExitTransition.None },
-        predictivePopEnterTransition = {
-            // TODO If screen-specific transitions are needed in the future, handle branching based on targetState/initialState.
-            homePopEnterTransitionFactory() ?: EnterTransition.None
-        },
-        predictivePopExitTransition = {
-            // TODO If screen-specific transitions are needed in the future, handle branching based on initialState/targetState.
-            fromHomePopExitTransitionFactory() ?: ExitTransition.None
-        }
-    ) {
-        homeEntryPoint {
-            homeScreen(
-                provideExitTransition = homeExitTransitionFactory,
-                providePopEnterTransition = homePopEnterTransitionFactory,
-                onTodayCategoryClicked = {
-                    // TODO implement
-                },
-                onTimetableCategoryClicked = {
-                    // TODO implement
-                },
-                onAllCategoryClicked = { navController.navigateToAll() }
-            )
-            allScreen(
-                enterTransitionTimeInMillis = HOME_TRANSITION_DURATION,
-                provideEnterTransition = fromHomeEnterTransitionFactory,
-                providePopExitTransition = fromHomePopExitTransitionFactory,
-                showAppToast = { appState.showApplicationToast(it) },
-                onBackClicked = { navController.popBackStack() }
-            )
-        }
+    val navigationState = appState.navigationState
+    val navigator = remember(navigationState) { Navigator(navigationState) }
+    val entryProvider = entryProvider {
+        homeEntry(
+            onTodayCategoryClicked = {
+                // TODO implement
+            },
+            onTimetableCategoryClicked = {
+                // TODO implement
+            },
+            onAllCategoryClicked = { navigator.navigateToAll() }
+        )
+        allEntry(
+            enterTransitionTimeInMillis = HOME_TRANSITION_DURATION,
+            // The transition between Home and All is decided by the metadata of All, because Navigation 3 uses
+            // the metadata of the entry that is pushed (or popped) for both of the entries involved.
+            metadata = NavDisplay.transitionSpec { homeToAllTransform() } +
+                    NavDisplay.popTransitionSpec { allToHomeTransform() } +
+                    NavDisplay.predictivePopTransitionSpec { allToHomeTransform() },
+            showAppToast = { appState.showApplicationToast(it) },
+            onBackClicked = { navigator.goBack() }
+        )
     }
+    NavDisplay(
+        entries = navigationState.toEntries(entryProvider),
+        modifier = modifier,
+        onBack = { navigator.goBack() },
+        transitionSpec = { noneTransform() },
+        popTransitionSpec = { noneTransform() },
+        predictivePopTransitionSpec = { noneTransform() }
+    )
 }
 
 private const val HOME_TRANSITION_DURATION = 300
@@ -116,3 +113,13 @@ private val fromHomePopExitTransitionFactory: ExitTransitionFactory = {
         towards = AnimatedContentTransitionScope.SlideDirection.End
     )
 }
+
+private fun noneTransform(): ContentTransform = EnterTransition.None togetherWith ExitTransition.None
+
+private fun AnimatedContentTransitionScope<Scene<*>>.homeToAllTransform(): ContentTransform =
+    (fromHomeEnterTransitionFactory() ?: EnterTransition.None) togetherWith
+            (homeExitTransitionFactory() ?: ExitTransition.None)
+
+private fun AnimatedContentTransitionScope<Scene<*>>.allToHomeTransform(): ContentTransform =
+    (homePopEnterTransitionFactory() ?: EnterTransition.None) togetherWith
+            (fromHomePopExitTransitionFactory() ?: ExitTransition.None)

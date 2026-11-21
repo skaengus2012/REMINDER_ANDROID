@@ -16,35 +16,22 @@
 
 package com.nlab.reminder.feature.all.navigation
 
-import androidx.navigation.NavController
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavOptionsBuilder
-import androidx.navigation.compose.composable
-import com.nlab.reminder.core.androidx.navigation.compose.EnterTransitionFactory
-import com.nlab.reminder.core.androidx.navigation.compose.ExitTransitionFactory
+import androidx.navigation3.runtime.EntryProviderScope
+import androidx.navigation3.runtime.NavKey
 import com.nlab.reminder.feature.all.ui.AllScreen
-import kotlinx.serialization.Serializable
 
 /**
+ * @param metadata [androidx.navigation3.runtime.NavEntry] metadata, such as `NavDisplay.transitionSpec`.
+ *
  * @author Doohyun
  */
-@Serializable
-internal data object AllRoute
-
-fun NavController.navigateToAll(navOptions: NavOptionsBuilder.() -> Unit = {}) =
-    navigate(route = AllRoute, builder = navOptions)
-
-fun NavGraphBuilder.allScreen(
+fun EntryProviderScope<NavKey>.allEntry(
     enterTransitionTimeInMillis: Int,
-    provideEnterTransition: EnterTransitionFactory? = null,
-    providePopExitTransition: ExitTransitionFactory? = null,
+    metadata: Map<String, Any> = emptyMap(),
     onBackClicked: () -> Unit,
     showAppToast: (String) -> Unit,
 ) {
-    composable<AllRoute>(
-        enterTransition = provideEnterTransition,
-        popExitTransition = providePopExitTransition
-    ) {
+    entry<AllNavKey>(metadata = metadata) {
         AllScreen(
             enterTransitionTimeInMillis = enterTransitionTimeInMillis.toLong(),
             onBackClicked = onBackClicked,

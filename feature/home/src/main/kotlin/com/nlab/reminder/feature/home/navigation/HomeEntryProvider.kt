@@ -16,38 +16,19 @@
 
 package com.nlab.reminder.feature.home.navigation
 
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.compose.composable
-import androidx.navigation.navigation
-import com.nlab.reminder.core.androidx.navigation.compose.EnterTransitionFactory
-import com.nlab.reminder.core.androidx.navigation.compose.ExitTransitionFactory
+import androidx.navigation3.runtime.EntryProviderScope
+import androidx.navigation3.runtime.NavKey
 import com.nlab.reminder.feature.home.ui.HomeScreen
-import kotlinx.serialization.Serializable
 
 /**
  * @author Thalys
  */
-@Serializable
-internal data object HomeRoute
-
-@Serializable
-data object HomeEntryPointRoute
-
-fun NavGraphBuilder.homeEntryPoint(builder: NavGraphBuilder.() -> Unit) {
-    navigation<HomeEntryPointRoute>(startDestination = HomeRoute, builder = builder)
-}
-
-fun NavGraphBuilder.homeScreen(
+fun EntryProviderScope<NavKey>.homeEntry(
     onTodayCategoryClicked: () -> Unit,
     onTimetableCategoryClicked: () -> Unit,
     onAllCategoryClicked: () -> Unit,
-    provideExitTransition: ExitTransitionFactory? = null,
-    providePopEnterTransition: EnterTransitionFactory? = null
 ) {
-    composable<HomeRoute>(
-        exitTransition = provideExitTransition,
-        popEnterTransition = providePopEnterTransition
-    ) {
+    entry<HomeNavKey> {
         HomeScreen(
             onTodayCategoryClicked = onTodayCategoryClicked,
             onTimetableCategoryClicked = onTimetableCategoryClicked,
@@ -55,4 +36,3 @@ fun NavGraphBuilder.homeScreen(
         )
     }
 }
-
