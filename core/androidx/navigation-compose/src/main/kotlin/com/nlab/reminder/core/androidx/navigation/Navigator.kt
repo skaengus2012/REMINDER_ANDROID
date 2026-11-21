@@ -43,11 +43,7 @@ class Navigator(val backStack: NavBackStack<NavKey>) {
     /**
      * Pops the top key. The last remaining key is kept, so back events on the start key are ignored safely.
      *
-     * @return `true` if the top key was popped, `false` if it was ignored because only one key remained.
+     * @return the popped key, or `null` if it was ignored because only one key remained.
      */
-    fun goBack(): Boolean {
-        if (backStack.size <= 1) return false
-        backStack.removeLastOrNull()
-        return true
-    }
+    fun goBack(): NavKey? = if (backStack.size > 1) backStack.removeLastOrNull() else null
 }

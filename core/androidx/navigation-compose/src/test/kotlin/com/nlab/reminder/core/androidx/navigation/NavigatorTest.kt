@@ -19,6 +19,7 @@ package com.nlab.reminder.core.androidx.navigation
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import org.hamcrest.CoreMatchers.equalTo
+import org.hamcrest.CoreMatchers.nullValue
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
 
@@ -118,21 +119,21 @@ class NavigatorTest {
     }
 
     @Test
-    fun `Given stack with two keys, When go back, Then returns true`() {
+    fun `Given stack with two keys, When go back, Then returns the popped key`() {
         val (_, navigator) = genNavigator()
         navigator.navigate(SecondKey)
 
         val actual = navigator.goBack()
 
-        assertThat(actual, equalTo(true))
+        assertThat(actual, equalTo<NavKey?>(SecondKey))
     }
 
     @Test
-    fun `Given only start key, When go back, Then returns false`() {
+    fun `Given only start key, When go back, Then returns null`() {
         val (_, navigator) = genNavigator()
 
         val actual = navigator.goBack()
 
-        assertThat(actual, equalTo(false))
+        assertThat(actual, nullValue())
     }
 }
