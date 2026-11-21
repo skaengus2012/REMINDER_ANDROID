@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.nlab.reminder.core.androidx.navigation.compose"
+    namespace = "com.nlab.reminder.core.androidx.navigation"
 }
 
 dependencies {

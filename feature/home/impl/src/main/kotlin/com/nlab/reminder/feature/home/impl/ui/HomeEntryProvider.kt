@@ -18,7 +18,7 @@ package com.nlab.reminder.feature.home.impl.ui
 
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
-import com.nlab.reminder.core.androidx.navigation.compose.Navigator
+import com.nlab.reminder.core.androidx.navigation.Navigator
 import com.nlab.reminder.feature.all.api.navigation.navigateToAll
 import com.nlab.reminder.feature.home.api.navigation.HomeNavKey
 

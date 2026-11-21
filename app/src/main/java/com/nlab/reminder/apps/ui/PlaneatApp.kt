@@ -24,7 +24,7 @@ import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDe
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
-import com.nlab.reminder.core.androidx.navigation.compose.Navigator
+import com.nlab.reminder.core.androidx.navigation.Navigator
 import com.nlab.reminder.core.component.usermessage.eventbus.ui.UserMessageAggregateHandler
 import com.nlab.reminder.feature.all.impl.ui.allEntry
 import com.nlab.reminder.feature.home.impl.ui.homeEntry

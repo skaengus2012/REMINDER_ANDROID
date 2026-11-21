@@ -17,7 +17,7 @@
 package com.nlab.reminder.feature.all.api.navigation
 
 import androidx.navigation3.runtime.NavKey
-import com.nlab.reminder.core.androidx.navigation.compose.Navigator
+import com.nlab.reminder.core.androidx.navigation.Navigator
 import kotlinx.serialization.Serializable
 
 /**
