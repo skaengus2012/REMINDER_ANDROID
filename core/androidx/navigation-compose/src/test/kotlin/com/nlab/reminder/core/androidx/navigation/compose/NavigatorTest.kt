@@ -116,4 +116,23 @@ class NavigatorTest {
 
         assertThat(backStack.toList(), equalTo(listOf<NavKey>(StartKey)))
     }
+
+    @Test
+    fun `Given stack with two keys, When go back, Then returns true`() {
+        val (_, navigator) = genNavigator()
+        navigator.navigate(SecondKey)
+
+        val actual = navigator.goBack()
+
+        assertThat(actual, equalTo(true))
+    }
+
+    @Test
+    fun `Given only start key, When go back, Then returns false`() {
+        val (_, navigator) = genNavigator()
+
+        val actual = navigator.goBack()
+
+        assertThat(actual, equalTo(false))
+    }
 }
