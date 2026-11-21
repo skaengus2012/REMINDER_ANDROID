@@ -53,7 +53,7 @@ requirements.md의 FR/NFR과 결정 사항(D-1 ~ D-17)을 따른다. 요약:
 | (신규) | `Navigator` | `PlaneatApp`이 `remember(appState.backStack) { Navigator(appState.backStack) }`로 만들어 같은 곳의 `NavDisplay`에 쓴다 (NIA `NiaApp`과 같은 위치) |
 | `EnterTransitionFactory`, `ExitTransitionFactory` | 삭제 (D-15) | `NavComposeExt.kt`를 제거하고 `PlaneatNavTransitions.kt`의 `AnimatedContentTransitionScope<Scene<*>>` 확장 함수로 직접 합성 |
 
-유지하는 이름: `PlaneatAppState`, `rememberPlaneatAppState`, `PlaneatApp`, `core:androidx:navigation-compose` 및 패키지 `com.nlab.reminder.core.androidx.navigation.compose`.
+유지하는 이름: `PlaneatAppState`, `rememberPlaneatAppState`, `PlaneatApp`, `core:androidx:navigation-compose` (패키지는 `com.nlab.reminder.core.androidx.navigation`).
 
 ### 상태 구조 (D-17: `Navigator` 단일 클래스)
 
@@ -63,9 +63,9 @@ NIA는 `NavigationState`(탭별 스택 상태)와 `Navigator`(이동 로직)로 
 - `Navigator(val backStack: NavBackStack<NavKey>)`. `backStack`은 `NavDisplay` 렌더링용으로 공개하며, 이동은 `navigate`/`goBack`으로만 하는 것을 관례로 한다.
 - 생성: 사용처가 `rememberNavBackStack(startKey)`로 스택을 만들고 `remember(backStack) { Navigator(backStack) }`로 `Navigator`를 기억한다(`rememberNavigator` 헬퍼는 두지 않는다). 생성자를 `remember` 없이 composition에서 직접 호출하면 상태가 저장되지 않는다. `startKey`는 스택을 처음 만들 때만 쓰인다.
 - `navigate(key)`: 이미 스택에 있으면 제거 후 끝에 추가한다(시작 키도 동일하며 스택을 비우지 않는다). 주의: `[Home, All]`에서 `navigate(Home)`은 `[All, Home]`이 되어 back 시 All로 간다. 현재 Home으로 이동하는 호출이 없고 테스트로 문서화했으며, 생기면 정책을 다시 검토한다.
-- `goBack()`: 스택 크기가 2 이상이면 마지막 키를 제거한다. 크기가 1 이하이면 아무 동작도 하지 않는다(D-15, 공식 가이드 패턴 적용 및 런타임 크래시 방지).
+- `goBack()`: 스택 크기가 2 이상이면 마지막 키를 제거한다. 크기가 1 이하이면 아무 동작도 하지 않는다(D-15, 공식 가이드 패턴 적용 및 런타임 크래시 방지). 반환값은 `Boolean`으로, pop했으면 `true`, 무시했으면 `false`이다.
 
-위치: `Navigator`는 래퍼 모듈 `core:androidx:navigation-compose`의 패키지 `com.nlab.reminder.core.androidx.navigation.compose`에 둔다(NIA는 별도 `core:navigation` 모듈이나 신규 모듈은 만들지 않는다, Q2). 이 모듈은 jacoco를 적용하지 않는다. `NavEntry` 변환(`toEntries`)은 공유 모듈에 두지 않고 `PlaneatApp`이 `NavDisplay`를 직접 호출한다.
+위치: `Navigator`는 래퍼 모듈 `core:androidx:navigation-compose`의 패키지 `com.nlab.reminder.core.androidx.navigation`에 둔다(NIA는 별도 `core:navigation` 모듈이나 신규 모듈은 만들지 않는다, Q2). 이 모듈은 jacoco를 적용하지 않는다. `NavEntry` 변환(`toEntries`)은 공유 모듈에 두지 않고 `PlaneatApp`이 `NavDisplay`를 직접 호출한다.
 
 ### 모듈 구조 (D-12, NIA `api`/`impl` 분리)
 
@@ -92,7 +92,7 @@ NIA 구조: `settings.gradle.kts`에 `include(":feature:foryou:api")`, `include(
 - `PlaneatAppState`가 `backStack`을 소유하고(`rememberPlaneatAppState`가 생성), `PlaneatApp`이 `Navigator`를 만들고 `entryProvider { homeEntry(...); allEntry(...) }`와 `NavDisplay(backStack = navigator.backStack, entryDecorators = listOf(rememberSaveableStateHolderNavEntryDecorator(), rememberViewModelStoreNavEntryDecorator()), entryProvider = entryProvider, onBack = { navigator.goBack() })`를 직접 사용한다(NIA `NiaApp`처럼 별도 `NavHost` 함수 없이 인라인). 전환 함수는 `PlaneatNavTransitions.kt`에 둔다. decorator는 화면 상태 보존과 ViewModel 스코프(기존 `hiltViewModel()`의 NavBackStackEntry 스코프)를 유지한다.
 - entry 시그니처(D-14):
   - `allEntry(navigator: Navigator, enterTransitionTimeInMillis: Int, metadata: Map<String, Any> = emptyMap(), showAppToast: (String) -> Unit)`: `AllScreen`에 `onBackClicked = { navigator.goBack() }`를 전달한다. `metadata`는 전환 spec을 `app`이 정의하므로 유지하고, `showAppToast`와 `enterTransitionTimeInMillis`도 이동이 아니므로 값/람다로 유지한다.
-  - `homeEntry(navigator: Navigator, onTodayCategoryClicked: () -> Unit, onTimetableCategoryClicked: () -> Unit)`: `HomeScreen`에 `onAllCategoryClicked = { navigator.navigateToAll() }`를 전달한다. Today/Timetable은 이동 대상 `NavKey`가 아직 없는 `TODO`이므로 람다로 유지한다.
+  - `homeEntry(navigator: Navigator)`: `HomeScreen`에 `onAllCategoryClicked = { navigator.navigateToAll() }`를 전달한다. Today/Timetable은 이동 대상 `NavKey`가 아직 없는 `TODO`이므로 `homeEntry` 안의 빈 람다로 처리하고 인자로 노출하지 않는다.
   - `HomeScreen`/`AllScreen`의 시그니처(람다)는 `internal`이며 변경하지 않는다.
   - 단위 테스트: entry는 Compose 연결 코드라 JVM 단위 테스트 대상이 아니다. 이동 로직은 `NavigatorTest`가 검증하고, `navigateToAll()`은 `navigate(AllNavKey)` 한 줄 확장이라 별도 테스트를 만들지 않는다.
 - 전환 매핑
@@ -158,7 +158,7 @@ testStrategy: unit+ui
 
 - Q1: `Navigator.navigate(key)`는 이미 스택에 있으면 제거 후 추가한다(NIA 방식). Navigation 2의 연타 시 중복 push가 사라지는 것은 엄밀히는 동작 변경이나 개선이다.
 - Q2: `Navigator`는 신규 모듈 없이 래퍼 모듈 `core:androidx:navigation-compose`에 둔다. 단위 테스트를 가볍게 둘 수 있고 D-7과 충돌하지 않는다.
-- Q3: feature entry 함수는 NIA처럼 `Navigator`를 받는다(D-14). 이전의 "람다 유지" 결정은 폐기되었다. 이동이 아닌 값(`showAppToast`, `enterTransitionTimeInMillis`, `metadata`)과 대상 `NavKey`가 아직 없는 `onTodayCategoryClicked`/`onTimetableCategoryClicked`는 유지한다.
+- Q3: feature entry 함수는 NIA처럼 `Navigator`를 받는다(D-14). 이전의 "람다 유지" 결정은 폐기되었다. 이동이 아닌 값(`showAppToast`, `enterTransitionTimeInMillis`, `metadata`)만 인자로 유지한다. 대상 `NavKey`가 아직 없는 `onTodayCategoryClicked`/`onTimetableCategoryClicked`는 PR 리뷰로 `homeEntry` 내부 `TODO`로 옮겼다.
 - Q4: 시작 키에서 `goBack()`은 예외 대신 아무 동작도 하지 않는다(D-15). `NavDisplay.onBack` 호출 타이밍에 따른 크래시를 방지한다.
 - Q5: `impl` 소스 패키지와 namespace는 `.impl`, `api`는 `.api.navigation`(D-13). 소스/테스트의 `package`/import가 바뀌어 diff가 늘어나는 것을 수용한다.
 - 남은 미결정 질문: 없음.
@@ -178,3 +178,4 @@ testStrategy: unit+ui
 | 2026-11-21 | Task 31: `PlaneatNavHost` 인라인(NIA `NiaApp` 방식), 전환 함수는 `PlaneatNavTransitions.kt`로 분리, 매핑/화면 구성 문구 갱신 | 사용자 결정 |
 | 2026-11-21 | 문서 정리: 제거된 `PlaneatNavHost`를 가리키던 문구(공유 모듈 위치, Task 26/28, 유지하는 이름) 수정, Task 29~31의 "이 변경의 커밋"을 실제 커밋 해시로 교체, 수정일/진행 상태 날짜 갱신 | 사용자 요청(문서 정리) |
 | 2026-11-21 | 커밋 정리(squash)로 구 커밋 해시가 무효가 되어 Task 완료 표기에서 해시를 제거 | 사용자 요청(커밋 정리) |
+| 2026-11-21 | PR 리뷰 반영: `Navigator.goBack()`이 `Boolean`을 반환, `homeEntry`가 Today/Timetable `TODO` 콜백을 내부에서 처리, 패키지를 `com.nlab.reminder.core.androidx.navigation`으로 변경 | 사용자 결정(PR 리뷰) |
