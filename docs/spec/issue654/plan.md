@@ -22,7 +22,7 @@ requirements.md의 FR/NFR과 결정 사항(D-1 ~ D-17)을 따른다. 요약:
 - D-7/D-8: 래퍼 모듈 이름 유지, `hilt-navigation-compose`를 `hilt-lifecycle-viewmodel-compose:1.4.0`으로 대체.
 - D-11~D-14: NIA 네이밍, `api`/`impl` 분리와 `.impl` 패키지, entry가 `Navigator`를 받음(`home:impl` -> `all:api` 의존).
 - D-15: 레거시 Transition typealias 삭제, `goBack` 안전 처리.
-- D-17: `NavigationState` 없이 `Navigator`가 back stack을 소유/공개, `PlaneatAppState`가 `backStack`을 소유(`rememberPlaneatAppState`가 `rememberNavBackStack`으로 생성)하고 `PlaneatApp`이 `Navigator`를 생성, `NavDisplay(backStack=...)` 직접 호출, entry provider는 `impl.ui`, Jacoco `navigation` 제외 규칙 제거.
+- D-17: `NavigationState` 없이 `Navigator`가 back stack 이동 규칙을 가지며 back stack은 `private`, `PlaneatAppState`가 `backStack`을 소유(`rememberPlaneatAppState`가 `rememberNavBackStack`으로 생성)하고 `PlaneatApp`이 `Navigator`를 생성, `NavDisplay(backStack=...)` 직접 호출, entry provider는 `impl.ui`, Jacoco `navigation` 제외 규칙 제거.
 
 ## 아키텍처/설계
 
@@ -60,7 +60,7 @@ requirements.md의 FR/NFR과 결정 사항(D-1 ~ D-17)을 따른다. 요약:
 NIA는 `NavigationState`(탭별 스택 상태)와 `Navigator`(이동 로직)로 나누지만, 이 앱은 단일 back stack이므로 `NavigationState`, 탭 스택(`topLevelStack`/`subStacks`), `currentKey`, `startKey` 프로퍼티, 딥링크 처리(`deepLinkKey`)는 두지 않는다. 딥링크가 생기면 초기 back stack 구성은 `app`에서 처리한다(D-10).
 
 `Navigator` 계약:
-- `Navigator(val backStack: NavBackStack<NavKey>)`. `backStack`은 `NavDisplay` 렌더링용으로 공개하며, 이동은 `navigate`/`goBack`으로만 하는 것을 관례로 한다.
+- `Navigator(private val backStack: NavBackStack<NavKey>)`. `backStack`은 노출하지 않아 feature가 `navigate`/`goBack`의 규칙을 우회할 수 없다. 렌더링(`NavDisplay`)은 `PlaneatAppState.backStack`을 사용한다.
 - 생성: 사용처가 `rememberNavBackStack(startKey)`로 스택을 만들고 `remember(backStack) { Navigator(backStack) }`로 `Navigator`를 기억한다(`rememberNavigator` 헬퍼는 두지 않는다). 생성자를 `remember` 없이 composition에서 직접 호출하면 상태가 저장되지 않는다. `startKey`는 스택을 처음 만들 때만 쓰인다.
 - `navigate(key)`: 이미 스택에 있으면 제거 후 끝에 추가한다(시작 키도 동일하며 스택을 비우지 않는다). 주의: `[Home, All]`에서 `navigate(Home)`은 `[All, Home]`이 되어 back 시 All로 간다. 현재 Home으로 이동하는 호출이 없고 테스트로 문서화했으며, 생기면 정책을 다시 검토한다.
 - `goBack()`: 스택 크기가 2 이상이면 마지막 키를 제거한다. 크기가 1 이하이면 아무 동작도 하지 않는다(D-15, 공식 가이드 패턴 적용 및 런타임 크래시 방지). 반환값은 `NavKey?`로, pop한 키이며 무시했으면 `null`이다.
@@ -89,7 +89,7 @@ NIA 구조: `settings.gradle.kts`에 `include(":feature:foryou:api")`, `include(
 - 가시성: `impl`의 화면/ViewModel/Environment 등은 `internal`이고, `impl`에서 외부로 공개하는 것은 `homeEntry`/`allEntry`뿐이다. `api`에서는 `NavKey`와 `navigateToAll`만 public이다.
 
 ### 화면 구성 (`NavDisplay`)
-- `PlaneatAppState`가 `backStack`을 소유하고(`rememberPlaneatAppState`가 생성), `PlaneatApp`이 `Navigator`를 만들고 `entryProvider { homeEntry(...); allEntry(...) }`와 `NavDisplay(backStack = navigator.backStack, entryDecorators = listOf(rememberSaveableStateHolderNavEntryDecorator(), rememberViewModelStoreNavEntryDecorator()), entryProvider = entryProvider, onBack = { navigator.goBack() })`를 직접 사용한다(NIA `NiaApp`처럼 별도 `NavHost` 함수 없이 인라인). 전환 함수는 `PlaneatNavTransitions.kt`에 둔다. decorator는 화면 상태 보존과 ViewModel 스코프(기존 `hiltViewModel()`의 NavBackStackEntry 스코프)를 유지한다.
+- `PlaneatAppState`가 `backStack`을 소유하고(`rememberPlaneatAppState`가 생성), `PlaneatApp`이 `Navigator`를 만들고 `entryProvider { homeEntry(...); allEntry(...) }`와 `NavDisplay(backStack = appState.backStack, entryDecorators = listOf(rememberSaveableStateHolderNavEntryDecorator(), rememberViewModelStoreNavEntryDecorator()), entryProvider = entryProvider, onBack = { navigator.goBack() })`를 직접 사용한다(NIA `NiaApp`처럼 별도 `NavHost` 함수 없이 인라인). 전환 함수는 `PlaneatNavTransitions.kt`에 둔다. decorator는 화면 상태 보존과 ViewModel 스코프(기존 `hiltViewModel()`의 NavBackStackEntry 스코프)를 유지한다.
 - entry 시그니처(D-14):
   - `allEntry(navigator: Navigator, enterTransitionTimeInMillis: Int, metadata: Map<String, Any> = emptyMap(), showAppToast: (String) -> Unit)`: `AllScreen`에 `onBackClicked = { navigator.goBack() }`를 전달한다. `metadata`는 전환 spec을 `app`이 정의하므로 유지하고, `showAppToast`와 `enterTransitionTimeInMillis`도 이동이 아니므로 값/람다로 유지한다.
   - `homeEntry(navigator: Navigator)`: `HomeScreen`에 `onAllCategoryClicked = { navigator.navigateToAll() }`를 전달한다. Today/Timetable은 이동 대상 `NavKey`가 아직 없는 `TODO`이므로 `homeEntry` 안의 빈 람다로 처리하고 인자로 노출하지 않는다.
@@ -180,3 +180,4 @@ testStrategy: unit+ui
 | 2026-11-21 | 커밋 정리(squash)로 구 커밋 해시가 무효가 되어 Task 완료 표기에서 해시를 제거 | 사용자 요청(커밋 정리) |
 | 2026-11-21 | PR 리뷰 반영: `Navigator.goBack()`이 `Boolean`을 반환, `homeEntry`가 Today/Timetable `TODO` 콜백을 내부에서 처리, 패키지를 `com.nlab.reminder.core.androidx.navigation`으로 변경 | 사용자 결정(PR 리뷰) |
 | 2026-11-21 | PR 리뷰 반영: `Navigator.goBack()`이 popped key(`NavKey?`)를 반환, `core:androidx:navigation-compose`에 jacoco 적용 | 사용자 결정(PR 리뷰) |
+| 2026-11-21 | PR 리뷰 반영: `Navigator.backStack`을 `private`으로 변경, `NavDisplay`는 `appState.backStack` 사용 (Task 28의 `navigator.backStack` 표기는 당시 형태) | 사용자 결정(PR 리뷰) |
