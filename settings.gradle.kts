@@ -90,6 +90,8 @@ include(
     ":core:uitext-test",
 )
 include(
-    ":feature:all",
-    ":feature:home"
+    ":feature:all:api",
+    ":feature:all:impl",
+    ":feature:home:api",
+    ":feature:home:impl"
 )
