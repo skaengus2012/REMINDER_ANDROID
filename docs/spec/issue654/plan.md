@@ -3,7 +3,7 @@
 - 이슈: https://github.com/skaengus2012/REMINDER_ANDROID/issues/654
 - 요구사항: docs/spec/issue654/requirements.md
 - 생성일: 2026-11-15
-- 최종 수정일: 2026-11-21
+- 최종 수정일: 2026-11-22
 
 ## 컨텍스트/목표
 
@@ -76,7 +76,7 @@ NIA 구조: `settings.gradle.kts`에 `include(":feature:foryou:api")`, `include(
 | 기존 | 신규 | 내용 |
 |------|------|------|
 | `:feature:home` | `:feature:home:api` | `HomeNavKey`(public). 의존: 래퍼 `core:androidx:navigation-compose`(`api`), serialization |
-| | `:feature:home:impl` | `HomeScreen`, `HomeEnvironment`/`HomeReduce`/`HomeAction`/`HomeUiState`/`StateSyncFlow`(`internal`), `homeEntry(navigator, ...)`(public, `app`이 호출), 단위 테스트(`HomeReduceKtTest`, `StateSyncedFlowKtTest`, `HomeTestGenerator`), `AndroidManifest.xml`. `home:api`와 `all:api` 의존(D-14) |
+| | `:feature:home:impl` | `HomeScreen`, `HomeEnvironment`/`HomeReduce`/`HomeAction`/`HomeUiState`/`StateSyncFlow`(`internal`), `homeEntry(navigator)`(public, `app`이 호출), 단위 테스트(`HomeReduceKtTest`, `StateSyncedFlowKtTest`, `HomeTestGenerator`), `AndroidManifest.xml`. `home:api`와 `all:api` 의존(D-14) |
 | `:feature:all` | `:feature:all:api` | `AllNavKey`(public), `Navigator.navigateToAll()` |
 | | `:feature:all:impl` | `AllScreen`(`internal`), `AllScheduleTriggerAtFormatPatterns`/`FakeData`(`internal`), `allEntry(navigator, ...)`(public), 매니페스트. `all:api` 의존 |
 | `app`: `projects.feature.home`, `projects.feature.all` | `app`: `projects.feature.home.api`/`.impl`, `projects.feature.all.impl` | `app`은 `HomeNavKey`(시작 키)를 직접 쓰므로 `home:api`가 필요하고, Hilt 그래프와 entry 호출 때문에 `impl`도 필요하다. `all:api`는 직접 쓰지 않아 의존하지 않는다(D-15) |
@@ -84,12 +84,12 @@ NIA 구조: `settings.gradle.kts`에 `include(":feature:foryou:api")`, `include(
 - 의존 그래프는 비순환이다: `home:impl` -> `all:api` -> 래퍼. `all:*`은 `home:*`을 의존하지 않는다. `feature.api`/`feature.impl` 컨벤션 플러그인은 프로젝트 간 의존을 제한하지 않으므로 `home:impl`의 `build.gradle.kts`에 `implementation(projects.feature.all.api)`만 추가했다.
 - 컨벤션 플러그인: `nlab.android.library.feature.api`(`nlab.android.library` + serialization 플러그인 + 래퍼 `api` 의존 + `kotlinx-serialization-json` `implementation`, jacoco/hilt/statekit 미적용)와 `nlab.android.library.feature.impl`(component, di, jacoco, statekit, `hilt-lifecycle-viewmodel-compose`, `lifecycle-runtime-compose`)을 만들고 기존 `nlab.android.library.feature`는 제거했다.
 - 패키지/네임스페이스(D-13): `api`는 `com.nlab.reminder.feature.<name>.api.navigation`(namespace `...<name>.api`), `impl`은 `com.nlab.reminder.feature.<name>.impl`(하위 `.ui`; entry provider도 `.impl.ui`, D-17)이고 namespace도 `...<name>.impl`이다.
-- jacoco: `nlab.android.library.jacoco`는 `impl` 플러그인이 적용하므로 `impl`에서만 `jacocoTestReport<Variant>` 태스크가 생긴다. `api`는 적용하지 않고, 테스트가 있는 `core:androidx:navigation-compose`는 직접 적용한다(`Navigator` 커버리지 100%). entry provider는 `impl.ui`에 있어 기존 `**/ui/**` 제외 규칙으로 제외된다. CI(`.github/workflows/ci.yml`)는 `./gradlew jacocoTestReportJvm`, `jacocoTestReportRelease`를 모듈 이름 없이 호출하므로 모듈 경로 변경이 필요 없다.
+- jacoco: `nlab.android.library.jacoco`는 `impl` 플러그인이 적용하므로 feature 모듈 중에서는 `impl`에서만 `jacocoTestReport<Variant>` 태스크가 생긴다. `api`는 적용하지 않고, 테스트가 있는 `core:androidx:navigation-compose`는 직접 적용한다(`Navigator` 커버리지 100%). 패키지를 `compose` 하위가 아닌 `...core.androidx.navigation`으로 둔 것도 `AndroidJacoco.kt`의 `**/compose/**` 제외 규칙을 피하기 위해서이다. entry provider는 `impl.ui`에 있어 기존 `**/ui/**` 제외 규칙으로 제외된다. CI(`.github/workflows/ci.yml`)는 `./gradlew jacocoTestReportJvm`, `jacocoTestReportRelease`를 모듈 이름 없이 호출하므로 모듈 경로 변경이 필요 없다.
 - 테스트: feature에는 `-test` 모듈이 없다. `home:impl`이 기존 `testImplementation(projects.core.component.tagTest)`, `projects.core.dataTest`를 가져간다. `api`는 테스트가 없다.
 - 가시성: `impl`의 화면/ViewModel/Environment 등은 `internal`이고, `impl`에서 외부로 공개하는 것은 `homeEntry`/`allEntry`뿐이다. `api`에서는 `NavKey`와 `navigateToAll`만 public이다.
 
 ### 화면 구성 (`NavDisplay`)
-- `PlaneatAppState`가 `backStack`을 소유하고(`rememberPlaneatAppState`가 생성), `PlaneatApp`이 `Navigator`를 만들고 `entryProvider { homeEntry(...); allEntry(...) }`와 `NavDisplay(backStack = appState.backStack, entryDecorators = listOf(rememberSaveableStateHolderNavEntryDecorator(), rememberViewModelStoreNavEntryDecorator()), entryProvider = entryProvider, onBack = { navigator.goBack() })`를 직접 사용한다(NIA `NiaApp`처럼 별도 `NavHost` 함수 없이 인라인). 전환 함수는 `PlaneatNavTransitions.kt`에 둔다. decorator는 화면 상태 보존과 ViewModel 스코프(기존 `hiltViewModel()`의 NavBackStackEntry 스코프)를 유지한다.
+- `PlaneatAppState`가 `backStack`을 소유하고(`rememberPlaneatAppState`가 생성), `PlaneatApp`이 `Navigator`를 만들고 `entryProvider { homeEntry(navigator); allEntry(...) }`와 `NavDisplay(backStack = appState.backStack, entryDecorators = listOf(rememberSaveableStateHolderNavEntryDecorator(), rememberViewModelStoreNavEntryDecorator()), entryProvider = entryProvider, onBack = { navigator.goBack() })`를 직접 사용한다(NIA `NiaApp`처럼 별도 `NavHost` 함수 없이 인라인). 전환 함수는 `PlaneatNavTransitions.kt`에 둔다. decorator는 화면 상태 보존과 ViewModel 스코프(기존 `hiltViewModel()`의 NavBackStackEntry 스코프)를 유지한다.
 - entry 시그니처(D-14):
   - `allEntry(navigator: Navigator, enterTransitionTimeInMillis: Int, metadata: Map<String, Any> = emptyMap(), showAppToast: (String) -> Unit)`: `AllScreen`에 `onBackClicked = { navigator.goBack() }`를 전달한다. `metadata`는 전환 spec을 `app`이 정의하므로 유지하고, `showAppToast`와 `enterTransitionTimeInMillis`도 이동이 아니므로 값/람다로 유지한다.
   - `homeEntry(navigator: Navigator)`: `HomeScreen`에 `onAllCategoryClicked = { navigator.navigateToAll() }`를 전달한다. Today/Timetable은 이동 대상 `NavKey`가 아직 없는 `TODO`이므로 `homeEntry` 안의 빈 람다로 처리하고 인자로 노출하지 않는다.
@@ -115,7 +115,7 @@ NIA 구조: `settings.gradle.kts`에 `include(":feature:foryou:api")`, `include(
 8. [완료: 2026-11-20 확인, 별도 커밋 없음] 최종 빌드/테스트/의존성 확인.
    - **Verify**: `./gradlew :app:assembleDebug :core:androidx:navigation-compose:test :core:component:usermessage-eventbus:test :feature:home:impl:test :feature:all:impl:test :feature:home:api:assembleDebug :feature:all:api:assembleDebug` 통과, `app`/래퍼/`usermessage-eventbus`/`feature:*:api`/`feature:*:impl` 의 `debugRuntimeClasspath`에서 `androidx.navigation:`이 나오지 않는다.
 9. [보류: 사용자 결정(2026-11-20)으로 Maestro 실행 없이 NFR-2 수동 테스트로 대체] 이동 흐름 확인: Home -> All 이동, back, 전환 애니메이션, 예측 back, 구성 변경/프로세스 복원 시 백스택/ViewModel 유지.
-10. [완료] `Navigator` 단위 테스트(`NavigatorTest`) 작성: 추가, 중복 없음, 중간 키 top 이동, 시작 키 top 이동, `goBack`, 시작 키에서 `goBack` 무시, 시작 키 이동 후 `goBack`. 이후 구조 변경에 맞춰 갱신.
+10. [완료] `Navigator` 단위 테스트(`NavigatorTest`) 작성: 추가, 중복 없음, 중간 키 top 이동, 시작 키 top 이동, `goBack`, 시작 키에서 `goBack` 무시, 시작 키 이동 후 `goBack`, `goBack` 반환값(pop한 키 / `null`). 이후 구조 변경에 맞춰 갱신.
 11. [완료] 이동 로직 구현. 최종 형태는 Task 26(`Navigator` 단일 클래스).
 12. [완료: 별도 커밋 없음] 이전 구현 시도의 미커밋 변경을 폐기하고 카탈로그 항목만 대조.
 13. [완료] `nlab.android.library.feature.api`/`.impl` 컨벤션 플러그인 추가.
@@ -144,6 +144,9 @@ NIA 구조: `settings.gradle.kts`에 `include(":feature:foryou:api")`, `include(
 
 31. [완료] `PlaneatNavHost` 제거: 호출처가 `PlaneatApp` 하나뿐이고 `navigator` 중계만 늘어 NIA처럼 `entryProvider`와 `NavDisplay`를 `PlaneatApp`에 인라인한다. 전환 함수와 상수는 `PlaneatNavHost.kt`를 `git mv`한 `PlaneatNavTransitions.kt`(`internal`)에 둔다.
    - **Verify**: `./gradlew :app:assembleDebug` 통과.
+
+32. [완료] PR 리뷰 반영: `Navigator.goBack()`이 pop한 키(`NavKey?`)를 반환, `homeEntry`가 Today/Timetable `TODO` 콜백을 내부에서 처리, `Navigator`를 `com.nlab.reminder.core.androidx.navigation`으로 이동, `NavigatorTest` helper를 top-level로 이동, `core:androidx:navigation-compose`에 jacoco 적용, `Navigator.backStack`을 `private`으로 변경하고 `NavDisplay`는 `appState.backStack` 사용.
+   - **Verify**: `./gradlew :core:androidx:navigation-compose:test :core:androidx:navigation-compose:jacocoTestReportRelease :app:assembleDebug :feature:home:impl:test :feature:all:impl:test` 통과, `Navigator` 커버리지 100%.
 
 ## 검증
 
@@ -181,3 +184,4 @@ testStrategy: unit+ui
 | 2026-11-21 | PR 리뷰 반영: `Navigator.goBack()`이 `Boolean`을 반환, `homeEntry`가 Today/Timetable `TODO` 콜백을 내부에서 처리, 패키지를 `com.nlab.reminder.core.androidx.navigation`으로 변경 | 사용자 결정(PR 리뷰) |
 | 2026-11-21 | PR 리뷰 반영: `Navigator.goBack()`이 popped key(`NavKey?`)를 반환, `core:androidx:navigation-compose`에 jacoco 적용 | 사용자 결정(PR 리뷰) |
 | 2026-11-21 | PR 리뷰 반영: `Navigator.backStack`을 `private`으로 변경, `NavDisplay`는 `appState.backStack` 사용 (Task 28의 `navigator.backStack` 표기는 당시 형태) | 사용자 결정(PR 리뷰) |
+| 2026-11-22 | 문서 정리: `homeEntry` 표기, jacoco 적용 범위와 패키지 이유, Task 10 테스트 목록, Task 32(PR 리뷰 반영) 추가 | 사용자 요청(문서 재검토) |

@@ -4,7 +4,7 @@
 - 상위 이슈: 없음
 - 라벨: Feature
 - 생성일: 2025-12-07
-- 최종 수정일: 2026-11-21
+- 최종 수정일: 2026-11-22
 - 분석 기준점: 2025-12-07T14:15:15Z (댓글이 없으므로 이슈 `updatedAt`. 이후 변경된 사항은 이슈가 아니라 사용자 답변이며 변경 이력에 기록)
 
 ## 배경 및 문제
@@ -55,7 +55,7 @@
 | D-14 | feature entry 함수는 NIA처럼 `Navigator`를 받아 직접 이동한다(`navigateToAll()`, `goBack()`). `feature:home:impl`은 `feature:all:api`에 의존하고, `feature:all:api`가 `Navigator.navigateToAll()` 확장을 제공한다. 이동이 아닌 값(`showAppToast`, `enterTransitionTimeInMillis`, `metadata`)만 인자로 받는다. 대상 `NavKey`가 아직 없는 Today/Timetable 콜백은 `homeEntry` 안에서 `TODO`로 처리하고 인자로 노출하지 않는다. | 사용자 승인 (2026-11-15) |
 | D-15 | 공식 Navigation 3 스킬 검토 결과 불필요한 레거시 Transition typealias(`NavComposeExt.kt`)를 삭제하고 `app`의 전환 함수(`PlaneatNavTransitions.kt`)로 직접 합성하며, `app/build.gradle.kts`의 미사용 `feature.all.api` 의존성을 제거한다. `Navigator.goBack()`은 크래시 방지를 위해 예외 대신 스택 크기가 2 이상일 때만 pop한다. | 사용자 요청 (2026-11-15) |
 | D-16 | (D-17로 대체) PR 리뷰의 과설계 지적에 따라 NIA의 탭 스택, 미사용 `startKey` 분기, `currentKey`를 제거하고 단일 back stack으로 단순화했다. 이후 `NavigationState`를 폐기하는 D-17이 구조를 대체했다. | 사용자 결정 (2026-11-18, 2026-11-19) |
-| D-17 | 앱이 단일 탭 구조라 `NavigationState` 없이 `Navigator`만 둔다. `Navigator(private val backStack: NavBackStack<NavKey>)`가 back stack에 대한 이동 규칙을 가지며 back stack을 노출하지 않는다(feature가 규칙을 우회하지 못하도록 `private`, 렌더링은 `PlaneatAppState.backStack`을 쓴다), `navigate`(이미 있는 키는 제거 후 top에 추가, 시작 키도 동일하며 스택을 비우지 않음)와 `goBack`(스택 크기 1이면 무시)을 제공한다. `rememberNavigator` 같은 헬퍼는 두지 않고, 사용처가 `rememberNavBackStack(startKey)`와 `remember`로 `Navigator`를 만든다. 공유 모듈에 `NavEntry` 변환 API(`toEntries`)는 두지 않고, `PlaneatApp`이 `NavDisplay(backStack = appState.backStack, entryDecorators = listOf(rememberSaveableStateHolderNavEntryDecorator(), rememberViewModelStoreNavEntryDecorator()), entryProvider = ...)`를 직접 호출한다. `PlaneatAppState`가 `backStack: NavBackStack<NavKey>`를 `public`으로 보유하고(`rememberPlaneatAppState`가 `rememberNavBackStack(HomeNavKey)`로 만든다), `PlaneatApp`이 `remember(appState.backStack) { Navigator(appState.backStack) }`로 `Navigator`를 만들어 같은 곳의 `NavDisplay`에 쓴다(NIA의 `NiaAppState.navigationState` / `NiaApp`의 `Navigator` 생성과 `NavDisplay` 인라인과 같은 배치). 딥링크 등 `PlaneatApp` 바깥에서 초기 스택이 필요해질 때를 대비해 back stack은 appState가 소유한다. `core:androidx:navigation-compose`는 `Navigator` 테스트가 있어 jacoco를 적용하고, 패키지는 `compose` 하위 없이 `com.nlab.reminder.core.androidx.navigation`을 쓴다(제외 규칙 `**/navigation/**`를 제거했으므로 패키지명이 측정에 영향을 주지 않는다). `homeEntry`/`allEntry`는 `feature/*/impl`의 `.impl.ui`로 옮겨 기존 `**/ui/**` 제외 규칙을 따르게 한다(`ui` 패키지에는 테스트 대상 로직을 두지 않는다). Navigation Component용 Jacoco 제외 규칙 `**/navigation/**`, `**/*Args*.*`, `**/*Directions*.*`는 의미가 없어 제거한다. 딥링크는 범위에 포함하지 않으며, 생기면 초기 back stack 구성은 `app`에서 처리한다. | 사용자 결정 (2026-11-19, 2026-11-20 `toEntries` 제거 반영) |
+| D-17 | 앱이 단일 탭 구조라 `NavigationState` 없이 `Navigator`만 둔다. `Navigator(private val backStack: NavBackStack<NavKey>)`가 back stack에 대한 이동 규칙을 가지며 back stack을 노출하지 않는다(feature가 규칙을 우회하지 못하도록 `private`, 렌더링은 `PlaneatAppState.backStack`을 쓴다), `navigate`(이미 있는 키는 제거 후 top에 추가, 시작 키도 동일하며 스택을 비우지 않음)와 `goBack`(스택 크기 1이면 무시하고 `null`, 아니면 pop한 키를 `NavKey?`로 반환)을 제공한다. `rememberNavigator` 같은 헬퍼는 두지 않고, 사용처가 `rememberNavBackStack(startKey)`와 `remember`로 `Navigator`를 만든다. 공유 모듈에 `NavEntry` 변환 API(`toEntries`)는 두지 않고, `PlaneatApp`이 `NavDisplay(backStack = appState.backStack, entryDecorators = listOf(rememberSaveableStateHolderNavEntryDecorator(), rememberViewModelStoreNavEntryDecorator()), entryProvider = ...)`를 직접 호출한다. `PlaneatAppState`가 `backStack: NavBackStack<NavKey>`를 `public`으로 보유하고(`rememberPlaneatAppState`가 `rememberNavBackStack(HomeNavKey)`로 만든다), `PlaneatApp`이 `remember(appState.backStack) { Navigator(appState.backStack) }`로 `Navigator`를 만들어 같은 곳의 `NavDisplay`에 쓴다(NIA의 `NiaAppState.navigationState` / `NiaApp`의 `Navigator` 생성과 `NavDisplay` 인라인과 같은 배치). 딥링크 등 `PlaneatApp` 바깥에서 초기 스택이 필요해질 때를 대비해 back stack은 appState가 소유한다. `core:androidx:navigation-compose`는 `Navigator` 테스트가 있어 jacoco를 적용하고, 패키지는 `compose` 하위 없이 `com.nlab.reminder.core.androidx.navigation`을 쓴다(`compose` 하위 패키지는 Jacoco 제외 규칙 `**/compose/**`에 걸려 측정되지 않으므로 상위 패키지에 둔다. `**/navigation/**` 규칙은 제거했으므로 새 패키지는 측정된다). `homeEntry`/`allEntry`는 `feature/*/impl`의 `.impl.ui`로 옮겨 기존 `**/ui/**` 제외 규칙을 따르게 한다(`ui` 패키지에는 테스트 대상 로직을 두지 않는다). Navigation Component용 Jacoco 제외 규칙 `**/navigation/**`, `**/*Args*.*`, `**/*Directions*.*`는 의미가 없어 제거한다. 딥링크는 범위에 포함하지 않으며, 생기면 초기 back stack 구성은 `app`에서 처리한다. | 사용자 결정 (2026-11-19, 2026-11-20 `toEntries` 제거 반영) |
 
 ## 조사 결과
 
@@ -125,11 +125,12 @@
 코드에서 확인된 Navigation 2 사용처와 변경 위치이다.
 
 - 버전 카탈로그: `gradle/libs.versions.toml` (Navigation 2 항목 삭제, Navigation 3 항목 추가)
-- 래퍼 모듈: `core/androidx/navigation-compose` (`Navigator`), `settings.gradle.kts`의 모듈 등록
-- 빌드 로직: `build-logic/convention/src/main/kotlin/` 아래 `nlab.android.library.feature.api.gradle.kts`, `nlab.android.library.feature.impl.gradle.kts`(기존 `nlab.android.library.feature` 대체), `AndroidJacoco.kt`(`navigation` 제외 규칙 제거)
+- 래퍼 모듈: `core/androidx/navigation-compose` (`Navigator`, `NavigatorTest`, `build.gradle.kts`의 namespace와 jacoco 적용)
+- 모듈 등록: `settings.gradle.kts` (feature `api`/`impl` 4개 모듈)
+- 빌드 로직: `build-logic/convention/src/main/kotlin/` 아래 `nlab.android.library.feature.api.gradle.kts`, `nlab.android.library.feature.impl.gradle.kts`(기존 `nlab.android.library.feature` 대체), `AndroidJacoco.kt`(`navigation` 제외 규칙 제거), `AndroidFeature.kt`(삭제, 각 컨벤션 스크립트에 인라인)
 - 앱 모듈: `app/build.gradle.kts`, `PlaneatAppState.kt`(`NavHostController`를 `backStack`으로 교체), `PlaneatApp.kt`(`Navigator` 생성, `entryProvider`, `NavDisplay`), `PlaneatNavTransitions.kt`(전환 함수; 이전 `PlaneatNavHost.kt`), `app/src/main/AndroidManifest.xml`(`enableOnBackInvokedCallback` 유지)
 - 기능 모듈: `feature/home/{api,impl}`, `feature/all/{api,impl}` (`api`는 NavKey와 이동 확장, `impl`은 화면과 entry, D-12). 이 두 모듈을 의존하는 모듈은 `app`뿐이다.
-- 기타: `core/component/usermessage-eventbus/build.gradle.kts`(`navigation-compose` 의존 제거), `UserMessageAggregateHandler.kt`와 `HomeScreen.kt`(`hiltViewModel()`)
+- 기타: `core/component/usermessage-eventbus/build.gradle.kts`(`navigation-compose` 의존 제거), `UserMessageAggregateHandler.kt`와 `HomeScreen.kt`(`hiltViewModel()` import 경로가 그대로라 코드 변경 없음)
 
 ## 충돌 및 참고사항
 
@@ -155,3 +156,4 @@
 | 2026-11-21 | PR 리뷰 반영: 패키지를 `com.nlab.reminder.core.androidx.navigation`으로 변경, `homeEntry`가 Today/Timetable `TODO` 콜백을 내부에서 처리해 인자에서 제거(D-14, D-17 갱신) (FR/NFR 의미 변경 없음) | 사용자 결정(PR 리뷰) |
 | 2026-11-21 | PR 리뷰 반영: `core:androidx:navigation-compose`에 jacoco 적용(D-17 갱신), `Navigator.goBack()` 반환 타입을 `NavKey?`로 정리 (FR/NFR 의미 변경 없음) | 사용자 결정(PR 리뷰) |
 | 2026-11-21 | PR 리뷰 반영: `Navigator.backStack`을 `private`으로 변경하고 `NavDisplay`는 `appState.backStack`을 사용(D-17 갱신) (FR/NFR 의미 변경 없음) | 사용자 결정(PR 리뷰) |
+| 2026-11-22 | 문서 정리: 패키지 이동 이유를 `**/compose/**` 제외 규칙 기준으로 정정, D-17에 `goBack` 반환형 추가, 영향 범위(래퍼/모듈 등록/빌드 로직/기타) 보완 (FR/NFR 의미 변경 없음) | 사용자 요청(문서 재검토)
