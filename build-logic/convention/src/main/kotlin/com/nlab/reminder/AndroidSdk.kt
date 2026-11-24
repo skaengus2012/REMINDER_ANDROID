@@ -24,7 +24,12 @@ import org.gradle.api.Project
  */
 internal fun Project.configureAndroidSdk(commonExtension: CommonExtension) {
     commonExtension.apply {
-        compileSdk = libs.findVersion("compileSdk").get().toString().toInt()
+        val compileSdkVersion = parseCompileSdkVersion(libs.findVersion("compileSdk").get().toString())
+        compileSdk {
+            version = release(compileSdkVersion.major) {
+                compileSdkVersion.minor?.let { minorApiLevel = it }
+            }
+        }
 
         defaultConfig.apply {
             minSdk = libs.findVersion("minSdk").get().toString().toInt()
