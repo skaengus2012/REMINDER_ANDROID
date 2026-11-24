@@ -18,17 +18,48 @@ package com.nlab.reminder.apps.ui
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
+import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
+import androidx.navigation3.ui.NavDisplay
+import com.nlab.reminder.core.androidx.navigation.Navigator
 import com.nlab.reminder.core.component.usermessage.eventbus.ui.UserMessageAggregateHandler
+import com.nlab.reminder.feature.all.impl.ui.allEntry
+import com.nlab.reminder.feature.home.impl.ui.homeEntry
 
 /**
  * @author Thalys
  */
 @Composable
 fun PlaneatApp(appState: PlaneatAppState) {
-    PlaneatNavHost(
+    val navigator = remember(appState.backStack) { Navigator(appState.backStack) }
+    val entryProvider = entryProvider {
+        homeEntry(navigator = navigator)
+        allEntry(
+            navigator = navigator,
+            enterTransitionTimeInMillis = HOME_TRANSITION_DURATION,
+            // The transition between Home and All is decided by the metadata of All, because Navigation 3 uses
+            // the metadata of the entry that is pushed (or popped) for both of the entries involved.
+            metadata = NavDisplay.transitionSpec { homeToAllTransform() } +
+                    NavDisplay.popTransitionSpec { allToHomeTransform() } +
+                    NavDisplay.predictivePopTransitionSpec { allToHomeTransform() },
+            showAppToast = { appState.showApplicationToast(it) }
+        )
+    }
+    NavDisplay(
         modifier = Modifier.fillMaxSize(),
-        appState = appState
+        backStack = appState.backStack,
+        entryDecorators = listOf(
+            rememberSaveableStateHolderNavEntryDecorator(),
+            rememberViewModelStoreNavEntryDecorator(),
+        ),
+        entryProvider = entryProvider,
+        onBack = { navigator.goBack() },
+        transitionSpec = { noneTransform() },
+        popTransitionSpec = { noneTransform() },
+        predictivePopTransitionSpec = { noneTransform() }
     )
     UserMessageAggregateHandler(
         showUserMessage = { message, _ ->

@@ -130,11 +130,6 @@ private val coverageExclusions = jacocoExcludePatterns + setOf(
     "**/*Binding.class",
     "**/*BindingImpl.class",
 
-    /* Navigation Component generated classes */
-    "**/navigation/**",
-    "**/*Args*.*",
-    "**/*Directions*.*",
-
     /* Unnecessary feature components */
     "**/*Action$*.class",
     "**/*UiState$*.class",
