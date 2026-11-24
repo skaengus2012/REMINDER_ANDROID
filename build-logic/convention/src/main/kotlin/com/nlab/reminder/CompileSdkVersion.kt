@@ -23,7 +23,7 @@ package com.nlab.reminder
  */
 internal data class CompileSdkVersion(val major: Int, val minor: Int?)
 
-internal fun parseCompileSdkVersion(raw: String): CompileSdkVersion {
+internal fun CompileSdkVersion(raw: String): CompileSdkVersion {
     val parts = raw.split(".")
     require(parts.size in 1..2 && parts.all { part -> part.isNotEmpty() && part.all(Char::isDigit) }) {
         "Invalid compileSdk version: '$raw'. Expected format is 'major' or 'major.minor'."
