@@ -1,3 +1,6 @@
+# Keep entries in alphabetical order within each section (and within each comment group).
+# Insert new entries at their alphabetical position; do not reorder unrelated existing entries.
+
 [versions]
 
 # build Environmental
