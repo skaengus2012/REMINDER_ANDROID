@@ -12,12 +12,8 @@ dependencies {
     implementation(projects.core.component.schedule)
     implementation(projects.core.component.schedulelist)
     implementation(projects.core.dataDi)
-<<<<<<< HEAD:feature/all/build.gradle.kts
+    implementation(projects.feature.all.api)
 
     testImplementation(projects.core.component.schedulelistTest)
     testImplementation(projects.core.dataTest)
-||||||| c64fd2e2:feature/all/build.gradle.kts
-=======
-    implementation(projects.feature.all.api)
->>>>>>> origin/master:feature/all/impl/build.gradle.kts
 }
