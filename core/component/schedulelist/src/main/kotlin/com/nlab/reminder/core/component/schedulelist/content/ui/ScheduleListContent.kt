@@ -33,6 +33,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.fragment.compose.AndroidFragment
 import com.nlab.reminder.core.androidx.compose.ui.LocalTimeZone
@@ -54,6 +55,9 @@ fun ScheduleListContent(
     modifier: Modifier = Modifier,
     toolbarRenderState: ScheduleListToolbarRenderState? = null,
 ) {
+    // AndroidFragment requires a FragmentActivity host, which the preview renderer does not provide.
+    if (LocalInspectionMode.current) return
+
     val layoutDirection = LocalLayoutDirection.current
     val displayCutoutPaddings = WindowInsets.displayCutout.asPaddingValues()
 
