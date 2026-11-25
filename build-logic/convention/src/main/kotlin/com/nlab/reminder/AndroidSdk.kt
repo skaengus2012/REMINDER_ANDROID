@@ -24,10 +24,13 @@ import org.gradle.api.Project
  */
 internal fun Project.configureAndroidSdk(commonExtension: CommonExtension) {
     commonExtension.apply {
-        val compileSdkVersion = CompileSdkVersion(libs.findVersion("compileSdk").get().toString())
+        // "major" or "major.minor". The limit makes anything like "37.1.2" fail on toInt().
+        val compileSdkLevels = libs.findVersion("compileSdk").get().toString()
+            .split(".", limit = 2)
+            .map(String::toInt)
         compileSdk {
-            version = release(compileSdkVersion.major) {
-                compileSdkVersion.minor?.let { minorApiLevel = it }
+            version = release(compileSdkLevels[0]) {
+                compileSdkLevels.getOrNull(1)?.let { minorApiLevel = it }
             }
         }
 
