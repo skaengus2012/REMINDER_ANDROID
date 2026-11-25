@@ -25,13 +25,13 @@ import androidx.compose.ui.tooling.preview.Preview
  */
 @Preview(
     name = "phone",
-    device = "spec:shape=Normal,width=360,height=640,unit=dp,dpi=480",
+    device = "spec:width=360dp,height=640dp,dpi=480",
     uiMode = UI_MODE_NIGHT_NO,
     showBackground = true
 )
 @Preview(
     name = "phone-dark",
-    device = "spec:shape=Normal,width=360,height=640,unit=dp,dpi=480",
+    device = "spec:width=360dp,height=640dp,dpi=480",
     uiMode = UI_MODE_NIGHT_YES,
     showBackground = true
 )
