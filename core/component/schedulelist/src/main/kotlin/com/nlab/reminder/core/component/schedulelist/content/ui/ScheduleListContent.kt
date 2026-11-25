@@ -16,6 +16,7 @@
 
 package com.nlab.reminder.core.component.schedulelist.content.ui
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.calculateEndPadding
@@ -56,7 +57,11 @@ fun ScheduleListContent(
     toolbarRenderState: ScheduleListToolbarRenderState? = null,
 ) {
     // AndroidFragment requires a FragmentActivity host, which the preview renderer does not provide.
-    if (LocalInspectionMode.current) return
+    // An empty placeholder keeps the layout space of the list.
+    if (LocalInspectionMode.current) {
+        Box(modifier = modifier.fillMaxSize())
+        return
+    }
 
     val layoutDirection = LocalLayoutDirection.current
     val displayCutoutPaddings = WindowInsets.displayCutout.asPaddingValues()
