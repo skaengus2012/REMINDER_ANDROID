@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.feature.all
+package com.nlab.reminder.feature.all.impl
 
 import com.nlab.reminder.core.component.schedulelist.CompletedSchedulesCleanupConfirmation
 import com.nlab.reminder.core.component.schedulelist.ScheduleDeletionConfirmation

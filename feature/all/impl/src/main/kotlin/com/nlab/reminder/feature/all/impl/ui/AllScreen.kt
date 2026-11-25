@@ -69,11 +69,11 @@ import com.nlab.reminder.core.designsystem.compose.theme.DrawableIds
 import com.nlab.reminder.core.kotlin.NonNegativeInt
 import com.nlab.reminder.core.kotlin.collections.toIdentityList
 import com.nlab.reminder.core.translation.StringIds
-import com.nlab.reminder.feature.all.AllAction
-import com.nlab.reminder.feature.all.AllEnvironment
-import com.nlab.reminder.feature.all.AllReduce
-import com.nlab.reminder.feature.all.AllUiState
-import com.nlab.reminder.feature.all.AllUiStateSyncedFlow
+import com.nlab.reminder.feature.all.impl.AllAction
+import com.nlab.reminder.feature.all.impl.AllEnvironment
+import com.nlab.reminder.feature.all.impl.AllReduce
+import com.nlab.reminder.feature.all.impl.AllUiState
+import com.nlab.reminder.feature.all.impl.AllUiStateSyncedFlow
 import com.nlab.statekit.androidx.lifecycle.store.compose.retained
 import com.nlab.statekit.bootstrap.DeliveryStarted
 import com.nlab.statekit.bootstrap.collectAsBootstrap

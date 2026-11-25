@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.feature.all
+package com.nlab.reminder.feature.all.impl
 
 import com.nlab.reminder.core.component.schedulelist.CompletedSchedulesCleanupConfirmation
 import com.nlab.reminder.core.component.schedulelist.ScheduleDeletionConfirmation
@@ -29,8 +29,8 @@ import com.nlab.reminder.core.kotlin.tryToNonBlankStringOrNull
 import com.nlab.reminder.core.kotlin.tryToPositiveInt
 import com.nlab.statekit.dsl.reduce.DslReduce
 import com.nlab.statekit.reduce.Reduce
-import com.nlab.reminder.feature.all.AllAction.*
-import com.nlab.reminder.feature.all.AllUiState.*
+import com.nlab.reminder.feature.all.impl.AllAction.*
+import com.nlab.reminder.feature.all.impl.AllUiState.*
 
 internal typealias AllReduce = Reduce<AllAction, AllUiState>
 

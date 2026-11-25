@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.nlab.reminder.feature.all
+package com.nlab.reminder.feature.all.impl
 
 import app.cash.turbine.test
 import com.nlab.reminder.core.component.schedulelist.GetUserScheduleListResourcesFlowUseCase
