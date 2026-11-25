@@ -6,17 +6,28 @@ This document defines the branching strategy and naming conventions for the REMI
 
 ## 1. Allowed Branch Types
 
-Only the following three types of branches are used in this project:
+Developers and agents create only the following three types of branches (see [Tool-generated Branches](#tool-generated-branches) for the exceptions):
 
 * **`master`**
   * The main production-ready branch. It must always be buildable and stable.
 * **`epic/issue<issue-number>`**
   * Inspired by Jira's Epic. Used for large-scale tasks or major features that contain multiple sub-tasks.
   * Example: `epic/issue795`
-* **`feature/issue<issue-number>`**
-  * Represents a single task.
-  * **Important**: Regardless of the task nature (e.g., Fix, Refactor, Chore), all single task branches must use the `feature/` prefix.
-  * Example: `feature/issue796`
+* **`feature/*`**
+  * Represents a single task or a work branch.
+  * **Important**: Regardless of the task nature (e.g., Fix, Refactor, Chore), all of these branches must use the `feature/` prefix.
+  * Default format: `feature/issue<issue-number>`. Use it for every task that has an issue.
+    * Example: `feature/issue796`
+  * Merge work branches (e.g., resolving conflicts between two branches): `feature/<source>-into-<target>-<timestamp>`. Do not use a `merge/` prefix.
+    * Example: `feature/master-into-epic-issue601-20261125T125543Z`
+  * Any other name under `feature/` is also allowed.
+
+### Tool-generated Branches
+
+The following branches are created by tools and are also allowed:
+
+* **`revert-<pr-number>-<original-branch>`**: created by the GitHub Revert button.
+* **`dependabot/...`**: created by Dependabot.
 
 ---
 
@@ -67,3 +78,38 @@ gitGraph
     checkout master
     merge feature/issue201 id: "Merge Task to Master"
 ```
+
+---
+
+## 3. Enforcement
+
+The GitHub branch ruleset `Branch naming (see docs/guidelines/branch-rules.md)` blocks creating a remote branch whose name is not allowed. It does not check local branches, and it does not restrict pushes to branches that already exist.
+
+| Setting | Value |
+|---------|-------|
+| Enforcement | Active |
+| Bypass list | Empty |
+| Target | All branches, excluding the patterns below |
+| Rules | `Restrict creations` only |
+
+Excluded (allowed) patterns:
+
+```text
+master
+epic/issue[0-9]*
+feature/**/*
+revert-*
+revert-*/**/*
+dependabot/**/*
+```
+
+The patterns are looser than the naming rules above (e.g., `epic/issue[0-9]*` also matches `epic/issue1abc`), so follow the rules even when the ruleset accepts a name.
+
+To check whether a name is restricted before pushing:
+
+```bash
+gh ruleset check <branch-name>
+```
+
+**Important**: The ruleset is a repository setting and is not synced with this document. Whenever the naming rules change, update the ruleset as well.
+

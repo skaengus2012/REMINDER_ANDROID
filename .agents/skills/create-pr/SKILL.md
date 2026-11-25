@@ -30,15 +30,17 @@ git status --short
 git log --format='%h %s' origin/master..HEAD   # adjust the base after Step 2
 ```
 
-- **Issue number**: extract `issue<N>` from the branch name (e.g. `feature/issue790` -> `790`).
-  If the branch has no issue number, ask the user for it, or use `N/A` when there is none.
+- **Issue number**: extract `<N>` from a branch named `feature/issue<N>` or `epic/issue<N>` (e.g.
+  `feature/issue790` -> `790`). For any other name, including a merge work branch that mentions an issue
+  (`feature/<source>-into-<target>-<timestamp>`), ask the user for it, or use `N/A` when there is none.
 - **Uncommitted changes**: if `git status` is not clean, stop and ask whether to commit them first
   (follow `commit-rules.md`). A PR built from a dirty tree would not match what the user sees locally.
   If the user agrees, propose a commit message (`<Type> #<N> - <subject>`, plus a body for `Implement`) and commit
   before continuing. If there are no commits ahead of the base branch after that, there is nothing to open a PR for.
-- **Branch name**: it should be `feature/issue<N>` or `epic/issue<N>`. If it does not match (e.g. a worktree
-  branch like `worktree/feature/issue790`), ask the user which remote branch name to push to, recommending
-  `feature/issue<N>`. Pushing the local name as is would put a rule-breaking branch on the remote.
+- **Branch name**: it should be `epic/issue<N>` or `feature/*` (default `feature/issue<N>`; merge work branches
+  use `feature/<source>-into-<target>-<timestamp>`). If it does not match (e.g. a worktree branch like
+  `worktree/feature/issue790` or a `merge/...` branch), ask the user which remote branch name to push to,
+  recommending the matching `feature/` name. The remote ruleset rejects creating a rule-breaking branch.
 
 ## Step 2. Decide the Base Branch
 
