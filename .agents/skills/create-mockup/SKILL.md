@@ -4,8 +4,8 @@ description: >-
   Creates a self-contained HTML mockup for a GitHub issue's UI change and saves it as
   `docs/spec/issue<number>/mockup/<screen>.html`. Reads the issue's requirements and the `core:designsystem`
   tokens (colors, typography, dimens, icons) so the mockup matches the app. Use this skill whenever the user asks
-  to design a screen, draw a UI mockup or prototype for an issue, or says things like "시안 만들어줘" /
-  "목업 만들어줘" / "디자인 해줘", even if they do not mention 'create-mockup'.
+  to design a screen, draw a UI mockup or prototype for an issue, or says things like "draw a mockup" /
+  "design this screen" / "make a prototype", even if they do not mention 'create-mockup'.
 ---
 
 # Create Mockup Skill

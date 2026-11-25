@@ -76,8 +76,9 @@ dependencies {
     implementation(projects.core.translation)
     implementation(projects.statekit.foundation)
 
-    implementation(projects.feature.all)
-    implementation(projects.feature.home)
+    implementation(projects.feature.all.impl)
+    implementation(projects.feature.home.impl)
+    implementation(projects.feature.home.api)
 
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.appcompat)
@@ -88,13 +89,13 @@ dependencies {
     implementation(libs.bundles.androidx.hilt.work)
     ksp(libs.androidx.hilt.compiler)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
-    implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.startup.runtime)
     implementation(libs.coil.kt)
     implementation(libs.google.material)
     implementation(libs.timber)
 
     debugImplementation(libs.flocon)
+    debugImplementation(libs.flocon.network.core)
     debugImplementation(libs.flocon.okhttp)
     debugImplementation(libs.squeare.leakcanary)
 

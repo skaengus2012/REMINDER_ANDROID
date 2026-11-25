@@ -5,7 +5,7 @@ description: >-
   Validates the branch/commit conventions, picks the correct base branch (master or epic), runs tests for the
   changed modules, drafts the title and body from the linked GitHub issue and commit log, then pushes and opens
   a Draft PR with `gh`. Use this skill whenever the user asks to create, open, or submit a pull request, push
-  the work for review, or says things like "PR 올려줘" / "PR 만들어줘", even if they do not mention 'create-pr'.
+  the work for review, or says things like "open a PR" / "create a PR", even if they do not mention 'create-pr'.
 ---
 
 # Create PR Skill
@@ -65,9 +65,11 @@ Then decide:
 - **Parent is `master`, `develop`, or `epic/*`**: use the parent as the base without asking. These are the
   integration branches a PR is meant to target, so the parent is almost certainly right and asking would only add a
   step. State the choice in one line so the user can object (e.g. "Base branch: epic/issue1 (parent branch)").
-- **Parent is anything else (e.g. `feature/*`) or could not be determined**: call `AskUserQuestion` with the
-  candidates (parent first, labeled "(Recommended)", then `master`; remove duplicates). A feature branch is not a
-  normal merge target, so the user should decide.
+- **Parent is anything else (e.g. `feature/*`) or could not be determined**: remove duplicates from the candidates
+  (parent first, labeled "(Recommended)", then `master`). If 2 or more remain, call `AskUserQuestion` with them. A
+  feature branch is not a normal merge target, so the user should decide. If only `master` remains (the parent could
+  not be determined), `AskUserQuestion` would reject a 1-option question, so do not ask: use `master` as the base and
+  state it in one line (e.g. "Base branch: master (parent could not be determined)").
 
 Note on `branch-rules.md`: a standalone `feature/issue<N>` targets `master`, a feature inside an epic targets
 `epic/issue<M>`. A feature created from another unmerged feature is not covered by the rules. If the parent

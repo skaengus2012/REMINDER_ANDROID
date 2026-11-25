@@ -1,0 +1,494 @@
+/*
+ * Copyright (C) 2024 The N's lab Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.nlab.reminder.feature.all.impl.ui
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.width
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.nlab.reminder.core.androidx.compose.ui.DelayedContent
+import com.nlab.reminder.core.androidx.compose.ui.tooling.preview.Previews
+import com.nlab.reminder.core.component.schedulelist.UserScheduleListResource
+import com.nlab.reminder.core.component.schedulelist.ui.content.FormBottomLine
+import com.nlab.reminder.core.component.schedulelist.ui.content.ScheduleListContent
+import com.nlab.reminder.core.component.schedulelist.ui.content.ScheduleListItem
+import com.nlab.reminder.core.component.schedulelist.ui.content.ScheduleListTheme
+import com.nlab.reminder.core.component.schedulelist.ui.content.SimpleAdd
+import com.nlab.reminder.core.component.schedulelist.ui.content.SimpleEdit
+import com.nlab.reminder.core.component.schedulelist.ui.content.rememberScheduleListItemsAdaptationState
+import com.nlab.reminder.core.component.schedulelist.ui.toolbar.ScheduleListToolbar
+import com.nlab.reminder.core.component.schedulelist.ui.toolbar.ScheduleListToolbarState
+import com.nlab.reminder.core.component.schedulelist.ui.toolbar.rememberScheduleListToolbarState
+import com.nlab.reminder.core.component.schedulelist.ui.bottomappbar.ScheduleListBottomAppbarState
+import com.nlab.reminder.core.component.schedulelist.ui.bottomappbar.rememberScheduleListBottomAppbarState
+import com.nlab.reminder.core.component.schedulelist.ui.bottomappbar.ScheduleListBottomAppbar
+import com.nlab.reminder.core.androidx.compose.ui.throttleClick
+import com.nlab.reminder.core.designsystem.compose.theme.PlaneatTheme
+import com.nlab.reminder.core.kotlin.collections.IdentityList
+import com.nlab.reminder.core.androidx.compose.runtime.rememberAccumulatedStateStream
+import com.nlab.reminder.core.component.schedulelist.ui.content.CompletionUpdate
+import com.nlab.reminder.core.component.schedulelist.ui.content.Delete
+import com.nlab.reminder.core.component.schedulelist.ui.content.OpenDetail
+import com.nlab.reminder.core.component.schedulelist.ui.content.SelectionUpdate
+import com.nlab.reminder.core.component.schedulelist.ui.modal.CompletedSchedulesCleanupConfirmBottomSheetHandler
+import com.nlab.reminder.core.component.schedulelist.ui.modal.SchedulesDeleteConfirmationHandler
+import com.nlab.reminder.core.component.schedulelist.ui.toolbar.MenuDropdown
+import com.nlab.reminder.core.designsystem.compose.component.PlaneatDropdownDivider
+import com.nlab.reminder.core.designsystem.compose.component.PlaneatDropdownIcon
+import com.nlab.reminder.core.designsystem.compose.component.PlaneatDropdownMenu
+import com.nlab.reminder.core.designsystem.compose.component.PlaneatDropdownMenuItem
+import com.nlab.reminder.core.designsystem.compose.component.PlaneatDropdownText
+import com.nlab.reminder.core.designsystem.compose.theme.DrawableIds
+import com.nlab.reminder.core.kotlin.NonNegativeInt
+import com.nlab.reminder.core.kotlin.collections.toIdentityList
+import com.nlab.reminder.core.translation.StringIds
+import com.nlab.reminder.feature.all.impl.AllAction
+import com.nlab.reminder.feature.all.impl.AllEnvironment
+import com.nlab.reminder.feature.all.impl.AllReduce
+import com.nlab.reminder.feature.all.impl.AllUiState
+import com.nlab.reminder.feature.all.impl.AllUiStateSyncedFlow
+import com.nlab.statekit.androidx.lifecycle.store.compose.retained
+import com.nlab.statekit.bootstrap.DeliveryStarted
+import com.nlab.statekit.bootstrap.collectAsBootstrap
+import com.nlab.statekit.foundation.store.createStore
+import kotlin.time.Instant
+
+/**
+ * @author Doohyun
+ */
+@Composable
+internal fun AllScreen(
+    enterTransitionTimeInMillis: Long,
+    onBackClicked: () -> Unit,
+    showAppToast: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    environment: AllEnvironment = hiltViewModel()
+) {
+    val store = retained {
+        createStore(
+            initState = AllUiState.Loading,
+            reduce = AllReduce(environment),
+            bootstrap = AllUiStateSyncedFlow(environment).collectAsBootstrap(
+                started = DeliveryStarted.WhileSubscribed(stopTimeoutMillis = 5_000)
+            )
+        )
+    }
+    val uiState by store.state
+        .rememberAccumulatedStateStream(
+            accumulator = { prev, next ->
+                if (prev !is AllUiState.Success || next !is AllUiState.Success) {
+                    convertToOptimizedState(uiState = next)
+                } else {
+                    reuseScheduleListIfUnchanged(prev = prev, next = next)
+                }
+            },
+            initialValueTransform = ::convertToOptimizedState
+        )
+        .collectAsStateWithLifecycle()
+    AllScreen(
+        modifier = modifier,
+        uiState = uiState,
+        contentDelayTimeMillis = enterTransitionTimeInMillis,
+        onBackClicked = onBackClicked,
+        onMenuClicked = { store.dispatch(AllAction.MenuClicked) },
+        onMenuDropdownDismissed = { store.dispatch(AllAction.MenuDropdownDismissed) },
+        onSelectionStartClicked = {
+            store.dispatch(AllAction.SelectionModeClicked(enabled = true))
+        },
+        onSelectionCompleteClicked = {
+            store.dispatch(AllAction.SelectionModeClicked(enabled = false))
+        },
+        onCompletedScheduleVisibilityChangeClicked = {
+            store.dispatch(AllAction.CompletedSchedulesToggleClicked(visible = it))
+        },
+        onCompletedSchedulesCleanupClicked = {
+            store.dispatch(AllAction.CompletedSchedulesCleanupClicked)
+        },
+        onCompletedSchedulesCleanupAnswered = {
+            store.dispatch(AllAction.CleanupConfirmAnswered(confirmed = it))
+        },
+        onCompletionUpdated = { completionUpdate ->
+            store.dispatch(
+                AllAction.ItemCompletionUpdated(
+                    scheduleId = completionUpdate.id,
+                    targetCompleted = completionUpdate.targetCompleted
+                )
+            )
+        },
+        onDeleteRequested = { delete ->
+            store.dispatch(AllAction.ScheduleDeletionClicked(delete.id))
+        },
+        onItemPositionUpdated = { userScheduleListResources ->
+            store.dispatch(AllAction.ItemPositionUpdated(userScheduleListResources))
+        },
+        onItemSelectionChanged = { selectionUpdate ->
+            store.dispatch(AllAction.ItemSelectionUpdated(selectionUpdate.selectedIds))
+        },
+        onOpenDetailRequested = { openDetail ->
+            showAppToast("TODO implements $openDetail")
+        },
+        onSimpleAdd = { simpleAdd ->
+            store.dispatch(
+                AllAction.ScheduleAdditionSubmitted(
+                    title = simpleAdd.title,
+                    note = simpleAdd.note
+                )
+            )
+        },
+        onSimpleEdit = { simpleEdit ->
+            store.dispatch(
+                AllAction.ScheduleEditSubmitted(
+                    id = simpleEdit.id,
+                    title = simpleEdit.title,
+                    note = simpleEdit.note,
+                    tagNames = simpleEdit.tagNames
+                )
+            )
+        },
+        onNewPlanClicked = {
+            showAppToast("TODO implements NewPlan")
+        },
+        onSelectedSchedulesTimingConfigClicked = {
+            showAppToast("TODO implements Timing")
+        },
+        onSelectedSchedulesCompleteClicked = {
+            showAppToast("TODO implements Complete")
+        },
+        onSelectedSchedulesTagClicked = {
+            showAppToast("TODO implements Tag")
+        },
+        onSelectedSchedulesDeletionClicked = {
+            store.dispatch(AllAction.SelectedSchedulesDeletionClicked)
+        },
+        onSchedulesDeletionAnswered = {
+            store.dispatch(
+                AllAction.SchedulesDeletionConfirmAnswered(confirmed = it)
+            )
+        }
+    )
+}
+
+private fun convertToOptimizedState(uiState: AllUiState): AllUiState =
+    if (uiState !is AllUiState.Success) uiState
+    else uiState.copy(scheduleResources = uiState.scheduleResources.toIdentityList())
+
+private fun reuseScheduleListIfUnchanged(
+    prev: AllUiState.Success,
+    next: AllUiState.Success
+): AllUiState {
+    if (prev.scheduleResources !is IdentityList
+        || prev.scheduleResources.value != next.scheduleResources
+    ) {
+        return convertToOptimizedState(uiState = next)
+    }
+    return next.copy(scheduleResources = prev.scheduleResources)
+}
+
+@Composable
+private fun AllScreen(
+    uiState: AllUiState,
+    contentDelayTimeMillis: Long,
+    onBackClicked: () -> Unit,
+    onMenuClicked: () -> Unit,
+    onMenuDropdownDismissed: () -> Unit,
+    onSelectionStartClicked: () -> Unit,
+    onSelectionCompleteClicked: () -> Unit,
+    onCompletedScheduleVisibilityChangeClicked: (Boolean) -> Unit,
+    onCompletedSchedulesCleanupClicked: () -> Unit,
+    onCompletedSchedulesCleanupAnswered: (Boolean) -> Unit,
+    onCompletionUpdated: (CompletionUpdate) -> Unit,
+    onDeleteRequested: (Delete) -> Unit,
+    onItemPositionUpdated: (List<UserScheduleListResource>) -> Unit,
+    onItemSelectionChanged: (SelectionUpdate) -> Unit,
+    onOpenDetailRequested: (OpenDetail) -> Unit,
+    onSimpleAdd: (SimpleAdd) -> Unit,
+    onSimpleEdit: (SimpleEdit) -> Unit,
+    onNewPlanClicked: () -> Unit,
+    onSelectedSchedulesTimingConfigClicked: () -> Unit,
+    onSelectedSchedulesCompleteClicked: () -> Unit,
+    onSelectedSchedulesTagClicked: () -> Unit,
+    onSelectedSchedulesDeletionClicked: () -> Unit,
+    onSchedulesDeletionAnswered: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val toolbarState = rememberScheduleListToolbarState()
+    val bottomAppbarState = rememberScheduleListBottomAppbarState()
+    val title = stringResource(StringIds.label_all)
+    val successUiState = uiState as? AllUiState.Success
+    Box(
+        modifier = modifier
+            .background(color = PlaneatTheme.colors.bg2)
+            .fillMaxSize()
+    ) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            ScheduleListToolbar(
+                title = title,
+                toolbarState = toolbarState,
+                menuVisible = successUiState?.selectionEnabled?.not() ?: true,
+                menuDropdown = successUiState?.let { state ->
+                    MenuDropdown(isVisible = state.menuExpanded) {
+                        MenuDropdown(
+                            isCompletedScheduleShown = state.stats.completedShown,
+                            onSelectionStartClicked = onSelectionStartClicked,
+                            onCompletedScheduleVisibilityChangeClicked = onCompletedScheduleVisibilityChangeClicked,
+                            onDismissed = onMenuDropdownDismissed,
+                        )
+                    }
+                },
+                onMenuClicked = onMenuClicked,
+                selectionCompleteVisible = successUiState?.selectionEnabled ?: false,
+                onSelectionCompleteClicked = onSelectionCompleteClicked,
+                onBackClicked = onBackClicked,
+            )
+            DelayedContent(delayTimeMillis = contentDelayTimeMillis) {
+                when (uiState) {
+                    is AllUiState.Loading -> {
+                        // todo make loading.
+                    }
+
+                    is AllUiState.Success -> {
+                        AllScheduleListContent(
+                            headline = title,
+                            entryAt = uiState.entryAt,
+                            scheduleResources = uiState.scheduleResources,
+                            completedScheduleShown = uiState.stats.completedShown,
+                            completedScheduleCount = uiState.stats.completedCount,
+                            replayStamp = uiState.replayStamp,
+                            multiSelectionEnabled = uiState.selectionEnabled,
+                            toolbarState = toolbarState,
+                            bottomAppbarState = bottomAppbarState,
+                            onItemSelectionChanged = onItemSelectionChanged,
+                            onCompletionUpdated = onCompletionUpdated,
+                            onDeleteRequested = onDeleteRequested,
+                            onItemPositionUpdated = onItemPositionUpdated,
+                            onOpenDetailRequested = onOpenDetailRequested,
+                            onSimpleAdd = onSimpleAdd,
+                            onSimpleEdit = onSimpleEdit,
+                            onCompletedSchedulesCleanupRequested = onCompletedSchedulesCleanupClicked
+                        )
+
+                        CompletedSchedulesCleanupConfirmBottomSheetHandler(
+                            confirmation = uiState.completedSchedulesCleanupConfirmation,
+                            onConfirm = { onCompletedSchedulesCleanupAnswered(true) },
+                            onCancel = { onCompletedSchedulesCleanupAnswered(false) }
+                        )
+
+                        SchedulesDeleteConfirmationHandler(
+                            confirmation = uiState.schedulesDeletionConfirmation,
+                            onConfirm = { onSchedulesDeletionAnswered(true) },
+                            onCancel = { onSchedulesDeletionAnswered(false) }
+                        )
+                    }
+                }
+            }
+        }
+
+        ScheduleListBottomAppbar(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth(),
+            bottomAppbarState = bottomAppbarState,
+            isMultiSelectionEnabled = successUiState?.selectionEnabled == true,
+            isMultiSelectionContentEnabled = successUiState?.stats?.selectedCount != null,
+            onTimingConfigClicked = throttleClick(onClick = onSelectedSchedulesTimingConfigClicked),
+            onCompleteClicked = throttleClick(onClick = onSelectedSchedulesCompleteClicked),
+            onTagConfigClicked = throttleClick(onClick = onSelectedSchedulesTagClicked),
+            onDeleteClicked = throttleClick(onClick = onSelectedSchedulesDeletionClicked),
+            onNewPlanClicked = throttleClick(onClick = onNewPlanClicked),
+        )
+    }
+}
+
+@Composable
+private fun AllScheduleListContent(
+    headline: String,
+    entryAt: Instant,
+    scheduleResources: List<UserScheduleListResource>,
+    completedScheduleShown: Boolean,
+    completedScheduleCount: NonNegativeInt,
+    replayStamp: Long,
+    multiSelectionEnabled: Boolean,
+    toolbarState: ScheduleListToolbarState,
+    bottomAppbarState: ScheduleListBottomAppbarState,
+    onItemSelectionChanged: (SelectionUpdate) -> Unit,
+    onCompletionUpdated: (CompletionUpdate) -> Unit,
+    onDeleteRequested: (Delete) -> Unit,
+    onItemPositionUpdated: (List<UserScheduleListResource>) -> Unit,
+    onOpenDetailRequested: (OpenDetail) -> Unit,
+    onSimpleAdd: (SimpleAdd) -> Unit,
+    onSimpleEdit: (SimpleEdit) -> Unit,
+    onCompletedSchedulesCleanupRequested: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val navBarsPaddings = WindowInsets.navigationBars.asPaddingValues()
+    val footerForm = remember {
+        ScheduleListItem.FooterForm(formBottomLine = FormBottomLine.Type1)
+    }
+    val scheduleListItemsAdaptation by rememberScheduleListItemsAdaptationState(
+        headline = headline,
+        elements = scheduleResources,
+        elementsReplayStamp = replayStamp,
+        buildBodyItems = { elements ->
+            buildList {
+                if (completedScheduleShown) {
+                    this += ScheduleListItem.ClearableCompletedSubHeadline(
+                        completedScheduleCount = completedScheduleCount
+                    )
+                }
+
+                elements.forEach { resource ->
+                    this += ScheduleListItem.Content(
+                        resource = resource,
+                        isLineVisible = true
+                    )
+                }
+
+                this += footerForm
+            }
+        }
+    )
+    ScheduleListContent(
+        modifier = modifier,
+        scheduleListItemsAdaptation = scheduleListItemsAdaptation,
+        entryAt = entryAt,
+        multiSelectionEnabled = multiSelectionEnabled,
+        triggerAtFormatPatterns = remember { AllScheduleTriggerAtFormatPatterns() },
+        theme = ScheduleListTheme.Point3,
+        listBottomScrollPadding = remember(navBarsPaddings) {
+            navBarsPaddings.calculateBottomPadding()
+        },
+        toolbarState = toolbarState,
+        bottomAppbarState = bottomAppbarState,
+        onSelectionUpdated = onItemSelectionChanged,
+        onCompletionUpdated = onCompletionUpdated,
+        onDeleteRequested = onDeleteRequested,
+        onItemPositionUpdated = { itemPositionUpdated ->
+            val userScheduleListResources = buildList {
+                itemPositionUpdated.snapshot.forEach { item ->
+                    if (item is ScheduleListItem.Content) {
+                        this += item.resource
+                    }
+                }
+            }
+            onItemPositionUpdated(userScheduleListResources)
+        },
+        onOpenDetailRequested = onOpenDetailRequested,
+        onSimpleAdd = onSimpleAdd,
+        onSimpleEdit = onSimpleEdit,
+        onCompletedSchedulesCleanupRequested = onCompletedSchedulesCleanupRequested,
+    )
+}
+
+@Composable
+private fun MenuDropdown(
+    isCompletedScheduleShown: Boolean,
+    onSelectionStartClicked: () -> Unit,
+    onCompletedScheduleVisibilityChangeClicked: (Boolean) -> Unit,
+    onDismissed: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    PlaneatDropdownMenu(
+        modifier = modifier.width(250.dp),
+        onDismissRequest = onDismissed,
+        expanded = true
+    ) {
+        PlaneatDropdownMenuItem(
+            text = {
+                PlaneatDropdownText(text = stringResource(StringIds.content_select_plans))
+            },
+            leadingIcon = {
+                PlaneatDropdownIcon(
+                    painter = painterResource(DrawableIds.ic_round_check_stroke_24)
+                )
+            },
+            onClick = {
+                onSelectionStartClicked()
+                onDismissed()
+            }
+        )
+
+        PlaneatDropdownDivider()
+
+        PlaneatDropdownMenuItem(
+            text = {
+                PlaneatDropdownText(
+                    text = stringResource(
+                        if (isCompletedScheduleShown) StringIds.content_completed_hidden
+                        else StringIds.content_completed_shown
+                    )
+                )
+            },
+            leadingIcon = {
+                PlaneatDropdownIcon(
+                    painter = painterResource(
+                        if (isCompletedScheduleShown) DrawableIds.ic_eye_invisible_24
+                        else DrawableIds.ic_eye_visible_24
+                    )
+                )
+            },
+            onClick = {
+                onCompletedScheduleVisibilityChangeClicked(isCompletedScheduleShown.not())
+                onDismissed()
+            }
+        )
+    }
+}
+
+@Previews
+@Composable
+private fun AllScreenPreview() {
+    PlaneatTheme {
+        AllScreen(
+            contentDelayTimeMillis = 0,
+            uiState = AllUiState.Loading,
+            onBackClicked = {},
+            onMenuClicked = {},
+            onMenuDropdownDismissed = {},
+            onSelectionStartClicked = {},
+            onSelectionCompleteClicked = {},
+            onCompletedScheduleVisibilityChangeClicked = {},
+            onCompletedSchedulesCleanupClicked = {},
+            onCompletedSchedulesCleanupAnswered = {},
+            onCompletionUpdated = {},
+            onDeleteRequested = {},
+            onItemPositionUpdated = {},
+            onItemSelectionChanged = {},
+            onOpenDetailRequested = {},
+            onSimpleAdd = {},
+            onSimpleEdit = {},
+            onNewPlanClicked = {},
+            onSelectedSchedulesTimingConfigClicked = {},
+            onSelectedSchedulesCompleteClicked = {},
+            onSelectedSchedulesTagClicked = {},
+            onSelectedSchedulesDeletionClicked = {},
+            onSchedulesDeletionAnswered = {}
+        )
+    }
+}
