@@ -4,7 +4,7 @@
 [versions]
 
 # build Environmental
-compileSdk = "37"
+compileSdk = "37.1"
 targetSdk = "35"
 minSdk = "24"
 
@@ -13,7 +13,7 @@ androidGradlePlugin = "9.5.2"
 androidxAnnotation = "1.11.0"
 androidxAppCompat = "1.8.0"
 androidxCardview = "1.0.0"
-androidxComposeBom = "2026.09.00"
+androidxComposeBom = "2026.11.01"
 androidxConstaintLayout = "2.2.2"
 androidxCoreKtx = "1.19.1"
 androidxCoreSplashScreen = "1.2.0"
