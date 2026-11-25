@@ -43,7 +43,11 @@ REMINDER_ANDROID/
 ├── app/                      # Main application entry point & Hilt setup
 ├── feature/                  # Feature-level modules
 │   ├── home/                 # Main home screen feature
+│   │   ├── api/              # HomeNavKey (public navigation key only)
+│   │   └── impl/             # Screen, ViewModel/state, homeEntry (depends on other features' api only)
 │   └── all/                  # Aggregate or common feature entry points
+│       ├── api/              # AllNavKey and Navigator.navigateToAll()
+│       └── impl/             # Screen and allEntry
 ├── core/                     # Shared foundation and utility modules
 │   ├── component/            # Reusable UI components (e.g., schedulelist, tag, toolbar, usermessage)
 │   ├── data/                 # Data layer definitions
@@ -57,6 +61,7 @@ REMINDER_ANDROID/
 └── testkit/                  # Shared test utilities and helper modules
 ```
 
+*   **Feature Modules:** each feature is split into `api` (navigation keys and navigation extension functions) and `impl` (screens, ViewModels, entry functions). An `impl` module never depends on another feature's `impl`, only on its `api`.
 *   **Helper Test Modules:** Core component modules have matching `-test` modules (e.g., `:core:component:tag-test`, `:core:component:schedulelist-test`) containing mock data, test configurations, and utilities to isolate test scopes.
 
 ---

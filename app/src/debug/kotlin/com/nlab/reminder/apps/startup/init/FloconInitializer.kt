@@ -19,14 +19,15 @@ package com.nlab.reminder.apps.startup.init
 import android.content.Context
 import androidx.startup.Initializer
 import com.nlab.reminder.apps.startup.EmptyDependencies
-import io.github.openflocon.flocon.Flocon
+import io.github.openflocon.flocon.network.core.FloconNetwork
+import io.github.openflocon.flocon.startFlocon
 
 /**
  * @author Doohyun
  */
 class FloconInitializer : Initializer<Unit> {
     override fun create(context: Context) {
-        Flocon.initialize(context)
+        startFlocon(context) { install(FloconNetwork) }
     }
 
     override fun dependencies() = EmptyDependencies()

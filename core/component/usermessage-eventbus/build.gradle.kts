@@ -15,9 +15,8 @@ dependencies {
     implementation(projects.core.component.usermessage)
     implementation(projects.core.kotlinx.coroutines)
 
-    implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.androidx.hilt.lifecycle.viewmodel.compose)
     implementation(libs.androidx.lifecycle.runtime.compose)
-    implementation(libs.androidx.navigation.compose)
 
     testImplementation(projects.core.component.usermessageTest)
     testImplementation(projects.testkit)
